@@ -139,7 +139,7 @@ pub fn monitoring(board_id          : u8,
 
     // Preamp monitoring routine
     if pa_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*pa_moni_every_x {
-      let mut moni = get_preamp_moni(board_id).unwrap();
+      let moni = get_preamp_moni(board_id).unwrap();
 
       if verbose {
         println!("{}", moni);
@@ -155,7 +155,7 @@ pub fn monitoring(board_id          : u8,
 
     // PB monitoring routine
     if pb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*pb_moni_every_x {
-      let mut moni = get_pb_moni(board_id).unwrap();
+      let moni = get_pb_moni(board_id).unwrap();
 
       if verbose {
         println!("{}", moni);
@@ -171,7 +171,7 @@ pub fn monitoring(board_id          : u8,
 
     // LTB monitoring routine
     if ltb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*ltb_moni_every_x {
-      let mut moni = get_ltb_moni(board_id).unwrap();
+      let moni = get_ltb_moni(board_id).unwrap();
 
       if verbose {
         println!("{}", moni);

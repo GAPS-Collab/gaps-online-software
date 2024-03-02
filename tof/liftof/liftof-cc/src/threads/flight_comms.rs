@@ -10,12 +10,22 @@ use std::time::{
     //Duration,
 };
 
+use std::sync::{
+    Arc,
+    Mutex,
+};
+
+
 extern crate crossbeam_channel;
 use crossbeam_channel::Receiver; 
 
 use tof_dataclasses::packets::{
     TofPacket,
     PacketType
+};
+
+use tof_dataclasses::threading::{
+    ThreadControl,
 };
 
 use tof_dataclasses::monitoring::{
@@ -52,7 +62,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                         write_stream_path  : String,
                         write_npack_file   : usize,
                         runid              : usize,
-                        print_moni_packets : bool) {
+                        print_moni_packets : bool,
+                        thread_control     : Arc<Mutex<ThreadControl>>) {
 
   let ctx = zmq::Context::new();
   // FIXME - should we just move to another socket if that one is not working?
@@ -71,7 +82,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
     //streamfile_name += &runid.to_string();
     let file_type = FileType::RunFile(runid as u32);
     //println!("==> Writing stream to file with prefix {}", streamfile_name);
-    writer = Some(TofPacketWriter::new(write_stream_path, file_type));
+    writer = Some(TofPacketWriter::new(write_stream_path.clone(), file_type));
     writer.as_mut().unwrap().pkts_per_file = write_npack_file;
   }
   //let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
@@ -88,6 +99,38 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         debug!("Got new tof packet {}", pack.packet_type);
         if writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(&pack);
+        }
+        // yeah, this is it. 
+        // catch RBCalibration packets here,
+        // they will end up automatically in 
+        // the stream, but if we catch them 
+        // and expose them to an arc mutex,
+        // the waveform processing could 
+        // access them directly. 
+        match pack.packet_type {
+          PacketType::RBCalibration => {
+            let cali_rb_id = pack.payload[2]; 
+            debug!("Received RBCalibration packet for board {}!", cali_rb_id);
+            // we notify the other threads that we got this specific packet, 
+            // so we know how long we still have to wait
+            match thread_control.lock() {
+              Ok(mut tc) => {
+                // FIXME - unwrap (for bad packets)
+                *tc.finished_calibrations.get_mut(&cali_rb_id).unwrap() = true; 
+              },
+              Err(err) => {
+                error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+              },
+            }
+            
+            // See RBCalibration reference
+            let file_type  = FileType::CalibrationFile(cali_rb_id);
+            //println!("==> Writing stream to file with prefix {}", streamfile_name);
+            let mut cali_writer = TofPacketWriter::new(write_stream_path.clone(), file_type);
+            cali_writer.add_tof_packet(&pack);
+            drop(cali_writer);
+          }
+          _ => ()
         }
         if print_moni_packets {
           let mut pos = 0;

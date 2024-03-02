@@ -165,6 +165,9 @@ pub struct LiftofCCSettings {
   pub rb_ignorelist              : Vec<u8>,
   /// Should TofHits be generated?
   pub run_analysis_engine        : bool,
+  /// Send TofSummary + RBWaveforms instead of 
+  /// TofEvents
+  pub send_flight_packets        : bool,
   /// Settings to control the MTB
   pub mtb_settings               : MTBSettings,
   /// Settings for the TOF event builder
@@ -187,6 +190,7 @@ impl LiftofCCSettings {
       cpu_moni_interval_sec     : 60,
       rb_ignorelist             : Vec::<u8>::new(),
       run_analysis_engine       : true,
+      send_flight_packets       : false,
       mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),

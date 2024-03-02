@@ -1,4 +1,3 @@
-use std::net::IpAddr;
 use std::env;
 use std::path::Path;
 use std::fs;
@@ -61,10 +60,10 @@ fn find_missing_elements(nums: &[u32]) -> Vec<u32> {
 ///                   write it with this name.
 ///                   In case of a calibration file, then 
 ///                   also save it in the dedicated foler.
+///                   If this is None, don't write anything.
 /// * print_packets : Print outgoing packets to terminal
 ///
 pub fn data_publisher(data           : &Receiver<TofPacket>,
-                      write_to_disk  : bool,
                       address        : String,
                       output_fname   : Option<String> ,
                       testing        : bool,
@@ -79,49 +78,51 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
   data_socket.bind(&address).expect("Unable to bind to data (PUB) socket {data_adress}");
   info!("0MQ PUB socket bound to address {address}");
 
-  let mut file_on_disk : Option<File> = None;//let mut output = File::create(path)?;
-  if write_to_disk {
-    let fname : String;
-    match output_fname {
-      None => {
-        fname = String::from("Unknown.tof.gaps");
-      }
-      Some(_fname) => {
-        fname = _fname;
-      }
+  let mut file_on_disk : Option<File>;//let mut output = File::create(path)?;
+  //if write_to_disk {
+  let fname : String;
+  let write_to_disk;
+  match output_fname {
+    None => {
+      fname = String::from("Unknown.tof.gaps");
+      write_to_disk = false;
     }
-    let datafile_output_file = Path::new(&fname);
-    // in case it is a calibration file, delete any old 
-    // calibration and write it to a specific location
-    let home      = env::var_os("HOME").unwrap_or(OsString::from("/home/gaps"));
-    let calib_dir = home.to_string_lossy().to_string() + "/calib"; 
-    if fname.ends_with("cali.tof.gaps") {
-      match fs::metadata(&calib_dir) {
-        Ok(metadata) => {
-          // Check if the metadata is for a directory
-          if !metadata.is_dir() {
-            error!("The path exists, but it is not a directory.");
+    Some(_fname) => {
+      fname = _fname;
+      write_to_disk = true;
+    }
+  }
+  let datafile_output_file = Path::new(&fname);
+  // in case it is a calibration file, delete any old 
+  // calibration and write it to a specific location
+  let home      = env::var_os("HOME").unwrap_or(OsString::from("/home/gaps"));
+  let calib_dir = home.to_string_lossy().to_string() + "/calib"; 
+  if fname.ends_with("cali.tof.gaps") {
+    match fs::metadata(&calib_dir) {
+      Ok(metadata) => {
+        // Check if the metadata is for a directory
+        if !metadata.is_dir() {
+          error!("The path exists, but it is not a directory.");
+        }
+      }
+      Err(_) => {
+        // An error occurred, which typically means the directory does not exist
+        warn!("No calibration directory found. Will create {}", calib_dir);
+        match fs::create_dir(calib_dir.clone()) {
+          Ok(_) => (),
+          Err(err) => {
+            error!("Can not create {}! Err {err}", calib_dir)
           }
         }
-        Err(_) => {
-          // An error occurred, which typically means the directory does not exist
-          warn!("No calibration directory found. Will create {}", calib_dir);
-          match fs::create_dir(calib_dir.clone()) {
-            Ok(_) => (),
-            Err(err) => {
-              error!("Can not create {}! Err {err}", calib_dir)
-            }
-          }
-        }
-      } // end match
-      let calib_file = Path::new(&calib_dir);
-      let local_file = calib_file.join(fname);
-      info!("Writing calibration to {}", local_file.display() );
-      file_on_disk = OpenOptions::new().create(true).write(true).open(local_file).ok()
-    } else {
-      info!("Writing to local file {}!", fname );
-      file_on_disk = OpenOptions::new().append(true).create(true).open(datafile_output_file).ok()
-    }
+      }
+    } // end match
+    let calib_file = Path::new(&calib_dir);
+    let local_file = calib_file.join(fname);
+    info!("Writing calibration to {}", local_file.display() );
+    file_on_disk = OpenOptions::new().create(true).write(true).open(local_file).ok()
+  } else {
+    info!("Writing to local file {}!", fname );
+    file_on_disk = OpenOptions::new().append(true).create(true).open(datafile_output_file).ok()
   }
  
   // these are only required for testing
@@ -250,7 +251,11 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
             trace!("0MQ PUB socket.send() SUCCESS!");
             n_sent += 1;
           },
-          Err(err) => error!("Not able to send over 0MQ PUB socket! Err {err}"),
+          Err(err) => error!("Not able to send {} over 0MQ PUB socket! {err}", packet.packet_type),
+        }
+        if packet.packet_type == PacketType::RBCalibration {
+          //info!("==> last data type {:?}", data_type);
+          info!("==> Calibration packet {} sent!", packet );
         }
         if n_sent % 1000 == 0 && n_sent > 0 && print_packets {
           println!("==> We sent {n_sent} packets!");

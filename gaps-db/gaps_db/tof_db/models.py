@@ -1,5 +1,26 @@
 from django.db import models
 
+#class LiftofSettings(models.Model):
+#    """
+#    Run settings to be used with liftof-cc
+#    """
+#    data_dir                   : model.String,
+#    calibration_dir            : model.String,
+#    db_path                    : model.String,
+#    runtime_sec                : model.PositiveBigIntegerField(blank=True, null=True)
+#    packs_per_file             : model.PositiveBigIntegerField(blank=True, null=True)
+#    fc_pub_address             : model.String,
+#    fc_sub_address             : model.String,
+#    mtb_address                : model.String,
+#    cpu_moni_interval_sec      : model.PositiveBigIntegerField(blank=True, null=True)
+#    rb_ignorelist              : model.Vec<u8>,
+#    run_analysis_engine        : model.bool,
+#  #mtb_settings               : MTBSettings,
+#  #event_builder_settings     : TofEventBuilderSettings,
+#  #analysis_engine_settings   : AnalysisEngineSettings,
+
+
+
 class MTBChannel(models.Model):
     """
     Summary of DSI/J/LTBCH (0-319)

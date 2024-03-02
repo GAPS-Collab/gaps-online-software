@@ -70,8 +70,9 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
   }
   // no need to subscribe to a topic, since there 
   // is one port for each rb
-  let topic = b"";
-  match socket.set_subscribe(topic) {
+  let topic = format!("RB{:02}", board_id);
+  //let topic = b"";
+  match socket.set_subscribe(&topic.as_bytes()) {
    Err(err) => error!("Unable to subscribe to topic! {err}"),
    Ok(_)    => info!("Subscribed to {:?}!", topic),
   }

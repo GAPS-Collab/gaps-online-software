@@ -9,27 +9,24 @@ use crossbeam_channel::{Sender,
                         Receiver};
 
 use tof_dataclasses::events::DataType;
-use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::packets::{
     TofPacket,
-    PacketType
+    //PacketType
 };
 use tof_dataclasses::io::RBEventMemoryStreamer;
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::threading::ThreadControl;
 use tof_dataclasses::events::EventStatus;
 use tof_dataclasses::commands::{
-    RBCommand,
+    //RBCommand,
     TofOperationMode,
 };
-use tof_dataclasses::RBChannelPaddleEndIDMap;
+//use tof_dataclasses::RBChannelPaddleEndIDMap;
 
 use liftof_lib::{
     RunStatistics,
     waveform_analysis,
 };
-
-use crate::control::get_board_id;
 
 ///  Transforms raw bytestream to TofPackets
 ///
@@ -40,9 +37,6 @@ use crate::control::get_board_id;
 ///  
 ///  * board_id            : The unique ReadoutBoard identifier
 ///                          (ID) of this RB
-///  * tp_recv             : A receiver for TofPackets. This
-///                          will receive RBCommands with 
-///                          event ids to consider.
 ///  * bs_recv             : A receiver for bytestreams. The 
 ///                          bytestream comes directly from 
 ///                          the data buffers.
@@ -67,12 +61,10 @@ use crate::control::get_board_id;
 ///                          This only applies when the op mode is not 
 ///                          RBHighThroughput
 pub fn event_processing(board_id            : u8,
-                        tp_recv             : &Receiver<TofPacket>,
                         bs_recv             : &Receiver<Vec<u8>>,
                         get_op_mode         : &Receiver<TofOperationMode>, 
                         tp_sender           : &Sender<TofPacket>,
                         dtf_fr_runner       : &Receiver<DataType>,
-                        paddle_map          : RBChannelPaddleEndIDMap, 
                         verbose             : bool,
                         calc_crc32          : bool,
                         thread_control      : Arc<Mutex<ThreadControl>>,
@@ -101,7 +93,6 @@ pub fn event_processing(board_id            : u8,
     cali_loaded = false;
   }
   // FIXME - deprecate!
-  let mut op_mode_stream  = true;
   let mut events_not_sent : u64 = 0;
   let mut data_type       : DataType   = DataType::Unknown;
   //let one_milli           = Duration::from_millis(1);
@@ -112,8 +103,6 @@ pub fn event_processing(board_id            : u8,
   // events. This means we might want to wait for 50 MTE
   // events?
   let mut skipped_events : usize = 0;
-  let mut n_request = 0;
-  let ev_buff_size = 50;
   let mut n_events = 0usize;
   'main : loop {
     match thread_control.lock() {
@@ -135,7 +124,6 @@ pub fn event_processing(board_id            : u8,
           warn!("Will change operation mode to {:?}!", mode);
           match mode {
             TofOperationMode::Default    => {
-              op_mode_stream = true;
               streamer.request_mode = false;
               op_mode = mode;
             },
@@ -214,7 +202,7 @@ pub fn event_processing(board_id            : u8,
               match streamer.next_tofpacket() {
                 None => {
                   streamer.is_depleted = true;
-                  continue;
+                  continue 'main;
                 },
                 Some(tp) => {
                   tp_to_send = tp;

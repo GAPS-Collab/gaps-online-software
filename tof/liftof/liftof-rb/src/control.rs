@@ -80,7 +80,10 @@ pub fn soft_reset_board() -> Result<(), RegisterError> {
     ncycles += 1;
     if ncycles % 10 == 0 {
       error!("Not getting SOFT_RESET_DONE acknowledged. Will try DMA reset");
-      reset_dma();
+      match reset_dma() {
+        Err(err) => error!("Unable to reset DMA! {err}"),
+        Ok(_)    => ()
+      }
     }
     if ncycles == 29 {
       return Err(RegisterError::RegisterTimeOut);     

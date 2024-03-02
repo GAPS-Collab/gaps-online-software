@@ -1,7 +1,21 @@
 # NIUHI series
 
+## v0.9.5
+* revamps configuration - use the same
+  .toml file as liftof-cc
+* redoes command line arguments
+  use CommandRB now to set the 
+  listen flag
+* removes a bunch of outdated
+  commandline arguments
+* prepare to actually listen to liftof-cc
+
+
+## v0.9.3/0.9.4
+* adopts to upstream changes
+
 ## v0.9.2
-* fixe 4 packet calibration bug by using a 
+* fixes 4 packet calibration bug by using a 
   a workaround for now
 
 ## v0.9.1

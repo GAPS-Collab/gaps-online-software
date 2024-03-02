@@ -140,7 +140,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
   
   // this are all settings for the progress bar
   let mut template_bar_n_ev : &str;
-  let mut sty_ev : ProgressStyle;
+  let mut sty_ev     : ProgressStyle;
   let mut multi_prog : MultiProgress;
   let mut prog_a  = ProgressBar::hidden();
   let mut prog_b  = ProgressBar::hidden();

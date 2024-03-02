@@ -1,24 +1,128 @@
-use std::time::Instant;
-
-use crossbeam_channel::{
-    Receiver,
-    Sender,
+use std::thread;
+use std::time::{
+    Instant,
+    Duration
+};
+use std::sync::{
+    Arc,
+    Mutex
 };
 
 use std::collections::VecDeque;
 use std::collections::HashMap;
 //use std::path::Path;
 
+use crossbeam_channel::{
+    Receiver,
+    Sender,
+};
+
+
 use tof_dataclasses::events::{MasterTriggerEvent,
                               TofEvent,
                               RBEvent};
-use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
-use crate::settings::{
+use tof_dataclasses::packets::TofPacket;
+use tof_dataclasses::manifest::get_dsi_j_ltbch_vs_rbch_map;
+use tof_dataclasses::threading::ThreadControl;
+
+use liftof_lib::settings::{
     TofEventBuilderSettings,
     BuildStrategy
 };
-use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::manifest::get_dsi_j_ltbch_vs_rbch_map;
+use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
+use crate::settings::{
+    //TofEventBuilderSettings,
+    //BuildStrategy
+};
+
+use colored::Colorize;
+
+// debug the number of rb events we got from the individual boards
+
+fn heartbeat_formatter() {
+  let fwidth = 56;
+  let n_mte_received_tot = 0;
+  let mut repr = String::from("");
+  repr += &String::from("  >> == == == == ==  EVTBLDR HEARTBEAT  == == == == == <<").bright_purple().bold();
+  repr += &format!("  >> {:fwidth$} <<<", format!("Received MTEvents \t{}", n_mte_received_tot)).bright_purple().bold();
+  //println!("  {:fwidth$}", ">> == == == == ==  EVTBLDR HEARTBEAT   == == == == == <<".bright_purple().bold());
+  //println!("  {:fwidth$} <<", format!(">> ==> Received MTEvents \t{}", n_mte_received_tot).bright_purple());
+  //println!("  {:fwidth$} <<", format!(">> ==> Received RBEvents \t{}", n_rbe_received_tot).bright_purple());
+  //println!("  {:fwidth$} <<", format!(">> ==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid).bright_purple());
+  //println!("  {:fwidth$} <<", format!(">> ==> Size of event cache    \t{}", event_cache.len()).bright_purple());
+  //println!("  {:fwidth$} <<", format!(">> ==> Size of event ID cache \t{}", event_id_cache.len()).bright_purple());
+  //println!("  {:fwidth$} <<", format!(">> ==> Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!").bright_purple());
+  //println!("  {:fwidth$} <<", format!(">> ==> Sent {} events!", n_sent).bright_purple());
+  //println!("  {:fwidth$} <<", format!(">> ==> Chn len MTE receiver\t {}",m_trig_ev.len() ).bright_purple());
+  //println!("  {:fwidth$} <<", format!(">> ==> Chn len RBE receiver\t {}",ev_from_rb.len()).bright_purple());
+  //println!("  {:fwidth$} <<", format!(">> ==> Chn len TP  sender  \t {}",data_sink.len()).bright_purple());
+  //if n_sent > 0 {
+  //  let av_rb_ev = n_rbs_per_ev as f64 / n_sent as f64;
+  //  println!(">> ==> Average number of RBEvents/TofEvent {:4.2}", av_rb_ev);
+  //}
+  //if n_mte_received_tot > 0 {
+  //  let to_frac = n_timed_out as f64 / n_mte_received_tot as f64;
+  //  println!(">> ==> Fraction of timed out events {:4.2}", to_frac);
+  //}
+  //println!(">> ==> RBEvents received overview:");
+  ////let mut rbtable_repr = String::from(">> ");
+  ////for k in seen_rbevents.keys() {
+  ////  println!(">> >> RB {}  : {}", k, seen_rbevents[k]);
+  ////}
+  //
+  //let mut key_value_pairs: Vec<_> = seen_rbevents.iter().collect();
+  //let mut head0 = String::from(">> >> ");
+  //let mut row0  = String::from(">> >> ");
+  //let mut head1 = String::from(">> >> ");
+  //let mut row1  = String::from(">> >> ");
+  //let mut head2 = String::from(">> >> ");
+  //let mut row2  = String::from(">> >> ");
+  //let mut head3 = String::from(">> >> ");
+  //let mut row3  = String::from(">> >> ");
+  //let mut head4 = String::from(">> >> ");
+  //let mut row4  = String::from(">> >> ");
+  //key_value_pairs.sort_by(|a, b| a.0.cmp(b.0));
+  //for (key, value) in key_value_pairs {
+  //    if key < &10 {
+  //      head0 += &(format!(" RB {:02}\t| ", key)); 
+  //      row0  += &(format!(" {}\t| ", value));
+  //      continue;
+  //    }
+  //    if key < &20 {
+  //      head1 += &(format!(" RB {:02}\t| ", key)); 
+  //      row1  += &(format!(" {}\t| ", value));
+  //      continue;
+  //    }
+  //    if key < &30 {
+  //      head2 += &(format!(" RB {:02}\t| ", key)); 
+  //      row2  += &(format!(" {}\t| ", value));
+  //      continue;
+  //    }
+  //    if key < &40 {
+  //      head3 += &(format!(" RB {:02}\t| ", key)); 
+  //      row3  += &(format!(" {}\t| ", value));
+  //      continue;
+  //    }
+  //    if key < &50 {
+  //      head4 += &(format!(" RB {:02}\t| ", key)); 
+  //      row4  += &(format!(" {}\t| ", value));
+  //      continue;
+  //    }
+  //    //println!(">> >> RB {} : {}", key, value);
+  //}
+  //println!("  {}", head0);
+  //println!("  {}", row0);
+  //println!("  {}", head1);
+  //println!("  {}", row1);
+  //println!("  {}", head2);
+  //println!("  {}", row2);
+  //println!("  {}", head3);
+  //println!("  {}", row3);
+  //println!("  {}", head4);
+  //println!("  {}", row4);
+  //println!("  {}",">> == == == == ==  END HEARTBEAT! == == == == == <<".bright_purple().bold());
+}
+
 
 /// Events ... assemble! 
 ///
@@ -36,8 +140,6 @@ use tof_dataclasses::manifest::get_dsi_j_ltbch_vs_rbch_map;
 ///                    channel. The event will be either build 
 ///                    immediatly, or cached. 
 ///
-/// * dsi_j_mapping  : A HashMap of some Hashmaps which makes the 
-///                    following connection DSI/J/LTB_CH -> RBID, RBCH
 /// * pp_query       : Send request to a paddle_packet cache to send
 ///                    Paddle packets with the given event id
 /// * paddle_packets : Receive paddle_packets from a paddle_packet
@@ -51,7 +153,18 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                       data_sink      : &Sender<TofPacket>,
                       run_id         : u32,
                       db_path        : String,
-                      mut settings   : TofEventBuilderSettings) { 
+                      mut settings   : TofEventBuilderSettings,
+                      thread_control : Arc<Mutex<ThreadControl>>) { 
+  // debug the number of rb events we have seen 
+  let mut seen_rbevents      = HashMap::<u8, usize>::new();
+  // 10, 12, 37,38, 43, 45 don't exist
+  for k in 1..47 {
+    if k == 10 || k ==12 || k == 37 || k == 38 || k == 43 || k == 45 {
+      continue;
+    } else {
+      seen_rbevents.insert(k as u8, 0);
+    }
+  }
   // event caches for assembled events
   let mut event_cache        = HashMap::<u32, TofEvent>::new();
   let mut event_id_cache     = VecDeque::<u32>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
@@ -69,15 +182,37 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut last_rb_evid       = 0u32;
   let mut n_rbs_per_ev       = 0usize;
   let mut rb_ev_wo_mte       = 0usize;
-
+  let mut debug_timer = Instant::now();
+    
+  let mut n_receiving_errors = 0;
+  let mut check_tc_update    = Instant::now();
   loop {
+    if check_tc_update.elapsed().as_secs() > 5 {
+      match thread_control.lock() {
+        Ok(tc) => {
+          if tc.calibration_active {
+            thread::sleep(Duration::from_secs(1));
+            continue;
+          } else {
+            check_tc_update = Instant::now();
+          }
+        },
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        },
+      }
+    }
+    if n_receiving_errors == 1000 {
+      error!("Trying to get a new MTEvent failed {}", n_receiving_errors);
+      n_receiving_errors = 0;
+    }
     n_received = 0;
-    let debug_timer = Instant::now();
     while n_received < settings.n_mte_per_loop {
       // every iteration, we welcome a new master event
       match m_trig_ev.try_recv() {
         Err(_) => {
           trace!("No new event ready yet!");
+          n_receiving_errors += 1;
           continue;
         }   
         Ok(mt) => {
@@ -97,6 +232,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           // use this to keep track of the order
           // of events
           event_id_cache.push_back(last_evid);
+          
         }
       } // end match Ok(mt)
       n_received  += 1;
@@ -128,6 +264,14 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           //println!("==> Len evt cache {}", event_cache.len());
           n_rbe_received_tot += 1;
           n_received += 1;
+          match seen_rbevents.get_mut(&rb_ev.header.rb_id) {
+            Some(value) => {
+              *value += 1;
+            }
+            None => {
+              error!("Unable to do bookkeeping for RB {}", rb_ev.header.rb_id);
+            }
+          }
           //iter_ev = 0;
           last_rb_evid = rb_ev.header.event_id;
           if last_rb_evid < first_evid {
@@ -203,27 +347,88 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         settings.n_rbe_per_loop = 40;
       }
     }
-    if n_mte_received_tot % 50 == 0 {
-      println!("[EVTBLDR] ==> Received {} MTE", n_mte_received_tot);
-      println!("[EVTBLDR] ==> Received {n_rbe_received_tot} RBEvents!");
-      println!("[EVTBLDR] ==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid);
-      println!("[EVTBLDR] ==> Size of event cache {}", event_cache.len());
-      println!("[EVTBLDR] ==> Size of event ID cache {}", event_id_cache.len());
-      println!("[EVTBLDR] ==> Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!");
-      println!("[EVTBLDR] ==> Sent {n_sent} events!");
-      println!("[EVTBLDR] ==> Chn len MTE receiver {}",m_trig_ev.len() );
-      println!("[EVTBLDR] ==> Chn len RBE receiver {}",ev_from_rb.len());
-      println!("[EVTBLDR] ==> Chn len TP  sender   {}",data_sink.len());
-      
+    let debug_timer_elapsed = debug_timer.elapsed().as_secs_f64();
+    if debug_timer_elapsed > 35.0  {
+      let fwidth = 56;
+      println!("  {:fwidth$}", ">> == == == == ==  EVTBLDR HEARTBEAT   == == == == == <<".bright_purple().bold());
+    //if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
+      println!("  {:fwidth$} <<", format!(">> ==> Received MTEvents \t{}", n_mte_received_tot).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Received RBEvents \t{}", n_rbe_received_tot).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Size of event cache    \t{}", event_cache.len()).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Size of event ID cache \t{}", event_id_cache.len()).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!").bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Sent {} events!", n_sent).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Chn len MTE receiver\t {}",m_trig_ev.len() ).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Chn len RBE receiver\t {}",ev_from_rb.len()).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Chn len TP  sender  \t {}",data_sink.len()).bright_purple());
       if n_sent > 0 {
         let av_rb_ev = n_rbs_per_ev as f64 / n_sent as f64;
-        println!("[EVTBLDR] ==> Average number of RBEvents/TofEvent {:4.2}", av_rb_ev);
+        println!(">> ==> Average number of RBEvents/TofEvent {:4.2}", av_rb_ev);
       }
       if n_mte_received_tot > 0 {
         let to_frac = n_timed_out as f64 / n_mte_received_tot as f64;
-        println!("[EVTBLDR] ==> Fraction of timed out events {:4.2}", to_frac);
+        println!(">> ==> Fraction of timed out events {:4.2}", to_frac);
       }
+      println!(">> ==> RBEvents received overview:");
+      //let mut rbtable_repr = String::from(">> ");
+      //for k in seen_rbevents.keys() {
+      //  println!(">> >> RB {}  : {}", k, seen_rbevents[k]);
+      //}
+      
+      let mut key_value_pairs: Vec<_> = seen_rbevents.iter().collect();
+      let mut head0 = String::from(">> >> ");
+      let mut row0  = String::from(">> >> ");
+      let mut head1 = String::from(">> >> ");
+      let mut row1  = String::from(">> >> ");
+      let mut head2 = String::from(">> >> ");
+      let mut row2  = String::from(">> >> ");
+      let mut head3 = String::from(">> >> ");
+      let mut row3  = String::from(">> >> ");
+      let mut head4 = String::from(">> >> ");
+      let mut row4  = String::from(">> >> ");
+      key_value_pairs.sort_by(|a, b| a.0.cmp(b.0));
+      for (key, value) in key_value_pairs {
+          if key < &10 {
+            head0 += &(format!(" RB {:02}\t| ", key)); 
+            row0  += &(format!(" {}\t| ", value));
+            continue;
+          }
+          if key < &20 {
+            head1 += &(format!(" RB {:02}\t| ", key)); 
+            row1  += &(format!(" {}\t| ", value));
+            continue;
+          }
+          if key < &30 {
+            head2 += &(format!(" RB {:02}\t| ", key)); 
+            row2  += &(format!(" {}\t| ", value));
+            continue;
+          }
+          if key < &40 {
+            head3 += &(format!(" RB {:02}\t| ", key)); 
+            row3  += &(format!(" {}\t| ", value));
+            continue;
+          }
+          if key < &50 {
+            head4 += &(format!(" RB {:02}\t| ", key)); 
+            row4  += &(format!(" {}\t| ", value));
+            continue;
+          }
+          //println!(">> >> RB {} : {}", key, value);
+      }
+      println!("  {}", head0);
+      println!("  {}", row0);
+      println!("  {}", head1);
+      println!("  {}", row1);
+      println!("  {}", head2);
+      println!("  {}", row2);
+      println!("  {}", head3);
+      println!("  {}", row3);
+      println!("  {}", head4);
+      println!("  {}", row4);
+      println!("  {}",">> == == == == ==  END HEARTBEAT! == == == == == <<".bright_purple().bold());
       //println!("[EVTBLDR] ==> Last RB evid {last_rb_evid}");
+      debug_timer = Instant::now(); 
     }
     trace!("Debug timer RBE received! {:?}", debug_timer.elapsed());
     //if event_sending == send_every_x_event {

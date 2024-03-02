@@ -1,4 +1,6 @@
 use std::path::Path;
+use std::time::Duration;
+use std::thread;
 use std::sync::{
     Arc,
     Mutex,
@@ -28,7 +30,7 @@ use crate::api::{rb_calibration,
                  send_ltb_threshold_set,
                  power_preamp,
                  power_ltb,
-                 get_runconfig,
+                 //get_runconfig,
                  prefix_board_id,
                  DATAPORT};
 use crate::threads::monitoring::{get_ltb_moni, get_pb_moni, get_rb_moni};
@@ -47,50 +49,53 @@ use crate::control::{get_board_id_string,
 ///
 /// # Arguments
 ///
-/// * cmd_server_ip             : The IP addresss of the C&C server we are listening to.
-/// * run_config_file           : The default runconfig file. When we receive a simple
-///                               DataRunStartCommand, we will run this configuration
-/// * run_config                : A sender to send the dedicated run config to the 
+/// * cmd_server_address        : The full address string e.g. tcp://1.1.1.1:12345 
+///                               where the command server is publishing commands..
+/// * run_config                : The default runconfig. Defined by reading in the 
+///                               config file when the code boots up.
+///                               When we receive a simple DataRunStartCommand,
+///                               we will run this configuration
+/// * run_config_sender         : A sender to send the dedicated run config to the 
 ///                               runner
 /// * ev_request_to_cache       : When receiveing RBCommands which contain requests,
 ///                               forward them to event processing.
 /// * address_for_cali          : The local (self) PUB address, so that the rb_calibratoin,
 ///                               can subscribe to it to loop itself the event packets
 /// * thread_control            : Manage thread control signals, e.g. stop
-pub fn cmd_responder(cmd_server_ip             : String,
-                     run_config_file           : &Path,
-                     run_config                : &Sender<RunConfig>,
+pub fn cmd_responder(cmd_server_address        : String,
+                     run_config                : &RunConfig,
+                     run_config_sender         : &Sender<RunConfig>,
+                     //FIXME - this has to go away. There are no 
+                     //event requests any more
                      ev_request_to_cache       : &Sender<TofPacket>,
                      address_for_cali          : String,
                      thread_control            : Arc<Mutex<ThreadControl>>) {
   // create 0MQ sockedts
   //let one_milli       = time::Duration::from_millis(1);
-  let port = DATAPORT.to_string();
-  let cmd_address = build_tcp_from_ip(cmd_server_ip,port);
-  // we will subscribe to two types of messages, BRCT and RB + 2 digits 
-  // of board id
-  let topic_board = get_board_id_string().expect("Can not get board id!");
+  //let port            = DATAPORT.to_string();
+  //let cmd_address     = build_tcp_from_ip(cmd_server_ip,port);
+  //// we will subscribe to two types of messages, BRCT and RB + 2 digits 
+  //// of board id
+  let topic_board     = get_board_id_string().expect("Can not get board id!");
   let topic_broadcast = String::from("BRCT");
   let ctx = zmq::Context::new();
   // I guess expect is fine here, see above
   let cmd_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
-  info!("Will set up 0MQ SUB socket to listen for commands at address {cmd_address}");
+  info!("Will set up 0MQ SUB socket to listen for commands at address {cmd_server_address}");
   let mut is_connected = false;
-  match cmd_socket.connect(&cmd_address) {
-    Err(err) => warn!("Not able to connect to {}, Error {err}", cmd_address),
+  match cmd_socket.connect(&cmd_server_address) {
+    Err(err) => warn!("Not able to connect to {}, Error {err}", cmd_server_address),
     Ok(_)    => {
-      info!("Connected to CnC server at {}", cmd_address);
+      info!("Connected to CnC server at {}", cmd_server_address);
+      match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
+        Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
+        Ok(_)    => ()
+      }
+      match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
+        Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
+        Ok(_)    => ()
+      }
       is_connected = true;
-    }
-  }
-  if is_connected {
-    match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
-      Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
-      Ok(_)    => ()
-    }
-    match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
-      Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
-      Ok(_)    => ()
     }
   }
   
@@ -116,14 +121,29 @@ pub fn cmd_responder(cmd_server_ip             : String,
         trace!("Can't acquire lock! {err}");
       },
     }
-    // Not sure how to deal with the connection. Poll? Or wait blocking?
-    // Or don't block? Set a timeout? I guess technically since we are not doing
-    // anything else here, we can block until we get something, this saves resources.
-    // (in that case the DONTWAIT can go away)
-    // Paolo: I would say that either blocking or setting a timeout is the best opt.
-    //  Probably setting a timeout is the best practice since, else, we might die.
-    //  If we wouldn't block some other commands might be sent and get stuck in the
-    //  process (?).
+    // we need to make sure to connect to our server
+    // The startup is a bit tricky... FIXME
+    if !is_connected {
+      match cmd_socket.connect(&cmd_server_address) {
+        Err(err) => {
+          debug!("Not able to connect to {}! {err}", cmd_server_address);
+          thread::sleep(Duration::from_millis(200));
+          continue;
+        }
+        Ok(_)    => {
+          info!("Connected to CnC server at {}", cmd_server_address);
+          match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
+            Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
+            Ok(_)    => ()
+          }
+          match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
+            Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
+            Ok(_)    => ()
+          }
+          is_connected = true;
+        }
+      }
+    }
     match cmd_socket.recv_bytes(0) {
     //match cmd_socket.recv_bytes(zmq::DONTWAIT) {
       Err(err) => trace!("Problem receiving command over 0MQ ! Err {err}"),
@@ -376,7 +396,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                           // default is not active for run config
 
                           let rc = RunConfig::new();
-                          match run_config.send(rc) {
+                          match run_config_sender.send(rc) {
                             Ok(_)    => {
                               info!("Run stopped successfully!");
                               return_val = Ok(TofCommandCode::CmdDataRunStop);
@@ -405,8 +425,9 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         // if this RB is the one then do stuff
                         if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
                           println!("==> Will initialize new run!");
-                          let rc    = get_runconfig(&run_config_file);
-                          match run_config.send(rc) {
+                          //let rc    = get_runconfig(&run_config_file);
+                          let rc = run_config.clone();
+                          match run_config_sender.send(rc) {
                             Ok(_)    => {
                               info!("Run started successfully!");
                               return_val = Ok(TofCommandCode::CmdDataRunStart);
@@ -439,7 +460,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         let my_rb_id = get_board_id().unwrap() as u8;
                         // if this RB is the one then do stuff
                         if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
-                          match rb_noi_subcalibration(&run_config, &ev_request_to_cache) {
+                          match rb_noi_subcalibration(&run_config_sender, &ev_request_to_cache) {
                             Ok(_) => {
                               info!("No input data taking successful!");
                               return_val = Ok(TofCommandCode::CmdNoiCalibration);
@@ -466,7 +487,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         let my_rb_id = get_board_id().unwrap() as u8;
                         // if this RB is the one then do stuff
                         if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
-                          match rb_voltage_subcalibration(&run_config, &ev_request_to_cache, voltage_val) {
+                          match rb_voltage_subcalibration(&run_config_sender, &ev_request_to_cache, voltage_val) {
                             Ok(_) => {
                               info!("Voltage data taking successful!");
                               return_val = Ok(TofCommandCode::CmdVoltageCalibration);
@@ -492,7 +513,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         let my_rb_id = get_board_id().unwrap() as u8;
                         // if this RB is the one then do stuff
                         if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
-                          match rb_timing_subcalibration(&run_config, &ev_request_to_cache, voltage_val) {
+                          match rb_timing_subcalibration(&run_config_sender, &ev_request_to_cache, voltage_val) {
                             Ok(_) => {
                               info!("Timing data taking successful!");
                               return_val = Ok(TofCommandCode::CmdTimingCalibration);
@@ -518,7 +539,11 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         let my_rb_id = get_board_id().unwrap() as u8;
                         // if this RB is the one then do stuff
                         if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
-                          match rb_calibration(&run_config, &ev_request_to_cache, address_for_cali.clone()) {
+                          // FIXME - time delay? When we start all calibrations at the 
+                          // same time, then the nw might get too busy? 
+                          match rb_calibration(&run_config_sender,
+                                               &ev_request_to_cache,
+                                               address_for_cali.clone()) {
                             Ok(_) => {
                               info!("Default calibration data taking successful!");
                               return_val = Ok(TofCommandCode::CmdDefaultCalibration);
@@ -566,7 +591,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                       Ok(tof_command)  => {
                         let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
                         match cmd_socket.send(r.to_bytestream(),0) {
-                          Err(err) => warn!("Can not send response!, Err {err}"),
+                          Err(err) => warn!("Can not send response!! {err}"),
                           Ok(_)    => info!("Responded to {tof_command}!")
                         }
                       }
