@@ -92,7 +92,7 @@ pub fn enable_poisson_self_trigger(rate : f32) {
 ///
 /// * n_errors     : Unforgiveable number of errors
 ///                  when querying the trigger status
-///                  register. If reached, break.
+///                  register. If reached, return.
 /// * interval     : Check the trigger register every
 ///                  interval
 /// * n_events_exp : Don't return before we have seen
@@ -171,7 +171,7 @@ pub fn wait_while_run_active(n_errors     : u32,
       }
       //thread::sleep(interval);
       if errs == n_errors {
-        info!("Can't wait anymore since we have seen the configured number of errors! {n_errors}");
+        error!("Can't wait anymore since we have seen the configured number of errors! {n_errors}");
         return events;
       }
     //start = Instant::now();
@@ -714,7 +714,7 @@ fn run_voltage_calibration(rc_to_runner: &Sender<RunConfig>,
     Err(err) => warn!("Can not send runconfig! {err}"),
     Ok(_)    => trace!("Success!")
   }  
-  let cal_dtype             = DataType::VoltageCalibration;
+  let cal_dtype         = DataType::VoltageCalibration;
   calibration.vcal_data = wait_while_run_active(20, 4*FIVE_SECONDS, 1000, &cal_dtype, &socket);
   
   println!("==> {} events for vcal (voltage calibration) data taken!", calibration.vcal_data.len());

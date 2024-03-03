@@ -1,5 +1,13 @@
 # HAHALUA series
 
+* v0.9.5
+* allow to send RBWaveform + TofEventSummary instead 
+  of TofEvents
+* further improvements on the performance of the 
+  ipbus implmentation
+* allow to trigger calibration remotly from the 
+  TOF CPU
+
 # v0.9.4
 * fixes a bug when setting RB_INTEGRATION_WINDOW
 * completly revamps IPBus communication with the 

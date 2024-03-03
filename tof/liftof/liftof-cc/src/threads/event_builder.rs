@@ -30,16 +30,12 @@ use liftof_lib::settings::{
     BuildStrategy
 };
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
-use crate::settings::{
-    //TofEventBuilderSettings,
-    //BuildStrategy
-};
 
 use colored::Colorize;
 
 // debug the number of rb events we got from the individual boards
 
-fn heartbeat_formatter() {
+pub fn heartbeat_formatter() {
   let fwidth = 56;
   let n_mte_received_tot = 0;
   let mut repr = String::from("");
@@ -364,11 +360,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       println!("  {:fwidth$} <<", format!(">> ==> Chn len TP  sender  \t {}",data_sink.len()).bright_purple());
       if n_sent > 0 {
         let av_rb_ev = n_rbs_per_ev as f64 / n_sent as f64;
-        println!(">> ==> Average number of RBEvents/TofEvent {:4.2}", av_rb_ev);
+        println!("  {:fwidth$} <<", format!(">> ==> Average number of RBEvents/TofEvent {:4.2}", av_rb_ev).bright_purple());
       }
       if n_mte_received_tot > 0 {
         let to_frac = n_timed_out as f64 / n_mte_received_tot as f64;
-        println!(">> ==> Fraction of timed out events {:4.2}", to_frac);
+        println!("  {:fwidth$} <<", format!(">> ==> Fraction of timed out events {:4.2}", to_frac).bright_purple());
       }
       println!(">> ==> RBEvents received overview:");
       //let mut rbtable_repr = String::from(">> ");
@@ -472,14 +468,40 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               // if we don't cache it, we have to send it. 
               let ev_to_send = event_cache.remove(&evid).unwrap();
               n_rbs_per_ev  += ev_to_send.rb_events.len(); 
-              let pack = TofPacket::from(&ev_to_send);
-              match data_sink.send(pack) {
-                Err(err) => {
-                  error!("Packet sending failed! Err {}", err);
+              if settings.send_flight_packets {
+                // we have to chop it up
+                let te_summary = ev_to_send.get_summary();
+                let pack = TofPacket::from(&te_summary);
+                match data_sink.send(pack) {
+                  Err(err) => {
+                    error!("Packet sending failed! {err}");
+                  }
+                  Ok(_)    => {
+                    trace!("Event Summary for event id {} send!", evid);
+                    n_sent += 1;
+                  }
                 }
-                Ok(_)    => {
-                  debug!("Event with id {} send!", evid);
-                  n_sent += 1;
+                for rbwave in ev_to_send.get_rbwaveforms() {
+                  let pack = TofPacket::from(&rbwave);
+                  match data_sink.send(pack) {
+                    Err(err) => {
+                      error!("Packet sending failed! {err}");
+                    }
+                    Ok(_)    => {
+                      trace!("RB waveform for event id {} send!", evid);
+                    }
+                  }
+                }
+              } else {
+                let pack       = TofPacket::from(&ev_to_send);
+                match data_sink.send(pack) {
+                  Err(err) => {
+                    error!("Packet sending failed! Err {}", err);
+                  }
+                  Ok(_)    => {
+                    debug!("Event with id {} send!", evid);
+                    n_sent += 1;
+                  }
                 }
               }
             }
@@ -490,25 +512,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       //event_cache.retain(|ev| ev.valid);
       debug!("Debug timer! EVT SENDING {:?}", debug_timer.elapsed());
     } 
-
-    //// remove sent events! 
-    //if clear_cache == 500 {
-    //  event_cache.retain(|ev| ev.valid);
-    //  clear_cache = 0;
-    //}
-    //clear_cache += 1
-    //if n_iter  == 500 {
-    //  build_events_in_cache(&mut event_cache, timeout_micro,
-    //                        pp_query,
-    //                        pp_recv,
-    //                        true,
-    //                        use_timeout,
-    //                        &mut paddle_cache, 
-    //                        &data_sink);
-    //                        //&socket);
-    //  n_iter = 0;
-    //}
-    //n_iter += 1;
   } // end loop
 }
 

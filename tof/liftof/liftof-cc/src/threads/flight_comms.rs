@@ -41,6 +41,8 @@ use tof_dataclasses::io::{
     FileType
 };
 
+use liftof_lib::settings::DataPublisherSettings;
+
 /// Manages "outgoing" 0MQ PUB socket
 ///
 /// Everything should send to here, and 
@@ -57,20 +59,20 @@ use tof_dataclasses::io::{
 ///                      single file before starting a 
 ///                      new one.
 pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
-                        flight_address     : &str,
                         write_stream       : bool,
-                        write_stream_path  : String,
-                        write_npack_file   : usize,
                         runid              : usize,
+                        settings           : &DataPublisherSettings,
                         print_moni_packets : bool,
                         thread_control     : Arc<Mutex<ThreadControl>>) {
-
+  let flight_address      = settings.fc_pub_address.clone();
+  let write_stream_path   = settings.data_dir.clone(); 
+  let write_npack_file    = settings.packs_per_file;
   let ctx = zmq::Context::new();
   // FIXME - should we just move to another socket if that one is not working?
   let data_socket = ctx.socket(zmq::PUB).expect("Can not create socket!");
   let unlim : i32 = 1000000;
   data_socket.set_sndhwm(unlim).unwrap();
-  match data_socket.bind(flight_address) {
+  match data_socket.bind(&flight_address) {
     Err(err) => panic!("Can not bind to address {}! {}", flight_address, err),
     Ok(_)    => ()
   }

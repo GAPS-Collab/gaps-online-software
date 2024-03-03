@@ -10,10 +10,13 @@ use crossbeam_channel::{Receiver,
                         Sender};
 
 use tof_dataclasses::commands::{TofCommand, TofCommandCode, TofCommandResp, TofResponse};
-use tof_dataclasses::errors::{CmdError, SetError};
+use tof_dataclasses::errors::{
+    CmdError,
+    //SetError
+};
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
-use tof_dataclasses::run::RunConfig;
+//use tof_dataclasses::run::RunConfig;
 
 use tof_dataclasses::serialization::Serialization;
 
@@ -72,8 +75,8 @@ pub fn flight_cpu_listener(flight_address  : &str,
                 Ok(cmd)  => {
                   // we got a valid tof command, forward it and wait for the 
                   // response
-                  let tof_resp  = TofResponse::GeneralFail(TofCommandResp::RespErrNotImplemented as u32);
-                  let resp_not_implemented = crate::prefix_tof_cpu(&mut tof_resp.to_bytestream());
+                  //let tof_resp  = TofResponse::GeneralFail(TofCommandResp::RespErrNotImplemented as u32);
+                  //let resp_not_implemented = crate::prefix_tof_cpu(&mut tof_resp.to_bytestream());
                   //let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
                   let outgoing_c = outgoing.clone();
 

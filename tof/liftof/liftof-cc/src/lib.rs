@@ -15,7 +15,7 @@ use tof_dataclasses::constants::PAD_CMD_32BIT;
 extern crate clap;
 extern crate colored;
 
-extern crate local_ip_address;
+//extern crate local_ip_address;
 extern crate crossbeam_channel;
 extern crate liftof_lib;
 

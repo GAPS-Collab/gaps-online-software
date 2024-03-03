@@ -11,7 +11,6 @@ extern crate clap;
 extern crate ctrlc;
 //extern crate zmq;
 extern crate tof_dataclasses;
-extern crate local_ip_address;
 extern crate crossbeam_channel;
 extern crate colored;
 
@@ -79,10 +78,14 @@ use liftof_lib::{
     TofComponent,
     SetCmd
 };
-use liftof_cc::threads::{event_builder, flight_cpu_listener, global_data_sink, monitor_cpu, readoutboard_communicator};
-//use liftof_cc::settings::{
-//    LiftofCCSettings,
-//};
+use liftof_cc::threads::{
+    event_builder,
+    flight_cpu_listener,
+    global_data_sink,
+    monitor_cpu,
+    readoutboard_communicator
+};
+
 use liftof_lib::settings::LiftofSettings;
 use liftof_lib::Command;
 
@@ -116,15 +119,6 @@ struct LiftofCCArgs {
 /*************************************/
 
 fn main() {
-  //env_logger::builder()
-  //  .format(|buf, record| {
-  //  writeln!( buf, "[{level}][{module_path}:{line}] {args}",
-  //    level = color_log(&record.level()),
-  //    module_path = record.module_path().unwrap_or("<unknown>"),
-  //    line = record.line().unwrap_or(0),
-  //    args = record.args()
-  //    )
-  //  }).init();
   init_env_logger();
 
   // global thread control
@@ -150,7 +144,6 @@ fn main() {
   //info!("info");
   //debug!("debug");
   //trace!("trace");
- 
 
   // deal with command line arguments
   let config          : LiftofSettings;
@@ -162,7 +155,7 @@ fn main() {
   match args.command {
     Command::Calibration(ref calibration_cmd) => {
       match calibration_cmd {
-        CalibrationCmd::Default(default_opts) => {
+        CalibrationCmd::Default(_default_opts) => {
           cali_from_cmdline = true;
         },
         _ => ()
@@ -187,7 +180,6 @@ fn main() {
   } // end match
   
   println!("=> Using the following config as parsed from the config file:\n{}", config);
-  //exit(0);
 
   let mtb_address           = config.mtb_address.clone();
   info!("Will connect to the master trigger board at {}!", mtb_address);
@@ -199,14 +191,16 @@ fn main() {
     panic!("Writing data to disk requires a run id != 0! Please specify runid through the --run_id parameter!");
   }
   // clone the strings, so we can save the config later
-  let mut write_stream_path = config.data_dir.clone();
+  let mut write_stream_path = config.data_publisher_settings.data_dir.clone();
   let calib_file_path       = config.calibration_dir.clone();
   let runtime_nseconds      = config.runtime_sec;
-  let write_npack_file      = config.packs_per_file;
+  //let write_npack_file      = config.packs_per_file;
   let db_path               = Path::new(&config.db_path);
   let cpu_moni_interval     = config.cpu_moni_interval_sec;
-  let flight_address        = config.fc_pub_address.clone();
+  //let flight_address        = config.fc_pub_address.clone();
+  let flight_sub_address    = config.fc_sub_address.clone();
   let mtb_settings          = config.mtb_settings.clone();
+  let mut gds_settings      = config.data_publisher_settings.clone();
   let run_analysis_engine   = config.run_analysis_engine;
   //let ltb_rb_map            = get_dsi_j_ltbch_vs_rbch_map(db_path);
   let mut rb_list           = get_rbs_from_sqlite(db_path);
@@ -305,23 +299,17 @@ fn main() {
           .expect("Failed to spawn cpu-monitoring thread!");
     }
     write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
+    gds_settings.data_dir = write_stream_path;
 
-    // this is the tailscale address
-    //let flight_address = format!("tcp://100.101.96.10:{}", DATAPORT);
-    // this is the address in the flight network
-    // flight_address = format!("tcp://10.0.1.1:{}", DATAPORT);
     println!("==> Starting data sink thread!");
-    let flight_address_gds = flight_address.clone();
     let thread_control_gds = thread_control.clone();
     let _data_sink_thread = thread::Builder::new()
       .name("data-sink".into())
       .spawn(move || {
         global_data_sink(&tp_from_client,
-                         &flight_address_gds,
                          write_stream,
-                         write_stream_path,
-                         write_npack_file,
                          runid,
+                         &gds_settings,
                          verbose,
                          thread_control_gds);
       })
@@ -385,7 +373,7 @@ fn main() {
          })
         .expect("Failed to spawn event-builder thread!");
       // master trigger
-      let thread_control_mt = thread_control.clone();
+      //let thread_control_mt = thread_control.clone();
       let _mtb_thread = thread::Builder::new()
         .name("master-trigger".into())
         .spawn(move || {
@@ -403,7 +391,7 @@ fn main() {
     // set the handler for SIGINT
     let cmd_sender_1 = cmd_sender.clone();
     ctrlc::set_handler(move || {
-      println!("==> \u{1F6D1} Caught [SIGING] (allegedly Ctrl+C has been pressed)! Sending "end run" signal to all boards!");
+      println!("==> \u{1F6D1} Caught [SIGING] (allegedly Ctrl+C has been pressed)! Sending >>end run<< signal to all boards!");
       let end_run =
         TofCommand::from_command_code(TofCommandCode::CmdDataRunStop,0u32);
       let tp = TofPacket::from(&end_run);
@@ -426,7 +414,7 @@ fn main() {
 
     match args.command {
       Command::Listen(_) => {
-        let _flight_address_c    = flight_address.clone();
+        //let _flight_address_c    = flight_address.clone();
         let _thread_control_c    = thread_control.clone();
         let _cmd_interval: u64   = 1000;
         let _cmd_sender_c        = cmd_sender.clone();
@@ -434,7 +422,7 @@ fn main() {
         let _flight_cpu_listener = thread::Builder::new()
                       .name("flight-cpu-listener".into())
                       .spawn(move || {
-                                      flight_cpu_listener(&_flight_address_c,
+                                      flight_cpu_listener(&flight_sub_address,
                                                           &_cmd_receiver_c,
                                                           &_cmd_sender_c,
                                                           _cmd_interval,
@@ -519,12 +507,12 @@ fn main() {
               },
             }
             // now we wait until the calibrations are finished
-            let cali_wait_timer     = Instant::now();
-            let mut cali_received   = 0;
+            //let cali_wait_timer     = Instant::now();
+            let mut cali_received   : u64;
             let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
             let bar_label  = String::from("Acquiring RB calibration data");
             let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
-            let mut bar = ProgressBar::new(rb_list.len() as u64); 
+            let bar = ProgressBar::new(rb_list.len() as u64); 
             bar.set_position(0);
             bar.set_message (bar_label);
             bar.set_prefix  ("\u{2699}\u{1F4D0}");
