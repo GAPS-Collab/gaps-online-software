@@ -205,23 +205,27 @@ impl Default for AnalysisEngineSettings {
 /// Settings to change the configuration of the TOF Eventbuilder
 #[derive(Debug, Copy, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TofEventBuilderSettings {
-  pub cachesize         : usize,
-  pub n_mte_per_loop    : usize,
-  pub n_rbe_per_loop    : usize,
+  pub cachesize           : usize,
+  pub n_mte_per_loop      : usize,
+  pub n_rbe_per_loop      : usize,
   /// The timeout parameter for the TofEvent. If not
   /// complete after this time, send it onwards anyway
-  pub te_timeout_sec    : u32,
-  pub build_strategy    : BuildStrategy,
+  pub te_timeout_sec      : u32,
+  /// Send TofSummary + RBWaveforms instead of 
+  /// TofEvents
+  pub send_flight_packets : bool,
+  pub build_strategy      : BuildStrategy,
 }
 
 impl TofEventBuilderSettings {
   pub fn new() -> TofEventBuilderSettings {
     TofEventBuilderSettings {
-      cachesize         : 100000,
-      n_mte_per_loop    : 1,
-      n_rbe_per_loop    : 40,
-      te_timeout_sec    : 30,
-      build_strategy    : BuildStrategy::WaitForNBoards(40),
+      cachesize           : 100000,
+      n_mte_per_loop      : 1,
+      n_rbe_per_loop      : 40,
+      te_timeout_sec      : 30,
+      send_flight_packets : false,
+      build_strategy      : BuildStrategy::WaitForNBoards(40),
     }
   }
 }
@@ -246,9 +250,6 @@ pub struct DataPublisherSettings {
   pub data_dir       : String,
   pub packs_per_file : usize,
   pub fc_pub_address : String,
-  /// Send TofSummary + RBWaveforms instead of 
-  /// TofEvents
-  pub send_flight_packets        : bool,
 }
 
 impl DataPublisherSettings {
@@ -257,7 +258,6 @@ impl DataPublisherSettings {
       data_dir                  : String::from(""),
       packs_per_file            : 1000,
       fc_pub_address            : String::from(""),
-      send_flight_packets       : false,
     }
   }
 }
@@ -311,9 +311,6 @@ pub struct LiftofSettings {
   pub rb_ignorelist              : Vec<u8>,
   /// Should TofHits be generated?
   pub run_analysis_engine        : bool,
-  /// Send TofSummary + RBWaveforms instead of 
-  /// TofEvents
-  pub send_flight_packets        : bool,
   /// Settings to control the MTB
   pub mtb_settings               : MTBSettings,
   /// Settings for the TOF event builder
@@ -341,7 +338,6 @@ impl LiftofSettings {
       cpu_moni_interval_sec     : 60,
       rb_ignorelist             : Vec::<u8>::new(),
       run_analysis_engine       : true,
-      send_flight_packets       : false,
       mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),
