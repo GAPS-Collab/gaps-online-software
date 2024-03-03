@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+//use std::collections::VecDeque;
 
 use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
@@ -15,7 +15,7 @@ use tof_dataclasses::analysis::{
     time2bin
 };
 
-use tof_dataclasses::constants::N_CHN_PER_LTB;
+//use tof_dataclasses::constants::N_CHN_PER_LTB;
 
 use tof_dataclasses::calibrations::{
     find_zero_crossings,
@@ -250,8 +250,15 @@ impl IPBus {
   }
 
   /// Make a IPBus status query
-  pub fn get_status(&mut self) {
-    self.ipbus.get_status();
+  pub fn get_status(&mut self) -> PyResult<()> {
+    match self.ipbus.get_status() {
+      Ok(_) => {
+        return Ok(());
+      },
+      Err(err)   => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
   }
  
   pub fn get_buffer(&self) -> [u8;ipbus::MT_MAX_PACKSIZE] {
@@ -271,8 +278,15 @@ impl IPBus {
   }
 
   /// Set the packet id to that what is expected from the targetr
-  pub fn realign_packet_id(&mut self) {
-    self.ipbus.realign_packet_id();
+  pub fn realign_packet_id(&mut self) -> PyResult<()> {
+    match self.ipbus.realign_packet_id() {
+      Ok(_) => {
+        return Ok(());
+      },
+      Err(err)   => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
   }
   
   /// Get the next packet id, which is expected by the target
@@ -291,14 +305,12 @@ impl IPBus {
   pub fn read_multiple(&mut self,
                        addr           : u32,
                        nwords         : usize,
-                       increment_addr : bool,
-                       verify_tid     : bool) 
+                       increment_addr : bool) 
     -> PyResult<Vec<u32>> {
   
     match self.ipbus.read_multiple(addr,
                                    nwords,
-                                   increment_addr,
-                                   verify_tid) {
+                                   increment_addr) {
       Ok(result) => {
         return Ok(result);
       },
@@ -322,9 +334,9 @@ impl IPBus {
   }
  
 
-  pub fn read(&mut self, addr   : u32, verify_tid : bool) 
+  pub fn read(&mut self, addr   : u32) 
     -> PyResult<u32> {
-    match self.ipbus.read(addr, verify_tid) {
+    match self.ipbus.read(addr) {
       Ok(result) => {
         return Ok(result);
       },
@@ -351,8 +363,15 @@ impl MasterTrigger {
     }
   }
 
-  fn reset_daq(&mut self) {
-    self.ipbus.write(0x10,1);
+  fn reset_daq(&mut self) -> PyResult<()>{
+    match self.ipbus.write(0x10,1) {
+      Ok(result) => {
+        return Ok(result); 
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
   }
 
 
@@ -367,8 +386,15 @@ impl MasterTrigger {
     }
   }
 
-  fn realign_packet_id(&mut self) {
-    self.ipbus.realign_packet_id();
+  fn realign_packet_id(&mut self) -> PyResult<()> {
+    match self.ipbus.realign_packet_id() {
+      Ok(_) => {
+        return Ok(()); 
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
   }
 
   fn set_packet_id(&mut self, pid : u16) {
@@ -382,7 +408,7 @@ impl MasterTrigger {
   fn get_mtevent(&mut self) {
     let mut n_daq_words : u16;
     loop {
-      match self.ipbus.read(0x13, true) { 
+      match self.ipbus.read(0x13) { 
         Err(_err) => {
           // A timeout does not ncecessarily mean that there 
           // is no event, it can also just mean that 
@@ -407,7 +433,6 @@ impl MasterTrigger {
     match self.ipbus.read_multiple(
                                    0x11,
                                    n_daq_words as usize,
-                                   false,
                                    false) {
       Err(err) => {
         println!("[MasterTrigger::get_mtevent] => failed! {err}");
@@ -439,8 +464,8 @@ impl MasterTrigger {
 
     // Number of words which will be always there. 
     // Min event size is +1 word for hits
-    const MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = 9; 
-    let n_hit_packets = n_daq_words as u32 - MTB_DAQ_PACKET_FIXED_N_WORDS;
+    //const MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = 9; 
+    //let n_hit_packets = n_daq_words as u32 - MTB_DAQ_PACKET_FIXED_N_WORDS;
     //println!("We are expecting {}", n_hit_packets);
     let mut mte = MasterTriggerEvent::new(0,0);
     mte.event_id      = data[1];
@@ -472,8 +497,8 @@ impl MasterTrigger {
     println!("[MasterTrigger::get_mtevent] => Got MTE {}", mte);
   }
 
-  fn get_rate(&mut self, verify : bool) -> PyResult<u32> {
-    match self.ipbus.read(0x17,verify) {
+  fn get_rate(&mut self) -> PyResult<u32> {
+    match self.ipbus.read(0x17) {
       Ok(rate) => {
         return Ok(rate & 0x00ffffff); 
       }

@@ -317,76 +317,45 @@ impl Default for MTBSettings {
 /// For that, we just have to query the
 /// event size register multiple times.
 ///
+/// This is currently blocking until we 
+/// either get a UDP timeout or a 
+/// non-zero result for the MT.EVENT_QUEUE.SIZE 
+/// register
+///
 /// # Arguments
 ///
 /// * bus       : connected IPBus for UDP comms
 pub fn get_mtevent(bus : &mut IPBus)
   -> Result<MasterTriggerEvent, MasterTriggerError> {
   let mut mte = MasterTriggerEvent::new(0,0);
-  let mut n_daq_words  : u32;
+  let     n_daq_words  : u32;
   let mut hits_a       : [bool;N_CHN_PER_LTB];
   let mut hits_b       : [bool;N_CHN_PER_LTB];
   //let sleeptime = Duration::from_micros(10);
   //FIXME - reduce polling rate. 10micros is the 
   //fasterst
   //let sleeptime = Duration::from_micros(1000);
-  let mut timeout = Instant::now();
+  //let mut timeout = Instant::now();
   loop {
     //thread::sleep(sleeptime);
-    match bus.read(0x13, true) {
-    //match read_register(socket, 
-    //                    //address,
-    //                    0x13 , buffer) {
-      Err(err) => {
-        // A timeout does not ncecessarily mean that there 
-        // is no event, it can also just mean that 
-        // the rate is low.
-        if timeout.elapsed().as_secs_f64() > 1.0 {
-          error!("Did not get a new event since 1s! Reconnecting..");
-          return Err(MasterTriggerError::UdpTimeOut);
-
-          //thread::sleep(Duration::from_secs(2));
-          //bus.reconnect();
-          //thread::sleep(Duration::from_secs(2));
-          //timeout = Instant::now();
-        };
-        //println!("Timeout in read_register for MTB! {err}");
-        continue;
-      },
-      Ok(_n_words) => {
-        n_daq_words = _n_words >> 16 as u16;
-        if _n_words == 0 {
-          continue;
-        }
-        debug!("Got n_daq_words {n_daq_words}");
-        n_daq_words /= 2; //mtb internally operates in 16bit words, but 
-                          //registers return 32bit words.
-        break;
-      }
-    }
+    // 3 things can happen here:
+    // - it returns an error. Then we end this call
+    // - it returns 0 - no mt event is ready, we end 
+    //   this call
+    // - non 0 result -> next mt ready, continue
+    // when we are reading, remember that only 
+    // the first 16bits are the value we are 
+    // interested in
+    let nwords = bus.read(0x13)? >> 16;
+    if nwords != 0 {
+      n_daq_words = nwords/2;
+      //println!("Read {} from SIZE register", nwords);
+      break;
+    } 
   }
   
-  let mut n_iter = 0usize;
-  let data : Vec<u32>;
-  loop {
-    n_iter += 1;
-    if n_iter == 4 {
-      return Err(MasterTriggerError::DAQNotAvailable);
-    }
-    match bus.read_multiple(0x11, n_daq_words as usize, false, true) {
-      Err(err) => {
-        // this is most likely the timeout error, because the packet
-        // id is not correct
-        let _ = bus.realign_packet_id();
-        continue;
-      }
-      Ok(_data) => {
-        data = _data;
-        break;
-      }
-    }
-  }
-  //let data = bus.read_multiple(0x11, n_daq_words as usize, false, true)?;  
+  let data = bus.read_multiple(0x11, n_daq_words as usize, false)?;  
+  //println!("{}", data[0]);
   if data[0] != 0xAAAAAAAA {
     error!("Got MTB data, but the header is incorrect {}", data[0]);
     return Err(MasterTriggerError::PackageHeaderIncorrect);
@@ -434,57 +403,6 @@ pub fn get_mtevent(bus : &mut IPBus)
   mte.n_paddles = mte.get_hit_paddles(); 
   Ok(mte)
 }
-//
-//
-///// Connect to MTB Utp socket
-/////
-///// This will try a number of options to bind 
-///// to the local port.
-///// 
-///// # Arguments 
-/////
-///// * mtb_ip    : IP Adress of the MTB
-///// * mtb_port  : Port of the MTB
-/////
-//pub fn connect_to_mtb(mt_address : &String) 
-//  ->io::Result<UdpSocket> {
-//  // provide a number of local ports to try
-//  let local_addrs = [
-//    SocketAddr::from(([0, 0, 0, 0], 50100)),
-//    SocketAddr::from(([0, 0, 0, 0], 50101)),
-//    SocketAddr::from(([0, 0, 0, 0], 50102)),
-//    SocketAddr::from(([0, 0, 0, 0], 50103)),
-//    SocketAddr::from(([0, 0, 0, 0], 50104)),
-//  ];
-//  let local_socket = UdpSocket::bind(&local_addrs[..]);
-//  let socket : UdpSocket;
-//  match local_socket {
-//    Err(err)   => {
-//      error!("Can not create local UDP socket for master trigger connection!, err {}", err);
-//      return Err(err);
-//    }
-//    Ok(value)  => {
-//      info!("Successfully bound UDP socket for master trigger communcations to {:?}", value);
-//      socket = value;
-//      // this is not strrictly necessary, but 
-//      // it is nice to limit communications
-//      match socket.set_read_timeout(Some(Duration::from_millis(1))) {
-//        Err(err) => error!("Can not set read timeout for Udp socket! Error {err}"),
-//        Ok(_)    => ()
-//      }
-//      match socket.connect(&mt_address) {
-//        Err(err) => {
-//          error!("Can not connect to master trigger at {}, err {}", mt_address, err);
-//          return Err(err);
-//        }
-//        Ok(_)    => info!("Successfully connected to the master trigger at {}", mt_address)
-//      }
-//      return Ok(socket);
-//    }
-//  } // end match
-//}  
-
-
 
 /// Gather monitoring data from the Mtb
 ///
@@ -492,13 +410,7 @@ pub fn get_mtevent(bus : &mut IPBus)
 pub fn get_mtbmonidata(bus : &mut IPBus) 
   -> Result<MtbMoniData, MasterTriggerError> {
   let mut moni = MtbMoniData::new();
-  let data = bus.read_multiple(0x120, 4, true, false)?;
-  //let data     = read_register_multiple(socket,
-  //                                      //target_address,
-  //                                      0x120,
-  //                                      buffer,
-  //                                      IPBusPacketType::Read,
-  //                                      4)?;
+  let data = bus.read_multiple(0x120, 4, true)?;
   if data.len() < 4 {
     return Err(MasterTriggerError::BrokenPackage);
   }
@@ -514,13 +426,7 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
   moni.vccaux      = ( data[3] & first_word  ) as u16;  
   moni.vccbram     = ((data[3] & second_word ) >> 16) as u16;  
  
-  let rate = bus.read_multiple(0x17, 2, true, false)?;
-  //let rate         = read_register_multiple(socket, 
-  //                                          //target_address,
-  //                                          0x17,
-  //                                          buffer,
-  //                                          IPBusPacketType::Read,
-  //                                          2)?;
+  let rate = bus.read_multiple(0x17, 2, true)?;
   // FIXME - technically, the rate is 24bit, however, we just
   // read out 16 here (if the rate is beyond ~65kHz, we don't need 
   // to know with precision
@@ -692,7 +598,7 @@ pub fn master_trigger(mt_address        : String,
   // verbose, debugging
   let mut last_event_id  = 0u32;
   let mut n_events       = 0u64;
-  let mut rate_from_reg  : Option<u32> = None;
+  //let mut rate_from_reg  : Option<u32> = None;
   let mut verbose_timer  = Instant::now();
   let mut total_elapsed  = 0f64;
   let mut n_ev_unsent    = 0u64;
@@ -700,8 +606,12 @@ pub fn master_trigger(mt_address        : String,
   let mut init_reconnect = false;
   let mut first          = true;
   loop {
-    if mtb_timeout.elapsed().as_secs() > mtb_timeout_sec || init_reconnect {
-      println!("==> [master_trigger] reconnection timer elapsed");
+    if (mtb_timeout.elapsed().as_secs() > mtb_timeout_sec) || init_reconnect {
+      if mtb_timeout.elapsed().as_secs() > mtb_timeout_sec {
+        println!("==> [master_trigger] reconnection timer elapsed");
+      } else {
+        println!("==> [master_trigger] reconnection requested");
+      }
       match IPBus::new(mt_address.clone()) {
         Err(err) => {
           error!("Can't connect to MTB! {err}");
@@ -713,12 +623,12 @@ pub fn master_trigger(mt_address        : String,
           debug!("Resetting master trigger DAQ");
           // We'll reset the pid as well
           bus.pid = 0;
-          match reset_daq(&mut bus) {//, &mt_address) {
-            Err(err) => error!("Can not reset DAQ, error {err}"),
+          match bus.realign_packet_id() {
+            Err(err) => error!("Can not realign packet ID! {err}"),
             Ok(_)    => ()
           }
-          match bus.realign_packet_id() {
-            Err(err) => error!("Can not realign packet ID"),
+          match reset_daq(&mut bus) {//, &mt_address) {
+            Err(err) => error!("Can not reset DAQ! {err}"),
             Ok(_)    => ()
           }
         }
@@ -770,7 +680,7 @@ pub fn master_trigger(mt_address        : String,
                 }
               }
               Err(err) => {
-                error!("Can not convert .json to string!");
+                error!("Can not convert .json to string! {err}");
               }
             }
           }
@@ -792,7 +702,7 @@ pub fn master_trigger(mt_address        : String,
     match get_mtevent(&mut bus){ //,
       Err(err) => {
         error!("Unable to get MasterTriggerEvent! {err}");
-        init_reconnect = true;
+        //init_reconnect = true;
         continue;
       },
       Ok(_ev) => {
@@ -807,7 +717,6 @@ pub fn master_trigger(mt_address        : String,
           }
         }
         last_event_id = _ev.event_id;
-        //let tp = TofPacket::from(&_ev);
         // we got an even successfully, so reset the 
         // connection timeout
         mtb_timeout = Instant::now();
@@ -836,12 +745,12 @@ pub fn master_trigger(mt_address        : String,
           println!("  {}{}{}", ">> ==> ".yellow().bold(),n_events, " missed events                       <<".yellow().bold());
         }
         println!("  {}{:.2}{}", ">> ==> -- trigger rate: ".bright_blue(), n_events as f64/total_elapsed, " Hz                 <<".bright_blue());
-        match rate_from_reg {
-          None => (),
-          Some(_rate) => {
-            println!("  {}{:.3}{}",">> ==> -- expected rate ".bright_blue(),_rate," Hz (from register)    <<".bright_blue());   
-          }
-        }
+        //match rate_from_reg {
+        //  None => (),
+        //  Some(_rate) => {
+        //    println!("  {}{:.3}{}",">> ==> -- expected rate ".bright_blue(),_rate," Hz (from register)    <<".bright_blue());   
+        //  }
+        //}
         println!("  {}",">> == == == == ==  END HEARTBEAT! == == == == == <<".bright_blue().bold());
         verbose_timer = Instant::now();
       }
@@ -854,10 +763,7 @@ pub fn master_trigger(mt_address        : String,
 pub fn read_event_cnt(bus : &mut IPBus) //,
                       //buffer : &mut [u8;MT_MAX_PACKSIZE])
   -> Result<u32, Box<dyn Error>> {
-  //let event_count = read_register(socket,
-  //                                //target_address,
-  //                                0xd, buffer)?;
-  let event_count = bus.read(0xd, false)?;
+  let event_count = bus.read(0xd)?;
   trace!("Got event count! {} ", event_count);
   Ok(event_count)
 }
@@ -870,9 +776,7 @@ pub fn set_trace_suppression(bus : &mut IPBus,
                              sup : bool) 
   -> Result<(), Box<dyn Error>> {
   info!("Setting MTB trace suppression {}!", sup);
-  //let mut buffer = [0u8;MT_MAX_PACKSIZE];
-  //let mut value = read_register(socket, 0xf, &mut buffer)?;
-  let mut value = bus.read(0xf, false)?;
+  let mut value = bus.read(0xf)?;
   // bit 13 has to be 1 for read all channels
   let read_all_ch = u32::pow(2, 13);
   if sup { // sup means !read_all_ch
@@ -881,12 +785,6 @@ pub fn set_trace_suppression(bus : &mut IPBus,
   else {
     value = value | read_all_ch; 
   }
-  //let val = !sup;
-  //value = value | (val as u32) << 13;
-  //write_register(socket,
-  //               0xf,
-  //               value,
-  //               &mut buffer)?;
   bus.write(0xf, value)?;
   Ok(())
 }
@@ -895,9 +793,6 @@ pub fn set_trace_suppression(bus : &mut IPBus,
 pub fn reset_daq(bus : &mut IPBus) 
   -> Result<(), Box<dyn Error>> {
   info!("Resetting DAQ!");
-  //let mut buffer = [0u8;MT_MAX_PACKSIZE];
-  //write_register(socket,
-  //               0x10, 1,&mut buffer)?;
   bus.write(0x10, 1)?;
   Ok(())
 }
@@ -905,9 +800,7 @@ pub fn reset_daq(bus : &mut IPBus)
 pub fn get_tiu_link_status(bus : &mut IPBus)
   -> Result<bool, Box<dyn Error>> {
   let mut tiu_good = 0x1u32;
-  let value        = bus.read(0xf, false)?;
-  //let mut buffer   = [0u8;MT_MAX_PACKSIZE];
-  //let value        = read_register(socket, 0xf, &mut buffer)?;
+  let value        = bus.read(0xf)?;
   tiu_good         = tiu_good & ( value & 0x1);
   Ok(tiu_good > 0)
 }
@@ -916,9 +809,7 @@ pub fn get_tiu_link_status(bus : &mut IPBus)
 pub fn set_rb_int_window(bus : &mut IPBus, wind : u8)
   -> Result<(), Box<dyn Error>> {
   info!("Setting RB_INT_WINDOW to {}!", wind);
-  //let mut buffer = [0u8;MT_MAX_PACKSIZE];
-  let mut value  =  bus.read(0xf, false)?;
-  //let mut value  =  read_register(socket, 0xf , &mut buffer)?;
+  let mut value  =  bus.read(0xf)?;
   println!("==> Retrieved {value} from register 0xf on MTB");
   let mask   = 0xffffe0ff;
   // switch the bins off
@@ -926,14 +817,9 @@ pub fn set_rb_int_window(bus : &mut IPBus, wind : u8)
   let wind_bits  = (wind as u32) << 8;
   value = value | wind_bits;
   bus.write(0xf, value)?;
-  //write_register(socket,
-  //               0xf,
-  //               value,
-  //               &mut buffer)?;
-  println!("++ Writing to register ++");
-  //value  =  read_register(socket, 0xf , &mut buffer)?;
-  value = bus.read(0xf, false)?;
-  println!("==> Reading back value {value} from register 0xf on MTB after writing to it!");
+  trace!("++ Writing to register ++");
+  value = bus.read(0xf)?;
+  trace!("==> Reading back value {value} from register 0xf on MTB after writing to it!");
   Ok(())
 }
 
@@ -947,11 +833,6 @@ pub fn set_poisson_trigger(bus : &mut IPBus, rate : u32)
   //let rate_val   = (rate as f32 * u32::MAX as f32/1.0e8) as u32; 
   info!("Setting poisson trigger with rate {}!", rate);
   bus.write(0x9, rate_val)?;
-  //let mut buffer = [0u8;MT_MAX_PACKSIZE];
-  //write_register(socket,
-  //               0x9,
-  //               rate_val,
-  //               &mut buffer)?;
   Ok(())
 }
 
@@ -960,11 +841,6 @@ pub fn set_any_trigger(bus : &mut IPBus, prescale : f32)
   -> Result<(), Box<dyn Error>> {
   let prescale_val = (u32::MAX as f32 * prescale).floor() as u32;
   info!("Setting any trigger with prescale {}!", prescale);
-  //let mut buffer = [0u8;MT_MAX_PACKSIZE];
-  //write_register(socket,
-  //               0x40,
-  //               prescale_val,
-  //               &mut buffer)?;
   bus.write(0x40, prescale_val)?;
   Ok(())
 }
@@ -974,11 +850,6 @@ pub fn set_track_trigger(bus : &mut IPBus, prescale : f32)
   -> Result<(), Box<dyn Error>> {
   let prescale_val = (u32::MAX as f32 * prescale).floor() as u32;
   info!("Setting track trigger with prescale {}!", prescale);
-  //let mut buffer = [0u8;MT_MAX_PACKSIZE];
-  //write_register(socket,
-  //               0x41,
-  //               prescale_val,
-  //               &mut buffer)?;
   bus.write(0x41, prescale_val)?;
   Ok(())
 }
@@ -988,11 +859,6 @@ pub fn set_central_track_trigger(bus : &mut IPBus, prescale : f32)
   -> Result<(), Box<dyn Error>> {
   let prescale_val = (u32::MAX as f32 * prescale).floor() as u32;
   info!("Setting CENTRAL TRACK trigger with prescale {}!", prescale);
-  //let mut buffer = [0u8;MT_MAX_PACKSIZE];
-  //write_register(socket,
-  //               0x42,
-  //               prescale_val,
-  //               &mut buffer)?;
   bus.write(0x42, prescale_val)?;
   Ok(())
 }
@@ -1003,7 +869,7 @@ pub fn unset_all_triggers(bus : &mut IPBus)
   // first the GAPS trigger, whcih is a more 
   // complicated register, where we only have
   // to flip 1 bit
-  let mut trig_settings = bus.read(0x14, false)?;
+  let mut trig_settings = bus.read(0x14)?;
   trig_settings         = trig_settings & !u32::pow(2,24);
   bus.write(0x14, trig_settings)?;
   set_poisson_trigger(bus, 0)?;
@@ -1017,17 +883,11 @@ pub fn unset_all_triggers(bus : &mut IPBus)
 pub fn set_gaps_trigger(bus : &mut IPBus, use_beta : bool) 
   -> Result<(), Box<dyn Error>> {
   info!("Setting GAPS Antiparticle trigger, use beta {}!", use_beta);
-  //let mut buffer = [0u8;MT_MAX_PACKSIZE];
-  //let mut trig_settings =  read_register(socket, 0x14 , &mut buffer)?;
-  let mut trig_settings = bus.read(0x14, false)?;
+  let mut trig_settings = bus.read(0x14)?;
   trig_settings = trig_settings | u32::pow(2,24);
   if use_beta {
     trig_settings = trig_settings | u32::pow(2,25);
   }
-  //write_register(socket,
-  //               0x14,
-  //               trig_settings,
-  //               &mut buffer)?;
   bus.write(0x14, trig_settings)?;
   Ok(())
 }

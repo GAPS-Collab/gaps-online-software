@@ -15,7 +15,10 @@ use std::net::{
 };
 
 use std::error::Error;
-use std::time::Duration;
+use std::time::{
+    Duration,
+    Instant
+};
 
 use crate::errors::IPBusError;
 use crate::serialization::{
@@ -125,7 +128,8 @@ pub struct IPBus {
   pub socket         : UdpSocket,
   pub target_address : String,
   pub packet_type    : IPBusPacketType,
-  /// IPBus Packet ID 
+  /// IPBus Packet ID - this is then NEXT
+  /// pid which will be sent
   pub pid            : u16,
   pub expected_pid   : u16,
   pub last_pid       : u16,
@@ -255,42 +259,12 @@ impl IPBus {
     Ok(())
   }
   
-  /// A combined send-receive with error checking
-  //pub fn query(&mut self, data : &Vec<u8>) -> Result<(), Box<dyn Error>> {
-  pub fn write(&mut self,
-               addr   : u32,
-               data   : u32) -> Result<(), Box<dyn Error>> {
-    // we don't expect any issues with sending the data
-    let send_data = Vec::<u32>::from([data]);
-    self.packet_type = IPBusPacketType::Write;
-    let message = self.encode_payload(addr, &send_data);
-    match self.send(&message) {
-      Err(err) => {
-        error!("Sending Udp message failed! {err}");
-        return Err(Box::new(IPBusError::UdpSendFailed));
-      },
-      Ok(_) => ()
-    }
-    match self.receive() {
-      // this can have two failure modes
-      // 1) we receive nothing (timeout)
-      Err(err) => {
-        //if err.kind = std::io::ErrorKind  
-        error!("Unable to receive data! i/o error : {}", err.kind());
-        let target_exp_pid = self.get_target_next_expected_packet_id()?;
-        let buffer_pid = self.get_pid_from_current_buffer();
-        error!("self.pid {}, self.expected.pid {}, target expects pid {:?}, buffer pid {} ", self.pid, self.expected_pid, target_exp_pid, buffer_pid);
-        return Err(Box::new(IPBusError::UdpReceiveFailed));
-        //if err == IPBusError::InvalidPacketID {
-      }
-      Ok(_data) => {
-        // _data is tne number of bytes received
-        trace!("[ipbus::write] => Got buffer {:?}", self.buffer);
-        return Ok(());  
-      }
-    }
-  }
 
+
+  /// Send a ipbus status packet and receive the response
+  ///
+  /// Inspect self.buffer after the call if interested in 
+  /// the result.
   pub fn get_status(&mut self) 
     -> Result<(), Box<dyn Error>> {
     let mut udp_data = Vec::<u8>::new();
@@ -304,15 +278,11 @@ impl IPBus {
       udp_data.push(0);
       udp_data.push(0);
     }
-    //self.socket.send(udp_data.as_slice())?;
     match self.send(&udp_data) {
       Err(err) => error!("Unable to send udp data! {err}"),
       Ok(_)    => ()
     }
     trace!("[IPBus::get_status => message {:?} sent!", udp_data);
-    //let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer)?;
-    //let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer)?;
-    //let number_of_bytes = self.receive()?;
     let number_of_bytes : usize;
     match self.receive() {
       Err(err) => {
@@ -337,6 +307,11 @@ impl IPBus {
     Ok(())
   }
 
+
+  /// Assemble the 32bit packet header 
+  ///
+  /// This will include the (presume) next
+  /// packet id
   fn create_packetheader(&mut self, status : bool) -> u32 {
     // we use this to switch the byteorder
     let pid : u16;
@@ -418,10 +393,7 @@ impl IPBus {
   ///             the specs of IPBus protocoll
   /// * verbose : print information for debugging.
   ///
-  /// FIXME - currently this is always successful.
-  /// Should we check for garbage?
   fn decode_payload(&mut self,
-                    debug_pid : &mut u16,
                     verbose : bool)
     -> Result<Vec<u32>, IPBusError> {
     let mut pos  : usize = 0;
@@ -439,7 +411,6 @@ impl IPBus {
     let ptype    = ((0x000000f0 & theader) >> 4) as u8;
     let packet_type = IPBusPacketType::from_u8(ptype);
     trace!("[IPBus::decode_payload] => PID, SIZE, PTYPE : {} {} {}", pid, size, packet_type);
-    *debug_pid = pid;
     if pid != self.expected_pid {
       if !is_status {
         error!("Invalid packet ID. Expected {}, received {}", self.expected_pid, pid);
@@ -493,16 +464,19 @@ impl IPBus {
   pub fn realign_packet_id(&mut self) 
     -> Result<(), Box<dyn Error>> {
     trace!("[IPBus::realign_packet_id] - aligning...");
-    match self.get_target_next_expected_packet_id() {
-      Ok(pid) => {
-        self.pid = pid;
-      }
-      Err(err) => {
-        error!("Can not get next expected packet id from target, will use 0! {err}");
-        self.pid = 0;
-      }
-    }
-    self.expected_pid = self.pid;
+    let pid = self.get_target_next_expected_packet_id()?;
+    self.pid = pid;
+    self.expected_pid = pid;
+    ////match self.get_target_next_expected_packet_id() {
+    //  Ok(pid) => {
+    //    self.pid = pid;
+    //  }
+    //  Err(err) => {
+    //    error!("Can not get next expected packet id from target, will use 0! {err}");
+    //    self.pid = 0;
+    //  }
+    //}
+    //self.expected_pid = self.pid;
     trace!("[IPBus::realign_packet_id] - aligned {}", self.pid);
     Ok(())
   }
@@ -524,159 +498,87 @@ impl IPBus {
     Ok(target_exp_pid)
   }
 
-  pub fn read(&mut self, addr   : u32, verify_tid : bool) 
-    -> Result<u32, Box<dyn Error>> {
-    let send_data    = Vec::<u32>::from([0]);
-    self.packet_type = IPBusPacketType::Read;
-    let message      = self.encode_payload(addr, &send_data);
-    trace!("[IPBus::read => sending message {:?}", message);
-    //self.socket.send(message.as_slice())?;
-    self.send(&message)?;
-    //println!("[IPBus::read => message sent!");
-    let mut data = Vec::<u32>::new();
-    let mut debug_pid = 0u16;
-    let mut notify_success = false;
-    let mut ntries    = 4usize;
-    let mut number_of_bytes : usize;
-    loop {
-      //let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer)?;
-      match self.receive() {
-        Err(err) => {
-          let pid_from_buffer = self.get_pid_from_current_buffer();
-          error!("Can not receive from socket! {err}. self.pid {}, self.expected_pid {}, buffer pid {}", self.pid, self.expected_pid, pid_from_buffer);
-          return Err(Box::new(IPBusError::UdpReceiveFailed));
-        }
-        Ok(_number_of_bytes) => {
-          number_of_bytes = _number_of_bytes;
-        }
-      }
-      //let number_of_bytes = self.receive()?;
-      trace!("[IPBus::read] => Received {} bytes from master trigger! Message {:?}", number_of_bytes, self.buffer);
-      if self.buffer_is_status() {
-        continue;
-      }
-      // this one can actually succeed, but return an emtpy vector
-      match self.decode_payload(&mut debug_pid,false) { 
-        Err(err) => {
-          ntries -= 1;
-          if ntries == 0 {
-            // FIXME - this might not be the best error to return
-            return Err(Box::new(IPBusError::DecodingFailed));
-          }
-          if err == IPBusError::InvalidPacketID {
-            debug!("--> invalid packet id, trying again");
-            if verify_tid {
-              if debug_pid < self.expected_pid {
-                if self.expected_pid - debug_pid == 1 {
-                  // in this case, we simply try again
-                  error!("[IPBus::read] Packet ID is 1 behind.. retry!");
-                  notify_success = true;
-                  continue;
-                }
-              } else {
-                match self.realign_packet_id() {
-                  Err(err) => {
-                    error!("Unable to realign packet id! {err}");
-                    return Err(err);
-                  }
-                  Ok(_) => ()
-                }
-              }
-              notify_success = true;
-              continue;
-            } else {
-              break;
-            }
-          } else {
-            error!("[IPBus::read] Received error {err}");
-            break;
-          }
-        }
-        Ok(_data) => {
-          data = _data;
-          if notify_success {
-            println!("[IPBus::read] Packet ID has been restored, data acquired..");
-          }
-          break;
-        }
-      } 
-    }
-    if data.len() == 0 {
-      error!("[IPBus::read] Data has size 0");
-      return Err(Box::new(IPBusError::DecodingFailed));
-    }
-    Ok(data[0])
-  }
 
+  /// Multiple read operations with a single UDP request
+  ///
+  /// Read either the same register multiple times 
+  /// or read from  incrementing register addresses 
+  ///
+  /// # Arguments:
+  ///
+  /// * addr           : register addresss to read 
+  ///                    from
+  /// * nwords         : number of read operations
+  /// * increment_addr : if true, increment the 
+  ///                    register address after
+  ///                    each read operation
   pub fn read_multiple(&mut self,
                        addr           : u32,
                        nwords         : usize,
-                       increment_addr : bool,
-                       verify_tid     : bool) 
+                       increment_addr : bool) 
     -> Result<Vec<u32>, Box<dyn Error>> {
     let send_data = vec![0u32;nwords];
-    let mut data = Vec::<u32>::new();
-    let mut debug_pid = 0u16;
     if increment_addr {
       self.packet_type = IPBusPacketType::Read;
     } else {
       self.packet_type = IPBusPacketType::ReadNonIncrement;
     }
-    // FIXME - we assume nwords != 1
     let mut message = self.encode_payload(addr, &send_data);
-    self.send(&message)?;
-    let mut n_send_failures = 0usize;
+    let mut send_again = true;
+    let timeout = Instant::now();
     loop {
-      //let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer)?;
-      let number_of_bytes : usize;
+      if send_again {
+        self.send(&message)?;
+      }
       match self.receive() {
-        Err(err) => {
-          n_send_failures += 1;
-          if n_send_failures == 4 {
-            error!("allowed send failures exceeded!");
-            return Err(Box::new(err));
-          }
-          if self.buffer_is_status() {
-            continue;
-          }
-          // the only error this can throw is a timeout
-          // This most likely means the pid is wrong
-          let which_pid_next = self.get_target_next_expected_packet_id()?;
-          error!("self.receive threw {err}. pid {} exp. pid.{} target exp. pid.{}", self.pid, self.expected_pid, which_pid_next);
+        Err(_err) => {
+          // In case the address is correct, this
+          // MUST be some kind of timeout/udp issue. 
+          // We assume the packet is lost, realign
+          // the packet id and try again
+          //
+          //// this will be the last pid we have received
+          //error!("Can not receive from socket! {err}. self.pid {}, self.expected_pid {}, buffer pid {}", self.pid, self.expected_pid, pid_from_buffer);
           self.realign_packet_id()?;
-          message = self.encode_payload(addr, &send_data);
-          self.send(&message)?;
+          // we need to rewrite the message with the 
+          // new packet id
+          message    = self.encode_payload(addr, &send_data);
+          send_again = true;
+          if timeout.elapsed().as_millis() == 10 {
+            return Err(Box::new(IPBusError::UdpReceiveFailed));
+          }
           continue;
         }
-        Ok(_number_of_bytes) => {
-          number_of_bytes = _number_of_bytes;
+        Ok(number_of_bytes) => {
+          
           if self.buffer_is_status() {
+            // if we received a stray status message, let's just try again
             continue;
           }
-
-        }
-      }
-      trace!("[IPBus::read_multiple] Received {} bytes from master trigger. Buffer {:?}", number_of_bytes, self.buffer);
-      // this one can actually succeed, but return an emtpy vector
-      match self.decode_payload(&mut debug_pid,false) { 
-        Err(err) => {
-          debug!("Got error {err}!");
-          if err == IPBusError::InvalidPacketID {
-            debug!("--> invalid packet id, trying again");
-            if verify_tid {
-              self.realign_packet_id()?;
+          
+          let pid_from_buffer = self.get_pid_from_current_buffer();
+          if pid_from_buffer != self.expected_pid {
+            error!("We got a packet, but the PacketID is not as expected!");
+            error!("-- self.pid {}, self.expected_pid {}, buffer pid {}", self.pid, self.expected_pid, pid_from_buffer);
+            // we try to fix it. If it is behind, we can just call receive again
+            if self.expected_pid > pid_from_buffer {
+              send_again = false;
               continue;
             } else {
-              break;
+              // we have missed out on messages and need to send our original message
+              // again
+              self.realign_packet_id()?;
+              message    = self.encode_payload(addr, &send_data);
+              send_again = true;
+              continue;
             }
           }
-        }
-        Ok(_data) => {
-          data = _data;
+          trace!("[IPBus::read] => Received {} bytes from master trigger! Message {:?}", number_of_bytes, self.buffer);
           break;
         }
-      } 
-    }
+      } // end match
+    } // here we must have either gotten the message or 
+    let data = self.decode_payload(false)?;  
     if data.len() == 0 {
       error!("Received empty data!");
       return Err(Box::new(IPBusError::DecodingFailed));
@@ -684,19 +586,60 @@ impl IPBus {
     Ok(data)
   }
   
-  pub fn write_deprecated(&mut self,
+  /// Read a single value from a register
+  ///
+  /// # Arguments:
+  ///
+  /// * addr : register address to be read from
+  pub fn read(&mut self, 
+              addr : u32) 
+    -> Result<u32, Box<dyn Error>> {
+  
+    let data  = self.read_multiple(addr,1,false)?;
+    Ok(data[0])
+  }
+  
+  /// Write a single value to a register
+  ///
+  /// # Arguments
+  ///
+  /// * addr        : target register address
+  /// * data        : word to write in register
+  pub fn write(&mut self,
                addr   : u32,
-               data   : u32) 
-    -> Result<(), Box<dyn Error>> {
+               data   : u32)
+      -> Result<(), Box<dyn Error>> {
+    // we don't expect any issues with sending the data
     let send_data = Vec::<u32>::from([data]);
     self.packet_type = IPBusPacketType::Write;
     let message = self.encode_payload(addr, &send_data);
-    self.send(&message)?;
-    let number_of_bytes = self.receive()?;
-    trace!("Received {} bytes from master trigger", number_of_bytes);
-    Ok(())
+    match self.send(&message) {
+      Err(err) => {
+        error!("Sending Udp message failed! {err}");
+        return Err(Box::new(IPBusError::UdpSendFailed));
+      },
+      Ok(_) => ()
+    }
+    match self.receive() {
+      // this can have two failure modes
+      // 1) we receive nothing (timeout)
+      Err(err) => {
+        //if err.kind = std::io::ErrorKind  
+        error!("Unable to receive data! i/o error : {}", err.kind());
+        let target_exp_pid = self.get_target_next_expected_packet_id()?;
+        let buffer_pid = self.get_pid_from_current_buffer();
+        error!("self.pid {}, self.expected.pid {}, target expects pid {:?}, buffer pid {} ", self.pid, self.expected_pid, target_exp_pid, buffer_pid);
+        return Err(Box::new(IPBusError::UdpReceiveFailed));
+        //if err == IPBusError::InvalidPacketID {
+      }
+      Ok(_data) => {
+        // _data is tne number of bytes received
+        trace!("[ipbus::write] => Got buffer {:?}", self.buffer);
+        return Ok(());  
+      }
+    }
   }
-
+  
 }
 
 impl fmt::Display for IPBus {
