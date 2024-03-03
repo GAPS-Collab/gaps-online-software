@@ -247,8 +247,13 @@ impl Default for TofEventBuilderSettings {
 /// Configure data storage and packet publishing
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DataPublisherSettings {
+  /// location to store data on TOF computer
   pub data_dir       : String,
+  /// TOFPackets per file. This defines the "length" of 
+  /// a subrun. 
   pub packs_per_file : usize,
+  /// The address the flight computer should subscribe 
+  /// to to get tof packets
   pub fc_pub_address : String,
 }
 
@@ -279,24 +284,16 @@ impl Default for DataPublisherSettings {
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct LiftofSettings {
-  /// location to store data on TOF computer
-  pub data_dir                   : String,
   /// default location for RBCalibration files
   pub calibration_dir            : String,
   /// default location for the database
   pub db_path                    : String,
   /// Runtime in seconds
   pub runtime_sec                : u64,
-  /// TOFPackets per file. This defines the "length" of 
-  /// a subrun. 
-  pub packs_per_file             : usize,
   /// The address of the liftof-command & control server
   /// that is the ip address on the RBNetwork which the 
   /// liftof-cc instance runs on 
   pub cc_server_address          : String,   
-  /// The address the flight computer should subscribe 
-  /// to to get tof packets
-  pub fc_pub_address             : String,
   /// The address ("tcp://xx.xx.xx.xx:xxxxx") the tof computer should subscribe to 
   /// to get commands from the flight computer
   pub fc_sub_address             : String,
@@ -326,13 +323,10 @@ pub struct LiftofSettings {
 impl LiftofSettings {
   pub fn new() -> Self {
     LiftofSettings {
-      data_dir                  : String::from(""),
       calibration_dir           : String::from(""),
       db_path                   : String::from("/home/gaps/config/gaps_flight.db"),
       runtime_sec               : 0,
-      packs_per_file            : 0,
       cc_server_address         : String::from("tcp://10.0.1.10:42000"),   
-      fc_pub_address            : String::from(""),
       fc_sub_address            : String::from(""),
       mtb_address               : String::from("10.0.1.10:50001"),
       cpu_moni_interval_sec     : 60,
