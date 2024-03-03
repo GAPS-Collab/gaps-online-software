@@ -39,10 +39,16 @@ use crate::errors::{
     SerializationError,
     PacketError
 };
-use crate::events::{RBEventHeader,
-                    RBEvent,
-                    MasterTriggerEvent,
-                    TofEvent};
+
+use crate::events::{
+    RBEventHeader,
+    RBEvent,
+    MasterTriggerEvent,
+    TofEvent,
+    RBWaveform,
+    TofEventSummary,
+};
+
 use crate::commands::{TofCommand,
                       RBCommand};
 use crate::calibrations::RBCalibrations;
@@ -154,6 +160,24 @@ impl TofPacket {
     #[allow(unreachable_code)] {
       return 1;
     }
+  }
+}
+
+impl From<&RBWaveform> for TofPacket {
+  fn from(rbwave : &RBWaveform) -> Self {
+    let mut tp     = Self::new();
+    tp.packet_type = PacketType::RBWaveform;
+    tp.payload     = rbwave.to_bytestream();
+    tp
+  }
+}
+
+impl From<&TofEventSummary> for TofPacket {
+  fn from(tsum : &TofEventSummary) -> Self {
+    let mut tp     = Self::new();
+    tp.packet_type = PacketType::TofEventSummary;
+    tp.payload     = tsum.to_bytestream();
+    tp
   }
 }
 

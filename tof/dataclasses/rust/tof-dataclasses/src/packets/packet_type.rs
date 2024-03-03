@@ -20,7 +20,7 @@ pub enum PacketType {
   RBEvent             = 20u8,
   TofEvent            = 21u8,
   RBWaveform          = 22u8,
-  TofSummary          = 23u8,
+  TofEventSummary     = 23u8,
   //Monitor             = 30u8,    // needs to go away
   HeartBeat           = 40u8,    // might probably go away
   MasterTrigger       = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
@@ -63,7 +63,7 @@ impl From<u8> for PacketType {
       20u8  => PacketType::RBEvent,
       21u8  => PacketType::TofEvent,
       22u8  => PacketType::RBWaveform,
-      23u8  => PacketType::TofSummary,
+      23u8  => PacketType::TofEventSummary,
       //30u8  => PacketType::Monitor,
       40u8  => PacketType::HeartBeat,
       60u8  => PacketType::MasterTrigger,
@@ -97,7 +97,7 @@ impl FromRandom for PacketType {
       PacketType::Unknown,
       PacketType::TofEvent,
       PacketType::RBWaveform,
-      PacketType::TofSummary,
+      PacketType::TofEventSummary,
       //PacketType::Monitor,
       PacketType::MasterTrigger,
       PacketType::HeartBeat,
@@ -130,7 +130,7 @@ fn test_packet_types() {
   type_codes.push(PacketType::Unknown as u8);
   type_codes.push(PacketType::TofEvent as u8);
   type_codes.push(PacketType::RBWaveform as u8);
-  type_codes.push(PacketType::TofSummary as u8);
+  type_codes.push(PacketType::TofEventSummary as u8);
   //type_codes.push(PacketType::Monitor as u8);
   type_codes.push(PacketType::MasterTrigger as u8);
   type_codes.push(PacketType::HeartBeat as u8);
