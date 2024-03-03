@@ -5,22 +5,12 @@
 ##########################################
 
 
-# location of data stored on the TOF CPU
-data_dir              = "/tofdata/run/"
 # location to store calibration files on the TOF CPUE
 calibration_dir       = "/tofdata/calibration/latest/"
 # location of the database
 db_path               = "/home/gaps/config/gaps_flight.db"
 # default runtime of the program
 runtime_sec           = 300
-# number of tofpackets per file before a new file
-# gets started
-packs_per_file        = 100000
-# use this address for UCLA teststand (tailscale)
-#fc_pub_address       = "tcp://100.101.96.10:42000"
-# flight computer needs to subscribe to this address to 
-# recieve tof packets
-fc_pub_address        = "tcp://192.168.37.20:42000"
 # TOF computer needs to subscribe to this address to 
 # recieve commands
 fc_sub_address        = "tcp://192.168.37.200:41662"
@@ -32,8 +22,6 @@ cpu_moni_interval_sec = 20
 rb_ignorelist         = [10, 12, 37, 38, 43, 45, 47, 48, 49, 50]
 # should TofHits be calculated for RBEvents? [should be true for flight]
 run_analysis_engine   = true
-# send TofEventSummary & RBWaveform over network instead of TofEvent
-send_flight_packets   = false
 # the ip where the central liftof cc server is listening
 cc_server_address     = "tcp://10.0.1.1:42000"
 
@@ -56,6 +44,20 @@ tiu_emulation_mode    = true
 #tofbot_webhook        = "https://hooks.slack.com/services/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"
 #tofbot channel 
 tofbot_webhook        = "https://hooks.slack.com/services/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"
+
+[data_publisher_settings]
+# location of data stored on the TOF CPU
+data_dir = "/tofdata/run"
+# number of tofpackets per file before a new file
+# gets started
+packs_per_file = 1000
+# use this address for UCLA teststand (tailscale)
+#fc_pub_address       = "tcp://100.101.96.10:42000"
+# flight computer needs to subscribe to this address to 
+# recieve tof packets
+fc_pub_address        = "tcp://192.168.37.20:42000"
+# send TofEventSummary & RBWaveform over network instead of TofEvent
+send_flight_packets   = false
 
 # not supported yet
 [event_builder_settings]

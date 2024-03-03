@@ -1,8 +1,11 @@
-/// Generalized settings for liftof-cc
-///
-/// Configure it from a .json config 
-/// file
-///
+//! Aggregate settings for the TOF system
+//!
+//! Control the settings for the C&C server
+//! as well as the liftof-clients on the RBs
+//!
+//! Different sections might represent different
+//! threads/aspects of the code
+//!
 
 use std::fs::File;
 use std::io::{
@@ -237,6 +240,42 @@ impl Default for TofEventBuilderSettings {
   }
 }
 
+/// Configure data storage and packet publishing
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct DataPublisherSettings {
+  pub data_dir       : String,
+  pub packs_per_file : usize,
+  pub fc_pub_address : String,
+  /// Send TofSummary + RBWaveforms instead of 
+  /// TofEvents
+  pub send_flight_packets        : bool,
+}
+
+impl DataPublisherSettings {
+  pub fn new() -> Self {
+    Self {
+      data_dir                  : String::from(""),
+      packs_per_file            : 1000,
+      fc_pub_address            : String::from(""),
+      send_flight_packets       : false,
+    }
+  }
+}
+
+impl fmt::Display for DataPublisherSettings {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = toml::to_string(self).unwrap_or(
+      String::from("-- DESERIALIZATION ERROR! --"));
+    write!(f, "<DataPublisherSettings :\n{}>", disp)
+  }
+}
+
+impl Default for DataPublisherSettings {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct LiftofSettings {
@@ -281,6 +320,8 @@ pub struct LiftofSettings {
   pub event_builder_settings     : TofEventBuilderSettings,
   /// Settings for the analysis engine
   pub analysis_engine_settings   : AnalysisEngineSettings,
+  /// Configure data publshing and saving on local disc
+  pub data_publisher_settings    : DataPublisherSettings,
   /// Settings for the individual RBs
   pub rb_settings                : RBSettings,
 }
@@ -304,6 +345,7 @@ impl LiftofSettings {
       mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),
+      data_publisher_settings   : DataPublisherSettings::new(),
       rb_settings               : RBSettings::new(),
     }
   }
