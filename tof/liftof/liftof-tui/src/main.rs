@@ -37,10 +37,21 @@ use crossbeam_channel::{unbounded,
 
 use ratatui::{
     backend::CrosstermBackend,
-    layout::{Constraint, Direction, Layout, Rect},
-    style::{Color, Style},
+    terminal::Frame,
+    layout::{
+        Constraint,
+        Direction,
+        Layout,
+        Rect
+    },
+    style::{
+        Color,
+        Style
+    },
     widgets::{
-        Block, Borders, },
+        Block,
+        Borders,
+    },
     Terminal,
 };
 
@@ -66,6 +77,7 @@ use liftof_tui::menu::{
 };
 
 use liftof_tui::colors::{
+    ColorSet,
     ColorTheme2,
     COLORSETOMILU, // current default
 };
@@ -352,11 +364,118 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
 }
 
 
+// make a "holder" for all the tabs and menus, 
+// so that it can be put in an Arc(Mutex), so
+// we can multithread it
+#[derive(Debug, Clone)]
+struct TabbedInterface<'a> {
+  pub ui_menu       :  MainMenu,
+  pub rb_menu       :  RBMenu,
+  pub mt_menu       :  MTMenu,
+  pub st_menu       :  SettingsMenu,
+
+  // The tabs
+  pub mt_tab        : MTTab,
+  pub cpu_tab       : CPUTab,
+  // waifu tab
+  pub wf_tab        : RBTab<'a>,
+  pub settings_tab  : SettingsTab<'a>,
+  pub home_tab      : HomeTab,
+  pub event_tab     : EventTab,
+}
+
+impl<'a> TabbedInterface<'a> {
+  pub fn new(ui_menu      : MainMenu,
+             rb_menu      : RBMenu,
+             mt_menu      : MTMenu,
+             st_menu      : SettingsMenu,
+             mt_tab       : MTTab,
+             cpu_tab      : CPUTab,
+             wf_tab       : RBTab<'a>,
+             settings_tab : SettingsTab<'a>,
+             home_tab     : HomeTab,
+             event_tab    : EventTab) -> Self {
+    Self {
+      ui_menu     ,
+      rb_menu     , 
+      mt_menu     , 
+      st_menu     ,
+      mt_tab      , 
+      cpu_tab     , 
+      wf_tab      , 
+      settings_tab,
+      home_tab    , 
+      event_tab   , 
+    }
+  }
+
+  pub fn receive_packet(&mut self) {
+    match self.mt_tab.receive_packet() {
+      Err(err) => error!("Can not receive TofPackets for MTTab! {err}"),
+      Ok(_)    => ()
+    }
+    match self.wf_tab.receive_packet() {
+      Err(err) => error!("Can not receive TofPackets for WfTab! {err}"),
+      Ok(_)    => ()
+    }
+    match self.event_tab.receive_packet() {
+      Err(err) => error!("Can not receive TofPackets for EventTab! {err}"),
+      Ok(_)    => ()
+    }
+    match self.cpu_tab.receive_packet() {
+      Err(err) => error!("Can not receive TofPackets for CPUTab! {err}"),
+      Ok(_)    => ()
+    }
+  }
+
+  fn update_color_theme(&mut self, cs : ColorSet) {
+    self.st_menu.theme.update(&cs);
+    self.ui_menu.theme.update(&cs);
+    self.rb_menu.theme.update(&cs);
+    self.mt_menu.theme.update(&cs);
+    self.home_tab.theme.update(&cs);
+    self.event_tab.theme.update(&cs);
+    self.wf_tab.theme.update(&cs);
+    self.mt_tab.theme.update(&cs);
+    self.settings_tab.theme.update(&cs);
+    self.cpu_tab.theme.update(&cs);
+  }
+  
+  pub fn render_home(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.ui_menu.render (&master_lo.rect[0], frame);
+    self.home_tab.render(&master_lo.rect[1], frame);
+  }
+
+  pub fn render_events(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.ui_menu.render  (&master_lo.rect[0], frame);
+    self.event_tab.render(&master_lo.rect[1], frame);
+  }
+
+  pub fn render_cpu(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.ui_menu.render(&master_lo.rect[0], frame);
+    self.cpu_tab.render(&master_lo.rect[1], frame);
+  }
+  
+  pub fn render_mt(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.mt_menu.render(&master_lo.rect[0], frame);
+    self.mt_tab.render (&master_lo.rect[1], frame);
+  }
+  
+  pub fn render_rbs(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.rb_menu.render(&master_lo.rect[0], frame);
+    self.wf_tab.render (&master_lo.rect[1], frame);
+  }
+  
+  pub fn render_settings(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.st_menu.render     (&master_lo.rect[0], frame);
+    self.settings_tab.render(&master_lo.rect[1], frame);
+  }
+}
+
 fn main () -> Result<(), Box<dyn std::error::Error>>{
 
   let home_stream_wd_cnt : Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
   let home_streamer      = home_stream_wd_cnt.clone();
-
 
   let mut pm = HashMap::<String, usize>::new();
   pm.insert(String::from("Unknown"          ) ,0);
@@ -380,7 +499,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   pm.insert(String::from("RBWaveform"       ) ,0); 
   pm.insert(String::from("TofEventSummary"  ) ,0); 
   
-
   let packet_map : Arc<Mutex<HashMap<String, usize>>> = Arc::new(Mutex::new(pm));
   let packet_map_home = packet_map.clone();
 
@@ -398,17 +516,17 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
 
   // FIXME - spawn a new thread per each tab!
   let _packet_recv_thread = thread::Builder::new()
-         .name("mt_packet_receiver".into())
-         .spawn(move || {
-           packet_receiver(mt_pack_send, 
-                           rb_pack_send,
-                           ev_pack_send,
-                           cp_pack_send,
-                           home_stream_wd_cnt,
-                           packet_map,
-                           );
-         })
-         .expect("Failed to spawn mt packet receiver thread!");
+    .name("mt_packet_receiver".into())
+    .spawn(move || {
+      packet_receiver(mt_pack_send, 
+                      rb_pack_send,
+                      ev_pack_send,
+                      cp_pack_send,
+                      home_stream_wd_cnt,
+                      packet_map,
+                      );
+    })
+    .expect("Failed to spawn mt packet receiver thread!");
   
   // Set max_log_level to Trace
   match tui_logger::init_logger(log::LevelFilter::Info) {
@@ -464,11 +582,12 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //let mut color_set_bw    = 
   
   // The menus
-  let mut ui_menu = MainMenu::new(color_theme.clone());
-  let mut rb_menu = RBMenu::new(color_theme.clone());
-  let mut mt_menu = MTMenu::new(color_theme.clone());
-  let mut st_menu = SettingsMenu::new(color_theme.clone());
+  let mut ui_menu         = MainMenu::new(color_theme.clone());
+  let mut rb_menu         = RBMenu::new(color_theme.clone());
+  let mut mt_menu         = MTMenu::new(color_theme.clone());
+  let mut st_menu         = SettingsMenu::new(color_theme.clone());
 
+  // The tabs
   let mut mt_tab2         = MTTab::new(mt_pack_recv,
                                        mte_recv,
                                        color_theme.clone());
@@ -483,8 +602,30 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let mut home_tab        = HomeTab::new(color_theme.clone(), home_streamer, packet_map_home);
   let mut event_tab       = EventTab::new(ev_pack_recv, mte_send, rbe_send, color_theme);
 
+  //let mut tabs            = TabbedInterface::new(ui_menu,
+  //                                               rb_menu,
+  //                                               mt_menu,
+  //                                               st_menu,
+  //                                               mt_tab2,
+  //                                               cpu_tab,
+  //                                               wf_tab,
+  //                                               settings_tab,
+  //                                               home_tab,
+  //                                               event_tab);
+  //let update_thread = thread::Builder::new()
+  //  .name("updated".into())
+  //  .spawn(move || {
+  //                   tab_receive_packet(&mut mt_tab2,
+  //                                      &mut cpu_tab,
+  //                                      &mut wf_tab,
+  //                                      &mut event_tab);
+  //                 }
+  //  ).expect("Failed to spawn heartbeat thread!");
+
+
   // FIXME - multithread it
   loop {
+    //tabs.receive_packet();
     match mt_tab2.receive_packet() {
       Err(err) => error!("Can not receive TofPackets for MTTab! {err}"),
       Ok(_)    => ()
@@ -523,6 +664,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                       match settings_tab.get_colorset() {
                         None => info!("Did not get a new colorset!"),
                         Some(cs) => {
+                          color_theme.update(&cs);
+                          //tabs.update_color_theme(cs);
                           st_menu.theme.update(&cs);
                           ui_menu.theme.update(&cs);
                           rb_menu.theme.update(&cs);
@@ -533,7 +676,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                           mt_tab2.theme.update(&cs);
                           settings_tab.theme.update(&cs);
                           cpu_tab.theme.update(&cs);
-                          color_theme.update(&cs);
                         }
                       }
                     }
@@ -544,6 +686,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                       match settings_tab.get_colorset() {
                         None => info!("Did not get a new colorset!"),
                         Some(cs) => {
+                          color_theme.update(&cs);
+                          //tabs.update_color_theme(cs);
                           st_menu.theme.update(&cs);
                           ui_menu.theme.update(&cs);
                           rb_menu.theme.update(&cs);
@@ -554,7 +698,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                           mt_tab2.theme.update(&cs);
                           settings_tab.theme.update(&cs);
                           cpu_tab.theme.update(&cs);
-                          color_theme.update(&cs);
                         }
                       }
                     }
@@ -570,7 +713,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               },
               MenuItem::ReadoutBoards => {
                 settings_tab.ctl_active = false;
-
 
                 match ev.code {
                   KeyCode::Up  => {
@@ -639,6 +781,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
       }
     } // end rx.recv()
     // FIXME - terminal draw should run in its own thread
+    // FIXME - what is named "rect" here is a frame actually
     match terminal.draw(|rect| {
       let size           = rect.size();
       let mster_lo       = MasterLayout::new(size); 
