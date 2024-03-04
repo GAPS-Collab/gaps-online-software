@@ -46,7 +46,10 @@ use ratatui::{
 
 
 
-use tof_dataclasses::packets::{TofPacket, PacketType};
+use tof_dataclasses::packets::{
+    TofPacket,
+    PacketType
+};
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::events::{
     MasterTriggerEvent,
@@ -208,6 +211,12 @@ fn packet_sorter(packet_type : &PacketType,
         PacketType::MultiPacket        => { 
           *pm.get_mut("MultiPacket").unwrap() += 1;
         },
+        PacketType::RBWaveform        => { 
+          *pm.get_mut("RBWaveform").unwrap() += 1;
+        },
+        PacketType::TofEventSummary        => { 
+          *pm.get_mut("TofEventSummary").unwrap() += 1;
+        },
         PacketType::Ping               => {
           *pm.get_mut("PingPacket").unwrap() += 1;
         }
@@ -368,7 +377,10 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   pm.insert(String::from("RBCommand"        ) ,0); 
   pm.insert(String::from("MultiPacket"      ) ,0); 
   pm.insert(String::from("PingPacket"       ) ,0); 
- 
+  pm.insert(String::from("RBWaveform"       ) ,0); 
+  pm.insert(String::from("TofEventSummary"  ) ,0); 
+  
+
   let packet_map : Arc<Mutex<HashMap<String, usize>>> = Arc::new(Mutex::new(pm));
   let packet_map_home = packet_map.clone();
 
