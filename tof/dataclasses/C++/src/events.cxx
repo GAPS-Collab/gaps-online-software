@@ -1038,12 +1038,15 @@ std::string TofHit::to_string() const {
   repr += "\n   |-> timestamp48  : "     + std::to_string(get_timestamp48() ); 
   repr += "\n  _________";
   repr += "\n  ##  Peak:";
-  repr += "\n  >>  time   A | B  : "     + std::to_string(get_time_a()      )
-       +  " " + std::to_string(get_time_b());
-  repr += "\n  >>  height A | B  : "     + std::to_string(get_peak_a()      )
-       +  " " + std::to_string(get_time_a());
-  repr += "\n  >>  charge A | B  : "     + std::to_string(get_charge_a()    )
-       +  " " + std::to_string(get_time_b());
+  repr += std::format("\n  >> time   A | B  : {} {}", get_time_a(), get_time_b());
+  //repr += "\n  >>  time   A | B  : "     + std::to_string(get_time_a()      )
+  //     +  " " + std::to_string(get_time_b());
+  repr += std::format("\n  >>  height A | B  : {} {}",get_peak_a(), get_peak_b());
+  repr += std::format("\n  >>  charge A | B  : {} {}",get_charge_a(), get_charge_b());
+  //repr += "\n  >>  height A | B  : "     + std::to_string(get_peak_a()      )
+  //     +  " " + std::to_string(get_time_a());
+  //repr += "\n  >>  charge A | B  : "     + std::to_string(get_charge_a()    )
+  //     +  " " + std::to_string(get_time_b());
   repr += "\n  >>  charge min_I  : "     + std::to_string(get_charge_min_i());
   repr += "\n  >>  in pad. pos   : "     + std::to_string(get_x_pos()       );
   repr += "\n  >>  t_avg         : "     + std::to_string(get_t_avg()       );
