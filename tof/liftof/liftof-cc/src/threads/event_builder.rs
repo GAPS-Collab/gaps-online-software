@@ -345,7 +345,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     }
     let debug_timer_elapsed = debug_timer.elapsed().as_secs_f64();
     if debug_timer_elapsed > 35.0  {
-      let fwidth = 56;
+      let fwidth = 100;
       println!("  {:fwidth$}", ">> == == == == ==  EVTBLDR HEARTBEAT   == == == == == <<".bright_purple().bold());
     //if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
       println!("  {:fwidth$} <<", format!(">> ==> Received MTEvents \t{}", n_mte_received_tot).bright_purple());
