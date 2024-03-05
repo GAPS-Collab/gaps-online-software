@@ -30,14 +30,12 @@ crossbeam-channel = "0.5"
 tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "database"], version = "0.9"}
 liftof-lib = { path = "../liftof-lib" , features = ["random"], version = "0.9"}
 
-histo = "0.1.0"
-# histogram = "0.7" 
-# hdrhistogram = "7"
+# this is the "one and only" histogram 
+# crate in my opinion
+ndhistogram = "0.9.0"
 zmq = "0.10.0"
 
 log = "0.4"
-json = "0.12"
-#local-ip-address = "0.5"
 clap = { version = "4.0", features = ["derive"] }
 
 

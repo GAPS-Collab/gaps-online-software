@@ -18,10 +18,6 @@ use std::io;
 use std::collections::{VecDeque, HashMap};
 #[macro_use] extern crate log;
 
-extern crate json;
-
-extern crate histo;
-
 use tui_logger::TuiLoggerWidget;
 
 use crossterm::{
@@ -798,10 +794,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                    }
     ).expect("Failed to spawn tab-packet-receiver thread!");
 
-  // FIXME - multithread it
   let mut quit_app = false;
   loop {
-    
     match rx.recv() {
       Err(err) => trace!("Err - no update! {err}"),
       Ok(event) => {
@@ -817,133 +811,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                 }
                 let cs = tabs.get_colorset();
                 color_theme.update(&cs);
-
-                        //match ui_menu.active_menu_item {
-                        //  // if we are in the RBTab, 
-                        //  // route input accordingly
-                        //  MenuItem::Settings   => {
-                        //    match ev.code {
-                        //      KeyCode::Char('h') => ui_menu.active_menu_item = MenuItem::Home,
-                        //      KeyCode::Char('a') => {
-                        //        settings_tab.ctl_active = true;
-                        //        settings_tab.ctl_state.select(Some(0));
-                        //      }
-                        //      KeyCode::Up  => {
-                        //        if settings_tab.ctl_active {
-                        //          settings_tab.previous_ct();
-                        //          match settings_tab.get_colorset() {
-                        //            None => info!("Did not get a new colorset!"),
-                        //            Some(cs) => {
-                        //              color_theme.update(&cs);
-                        //              //tabs.update_color_theme(cs);
-                        //              st_menu.theme.update(&cs);
-                        //              ui_menu.theme.update(&cs);
-                        //              rb_menu.theme.update(&cs);
-                        //              mt_menu.theme.update(&cs);
-                        //              home_tab.theme.update(&cs);
-                        //              event_tab.theme.update(&cs);
-                        //              wf_tab.theme.update(&cs);
-                        //              mt_tab2.theme.update(&cs);
-                        //              settings_tab.theme.update(&cs);
-                        //              cpu_tab.theme.update(&cs);
-                        //            }
-                        //          }
-                        //        }
-                        //      },
-                        //      KeyCode::Down => {
-                        //        if settings_tab.ctl_active {
-                        //          settings_tab.next_ct();
-                        //          match settings_tab.get_colorset() {
-                        //            None => info!("Did not get a new colorset!"),
-                        //            Some(cs) => {
-                        //              color_theme.update(&cs);
-                        //              //tabs.update_color_theme(cs);
-                        //              st_menu.theme.update(&cs);
-                        //              ui_menu.theme.update(&cs);
-                        //              rb_menu.theme.update(&cs);
-                        //              mt_menu.theme.update(&cs);
-                        //              home_tab.theme.update(&cs);
-                        //              event_tab.theme.update(&cs);
-                        //              wf_tab.theme.update(&cs);
-                        //              mt_tab2.theme.update(&cs);
-                        //              settings_tab.theme.update(&cs);
-                        //              cpu_tab.theme.update(&cs);
-                        //            }
-                        //          }
-                        //        }
-                        //      },
-                        //      KeyCode::Char('q') => {
-                        //        disable_raw_mode()?;
-                        //        terminal.clear()?;
-                        //        terminal.show_cursor()?;
-                        //        break;
-                        //      },
-                        //      _ => (),
-                        //    }
-                        //  },
-                        //  MenuItem::ReadoutBoards => {
-                        //    settings_tab.ctl_active = false;
-
-                        //    match ev.code {
-                        //      KeyCode::Up  => {
-                        //        if rb_menu.active_menu_item == RBMenuItem::SelectRB {
-                        //          wf_tab.previous_rb();
-                        //        }
-                        //      },
-                        //      KeyCode::Down => {
-                        //        if rb_menu.active_menu_item == RBMenuItem::SelectRB {
-                        //          wf_tab.next_rb();
-                        //        }
-                        //      },
-                        //      KeyCode::Char('h') => {
-                        //        ui_menu.active_menu_item = MenuItem::Home;
-                        //        rb_menu.active_menu_item = RBMenuItem::Home;
-                        //      },
-                        //      KeyCode::Char('i') => {
-                        //        rb_menu.active_menu_item = RBMenuItem::Info;
-                        //        wf_tab.view = RBTabView::Info;
-                        //      },
-                        //      KeyCode::Char('r') => {
-                        //        rb_menu.active_menu_item = RBMenuItem::RBMoniData;
-                        //        wf_tab.view = RBTabView::RBMoniData;
-                        //      },
-                        //      KeyCode::Char('w') => {
-                        //        rb_menu.active_menu_item = RBMenuItem::Waveforms;
-                        //        wf_tab.view = RBTabView::Waveform;
-                        //      },
-                        //      KeyCode::Char('s') => {
-                        //        rb_menu.active_menu_item = RBMenuItem::SelectRB;
-                        //        wf_tab.view = RBTabView::SelectRB;
-                        //      },
-                        //      KeyCode::Char('q') => {
-                        //        disable_raw_mode()?;
-                        //        terminal.clear()?;
-                        //        terminal.show_cursor()?;
-                        //        break;
-                        //      },
-                        //      _ => ()
-                        //    }
-                        //  },
-                        //  _ => {
-                        //    settings_tab.ctl_active = false;
-                        //    match ev.code {
-                        //      // it seems we have to carry thos allong for every tab
-                        //      KeyCode::Char('h') => ui_menu.active_menu_item = MenuItem::Home,
-                        //      KeyCode::Char('t') => ui_menu.active_menu_item = MenuItem::TofEvents,
-                        //      KeyCode::Char('r') => ui_menu.active_menu_item = MenuItem::ReadoutBoards,
-                        //      KeyCode::Char('s') => ui_menu.active_menu_item = MenuItem::Settings,
-                        //      KeyCode::Char('m') => ui_menu.active_menu_item = MenuItem::MasterTrigger,
-                        //      KeyCode::Char('c') => ui_menu.active_menu_item = MenuItem::TOFCpu,
-                        //      KeyCode::Char('q') => {
-                        //        disable_raw_mode()?;
-                        //        terminal.clear()?;
-                        //        terminal.show_cursor()?;
-                        //        break;
-                        //      },
-                        //      _ => trace!("Some other key pressed!"),
-                        //    }
-                        //  }
-                        //} // end match ui_menu
               }
             }
           }, 
@@ -951,48 +818,12 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             match shared_tabs.lock() {
               Err(err) => error!("Unable to get lock on shared tabbed interface! {err}"),
               Ok(mut tabs) => {
-            // FIXME - terminal draw should run in its own thread
-            // FIXME - what is named "rect" here is a frame actually
-                match terminal.draw(|rect| {
-                  let size           = rect.size();
+                match terminal.draw(|frame| {
+                  let size           = frame.size();
                   let mut mster_lo   = MasterLayout::new(size); 
                   let w_logs         = render_logs(color_theme.clone());
-                  rect.render_widget(w_logs, mster_lo.rect[2]);
-                  tabs.render(&mut mster_lo, rect);
-                  //match ui_menu.active_menu_item {
-                  //  MenuItem::Home => {
-                  //    ui_menu.render(&mster_lo.rect[0], rect);
-                  //    trace!("Rendering HomeTab!");
-                  //    home_tab.render(&mster_lo.rect[1], rect);
-                  //  },
-                  //  MenuItem::TofEvents => {
-                  //    ui_menu.render(&mster_lo.rect[0], rect);
-                  //    event_tab.render(&mster_lo.rect[1], rect);
-                  //  },
-                  //  MenuItem::TOFCpu => { 
-                  //    ui_menu.render(&mster_lo.rect[0], rect);
-                  //    cpu_tab.render(&mster_lo.rect[1], rect);
-                  //  },
-                  //  MenuItem::MasterTrigger => {
-                  //    //rect.render_widget(ui_menu.tabs.clone(), mster_lo.rect[0]);
-                  //    mt_menu.render(&mster_lo.rect[0], rect);
-                  //    trace!("Rendering MasterTriggerTab!");
-                  //    mt_tab2.render(&mster_lo.rect[1], rect);
-                  //  },
-                  //  MenuItem::ReadoutBoards => {
-                  //    rb_menu.render(&mster_lo.rect[0], rect);
-                  //    trace!("Rendering RBTab!");
-                  //    wf_tab.render(&mster_lo.rect[1], rect);
-                  //  },
-                  //  MenuItem::Settings => {
-                  //    st_menu.render(&mster_lo.rect[0], rect);
-                  //    trace!("Rendering SettingsTab!");
-                  //    settings_tab.render(&mster_lo.rect[1], rect);
-                  //  },
-                  //  _ => {
-                  //    ui_menu.render(&mster_lo.rect[0], rect);
-                  //  }
-                  //}
+                  frame.render_widget(w_logs, mster_lo.rect[2]);
+                  tabs.render(&mut mster_lo, frame);
                 }) {
                   Err(err) => error!("Can't render terminal! {err}"),
                   Ok(_)    => () ,
