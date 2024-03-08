@@ -554,27 +554,27 @@ impl TofCommand {
   /// representation
   pub fn from_command_code(cc : TofCommandCode, value : u32) -> TofCommand {
     match cc {
-      TofCommandCode::CmdUnknown                 => TofCommand::Unknown                 (0u32),
-      TofCommandCode::CmdPing                    => TofCommand::Ping                    (0u32),
-      TofCommandCode::CmdMoni                    => TofCommand::Moni                    (0u32),
+      TofCommandCode::CmdUnknown                 => TofCommand::Unknown                 (value),
+      TofCommandCode::CmdPing                    => TofCommand::Ping                    (value),
+      TofCommandCode::CmdMoni                    => TofCommand::Moni                    (value),
       TofCommandCode::CmdPower                   => TofCommand::Power                   (value),
       TofCommandCode::CmdSetThresholds           => TofCommand::SetThresholds           (value),
       TofCommandCode::CmdSetMTConfig             => TofCommand::SetMTConfig             (value),
       TofCommandCode::CmdSetPreampBias           => TofCommand::SetPreampBias           (value),
-      TofCommandCode::CmdDataRunStop             => TofCommand::DataRunStop             (0u32),
+      TofCommandCode::CmdDataRunStop             => TofCommand::DataRunStop             (value),
       TofCommandCode::CmdDataRunStart            => TofCommand::DataRunStart            (value),
       TofCommandCode::CmdStartValidationRun      => TofCommand::StartValidationRun      (value),
-      TofCommandCode::CmdGetFullWaveforms        => TofCommand::GetFullWaveforms        (0u32),
+      TofCommandCode::CmdGetFullWaveforms        => TofCommand::GetFullWaveforms        (value),
       TofCommandCode::CmdNoiCalibration          => TofCommand::NoiCalibration          (value),
       TofCommandCode::CmdVoltageCalibration      => TofCommand::VoltageCalibration      (value),
       TofCommandCode::CmdTimingCalibration       => TofCommand::TimingCalibration       (value),
       TofCommandCode::CmdDefaultCalibration      => TofCommand::DefaultCalibration      (value),
-      TofCommandCode::CmdUnspoolEventCache       => TofCommand::UnspoolEventCache       (0u32),
-      TofCommandCode::CmdSetRBDataBufSize        => TofCommand::SetRBDataBufSize        (0u32),
-      TofCommandCode::CmdTriggerModeForced       => TofCommand::TriggerModeForced       (0u32),
-      TofCommandCode::CmdTriggerModeForcedMTB    => TofCommand::TriggerModeForcedMTB    (0u32),
-      TofCommandCode::CmdSystemdReboot           => TofCommand::SystemdReboot           (0u32),
-      TofCommandCode::CmdListen                  => TofCommand::Listen                  (0u32)
+      TofCommandCode::CmdUnspoolEventCache       => TofCommand::UnspoolEventCache       (value),
+      TofCommandCode::CmdSetRBDataBufSize        => TofCommand::SetRBDataBufSize        (value),
+      TofCommandCode::CmdTriggerModeForced       => TofCommand::TriggerModeForced       (value),
+      TofCommandCode::CmdTriggerModeForcedMTB    => TofCommand::TriggerModeForcedMTB    (value),
+      TofCommandCode::CmdSystemdReboot           => TofCommand::SystemdReboot           (value),
+      TofCommandCode::CmdListen                  => TofCommand::Listen                  (value)
     }
   }
     
@@ -701,7 +701,6 @@ impl Serialization for TofCommand {
       error!("Packet does not start with HEAD signature");
       return Err(SerializationError::HeadInvalid {});
     }
-   
     let cc   = stream[*pos];
     *pos += 1;
     four_bytes = [stream[*pos],

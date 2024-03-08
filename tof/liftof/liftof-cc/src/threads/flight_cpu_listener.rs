@@ -68,7 +68,7 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
               continue;  
             },
             Ok(pack) => {
-              debug!("Got new tof packet {}", pack.packet_type);
+              info!("Got new tof packet {}", pack.packet_type);
               match pack.packet_type {
                 PacketType::TofCommand => {
                   // we have to strip off the topic
@@ -77,7 +77,10 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
                       error!("Problem decoding command {}", err);
                     }
                     Ok(cmd)  => {
-                      // we got a valid tof command, forward it and wait for the 
+                      // we got a valid tof command
+                      // interpret it
+
+                      // forward it and wait for the 
                       // response
                       let tof_resp  = TofResponse::GeneralFail(TofCommandResp::RespErrNotImplemented as u32);
                       let resp_not_implemented = crate::prefix_tof_cpu(&mut tof_resp.to_bytestream());
@@ -101,10 +104,10 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
                         },
                         TofCommand::Ping (value) => {
                           info!("Received ping command");
-                          // MSB third 8 bits are 
-                          let tof_component: TofComponent = TofComponent::from(((value | MASK_CMD_8BIT << 8) >> 8) as u8);
+                          // MSB third 8 bits are
+                          let tof_component: TofComponent = TofComponent::from(((value & (MASK_CMD_8BIT << 8)) >> 8) as u8);
                           // MSB fourth 8 bits are 
-                          let id: u8 = (value | MASK_CMD_8BIT) as u8;
+                          let id: u8 = (value & MASK_CMD_8BIT) as u8;
 
                           if tof_component == TofComponent::Unknown {
                             info!("The command is not valid for {}", TofComponent::Unknown);
@@ -126,9 +129,9 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
                         TofCommand::Moni (value) => {
                           info!("Received moni command");
                           // MSB third 8 bits are 
-                          let tof_component: TofComponent = TofComponent::from(((value | MASK_CMD_8BIT << 8) >> 8) as u8);
+                          let tof_component: TofComponent = TofComponent::from(((value & (MASK_CMD_8BIT << 8)) >> 8) as u8);
                           // MSB fourth 8 bits are 
-                          let id: u8 = (value | MASK_CMD_8BIT) as u8;
+                          let id: u8 = (value & MASK_CMD_8BIT) as u8;
 
                           if tof_component == TofComponent::Unknown {
                             // The packet was not for this RB so bye
@@ -149,11 +152,11 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
                         TofCommand::Power   (value) => {
                           info!("Received power command");
                           // MSB second 8 bits are tof component
-                          let tof_component: TofComponent = TofComponent::from(((value | (MASK_CMD_8BIT << 16)) >> 16) as u8);
+                          let tof_component: TofComponent = TofComponent::from(((value & (MASK_CMD_8BIT << 16)) >> 16) as u8);
                           // MSB third 8 bits are 
-                          let component_id: u8 = ((value | MASK_CMD_8BIT << 8) >> 8) as u8;
+                          let component_id: u8 = ((value & MASK_CMD_8BIT << 8) >> 8) as u8;
                           // MSB fourth 8 bits are 
-                          let power_status: PowerStatusEnum = PowerStatusEnum::from((value | MASK_CMD_8BIT) as u8);
+                          let power_status: PowerStatusEnum = PowerStatusEnum::from((value & MASK_CMD_8BIT) as u8);
                           // TODO implement proper routines
 
                           match tof_component {
@@ -178,11 +181,11 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
                         TofCommand::SetThresholds   (value) =>  {
                           info!("Received set threshold command! Will communicate to LTBs");
                           // MSB first 8 bits are LTB ID
-                          let ltb_id: u8 = ((value | (MASK_CMD_8BIT << 24)) >> 24) as u8;
+                          let ltb_id: u8 = ((value & (MASK_CMD_8BIT << 24)) >> 24) as u8;
                           // MSB second 8 bits are LTB ID
-                          let threshold_name: LTBThresholdName = LTBThresholdName::from(((value | (MASK_CMD_8BIT << 16)) >> 16) as u8);
+                          let threshold_name: LTBThresholdName = LTBThresholdName::from(((value & (MASK_CMD_8BIT << 16)) >> 16) as u8);
                           // MSB third 16 bits are extra (not used)
-                          let threshold_level: u16 = (value | MASK_CMD_16BIT) as u16;
+                          let threshold_level: u16 = (value & MASK_CMD_16BIT) as u16;
                           return_val = crate::send_ltb_threshold_set(Some(resp_socket), outgoing_c,  ltb_id, threshold_name, threshold_level);
                         },
                         TofCommand::SetMTConfig  (_) => {
@@ -193,26 +196,26 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
                         TofCommand::SetPreampBias   (value) =>  {
                           info!("Received set preamp bias command! Will communicate to preamps");
                           // MSB second 8 bits are LTB ID
-                          let preamp_id: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
+                          let preamp_id: u8 = ((value & (MASK_CMD_8BIT << 16)) >> 16) as u8;
                           // MSB third 16 bits are extra (not used)
-                          let preamp_bias: u16 = (value | MASK_CMD_16BIT) as u16;
+                          let preamp_bias: u16 = (value & MASK_CMD_16BIT) as u16;
                           return_val = crate::send_preamp_bias_set(Some(resp_socket), outgoing_c,  preamp_id, preamp_bias);
                         },
                         TofCommand::DataRunStop(value)   => {
                           info!("Received data run stop command");
                           // MSB fourth 8 bits are RB ID
-                          let rb_id: u8 = (value | MASK_CMD_8BIT) as u8;
+                          let rb_id: u8 = (value & MASK_CMD_8BIT) as u8;
 
                           return_val = crate::send_run_stop(Some(resp_socket), outgoing_c,  rb_id);
                         },
                         TofCommand::DataRunStart (value) => {
                           info!("Received data run start command");
                           // MSB second 8 bits are run_type
-                          let run_type: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
+                          let run_type: u8 = ((value & (MASK_CMD_8BIT << 16)) >> 16) as u8;
                           // MSB third 8 bits are RB ID
-                          let rb_id: u8    = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                          let rb_id: u8    = ((value & (MASK_CMD_8BIT << 8)) >> 8) as u8;
                           // MSB fourth 8 bits are event number
-                          let event_no: u8 = (value | MASK_CMD_8BIT) as u8;
+                          let event_no: u8 = (value & MASK_CMD_8BIT) as u8;
                           // let's start a run. The value of the TofCommnad shall be 
                           // nevents
 
@@ -232,42 +235,42 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
                         TofCommand::NoiCalibration (value) => {
                           info!("Received no input calibration command");
                           // MSB third 8 bits are RB ID
-                          let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                          let rb_id: u8 = ((value & (MASK_CMD_8BIT << 8)) >> 8) as u8;
                           // MSB fourth 8 bits are extra (not used)
-                          let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                          let extra: u8 = (value & MASK_CMD_8BIT) as u8;
                           
                           return_val = crate::send_noi_calibration(Some(resp_socket), outgoing_c,  rb_id, extra);
                         },
                         TofCommand::VoltageCalibration (value) => {
                           info!("Received voltage calibration command");
                           // MSB first 16 bits are voltage level
-                          let voltage_level: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
+                          let voltage_level: u16 = ((value & (MASK_CMD_16BIT << 16)) >> 16) as u16;
                           // MSB third 8 bits are RB ID
-                          let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                          let rb_id: u8 = ((value & (MASK_CMD_8BIT << 8)) >> 8) as u8;
                           // MSB fourth 8 bits are extra (not used)
-                          let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                          let extra: u8 = (value & MASK_CMD_8BIT) as u8;
                           
                           return_val = crate::send_voltage_calibration(Some(resp_socket), outgoing_c,  voltage_level, rb_id, extra);
                         },
                         TofCommand::TimingCalibration  (value) => {
                           info!("Received timing calibration command");
                           // MSB first 16 bits are voltage level
-                          let voltage_level: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
+                          let voltage_level: u16 = ((value & (MASK_CMD_16BIT << 16)) >> 16) as u16;
                           // MSB third 8 bits are RB ID
-                          let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                          let rb_id: u8 = ((value & (MASK_CMD_8BIT << 8)) >> 8) as u8;
                           // MSB fourth 8 bits are extra (not used)
-                          let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                          let extra: u8 = (value & MASK_CMD_8BIT) as u8;
                           
                           return_val = crate::send_timing_calibration(Some(resp_socket), outgoing_c,  voltage_level, rb_id, extra);
                         },
                         TofCommand::DefaultCalibration  (value) => {
                           info!("Received default calibration command");
                           // MSB first 16 bits are voltage level
-                          let voltage_level: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
+                          let voltage_level: u16 = ((value & (MASK_CMD_16BIT << 16)) >> 16) as u16;
                           // MSB third 8 bits are RB ID
-                          let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                          let rb_id: u8 = ((value & (MASK_CMD_8BIT << 8)) >> 8) as u8;
                           // MSB fourth 8 bits are extra (not used)
-                          let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                          let extra: u8 = (value & MASK_CMD_8BIT) as u8;
 
                           return_val = crate::send_default_calibration(Some(resp_socket), outgoing_c,  voltage_level, rb_id, extra);
                         },
@@ -298,17 +301,23 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
                         }
                       }
                       // deal with return values
+                      let resp_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+                      info!("Will set up 0MQ PUB socket to send status to flight cpu commands at address {flight_address_pub}");
+                      resp_socket.connect(flight_address_pub).expect("Unable to bind to data (PUB) socket {data_adress}");
+                      info!("ZMQ SUB Socket for flight cpu responder bound to {flight_address_pub}");
                       match return_val {
                         Err(cmd_error) => {
+                          info!("Cmd Error: {cmd_error}");
                           let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
-                          match cmd_socket.send(r.to_bytestream(),0) {
+                          match resp_socket.send(r.to_bytestream(),0) {
                             Err(err) => warn!("Can not send response!, Err {err}"),
                             Ok(_)    => info!("Responded to {cmd_error}!")
                           }
                         },
                         Ok(tof_command)  => {
+                          info!("Cmd resp: {tof_command}");
                           let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
-                          match cmd_socket.send(r.to_bytestream(),0) {
+                          match resp_socket.send(r.to_bytestream(),0) {
                             Err(err) => warn!("Can not send response!, Err {err}"),
                             Ok(_)    => info!("Responded to {tof_command}!")
                           }
