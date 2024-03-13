@@ -1,10 +1,13 @@
 //! Higher level functions, to deal with events/binary reprentation of it, 
 //! configure the drs4, etc.
+
 use std::fs::read_to_string;
 
-
 use tof_control::ltb_control::ltb_threshold;
-use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::serialization::{
+    Serialization,
+    //parse_u16,
+};
 use tof_dataclasses::io::RBEventMemoryStreamer;
 use std::path::Path;
 use std::time::{
@@ -439,7 +442,7 @@ pub fn rb_noi_subcalibration(rc_to_runner    : &Sender<RunConfig>,
 // Noi -> Voltage chain and publish.
 pub fn rb_voltage_subcalibration(rc_to_runner    : &Sender<RunConfig>,
                                  tp_to_publisher : &Sender<TofPacket>,
-                                 voltage_level   : u16) // where do we put this bad boi?
+                                 _voltage_level   : u16) // where do we put this bad boi?
 -> Result<(), CalibrationError> {
   warn!("Commencing RB no input + voltage sub-calibration routine! This will take the board out of datataking for a few minutes!");
   // TODO this should become something that can be read from a local json file
@@ -529,7 +532,7 @@ pub fn rb_voltage_subcalibration(rc_to_runner    : &Sender<RunConfig>,
 // Noi -> Voltage -> Timing chain and publish (no calib!).
 pub fn rb_timing_subcalibration(rc_to_runner    : &Sender<RunConfig>,
                                 tp_to_publisher : &Sender<TofPacket>,
-                                voltage_level   : u16)
+                                _voltage_level   : u16)
 -> Result<(), CalibrationError> {
   warn!("Commencing RB no input + voltage + timing sub-calibration routine! This will take the board out of datataking for a few minutes!");
   // TODO this should become something that can be read from a local json file
@@ -793,9 +796,9 @@ fn run_timing_calibration(rc_to_runner: &Sender<RunConfig>,
 // BEGIN Run stuff ============================================================
 pub fn rb_start_run(rc_to_runner    : &Sender<RunConfig>,
                     rc_config       : RunConfig,
-                    run_type        : u8,
-                    rb_id           : u8,
-                    event_no        : u8) -> Result<(), RunError> {
+                    _run_type        : u8,
+                    _rb_id           : u8,
+                    _event_no        : u8) -> Result<(), RunError> {
   println!("==> Will initialize new run!");
   match rc_to_runner.send(rc_config) {
     Err(err) => error!("Error initializing run! {err}"),
@@ -806,7 +809,7 @@ pub fn rb_start_run(rc_to_runner    : &Sender<RunConfig>,
 }
 
 pub fn rb_stop_run(rc_to_runner    : &Sender<RunConfig>,
-                   rb_id           : u8) -> Result<(), RunError> {
+                   _rb_id           : u8) -> Result<(), RunError> {
   println!("==> Will initialize new run!");
   println!("Received command to end run!");
   // default is not active for run config
@@ -1165,19 +1168,44 @@ pub fn ram_buffer_handler(buff_trip     : usize,
     // 2) read out
     // 3) reset
     if switch_buff {
-      match switch_ram_buffer() {
-        Ok(_)  => {
-          info!("Ram buffer switched!");
-        },
-        Err(_) => error!("Unable to switch RAM buffers!") 
+      // maybe do the switch when the DRS4 is not 
+      // busy atm
+      loop {
+        match daq_is_busy() {
+          Err(err) => {
+            trace!("DAQ is busy, not reading out RAM buffers..! {err}");
+            continue;
+          }
+          Ok(busy) => {
+            if busy {
+              continue;
+            }
+            match switch_ram_buffer() {
+              Ok(_)  => {
+                info!("Ram buffer switched!");
+              },
+              Err(_) => error!("Unable to switch RAM buffers!") 
+            }
+            break;
+          }
+        }
       }
     }
+    // make sure buffsize is up to date
+    buff_size  = get_buff_size(&which)?;
     let mut bytestream = Vec::<u8>::new(); 
     match read_data_buffer(&which, buff_size as usize) {
       Err(err) => error!("Can not read data buffer {err}"),
       Ok(bs)    => bytestream = bs,
     }
     let bs_len = bytestream.len();
+    
+    // check what is the last signature of the stream
+    // (debugging)
+    //let mut foo_pos : usize = bs_len - 2;
+    //let foo = parse_u16(&bytestream,&mut foo_pos);
+    //println!("[api::ram_buffer_handler] - stream ends with {}", foo);
+
     match bs_sender.send(bytestream) {
       Err(err) => error!("error sending {err}"),
       Ok(_)    => {
@@ -1321,7 +1349,7 @@ pub fn send_ltb_all_thresholds_reset() -> Result<(), SetError> {
 }
 
 
-pub fn send_ltb_threshold_set(ltb_id: u8, threshold_name: LTBThresholdName, threshold_level: u16) -> Result<(), SetError> {
+pub fn send_ltb_threshold_set(_ltb_id: u8, threshold_name: LTBThresholdName, threshold_level: u16) -> Result<(), SetError> {
   // TODO add check for LTB of interest
   let ch = LTBThresholdName::get_ch_number(threshold_name).unwrap();
   match ltb_threshold::set_threshold(ch, threshold_level as f32) {
@@ -1335,7 +1363,8 @@ pub fn send_ltb_threshold_set(ltb_id: u8, threshold_name: LTBThresholdName, thre
 
 
 pub fn power_preamp(preamp_id: u8, status: PowerStatusEnum) -> Result<TofCommandCode, CmdError> {
-  let mut result = Ok(());
+  //let mut result = Ok(());
+  let result : Result<(),SetError>; 
   match status {
     PowerStatusEnum::ON => {
       if preamp_id == DEFAULT_PREAMP_ID {

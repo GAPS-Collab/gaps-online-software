@@ -45,6 +45,11 @@ pub const TRIGGER_ENABLE : u32 = 0x11c;  // Write 0 to stop all triggers, 1 to e
 pub const WRITE_EVENTFRAGMENT : u32 = 0xc4;
 pub const TRIG_GEN_RATE       : u32 = 0x164;
 
+// this is at bit 1, where WRITE_EVENTFRAGMENT technically
+// is only at bit 0. Have 2 seperate addresses to not 
+// be confusing in th control functions.
+pub const DAQ_BUSY            : u32 = 0xc4;
+
 //=================DMA==================================
 // (direct memory access)
 //======================================================

@@ -26,7 +26,7 @@ pub fn get_mtb_link_id() -> Result<u32, RegisterError> {
 }
 
 
-/// write header only packets when the drs is busyu
+/// write header only packets when the drs is busy
 pub fn enable_evt_fragments() -> Result<(), RegisterError> {
   trace!("Enable event fragment writing!");
   write_control_reg(WRITE_EVENTFRAGMENT, 1)?;
@@ -59,6 +59,11 @@ pub fn disable_trigger() -> Result<(), RegisterError> {
   trace!("Enable triggers!");
   write_control_reg(TRIGGER_ENABLE, 0)?;
   Ok(())
+}
+
+pub fn daq_is_busy() -> Result<bool, RegisterError> {
+  let busy = (read_control_reg(DAQ_BUSY)? & 0x2) > 0;
+  Ok(busy)
 }
 
 /// Reset the board and prepare for a new run
