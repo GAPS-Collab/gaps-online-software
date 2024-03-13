@@ -19,6 +19,8 @@ use std::sync::{
 extern crate crossbeam_channel;
 use crossbeam_channel::Receiver; 
 
+use colored::Colorize;
+
 use tof_dataclasses::packets::{
     TofPacket,
     PacketType
@@ -199,9 +201,12 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         } // end match
         //} // end else
       } // end if pk == event packet
-    } // end incoming.recv 
-    if n_pack_sent % 1000 == 0 {
-      println!("[FLIGHT] Sent {n_pack_sent} TofPacket in {} sec!", timer.elapsed().as_secs());
+    } // end incoming.recv
+    if timer.elapsed().as_secs() > 60 {
+      let packet_rate = n_pack_sent as f32 /timer.elapsed().as_secs_f32();
+      println!("  {:<60}", ">> == == == == ==  DATA SINK HEARTBEAT   == == == == == <<".bright_cyan().bold());
+      println!("  {:<60} <<", format!(">> ==> Sent \t{} TofPackets! (packet rate {:.2}/s)", n_pack_sent ,packet_rate).bright_cyan());
+      println!("  {:<60}", ">> == == == == ==  == == == == == == ==  == == == == == <<".bright_cyan().bold());
       timer = Instant::now();
     }
   }
