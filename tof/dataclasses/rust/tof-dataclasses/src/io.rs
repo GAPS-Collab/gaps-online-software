@@ -657,7 +657,7 @@ impl Iterator for RBEventMemoryStreamer {
     // event id from stream
     //let event_id  = 0u32;
     let begin_pos : usize; // in case we need
-                               // to rewind
+                           // to rewind
      
     self.pos_at_head = false;
     begin_pos = self.pos; // in case we need
