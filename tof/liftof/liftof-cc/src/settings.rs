@@ -154,6 +154,8 @@ pub struct LiftofCCSettings {
   /// The address ("tcp://xx.xx.xx.xx:xxxxx") the tof computer should subscribe to 
   /// to get commands from the flight computer
   pub fc_sub_address             : String,
+  /// Interval of time that will elapse from a cmd check to the other
+  pub cmd_listener_interval_sec  : u64,
   /// The UDP port to be used to get packets from the 
   /// MTB
   pub mtb_address                : String,
@@ -186,6 +188,7 @@ impl LiftofCCSettings {
       packs_per_file            : 0,
       fc_pub_address            : String::from(""),
       fc_sub_address            : String::from(""),
+      cmd_listener_interval_sec : 60,
       mtb_address               : String::from("10.0.1.10:50001"),
       cpu_moni_interval_sec     : 60,
       rb_ignorelist             : Vec::<u8>::new(),
