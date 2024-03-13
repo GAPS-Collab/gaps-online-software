@@ -22,7 +22,7 @@ use std::time::{
     Duration,
     Instant,
 };
-use std::io::Write;
+//use std::io::Write;
 
 extern crate crossbeam_channel;
 extern crate signal_hook;
@@ -78,7 +78,7 @@ use liftof_lib::{
     DATAPORT,
     //Command,
     CommandRB,
-    color_log,
+    //color_log,
     RunStatistics,
     CalibrationCmd,
     LiftofSettings,
@@ -87,7 +87,7 @@ use liftof_lib::{
 
 use liftof_rb::threads::{
     runner,
-    calibration, 
+    //calibration, 
     cmd_responder,
     event_processing,
     monitoring,
@@ -334,14 +334,14 @@ fn main() {
     },
     CommandRB::Run(run_cmd) => {
       match run_cmd {
-        liftof_lib::RunCmd::Start(run_start_opts) => {
+        liftof_lib::RunCmd::Start(_run_start_opts) => {
           start_run_now = true;
           // for the default setting, actually we 
           // don't stop after a certain time, 
           // but just when we hit Ctrl+C
           end_after_run = run_config.nseconds > 0;
         },
-        liftof_lib::RunCmd::Stop(run_stop_opts) => {
+        liftof_lib::RunCmd::Stop(_run_stop_opts) => {
           match disable_trigger() {
             Err(err) => {
               error!("Unable to stop run! {err}");
@@ -354,8 +354,8 @@ fn main() {
           }
         }
       }
-    }, 
-    _ => ()
+    } 
+    //_ => ()
   }
   let run_stat = Arc::new(Mutex::new(RunStatistics::new()));
   let output_fname : Option<String>;
@@ -392,8 +392,8 @@ fn main() {
       (Sender<RunConfig>, Receiver<RunConfig>)                = unbounded();
   let (tp_to_pub, tp_from_client)        : 
       (Sender<TofPacket>, Receiver<TofPacket>)                = unbounded();
-  let (tp_to_cache, tp_from_builder) : 
-      (Sender<TofPacket>, Receiver<TofPacket>)                = unbounded();
+  //let (tp_to_cache, tp_from_builder) : 
+  //    (Sender<TofPacket>, Receiver<TofPacket>)                = unbounded();
   let (dtf_to_evproc, dtf_from_runner) :                
       (Sender<DataType>, Receiver<DataType>)                  = unbounded();
   
@@ -435,7 +435,7 @@ fn main() {
 
   // then the runner. It does nothing, until we send a set
   // of RunParams
-  let tp_to_cache_c    = tp_to_cache.clone();
+  //let tp_to_cache_c    = tp_to_cache.clone();
   let run_control      = thread_control.clone();
   let _runner_thread = thread::Builder::new()
     .name("runner".into())
@@ -536,10 +536,10 @@ fn main() {
   //                                      */
   //***************************************/
   
-  /// spawn the monitoring thread. From here on, 
-  /// we want monitoring for whatever we are doing.
-  /// If rb_moni_interval is set to a negative value,
-  /// we won't do it
+  // spawn the monitoring thread. From here on, 
+  // we want monitoring for whatever we are doing.
+  // If rb_moni_interval is set to a negative value,
+  // we won't do it
   if rb_moni_interval > 0.0 {
     let moni_ctrl          = thread_control.clone();
     let _monitoring_thread = thread::Builder::new()
