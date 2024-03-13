@@ -169,6 +169,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   //let mut clear_cache      = 0; // clear cache every 
   //let mut event_sending    = 0;
   let mut n_mte_received_tot = 0u64;
+  let mut n_mte_skipped      = 0u32;
   let mut n_rbe_received_tot = 0u64;
   let mut first_evid         : u32;
   let mut last_evid          = 0;
@@ -219,27 +220,32 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
 
           let mut event = TofEvent::from(&mt);
           event.header.run_id = run_id;
-          if event.mt_event.event_id != last_evid + 1 {
-            let delta_id = event.mt_event.event_id - last_evid;
-            error!("We skipped event ids {}", delta_id );
+          if last_evid != 0 {
+            if event.mt_event.event_id != last_evid + 1 {
+              //let delta_id = event.mt_event.event_id - last_evid;
+              if event.mt_event.event_id > last_evid {
+                n_mte_skipped += event.mt_event.event_id - last_evid - 1;
+              }
+              //error!("We skipped event ids {}", delta_id );
+            }
           }
           last_evid = event.mt_event.event_id;
           event_cache.insert(last_evid, event);
           // use this to keep track of the order
           // of events
           event_id_cache.push_back(last_evid);
+          n_received  += 1;
+          n_mte_received_tot += 1;
           
         }
       } // end match Ok(mt)
-      n_received  += 1;
       //if n_received % 10 == 0 {
       //  println!("==> Received 10 more MasterTriggerEvents");
       //}
-      n_mte_received_tot += 1;
     } // end getting MTEvents
     trace!("Debug timer MTE received! {:?}", debug_timer.elapsed());
     first_evid = event_id_cache[0]; 
-    
+    //let last_cache_evid = event_id_cache.back().unwrap(); 
     // check this timeout
     //let mut rb_events_added   = 0usize;
     //let mut iter_ev           = 0usize;
@@ -282,6 +288,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               // insert a new TofEvent
               //let new_ev = TofEvent::new();
               rb_ev_wo_mte += 1;
+              //error!("No MTEvent for RBEvent. rb event id {}, first mte {}, last mte {}", last_rb_evid, first_evid, last_cache_evid);
               continue 'main;
             },
             Some(ev) => {
@@ -300,6 +307,9 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                   println!("== ==> We saw {:?}, but {} is not part of that!", lg_hits, ev_rbid);
                 }
               } else {
+                if ev.is_complete() {
+                  error!("We are adding a RBEvent to a TofEvent which is already complete!");
+                }
                 ev.rb_events.push(rb_ev);
               }
               //break;
@@ -345,26 +355,27 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     }
     let debug_timer_elapsed = debug_timer.elapsed().as_secs_f64();
     if debug_timer_elapsed > 35.0  {
-      let fwidth = 100;
+      let fwidth = 70;
       println!("  {:fwidth$}", ">> == == == == ==  EVTBLDR HEARTBEAT   == == == == == <<".bright_purple().bold());
     //if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
-      println!("  {:fwidth$} <<", format!(">> ==> Received MTEvents \t{}", n_mte_received_tot).bright_purple());
-      println!("  {:fwidth$} <<", format!(">> ==> Received RBEvents \t{}", n_rbe_received_tot).bright_purple());
-      println!("  {:fwidth$} <<", format!(">> ==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid).bright_purple());
+      println!("  {:<60} <<", format!(">> ==> Received MTEvents \t{}", n_mte_received_tot).bright_purple());
+      println!("  {:<60} <<", format!(">> ==> Received RBEvents \t{}", n_rbe_received_tot).bright_purple());
+      println!("  {:<60} <<", format!(">> ==> Skipped MTEvents  \t{}", n_mte_skipped).bright_purple());
+      println!("  {:<60} <<", format!(">> ==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid).bright_purple());
       println!("  {:fwidth$} <<", format!(">> ==> Size of event cache    \t{}", event_cache.len()).bright_purple());
       println!("  {:fwidth$} <<", format!(">> ==> Size of event ID cache \t{}", event_id_cache.len()).bright_purple());
       println!("  {:fwidth$} <<", format!(">> ==> Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!").bright_purple());
       println!("  {:fwidth$} <<", format!(">> ==> Sent {} events!", n_sent).bright_purple());
-      println!("  {:fwidth$} <<", format!(">> ==> Chn len MTE receiver\t {}",m_trig_ev.len() ).bright_purple());
-      println!("  {:fwidth$} <<", format!(">> ==> Chn len RBE receiver\t {}",ev_from_rb.len()).bright_purple());
-      println!("  {:fwidth$} <<", format!(">> ==> Chn len TP  sender  \t {}",data_sink.len()).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Chn len MTE receiver\t{}",m_trig_ev.len() ).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Chn len RBE receiver\t{}",ev_from_rb.len()).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Chn len TP  sender  \t{}",data_sink.len()).bright_purple());
       if n_sent > 0 {
         let av_rb_ev = n_rbs_per_ev as f64 / n_sent as f64;
         println!("  {:fwidth$} <<", format!(">> ==> Average number of RBEvents/TofEvent {:4.2}", av_rb_ev).bright_purple());
-      }
-      if n_mte_received_tot > 0 {
-        let to_frac = n_timed_out as f64 / n_mte_received_tot as f64;
+        let to_frac = n_timed_out as f64 / n_sent as f64;
         println!("  {:fwidth$} <<", format!(">> ==> Fraction of timed out events {:4.2}", to_frac).bright_purple());
+        let recv_sent_frac = n_mte_received_tot as f64 / n_sent as f64;
+        println!("  {:fwidth$} <<", format!(">> ==> Fraction of incoming vs outgoing MTEvents {:4.2}", recv_sent_frac).bright_purple());
       }
       println!(">> ==> RBEvents received overview:");
       //let mut rbtable_repr = String::from(">> ");
@@ -466,6 +477,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               event_id_cache.push_back(evid);
             } else {
               // if we don't cache it, we have to send it. 
+              //let ev_to_send = ev.clone();
               let ev_to_send = event_cache.remove(&evid).unwrap();
               n_rbs_per_ev  += ev_to_send.rb_events.len(); 
               if settings.send_flight_packets {
