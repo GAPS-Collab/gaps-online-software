@@ -336,6 +336,11 @@ pub fn get_mtevent(bus : &mut IPBus)
   //fasterst
   //let sleeptime = Duration::from_micros(1000);
   //let mut timeout = Instant::now();
+  // FIXME - this is a bad workaround!!
+  //match reset_daq(bus) {
+  //  Err(err) => error!("Can not reset DAQ, error {err}"),
+  //  Ok(_)    => ()
+  //}
   loop {
     //thread::sleep(sleeptime);
     // 3 things can happen here:
