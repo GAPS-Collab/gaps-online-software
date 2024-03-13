@@ -118,13 +118,28 @@ where P: AsRef<Path>, {
 fn trace_check(event : &RBEvent) -> bool {
   let mut check = true;
   let mut nchan = 0usize;
+  let mut failed = true;
   for ch in event.header.get_channels() {
     if event.adc[ch as usize].len() != 1024 {
       check = false;
     }
+    for k in &event.adc[ch as usize] {
+      if *k != u16::MAX {
+        // just check that not all bins are 
+        // u16::MAX. They get set to that
+        // value in case of an error
+        // also if that happens to any of 
+        // the channels, throw the whole 
+        // event away.
+        failed = false;
+      }
+    }
+
     nchan += 1;
   }
-  check && nchan == NCHN
+  // for the calibration we want to have all 
+  // channels!
+  check && nchan == NCHN && !failed
 }
 
 /***********************************/
