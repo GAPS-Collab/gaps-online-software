@@ -342,6 +342,63 @@
 <a href="#341" id="341">341</a>
 <a href="#342" id="342">342</a>
 <a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::errors::SerializationError;
 <span class="kw">use </span><span class="kw">crate</span>::serialization::{
     parse_u8,
@@ -355,6 +412,23 @@
 </span><span class="kw">extern crate </span>rand;
 <span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 </span><span class="kw">use </span>rand::Rng;
+
+<span class="doccomment">/// We will save the values for the peak heigth, time and charge
+/// as u16. The calculations yield f32 though. We need to convert
+/// them using MIN/MAX and a range
+</span><span class="kw">const </span>MAX_PEAK_HEIGHT      : f32 = <span class="number">500.0</span>; <span class="comment">//mV
+//const MIN_PEAK_HEIGHT      : f32 = 0.0;
+</span><span class="kw">const </span>U16TOF32_PEAK_HEIGHT : f32 = MAX_PEAK_HEIGHT/(u16::MAX <span class="kw">as </span>f32);
+<span class="kw">const </span>F32TOU16_PEAK_HEIGHT : u16 = ((u16::MAX <span class="kw">as </span>f32)/MAX_PEAK_HEIGHT) <span class="kw">as </span>u16;
+<span class="kw">const </span>MAX_PEAK_CHARGE      : f32 = <span class="number">100.0</span>; 
+<span class="comment">//const MIN_PEAK_CHARGE      : f32 = 0.0;
+</span><span class="kw">const </span>U16TOF32_PEAK_CHARGE : f32 = MAX_PEAK_CHARGE/(u16::MAX <span class="kw">as </span>f32);
+<span class="kw">const </span>F32TOU16_PEAK_CHARGE : u16 = ((u16::MAX <span class="kw">as </span>f32)/MAX_PEAK_CHARGE) <span class="kw">as </span>u16;
+<span class="kw">const </span>MAX_PEAK_TIME        : f32 = <span class="number">500.0</span>;
+<span class="comment">//const MIN_PEAK_TIME        : f32 = 0.0;
+</span><span class="kw">const </span>U16TOF32_PEAK_TIME   : f32 = MAX_PEAK_TIME/(u16::MAX <span class="kw">as </span>f32);
+<span class="kw">const </span>F32TOU16_PEAK_TIME   : u16 = ((u16::MAX <span class="kw">as </span>f32)/MAX_PEAK_TIME) <span class="kw">as </span>u16;
+
 
 <span class="doccomment">/// Waveform peak
 ///
@@ -440,9 +514,9 @@
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="macro">write!</span>(f, <span class="string">"&lt;TofHit:
   Peak:
-    LE Time A/B   {} {}   
-    Height  A/B   {} {}
-    Charge  A/B   {} {}
+    LE Time A/B   {:.2} {:.2}   
+    Height  A/B   {:.2} {:.2}
+    Charge  A/B   {:.2} {:.2}
   charge_min_i    {}   
   pos_across      {}   
   t_average       {}   
@@ -451,12 +525,12 @@
   timestamp16     {}
   |-&gt; timestamp48 {}
   VALID           {}&gt;"</span>, 
-            <span class="self">self</span>.time_a,
-            <span class="self">self</span>.time_b,
-            <span class="self">self</span>.peak_a,
-            <span class="self">self</span>.peak_b,
-            <span class="self">self</span>.charge_a,
-            <span class="self">self</span>.charge_b,
+            <span class="self">self</span>.get_time_a(),
+            <span class="self">self</span>.get_time_b(),
+            <span class="self">self</span>.get_peak_a(),
+            <span class="self">self</span>.get_peak_b(),
+            <span class="self">self</span>.get_charge_a(),
+            <span class="self">self</span>.get_charge_b(),
             <span class="self">self</span>.charge_min_i,
             <span class="self">self</span>.pos_across,
             <span class="self">self</span>.t_average,
@@ -604,13 +678,27 @@
   }
 
   <span class="kw">pub fn </span>set_peak_a(<span class="kw-2">&amp;mut </span><span class="self">self</span>, peak : f32 ) {
-    <span class="kw">let </span>prec : f64 = <span class="number">0.004</span>;
-    <span class="self">self</span>.peak_a = (peak <span class="kw">as </span>f64/prec) <span class="kw">as </span>u16;
+    <span class="kw">if </span>peak &gt;= MAX_PEAK_HEIGHT {
+      <span class="self">self</span>.peak_a = u16::MAX;
+    } <span class="kw">else </span>{
+      <span class="self">self</span>.peak_a = F32TOU16_PEAK_HEIGHT<span class="kw-2">*</span>(peak.floor() <span class="kw">as </span>u16); 
+    }
+  }
+  
+  <span class="kw">pub fn </span>get_peak_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
+    <span class="self">self</span>.peak_a <span class="kw">as </span>f32 * U16TOF32_PEAK_HEIGHT
   }
 
   <span class="kw">pub fn </span>set_peak_b(<span class="kw-2">&amp;mut </span><span class="self">self</span>, peak : f32 ) {
-    <span class="kw">let </span>prec : f64 = <span class="number">0.004</span>;
-    <span class="self">self</span>.peak_b = (peak <span class="kw">as </span>f64/prec) <span class="kw">as </span>u16;
+    <span class="kw">if </span>peak &gt;= MAX_PEAK_HEIGHT {
+      <span class="self">self</span>.peak_b = u16::MAX;
+    } <span class="kw">else </span>{
+      <span class="self">self</span>.peak_b = F32TOU16_PEAK_HEIGHT<span class="kw-2">*</span>(peak.floor() <span class="kw">as </span>u16); 
+    }
+  }
+  
+  <span class="kw">pub fn </span>get_peak_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
+    <span class="self">self</span>.peak_b <span class="kw">as </span>f32 * U16TOF32_PEAK_HEIGHT
   }
   
   <span class="kw">pub fn </span>set_peak(<span class="kw-2">&amp;mut </span><span class="self">self</span>, peak : f32, side : usize ) {
@@ -620,15 +708,27 @@
   }
 
   <span class="kw">pub fn </span>set_time_a(<span class="kw-2">&amp;mut </span><span class="self">self</span>, time : f32 ) {
-    <span class="comment">//println!("time {time}");
-    </span><span class="kw">let </span>prec : f64 = <span class="number">0.004</span>;
-    <span class="self">self</span>.time_a = (time <span class="kw">as </span>f64/prec) <span class="kw">as </span>u16;
-    <span class="comment">//println!("time_a {}", self.time_a);
-  </span>}
+    <span class="kw">if </span>time &gt;= MAX_PEAK_TIME {
+      <span class="self">self</span>.time_a = u16::MAX;
+    } <span class="kw">else </span>{
+      <span class="self">self</span>.time_a = F32TOU16_PEAK_TIME<span class="kw-2">*</span>(time.floor() <span class="kw">as </span>u16); 
+    }
+  }
+
+  <span class="kw">pub fn </span>get_time_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
+    <span class="self">self</span>.time_a <span class="kw">as </span>f32 * U16TOF32_PEAK_TIME 
+  }
 
   <span class="kw">pub fn </span>set_time_b(<span class="kw-2">&amp;mut </span><span class="self">self</span>, time : f32 ) {
-    <span class="kw">let </span>prec : f64 = <span class="number">0.004</span>;
-    <span class="self">self</span>.time_b = (time <span class="kw">as </span>f64/prec) <span class="kw">as </span>u16;
+    <span class="kw">if </span>time &gt;= MAX_PEAK_TIME {
+      <span class="self">self</span>.time_b = u16::MAX;
+    } <span class="kw">else </span>{
+      <span class="self">self</span>.time_b = F32TOU16_PEAK_TIME<span class="kw-2">*</span>(time.floor() <span class="kw">as </span>u16); 
+    }
+  }
+  
+  <span class="kw">pub fn </span>get_time_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
+    <span class="self">self</span>.time_b <span class="kw">as </span>f32 * U16TOF32_PEAK_TIME 
   }
   
   <span class="kw">pub fn </span>set_time(<span class="kw-2">&amp;mut </span><span class="self">self</span>, time : f32, side : usize ) {
@@ -638,13 +738,27 @@
   }
 
   <span class="kw">pub fn </span>set_charge_a(<span class="kw-2">&amp;mut </span><span class="self">self</span>, charge : f32 ) {
-    <span class="kw">let </span>prec : f64 = <span class="number">0.004</span>;
-    <span class="self">self</span>.charge_a = (charge <span class="kw">as </span>f64/prec) <span class="kw">as </span>u16;
+    <span class="kw">if </span>charge &gt;= MAX_PEAK_CHARGE {
+      <span class="self">self</span>.charge_a = u16::MAX;
+    } <span class="kw">else </span>{
+      <span class="self">self</span>.charge_a = F32TOU16_PEAK_CHARGE<span class="kw-2">*</span>(charge.floor() <span class="kw">as </span>u16); 
+    }
+  }
+  
+  <span class="kw">pub fn </span>get_charge_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
+    <span class="self">self</span>.charge_a <span class="kw">as </span>f32 * U16TOF32_PEAK_CHARGE
   }
 
   <span class="kw">pub fn </span>set_charge_b(<span class="kw-2">&amp;mut </span><span class="self">self</span>, charge : f32 ) {
-    <span class="kw">let </span>prec : f64 = <span class="number">0.004</span>;
-    <span class="self">self</span>.charge_b = (charge <span class="kw">as </span>f64/prec) <span class="kw">as </span>u16;
+    <span class="kw">if </span>charge &gt;= MAX_PEAK_CHARGE {
+      <span class="self">self</span>.charge_b = u16::MAX;
+    } <span class="kw">else </span>{
+      <span class="self">self</span>.charge_b = F32TOU16_PEAK_CHARGE<span class="kw-2">*</span>(charge.floor() <span class="kw">as </span>u16); 
+    }
+  }
+  
+  <span class="kw">pub fn </span>get_charge_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
+    <span class="self">self</span>.charge_b <span class="kw">as </span>f32 * U16TOF32_PEAK_CHARGE
   }
   
   <span class="kw">pub fn </span>set_charge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, charge : f32, side : usize ) {

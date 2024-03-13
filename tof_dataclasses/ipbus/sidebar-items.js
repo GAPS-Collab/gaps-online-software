@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["IPBusPacketType"],"struct":["IPBus"]};
+window.SIDEBAR_ITEMS = {"constant":["MT_MAX_PACKSIZE","UDP_SOCKET_SLEEP_USEC"],"enum":["IPBusPacketType"],"struct":["IPBus","IPBusPacket"]};

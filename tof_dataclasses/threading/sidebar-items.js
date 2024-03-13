@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["ThreadControl","ThreadPool"]};
+window.SIDEBAR_ITEMS = {"struct":["ThreadControl"]};

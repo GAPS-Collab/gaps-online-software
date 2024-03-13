@@ -1882,7 +1882,7 @@
         <span class="kw">match </span>search_for_u16(TofPacket::HEAD, <span class="kw-2">&amp;</span><span class="self">self</span>.stream, search_pos) {
           <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; (),
           <span class="prelude-val">Ok</span>(result) =&gt; {
-            <span class="macro">println!</span>(<span class="string">"The channel data is corrupt, but we found a header at {} for remaining stream len {}"</span>, result, <span class="self">self</span>.stream.len()); 
+            <span class="macro">info!</span>(<span class="string">"The channel data is corrupt, but we found a header at {} for remaining stream len {}"</span>, result, <span class="self">self</span>.stream.len()); 
           }
         }
         <span class="kw">let </span><span class="kw-2">mut </span>stream_view = Vec::&lt;u8&gt;::new();
@@ -1973,7 +1973,7 @@
     event.header = header;
     event.status = event_status;
     <span class="kw">if </span>event_status == EventStatus::TailWrong {
-      <span class="macro">println!</span>(<span class="string">"{}"</span>, event);
+      <span class="macro">info!</span>(<span class="string">"{}"</span>, event);
     }
     <span class="prelude-val">Some</span>(event)
   }
@@ -2010,7 +2010,7 @@
     // event id from stream
     //let event_id  = 0u32;
     </span><span class="kw">let </span>begin_pos : usize; <span class="comment">// in case we need
-                               // to rewind
+                           // to rewind
      
     </span><span class="self">self</span>.pos_at_head = <span class="bool-val">false</span>;
     begin_pos = <span class="self">self</span>.pos; <span class="comment">// in case we need

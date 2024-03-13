@@ -285,6 +285,10 @@
 <a href="#284" id="284">284</a>
 <a href="#285" id="285">285</a>
 <a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// Generalized settings for liftof-cc
 ///
 /// Configure it from a .json config 
@@ -300,9 +304,9 @@
 
 <span class="kw">extern crate </span>toml;
 <span class="kw">use </span>tof_dataclasses::errors::SerializationError;
-<span class="kw">use </span>tof_dataclasses::events::master_trigger::TriggerType;
+<span class="comment">//use tof_dataclasses::events::master_trigger::TriggerType;
 
-<span class="kw">use </span>liftof_lib::master_trigger::MTBSettings;
+</span><span class="kw">use </span>liftof_lib::master_trigger::MTBSettings;
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 </span><span class="kw">pub enum </span>BuildStrategy {
@@ -452,6 +456,9 @@
   </span><span class="kw">pub </span>rb_ignorelist              : Vec&lt;u8&gt;,
   <span class="doccomment">/// Should TofHits be generated?
   </span><span class="kw">pub </span>run_analysis_engine        : bool,
+  <span class="doccomment">/// Send TofSummary + RBWaveforms instead of 
+  /// TofEvents
+  </span><span class="kw">pub </span>send_flight_packets        : bool,
   <span class="doccomment">/// Settings to control the MTB
   </span><span class="kw">pub </span>mtb_settings               : MTBSettings,
   <span class="doccomment">/// Settings for the TOF event builder
@@ -474,6 +481,7 @@
       cpu_moni_interval_sec     : <span class="number">60</span>,
       rb_ignorelist             : Vec::&lt;u8&gt;::new(),
       run_analysis_engine       : <span class="bool-val">true</span>,
+      send_flight_packets       : <span class="bool-val">false</span>,
       mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),

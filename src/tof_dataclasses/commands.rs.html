@@ -892,6 +892,10 @@
 <a href="#891" id="891">891</a>
 <a href="#892" id="892">892</a>
 <a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Commmands which can be issued
 //! to the various components of 
 //! the tof system.
@@ -1155,11 +1159,11 @@
 </span><span class="kw">pub enum </span>TofOperationMode {
   Unknown          = <span class="number">0u8</span>,
   Default          = <span class="number">1u8</span>,
-  <span class="attr">#[deprecated(since=<span class="string">"0.8.3"</span>)] 
-  </span>StreamAny        = <span class="number">10u8</span>,
-  <span class="attr">#[deprecated(since=<span class="string">"0.8.3"</span>)] 
-  </span>RequestReply     = <span class="number">20u8</span>,
-  <span class="doccomment">/// Don't decode any of the event 
+  <span class="comment">//#[deprecated(since="0.8.3")] 
+  //StreamAny        = 10u8,
+  //#[deprecated(since="0.8.3")] 
+  //RequestReply     = 20u8,
+  </span><span class="doccomment">/// Don't decode any of the event 
   /// data on the RB, just push it 
   /// onward
   </span>RBHighThroughput = <span class="number">30u8</span>,
@@ -1180,9 +1184,9 @@
     <span class="kw">match </span>value {
       <span class="number">0u8  </span>=&gt; TofOperationMode::Unknown,
       <span class="number">1u8  </span>=&gt; TofOperationMode::Default,
-      <span class="number">10u8 </span>=&gt; TofOperationMode::StreamAny,
-      <span class="number">20u8 </span>=&gt; TofOperationMode::RequestReply,
-      <span class="number">30u8 </span>=&gt; TofOperationMode::RBHighThroughput,
+      <span class="comment">//10u8 =&gt; TofOperationMode::StreamAny,
+      //20u8 =&gt; TofOperationMode::RequestReply,
+      </span><span class="number">30u8 </span>=&gt; TofOperationMode::RBHighThroughput,
       <span class="number">40u8 </span>=&gt; TofOperationMode::RBCalcCRC32,
       <span class="number">50u8 </span>=&gt; TofOperationMode::RBWaveform,
       <span class="kw">_    </span>=&gt; TofOperationMode::Unknown
@@ -1197,9 +1201,9 @@
     <span class="kw">let </span>choices = [
       TofOperationMode::Unknown,
       TofOperationMode::Default,
-      TofOperationMode::RequestReply,
-      TofOperationMode::StreamAny,
-      TofOperationMode::RBHighThroughput,
+      <span class="comment">//TofOperationMode::RequestReply,
+      //TofOperationMode::StreamAny,
+      </span>TofOperationMode::RBHighThroughput,
       TofOperationMode::RBCalcCRC32,
       TofOperationMode::RBWaveform,
       TofOperationMode::Unknown
@@ -1771,9 +1775,13 @@
 </span><span class="kw">fn </span>test_tofoperationmode() {
   <span class="kw">let </span><span class="kw-2">mut </span>type_codes = Vec::&lt;u8&gt;::new();
   type_codes.push(TofOperationMode::Unknown <span class="kw">as </span>u8); 
-  type_codes.push(TofOperationMode::StreamAny <span class="kw">as </span>u8); 
-  type_codes.push(TofOperationMode::RequestReply <span class="kw">as </span>u8); 
-  <span class="kw">for </span>tc <span class="kw">in </span>type_codes.iter() {
+  type_codes.push(TofOperationMode::Default <span class="kw">as </span>u8); 
+  type_codes.push(TofOperationMode::RBHighThroughput <span class="kw">as </span>u8); 
+  type_codes.push(TofOperationMode::RBWaveform <span class="kw">as </span>u8); 
+  type_codes.push(TofOperationMode::RBCalcCRC32 <span class="kw">as </span>u8); 
+  <span class="comment">//type_codes.push(TofOperationMode::StreamAny as u8); 
+  //type_codes.push(TofOperationMode::RequestReply as u8); 
+  </span><span class="kw">for </span>tc <span class="kw">in </span>type_codes.iter() {
     <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>tc,TofOperationMode::try_from(<span class="kw-2">*</span>tc).unwrap() <span class="kw">as </span>u8);  
   }
 }

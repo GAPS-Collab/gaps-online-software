@@ -1300,7 +1300,24 @@
 <a href="#1299" id="1299">1299</a>
 <a href="#1300" id="1300">1300</a>
 <a href="#1301" id="1301">1301</a>
+<a href="#1302" id="1302">1302</a>
+<a href="#1303" id="1303">1303</a>
+<a href="#1304" id="1304">1304</a>
+<a href="#1305" id="1305">1305</a>
+<a href="#1306" id="1306">1306</a>
+<a href="#1307" id="1307">1307</a>
+<a href="#1308" id="1308">1308</a>
+<a href="#1309" id="1309">1309</a>
+<a href="#1310" id="1310">1310</a>
+<a href="#1311" id="1311">1311</a>
+<a href="#1312" id="1312">1312</a>
+<a href="#1313" id="1313">1313</a>
+<a href="#1314" id="1314">1314</a>
+<a href="#1315" id="1315">1315</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
+<span class="kw">pub mod </span>settings;
+<span class="kw">pub mod </span>constants;
+
 <span class="kw">use </span>constants::{DEFAULT_CALIB_VOLTAGE,
                 DEFAULT_CALIB_EXTRA,
                 DEFAULT_RB_ID,
@@ -1315,15 +1332,16 @@
                 </span>PREAMP_MIN_BIAS,
                 PREAMP_MAX_BIAS};
 <span class="kw">pub use </span>master_trigger::{
-    connect_to_mtb,
-    master_trigger,
+    <span class="comment">//connect_to_mtb,
+    </span>master_trigger,
     MTBSettings
 };
 
-<span class="kw">pub mod </span>constants;
+<span class="kw">pub use </span>settings::LiftofSettings;
 
 <span class="kw">use </span>std::error::Error;
 <span class="kw">use </span>std::fmt;
+
 <span class="kw">use </span>std::{
     fs::File,
 };
@@ -1356,8 +1374,8 @@
 <span class="kw">use </span>tof_dataclasses::manifest::ReadoutBoard;
 <span class="kw">use </span>tof_dataclasses::constants::NWORDS;
 <span class="kw">use </span>tof_dataclasses::calibrations::{
-    RBCalibrations,
-    find_zero_crossings,
+    <span class="comment">//RBCalibrations,
+    </span>find_zero_crossings,
 };
 <span class="kw">use </span>tof_dataclasses::packets::{
     TofPacket,
@@ -1375,10 +1393,12 @@
 };
 <span class="kw">use </span>tof_dataclasses::events::tof_hit::Peak;
 
-<span class="kw">use </span>tof_dataclasses::analysis::{calculate_pedestal,
-                                integrate,
-                                cfd_simple,
-                                find_peaks};
+<span class="kw">use </span>tof_dataclasses::analysis::{
+    calculate_pedestal,
+    integrate,
+    cfd_simple,
+    find_peaks
+};
 
 <span class="kw">use </span>tof_dataclasses::RBChannelPaddleEndIDMap;
 
@@ -1605,8 +1625,7 @@
 </span><span class="kw">pub fn </span>readoutboard_commander(cmd : <span class="kw-2">&amp;</span>Receiver&lt;TofPacket&gt;){
   <span class="macro">debug!</span>(<span class="string">".. started!"</span>);
   <span class="kw">let </span>ctx = zmq::Context::new();
-  <span class="comment">//let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
-  </span><span class="kw">let </span>this_board_ip = IpAddr::V4(Ipv4Addr::new(<span class="number">10</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>));
+  <span class="kw">let </span>this_board_ip = IpAddr::V4(Ipv4Addr::new(<span class="number">10</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>));
 
   <span class="kw">let </span>address_ip;
   <span class="kw">match </span>this_board_ip {
@@ -1818,8 +1837,8 @@
       ch_voltages[n] -= ped;
     }
     <span class="kw">let </span><span class="kw-2">mut </span>charge : f32 = <span class="number">0.0</span>;
-    <span class="macro">debug!</span>(<span class="string">"Check impedance value! Just using 50 [Ohm]"</span>);
-    <span class="kw">match </span>integrate(<span class="kw-2">&amp;</span>ch_voltages,
+    <span class="comment">//debug!("Check impedance value! Just using 50 [Ohm]");
+    </span><span class="kw">match </span>integrate(<span class="kw-2">&amp;</span>ch_voltages,
                     <span class="kw-2">&amp;</span>ch_times,
                     <span class="number">270.0</span>, <span class="number">70.0</span>, <span class="number">50.0</span>) {
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1834,7 +1853,8 @@
     <span class="comment">// We actually might have multiple peaks 
     // here
     // FIXME 
-    </span><span class="kw">match </span>find_peaks(<span class="kw-2">&amp;</span>ch_voltages ,
+    </span><span class="kw">let </span><span class="kw-2">mut </span>max_volts = <span class="number">0.0f32</span>;
+    <span class="kw">match </span>find_peaks(<span class="kw-2">&amp;</span>ch_voltages ,
                      <span class="kw-2">&amp;</span>ch_times    ,
                      <span class="number">270.0</span>, 
                      <span class="number">70.0 </span>,
@@ -1858,6 +1878,10 @@
               cfd_times.push(cfd);
             }
           }
+          <span class="comment">// just do the first peak for now
+          </span><span class="kw">let </span>pk_height = ch_voltages[pk.<span class="number">0</span>..pk.<span class="number">1</span>].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
+          max_volts = <span class="kw-2">*</span>pk_height; 
+          <span class="kw">break</span>;
         }
       }<span class="comment">// end OK
     </span>} <span class="comment">// end match find_peaks 
@@ -1870,9 +1894,11 @@
     <span class="kw">if </span>is_a_side {
       this_hit.set_time_a(this_time);
       this_hit.set_charge_a(charge);
+      this_hit.set_peak_a(max_volts);
     } <span class="kw">else </span>{
       this_hit.set_time_b(this_time);
       this_hit.set_charge_b(charge);
+      this_hit.set_peak_b(max_volts);
     }
     <span class="comment">// Technically, we can have more than one peak. 
     // We need to adjust the integration window to 
@@ -2036,7 +2062,7 @@
 }
 
 <span class="doccomment">/// Command Enums and stucts
-</span><span class="attr">#[derive(Debug, Parser, PartialEq)]
+</span><span class="attr">#[derive(Debug, Clone, Parser, PartialEq)]
 </span><span class="kw">pub enum </span>CommandRB {
   <span class="doccomment">/// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
   </span><span class="attr">#[command(subcommand)]
@@ -2046,11 +2072,13 @@
   </span>Set(SetCmd),
   <span class="doccomment">/// Start/stop data taking run.
   </span><span class="attr">#[command(subcommand)]
-  </span>Run(RunCmd)
+  </span>Run(RunCmd),
+  <span class="doccomment">/// Listen to commands from the central C&amp;C server (liftof-cc).
+  </span>Listen(ListenCmd),
 }
 
 <span class="doccomment">/// TOF SW cmds ====================================================
-</span><span class="attr">#[derive(Debug, Args, PartialEq)]
+</span><span class="attr">#[derive(Debug, Copy, Clone, Args, PartialEq)]
 </span><span class="kw">pub struct </span>ListenCmd { }
 
 <span class="attr">#[derive(Debug, Args, PartialEq)]
@@ -2095,7 +2123,7 @@
 
 
 /// Set cmds ====================================================
-</span><span class="attr">#[derive(Debug, Subcommand, PartialEq)]
+</span><span class="attr">#[derive(Debug, Clone, Subcommand, PartialEq)]
 </span><span class="kw">pub enum </span>SetCmd {
   <span class="doccomment">/// Set MT configuration (WHAT SHOULD I DO WITH THIS TODO)
   </span><span class="comment">//MTConfig(MTConfigOpts),
@@ -2125,7 +2153,7 @@
 //   }
 // }
 
-</span><span class="attr">#[derive(Debug, Args, PartialEq)]
+</span><span class="attr">#[derive(Debug, Clone, Args, PartialEq)]
 </span><span class="kw">pub struct </span>LtbThresholdOpts {
   <span class="doccomment">/// ID of the LTB to target
   </span><span class="attr">#[arg(short, long, default_value_t = DEFAULT_LTB_ID)]
@@ -2192,7 +2220,7 @@
   }
 }
 
-<span class="attr">#[derive(Debug, Args, PartialEq)]
+<span class="attr">#[derive(Debug, Clone, Args, PartialEq)]
 </span><span class="kw">pub struct </span>PreampBiasOpts {
   <span class="doccomment">/// RB to target in voltage calibration run.
   </span><span class="attr">#[arg(short, long, default_value_t = DEFAULT_RB_ID)]
@@ -2214,7 +2242,7 @@
 <span class="doccomment">/// END Set cmds ================================================
 
 /// Calibration cmds ====================================================
-</span><span class="attr">#[derive(Debug, Subcommand, PartialEq)]
+</span><span class="attr">#[derive(Debug, Clone, Subcommand, PartialEq)]
 </span><span class="kw">pub enum </span>CalibrationCmd {
   <span class="doccomment">/// Default calibration run, meaning 2 voltage calibrations and one timing calibration on all RBs with the default values.
   </span>Default(DefaultOpts),
@@ -2226,7 +2254,7 @@
   </span>Timing(TimingOpts)
 }
 
-<span class="attr">#[derive(Debug, Args, PartialEq)]
+<span class="attr">#[derive(Debug, Clone, Args, PartialEq)]
 </span><span class="kw">pub struct </span>DefaultOpts {
   <span class="doccomment">/// Voltage level to be set in default calibration run.
   </span><span class="attr">#[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
@@ -2249,7 +2277,7 @@
   }
 }
 
-<span class="attr">#[derive(Debug, Args, PartialEq)]
+<span class="attr">#[derive(Debug, Clone, Args, PartialEq)]
 </span><span class="kw">pub struct </span>NoiOpts {
   <span class="doccomment">/// ID of the RB to target in no input calibration run.
   </span><span class="attr">#[arg(short, long, default_value_t = DEFAULT_RB_ID)]
@@ -2268,7 +2296,7 @@
   }
 }
 
-<span class="attr">#[derive(Debug, Args, PartialEq)]
+<span class="attr">#[derive(Debug, Copy, Clone, Args, PartialEq)]
 </span><span class="kw">pub struct </span>VoltageOpts {
   <span class="doccomment">/// Voltage level to be set in voltage calibration run.
   </span><span class="attr">#[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
@@ -2291,7 +2319,7 @@
   }
 }
 
-<span class="attr">#[derive(Debug, Args, PartialEq)]
+<span class="attr">#[derive(Debug, Copy, Clone, Args, PartialEq)]
 </span><span class="kw">pub struct </span>TimingOpts {
   <span class="doccomment">/// Voltage level to be set in voltage calibration run.
   </span><span class="attr">#[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
@@ -2546,7 +2574,7 @@
 <span class="doccomment">/// END Power cmds ================================================
 
 /// Run cmds ======================================================
-</span><span class="attr">#[derive(Debug, Subcommand, PartialEq)]
+</span><span class="attr">#[derive(Debug, Clone, Subcommand, PartialEq)]
 </span><span class="kw">pub enum </span>RunCmd {
   <span class="doccomment">/// Start data taking
   </span>Start(StartRunOpts),
@@ -2554,7 +2582,7 @@
   </span>Stop(StopRunOpts)
 }
 
-<span class="attr">#[derive(Debug, Args, PartialEq)]
+<span class="attr">#[derive(Debug, Clone, Args, PartialEq)]
 </span><span class="kw">pub struct </span>StartRunOpts {
   <span class="doccomment">/// Which kind of run is to be launched
   </span><span class="attr">#[arg(short, long, default_value_t = DEFAULT_RUN_TYPE)]
@@ -2577,7 +2605,7 @@
   }
 }
 
-<span class="attr">#[derive(Debug, Args, PartialEq)]
+<span class="attr">#[derive(Debug, Clone, Args, PartialEq)]
 </span><span class="kw">pub struct </span>StopRunOpts {
   <span class="doccomment">/// ID of the RB where to run data taking
   </span><span class="attr">#[arg(short, long, default_value_t = DEFAULT_RB_ID)]

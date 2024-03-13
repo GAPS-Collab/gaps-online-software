@@ -349,6 +349,14 @@
 <a href="#348" id="348">348</a>
 <a href="#349" id="349">349</a>
 <a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Convenience functions to read/write
 //!  the various control registers
 //!
@@ -377,7 +385,7 @@
 }
 
 
-<span class="doccomment">/// write header only packets when the drs is busyu
+<span class="doccomment">/// write header only packets when the drs is busy
 </span><span class="kw">pub fn </span>enable_evt_fragments() -&gt; <span class="prelude-ty">Result</span>&lt;(), RegisterError&gt; {
   <span class="macro">trace!</span>(<span class="string">"Enable event fragment writing!"</span>);
   write_control_reg(WRITE_EVENTFRAGMENT, <span class="number">1</span>)<span class="question-mark">?</span>;
@@ -412,6 +420,11 @@
   <span class="prelude-val">Ok</span>(())
 }
 
+<span class="kw">pub fn </span>daq_is_busy() -&gt; <span class="prelude-ty">Result</span>&lt;bool, RegisterError&gt; {
+  <span class="kw">let </span>busy = (read_control_reg(DAQ_BUSY)<span class="question-mark">? </span>&amp; <span class="number">0x2</span>) &gt; <span class="number">0</span>;
+  <span class="prelude-val">Ok</span>(busy)
+}
+
 <span class="doccomment">/// Reset the board and prepare for a new run
 ///
 /// Procedure as discussed in 12/2023
@@ -431,7 +444,10 @@
     ncycles += <span class="number">1</span>;
     <span class="kw">if </span>ncycles % <span class="number">10 </span>== <span class="number">0 </span>{
       <span class="macro">error!</span>(<span class="string">"Not getting SOFT_RESET_DONE acknowledged. Will try DMA reset"</span>);
-      reset_dma();
+      <span class="kw">match </span>reset_dma() {
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to reset DMA! {err}"</span>),
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+      }
     }
     <span class="kw">if </span>ncycles == <span class="number">29 </span>{
       <span class="kw">return </span><span class="prelude-val">Err</span>(RegisterError::RegisterTimeOut);     

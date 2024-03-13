@@ -149,23 +149,14 @@
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Routines for RB commiunication and data reception 
 
 </span><span class="comment">//use std::time::{SystemTime, UNIX_EPOCH};
-</span><span class="kw">use </span>std::path::{
-    Path,
-    PathBuf,
-};
-<span class="kw">use </span>crossbeam_channel::Sender;
+//use std::path::{
+//    Path,
+//    PathBuf,
+//};
+</span><span class="kw">use </span>crossbeam_channel::Sender;
 
 <span class="kw">use </span>tof_dataclasses::manifest::ReadoutBoard;
 <span class="kw">use </span>tof_dataclasses::events::RBEvent;
@@ -173,7 +164,6 @@
     TofPacket,
     PacketType
 };
-<span class="kw">use </span>tof_dataclasses::calibrations::RBCalibrations;
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
 <span class="comment">//use tof_dataclasses::RBChannelPaddleEndIDMap;
 
@@ -181,7 +171,6 @@
     <span class="comment">//build_tcp_from_ip,
     //get_rb_ch_pid_map,
     </span>waveform_analysis,
-    ASSET_DIR,
 };
 
 <span class="comment">/*************************************/
@@ -221,15 +210,7 @@
   <span class="comment">// how many chunks ("buffers") we dealt with
   </span><span class="kw">let </span><span class="kw-2">mut </span>n_chunk  = <span class="number">0usize</span>;
   <span class="comment">// in case we want to do calibratoins
-  </span><span class="kw">let </span><span class="kw-2">mut </span>calibrations = RBCalibrations::new(rb.rb_id);
-  <span class="kw">if </span>run_analysis_engine {
-    <span class="kw">if </span>rb.calibration.rb_id == <span class="number">0 </span>{
-      <span class="macro">error!</span>(<span class="string">"Requested to run analysis engine for board {}, but we did not load a valid calibration!"</span>, board_id);
-    } <span class="kw">else </span>{
-      <span class="comment">//calibrations = rb.calibration;
-    </span>}
-  }
-  <span class="kw">let </span>address = rb.guess_address();
+  </span><span class="kw">let </span>address = rb.guess_address();
 
   <span class="comment">// FIXME - this panics, however, if we can't set up the socket, what's 
   // the point of this thread?
@@ -240,8 +221,9 @@
   }
   <span class="comment">// no need to subscribe to a topic, since there 
   // is one port for each rb
-  </span><span class="kw">let </span>topic = <span class="string">b""</span>;
-  <span class="kw">match </span>socket.set_subscribe(topic) {
+  </span><span class="kw">let </span>topic = <span class="macro">format!</span>(<span class="string">"RB{:02}"</span>, board_id);
+  <span class="comment">//let topic = b"";
+  </span><span class="kw">match </span>socket.set_subscribe(<span class="kw-2">&amp;</span>topic.as_bytes()) {
    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to subscribe to topic! {err}"</span>),
    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Subscribed to {:?}!"</span>, topic),
   }

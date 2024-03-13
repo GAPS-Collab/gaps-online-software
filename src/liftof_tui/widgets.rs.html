@@ -114,6 +114,29 @@
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::VecDeque;
 
 <span class="kw">use </span>ratatui::symbols;
@@ -132,8 +155,31 @@
     Borders,
 };
 
+<span class="comment">//extern crate ndhistogram;
+</span><span class="kw">use </span>ndhistogram::{
+    ndhistogram,
+    Histogram,
+    Hist1D,
+};
+<span class="kw">use </span>ndhistogram::axis::{
+    Uniform,
+};
+<span class="kw">use </span><span class="kw">crate</span>::colors::{
+  ColorTheme2,
+};
 
-<span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme2;
+
+
+<span class="kw">pub fn </span>histogram(nbin : usize, bin_low : f32,
+                 bin_high : f32,
+                 data : Vec&lt;f32&gt;) -&gt; Hist1D&lt;Uniform&lt;f32&gt;&gt; {
+  <span class="kw">let </span>bins = Uniform::new(nbin, bin_low, bin_high);
+  <span class="kw">let </span><span class="kw-2">mut </span>histo = <span class="macro">ndhistogram!</span>(bins);
+  <span class="kw">for </span>k <span class="kw">in </span>data {
+    histo.fill(<span class="kw-2">&amp;</span>k);
+  }
+  histo
+}
 
 <span class="kw">pub fn </span>timeseries&lt;<span class="lifetime">'a</span>&gt;(data        : <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>VecDeque&lt;(f64,f64)&gt;,
                       ds_name     : String,

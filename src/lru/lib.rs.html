@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/lru-0.12.2/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="lru" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/lru-0.12.3/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="lru" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -2321,6 +2321,71 @@
 <a href="#2320" id="2320">2320</a>
 <a href="#2321" id="2321">2321</a>
 <a href="#2322" id="2322">2322</a>
+<a href="#2323" id="2323">2323</a>
+<a href="#2324" id="2324">2324</a>
+<a href="#2325" id="2325">2325</a>
+<a href="#2326" id="2326">2326</a>
+<a href="#2327" id="2327">2327</a>
+<a href="#2328" id="2328">2328</a>
+<a href="#2329" id="2329">2329</a>
+<a href="#2330" id="2330">2330</a>
+<a href="#2331" id="2331">2331</a>
+<a href="#2332" id="2332">2332</a>
+<a href="#2333" id="2333">2333</a>
+<a href="#2334" id="2334">2334</a>
+<a href="#2335" id="2335">2335</a>
+<a href="#2336" id="2336">2336</a>
+<a href="#2337" id="2337">2337</a>
+<a href="#2338" id="2338">2338</a>
+<a href="#2339" id="2339">2339</a>
+<a href="#2340" id="2340">2340</a>
+<a href="#2341" id="2341">2341</a>
+<a href="#2342" id="2342">2342</a>
+<a href="#2343" id="2343">2343</a>
+<a href="#2344" id="2344">2344</a>
+<a href="#2345" id="2345">2345</a>
+<a href="#2346" id="2346">2346</a>
+<a href="#2347" id="2347">2347</a>
+<a href="#2348" id="2348">2348</a>
+<a href="#2349" id="2349">2349</a>
+<a href="#2350" id="2350">2350</a>
+<a href="#2351" id="2351">2351</a>
+<a href="#2352" id="2352">2352</a>
+<a href="#2353" id="2353">2353</a>
+<a href="#2354" id="2354">2354</a>
+<a href="#2355" id="2355">2355</a>
+<a href="#2356" id="2356">2356</a>
+<a href="#2357" id="2357">2357</a>
+<a href="#2358" id="2358">2358</a>
+<a href="#2359" id="2359">2359</a>
+<a href="#2360" id="2360">2360</a>
+<a href="#2361" id="2361">2361</a>
+<a href="#2362" id="2362">2362</a>
+<a href="#2363" id="2363">2363</a>
+<a href="#2364" id="2364">2364</a>
+<a href="#2365" id="2365">2365</a>
+<a href="#2366" id="2366">2366</a>
+<a href="#2367" id="2367">2367</a>
+<a href="#2368" id="2368">2368</a>
+<a href="#2369" id="2369">2369</a>
+<a href="#2370" id="2370">2370</a>
+<a href="#2371" id="2371">2371</a>
+<a href="#2372" id="2372">2372</a>
+<a href="#2373" id="2373">2373</a>
+<a href="#2374" id="2374">2374</a>
+<a href="#2375" id="2375">2375</a>
+<a href="#2376" id="2376">2376</a>
+<a href="#2377" id="2377">2377</a>
+<a href="#2378" id="2378">2378</a>
+<a href="#2379" id="2379">2379</a>
+<a href="#2380" id="2380">2380</a>
+<a href="#2381" id="2381">2381</a>
+<a href="#2382" id="2382">2382</a>
+<a href="#2383" id="2383">2383</a>
+<a href="#2384" id="2384">2384</a>
+<a href="#2385" id="2385">2385</a>
+<a href="#2386" id="2386">2386</a>
+<a href="#2387" id="2387">2387</a>
 </pre></div><pre class="rust"><code><span class="comment">// MIT License
 
 // Copyright (c) 2016 Jerome Froelich
@@ -2845,6 +2910,50 @@
         </span>}
     }
 
+    <span class="doccomment">/// Returns a key-value references pair of the key in the cache or `None` if it is not
+    /// present in the cache. The reference to the value of the key is mutable. Moves the key to
+    /// the head of the LRU list if it exists.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use lru::LruCache;
+    /// use std::num::NonZeroUsize;
+    /// let mut cache = LruCache::new(NonZeroUsize::new(2).unwrap());
+    ///
+    /// cache.put(1, "a");
+    /// cache.put(2, "b");
+    /// let (k, v) = cache.get_key_value_mut(&amp;1).unwrap();
+    /// assert_eq!(k, &amp;1);
+    /// assert_eq!(v, &amp;mut "a");
+    /// *v = "aa";
+    /// cache.put(3, "c");
+    /// assert_eq!(cache.get_key_value(&amp;2), None);
+    /// assert_eq!(cache.get_key_value(&amp;1), Some((&amp;1, &amp;"aa")));
+    /// assert_eq!(cache.get_key_value(&amp;3), Some((&amp;3, &amp;"c")));
+    /// ```
+    </span><span class="kw">pub fn </span>get_key_value_mut&lt;<span class="lifetime">'a</span>, Q&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>K, <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>V)&gt;
+    <span class="kw">where
+        </span>K: Borrow&lt;Q&gt;,
+        Q: Hash + Eq + <span class="question-mark">?</span>Sized,
+    {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(node) = <span class="self">self</span>.map.get_mut(KeyWrapper::from_ref(k)) {
+            <span class="kw">let </span>node_ptr: <span class="kw-2">*mut </span>LruEntry&lt;K, V&gt; = node.as_ptr();
+
+            <span class="self">self</span>.detach(node_ptr);
+            <span class="self">self</span>.attach(node_ptr);
+
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{
+                (
+                    <span class="kw-2">&amp;*</span>(<span class="kw-2">*</span>node_ptr).key.as_ptr(),
+                    <span class="kw-2">&amp;mut *</span>(<span class="kw-2">*</span>node_ptr).val.as_mut_ptr(),
+                )
+            })
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
     <span class="doccomment">/// Returns a reference to the value of the key in the cache if it is
     /// present in the cache and moves the key to the head of the LRU list.
     /// If the key does not exist the provided `FnOnce` is used to populate
@@ -2867,7 +2976,7 @@
     /// assert_eq!(cache.get_or_insert(1, ||"a"), &amp;"a");
     /// assert_eq!(cache.get_or_insert(1, ||"b"), &amp;"a");
     /// ```
-    </span><span class="kw">pub fn </span>get_or_insert&lt;<span class="lifetime">'a</span>, F&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, k: K, f: F) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span>V
+    </span><span class="kw">pub fn </span>get_or_insert&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, k: K, f: F) -&gt; <span class="kw-2">&amp;</span>V
     <span class="kw">where
         </span>F: FnOnce() -&gt; V,
     {
@@ -2964,7 +3073,7 @@
     /// assert_eq!(cache.get_or_insert_mut(3, ||"f"), &amp;mut "f");
     /// assert_eq!(cache.get_or_insert_mut(3, ||"e"), &amp;mut "f");
     /// ```
-    </span><span class="kw">pub fn </span>get_or_insert_mut&lt;<span class="lifetime">'a</span>, F&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, k: K, f: F) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>V
+    </span><span class="kw">pub fn </span>get_or_insert_mut&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, k: K, f: F) -&gt; <span class="kw-2">&amp;mut </span>V
     <span class="kw">where
         </span>F: FnOnce() -&gt; V,
     {
@@ -3016,7 +3125,7 @@
     /// assert_eq!(cache.try_get_or_insert_mut(4, b), Ok(&amp;mut "b"));
     /// assert_eq!(cache.try_get_or_insert_mut(4, a), Ok(&amp;mut "b"));
     /// ```
-    </span><span class="kw">pub fn </span>try_get_or_insert_mut&lt;<span class="lifetime">'a</span>, F, E&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, k: K, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>V, E&gt;
+    </span><span class="kw">pub fn </span>try_get_or_insert_mut&lt;F, E&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, k: K, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;mut </span>V, E&gt;
     <span class="kw">where
         </span>F: FnOnce() -&gt; <span class="prelude-ty">Result</span>&lt;V, E&gt;,
     {
@@ -3111,7 +3220,7 @@
     ///
     /// assert_eq!(cache.peek_lru(), Some((&amp;1, &amp;"a")));
     /// ```
-    </span><span class="kw">pub fn </span>peek_lru&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>K, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>V)&gt; {
+    </span><span class="kw">pub fn </span>peek_lru(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>V)&gt; {
         <span class="kw">if </span><span class="self">self</span>.is_empty() {
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
@@ -3279,7 +3388,7 @@
     /// cache.promote(&amp;3);
     /// assert_eq!(cache.pop_lru(), Some((1, "a")));
     /// ```
-    </span><span class="kw">pub fn </span>promote&lt;<span class="lifetime">'a</span>, Q&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q)
+    </span><span class="kw">pub fn </span>promote&lt;Q&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q)
     <span class="kw">where
         </span>K: Borrow&lt;Q&gt;,
         Q: Hash + Eq + <span class="question-mark">?</span>Sized,
@@ -3315,7 +3424,7 @@
     /// assert_eq!(cache.pop_lru(), Some((1, "a")));
     /// assert_eq!(cache.pop_lru(), Some((2, "b")));
     /// ```
-    </span><span class="kw">pub fn </span>demote&lt;<span class="lifetime">'a</span>, Q&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q)
+    </span><span class="kw">pub fn </span>demote&lt;Q&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q)
     <span class="kw">where
         </span>K: Borrow&lt;Q&gt;,
         Q: Hash + Eq + <span class="question-mark">?</span>Sized,
@@ -4603,6 +4712,27 @@
         <span class="macro">assert_eq!</span>(
             cache.get_key_value(<span class="string">"apple"</span>),
             <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>String::from(<span class="string">"apple"</span>), <span class="kw-2">&amp;</span><span class="string">"red"</span>))
+        );
+        <span class="macro">assert_eq!</span>(cache.get_key_value(<span class="string">"banana"</span>), <span class="prelude-val">None</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_get_key_value_mut() {
+        <span class="kw">use </span>alloc::string::String;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>cache = LruCache::new(NonZeroUsize::new(<span class="number">2</span>).unwrap());
+
+        <span class="kw">let </span>key = String::from(<span class="string">"apple"</span>);
+        cache.put(key, <span class="string">"red"</span>);
+
+        <span class="kw">let </span>(k, v) = cache.get_key_value_mut(<span class="string">"apple"</span>).unwrap();
+        <span class="macro">assert_eq!</span>(k, <span class="kw-2">&amp;</span>String::from(<span class="string">"apple"</span>));
+        <span class="macro">assert_eq!</span>(v, <span class="kw-2">&amp;mut </span><span class="string">"red"</span>);
+        <span class="kw-2">*</span>v = <span class="string">"green"</span>;
+
+        <span class="macro">assert_eq!</span>(
+            cache.get_key_value(<span class="string">"apple"</span>),
+            <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>String::from(<span class="string">"apple"</span>), <span class="kw-2">&amp;</span><span class="string">"green"</span>))
         );
         <span class="macro">assert_eq!</span>(cache.get_key_value(<span class="string">"banana"</span>), <span class="prelude-val">None</span>);
     }

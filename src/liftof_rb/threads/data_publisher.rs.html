@@ -262,8 +262,12 @@
 <a href="#261" id="261">261</a>
 <a href="#262" id="262">262</a>
 <a href="#263" id="263">263</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::net::IpAddr;
-<span class="kw">use </span>std::env;
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::env;
 <span class="kw">use </span>std::path::Path;
 <span class="kw">use </span>std::fs;
 <span class="kw">use </span>std::fs::OpenOptions; 
@@ -325,10 +329,10 @@
 ///                   write it with this name.
 ///                   In case of a calibration file, then 
 ///                   also save it in the dedicated foler.
+///                   If this is None, don't write anything.
 /// * print_packets : Print outgoing packets to terminal
 ///
 </span><span class="kw">pub fn </span>data_publisher(data           : <span class="kw-2">&amp;</span>Receiver&lt;TofPacket&gt;,
-                      write_to_disk  : bool,
                       address        : String,
                       output_fname   : <span class="prelude-ty">Option</span>&lt;String&gt; ,
                       testing        : bool,
@@ -343,49 +347,51 @@
   data_socket.bind(<span class="kw-2">&amp;</span>address).expect(<span class="string">"Unable to bind to data (PUB) socket {data_adress}"</span>);
   <span class="macro">info!</span>(<span class="string">"0MQ PUB socket bound to address {address}"</span>);
 
-  <span class="kw">let </span><span class="kw-2">mut </span>file_on_disk : <span class="prelude-ty">Option</span>&lt;File&gt; = <span class="prelude-val">None</span>;<span class="comment">//let mut output = File::create(path)?;
-  </span><span class="kw">if </span>write_to_disk {
-    <span class="kw">let </span>fname : String;
-    <span class="kw">match </span>output_fname {
-      <span class="prelude-val">None </span>=&gt; {
-        fname = String::from(<span class="string">"Unknown.tof.gaps"</span>);
-      }
-      <span class="prelude-val">Some</span>(_fname) =&gt; {
-        fname = _fname;
-      }
+  <span class="kw">let </span><span class="kw-2">mut </span>file_on_disk : <span class="prelude-ty">Option</span>&lt;File&gt;;<span class="comment">//let mut output = File::create(path)?;
+  //if write_to_disk {
+  </span><span class="kw">let </span>fname : String;
+  <span class="kw">let </span>write_to_disk;
+  <span class="kw">match </span>output_fname {
+    <span class="prelude-val">None </span>=&gt; {
+      fname = String::from(<span class="string">"Unknown.tof.gaps"</span>);
+      write_to_disk = <span class="bool-val">false</span>;
     }
-    <span class="kw">let </span>datafile_output_file = Path::new(<span class="kw-2">&amp;</span>fname);
-    <span class="comment">// in case it is a calibration file, delete any old 
-    // calibration and write it to a specific location
-    </span><span class="kw">let </span>home      = env::var_os(<span class="string">"HOME"</span>).unwrap_or(OsString::from(<span class="string">"/home/gaps"</span>));
-    <span class="kw">let </span>calib_dir = home.to_string_lossy().to_string() + <span class="string">"/calib"</span>; 
-    <span class="kw">if </span>fname.ends_with(<span class="string">"cali.tof.gaps"</span>) {
-      <span class="kw">match </span>fs::metadata(<span class="kw-2">&amp;</span>calib_dir) {
-        <span class="prelude-val">Ok</span>(metadata) =&gt; {
-          <span class="comment">// Check if the metadata is for a directory
-          </span><span class="kw">if </span>!metadata.is_dir() {
-            <span class="macro">error!</span>(<span class="string">"The path exists, but it is not a directory."</span>);
+    <span class="prelude-val">Some</span>(_fname) =&gt; {
+      fname = _fname;
+      write_to_disk = <span class="bool-val">true</span>;
+    }
+  }
+  <span class="kw">let </span>datafile_output_file = Path::new(<span class="kw-2">&amp;</span>fname);
+  <span class="comment">// in case it is a calibration file, delete any old 
+  // calibration and write it to a specific location
+  </span><span class="kw">let </span>home      = env::var_os(<span class="string">"HOME"</span>).unwrap_or(OsString::from(<span class="string">"/home/gaps"</span>));
+  <span class="kw">let </span>calib_dir = home.to_string_lossy().to_string() + <span class="string">"/calib"</span>; 
+  <span class="kw">if </span>fname.ends_with(<span class="string">"cali.tof.gaps"</span>) {
+    <span class="kw">match </span>fs::metadata(<span class="kw-2">&amp;</span>calib_dir) {
+      <span class="prelude-val">Ok</span>(metadata) =&gt; {
+        <span class="comment">// Check if the metadata is for a directory
+        </span><span class="kw">if </span>!metadata.is_dir() {
+          <span class="macro">error!</span>(<span class="string">"The path exists, but it is not a directory."</span>);
+        }
+      }
+      <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
+        <span class="comment">// An error occurred, which typically means the directory does not exist
+        </span><span class="macro">warn!</span>(<span class="string">"No calibration directory found. Will create {}"</span>, calib_dir);
+        <span class="kw">match </span>fs::create_dir(calib_dir.clone()) {
+          <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+          <span class="prelude-val">Err</span>(err) =&gt; {
+            <span class="macro">error!</span>(<span class="string">"Can not create {}! Err {err}"</span>, calib_dir)
           }
         }
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-          <span class="comment">// An error occurred, which typically means the directory does not exist
-          </span><span class="macro">warn!</span>(<span class="string">"No calibration directory found. Will create {}"</span>, calib_dir);
-          <span class="kw">match </span>fs::create_dir(calib_dir.clone()) {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
-            <span class="prelude-val">Err</span>(err) =&gt; {
-              <span class="macro">error!</span>(<span class="string">"Can not create {}! Err {err}"</span>, calib_dir)
-            }
-          }
-        }
-      } <span class="comment">// end match
-      </span><span class="kw">let </span>calib_file = Path::new(<span class="kw-2">&amp;</span>calib_dir);
-      <span class="kw">let </span>local_file = calib_file.join(fname);
-      <span class="macro">info!</span>(<span class="string">"Writing calibration to {}"</span>, local_file.display() );
-      file_on_disk = OpenOptions::new().create(<span class="bool-val">true</span>).write(<span class="bool-val">true</span>).open(local_file).ok()
-    } <span class="kw">else </span>{
-      <span class="macro">info!</span>(<span class="string">"Writing to local file {}!"</span>, fname );
-      file_on_disk = OpenOptions::new().append(<span class="bool-val">true</span>).create(<span class="bool-val">true</span>).open(datafile_output_file).ok()
-    }
+      }
+    } <span class="comment">// end match
+    </span><span class="kw">let </span>calib_file = Path::new(<span class="kw-2">&amp;</span>calib_dir);
+    <span class="kw">let </span>local_file = calib_file.join(fname);
+    <span class="macro">info!</span>(<span class="string">"Writing calibration to {}"</span>, local_file.display() );
+    file_on_disk = OpenOptions::new().create(<span class="bool-val">true</span>).write(<span class="bool-val">true</span>).open(local_file).ok()
+  } <span class="kw">else </span>{
+    <span class="macro">info!</span>(<span class="string">"Writing to local file {}!"</span>, fname );
+    file_on_disk = OpenOptions::new().append(<span class="bool-val">true</span>).create(<span class="bool-val">true</span>).open(datafile_output_file).ok()
   }
  
   <span class="comment">// these are only required for testing
@@ -514,7 +520,11 @@
             <span class="macro">trace!</span>(<span class="string">"0MQ PUB socket.send() SUCCESS!"</span>);
             n_sent += <span class="number">1</span>;
           },
-          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Not able to send over 0MQ PUB socket! Err {err}"</span>),
+          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Not able to send {} over 0MQ PUB socket! {err}"</span>, packet.packet_type),
+        }
+        <span class="kw">if </span>packet.packet_type == PacketType::RBCalibration {
+          <span class="comment">//info!("==&gt; last data type {:?}", data_type);
+          </span><span class="macro">info!</span>(<span class="string">"==&gt; Calibration packet {} sent!"</span>, packet );
         }
         <span class="kw">if </span>n_sent % <span class="number">1000 </span>== <span class="number">0 </span>&amp;&amp; n_sent &gt; <span class="number">0 </span>&amp;&amp; print_packets {
           <span class="macro">println!</span>(<span class="string">"==&gt; We sent {n_sent} packets!"</span>);

@@ -8,10 +8,10 @@ var annotated_dup =
       [ "Waveform", "classGAPS_1_1Waveform.html", "classGAPS_1_1Waveform" ]
     ] ],
     [ "CPUMoniData", "structCPUMoniData.html", "structCPUMoniData" ],
-    [ "LTB", "structLTB.html", "structLTB" ],
     [ "LTBMoniData", "structLTBMoniData.html", "structLTBMoniData" ],
     [ "MasterTriggerEvent", "structMasterTriggerEvent.html", "structMasterTriggerEvent" ],
     [ "MtbMoniData", "structMtbMoniData.html", "structMtbMoniData" ],
+    [ "Paddle", "structPaddle.html", "structPaddle" ],
     [ "PAMoniData", "structPAMoniData.html", "structPAMoniData" ],
     [ "PBMoniData", "structPBMoniData.html", "structPBMoniData" ],
     [ "RBCalibration", "structRBCalibration.html", "structRBCalibration" ],
@@ -24,6 +24,7 @@ var annotated_dup =
     [ "SimPrimary", "structSimPrimary.html", "structSimPrimary" ],
     [ "TofEvent", "structTofEvent.html", "structTofEvent" ],
     [ "TofEventHeader", "structTofEventHeader.html", "structTofEventHeader" ],
+    [ "TofEventSummary", "structTofEventSummary.html", "structTofEventSummary" ],
     [ "TofHit", "structTofHit.html", "structTofHit" ],
     [ "TofPacket", "structTofPacket.html", "structTofPacket" ]
 ];

@@ -392,7 +392,7 @@
 
     <span class="comment">// Preamp monitoring routine
     </span><span class="kw">if </span>pa_moni_timer.elapsed().as_secs_f32() &gt; rb_moni_interval<span class="kw-2">*</span>pa_moni_every_x {
-      <span class="kw">let </span><span class="kw-2">mut </span>moni = get_preamp_moni(board_id).unwrap();
+      <span class="kw">let </span>moni = get_preamp_moni(board_id).unwrap();
 
       <span class="kw">if </span>verbose {
         <span class="macro">println!</span>(<span class="string">"{}"</span>, moni);
@@ -408,7 +408,7 @@
 
     <span class="comment">// PB monitoring routine
     </span><span class="kw">if </span>pb_moni_timer.elapsed().as_secs_f32() &gt; rb_moni_interval<span class="kw-2">*</span>pb_moni_every_x {
-      <span class="kw">let </span><span class="kw-2">mut </span>moni = get_pb_moni(board_id).unwrap();
+      <span class="kw">let </span>moni = get_pb_moni(board_id).unwrap();
 
       <span class="kw">if </span>verbose {
         <span class="macro">println!</span>(<span class="string">"{}"</span>, moni);
@@ -424,7 +424,7 @@
 
     <span class="comment">// LTB monitoring routine
     </span><span class="kw">if </span>ltb_moni_timer.elapsed().as_secs_f32() &gt; rb_moni_interval<span class="kw-2">*</span>ltb_moni_every_x {
-      <span class="kw">let </span><span class="kw-2">mut </span>moni = get_ltb_moni(board_id).unwrap();
+      <span class="kw">let </span>moni = get_ltb_moni(board_id).unwrap();
 
       <span class="kw">if </span>verbose {
         <span class="macro">println!</span>(<span class="string">"{}"</span>, moni);
@@ -502,4 +502,5 @@
   moni.add_temps(<span class="kw-2">&amp;</span>ltb_temp);
   moni.add_thresh(<span class="kw-2">&amp;</span>ltb_thrs);
   <span class="prelude-val">Ok</span>(moni)
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>

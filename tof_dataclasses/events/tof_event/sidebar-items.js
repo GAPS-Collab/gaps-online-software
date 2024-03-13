@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["CompressionLevel","EventQuality"],"struct":["TofEvent","TofEventHeader"]};
+window.SIDEBAR_ITEMS = {"enum":["CompressionLevel","EventQuality"],"struct":["TofEvent","TofEventHeader","TofEventSummary"]};

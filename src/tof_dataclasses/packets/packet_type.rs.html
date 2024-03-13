@@ -178,7 +178,7 @@
   RBEvent             = <span class="number">20u8</span>,
   TofEvent            = <span class="number">21u8</span>,
   RBWaveform          = <span class="number">22u8</span>,
-  TofSummary          = <span class="number">23u8</span>,
+  TofEventSummary     = <span class="number">23u8</span>,
   <span class="comment">//Monitor             = 30u8,    // needs to go away
   </span>HeartBeat           = <span class="number">40u8</span>,    <span class="comment">// might probably go away
   </span>MasterTrigger       = <span class="number">60u8</span>,    <span class="comment">// needs to be renamed to either MasterTriggerEvent or MTEvent
@@ -221,7 +221,7 @@
       <span class="number">20u8  </span>=&gt; PacketType::RBEvent,
       <span class="number">21u8  </span>=&gt; PacketType::TofEvent,
       <span class="number">22u8  </span>=&gt; PacketType::RBWaveform,
-      <span class="number">23u8  </span>=&gt; PacketType::TofSummary,
+      <span class="number">23u8  </span>=&gt; PacketType::TofEventSummary,
       <span class="comment">//30u8  =&gt; PacketType::Monitor,
       </span><span class="number">40u8  </span>=&gt; PacketType::HeartBeat,
       <span class="number">60u8  </span>=&gt; PacketType::MasterTrigger,
@@ -255,7 +255,7 @@
       PacketType::Unknown,
       PacketType::TofEvent,
       PacketType::RBWaveform,
-      PacketType::TofSummary,
+      PacketType::TofEventSummary,
       <span class="comment">//PacketType::Monitor,
       </span>PacketType::MasterTrigger,
       PacketType::HeartBeat,
@@ -288,7 +288,7 @@
   type_codes.push(PacketType::Unknown <span class="kw">as </span>u8);
   type_codes.push(PacketType::TofEvent <span class="kw">as </span>u8);
   type_codes.push(PacketType::RBWaveform <span class="kw">as </span>u8);
-  type_codes.push(PacketType::TofSummary <span class="kw">as </span>u8);
+  type_codes.push(PacketType::TofEventSummary <span class="kw">as </span>u8);
   <span class="comment">//type_codes.push(PacketType::Monitor as u8);
   </span>type_codes.push(PacketType::MasterTrigger <span class="kw">as </span>u8);
   type_codes.push(PacketType::HeartBeat <span class="kw">as </span>u8);

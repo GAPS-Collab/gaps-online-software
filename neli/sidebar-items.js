@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"attr":["neli_enum"],"derive":["FromBytes","FromBytesWithInput","Header","Size","ToBytes"],"macro":["impl_flags","impl_trait"],"mod":["attr","consts","err","genl","iter","nl","rtnl","socket","types","utils"],"struct":["BeU64"],"trait":["FromBytes","FromBytesWithInput","Header","Size","ToBytes","TypeSize"]};

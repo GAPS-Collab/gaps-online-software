@@ -190,16 +190,6 @@
 <a href="#189" id="189">189</a>
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
-<a href="#201" id="201">201</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Provides run configuration and 
 //! settings for RBs and Tof CPU
 //!
@@ -271,23 +261,13 @@
       is_active               : <span class="bool-val">false</span>,
       nevents                 : <span class="number">0</span>,
       nseconds                : <span class="number">0</span>,
-      tof_op_mode             : TofOperationMode::StreamAny,
+      tof_op_mode             : TofOperationMode::Default,
       trigger_poisson_rate    : <span class="number">0</span>,
       trigger_fixed_rate      : <span class="number">0</span>,
       data_type               : DataType::Unknown, 
       rb_buff_size            : <span class="number">0</span>,
     }
   }
-
-  <span class="attr">#[deprecated(since=<span class="string">"0.8.3"</span>, note=<span class="string">"Public argument does not need setter. Semantics need to be clear though."</span>)]
-  </span><span class="kw">pub fn </span>set_forever(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-    <span class="self">self</span>.nevents = <span class="number">0</span>;
-  }
-
-  <span class="attr">#[deprecated(since=<span class="string">"0.8.3"</span>, note=<span class="string">"Public argument does not need setter. Semantics need to be clear though."</span>)]
-  </span><span class="kw">pub fn </span>runs_forever(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-    <span class="self">self</span>.nevents == <span class="number">0 
-  </span>}
 }
 
 <span class="kw">impl </span>Serialization <span class="kw">for </span>RunConfig {

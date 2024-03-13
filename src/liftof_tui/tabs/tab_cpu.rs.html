@@ -291,6 +291,8 @@
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
 <a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::time::Instant;
 <span class="kw">use </span>std::collections::VecDeque;
 
@@ -299,8 +301,8 @@
 <span class="kw">use </span>ratatui::symbols::line::<span class="kw-2">*</span>;
 <span class="kw">use </span>ratatui::{
     <span class="comment">//backend::CrosstermBackend,
-    </span>symbols, 
-    terminal::Frame,
+    //symbols, 
+    </span>terminal::Frame,
     layout::{
         Alignment,
         Constraint,
@@ -312,7 +314,9 @@
     </span>style::{Modifier, Color, Style},
     <span class="comment">//text::{Span, Line},
     </span>widgets::{
-        Block, BorderType, Borders, LineGauge, List, ListItem, ListState, Paragraph},
+        Block, BorderType, Borders, LineGauge,
+        <span class="comment">//List, ListItem, ListState,
+        </span>Paragraph},
 };
 
 <span class="kw">use </span>tof_dataclasses::packets::{
@@ -386,8 +390,8 @@
   }
   
   <span class="kw">pub fn </span>receive_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), SerializationError&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>moni = CPUMoniData::new();
-    <span class="kw">let </span>met      = <span class="self">self</span>.timer.elapsed().as_secs_f64();
+    <span class="kw">let </span>moni : CPUMoniData;<span class="comment">// CPUMoniData::new();
+    </span><span class="kw">let </span>met      = <span class="self">self</span>.timer.elapsed().as_secs_f64();
     <span class="kw">match </span><span class="self">self</span>.tp_recv.try_recv() {
       <span class="prelude-val">Err</span>(err)   =&gt; {
         <span class="macro">trace!</span>(<span class="string">"Can't receive packet! {err}"</span>);
@@ -441,7 +445,7 @@
           )
           .split(main_chunks[<span class="number">0</span>]);
       
-        <span class="kw">let </span><span class="kw-2">mut </span>graph_chunks = Layout::default()
+        <span class="kw">let </span>graph_chunks = Layout::default()
           .direction(Direction::Horizontal)
           .constraints(
               [Constraint::Percentage(<span class="number">50</span>),
@@ -450,7 +454,7 @@
           .split(main_chunks[<span class="number">1</span>]).to_vec();
 
         
-        <span class="kw">let </span><span class="kw-2">mut </span>freq_chunks = Layout::default()
+        <span class="kw">let </span>freq_chunks = Layout::default()
           .direction(Direction::Vertical)
           .constraints(
               [Constraint::Percentage(<span class="number">25</span>),
@@ -460,7 +464,7 @@
           )
           .split(graph_chunks[<span class="number">0</span>]).to_vec();
         
-        <span class="kw">let </span><span class="kw-2">mut </span>temp_chunks = Layout::default()
+        <span class="kw">let </span>temp_chunks = Layout::default()
           .direction(Direction::Vertical)
           .constraints(
               [Constraint::Percentage(<span class="number">25</span>),
@@ -471,11 +475,11 @@
           .split(graph_chunks[<span class="number">1</span>]).to_vec();
 
 
-        <span class="kw">let </span>foo1 = String::from(<span class="string">"foo1"</span>);
-        <span class="kw">let </span>foo3 = String::from(<span class="string">"foo3"</span>);
-        <span class="kw">let </span>foo4 = String::from(<span class="string">"foo4"</span>);
+        <span class="kw">let </span>info_view_str = String::from(<span class="string">"foo1"</span>);
+        <span class="comment">//let foo3 = String::from("foo3");
+        //let foo4 = String::from("foo4");
 
-        <span class="kw">let </span>info_view = Paragraph::new(foo1)
+        </span><span class="kw">let </span>info_view = Paragraph::new(info_view_str)
         .style(<span class="self">self</span>.theme.style())
         .alignment(Alignment::Left)
         .block(
@@ -485,18 +489,18 @@
             .title(<span class="string">"Info"</span>)
             .border_type(BorderType::Rounded),
         );
-        <span class="kw">let </span>foo_par3 = Paragraph::new(foo3)
-        .style(<span class="self">self</span>.theme.style())
-        .alignment(Alignment::Left)
-        .block(
-          Block::default()
-            .borders(Borders::ALL)
-            .style(<span class="self">self</span>.theme.style())
-            .title(<span class="string">"Overview"</span>)
-            .border_type(BorderType::Rounded),
-        );
+        <span class="comment">//let foo_par3 = Paragraph::new(foo3)
+        //.style(self.theme.style())
+        //.alignment(Alignment::Left)
+        //.block(
+        //  Block::default()
+        //    .borders(Borders::ALL)
+        //    .style(self.theme.style())
+        //    .title("Overview")
+        //    .border_type(BorderType::Rounded),
+        //);
         
-        <span class="comment">// disc usage gauge
+        // disc usage gauge
         //self.disk_usage = 42;
         
         </span><span class="kw">let </span><span class="kw-2">mut </span>ratio = <span class="self">self</span>.disk_usage <span class="kw">as </span>f64/<span class="number">100.0</span>;
@@ -533,17 +537,17 @@
           </span>.line_set(LG_LINE)
           <span class="comment">//.percent(self.disk_usage as u16);
           </span>.ratio(ratio);
-        <span class="kw">let </span>foo_par4 = Paragraph::new(foo4)
-        .style(<span class="self">self</span>.theme.style())
-        .alignment(Alignment::Left)
-        .block(
-          Block::default()
-            .borders(Borders::ALL)
-            .style(<span class="self">self</span>.theme.style())
-            .title(<span class="string">"Overview"</span>)
-            .border_type(BorderType::Rounded),
-        );
-        <span class="kw">for </span>core <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
+        <span class="comment">//let foo_par4 = Paragraph::new(foo4)
+        //.style(self.theme.style())
+        //.alignment(Alignment::Left)
+        //.block(
+        //  Block::default()
+        //    .borders(Borders::ALL)
+        //    .style(self.theme.style())
+        //    .title("Overview")
+        //    .border_type(BorderType::Rounded),
+        //);
+        </span><span class="kw">for </span>core <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
           <span class="kw">let </span>label            = <span class="macro">format!</span>(<span class="string">"Core{} freq. [GHz]"</span>, core);
           <span class="kw">let </span>core_theme       = <span class="self">self</span>.theme.clone();
           <span class="kw">let </span><span class="kw-2">mut </span>freq_ts_data = VecDeque::from(<span class="self">self</span>.freq_queue[core].clone());

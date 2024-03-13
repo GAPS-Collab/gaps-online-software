@@ -4,10 +4,10 @@ var hierarchy =
     [ "std::exception", null, [
       [ "Gaps::FatalException", "classGaps_1_1FatalException.html", null ]
     ] ],
-    [ "LTB", "structLTB.html", null ],
     [ "LTBMoniData", "structLTBMoniData.html", null ],
     [ "MasterTriggerEvent", "structMasterTriggerEvent.html", null ],
     [ "MtbMoniData", "structMtbMoniData.html", null ],
+    [ "Paddle", "structPaddle.html", null ],
     [ "PAMoniData", "structPAMoniData.html", null ],
     [ "PBMoniData", "structPBMoniData.html", null ],
     [ "RBCalibration", "structRBCalibration.html", null ],
@@ -20,6 +20,7 @@ var hierarchy =
     [ "SimPrimary", "structSimPrimary.html", null ],
     [ "TofEvent", "structTofEvent.html", null ],
     [ "TofEventHeader", "structTofEventHeader.html", null ],
+    [ "TofEventSummary", "structTofEventSummary.html", null ],
     [ "TofHit", "structTofHit.html", null ],
     [ "TofPacket", "structTofPacket.html", null ],
     [ "Gaps::TofPacketReader", "classGaps_1_1TofPacketReader.html", null ],

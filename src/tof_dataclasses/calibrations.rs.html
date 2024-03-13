@@ -1528,6 +1528,19 @@
 <a href="#1527" id="1527">1527</a>
 <a href="#1528" id="1528">1528</a>
 <a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a>
+<a href="#1534" id="1534">1534</a>
+<a href="#1535" id="1535">1535</a>
+<a href="#1536" id="1536">1536</a>
+<a href="#1537" id="1537">1537</a>
+<a href="#1538" id="1538">1538</a>
+<a href="#1539" id="1539">1539</a>
+<a href="#1540" id="1540">1540</a>
+<a href="#1541" id="1541">1541</a>
+<a href="#1542" id="1542">1542</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The ReadoutBoardCalibration is 
 //! the first stage in a 3 stage 
 //! calibration process for the tof
@@ -1648,13 +1661,28 @@
 </span><span class="kw">fn </span>trace_check(event : <span class="kw-2">&amp;</span>RBEvent) -&gt; bool {
   <span class="kw">let </span><span class="kw-2">mut </span>check = <span class="bool-val">true</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>nchan = <span class="number">0usize</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>failed = <span class="bool-val">true</span>;
   <span class="kw">for </span>ch <span class="kw">in </span>event.header.get_channels() {
     <span class="kw">if </span>event.adc[ch <span class="kw">as </span>usize].len() != <span class="number">1024 </span>{
       check = <span class="bool-val">false</span>;
     }
+    <span class="kw">for </span>k <span class="kw">in </span><span class="kw-2">&amp;</span>event.adc[ch <span class="kw">as </span>usize] {
+      <span class="kw">if </span><span class="kw-2">*</span>k != u16::MAX {
+        <span class="comment">// just check that not all bins are 
+        // u16::MAX. They get set to that
+        // value in case of an error
+        // also if that happens to any of 
+        // the channels, throw the whole 
+        // event away.
+        </span>failed = <span class="bool-val">false</span>;
+      }
+    }
+
     nchan += <span class="number">1</span>;
   }
-  check &amp;&amp; nchan == NCHN
+  <span class="comment">// for the calibration we want to have all 
+  // channels!
+  </span>check &amp;&amp; nchan == NCHN &amp;&amp; !failed
 }
 
 <span class="comment">/***********************************/
@@ -1928,7 +1956,7 @@
   <span class="comment">// Get the number of columns (assuming all sub-vectors have the same length)
   </span><span class="kw">let </span>num_columns = data[<span class="number">0</span>].len();
   <span class="kw">let </span>num_rows    = data.len();
-  <span class="macro">info!</span>(<span class="string">"Calculating means for {} columns and {} rows"</span>, num_columns, num_rows);
+  <span class="macro">debug!</span>(<span class="string">"Calculating means for {} columns and {} rows"</span>, num_columns, num_rows);
   <span class="comment">// Initialize a Vec to store the column-wise medians
   </span><span class="kw">let </span><span class="kw-2">mut </span>column_means: Vec&lt;f32&gt; = <span class="macro">vec!</span>[<span class="number">0.0</span>; num_columns];
   <span class="comment">// Calculate the median for each column across all sub-vectors, ignoring NaN values
@@ -2138,7 +2166,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>all_v_dips    = Vec::&lt;Vec::&lt;f32&gt;&gt;::new();
     <span class="kw">let </span>nchn = input_vcal_data[<span class="number">0</span>].header.get_nchan();
 
-    <span class="macro">info!</span>(<span class="string">"Found {nchn} channels!"</span>);
+    <span class="macro">debug!</span>(<span class="string">"Found {nchn} channels!"</span>);
     <span class="kw">for _ in </span><span class="number">0</span>..nchn {
       <span class="kw">let </span>empty_vec_off : Vec&lt;f32&gt; = <span class="macro">vec!</span>[<span class="number">0.0</span>;NWORDS];
       all_v_offsets.push(empty_vec_off);  
@@ -2300,7 +2328,7 @@
     </span>|| <span class="self">self</span>.noi_data.len() == <span class="number">0 </span>{
       <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::EmptyInputData);
     }
-    <span class="macro">info!</span>(<span class="string">"Starting voltage calibration!"</span>);
+    <span class="macro">info!</span>(<span class="string">"Starting calculating voltage calibration constants!"</span>);
     <span class="kw">let </span>(v_offsets_high, _v_dips_high) 
         = <span class="self">Self</span>::voltage_offset_and_dips(<span class="kw-2">&amp;</span><span class="self">self</span>.vcal_data)<span class="question-mark">?</span>;
     <span class="kw">let </span>(v_offsets_low, v_dips_low) 
@@ -2314,8 +2342,8 @@
       }
     }
     <span class="comment">// at this point, the voltage calibration is complete
-    </span><span class="macro">info!</span>(<span class="string">"Voltage calibration complete!"</span>);
-    <span class="macro">info!</span>(<span class="string">"Begin timing calibration!"</span>);
+    </span><span class="macro">info!</span>(<span class="string">"Filnished calculating voltage calibration constants!"</span>);
+    <span class="macro">info!</span>(<span class="string">"Starting calculating timing calibration constants!"</span>);
     <span class="macro">warn!</span>(<span class="string">"Calibration only supported for Edge::Average!"</span>);
     <span class="comment">// this just suppresses a warning
     // We have to think if edge will be
@@ -2883,12 +2911,10 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>RBCalibrations {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span><span class="kw-2">mut </span>timestamp_str = String::from(<span class="string">"?"</span>);
-    <span class="macro">println!</span>(<span class="string">"Self.timestamp {}"</span>, <span class="self">self</span>.timestamp);
     <span class="kw">match </span>Utc.timestamp_opt(<span class="self">self</span>.timestamp.into(), <span class="number">0</span>) {
       LocalResult::Single(datetime_utc) =&gt; {
         timestamp_str = datetime_utc.format(<span class="string">"%Y/%m/%d %H:%M:%S"</span>).to_string();
-        <span class="comment">//println!("UTC datetime: {}", datetime_utc);
-      </span>},
+      },
       LocalResult::Ambiguous(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
         <span class="macro">println!</span>(<span class="string">"The given timestamp is ambiguous."</span>);
       },

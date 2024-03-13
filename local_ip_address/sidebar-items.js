@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Error"],"fn":["local_ip","local_ipv6"],"mod":["linux"]};

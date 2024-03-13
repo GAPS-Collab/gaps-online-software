@@ -561,6 +561,7 @@
 <a href="#560" id="560">560</a>
 <a href="#561" id="561">561</a>
 <a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerEvent
 
 </span><span class="macro">cfg_if::cfg_if! </span>{
@@ -1017,8 +1018,8 @@
     dsi_j.insert(<span class="number">14 </span>, <span class="string">"3/5"</span>);
     dsi_j.insert(<span class="number">15 </span>, <span class="string">"4/1"</span>);
     dsi_j.insert(<span class="number">16 </span>, <span class="string">"4/2"</span>);
-    dsi_j.insert(<span class="number">16 </span>, <span class="string">"4/3"</span>);
-    dsi_j.insert(<span class="number">17 </span>, <span class="string">"4/4"</span>);
+    dsi_j.insert(<span class="number">17 </span>, <span class="string">"4/3"</span>);
+    dsi_j.insert(<span class="number">18 </span>, <span class="string">"4/4"</span>);
     dsi_j.insert(<span class="number">19 </span>, <span class="string">"4/5"</span>);
     dsi_j.insert(<span class="number">20 </span>, <span class="string">"5/1"</span>);
     dsi_j.insert(<span class="number">21 </span>, <span class="string">"5/2"</span>);
@@ -1038,7 +1039,7 @@
     repr += <span class="kw-2">&amp;</span><span class="self">self</span>.tiu_gps_16.to_string(); 
     repr += <span class="string">"\n  tiu_gps32 (fast)            "</span>;
     repr += <span class="kw-2">&amp;</span><span class="self">self</span>.tiu_gps_32.to_string(); 
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  |-&gt; tiu_gps48        {}"</span>, <span class="self">self</span>.get_gpstimestamp48()));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  |-&gt; tiu_gps48               {}"</span>, <span class="self">self</span>.get_gpstimestamp48()));
     repr += <span class="string">"\n  n_paddles                   "</span>;
     repr += <span class="kw-2">&amp;</span><span class="self">self</span>.n_paddles.to_string(); 
     repr += <span class="string">"\n  crc                         "</span>;
@@ -1062,12 +1063,13 @@
     <span class="comment">//    repr += "-0-   ";
       </span>}
     }
-    repr += <span class="string">"\n  == == LTB HITS [BRD CH] == ==\n"</span>;
+    repr += <span class="string">"\n  == == LTB HITS == ==\n"</span>;
     <span class="kw">for  </span>k <span class="kw">in </span>hit_boards.iter() {
-      repr += <span class="string">"\t DSI/J "</span>;
+      <span class="comment">//println!("Getting {}", k);
+      </span>repr += <span class="string">"\t DSI/J/CHANNEL "</span>;
       repr += dsi_j[k];
-      repr += <span class="string">"\t=&gt; "</span>;
-      <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..N_CHN_PER_LTB {
+      <span class="comment">//repr += "\t=&gt; ";
+      </span><span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..N_CHN_PER_LTB {
         <span class="kw">if </span><span class="self">self</span>.hits[<span class="kw-2">*</span>k <span class="kw">as </span>usize][j] {
           repr += <span class="string">" "</span>;
           repr += <span class="kw-2">&amp;</span>(j + <span class="number">1</span>).to_string();

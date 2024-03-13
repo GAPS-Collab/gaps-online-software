@@ -136,141 +136,145 @@
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
-</pre></div><pre class="rust"><code><span class="doccomment">/// This is basically the thread 
-/// implementation from the 
-/// Rust book example
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! Thread control structures
+//! FIXME - this should go to liftof-lib
 
-
-</span><span class="kw">use </span>std::thread;
-<span class="kw">use </span>std::sync::mpsc;
-<span class="kw">use </span>std::sync::Arc;
-<span class="kw">use </span>std::sync::Mutex;
-
+</span><span class="kw">use </span>std::collections::HashMap;
 
 <span class="doccomment">/// Send runtime information 
 /// to threads via shared memory
 /// (Arc(Mutex)
 </span><span class="attr">#[derive(Default, Debug)]
 </span><span class="kw">pub struct </span>ThreadControl {
-  <span class="kw">pub </span>stop_flag: bool,
+  <span class="doccomment">/// Stop ALL threads
+  </span><span class="kw">pub </span>stop_flag: bool,
+  <span class="doccomment">/// Trigger calibration thread
+  </span><span class="kw">pub </span>calibration_active: bool,
+  <span class="doccomment">/// Keep track on how many calibration 
+  /// packets we have received
+  </span><span class="kw">pub </span>finished_calibrations : HashMap&lt;u8,bool&gt;,
 }
 
 <span class="kw">impl </span>ThreadControl {
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
-      stop_flag : <span class="bool-val">false</span>,
+      stop_flag             : <span class="bool-val">false</span>,
+      calibration_active    : <span class="bool-val">false</span>,
+      finished_calibrations : HashMap::&lt;u8,bool&gt;::new(),
     }
   }
 }
 
-<span class="kw">enum </span>Message {
-  NewJob(Job),
-  Terminate,
-}
-
-
-<span class="doccomment">/// Implements "standard" Threadpool. 
-///
-/// Threadpool spawns unnamed threads 
-/// for workers
-</span><span class="kw">pub struct </span>ThreadPool {
-  workers: Vec&lt;Worker&gt;,
-  sender: mpsc::Sender&lt;Message&gt;,
-}
-
-<span class="kw">trait </span>FnBox {
-  <span class="kw">fn </span>call_box(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;);
-}
-
-<span class="kw">impl</span>&lt;F: FnOnce()&gt; FnBox <span class="kw">for </span>F {
-  <span class="kw">fn </span>call_box(<span class="self">self</span>: Box&lt;F&gt;) {
-    (<span class="kw-2">*</span><span class="self">self</span>)()
-  }
-}
-
-<span class="kw">type </span>Job = Box&lt;<span class="kw">dyn </span>FnBox + Send + <span class="lifetime">'static</span>&gt;;
-
-<span class="kw">impl </span>ThreadPool {
-  <span class="doccomment">/// Create a new ThreadPool.
-  ///
-  /// The size is the number of threads in the pool.
-  ///
-  /// # Panics
-  ///
-  /// The `new` function will panic if the size is zero.
-  </span><span class="kw">pub fn </span>new(size: usize) -&gt; ThreadPool {
-    <span class="macro">assert!</span>(size &gt; <span class="number">0</span>);
-
-    <span class="kw">let </span>(sender, receiver) = mpsc::channel();
-    <span class="kw">let </span>receiver = Arc::new(Mutex::new(receiver));
-    <span class="kw">let </span><span class="kw-2">mut </span>workers = Vec::with_capacity(size);
-
-    <span class="kw">for </span>id <span class="kw">in </span><span class="number">0</span>..size {
-      workers.push(Worker::new(id, Arc::clone(<span class="kw-2">&amp;</span>receiver)));
-    }
-
-    ThreadPool {
-      workers,
-      sender,
-    }
-  }
-
-  <span class="kw">pub fn </span>execute&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: F)
-    <span class="kw">where
-        </span>F: FnOnce() + Send + <span class="lifetime">'static </span>{
-    <span class="kw">let </span>job = Box::new(f);
-    <span class="self">self</span>.sender.send(Message::NewJob(job)).unwrap();
-  }
-}
-
-<span class="kw">impl </span>Drop <span class="kw">for </span>ThreadPool {
-  <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-    <span class="macro">info!</span>(<span class="string">"Sending terminate message to all workers."</span>);
-
-    <span class="kw">for _ in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.workers {
-      <span class="self">self</span>.sender.send(Message::Terminate).unwrap();
-    }
-
-    <span class="macro">warn!</span>(<span class="string">"Shutting down all workers."</span>);
-
-    <span class="kw">for </span>worker <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.workers {
-      <span class="macro">info!</span>(<span class="string">"Shutting down worker {}"</span>, worker.id);
-
-      <span class="kw">if let </span><span class="prelude-val">Some</span>(thread) = worker.thread.take() {
-          thread.join().unwrap();
-      }
-    }
-  }
-}
-
-<span class="kw">struct </span>Worker {
-  id: usize,
-  thread: <span class="prelude-ty">Option</span>&lt;thread::JoinHandle&lt;()&gt;&gt;,
-}
-
-<span class="kw">impl </span>Worker {
-  <span class="kw">fn </span>new(id: usize, receiver: Arc&lt;Mutex&lt;mpsc::Receiver&lt;Message&gt;&gt;&gt;) -&gt;
-    Worker {
-      <span class="kw">let </span>thread = thread::spawn(<span class="kw">move </span>||{
-      <span class="kw">loop </span>{
-        <span class="kw">let </span>message = receiver.lock().unwrap().recv().unwrap();
-        <span class="kw">match </span>message {
-          Message::NewJob(job) =&gt; {
-            <span class="macro">trace!</span>(<span class="string">"Worker {} got a job; executing."</span>, id);
-            job.call_box();
-          },
-          Message::Terminate =&gt; {
-            <span class="macro">trace!</span>(<span class="string">"Worker {} was told to terminate."</span>, id);
-            <span class="kw">break</span>;
-          },
-        }
-      }
-    });
-
-    Worker {
-      id,
-      thread: <span class="prelude-val">Some</span>(thread),
-    }
-  }
-}
-</code></pre></div></section></main></body></html>
+<span class="comment">//enum Message {
+//  NewJob(Job),
+//  Terminate,
+//}
+//
+//
+///// Implements "standard" Threadpool. 
+/////
+///// Threadpool spawns unnamed threads 
+///// for workers
+//pub struct ThreadPool {
+//  workers: Vec&lt;Worker&gt;,
+//  sender: mpsc::Sender&lt;Message&gt;,
+//}
+//
+//trait FnBox {
+//  fn call_box(self: Box&lt;Self&gt;);
+//}
+//
+//impl&lt;F: FnOnce()&gt; FnBox for F {
+//  fn call_box(self: Box&lt;F&gt;) {
+//    (*self)()
+//  }
+//}
+//
+//type Job = Box&lt;dyn FnBox + Send + 'static&gt;;
+//
+//impl ThreadPool {
+//  /// Create a new ThreadPool.
+//  ///
+//  /// The size is the number of threads in the pool.
+//  ///
+//  /// # Panics
+//  ///
+//  /// The `new` function will panic if the size is zero.
+//  pub fn new(size: usize) -&gt; ThreadPool {
+//    assert!(size &gt; 0);
+//
+//    let (sender, receiver) = mpsc::channel();
+//    let receiver = Arc::new(Mutex::new(receiver));
+//    let mut workers = Vec::with_capacity(size);
+//
+//    for id in 0..size {
+//      workers.push(Worker::new(id, Arc::clone(&amp;receiver)));
+//    }
+//
+//    ThreadPool {
+//      workers,
+//      sender,
+//    }
+//  }
+//
+//  pub fn execute&lt;F&gt;(&amp;self, f: F)
+//    where
+//        F: FnOnce() + Send + 'static {
+//    let job = Box::new(f);
+//    self.sender.send(Message::NewJob(job)).unwrap();
+//  }
+//}
+//
+//impl Drop for ThreadPool {
+//  fn drop(&amp;mut self) {
+//    info!("Sending terminate message to all workers.");
+//
+//    for _ in &amp;mut self.workers {
+//      self.sender.send(Message::Terminate).unwrap();
+//    }
+//
+//    warn!("Shutting down all workers.");
+//
+//    for worker in &amp;mut self.workers {
+//      info!("Shutting down worker {}", worker.id);
+//
+//      if let Some(thread) = worker.thread.take() {
+//          thread.join().unwrap();
+//      }
+//    }
+//  }
+//}
+//
+//struct Worker {
+//  id: usize,
+//  thread: Option&lt;thread::JoinHandle&lt;()&gt;&gt;,
+//}
+//
+//impl Worker {
+//  fn new(id: usize, receiver: Arc&lt;Mutex&lt;mpsc::Receiver&lt;Message&gt;&gt;&gt;) -&gt;
+//    Worker {
+//      let thread = thread::spawn(move ||{
+//      loop {
+//        let message = receiver.lock().unwrap().recv().unwrap();
+//        match message {
+//          Message::NewJob(job) =&gt; {
+//            trace!("Worker {} got a job; executing.", id);
+//            job.call_box();
+//          },
+//          Message::Terminate =&gt; {
+//            trace!("Worker {} was told to terminate.", id);
+//            break;
+//          },
+//        }
+//      }
+//    });
+//
+//    Worker {
+//      id,
+//      thread: Some(thread),
+//    }
+//  }
+//}
+</span></code></pre></div></section></main></body></html>

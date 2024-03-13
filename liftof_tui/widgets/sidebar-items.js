@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["timeseries"]};
+window.SIDEBAR_ITEMS = {"fn":["histogram","timeseries"]};

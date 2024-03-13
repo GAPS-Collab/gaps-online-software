@@ -786,6 +786,19 @@
 <a href="#785" id="785">785</a>
 <a href="#786" id="786">786</a>
 <a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! ReadoutBoard Status tab
 //!
 //! Find connected ReadoutBoards and show their 
@@ -796,8 +809,16 @@
 <span class="kw">use </span>std::fs;
 <span class="kw">use </span>std::collections::VecDeque;
 
-<span class="kw">extern crate </span>histo;
-<span class="kw">use </span>histo::Histogram;
+<span class="comment">//extern crate histo;
+//use histo::Histogram;
+</span><span class="kw">use </span>ndhistogram::{
+    Histogram,
+    Hist1D,
+    ndhistogram,
+};
+<span class="kw">use </span>ndhistogram::axis::{
+    Uniform,
+};
 
 <span class="kw">use </span>ratatui::{
     <span class="comment">//backend::CrosstermBackend,
@@ -821,7 +842,10 @@
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
 <span class="kw">use </span>tof_dataclasses::monitoring::RBMoniData;
 <span class="kw">use </span>tof_dataclasses::io::RBEventMemoryStreamer;
-<span class="kw">use </span><span class="kw">crate</span>::widgets::timeseries;
+<span class="kw">use </span><span class="kw">crate</span>::widgets::{
+    timeseries,
+    <span class="comment">//histogram,
+</span>};
 <span class="kw">use </span><span class="kw">crate</span>::colors::{
   ColorTheme2,
 };
@@ -866,7 +890,7 @@
   <span class="kw">pub </span>n_moni         : usize,
   <span class="kw">pub </span>miss_evid      : usize,
   <span class="kw">pub </span>last_evid      : u32,
-  <span class="kw">pub </span>nch_histo      : Histogram,
+  <span class="kw">pub </span>nch_histo      : Hist1D&lt;Uniform&lt;f32&gt;&gt;,
   timer              : Instant,
 
   <span class="kw">pub </span>theme          : ColorTheme2,
@@ -896,6 +920,7 @@
       <span class="comment">//ch_data.push(Vec::&lt;(f64,f64)&gt;::new());
       </span>ch_data.push(tmp_vec);
     }
+    <span class="kw">let </span>bins = Uniform::new(<span class="number">50</span>,-<span class="number">0.5</span>,<span class="number">49.5</span>);
     RBTab {
       tp_receiver    : tp_receiver,
       rb_receiver    : rb_receiver,
@@ -924,7 +949,7 @@
       n_moni         : <span class="number">0</span>,
       miss_evid      : <span class="number">0</span>,
       last_evid      : <span class="number">0</span>,
-      nch_histo      : Histogram::with_buckets(<span class="number">50</span>),
+      nch_histo      : <span class="macro">ndhistogram!</span>(bins),
       timer          : Instant::now(),
   
       theme          : theme,
@@ -937,8 +962,9 @@
   }
   
   <span class="kw">pub fn </span>receive_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), SerializationError&gt; {
-    <span class="kw">let </span>met = <span class="self">self</span>.timer.elapsed().as_secs_f64();
+    <span class="kw">let </span>met    = <span class="self">self</span>.timer.elapsed().as_secs_f64();
     <span class="kw">let </span><span class="kw-2">mut </span>ev = RBEvent::new();
+    <span class="kw">let </span>bins   = Uniform::new(<span class="number">50</span>,-<span class="number">0.5</span>,<span class="number">49.5</span>);
     
     <span class="kw">if </span><span class="self">self</span>.rb_changed {
       <span class="comment">// currently, only one RB at a time is supported
@@ -954,7 +980,7 @@
       <span class="self">self</span>.met_queue.clear();
       <span class="self">self</span>.met_queue_moni.clear();
       <span class="self">self</span>.fpgatmp_queue.clear();
-      <span class="self">self</span>.nch_histo = Histogram::with_buckets(<span class="number">50</span>);
+      <span class="self">self</span>.nch_histo = <span class="macro">ndhistogram!</span>(bins);
       <span class="comment">// try to get a new calibration
       </span><span class="kw">match </span><span class="self">self</span>.rbl_state.selected() {
         <span class="prelude-val">None </span>=&gt; {
@@ -1082,7 +1108,7 @@
         </span>}
       }
 
-      <span class="self">self</span>.nch_histo.add(ev.header.get_nchan() <span class="kw">as </span>u64);
+      <span class="self">self</span>.nch_histo.fill(<span class="kw-2">&amp;</span>(ev.header.get_nchan() <span class="kw">as </span>f32));
       <span class="self">self</span>.n_events += <span class="number">1</span>;
       <span class="kw">if </span><span class="self">self</span>.last_evid != <span class="number">0 </span>{
         <span class="kw">if </span>ev.header.event_id - <span class="self">self</span>.last_evid != <span class="number">1 </span>{

@@ -398,20 +398,30 @@
 <a href="#397" id="397">397</a>
 <a href="#398" id="398">398</a>
 <a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>crossbeam_channel::Sender;
 <span class="kw">use </span>liftof_lib::{PowerStatusEnum, TofComponent, LTBThresholdName};
 <span class="kw">use </span>tof_dataclasses::errors::CmdError;
 <span class="kw">use </span>tof_dataclasses::packets::{TofPacket, PacketType};
-<span class="kw">use </span>tof_dataclasses::commands::{TofCommand, TofCommandCode, TofCommandResp, TofResponse};
+<span class="kw">use </span>tof_dataclasses::commands::{
+    TofCommand,
+    TofCommandCode,
+    <span class="comment">//TofCommandResp,
+    //TofResponse
+</span>};
 <span class="kw">use </span>tof_dataclasses::constants::PAD_CMD_32BIT;
-<span class="kw">use </span>zmq::Socket;
+<span class="comment">//use zmq::Socket;
 
-<span class="attr">#[macro_use] </span><span class="kw">extern crate </span>log;
+</span><span class="attr">#[macro_use] </span><span class="kw">extern crate </span>log;
 <span class="kw">extern crate </span>clap;
 <span class="kw">extern crate </span>colored;
 
-<span class="kw">extern crate </span>local_ip_address;
-<span class="kw">extern crate </span>crossbeam_channel;
+<span class="comment">//extern crate local_ip_address;
+</span><span class="kw">extern crate </span>crossbeam_channel;
 <span class="kw">extern crate </span>liftof_lib;
 
 <span class="kw">extern crate </span>zmq;
@@ -796,4 +806,5 @@
   <span class="comment">//bytestream.append(&amp;mut resp.to_bytestream());
   </span>bytestream.append(input);
   bytestream
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>

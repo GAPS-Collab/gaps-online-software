@@ -1,0 +1,210 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="ndhistogram implements multi-dimensional histograms for Rust."><title>ndhistogram - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="ndhistogram" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../ndhistogram/index.html">ndhistogram</a><span class="version">0.9.0</span></h2></div><div class="sidebar-elems"><ul class="block">
+            <li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Aliases</a></li></ul></section></div></nav><div class="sidebar-resizer"></div>
+    <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../ndhistogram/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">ndhistogram</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/ndhistogram/lib.rs.html#1-316">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>ndhistogram implements multi-dimensional histograms for Rust.</p>
+<p>This library aims to provide a similar feature set to the C++ library
+<a href="https://www.boost.org/doc/libs/1_75_0/libs/histogram">boost-histogram</a>
+but with an idomatic pure-Rust implementation.</p>
+<p>Features include:</p>
+<ul>
+<li>Histograms with any number of dimensions from 1 up to 21 dimensions.</li>
+<li>Continuous (eg represented by a floating point number) and discrete axis (eg a category represented by a string value or enum) types that are composable (eg you may mix discrete and continuous axes).</li>
+<li>Flexible bin values including any primitive number type, or a user-defined type.</li>
+<li>Unweighted and weighted filling of histograms.</li>
+<li>Flexible, user-definable axis types.</li>
+<li>Sparse histograms to reduce the memory footprint of high bin count, mostly empty, histograms.</li>
+</ul>
+<h3 id="table-of-contents"><a href="#table-of-contents">Table of Contents</a></h3>
+<ol>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#quick-start">Quick-start</a></li>
+<li><a href="#overview">Overview</a>
+<ol>
+<li><a href="#histogram-implementations">Histogram Implementations</a></li>
+<li><a href="#axis-implementations">Axis Implementations</a></li>
+<li><a href="#histogram-bin-values">Histogram Bin Values</a></li>
+</ol>
+</li>
+<li><a href="#how-to-guide">How to Guide</a>
+<ol>
+<li><a href="#customize-the-bin-value-type">Customize the Bin Value Type</a></li>
+<li><a href="#create-and-use-a-2d-histogram">Create and Use a 2D Histogram</a></li>
+<li><a href="#create-a-histogram-with-a-discrete-axis">Create a Histogram with a Discrete Axis</a></li>
+<li><a href="#create-a-histogram-with-variable-sized-bins">Create a Histogram with Variable Sized Bins</a></li>
+<li><a href="#create-a-histogram-with-a-periodic-or-cyclic-axis">Create a Histogram with a Periodic or Cyclic Axis</a></li>
+<li><a href="#create-a-sparse-histogram">Create a Sparse Histogram</a></li>
+<li><a href="#merge-histograms">Merge Histograms</a></li>
+<li><a href="#iterate-over-histogram-bins-in-parallel">Iterate over Histogram Bins in Parallel</a></li>
+</ol>
+</li>
+<li><a href="#crate-feature-flags">Crate Feature Flags</a></li>
+</ol>
+<h3 id="usage"><a href="#usage">Usage</a></h3>
+<p>Add this to your <code>Cargo.toml</code>:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+ndhistogram = &quot;0.9.0&quot;
+</code></pre></div>
+<p>See the <a href="https://github.com/davehadley/ndhistogram/blob/main/ndhistogram/CHANGELOG.md">change log</a>
+for differences between releases.
+Please report any bugs in the <a href="https://github.com/davehadley/ndhistogram/issues">issues tracker</a>.</p>
+<h3 id="quick-start"><a href="#quick-start">Quick-start</a></h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ndhistogram::{Histogram, ndhistogram, axis::Uniform};
+
+<span class="comment">// create a 1D histogram with 10 equally sized bins between -5 and 5
+</span><span class="kw">let </span><span class="kw-2">mut </span>hist = <span class="macro">ndhistogram!</span>(Uniform::new(<span class="number">10</span>, -<span class="number">5.0</span>, <span class="number">5.0</span>));
+<span class="comment">// fill this histogram with a single value
+</span>hist.fill(<span class="kw-2">&amp;</span><span class="number">1.0</span>);
+<span class="comment">// fill this histogram with weights
+</span>hist.fill_with(<span class="kw-2">&amp;</span><span class="number">2.0</span>, <span class="number">4.0</span>);
+<span class="comment">// read the histogram values
+</span><span class="kw">let </span>x1 = hist.value(<span class="kw-2">&amp;</span><span class="number">1.0</span>);
+<span class="kw">let </span>also_x1 = hist.value_at_index(<span class="number">7</span>);
+<span class="macro">assert_eq!</span>(x1, also_x1);
+<span class="comment">// iterate the histogram values
+</span><span class="kw">for </span>item <span class="kw">in </span>hist.iter() {
+    <span class="macro">println!</span>(<span class="string">"{}, {}, {}"</span>, item.index, item.bin, item.value)
+}
+<span class="comment">// print the histogram to stdout
+</span><span class="macro">println!</span>(<span class="string">"{}"</span>, hist);</code></pre></div>
+<h3 id="overview"><a href="#overview">Overview</a></h3>
+<p>A <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a> is composed of two components:</p>
+<ul>
+<li>The <a href="trait.Axes.html" title="trait ndhistogram::Axes">Axes</a> which is a set of <a href="axis/trait.Axis.html" title="trait ndhistogram::axis::Axis">Axis</a> corresponding to each dimension of the histogram.
+The <a href="trait.Axes.html" title="trait ndhistogram::Axes">Axes</a> and <a href="axis/trait.Axis.html" title="trait ndhistogram::axis::Axis">Axis</a> define the binning of the histogram and are responsible for mapping from coordinate space (eg [x,y,z]) to an integer bin number.</li>
+<li>The histogram bin value storage. Valid bin value types include any integer and floating number type as well as user defined types that implement <a href="trait.Fill.html" title="trait ndhistogram::Fill">Fill</a>, <a href="trait.FillWith.html" title="trait ndhistogram::FillWith">FillWith</a> or <a href="trait.FillWithWeighted.html" title="trait ndhistogram::FillWithWeighted">FillWithWeighted</a>.</li>
+</ul>
+<h4 id="histogram-implementations"><a href="#histogram-implementations">Histogram Implementations</a></h4>
+<ul>
+<li><a href="struct.VecHistogram.html" title="struct ndhistogram::VecHistogram">VecHistogram</a>: bin values are stored in a <a href="https://doc.rust-lang.org/1.76.0/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>.
+Created with the <a href="macro.ndhistogram.html" title="macro ndhistogram::ndhistogram">ndhistogram</a> macro.
+This is the recommended implementation for most use cases.
+However, as memory is allocated even for empty bins,
+this may not be practical for very high dimension histograms.</li>
+<li><a href="struct.HashHistogram.html" title="struct ndhistogram::HashHistogram">HashHistogram</a>: bin values are stored in a <a href="https://doc.rust-lang.org/1.76.0/std/collections/hash/map/struct.HashMap.html" title="struct std::collections::hash::map::HashMap">HashMap</a>.
+Created with the <a href="macro.sparsehistogram.html" title="macro ndhistogram::sparsehistogram">sparsehistogram</a> macro.
+Useful for high dimension, mostly empty, histograms as empty bins
+take up no memory.</li>
+</ul>
+<p>Alternative implementations are possible by implementing the <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a> trait.</p>
+<h4 id="axis-implementations"><a href="#axis-implementations">Axis Implementations</a></h4>
+<ul>
+<li><a href="axis/struct.Uniform.html" title="struct ndhistogram::axis::Uniform">Uniform</a>/<a href="axis/struct.UniformNoFlow.html" title="struct ndhistogram::axis::UniformNoFlow">UniformNoFlow</a>: equally sized bins in a some range with optional underflow/overflow bins.</li>
+<li><a href="axis/struct.Variable.html" title="struct ndhistogram::axis::Variable">Variable</a>/<a href="axis/struct.VariableNoFlow.html" title="struct ndhistogram::axis::VariableNoFlow">VariableNoFlow</a>: variable sized bins with optional underflow/overflow bins.</li>
+<li><a href="axis/struct.UniformCyclic.html" title="struct ndhistogram::axis::UniformCyclic">UniformCyclic</a>/<a href="axis/struct.VariableCyclic.html" title="struct ndhistogram::axis::VariableCyclic">VariableCyclic</a>: cyclic or periodic versions of the Uniform and Variable axes.</li>
+<li><a href="axis/struct.Category.html" title="struct ndhistogram::axis::Category">Category</a>/<a href="axis/struct.CategoryNoFlow.html" title="struct ndhistogram::axis::CategoryNoFlow">CategoryNoFlow</a>: a finite set of discrete values with optional overflow bin.</li>
+</ul>
+<p>User defined axes types are possible by implementing the <a href="axis/trait.Axis.html" title="trait ndhistogram::axis::Axis">Axis</a> trait.</p>
+<h4 id="histogram-bin-values"><a href="#histogram-bin-values">Histogram Bin Values</a></h4>
+<p>Histograms may be filled with values of the following types:</p>
+<ul>
+<li>Primitive floating point and integer number types.</li>
+<li>All types that implement <a href="trait.Fill.html" title="trait ndhistogram::Fill">Fill</a></li>
+<li>All types that implement <a href="trait.FillWith.html" title="trait ndhistogram::FillWith">FillWith</a></li>
+<li>All types that implement <a href="trait.FillWithWeighted.html" title="trait ndhistogram::FillWithWeighted">FillWithWeighted</a></li>
+<li>All types that implement <a href="https://doc.rust-lang.org/1.76.0/core/ops/arith/trait.AddAssign.html" title="trait core::ops::arith::AddAssign">AddAssign</a> (as they are also <a href="trait.FillWith.html" title="trait ndhistogram::FillWith">FillWith</a>).</li>
+<li>All types that implement <a href="https://doc.rust-lang.org/1.76.0/core/ops/arith/trait.AddAssign.html" title="trait core::ops::arith::AddAssign">AddAssign</a> and <a href="../num_traits/identities/trait.One.html" title="trait num_traits::identities::One">One</a> (as they are also <a href="trait.Fill.html" title="trait ndhistogram::Fill">Fill</a>).</li>
+</ul>
+<p>This crate defines the following bin value types:</p>
+<ul>
+<li><a href="value/struct.Sum.html" title="struct ndhistogram::value::Sum">Sum</a> : a simple bin count that counts the number of times it has been filled.</li>
+<li><a href="value/struct.WeightedSum.html" title="struct ndhistogram::value::WeightedSum">WeightedSum</a> : as Sum but with weighted fills.</li>
+<li><a href="value/struct.Mean.html" title="struct ndhistogram::value::Mean">Mean</a> : computes the mean of the values it is filled with.</li>
+<li><a href="value/struct.WeightedMean.html" title="struct ndhistogram::value::WeightedMean">WeightedMean</a> : as Mean but with weighted fills.</li>
+</ul>
+<p>User defined bin value types are possible by implementing the <a href="trait.Fill.html" title="trait ndhistogram::Fill">Fill</a>, <a href="trait.FillWith.html" title="trait ndhistogram::FillWith">FillWith</a> or <a href="trait.FillWithWeighted.html" title="trait ndhistogram::FillWithWeighted">FillWithWeighted</a> traits.</p>
+<h3 id="how-to-guide"><a href="#how-to-guide">How to Guide</a></h3><h4 id="customize-the-bin-value-type"><a href="#customize-the-bin-value-type">Customize the Bin Value Type</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ndhistogram::{Histogram, ndhistogram, axis::Uniform, value::Mean};
+<span class="comment">// Create a histogram whose bin values are i32
+</span><span class="kw">let </span><span class="kw-2">mut </span>hist = <span class="macro">ndhistogram!</span>(Uniform::new(<span class="number">10</span>, -<span class="number">5.0</span>, <span class="number">5.0</span>); i32);
+hist.fill_with(<span class="kw-2">&amp;</span><span class="number">1.0</span>, <span class="number">2</span>);
+<span class="kw">let </span>value: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>i32&gt; = hist.value(<span class="kw-2">&amp;</span><span class="number">1.0</span>);
+<span class="macro">assert_eq!</span>(value, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">2</span>));
+
+<span class="comment">// More complex value types beyond primitives are available
+// "Mean" calculates the average of values it is filled with
+</span><span class="kw">let </span><span class="kw-2">mut </span>hist = <span class="macro">ndhistogram!</span>(Uniform::new(<span class="number">10</span>, -<span class="number">5.0</span>, <span class="number">5.0</span>); Mean);
+hist.fill_with(<span class="kw-2">&amp;</span><span class="number">1.0</span>, <span class="number">1.0</span>);
+hist.fill_with(<span class="kw-2">&amp;</span><span class="number">1.0</span>, <span class="number">3.0</span>);
+<span class="macro">assert_eq!</span>(hist.value(<span class="kw-2">&amp;</span><span class="number">1.0</span>).unwrap().mean(), <span class="number">2.0</span>);
+
+<span class="comment">// for other examples see the documentation of Sum, WeightedSum and WeightedMean
+
+// user defined value types are possible by implementing
+// Fill, FillWith or FillWithWeighted traits</span></code></pre></div>
+<h4 id="create-and-use-a-2d-histogram"><a href="#create-and-use-a-2d-histogram">Create and Use a 2D Histogram</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ndhistogram::{Histogram, ndhistogram, axis::Uniform};
+<span class="comment">// create a 2D histogram
+</span><span class="kw">let </span><span class="kw-2">mut </span>hist = <span class="macro">ndhistogram!</span>(Uniform::new(<span class="number">10</span>, -<span class="number">5.0</span>, <span class="number">5.0</span>), Uniform::new(<span class="number">10</span>, -<span class="number">5.0</span>, <span class="number">5.0</span>));
+<span class="comment">// fill 2D histogram
+</span>hist.fill(<span class="kw-2">&amp;</span>(<span class="number">1.0</span>, <span class="number">2.0</span>));
+<span class="comment">// read back the histogram values
+</span><span class="kw">let </span>x1_y2 = hist.value(<span class="kw-2">&amp;</span>(<span class="number">1.0</span>, <span class="number">2.0</span>));
+<span class="comment">// higher dimensions are possible with additional arguments to ndhistogram</span></code></pre></div>
+<h4 id="create-a-histogram-with-a-discrete-axis"><a href="#create-a-histogram-with-a-discrete-axis">Create a Histogram with a Discrete Axis</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ndhistogram::{Histogram, ndhistogram, axis::Category};
+<span class="kw">let </span><span class="kw-2">mut </span>hist = <span class="macro">ndhistogram!</span>(Category::new(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">4</span>]));
+hist.fill_with(<span class="kw-2">&amp;</span><span class="number">2</span>, <span class="number">42.0</span>);
+hist.fill_with(<span class="kw-2">&amp;</span><span class="number">1</span>, <span class="number">128.0</span>);
+<span class="macro">assert_eq!</span>(hist.value(<span class="kw-2">&amp;</span><span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">42.0</span>));
+<span class="macro">assert_eq!</span>(hist.value(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">128.0</span>));
+<span class="macro">assert_eq!</span>(hist.value(<span class="kw-2">&amp;</span><span class="number">3</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">128.0</span>));
+<span class="comment">// 1 and 3 give the same answer as they are both mapped to the overflow bin
+// For a version with no overflow bins use CategoryNoFlow
+
+// The Category type can be any hashable type, for example string
+</span><span class="kw">let </span><span class="kw-2">mut </span>hist = <span class="macro">ndhistogram!</span>(Category::new(<span class="macro">vec!</span>[<span class="string">"Red"</span>, <span class="string">"Blue"</span>, <span class="string">"Green"</span>]));
+hist.fill(<span class="kw-2">&amp;</span><span class="string">"Red"</span>);
+<span class="macro">assert_eq!</span>(hist.value(<span class="kw-2">&amp;</span><span class="string">"Red"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1.0</span>));</code></pre></div>
+<h4 id="create-a-histogram-with-variable-sized-bins"><a href="#create-a-histogram-with-variable-sized-bins">Create a Histogram with Variable Sized Bins</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ndhistogram::{Histogram, ndhistogram, axis::Variable};
+<span class="kw">let </span><span class="kw-2">mut </span>hist = <span class="macro">ndhistogram!</span>(Variable::new(<span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">3.0</span>, <span class="number">6.0</span>]));
+<span class="kw">for </span>x <span class="kw">in </span><span class="number">0</span>..<span class="number">6 </span>{
+    hist.fill(<span class="kw-2">&amp;</span>f64::from(x));
+}
+<span class="macro">assert_eq!</span>(hist.value(<span class="kw-2">&amp;</span><span class="number">0.0</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1.0</span>));
+<span class="macro">assert_eq!</span>(hist.value(<span class="kw-2">&amp;</span><span class="number">1.0</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">2.0</span>));
+<span class="macro">assert_eq!</span>(hist.value(<span class="kw-2">&amp;</span><span class="number">3.0</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">3.0</span>));</code></pre></div>
+<h4 id="create-a-histogram-with-a-periodic-or-cyclic-axis"><a href="#create-a-histogram-with-a-periodic-or-cyclic-axis">Create a Histogram with a Periodic or Cyclic Axis</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::f64::consts::PI;
+<span class="kw">use </span>ndhistogram::{Histogram, ndhistogram, axis::UniformCyclic};
+<span class="kw">let </span><span class="kw-2">mut </span>hist = <span class="macro">ndhistogram!</span>(UniformCyclic::&lt;f64&gt;::new(<span class="number">10</span>, <span class="number">0.0</span>, <span class="number">2.0</span><span class="kw-2">*</span>PI));
+hist.fill(<span class="kw-2">&amp;</span>PI);
+hist.fill(<span class="kw-2">&amp;</span>-PI);
+<span class="comment">// +pi and -pi are mapped onto the same value
+</span><span class="macro">assert_eq!</span>(hist.value(<span class="kw-2">&amp;</span>-PI), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">2.0</span>));
+<span class="macro">assert_eq!</span>(hist.value(<span class="kw-2">&amp;</span>PI), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">2.0</span>));</code></pre></div>
+<h4 id="create-a-sparse-histogram"><a href="#create-a-sparse-histogram">Create a Sparse Histogram</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ndhistogram::{Histogram, sparsehistogram, axis::Uniform};
+<span class="comment">// This histogram has 1e18 bins, too many to allocate with a normal histogram
+</span><span class="kw">let </span><span class="kw-2">mut </span>histogram_with_lots_of_bins = <span class="macro">sparsehistogram!</span>(
+    Uniform::new(<span class="number">1_000_000</span>, -<span class="number">5.0</span>, <span class="number">5.0</span>),
+    Uniform::new(<span class="number">1_000_000</span>, -<span class="number">5.0</span>, <span class="number">5.0</span>),
+    Uniform::new(<span class="number">1_000_000</span>, -<span class="number">5.0</span>, <span class="number">5.0</span>)
+);
+histogram_with_lots_of_bins.fill(<span class="kw-2">&amp;</span>(<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>));
+<span class="comment">// read back the filled value
+</span><span class="macro">assert_eq!</span>(histogram_with_lots_of_bins.value(<span class="kw-2">&amp;</span>(<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>)).unwrap(), <span class="kw-2">&amp;</span><span class="number">1.0</span>);
+<span class="comment">// unfilled bins will return None
+</span><span class="macro">assert!</span>(histogram_with_lots_of_bins.value(<span class="kw-2">&amp;</span>(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>)).is_none());</code></pre></div>
+<h4 id="merge-histograms"><a href="#merge-histograms">Merge Histograms</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ndhistogram::{Histogram, ndhistogram, axis::Uniform};
+<span class="kw">let </span><span class="kw-2">mut </span>hist1 = <span class="macro">ndhistogram!</span>(Uniform::&lt;f64&gt;::new(<span class="number">10</span>, -<span class="number">5.0</span>, <span class="number">5.0</span>));
+<span class="kw">let </span><span class="kw-2">mut </span>hist2 = <span class="macro">ndhistogram!</span>(Uniform::&lt;f64&gt;::new(<span class="number">10</span>, -<span class="number">5.0</span>, <span class="number">5.0</span>));
+hist1.fill_with(<span class="kw-2">&amp;</span><span class="number">0.0</span>, <span class="number">2.0</span>);
+hist2.fill_with(<span class="kw-2">&amp;</span><span class="number">0.0</span>, <span class="number">3.0</span>);
+<span class="kw">let </span>combined_hist = (hist1 + <span class="kw-2">&amp;</span>hist2).expect(<span class="string">"Axes are compatible"</span>);</code></pre></div>
+<h4 id="iterate-over-histogram-bins-in-parallel"><a href="#iterate-over-histogram-bins-in-parallel">Iterate over Histogram Bins in Parallel</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rayon::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>ndhistogram::{Histogram, ndhistogram, axis::Uniform};
+<span class="kw">let </span><span class="kw-2">mut </span>histogram = <span class="macro">ndhistogram!</span>(Uniform::&lt;f64&gt;::new(<span class="number">10</span>, -<span class="number">5.0</span>, <span class="number">5.0</span>));
+<span class="kw">let </span>sum: f64 = histogram.par_iter().map(|bin| bin.value).sum();
+<span class="comment">// see also: par_iter_mut, par_values, par_values_mut.
+</span><span class="macro">assert_eq!</span>(sum, <span class="number">0.0</span>);</code></pre></div>
+<p>Requires “rayon” feature enabled.</p>
+<h3 id="crate-feature-flags"><a href="#crate-feature-flags">Crate Feature Flags</a></h3>
+<p>All cargo features of this crate are off by default.
+The following features can be enabled in your <code>Cargo.toml</code>:</p>
+<ul>
+<li>[serde] : enable support for histogram serialization and deserialization.</li>
+<li>[rayon] : enable parallel iteration over histograms.</li>
+</ul>
+</div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="axis/index.html" title="mod ndhistogram::axis">axis</a></div><div class="desc docblock-short">Axis for ND histograms</div></li><li><div class="item-name"><a class="mod" href="error/index.html" title="mod ndhistogram::error">error</a></div><div class="desc docblock-short">Provides errors that may be returned by <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a>s.</div></li><li><div class="item-name"><a class="mod" href="value/index.html" title="mod ndhistogram::value">value</a></div><div class="desc docblock-short">Bin Value types for ND-histograms</div></li></ul><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2><ul class="item-table"><li><div class="item-name"><a class="macro" href="macro.ndhistogram.html" title="macro ndhistogram::ndhistogram">ndhistogram</a></div><div class="desc docblock-short">Creates a <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a>.</div></li><li><div class="item-name"><a class="macro" href="macro.sparsehistogram.html" title="macro ndhistogram::sparsehistogram">sparsehistogram</a></div><div class="desc docblock-short">Creates a sparse <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a>.</div></li></ul><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.AxesTuple.html" title="struct ndhistogram::AxesTuple">AxesTuple</a></div><div class="desc docblock-short">Container for a set of <a href="axis/trait.Axis.html" title="trait ndhistogram::axis::Axis">Axis</a> that implements <a href="trait.Axes.html" title="trait ndhistogram::Axes">Axes</a>.</div></li><li><div class="item-name"><a class="struct" href="struct.HashHistogram.html" title="struct ndhistogram::HashHistogram">HashHistogram</a></div><div class="desc docblock-short">A sparse N-dimensional <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a> that stores its values in a <a href="https://doc.rust-lang.org/1.76.0/std/collections/hash/map/struct.HashMap.html" title="struct std::collections::hash::map::HashMap">HashMap</a>.</div></li><li><div class="item-name"><a class="struct" href="struct.Item.html" title="struct ndhistogram::Item">Item</a></div><div class="desc docblock-short">Struct to be returned when iterating over <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a>s bins.</div></li><li><div class="item-name"><a class="struct" href="struct.VecHistogram.html" title="struct ndhistogram::VecHistogram">VecHistogram</a></div><div class="desc docblock-short">A <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a> that stores its values in a <a href="https://doc.rust-lang.org/1.76.0/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>.</div></li></ul><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2><ul class="item-table"><li><div class="item-name"><a class="trait" href="trait.Axes.html" title="trait ndhistogram::Axes">Axes</a></div><div class="desc docblock-short">Axes provided an interface for a set of ND dimensional set of histograms.</div></li><li><div class="item-name"><a class="trait" href="trait.Fill.html" title="trait ndhistogram::Fill">Fill</a></div><div class="desc docblock-short">Fill a histogram bin value with unit weight.</div></li><li><div class="item-name"><a class="trait" href="trait.FillWith.html" title="trait ndhistogram::FillWith">FillWith</a></div><div class="desc docblock-short">Fill a histogram bin value with some data.</div></li><li><div class="item-name"><a class="trait" href="trait.FillWithWeighted.html" title="trait ndhistogram::FillWithWeighted">FillWithWeighted</a></div><div class="desc docblock-short">Fill a histogram with some weighted value.</div></li><li><div class="item-name"><a class="trait" href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a></div><div class="desc docblock-short">A common interface for an ND histograms.</div></li></ul><h2 id="types" class="section-header"><a href="#types">Type Aliases</a></h2><ul class="item-table"><li><div class="item-name"><a class="type" href="type.Hist1D.html" title="type ndhistogram::Hist1D">Hist1D</a></div><div class="desc docblock-short">Type alias for 1D <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a>s returned by <a href="macro.ndhistogram.html" title="macro ndhistogram::ndhistogram">ndhistogram</a>.</div></li><li><div class="item-name"><a class="type" href="type.Hist2D.html" title="type ndhistogram::Hist2D">Hist2D</a></div><div class="desc docblock-short">Type alias for 2D <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a>s returned by <a href="macro.ndhistogram.html" title="macro ndhistogram::ndhistogram">ndhistogram</a>.</div></li><li><div class="item-name"><a class="type" href="type.Hist3D.html" title="type ndhistogram::Hist3D">Hist3D</a></div><div class="desc docblock-short">Type alias for 3D <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a>s returned by <a href="macro.ndhistogram.html" title="macro ndhistogram::ndhistogram">ndhistogram</a>.</div></li><li><div class="item-name"><a class="type" href="type.HistND.html" title="type ndhistogram::HistND">HistND</a></div><div class="desc docblock-short">Type alias for ND <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a>s returned by <a href="macro.ndhistogram.html" title="macro ndhistogram::ndhistogram">ndhistogram</a>.</div></li><li><div class="item-name"><a class="type" href="type.SparseHist1D.html" title="type ndhistogram::SparseHist1D">SparseHist1D</a></div><div class="desc docblock-short">Type alias for 1D <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a>s returned by <a href="macro.sparsehistogram.html" title="macro ndhistogram::sparsehistogram">sparsehistogram</a>.</div></li><li><div class="item-name"><a class="type" href="type.SparseHist2D.html" title="type ndhistogram::SparseHist2D">SparseHist2D</a></div><div class="desc docblock-short">Type alias for 2D <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a>s returned by <a href="macro.sparsehistogram.html" title="macro ndhistogram::sparsehistogram">sparsehistogram</a>.</div></li><li><div class="item-name"><a class="type" href="type.SparseHist3D.html" title="type ndhistogram::SparseHist3D">SparseHist3D</a></div><div class="desc docblock-short">Type alias for 3D <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a>s returned by <a href="macro.sparsehistogram.html" title="macro ndhistogram::sparsehistogram">sparsehistogram</a>.</div></li><li><div class="item-name"><a class="type" href="type.SparseHistND.html" title="type ndhistogram::SparseHistND">SparseHistND</a></div><div class="desc docblock-short">Type alias for ND <a href="trait.Histogram.html" title="trait ndhistogram::Histogram">Histogram</a>s returned by <a href="macro.sparsehistogram.html" title="macro ndhistogram::sparsehistogram">sparsehistogram</a>.</div></li></ul></section></div></main></body></html>

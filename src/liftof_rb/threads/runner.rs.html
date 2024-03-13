@@ -897,9 +897,6 @@
 <a href="#896" id="896">896</a>
 <a href="#897" id="897">897</a>
 <a href="#898" id="898">898</a>
-<a href="#899" id="899">899</a>
-<a href="#900" id="900">900</a>
-<a href="#901" id="901">901</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::time::{Instant};
 <span class="kw">use </span>std::{thread, time};
 <span class="kw">use </span>crossbeam_channel::{Sender,
@@ -1042,7 +1039,7 @@
   
   <span class="comment">// this are all settings for the progress bar
   </span><span class="kw">let </span><span class="kw-2">mut </span>template_bar_n_ev : <span class="kw-2">&amp;</span>str;
-  <span class="kw">let </span><span class="kw-2">mut </span>sty_ev : ProgressStyle;
+  <span class="kw">let </span><span class="kw-2">mut </span>sty_ev     : ProgressStyle;
   <span class="kw">let </span><span class="kw-2">mut </span>multi_prog : MultiProgress;
   <span class="kw">let </span><span class="kw-2">mut </span>prog_a  = ProgressBar::hidden();
   <span class="kw">let </span><span class="kw-2">mut </span>prog_b  = ProgressBar::hidden();
@@ -1134,11 +1131,7 @@
           uio2_total_size = buffer_trip;
         }
         
-        <span class="comment">//let mut tof_op_mode = TofOperationMode::RequestReply;
-        //if rc.stream_any {
-        //  tof_op_mode = TofOperationMode::StreamAny;
-        //}
-        </span><span class="kw">match </span>opmode_to_cache.send(rc.tof_op_mode.clone()) {
+        <span class="kw">match </span>opmode_to_cache.send(rc.tof_op_mode.clone()) {
           <span class="prelude-val">Err</span>(err) =&gt; {
             <span class="macro">error!</span>(<span class="string">"Unable to send TofOperationMode to the event cache! Err {err}"</span>);
           }
@@ -1225,7 +1218,7 @@
           }
         }
         <span class="kw">if </span>show_progress {
-          <span class="kw">if </span>rc.runs_forever() {
+          <span class="kw">if </span>rc.nevents == <span class="number">0 </span>{
             template_bar_n_ev = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} "</span>;
           } <span class="kw">else </span>{
             template_bar_n_ev = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:&gt;7}/{len:7}"</span>;
@@ -1358,7 +1351,8 @@
       }
     }
     
-    <span class="kw">if </span>!rc.runs_forever() {
+    <span class="comment">// FIXME
+    </span><span class="kw">if </span>!rc.nevents == <span class="number">0 </span>{
       <span class="kw">if </span>rc.nevents != <span class="number">0 </span>{
         <span class="kw">if </span>n_events &gt; rc.nevents <span class="kw">as </span>u64{
           terminate = <span class="bool-val">true</span>;
@@ -1610,7 +1604,7 @@
           }
         }
         <span class="kw">if </span>show_progress {
-          <span class="kw">if </span>rc.runs_forever() {
+          <span class="kw">if </span>rc.nevents == <span class="number">0 </span>{
             template_bar_n_ev = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} "</span>;
           } <span class="kw">else </span>{
             template_bar_n_ev = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:&gt;7}/{len:7}"</span>;
@@ -1778,7 +1772,7 @@
     
     // from here on, check termination 
     // conditions
-    </span><span class="kw">if </span>!rc.runs_forever() {
+    </span><span class="kw">if </span>!rc.nevents == <span class="number">0 </span>{
       <span class="kw">if </span>rc.nevents != <span class="number">0 </span>{
         <span class="kw">if </span>n_events &gt; rc.nevents <span class="kw">as </span>u64{
           terminate = <span class="bool-val">true</span>;

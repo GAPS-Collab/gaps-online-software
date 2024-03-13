@@ -215,28 +215,6 @@
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
 <a href="#216" id="216">216</a>
-<a href="#217" id="217">217</a>
-<a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
-<a href="#220" id="220">220</a>
-<a href="#221" id="221">221</a>
-<a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
-<a href="#224" id="224">224</a>
-<a href="#225" id="225">225</a>
-<a href="#226" id="226">226</a>
-<a href="#227" id="227">227</a>
-<a href="#228" id="228">228</a>
-<a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
-<a href="#237" id="237">237</a>
-<a href="#238" id="238">238</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Standalone application to get events from the MTB (master trigger board)
 //!
 //! This will connect to the MTB over Udp and request the event queue, 
@@ -256,23 +234,12 @@
 <span class="kw">extern crate </span>liftof_cc;
 <span class="kw">extern crate </span>liftof_lib;
 
-<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::thread;
 
-<span class="comment">//use std::sync::{
-//    Arc,
-//    Mutex
-//};
-
-</span><span class="kw">use </span>std::thread;
-<span class="kw">use </span>std::path::PathBuf;
-
-<span class="kw">use </span>tof_dataclasses::DsiLtbRBMapping;
 <span class="comment">//use tof_dataclasses::threading::ThreadControl;
 
 //use tof_dataclasses::commands::RBCommand;
 </span><span class="kw">use </span>liftof_lib::{
-    get_ltb_dsi_j_ch_mapping,
-    readoutboard_commander,
     init_env_logger
 };
 
@@ -281,8 +248,9 @@
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
 <span class="kw">use </span>liftof_lib::{
     master_trigger,
-    MTBSettings
 };
+
+<span class="kw">use </span>liftof_cc::settings::LiftofCCSettings;
 
 <span class="kw">use </span>crossbeam_channel <span class="kw">as </span>cbc;
 <span class="comment">//use std::io::Write;
@@ -298,28 +266,25 @@
   </span><span class="attr">#[arg(long, default_value_t=<span class="bool-val">false</span>)]
   </span>verbose : bool,
   <span class="doccomment">/// Send RB request packets
-  </span><span class="attr">#[arg(long, default_value_t=<span class="bool-val">false</span>)]
-  </span>send_requests : bool,
-  <span class="doccomment">/// Relay RB network traffic through 
+  /// Relay RB network traffic through 
   /// open poart
   </span><span class="attr">#[arg(long, default_value_t=<span class="bool-val">false</span>)]
   </span>relay_rbs : bool,
-  <span class="doccomment">/// Apply trace suppression 
-  </span><span class="attr">#[arg(long, default_value_t=<span class="bool-val">false</span>)]
-  </span>trace_suppression : bool,
   <span class="doccomment">/// Publish TofPackets at port 42000
   </span><span class="attr">#[arg(long, default_value_t=<span class="bool-val">false</span>)]
   </span>publish_packets : bool,
-  <span class="doccomment">/// A json file wit the ltb(dsi, j, ch) -&gt; rb_id, rb_ch mapping.
-  </span><span class="attr">#[arg(long)]
-  </span>json_ltb_rb_map : <span class="prelude-ty">Option</span>&lt;PathBuf&gt;,
+  <span class="doccomment">/// Configuration of liftof-mt. 
+  /// Use the same config 
+  </span><span class="attr">#[arg(short, long)]
+  </span>config: <span class="prelude-ty">Option</span>&lt;String&gt;,
+
 }
 
 <span class="kw">fn </span>rb_relay() {
   <span class="kw">let </span>ctx = zmq::Context::new();
   <span class="kw">let </span>socket = ctx.socket(zmq::SUB).expect(<span class="string">"Unable to create 0MQ SUB socket!"</span>);
   <span class="kw">let </span>socket_out = ctx.socket(zmq::PUB).expect(<span class="string">"Unable to create 0MQ PUB socket!"</span>);
-  <span class="kw">for </span>rb_id <span class="kw">in </span><span class="number">1</span>..<span class="number">41 </span>{
+  <span class="kw">for </span>rb_id <span class="kw">in </span><span class="number">1</span>..<span class="number">51 </span>{
     <span class="kw">let </span>address = <span class="macro">format!</span>(<span class="string">"tcp://10.0.1.1{:02}:42000"</span>, rb_id);
     socket.connect(<span class="kw-2">&amp;</span>address).expect(<span class="string">"Unable to bind to data (PUB) socket {adress}"</span>);
     <span class="macro">println!</span>(<span class="string">"==&gt; 0MQ PUB socket bound to address {address}"</span>);
@@ -353,56 +318,47 @@
   <span class="macro">info!</span>(<span class="string">"Logging initialized!"</span>);
   <span class="kw">let </span>(mte_send, mte_rec): (cbc::Sender&lt;MasterTriggerEvent&gt;, cbc::Receiver&lt;MasterTriggerEvent&gt;) = cbc::unbounded(); 
   <span class="kw">let </span>(tp_send_moni, tp_rec_moni): (cbc::Sender&lt;TofPacket&gt;, cbc::Receiver&lt;TofPacket&gt;) = cbc::unbounded(); 
-  <span class="kw">let </span>(tp_send_req, tp_rec_req): (cbc::Sender&lt;TofPacket&gt;, cbc::Receiver&lt;TofPacket&gt;) = cbc::unbounded(); 
  
   <span class="comment">// Create shared data wrapped in an Arc and a Mutex for synchronization
   //let thread_control = Arc::new(Mutex::new(ThreadControl::default()));
+  // deal with command line arguments
+  </span><span class="kw">let </span>config          : LiftofCCSettings;
+  <span class="kw">let </span>args    = Args::parse();
+  <span class="kw">match </span>args.config {
+    <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">"No config file provided! Please provide a config file with --config or -c flag!"</span>),
+    <span class="prelude-val">Some</span>(cfg_file) =&gt; {
+      <span class="kw">match </span>LiftofCCSettings::from_toml(cfg_file) {
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"CRITICAL! Unable to parse .toml settings file! {}"</span>, err);
+          <span class="macro">panic!</span>(<span class="string">"Unable to parse config file!"</span>);
+        }
+        <span class="prelude-val">Ok</span>(_cfg) =&gt; {
+          config = _cfg;
+        }
+      }
+    } <span class="comment">// end Some
+  </span>} <span class="comment">// end match
+  </span><span class="kw">let </span>mtb_settings          = config.mtb_settings.clone();
+  
+  <span class="macro">println!</span>(<span class="string">"=&gt; Using the following config as parsed from the config file:\n{}"</span>, config);
 
-  </span><span class="kw">let </span><span class="kw-2">mut </span>ltb_rb_map : DsiLtbRBMapping = HashMap::&lt;u8,HashMap::&lt;u8,HashMap::&lt;u8,(u8,u8)&gt;&gt;&gt;::new();
   <span class="kw">let </span>mt_address          = String::from(<span class="string">"10.0.1.10:50001"</span>);
 
   <span class="kw">let </span>args                = Args::parse();
   <span class="kw">let </span>verbose             = args.verbose;
   <span class="kw">let </span>publish_packets     = args.publish_packets;
-  <span class="kw">let </span>send_requests       = args.send_requests;
   <span class="kw">let </span>relay_rbs           = args.relay_rbs;
-  <span class="kw">let </span>trace_suppression   = args.trace_suppression;
 
-  <span class="comment">//FIXME - just make it work now
-  </span><span class="kw">let </span><span class="kw-2">mut </span>settings = MTBSettings::new();
-  settings.trace_suppression = trace_suppression;
-
-  <span class="kw">if </span>args.send_requests {
-    <span class="kw">match </span>args.json_ltb_rb_map {
-      <span class="prelude-val">None </span>=&gt; {
-        <span class="macro">panic!</span>(<span class="string">"Will need json ltb -&gt; rb mapping when we want to send requests!"</span>)
-      },
-      <span class="prelude-val">Some</span>(_json_ltb_rb_map) =&gt; {
-        ltb_rb_map = get_ltb_dsi_j_ch_mapping(_json_ltb_rb_map);
-      }
-    }
-  }
   <span class="kw">let </span>_worker_thread = thread::Builder::new()
          .name(<span class="string">"master_trigger"</span>.into())
          .spawn(<span class="kw">move </span>|| {
             master_trigger(mt_address, 
-                           <span class="kw-2">&amp;</span>ltb_rb_map,
                            <span class="kw-2">&amp;</span>mte_send,
-                           <span class="kw-2">&amp;</span>tp_send_req,
                            <span class="kw-2">&amp;</span>tp_send_moni,
-                           settings,
-                           verbose,
-                           send_requests);
+                           mtb_settings,
+                           verbose);
          })
          .expect(<span class="string">"Failed to spawn master_trigger thread!"</span>);
- <span class="kw">if </span>send_requests {
-   <span class="kw">let </span>_rbcmd_thread = thread::Builder::new()
-                       .name(<span class="string">"rb_commander"</span>.into())
-                       .spawn(<span class="kw">move </span>|| {
-                         readoutboard_commander(<span class="kw-2">&amp;</span>tp_rec_req); 
-                        })
-                       .expect(<span class="string">"Failed to spawn rb_commander thread!"</span>);
- }
  <span class="kw">if </span>relay_rbs {
    <span class="kw">let </span>_relay_thread = thread::Builder::new()
                        .name(<span class="string">"rb_relay"</span>.into())
@@ -434,7 +390,7 @@
            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
          }
        }
-       <span class="kw">if </span>n_events % <span class="number">100 </span>== <span class="number">0 </span>{
+       <span class="kw">if </span>n_events % <span class="number">1000 </span>== <span class="number">0 </span>{
          <span class="kw">if </span>verbose {
            <span class="macro">println!</span>(<span class="string">"{}"</span>, _ev);
          }

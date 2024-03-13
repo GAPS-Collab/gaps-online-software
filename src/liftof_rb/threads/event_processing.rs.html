@@ -308,16 +308,6 @@
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fs;
 <span class="kw">use </span>std::path::PathBuf;
 <span class="kw">use </span>std::sync::{
@@ -329,27 +319,24 @@
                         Receiver};
 
 <span class="kw">use </span>tof_dataclasses::events::DataType;
-<span class="kw">use </span>tof_dataclasses::serialization::Serialization;
 <span class="kw">use </span>tof_dataclasses::packets::{
     TofPacket,
-    PacketType
-};
+    <span class="comment">//PacketType
+</span>};
 <span class="kw">use </span>tof_dataclasses::io::RBEventMemoryStreamer;
 <span class="kw">use </span>tof_dataclasses::calibrations::RBCalibrations;
 <span class="kw">use </span>tof_dataclasses::threading::ThreadControl;
 <span class="kw">use </span>tof_dataclasses::events::EventStatus;
 <span class="kw">use </span>tof_dataclasses::commands::{
-    RBCommand,
-    TofOperationMode,
+    <span class="comment">//RBCommand,
+    </span>TofOperationMode,
 };
-<span class="kw">use </span>tof_dataclasses::RBChannelPaddleEndIDMap;
+<span class="comment">//use tof_dataclasses::RBChannelPaddleEndIDMap;
 
-<span class="kw">use </span>liftof_lib::{
+</span><span class="kw">use </span>liftof_lib::{
     RunStatistics,
-    waveform_analysis,
-};
-
-<span class="kw">use </span><span class="kw">crate</span>::control::get_board_id;
+    <span class="comment">//waveform_analysis,
+</span>};
 
 <span class="doccomment">///  Transforms raw bytestream to TofPackets
 ///
@@ -360,19 +347,18 @@
 ///  
 ///  * board_id            : The unique ReadoutBoard identifier
 ///                          (ID) of this RB
-///  * tp_recv             : A receiver for TofPackets. This
-///                          will receive RBCommands with 
-///                          event ids to consider.
 ///  * bs_recv             : A receiver for bytestreams. The 
 ///                          bytestream comes directly from 
 ///                          the data buffers.
 ///  * get_op_mode         : The TOF operation mode. Typically,
-///                          this is "StreamAny", meaning that 
-///                          whatever the TOF produceds, it gets
-///                          wrapped in TofPackets and send away.
-///                          In "RequestReply" mode, liftof-rb
-///                          waits for event requests sent by 
-///                          a third party
+///                          this is "Default", meaning that the
+///                          RBs will sent what is in the memory 
+///                          buffer translated into RBEvents.
+///                          In "RBHighThrougput" mode, it will not
+///                          translate them into RBEvents, but just
+///                          transmits the content of the buffers, and 
+///                          RBWaveform mode will do waveform analysis
+///                          on the boards
 ///  * tp_sender           : Send the resulting data product to 
 ///                          get processed further
 ///  * data_type           : If different from 0, do some processing
@@ -385,23 +371,20 @@
 ///                          This only applies when the op mode is not 
 ///                          RBHighThroughput
 </span><span class="kw">pub fn </span>event_processing(board_id            : u8,
-                        tp_recv             : <span class="kw-2">&amp;</span>Receiver&lt;TofPacket&gt;,
                         bs_recv             : <span class="kw-2">&amp;</span>Receiver&lt;Vec&lt;u8&gt;&gt;,
                         get_op_mode         : <span class="kw-2">&amp;</span>Receiver&lt;TofOperationMode&gt;, 
                         tp_sender           : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
                         dtf_fr_runner       : <span class="kw-2">&amp;</span>Receiver&lt;DataType&gt;,
-                        paddle_map          : RBChannelPaddleEndIDMap, 
                         verbose             : bool,
                         calc_crc32          : bool,
                         thread_control      : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;,
                         stat                : Arc&lt;Mutex&lt;RunStatistics&gt;&gt;,
                         only_perfect_events : bool) {
-  <span class="comment">// reasonable default ? 
-  </span><span class="kw">let </span><span class="kw-2">mut </span>op_mode = TofOperationMode::StreamAny;
+  <span class="kw">let </span><span class="kw-2">mut </span>op_mode = TofOperationMode::Default;
 
   <span class="comment">// load calibration just in case?
   </span><span class="kw">let </span><span class="kw-2">mut </span>cali_loaded = <span class="bool-val">false</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>cali        = RBCalibrations::new(<span class="number">0</span>);
+  <span class="kw">let </span>cali        : RBCalibrations;
   <span class="kw">let </span>cali_path       = <span class="macro">format!</span>(<span class="string">"/home/gaps/calib/rb_{:0&gt;2}.cali.tof.gaps"</span>, board_id);
   <span class="kw">let </span>cali_path_buf   = PathBuf::from(<span class="kw-2">&amp;</span>cali_path);
   <span class="kw">if </span>fs::metadata(cali_path_buf.clone()).is_ok() {
@@ -413,6 +396,7 @@
       <span class="prelude-val">Ok</span>(_c) =&gt; {
         cali = _c;
         cali_loaded = <span class="bool-val">true</span>;
+        <span class="macro">debug!</span>(<span class="string">"We loaded calibration {}"</span>, cali);
       }
     }
   } <span class="kw">else </span>{
@@ -420,8 +404,7 @@
     cali_loaded = <span class="bool-val">false</span>;
   }
   <span class="comment">// FIXME - deprecate!
-  </span><span class="kw">let </span><span class="kw-2">mut </span>op_mode_stream  = <span class="bool-val">true</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>events_not_sent : u64 = <span class="number">0</span>;
+  </span><span class="kw">let </span><span class="kw-2">mut </span>events_not_sent : u64 = <span class="number">0</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>data_type       : DataType   = DataType::Unknown;
   <span class="comment">//let one_milli           = Duration::from_millis(1);
   </span><span class="kw">let </span><span class="kw-2">mut </span>streamer        = RBEventMemoryStreamer::new();
@@ -431,8 +414,6 @@
   // events. This means we might want to wait for 50 MTE
   // events?
   </span><span class="kw">let </span><span class="kw-2">mut </span>skipped_events : usize = <span class="number">0</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_request = <span class="number">0</span>;
-  <span class="kw">let </span>ev_buff_size = <span class="number">50</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_events = <span class="number">0usize</span>;
   <span class="lifetime">'main </span>: <span class="kw">loop </span>{
     <span class="kw">match </span>thread_control.lock() {
@@ -453,8 +434,7 @@
         <span class="prelude-val">Ok</span>(mode) =&gt; {
           <span class="macro">warn!</span>(<span class="string">"Will change operation mode to {:?}!"</span>, mode);
           <span class="kw">match </span>mode {
-            TofOperationMode::StreamAny    =&gt; {
-              op_mode_stream = <span class="bool-val">true</span>;
+            TofOperationMode::Default    =&gt; {
               streamer.request_mode = <span class="bool-val">false</span>;
               op_mode = mode;
             },
@@ -462,8 +442,8 @@
               <span class="kw">if </span>!cali_loaded {
                 <span class="macro">error!</span>(<span class="string">"Requesting waveform analysis without having a calibration loaded!"</span>);
                 <span class="macro">error!</span>(<span class="string">"Can't do waveform analysis without calibration!"</span>);
-                <span class="macro">error!</span>(<span class="string">"Switching mode to StreamAny"</span>);
-                op_mode = TofOperationMode::StreamAny;
+                <span class="macro">error!</span>(<span class="string">"Switching mode to Default"</span>);
+                op_mode = TofOperationMode::Default;
               }
             }
             <span class="kw">_ </span>=&gt; (),
@@ -474,7 +454,7 @@
     <span class="kw">if </span>!dtf_fr_runner.is_empty() {
       <span class="kw">match </span>dtf_fr_runner.try_recv() {
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">"Issues receiving datatype/format! Err {err}"</span>);
+          <span class="macro">error!</span>(<span class="string">"Issues receiving datatype/format! {err}"</span>);
         }
         <span class="prelude-val">Ok</span>(dtf) =&gt; {
           data_type = dtf; 
@@ -514,7 +494,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>packets_in_stream : u32 = <span class="number">0</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>last_event_id     : u32 = <span class="number">0</span>;
         <span class="comment">//println!("Streamer::stream size {}", streamer.stream.len());
-        </span><span class="lifetime">'event_reader </span>: <span class="kw">loop </span>{
+        </span><span class="kw">loop </span>{
           <span class="kw">if </span>streamer.is_depleted {
             <span class="macro">info!</span>(<span class="string">"Streamer exhausted after sending {} packets!"</span>, packets_in_stream);
             <span class="comment">//break 'event_reader;
@@ -533,15 +513,14 @@
               <span class="kw">match </span>streamer.next_tofpacket() {
                 <span class="prelude-val">None </span>=&gt; {
                   streamer.is_depleted = <span class="bool-val">true</span>;
-                  <span class="kw">continue</span>;
+                  <span class="kw">continue </span><span class="lifetime">'main</span>;
                 },
                 <span class="prelude-val">Some</span>(tp) =&gt; {
                   tp_to_send = tp;
                 }
               }
             },
-            TofOperationMode::StreamAny |
-            TofOperationMode::RequestReply |
+            TofOperationMode::Default |
             TofOperationMode::RBWaveform =&gt; {
               <span class="kw">match </span>streamer.next() {
                 <span class="prelude-val">None </span>=&gt; {
@@ -553,14 +532,15 @@
                   </span><span class="kw">if </span>last_event_id != <span class="number">0 </span>{
                     <span class="kw">if </span>event.header.event_id != last_event_id + <span class="number">1 </span>{
                       <span class="kw">if </span>event.header.event_id &gt; last_event_id {
-                          skipped_events += (event.header.event_id - last_event_id) <span class="kw">as </span>usize;
+                          skipped_events += (event.header.event_id - last_event_id -<span class="number">1</span>) <span class="kw">as </span>usize;
                       } <span class="kw">else </span>{
                         <span class="macro">error!</span>(<span class="string">"Something with the event counter is messed up. Got event id {}, but the last event id was {}"</span>, event.header.event_id, last_event_id);
                       }
                     }
                   }
                   last_event_id = event.header.event_id;
-                  event.data_type = data_type;
+                  <span class="comment">//println!("This event id {}!", last_event_id);
+                  </span>event.data_type = data_type;
                   <span class="kw">if </span>verbose {
                     <span class="kw">match </span>stat.lock() {
                       <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to acquire lock on shared memory for RunStatisitcis! {err}"</span>),

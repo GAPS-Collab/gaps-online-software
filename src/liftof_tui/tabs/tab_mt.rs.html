@@ -420,6 +420,28 @@
 <a href="#419" id="419">419</a>
 <a href="#420" id="420">420</a>
 <a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Master Trigger tab
 //! 
 //! Show current data from the master trigger
@@ -437,13 +459,31 @@
     text::Span,
     terminal::Frame,
     widgets::{
-        Block, Dataset, Axis, GraphType, BorderType, Chart, BarChart, Borders, Paragraph, },
+        Block,
+        Dataset,
+        Axis,
+        GraphType,
+        BorderType,
+        Chart,
+        BarChart,
+        Borders,
+        Paragraph
+    },
 };
 
 <span class="kw">extern crate </span>crossbeam_channel;
 <span class="kw">use </span>crossbeam_channel::Receiver;
-<span class="kw">extern crate </span>histo;
-<span class="kw">use </span>histo::Histogram;
+
+<span class="kw">extern crate </span>ndhistogram;
+<span class="kw">use </span>ndhistogram::{
+    ndhistogram,
+    Histogram,
+    Hist1D,
+};
+<span class="kw">use </span>ndhistogram::axis::{
+    Uniform,
+};
+
 
 <span class="kw">use </span>tof_dataclasses::packets::{TofPacket, PacketType};
 <span class="kw">use </span>tof_dataclasses::events::MasterTriggerEvent;
@@ -489,7 +529,7 @@
   <span class="kw">pub </span>n_moni         : usize,
   <span class="kw">pub </span>miss_evid      : usize,
   <span class="kw">pub </span>last_evid      : u32,
-  <span class="kw">pub </span>nch_histo      : Histogram,
+  <span class="kw">pub </span>nch_histo      : Hist1D&lt;Uniform&lt;f32&gt;&gt;,
   <span class="kw">pub </span>theme          : ColorTheme2,
 
   timer              : Instant,
@@ -501,7 +541,8 @@
   <span class="kw">pub fn </span>new(tp_receiver  : Receiver&lt;TofPacket&gt;,
              mte_receiver : Receiver&lt;MasterTriggerEvent&gt;,
              theme        : ColorTheme2) -&gt; MTTab {
-    MTTab {
+    <span class="kw">let </span>bins = Uniform::new(<span class="number">50</span>, -<span class="number">0.5</span>, <span class="number">49.5</span>);
+    <span class="self">Self </span>{
       main_layout    : Vec::&lt;Rect&gt;::new(),
       info_layout    : Vec::&lt;Rect&gt;::new(),
       detail_layout  : Vec::&lt;Rect&gt;::new(),
@@ -518,7 +559,7 @@
       n_moni         : <span class="number">0</span>,
       miss_evid      : <span class="number">0</span>,
       last_evid      : <span class="number">0</span>,
-      nch_histo      : Histogram::with_buckets(<span class="number">50</span>),
+      nch_histo      : <span class="macro">ndhistogram!</span>(bins),
       theme          : theme,
       timer          : Instant::now(),
     }
@@ -570,7 +611,7 @@
     </span>} <span class="comment">// end match
     </span><span class="kw">if </span>mte.event_id != <span class="number">0 </span>{
       <span class="kw">let </span>hits = mte.get_dsi_j_ch_for_triggered_ltbs();
-      <span class="self">self</span>.nch_histo.add(hits.len() <span class="kw">as </span>u64);
+      <span class="self">self</span>.nch_histo.fill(<span class="kw-2">&amp;</span>(hits.len() <span class="kw">as </span>f32));
       <span class="self">self</span>.n_events += <span class="number">1</span>;
       <span class="self">self</span>.event_queue.push_back(mte);
       <span class="kw">if </span><span class="self">self</span>.event_queue.len() &gt; <span class="self">self</span>.queue_size {
@@ -683,9 +724,13 @@
     <span class="kw">let </span><span class="kw-2">mut </span>vec_index   = <span class="number">0</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>bins = Vec::&lt;(u64, u64)&gt;::new();
     
-    <span class="kw">for </span>bucket <span class="kw">in </span><span class="self">self</span>.nch_histo.buckets() {
-      bins.push((bucket.start(), bucket.count()));
-      <span class="kw">if </span>bucket.count() &gt; <span class="number">0 </span>{
+    <span class="kw">for </span>bin <span class="kw">in </span><span class="self">self</span>.nch_histo.iter() {
+      <span class="kw">let </span>bin_value = <span class="kw-2">*</span>bin.value <span class="kw">as </span>u64;
+      bins.push((bin.index <span class="kw">as </span>u64, bin_value));
+      <span class="comment">// always show the first 10 bins, but if 
+      // the bins with index &gt; 10 are not 
+      // populated, discard them
+      </span><span class="kw">if </span>bin_value &gt; <span class="number">0 </span>&amp;&amp; bin.index &gt; <span class="number">10 </span>{
         max_pop_bin = vec_index;
       }
       vec_index += <span class="number">1</span>;
@@ -709,7 +754,6 @@
         <span class="self">self</span>.theme.highlight_fg()
         <span class="comment">//Style::default()
         //.bg(Color::Blue)
-        
         </span>.add_modifier(Modifier::BOLD),
       )
       .style(<span class="self">self</span>.theme.background());
