@@ -298,6 +298,8 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("MasterTrigger",    PacketType::MasterTrigger )
       .value("RBCalibration",    PacketType::RBCalibration )
       .value("MtbMoniData",      PacketType::MTBMoni       )
+      .value("TofEventSummary",  PacketType::TofEventSummary)
+      .value("RBWaveform",       PacketType::RBWaveform     )
       ;
       //.export_values();
 
