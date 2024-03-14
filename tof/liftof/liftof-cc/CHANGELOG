@@ -1,6 +1,10 @@
 # HAHALUA series
 
-* v0.9.5
+# v0.9.6
+* after merge with paolo_dev, slight changes to 
+  flight_cpu_listener architecture
+
+# v0.9.5
 * allow to send RBWaveform + TofEventSummary instead 
   of TofEvents
 * further improvements on the performance of the 

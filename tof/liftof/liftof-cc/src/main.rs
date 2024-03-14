@@ -201,6 +201,7 @@ fn main() {
   let flight_sub_address    = config.fc_sub_address.clone();
   let mtb_settings          = config.mtb_settings.clone();
   let mut gds_settings      = config.data_publisher_settings.clone();
+  let flight_pub_address    = config.data_publisher_settings.fc_pub_address.clone();
   let cmd_listener_interval_sec    = config.cmd_listener_interval_sec;
   let run_analysis_engine   = config.run_analysis_engine;
   //let ltb_rb_map            = get_dsi_j_ltbch_vs_rbch_map(db_path);
@@ -414,8 +415,8 @@ fn main() {
   thread::sleep(5*one_second);
   match args.command {
     Command::Listen(_) => {
-      let _flight_address_sub_c = flight_address_sub.clone();
-      let _flight_address_pub_c = flight_address_pub.clone();
+      let _flight_address_sub_c = flight_sub_address.clone();
+      let _flight_address_pub_c = flight_pub_address;
       let _thread_control_c = thread_control.clone();
       let _cmd_sender_c = cmd_sender.clone();
       let _cmd_receiver_c = cmd_receiver.clone();

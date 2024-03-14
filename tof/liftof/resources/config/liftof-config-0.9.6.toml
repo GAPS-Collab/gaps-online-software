@@ -10,34 +10,38 @@ calibration_dir       = "/tofdata/calibration/latest/"
 # location of the database
 db_path               = "/home/gaps/config/gaps_flight.db"
 # default runtime of the program
-runtime_sec           = 300
+#runtime_sec           = 28800
+runtime_sec           = 28800
 # TOF computer needs to subscribe to this address to 
 # recieve commands
-fc_sub_address        = "tcp://192.168.37.200:41662"
+fc_sub_address            = "tcp://192.168.37.200:41662"
 # UDP connection to the MTB (does NOT start with tcp://)
-mtb_address           = "10.0.1.10:50001"
+mtb_address               = "10.0.1.10:50001"
 # Query the TOF computer for CPUMoniData every X secs
-cpu_moni_interval_sec = 20
+cpu_moni_interval_sec     = 120
 # Non existent/broken RBs (in range 1-50)
-rb_ignorelist         = [10, 12, 37, 38, 43, 45, 47, 48, 49, 50]
+rb_ignorelist             = [10, 12, 37, 38, 43, 45, 47, 48, 49, 50]
 # should TofHits be calculated for RBEvents? [should be true for flight]
-run_analysis_engine   = true
+run_analysis_engine       = true
 # the ip where the central liftof cc server is listening
-cc_server_address     = "tcp://10.0.1.1:42000"
+cc_server_address         = "tcp://10.0.1.1:42000"
+# timeout for the command listener (sleeptime between queries on 
+# incoming messages)
+cmd_listener_interval_sec = 1
 
 [mtb_settings]
 # can be either Gaps, Track, Any or Poisson
 # set it to "Unknown" if you want to use 
 # pico_hal.py to set the trigger conditions
-trigger_type          = "Unknown"
+trigger_type          = "Track"
 # prescale is between 0 and 1
-trigger_prescale      = 0.1
+trigger_prescale      = 0.02
 poisson_trigger_rate  = 0
 gaps_trigger_use_beta = true
-trace_suppression     = false
+trace_suppression     = true
 # Receive MtbMoniData every X secs
-mtb_moni_interval     = 30
-mtb_timeout_sec       = 60
+mtb_moni_interval     = 60
+mtb_timeout_sec       = 120
 rb_int_window         = 1
 tiu_emulation_mode    = true
 # Achim's channel
@@ -50,7 +54,7 @@ tofbot_webhook        = "https://hooks.slack.com/services/TAA9XQEHL/B06FN3E80MP/
 data_dir = "/tofdata/run"
 # number of tofpackets per file before a new file
 # gets started
-packs_per_file = 1000
+packs_per_file = 200000
 # use this address for UCLA teststand (tailscale)
 #fc_pub_address       = "tcp://100.101.96.10:42000"
 # flight computer needs to subscribe to this address to 
@@ -65,19 +69,19 @@ n_rbe_per_loop = 40
 # tof event timeout (in secs)
 # if the event is not completed within this timewindow
 # it is sent despite the fact
-te_timeout_sec = 30
+te_timeout_sec = 600
 # send TofEventSummary & RBWaveform over network instead of TofEvent
-send_flight_packets   = false
+send_flight_packets   = true
 # Decide on event builder strategy. Adaptive will automatically 
 # adjust the number of expected RBEvents for each MTBEvent and 
 # wait for this number of RBEvents come in 
-#build_strategy = "Adaptive"
+build_strategy = "Adaptive"
 
 # in case we want to select a build 
 # strategy with a parameter, use
 # this section
-[event_builder_settings.build_strategy]
-WaitForNBoards = 40
+#[event_builder_settings.build_strategy]
+#WaitForNBoards = 40
 
 [analysis_engine_settings]
 integration_start      = 270.0
@@ -106,7 +110,7 @@ data_type            = "Physics"
 # The value is in size of events with 8 channels
 rb_buff_size         = 50
 # monitoring interval for RBMoniData in seconds
-rb_moni_interval     = -1.0
+rb_moni_interval     = 10.0
 # monitoring interval for PBMoniData in x*rb_moni_interval
 pb_moni_every_x      = 2.0
 # monitoring interval for PAMoniData in x*rb_moni_interval

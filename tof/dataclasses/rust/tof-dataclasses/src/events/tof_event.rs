@@ -16,6 +16,7 @@ cfg_if::cfg_if! {
   }
 }
 
+use crate::DsiLtbRBMapping;
 use crate::serialization::{Serialization,
                            parse_u8,
                            parse_u16,
@@ -164,6 +165,10 @@ impl TofEvent {
   // nothing the event builder can deal with right now.
   pub fn is_complete(&self) -> bool {
     self.mt_event.get_n_rbs_expected() as usize == self.rb_events.len()
+  }
+  
+  pub fn is_complete_from_map(&self, dsimap : &DsiLtbRBMapping) -> bool {
+    self.mt_event.get_n_rbs_exp_from_map(dsimap)  as usize == self.rb_events.len()
   }
 
   /// Encode the sizes of the vectors holding the 

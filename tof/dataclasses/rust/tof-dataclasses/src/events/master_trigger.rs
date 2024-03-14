@@ -17,8 +17,10 @@ use crate::serialization::{
     SerializationError,
     parse_u8,
     parse_u16,
-    parse_u32
+    parse_u32,
 };
+
+use crate::DsiLtbRBMapping;
 
 //use crate::events::RBMissingHit;
 use crate::constants::{
@@ -193,6 +195,19 @@ impl MasterTriggerEvent {
     }   
   }
 
+  pub fn get_rbs_exp_from_map(&self, dsimap : &DsiLtbRBMapping) -> Vec<u8> {
+    let mut rbids = Vec::<u8>::new();
+    for k in self.get_dsi_j_ch_for_triggered_ltbs() {
+      rbids.push(dsimap[&k.0][&k.1][&k.2].0)
+    }
+    rbids
+  }
+
+  pub fn get_n_rbs_exp_from_map(&self, dsimap : &DsiLtbRBMapping) -> u8 {
+    self.get_rbs_exp_from_map(dsimap).len() as u8
+  }
+
+  //#[deprecated(since="0.9.2")]
   pub fn get_n_rbs_expected(&self) -> u8 {
     let mut n_rbs = 0u8;
     //println!("SELF HITS : {:?}", self.hits);
@@ -211,7 +226,7 @@ impl MasterTriggerEvent {
 
   /// Make the connection between the triggered
   /// boards in the boardmask and convert that
-  /// to DSI/J
+  /// to DSI/J/CH
   pub fn get_dsi_j_ch_for_triggered_ltbs(&self) -> Vec<(u8,u8,u8)> {
     let mut dsi_js = Vec::<(u8,u8,u8)>::new();
     let mut dsi = 1u8;

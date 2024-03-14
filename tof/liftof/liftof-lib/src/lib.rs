@@ -146,6 +146,19 @@ pub fn init_env_logger() {
     }).init();
 }
 
+/// Nicer output for thread "heartbeats" to terminal
+pub fn heartbeat_printer(strings: Vec<String>) {
+    // Determine the maximum length of the strings to ensure consistent length
+    let max_length = strings.iter().map(|s| s.len()).max().unwrap_or(0);
+    // Calculate total width including ">>" and "<<" markers
+    let total_width = max_length + 4; // 4 extra characters for ">>" and "<<"
+
+    for s in strings {
+        // Use the calculated total_width for consistent formatting
+        println!(">>{: <width$}<<", s, width = total_width - 4);
+    }
+}
+
 /// Common settings for apps, e.g. liftof-tui
 #[derive(Debug, Clone)]
 pub struct AppSettings {

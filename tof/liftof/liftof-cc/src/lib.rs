@@ -26,7 +26,7 @@ extern crate tof_control;
 
 pub mod constants;
 pub mod threads;
-pub mod settings;
+//pub mod settings;
 
 /// Function that just replies to a moni command send to tofcpu
 pub fn send_power_response(resp_socket_opt: Option<Socket>,
