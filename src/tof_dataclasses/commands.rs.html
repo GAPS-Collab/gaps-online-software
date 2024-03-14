@@ -895,7 +895,6 @@
 <a href="#894" id="894">894</a>
 <a href="#895" id="895">895</a>
 <a href="#896" id="896">896</a>
-<a href="#897" id="897">897</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Commmands which can be issued
 //! to the various components of 
 //! the tof system.
@@ -1455,27 +1454,27 @@
   /// representation
   </span><span class="kw">pub fn </span>from_command_code(cc : TofCommandCode, value : u32) -&gt; TofCommand {
     <span class="kw">match </span>cc {
-      TofCommandCode::CmdUnknown                 =&gt; TofCommand::Unknown                 (<span class="number">0u32</span>),
-      TofCommandCode::CmdPing                    =&gt; TofCommand::Ping                    (<span class="number">0u32</span>),
-      TofCommandCode::CmdMoni                    =&gt; TofCommand::Moni                    (<span class="number">0u32</span>),
+      TofCommandCode::CmdUnknown                 =&gt; TofCommand::Unknown                 (value),
+      TofCommandCode::CmdPing                    =&gt; TofCommand::Ping                    (value),
+      TofCommandCode::CmdMoni                    =&gt; TofCommand::Moni                    (value),
       TofCommandCode::CmdPower                   =&gt; TofCommand::Power                   (value),
       TofCommandCode::CmdSetThresholds           =&gt; TofCommand::SetThresholds           (value),
       TofCommandCode::CmdSetMTConfig             =&gt; TofCommand::SetMTConfig             (value),
       TofCommandCode::CmdSetPreampBias           =&gt; TofCommand::SetPreampBias           (value),
-      TofCommandCode::CmdDataRunStop             =&gt; TofCommand::DataRunStop             (<span class="number">0u32</span>),
+      TofCommandCode::CmdDataRunStop             =&gt; TofCommand::DataRunStop             (value),
       TofCommandCode::CmdDataRunStart            =&gt; TofCommand::DataRunStart            (value),
       TofCommandCode::CmdStartValidationRun      =&gt; TofCommand::StartValidationRun      (value),
-      TofCommandCode::CmdGetFullWaveforms        =&gt; TofCommand::GetFullWaveforms        (<span class="number">0u32</span>),
+      TofCommandCode::CmdGetFullWaveforms        =&gt; TofCommand::GetFullWaveforms        (value),
       TofCommandCode::CmdNoiCalibration          =&gt; TofCommand::NoiCalibration          (value),
       TofCommandCode::CmdVoltageCalibration      =&gt; TofCommand::VoltageCalibration      (value),
       TofCommandCode::CmdTimingCalibration       =&gt; TofCommand::TimingCalibration       (value),
       TofCommandCode::CmdDefaultCalibration      =&gt; TofCommand::DefaultCalibration      (value),
-      TofCommandCode::CmdUnspoolEventCache       =&gt; TofCommand::UnspoolEventCache       (<span class="number">0u32</span>),
-      TofCommandCode::CmdSetRBDataBufSize        =&gt; TofCommand::SetRBDataBufSize        (<span class="number">0u32</span>),
-      TofCommandCode::CmdTriggerModeForced       =&gt; TofCommand::TriggerModeForced       (<span class="number">0u32</span>),
-      TofCommandCode::CmdTriggerModeForcedMTB    =&gt; TofCommand::TriggerModeForcedMTB    (<span class="number">0u32</span>),
-      TofCommandCode::CmdSystemdReboot           =&gt; TofCommand::SystemdReboot           (<span class="number">0u32</span>),
-      TofCommandCode::CmdListen                  =&gt; TofCommand::Listen                  (<span class="number">0u32</span>)
+      TofCommandCode::CmdUnspoolEventCache       =&gt; TofCommand::UnspoolEventCache       (value),
+      TofCommandCode::CmdSetRBDataBufSize        =&gt; TofCommand::SetRBDataBufSize        (value),
+      TofCommandCode::CmdTriggerModeForced       =&gt; TofCommand::TriggerModeForced       (value),
+      TofCommandCode::CmdTriggerModeForcedMTB    =&gt; TofCommand::TriggerModeForcedMTB    (value),
+      TofCommandCode::CmdSystemdReboot           =&gt; TofCommand::SystemdReboot           (value),
+      TofCommandCode::CmdListen                  =&gt; TofCommand::Listen                  (value)
     }
   }
     
@@ -1602,7 +1601,6 @@
       <span class="macro">error!</span>(<span class="string">"Packet does not start with HEAD signature"</span>);
       <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::HeadInvalid {});
     }
-   
     <span class="kw">let </span>cc   = stream[<span class="kw-2">*</span>pos];
     <span class="kw-2">*</span>pos += <span class="number">1</span>;
     four_bytes = [stream[<span class="kw-2">*</span>pos],

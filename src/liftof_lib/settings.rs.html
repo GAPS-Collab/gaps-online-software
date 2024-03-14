@@ -573,6 +573,9 @@
 <a href="#572" id="572">572</a>
 <a href="#573" id="573">573</a>
 <a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Aggregate settings for the TOF system
 //!
 //! Control the settings for the C&amp;C server
@@ -872,6 +875,8 @@
   <span class="doccomment">/// The address ("tcp://xx.xx.xx.xx:xxxxx") the tof computer should subscribe to 
   /// to get commands from the flight computer
   </span><span class="kw">pub </span>fc_sub_address             : String,
+  <span class="doccomment">/// Interval of time that will elapse from a cmd check to the other
+  </span><span class="kw">pub </span>cmd_listener_interval_sec  : u64,
   <span class="doccomment">/// The UDP port to be used to get packets from the 
   /// MTB
   </span><span class="kw">pub </span>mtb_address                : String,
@@ -903,6 +908,7 @@
       runtime_sec               : <span class="number">0</span>,
       cc_server_address         : String::from(<span class="string">"tcp://10.0.1.10:42000"</span>),   
       fc_sub_address            : String::from(<span class="string">""</span>),
+      cmd_listener_interval_sec : <span class="number">1</span>,
       mtb_address               : String::from(<span class="string">"10.0.1.10:50001"</span>),
       cpu_moni_interval_sec     : <span class="number">60</span>,
       rb_ignorelist             : Vec::&lt;u8&gt;::new(),

@@ -240,7 +240,8 @@
 
 //use tof_dataclasses::commands::RBCommand;
 </span><span class="kw">use </span>liftof_lib::{
-    init_env_logger
+    init_env_logger,
+    LiftofSettings
 };
 
 <span class="kw">use </span>tof_dataclasses::packets::TofPacket;
@@ -250,7 +251,6 @@
     master_trigger,
 };
 
-<span class="kw">use </span>liftof_cc::settings::LiftofCCSettings;
 
 <span class="kw">use </span>crossbeam_channel <span class="kw">as </span>cbc;
 <span class="comment">//use std::io::Write;
@@ -322,12 +322,12 @@
   <span class="comment">// Create shared data wrapped in an Arc and a Mutex for synchronization
   //let thread_control = Arc::new(Mutex::new(ThreadControl::default()));
   // deal with command line arguments
-  </span><span class="kw">let </span>config          : LiftofCCSettings;
+  </span><span class="kw">let </span>config          : LiftofSettings;
   <span class="kw">let </span>args    = Args::parse();
   <span class="kw">match </span>args.config {
     <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">"No config file provided! Please provide a config file with --config or -c flag!"</span>),
     <span class="prelude-val">Some</span>(cfg_file) =&gt; {
-      <span class="kw">match </span>LiftofCCSettings::from_toml(cfg_file) {
+      <span class="kw">match </span>LiftofSettings::from_toml(cfg_file) {
         <span class="prelude-val">Err</span>(err) =&gt; {
           <span class="macro">error!</span>(<span class="string">"CRITICAL! Unable to parse .toml settings file! {}"</span>, err);
           <span class="macro">panic!</span>(<span class="string">"Unable to parse config file!"</span>);

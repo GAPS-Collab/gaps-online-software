@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["BuildStrategy"],"struct":["AnalysisEngineSettings","LiftofCCSettings","TofEventBuilderSettings"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["event_builder","heartbeat_formatter"]};
+window.SIDEBAR_ITEMS = {"fn":["event_builder","heartbeat_formatter"],"struct":["EventBuilderHeartBeat"]};
