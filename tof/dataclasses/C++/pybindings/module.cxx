@@ -220,6 +220,8 @@ PYBIND11_MODULE(gaps_tof, m) {
            "Global event id")
       .def_readonly("adc"                ,&RBWaveform::adc,
            "Channel adc")
+      .def("from_bytestream"            , &RBWaveform::from_bytestream,
+           "deserialize TofEventSummary from a list of bytes")
       .def("__repr__",        [](const RBWaveform &wf) {
                                  return wf.to_string(); 
                                  }) 
@@ -248,8 +250,8 @@ PYBIND11_MODULE(gaps_tof, m) {
       // primary charge and beta missing
       .def_readonly("hits"              ,&TofEventSummary::hits,
            "TofHits")
-      //.def_readonly("timestamp32"       ,&TofEventSummary::timestamp32,
-      //     "Timestamp 32bit (fast)")
+      .def("from_bytestream"            , &TofEventSummary::from_bytestream,
+           "deserialize TofEventSummary from a list of bytes")
       .def("__repr__",        [](const TofEventSummary &tes) {
                                  return tes.to_string(); 
                                  }) 
