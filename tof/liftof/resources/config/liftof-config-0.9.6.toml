@@ -60,6 +60,8 @@ packs_per_file = 200000
 # flight computer needs to subscribe to this address to 
 # recieve tof packets
 fc_pub_address        = "tcp://192.168.37.20:42000"
+# send TofEventSummary & RBWaveform over network instead of TofEvent
+send_flight_packets   = true
 
 # not supported yet
 [event_builder_settings]
@@ -70,8 +72,6 @@ n_rbe_per_loop = 40
 # if the event is not completed within this timewindow
 # it is sent despite the fact
 te_timeout_sec = 600
-# send TofEventSummary & RBWaveform over network instead of TofEvent
-send_flight_packets   = true
 # Decide on event builder strategy. Adaptive will automatically 
 # adjust the number of expected RBEvents for each MTBEvent and 
 # wait for this number of RBEvents come in 

@@ -211,9 +211,6 @@ pub struct TofEventBuilderSettings {
   /// The timeout parameter for the TofEvent. If not
   /// complete after this time, send it onwards anyway
   pub te_timeout_sec      : u32,
-  /// Send TofSummary + RBWaveforms instead of 
-  /// TofEvents
-  pub send_flight_packets : bool,
   pub build_strategy      : BuildStrategy,
 }
 
@@ -224,7 +221,6 @@ impl TofEventBuilderSettings {
       n_mte_per_loop      : 1,
       n_rbe_per_loop      : 40,
       te_timeout_sec      : 30,
-      send_flight_packets : false,
       build_strategy      : BuildStrategy::WaitForNBoards(40),
     }
   }
@@ -255,6 +251,9 @@ pub struct DataPublisherSettings {
   /// The address the flight computer should subscribe 
   /// to to get tof packets
   pub fc_pub_address : String,
+  /// Send TofSummary + RBWaveforms instead of 
+  /// TofEvents
+  pub send_flight_packets : bool,
 }
 
 impl DataPublisherSettings {
@@ -263,6 +262,7 @@ impl DataPublisherSettings {
       data_dir                  : String::from(""),
       packs_per_file            : 1000,
       fc_pub_address            : String::from(""),
+      send_flight_packets       : false
     }
   }
 }
