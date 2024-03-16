@@ -45,10 +45,14 @@ add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
 target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
 target_include_directories(${GAPSTOF_LIBRARY_SHARED}
                             PUBLIC
-                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
-                            ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+    
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
+                            $<INSTALL_INTERFACE:include> 
+                            #${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                            #${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
                               $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
-                              ${Boost_INCLUDE_DIR}
+                              #  ${Boost_INCLUDE_DIR}
                           )
 target_link_libraries(${GAPSTOF_LIBRARY_SHARED}
                       PUBLIC
@@ -63,7 +67,9 @@ if (BUILD_PYBINDINGS)
                                            dataclasses/C++/pybindings/helpers.cxx)
   target_include_directories(${pybindings}
                             PUBLIC
-                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
+                              $<INSTALL_INTERFACE:include> 
+                              #${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
             			      ${Python_INCLUDE_DIRS}
 			                )
   target_link_libraries(${pybindings}
@@ -178,6 +184,28 @@ install(TARGETS ${GAPSTOF_LIBRARY_SHARED}
     #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
     #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
 )
+
+install(EXPORT GAPSTargets
+    FILE GapsOnlineSoftware.cmake
+    NAMESPACE GapsOnlineSoftware::
+    DESTINATION ${CMAKE_INSTALL_PREFIX}
+)
+
+# not sure about this
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "GapsOnlineSoftwareConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion)
+
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/../GapsOnlineSoftwareConfig.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/GapsOnlineSoftwareConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/GapsOnlineSoftwareConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/GapsOnlineSoftwareConfigVersion.cmake"
+        DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
     DESTINATION ${CMAKE_INSTALL_PREFIX})

@@ -4,7 +4,7 @@
 get_version() {
   # build it for this architecture so we can parse the version
   cargo build --all-features --release --bin=liftof-cc
-  VERSION=`../target/release/liftof-cc -V`
+  VERSION=`../target/release/liftof-cc -V | tail -n 1`
   IFS=' '
   read -ra arr <<< "$VERSION"
   for val in "${arr[@]}";
@@ -19,10 +19,12 @@ compile_and_deploy_target() {
   # the cross FAQ says to run cargo clean 
   # every time you switch targets.
   cargo clean
-  #CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cargo build --bin $1 --features=tofcontrol --release && scp ../target/release/$1 $2:~/bin/ 
-  
-  CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build --target=x86_64-unknown-linux-musl --bin $1 --release && rsync -avz ../target/x86_64-unknown-linux-musl/release/$1 $2:~/bin/liftof-cc-0.9.5 
-  #scp liftof-cc-config-0.9.3.toml $2:~/config/
+  version=`get_version`
+  cargo clean
+  echo -e "-- [compile_and_deploy] Deploying version $version"
+  CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build --target=x86_64-unknown-linux-musl --bin $1 --release && rsync -avz ../target/x86_64-unknown-linux-musl/release/$1 $2:~/bin/liftof-cc-$version 
+  echo -e "-- [compile_and_deploy] Starting rsync..."
+  scp ../resources/config/liftof-config-$version.toml $2:~/config/
   cargo clean
 }
 
@@ -30,4 +32,3 @@ compile_and_deploy_target() {
 rm -rf ../target/x86_64-unknown-linux-musl/*
 
 compile_and_deploy_target liftof-cc nevis-tof
-#compile_and_deploy_target liftof-cc tof-computer-tailscale

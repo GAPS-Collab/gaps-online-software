@@ -201,6 +201,8 @@ fn main() {
   let flight_sub_address    = config.fc_sub_address.clone();
   let mtb_settings          = config.mtb_settings.clone();
   let mut gds_settings      = config.data_publisher_settings.clone();
+  let flight_pub_address    = config.data_publisher_settings.fc_pub_address.clone();
+  let cmd_listener_interval_sec    = config.cmd_listener_interval_sec;
   let run_analysis_engine   = config.run_analysis_engine;
   //let ltb_rb_map            = get_dsi_j_ltbch_vs_rbch_map(db_path);
   let mut rb_list           = get_rbs_from_sqlite(db_path);
@@ -405,195 +407,232 @@ fn main() {
     })
     .expect("Error setting Ctrl-C handler");
 
-    let return_val: Result<TofCommandCode, CmdError>;
-    let cmd_sender_c = cmd_sender.clone();
-    let mut dont_stop = false;
-    // let's give everything a little time to come up
-    // before we issues the commands
-    thread::sleep(5*one_second);
+  let return_val: Result<TofCommandCode, CmdError>;
+  let cmd_sender_c = cmd_sender.clone();
+  let mut dont_stop = false;
+  // let's give everything a little time to come up
+  // before we issues the commands
+  thread::sleep(5*one_second);
+  match args.command {
+    Command::Listen(_) => {
+      let _flight_address_sub_c = flight_sub_address.clone();
+      let _flight_address_pub_c = flight_pub_address;
+      let _thread_control_c = thread_control.clone();
+      let _cmd_sender_c = cmd_sender.clone();
+      let _cmd_receiver_c = cmd_receiver.clone();
+      let _cmd_interval_sec: u64 = cmd_listener_interval_sec;
+      let _flight_cpu_listener = thread::Builder::new()
+                    .name("flight-cpu-listener".into())
+                    .spawn(move || {
+                                    flight_cpu_listener(&_flight_address_sub_c,
+                                                        &_flight_address_pub_c,
+                                                        &_cmd_receiver_c,
+                                                        &_cmd_sender_c,
+                                                        _cmd_interval_sec,
+                                                        _thread_control_c);
+                    })
+                    .expect("Failed to spawn flight-cpu-listener thread!");
+      dont_stop = true;
+      return_val = Ok(TofCommandCode::CmdListen);
+    },
+    Command::Ping(ping_cmd) => {
+      match ping_cmd.component {
+        TofComponent::TofCpu => return_val = liftof_cc::send_ping_response(None),
+        TofComponent::RB  |
+        TofComponent::LTB |
+        TofComponent::MT     => return_val = liftof_cc::send_ping(None,
+                                                                  cmd_sender_c,
+                                                                  ping_cmd.component,
+                                                                  ping_cmd.id),
+        _                    => {
+          error!("The ping command is not implemented for this TofComponent!");
+          return_val = Err(CmdError::NotImplementedError);
+        }
+      }
+    },
+    Command::Moni(moni_cmd) => {
+      match moni_cmd.component {
+        TofComponent::TofCpu => return_val = liftof_cc::send_moni_response(None),
+        TofComponent::RB    |
+        TofComponent::LTB   |
+        TofComponent::MT     => return_val = liftof_cc::send_moni(None,
+                                                                  cmd_sender_c,
+                                                                  moni_cmd.component,
+                                                                  moni_cmd.id),
+        _                    => {
+          error!("The moni command is not implemented for this TofComponent!");
+          return_val = Err(CmdError::NotImplementedError);
+        }
+      }
+    },
+    Command::SystemdReboot(systemd_reboot_cmd) => {
+      let rb_id = systemd_reboot_cmd.id;
+      return_val = liftof_cc::send_systemd_reboot(None,
+                                                                  cmd_sender_c,
+                                                                  rb_id);
+    },
+    Command::Power(power_cmd) => {
+      match power_cmd {
+        PowerCmd::All(power_status) => {
+          let power_status_enum: PowerStatusEnum = power_status.status;
+          return_val = liftof_cc::send_power(None,
+                                                                  cmd_sender_c,
+                                                                  TofComponent::All,
+                                                                  power_status_enum);
+        },
+        PowerCmd::MT(power_status) => {
+          let power_status_enum: PowerStatusEnum = power_status.status;
+          return_val = liftof_cc::send_power(None,
+                                                                  cmd_sender_c,
+                                                                  TofComponent::MT,
+                                                                  power_status_enum);
+        },
+        PowerCmd::AllButMT(power_status) => {
+          let power_status_enum: PowerStatusEnum = power_status.status;
+          return_val = liftof_cc::send_power(None,
+                                                                  cmd_sender_c,
+                                                                  TofComponent::AllButMT,
+                                                                  power_status_enum);
+        },
+        PowerCmd::LTB(ltb_power_opts) => {
+          let power_status_enum: PowerStatusEnum = ltb_power_opts.status;
+          let ltb_id = ltb_power_opts.id;
+          return_val = liftof_cc::send_power_id(None,
+                                                                  cmd_sender_c,
+                                                                  TofComponent::LTB,
+                                                                  power_status_enum,
+                                                                  ltb_id);
+        },
+        PowerCmd::Preamp(preamp_power_opts) => {
+          let power_status_enum: PowerStatusEnum = preamp_power_opts.status;
+          let preamp_id = preamp_power_opts.id;
+          let preamp_bias = preamp_power_opts.bias;
+          return_val = liftof_cc::send_power_preamp(None,
+                                                                  cmd_sender_c,
+                                                                  power_status_enum,
+                                                                  preamp_id,
+                                                                  preamp_bias);
+        }
+      }
+    },
+    Command::Calibration(calibration_cmd) => {
+      match calibration_cmd {
+        CalibrationCmd::Default(default_opts) => {
+          let voltage_level = default_opts.level;
+          let rb_id = default_opts.id;
+          let extra = default_opts.extra;
+          println!("=> Received calibration default command! Will init run start...");
+          return_val = liftof_cc::send_default_calibration(None,cmd_sender_c, voltage_level, rb_id, extra);
+          println!("=> calibration default command resulted in {:?}", return_val);
+          println!("=> .. now we need to wait until the calibration is finished!");
+          // if that is successful, we need to wait
+          match thread_control.lock() {
+            Ok(mut tc) => {
+              tc.calibration_active = true;
+            },
+            Err(err) => {
+              error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+            },
+          }
+          // now we wait until the calibrations are finished
+          //let cali_wait_timer     = Instant::now();
+          let mut cali_received   : u64;
+          let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
+          let bar_label  = String::from("Acquiring RB calibration data");
+          let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
+          let bar = ProgressBar::new(rb_list.len() as u64); 
+          bar.set_position(0);
+          bar.set_message (bar_label);
+          bar.set_prefix  ("\u{2699}\u{1F4D0}");
+          bar.set_style   (bar_style);
 
-    match args.command {
-      Command::Listen(_) => {
-        //let _flight_address_c    = flight_address.clone();
-        let _thread_control_c    = thread_control.clone();
-        let _cmd_interval: u64   = 1000;
-        let _cmd_sender_c        = cmd_sender.clone();
-        let _cmd_receiver_c      = cmd_receiver.clone();
-        let _flight_cpu_listener = thread::Builder::new()
-                      .name("flight-cpu-listener".into())
-                      .spawn(move || {
-                                      flight_cpu_listener(&flight_sub_address,
-                                                          &_cmd_receiver_c,
-                                                          &_cmd_sender_c,
-                                                          _cmd_interval,
-                                                          _thread_control_c);
-                      })
-                      .expect("Failed to spawn flight-cpu-listener thread!");
-        dont_stop = true;
-        return_val = Ok(TofCommandCode::CmdListen);
-      },
-      Command::Ping(ping_cmd) => {
-        match ping_cmd.component {
-          TofComponent::TofCpu => return_val = liftof_cc::send_ping_response(cmd_sender_c),
-          TofComponent::RB  |
-          TofComponent::LTB |
-          TofComponent::MT     => return_val = liftof_cc::send_ping(cmd_sender_c, ping_cmd.component, ping_cmd.id),
-          _                    => {
-            error!("The ping command is not implemented for this TofComponent!");
-            return_val = Err(CmdError::NotImplementedError);
-          }
-        }
-      },
-      Command::Moni(moni_cmd) => {
-        match moni_cmd.component {
-          TofComponent::TofCpu => return_val = liftof_cc::send_moni_response(cmd_sender_c),
-          TofComponent::RB    |
-          TofComponent::LTB   |
-          TofComponent::MT     => return_val = liftof_cc::send_moni(cmd_sender_c, moni_cmd.component, moni_cmd.id),
-          _                    => {
-            error!("The moni command is not implemented for this TofComponent!");
-            return_val = Err(CmdError::NotImplementedError);
-          }
-        }
-      },
-      Command::SystemdReboot(systemd_reboot_cmd) => {
-        let rb_id = systemd_reboot_cmd.id;
-        return_val = liftof_cc::send_systemd_reboot(cmd_sender_c, rb_id);
-      },
-      Command::Power(power_cmd) => {
-        match power_cmd {
-          PowerCmd::All(power_status) => {
-            let power_status_enum: PowerStatusEnum = power_status.status;
-            return_val = liftof_cc::send_power(cmd_sender_c, TofComponent::All, power_status_enum);
-          },
-          PowerCmd::MT(power_status) => {
-            let power_status_enum: PowerStatusEnum = power_status.status;
-            return_val = liftof_cc::send_power(cmd_sender_c, TofComponent::MT, power_status_enum);
-          },
-          PowerCmd::AllButMT(power_status) => {
-            let power_status_enum: PowerStatusEnum = power_status.status;
-            return_val = liftof_cc::send_power(cmd_sender_c, TofComponent::AllButMT, power_status_enum);
-          },
-          PowerCmd::LTB(ltb_power_opts) => {
-            let power_status_enum: PowerStatusEnum = ltb_power_opts.status;
-            let ltb_id = ltb_power_opts.id;
-            return_val = liftof_cc::send_power_id(cmd_sender_c, TofComponent::LTB, power_status_enum, ltb_id);
-          },
-          PowerCmd::Preamp(preamp_power_opts) => {
-            let power_status_enum: PowerStatusEnum = preamp_power_opts.status;
-            let preamp_id = preamp_power_opts.id;
-            let preamp_bias = preamp_power_opts.bias;
-            return_val = liftof_cc::send_power_preamp(cmd_sender_c, power_status_enum, preamp_id, preamp_bias);
-          }
-        }
-      },
-      Command::Calibration(calibration_cmd) => {
-        match calibration_cmd {
-          CalibrationCmd::Default(default_opts) => {
-            let voltage_level = default_opts.level;
-            let rb_id = default_opts.id;
-            let extra = default_opts.extra;
-            println!("=> Received calibration default command! Will init run start...");
-            return_val = liftof_cc::send_default_calibration(cmd_sender_c, voltage_level, rb_id, extra);
-            println!("=> calibration default command resulted in {:?}", return_val);
-            println!("=> .. now we need to wait until the calibration is finished!");
-            // if that is successful, we need to wait
+          loop {
+            cali_received = 0;
             match thread_control.lock() {
-              Ok(mut tc) => {
-                tc.calibration_active = true;
+              Ok(tc) => {
+                for rbid in &rb_list {
+                  if tc.finished_calibrations[&rbid.rb_id] {
+                    cali_received += 1;
+                  }
+                }
               },
               Err(err) => {
                 error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
               },
             }
-            // now we wait until the calibrations are finished
-            //let cali_wait_timer     = Instant::now();
-            let mut cali_received   : u64;
-            let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
-            let bar_label  = String::from("Acquiring RB calibration data");
-            let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
-            let bar = ProgressBar::new(rb_list.len() as u64); 
-            bar.set_position(0);
-            bar.set_message (bar_label);
-            bar.set_prefix  ("\u{2699}\u{1F4D0}");
-            bar.set_style   (bar_style);
-
-            loop {
-              cali_received = 0;
-              match thread_control.lock() {
-                Ok(tc) => {
-                  for rbid in &rb_list {
-                    if tc.finished_calibrations[&rbid.rb_id] {
-                      cali_received += 1;
-                    }
-                  }
-                },
-                Err(err) => {
-                  error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-                },
-              }
-              bar.set_position(cali_received);
-              thread::sleep(5*one_second);
-              if cali_received as usize == rb_list.len() {
-                break;
-              }
+            bar.set_position(cali_received);
+            thread::sleep(5*one_second);
+            if cali_received as usize == rb_list.len() {
+              break;
             }
-            bar.finish();
-            println!("=> All calibrations acquired!");
-            println!(">> So long and thanks for all the \u{1F41F} <<"); 
-            exit(0);
-          },
-          CalibrationCmd::Noi(noi_opts) => {
-            let rb_id = noi_opts.id;
-            let extra = noi_opts.extra;
-            return_val = liftof_cc::send_noi_calibration(cmd_sender_c, rb_id, extra);
-          },
-          CalibrationCmd::Voltage(voltage_opts) => {
-            let voltage_level = voltage_opts.level;
-            let rb_id = voltage_opts.id;
-            let extra = voltage_opts.extra;
-            return_val = liftof_cc::send_voltage_calibration(cmd_sender_c, voltage_level, rb_id, extra);
-          },
-          CalibrationCmd::Timing(timing_opts) => {
-            let voltage_level = timing_opts.level;
-            let rb_id = timing_opts.id;
-            let extra = timing_opts.extra;
-            return_val = liftof_cc::send_timing_calibration(cmd_sender_c, voltage_level, rb_id, extra);
           }
-        }
-      }
-      Command::Set(set_cmd) => {
-        match set_cmd {
-          SetCmd::LtbThreshold(ltb_threshold_opts) => {
-            let ltb_id = ltb_threshold_opts.id;
-            let threshold_name = ltb_threshold_opts.name;
-            let threshold_level = ltb_threshold_opts.level;
-            return_val = liftof_cc::send_ltb_threshold_set(cmd_sender_c, ltb_id, threshold_name, threshold_level);
-          },
-          SetCmd::PreampBias(preamp_bias_opts) => {
-            let preamp_id = preamp_bias_opts.id;
-            let preamp_bias = preamp_bias_opts.bias;
-            return_val = liftof_cc::send_preamp_bias_set(cmd_sender_c, preamp_id, preamp_bias);
-          }
-        }
-      },
-      Command::Run(run_cmd) => {
-        match run_cmd {
-          RunCmd::Start(run_start_opts) => {
-            let run_type = run_start_opts.run_type;
-            let rb_id    = run_start_opts.id;
-            let event_no = run_start_opts.no;
-            println!("=> Received run start command! Will init run start...");
-            return_val = liftof_cc::send_run_start(cmd_sender_c, run_type, rb_id, event_no);
-            println!("=> run start command resulted in {:?}", return_val);
-          },
-          RunCmd::Stop(run_stop_opts) => {
-            let rb_id = run_stop_opts.id;
-            return_val = liftof_cc::send_run_stop(cmd_sender_c, rb_id);
-          }
+          bar.finish();
+          println!("=> All calibrations acquired!");
+          println!(">> So long and thanks for all the \u{1F41F} <<"); 
+          exit(0);
+        },
+        CalibrationCmd::Noi(noi_opts) => {
+          let rb_id = noi_opts.id;
+          let extra = noi_opts.extra;
+          return_val = liftof_cc::send_noi_calibration(None,cmd_sender_c, rb_id, extra);
+        },
+        CalibrationCmd::Voltage(voltage_opts) => {
+          let voltage_level = voltage_opts.level;
+          let rb_id = voltage_opts.id;
+          let extra = voltage_opts.extra;
+          return_val = liftof_cc::send_voltage_calibration(None,cmd_sender_c, voltage_level, rb_id, extra);
+        },
+        CalibrationCmd::Timing(timing_opts) => {
+          let voltage_level = timing_opts.level;
+          let rb_id = timing_opts.id;
+          let extra = timing_opts.extra;
+          return_val = liftof_cc::send_timing_calibration(None,cmd_sender_c, voltage_level, rb_id, extra);
         }
       }
     }
+    Command::Set(set_cmd) => {
+      match set_cmd {
+        SetCmd::LtbThreshold(ltb_threshold_opts) => {
+          let ltb_id = ltb_threshold_opts.id;
+          let threshold_name = ltb_threshold_opts.name;
+          let threshold_level = ltb_threshold_opts.level;
+          return_val = liftof_cc::send_ltb_threshold_set(None,
+                                                                  cmd_sender_c,
+                                                                  ltb_id,
+                                                                  threshold_name,
+                                                                  threshold_level);
+        },
+        SetCmd::PreampBias(preamp_bias_opts) => {
+          let preamp_id = preamp_bias_opts.id;
+          let preamp_bias = preamp_bias_opts.bias;
+          return_val = liftof_cc::send_preamp_bias_set(None,
+                                                                  cmd_sender_c,
+                                                                  preamp_id,
+                                                                  preamp_bias);
+        }
+      }
+    },
+    Command::Run(run_cmd) => {
+      match run_cmd {
+        RunCmd::Start(run_start_opts) => {
+          let run_type = run_start_opts.run_type;
+          let rb_id = run_start_opts.id;
+          let event_no = run_start_opts.no;
+          return_val = liftof_cc::send_run_start(None,
+                                                                  cmd_sender_c,
+                                                                  run_type,
+                                                                  rb_id,
+                                                                  event_no);
+        },
+        RunCmd::Stop(run_stop_opts) => {
+          let rb_id = run_stop_opts.id;
+          return_val = liftof_cc::send_run_stop(None,
+                                                                  cmd_sender_c,
+                                                                  rb_id);
+        }
+      }
+    }
+  }
   // deal with return values
   match return_val {
     Err(cmd_error) => {

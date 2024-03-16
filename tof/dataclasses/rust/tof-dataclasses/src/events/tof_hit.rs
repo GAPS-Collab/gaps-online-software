@@ -12,6 +12,23 @@ extern crate rand;
 #[cfg(feature="random")]
 use rand::Rng;
 
+/// We will save the values for the peak heigth, time and charge
+/// as u16. The calculations yield f32 though. We need to convert
+/// them using MIN/MAX and a range
+const MAX_PEAK_HEIGHT      : f32 = 500.0; //mV
+//const MIN_PEAK_HEIGHT      : f32 = 0.0;
+const U16TOF32_PEAK_HEIGHT : f32 = MAX_PEAK_HEIGHT/(u16::MAX as f32);
+const F32TOU16_PEAK_HEIGHT : u16 = ((u16::MAX as f32)/MAX_PEAK_HEIGHT) as u16;
+const MAX_PEAK_CHARGE      : f32 = 100.0; 
+//const MIN_PEAK_CHARGE      : f32 = 0.0;
+const U16TOF32_PEAK_CHARGE : f32 = MAX_PEAK_CHARGE/(u16::MAX as f32);
+const F32TOU16_PEAK_CHARGE : u16 = ((u16::MAX as f32)/MAX_PEAK_CHARGE) as u16;
+const MAX_PEAK_TIME        : f32 = 500.0;
+//const MIN_PEAK_TIME        : f32 = 0.0;
+const U16TOF32_PEAK_TIME   : f32 = MAX_PEAK_TIME/(u16::MAX as f32);
+const F32TOU16_PEAK_TIME   : u16 = ((u16::MAX as f32)/MAX_PEAK_TIME) as u16;
+
+
 /// Waveform peak
 ///
 /// Helper to form TofHits
@@ -96,9 +113,9 @@ impl fmt::Display for TofHit {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<TofHit:
   Peak:
-    LE Time A/B   {} {}   
-    Height  A/B   {} {}
-    Charge  A/B   {} {}
+    LE Time A/B   {:.2} {:.2}   
+    Height  A/B   {:.2} {:.2}
+    Charge  A/B   {:.2} {:.2}
   charge_min_i    {}   
   pos_across      {}   
   t_average       {}   
@@ -107,12 +124,12 @@ impl fmt::Display for TofHit {
   timestamp16     {}
   |-> timestamp48 {}
   VALID           {}>", 
-            self.time_a,
-            self.time_b,
-            self.peak_a,
-            self.peak_b,
-            self.charge_a,
-            self.charge_b,
+            self.get_time_a(),
+            self.get_time_b(),
+            self.get_peak_a(),
+            self.get_peak_b(),
+            self.get_charge_a(),
+            self.get_charge_b(),
             self.charge_min_i,
             self.pos_across,
             self.t_average,
@@ -260,13 +277,27 @@ impl TofHit {
   }
 
   pub fn set_peak_a(&mut self, peak : f32 ) {
-    let prec : f64 = 0.004;
-    self.peak_a = (peak as f64/prec) as u16;
+    if peak >= MAX_PEAK_HEIGHT {
+      self.peak_a = u16::MAX;
+    } else {
+      self.peak_a = F32TOU16_PEAK_HEIGHT*(peak.floor() as u16); 
+    }
+  }
+  
+  pub fn get_peak_a(&self) -> f32 {
+    self.peak_a as f32 * U16TOF32_PEAK_HEIGHT
   }
 
   pub fn set_peak_b(&mut self, peak : f32 ) {
-    let prec : f64 = 0.004;
-    self.peak_b = (peak as f64/prec) as u16;
+    if peak >= MAX_PEAK_HEIGHT {
+      self.peak_b = u16::MAX;
+    } else {
+      self.peak_b = F32TOU16_PEAK_HEIGHT*(peak.floor() as u16); 
+    }
+  }
+  
+  pub fn get_peak_b(&self) -> f32 {
+    self.peak_b as f32 * U16TOF32_PEAK_HEIGHT
   }
   
   pub fn set_peak(&mut self, peak : f32, side : usize ) {
@@ -276,15 +307,27 @@ impl TofHit {
   }
 
   pub fn set_time_a(&mut self, time : f32 ) {
-    //println!("time {time}");
-    let prec : f64 = 0.004;
-    self.time_a = (time as f64/prec) as u16;
-    //println!("time_a {}", self.time_a);
+    if time >= MAX_PEAK_TIME {
+      self.time_a = u16::MAX;
+    } else {
+      self.time_a = F32TOU16_PEAK_TIME*(time.floor() as u16); 
+    }
+  }
+
+  pub fn get_time_a(&self) -> f32 {
+    self.time_a as f32 * U16TOF32_PEAK_TIME 
   }
 
   pub fn set_time_b(&mut self, time : f32 ) {
-    let prec : f64 = 0.004;
-    self.time_b = (time as f64/prec) as u16;
+    if time >= MAX_PEAK_TIME {
+      self.time_b = u16::MAX;
+    } else {
+      self.time_b = F32TOU16_PEAK_TIME*(time.floor() as u16); 
+    }
+  }
+  
+  pub fn get_time_b(&self) -> f32 {
+    self.time_b as f32 * U16TOF32_PEAK_TIME 
   }
   
   pub fn set_time(&mut self, time : f32, side : usize ) {
@@ -294,13 +337,27 @@ impl TofHit {
   }
 
   pub fn set_charge_a(&mut self, charge : f32 ) {
-    let prec : f64 = 0.004;
-    self.charge_a = (charge as f64/prec) as u16;
+    if charge >= MAX_PEAK_CHARGE {
+      self.charge_a = u16::MAX;
+    } else {
+      self.charge_a = F32TOU16_PEAK_CHARGE*(charge.floor() as u16); 
+    }
+  }
+  
+  pub fn get_charge_a(&self) -> f32 {
+    self.charge_a as f32 * U16TOF32_PEAK_CHARGE
   }
 
   pub fn set_charge_b(&mut self, charge : f32 ) {
-    let prec : f64 = 0.004;
-    self.charge_b = (charge as f64/prec) as u16;
+    if charge >= MAX_PEAK_CHARGE {
+      self.charge_b = u16::MAX;
+    } else {
+      self.charge_b = F32TOU16_PEAK_CHARGE*(charge.floor() as u16); 
+    }
+  }
+  
+  pub fn get_charge_b(&self) -> f32 {
+    self.charge_b as f32 * U16TOF32_PEAK_CHARGE
   }
   
   pub fn set_charge(&mut self, charge : f32, side : usize ) {

@@ -19,6 +19,8 @@ use std::sync::{
 extern crate crossbeam_channel;
 use crossbeam_channel::Receiver; 
 
+use colored::Colorize;
+
 use tof_dataclasses::packets::{
     TofPacket,
     PacketType
@@ -40,6 +42,8 @@ use tof_dataclasses::io::{
     TofPacketWriter,
     FileType
 };
+use tof_dataclasses::events::TofEvent;
+
 
 use liftof_lib::settings::DataPublisherSettings;
 
@@ -67,6 +71,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let flight_address      = settings.fc_pub_address.clone();
   let write_stream_path   = settings.data_dir.clone(); 
   let write_npack_file    = settings.packs_per_file;
+  let mut met_time_secs   = 0f32; // mission elapsed time
+
   let ctx = zmq::Context::new();
   // FIXME - should we just move to another socket if that one is not working?
   let data_socket = ctx.socket(zmq::PUB).expect("Can not create socket!");
@@ -190,18 +196,75 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
 
         //} else {
         // FIXME - disentangle network and disk I/O?
-        match data_socket.send(pack.to_bytestream(),0) {
-          Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
-          Ok(_)    => {
-            trace!("TofPacket sent");
-            n_pack_sent += 1;
+        if pack.packet_type == PacketType::TofEvent {
+          if settings.send_flight_packets {
+            let mut pos = 0;
+            // unfortunatly we have to do this unnecessary step
+            // I have to think about fast tracking these.
+            // maybe sending TofEvents over the channel instead
+            // of TofPackets?
+            let ev_to_send : TofEvent;
+            match TofEvent::from_bytestream(&pack.payload, &mut pos) {
+              Err(err) => {
+                error!("Unable to unpack TofEvent! {err}");
+                continue;
+              },
+              Ok(_ev_to_send) => {
+                ev_to_send = _ev_to_send;
+              }
+            }
+            let te_summary = ev_to_send.get_summary();
+            let pack = TofPacket::from(&te_summary);
+            match data_socket.send(pack.to_bytestream(),0) {
+              Err(err) => {
+                error!("Packet sending failed! {err}");
+              }
+              Ok(_)    => {
+                //trace!("Event Summary for event id {} send!", evid);
+                n_pack_sent += 1;
+              }
+            }
+            for rbwave in ev_to_send.get_rbwaveforms() {
+              let pack = TofPacket::from(&rbwave);
+              match data_socket.send(pack.to_bytestream(),0) {
+                Err(err) => {
+                  error!("Packet sending failed! {err}");
+                }
+                Ok(_)    => {
+                  //trace!("RB waveform for event id {} send!", evid);
+                  n_pack_sent += 1;
+                }
+              }
+            }
+          } else {
+            match data_socket.send(pack.to_bytestream(),0) {
+              Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
+              Ok(_)    => {
+                trace!("TofPacket sent");
+                n_pack_sent += 1;
+              }
+            } // end match
           }
-        } // end match
-        //} // end else
+        // FIXME else branching not optimal
+        } else {
+          match data_socket.send(pack.to_bytestream(),0) {
+            Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
+            Ok(_)    => {
+              trace!("TofPacket sent");
+              n_pack_sent += 1;
+            }
+          } // end match
+        } // end else
       } // end if pk == event packet
-    } // end incoming.recv 
-    if n_pack_sent % 1000 == 0 {
-      println!("[FLIGHT] Sent {n_pack_sent} TofPacket in {} sec!", timer.elapsed().as_secs());
+    } // end incoming.recv
+    if timer.elapsed().as_secs() > 60 {
+      met_time_secs += timer.elapsed().as_secs_f32();
+      let packet_rate = n_pack_sent as f32 /met_time_secs;
+      println!("  {:<60}", ">> == == == == ==  DATA SINK HEARTBEAT   == == == == == <<".bright_cyan().bold());
+      println!("  {:<60} <<", format!(">> ==> Sent \t{} TofPackets! (packet rate {:.2}/s)", n_pack_sent ,packet_rate).bright_cyan());
+      println!("  {:<60} <<", format!(">> ==> Incoming cb channel len {}", incoming.len()).bright_cyan());
+
+      println!("  {:<60}", ">> == == == == ==  == == == == == == ==  == == == == == <<".bright_cyan().bold());
       timer = Instant::now();
     }
   }

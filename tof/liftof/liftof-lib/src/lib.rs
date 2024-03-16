@@ -77,10 +77,12 @@ use tof_dataclasses::events::{
 };
 use tof_dataclasses::events::tof_hit::Peak;
 
-use tof_dataclasses::analysis::{calculate_pedestal,
-                                integrate,
-                                cfd_simple,
-                                find_peaks};
+use tof_dataclasses::analysis::{
+    calculate_pedestal,
+    integrate,
+    cfd_simple,
+    find_peaks
+};
 
 use tof_dataclasses::RBChannelPaddleEndIDMap;
 
@@ -142,6 +144,19 @@ pub fn init_env_logger() {
       args = record.args()
       )
     }).init();
+}
+
+/// Nicer output for thread "heartbeats" to terminal
+pub fn heartbeat_printer(strings: Vec<String>) {
+    // Determine the maximum length of the strings to ensure consistent length
+    let max_length = strings.iter().map(|s| s.len()).max().unwrap_or(0);
+    // Calculate total width including ">>" and "<<" markers
+    let total_width = max_length + 4; // 4 extra characters for ">>" and "<<"
+
+    for s in strings {
+        // Use the calculated total_width for consistent formatting
+        println!(">>{: <width$}<<", s, width = total_width - 4);
+    }
 }
 
 /// Common settings for apps, e.g. liftof-tui
@@ -519,7 +534,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
       ch_voltages[n] -= ped;
     }
     let mut charge : f32 = 0.0;
-    debug!("Check impedance value! Just using 50 [Ohm]");
+    //debug!("Check impedance value! Just using 50 [Ohm]");
     match integrate(&ch_voltages,
                     &ch_times,
                     270.0, 70.0, 50.0) {
@@ -535,6 +550,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     // We actually might have multiple peaks 
     // here
     // FIXME 
+    let mut max_volts = 0.0f32;
     match find_peaks(&ch_voltages ,
                      &ch_times    ,
                      270.0, 
@@ -559,6 +575,10 @@ pub fn waveform_analysis(event         : &mut RBEvent,
               cfd_times.push(cfd);
             }
           }
+          // just do the first peak for now
+          let pk_height = ch_voltages[pk.0..pk.1].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
+          max_volts = *pk_height; 
+          break;
         }
       }// end OK
     } // end match find_peaks 
@@ -571,9 +591,11 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     if is_a_side {
       this_hit.set_time_a(this_time);
       this_hit.set_charge_a(charge);
+      this_hit.set_peak_a(max_volts);
     } else {
       this_hit.set_time_b(this_time);
       this_hit.set_charge_b(charge);
+      this_hit.set_peak_b(max_volts);
     }
     // Technically, we can have more than one peak. 
     // We need to adjust the integration window to 

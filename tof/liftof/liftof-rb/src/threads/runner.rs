@@ -319,7 +319,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
           }
         }
         if show_progress {
-          if rc.runs_forever() {
+          if rc.nevents == 0 {
             template_bar_n_ev = "[{elapsed_precise}] {prefix} {msg} {spinner} ";
           } else {
             template_bar_n_ev = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
@@ -452,7 +452,8 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
       }
     }
     
-    if !rc.runs_forever() {
+    // FIXME
+    if !rc.nevents == 0 {
       if rc.nevents != 0 {
         if n_events > rc.nevents as u64{
           terminate = true;
@@ -704,7 +705,7 @@ pub fn experimental_runner(run_config              : &Receiver<RunConfig>,
           }
         }
         if show_progress {
-          if rc.runs_forever() {
+          if rc.nevents == 0 {
             template_bar_n_ev = "[{elapsed_precise}] {prefix} {msg} {spinner} ";
           } else {
             template_bar_n_ev = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
@@ -872,7 +873,7 @@ pub fn experimental_runner(run_config              : &Receiver<RunConfig>,
     
     // from here on, check termination 
     // conditions
-    if !rc.runs_forever() {
+    if !rc.nevents == 0 {
       if rc.nevents != 0 {
         if n_events > rc.nevents as u64{
           terminate = true;

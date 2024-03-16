@@ -211,9 +211,6 @@ pub struct TofEventBuilderSettings {
   /// The timeout parameter for the TofEvent. If not
   /// complete after this time, send it onwards anyway
   pub te_timeout_sec      : u32,
-  /// Send TofSummary + RBWaveforms instead of 
-  /// TofEvents
-  pub send_flight_packets : bool,
   pub build_strategy      : BuildStrategy,
 }
 
@@ -224,7 +221,6 @@ impl TofEventBuilderSettings {
       n_mte_per_loop      : 1,
       n_rbe_per_loop      : 40,
       te_timeout_sec      : 30,
-      send_flight_packets : false,
       build_strategy      : BuildStrategy::WaitForNBoards(40),
     }
   }
@@ -255,6 +251,9 @@ pub struct DataPublisherSettings {
   /// The address the flight computer should subscribe 
   /// to to get tof packets
   pub fc_pub_address : String,
+  /// Send TofSummary + RBWaveforms instead of 
+  /// TofEvents
+  pub send_flight_packets : bool,
 }
 
 impl DataPublisherSettings {
@@ -263,6 +262,7 @@ impl DataPublisherSettings {
       data_dir                  : String::from(""),
       packs_per_file            : 1000,
       fc_pub_address            : String::from(""),
+      send_flight_packets       : false
     }
   }
 }
@@ -297,6 +297,8 @@ pub struct LiftofSettings {
   /// The address ("tcp://xx.xx.xx.xx:xxxxx") the tof computer should subscribe to 
   /// to get commands from the flight computer
   pub fc_sub_address             : String,
+  /// Interval of time that will elapse from a cmd check to the other
+  pub cmd_listener_interval_sec  : u64,
   /// The UDP port to be used to get packets from the 
   /// MTB
   pub mtb_address                : String,
@@ -328,6 +330,7 @@ impl LiftofSettings {
       runtime_sec               : 0,
       cc_server_address         : String::from("tcp://10.0.1.10:42000"),   
       fc_sub_address            : String::from(""),
+      cmd_listener_interval_sec : 1,
       mtb_address               : String::from("10.0.1.10:50001"),
       cpu_moni_interval_sec     : 60,
       rb_ignorelist             : Vec::<u8>::new(),

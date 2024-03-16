@@ -16,8 +16,31 @@ use ratatui::widgets::{
     Borders,
 };
 
+//extern crate ndhistogram;
+use ndhistogram::{
+    ndhistogram,
+    Histogram,
+    Hist1D,
+};
+use ndhistogram::axis::{
+    Uniform,
+};
+use crate::colors::{
+  ColorTheme2,
+};
 
-use crate::colors::ColorTheme2;
+
+
+pub fn histogram(nbin : usize, bin_low : f32,
+                 bin_high : f32,
+                 data : Vec<f32>) -> Hist1D<Uniform<f32>> {
+  let bins = Uniform::new(nbin, bin_low, bin_high);
+  let mut histo = ndhistogram!(bins);
+  for k in data {
+    histo.fill(&k);
+  }
+  histo
+}
 
 pub fn timeseries<'a>(data        : &'a mut VecDeque<(f64,f64)>,
                       ds_name     : String,

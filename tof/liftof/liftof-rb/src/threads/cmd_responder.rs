@@ -1,5 +1,7 @@
-use std::path::Path;
-use std::time::Duration;
+use std::time::{
+    //Instant,
+    Duration,
+};
 use std::thread;
 use std::sync::{
     Arc,
@@ -7,6 +9,7 @@ use std::sync::{
 };
 
 //use std::time::Instant;
+//use std::path::Path;
 use crossbeam_channel::Sender;
 
 use tof_dataclasses::commands::{TofCommand, TofCommandCode, TofCommandResp, TofResponse};
@@ -17,7 +20,12 @@ use tof_dataclasses::run::RunConfig;
 
 use tof_dataclasses::serialization::Serialization;
 
-use liftof_lib::{build_tcp_from_ip, TofComponent, PowerStatusEnum, LTBThresholdName};
+use liftof_lib::{
+    //build_tcp_from_ip,
+    TofComponent,
+    PowerStatusEnum,
+    LTBThresholdName
+};
 
 use tof_dataclasses::constants::{MASK_CMD_8BIT,
                                   MASK_CMD_16BIT};
@@ -31,8 +39,9 @@ use crate::api::{rb_calibration,
                  power_preamp,
                  power_ltb,
                  //get_runconfig,
-                 prefix_board_id,
-                 DATAPORT};
+                 //prefix_board_id,
+                 //DATAPORT
+};
 use crate::threads::monitoring::{get_ltb_moni, get_pb_moni, get_rb_moni};
 
 use liftof_lib::constants::DEFAULT_RB_ID;
@@ -165,8 +174,8 @@ pub fn cmd_responder(cmd_server_address        : String,
                   Ok(cmd)  => {
                     // we got a valid tof command, forward it and wait for the 
                     // response
-                    let tof_resp  = TofResponse::GeneralFail(TofCommandResp::RespErrNotImplemented as u32);
-                    let resp_not_implemented = prefix_board_id(&mut tof_resp.to_bytestream());
+                    //let tof_resp  = TofResponse::GeneralFail(TofCommandResp::RespErrNotImplemented as u32);
+                    //let resp_not_implemented = prefix_board_id(&mut tof_resp.to_bytestream());
                     //let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
                     let return_val: Result<TofCommandCode, CmdError>;
                     match cmd {
@@ -413,11 +422,11 @@ pub fn cmd_responder(cmd_server_address        : String,
                       },
                       TofCommand::DataRunStart (value) => {
                         // MSB second 8 bits are run_type
-                        let run_type: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
+                        //let run_type: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
                         // MSB third 8 bits are RB ID
                         let rb_id: u8    = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
                         // MSB fourth 8 bits are event number
-                        let event_no: u8 = (value | MASK_CMD_8BIT) as u8;
+                        //let event_no: u8 = (value | MASK_CMD_8BIT) as u8;
                         // let's start a run. The value of the TofCommnad shall be 
                         // nevents
 
@@ -455,7 +464,7 @@ pub fn cmd_responder(cmd_server_address        : String,
                         // MSB third 8 bits are RB ID
                         let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
                         // MSB fourth 8 bits are extra (not used)
-                        let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                        //let extra: u8 = (value | MASK_CMD_8BIT) as u8;
                         
                         let my_rb_id = get_board_id().unwrap() as u8;
                         // if this RB is the one then do stuff
@@ -482,7 +491,7 @@ pub fn cmd_responder(cmd_server_address        : String,
                         // MSB third 8 bits are RB ID
                         let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
                         // MSB fourth 8 bits are extra (not used)
-                        let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                        //let extra: u8 = (value | MASK_CMD_8BIT) as u8;
                         
                         let my_rb_id = get_board_id().unwrap() as u8;
                         // if this RB is the one then do stuff
@@ -508,7 +517,7 @@ pub fn cmd_responder(cmd_server_address        : String,
                         // MSB third 8 bits are RB ID
                         let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
                         // MSB fourth 8 bits are extra (not used)
-                        let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                        //let extra: u8 = (value | MASK_CMD_8BIT) as u8;
                         
                         let my_rb_id = get_board_id().unwrap() as u8;
                         // if this RB is the one then do stuff
@@ -530,11 +539,11 @@ pub fn cmd_responder(cmd_server_address        : String,
                       },
                       TofCommand::DefaultCalibration  (value) => {
                         // MSB first 16 bits are voltage level
-                        let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
+                        //let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
                         // MSB third 8 bits are RB ID
                         let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
                         // MSB fourth 8 bits are extra (not used)
-                        let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                        //let extra: u8 = (value | MASK_CMD_8BIT) as u8;
 
                         let my_rb_id = get_board_id().unwrap() as u8;
                         // if this RB is the one then do stuff

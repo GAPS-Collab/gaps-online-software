@@ -8,8 +8,16 @@ use std::time::Instant;
 use std::fs;
 use std::collections::VecDeque;
 
-extern crate histo;
-use histo::Histogram;
+//extern crate histo;
+//use histo::Histogram;
+use ndhistogram::{
+    Histogram,
+    Hist1D,
+    ndhistogram,
+};
+use ndhistogram::axis::{
+    Uniform,
+};
 
 use ratatui::{
     //backend::CrosstermBackend,
@@ -33,7 +41,10 @@ use tof_dataclasses::events::RBEvent;
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::monitoring::RBMoniData;
 use tof_dataclasses::io::RBEventMemoryStreamer;
-use crate::widgets::timeseries;
+use crate::widgets::{
+    timeseries,
+    //histogram,
+};
 use crate::colors::{
   ColorTheme2,
 };
@@ -78,7 +89,7 @@ pub struct RBTab<'a>  {
   pub n_moni         : usize,
   pub miss_evid      : usize,
   pub last_evid      : u32,
-  pub nch_histo      : Histogram,
+  pub nch_histo      : Hist1D<Uniform<f32>>,
   timer              : Instant,
 
   pub theme          : ColorTheme2,
@@ -108,6 +119,7 @@ impl RBTab<'_>  {
       //ch_data.push(Vec::<(f64,f64)>::new());
       ch_data.push(tmp_vec);
     }
+    let bins = Uniform::new(50,-0.5,49.5);
     RBTab {
       tp_receiver    : tp_receiver,
       rb_receiver    : rb_receiver,
@@ -136,7 +148,7 @@ impl RBTab<'_>  {
       n_moni         : 0,
       miss_evid      : 0,
       last_evid      : 0,
-      nch_histo      : Histogram::with_buckets(50),
+      nch_histo      : ndhistogram!(bins),
       timer          : Instant::now(),
   
       theme          : theme,
@@ -149,8 +161,9 @@ impl RBTab<'_>  {
   }
   
   pub fn receive_packet(&mut self) -> Result<(), SerializationError> {
-    let met = self.timer.elapsed().as_secs_f64();
+    let met    = self.timer.elapsed().as_secs_f64();
     let mut ev = RBEvent::new();
+    let bins   = Uniform::new(50,-0.5,49.5);
     
     if self.rb_changed {
       // currently, only one RB at a time is supported
@@ -166,7 +179,7 @@ impl RBTab<'_>  {
       self.met_queue.clear();
       self.met_queue_moni.clear();
       self.fpgatmp_queue.clear();
-      self.nch_histo = Histogram::with_buckets(50);
+      self.nch_histo = ndhistogram!(bins);
       // try to get a new calibration
       match self.rbl_state.selected() {
         None => {
@@ -294,7 +307,7 @@ impl RBTab<'_>  {
         }
       }
 
-      self.nch_histo.add(ev.header.get_nchan() as u64);
+      self.nch_histo.fill(&(ev.header.get_nchan() as f32));
       self.n_events += 1;
       if self.last_evid != 0 {
         if ev.header.event_id - self.last_evid != 1 {

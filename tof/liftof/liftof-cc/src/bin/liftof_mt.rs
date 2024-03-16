@@ -23,7 +23,8 @@ use std::thread;
 
 //use tof_dataclasses::commands::RBCommand;
 use liftof_lib::{
-    init_env_logger
+    init_env_logger,
+    LiftofSettings
 };
 
 use tof_dataclasses::packets::TofPacket;
@@ -33,7 +34,6 @@ use liftof_lib::{
     master_trigger,
 };
 
-use liftof_cc::settings::LiftofCCSettings;
 
 use crossbeam_channel as cbc;
 //use std::io::Write;
@@ -105,12 +105,12 @@ fn main() {
   // Create shared data wrapped in an Arc and a Mutex for synchronization
   //let thread_control = Arc::new(Mutex::new(ThreadControl::default()));
   // deal with command line arguments
-  let config          : LiftofCCSettings;
+  let config          : LiftofSettings;
   let args    = Args::parse();
   match args.config {
     None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
     Some(cfg_file) => {
-      match LiftofCCSettings::from_toml(cfg_file) {
+      match LiftofSettings::from_toml(cfg_file) {
         Err(err) => {
           error!("CRITICAL! Unable to parse .toml settings file! {}", err);
           panic!("Unable to parse config file!");

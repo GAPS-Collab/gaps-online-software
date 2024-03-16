@@ -25,13 +25,205 @@ use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::manifest::get_dsi_j_ltbch_vs_rbch_map;
 use tof_dataclasses::threading::ThreadControl;
 
+//use liftof_lib::heartbeat_printer;
 use liftof_lib::settings::{
     TofEventBuilderSettings,
-    BuildStrategy
+    BuildStrategy,
 };
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 
-use colored::Colorize;
+use colored::{
+    Colorize,
+    ColoredString
+};
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct EventBuilderHeartBeat {
+  pub met_seconds           : usize,
+  pub n_mte_received_tot    : usize,
+  pub n_rbe_received_tot    : usize,
+  pub n_rbe_per_te          : usize,
+  pub n_rbe_discarded_tot   : usize,
+  pub n_mte_skipped         : usize,
+  pub n_timed_out           : usize,
+  pub n_sent                : usize,
+  pub delta_mte_rbe         : usize,
+  pub event_cache_size      : usize,
+  pub event_id_cache_size   : usize, 
+  pub rbe_wo_mte            : usize,
+  pub n_sent_events         : usize,
+  pub mte_receiver_cbc_len  : usize,
+  pub rbe_receiver_cbc_len  : usize,
+  pub tp_sender_cbc_len     : usize,
+  pub seen_rbevents         : HashMap<u8, usize>,
+}
+
+impl EventBuilderHeartBeat {
+  pub fn new() -> Self {
+    let mut seen_rbevents = HashMap::<u8, usize>::new();
+    for k in 1..47 {
+      if k == 10 || k ==12 || k == 37 || k == 38 || k == 43 || k == 45 {
+        continue;
+      } else {
+        seen_rbevents.insert(k as u8, 0);
+      }
+    }
+    Self {
+      met_seconds          : 0,
+      n_mte_received_tot   : 0,
+      n_rbe_received_tot   : 0,
+      n_rbe_per_te         : 0,
+      n_rbe_discarded_tot  : 0,
+      n_mte_skipped        : 0,
+      n_timed_out          : 0,
+      n_sent               : 0,
+      delta_mte_rbe        : 0,
+      event_cache_size     : 0,
+      event_id_cache_size  : 0,
+      rbe_wo_mte           : 0,
+      n_sent_events        : 0,
+      mte_receiver_cbc_len : 0,
+      rbe_receiver_cbc_len : 0,
+      tp_sender_cbc_len    : 0,
+      seen_rbevents        : seen_rbevents, 
+    }
+ }
+
+ pub fn get_average_rbe_te(&self) -> f64 {
+   if self.n_sent > 0 {
+     return self.n_rbe_per_te as f64 / self.n_sent as f64;
+   }
+   0.0
+ }
+
+ pub fn get_timed_out_frac(&self) -> f64 {
+   if self.n_sent > 0 {
+     return self.n_timed_out as f64 / self.n_sent as f64;
+   }
+   0.0
+ }
+
+ pub fn add_rbevent(&mut self, rb_id : u8) {
+   *self.seen_rbevents.get_mut(&rb_id).unwrap() += 1;
+ }
+
+ pub fn get_incoming_vs_outgoing_mte(&self) -> f64 {
+   if self.n_sent > 0 {
+     return self.n_mte_received_tot as f64 /  self.n_sent as f64;
+   }
+   0.0
+ }
+
+ pub fn get_nrbe_discarded_frac(&self) -> f64 {
+   if self.n_rbe_received_tot > 0 {
+     return self.n_rbe_discarded_tot as f64 / self.n_rbe_received_tot as f64;
+   }
+   0.0
+ }
+
+ pub fn get_string(&self) -> ColoredString {
+   let mut string_field = Vec::<ColoredString>::new();
+   let mut hb = String::from("== == == == == == EVENTBUILDER HEARTBTEAT == == == == == ==").bright_purple();
+   string_field.push(hb);
+   //if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
+   hb = format!("==> Received MTEvents \t\t{}", self.n_mte_received_tot).bright_purple();
+   string_field.push(hb.clone());
+   hb = format!("==> Received RBEvents \t\t{}", self.n_rbe_received_tot).bright_purple();
+   string_field.push(hb.clone());
+   hb = format!("==> Skipped MTEvents  \t\t{}", self.n_mte_skipped     ).bright_purple();
+    //hb = format!("==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid).bright_purple());
+   string_field.push(hb.clone());
+   hb = format!("==> Size of event cache    \t{}", self.event_cache_size).bright_purple();
+   string_field.push(hb.clone());
+   hb = format!("==> Size of event ID cache \t{}", self.event_id_cache_size).bright_purple();
+   string_field.push(hb.clone());
+   hb = format!("==> Get MTE from cache for RB ev failed {} times!", self.rbe_wo_mte).bright_purple();
+   string_field.push(hb.clone());
+   hb = format!("==> Sent {} events!", self.n_sent).bright_purple();
+   string_field.push(hb.clone());
+   //hb = format!("==> Chn len MTE receiver\t{}",self.m_trig_ev.len() ).bright_purple();
+   //hb = format!("==> Chn len RBE receiver\t{}",ev_from_rb.len()).bright_purple();
+   //hb = format!("==> Chn len TP  sender  \t{}",data_sink.len()).bright_purple();
+    //  if n_sent > 0 {
+    //    let av_rb_ev = n_rbs_per_ev as f64 / n_sent as f64;
+    //    println!("  {:fwidth$} <<", format!(">> ==> Average number of RBEvents/TofEvent {:4.2}", av_rb_ev).bright_purple());
+    //    let to_frac = 100.0 * n_timed_out as f64 / n_sent as f64;
+    //    println!("  {:fwidth$} <<", format!(">> ==> Fraction of timed out events {:4.2}%", to_frac).bright_purple());
+    //    let recv_sent_frac = 100.0* n_mte_received_tot as f64 / n_sent as f64;
+    //    println!("  {:fwidth$} <<", format!(">> ==> Fraction of incoming vs outgoing MTEvents {:4.2}%", recv_sent_frac).bright_purple());
+    //  }
+    //  if n_rbe_received_tot > 0 {
+    //    let rbe_discarded_frac = 100.0 * n_rbe_discarded_tot as f64 / n_rbe_received_tot as f64;
+    //    println!("  {:fwidth$} <<", format!(">> ==> Fraction of discarded RBEvents {:4.2}%", rbe_discarded_frac).bright_purple());
+    //  }
+    //  println!(">> ==> RBEvents received overview:");
+    //  //let mut rbtable_repr = String::from(">> ");
+    //  //for k in seen_rbevents.keys() {
+    //  //  println!(">> >> RB {}  : {}", k, seen_rbevents[k]);
+    //  //}
+   hb
+ }
+ //     }
+ //     println!(">> ==> RBEvents received overview:");
+ //     //let mut rbtable_repr = String::from(">> ");
+ //     //for k in seen_rbevents.keys() {
+ //     //  println!(">> >> RB {}  : {}", k, seen_rbevents[k]);
+ //     //}
+ //     
+ //     let mut key_value_pairs: Vec<_> = seen_rbevents.iter().collect();
+ //     let mut head0 = String::from(">> >> ");
+ //     let mut row0  = String::from(">> >> ");
+ //     let mut head1 = String::from(">> >> ");
+ //     let mut row1  = String::from(">> >> ");
+ //     let mut head2 = String::from(">> >> ");
+ //     let mut row2  = String::from(">> >> ");
+ //     let mut head3 = String::from(">> >> ");
+ //     let mut row3  = String::from(">> >> ");
+ //     let mut head4 = String::from(">> >> ");
+ //     let mut row4  = String::from(">> >> ");
+ //     key_value_pairs.sort_by(|a, b| a.0.cmp(b.0));
+ //     for (key, value) in key_value_pairs {
+ //         if key < &10 {
+ //           head0 += &(format!(" RB {:02}\t| ", key)); 
+ //           row0  += &(format!(" {}\t| ", value));
+ //           continue;
+ //         }
+ //         if key < &20 {
+ //           head1 += &(format!(" RB {:02}\t| ", key)); 
+ //           row1  += &(format!(" {}\t| ", value));
+ //           continue;
+ //         }
+ //         if key < &30 {
+ //           head2 += &(format!(" RB {:02}\t| ", key)); 
+ //           row2  += &(format!(" {}\t| ", value));
+ //           continue;
+ //         }
+ //         if key < &40 {
+ //           head3 += &(format!(" RB {:02}\t| ", key)); 
+ //           row3  += &(format!(" {}\t| ", value));
+ //           continue;
+ //         }
+ //         if key < &50 {
+ //           head4 += &(format!(" RB {:02}\t| ", key)); 
+ //           row4  += &(format!(" {}\t| ", value));
+ //           continue;
+ //         }
+ //         //println!(">> >> RB {} : {}", key, value);
+ //     }
+ //     println!("  {}", head0);
+ //     println!("  {}", row0);
+ //     println!("  {}", head1);
+ //     println!("  {}", row1);
+ //     println!("  {}", head2);
+ //     println!("  {}", row2);
+ //     println!("  {}", head3);
+ //     println!("  {}", row3);
+ //     println!("  {}", head4);
+ //     println!("  {}", row4);
+ //     println!("  {}",">> == == == == ==  END HEARTBEAT! == == == == == <<".bright_purple().bold());
+ //   }
+ // }
+}
 
 // debug the number of rb events we got from the individual boards
 
@@ -162,23 +354,25 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     }
   }
   // event caches for assembled events
-  let mut event_cache        = HashMap::<u32, TofEvent>::new();
-  let mut event_id_cache     = VecDeque::<u32>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  let dsi_map                = get_dsi_j_ltbch_vs_rbch_map(db_path.as_ref()); 
-  let mut n_received         : usize;
-  //let mut clear_cache      = 0; // clear cache every 
-  //let mut event_sending    = 0;
-  let mut n_mte_received_tot = 0u64;
-  let mut n_rbe_received_tot = 0u64;
-  let mut first_evid         : u32;
-  let mut last_evid          = 0;
-  let mut n_sent             = 0usize;
-  let mut n_timed_out        = 0usize; 
+  let mut event_cache         = HashMap::<u32, TofEvent>::new();
+  let mut event_id_cache      = VecDeque::<u32>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
+  let dsi_map                 = get_dsi_j_ltbch_vs_rbch_map(db_path.as_ref()); 
+  let mut n_received          : usize;
+  //let mut clear_cache       = 0; // clear cache every 
+  //let mut event_sending     = 0;
+  let mut n_mte_received_tot  = 0u64;
+  let mut n_mte_skipped       = 0u32;
+  let mut n_rbe_received_tot  = 0u64;
+  let mut n_rbe_discarded_tot = 0u64;
+  let mut first_evid          : u32;
+  let mut last_evid           = 0;
+  let mut n_sent              = 0usize;
+  let mut n_timed_out         = 0usize; 
   // debug
-  let mut last_rb_evid       = 0u32;
-  let mut n_rbs_per_ev       = 0usize;
-  let mut rb_ev_wo_mte       = 0usize;
-  let mut debug_timer = Instant::now();
+  let mut last_rb_evid        = 0u32;
+  let mut n_rbs_per_ev        = 0usize;
+  let mut rb_ev_wo_mte        = 0usize;
+  let mut debug_timer         = Instant::now();
     
   let mut n_receiving_errors = 0;
   let mut check_tc_update    = Instant::now();
@@ -219,32 +413,37 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
 
           let mut event = TofEvent::from(&mt);
           event.header.run_id = run_id;
-          if event.mt_event.event_id != last_evid + 1 {
-            let delta_id = event.mt_event.event_id - last_evid;
-            error!("We skipped event ids {}", delta_id );
+          if last_evid != 0 {
+            if event.mt_event.event_id != last_evid + 1 {
+              //let delta_id = event.mt_event.event_id - last_evid;
+              if event.mt_event.event_id > last_evid {
+                n_mte_skipped += event.mt_event.event_id - last_evid - 1;
+              }
+              //error!("We skipped event ids {}", delta_id );
+            }
           }
           last_evid = event.mt_event.event_id;
           event_cache.insert(last_evid, event);
           // use this to keep track of the order
           // of events
           event_id_cache.push_back(last_evid);
-          
+          n_received  += 1;
+          n_mte_received_tot += 1;
         }
       } // end match Ok(mt)
-      n_received  += 1;
       //if n_received % 10 == 0 {
       //  println!("==> Received 10 more MasterTriggerEvents");
       //}
-      n_mte_received_tot += 1;
     } // end getting MTEvents
     trace!("Debug timer MTE received! {:?}", debug_timer.elapsed());
     first_evid = event_id_cache[0]; 
-    
+    //let last_cache_evid = event_id_cache.back().unwrap(); 
     // check this timeout
     //let mut rb_events_added   = 0usize;
     //let mut iter_ev           = 0usize;
     //let mut rb_events_dropped = 0usize;
     n_received = 0;
+    //let mut attempts = 0usize;
     'main: while !ev_from_rb.is_empty() && n_received < settings.n_rbe_per_loop {
     // try to catch up
     //while !ev_from_rb.is_empty() && last_rb_evid < last_evid {
@@ -273,6 +472,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           if last_rb_evid < first_evid {
             n_received -= 1;
             debug!(".. re-synchrnoizing ..");
+            //attempts += 1;
+            n_rbe_discarded_tot += 1;
             continue;
           }
           match event_cache.get_mut(&last_rb_evid) {
@@ -282,6 +483,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               // insert a new TofEvent
               //let new_ev = TofEvent::new();
               rb_ev_wo_mte += 1;
+              n_rbe_discarded_tot += 1;
+              //error!("No MTEvent for RBEvent. rb event id {}, first mte {}, last mte {}", last_rb_evid, first_evid, last_cache_evid);
               continue 'main;
             },
             Some(ev) => {
@@ -300,7 +503,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                   println!("== ==> We saw {:?}, but {} is not part of that!", lg_hits, ev_rbid);
                 }
               } else {
+                if ev.is_complete_from_map(&dsi_map) {
+                  error!("We are adding a RBEvent to a TofEvent which is already complete!");
+                }
                 ev.rb_events.push(rb_ev);
+                //println!("[EVTBUILDER] DEBUG n rb expected : {}, n rbs {}",ev.mt_event.get_n_rbs_expected(), ev.rb_events.len());
               }
               //break;
             }
@@ -329,8 +536,12 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     }
     let av_rb_ev = n_rbs_per_ev as f64 / n_sent as f64;
     if settings.build_strategy == BuildStrategy::Adaptive || 
-       settings.build_strategy == BuildStrategy::AdaptiveThorough {
+      settings.build_strategy == BuildStrategy::AdaptiveThorough {
       settings.n_rbe_per_loop = av_rb_ev.ceil() as usize;
+      /// when the rb loop gets too long, catch up
+      if ev_from_rb.len() > 1000 {
+        settings.n_rbe_per_loop = ev_from_rb.len();
+      }
       if settings.n_rbe_per_loop == 0 {
         // failsafe
         settings.n_rbe_per_loop = 40;
@@ -345,26 +556,40 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     }
     let debug_timer_elapsed = debug_timer.elapsed().as_secs_f64();
     if debug_timer_elapsed > 35.0  {
-      let fwidth = 100;
+      //let mut hbs : Vec<String>;
+      //let mut line :String;
+      //let title = String::from("== == == == == == EVENTBUILDER HEARTBTEAT == == == == == ==");
+      //hbs.push(title);
+      //line = format!("==> Received MTEvents \t{}", n_mte_received_tot).bright_purple();
+      //hbs.push(line);
+      //let end   = String::from("== == == == == == == == == == == == == == == == == == == ==");
+      //hbs.push(end);
+
+      let fwidth = 70;
       println!("  {:fwidth$}", ">> == == == == ==  EVTBLDR HEARTBEAT   == == == == == <<".bright_purple().bold());
     //if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
-      println!("  {:fwidth$} <<", format!(">> ==> Received MTEvents \t{}", n_mte_received_tot).bright_purple());
-      println!("  {:fwidth$} <<", format!(">> ==> Received RBEvents \t{}", n_rbe_received_tot).bright_purple());
-      println!("  {:fwidth$} <<", format!(">> ==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid).bright_purple());
+      println!("  {:<60} <<", format!(">> ==> Received MTEvents \t{}", n_mte_received_tot).bright_purple());
+      println!("  {:<60} <<", format!(">> ==> Received RBEvents \t{}", n_rbe_received_tot).bright_purple());
+      println!("  {:<60} <<", format!(">> ==> Skipped MTEvents  \t{}", n_mte_skipped).bright_purple());
+      println!("  {:<60} <<", format!(">> ==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid).bright_purple());
       println!("  {:fwidth$} <<", format!(">> ==> Size of event cache    \t{}", event_cache.len()).bright_purple());
       println!("  {:fwidth$} <<", format!(">> ==> Size of event ID cache \t{}", event_id_cache.len()).bright_purple());
       println!("  {:fwidth$} <<", format!(">> ==> Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!").bright_purple());
       println!("  {:fwidth$} <<", format!(">> ==> Sent {} events!", n_sent).bright_purple());
-      println!("  {:fwidth$} <<", format!(">> ==> Chn len MTE receiver\t {}",m_trig_ev.len() ).bright_purple());
-      println!("  {:fwidth$} <<", format!(">> ==> Chn len RBE receiver\t {}",ev_from_rb.len()).bright_purple());
-      println!("  {:fwidth$} <<", format!(">> ==> Chn len TP  sender  \t {}",data_sink.len()).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Chn len MTE receiver\t{}",m_trig_ev.len() ).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Chn len RBE receiver\t{}",ev_from_rb.len()).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Chn len TP  sender  \t{}",data_sink.len()).bright_purple());
       if n_sent > 0 {
         let av_rb_ev = n_rbs_per_ev as f64 / n_sent as f64;
         println!("  {:fwidth$} <<", format!(">> ==> Average number of RBEvents/TofEvent {:4.2}", av_rb_ev).bright_purple());
+        let to_frac = 100.0 * n_timed_out as f64 / n_sent as f64;
+        println!("  {:fwidth$} <<", format!(">> ==> Fraction of timed out events {:4.2}%", to_frac).bright_purple());
+        let recv_sent_frac = 100.0* n_mte_received_tot as f64 / n_sent as f64;
+        println!("  {:fwidth$} <<", format!(">> ==> Fraction of incoming vs outgoing MTEvents {:4.2}%", recv_sent_frac).bright_purple());
       }
-      if n_mte_received_tot > 0 {
-        let to_frac = n_timed_out as f64 / n_mte_received_tot as f64;
-        println!("  {:fwidth$} <<", format!(">> ==> Fraction of timed out events {:4.2}", to_frac).bright_purple());
+      if n_rbe_received_tot > 0 {
+        let rbe_discarded_frac = 100.0 * n_rbe_discarded_tot as f64 / n_rbe_received_tot as f64;
+        println!("  {:fwidth$} <<", format!(">> ==> Fraction of discarded RBEvents {:4.2}%", rbe_discarded_frac).bright_purple());
       }
       println!(">> ==> RBEvents received overview:");
       //let mut rbtable_repr = String::from(">> ");
@@ -456,7 +681,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               }
             } else {
               // "normal" build strategy
-              if ev.is_complete() || ev_timed_out {
+              if ev.is_complete_from_map(&dsi_map) || ev_timed_out {
                 cache_it = false;
               } else {
                 cache_it = true;
@@ -466,6 +691,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               event_id_cache.push_back(evid);
             } else {
               // if we don't cache it, we have to send it. 
+              //let ev_to_send = ev.clone();
               let ev_to_send = event_cache.remove(&evid).unwrap();
               n_rbs_per_ev  += ev_to_send.rb_events.len(); 
               if settings.send_flight_packets {

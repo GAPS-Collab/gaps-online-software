@@ -25,7 +25,7 @@ use tof_dataclasses::commands::{
 
 use liftof_lib::{
     RunStatistics,
-    waveform_analysis,
+    //waveform_analysis,
 };
 
 ///  Transforms raw bytestream to TofPackets
@@ -74,7 +74,7 @@ pub fn event_processing(board_id            : u8,
 
   // load calibration just in case?
   let mut cali_loaded = false;
-  let mut cali        = RBCalibrations::new(0);
+  let cali        : RBCalibrations;
   let cali_path       = format!("/home/gaps/calib/rb_{:0>2}.cali.tof.gaps", board_id);
   let cali_path_buf   = PathBuf::from(&cali_path);
   if fs::metadata(cali_path_buf.clone()).is_ok() {
@@ -86,6 +86,7 @@ pub fn event_processing(board_id            : u8,
       Ok(_c) => {
         cali = _c;
         cali_loaded = true;
+        debug!("We loaded calibration {}", cali);
       }
     }
   } else {
@@ -183,7 +184,7 @@ pub fn event_processing(board_id            : u8,
         let mut packets_in_stream : u32 = 0;
         let mut last_event_id     : u32 = 0;
         //println!("Streamer::stream size {}", streamer.stream.len());
-        'event_reader : loop {
+        loop {
           if streamer.is_depleted {
             info!("Streamer exhausted after sending {} packets!", packets_in_stream);
             //break 'event_reader;
@@ -221,13 +222,14 @@ pub fn event_processing(board_id            : u8,
                   if last_event_id != 0 {
                     if event.header.event_id != last_event_id + 1 {
                       if event.header.event_id > last_event_id {
-                          skipped_events += (event.header.event_id - last_event_id) as usize;
+                          skipped_events += (event.header.event_id - last_event_id -1) as usize;
                       } else {
                         error!("Something with the event counter is messed up. Got event id {}, but the last event id was {}", event.header.event_id, last_event_id);
                       }
                     }
                   }
                   last_event_id = event.header.event_id;
+                  //println!("This event id {}!", last_event_id);
                   event.data_type = data_type;
                   if verbose {
                     match stat.lock() {

@@ -25,6 +25,9 @@ std::string packet_type_to_string(const PacketType pt) {
       case PacketType::RBWaveform : {
       return "RBWaveform";
     }      
+      case PacketType::TofEventSummary : {
+      return "TofEventSummary";
+    }      
       case PacketType::HeartBeat : {
       return "Heartbeat";
     }      

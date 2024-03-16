@@ -15,13 +15,31 @@ use ratatui::{
     text::Span,
     terminal::Frame,
     widgets::{
-        Block, Dataset, Axis, GraphType, BorderType, Chart, BarChart, Borders, Paragraph, },
+        Block,
+        Dataset,
+        Axis,
+        GraphType,
+        BorderType,
+        Chart,
+        BarChart,
+        Borders,
+        Paragraph
+    },
 };
 
 extern crate crossbeam_channel;
 use crossbeam_channel::Receiver;
-extern crate histo;
-use histo::Histogram;
+
+extern crate ndhistogram;
+use ndhistogram::{
+    ndhistogram,
+    Histogram,
+    Hist1D,
+};
+use ndhistogram::axis::{
+    Uniform,
+};
+
 
 use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::events::MasterTriggerEvent;
@@ -67,7 +85,7 @@ pub struct MTTab {
   pub n_moni         : usize,
   pub miss_evid      : usize,
   pub last_evid      : u32,
-  pub nch_histo      : Histogram,
+  pub nch_histo      : Hist1D<Uniform<f32>>,
   pub theme          : ColorTheme2,
 
   timer              : Instant,
@@ -79,7 +97,8 @@ impl MTTab {
   pub fn new(tp_receiver  : Receiver<TofPacket>,
              mte_receiver : Receiver<MasterTriggerEvent>,
              theme        : ColorTheme2) -> MTTab {
-    MTTab {
+    let bins = Uniform::new(50, -0.5, 49.5);
+    Self {
       main_layout    : Vec::<Rect>::new(),
       info_layout    : Vec::<Rect>::new(),
       detail_layout  : Vec::<Rect>::new(),
@@ -96,7 +115,7 @@ impl MTTab {
       n_moni         : 0,
       miss_evid      : 0,
       last_evid      : 0,
-      nch_histo      : Histogram::with_buckets(50),
+      nch_histo      : ndhistogram!(bins),
       theme          : theme,
       timer          : Instant::now(),
     }
@@ -148,7 +167,7 @@ impl MTTab {
     } // end match
     if mte.event_id != 0 {
       let hits = mte.get_dsi_j_ch_for_triggered_ltbs();
-      self.nch_histo.add(hits.len() as u64);
+      self.nch_histo.fill(&(hits.len() as f32));
       self.n_events += 1;
       self.event_queue.push_back(mte);
       if self.event_queue.len() > self.queue_size {
@@ -261,9 +280,13 @@ impl MTTab {
     let mut vec_index   = 0;
     let mut bins = Vec::<(u64, u64)>::new();
     
-    for bucket in self.nch_histo.buckets() {
-      bins.push((bucket.start(), bucket.count()));
-      if bucket.count() > 0 {
+    for bin in self.nch_histo.iter() {
+      let bin_value = *bin.value as u64;
+      bins.push((bin.index as u64, bin_value));
+      // always show the first 10 bins, but if 
+      // the bins with index > 10 are not 
+      // populated, discard them
+      if bin_value > 0 && bin.index > 10 {
         max_pop_bin = vec_index;
       }
       vec_index += 1;
@@ -287,7 +310,6 @@ impl MTTab {
         self.theme.highlight_fg()
         //Style::default()
         //.bg(Color::Blue)
-        
         .add_modifier(Modifier::BOLD),
       )
       .style(self.theme.background());

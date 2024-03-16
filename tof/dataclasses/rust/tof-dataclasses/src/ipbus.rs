@@ -278,26 +278,35 @@ impl IPBus {
       udp_data.push(0);
       udp_data.push(0);
     }
-    match self.send(&udp_data) {
-      Err(err) => error!("Unable to send udp data! {err}"),
-      Ok(_)    => ()
-    }
-    trace!("[IPBus::get_status => message {:?} sent!", udp_data);
-    let number_of_bytes : usize;
-    match self.receive() {
-      Err(err) => {
-        error!("Can not receive from Udp Socket! {err}");
-        return Err(Box::new(IPBusError::NotAStatusPacket));
-      },
-      Ok(_number_of_bytes)    => {
-        number_of_bytes = _number_of_bytes;
+    let mut send_again = true;
+    let mut number_of_bytes : usize;
+    loop {
+      if send_again {
+        match self.send(&udp_data) {
+          Err(err) => error!("Unable to send udp data! {err}"),
+          Ok(_)    => ()
+        }
       }
-    }
-    // check if this is really a status packet
-    let status_byte = self.buffer[3];
-    if status_byte & 0x1 != 1 {
-      // not a status packet
-      return Err(Box::new(IPBusError::NotAStatusPacket));
+      trace!("[IPBus::get_status => message {:?} sent!", udp_data);
+      match self.receive() {
+        Err(err) => {
+          error!("Can not receive status packet from Udp Socket! {err}");
+          return Err(Box::new(IPBusError::UdpReceiveFailed));
+        },
+        Ok(_number_of_bytes)    => {
+          number_of_bytes = _number_of_bytes;
+        }
+      }
+      // check if this is really a status packet
+      let status_byte = self.buffer[3];
+      if status_byte & 0x1 != 1 {
+        // not a status packet
+        //return Err(Box::new(IPBusError::NotAStatusPacket));
+        send_again = false;
+        continue;
+      } else {
+        break;
+      }
     }
     trace!("[IPBus::get_status] => {} bytes received!", number_of_bytes);
     //println!("[IPBus::get_status] => buffer {:?}", self. buffer);

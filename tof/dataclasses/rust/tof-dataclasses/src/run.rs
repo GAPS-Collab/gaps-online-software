@@ -76,16 +76,6 @@ impl RunConfig {
       rb_buff_size            : 0,
     }
   }
-
-  #[deprecated(since="0.8.3", note="Public argument does not need setter. Semantics need to be clear though.")]
-  pub fn set_forever(&mut self) {
-    self.nevents = 0;
-  }
-
-  #[deprecated(since="0.8.3", note="Public argument does not need setter. Semantics need to be clear though.")]
-  pub fn runs_forever(&self) -> bool {
-    self.nevents == 0 
-  }
 }
 
 impl Serialization for RunConfig {
