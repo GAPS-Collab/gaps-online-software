@@ -123,7 +123,7 @@ void EventGAPS::SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],
 
       // Store the SiPM Channel for each Paddle end
       int paddle = paddle_map[i][j] % 1000;
-      int ch_num = i*NCH+j; // Map the value to NTOT
+      int ch_num = (i-1)*NCH+j; // Map the value to NTOT
       if (paddle_map[i][j] > 2000) { // We have a paddle ID for B
 	Paddle_B[paddle] = ch_num; 
 	//printf("B -> %d %d %d %d %d\n", i,j,ch_num, paddle,paddle_map[i][j]);
@@ -498,8 +498,9 @@ void EventGAPS::SetCFDFraction(float CFDS_frac){
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 void EventGAPS::FillChannelHistos(void) {
-  
-  for (int i=0; i<NTOT; i++) {
+  // This section of code stores histos with channel numbers based on
+  // RBs. Histo channel = SiPM Channel = (RB-1)*NCH+rbch
+  /*for (int i=0; i<NTOT; i++) {
     pedHist[i]->Fill(Pedestal[i]);
     pedRMSHist[i]->Fill(PedRMS[i]);
     Peak[i]->Fill(VPeak[i]);
@@ -507,6 +508,29 @@ void EventGAPS::FillChannelHistos(void) {
     if (QInt[i]>1.0) Charge_cut[i]->Fill(QInt[i]);
 
     tdcCFD[i]->Fill(TDC[i]);
+    }*/
+
+  // This section of code stores histos with channel numbers based on
+  // paddles. For paddle N, Histo[N/N+1] = PaddleA/B SiPM
+  for (int i=0; i<NPAD; i++) {
+    if (Paddle_A[i] > 0) { 
+      int ch = 2*i;
+      pedHist[ch-1]->Fill(Pedestal[Paddle_A[i]]);
+      pedHist[ch]->Fill(Pedestal[Paddle_B[i]]);
+      pedRMSHist[ch-1]->Fill(PedRMS[Paddle_A[i]]);
+      pedRMSHist[ch]->Fill(PedRMS[Paddle_B[i]]);
+      
+      Peak[ch-1]->Fill(VPeak[Paddle_A[i]]);
+      Peak[ch]->Fill(VPeak[Paddle_B[i]]);
+      
+      Charge[ch-1]->Fill(QInt[Paddle_A[i]]);
+      Charge[ch]->Fill(QInt[Paddle_B[i]]);
+      if (QInt[Paddle_A[i]]>1.0) Charge_cut[ch-1]->Fill(QInt[Paddle_A[i]]);
+      if (QInt[Paddle_B[i]]>1.0) Charge_cut[ch]->Fill(QInt[Paddle_B[i]]);
+      
+      tdcCFD[ch-1]->Fill(TDC[Paddle_A[i]]);
+      tdcCFD[ch]->Fill(TDC[Paddle_B[i]]);
+    }
   }
 }
 ////////////////////////////////////////////////////////////////////////////

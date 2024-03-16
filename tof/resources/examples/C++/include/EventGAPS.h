@@ -5,7 +5,9 @@
 #include <TGraphAsymmErrors.h>
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TH3F.h>
 #include <TROOT.h>
+#include <TProfile.h>
 
 #include <legacy.h>
 #include "./constants.h"
@@ -34,7 +36,8 @@ public:
   void    InitializeWaveforms(GAPS::Waveform *wave[], GAPS::Waveform *wch9[]);
   void    UnsetWaveforms(void);
   void    SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],
-		       int padvid[NPAD], float padLocation[NPAD][3]);
+		       int padvid[NPAD], float padLocation[NPAD][4]);
+  void    SetPaddleMap(struct PaddleInfo *pad, struct SiPMInfo *sipm);
   
   // Stuff related to the actual data
   void    AnalyzePedestals(float Ped_begin, float Ped_win);
@@ -67,15 +70,20 @@ private:
   float   Threshold;                 // PMT Threshold in DC (for now...)
   float   CFDFraction;               // CFD Fraction for TDC calculation
 
+  // SiPM channel info (index references NTOT value)
+  int     RB[NTOT];
+  int     RB_ch[NTOT];
+  int     Paddle[NTOT];
+  int     PadEnd[NTOT];
+
   // Since paddles start at 1, we include one extra value
   int     Paddle_A[NPAD];            // Channel for this PadddleA
   int     Paddle_B[NPAD];            // Channel for this PadddleB
-  int     ChnlMap[NRB][NCH];         // Maps SiPM channel to Paddle
   int     PadVID[NPAD];              // Volume ID
   float   PadX[NPAD];                // X detector location
   float   PadY[NPAD];                // Y detector location
   float   PadZ[NPAD];                // Z detector location
-
+  int     PadO[NPAD];                // Orientation of Paddle
   
   float   Pedestal[NTOT];             // Pedestal values
   float   PedRMS[NTOT];               // Pedestal RMS values
@@ -86,10 +94,12 @@ private:
   float   QInt[NTOT];                 // Pulse charge value
   float   TDC[NTOT];                  // TDC value (CFD method)
 
+  bool    IsHit[NPAD];                // Do we have Hit info?
   int     Hits[NPAD];                 // Hit mask for paddle 
   float   HitX[NPAD];                 // X location in detector
   float   HitY[NPAD];                 // Y location in detector
   float   HitZ[NPAD];                 // Z location in detector
+  float   delta[NPAD];                // displacement from center
   int     NPadCube;
   int     NPadUpper;
   int     NPadLower;
@@ -104,12 +114,18 @@ private:
   TH1D    *tdcCFD[NTOT];                  // TDC histograms
 
   TH2D    *QEnd2End[NPAD];             // End 2 End charge 
-  TH1D    *HitMask[NPAD];              // Hit mask of paddle
-  TH1D    *tDiff[NPAD];                // TDC diff for paddle
-  TH1D    *NPaddlesCube;
-  TH1D    *NPaddlesUpper;
-  TH1D    *NPaddlesLower;
-  TH1D    *NPaddlesOuter;
+  TH1I    *HitMask[NPAD];              // Hit mask of paddle
+  TH1D    *tDiff[NPAD];                // tdc diff of paddle ends
+  TH1F    *HitPosition[NPAD];          // Hit Position along paddle (cm)
+  TH3F    *HitGAPS;                    // Hit Position in detector (mm)
+  TH3F    *HitCube;                    // Hit Position in detector (mm)
+  TH3F    *HitCortina;                 // Hit Position in detector (mm)
+  TH3F    *HitUmbrella;                // Hit Position in detector (mm)
+  TProfile *QvPosition[NPAD];          // Avg Q vs position along paddle
+  TH1I    *NPaddlesCube;
+  TH1I    *NPaddlesUpper;
+  TH1I    *NPaddlesLower;
+  TH1I    *NPaddlesOuter;
   
   // MEMBER FUNCTIONS
   void    Message(const char *s);           // Print out messages as needed
