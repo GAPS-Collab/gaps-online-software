@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "./include/constants.h"
-#include "./include/EventRene.h"
+#include "./include/EventPadrick.h"
 
 void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm);
 
@@ -109,6 +109,26 @@ int main(int argc, char *argv[]){
       } 
     }
   }
+  
+  // To read calibration data from individual text files, when -c is
+  // given with the directory of the calibration files
+  /*if (calname != "") {
+    // obviously here we have to get all the calibration files, 
+    // but for the sake of the example let's use only one
+    // Ultimatly, they will be stored in the stream.
+    for (int i=1; i<NRB; i++) {
+      std::string f_str;
+      if (i<10) // Little Kludgy, but it works
+	f_str = calname + "/txt-files/rb0" + std::to_string(i) + "_cal.txt";
+      else
+	f_str = calname + "/txt-files/rb" + std::to_string(i) + "_cal.txt";
+      
+      //spdlog::info("Will use calibration file {}", calname);
+      //cali[i] = RBCalibration::from_txtfile(calname);
+      spdlog::info("Will use calibration file {}", f_str);
+      cali[i] = RBCalibration::from_txtfile(f_str);
+    }
+    }*/
 
   // Some useful variables (some initialized to default values)
   // but overwritten from file (if it exists)
@@ -118,7 +138,7 @@ int main(int argc, char *argv[]){
   float CFDS_frac = 0.10;
   float Qwin_low  = 100;
   float Qwin_size = 100;
-  float CHmin     = 5.0;
+  float CHmin     = 4.0;
 
   // Some useful analysis quantities
   float Ped[NTOT];

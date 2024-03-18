@@ -320,7 +320,7 @@ int main(int argc, char *argv[]){
 	Event.AnalyzeEvent();
 	
 	// Now fill out histograms
-	Event.FillChannelHistos();
+	Event.FillChannelHistos(0);
 	Event.FillPaddleHistos();
 
 	Event.UnsetWaveforms();

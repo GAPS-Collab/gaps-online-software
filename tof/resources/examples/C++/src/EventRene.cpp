@@ -113,14 +113,18 @@ void EventGAPS::UnsetWaveforms(void) {
 ////////////////////////////////////////////////////////////////////////////
 // Set up our SiPM channel to Paddle map to Location in detector
 void EventGAPS::SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],
-			     int padvid[NPAD], float padLocation[NPAD][3]) {
-
+			     int padvid[NPAD], float padLocation[NPAD][4]) {
+  // This was an older, more kludgey way of doing this where a bunch
+  // of arrays were passed into the subroutine. The next method is
+  // much cleaner where arguments are two structures with all the
+  // mapping already done.
+  
   // This subroutine stores the SiPM channel for each paddle end (A,B)
   for (int i=0; i<NRB; i++) {
     for (int j=0; j<NCH; j++) {
       // Store the paddle for each RB/CH
-      ChnlMap[i][j] = paddle_map[i][j];
-
+      //ChnlMap[i][j] = paddle_map[i][j];
+      
       // Store the SiPM Channel for each Paddle end
       int paddle = paddle_map[i][j] % 1000;
       int ch_num = (i-1)*NCH+j; // Map the value to NTOT
@@ -132,13 +136,15 @@ void EventGAPS::SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],
       }
     }
   }
+  
   /*
-  for (int i=0; i<NPAD; i++) 
-    printf("PadID %d  -> RB_A %d %d %d; RB_B %d %d %d\n", i,
- 	   Paddle_A[i], (int)Paddle_A[i]/NCH, Paddle_A[i]%NCH, 
- 	   Paddle_B[i], (int)Paddle_B[i]/NCH, Paddle_B[i]%NCH);
+  for (int i=0; i<NPAD; i++) {
+    printf("PadID %3d  -> RB_A %3d %2d %2d; RB_B %3d %2d %2d\n", i,
+	   Paddle_A[i], (int)Paddle_A[i]/NCH, Paddle_A[i]%NCH, 
+	   Paddle_B[i], (int)Paddle_B[i]/NCH, Paddle_B[i]%NCH); 
+  }
   */
-
+  
   // For each paddle, we want to set the X, Y, Z locations. So, index
   // through the pad2volid[] array, find matching volid in
   // padLocation[][] array, and set x,y,z from appropriate values
@@ -148,11 +154,12 @@ void EventGAPS::SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],
       for (int j=0; j<NPAD; j++) {
 	if (tmp_id == padvid[j]) { // Found a match
 	  PadVID[i] = tmp_id;
-	  PadX[i]   = padLocation[j][1];
-	  PadY[i]   = padLocation[j][2];
-	  PadZ[i]   = padLocation[j][3];
-	  //printf("  Pad %d: %d  %.2f %.2f %.2f\n", i, PadVID[i],
-	  //	 PadX[i], PadY[i], PadZ[i]);
+	  PadX[i]   = padLocation[j][0];
+	  PadY[i]   = padLocation[j][1];
+	  PadZ[i]   = padLocation[j][2];
+	  PadO[i]   = (int)(padLocation[j][3]);
+	  //printf("  Pad %d: %d  %.2f %.2f %.2f %.d\n", i, PadVID[i],
+	  //	 PadX[i], PadY[i], PadZ[i], PadO[i]);
 	}
       }
     }
@@ -161,6 +168,48 @@ void EventGAPS::SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+// Set up our SiPM channel to Paddle map to Location in detector
+void EventGAPS::SetPaddleMap(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
+  // This subroutine stores the SiPM channel for each paddle end (A,B)
+  for (int i=0; i<NRB; i++) {
+    for (int j=0; j<NCH; j++) {
+      int ch=(i-1)*NCH + j;  // Determine NTOT position
+      RB[ch]     = sipm->RB[ch];
+      RB_ch[ch]  = sipm->RB_ch[ch];
+      Paddle[ch] = sipm->PaddleID[ch];
+      PadEnd[ch] = sipm->PaddleEnd[ch];
+    }
+  }
+  //for (int i=0;i<NTOT;i++)
+  //printf("%3d: %2d  %d  %3d  %d\n",i,RB[i],RB_ch[i],Paddle[i],PadEnd[i]);
+
+  
+  for (int i=0; i<NPAD; i++) {
+    // Store the SiPM Channel for each Paddle end
+    Paddle_A[i] = pad->SiPM_A[i]; 
+    Paddle_B[i] = pad->SiPM_B[i]; 
+
+    PadVID[i] = pad->VolumeID[i];
+    PadO[i]   = pad->Orientation[i];
+    PadX[i]   = pad->Location[i][0];
+    PadY[i]   = pad->Location[i][1];
+    PadZ[i]   = pad->Location[i][2];
+    
+    //printf("  Pad %d: %d  %8.2f %8.2f %8.2f %2d\n", i, PadVID[i],
+    //	   PadX[i], PadY[i], PadZ[i], PadO[i]);
+  }
+  
+  /*  
+  for (int i=0; i<NPAD; i++) {
+    printf("PadID %3d  -> RB_A %3d %2d %2d; RB_B %3d %2d %2d\n", i,
+	   Paddle_A[i], (int)Paddle_A[i]/NCH, Paddle_A[i]%NCH, 
+	   Paddle_B[i], (int)Paddle_B[i]/NCH, Paddle_B[i]%NCH); 
+  }
+  */
+}
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -244,25 +293,72 @@ void EventGAPS::InitializeHistograms(void) {
   //rao  hit mask histograms
   for (int b = 0; b < NPAD; b++) {
     sprintf(text, "HitMask[%d]", b);
-    HitMask[b] = new TH1D(text, "", 10, -2.5, 7.5);
+    HitMask[b] = new TH1I(text, "", 10, -2.5, 7.5);
     HitMask[b]->GetXaxis()->SetTitle("Hit Mask (A=1,B=2)");
     HitMask[b]->GetYaxis()->SetTitle("Counts");
   }
 
+  // Hit position along paddle
+  for (int b = 0; b < NPAD; b++) {
+    sprintf(text, "HitPosition[%d]", b);
+    HitPosition[b] = new TH1F(text, "", 190, -95.0, 95.0);
+    HitPosition[b]->GetXaxis()->SetTitle("Position");
+    HitPosition[b]->GetYaxis()->SetTitle("Counts");
+  }
+
+  // Hit position in GAPS volume
+  HitGAPS = new TH3F("HitGAPS", "", 180, -1800.0, 1800.0,
+		     180, -1800.0, 1800.0,
+		     110, 0.0, 2200.0 );
+  HitGAPS->GetXaxis()->SetTitle("X Position");
+  HitGAPS->GetYaxis()->SetTitle("Y Position");
+
+  // Hit position in GAPS volume
+  HitCube = new TH3F("HitCube", "", 180, -1800.0, 1800.0,
+		     180, -1800.0, 1800.0,
+		     110, 0.0, 2200.0 );
+  HitCube->GetXaxis()->SetTitle("X Position");
+  HitCube->GetYaxis()->SetTitle("Y Position");
+
+  // Hit position in GAPS volume
+  HitCortina = new TH3F("HitCortina", "", 180, -1800.0, 1800.0,
+		     180, -1800.0, 1800.0,
+		     110, 0.0, 2200.0 );
+  HitCortina->GetXaxis()->SetTitle("X Position");
+  HitCortina->GetYaxis()->SetTitle("Y Position");
+
+  // Hit position in GAPS volume
+  HitUmbrella = new TH3F("HitUmbrella", "", 180, -1800.0, 1800.0,
+		     180, -1800.0, 1800.0,
+		     110, 0.0, 2200.0 );
+  HitUmbrella->GetXaxis()->SetTitle("X Position");
+  HitUmbrella->GetYaxis()->SetTitle("Y Position");
+
+  // Average Charge vs position along paddle
+  for (int b = 0; b < NPAD; b++) {
+    sprintf(text, "QvPosition[%d]", b);
+    QvPosition[b] = new TProfile(text, "", 190, -95.0, 95.0);
+    QvPosition[b]->GetXaxis()->SetTitle("Position");
+    QvPosition[b]->GetYaxis()->SetTitle("Avg Charge");
+    QvPosition[b]->SetMinimum(0);
+    QvPosition[b]->SetMaximum(70);
+    //QvPosition[b]->SetStats(false);
+  }
+
   //rao  number of paddles hit upper, lower and outer
-  NPaddlesCube = new TH1D("NPaddles Hit Cube", "", 12, -1.5, 10.5);
+  NPaddlesCube = new TH1I("NPaddles Hit Cube", "", 12, -1.5, 10.5);
   NPaddlesCube->GetXaxis()->SetTitle("NPaddes Hit Cube");
   NPaddlesCube->GetYaxis()->SetTitle("Counts");
   
-  NPaddlesUpper = new TH1D("NPaddles Hit Upper", "", 12, -1.5, 10.5);
+  NPaddlesUpper = new TH1I("NPaddles Hit Upper", "", 12, -1.5, 10.5);
   NPaddlesUpper->GetXaxis()->SetTitle("NPaddes Hit Upper");
   NPaddlesUpper->GetYaxis()->SetTitle("Counts");
   
-  NPaddlesLower = new TH1D("NPaddles Hit Lower", "", 12, -1.5, 10.5);
+  NPaddlesLower = new TH1I("NPaddles Hit Lower", "", 12, -1.5, 10.5);
   NPaddlesLower->GetXaxis()->SetTitle("NPaddes Hit Lower");
   NPaddlesLower->GetYaxis()->SetTitle("Counts");
   
-  NPaddlesOuter = new TH1D("NPaddles Hit Outer", "", 12, -1.5, 10.5);
+  NPaddlesOuter = new TH1I("NPaddles Hit Outer", "", 12, -1.5, 10.5);
   NPaddlesOuter->GetXaxis()->SetTitle("NPaddes Hit Outer");
   NPaddlesOuter->GetYaxis()->SetTitle("Counts");
 
@@ -315,6 +411,12 @@ void EventGAPS::WriteHistograms() {
     Charge_cut[i]->Write();
   }
   for (int j = 0; j < NPAD; j++) QEnd2End[j]->Write();
+  HitGAPS->Write();
+  HitCube->Write();
+  HitCortina->Write();
+  HitUmbrella->Write();
+  for (int j = 0; j < NPAD; j++) HitPosition[j]->Write();
+  for (int j = 0; j < NPAD; j++) QvPosition[j]->Write();
   
   //TDCdir->cd();
   for (int i = 0; i < NTOT; i++) tdcCFD[i]->Write();
@@ -410,7 +512,7 @@ void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
   float Vpeak_cut  = 10.0;
   float Charge_cut =  5.0;
   int ahit, bhit;
-  float sspeed = 15.4; // in cm/s
+  float sspeed = 154.0; // in mm/s
   
   int cube=0, upper=0, outer=0, lower=0;
 
@@ -424,18 +526,24 @@ void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
     ahit = (VPeak[chA] > Vpeak_cut) ? 1 : 0 ;   
     bhit = (VPeak[chB] > Vpeak_cut) ? 2 : 0 ;   
     Hits[i] = ahit + bhit;
-
-    if (Hits[i] > 2) { // We have hits on both ends of paddle
+    IsHit[i] = false; // Flag that we don't have Hit info
+    
+    if (Hits[i] == 3) { // We have hits on both ends of paddle
       float tdc_diff = TDC[chA] - TDC[chB];
       float delta_pos = tdc_diff*sspeed/2.0;
-      // Now, use the position of the paddle to find the hit location
-      int orient = 0; // 0->x, 1->y, 2->z
+      // Now, use position and orientation of paddle to find hit location
+      int sign = (PadO[i] > 0 ? 1 : -1); 
+      int orient = ABS(PadO[i]);
+      delta[i] = delta_pos/10.0;
       HitX[i] = PadX[i];
       HitY[i] = PadY[i];
       HitZ[i] = PadZ[i];
-      if (orient ==0) HitX[i] += delta_pos;
-      if (orient ==1) HitY[i] += delta_pos;
-      if (orient ==2) HitZ[i] += delta_pos;
+      if (orient == 1) HitX[i] += sign*delta_pos; 
+      if (orient == 2) HitY[i] += sign*delta_pos;
+      if (orient == 3) HitZ[i] += sign*delta_pos;
+      if (TDC[chA]>100 && TDC[chA]<200 && TDC[chB]>100 && TDC[chB]<200) 
+      //if (TDC[chA]>95 && TDC[chB]>95) 
+	IsHit[i] = true;
     }
     
     if (Hits[i]>0) {
@@ -497,39 +605,42 @@ void EventGAPS::SetCFDFraction(float CFDS_frac){
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void EventGAPS::FillChannelHistos(void) {
+void EventGAPS::FillChannelHistos(int old=0) {
   // This section of code stores histos with channel numbers based on
-  // RBs. Histo channel = SiPM Channel = (RB-1)*NCH+rbch
-  /*for (int i=0; i<NTOT; i++) {
-    pedHist[i]->Fill(Pedestal[i]);
-    pedRMSHist[i]->Fill(PedRMS[i]);
-    Peak[i]->Fill(VPeak[i]);
-    Charge[i]->Fill(QInt[i]);
-    if (QInt[i]>1.0) Charge_cut[i]->Fill(QInt[i]);
-
-    tdcCFD[i]->Fill(TDC[i]);
-    }*/
-
-  // This section of code stores histos with channel numbers based on
-  // paddles. For paddle N, Histo[N/N+1] = PaddleA/B SiPM
-  for (int i=0; i<NPAD; i++) {
-    if (Paddle_A[i] > 0) { 
-      int ch = 2*i;
-      pedHist[ch-1]->Fill(Pedestal[Paddle_A[i]]);
-      pedHist[ch]->Fill(Pedestal[Paddle_B[i]]);
-      pedRMSHist[ch-1]->Fill(PedRMS[Paddle_A[i]]);
-      pedRMSHist[ch]->Fill(PedRMS[Paddle_B[i]]);
+  // RBs. Histo channel = SiPM Channel = (RB-1)*NCH+rbch  
+  if (old) {
+    for (int i=0; i<NTOT; i++) {
+      pedHist[i]->Fill(Pedestal[i]);
+      pedRMSHist[i]->Fill(PedRMS[i]);
+      Peak[i]->Fill(VPeak[i]);
+      Charge[i]->Fill(QInt[i]);
+      if (QInt[i]>5.0) Charge_cut[i]->Fill(QInt[i]);
       
-      Peak[ch-1]->Fill(VPeak[Paddle_A[i]]);
-      Peak[ch]->Fill(VPeak[Paddle_B[i]]);
-      
-      Charge[ch-1]->Fill(QInt[Paddle_A[i]]);
-      Charge[ch]->Fill(QInt[Paddle_B[i]]);
-      if (QInt[Paddle_A[i]]>1.0) Charge_cut[ch-1]->Fill(QInt[Paddle_A[i]]);
-      if (QInt[Paddle_B[i]]>1.0) Charge_cut[ch]->Fill(QInt[Paddle_B[i]]);
-      
-      tdcCFD[ch-1]->Fill(TDC[Paddle_A[i]]);
-      tdcCFD[ch]->Fill(TDC[Paddle_B[i]]);
+      tdcCFD[i]->Fill(TDC[i]);
+    }
+  } else {
+    // This is the default way to store the histograms in the root file
+    // This section of code stores histos with channel numbers based on
+    // paddles. For paddle N, Histo[N/N+1] = PaddleA/B SiPM
+    for (int i=0; i<NPAD; i++) {
+      if (Paddle_A[i] > 0) { 
+	int ch = 2*i;
+	pedHist[ch-1]->Fill(Pedestal[Paddle_A[i]]);
+	pedHist[ch]->Fill(Pedestal[Paddle_B[i]]);
+	pedRMSHist[ch-1]->Fill(PedRMS[Paddle_A[i]]);
+	pedRMSHist[ch]->Fill(PedRMS[Paddle_B[i]]);
+	
+	Peak[ch-1]->Fill(VPeak[Paddle_A[i]]);
+	Peak[ch]->Fill(VPeak[Paddle_B[i]]);
+	
+	Charge[ch-1]->Fill(QInt[Paddle_A[i]]);
+	Charge[ch]->Fill(QInt[Paddle_B[i]]);
+	if (QInt[Paddle_A[i]]>5.0) Charge_cut[ch-1]->Fill(QInt[Paddle_A[i]]);
+	if (QInt[Paddle_B[i]]>5.0) Charge_cut[ch]->Fill(QInt[Paddle_B[i]]);
+	
+	tdcCFD[ch-1]->Fill(TDC[Paddle_A[i]]);
+	tdcCFD[ch]->Fill(TDC[Paddle_B[i]]);
+      }
     }
   }
 }
@@ -541,14 +652,23 @@ void EventGAPS::FillChannelHistos(void) {
 void EventGAPS::FillPaddleHistos(void) {
   
   for (int i=0; i<NPAD; i++) {
-    if (Paddle_A[i] > 0) { // Paddle-channel map exists                    
+    if (Paddle_A[i] > 0) { // Paddle-channel map exists
       QEnd2End[i]->Fill(QInt[Paddle_A[i]], QInt[Paddle_B[i]]);
       HitMask[i]->Fill(Hits[i]);
       if ( TDC[Paddle_A[i]] > 0 && TDC[Paddle_B[i]] > 0 )
-        tDiff[i]->Fill(TDC[Paddle_A[i]] - TDC[Paddle_B[i]]);
+	tDiff[i]->Fill(TDC[Paddle_A[i]] - TDC[Paddle_B[i]]);
+      if (IsHit[i]) { // Both ends of paddle hit
+	HitPosition[i]->Fill(delta[i]);
+	HitGAPS->Fill(HitX[i], HitY[i], HitZ[i]);
+	if (i<61) HitCube->Fill(HitX[i], HitY[i], HitZ[i]);
+	else if (i<109) HitUmbrella->Fill(HitX[i], HitY[i], HitZ[i]);
+	else if (i<161) HitCortina->Fill(HitX[i], HitY[i], HitZ[i]);
+	float q_ave = (QInt[Paddle_A[i]] + QInt[Paddle_B[i]]) / 2.0;
+	QvPosition[i]->Fill(delta[i], q_ave);
+      }
     }
   }
-
+    
   NPaddlesCube->Fill(NPadCube);
   NPaddlesUpper->Fill(NPadUpper);
   NPaddlesLower->Fill(NPadLower);
