@@ -154,20 +154,18 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
                 // MSB fourth 8 bits are 
                 let id: u8 = (value & MASK_CMD_8BIT) as u8;
 
-                if tof_component == TofComponent::Unknown {
-                  info!("The command is not valid for {}", TofComponent::Unknown);
-                  // The packet was not for this RB so bye
-                  continue;
-                } else {
-                  match tof_component {
-                    TofComponent::TofCpu => return_val = crate::send_ping_response(resp_socket),
-                    TofComponent::RB  |
-                    TofComponent::LTB |
-                    TofComponent::MT     => return_val = crate::send_ping(resp_socket, outgoing_c,  tof_component, id),
-                    _                    => {
-                      error!("The ping command is not implemented for this TofComponent!");
-                      return_val = Err(CmdError::NotImplementedError);
-                    }
+                match tof_component {
+                  TofComponent::TofCpu => {
+                    return_val = crate::send_ping_response(resp_socket)
+                  },
+                  TofComponent::RB  |
+                  TofComponent::LTB |
+                  TofComponent::MT     => {
+                    return_val = crate::send_ping(resp_socket, outgoing_c,  tof_component, id)
+                  },
+                  _                    => {
+                    error!("The ping command is not implemented for this TofComponent!");
+                    return_val = Err(CmdError::NotImplementedError);
                   }
                 }
               },
@@ -178,19 +176,18 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
                 // MSB fourth 8 bits are 
                 let id: u8 = (value & MASK_CMD_8BIT) as u8;
 
-                if tof_component == TofComponent::Unknown {
-                  // The packet was not for this RB so bye
-                  continue;
-                } else {
-                  match tof_component {
-                    TofComponent::TofCpu => return_val = crate::send_moni_response(resp_socket),
-                    TofComponent::RB  |
-                    TofComponent::LTB |
-                    TofComponent::MT     => return_val = crate::send_moni(resp_socket, outgoing_c,  tof_component, id),
-                    _                    => {
-                      error!("The moni command is not implemented for this TofComponent!");
-                      return_val = Err(CmdError::NotImplementedError);
-                    }
+                match tof_component {
+                  TofComponent::TofCpu         => {
+                    return_val = crate::send_moni_response(resp_socket)
+                  },
+                  TofComponent::RB  |
+                  TofComponent::LTB |
+                  TofComponent::MT             => {
+                    return_val = crate::send_moni(resp_socket, outgoing_c,  tof_component, id)
+                  },
+                  _                            => {
+                    error!("The moni command is not implemented for this TofComponent!");
+                    return_val = Err(CmdError::NotImplementedError);
                   }
                 }
               },
@@ -205,6 +202,10 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
                 // TODO implement proper routines
 
                 match tof_component {
+                  TofComponent::AllButTofCpu      |
+                  TofComponent::AllButTofCpuMT => {
+                    continue
+                  },
                   TofComponent::All      |
                   TofComponent::MT       |
                   TofComponent::AllButMT => {

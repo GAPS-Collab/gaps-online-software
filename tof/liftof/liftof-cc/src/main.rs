@@ -281,6 +281,7 @@ fn main() {
   let one_minute = time::Duration::from_millis(60000);
   let only_cmd   = args.only_cmd;
   // no cpu monitoring for cmdline calibration tasks
+  let one_second = time::Duration::from_millis(1000);
   if !only_cmd {
     if !cali_from_cmdline && cpu_moni_interval > 0 {
       println!("==> Starting main monitoring thread...");
@@ -344,7 +345,6 @@ fn main() {
     } // end for loop over nboards
     println!("==> All RB threads started!");
     
-    let one_second = time::Duration::from_millis(1000);
     println!("==> Starting RB commander thread!");
     let _cmd_receiver_rb_comms = cmd_receiver.clone();
     let _rb_cmd_thread = thread::Builder::new()
@@ -406,6 +406,7 @@ fn main() {
       exit(0);
     })
     .expect("Error setting Ctrl-C handler");
+  }
 
   let return_val: Result<TofCommandCode, CmdError>;
   let cmd_sender_c = cmd_sender.clone();
@@ -436,13 +437,14 @@ fn main() {
       return_val = Ok(TofCommandCode::CmdListen);
     },
     Command::Ping(ping_cmd) => {
-      match ping_cmd.component {
+      let component = TofComponent::from(ping_cmd.component);
+      match component {
         TofComponent::TofCpu => return_val = liftof_cc::send_ping_response(None),
         TofComponent::RB  |
         TofComponent::LTB |
         TofComponent::MT     => return_val = liftof_cc::send_ping(None,
                                                                   cmd_sender_c,
-                                                                  ping_cmd.component,
+                                                                  component,
                                                                   ping_cmd.id),
         _                    => {
           error!("The ping command is not implemented for this TofComponent!");
@@ -451,13 +453,14 @@ fn main() {
       }
     },
     Command::Moni(moni_cmd) => {
-      match moni_cmd.component {
+      let component = TofComponent::from(moni_cmd.component);
+      match component {
         TofComponent::TofCpu => return_val = liftof_cc::send_moni_response(None),
         TofComponent::RB    |
         TofComponent::LTB   |
         TofComponent::MT     => return_val = liftof_cc::send_moni(None,
                                                                   cmd_sender_c,
-                                                                  moni_cmd.component,
+                                                                  component,
                                                                   moni_cmd.id),
         _                    => {
           error!("The moni command is not implemented for this TofComponent!");
@@ -477,7 +480,7 @@ fn main() {
           let power_status_enum: PowerStatusEnum = power_status.status;
           return_val = liftof_cc::send_power(None,
                                                                   cmd_sender_c,
-                                                                  TofComponent::All,
+                                                                  TofComponent::AllButTofCpu,
                                                                   power_status_enum);
         },
         PowerCmd::MT(power_status) => {
@@ -491,11 +494,11 @@ fn main() {
           let power_status_enum: PowerStatusEnum = power_status.status;
           return_val = liftof_cc::send_power(None,
                                                                   cmd_sender_c,
-                                                                  TofComponent::AllButMT,
+                                                                  TofComponent::AllButTofCpuMT,
                                                                   power_status_enum);
         },
         PowerCmd::LTB(ltb_power_opts) => {
-          let power_status_enum: PowerStatusEnum = ltb_power_opts.status;
+          let power_status_enum: PowerStatusEnum = PowerStatusEnum::from(ltb_power_opts.status);
           let ltb_id = ltb_power_opts.id;
           return_val = liftof_cc::send_power_id(None,
                                                                   cmd_sender_c,
@@ -504,14 +507,13 @@ fn main() {
                                                                   ltb_id);
         },
         PowerCmd::Preamp(preamp_power_opts) => {
-          let power_status_enum: PowerStatusEnum = preamp_power_opts.status;
+          let power_status_enum: PowerStatusEnum = PowerStatusEnum::from(preamp_power_opts.status);
           let preamp_id = preamp_power_opts.id;
-          let preamp_bias = preamp_power_opts.bias;
-          return_val = liftof_cc::send_power_preamp(None,
+          return_val = liftof_cc::send_power_id(None,
                                                                   cmd_sender_c,
+                                                                  TofComponent::Preamp,
                                                                   power_status_enum,
-                                                                  preamp_id,
-                                                                  preamp_bias);
+                                                                  preamp_id);
         }
       }
     },
@@ -679,6 +681,5 @@ fn main() {
       println!(">> So long and thanks for all the \u{1F41F} <<"); 
       exit(0);    
     }
-  }
   }
 }

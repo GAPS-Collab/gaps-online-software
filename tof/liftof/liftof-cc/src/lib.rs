@@ -3,8 +3,7 @@ use liftof_lib::{PowerStatusEnum, TofComponent, LTBThresholdName};
 use tof_dataclasses::errors::CmdError;
 use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::commands::{
-    TofCommand,
-    TofCommandCode,
+    RBCommand, TofCommand, TofCommandCode
     //TofCommandResp,
     //TofResponse
 };
@@ -55,11 +54,11 @@ pub fn send_power_response(resp_socket_opt: Option<Socket>,
       match resp_socket.send(tp.to_bytestream(), 0) {
         Err(err) => {
           error!("Unable to reply to command, error{err}");
-          return Err(CmdError::MoniError);
+          return Err(CmdError::PowerError);
         },
         Ok(_)    => {
           info!("Replied to moni command");
-          return Ok(TofCommandCode::CmdMoni)
+          return Ok(TofCommandCode::CmdPower)
         }
       }
     }
@@ -73,7 +72,17 @@ pub fn send_power(resp_socket_opt: Option<Socket>,
                   power_status: PowerStatusEnum)
                   -> Result<TofCommandCode, CmdError> {
   // no ID in the payload
-  let payload: u32 = PAD_CMD_32BIT | (component as u32) << 24 | (power_status as u32);
+  let component_c: TofComponent;
+  // Needed to avoid double reply from tofcpu
+  match component {
+    TofComponent::All      => component_c = TofComponent::AllButTofCpu,
+    TofComponent::AllButMT => component_c = TofComponent::AllButTofCpuMT,
+    _                      => component_c = component
+  }
+  // THERE IS SORT OF A PER-BYTE BIG-ENDIANNESS INSIDE PAYLOAD :(
+  // PLS BEWARE OF THE ORDER!!!!
+  let payload: u32 = PAD_CMD_32BIT | (component_c as u32) << 16 | (power_status as u32) << 24;
+  info!("payload {payload}");
   let power = TofCommand::Power(payload);
   
   let tp = TofPacket::from(&power);
@@ -85,7 +94,7 @@ pub fn send_power(resp_socket_opt: Option<Socket>,
       return Err(CmdError::PowerError);
     },
     Ok(_)    => {
-      info!("Power command sent to RBs")
+      info!("Power command sent to {component}")
     }
   }
   
@@ -113,7 +122,7 @@ pub fn send_power_id(resp_socket_opt: Option<Socket>,
                      power_status: PowerStatusEnum,
                      component_id: u8)
                      -> Result<TofCommandCode, CmdError> {
-  let payload: u32 = PAD_CMD_32BIT | (component as u32) << 24 | (component_id as u32) << 16 | (power_status as u32);
+  let payload: u32 = PAD_CMD_32BIT | (component as u32) << 8 | (component_id as u32) << 16 | (power_status as u32) << 24;
   let power_id = TofCommand::Power(payload);
   
   let tp = TofPacket::from(&power_id);
@@ -125,59 +134,7 @@ pub fn send_power_id(resp_socket_opt: Option<Socket>,
       return Err(CmdError::PowerError);
     },
     Ok(_)    => {
-      info!("Power command sent to component")
-    }
-  }
-  
-  match resp_socket_opt {
-    None => Ok(TofCommandCode::CmdPower),
-    Some(resp_socket) => {
-      match resp_socket.send(tp_c.to_bytestream(), 0) {
-        Err(err) => {
-          error!("Unable to reply to command, error{err}");
-          return Err(CmdError::PowerError);
-        },
-        Ok(_)    => {
-          info!("Replied to power command");
-          return Ok(TofCommandCode::CmdPower)
-        }
-      }
-    }
-  }
-}
-
-/// Power function that targets the component specified with supplied ID
-pub fn send_power_preamp(resp_socket_opt: Option<Socket>,
-                         outgoing: Sender<TofPacket>,
-                         power_status: PowerStatusEnum,
-                         preamp_id: u8,
-                         preamp_bias: u16)
-                         -> Result<TofCommandCode, CmdError> {
-  // bias only if ON and Cycle
-  let payload: u32 = match power_status {
-    PowerStatusEnum::OFF => 
-      (TofComponent::Preamp as u32) << 16 | (preamp_id as u32) << 8 | 0u32,
-    PowerStatusEnum::ON => 
-      (TofComponent::Preamp as u32) << 16 | (preamp_id as u32) << 8 | preamp_bias as u32,
-    PowerStatusEnum::Cycle => 
-      (TofComponent::Preamp as u32) << 16 | (preamp_id as u32) << 8 | preamp_bias as u32,
-    _ => {
-      warn!("Status unknown, not doing stuff.");
-      return Err(CmdError::PowerError);
-    }
-  };
-  let power_preamp = TofCommand::Power(payload);
-  
-  let tp = TofPacket::from(&power_preamp);
-  let tp_c: TofPacket = tp.clone();
-  
-  match outgoing.send(tp) {
-    Err(err) => {
-      error!("Unable to send command, error{err}");
-      return Err(CmdError::PowerError);
-    },
-    Ok(_)    => {
-      info!("Power command sent to Preamps")
+      info!("Power command sent to {component}")
     }
   }
   
@@ -207,7 +164,7 @@ pub fn send_default_calibration(resp_socket_opt: Option<Socket>,
                                 extra: u8)
                                 -> Result<TofCommandCode, CmdError> {
   let payload: u32
-    = (voltage_level as u32) << 16 | (rb_id as u32) << 8 | (extra as u32);
+    = (voltage_level as u32) << 8 | (rb_id as u32) << 16 | (extra as u32) << 24;
   let default_calib = TofCommand::DefaultCalibration(payload);
 
   let tp = TofPacket::from(&default_calib);
@@ -248,7 +205,7 @@ pub fn send_noi_calibration(resp_socket_opt: Option<Socket>,
                             rb_id: u8,
                             extra: u8)
                             -> Result<TofCommandCode, CmdError> {
-  let payload: u32 = PAD_CMD_32BIT | (rb_id as u32) << 8 | (extra as u32);
+  let payload: u32 = PAD_CMD_32BIT | (rb_id as u32) << 16 | (extra as u32) << 24;
   let noi_calib = TofCommand::NoiCalibration(payload);
 
   let tp = TofPacket::from(&noi_calib);
@@ -257,7 +214,7 @@ pub fn send_noi_calibration(resp_socket_opt: Option<Socket>,
   match outgoing.send(tp) {
     Err(err) => {
       error!("Unable to send command, error{err}");
-      return Err(CmdError::PowerError);
+      return Err(CmdError::CalibrationError);
     },
     Ok(_)    => {
       info!("Calibration command sent")
@@ -291,7 +248,7 @@ pub fn send_voltage_calibration(resp_socket_opt: Option<Socket>,
                                 extra: u8)
                                 -> Result<TofCommandCode, CmdError> {
   let payload: u32
-    = (voltage_level as u32) << 16 | (rb_id as u32) << 8 | (extra as u32);
+    = (voltage_level as u32) | (rb_id as u32) << 16 | (extra as u32) << 24;
   let voltage_calib = TofCommand::VoltageCalibration(payload);
 
   let tp = TofPacket::from(&voltage_calib);
@@ -300,7 +257,7 @@ pub fn send_voltage_calibration(resp_socket_opt: Option<Socket>,
   match outgoing.send(tp) {
     Err(err) => {
       error!("Unable to send command, error{err}");
-      return Err(CmdError::PowerError);
+      return Err(CmdError::CalibrationError);
     },
     Ok(_)    => {
       info!("Calibration command sent")
@@ -334,7 +291,7 @@ pub fn send_timing_calibration(resp_socket_opt: Option<Socket>,
                                extra: u8)
                                -> Result<TofCommandCode, CmdError> {
   let payload: u32
-    = (voltage_level as u32) << 16 | (rb_id as u32) << 8 | (extra as u32);
+    = (voltage_level as u32) | (rb_id as u32) << 16 | (extra as u32) << 24;
   let timing_calib = TofCommand::TimingCalibration(payload);
 
   let tp = TofPacket::from(&timing_calib);
@@ -343,7 +300,7 @@ pub fn send_timing_calibration(resp_socket_opt: Option<Socket>,
   match outgoing.send(tp) {
     Err(err) => {
       error!("Unable to send command, error{err}");
-      return Err(CmdError::PowerError);
+      return Err(CmdError::CalibrationError);
     },
     Ok(_)    => {
       info!("Calibration command sent")
@@ -376,7 +333,7 @@ pub fn send_ltb_threshold_set(resp_socket_opt: Option<Socket>,
                               threshold_level: u16)
                               -> Result<TofCommandCode, CmdError> {
   let payload: u32
-  = (ltb_id as u32) << 24 | (threshold_name as u32) << 16 | (threshold_level as u32);
+  = (ltb_id as u32) | (threshold_name as u32) << 8 | (threshold_level as u32) << 16;
   let ltb_threshold = TofCommand::SetThresholds(payload);
 
   let tp = TofPacket::from(&ltb_threshold);
@@ -385,7 +342,7 @@ pub fn send_ltb_threshold_set(resp_socket_opt: Option<Socket>,
   match outgoing.send(tp) {
     Err(err) => {
       error!("Unable to send command, error{err}");
-      return Err(CmdError::PowerError);
+      return Err(CmdError::ThresholdSetError);
     },
     Ok(_)    => {
       info!("Threshold set command sent")
@@ -417,7 +374,7 @@ pub fn send_preamp_bias_set(resp_socket_opt: Option<Socket>,
                             preamp_bias: u16)
                             -> Result<TofCommandCode, CmdError> {
   let payload: u32
-  = PAD_CMD_32BIT | (preamp_id as u32) << 16 | (preamp_bias as u32);
+  = PAD_CMD_32BIT | (preamp_id as u32) << 8 | (preamp_bias as u32) << 16;
   let preamp_bias = TofCommand::SetPreampBias(payload);
 
   let tp = TofPacket::from(&preamp_bias);
@@ -426,7 +383,7 @@ pub fn send_preamp_bias_set(resp_socket_opt: Option<Socket>,
   match outgoing.send(tp) {
     Err(err) => {
       error!("Unable to send command, error{err}");
-      return Err(CmdError::PowerError);
+      return Err(CmdError::ThresholdSetError);
     },
     Ok(_)    => {
       info!("Preamp bias set command sent")
@@ -459,7 +416,7 @@ pub fn send_run_start(resp_socket_opt: Option<Socket>,
                       event_no: u8)
                       -> Result<TofCommandCode, CmdError> {
   let payload: u32
-  = PAD_CMD_32BIT | (run_type as u32) << 16 | (rb_id as u32) << 8 | (event_no as u32);
+  = PAD_CMD_32BIT | (run_type as u32) << 8 | (rb_id as u32) << 16 | (event_no as u32) << 24;
   let run_start = TofCommand::DataRunStart(payload);
 
   let tp = TofPacket::from(&run_start);
@@ -468,7 +425,7 @@ pub fn send_run_start(resp_socket_opt: Option<Socket>,
   match outgoing.send(tp) {
     Err(err) => {
       error!("Unable to send command, error{err}");
-      return Err(CmdError::PowerError);
+      return Err(CmdError::RunStartError);
     },
     Ok(_)    => {
       info!("Start run command sent")
@@ -498,7 +455,7 @@ pub fn send_run_stop(resp_socket_opt: Option<Socket>,
                      outgoing: Sender<TofPacket>,
                      rb_id: u8)
                      -> Result<TofCommandCode, CmdError> {
-  let payload: u32 = PAD_CMD_32BIT | (rb_id as u32);
+  let payload: u32 = PAD_CMD_32BIT | (rb_id as u32) << 24;
   let run_stop = TofCommand::DataRunStop(payload);
 
   let tp = TofPacket::from(&run_stop);
@@ -507,7 +464,7 @@ pub fn send_run_stop(resp_socket_opt: Option<Socket>,
   match outgoing.send(tp) {
     Err(err) => {
       error!("Unable to send command, error{err}");
-      return Err(CmdError::PowerError);
+      return Err(CmdError::RunStopError);
     },
     Ok(_)    => {
       info!("Stop run command sent")
@@ -537,7 +494,7 @@ pub fn send_ping(resp_socket_opt: Option<Socket>,
                  tof_component: TofComponent,
                  id: u8)
                  -> Result<TofCommandCode, CmdError> {
-  let payload: u32 = PAD_CMD_32BIT | (tof_component as u32) << 8 | (id as u32);
+  let payload: u32 = PAD_CMD_32BIT | (tof_component as u32) << 16 | (id as u32) << 24;
   let ping = TofCommand::Ping(payload);
 
   let tp = TofPacket::from(&ping);
@@ -578,7 +535,7 @@ pub fn send_ping_response(resp_socket_opt: Option<Socket>)
   tp.payload = vec![TofComponent::TofCpu as u8, 0u8];
   
   match resp_socket_opt {
-    None => Ok(TofCommandCode::CmdPower),
+    None => Ok(TofCommandCode::CmdPing),
     Some(resp_socket) => {
       match resp_socket.send(tp.to_bytestream(), 0) {
         Err(err) => {
@@ -600,7 +557,7 @@ pub fn send_moni(resp_socket_opt: Option<Socket>,
                  tof_component: TofComponent,
                  id: u8)
                  -> Result<TofCommandCode, CmdError> {
-  let payload: u32 = PAD_CMD_32BIT | (tof_component as u32) << 8 | (id as u32);
+  let payload: u32 = PAD_CMD_32BIT | (tof_component as u32) << 16 | (id as u32) << 24;
   let moni = TofCommand::Moni(payload);
 
   let tp = TofPacket::from(&moni);
@@ -609,7 +566,7 @@ pub fn send_moni(resp_socket_opt: Option<Socket>,
   match outgoing.send(tp) {
     Err(err) => {
       error!("Unable to send command, error{err}");
-      return Err(CmdError::PowerError);
+      return Err(CmdError::MoniError);
     },
     Ok(_)    => {
       info!("Moni command sent")
@@ -641,7 +598,7 @@ pub fn send_moni_response(resp_socket_opt: Option<Socket>)
   tp.payload = vec![TofComponent::TofCpu as u8, 0u8];
   
   match resp_socket_opt {
-    None => Ok(TofCommandCode::CmdPower),
+    None => Ok(TofCommandCode::CmdMoni),
     Some(resp_socket) => {
       match resp_socket.send(tp.to_bytestream(), 0) {
         Err(err) => {
@@ -662,7 +619,7 @@ pub fn send_systemd_reboot(resp_socket_opt: Option<Socket>,
                   outgoing: Sender<TofPacket>,
                            id: u8)
                            -> Result<TofCommandCode, CmdError> {
-  let payload: u32 = PAD_CMD_32BIT | (id as u32);
+  let payload: u32 = PAD_CMD_32BIT | (id as u32) << 24;
   let systemd_reboot = TofCommand::SystemdReboot(payload);
 
   let tp = TofPacket::from(&systemd_reboot);
@@ -671,7 +628,7 @@ pub fn send_systemd_reboot(resp_socket_opt: Option<Socket>,
   match outgoing.send(tp) {
     Err(err) => {
       error!("Unable to send command, error{err}");
-      return Err(CmdError::PowerError);
+      return Err(CmdError::SystemdRebootError);
     },
     Ok(_)    => {
       info!("Systemd reboot command sent")
@@ -679,7 +636,7 @@ pub fn send_systemd_reboot(resp_socket_opt: Option<Socket>,
   }
   
   match resp_socket_opt {
-    None => Ok(TofCommandCode::CmdPower),
+    None => Ok(TofCommandCode::CmdSystemdReboot),
     Some(resp_socket) => {
       match resp_socket.send(tp_c.to_bytestream(), 0) {
         Err(err) => {

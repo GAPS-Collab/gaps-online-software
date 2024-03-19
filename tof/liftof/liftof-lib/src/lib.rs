@@ -782,13 +782,13 @@ pub struct ListenCmd { }
 pub struct PingCmd {
   /// Component to target
   #[arg(value_parser = clap::builder::PossibleValuesParser::new([
-          TofComponent::TofCpu,
-          TofComponent::MT,
-          TofComponent::RB,
-          TofComponent::LTB
+          "TofCpu",
+          "MT",
+          "RB",
+          "LTB"
         ]),
         required = true)]
-  pub component: TofComponent,
+  pub component: String,
   /// Component ID
   #[arg(required = true)]
   pub id: u8
@@ -798,13 +798,13 @@ pub struct PingCmd {
 pub struct MoniCmd {
   /// Component to target
   #[arg(value_parser = clap::builder::PossibleValuesParser::new([
-          TofComponent::TofCpu,
-          TofComponent::MT,
-          TofComponent::RB,
-          TofComponent::LTB
+          "TofCpu",
+          "MT",
+          "RB",
+          "LTB"
         ]),
         required = true)]
-  pub component: TofComponent,
+  pub component: String,
   /// Component ID
   #[arg(required = true)]
   pub id: u8
@@ -1059,9 +1059,9 @@ pub enum PowerCmd {
 pub struct PowerStatus {
   /// Which power status one wants to achieve
   #[arg(value_parser = clap::builder::PossibleValuesParser::new([
-          PowerStatusEnum::OFF,
-          PowerStatusEnum::ON,
-          PowerStatusEnum::Cycle
+          "OFF",
+          "ON",
+          "Cycle"
         ]),
         required = true)]
   pub status: PowerStatusEnum
@@ -1078,23 +1078,27 @@ impl PowerStatus {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
 #[repr(u8)]
 pub enum TofComponent {
-  Unknown   = 0u8,
-  /// everything (LTB + preamps + MT)
-  All       = 1u8,
-  /// everything but MT (LTB + preamps)
-  AllButMT  = 2u8,
+  Unknown        = 0u8,
+  /// everything (TofCpu + LTB + preamps + MT)
+  All            = 1u8,
+  /// everything but MT (TofCpu + LTB + preamps)
+  AllButMT       = 2u8,
   /// TOF CPU
-  TofCpu    = 3u8,
+  TofCpu         = 3u8,
+  /// everything but TofCpu (LTB + preamps + MT)
+  AllButTofCpu   = 4u8,
+  /// everything but TofCpu and MT (LTB + preamps)
+  AllButTofCpuMT = 5u8,
   /// MT alone
-  MT        = 10u8,
+  MT             = 10u8,
   /// all or specific RBs
-  RB        = 20u8,
+  RB             = 20u8,
   /// all or specific PBs
-  PB        = 30u8,
+  PB             = 30u8,
   /// all or specific LTBs
-  LTB       = 40u8,
+  LTB            = 40u8,
   /// all or specific preamp
-  Preamp    = 50u8
+  Preamp         = 50u8
 }
 
 impl fmt::Display for TofComponent {
@@ -1112,6 +1116,8 @@ impl From<u8> for TofComponent {
       1u8  => TofComponent::All,
       2u8  => TofComponent::AllButMT,
       3u8  => TofComponent::TofCpu,
+      4u8  => TofComponent::AllButTofCpu,
+      5u8  => TofComponent::AllButTofCpuMT,
       10u8 => TofComponent::MT,
       20u8 => TofComponent::RB,
       30u8 => TofComponent::PB,
@@ -1122,18 +1128,21 @@ impl From<u8> for TofComponent {
   }
 }
 
-impl From<TofComponent> for clap::builder::Str {
-  fn from(value: TofComponent) -> Self {
-    match value {
-      TofComponent::Unknown  => clap::builder::Str::from("Unknown"),
-      TofComponent::All      => clap::builder::Str::from("All"),
-      TofComponent::AllButMT => clap::builder::Str::from("AllButMT"),
-      TofComponent::TofCpu   => clap::builder::Str::from("TofCpu"),
-      TofComponent::MT       => clap::builder::Str::from("MT"),
-      TofComponent::RB       => clap::builder::Str::from("RB"),
-      TofComponent::PB       => clap::builder::Str::from("PB"),
-      TofComponent::LTB      => clap::builder::Str::from("LTB"),
-      TofComponent::Preamp   => clap::builder::Str::from("Preamp")
+impl From<String> for TofComponent {
+  fn from(value: String) -> Self {
+    match value.as_str() {
+      "Unknown"        => TofComponent::Unknown,
+      "All"            => TofComponent::All,
+      "AllButMT"       => TofComponent::AllButMT,
+      "TofCpu"         => TofComponent::TofCpu,
+      "AllButTofCpu"   => TofComponent::AllButTofCpu,
+      "AllButTofCpuMT" => TofComponent::AllButTofCpuMT,
+      "MT"             => TofComponent::MT,
+      "RB"             => TofComponent::RB,
+      "PB"             => TofComponent::PB,
+      "LTB"            => TofComponent::LTB,
+      "Preamp"         => TofComponent::Preamp,
+      _                => TofComponent::Unknown
     }
   }
 }
@@ -1168,13 +1177,14 @@ impl From<u8> for PowerStatusEnum {
   }
 }
 
-impl From<PowerStatusEnum> for clap::builder::Str {
-  fn from(value: PowerStatusEnum) -> Self {
-    match value {
-      PowerStatusEnum::Unknown => clap::builder::Str::from("Unknown"),
-      PowerStatusEnum::OFF     => clap::builder::Str::from("OFF"),
-      PowerStatusEnum::ON      => clap::builder::Str::from("ON"),
-      PowerStatusEnum::Cycle   => clap::builder::Str::from("Cycle")
+impl From<String> for PowerStatusEnum {
+  fn from(value: String) -> Self {
+    match value.as_str() {
+      "Unknown" => PowerStatusEnum::Unknown,
+      "ON"      => PowerStatusEnum::OFF,
+      "OFF"     => PowerStatusEnum::ON,
+      "Cycle"   => PowerStatusEnum::Cycle,
+      _         => PowerStatusEnum::Unknown
     }
   }
 }
@@ -1220,20 +1230,20 @@ impl RBPowerOpts {
 #[derive(Debug, Args, PartialEq)]
 pub struct LTBPowerOpts {
   /// Which power status one wants to achieve
-  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
-          PowerStatusEnum::OFF,
-          PowerStatusEnum::ON,
-          PowerStatusEnum::Cycle
-        ]),
+  #[arg(value_parser = [
+          "OFF",
+          "ON",
+          "Cycle"
+        ],
         required = true)]
-  pub status: PowerStatusEnum,
+  pub status: String,
   /// ID of the LTB to be powered up
   #[arg(short, long, default_value_t = DEFAULT_LTB_ID)]
   pub id: u8
 }
 
 impl LTBPowerOpts {
-  pub fn new(status: PowerStatusEnum, id: u8) -> Self {
+  pub fn new(status: String, id: u8) -> Self {
     Self {
       status,
       id
@@ -1245,26 +1255,22 @@ impl LTBPowerOpts {
 pub struct PreampPowerOpts {
   /// Which power status one wants to achieve
   #[arg(value_parser = clap::builder::PossibleValuesParser::new([
-          PowerStatusEnum::OFF,
-          PowerStatusEnum::ON,
-          PowerStatusEnum::Cycle
+          "OFF",
+          "ON",
+          "Cycle"
         ]),
         required = true)]
-  pub status: PowerStatusEnum,
+  pub status: String,
   /// ID of the preamp to be powered up
   #[arg(short, long, default_value_t = DEFAULT_PREAMP_ID)]
-  pub id: u8,
-  /// Turn on bias of the preamp specified
-  #[arg(short, long, default_value_t = DEFAULT_PREAMP_BIAS)]
-  pub bias: u16
+  pub id: u8
 }
 
 impl PreampPowerOpts {
-  pub fn new(status: PowerStatusEnum, id: u8, bias: u16) -> Self {
+  pub fn new(status: String, id: u8) -> Self {
     Self {
       status,
-      id,
-      bias
+      id
     }
   }
 }
