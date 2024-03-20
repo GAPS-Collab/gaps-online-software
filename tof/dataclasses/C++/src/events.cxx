@@ -1064,7 +1064,7 @@ RBWaveform RBWaveform::from_bytestream(const Vec<u8> &stream,
     //log_error("[RBEvent::from_bytestream] Header signature invalid!");  
     return wf;
   }
-  wf.event_id   = Gaps::parse_u16(stream, pos);
+  wf.event_id   = Gaps::parse_u32(stream, pos);
   wf.rb_id      = Gaps::parse_u8(stream, pos);
   wf.rb_channel = Gaps::parse_u8(stream, pos); 
   Vec<u8>::const_iterator start = stream.begin() + pos;
