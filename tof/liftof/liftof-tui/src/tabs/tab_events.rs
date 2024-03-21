@@ -44,6 +44,7 @@ pub struct EventTab {
   pub queue_size    : usize,
   pub mte_sender    : Sender<MasterTriggerEvent>,
   pub rbe_sender    : Sender<RBEvent>,
+  pub th_sender     : Sender<TofHit>,
   //pub streamer   : Arc<Mutex<VecDeque<String>>>,
   //pub pack_stat  : Arc<Mutex<HashMap<String, usize>>>,
   //pub stream     : String,
@@ -54,16 +55,18 @@ impl EventTab {
   pub fn new(tp_receiver : Receiver<TofPacket>,
              mte_sender  : Sender<MasterTriggerEvent>,
              rbe_sender  : Sender<RBEvent>,
-             theme       : ColorTheme2) -> EventTab {
+             th_sender   : Sender<TofHit>,
+             theme       : ColorTheme2) -> Self {
              //streamer  : Arc<Mutex<VecDeque<String>>>,
              //pack_stat : Arc<Mutex<HashMap<String,usize>>>) -> HomeTab<T> {
-    EventTab {
+    Self {
       theme,
       tp_receiver,
       event_queue : VecDeque::<TofEvent>::new(),
       queue_size  : 1000,
       mte_sender  : mte_sender,
       rbe_sender  : rbe_sender,
+      th_sender   : th_sender,
       //streamer, 
       //pack_stat,
       //stream     : String::from(""),
@@ -83,9 +86,16 @@ impl EventTab {
           Ok(_)    => ()
         }
         for k in ev.rb_events.iter() {
+          let rb_ev = k.clone();
+          for h in rb_ev.hits.iter() {
+            match self.th_sender.send(h.clone()) {
+              Err(err) => error!("Can not send TofHit! {err}"),
+              Ok(_)    => ()
+            }
+          }
           match self.rbe_sender.send(k.clone()) {
-            Err(err) => error!("Can not send RB Event! {err}"),
-            Ok(_)    => {}
+            Err(err) => error!("Can not send RBEvent! {err}"),
+            Ok(_)    => ()
           }
         }
         self.event_queue.push_back(ev);
@@ -107,18 +117,9 @@ impl EventTab {
           [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
       )
       .split(*main_window);
-  
-    let hit_chunks = Layout::default()
-      .direction(Direction::Horizontal)
-      .constraints(
-          [Constraint::Percentage(50), Constraint::Percentage(50)].as_ref(),
-      )
-      .split(status_chunks[1]);
 
     let header      = TofEventHeader::new();
-    let hit         = TofHit::new();
     let mut header_string = header.to_string();
-    let mut hit_string    = hit.to_string(); 
     match self.event_queue.back() {
       None => (),
       Some(ev)   => {
@@ -126,15 +127,6 @@ impl EventTab {
         let info_field = format!("\n --> NRBs {}\n --> NMissingHit {}\n Quality: {}\n CompressionLevel {}",
                                  ev.rb_events.len(), ev.missing_hits.len(), ev.quality, ev.compression_level);
         header_string += &info_field;
-        if ev.rb_events.len() > 0 {
-          if ev.rb_events[0].hits.len() > 0 {
-            hit_string = ev.rb_events[0].hits[0].to_string();
-          } else {
-            hit_string = String::from("NO HIT IN RB!"); 
-          }
-        } else {
-          hit_string = String::from("NO HIT!");
-        }
       }
     }
     let header_view = Paragraph::new(header_string)
@@ -147,16 +139,5 @@ impl EventTab {
           .title("Last TofEvent")
       );
     frame.render_widget(header_view, status_chunks[0]);
-    let hit_view   = Paragraph::new(hit_string)
-      .style(self.theme.style())
-      .alignment(Alignment::Left)
-      .block(
-        Block::default()
-          .borders(Borders::ALL)
-          .border_type(BorderType::Rounded)
-          .title("Last TofHit")
-      );
-    frame.render_widget(hit_view, hit_chunks[0]);
-
   }
 }

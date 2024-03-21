@@ -108,7 +108,7 @@ impl RBTab<'_>  {
              theme       : ColorTheme2) -> RBTab<'static>  {
     let mut rb_select_items = Vec::<ListItem>::new();
     for k in 1..51 {
-      let this_item = format!("RB{:0>2}", k);
+      let this_item = format!("  RB{:0>2}", k);
       rb_select_items.push(ListItem::new(Line::from(this_item)));
     }
 
@@ -210,6 +210,7 @@ impl RBTab<'_>  {
         }
       }
     }
+
     if !self.tp_receiver.is_empty() {
       match self.tp_receiver.try_recv() {
         Err(_err) => (),

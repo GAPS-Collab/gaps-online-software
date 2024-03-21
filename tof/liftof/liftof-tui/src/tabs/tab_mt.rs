@@ -40,7 +40,6 @@ use ndhistogram::axis::{
     Uniform,
 };
 
-
 use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::events::MasterTriggerEvent;
 use tof_dataclasses::monitoring::MtbMoniData;

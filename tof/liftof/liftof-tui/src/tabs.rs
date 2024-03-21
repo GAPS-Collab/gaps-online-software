@@ -4,6 +4,9 @@ pub mod tab_status;
 pub mod tab_settings;
 pub mod tab_events;
 pub mod tab_cpu;
+pub mod tab_rbwaveform;
+pub mod tab_tofsummary;
+pub mod tab_tofhit;
 
 pub use crate::tab_mt::MTTab;
 pub use crate::tab_settings::SettingsTab;
@@ -12,6 +15,10 @@ pub use crate::tab_events::EventTab;
 pub use crate::tab_status::{
         RBTab,
         RBTabView
+};
+pub use crate::tab_tofhit::{
+    TofHitTab,
+    TofHitView,
 };
 pub use crate::tab_cpu::CPUTab;
 
