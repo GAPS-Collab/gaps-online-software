@@ -49,7 +49,7 @@ struct LTBMoniData {
 struct RBMoniData {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
-  static const u8  SIZE = 6;
+  static const u8  SIZE = 151;
 
   u8  board_id           ;  
   /// Rate as recorded by the board itself
