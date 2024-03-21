@@ -41,6 +41,8 @@ struct LTBMoniData {
   std::string to_string() const;
 };
 
+std::ostream& operator<<(std::ostream& os, const LTBMoniData& moni);
+
 /**
  * Sensors on the Readoutboards
  *
