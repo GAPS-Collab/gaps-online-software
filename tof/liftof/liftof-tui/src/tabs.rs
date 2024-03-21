@@ -16,6 +16,9 @@ pub use crate::tab_status::{
         RBTab,
         RBTabView
 };
+
+pub use crate::tab_rbwaveform::RBWaveformTab;
+
 pub use crate::tab_tofhit::{
     TofHitTab,
     TofHitView,

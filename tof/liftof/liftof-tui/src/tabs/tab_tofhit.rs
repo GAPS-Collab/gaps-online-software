@@ -50,7 +50,6 @@ use crate::widgets::{
     create_labels,
 };
 
-
 #[derive(Debug, Clone)]
 pub enum TofHitView {
   Hits,
@@ -58,7 +57,6 @@ pub enum TofHitView {
   Paddles,
   SelectPaddle,
 }
-
 
 #[derive(Debug, Clone)]
 pub struct TofHitTab<'a> {
@@ -96,12 +94,12 @@ pub struct TofHitTab<'a> {
 
 impl TofHitTab<'_> {
   pub fn new(th_recv : Receiver<TofHit>, theme : ColorTheme) -> TofHitTab<'static> {
-    let bins_ph  = Uniform::new(50, -0.5, 199.5);
-    let bins_pt  = Uniform::new(50, -0.5, 399.5);
-    let bins_pc  = Uniform::new(50, -0.5, 499.5);
-    let bins_pa  = Uniform::new(50, -0.5, 179.5);
-    let bins_t0  = Uniform::new(50, -0.5, 199.5);
-    let bins_pid = Uniform::new(160, 0.5, 160.5);
+    let bins_ph    = Uniform::new(50, 0.0, 200.0);
+    let bins_pt    = Uniform::new(50, 0.0, 400.0);
+    let bins_pc    = Uniform::new(50, 0.0, 500.0);
+    let bins_pa    = Uniform::new(50, 0.0, 200.0);
+    let bins_t0    = Uniform::new(50, 0.0, 200.0);
+    let bins_pid   = Uniform::new(160,1.0, 161.0);
     let mut paddle_select_items = Vec::<ListItem>::new();
     let all_pdl = String::from("  All paddles");
     paddle_select_items.push(ListItem::new(Line::from(all_pdl)));
@@ -134,12 +132,11 @@ impl TofHitTab<'_> {
   }
 
   pub fn init_histos(&mut self) {
-    let bins_ph    = Uniform::new(50, -0.5, 199.5);
-    let bins_pt    = Uniform::new(50, -0.5, 399.5);
-    let bins_pc    = Uniform::new(50, -0.5, 499.5);
-    let bins_pa    = Uniform::new(50, -0.5, 179.5);
-    let bins_t0    = Uniform::new(50, -0.5, 199.5);
-    let bins_pid   = Uniform::new(160, -0.5, 159.5);
+    let bins_ph    = Uniform::new(50, 0.0, 200.0);
+    let bins_pt    = Uniform::new(50, 0.0, 400.0);
+    let bins_pc    = Uniform::new(50, 0.0, 500.0);
+    let bins_pa    = Uniform::new(50, 0.0, 200.0);
+    let bins_t0    = Uniform::new(50, 0.0, 200.0);
     self.pha_histo = ndhistogram!(bins_ph.clone());
     self.pta_histo = ndhistogram!(bins_pt.clone());
     self.pca_histo = ndhistogram!(bins_pc.clone());
@@ -466,8 +463,7 @@ impl TofHitTab<'_> {
           },
         }
         frame.render_stateful_widget(paddle_select_list, list_chunks[0], &mut self.pl_state );
-      },
-      _ => ()
+      }
     }
 
   }
