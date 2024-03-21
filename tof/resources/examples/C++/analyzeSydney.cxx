@@ -27,8 +27,10 @@ const int NCH   = 9;
 const int NTOT  = (NCH) * NRB; // NTOT is the number of channels
 const int NPADS = NTOT/2;        // NPAD: 1 per 2 SiPMs
 
-double FitSine(std::vector<double> volts, std::vector<double> times)
+//double FitSine(std::vector<double> volts, std::vector<double> times)
+std::vector<double> FitSine(std::vector<double> volts, std::vector<double> times, float cm)
 {
+  float ns_off = cm*0.08; //Harting cable signal propagation is 5.13 ns/m or 0.0513 ns/cm
   int start_bin = 20;
   int size_bin = 900; //can probably make this smaller
 
@@ -36,6 +38,7 @@ double FitSine(std::vector<double> volts, std::vector<double> times)
   double pi = 3.14159265;
   double a;
   double b;
+  double c;
   double p[3]; // product of fitting equation
   double XiYi = 0.0;
   double XiZi = 0.0;
@@ -58,8 +61,8 @@ double FitSine(std::vector<double> volts, std::vector<double> times)
 //    if (volts[i] > -260.0)
 //    {
 
-      xi = cos(2*pi*0.025*(times[i]));  //for this fit we know the frequency is 0.025 waves/ns
-      yi = sin(2*pi*0.025*(times[i]));
+      xi = cos(2*pi*0.02*(times[i]-ns_off));  //for this fit we know the frequency is 0.02 waves/ns
+      yi = sin(2*pi*0.02*(times[i]-ns_off));
       zi = volts[i];
       XiYi += xi*yi;
       XiZi += xi*zi;
@@ -124,9 +127,19 @@ double FitSine(std::vector<double> volts, std::vector<double> times)
   p[2] = Zi;
   a = X[0][0] * p[0] + X[1][0] * p[1] + X[2][0] * p[2];
   b = X[0][1] * p[0] + X[1][1] * p[1] + X[2][1] * p[2];
-
+  c = X[0][2] * p[0] + X[1][2] * p[1] + X[2][2] * p[2];
   double phi = atan2(a,b);
-  return phi;
+  
+  //return phi;
+
+  double amp2 = pow(a,2)+pow(b,2);
+  
+  std::vector<double> v;
+  v.push_back(phi);
+  v.push_back(amp2);
+  v.push_back(c);
+
+  return v;
 }
 
 
@@ -263,11 +276,11 @@ int main(int argc, char *argv[]){
 	GAPS::Waveform *wave[NTOT];
 	GAPS::Waveform *wch9[NRB];
 	float Ped_low   = 10;
-	float Ped_win   = 50;
+	float Ped_win   = 70;
 	float CThresh   = 5.0;
 	float CFDS_frac = 0.40;
-	float Qwin_low  = 55;
-	float Qwin_size = 400;
+	float Qwin_low  = 75;
+	float Qwin_size = 200;
 	float Ped[NTOT];
 	float PedRMS[NTOT];
 	float Qint[NTOT];
@@ -275,6 +288,9 @@ int main(int argc, char *argv[]){
 	float TCFDS[NTOT];
 	bool  IsHit[NTOT] = {false};
 	float phi[NRB];
+	float amp[NRB];
+	float offs[NRB];
+	float H_len = 0;
 	
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
@@ -331,8 +347,12 @@ int main(int argc, char *argv[]){
 		//printf("\n");
 	      //}
 	      
-	      if (PedRMS[cw] > 2.0) {
+	      if (PedRMS[cw] > 1.0) {
 		highrms++;
+		std::ofstream fileP;
+                fileP.open ("HiRMS_feb.csv", std::ios::app);
+                fileP << evt_ctr << "," << cw << std::endl;
+                fileP.close();
 		continue;
 	      }
 
@@ -349,7 +369,18 @@ int main(int argc, char *argv[]){
 		TCFDS[cw] = wave[cw]->GetTdcs(0);
 		//printf("%ld hit\n",cw);
 
-		phi[rbid] = FitSine(ch9_volts,ch9_times);
+		//phi[rbid] = FitSine(ch9_volts,ch9_times);
+		
+		//RB47 ch0 is 414, RB48 ch0 is 423. Harting cable length in cm
+
+		if (cw == 414 ) H_len = 300;
+		if (cw == 423 ) H_len = 500;
+
+		std::vector<double> v = FitSine(ch9_volts,ch9_times,H_len);
+                phi[rbid] = v[0];
+		amp[rbid] = v[1];
+		offs[rbid] = v[2];
+
 		//printf("EVT %12ld - ch %3ld: %10.5f\n", evt_ctr, cw, TCFDS[cw]);
 	      }		
 	    }
@@ -388,46 +419,46 @@ int main(int argc, char *argv[]){
         
 	if (IsHit[324] && IsHit[325]) {
 
-	  if (TCFDS[324] < 390.0 || TCFDS[325] < 390.0) {
+	/*  if (TCFDS[324] < 90.0 || TCFDS[325] < 90.0) {
 
 	    std::ofstream file2;
-            file2.open ("U1B_tdc0_feb.csv", std::ios::app);
+            file2.open ("RB37_tdc0_feb.csv", std::ios::app);
             file2 << evt_ctr;
             file2 << "," << TCFDS[324] << "," << TCFDS[325] << std::endl;
             file2.close();
           }
 
-	  else {
+	  else { */
             std::ofstream myfile;
-            myfile.open ("U1B_feb.csv", std::ios::app);
+            myfile.open ("RB37.csv", std::ios::app);
             myfile << evt_ctr;
             myfile << "," << TCFDS[324] << "," << TCFDS[325] << std::endl;
             myfile.close();
 	  }
 		  
-	}
+//	}
         
 
         // now look at U1A signal: RB47 ch0 is 414 in wave vector, RB48 ch0 is 423
   
         if (IsHit[414] && IsHit[423]) {
 
-          if (TCFDS[414] < 90.0 || TCFDS[423] < 90.0) {
+       /* if (TCFDS[414] < 90.0 || TCFDS[423] < 90.0) {
             std::ofstream file3;
-            file3.open ("U1A_tdc0_feb.csv", std::ios::app);
+            file3.open ("RB4748_tdc0_feb.csv", std::ios::app);
             file3 << evt_ctr;
             file3 << "," << TCFDS[414] << "," << TCFDS[423] << std::endl;
             file3.close();
           }
 
           else {
-
+*/
             std::ofstream myfile4;
-            myfile4.open ("U1A_feb.csv", std::ios::app);
+            myfile4.open ("RB4748.csv", std::ios::app);
             myfile4 << evt_ctr;
-            myfile4 << "," << TCFDS[414] << "," << TCFDS[423] << "," << phi[47] << "," << phi[48] << std::endl;
+            myfile4 << "," << TCFDS[414] << "," << TCFDS[423] << "," << phi[47] << "," << phi[48] << "," << amp[47] << "," << amp[48] << "," << offs[47] << "," << offs[48] << std::endl;
             myfile4.close();
-          }
+  //        }
                   
         }
 
@@ -461,6 +492,7 @@ int main(int argc, char *argv[]){
 	myfile3.close();
 */
 	n_tofevents++;
+	//printf("%i\n",n_tofevents);
         break;
       }
       case PacketType::RBMoni : {

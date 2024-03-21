@@ -367,6 +367,26 @@ if (BUILD_EXAMPLES)
     install(TARGETS ${analyze-rene}
             DESTINATION ${INSTALL_EXAMPLES_DIR}
     )
+    set(analyze-padrick "analyzePadrick")
+    add_executable(${analyze-padrick}
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzePadrick.cxx
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventPadrick.cpp
+    )
+    target_include_directories(${analyze-padrick} 
+                              PUBLIC
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                              )
+    target_link_libraries(${analyze-padrick}
+                          PRIVATE
+                          ${GAPSTOF_LIBRARY_SHARED}
+      			  $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
+      			  ROOT::Gui ROOT::Core ROOT::RIO ROOT::Net ROOT::Hist ROOT::Tree ROOT::Rint
+			  )
+    install(TARGETS ${analyze-padrick}
+            DESTINATION ${INSTALL_EXAMPLES_DIR}
+    )
 
   endif(BUILD_ROOTCOMPONENTS)
 endif()
