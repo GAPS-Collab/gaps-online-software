@@ -7,11 +7,7 @@
 //! If the register is the same as another, then the register
 //! holds different fields for the different bits in the register.
 //!
-//! Please refere to 
-//! https://gitlab.com/ucla-gaps-tof/firmware/-/blob/develop/regmap/rb_address_table.org
-//! DRS4 readout
-
-
+//! [For the latest version of the registers, please refer to]([https://gitlab.com/ucla-gaps-tof/firmware/-/blob/develop/regmap/rb_address_table.org)
 
 //========== DRS4 Registers =============
 //

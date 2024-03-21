@@ -69,11 +69,11 @@ pub fn daq_is_busy() -> Result<bool, RegisterError> {
 /// Reset the board and prepare for a new run
 ///
 /// Procedure as discussed in 12/2023
-/// Trigger disable (0 to 0x11C[0])
-/// Set desired trigger mode  (1 to 0x114[0] for MTB trigger or 0 to 0x114[0] for software trigger)
-/// Soft reset (1 to 0x70[0])
-/// Check for soft reset done (read 0x74[15])
-/// Trigger enable (1 to 0x11C[0])
+/// Trigger disable (0 to 0x11C\[0\])
+/// Set desired trigger mode  (1 to 0x114\[0\] for MTB trigger or 0 to 0x114\[0\] for software trigger)
+/// Soft reset (1 to 0x70\[0\])
+/// Check for soft reset done (read 0x74\[15\])
+/// Trigger enable (1 to 0x11C\[0\])
 pub fn soft_reset_board() -> Result<(), RegisterError> {
   trace!("Initialize soft reset procedure!");
   let eight_cycles = Duration::from_micros(4);

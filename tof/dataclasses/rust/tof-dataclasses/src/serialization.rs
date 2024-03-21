@@ -168,7 +168,7 @@ pub fn get_json_from_file(filename : &Path)
 }
 
 
-/// Encode/decode structs to Vec::<u8> to write to a file or
+/// Encode/decode structs to `Vec::<u8>` to write to a file or
 /// send over the network
 ///
 pub trait Serialization {

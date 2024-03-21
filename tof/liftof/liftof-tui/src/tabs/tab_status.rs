@@ -188,7 +188,7 @@ impl RBTab<'_>  {
         Some(_rb_id) => {
           let cali_path = format!("calibrations/rb_{:02}.cali.tof.gaps", _rb_id + 1);
           if fs::metadata(cali_path.clone()).is_ok() {
-            match RBCalibrations::from_file(cali_path.clone()) {
+            match RBCalibrations::from_file(cali_path.clone(), true) {
               Err(err) => error!("Unable to load RBCalibration from file {}! {err}", cali_path),
               Ok(cali) => {
                 self.rb_calibration = cali;

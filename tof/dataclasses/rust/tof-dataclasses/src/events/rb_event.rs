@@ -230,7 +230,7 @@ impl FromRandom for RBMissingHit {
 /// channels.
 ///
 /// Shape
-/// [ch:9][nevents][adc_bin:1024]
+/// \[ch:9\]\[nevents\]\[adc_bin:1024\]
 ///
 /// # Args:
 ///   events - events to get the traces from
