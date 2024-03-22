@@ -65,8 +65,8 @@ pub use packet_type::PacketType;
 /// HEAD : u16
 
 /// PAYLOAD_SIZE : u32
-/// PYALOAD : [u8;PAYLOAD_SIZE]
-/// TAIL : u16
+/// PAYLOAD      : \[u8;PAYLOAD_SIZE\]
+/// TAIL         : u16
 ///
 /// => Fixed size is 13
 ///
