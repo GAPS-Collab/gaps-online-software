@@ -5,12 +5,12 @@
 //! well as to serialize them locally.
 
 use std::fmt;
-use std::collections::HashMap;
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "database")]  {
     use std::path::Path;
     use std::str::FromStr;
+    use std::collections::HashMap;
     use crate::DsiLtbRBMapping;
     extern crate sqlite;
   }
@@ -258,6 +258,19 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
     for ch in 1..9 {
       let pid    = rb.get_pid_for_ch(ch);
       let pend   = rb.channel_to_paddle_end_id[ch - 1];
+      if !rb.paddle_id_to_channel.contains_key(&pid) {
+        if pend > 2000 {
+          rb.paddle_id_to_channel.insert(pid, [0, ch as u8 -1]);
+        } else {
+          rb.paddle_id_to_channel.insert(pid, [ch as u8 -1,0]);
+        }
+      } else {
+        if pend > 2000 {
+          rb.paddle_id_to_channel.get_mut(&pid).unwrap()[1] = ch as u8 -1;
+        } else {
+          rb.paddle_id_to_channel.get_mut(&pid).unwrap()[0] = ch as u8 -1;
+        }
+      }
       let pid_q  = format!("SELECT length FROM tof_db_paddle WHERE paddle_id == {}", pid);
       let pend_q = format!("SELECT cable_length FROM tof_db_paddleend WHERE paddle_end_id == {}", pend);
       match connection.iterate(pid_q, |pairs| {
@@ -622,19 +635,22 @@ impl fmt::Display for Paddle {
 
 //---------------------------------------------------------
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum PaddleEndIdentifier {
   A,
   B
 }
 
-//impl fmt::Display for PaddleEndIdentifier {
-//  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//    match self {
-//      PaddleEndIdentifier::A => {write!(f, "A")}
-//      PaddleEndIdentifier::B => {write!(f, "B")}
-//  }
-//}
+impl fmt::Display for PaddleEndIdentifier {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<PaddleEndIdent:");
+    match self {
+      PaddleEndIdentifier::A => {repr += &String::from("A>");}
+      PaddleEndIdentifier::B => {repr += &String::from("B>");}
+    }
+    write!(f,"{}", repr)
+  }
+}
 
 #[derive(Debug, Copy, Clone)]
 #[repr(u8)]
@@ -818,6 +834,9 @@ impl fmt::Display for RAT {
 pub struct ReadoutBoard {
   pub rb_id                    : u8,  
   pub channel_to_paddle_end_id : [u16;8],
+  /// The value will always be .0 for "A" and 
+  /// .1 for "B"
+  pub paddle_id_to_channel     : HashMap<u8,[u8;2]>,
   pub paddle_lengths           : [f32;8],
   pub cable_lengths            : [f32;8],
   pub calib_file_path          : String,
@@ -829,12 +848,30 @@ impl ReadoutBoard {
     Self {
       rb_id                    : 0,  
       channel_to_paddle_end_id : [0;8],
+      paddle_id_to_channel     : HashMap::<u8,[u8;2]>::new(),
       paddle_lengths           : [0.0;8],
       cable_lengths            : [0.0;8],
       calib_file_path          : String::from(""),
       calibration              : RBCalibrations::new(0),
     }
   }
+
+  pub fn get_paddle_length(&self,pid : u8) -> f32 {
+    if !self.paddle_id_to_channel.contains_key(&pid) {
+      error!("Paddle {pid} might not be connected to this RB {}", self.rb_id);
+      return 0.0;
+    }
+    // unwrap is ok, because of key check earlier
+    let ch = self.paddle_id_to_channel.get(&pid).unwrap()[0];
+    return self.paddle_lengths[ch as usize];
+  }
+  ///// Get the associated paddle ids with the paddle ends for 
+  ///// the channels of the Readoutboard. The (raw) channel id
+  ///// will be the index of the returned array
+  //pub fn get_paddles(&self) -> [(u8, PaddleEndIdentifier);8] {
+  //  let paddles = [(0,PaddleEndIdentifier::A);8];
+  //  paddles
+  //}
 
   /// Load the newest calibration from the calibration file path
   pub fn load_latest_calibration(&mut self) -> Result<(), Box<dyn std::error::Error>> {
@@ -970,12 +1007,14 @@ impl fmt::Display for ReadoutBoard {
       \u{021B3} {}
     calibration         : {}
     CHANNEL/PADDLE END  : {:?}
+    PID/CHANNELS        : {:?}
     PADDLE LENGTHS [mm] : {:?}
     CABLE  LENGTHS [cm] : {:?}>",
       self.rb_id,
       self.calib_file_path,
       self.calibration,
       self.channel_to_paddle_end_id,
+      self.paddle_id_to_channel,
       self.paddle_lengths,
       self.cable_lengths)
   }

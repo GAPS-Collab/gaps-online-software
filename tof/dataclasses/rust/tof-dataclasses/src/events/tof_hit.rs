@@ -27,7 +27,10 @@ const MAX_PEAK_TIME        : f32 = 500.0;
 //const MIN_PEAK_TIME        : f32 = 0.0;
 const U16TOF32_PEAK_TIME   : f32 = MAX_PEAK_TIME/(u16::MAX as f32);
 const F32TOU16_PEAK_TIME   : u16 = ((u16::MAX as f32)/MAX_PEAK_TIME) as u16;
-
+const U16TOF32_T0          : f32 = MAX_PEAK_TIME/(u16::MAX as f32);
+const F32TOU16_T0          : u16 = ((u16::MAX as f32)/MAX_PEAK_TIME) as u16;
+const U16TOF32_POS_ACROSS  : f32 = 1800.0/(u16::MAX as f32);
+const F32TOU16_POS_ACROSS  : u16 = ((u16::MAX as f32)/1800.0) as u16;
 
 /// Waveform peak
 ///
@@ -80,7 +83,8 @@ impl fmt::Display for Peak {
 #[derive(Debug,Copy,Clone,PartialEq)]
 pub struct TofHit {
   
-  //unsigned short head = 0xF0F0;
+  /// The ID of the paddle in TOF notation
+  /// (1-160)
   pub paddle_id    : u8,
   pub time_a       : u16,
   pub time_b       : u16,
@@ -89,8 +93,11 @@ pub struct TofHit {
   pub charge_a     : u16,
   pub charge_b     : u16,
   pub charge_min_i : u16,
+  /// Reconstructed particle interaction position
+  /// across the paddle
   pub pos_across   : u16,
-  pub t_average    : u16,
+  /// Reconstructed particle interaction time
+  pub t0           : u16,
   pub ctr_etx      : u8,
 
   // this might be not needed, 
@@ -101,6 +108,10 @@ pub struct TofHit {
   // fields which won't get 
   // serialized
   pub valid        : bool,
+  // for debugging purposes
+  pub ftime_a      : f32,
+  pub ftime_b      : f32,
+  pub paddle_len   : f32,
 }
 
 impl Default for TofHit {
@@ -117,8 +128,9 @@ impl fmt::Display for TofHit {
     Height  A/B   {:.2} {:.2}
     Charge  A/B   {:.2} {:.2}
   charge_min_i    {}   
-  pos_across      {}   
-  t_average       {}   
+  ** reconstructed interaction
+    pos_across    {}   
+    t0            {}   
   ctr_etx         {}   
   timestamp32     {}  
   timestamp16     {}
@@ -132,7 +144,7 @@ impl fmt::Display for TofHit {
             self.get_charge_b(),
             self.charge_min_i,
             self.pos_across,
-            self.t_average,
+            self.t0,
             self.ctr_etx,
             self.timestamp32,
             self.timestamp16,
@@ -167,7 +179,7 @@ impl Serialization for TofHit {
     bytestream.extend_from_slice(&self.charge_b    .to_le_bytes()); 
     bytestream.extend_from_slice(&self.charge_min_i.to_le_bytes()); 
     bytestream.extend_from_slice(&self.pos_across  .to_le_bytes()); 
-    bytestream.extend_from_slice(&self.t_average   .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.t0          .to_le_bytes()); 
     bytestream.push(self.ctr_etx); 
     bytestream.extend_from_slice(&self.timestamp32 .to_le_bytes());
     bytestream.extend_from_slice(&self.timestamp16 .to_le_bytes());
@@ -198,7 +210,7 @@ impl Serialization for TofHit {
     pp.charge_b      = parse_u16(stream, pos);
     pp.charge_min_i  = parse_u16(stream, pos);
     pp.pos_across    = parse_u16(stream, pos);
-    pp.t_average     = parse_u16(stream, pos);
+    pp.t0            = parse_u16(stream, pos);
     pp.ctr_etx       = parse_u8(stream, pos);
     pp.timestamp32   = parse_u32(stream, pos);
     pp.timestamp16   = parse_u16(stream, pos);
@@ -211,6 +223,30 @@ impl TofHit {
 
   // update Feb 2023 - add 4 byte timestamp
   pub const VERSION       : &'static str = "1.2";
+  
+  pub fn new() -> Self {
+    Self{
+         paddle_id    : 0,
+         time_a       : 0,
+         time_b       : 0,
+         peak_a       : 0,
+         peak_b       : 0,
+         charge_a     : 0,
+         charge_b     : 0,
+         charge_min_i : 0,
+         pos_across   : 0,
+         t0           : 0,
+         ctr_etx      : 0,
+         timestamp32  : 0,
+         timestamp16  : 0,
+         // non-serialize fields
+         valid        : true,
+         ftime_a      : 0.0,
+         ftime_b      : 0.0,
+         paddle_len   : 0.0,
+    }
+  }
+
 
   /// Get the (official) paddle id
   ///
@@ -252,28 +288,33 @@ impl TofHit {
     }
   }
 
-  pub fn new() -> Self {
-    Self{
-         paddle_id    : 0,
-         time_a       : 0,
-         time_b       : 0,
-         peak_a       : 0,
-         peak_b       : 0,
-         charge_a     : 0,
-         charge_b     : 0,
-         charge_min_i : 0,
-         pos_across   : 0,
-         t_average    : 0,
-         ctr_etx      : 0,
-         timestamp32  : 0,
-         timestamp16  : 0,
-         // non-serialize fields
-         valid        : true,
-    }
-  }
 
   pub fn get_timestamp48(&self) -> u64 {
     ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
+  }
+  
+  pub fn set_pos_across(&mut self, pa : f32) {
+    if pa >= 1800.0 {
+      self.pos_across = u16::MAX;
+    } else {
+      self.pos_across = F32TOU16_POS_ACROSS*(pa.floor() as u16);
+    }
+  }
+
+  pub fn get_pos_across(&self) -> f32 {
+    self.pos_across as f32 * U16TOF32_POS_ACROSS
+  }
+
+  pub fn set_t0(&mut self, t0 : f32) {
+    if t0 >= MAX_PEAK_TIME {
+      self.t0 = u16::MAX;
+    } else {
+      self.t0 = F32TOU16_T0*(t0.floor() as u16);
+    }
+  }
+
+  pub fn get_t0(&self) -> f32 {
+    self.t0 as f32 * U16TOF32_T0
   }
 
   pub fn set_peak_a(&mut self, peak : f32 ) {
@@ -381,7 +422,7 @@ impl TofHit {
     pp.charge_b     = rng.gen::<u16>();
     pp.charge_min_i = rng.gen::<u16>();
     pp.pos_across   = rng.gen::<u16>();
-    pp.t_average    = rng.gen::<u16>();
+    pp.t0           = rng.gen::<u16>();
     pp.ctr_etx      = rng.gen::<u8>();
     pp.timestamp32  = rng.gen::<u32>();
     pp.timestamp16  = rng.gen::<u16>();

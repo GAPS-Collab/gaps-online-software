@@ -14,8 +14,7 @@ extern crate smoothed_z_score;
 #[cfg(feature="advanced-algorithms")]
 use smoothed_z_score::{Peak, PeaksDetector, PeaksFilter};
 
-// Return the bin with the maximum DC value
-//
+/// Return the bin with the maximum ADC value
 pub fn get_max_bin(voltages    : &Vec<f32>,
                    lower_bound : usize,
                    window      : usize) -> Result<usize, WaveformError> {
@@ -329,6 +328,15 @@ pub fn get_paddle_t0(t_a : f32, t_b : f32, paddle_length : f32) -> f32 {
   0.5*(t_a + t_b - (paddle_length/C_LIGHT_PADDLE))
 }
 
+/// Calculate the distance from the A side
+/// We will Always use the A side to measure
+/// "pos_accross"
+///
+/// Returns:
+///   Distance from "A" side (in mm)
+pub fn pos_across(t_a : f32, t0 : f32) -> f32 {
+  (t_a - t0)*C_LIGHT_PADDLE*10.0 // 10 for cm->mm 
+}
 
 #[cfg(feature = "advanced-algorithms")]
 fn find_sequence_ranges(vec: Vec<usize>) -> Vec<(usize, usize)> {
