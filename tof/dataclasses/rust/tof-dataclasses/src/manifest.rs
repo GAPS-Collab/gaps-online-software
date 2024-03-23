@@ -5,12 +5,12 @@
 //! well as to serialize them locally.
 
 use std::fmt;
+use std::collections::HashMap;
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "database")]  {
     use std::path::Path;
     use std::str::FromStr;
-    use std::collections::HashMap;
     use crate::DsiLtbRBMapping;
     extern crate sqlite;
   }
