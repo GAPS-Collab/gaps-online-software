@@ -31,7 +31,7 @@ double FitSine(std::vector<double> volts, std::vector<double> times)
 //if you want to get all three fit parameters:
 //std::vector<double> FitSine(std::vector<double> volts, std::vector<double> times, float cm)
 {
-  float ns_off = 0; //cm*0.08; //Harting cable signal propagation is supposed to be 5.13 ns/m or 0.0513 ns/cm. crude measurement gives  0.08 ns/cm
+  //float ns_off = 0; //cm*0.08; //Harting cable signal propagation is supposed to be 5.13 ns/m or 0.0513 ns/cm. crude measurement gives  0.08 ns/cm
   int start_bin = 20;
   int size_bin = 900; //can probably make this smaller
 
