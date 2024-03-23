@@ -14,6 +14,8 @@ struct PaddleInfo {
   float Location[NPAD][3];         // X, Y, Z in detector coordinates
   int   Orientation[NPAD];         // Orientation in detector (e.g. +/-X)
   float Dimension[NPAD][3];        // Physical size in mm
+  float CoaxLen[NPAD];             // Coax cable length (ns)
+  float HardingLen[NPAD];          // Harding cable length (ns)
   int   SiPM_A[NPAD];              // SiPM channel of A end
   int   SiPM_B[NPAD];              // SiPM channel of B end
   bool  IsUmbrella[NPAD];          // Paddle in the Umbrella
