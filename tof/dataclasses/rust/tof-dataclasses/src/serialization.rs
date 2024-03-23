@@ -10,6 +10,8 @@ use std::path::Path;
 
 use std::collections::VecDeque;
 
+use crate::packets::TofPacket;
+
 /// Convert a vector of u16 into a vector of u8
 ///
 /// The resulting vector has twice the number
@@ -21,7 +23,6 @@ pub fn u16_to_u8(vec_u16: &[u16]) -> Vec<u8> {
         .flat_map(|&n| n.to_le_bytes().to_vec())
         .collect()
 }
-
 
 /// Restore a vector of u16 from a vector of u8
 ///
@@ -211,7 +212,15 @@ pub trait Serialization {
                      pos        : &mut usize)
     -> Result<Self, SerializationError>
     where Self : Sized;
-  
+
+  /// Decode a serializable directly from a TofPacket
+  fn from_tofpacket(packet : &TofPacket)
+    -> Result<Self, SerializationError>
+    where Self: Sized {
+    let unpacked = Self::from_bytestream(&packet.payload, &mut 0)?;
+    Ok(unpacked)
+  }
+
   /// Encode a serializable to a bytestream  
   fn to_bytestream(&self) -> Vec<u8> {
     println!("There can't be a default implementation for this trait!");
