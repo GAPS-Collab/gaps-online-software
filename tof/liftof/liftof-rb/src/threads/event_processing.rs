@@ -79,7 +79,7 @@ pub fn event_processing(board_id            : u8,
   let cali_path_buf   = PathBuf::from(&cali_path);
   if fs::metadata(cali_path_buf.clone()).is_ok() {
     info!("Found valid calibration file path {cali_path_buf:?}");
-    match RBCalibrations::from_file(cali_path) {
+    match RBCalibrations::from_file(cali_path, true) {
       Err(err) => {
         error!("Can't load calibration! {err}");
       },

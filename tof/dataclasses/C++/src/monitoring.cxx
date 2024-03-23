@@ -279,11 +279,16 @@ PAMoniData PAMoniData::from_bytestream(const Vec<u8> &stream,
 }
 
 std::string PAMoniData::to_string() const {
-  std::string repr = "<PBMoniData :";
-  repr += "\n board_id        : " + std::to_string(board_id         );
-  repr += "\n **temps  (16x) [C] ";
+  //repr += std::format("\n  LTB   temp      [\u00B0C]  : {:.2}" ,ltb_temp   );
+  std::string repr = "<PAMoniData :";
+  repr += std::format("\n  Board ID    : {}", board_id);
+  repr += "\n  **temps (16x) [\u00B0C] ";
   for (const auto &k : temps) {
-    repr += std::to_string(k) + " | "; 
+    repr += std::format("{} | ", k); 
+  }
+  repr += "\n  **biases (16x) [V] ";
+  for (const auto &k : biases) {
+    repr += std::format("{} | ", k); 
   }
   repr += ">";
   return repr;
@@ -376,6 +381,11 @@ std::string CPUMoniData::to_string() const {
 }
 
 std::ostream& operator<<(std::ostream& os, const CPUMoniData& moni){
+  os << moni.to_string();
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const LTBMoniData& moni){
   os << moni.to_string();
   return os;
 }

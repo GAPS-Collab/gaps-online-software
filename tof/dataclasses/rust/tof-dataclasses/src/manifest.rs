@@ -21,7 +21,19 @@ use glob::glob;
 use chrono::NaiveDateTime;
 
 use crate::calibrations::RBCalibrations;
-    
+
+pub fn get_pid_from_pend(pend : u16) -> Option<u8> {
+  if pend < 1000 {
+    return None;
+  }
+  if pend > 2000 {
+    return Some((pend - 2000) as u8);
+  } else {
+    return Some((pend - 1000) as u8);
+  }
+}
+
+
 /// Summary of DSI/J/LTBCH (0-319)
 #[cfg(feature = "database")]
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -228,7 +240,7 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
         Some(v) => {
           //println!("{} = {}", name, v);
           match name {
-            "rb_id"      => {rb.rb_id  = u8::from_str(v).unwrap_or(0);},
+            "rb_id"         => {rb.rb_id  = u8::from_str(v).unwrap_or(0);},
             "ch1_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(1, u16::from_str(v).unwrap_or(0));},
             "ch2_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(2, u16::from_str(v).unwrap_or(0));},
             "ch3_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(3, u16::from_str(v).unwrap_or(0));},
@@ -242,6 +254,64 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
         }
       }
     } // end loop over rbs
+    // populate the other 
+    for ch in 1..9 {
+      let pid    = rb.get_pid_for_ch(ch);
+      let pend   = rb.channel_to_paddle_end_id[ch - 1];
+      if !rb.paddle_id_to_channel.contains_key(&pid) {
+        if pend > 2000 {
+          rb.paddle_id_to_channel.insert(pid, [0, ch as u8 -1]);
+        } else {
+          rb.paddle_id_to_channel.insert(pid, [ch as u8 -1,0]);
+        }
+      } else {
+        if pend > 2000 {
+          rb.paddle_id_to_channel.get_mut(&pid).unwrap()[1] = ch as u8 -1;
+        } else {
+          rb.paddle_id_to_channel.get_mut(&pid).unwrap()[0] = ch as u8 -1;
+        }
+      }
+      let pid_q  = format!("SELECT length FROM tof_db_paddle WHERE paddle_id == {}", pid);
+      let pend_q = format!("SELECT cable_length FROM tof_db_paddleend WHERE paddle_end_id == {}", pend);
+      match connection.iterate(pid_q, |pairs| {
+        debug!("New rb, has following values...");
+        for &(name, value) in pairs.iter() {
+          match value {
+            None    => {
+              error!("Did not find entry for Paddle ID {}", pid);
+              continue;
+            },
+            Some(v) => {
+              if name == "length" {
+                rb.paddle_lengths[ch -1] = v.parse().unwrap();
+              }
+            }
+          }
+        }
+        true
+      }) {
+        Ok(_) => (),
+        Err(_err) => ()
+      }
+      match connection.iterate(pend_q, |pairs| {
+        debug!("New rb, has following values...");
+        for &(name, value) in pairs.iter() {
+          match value {
+            None    => {
+              continue;
+            },
+            Some(v) => {
+              if name == "cable_length" {}
+                rb.cable_lengths[ch -1] = v.parse().unwrap();
+            }
+          }
+        }
+        true
+      }) {
+        Ok(_) => (),
+        Err(_err) => ()
+      }
+    }
     rbs.push(rb);
     true
   }) {
@@ -252,6 +322,7 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
       debug!("DB query successful!");
     }
   }
+
   info!("We found {} rbs in the database", rbs.len()); 
   rbs
 }
@@ -564,19 +635,22 @@ impl fmt::Display for Paddle {
 
 //---------------------------------------------------------
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum PaddleEndIdentifier {
   A,
   B
 }
 
-//impl fmt::Display for PaddleEndIdentifier {
-//  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//    match self {
-//      PaddleEndIdentifier::A => {write!(f, "A")}
-//      PaddleEndIdentifier::B => {write!(f, "B")}
-//  }
-//}
+impl fmt::Display for PaddleEndIdentifier {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<PaddleEndIdent:");
+    match self {
+      PaddleEndIdentifier::A => {repr += &String::from("A>");}
+      PaddleEndIdentifier::B => {repr += &String::from("B>");}
+    }
+    write!(f,"{}", repr)
+  }
+}
 
 #[derive(Debug, Copy, Clone)]
 #[repr(u8)]
@@ -759,24 +833,45 @@ impl fmt::Display for RAT {
 #[derive(Clone, Debug)]
 pub struct ReadoutBoard {
   pub rb_id                    : u8,  
-  pub dna                      : u64, 
   pub channel_to_paddle_end_id : [u16;8],
+  /// The value will always be .0 for "A" and 
+  /// .1 for "B"
+  pub paddle_id_to_channel     : HashMap<u8,[u8;2]>,
+  pub paddle_lengths           : [f32;8],
+  pub cable_lengths            : [f32;8],
   pub calib_file_path          : String,
   pub calibration              : RBCalibrations,       
-  pub trig_ch_mask             : [bool;8],
 }
 
 impl ReadoutBoard {
   pub fn new() -> Self {
     Self {
       rb_id                    : 0,  
-      dna                      : 0, 
       channel_to_paddle_end_id : [0;8],
+      paddle_id_to_channel     : HashMap::<u8,[u8;2]>::new(),
+      paddle_lengths           : [0.0;8],
+      cable_lengths            : [0.0;8],
       calib_file_path          : String::from(""),
       calibration              : RBCalibrations::new(0),
-      trig_ch_mask             : [false;8],
     }
   }
+
+  pub fn get_paddle_length(&self,pid : u8) -> f32 {
+    if !self.paddle_id_to_channel.contains_key(&pid) {
+      error!("Paddle {pid} might not be connected to this RB {}", self.rb_id);
+      return 0.0;
+    }
+    // unwrap is ok, because of key check earlier
+    let ch = self.paddle_id_to_channel.get(&pid).unwrap()[0];
+    return self.paddle_lengths[ch as usize];
+  }
+  ///// Get the associated paddle ids with the paddle ends for 
+  ///// the channels of the Readoutboard. The (raw) channel id
+  ///// will be the index of the returned array
+  //pub fn get_paddles(&self) -> [(u8, PaddleEndIdentifier);8] {
+  //  let paddles = [(0,PaddleEndIdentifier::A);8];
+  //  paddles
+  //}
 
   /// Load the newest calibration from the calibration file path
   pub fn load_latest_calibration(&mut self) -> Result<(), Box<dyn std::error::Error>> {
@@ -817,7 +912,7 @@ impl ReadoutBoard {
     } else {
       let file_to_load = self.calib_file_path.clone() + "/" + &newest_file.0;
       println!("== ==> Loading calibration from file: {}", file_to_load);
-      self.calibration = RBCalibrations::from_file(file_to_load)?;
+      self.calibration = RBCalibrations::from_file(file_to_load, true)?;
       //println!("==> Loaded calibration {}", self.calibration);
     }
     Ok(())
@@ -831,24 +926,9 @@ impl ReadoutBoard {
     format!("tcp://10.0.1.1{:02}:42000", self.rb_id)
   }
 
-
-  pub fn get_triggered_pids(&self) -> Vec<u8> {
-    let mut pids = Vec::<u8>::new();
-    for k in 0..8 {
-      let pid = self.get_pid_for_ch(k);
-      if self.trig_ch_mask[k] {
-        if pids.contains(&pid) {
-          continue;
-        }
-        pids.push(self.get_pid_for_ch(k));
-      }
-    }
-    pids
-  }
-
-  pub fn get_calibration(&self) -> String {
-    return self.calib_file_path.clone();
-  }
+  //pub fn get_calibration(&self) -> String {
+  //  return self.calib_file_path.clone();
+  //}
 
   pub fn get_paddle_end(&self, ch : usize) 
     -> PaddleEndIdentifier {
@@ -903,7 +983,6 @@ impl ReadoutBoard {
     self.channel_to_paddle_end_id[channel -1] = paddle_end_id;
   }
 
-
   pub fn get_paddle_end_id_for_rb_channel(&self,channel : usize) -> u16 {
     if channel > 9 || channel == 0 {
       error!("Got invalid channel value! Returning rubbish");
@@ -923,18 +1002,21 @@ impl fmt::Display for ReadoutBoard {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { 
     write!(f,
 "<ReadoutBoard:
-    ID                :  {}
-    DNA               :  {} 
-    calibration path  :  {}
-    calibration       :  {}
-    CHANNEL/PADDLE END:  {:?}
-    TRIG_CH_MASK      :  {:?}>",
+    ID                  : {}
+    ** calibration will be loaded from this path:
+      \u{021B3} {}
+    calibration         : {}
+    CHANNEL/PADDLE END  : {:?}
+    PID/CHANNELS        : {:?}
+    PADDLE LENGTHS [mm] : {:?}
+    CABLE  LENGTHS [cm] : {:?}>",
       self.rb_id,
-      self.dna,
       self.calib_file_path,
       self.calibration,
       self.channel_to_paddle_end_id,
-      self.trig_ch_mask)
+      self.paddle_id_to_channel,
+      self.paddle_lengths,
+      self.cable_lengths)
   }
 }
 

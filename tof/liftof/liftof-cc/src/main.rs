@@ -9,7 +9,6 @@
 extern crate env_logger;
 extern crate clap;
 extern crate ctrlc;
-//extern crate zmq;
 extern crate tof_dataclasses;
 extern crate crossbeam_channel;
 extern crate colored;
@@ -329,7 +328,8 @@ fn main() {
       }
       println!("==> Starting RB thread for {}", this_rb);
       let ev_to_builder_c = ev_to_builder.clone();
-      let thread_name = format!("rb-comms-{}", this_rb.rb_id);
+      let thread_name     = format!("rb-comms-{}", this_rb.rb_id);
+      let settings        = config.analysis_engine_settings.clone();
       let _rb_comm_thread = thread::Builder::new()
         .name(thread_name)
         .spawn(move || {
@@ -338,7 +338,8 @@ fn main() {
                                     &this_rb,
                                     runid,
                                     false,
-                                    run_analysis_engine);
+                                    run_analysis_engine,
+                                    settings);
         })
         .expect("Failed to spawn readoutboard-communicator thread!");
     } // end for loop over nboards
@@ -360,7 +361,7 @@ fn main() {
     if !cali_from_cmdline {
       println!("==> Starting event builder and master trigger threads...");
       let db_path_string    = config.db_path.clone();
-      let settings          = config.event_builder_settings;
+      let settings          = config.event_builder_settings.clone();
       let thread_control_eb = thread_control.clone();
       let _evb_thread = thread::Builder::new()
         .name("event-builder".into())

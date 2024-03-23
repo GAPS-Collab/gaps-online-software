@@ -22,6 +22,8 @@ use liftof_lib::{
     waveform_analysis,
 };
 
+use liftof_lib::settings::AnalysisEngineSettings;
+
 /*************************************/
 
 /// Receive data from a readoutboard
@@ -33,24 +35,27 @@ use liftof_lib::{
 ///
 /// # Arguments:
 ///
-/// * pp_pusher        :
-/// * reso_to_main     :
-/// * tp_to_sink       : Channel which should be connect to a (global) data sink.
-///                      Packets which are of not event type (e.g. header/full binary data)
-///                      will be forwarded to the sink.
-/// * write_rb_raw     : Should readoutboard raw data be written to disk?
-/// * storage_savepath :
-/// * events_per_file  :
-/// * rb               : 
-/// * runid            : Current assigned runid. Will be used in the filenames of saved 
-///                      readoutboard raw data.
-/// * print_packets    : 
+/// * ev_to_builder       :
+/// * tp_to_sink          : Channel which should be connect to a (global) data sink.
+///                         Packets which are of not event type (e.g. header/full binary data)
+///                         will be forwarded to the sink.
+/// * write_rb_raw        : Should readoutboard raw data be written to disk?
+/// * storage_savepath    :
+/// * events_per_file     :
+/// * rb                  : 
+/// * runid               : Current assigned runid. Will be used in the filenames of saved 
+///                         readoutboard raw data.
+/// * print_packets       : 
+/// * run_analysis_engine :
+/// * ae_settings         : Settings to configure peakfinding algorithms etc. 
+///                         These can be configured with an external .toml file
 pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
                                  tp_to_sink          : Sender<TofPacket>,
                                  rb                  : &ReadoutBoard,
                                  runid               : usize,
                                  print_packets       : bool,
-                                 run_analysis_engine : bool) {
+                                 run_analysis_engine : bool,
+                                 ae_settings         : AnalysisEngineSettings) {
   info!("Got run id {runid}");
   let zmq_ctx = zmq::Context::new();
   let board_id = rb.rb_id; //rb.id.unwrap();
@@ -109,7 +114,8 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
                 if event.hits.len() == 0 {
                   if run_analysis_engine {
                     match waveform_analysis(&mut event, 
-                                            &rb) {
+                                            &rb,
+                                            ae_settings) {
                         
                       Ok(_) => (),
                       Err(err) => {

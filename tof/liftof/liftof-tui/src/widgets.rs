@@ -25,11 +25,97 @@ use ndhistogram::{
 use ndhistogram::axis::{
     Uniform,
 };
+
+//extern crate num_traits;
+//use num_traits::Num;
+
 use crate::colors::{
-  ColorTheme2,
+  ColorTheme,
 };
 
 
+#[derive(Debug, Clone)]
+struct HistoDisplay {
+  pub nbin     : usize,
+  pub bin_low  : f32,
+  pub bin_high : f32,
+  pub histo    : Hist1D<Uniform<f32>>,
+}
+
+impl HistoDisplay {
+  pub fn new(nbin : usize, bin_low : f32, bin_high : f32) -> Self {
+    let bins = Uniform::new(nbin, bin_low, bin_high);  
+    Self {
+      nbin     : nbin,
+      bin_low  : bin_low,
+      bin_high : bin_high,
+      histo    : ndhistogram!(bins), 
+    }
+  }
+}
+
+/// Create the labels for a certain histogram
+/// for rendering
+pub fn create_labels(histo : &Hist1D<Uniform<f32>>) -> Vec<String> {
+  let mut labels = Vec::<String>::new();
+  for bin in histo.iter() {
+    labels.push(format!("{}",bin.index as u64));
+  }
+  labels
+}
+
+/// Adapt the bins of the histogram for the 
+/// bar chart which will get rendered.
+/// Always show a minimum number of bins, 
+/// but if the max y-bin is "too far to the left"
+/// then shorten the range for a better visualization
+///
+/// # Arguments
+///
+/// * labels       : bin labels for rendering
+/// * clean_from   : leave bins below this 
+///                  untouched
+pub fn clean_data<'a>(histo      : &'a Hist1D<Uniform<f32>>, 
+                      labels     : &'a Vec<String>, 
+                      clean_from : usize) -> Vec<(&'a str,u64)> {
+  let mut max_pop_bin = 0;
+  let mut vec_index   = 0;
+  let mut bins = Vec::<(u64, u64)>::new();
+  for bin in histo.iter() {
+    let bin_value = *bin.value as u64;
+    bins.push((bin.index as u64, bin_value));
+    // always show the first x bins, but if 
+    // the bins with index > clean_from are not 
+    // populated, discard them
+    if bin_value > 0 && bin.index > clean_from {
+      max_pop_bin = vec_index;
+    }
+    vec_index += 1;
+  }
+  bins.retain(|&(x,_)| x <= max_pop_bin);
+  let mut clean_data = Vec::<(&str, u64)>::new();
+  for n in bins.iter() {
+    clean_data.push((&labels[n.0 as usize], n.1));
+  }
+  clean_data
+}
+
+// FIXME - merge this with clean data
+pub fn prep_data<'a>(histo      : &'a Hist1D<Uniform<f32>>, 
+                     labels     : &'a Vec<String>,
+                     spacing    : usize) -> Vec<(&'a str,u64)> {
+  let mut data = Vec::<(&str, u64)>::new();
+  let mut cnt = 0usize;
+  for bin in histo.iter() {
+    if cnt % spacing != 0 {
+      data.push(("", *bin.value as u64));
+    } else {
+      data.push((&labels[cnt], *bin.value as u64));
+    }
+    cnt += 1;
+  }
+  data
+}
 
 pub fn histogram(nbin : usize, bin_low : f32,
                  bin_high : f32,
@@ -45,7 +131,7 @@ pub fn histogram(nbin : usize, bin_low : f32,
 pub fn timeseries<'a>(data        : &'a mut VecDeque<(f64,f64)>,
                       ds_name     : String,
                       xlabel      : String,
-                      theme       : &'a ColorTheme2) -> Chart<'a> {
+                      theme       : &'a ColorTheme) -> Chart<'a> {
   let x_only : Vec::<f64> = data.iter().map(|z| z.0).collect();
   // get timing axis
   let t_min : u64;

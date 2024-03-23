@@ -5,8 +5,6 @@
 //!
 //!
 
-
-
 use std::sync::{
     Arc,
     Mutex,
@@ -51,8 +49,6 @@ use ratatui::{
     Terminal,
 };
 
-
-
 use tof_dataclasses::packets::{
     TofPacket,
     PacketType
@@ -61,6 +57,8 @@ use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::events::{
     MasterTriggerEvent,
     RBEvent,
+    TofHit,
+    //RBWaveform,
 };
 
 use liftof_tui::menu::{
@@ -70,6 +68,12 @@ use liftof_tui::menu::{
     RBMenu,
     MTMenu,
     SettingsMenu,
+    THMenu,
+    THMenuItem,
+    TSMenu,
+    TSMenuItem,
+    RWMenu,
+    //RWMenuItem,
 };
 
 use liftof_tui::colors::{
@@ -82,10 +86,13 @@ use liftof_tui::{
     EventTab,
     HomeTab,
     SettingsTab,
+    TofHitTab,
+    TofHitView,
     RBTab,
     RBTabView,
     MTTab,
     CPUTab,
+    RBWaveformTab,
 };
 
 extern crate clap;
@@ -248,6 +255,7 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
                    tp_sender_rb : Sender<TofPacket>,
                    tp_sender_ev : Sender<TofPacket>,
                    tp_sender_cp : Sender<TofPacket>,
+                   rbwf_sender  : Sender<TofPacket>,
                    str_list     : Arc<Mutex<VecDeque<String>>>,
                    pck_map      : Arc<Mutex<HashMap<String, usize>>>) {
   let ctx = zmq::Context::new();
@@ -318,6 +326,12 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
                   Ok(_)    => (),
                 }
               },
+              PacketType::RBWaveform => {
+                match rbwf_sender.send(tp) {
+                  Err(err) => error!("Can't send TP! {err}"),
+                  Ok(_)    => (),
+                }
+              }
               PacketType::TofEvent => {
                 match tp_sender_ev.send(tp) {
                   Err(err) => error!("Can't send TP! {err}"),
@@ -369,6 +383,9 @@ struct TabbedInterface<'a> {
   pub rb_menu       :  RBMenu,
   pub mt_menu       :  MTMenu,
   pub st_menu       :  SettingsMenu,
+  pub th_menu       :  THMenu,
+  pub ts_menu       :  TSMenu,
+  pub rw_menu       :  RWMenu,
 
   // The tabs
   pub mt_tab        : MTTab,
@@ -379,6 +396,10 @@ struct TabbedInterface<'a> {
   pub home_tab      : HomeTab,
   pub event_tab     : EventTab,
 
+  pub th_tab        : TofHitTab<'a>,
+  // flight packets
+  pub rbwf_tab      : RBWaveformTab,
+
   // latest color set
   pub color_set     : ColorSet,
 } 
@@ -388,23 +409,33 @@ impl<'a> TabbedInterface<'a> {
              rb_menu      : RBMenu,
              mt_menu      : MTMenu,
              st_menu      : SettingsMenu,
+             th_menu      : THMenu,
+             ts_menu      : TSMenu,
+             rw_menu      : RWMenu,
              mt_tab       : MTTab,
              cpu_tab      : CPUTab,
              wf_tab       : RBTab<'a>,
              settings_tab : SettingsTab<'a>,
              home_tab     : HomeTab,
-             event_tab    : EventTab) -> Self {
+             event_tab    : EventTab,
+             th_tab       : TofHitTab<'a>,
+             rbwf_tab     : RBWaveformTab) -> Self {
     Self {
       ui_menu     ,
       rb_menu     , 
       mt_menu     , 
       st_menu     ,
+      th_menu     ,
+      ts_menu     ,
+      rw_menu     ,
       mt_tab      , 
       cpu_tab     , 
       wf_tab      , 
       settings_tab,
       home_tab    , 
       event_tab   , 
+      th_tab      ,
+      rbwf_tab    ,
       color_set   : COLORSETOMILU,
     }
   }
@@ -434,6 +465,14 @@ impl<'a> TabbedInterface<'a> {
       Err(err) => error!("Can not receive TofPackets for CPUTab! {err}"),
       Ok(_)    => ()
     }
+    match self.th_tab.receive_packet() {
+      Err(err) => error!("Can not receive TofPackets for TofHitTab! {err}"),
+      Ok(_)    => ()
+    }
+    match self.rbwf_tab.receive_packet() {
+      Err(err) => error!("Can not receive RBWaveforms for RBWaveformTab! {err}"),
+      Ok(_)    => ()
+    }
   }
 
   fn update_color_theme(&mut self, cs : ColorSet) {
@@ -441,12 +480,16 @@ impl<'a> TabbedInterface<'a> {
     self.ui_menu.theme.update(&cs);
     self.rb_menu.theme.update(&cs);
     self.mt_menu.theme.update(&cs);
-    self.home_tab.theme.update(&cs);
-    self.event_tab.theme.update(&cs);
-    self.wf_tab.theme.update(&cs);
-    self.mt_tab.theme.update(&cs);
+    self.rw_menu.theme.update(&cs);
+    self.ts_menu.theme.update(&cs);
+    self.home_tab    .theme.update(&cs);
+    self.event_tab   .theme.update(&cs);
+    self.wf_tab      .theme.update(&cs);
+    self.mt_tab      .theme.update(&cs);
     self.settings_tab.theme.update(&cs);
-    self.cpu_tab.theme.update(&cs);
+    self.cpu_tab     .theme.update(&cs);
+    self.th_tab      .theme.update(&cs);
+    self.rbwf_tab    .theme.update(&cs);
     self.color_set = cs;
   }
   
@@ -479,7 +522,22 @@ impl<'a> TabbedInterface<'a> {
     self.st_menu.render     (&master_lo.rect[0], frame);
     self.settings_tab.render(&master_lo.rect[1], frame);
   }
-      
+    
+  pub fn render_tofhittab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.th_menu.render(&master_lo.rect[0], frame);
+    self.th_tab.render(&master_lo.rect[1], frame);
+  }
+
+  pub fn render_tofsummarytab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.ts_menu.render(&master_lo.rect[0], frame);
+    //self.ts_tab.render(&master_lo.rect[1], frame);
+  }
+  
+  pub fn render_rbwaveformtab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.rw_menu.render(&master_lo.rect[0], frame);
+    self.rbwf_tab.render(&master_lo.rect[1], frame);
+  }
+
   pub fn render(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
     match self.ui_menu.active_menu_item {
       MenuItem::Home => {
@@ -500,6 +558,15 @@ impl<'a> TabbedInterface<'a> {
       MenuItem::Settings => {
         self.render_settings(master_lo, frame);
       },
+      MenuItem::TofHits => {
+        self.render_tofhittab(master_lo, frame);
+      }
+      MenuItem::RBWaveform => {
+        self.render_rbwaveformtab(master_lo, frame);
+      }
+      MenuItem::TofSummary => {
+        self.render_tofsummarytab(master_lo, frame);
+      }
       _ => {
         self.ui_menu.render(&master_lo.rect[0], frame);
       }
@@ -615,6 +682,35 @@ impl<'a> TabbedInterface<'a> {
           _ => ()
         }
       },
+      MenuItem::TofHits => {
+        match key_code {
+          KeyCode::Char('h') => {
+            self.ui_menu.active_menu_item = MenuItem::Home;
+            self.th_menu.active_menu_item = THMenuItem::Home;
+            self.th_tab.view = TofHitView::Pulses;
+          }
+          KeyCode::Char('i') => {
+            self.th_menu.active_menu_item = THMenuItem::Hits;
+            self.th_tab.view = TofHitView::Hits;
+          }
+          KeyCode::Char('p') => {
+            self.th_menu.active_menu_item = THMenuItem::Pulses;
+            self.th_tab.view = TofHitView::Pulses;
+          }
+          KeyCode::Char('a') => {
+            self.th_menu.active_menu_item = THMenuItem::Paddles;
+            self.th_tab.view = TofHitView::Paddles;
+          }
+          KeyCode::Char('s') => {
+            self.th_menu.active_menu_item = THMenuItem::SelectPaddle;
+            self.th_tab.view = TofHitView::SelectPaddle;
+          }
+          KeyCode::Char('q') => {
+            return true; // we want to quit the app
+          }
+          _ => ()
+        }
+      }
       _ => {
         self.settings_tab.ctl_active = false;
         match key_code {
@@ -622,6 +718,9 @@ impl<'a> TabbedInterface<'a> {
           KeyCode::Char('h') => self.ui_menu.active_menu_item = MenuItem::Home,
           KeyCode::Char('t') => self.ui_menu.active_menu_item = MenuItem::TofEvents,
           KeyCode::Char('r') => self.ui_menu.active_menu_item = MenuItem::ReadoutBoards,
+          KeyCode::Char('y') => self.ui_menu.active_menu_item = MenuItem::TofSummary,
+          KeyCode::Char('w') => self.ui_menu.active_menu_item = MenuItem::RBWaveform,
+          KeyCode::Char('f') => self.ui_menu.active_menu_item = MenuItem::TofHits,
           KeyCode::Char('s') => self.ui_menu.active_menu_item = MenuItem::Settings,
           KeyCode::Char('m') => self.ui_menu.active_menu_item = MenuItem::MasterTrigger,
           KeyCode::Char('c') => self.ui_menu.active_menu_item = MenuItem::TOFCpu,
@@ -668,16 +767,16 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let packet_map_home = packet_map.clone();
 
   // sender receiver combo to subscribe to tofpackets
-  let (mt_pack_send, mt_pack_recv) : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
-  let (rb_pack_send, rb_pack_recv) : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
-  let (ev_pack_send, ev_pack_recv) : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
-  let (cp_pack_send, cp_pack_recv) : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
+  let (mt_pack_send, mt_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
+  let (rb_pack_send, rb_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
+  let (ev_pack_send, ev_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
+  let (cp_pack_send, cp_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
+  let (rbwf_pack_send, rbwf_pack_recv)  : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
 
   // sender receiver for inter thread communication with decoded packets
   let (mte_send, mte_recv)         : (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = unbounded();
-  let (rbe_send, rbe_recv)         : (Sender<RBEvent>, Receiver<RBEvent>) = unbounded();
-
-  //let (_tx, _rx)                     : (Sender<Event>, Receiver<Event<I>>) = unbounded();
+  let (rbe_send, rbe_recv)         : (Sender<RBEvent>, Receiver<RBEvent>)       = unbounded();
+  let (th_send, th_recv)           : (Sender<TofHit>, Receiver<TofHit>)         = unbounded();
 
   // FIXME - spawn a new thread per each tab!
   let _packet_recv_thread = thread::Builder::new()
@@ -687,6 +786,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                       rb_pack_send,
                       ev_pack_send,
                       cp_pack_send,
+                      rbwf_pack_send,
                       home_stream_wd_cnt,
                       packet_map,
                       );
@@ -751,6 +851,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let rb_menu         = RBMenu::new(color_theme.clone());
   let mt_menu         = MTMenu::new(color_theme.clone());
   let st_menu         = SettingsMenu::new(color_theme.clone());
+  let th_menu         = THMenu::new(color_theme.clone());
+  let ts_menu         = TSMenu::new(color_theme.clone());
+  let rw_menu         = RWMenu::new(color_theme.clone());
 
   // The tabs
   let mt_tab          = MTTab::new(mt_pack_recv,
@@ -765,18 +868,24 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                        color_theme.clone());
   let settings_tab    = SettingsTab::new(color_theme.clone());
   let home_tab        = HomeTab::new(color_theme.clone(), home_streamer, packet_map_home);
-  let event_tab       = EventTab::new(ev_pack_recv, mte_send, rbe_send, color_theme);
-
-  let tabs        = TabbedInterface::new(ui_menu,
-                                         rb_menu,
-                                         mt_menu,
-                                         st_menu,
-                                         mt_tab,
-                                         cpu_tab,
-                                         wf_tab,
-                                         settings_tab,
-                                         home_tab,
-                                         event_tab);
+  let event_tab       = EventTab::new(ev_pack_recv, mte_send, rbe_send, th_send, color_theme);
+  let hit_tab         = TofHitTab::new(th_recv,color_theme.clone());
+  let rbwf_tab        = RBWaveformTab::new(rbwf_pack_recv, color_theme.clone());
+  let tabs            = TabbedInterface::new(ui_menu,
+                                             rb_menu,
+                                             mt_menu,
+                                             st_menu,
+                                             th_menu,
+                                             ts_menu,
+                                             rw_menu,
+                                             mt_tab,
+                                             cpu_tab,
+                                             wf_tab,
+                                             settings_tab,
+                                             home_tab,
+                                             event_tab,
+                                             hit_tab,
+                                             rbwf_tab);
 
   let shared_tabs : Arc<Mutex<TabbedInterface>> = Arc::new(Mutex::new(tabs));
   let shared_tabs_c = shared_tabs.clone();

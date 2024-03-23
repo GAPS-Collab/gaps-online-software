@@ -201,7 +201,7 @@ fn clean_spikes(traces : &mut Vec<Vec<Vec<f32>>>,vcaldone : bool) {
 
 /***********************************/
 
-/// Designed to match np.where(np.diff(np.signbit(trace)))[0] 
+/// Designed to match np.where(np.diff(np.signbit(trace)))\[0\] 
 /// FIXME -> This needs to be moved to analysis!
 pub fn find_zero_crossings(trace: &Vec<f32>) -> Vec<usize> {
   let mut zero_crossings = Vec::new();
@@ -679,7 +679,7 @@ impl RBCalibrations {
   /// 
   /// # Returns
   ///
-  ///   vec[ch[9], tbin[1024]]
+  ///   vec\[ch\[9\], tbin\[1024\]\]
   ///
   pub fn timing_calibration(&self,
                             edge       : &Edge,
@@ -1108,12 +1108,19 @@ impl RBCalibrations {
     }
   }
 
+  /// Discard the data to reduce the memory footprint
+  pub fn discard_data(&mut self) {
+    self.vcal_data = Vec::<RBEvent>::new();
+    self.tcal_data = Vec::<RBEvent>::new();
+    self.noi_data  = Vec::<RBEvent>::new();
+  }
+
   /// Gets the calibration from a file which 
   /// has the RBCalibration stored in a 
   /// TofPacket
   ///
   /// E.g. if it was written with TofPacketWriter
-  pub fn from_file(filename : String) -> Result<Self, SerializationError> {
+  pub fn from_file(filename : String, discard_data : bool) -> Result<Self, SerializationError> {
     let mut reader = TofPacketReader::new(filename);
     loop {
       match reader.next() {
@@ -1123,7 +1130,10 @@ impl RBCalibrations {
         },
         Some(pack) => {
           if pack.packet_type == PacketType::RBCalibration { 
-            let cali = RBCalibrations::from_bytestream(&pack.payload, &mut 0)?;
+            let mut cali = RBCalibrations::from_bytestream(&pack.payload, &mut 0)?;
+            if discard_data {
+              cali.discard_data();
+            }
             return Ok(cali);
           } else {
             continue;

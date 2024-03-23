@@ -1,7 +1,15 @@
-//! Global constants for tof operations
+//! Global constants for TOF operations
 //!
+//! ISSUES:
+//! * there might be constants defined elsewhere,
+//!   also we are defining constants in .toml files
+//!   now. There is an active issue #18
 //!
-//!
+
+/// Speed of light in the scintillator paddles
+/// (divine number from the TOF team)
+/// This value is in cm/ns
+pub const C_LIGHT_PADDLE : f32 = 15.4; 
 
 /// Number of AVAILABLE slots for LocalTriggerBoards
 pub const N_LTBS : usize = 25;
@@ -14,74 +22,6 @@ pub const NCHN          : usize = 9;
 
 /// Number of entries for each waveform (voltage and timing each)
 pub const NWORDS        : usize = 1024;
-
-/// The maximum number of supported readout boards
-#[deprecated(since="0.2.0")]
-pub const MAX_NBOARDS   : usize = 4;
-
-/// The maximum number of detectable peaks in a waveform
-pub const MAX_NUM_PEAKS : usize = 50;
-
-/// Expected maximum trigger rate
-///
-/// TODO/FIXME 
-///
-/// Rationale: The code/threads sleeps at 
-/// certain points, either to actively
-/// wait for something (writing to registers)
-/// or to ease resource consumption.
-///
-/// This might scale with the rate and lead
-/// to missing events. If we set a maximum
-/// rate here directly and adjust the sleep 
-/// times accordingly, we do not get any 
-/// surprises.
-///
-/// # Example:
-/// 
-/// If the `MAX_TRIGGER_RATE` is 1000, we 
-/// can nowhere sleep longer than
-/// 1 milli second.
-///
-pub const MAX_TRIGGER_RATE : usize = 200;
-
-/// How long to wait for paddles packets for each event 
-/// in seconds. This does highly depend on the 
-/// frequency with which the readoutboards are emitting
-/// For now, lets use 30s. 
-///
-/// This will impact also the size of the caches 
-/// (see below)
-///
-/// This might NOT be relevant when we run 
-/// with the master trigger.
-
-/// When should TofPackets time out? (sec)
-pub const TOFPACKET_TIMEOUT : u64 = 60;
-
-/// Limit the size of the internal paddle packet cache
-/// - all packets abvoe this value will be dropped
-pub const PADDLE_PACKET_CACHE_SIZE : usize = 20000;
-
-/// Limit the size of the internanl event cache
-///
-/// This cache holds assembled events.
-/// FIXME: This should be rate dependent
-///
-pub const EVENT_CACHE_SIZE : usize = 30000;
-
-/// Limit the size of the evids the event builder
-/// is currently waiting to get paddles for.
-///
-/// FIXME: (this shoudl be rate*event_timeout
-pub const EVENT_BUILDER_EVID_CACHE_SIZE : usize = 10000;
-
-/// Average number of paddle packets per event
-///
-/// This might be useful to calculate 
-/// cache/memory sizes
-///
-pub const EXP_N_PADDLES_PER_EVENT : usize = 10;
 
 /// Masks for 32 bits commands (byte packets)
 ///

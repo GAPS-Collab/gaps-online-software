@@ -4,15 +4,17 @@
 //!
   
 use crate::errors::WaveformError;
-use crate::constants::NWORDS;
+use crate::constants::{
+    NWORDS,
+    C_LIGHT_PADDLE,
+};
 
 #[cfg(feature="advanced-algorithms")]
 extern crate smoothed_z_score;
 #[cfg(feature="advanced-algorithms")]
 use smoothed_z_score::{Peak, PeaksDetector, PeaksFilter};
 
-// Return the bin with the maximum DC value
-//
+/// Return the bin with the maximum ADC value
 pub fn get_max_bin(voltages    : &Vec<f32>,
                    lower_bound : usize,
                    window      : usize) -> Result<usize, WaveformError> {
@@ -107,7 +109,9 @@ pub fn integrate(voltages     : &Vec<f32>,
   Ok(sum)
 }
 
-// Given a time in ns, find the bin most closely corresponding to that time
+/// Given a time in ns, find the bin most closely corresponding to that time
+/// # Arguments
+/// 
 pub fn time2bin(nanoseconds : &Vec<f32>,
                 t_ns        : f32) -> Result<usize, WaveformError> {
   for n in 0..nanoseconds.len() {
@@ -311,10 +315,28 @@ pub fn find_peaks(voltages       : &Vec<f32>,
   }
   Ok(peaks)
 }
-// 
 
+/// Calculate the interaction time based on the peak timings measured 
+/// at the paddle ends A and B
+///
+/// # Arguments
+///
+/// * t_a           : (absolute) timing for the peak measured at A side
+/// * t_b           : (absolute) timing for the peak measured at B side
+/// * paddle_length : the length of the paddle in cm
+pub fn get_paddle_t0(t_a : f32, t_b : f32, paddle_length : f32) -> f32 {
+  0.5*(t_a + t_b - (paddle_length/C_LIGHT_PADDLE))
+}
 
-
+/// Calculate the distance from the A side
+/// We will Always use the A side to measure
+/// "pos_accross"
+///
+/// Returns:
+///   Distance from "A" side (in mm)
+pub fn pos_across(t_a : f32, t0 : f32) -> f32 {
+  (t_a - t0)*C_LIGHT_PADDLE*10.0 // 10 for cm->mm 
+}
 
 #[cfg(feature = "advanced-algorithms")]
 fn find_sequence_ranges(vec: Vec<usize>) -> Vec<(usize, usize)> {

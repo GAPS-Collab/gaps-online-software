@@ -108,7 +108,7 @@ impl RBTab<'_>  {
              theme       : ColorTheme2) -> RBTab<'static>  {
     let mut rb_select_items = Vec::<ListItem>::new();
     for k in 1..51 {
-      let this_item = format!("RB{:0>2}", k);
+      let this_item = format!("  RB{:0>2}", k);
       rb_select_items.push(ListItem::new(Line::from(this_item)));
     }
 
@@ -188,7 +188,7 @@ impl RBTab<'_>  {
         Some(_rb_id) => {
           let cali_path = format!("calibrations/rb_{:02}.cali.tof.gaps", _rb_id + 1);
           if fs::metadata(cali_path.clone()).is_ok() {
-            match RBCalibrations::from_file(cali_path.clone()) {
+            match RBCalibrations::from_file(cali_path.clone(), true) {
               Err(err) => error!("Unable to load RBCalibration from file {}! {err}", cali_path),
               Ok(cali) => {
                 self.rb_calibration = cali;
@@ -210,6 +210,7 @@ impl RBTab<'_>  {
         }
       }
     }
+
     if !self.tp_receiver.is_empty() {
       match self.tp_receiver.try_recv() {
         Err(_err) => (),
@@ -664,137 +665,3 @@ impl RBTab<'_>  {
   }
 }
 
-//#[derive(Debug, Clone)]
-//pub struct StatusTab<'a> {
-//
-//  pub detail       : Paragraph<'a>,
-//  rb_list          : Vec::<ReadoutBoard>,
-//  pub list_widget  : List<'a>,
-//  pub list_rect    : Rect,
-//  pub detail_rect  : Rect,
-//  pub ch_rect      : Vec<Rect>,
-//  pub ch9_rect     : Rect,
-//  //message_queue    : VecDeque<String>, 
-//  //rb_list_state    : ListState,
-//  //pub ch_datasets  : Vec<Dataset<'a>>,
-//  //pub ch_charts    : Vec<Chart<'a>>
-//}
-//
-//impl StatusTab<'_> {
-//
-//
-//  pub fn new<'a> (main_window   : Rect,
-//                  rb_list       : &Vec<ReadoutBoard>,
-//                  rb_list_state : ListState)
-//    -> StatusTab<'a> {
-//    let empty_data = vec![(0.0,0.0);1024]; 
-//    let data = vec![empty_data;9];
-//    //let data     = Vec::<Vec<(f64,f64)>>::new();
-//    let charts = Vec::<Chart>::new();
-//    let chart_list = charts.clone();
-//
-//    // set up general layout
-//    let status_chunks = Layout::default()
-//      .direction(Direction::Horizontal)
-//      .constraints(
-//          [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
-//      )
-//      .split(main_window);
-//    let detail_and_ch9_chunks = Layout::default()
-//      .direction(Direction::Vertical)
-//      .constraints(
-//          [Constraint::Percentage(50),
-//           Constraint::Percentage(50)].as_ref(),
-//      )
-//      .split(status_chunks[0]);
-//    let list_and_detail_chunks = Layout::default()
-//      .direction(Direction::Horizontal)
-//      .constraints(
-//          [Constraint::Percentage(50),
-//           Constraint::Percentage(50)].as_ref(),
-//      )
-//      .split(detail_and_ch9_chunks[0]);
-//    let wf_chunks = Layout::default()
-//      .direction(Direction::Horizontal)
-//      .constraints(
-//          [Constraint::Percentage(50),
-//           Constraint::Percentage(50)].as_ref(),
-//      )
-//      .split(status_chunks[1]);
-//    let mut ch_chunks = Layout::default()
-//      .direction(Direction::Vertical)
-//      .constraints(
-//          [Constraint::Percentage(25),
-//           Constraint::Percentage(25),
-//           Constraint::Percentage(26),
-//           Constraint::Percentage(25)].as_ref(),
-//      )
-//      .split(wf_chunks[0]);
-//    let mut ch_chunks_2 = Layout::default()
-//      .direction(Direction::Vertical)
-//      .constraints(
-//          [Constraint::Percentage(25),
-//           Constraint::Percentage(25),
-//           Constraint::Percentage(26),
-//           Constraint::Percentage(25)].as_ref(),
-//      )
-//      .split(wf_chunks[1]);
-//    ch_chunks.append(&mut ch_chunks_2);
-//      let items: Vec<_> = rb_list
-//      .iter()
-//      .map(|rb| {
-//        ListItem::new(Line::from(vec![Span::styled(
-//          "RB ".to_owned() + &rb.rb_id.to_string(),
-//          Style::default(),
-//        )]))
-//      })
-//      .collect();
-//
-//    let selected_rb = rb_list[0]
-//    // .get(
-//    //   rb_list_state
-//    //     .selected()
-//    //     .expect("there is always a selected pet"),
-//    // )
-//    // .expect("exists")
-//     .clone();
-//    let rbs = Block::default()
-//    .borders(Borders::ALL)
-//    .style(Style::default().fg(Color::White))
-//    .title("ReadoutBoards")
-//    .border_type(BorderType::Plain);
-//
-//    let list = List::new(items).block(rbs).highlight_style(
-//      Style::default()
-//        .bg(Color::Blue)
-//        .fg(Color::Black)
-//        .add_modifier(Modifier::BOLD),
-//    );
-//
-//    let rb_detail =  Paragraph::new(selected_rb.to_string())
-//     .style(Style::default().fg(Color::LightCyan))
-//     .alignment(Alignment::Left)
-//     //.scroll((5, 10))
-//     //.text(rb_list[0].to_string())
-//     .block(
-//       Block::default()
-//         .borders(Borders::ALL)
-//         .style(Style::default().fg(Color::White))
-//         .title("Detail")
-//         .border_type(BorderType::Double),
-//    );
-//    let mut st = StatusTab {
-//      detail           : rb_detail,
-//      rb_list          : rb_list.clone(),
-//      list_widget      : list,
-//      list_rect        : list_and_detail_chunks[0],
-//      detail_rect      : list_and_detail_chunks[1],
-//      ch_rect          : ch_chunks,
-//      ch9_rect         : detail_and_ch9_chunks[1]
-//      //ch_charts        : chart_list,
-//    };
-//    st
-//    
-//  } // end new
-//}
-//

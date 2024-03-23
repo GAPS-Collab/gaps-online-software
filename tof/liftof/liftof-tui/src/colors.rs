@@ -123,3 +123,7 @@ impl ColorTheme2 {
   }
 }
 
+
+/// Helper - eventually rename ColorTheme2 to ColorTheme
+/// FIXME
+pub type ColorTheme = ColorTheme2;

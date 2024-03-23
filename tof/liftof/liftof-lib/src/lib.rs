@@ -21,7 +21,10 @@ pub use master_trigger::{
     MTBSettings
 };
 
-pub use settings::LiftofSettings;
+pub use settings::{
+    LiftofSettings,
+    AnalysisEngineSettings,
+};
 
 use std::error::Error;
 use std::fmt;
@@ -416,7 +419,8 @@ pub fn get_peaks() -> Vec<Peak> {
 /// * rb          : ReadoutBoard as loaded from the DB, 
 ///                 with latest calibration attached
 pub fn waveform_analysis(event         : &mut RBEvent,
-                         rb            : &ReadoutBoard)
+                         rb            : &ReadoutBoard,
+                         settings      : AnalysisEngineSettings)
 -> Result<(), AnalysisError> {
   //if event.status != EventStatus::Perfect {
   //if event.header.broken {
@@ -431,7 +435,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   // first loop over channels - construct pids
   let mut pid        : u8;
   // will become a parameter
-  let fit_sinus = true;
+  let fit_sinus      = true;
   
   // FIXME - don't do this per every event
   // We might have to though because the number
@@ -528,8 +532,10 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                                event.header.stop_cell as usize,
                                &mut ch_times);
     let (ped, ped_err) = calculate_pedestal(&ch_voltages,
-                                            10.0, 10, 50);
-    debug!("Got pedestal of {} +- {}", ped, ped_err);
+                                            settings.pedestal_thresh,
+                                            settings.pedestal_begin_bin,
+                                            settings.pedestal_win_bins);
+    trace!("Calculated pedestal of {} +- {}", ped, ped_err);
     for n in 0..ch_voltages.len() {
       ch_voltages[n] -= ped;
     }
@@ -537,7 +543,9 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     //debug!("Check impedance value! Just using 50 [Ohm]");
     match integrate(&ch_voltages,
                     &ch_times,
-                    270.0, 70.0, 50.0) {
+                    settings.integration_start,
+                    settings.integration_window,
+                    50.0) {
       Err(err) => {
         error!("Integration failed! Err {err}");
       }
@@ -553,11 +561,11 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     let mut max_volts = 0.0f32;
     match find_peaks(&ch_voltages ,
                      &ch_times    ,
-                     270.0, 
-                     70.0 ,
-                     3    ,
-                     10.0 ,
-                     5      ) {
+                     settings.find_pks_t_start , 
+                     settings.find_pks_t_window,
+                     settings.min_peak_size    ,
+                     settings.find_pks_thresh  ,
+                     settings.max_peaks      ) {
       Err(err) => {
         error!("Unable to find peaks for ch {ch}! Ignoring this channel!");
         error!("We won't be able to calculate timing information for this channel! Err {err}");
@@ -567,7 +575,8 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         for pk in peaks.iter() {
           match cfd_simple(&ch_voltages,
                            &ch_times,
-                           0.2, pk.0, pk.1) {
+                           settings.cfd_fraction,
+                           pk.0, pk.1) {
             Err(err) => {
               debug!("Unable to calculate cfd for peak {} {}! {}", pk.0, pk.1, err);
             }

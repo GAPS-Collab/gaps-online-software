@@ -58,7 +58,7 @@ Vec<u32> get_event_ids_from_raw_stream(const Vec<u8> &bytestream, u64 &pos) {
   while (!has_ended) { 
     pos = search_for_2byte_marker(bytestream, 0xAA, has_ended, pos);  
     pos += 22;
-    event_id = Gaps::u32_from_le_bytes(bytestream, pos);
+    event_id = Gaps::parse_u32(bytestream, pos);
     event_ids.push_back(event_id);
     pos += 18530 - 22 - 4;
   }
