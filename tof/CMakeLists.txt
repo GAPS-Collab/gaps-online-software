@@ -128,12 +128,6 @@ if (BUILD_LIFTOF)
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-cc
   )
   add_custom_target(
-    liftof-analysis
-      ALL
-      COMMAND cargo build --release --bin=liftof-robin-reader
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-analysis
-  )
-  add_custom_target(
     liftof-tui
       ALL
       COMMAND ${RUST_BUILD_COMMAND}
@@ -143,9 +137,6 @@ if (BUILD_LIFTOF)
       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   )
   install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-mt
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  )
-  install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-robin-reader
       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   )
   install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-tui
