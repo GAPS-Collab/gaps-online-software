@@ -5,6 +5,7 @@
 #include "logging.hpp"
 #include "parsers.h"
 #include "calibration.h"
+#include "io.hpp"
 
 u8 extract_rbid(const String& filename) {
   std::regex pattern("rb(\\d+)_cal"); // Match "RB" followed by digits, an underscore, and more digits
@@ -328,7 +329,8 @@ Vec<f32> RBCalibration::nanoseconds(const RBEvent &event, const u8 channel) cons
 /************************************************/
 
 RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
-                                             u64 &pos) {
+                                             u64 &pos,
+                                             bool discard_events) {
   //::set_pattern("[%^%l%$] [%s - %!:%#] [%Y-%m-%d %H:%M:%S] -- %v");
   RBCalibration calibration = RBCalibration();
   log_debug("Start decoding at pos " << pos);
@@ -356,31 +358,56 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
       calibration.t_bin[ch][k]  = value;
     }
   }
+  // FIXME - streamline this
+  serialize_event_data = !discard_events;
+  u16 n_noi = Gaps::parse_u16(stream, pos);
   if (serialize_event_data) {
-    u16 n_noi = Gaps::parse_u16(stream, pos);
     //log_info("Decoding " << n_noi << " no input data events..");
     for (u16 k=0; k<n_noi; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.noi_data.push_back(ev); 
     }
-    u16 n_vcal = Gaps::parse_u16(stream, pos);
+  } else {
+    // we have to advance the number of bytes
+    // the events will have 8 channels + ch9
+    // by definition
+    // FIXME - this number should not be hardcoded!
+    pos += n_noi * 18469;
+  }
+  u16 n_vcal = Gaps::parse_u16(stream, pos);
+  if (serialize_event_data) {
     //log_info("Decoding " << n_vcal << " VCAL data events...");
     for (u16 k=0; k<n_vcal; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.vcal_data.push_back(ev); 
     }
-    u16 n_tcal = Gaps::parse_u16(stream, pos);
+  } else {
+    pos += n_vcal * 18469;
+  }
+  u16 n_tcal = Gaps::parse_u16(stream, pos);
+  if (serialize_event_data) {
     //log_info("Decoding " << n_tcal << " TCAL data events...");
     for (u16 k=0; k<n_tcal; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.tcal_data.push_back(ev); 
     }
+  } else {
+    pos += n_tcal * 18469;
   }
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != RBEvent::TAIL) {
-    log_error("After parsing the event, we found an invalid tail signature " << tail);
+    log_error("After parsing, we found an invalid tail signature " << tail);
   }
   return calibration;
+}
+
+/************************************************/
+
+RBCalibration RBCalibration::from_file(const String &filename, bool discard_events) {
+    auto cali_pack = get_tofpackets(filename)[0];
+    u64 pos = 0;
+    RBCalibration cali = RBCalibration::from_bytestream(cali_pack.payload, pos, discard_events);
+    return cali;
 }
 
 /************************************************/
@@ -428,27 +455,27 @@ bool RBCalibration::channel_check(u8 channel) const {
 
 std::string RBCalibration::to_string() const {
   std::string repr = "<ReadoutboardCalibration:";  
-  repr += "\n\t RB             : " + std::to_string(rb_id);
+  repr += "\n RB             : " + std::to_string(rb_id);
   bool has_data = false;
   if (vcal_data.size() > 0) {
-    repr += "\n\t VCalData       : " + std::to_string(vcal_data.size()) + " (events)";
+    repr += "\n VCalData       : " + std::to_string(vcal_data.size()) + " (events)";
     has_data = true;
   }
   if (tcal_data.size() > 0) {
-    repr += "\n\t TCalData       : " + std::to_string(tcal_data.size()) + " (events)";
+    repr += "\n TCalData       : " + std::to_string(tcal_data.size()) + " (events)";
     has_data = true;
   }
   if (noi_data.size() > 0) {
-    repr += "\n\t NoInputData    : " + std::to_string(tcal_data.size()) + " (events)"; 
+    repr += "\n NoInputData    : " + std::to_string(tcal_data.size()) + " (events)"; 
     has_data = true;
   }
   if (!has_data) {
-    repr += "\n\t .. no calibration data (RBEvents) associated within this package ..";
+    repr += "\n .. no calibration data (RBEvents) loaded/available ..";
   }
-  repr += "\n\t V Offsets [ch0]: .. " + std::to_string(v_offsets[0][98]) + " " + std::to_string(v_offsets[0][99]) + ".."
-          "\n\t V Incrmts [ch0]: .. " + std::to_string(v_incs   [0][98]) + " " + std::to_string(v_incs   [0][99]) + ".."
-          "\n\t V Dips    [ch0]: .. " + std::to_string(v_dips   [0][98]) + " " + std::to_string(v_dips   [0][99]) + ".."
-          "\n\t T Bins    [ch0]: .. " + std::to_string(t_bin    [0][98]) + " " + std::to_string(t_bin    [0][99]) + "..>";
+  repr += "\n V Offsets [ch0]: .. " + std::to_string(v_offsets[0][98]) + " " + std::to_string(v_offsets[0][99]) + ".."
+          "\n V Incrmts [ch0]: .. " + std::to_string(v_incs   [0][98]) + " " + std::to_string(v_incs   [0][99]) + ".."
+          "\n V Dips    [ch0]: .. " + std::to_string(v_dips   [0][98]) + " " + std::to_string(v_dips   [0][99]) + ".."
+          "\n T Bins    [ch0]: .. " + std::to_string(t_bin    [0][98]) + " " + std::to_string(t_bin    [0][99]) + "..>";
   return repr;
 }
 

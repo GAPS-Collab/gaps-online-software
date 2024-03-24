@@ -314,6 +314,7 @@ PYBIND11_MODULE(gaps_tof, m) {
             "Monitoring data from the master trigger board.")
         .def(py::init())
         .def("from_bytestream"      , &MtbMoniData::from_bytestream)
+        .def("from_tofpacket"       , &MtbMoniData::from_tofpacket)
         .def_readonly("fpga_temp"   , &MtbMoniData::fpga_temp   ) 
         .def_readonly("fpga_vccint" , &MtbMoniData::fpga_vccint ) 
         .def_readonly("fpga_vccaux" , &MtbMoniData::fpga_vccaux ) 
@@ -445,8 +446,8 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def(py::init())
         .def_readonly("run_id"              , &TofEventHeader::run_id             )
         .def_readonly("event_id"            , &TofEventHeader::event_id           ) 
-        .def_readonly("timestamp32"         , &TofEventHeader::timestamp_32       ) 
-        .def_readonly("timestamp16"         , &TofEventHeader::timestamp_16       ) 
+        .def_readonly("timestamp32"         , &TofEventHeader::timestamp32        ) 
+        .def_readonly("timestamp16"         , &TofEventHeader::timestamp16        ) 
         .def_readonly("primary_beta"        , &TofEventHeader::primary_beta       ) 
         .def_readonly("primary_beta_unc"    , &TofEventHeader::primary_beta_unc   ) 
         .def_readonly("primary_charge"      , &TofEventHeader::primary_charge     ) 
@@ -462,6 +463,7 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def_readonly("trigger_info"        , &TofEventHeader::trigger_info       ) 
         .def_readonly("ctr_etx"             , &TofEventHeader::ctr_etx            ) 
         .def_readonly("n_paddles"           , &TofEventHeader::n_paddles          ) 
+        .def("get_timestamp48"              , &TofEventHeader::get_timestamp48    )
         .def("from_bytestream"              , &TofEvent::from_bytestream          )
         //.def("from_tofpacket"               ,&TofEvent::from_tofpacket)
         .def("__repr__",           [](const TofEventHeader &th) {
@@ -642,8 +644,9 @@ PYBIND11_MODULE(gaps_tof, m) {
             "Don't load event data from a calibration file (if available). Just load the calibration constants. (This only works with binary files.")
        .def("from_txtfile" ,       &RBCalibration::from_txtfile,
             "Initialize the RBCalibration from a file with exactly one TofPacket")
-       .def("from_califile" ,      &get_from_califile,
-            "Initialize the RBCalibration from a file with exactly one TofPacket of type RBCalibration")
+       .def_static("from_file" ,          &RBCalibration::from_file,
+            "Initialize the RBCalibration from a file with exactly one TofPacket of type RBCalibration",
+            py::arg("filename"), py::arg("discard_events") = true)
        .def("from_tofpacket",      unpack_tp_to_rbcalibration,
             "Unpack a RBCalibration from a compatible tofpacket") 
        .def("nanoseconds",         wrap_rbcalibration_nanoseconds_allchan_rbevent,

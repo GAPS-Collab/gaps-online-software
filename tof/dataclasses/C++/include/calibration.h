@@ -73,15 +73,23 @@ struct RBCalibration {
    *
    * @param
    * @param
+   * @param 
    */
   static RBCalibration from_bytestream(const Vec<u8> &bytestream,
-                                       u64 &pos);
+                                       u64 &pos,
+                                       bool discard_events = true);
 
   /// load a calibration from a txt file with constants
   /// This does not allow to load the data assigned to 
   /// the calibration
   static RBCalibration from_txtfile(const String &filename);
 
+
+  /// Load a calibration from a file with a TofPacket of 
+  /// type RBCalibration in it. This should be the default
+  /// way to load a calibration file
+  static RBCalibration from_file(const String &filename,
+                                 bool discard_events = true);
   /// String representation for printing 
   std::string to_string() const;
 

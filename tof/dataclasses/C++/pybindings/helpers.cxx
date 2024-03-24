@@ -10,15 +10,6 @@ namespace py = pybind11;
 
 /***********************************************/
 
-RBCalibration get_from_califile(const String filename) {
-    auto cali_pack = get_tofpackets(filename)[0];
-    u64 pos = 0;
-    RBCalibration cali = RBCalibration::from_bytestream(cali_pack.payload, pos);
-    return cali;
-}
-
-/***********************************************/
-
 Vec<TofPacket> wrap_get_tofpackets_from_file(const String filename, PacketType filter) {
   return get_tofpackets(filename, filter);
 }

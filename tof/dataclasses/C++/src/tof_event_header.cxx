@@ -16,8 +16,8 @@ TofEventHeader TofEventHeader::from_bytestream(const Vec<u8> &stream,
   TofEventHeader header      = TofEventHeader();
   header.run_id              = Gaps::parse_u32(stream, pos);
   header.event_id            = Gaps::parse_u32(stream, pos);
-  header.timestamp_32        = Gaps::parse_u32(stream, pos);
-  header.timestamp_16        = Gaps::parse_u16(stream, pos);
+  header.timestamp32         = Gaps::parse_u32(stream, pos);
+  header.timestamp16         = Gaps::parse_u16(stream, pos);
   header.primary_beta        = Gaps::parse_u16(stream, pos);
   header.primary_beta_unc    = Gaps::parse_u16(stream, pos);
   header.primary_charge      = Gaps::parse_u16(stream, pos);
@@ -44,8 +44,8 @@ std::string TofEventHeader::to_string() const {
   std::string repr = "<TofEventHeader";
   repr += "\n  Run   ID          : " + std::to_string(run_id              );
   repr += "\n  Event ID          : " + std::to_string(event_id            );
-  repr += "\n  Timestamp 32      : " + std::to_string(timestamp_32        );
-  repr += "\n  Timestamp 16      : " + std::to_string(timestamp_16        );
+  repr += "\n  Timestamp 32      : " + std::to_string(timestamp32         );
+  repr += "\n  Timestamp 16      : " + std::to_string(timestamp16         );
   repr += "\n  Prim. Beta        : " + std::to_string(primary_beta        );
   repr += "\n  Prim. Beta Unc    : " + std::to_string(primary_beta_unc    );
   repr += "\n  Prim. Charge      : " + std::to_string(primary_charge      );
@@ -62,6 +62,13 @@ std::string TofEventHeader::to_string() const {
   repr += "\n  Ctr ETX           : " + std::to_string(ctr_etx             );
   repr += "\n  NPaddles          : " + std::to_string(n_paddles           ) + ">";
   return repr;
+}
+
+/// combine the slow timestamp with 
+/// the fast to get the full
+f64 TofEventHeader::get_timestamp48() const {
+  f64 ts48 = timestamp16 << 16 | timestamp32;
+  return ts48;
 }
 
 std::ostream& operator<<(std::ostream& os, const TofEventHeader& h) {

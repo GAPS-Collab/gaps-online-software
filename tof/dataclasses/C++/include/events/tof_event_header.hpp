@@ -13,8 +13,8 @@ struct TofEventHeader {
   u32 event_id    ; 
   /// a reference to a timestamp
   /// which is not yet decided
-  u32 timestamp_32; 
-  u16 timestamp_16;  // -> 14 byres
+  u32 timestamp32 ; 
+  u16 timestamp16 ;  // -> 14 byres
   
   // reconstructed quantities
   u16 primary_beta        ; 
@@ -46,6 +46,9 @@ struct TofEventHeader {
 
   /// String representation for printing to output
   std::string to_string() const;
+
+  /// get the timestamp
+  f64 get_timestamp48() const;
 
   static TofEventHeader from_bytestream(const Vec<u8> &stream,
                                         u64 &pos);
