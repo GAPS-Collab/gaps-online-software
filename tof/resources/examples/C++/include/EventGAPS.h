@@ -44,6 +44,7 @@ public:
   void    SetThreshold(float PmtThreshold);
   void    SetCFDFraction(float CFDS_frac);
   void    AnalyzePulses(float Pulse_low, float Pulse_win);
+  void    AnalyzePhases(float phi[NRB]);
   void    AnalyzePaddles(float pk_cut, float ch_cut);
   void    AnalyzeEvent(void);
 
@@ -67,16 +68,20 @@ private:
   int     ch;                        // channel we are working with
   int     runno;                     // Run Number
   unsigned long int  evtno;          // Event Number
+  float   sc_speed;                  // Speed(mm/s) in scintillator
+
   float   Threshold;                 // PMT Threshold in DC (for now...)
   float   CFDFraction;               // CFD Fraction for TDC calculation
 
   // SiPM channel info (index references NTOT value)
+  int     max_sipm;                 // Largest SiPM channel
   int     RB[NTOT];
   int     RB_ch[NTOT];
   int     Paddle[NTOT];
   int     PadEnd[NTOT];
 
   // Since paddles start at 1, we include one extra value
+  int     max_paddle;                // Largest paddle ID
   int     Paddle_A[NPAD];            // Channel for this PadddleA
   int     Paddle_B[NPAD];            // Channel for this PadddleB
   int     PadVID[NPAD];              // Volume ID
@@ -84,12 +89,19 @@ private:
   float   PadY[NPAD];                // Y detector location
   float   PadZ[NPAD];                // Z detector location
   int     PadO[NPAD];                // Orientation of Paddle
+  float   Dimension[NPAD][3];        // Dimension of paddle (LxWxH)
+  float   TCorrFixed[NPAD];          // Timing correction (cables, pad_len)
+  float   TCorrEvent[NPAD];          // Timing correction (ch9)
+  int     EarlyPaddle;               // Which paddle is first hit
   
   float   Pedestal[NTOT];             // Pedestal values
   float   PedRMS[NTOT];               // Pedestal RMS values
+  bool    RBInData[NRB];              // RB in data stream?
   float   ClockPedestal[NRB];         // Pedestal values
   float   ClockPedRMS[NRB];           // Pedestal RMS values
- 
+  float   Phi[NRB];                   // Phase of ch9 data
+  float   TShift[NRB];                // Calculated timing shift
+  
   float   VPeak[NTOT];                // Pulse peak value
   float   QInt[NTOT];                 // Pulse charge value
   float   TDC[NTOT];                  // TDC value (CFD method)
@@ -99,11 +111,11 @@ private:
   float   HitX[NPAD];                 // X location in detector
   float   HitY[NPAD];                 // Y location in detector
   float   HitZ[NPAD];                 // Z location in detector
+  float   HitT[NPAD];                 // Time of hit in detector
   float   delta[NPAD];                // displacement from center
   int     NPadCube;
-  int     NPadUpper;
-  int     NPadLower;
-  int     NPadOuter;
+  int     NPadUmbrella;
+  int     NPadCortina;
   
   
   TH1D    *pedHist[NTOT];              // Pedestal histograms
@@ -116,16 +128,18 @@ private:
   TH2D    *QEnd2End[NPAD];             // End 2 End charge 
   TH1I    *HitMask[NPAD];              // Hit mask of paddle
   TH1D    *tDiff[NPAD];                // tdc diff of paddle ends
+  TH1D    *Ch9Shift[NPAD];             // T shift from ch9 analysis
+  TH1F    *HitTime[NPAD];              // Hit Time in detector
   TH1F    *HitPosition[NPAD];          // Hit Position along paddle (cm)
   TH3F    *HitGAPS;                    // Hit Position in detector (mm)
   TH3F    *HitCube;                    // Hit Position in detector (mm)
   TH3F    *HitCortina;                 // Hit Position in detector (mm)
   TH3F    *HitUmbrella;                // Hit Position in detector (mm)
   TProfile *QvPosition[NPAD];          // Avg Q vs position along paddle
+  TH1I    *FirstPaddle;
   TH1I    *NPaddlesCube;
-  TH1I    *NPaddlesUpper;
-  TH1I    *NPaddlesLower;
-  TH1I    *NPaddlesOuter;
+  TH1I    *NPaddlesUmbrella;
+  TH1I    *NPaddlesCortina;
   
   // MEMBER FUNCTIONS
   void    Message(const char *s);           // Print out messages as needed
