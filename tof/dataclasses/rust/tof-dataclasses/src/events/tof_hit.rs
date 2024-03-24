@@ -123,19 +123,21 @@ impl Default for TofHit {
 impl fmt::Display for TofHit {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<TofHit:
+  Paddle ID       {}
   Peak:
     LE Time A/B   {:.2} {:.2}   
     Height  A/B   {:.2} {:.2}
     Charge  A/B   {:.2} {:.2}
   charge_min_i    {}   
   ** reconstructed interaction
-    pos_across    {}   
-    t0            {}   
+    pos_across    {:.2}   
+    t0            {:.2}   
   ctr_etx         {}   
   timestamp32     {}  
   timestamp16     {}
   |-> timestamp48 {}
   VALID           {}>", 
+            self.paddle_id,
             self.get_time_a(),
             self.get_time_b(),
             self.get_peak_a(),
@@ -143,8 +145,8 @@ impl fmt::Display for TofHit {
             self.get_charge_a(),
             self.get_charge_b(),
             self.charge_min_i,
-            self.pos_across,
-            self.t0,
+            self.get_pos_across(),
+            self.get_t0(),
             self.ctr_etx,
             self.timestamp32,
             self.timestamp16,
