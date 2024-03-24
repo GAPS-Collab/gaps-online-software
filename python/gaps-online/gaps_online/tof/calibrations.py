@@ -2,6 +2,11 @@ import gaps_tof as gt
 import pylab as p
 import numpy as np
 import dashi as d
+import re
+import tqdm
+
+from pathlib import Path
+
 d.visual()
 
 try:
@@ -15,6 +20,8 @@ except ImportError as e:
     FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT = (WIDTH_A4, (WIDTH_A4/(2*GOLDEN_RATIO)))
     FIGSIZE_A4 = (WIDTH_A4, (WIDTH_A4/GOLDEN_RATIO) + WIDTH_A4)
     FIGSIZE=FIGSIZE_A4
+
+
 
 def _plot_constants(rb_id, data,var='offset', bins=20):
     fig, axes = \
@@ -118,3 +125,23 @@ gt.RBCalibration.plot_incs    = plot_incs
 gt.RBCalibration.plot_tbins   = plot_tbins
 RBCalibration = gt.RBCalibration
 
+## convenience functions
+def load_calibrations(cali_dir : Path, load_event_data = False):
+    """
+    Load all calibrations stored in a certain directory and
+    return a dictionary rbid -> RBCalibration
+
+    # Arguments:
+
+        * load_event_data : if True, also load the associated events
+                            which went into the calculation of the
+                            calibration constants.
+    """
+    pattern = re.compile('RB(?P<rb_id>[0-9]*)_')
+    calib_files = [k for k in cali_dir.glob("*.tof.gaps")]
+    calibs = dict()
+    for fname in tqdm.tqdm(calib_files, desc="Loading calibration files"):
+        fname = str(fname)
+        rb_id = int(pattern.search(fname).groupdict()['rb_id'])
+        calibs[rb_id] = RBCalibration.from_file(fname)
+    return calibs
