@@ -2,7 +2,9 @@
 #define MONITORINGPACKETS_H_INCLUDED
 
 #include <array>
+
 #include "tof_typedefs.h"
+#include "serialization.h"
 
 /**
  *
@@ -167,7 +169,7 @@ std::ostream& operator<<(std::ostream& os, const PAMoniData& moni);
  * Sensors on the MasterTriggerBoard (MTB)
  *
  */
-struct MtbMoniData {
+struct MtbMoniData : FromTofPacket<MtbMoniData> {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
   static const u8  SIZE = 6;

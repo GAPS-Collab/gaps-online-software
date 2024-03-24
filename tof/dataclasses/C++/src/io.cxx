@@ -89,7 +89,7 @@ Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos, PacketTy
     }
     last_pos = pos;
   }
-  log_info("Read out " << packets.size() << " packets from bytestream!");
+  log_debug("Read out " << packets.size() << " packets from bytestream!");
   return packets;
 }
 
