@@ -37,7 +37,7 @@ UCLA_RB="ucla-tof-rb47 ucla-tof-rb33 ucla-tof-rb34"
 UCLA_RB="nevis-tof foo"
 #UCLA_RB="tof-computer-tailscale"
 compile_target liftof-rb
-deploy_target liftof-rb 0.9.5-debug nevis-tof
+deploy_target liftof-rb 0.10.0 nevis-tof
 #version=$(get_version)
 #for rb in `echo $UCLA_RB`;
 #  do

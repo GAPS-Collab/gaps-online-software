@@ -2,19 +2,19 @@
 
 ![build-docs-badge](https://github.com/GAPS-Collab/gaps-online-software/workflows/BuildBot/badge.svg)
 
-This is branch HAHALUA-0.9. [Hahalua is a manta ray](https://dlnr.hawaii.gov/dar/sharks-and-rays/).
-![Manta ray](resources/assets/hahalua.png)
+This is branch LELEWAA-0.10. [Lelewaa is a whale shark](https://dlnr.hawaii.gov/dar/sharks-and-rays/).
+![Manta ray](resources/assets/lelewaa.png)
 
 >[!TIP] 
->Manta rays can be spotted in the Hawaiian waters. There are over 100 different individuals who have been seen in front of the Kona coast, Big Island. Please report sightings [here](https://mprf.net/identification/report-a-sighting.html), and remember to take a picture of their belly, since the spotted pattern on their underside is unique for every individual and allows to identify them. 
+>Whale sharks are the largest fish on the planet, and despite their size they are not aggressive towards humans. Whale sharks can be spotted in the Hawaiian waters, however, sightings are rare so if you see enjoy your encounter and please be respectful. 
 
 >[!NOTE]
->Manta rays seem to be extremly intelligent, and there are indications that they might even recognize themselves in a mirror, however, [this is active research](https://www.science.org/content/article/manta-rays-show-evidence-being-self-aware) 
+>Apparently the Hawai'ian name Lelewa'a stems from the tale that the whale sharks like to approach and lean on canoe outriggers. 
 
-This branch is the last version before we claim flight-readiness, which will be our first "true" release.
-The main purpose of this branch is to merge the command suite with what we learned from the UCLA teststand.
-
-The branch is related to a [milestone](https://github.com/GAPS-Collab/gaps-online-software/milestone/3), however, we are not strictly following the milestone concept.
+In contrast to what we claimed in the last pre-release branch, HAHALUA-0.9, this branch is NOT the flight version. Creating another pre-release version had been become necessary, because a breaking change in the way we communicate with the MTB has 
+been introduce, see also [MTB fw v3.0.0](https://gitlab.com/ucla-gaps-tof/firmware/-/tree/v3.0.0) . This affects the size of the MasterTriggerEvent. The purpose of this branch is to align the MasterTriggerEvent closer to the actual representation 
+on the MTB, which will boost performance and reduce data size, while increasing clarity and readibility of the code.
+**All previous data will be readable with this code, however, data taken with this version (or a later version of the code will not be able to be read by earlier versions of this code (or there is no guarantee that it works))** 
 
 ## API docs 
 

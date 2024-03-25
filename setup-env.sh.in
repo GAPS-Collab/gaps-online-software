@@ -6,7 +6,7 @@ export DJANGO_SETTINGS_MODULE=gaps_db.settings
 
 
 echo -e "\n\n  ************************************************"
-echo -e "  * WELCOME TO GAPS-ONLINE-SOFTWARE V0.9 'HAHALUA' *"
+echo -e "  * WELCOME TO GAPS-ONLINE-SOFTWARE V0.10 'LELEWAA' *"
 echo -e "  ************************************************"
 echo -e "   -- We have set the following variables:"
 echo -e "   -- PYTHONPATH=$PYTHONPATH"
