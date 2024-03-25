@@ -2,19 +2,22 @@ pub mod master_trigger;
 pub mod settings;
 pub mod constants;
 
-use constants::{DEFAULT_CALIB_VOLTAGE,
-                DEFAULT_CALIB_EXTRA,
-                DEFAULT_RB_ID,
-                //DEFAULT_PB_ID,
-                DEFAULT_LTB_ID,
-                DEFAULT_PREAMP_ID,
-                DEFAULT_PREAMP_BIAS,
-                //DEFAULT_POWER_STATUS,
-                DEFAULT_RUN_TYPE,
-                DEFAULT_RUN_EVENT_NO,
-                //DEFAULT_RUN_TIME,
-                PREAMP_MIN_BIAS,
-                PREAMP_MAX_BIAS};
+use constants::{
+    DEFAULT_CALIB_VOLTAGE,
+    DEFAULT_CALIB_EXTRA,
+    DEFAULT_RB_ID,
+    //DEFAULT_PB_ID,
+    DEFAULT_LTB_ID,
+    DEFAULT_PREAMP_ID,
+    DEFAULT_PREAMP_BIAS,
+    //DEFAULT_POWER_STATUS,
+    DEFAULT_RUN_TYPE,
+    DEFAULT_RUN_EVENT_NO,
+    //DEFAULT_RUN_TIME,
+    PREAMP_MIN_BIAS,
+    PREAMP_MAX_BIAS
+};
+
 pub use master_trigger::{
     //connect_to_mtb,
     master_trigger,
@@ -58,7 +61,10 @@ extern crate env_logger;
 
 //use tof_dataclasses::manifest as mf;
 use tof_dataclasses::DsiLtbRBMapping;
-use tof_dataclasses::manifest::ReadoutBoard;
+use tof_dataclasses::manifest::{
+    ReadoutBoard,
+};
+
 use tof_dataclasses::constants::NWORDS;
 use tof_dataclasses::calibrations::{
     //RBCalibrations,
@@ -84,7 +90,9 @@ use tof_dataclasses::analysis::{
     calculate_pedestal,
     integrate,
     cfd_simple,
-    find_peaks
+    find_peaks,
+    get_paddle_t0,
+    pos_across
 };
 
 use tof_dataclasses::RBChannelPaddleEndIDMap;
@@ -95,7 +103,8 @@ use clap::{arg,
   //Command,
   Parser,
   Args,
-  Subcommand};
+  Subcommand
+};
 
 pub const MT_MAX_PACKSIZE   : usize = 512;
 pub const DATAPORT          : u32   = 42000;
@@ -259,16 +268,16 @@ impl fmt::Display for RunStatistics {
 /// FIXME - proper fitting algorithm
 /// This here is bad, because it does not interpolate between 
 /// the bins
-fn fit_sine(time: Vec<f32>, data: Vec<f32>) -> (f32, f32, f32) {
-  let z_cross = find_zero_crossings(&data);
+fn fit_sine(time: &Vec<f32>, data: &Vec<f32>) -> (f32, f32, f32) {
+  let z_cross   = find_zero_crossings(&data);
   let mut y_max = f32::MIN;
   let mut y_min = f32::MAX;
   for y in data {
-    if y > y_max {
-      y_max = y;
+    if *y > y_max {
+      y_max = *y;
     }
-    if y < y_min {
-      y_min = y;
+    if *y < y_min {
+      y_min = *y;
     }
   }
   let amp   = f32::abs(y_max - y_min)/2.0;
@@ -428,98 +437,25 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   //  // is probably nothing else we can do?
   //  return Err(AnalysisError::InputBroken);
   //}
-
-  let mut paddles    = HashMap::<u8, TofHit>::new();
+  // ch -> pid
+  // pid -> (ch, ch) (for the two paddle ends)
+  //let mut pid_vs_chs = HashMap::<u8, (PaddleEndIdentifier,[u8;2])>::new();
   let channels       = event.header.get_channels();
-  let channels_c     = channels.clone();
-  // first loop over channels - construct pids
-  let mut pid        : u8;
   // will become a parameter
   let fit_sinus      = true;
-  
-  // FIXME - don't do this per every event
-  // We might have to though because the number
-  // of active paddles is changing every event
-  for raw_ch in channels {
-    if raw_ch == 8 {
-      continue;
+  // allocate memory for the calbration results
+  let mut voltages : Vec<f32>= vec![0.0; NWORDS];
+  let mut times    : Vec<f32>= vec![0.0; NWORDS];
+
+  // Step 0 : If desired, fit sine
+  if fit_sinus {
+    if !channels.contains(&8) {
+      error!("This RB does not have ch9 data!");
     }
-    // +1 channel convention
-    let ch = raw_ch + 1;
-    //let mut TofHit::new();
-    //let p_end_id = channel_map.get(&ch).unwrap_or(&0);
-    //let p_end_id = rb.channel_to_paddle_end_id[raw_ch as usize];
-    //if p_end_id < 1000 {
-    //  //error!("Invalid paddle end id {} for channel {}!", p_end_id, ch);
-    //  continue;
-    //}
-    pid = rb.get_pid_for_ch(ch as usize);
-    if !paddles.contains_key(&pid) {
-      let mut hit   = TofHit::new();
-      hit.paddle_id = pid;
-      paddles.insert(pid, hit);
-    }
-  }
-  // second loop over channels. Now we have
-  // all the paddles set up in the hashmap
-  for raw_ch in channels_c {
-    if event.adc[raw_ch as usize].len() == 0 {
-      // we are most likely running in trace suppression mode, 
-      // this channel is simply not populated
-      continue;
-    }
-    if raw_ch == 8 {
-      if fit_sinus {
-        // +1 channel convention
-        let ch = raw_ch + 1;
-        
-        let mut ch_voltages : Vec<f32>= vec![0.0; NWORDS];
-        let mut ch_times    : Vec<f32>= vec![0.0; NWORDS];
-        rb.calibration.voltages(ch.into(),
-                                event.header.stop_cell as usize,
-                                &event.adc[8],
-                                &mut ch_voltages);
-        //warn!("We have to rework the spike cleaning!");
-        //match RBCalibrations::spike_cleaning(&mut ch_voltages,
-        //                                     event.header.stop_cell) {
-        //  Err(err) => {
-        //    error!("Spike cleaning failed! {err}");
-        //  }
-        //  Ok(_)    => ()
-        //}
-        rb.calibration.nanoseconds(ch.into(),
-                                   event.header.stop_cell as usize,
-                                   &mut ch_times);
-        let fit_result = fit_sine(ch_times, ch_voltages);
-        //println!("FIT RESULT = {:?}", fit_result);
-        event.header.set_sine_fit(fit_result);
-        continue;
-      } else {
-        continue;
-      }
-    }
-    // +1 channel convention
-    let ch = raw_ch + 1;
-    // FIXME - copy/paste from above, wrap in a 
-    // function
-    let p_end_id = rb.channel_to_paddle_end_id[raw_ch as usize];
-    pid = rb.get_pid_for_ch(ch as usize);
-    //let p_end_id  = channel_map.get(&ch).unwrap_or(&0);
-    let mut is_a_side = false; 
-    if p_end_id < 1000 {
-      //error!("Invalid paddle end id: {}!" ,p_end_id);
-      continue;
-    }
-    if p_end_id <= 2000 {
-      is_a_side = true;
-    }
-    // allocate memory for the calbration results
-    let mut ch_voltages : Vec<f32>= vec![0.0; NWORDS];
-    let mut ch_times    : Vec<f32>= vec![0.0; NWORDS];
-    rb.calibration.voltages(ch.into(),
+    rb.calibration.voltages(9,
                             event.header.stop_cell as usize,
-                            &event.adc[raw_ch as usize],
-                            &mut ch_voltages);
+                            &event.adc[8],
+                            &mut voltages);
     //warn!("We have to rework the spike cleaning!");
     //match RBCalibrations::spike_cleaning(&mut ch_voltages,
     //                                     event.header.stop_cell) {
@@ -528,92 +464,169 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     //  }
     //  Ok(_)    => ()
     //}
-    rb.calibration.nanoseconds(ch.into(),
+    rb.calibration.nanoseconds(9,
                                event.header.stop_cell as usize,
-                               &mut ch_times);
-    let (ped, ped_err) = calculate_pedestal(&ch_voltages,
-                                            settings.pedestal_thresh,
-                                            settings.pedestal_begin_bin,
-                                            settings.pedestal_win_bins);
-    trace!("Calculated pedestal of {} +- {}", ped, ped_err);
-    for n in 0..ch_voltages.len() {
-      ch_voltages[n] -= ped;
+                               &mut times);
+    let fit_result = fit_sine(&times, &voltages);
+    //println!("FIT RESULT = {:?}", fit_result);
+    event.header.set_sine_fit(fit_result);
+  }
+
+  //// Step 1: Prepare the data. Currently, we 
+  //// only support one peak per channel
+  let mut paddles    = HashMap::<u8, TofHit>::new();
+  for raw_ch in channels.iter() {
+    if *raw_ch == 8 {
+      continue; // ignore ch9 for now (no hits) 
     }
-    let mut charge : f32 = 0.0;
-    //debug!("Check impedance value! Just using 50 [Ohm]");
-    match integrate(&ch_voltages,
-                    &ch_times,
-                    settings.integration_start,
-                    settings.integration_window,
-                    50.0) {
-      Err(err) => {
-        error!("Integration failed! Err {err}");
-      }
-      Ok(chrg)   => {
-        charge = chrg;
-      }
-    }
-    //let peaks : Vec::<(usize, usize)>;
-    let mut cfd_times = Vec::<f32>::new();
-    // We actually might have multiple peaks 
-    // here
-    // FIXME 
-    let mut max_volts = 0.0f32;
-    match find_peaks(&ch_voltages ,
-                     &ch_times    ,
-                     settings.find_pks_t_start , 
-                     settings.find_pks_t_window,
-                     settings.min_peak_size    ,
-                     settings.find_pks_thresh  ,
-                     settings.max_peaks      ) {
-      Err(err) => {
-        error!("Unable to find peaks for ch {ch}! Ignoring this channel!");
-        error!("We won't be able to calculate timing information for this channel! Err {err}");
-      },
-      Ok(peaks)  => {
-        //peaks = pks;
-        for pk in peaks.iter() {
-          match cfd_simple(&ch_voltages,
-                           &ch_times,
-                           settings.cfd_fraction,
-                           pk.0, pk.1) {
-            Err(err) => {
-              debug!("Unable to calculate cfd for peak {} {}! {}", pk.0, pk.1, err);
-            }
-            Ok(cfd) => {
-              cfd_times.push(cfd);
-            }
-          }
-          // just do the first peak for now
-          let pk_height = ch_voltages[pk.0..pk.1].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
-          max_volts = *pk_height; 
-          break;
-        }
-      }// end OK
-    } // end match find_peaks 
-    let this_hit      = paddles.get_mut(&pid).unwrap();
-    let mut this_time = 0.0f32;
-    if cfd_times.len() > 0 {
-      this_time = cfd_times[0];
-    }
-    
-    if is_a_side {
-      this_hit.set_time_a(this_time);
-      this_hit.set_charge_a(charge);
-      this_hit.set_peak_a(max_volts);
+    let pend = rb.channel_to_paddle_end_id[*raw_ch as usize];
+    // check which side it is
+    let pid : u8;
+    if pend > 2000 {
+      pid = (pend - 2000) as u8;
     } else {
-      this_hit.set_time_b(this_time);
-      this_hit.set_charge_b(charge);
-      this_hit.set_peak_b(max_volts);
+      pid = (pend - 1000) as u8;
     }
-    // Technically, we can have more than one peak. 
-    // We need to adjust the integration window to 
-    // the peak min/max and then create Peak instances
-    // and sort them into TofHits
+    if !paddles.contains_key(&pid) {
+      let mut hit = TofHit::new();
+      hit.paddle_id = pid;
+      paddles.insert(pid, hit);
+    }
+  }
 
-
-    // FIXME - do more analysis here!
-  } // end loop over channels
+  // Step 2. Walk over the paddles and fill the 
+  // values
+  let mut pids = Vec::<u8>::new();
+  for k in paddles.keys() {
+    pids.push(*k);
+  }
+  for pid in pids {
+    let mut hit : TofHit;
+    match paddles.get_mut(&pid) {
+      None => {
+        error!("The hit is not there, even after we put it in the map!");
+        error!("I am chugging along, but something is amiss here!");
+        continue;
+      },
+      Some(hit) => {
+        for raw_ch in rb.paddle_id_to_channel.get(&pid).unwrap() {
+          if channels.contains(&raw_ch) {
+            // Step 1: Calibration
+            rb.calibration.voltages(*raw_ch as usize+ 1,
+                                    event.header.stop_cell as usize,
+                                    &event.adc[*raw_ch as usize],
+                                    &mut voltages);
+            //FIXME - spike cleaning!
+            //match RBCalibrations::spike_cleaning(&mut ch_voltages,
+            //                                     event.header.stop_cell) {
+            //  Err(err) => {
+            //    error!("Spike cleaning failed! {err}");
+            //  }
+            //  Ok(_)    => ()
+            //}
+            rb.calibration.nanoseconds(*raw_ch as usize + 1,
+                                       event.header.stop_cell as usize,
+                                       &mut times);
+            // Step 2: Pedestal subtraction
+            let (ped, ped_err) = calculate_pedestal(&voltages,
+                                                    settings.pedestal_thresh,
+                                                    settings.pedestal_begin_bin,
+                                                    settings.pedestal_win_bins);
+            trace!("Calculated pedestal of {} +- {}", ped, ped_err);
+            for n in 0..voltages.len() {
+              voltages[n] -= ped;
+            }
+            let mut charge : f32 = 0.0;
+            //debug!("Check impedance value! Just using 50 [Ohm]");
+            // Step 3 : charge integration
+            // FIXME - make impedance a settings parameter
+            // This does not make sense. Why don't we integrate 
+            // the peak?
+            match integrate(&voltages,
+                            &times,
+                            settings.integration_start,
+                            settings.integration_window,
+                            50.0) {
+              Err(err) => {
+                error!("Integration failed! Err {err}");
+              }
+              Ok(chrg)   => {
+                charge = chrg;
+              }
+            }
+            //let peaks : Vec::<(usize, usize)>;
+            let mut cfd_times = Vec::<f32>::new();
+            let mut max_volts = 0.0f32;
+            // Step 4 : Find peaks
+            // FIXME - what do we do for multiple peaks?
+            // Currently we basically throw them away
+            match find_peaks(&voltages ,
+                             &times    ,
+                             settings.find_pks_t_start , 
+                             settings.find_pks_t_window,
+                             settings.min_peak_size    ,
+                             settings.find_pks_thresh  ,
+                             settings.max_peaks      ) {
+              Err(err) => {
+                error!("Unable to find peaks for ch {raw_ch}! Ignoring this channel!");
+                error!("We won't be able to calculate timing information for this channel! Err {err}");
+              },
+              Ok(peaks)  => {
+                //peaks = pks;
+                // Step 5 : Find tdcs
+                println!("Found {} peaks!", peaks.len());
+                for pk in peaks.iter() {
+                  match cfd_simple(&voltages,
+                                   &times,
+                                   settings.cfd_fraction,
+                                   pk.0, pk.1) {
+                    Err(err) => {
+                      debug!("Unable to calculate cfd for peak {} {}! {}", pk.0, pk.1, err);
+                    }
+                    Ok(cfd) => {
+                      cfd_times.push(cfd);
+                    }
+                  }
+                  // just do the first peak for now
+                  let pk_height = voltages[pk.0..pk.1].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
+                  max_volts = *pk_height; 
+                  break;
+                }
+              }// end OK
+            } // end match find_peaks 
+            let mut tdc : f32 = 0.0; 
+            if cfd_times.len() > 0 {
+              tdc = cfd_times[0];
+            }
+            println!("Calucalated tdc {}, charge {}, max {}", tdc, charge, max_volts); 
+            if rb.channel_to_paddle_end_id[*raw_ch as usize] > 2000 {
+              hit.ftime_b      = tdc;
+              hit.set_time_b(tdc);
+              hit.set_charge_b(charge);
+              hit.set_peak_b(max_volts);
+              
+            } else {
+              hit.ftime_a = tdc;
+              hit.set_time_a(tdc);
+              hit.set_charge_a(charge);
+              hit.set_peak_a(max_volts);
+            }
+            println!("{}", hit);
+          } else {
+            error!("Only one end of a paddle has a channel record! Ch {}, Pid {}", raw_ch, pid);
+          }
+        }
+      }
+    }
+  }
+  println!("{:?}", paddles);
+  for (_, hit) in paddles.iter_mut() {
+    let t0 = get_paddle_t0(hit.ftime_a, hit.ftime_b, rb.get_paddle_length(hit.paddle_id));
+    let pa = pos_across(hit.ftime_a, t0);
+    hit.set_t0(t0);
+    hit.set_pos_across(pa);
+    println!("caluclated {} {} for {}",t0, pa, hit);
+  }
   let result = paddles.into_values().collect();
   event.hits = result;
   Ok(())
