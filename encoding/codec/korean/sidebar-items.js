@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Windows949Encoder","Windows949Encoding"]};

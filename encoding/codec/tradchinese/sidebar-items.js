@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["BigFive2003Encoder","BigFive2003Encoding"]};

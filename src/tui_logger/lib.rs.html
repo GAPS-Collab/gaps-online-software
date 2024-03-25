@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tui-logger-0.10.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tui_logger" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tui-logger-0.11.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tui_logger" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -1546,7 +1546,7 @@
 //!
 //! ## Important note for `tui`
 //!
-//! The `tui` crate has been archived and `ratatui` has taken over. 
+//! The `tui` crate has been archived and `ratatui` has taken over.
 //! In order to avoid supporting compatibility for an inactive crate,
 //! the v0.9.x releases are the last to support `tui`. In case future bug fixes
 //! are needed, the branch `tui_legacy` has been created to track changes to 0.9.x releases.
@@ -1644,22 +1644,16 @@
 //!
 //! ## Demo
 //!
-//! Run demo using termion 1.5:
+//! Run demo using termion:
 //!
 //! ```ignore
-//! cargo run --example demo
-//! ```
-//!
-//! Or more verbosely:
-//!
-//! ```ignore
-//! cargo run --example demo --no-default-features -F examples-termion
+//! cargo run --example demo --features termion
 //! ```
 //!
 //! Run demo with crossterm:
 //!
 //! ```ignore
-//! cargo run --example demo --no-default-features -F examples-crossterm
+//! cargo run --example demo --features crossterm
 //! ```
 //!
 //! ## `slog` support
@@ -1721,7 +1715,13 @@
 //! * [Badr Bouslikhin](https://github.com/badrbouslikhin) for providing patch in [#47](https://github.com/gin66/tui-logger/issues/47) for ratatui update
 //! * [ganthern](https://github.com/ganthern) for providing patch in [#49](https://github.com/gin66/tui-logger/issues/49) for tui support removal
 //! * [Linda_pp](https://github.com/rhysd) for providing patch in [#51](https://github.com/gin66/tui-logger/issues/51) for Cell:set_symbol
+//! * [Josh McKinney](https://github.com/joshka) for providing patch in
+//! [#56](https://github.com/gin66/tui-logger/issues/56) for Copy on TuiWidgetEvent and
+//! TuiLoggerWidget
 //!
+//!## Star History
+//!
+//![![Star History Chart](https://api.star-history.com/svg?repos=gin66/tui-logger&amp;type=Date)](https://star-history.com/#gin66/tui-logger&amp;Date)
 </span><span class="attr">#[macro_use]
 </span><span class="kw">extern crate </span>lazy_static;
 
@@ -2064,7 +2064,7 @@
     }
 }
 
-<span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+<span class="attr">#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 </span><span class="kw">pub enum </span>TuiWidgetEvent {
     SpaceKey,
     UpKey,
@@ -2102,9 +2102,9 @@
     <span class="kw">pub fn </span>new() -&gt; TuiWidgetInnerState {
         TuiWidgetInnerState::default()
     }
-    <span class="kw">fn </span>transition(<span class="kw-2">&amp;mut </span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>TuiWidgetEvent) {
+    <span class="kw">fn </span>transition(<span class="kw-2">&amp;mut </span><span class="self">self</span>, event: TuiWidgetEvent) {
         <span class="kw">use </span>TuiWidgetEvent::<span class="kw-2">*</span>;
-        <span class="kw">match </span><span class="kw-2">*</span>event {
+        <span class="kw">match </span>event {
             SpaceKey =&gt; {
                 <span class="self">self</span>.hide_off ^= <span class="bool-val">true</span>;
             }
@@ -2181,7 +2181,7 @@
         <span class="self">self</span>.inner.lock().config.set(target, levelfilter);
         <span class="self">self
     </span>}
-    <span class="kw">pub fn </span>transition(<span class="kw-2">&amp;mut </span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>TuiWidgetEvent) {
+    <span class="kw">pub fn </span>transition(<span class="kw-2">&amp;mut </span><span class="self">self</span>, event: TuiWidgetEvent) {
         <span class="self">self</span>.inner.lock().transition(event);
     }
 }
@@ -2406,7 +2406,7 @@
 
 <span class="doccomment">/// The TuiLoggerWidget shows the logging messages in an endless scrolling view.
 /// It is controlled by a TuiWidgetState for selected events.
-</span><span class="attr">#[derive(Debug, Clone, PartialEq, Hash)]
+</span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Hash)]
 </span><span class="kw">pub enum </span>TuiLoggerLevelOutput {
     Abbreviated,
     Long,

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["AnsiValue","Bg","Black","Blue","Cyan","Fg","Green","LightBlack","LightBlue","LightCyan","LightGreen","LightMagenta","LightRed","LightWhite","LightYellow","Magenta","Red","Reset","Rgb","White","Yellow"],"trait":["Color","DetectColors"]};

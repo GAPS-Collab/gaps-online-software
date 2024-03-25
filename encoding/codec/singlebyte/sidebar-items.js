@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["iso_8859_1"],"struct":["SingleByteDecoder","SingleByteEncoder","SingleByteEncoding"]};

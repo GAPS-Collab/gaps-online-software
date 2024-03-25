@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["NAN"],"struct":["Number","NumberOutOfScope"]};

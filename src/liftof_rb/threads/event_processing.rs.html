@@ -389,7 +389,7 @@
   <span class="kw">let </span>cali_path_buf   = PathBuf::from(<span class="kw-2">&amp;</span>cali_path);
   <span class="kw">if </span>fs::metadata(cali_path_buf.clone()).is_ok() {
     <span class="macro">info!</span>(<span class="string">"Found valid calibration file path {cali_path_buf:?}"</span>);
-    <span class="kw">match </span>RBCalibrations::from_file(cali_path) {
+    <span class="kw">match </span>RBCalibrations::from_file(cali_path, <span class="bool-val">true</span>) {
       <span class="prelude-val">Err</span>(err) =&gt; {
         <span class="macro">error!</span>(<span class="string">"Can't load calibration! {err}"</span>);
       },

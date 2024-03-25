@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"macro":["define_color","define_linear_interpolation_color_map","doc"],"mod":["backend","chart","coord","data","drawing","element","prelude","series","style"]};

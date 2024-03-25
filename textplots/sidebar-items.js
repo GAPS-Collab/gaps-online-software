@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["LabelFormat","LineStyle","Shape","TickDisplay"],"mod":["scale","utils"],"struct":["Chart"],"trait":["AxisBuilder","ColorPlot","LabelBuilder","Plot","TickDisplayBuilder"]};

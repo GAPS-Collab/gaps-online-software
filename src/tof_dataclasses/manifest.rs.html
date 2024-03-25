@@ -939,6 +939,88 @@
 <a href="#938" id="938">938</a>
 <a href="#939" id="939">939</a>
 <a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Entities of the tof, that is LocalTriggerBoard, ReadoutBoard, PB, MTB...
 //! 
 //! This provides structs to hold their metainformation,
@@ -946,12 +1028,12 @@
 //! well as to serialize them locally.
 
 </span><span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::collections::HashMap;
 
 <span class="macro">cfg_if::cfg_if! </span>{
   <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"database"</span>)]  </span>{
     <span class="kw">use </span>std::path::Path;
     <span class="kw">use </span>std::str::FromStr;
-    <span class="kw">use </span>std::collections::HashMap;
     <span class="kw">use </span><span class="kw">crate</span>::DsiLtbRBMapping;
     <span class="kw">extern crate </span>sqlite;
   }
@@ -962,7 +1044,19 @@
 <span class="kw">use </span>chrono::NaiveDateTime;
 
 <span class="kw">use </span><span class="kw">crate</span>::calibrations::RBCalibrations;
-    
+
+<span class="kw">pub fn </span>get_pid_from_pend(pend : u16) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
+  <span class="kw">if </span>pend &lt; <span class="number">1000 </span>{
+    <span class="kw">return </span><span class="prelude-val">None</span>;
+  }
+  <span class="kw">if </span>pend &gt; <span class="number">2000 </span>{
+    <span class="kw">return </span><span class="prelude-val">Some</span>((pend - <span class="number">2000</span>) <span class="kw">as </span>u8);
+  } <span class="kw">else </span>{
+    <span class="kw">return </span><span class="prelude-val">Some</span>((pend - <span class="number">1000</span>) <span class="kw">as </span>u8);
+  }
+}
+
+
 <span class="doccomment">/// Summary of DSI/J/LTBCH (0-319)
 </span><span class="attr">#[cfg(feature = <span class="string">"database"</span>)]
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -1169,7 +1263,7 @@
         <span class="prelude-val">Some</span>(v) =&gt; {
           <span class="comment">//println!("{} = {}", name, v);
           </span><span class="kw">match </span>name {
-            <span class="string">"rb_id"      </span>=&gt; {rb.rb_id  = u8::from_str(v).unwrap_or(<span class="number">0</span>);},
+            <span class="string">"rb_id"         </span>=&gt; {rb.rb_id  = u8::from_str(v).unwrap_or(<span class="number">0</span>);},
             <span class="string">"ch1_paddle_id" </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">1</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
             <span class="string">"ch2_paddle_id" </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">2</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
             <span class="string">"ch3_paddle_id" </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">3</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
@@ -1183,7 +1277,65 @@
         }
       }
     } <span class="comment">// end loop over rbs
-    </span>rbs.push(rb);
+    // populate the other 
+    </span><span class="kw">for </span>ch <span class="kw">in </span><span class="number">1</span>..<span class="number">9 </span>{
+      <span class="kw">let </span>pid    = rb.get_pid_for_ch(ch);
+      <span class="kw">let </span>pend   = rb.channel_to_paddle_end_id[ch - <span class="number">1</span>];
+      <span class="kw">if </span>!rb.paddle_id_to_channel.contains_key(<span class="kw-2">&amp;</span>pid) {
+        <span class="kw">if </span>pend &gt; <span class="number">2000 </span>{
+          rb.paddle_id_to_channel.insert(pid, [<span class="number">0</span>, ch <span class="kw">as </span>u8 -<span class="number">1</span>]);
+        } <span class="kw">else </span>{
+          rb.paddle_id_to_channel.insert(pid, [ch <span class="kw">as </span>u8 -<span class="number">1</span>,<span class="number">0</span>]);
+        }
+      } <span class="kw">else </span>{
+        <span class="kw">if </span>pend &gt; <span class="number">2000 </span>{
+          rb.paddle_id_to_channel.get_mut(<span class="kw-2">&amp;</span>pid).unwrap()[<span class="number">1</span>] = ch <span class="kw">as </span>u8 -<span class="number">1</span>;
+        } <span class="kw">else </span>{
+          rb.paddle_id_to_channel.get_mut(<span class="kw-2">&amp;</span>pid).unwrap()[<span class="number">0</span>] = ch <span class="kw">as </span>u8 -<span class="number">1</span>;
+        }
+      }
+      <span class="kw">let </span>pid_q  = <span class="macro">format!</span>(<span class="string">"SELECT length FROM tof_db_paddle WHERE paddle_id == {}"</span>, pid);
+      <span class="kw">let </span>pend_q = <span class="macro">format!</span>(<span class="string">"SELECT cable_length FROM tof_db_paddleend WHERE paddle_end_id == {}"</span>, pend);
+      <span class="kw">match </span>connection.iterate(pid_q, |pairs| {
+        <span class="macro">debug!</span>(<span class="string">"New rb, has following values..."</span>);
+        <span class="kw">for </span><span class="kw-2">&amp;</span>(name, value) <span class="kw">in </span>pairs.iter() {
+          <span class="kw">match </span>value {
+            <span class="prelude-val">None    </span>=&gt; {
+              <span class="macro">error!</span>(<span class="string">"Did not find entry for Paddle ID {}"</span>, pid);
+              <span class="kw">continue</span>;
+            },
+            <span class="prelude-val">Some</span>(v) =&gt; {
+              <span class="kw">if </span>name == <span class="string">"length" </span>{
+                rb.paddle_lengths[ch -<span class="number">1</span>] = v.parse().unwrap();
+              }
+            }
+          }
+        }
+        <span class="bool-val">true
+      </span>}) {
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+        <span class="prelude-val">Err</span>(_err) =&gt; ()
+      }
+      <span class="kw">match </span>connection.iterate(pend_q, |pairs| {
+        <span class="macro">debug!</span>(<span class="string">"New rb, has following values..."</span>);
+        <span class="kw">for </span><span class="kw-2">&amp;</span>(name, value) <span class="kw">in </span>pairs.iter() {
+          <span class="kw">match </span>value {
+            <span class="prelude-val">None    </span>=&gt; {
+              <span class="kw">continue</span>;
+            },
+            <span class="prelude-val">Some</span>(v) =&gt; {
+              <span class="kw">if </span>name == <span class="string">"cable_length" </span>{}
+                rb.cable_lengths[ch -<span class="number">1</span>] = v.parse().unwrap();
+            }
+          }
+        }
+        <span class="bool-val">true
+      </span>}) {
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+        <span class="prelude-val">Err</span>(_err) =&gt; ()
+      }
+    }
+    rbs.push(rb);
     <span class="bool-val">true
   </span>}) {
     <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1193,6 +1345,7 @@
       <span class="macro">debug!</span>(<span class="string">"DB query successful!"</span>);
     }
   }
+
   <span class="macro">info!</span>(<span class="string">"We found {} rbs in the database"</span>, rbs.len()); 
   rbs
 }
@@ -1505,21 +1658,24 @@
 
 <span class="comment">//---------------------------------------------------------
 
-</span><span class="attr">#[derive(Debug, Copy, Clone)]
+</span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq)]
 </span><span class="kw">pub enum </span>PaddleEndIdentifier {
   A,
   B
 }
 
-<span class="comment">//impl fmt::Display for PaddleEndIdentifier {
-//  fn fmt(&amp;self, f: &amp;mut fmt::Formatter) -&gt; fmt::Result {
-//    match self {
-//      PaddleEndIdentifier::A =&gt; {write!(f, "A")}
-//      PaddleEndIdentifier::B =&gt; {write!(f, "B")}
-//  }
-//}
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>PaddleEndIdentifier {
+  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;PaddleEndIdent:"</span>);
+    <span class="kw">match </span><span class="self">self </span>{
+      PaddleEndIdentifier::A =&gt; {repr += <span class="kw-2">&amp;</span>String::from(<span class="string">"A&gt;"</span>);}
+      PaddleEndIdentifier::B =&gt; {repr += <span class="kw-2">&amp;</span>String::from(<span class="string">"B&gt;"</span>);}
+    }
+    <span class="macro">write!</span>(f,<span class="string">"{}"</span>, repr)
+  }
+}
 
-</span><span class="attr">#[derive(Debug, Copy, Clone)]
+<span class="attr">#[derive(Debug, Copy, Clone)]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>PaddleEndLocation {
   PositiveX,
@@ -1700,26 +1856,47 @@
 <span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>ReadoutBoard {
   <span class="kw">pub </span>rb_id                    : u8,  
-  <span class="kw">pub </span>dna                      : u64, 
   <span class="kw">pub </span>channel_to_paddle_end_id : [u16;<span class="number">8</span>],
+  <span class="doccomment">/// The value will always be .0 for "A" and 
+  /// .1 for "B"
+  </span><span class="kw">pub </span>paddle_id_to_channel     : HashMap&lt;u8,[u8;<span class="number">2</span>]&gt;,
+  <span class="kw">pub </span>paddle_lengths           : [f32;<span class="number">8</span>],
+  <span class="kw">pub </span>cable_lengths            : [f32;<span class="number">8</span>],
   <span class="kw">pub </span>calib_file_path          : String,
   <span class="kw">pub </span>calibration              : RBCalibrations,       
-  <span class="kw">pub </span>trig_ch_mask             : [bool;<span class="number">8</span>],
 }
 
 <span class="kw">impl </span>ReadoutBoard {
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
       rb_id                    : <span class="number">0</span>,  
-      dna                      : <span class="number">0</span>, 
       channel_to_paddle_end_id : [<span class="number">0</span>;<span class="number">8</span>],
+      paddle_id_to_channel     : HashMap::&lt;u8,[u8;<span class="number">2</span>]&gt;::new(),
+      paddle_lengths           : [<span class="number">0.0</span>;<span class="number">8</span>],
+      cable_lengths            : [<span class="number">0.0</span>;<span class="number">8</span>],
       calib_file_path          : String::from(<span class="string">""</span>),
       calibration              : RBCalibrations::new(<span class="number">0</span>),
-      trig_ch_mask             : [<span class="bool-val">false</span>;<span class="number">8</span>],
     }
   }
 
-  <span class="doccomment">/// Load the newest calibration from the calibration file path
+  <span class="kw">pub fn </span>get_paddle_length(<span class="kw-2">&amp;</span><span class="self">self</span>,pid : u8) -&gt; f32 {
+    <span class="kw">if </span>!<span class="self">self</span>.paddle_id_to_channel.contains_key(<span class="kw-2">&amp;</span>pid) {
+      <span class="macro">error!</span>(<span class="string">"Paddle {pid} might not be connected to this RB {}"</span>, <span class="self">self</span>.rb_id);
+      <span class="kw">return </span><span class="number">0.0</span>;
+    }
+    <span class="comment">// unwrap is ok, because of key check earlier
+    </span><span class="kw">let </span>ch = <span class="self">self</span>.paddle_id_to_channel.get(<span class="kw-2">&amp;</span>pid).unwrap()[<span class="number">0</span>];
+    <span class="kw">return </span><span class="self">self</span>.paddle_lengths[ch <span class="kw">as </span>usize];
+  }
+  <span class="comment">///// Get the associated paddle ids with the paddle ends for 
+  ///// the channels of the Readoutboard. The (raw) channel id
+  ///// will be the index of the returned array
+  //pub fn get_paddles(&amp;self) -&gt; [(u8, PaddleEndIdentifier);8] {
+  //  let paddles = [(0,PaddleEndIdentifier::A);8];
+  //  paddles
+  //}
+
+  </span><span class="doccomment">/// Load the newest calibration from the calibration file path
   </span><span class="kw">pub fn </span>load_latest_calibration(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>std::error::Error&gt;&gt; {
     <span class="comment">//  files look like RB20_2024_01_26-08_15_54.cali.tof.gaps
     </span><span class="kw">let </span>re = Regex::new(<span class="string">r"(\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2})"</span>)<span class="question-mark">?</span>;
@@ -1758,7 +1935,7 @@
     } <span class="kw">else </span>{
       <span class="kw">let </span>file_to_load = <span class="self">self</span>.calib_file_path.clone() + <span class="string">"/" </span>+ <span class="kw-2">&amp;</span>newest_file.<span class="number">0</span>;
       <span class="macro">println!</span>(<span class="string">"== ==&gt; Loading calibration from file: {}"</span>, file_to_load);
-      <span class="self">self</span>.calibration = RBCalibrations::from_file(file_to_load)<span class="question-mark">?</span>;
+      <span class="self">self</span>.calibration = RBCalibrations::from_file(file_to_load, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
       <span class="comment">//println!("==&gt; Loaded calibration {}", self.calibration);
     </span>}
     <span class="prelude-val">Ok</span>(())
@@ -1772,26 +1949,11 @@
     <span class="macro">format!</span>(<span class="string">"tcp://10.0.1.1{:02}:42000"</span>, <span class="self">self</span>.rb_id)
   }
 
+  <span class="comment">//pub fn get_calibration(&amp;self) -&gt; String {
+  //  return self.calib_file_path.clone();
+  //}
 
-  <span class="kw">pub fn </span>get_triggered_pids(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>pids = Vec::&lt;u8&gt;::new();
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">8 </span>{
-      <span class="kw">let </span>pid = <span class="self">self</span>.get_pid_for_ch(k);
-      <span class="kw">if </span><span class="self">self</span>.trig_ch_mask[k] {
-        <span class="kw">if </span>pids.contains(<span class="kw-2">&amp;</span>pid) {
-          <span class="kw">continue</span>;
-        }
-        pids.push(<span class="self">self</span>.get_pid_for_ch(k));
-      }
-    }
-    pids
-  }
-
-  <span class="kw">pub fn </span>get_calibration(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-    <span class="kw">return </span><span class="self">self</span>.calib_file_path.clone();
-  }
-
-  <span class="kw">pub fn </span>get_paddle_end(<span class="kw-2">&amp;</span><span class="self">self</span>, ch : usize) 
+  </span><span class="kw">pub fn </span>get_paddle_end(<span class="kw-2">&amp;</span><span class="self">self</span>, ch : usize) 
     -&gt; PaddleEndIdentifier {
     <span class="kw">let </span>end_id = <span class="self">self</span>.get_paddle_end_id_for_rb_channel(ch);
     <span class="kw">if </span>end_id &gt;= <span class="number">2000 </span>{
@@ -1844,7 +2006,6 @@
     <span class="self">self</span>.channel_to_paddle_end_id[channel -<span class="number">1</span>] = paddle_end_id;
   }
 
-
   <span class="kw">pub fn </span>get_paddle_end_id_for_rb_channel(<span class="kw-2">&amp;</span><span class="self">self</span>,channel : usize) -&gt; u16 {
     <span class="kw">if </span>channel &gt; <span class="number">9 </span>|| channel == <span class="number">0 </span>{
       <span class="macro">error!</span>(<span class="string">"Got invalid channel value! Returning rubbish"</span>);
@@ -1864,18 +2025,21 @@
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result { 
     <span class="macro">write!</span>(f,
 <span class="string">"&lt;ReadoutBoard:
-    ID                :  {}
-    DNA               :  {} 
-    calibration path  :  {}
-    calibration       :  {}
-    CHANNEL/PADDLE END:  {:?}
-    TRIG_CH_MASK      :  {:?}&gt;"</span>,
+    ID                  : {}
+    ** calibration will be loaded from this path:
+      \u{021B3} {}
+    calibration         : {}
+    CHANNEL/PADDLE END  : {:?}
+    PID/CHANNELS        : {:?}
+    PADDLE LENGTHS [mm] : {:?}
+    CABLE  LENGTHS [cm] : {:?}&gt;"</span>,
       <span class="self">self</span>.rb_id,
-      <span class="self">self</span>.dna,
       <span class="self">self</span>.calib_file_path,
       <span class="self">self</span>.calibration,
       <span class="self">self</span>.channel_to_paddle_end_id,
-      <span class="self">self</span>.trig_ch_mask)
+      <span class="self">self</span>.paddle_id_to_channel,
+      <span class="self">self</span>.paddle_lengths,
+      <span class="self">self</span>.cable_lengths)
   }
 }
 

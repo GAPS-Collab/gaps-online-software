@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["NestedValue"],"fn":["make_partial_axis"],"struct":["GroupBy","Linspace","LogCoord","LogRange","NestedRange","WithKeyPointMethod","WithKeyPoints"],"trait":["BindKeyPointMethod","BindKeyPoints","BuildNestedCoord","IntoLinspace","IntoLogRange","IntoPartialAxis","LogScalable","ToGroupByRange"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["DecoderTrap","EncoderTrap"],"fn":["decode"],"struct":["CodecError"],"trait":["ByteWriter","Encoding","RawDecoder","RawEncoder","StringWriter"],"type":["DecoderTrapFunc","EncoderTrapFunc","EncodingRef"]};

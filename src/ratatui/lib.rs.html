@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><a class="sub-logo-container" href="../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -362,35 +362,30 @@
 <a href="#361" id="361">361</a>
 <a href="#362" id="362">362</a>
 <a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
 </pre></div><pre class="rust"><code><span class="attr">#![forbid(unsafe_code)]
 
-</span><span class="doccomment">//! ![Demo](https://raw.githubusercontent.com/ratatui-org/ratatui/b33c878808c4c40591d7a2d9f9d94d6fee95a96f/examples/demo2.gif)
+</span><span class="doccomment">//! ![Demo](https://github.com/ratatui-org/ratatui/blob/1d39444e3dea6f309cf9035be2417ac711c1abc9/examples/demo2-destroy.gif?raw=true)
 //!
 //! &lt;div align="center"&gt;
 //!
-//! [![Crate Badge]](https://crates.io/crates/ratatui)
-//! [![License Badge]](./LICENSE)
-//! [![CI Badge]](https://github.com/ratatui-org/ratatui/actions?query=workflow%3ACI+)
-//! [![Docs Badge]](https://docs.rs/crate/ratatui/)&lt;br&gt;
-//! [![Dependencies Badge]](https://deps.rs/repo/github/ratatui-org/ratatui)
-//! [![Codecov Badge]](https://app.codecov.io/gh/ratatui-org/ratatui)
-//! [![Discord Badge]](https://discord.gg/pMCEU9hNEj)
-//! [![Matrix Badge]](https://matrix.to/#/#ratatui:matrix.org)&lt;br&gt;
+//! [![Crate Badge]][Crate] [![Docs Badge]][API Docs] [![CI Badge]][CI Workflow] [![License
+//! Badge]](./LICENSE) [![Sponsors Badge]][GitHub Sponsors]&lt;br&gt;
+//! [![Codecov Badge]][Codecov] [![Deps.rs Badge]][Deps.rs] [![Discord Badge]][Discord Server]
+//! [![Matrix Badge]][Matrix]&lt;br&gt;
 //!
-//! [Documentation](https://docs.rs/ratatui)
-//! · [Ratatui Website](https://ratatui.rs)
-//! · [Examples](https://github.com/ratatui-org/ratatui/tree/main/examples)
-//! · [Report a bug](https://github.com/ratatui-org/ratatui/issues/new?labels=bug&amp;projects=&amp;template=bug_report.md)
-//! · [Request a Feature](https://github.com/ratatui-org/ratatui/issues/new?labels=enhancement&amp;projects=&amp;template=feature_request.md)
-//! · [Send a Pull Request](https://github.com/ratatui-org/ratatui/compare)
+//! [Ratatui Website] · [API Docs] · [Examples] · [Changelog] · [Breaking Changes]&lt;br&gt;
+//! [Contributing] · [Report a bug] · [Request a Feature] · [Create a Pull Request]
 //!
 //! &lt;/div&gt;
 //!
 //! # Ratatui
 //!
-//! [Ratatui] is a crate for cooking up terminal user interfaces in Rust. It is a lightweight
-//! library that provides a set of widgets and utilities to build complex Rust TUIs. Ratatui was
-//! forked from the [tui-rs] crate in 2023 in order to continue its development.
+//! [Ratatui][Ratatui Website] is a crate for cooking up terminal user interfaces in Rust. It is a
+//! lightweight library that provides a set of widgets and utilities to build complex Rust TUIs.
+//! Ratatui was forked from the [tui-rs] crate in 2023 in order to continue its development.
 //!
 //! ## Installation
 //!
@@ -412,25 +407,26 @@
 //! automatically redrawn on the next frame. See the [Rendering] section of the [Ratatui Website]
 //! for more info.
 //!
+//! You can also watch the [FOSDEM 2024 talk] about Ratatui which gives a brief introduction to
+//! terminal user interfaces and showcases the features of Ratatui, along with a hello world demo.
+//!
 //! ## Other documentation
 //!
 //! - [Ratatui Website] - explains the library's concepts and provides step-by-step tutorials
+//! - [API Docs] - the full API documentation for the library on docs.rs.
 //! - [Examples] - a collection of examples that demonstrate how to use the library.
-//! - [API Documentation] - the full API documentation for the library on docs.rs.
-//! - [Changelog] - generated by [git-cliff] utilizing [Conventional Commits].
 //! - [Contributing] - Please read this if you are interested in contributing to the project.
+//! - [Changelog] - generated by [git-cliff] utilizing [Conventional Commits].
 //! - [Breaking Changes] - a list of breaking changes in the library.
 //!
 //! ## Quickstart
 //!
 //! The following example demonstrates the minimal amount of code necessary to setup a terminal and
 //! render "Hello World!". The full code for this example which contains a little more detail is in
-//! [hello_world.rs]. For more guidance on different ways to structure your application see the
-//! [Application Patterns] and [Hello World tutorial] sections in the [Ratatui Website] and the
-//! various [Examples]. There are also several starter templates available:
-//!
-//! - [template]
-//! - [async-template] (book and template)
+//! the [Examples] directory. For more guidance on different ways to structure your application see
+//! the [Application Patterns] and [Hello World tutorial] sections in the [Ratatui Website] and the
+//! various [Examples]. There are also several starter templates available in the [templates]
+//! repository.
 //!
 //! Every application built with `ratatui` needs to implement the following steps:
 //!
@@ -460,7 +456,8 @@
 //!
 //! The drawing logic is delegated to a closure that takes a [`Frame`] instance as argument. The
 //! [`Frame`] provides the size of the area to draw to and allows the app to render any [`Widget`]
-//! using the provided [`render_widget`] method. See the [Widgets] section of the [Ratatui Website]
+//! using the provided [`render_widget`] method. After this closure returns, a diff is performed and
+//! only the changes are drawn to the terminal. See the [Widgets] section of the [Ratatui Website]
 //! for more info.
 //!
 //! ### Handling events
@@ -661,15 +658,18 @@
 //! [Handling Events]: https://ratatui.rs/concepts/event-handling/
 //! [Layout]: https://ratatui.rs/how-to/layout/
 //! [Styling Text]: https://ratatui.rs/how-to/render/style-text/
-//! [template]: https://github.com/ratatui-org/template
-//! [async-template]: https://ratatui-org.github.io/async-template
-//! [Examples]: https://github.com/ratatui-org/ratatui/tree/main/examples
+//! [templates]: https://github.com/ratatui-org/templates/
+//! [Examples]: https://github.com/ratatui-org/ratatui/tree/main/examples/README.md
+//! [Report a bug]: https://github.com/ratatui-org/ratatui/issues/new?labels=bug&amp;projects=&amp;template=bug_report.md
+//! [Request a Feature]: https://github.com/ratatui-org/ratatui/issues/new?labels=enhancement&amp;projects=&amp;template=feature_request.md
+//! [Create a Pull Request]: https://github.com/ratatui-org/ratatui/compare
 //! [git-cliff]: https://git-cliff.org
 //! [Conventional Commits]: https://www.conventionalcommits.org
-//! [API Documentation]: https://docs.rs/ratatui
+//! [API Docs]: https://docs.rs/ratatui
 //! [Changelog]: https://github.com/ratatui-org/ratatui/blob/main/CHANGELOG.md
 //! [Contributing]: https://github.com/ratatui-org/ratatui/blob/main/CONTRIBUTING.md
 //! [Breaking Changes]: https://github.com/ratatui-org/ratatui/blob/main/BREAKING-CHANGES.md
+//! [FOSDEM 2024 talk]: https://www.youtube.com/watch?v=NU0q6NOLJ20
 //! [docsrs-hello]: https://github.com/ratatui-org/ratatui/blob/c3c3c289b1eb8d562afb1931adb4dc719cd48490/examples/docsrs-hello.png?raw=true
 //! [docsrs-layout]: https://github.com/ratatui-org/ratatui/blob/c3c3c289b1eb8d562afb1931adb4dc719cd48490/examples/docsrs-layout.png?raw=true
 //! [docsrs-styling]: https://github.com/ratatui-org/ratatui/blob/c3c3c289b1eb8d562afb1931adb4dc719cd48490/examples/docsrs-styling.png?raw=true
@@ -686,24 +686,30 @@
 //! [`Backend`]: backend::Backend
 //! [`backend` module]: backend
 //! [`crossterm::event`]: https://docs.rs/crossterm/latest/crossterm/event/index.html
-//! [Ratatui]: https://ratatui.rs
+//! [Crate]: https://crates.io/crates/ratatui
 //! [Crossterm]: https://crates.io/crates/crossterm
 //! [Termion]: https://crates.io/crates/termion
 //! [Termwiz]: https://crates.io/crates/termwiz
 //! [tui-rs]: https://crates.io/crates/tui
-//! [hello_world.rs]: https://github.com/ratatui-org/ratatui/blob/main/examples/hello_world.rs
+//! [GitHub Sponsors]: https://github.com/sponsors/ratatui-org
 //! [Crate Badge]: https://img.shields.io/crates/v/ratatui?logo=rust&amp;style=flat-square
+//! [License Badge]: https://img.shields.io/crates/l/ratatui?style=flat-square
 //! [CI Badge]:
 //!     https://img.shields.io/github/actions/workflow/status/ratatui-org/ratatui/ci.yml?style=flat-square&amp;logo=github
+//! [CI Workflow]: https://github.com/ratatui-org/ratatui/actions/workflows/ci.yml
 //! [Codecov Badge]:
 //!     https://img.shields.io/codecov/c/github/ratatui-org/ratatui?logo=codecov&amp;style=flat-square&amp;token=BAQ8SOKEST
-//! [Dependencies Badge]: https://deps.rs/repo/github/ratatui-org/ratatui/status.svg?style=flat-square
+//! [Codecov]: https://app.codecov.io/gh/ratatui-org/ratatui
+//! [Deps.rs Badge]: https://deps.rs/repo/github/ratatui-org/ratatui/status.svg?style=flat-square
+//! [Deps.rs]: https://deps.rs/repo/github/ratatui-org/ratatui
 //! [Discord Badge]:
 //!     https://img.shields.io/discord/1070692720437383208?label=discord&amp;logo=discord&amp;style=flat-square
+//! [Discord Server]: https://discord.gg/pMCEU9hNEj
 //! [Docs Badge]: https://img.shields.io/docsrs/ratatui?logo=rust&amp;style=flat-square
-//! [License Badge]: https://img.shields.io/crates/l/ratatui?style=flat-square
 //! [Matrix Badge]:
 //!     https://img.shields.io/matrix/ratatui-general%3Amatrix.org?style=flat-square&amp;logo=matrix&amp;label=Matrix
+//! [Matrix]: https://matrix.to/#/#ratatui:matrix.org
+//! [Sponsors Badge]: https://img.shields.io/github/sponsors/ratatui-org?logo=github&amp;style=flat-square
 
 </span><span class="comment">// show the feature flags in the generated documentation
 </span><span class="attr">#![cfg_attr(docsrs, feature(doc_auto_cfg))]

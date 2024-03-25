@@ -8,6 +8,7 @@ var annotated_dup =
       [ "Waveform", "classGAPS_1_1Waveform.html", "classGAPS_1_1Waveform" ]
     ] ],
     [ "CPUMoniData", "structCPUMoniData.html", "structCPUMoniData" ],
+    [ "FromTofPacket", "structFromTofPacket.html", null ],
     [ "LTBMoniData", "structLTBMoniData.html", "structLTBMoniData" ],
     [ "MasterTriggerEvent", "structMasterTriggerEvent.html", "structMasterTriggerEvent" ],
     [ "MtbMoniData", "structMtbMoniData.html", "structMtbMoniData" ],

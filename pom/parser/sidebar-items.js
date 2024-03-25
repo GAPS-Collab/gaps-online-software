@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["any","call","empty","end","is_a","list","none_of","not_a","one_of","seq","skip","sym","tag","take"],"struct":["Parser"]};

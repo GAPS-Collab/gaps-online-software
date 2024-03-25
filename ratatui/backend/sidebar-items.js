@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ClearType"],"struct":["CrosstermBackend","TermionBackend","TestBackend","WindowSize"],"trait":["Backend"]};
+window.SIDEBAR_ITEMS = {"enum":["ClearType"],"struct":["CrosstermBackend","TestBackend","WindowSize"],"trait":["Backend"]};

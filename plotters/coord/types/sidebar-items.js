@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Monthly","RangedCoordf32","RangedCoordf64","RangedCoordi128","RangedCoordi32","RangedCoordi64","RangedCoordu128","RangedCoordu32","RangedCoordu64","RangedCoordusize","RangedDate","RangedDateTime","RangedDuration","RangedSlice","Yearly"],"trait":["IntoMonthly","IntoYearly"]};

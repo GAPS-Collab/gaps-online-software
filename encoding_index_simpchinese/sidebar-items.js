@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["gb18030","gb18030_ranges"]};

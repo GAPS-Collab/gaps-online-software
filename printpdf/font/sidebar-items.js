@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["BuiltinFont","Font","TextRenderingMode"],"struct":["DirectFontRef","ExternalFont","FontList","FontMetrics","GlyphMetrics","IndirectFontRef"],"trait":["FontData","FontDataClone"]};

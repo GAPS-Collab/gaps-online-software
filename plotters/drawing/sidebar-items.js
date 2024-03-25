@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["DrawingAreaErrorKind"],"struct":["DrawingArea","DummyBackendError","Rect"],"trait":["IntoDrawingArea"]};

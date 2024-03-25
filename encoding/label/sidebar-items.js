@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["encoding_from_whatwg_label","encoding_from_windows_code_page"]};

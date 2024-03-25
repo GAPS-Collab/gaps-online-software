@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["histogram","timeseries"]};
+window.SIDEBAR_ITEMS = {"fn":["clean_data","create_labels","histogram","prep_data","timeseries"]};

@@ -1,5 +1,6 @@
 var structTofEventHeader =
 [
+    [ "get_timestamp48", "structTofEventHeader.html#a16fd4aad49cf4719f5bc1025ff513215", null ],
     [ "to_string", "structTofEventHeader.html#ad7e84dfa55bed3b8b27b2a8b188b96c0", null ],
     [ "ctr_etx", "structTofEventHeader.html#a6aef4415b91200c7127bdf155093cb66", null ],
     [ "event_id", "structTofEventHeader.html#aadecbef8416ce5b41be418145313f4af", null ],
@@ -17,7 +18,7 @@ var structTofEventHeader =
     [ "primary_outer_tof_y", "structTofEventHeader.html#a04d7e9c425e32b4245ca48023b4bc40a", null ],
     [ "primary_outer_tof_z", "structTofEventHeader.html#aa8386fc320feb595f6313cb7895e6a0c", null ],
     [ "run_id", "structTofEventHeader.html#a0344aabc7855587b6588b76095bfc16f", null ],
-    [ "timestamp_16", "structTofEventHeader.html#aee58172be1c80d07a92980be1258b590", null ],
-    [ "timestamp_32", "structTofEventHeader.html#a9c8d2d71c838e0cab0d8b6f66d3ab4ce", null ],
+    [ "timestamp16", "structTofEventHeader.html#a1ae1a568c2e86b1117d29ebac2b4e5c4", null ],
+    [ "timestamp32", "structTofEventHeader.html#a30d35e7ff4f51562a82e6797d4cc6471", null ],
     [ "trigger_info", "structTofEventHeader.html#a7b9ec5bdfce61ac7378c743ecbd72b46", null ]
 ];

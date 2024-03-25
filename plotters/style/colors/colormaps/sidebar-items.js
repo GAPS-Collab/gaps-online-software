@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["BlackWhite","Bone","Copper","DerivedColorMap","MandelbrotHSL","ViridisRGB","ViridisRGBA","VulcanoHSL"],"trait":["ColorMap"]};

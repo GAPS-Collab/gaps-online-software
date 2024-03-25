@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/barchart.rs`."><title>barchart.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/widgets/barchart.rs`."><title>barchart.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -1344,16 +1344,19 @@
 <a href="#1343" id="1343">1343</a>
 <a href="#1344" id="1344">1344</a>
 <a href="#1345" id="1345">1345</a>
-</pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
-</span><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
+<a href="#1346" id="1346">1346</a>
+<a href="#1347" id="1347">1347</a>
+<a href="#1348" id="1348">1348</a>
+<a href="#1349" id="1349">1349</a>
+<a href="#1350" id="1350">1350</a>
+<a href="#1351" id="1351">1351</a>
+</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, widgets::Block};
 
 <span class="kw">mod </span>bar;
 <span class="kw">mod </span>bar_group;
 
 <span class="kw">pub use </span>bar::Bar;
 <span class="kw">pub use </span>bar_group::BarGroup;
-
-<span class="kw">use super</span>::{Block, Widget};
 
 <span class="doccomment">/// A chart showing values as [bars](Bar).
 ///
@@ -1381,6 +1384,9 @@
 ///
 /// The chart can have a [`Direction`] (by default the bars are [`Vertical`](Direction::Vertical)).
 /// This is set using [`BarChart::direction`].
+///
+/// Note: this is the only widget that doesn't implement `Widget` for `&amp;T` because the current
+/// implementation modifies the internal state of self. This will be fixed in the future.
 ///
 /// # Examples
 ///
@@ -1516,11 +1522,14 @@
 
     <span class="doccomment">/// Set the default style of the bar.
     ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
     /// It is also possible to set individually the style of each [`Bar`].
     /// In this case the default style will be patched by the individual style
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>bar_style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
-        <span class="self">self</span>.bar_style = style;
+    </span><span class="kw">pub fn </span>bar_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+        <span class="self">self</span>.bar_style = style.into();
         <span class="self">self
     </span>}
 
@@ -1572,6 +1581,9 @@
 
     <span class="doccomment">/// Set the default value style of the bar.
     ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
     /// It is also possible to set individually the value style of each [`Bar`].
     /// In this case the default value style will be patched by the individual value style
     ///
@@ -1579,12 +1591,15 @@
     ///
     /// [Bar::value_style] to set the value style individually.
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>value_style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
-        <span class="self">self</span>.value_style = style;
+    </span><span class="kw">pub fn </span>value_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+        <span class="self">self</span>.value_style = style.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the default label style of the groups and bars.
+    ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
     ///
     /// It is also possible to set individually the label style of each [`Bar`] or [`BarGroup`].
     /// In this case the default label style will be patched by the individual label style
@@ -1593,8 +1608,8 @@
     ///
     /// [Bar::label] to set the label style individually.
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>label_style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
-        <span class="self">self</span>.label_style = style;
+    </span><span class="kw">pub fn </span>label_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+        <span class="self">self</span>.label_style = style.into();
         <span class="self">self
     </span>}
 
@@ -1607,10 +1622,13 @@
 
     <span class="doccomment">/// Set the style of the entire chart.
     ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
     /// The style will be applied to everything that isn't styled (borders, bars, labels, ...).
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
-        <span class="self">self</span>.style = style;
+    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+        <span class="self">self</span>.style = style.into();
         <span class="self">self
     </span>}
 
@@ -1646,7 +1664,7 @@
     height: u16,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+<span class="kw">impl </span>BarChart&lt;<span class="lifetime">'_</span>&gt; {
     <span class="doccomment">/// Returns the visible bars length in ticks. A cell contains 8 ticks.
     /// `available_space` used to calculate how many bars can fit in the space
     /// `bar_max_length` is the maximal length a bar can take.
@@ -1725,16 +1743,7 @@
         }
     }
 
-    <span class="doccomment">/// renders the block if there is one and updates the area to the inner area
-    </span><span class="kw">fn </span>render_block(<span class="kw-2">&amp;mut </span><span class="self">self</span>, area: <span class="kw-2">&amp;mut </span>Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(block) = <span class="self">self</span>.block.take() {
-            <span class="kw">let </span>inner_area = block.inner(<span class="kw-2">*</span>area);
-            block.render(<span class="kw-2">*</span>area, buf);
-            <span class="kw-2">*</span>area = inner_area
-        }
-    }
-
-    <span class="kw">fn </span>render_horizontal(<span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Buffer, area: Rect) {
+    <span class="kw">fn </span>render_horizontal(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Buffer, area: Rect) {
         <span class="comment">// get the longest label
         </span><span class="kw">let </span>label_size = <span class="self">self
             </span>.data
@@ -1759,10 +1768,8 @@
 
         <span class="comment">// print all visible bars, label and values
         </span><span class="kw">let </span><span class="kw-2">mut </span>bar_y = bars_area.top();
-        <span class="kw">for </span>(ticks_vec, <span class="kw-2">mut </span>group) <span class="kw">in </span>group_ticks.into_iter().zip(<span class="self">self</span>.data) {
-            <span class="kw">let </span>bars = std::mem::take(<span class="kw-2">&amp;mut </span>group.bars);
-
-            <span class="kw">for </span>(ticks, bar) <span class="kw">in </span>ticks_vec.into_iter().zip(bars) {
+        <span class="kw">for </span>(ticks_vec, group) <span class="kw">in </span>group_ticks.into_iter().zip(<span class="self">self</span>.data.iter()) {
+            <span class="kw">for </span>(ticks, bar) <span class="kw">in </span>ticks_vec.into_iter().zip(group.bars.iter()) {
                 <span class="kw">let </span>bar_length = (ticks / <span class="number">8</span>) <span class="kw">as </span>u16;
                 <span class="kw">let </span>bar_style = <span class="self">self</span>.bar_style.patch(bar.style);
 
@@ -1815,7 +1822,7 @@
         }
     }
 
-    <span class="kw">fn </span>render_vertical(<span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Buffer, area: Rect) {
+    <span class="kw">fn </span>render_vertical(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Buffer, area: Rect) {
         <span class="kw">let </span>label_info = <span class="self">self</span>.label_info(area.height - <span class="number">1</span>);
 
         <span class="kw">let </span>bars_area = Rect {
@@ -1877,7 +1884,7 @@
     }
 
     <span class="kw">fn </span>render_labels_and_values(
-        <span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
         area: Rect,
         buf: <span class="kw-2">&amp;mut </span>Buffer,
         label_info: LabelInfo,
@@ -1886,12 +1893,10 @@
         <span class="comment">// print labels and values in one go
         </span><span class="kw">let </span><span class="kw-2">mut </span>bar_x = area.left();
         <span class="kw">let </span>bar_y = area.bottom() - label_info.height - <span class="number">1</span>;
-        <span class="kw">for </span>(<span class="kw-2">mut </span>group, ticks_vec) <span class="kw">in </span><span class="self">self</span>.data.into_iter().zip(group_ticks) {
+        <span class="kw">for </span>(group, ticks_vec) <span class="kw">in </span><span class="self">self</span>.data.iter().zip(group_ticks) {
             <span class="kw">if </span>group.bars.is_empty() {
                 <span class="kw">continue</span>;
             }
-            <span class="kw">let </span>bars = std::mem::take(<span class="kw-2">&amp;mut </span>group.bars);
-
             <span class="comment">// print group labels under the bars or the previous labels
             </span><span class="kw">if </span>label_info.group_label_visible {
                 <span class="kw">let </span>label_max_width =
@@ -1906,7 +1911,7 @@
             }
 
             <span class="comment">// print the bar values and numbers
-            </span><span class="kw">for </span>(<span class="kw-2">mut </span>bar, ticks) <span class="kw">in </span>bars.into_iter().zip(ticks_vec) {
+            </span><span class="kw">for </span>(bar, ticks) <span class="kw">in </span>group.bars.iter().zip(ticks_vec) {
                 <span class="kw">if </span>label_info.bar_label_visible {
                     bar.render_label(buf, <span class="self">self</span>.bar_width, bar_x, bar_y + <span class="number">1</span>, <span class="self">self</span>.label_style);
                 }
@@ -1920,19 +1925,26 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Widget <span class="kw">for </span>BarChart&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">fn </span>render(<span class="kw-2">mut </span><span class="self">self</span>, <span class="kw-2">mut </span>area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
+<span class="kw">impl </span>Widget <span class="kw">for </span>BarChart&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>render(<span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
+        <span class="self">self</span>.render_ref(area, buf);
+    }
+}
+
+<span class="kw">impl </span>WidgetRef <span class="kw">for </span>BarChart&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>render_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         buf.set_style(area, <span class="self">self</span>.style);
 
-        <span class="self">self</span>.render_block(<span class="kw-2">&amp;mut </span>area, buf);
+        <span class="self">self</span>.block.render_ref(area, buf);
+        <span class="kw">let </span>inner = <span class="self">self</span>.block.inner_if_some(area);
 
-        <span class="kw">if </span>area.is_empty() || <span class="self">self</span>.data.is_empty() || <span class="self">self</span>.bar_width == <span class="number">0 </span>{
+        <span class="kw">if </span>inner.is_empty() || <span class="self">self</span>.data.is_empty() || <span class="self">self</span>.bar_width == <span class="number">0 </span>{
             <span class="kw">return</span>;
         }
 
         <span class="kw">match </span><span class="self">self</span>.direction {
-            Direction::Horizontal =&gt; <span class="self">self</span>.render_horizontal(buf, area),
-            Direction::Vertical =&gt; <span class="self">self</span>.render_vertical(buf, area),
+            Direction::Horizontal =&gt; <span class="self">self</span>.render_horizontal(buf, inner),
+            Direction::Vertical =&gt; <span class="self">self</span>.render_vertical(buf, inner),
         }
     }
 }
@@ -1943,7 +1955,7 @@
         <span class="self">self</span>.style
     }
 
-    <span class="kw">fn </span>set_style(<span class="self">self</span>, style: Style) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>set_style&lt;S: Into&lt;Style&gt;&gt;(<span class="self">self</span>, style: S) -&gt; <span class="self">Self</span>::Item {
         <span class="self">self</span>.style(style)
     }
 }

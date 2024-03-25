@@ -142,25 +142,6 @@
 <a href="#141" id="141">141</a>
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{
     <span class="comment">//HashMap,
     </span>VecDeque,
@@ -207,6 +188,7 @@
   <span class="kw">pub </span>queue_size    : usize,
   <span class="kw">pub </span>mte_sender    : Sender&lt;MasterTriggerEvent&gt;,
   <span class="kw">pub </span>rbe_sender    : Sender&lt;RBEvent&gt;,
+  <span class="kw">pub </span>th_sender     : Sender&lt;TofHit&gt;,
   <span class="comment">//pub streamer   : Arc&lt;Mutex&lt;VecDeque&lt;String&gt;&gt;&gt;,
   //pub pack_stat  : Arc&lt;Mutex&lt;HashMap&lt;String, usize&gt;&gt;&gt;,
   //pub stream     : String,
@@ -217,16 +199,18 @@
   <span class="kw">pub fn </span>new(tp_receiver : Receiver&lt;TofPacket&gt;,
              mte_sender  : Sender&lt;MasterTriggerEvent&gt;,
              rbe_sender  : Sender&lt;RBEvent&gt;,
-             theme       : ColorTheme2) -&gt; EventTab {
+             th_sender   : Sender&lt;TofHit&gt;,
+             theme       : ColorTheme2) -&gt; <span class="self">Self </span>{
              <span class="comment">//streamer  : Arc&lt;Mutex&lt;VecDeque&lt;String&gt;&gt;&gt;,
              //pack_stat : Arc&lt;Mutex&lt;HashMap&lt;String,usize&gt;&gt;&gt;) -&gt; HomeTab&lt;T&gt; {
-    </span>EventTab {
+    </span><span class="self">Self </span>{
       theme,
       tp_receiver,
       event_queue : VecDeque::&lt;TofEvent&gt;::new(),
       queue_size  : <span class="number">1000</span>,
       mte_sender  : mte_sender,
       rbe_sender  : rbe_sender,
+      th_sender   : th_sender,
       <span class="comment">//streamer, 
       //pack_stat,
       //stream     : String::from(""),
@@ -246,9 +230,16 @@
           <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
         }
         <span class="kw">for </span>k <span class="kw">in </span>ev.rb_events.iter() {
+          <span class="kw">let </span>rb_ev = k.clone();
+          <span class="kw">for </span>h <span class="kw">in </span>rb_ev.hits.iter() {
+            <span class="kw">match </span><span class="self">self</span>.th_sender.send(h.clone()) {
+              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not send TofHit! {err}"</span>),
+              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+            }
+          }
           <span class="kw">match </span><span class="self">self</span>.rbe_sender.send(k.clone()) {
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not send RB Event! {err}"</span>),
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {}
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not send RBEvent! {err}"</span>),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
           }
         }
         <span class="self">self</span>.event_queue.push_back(ev);
@@ -270,18 +261,9 @@
           [Constraint::Percentage(<span class="number">30</span>), Constraint::Percentage(<span class="number">70</span>)].as_ref(),
       )
       .split(<span class="kw-2">*</span>main_window);
-  
-    <span class="kw">let </span>hit_chunks = Layout::default()
-      .direction(Direction::Horizontal)
-      .constraints(
-          [Constraint::Percentage(<span class="number">50</span>), Constraint::Percentage(<span class="number">50</span>)].as_ref(),
-      )
-      .split(status_chunks[<span class="number">1</span>]);
 
     <span class="kw">let </span>header      = TofEventHeader::new();
-    <span class="kw">let </span>hit         = TofHit::new();
     <span class="kw">let </span><span class="kw-2">mut </span>header_string = header.to_string();
-    <span class="kw">let </span><span class="kw-2">mut </span>hit_string    = hit.to_string(); 
     <span class="kw">match </span><span class="self">self</span>.event_queue.back() {
       <span class="prelude-val">None </span>=&gt; (),
       <span class="prelude-val">Some</span>(ev)   =&gt; {
@@ -289,15 +271,6 @@
         <span class="kw">let </span>info_field = <span class="macro">format!</span>(<span class="string">"\n --&gt; NRBs {}\n --&gt; NMissingHit {}\n Quality: {}\n CompressionLevel {}"</span>,
                                  ev.rb_events.len(), ev.missing_hits.len(), ev.quality, ev.compression_level);
         header_string += <span class="kw-2">&amp;</span>info_field;
-        <span class="kw">if </span>ev.rb_events.len() &gt; <span class="number">0 </span>{
-          <span class="kw">if </span>ev.rb_events[<span class="number">0</span>].hits.len() &gt; <span class="number">0 </span>{
-            hit_string = ev.rb_events[<span class="number">0</span>].hits[<span class="number">0</span>].to_string();
-          } <span class="kw">else </span>{
-            hit_string = String::from(<span class="string">"NO HIT IN RB!"</span>); 
-          }
-        } <span class="kw">else </span>{
-          hit_string = String::from(<span class="string">"NO HIT!"</span>);
-        }
       }
     }
     <span class="kw">let </span>header_view = Paragraph::new(header_string)
@@ -310,17 +283,6 @@
           .title(<span class="string">"Last TofEvent"</span>)
       );
     frame.render_widget(header_view, status_chunks[<span class="number">0</span>]);
-    <span class="kw">let </span>hit_view   = Paragraph::new(hit_string)
-      .style(<span class="self">self</span>.theme.style())
-      .alignment(Alignment::Left)
-      .block(
-        Block::default()
-          .borders(Borders::ALL)
-          .border_type(BorderType::Rounded)
-          .title(<span class="string">"Last TofHit"</span>)
-      );
-    frame.render_widget(hit_view, hit_chunks[<span class="number">0</span>]);
-
   }
 }
 </code></pre></div></section></main></body></html>

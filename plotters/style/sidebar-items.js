@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["FontFamily","FontStyle","FontTransform","RelativeSize"],"mod":["colors","text_anchor"],"struct":["FontDesc","HSLColor","Palette100","Palette99","Palette9999","PaletteColor","RGBAColor","RGBColor","ShapeStyle","TextStyle"],"trait":["AsRelative","Color","IntoFont","IntoTextStyle","Palette","SizeDesc"],"type":["FontError","FontResult","LayoutBox"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["FontIndex","PdfContentIndex","PdfLayerIndex","PdfPageIndex","SvgIndex"]};

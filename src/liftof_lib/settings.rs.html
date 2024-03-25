@@ -789,9 +789,6 @@
   <span class="doccomment">/// The timeout parameter for the TofEvent. If not
   /// complete after this time, send it onwards anyway
   </span><span class="kw">pub </span>te_timeout_sec      : u32,
-  <span class="doccomment">/// Send TofSummary + RBWaveforms instead of 
-  /// TofEvents
-  </span><span class="kw">pub </span>send_flight_packets : bool,
   <span class="kw">pub </span>build_strategy      : BuildStrategy,
 }
 
@@ -802,7 +799,6 @@
       n_mte_per_loop      : <span class="number">1</span>,
       n_rbe_per_loop      : <span class="number">40</span>,
       te_timeout_sec      : <span class="number">30</span>,
-      send_flight_packets : <span class="bool-val">false</span>,
       build_strategy      : BuildStrategy::WaitForNBoards(<span class="number">40</span>),
     }
   }
@@ -833,6 +829,9 @@
   <span class="doccomment">/// The address the flight computer should subscribe 
   /// to to get tof packets
   </span><span class="kw">pub </span>fc_pub_address : String,
+  <span class="doccomment">/// Send TofSummary + RBWaveforms instead of 
+  /// TofEvents
+  </span><span class="kw">pub </span>send_flight_packets : bool,
 }
 
 <span class="kw">impl </span>DataPublisherSettings {
@@ -841,7 +840,8 @@
       data_dir                  : String::from(<span class="string">""</span>),
       packs_per_file            : <span class="number">1000</span>,
       fc_pub_address            : String::from(<span class="string">""</span>),
-    }
+      send_flight_packets       : <span class="bool-val">false
+    </span>}
   }
 }
 

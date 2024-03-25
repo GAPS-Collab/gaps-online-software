@@ -101,8 +101,8 @@ $(document).ready(function(){initNavTree('tof__event__header_8hpp_source.html','
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  </div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  u32 run_id      ; </div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  u32 event_id    ; </div>
-<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="structTofEventHeader.html#a9c8d2d71c838e0cab0d8b6f66d3ab4ce">   16</a></span>&#160;  u32 <a class="code" href="structTofEventHeader.html#a9c8d2d71c838e0cab0d8b6f66d3ab4ce">timestamp_32</a>; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  u16 timestamp_16;  <span class="comment">// -&gt; 14 byres</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="structTofEventHeader.html#a30d35e7ff4f51562a82e6797d4cc6471">   16</a></span>&#160;  u32 <a class="code" href="structTofEventHeader.html#a30d35e7ff4f51562a82e6797d4cc6471">timestamp32</a> ; </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  u16 timestamp16 ;  <span class="comment">// -&gt; 14 byres</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  </div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="comment">// reconstructed quantities</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  u16 primary_beta        ; </div>
@@ -134,16 +134,19 @@ $(document).ready(function(){initNavTree('tof__event__header_8hpp_source.html','
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
 <div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="structTofEventHeader.html#ad7e84dfa55bed3b8b27b2a8b188b96c0">   48</a></span>&#160;  std::string <a class="code" href="structTofEventHeader.html#ad7e84dfa55bed3b8b27b2a8b188b96c0">to_string</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofEventHeader.html">TofEventHeader</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream,</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                                        u64 &amp;pos);</div>
+<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="structTofEventHeader.html#a16fd4aad49cf4719f5bc1025ff513215">   51</a></span>&#160;  f64 <a class="code" href="structTofEventHeader.html#a16fd4aad49cf4719f5bc1025ff513215">get_timestamp48</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;}; <span class="comment">// end TofEventHeader</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofEventHeader.html">TofEventHeader</a>&amp; h);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofEventHeader.html">TofEventHeader</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream,</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                                        u64 &amp;pos);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;}; <span class="comment">// end TofEventHeader</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofEventHeader.html">TofEventHeader</a>&amp; h);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="astructTofEventHeader_html"><div class="ttname"><a href="structTofEventHeader.html">TofEventHeader</a></div><div class="ttdef"><b>Definition:</b> tof_event_header.hpp:6</div></div>
-<div class="ttc" id="astructTofEventHeader_html_a9c8d2d71c838e0cab0d8b6f66d3ab4ce"><div class="ttname"><a href="structTofEventHeader.html#a9c8d2d71c838e0cab0d8b6f66d3ab4ce">TofEventHeader::timestamp_32</a></div><div class="ttdeci">u32 timestamp_32</div><div class="ttdef"><b>Definition:</b> tof_event_header.hpp:16</div></div>
+<div class="ttc" id="astructTofEventHeader_html_a16fd4aad49cf4719f5bc1025ff513215"><div class="ttname"><a href="structTofEventHeader.html#a16fd4aad49cf4719f5bc1025ff513215">TofEventHeader::get_timestamp48</a></div><div class="ttdeci">f64 get_timestamp48() const</div><div class="ttdoc">get the timestamp</div></div>
+<div class="ttc" id="astructTofEventHeader_html_a30d35e7ff4f51562a82e6797d4cc6471"><div class="ttname"><a href="structTofEventHeader.html#a30d35e7ff4f51562a82e6797d4cc6471">TofEventHeader::timestamp32</a></div><div class="ttdeci">u32 timestamp32</div><div class="ttdef"><b>Definition:</b> tof_event_header.hpp:16</div></div>
 <div class="ttc" id="astructTofEventHeader_html_ac4744665f64968853fbf6c909dc808e6"><div class="ttname"><a href="structTofEventHeader.html#ac4744665f64968853fbf6c909dc808e6">TofEventHeader::SIZE</a></div><div class="ttdeci">static const usize SIZE</div><div class="ttdoc">fixed size including head and tail</div><div class="ttdef"><b>Definition:</b> tof_event_header.hpp:10</div></div>
 <div class="ttc" id="astructTofEventHeader_html_ad7e84dfa55bed3b8b27b2a8b188b96c0"><div class="ttname"><a href="structTofEventHeader.html#ad7e84dfa55bed3b8b27b2a8b188b96c0">TofEventHeader::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdoc">String representation for printing to output.</div></div>
 </div><!-- fragment --></div><!-- contents -->

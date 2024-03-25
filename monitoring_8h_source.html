@@ -93,194 +93,199 @@ $(document).ready(function(){initNavTree('monitoring_8h_source.html',''); initRe
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define MONITORINGPACKETS_H_INCLUDED</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160; </div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;array&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;tof_typedefs.h&quot;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="structLTBMoniData.html">   17</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structLTBMoniData.html">LTBMoniData</a> {</div>
-<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#a5e3f068b6f47c51b99e386ba8baa654b">   19</a></span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 <a class="code" href="structLTBMoniData.html#a5e3f068b6f47c51b99e386ba8baa654b">HEAD</a> = 0xAAAA;</div>
-<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#a44260aab7b02bb8c610f86a2cef122d8">   21</a></span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 <a class="code" href="structLTBMoniData.html#a44260aab7b02bb8c610f86a2cef122d8">TAIL</a> = 0x5555;</div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#a63e6fe71fa5cdbac6b69c28ee7676798">   23</a></span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u8  <a class="code" href="structLTBMoniData.html#a63e6fe71fa5cdbac6b69c28ee7676798">SIZE</a> = 25; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  </div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#abfcd64701cbaa993a72148c220ab02be">   26</a></span>&#160;  u8                 <a class="code" href="structLTBMoniData.html#abfcd64701cbaa993a72148c220ab02be">board_id</a>  ; </div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#a3bcaba1b72d5f1ff59cb076b312b3d5f">   28</a></span>&#160;  f32                <a class="code" href="structLTBMoniData.html#a3bcaba1b72d5f1ff59cb076b312b3d5f">trenz_temp</a>; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  f32                ltb_temp  ; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  std::array&lt;f32, 3&gt; thresh    ; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <a class="code" href="structLTBMoniData.html">LTBMoniData</a>();</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#aefb436425beaa3961db07a8af2fc5916">   37</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structLTBMoniData.html">LTBMoniData</a> <a class="code" href="structLTBMoniData.html#aefb436425beaa3961db07a8af2fc5916">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream,</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;                                     usize &amp;pos);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  </div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#a16322800e8afb8cc878ff6448a67d278">   41</a></span>&#160;  std::string <a class="code" href="structLTBMoniData.html#a16322800e8afb8cc878ff6448a67d278">to_string</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;};</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="structRBMoniData.html">   49</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structRBMoniData.html">RBMoniData</a> {</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u8  SIZE = 6;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  u8  board_id           ;  </div>
-<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="structRBMoniData.html#abb385a6a883190b2b5e4b7b4f755a909">   56</a></span>&#160;  u16 <a class="code" href="structRBMoniData.html#abb385a6a883190b2b5e4b7b4f755a909">rate</a>               ; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  f32 tmp_drs            ; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  f32 tmp_clk            ; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  f32 tmp_adc            ; </div>
-<div class="line"><a name="l00061"></a><span class="lineno"><a class="line" href="structRBMoniData.html#ae155d590200088364810f20cabb818cb">   61</a></span>&#160;  f32 <a class="code" href="structRBMoniData.html#ae155d590200088364810f20cabb818cb">tmp_zynq</a>           ; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  f32 tmp_lis3mdltr      ; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  f32 tmp_bm280          ; </div>
-<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="structRBMoniData.html#a417357f8a34942a7eefecb7ba73800ba">   65</a></span>&#160;  f32 <a class="code" href="structRBMoniData.html#a417357f8a34942a7eefecb7ba73800ba">pressure</a>           ; </div>
-<div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="structRBMoniData.html#a412fc44c126e97ef56e2d4bc7344ed6a">   67</a></span>&#160;  f32 <a class="code" href="structRBMoniData.html#a412fc44c126e97ef56e2d4bc7344ed6a">humidity</a>           ; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  f32 mag_x              ; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  f32 mag_y              ; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  f32 mag_z              ; </div>
-<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="structRBMoniData.html#aceb4fef6fbabb001a8fff0744f2ae23f">   72</a></span>&#160;  f32 <a class="code" href="structRBMoniData.html#aceb4fef6fbabb001a8fff0744f2ae23f">mag_tot</a>            ; </div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  f32 drs_dvdd_voltage   ; </div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  f32 drs_dvdd_current   ; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  f32 drs_dvdd_power     ; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  f32 p3v3_voltage       ; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  f32 p3v3_current       ; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  f32 p3v3_power         ; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  f32 zynq_voltage       ; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  f32 zynq_current       ; </div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  f32 zynq_power         ; </div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  f32 p3v5_voltage       ; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  f32 p3v5_current       ; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  f32 p3v5_power         ; </div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  f32 adc_dvdd_voltage   ; </div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  f32 adc_dvdd_current   ; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  f32 adc_dvdd_power     ; </div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  f32 adc_avdd_voltage   ; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  f32 adc_avdd_current   ; </div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  f32 adc_avdd_power     ; </div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  f32 drs_avdd_voltage   ; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  f32 drs_avdd_current   ; </div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  f32 drs_avdd_power     ; </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  f32 n1v5_voltage       ; </div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  f32 n1v5_current       ; </div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  f32 n1v5_power         ; </div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <a class="code" href="structRBMoniData.html">RBMoniData</a>();</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  <span class="keyword">static</span> <a class="code" href="structRBMoniData.html">RBMoniData</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream,</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                                    usize &amp;pos);</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  </div>
-<div class="line"><a name="l00104"></a><span class="lineno"><a class="line" href="structRBMoniData.html#ae8212172b758115eb35e7c0bb68aa4e3">  104</a></span>&#160;  std::string <a class="code" href="structRBMoniData.html#ae8212172b758115eb35e7c0bb68aa4e3">to_string</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;};</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structRBMoniData.html">RBMoniData</a>&amp; moni);</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
-<div class="line"><a name="l00112"></a><span class="lineno"><a class="line" href="structPBMoniData.html">  112</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structPBMoniData.html">PBMoniData</a> {</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u8  SIZE = 89;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  u8 board_id;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  std::array&lt;f32, 3&gt; p3v6_preamp_vcp;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  std::array&lt;f32, 3&gt; n1v6_preamp_vcp;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  std::array&lt;f32, 3&gt; p3v4f_ltb_vcp;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  std::array&lt;f32, 3&gt; p3v4d_ltb_vcp;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  std::array&lt;f32, 3&gt; p3v6_ltb_vcp;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  std::array&lt;f32, 3&gt; n1v6_ltb_vcp;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  f32 pds_temp;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  f32 pas_temp;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  f32 nas_temp;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  f32 shv_temp;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  </div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <a class="code" href="structPBMoniData.html">PBMoniData</a>();</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00132"></a><span class="lineno"><a class="line" href="structPBMoniData.html#a307509a33e6e6fe59f6c50ed35b736a8">  132</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structPBMoniData.html">PBMoniData</a> <a class="code" href="structPBMoniData.html#a307509a33e6e6fe59f6c50ed35b736a8">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream,</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;                                    usize &amp;pos);</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  </div>
-<div class="line"><a name="l00136"></a><span class="lineno"><a class="line" href="structPBMoniData.html#a38a31b4e95a044147f717622464cc696">  136</a></span>&#160;  std::string <a class="code" href="structPBMoniData.html#a38a31b4e95a044147f717622464cc696">to_string</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;};</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structPBMoniData.html">PBMoniData</a>&amp; moni);</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
-<div class="line"><a name="l00144"></a><span class="lineno"><a class="line" href="structPAMoniData.html">  144</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structPAMoniData.html">PAMoniData</a> {</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u8  SIZE = 89;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  u8 board_id;</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  std::array&lt;f32, 16&gt; temps;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  std::array&lt;f32, 16&gt; biases; </div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  <a class="code" href="structPAMoniData.html">PAMoniData</a>();</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
-<div class="line"><a name="l00155"></a><span class="lineno"><a class="line" href="structPAMoniData.html#a8576c002af8a04e3660ab40dba03cc55">  155</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structPAMoniData.html">PAMoniData</a> <a class="code" href="structPAMoniData.html#a8576c002af8a04e3660ab40dba03cc55">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream,</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;                                    usize &amp;pos);</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  </div>
-<div class="line"><a name="l00159"></a><span class="lineno"><a class="line" href="structPAMoniData.html#a98f71bc792fbee88c8657a4b0abeb4a7">  159</a></span>&#160;  std::string <a class="code" href="structPAMoniData.html#a98f71bc792fbee88c8657a4b0abeb4a7">to_string</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;};</div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;tof_typedefs.h&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;serialization.h&quot;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="structLTBMoniData.html">   19</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structLTBMoniData.html">LTBMoniData</a> {</div>
+<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#a5e3f068b6f47c51b99e386ba8baa654b">   21</a></span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 <a class="code" href="structLTBMoniData.html#a5e3f068b6f47c51b99e386ba8baa654b">HEAD</a> = 0xAAAA;</div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#a44260aab7b02bb8c610f86a2cef122d8">   23</a></span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 <a class="code" href="structLTBMoniData.html#a44260aab7b02bb8c610f86a2cef122d8">TAIL</a> = 0x5555;</div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#a63e6fe71fa5cdbac6b69c28ee7676798">   25</a></span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u8  <a class="code" href="structLTBMoniData.html#a63e6fe71fa5cdbac6b69c28ee7676798">SIZE</a> = 25; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  </div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#abfcd64701cbaa993a72148c220ab02be">   28</a></span>&#160;  u8                 <a class="code" href="structLTBMoniData.html#abfcd64701cbaa993a72148c220ab02be">board_id</a>  ; </div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#a3bcaba1b72d5f1ff59cb076b312b3d5f">   30</a></span>&#160;  f32                <a class="code" href="structLTBMoniData.html#a3bcaba1b72d5f1ff59cb076b312b3d5f">trenz_temp</a>; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  f32                ltb_temp  ; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  std::array&lt;f32, 3&gt; thresh    ; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <a class="code" href="structLTBMoniData.html">LTBMoniData</a>();</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#aefb436425beaa3961db07a8af2fc5916">   39</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structLTBMoniData.html">LTBMoniData</a> <a class="code" href="structLTBMoniData.html#aefb436425beaa3961db07a8af2fc5916">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream,</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;                                     usize &amp;pos);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  </div>
+<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="structLTBMoniData.html#a16322800e8afb8cc878ff6448a67d278">   43</a></span>&#160;  std::string <a class="code" href="structLTBMoniData.html#a16322800e8afb8cc878ff6448a67d278">to_string</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;};</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structLTBMoniData.html">LTBMoniData</a>&amp; moni);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="structRBMoniData.html">   53</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structRBMoniData.html">RBMoniData</a> {</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u8  SIZE = 151;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  u8  board_id           ;  </div>
+<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="structRBMoniData.html#abb385a6a883190b2b5e4b7b4f755a909">   60</a></span>&#160;  u16 <a class="code" href="structRBMoniData.html#abb385a6a883190b2b5e4b7b4f755a909">rate</a>               ; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  f32 tmp_drs            ; </div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  f32 tmp_clk            ; </div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  f32 tmp_adc            ; </div>
+<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="structRBMoniData.html#ae155d590200088364810f20cabb818cb">   65</a></span>&#160;  f32 <a class="code" href="structRBMoniData.html#ae155d590200088364810f20cabb818cb">tmp_zynq</a>           ; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  f32 tmp_lis3mdltr      ; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  f32 tmp_bm280          ; </div>
+<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="structRBMoniData.html#a417357f8a34942a7eefecb7ba73800ba">   69</a></span>&#160;  f32 <a class="code" href="structRBMoniData.html#a417357f8a34942a7eefecb7ba73800ba">pressure</a>           ; </div>
+<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="structRBMoniData.html#a412fc44c126e97ef56e2d4bc7344ed6a">   71</a></span>&#160;  f32 <a class="code" href="structRBMoniData.html#a412fc44c126e97ef56e2d4bc7344ed6a">humidity</a>           ; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  f32 mag_x              ; </div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  f32 mag_y              ; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  f32 mag_z              ; </div>
+<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="structRBMoniData.html#aceb4fef6fbabb001a8fff0744f2ae23f">   76</a></span>&#160;  f32 <a class="code" href="structRBMoniData.html#aceb4fef6fbabb001a8fff0744f2ae23f">mag_tot</a>            ; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  f32 drs_dvdd_voltage   ; </div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  f32 drs_dvdd_current   ; </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  f32 drs_dvdd_power     ; </div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  f32 p3v3_voltage       ; </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  f32 p3v3_current       ; </div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  f32 p3v3_power         ; </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  f32 zynq_voltage       ; </div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  f32 zynq_current       ; </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  f32 zynq_power         ; </div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  f32 p3v5_voltage       ; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  f32 p3v5_current       ; </div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  f32 p3v5_power         ; </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  f32 adc_dvdd_voltage   ; </div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  f32 adc_dvdd_current   ; </div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  f32 adc_dvdd_power     ; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  f32 adc_avdd_voltage   ; </div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  f32 adc_avdd_current   ; </div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  f32 adc_avdd_power     ; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  f32 drs_avdd_voltage   ; </div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  f32 drs_avdd_current   ; </div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  f32 drs_avdd_power     ; </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  f32 n1v5_voltage       ; </div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  f32 n1v5_current       ; </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  f32 n1v5_power         ; </div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <a class="code" href="structRBMoniData.html">RBMoniData</a>();</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <span class="keyword">static</span> <a class="code" href="structRBMoniData.html">RBMoniData</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream,</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;                                    usize &amp;pos);</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  </div>
+<div class="line"><a name="l00108"></a><span class="lineno"><a class="line" href="structRBMoniData.html#ae8212172b758115eb35e7c0bb68aa4e3">  108</a></span>&#160;  std::string <a class="code" href="structRBMoniData.html#ae8212172b758115eb35e7c0bb68aa4e3">to_string</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;};</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structRBMoniData.html">RBMoniData</a>&amp; moni);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
+<div class="line"><a name="l00116"></a><span class="lineno"><a class="line" href="structPBMoniData.html">  116</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structPBMoniData.html">PBMoniData</a> {</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u8  SIZE = 89;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  u8 board_id;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  std::array&lt;f32, 3&gt; p3v6_preamp_vcp;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  std::array&lt;f32, 3&gt; n1v6_preamp_vcp;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  std::array&lt;f32, 3&gt; p3v4f_ltb_vcp;</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  std::array&lt;f32, 3&gt; p3v4d_ltb_vcp;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  std::array&lt;f32, 3&gt; p3v6_ltb_vcp;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  std::array&lt;f32, 3&gt; n1v6_ltb_vcp;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  f32 pds_temp;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  f32 pas_temp;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  f32 nas_temp;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  f32 shv_temp;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  </div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  <a class="code" href="structPBMoniData.html">PBMoniData</a>();</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00136"></a><span class="lineno"><a class="line" href="structPBMoniData.html#a307509a33e6e6fe59f6c50ed35b736a8">  136</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structPBMoniData.html">PBMoniData</a> <a class="code" href="structPBMoniData.html#a307509a33e6e6fe59f6c50ed35b736a8">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream,</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;                                    usize &amp;pos);</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  </div>
+<div class="line"><a name="l00140"></a><span class="lineno"><a class="line" href="structPBMoniData.html#a38a31b4e95a044147f717622464cc696">  140</a></span>&#160;  std::string <a class="code" href="structPBMoniData.html#a38a31b4e95a044147f717622464cc696">to_string</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;};</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structPBMoniData.html">PBMoniData</a>&amp; moni);</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
+<div class="line"><a name="l00148"></a><span class="lineno"><a class="line" href="structPAMoniData.html">  148</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structPAMoniData.html">PAMoniData</a> {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u8  SIZE = 89;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  u8 board_id;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  std::array&lt;f32, 16&gt; temps;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  std::array&lt;f32, 16&gt; biases; </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  <a class="code" href="structPAMoniData.html">PAMoniData</a>();</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
+<div class="line"><a name="l00159"></a><span class="lineno"><a class="line" href="structPAMoniData.html#a8576c002af8a04e3660ab40dba03cc55">  159</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structPAMoniData.html">PAMoniData</a> <a class="code" href="structPAMoniData.html#a8576c002af8a04e3660ab40dba03cc55">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream,</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;                                    usize &amp;pos);</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  </div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structPAMoniData.html">PAMoniData</a>&amp; moni);</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno"><a class="line" href="structMtbMoniData.html">  168</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structMtbMoniData.html">MtbMoniData</a> {</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u8  SIZE = 6;</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  </div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  f32 fpga_temp    ;</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  f32 fpga_vccint  ;</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  f32 fpga_vccaux  ;</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  f32 fpga_vccbram ;</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  u16 rate         ;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  u16 lost_rate    ;</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  <a class="code" href="structMtbMoniData.html">MtbMoniData</a>();</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160; </div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  std::string to_string() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00163"></a><span class="lineno"><a class="line" href="structPAMoniData.html#a98f71bc792fbee88c8657a4b0abeb4a7">  163</a></span>&#160;  std::string <a class="code" href="structPAMoniData.html#a98f71bc792fbee88c8657a4b0abeb4a7">to_string</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;};</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structPAMoniData.html">PAMoniData</a>&amp; moni);</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
+<div class="line"><a name="l00172"></a><span class="lineno"><a class="line" href="structMtbMoniData.html">  172</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structMtbMoniData.html">MtbMoniData</a> : <a class="code" href="structFromTofPacket.html">FromTofPacket</a>&lt;MtbMoniData&gt; {</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u8  SIZE = 6;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  </div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  f32 fpga_temp    ;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  f32 fpga_vccint  ;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  f32 fpga_vccaux  ;</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  f32 fpga_vccbram ;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  u16 rate         ;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  u16 lost_rate    ;</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
-<div class="line"><a name="l00185"></a><span class="lineno"><a class="line" href="structMtbMoniData.html#a108660e8d66cfddde8c71b5f56783714">  185</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structMtbMoniData.html">MtbMoniData</a> <a class="code" href="structMtbMoniData.html#a108660e8d66cfddde8c71b5f56783714">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt;&amp; payload,</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;                                     usize&amp; pos);</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;};</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structMtbMoniData.html">MtbMoniData</a>&amp; moni);</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160; </div>
-<div class="line"><a name="l00195"></a><span class="lineno"><a class="line" href="structCPUMoniData.html">  195</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structCPUMoniData.html">CPUMoniData</a> {</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u8  SIZE = 41;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  u32                uptime     ; </div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  u8                 disk_usage ; </div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  std::array&lt;u32, 4&gt; cpu_freq   ;</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  f32                cpu_temp   ;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  f32                cpu0_temp  ;</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  f32                cpu1_temp  ;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  f32                mb_temp    ;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  </div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  <a class="code" href="structCPUMoniData.html">CPUMoniData</a>(); </div>
-<div class="line"><a name="l00210"></a><span class="lineno"><a class="line" href="structCPUMoniData.html#ada7e8973c01ac0f7690b7b6f4d53b8f2">  210</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structCPUMoniData.html">CPUMoniData</a> <a class="code" href="structCPUMoniData.html#ada7e8973c01ac0f7690b7b6f4d53b8f2">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt;&amp; payload,</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;                                     usize &amp;pos);</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  std::string to_string() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;};</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160; </div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structCPUMoniData.html">CPUMoniData</a>&amp; moni);</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="astructCPUMoniData_html"><div class="ttname"><a href="structCPUMoniData.html">CPUMoniData</a></div><div class="ttdef"><b>Definition:</b> monitoring.h:195</div></div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;  <a class="code" href="structMtbMoniData.html">MtbMoniData</a>();</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160; </div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  std::string to_string() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
+<div class="line"><a name="l00189"></a><span class="lineno"><a class="line" href="structMtbMoniData.html#a108660e8d66cfddde8c71b5f56783714">  189</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structMtbMoniData.html">MtbMoniData</a> <a class="code" href="structMtbMoniData.html#a108660e8d66cfddde8c71b5f56783714">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt;&amp; payload,</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;                                     usize&amp; pos);</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;};</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structMtbMoniData.html">MtbMoniData</a>&amp; moni);</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160; </div>
+<div class="line"><a name="l00199"></a><span class="lineno"><a class="line" href="structCPUMoniData.html">  199</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structCPUMoniData.html">CPUMoniData</a> {</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u8  SIZE = 41;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  u32                uptime     ; </div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  u8                 disk_usage ; </div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  std::array&lt;u32, 4&gt; cpu_freq   ;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  f32                cpu_temp   ;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  f32                cpu0_temp  ;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;  f32                cpu1_temp  ;</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  f32                mb_temp    ;</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  </div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;  <a class="code" href="structCPUMoniData.html">CPUMoniData</a>(); </div>
+<div class="line"><a name="l00214"></a><span class="lineno"><a class="line" href="structCPUMoniData.html#ada7e8973c01ac0f7690b7b6f4d53b8f2">  214</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structCPUMoniData.html">CPUMoniData</a> <a class="code" href="structCPUMoniData.html#ada7e8973c01ac0f7690b7b6f4d53b8f2">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt;&amp; payload,</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;                                     usize &amp;pos);</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  std::string to_string() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;};</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structCPUMoniData.html">CPUMoniData</a>&amp; moni);</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="astructCPUMoniData_html"><div class="ttname"><a href="structCPUMoniData.html">CPUMoniData</a></div><div class="ttdef"><b>Definition:</b> monitoring.h:199</div></div>
 <div class="ttc" id="astructCPUMoniData_html_ada7e8973c01ac0f7690b7b6f4d53b8f2"><div class="ttname"><a href="structCPUMoniData.html#ada7e8973c01ac0f7690b7b6f4d53b8f2">CPUMoniData::from_bytestream</a></div><div class="ttdeci">static CPUMoniData from_bytestream(const Vec&lt; u8 &gt; &amp;payload, usize &amp;pos)</div><div class="ttdoc">extract moni data from payload</div></div>
-<div class="ttc" id="astructLTBMoniData_html"><div class="ttname"><a href="structLTBMoniData.html">LTBMoniData</a></div><div class="ttdef"><b>Definition:</b> monitoring.h:17</div></div>
+<div class="ttc" id="astructFromTofPacket_html"><div class="ttname"><a href="structFromTofPacket.html">FromTofPacket</a></div><div class="ttdoc">Allow to extend all classes with a from_tofpacket method.</div><div class="ttdef"><b>Definition:</b> serialization.h:37</div></div>
+<div class="ttc" id="astructLTBMoniData_html"><div class="ttname"><a href="structLTBMoniData.html">LTBMoniData</a></div><div class="ttdef"><b>Definition:</b> monitoring.h:19</div></div>
 <div class="ttc" id="astructLTBMoniData_html_a16322800e8afb8cc878ff6448a67d278"><div class="ttname"><a href="structLTBMoniData.html#a16322800e8afb8cc878ff6448a67d278">LTBMoniData::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdoc">String representatioin for printing.</div></div>
-<div class="ttc" id="astructLTBMoniData_html_a3bcaba1b72d5f1ff59cb076b312b3d5f"><div class="ttname"><a href="structLTBMoniData.html#a3bcaba1b72d5f1ff59cb076b312b3d5f">LTBMoniData::trenz_temp</a></div><div class="ttdeci">f32 trenz_temp</div><div class="ttdoc">FIXME - temperature.</div><div class="ttdef"><b>Definition:</b> monitoring.h:28</div></div>
-<div class="ttc" id="astructLTBMoniData_html_a44260aab7b02bb8c610f86a2cef122d8"><div class="ttname"><a href="structLTBMoniData.html#a44260aab7b02bb8c610f86a2cef122d8">LTBMoniData::TAIL</a></div><div class="ttdeci">static const u16 TAIL</div><div class="ttdoc">struct end marker bytes</div><div class="ttdef"><b>Definition:</b> monitoring.h:21</div></div>
-<div class="ttc" id="astructLTBMoniData_html_a5e3f068b6f47c51b99e386ba8baa654b"><div class="ttname"><a href="structLTBMoniData.html#a5e3f068b6f47c51b99e386ba8baa654b">LTBMoniData::HEAD</a></div><div class="ttdeci">static const u16 HEAD</div><div class="ttdoc">struct begin marker bytes</div><div class="ttdef"><b>Definition:</b> monitoring.h:19</div></div>
-<div class="ttc" id="astructLTBMoniData_html_a63e6fe71fa5cdbac6b69c28ee7676798"><div class="ttname"><a href="structLTBMoniData.html#a63e6fe71fa5cdbac6b69c28ee7676798">LTBMoniData::SIZE</a></div><div class="ttdeci">static const u8 SIZE</div><div class="ttdoc">byte size with HEAD + TAIL</div><div class="ttdef"><b>Definition:</b> monitoring.h:23</div></div>
-<div class="ttc" id="astructLTBMoniData_html_abfcd64701cbaa993a72148c220ab02be"><div class="ttname"><a href="structLTBMoniData.html#abfcd64701cbaa993a72148c220ab02be">LTBMoniData::board_id</a></div><div class="ttdeci">u8 board_id</div><div class="ttdoc">FIXME - this might be the RB id.</div><div class="ttdef"><b>Definition:</b> monitoring.h:26</div></div>
+<div class="ttc" id="astructLTBMoniData_html_a3bcaba1b72d5f1ff59cb076b312b3d5f"><div class="ttname"><a href="structLTBMoniData.html#a3bcaba1b72d5f1ff59cb076b312b3d5f">LTBMoniData::trenz_temp</a></div><div class="ttdeci">f32 trenz_temp</div><div class="ttdoc">FIXME - temperature.</div><div class="ttdef"><b>Definition:</b> monitoring.h:30</div></div>
+<div class="ttc" id="astructLTBMoniData_html_a44260aab7b02bb8c610f86a2cef122d8"><div class="ttname"><a href="structLTBMoniData.html#a44260aab7b02bb8c610f86a2cef122d8">LTBMoniData::TAIL</a></div><div class="ttdeci">static const u16 TAIL</div><div class="ttdoc">struct end marker bytes</div><div class="ttdef"><b>Definition:</b> monitoring.h:23</div></div>
+<div class="ttc" id="astructLTBMoniData_html_a5e3f068b6f47c51b99e386ba8baa654b"><div class="ttname"><a href="structLTBMoniData.html#a5e3f068b6f47c51b99e386ba8baa654b">LTBMoniData::HEAD</a></div><div class="ttdeci">static const u16 HEAD</div><div class="ttdoc">struct begin marker bytes</div><div class="ttdef"><b>Definition:</b> monitoring.h:21</div></div>
+<div class="ttc" id="astructLTBMoniData_html_a63e6fe71fa5cdbac6b69c28ee7676798"><div class="ttname"><a href="structLTBMoniData.html#a63e6fe71fa5cdbac6b69c28ee7676798">LTBMoniData::SIZE</a></div><div class="ttdeci">static const u8 SIZE</div><div class="ttdoc">byte size with HEAD + TAIL</div><div class="ttdef"><b>Definition:</b> monitoring.h:25</div></div>
+<div class="ttc" id="astructLTBMoniData_html_abfcd64701cbaa993a72148c220ab02be"><div class="ttname"><a href="structLTBMoniData.html#abfcd64701cbaa993a72148c220ab02be">LTBMoniData::board_id</a></div><div class="ttdeci">u8 board_id</div><div class="ttdoc">FIXME - this might be the RB id.</div><div class="ttdef"><b>Definition:</b> monitoring.h:28</div></div>
 <div class="ttc" id="astructLTBMoniData_html_aefb436425beaa3961db07a8af2fc5916"><div class="ttname"><a href="structLTBMoniData.html#aefb436425beaa3961db07a8af2fc5916">LTBMoniData::from_bytestream</a></div><div class="ttdeci">static LTBMoniData from_bytestream(const Vec&lt; u8 &gt; &amp;stream, usize &amp;pos)</div></div>
-<div class="ttc" id="astructMtbMoniData_html"><div class="ttname"><a href="structMtbMoniData.html">MtbMoniData</a></div><div class="ttdef"><b>Definition:</b> monitoring.h:168</div></div>
+<div class="ttc" id="astructMtbMoniData_html"><div class="ttname"><a href="structMtbMoniData.html">MtbMoniData</a></div><div class="ttdef"><b>Definition:</b> monitoring.h:172</div></div>
 <div class="ttc" id="astructMtbMoniData_html_a108660e8d66cfddde8c71b5f56783714"><div class="ttname"><a href="structMtbMoniData.html#a108660e8d66cfddde8c71b5f56783714">MtbMoniData::from_bytestream</a></div><div class="ttdeci">static MtbMoniData from_bytestream(const Vec&lt; u8 &gt; &amp;payload, usize &amp;pos)</div><div class="ttdoc">extract moni data from payload</div></div>
-<div class="ttc" id="astructPAMoniData_html"><div class="ttname"><a href="structPAMoniData.html">PAMoniData</a></div><div class="ttdef"><b>Definition:</b> monitoring.h:144</div></div>
+<div class="ttc" id="astructPAMoniData_html"><div class="ttname"><a href="structPAMoniData.html">PAMoniData</a></div><div class="ttdef"><b>Definition:</b> monitoring.h:148</div></div>
 <div class="ttc" id="astructPAMoniData_html_a8576c002af8a04e3660ab40dba03cc55"><div class="ttname"><a href="structPAMoniData.html#a8576c002af8a04e3660ab40dba03cc55">PAMoniData::from_bytestream</a></div><div class="ttdeci">static PAMoniData from_bytestream(const Vec&lt; u8 &gt; &amp;stream, usize &amp;pos)</div><div class="ttdoc">Factory function - restore PAMoniData from byte-representation.</div></div>
 <div class="ttc" id="astructPAMoniData_html_a98f71bc792fbee88c8657a4b0abeb4a7"><div class="ttname"><a href="structPAMoniData.html#a98f71bc792fbee88c8657a4b0abeb4a7">PAMoniData::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdoc">String representation for pretty printing.</div></div>
-<div class="ttc" id="astructPBMoniData_html"><div class="ttname"><a href="structPBMoniData.html">PBMoniData</a></div><div class="ttdef"><b>Definition:</b> monitoring.h:112</div></div>
+<div class="ttc" id="astructPBMoniData_html"><div class="ttname"><a href="structPBMoniData.html">PBMoniData</a></div><div class="ttdef"><b>Definition:</b> monitoring.h:116</div></div>
 <div class="ttc" id="astructPBMoniData_html_a307509a33e6e6fe59f6c50ed35b736a8"><div class="ttname"><a href="structPBMoniData.html#a307509a33e6e6fe59f6c50ed35b736a8">PBMoniData::from_bytestream</a></div><div class="ttdeci">static PBMoniData from_bytestream(const Vec&lt; u8 &gt; &amp;stream, usize &amp;pos)</div><div class="ttdoc">Factor function - restore PAMoniData from byte-representation.</div></div>
 <div class="ttc" id="astructPBMoniData_html_a38a31b4e95a044147f717622464cc696"><div class="ttname"><a href="structPBMoniData.html#a38a31b4e95a044147f717622464cc696">PBMoniData::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdoc">String representation for pretty printing.</div></div>
-<div class="ttc" id="astructRBMoniData_html"><div class="ttname"><a href="structRBMoniData.html">RBMoniData</a></div><div class="ttdef"><b>Definition:</b> monitoring.h:49</div></div>
-<div class="ttc" id="astructRBMoniData_html_a412fc44c126e97ef56e2d4bc7344ed6a"><div class="ttname"><a href="structRBMoniData.html#a412fc44c126e97ef56e2d4bc7344ed6a">RBMoniData::humidity</a></div><div class="ttdeci">f32 humidity</div><div class="ttdoc">ambient humidity</div><div class="ttdef"><b>Definition:</b> monitoring.h:67</div></div>
-<div class="ttc" id="astructRBMoniData_html_a417357f8a34942a7eefecb7ba73800ba"><div class="ttname"><a href="structRBMoniData.html#a417357f8a34942a7eefecb7ba73800ba">RBMoniData::pressure</a></div><div class="ttdeci">f32 pressure</div><div class="ttdoc">ambient pressure</div><div class="ttdef"><b>Definition:</b> monitoring.h:65</div></div>
-<div class="ttc" id="astructRBMoniData_html_abb385a6a883190b2b5e4b7b4f755a909"><div class="ttname"><a href="structRBMoniData.html#abb385a6a883190b2b5e4b7b4f755a909">RBMoniData::rate</a></div><div class="ttdeci">u16 rate</div><div class="ttdoc">Rate as recorded by the board itself.</div><div class="ttdef"><b>Definition:</b> monitoring.h:56</div></div>
-<div class="ttc" id="astructRBMoniData_html_aceb4fef6fbabb001a8fff0744f2ae23f"><div class="ttname"><a href="structRBMoniData.html#aceb4fef6fbabb001a8fff0744f2ae23f">RBMoniData::mag_tot</a></div><div class="ttdeci">f32 mag_tot</div><div class="ttdoc">total strength of magnetic field</div><div class="ttdef"><b>Definition:</b> monitoring.h:72</div></div>
-<div class="ttc" id="astructRBMoniData_html_ae155d590200088364810f20cabb818cb"><div class="ttname"><a href="structRBMoniData.html#ae155d590200088364810f20cabb818cb">RBMoniData::tmp_zynq</a></div><div class="ttdeci">f32 tmp_zynq</div><div class="ttdoc">fpga temperature</div><div class="ttdef"><b>Definition:</b> monitoring.h:61</div></div>
+<div class="ttc" id="astructRBMoniData_html"><div class="ttname"><a href="structRBMoniData.html">RBMoniData</a></div><div class="ttdef"><b>Definition:</b> monitoring.h:53</div></div>
+<div class="ttc" id="astructRBMoniData_html_a412fc44c126e97ef56e2d4bc7344ed6a"><div class="ttname"><a href="structRBMoniData.html#a412fc44c126e97ef56e2d4bc7344ed6a">RBMoniData::humidity</a></div><div class="ttdeci">f32 humidity</div><div class="ttdoc">ambient humidity</div><div class="ttdef"><b>Definition:</b> monitoring.h:71</div></div>
+<div class="ttc" id="astructRBMoniData_html_a417357f8a34942a7eefecb7ba73800ba"><div class="ttname"><a href="structRBMoniData.html#a417357f8a34942a7eefecb7ba73800ba">RBMoniData::pressure</a></div><div class="ttdeci">f32 pressure</div><div class="ttdoc">ambient pressure</div><div class="ttdef"><b>Definition:</b> monitoring.h:69</div></div>
+<div class="ttc" id="astructRBMoniData_html_abb385a6a883190b2b5e4b7b4f755a909"><div class="ttname"><a href="structRBMoniData.html#abb385a6a883190b2b5e4b7b4f755a909">RBMoniData::rate</a></div><div class="ttdeci">u16 rate</div><div class="ttdoc">Rate as recorded by the board itself.</div><div class="ttdef"><b>Definition:</b> monitoring.h:60</div></div>
+<div class="ttc" id="astructRBMoniData_html_aceb4fef6fbabb001a8fff0744f2ae23f"><div class="ttname"><a href="structRBMoniData.html#aceb4fef6fbabb001a8fff0744f2ae23f">RBMoniData::mag_tot</a></div><div class="ttdeci">f32 mag_tot</div><div class="ttdoc">total strength of magnetic field</div><div class="ttdef"><b>Definition:</b> monitoring.h:76</div></div>
+<div class="ttc" id="astructRBMoniData_html_ae155d590200088364810f20cabb818cb"><div class="ttname"><a href="structRBMoniData.html#ae155d590200088364810f20cabb818cb">RBMoniData::tmp_zynq</a></div><div class="ttdeci">f32 tmp_zynq</div><div class="ttdoc">fpga temperature</div><div class="ttdef"><b>Definition:</b> monitoring.h:65</div></div>
 <div class="ttc" id="astructRBMoniData_html_ae8212172b758115eb35e7c0bb68aa4e3"><div class="ttname"><a href="structRBMoniData.html#ae8212172b758115eb35e7c0bb68aa4e3">RBMoniData::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdoc">String representatioin for printing.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

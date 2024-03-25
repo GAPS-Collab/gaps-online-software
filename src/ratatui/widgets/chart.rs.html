@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/chart.rs`."><title>chart.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/widgets/chart.rs`."><title>chart.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -1468,21 +1468,89 @@
 <a href="#1467" id="1467">1467</a>
 <a href="#1468" id="1468">1468</a>
 <a href="#1469" id="1469">1469</a>
-</pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
-</span><span class="kw">use </span>std::{borrow::Cow, cmp::max};
+<a href="#1470" id="1470">1470</a>
+<a href="#1471" id="1471">1471</a>
+<a href="#1472" id="1472">1472</a>
+<a href="#1473" id="1473">1473</a>
+<a href="#1474" id="1474">1474</a>
+<a href="#1475" id="1475">1475</a>
+<a href="#1476" id="1476">1476</a>
+<a href="#1477" id="1477">1477</a>
+<a href="#1478" id="1478">1478</a>
+<a href="#1479" id="1479">1479</a>
+<a href="#1480" id="1480">1480</a>
+<a href="#1481" id="1481">1481</a>
+<a href="#1482" id="1482">1482</a>
+<a href="#1483" id="1483">1483</a>
+<a href="#1484" id="1484">1484</a>
+<a href="#1485" id="1485">1485</a>
+<a href="#1486" id="1486">1486</a>
+<a href="#1487" id="1487">1487</a>
+<a href="#1488" id="1488">1488</a>
+<a href="#1489" id="1489">1489</a>
+<a href="#1490" id="1490">1490</a>
+<a href="#1491" id="1491">1491</a>
+<a href="#1492" id="1492">1492</a>
+<a href="#1493" id="1493">1493</a>
+<a href="#1494" id="1494">1494</a>
+<a href="#1495" id="1495">1495</a>
+<a href="#1496" id="1496">1496</a>
+<a href="#1497" id="1497">1497</a>
+<a href="#1498" id="1498">1498</a>
+<a href="#1499" id="1499">1499</a>
+<a href="#1500" id="1500">1500</a>
+<a href="#1501" id="1501">1501</a>
+<a href="#1502" id="1502">1502</a>
+<a href="#1503" id="1503">1503</a>
+<a href="#1504" id="1504">1504</a>
+<a href="#1505" id="1505">1505</a>
+<a href="#1506" id="1506">1506</a>
+<a href="#1507" id="1507">1507</a>
+<a href="#1508" id="1508">1508</a>
+<a href="#1509" id="1509">1509</a>
+<a href="#1510" id="1510">1510</a>
+<a href="#1511" id="1511">1511</a>
+<a href="#1512" id="1512">1512</a>
+<a href="#1513" id="1513">1513</a>
+<a href="#1514" id="1514">1514</a>
+<a href="#1515" id="1515">1515</a>
+<a href="#1516" id="1516">1516</a>
+<a href="#1517" id="1517">1517</a>
+<a href="#1518" id="1518">1518</a>
+<a href="#1519" id="1519">1519</a>
+<a href="#1520" id="1520">1520</a>
+<a href="#1521" id="1521">1521</a>
+<a href="#1522" id="1522">1522</a>
+<a href="#1523" id="1523">1523</a>
+<a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a>
+<a href="#1534" id="1534">1534</a>
+<a href="#1535" id="1535">1535</a>
+<a href="#1536" id="1536">1536</a>
+<a href="#1537" id="1537">1537</a>
+<a href="#1538" id="1538">1538</a>
+<a href="#1539" id="1539">1539</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::max;
 
 <span class="kw">use </span>strum::{Display, EnumString};
 <span class="kw">use </span>unicode_width::UnicodeWidthStr;
 
+<span class="kw">use </span><span class="kw">super</span>::block::BlockExt;
 <span class="kw">use crate</span>::{
-    buffer::Buffer,
-    layout::{Alignment, Constraint, Rect},
-    style::{Color, Style, Styled},
+    layout::Flex,
+    prelude::<span class="kw-2">*</span>,
     symbols,
-    text::{Line, Span},
     widgets::{
         canvas::{Canvas, Line <span class="kw">as </span>CanvasLine, Points},
-        Block, Borders, Widget,
+        Block, Borders,
     },
 };
 
@@ -1579,6 +1647,9 @@
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
     /// # Example
     ///
     /// [`Axis`] also implements [`Stylize`](crate::style::Stylize) which mean you can style it
@@ -1589,8 +1660,8 @@
     /// let axis = Axis::default().red();
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; Axis&lt;<span class="lifetime">'a</span>&gt; {
-        <span class="self">self</span>.style = style;
+    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; Axis&lt;<span class="lifetime">'a</span>&gt; {
+        <span class="self">self</span>.style = style.into();
         <span class="self">self
     </span>}
 
@@ -1743,16 +1814,13 @@
 ///
 /// This is the main element composing a [`Chart`].
 ///
-/// A dataset can be [named](Dataset::name) to be referenced in the legend (NOTE: Currently,
-/// datasets with an empty name will show an empty line in the legend, see [PR 527]).
+/// A dataset can be [named](Dataset::name). Only named datasets will be rendered in the legend.
 ///
 /// After that, you can pass it data with [`Dataset::data`]. Data is an array of `f64` tuples
 /// (`(f64, f64)`), the first element being X and the second Y. It's also worth noting that, unlike
 /// the [`Rect`], here the Y axis is bottom to top, as in math.
 ///
 /// You can also customize the rendering by using [`Dataset::marker`] and [`Dataset::graph_type`].
-///
-/// [PR 527]: https://github.com/ratatui-org/ratatui/pull/527
 ///
 /// # Example
 ///
@@ -1771,7 +1839,7 @@
 </span><span class="attr">#[derive(Debug, Default, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>Dataset&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Name of the dataset (used in the legend if shown)
-    </span>name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
+    </span>name: <span class="prelude-ty">Option</span>&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
     <span class="doccomment">/// A reference to the actual data
     </span>data: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(f64, f64)],
     <span class="doccomment">/// Symbol used for each points of this dataset
@@ -1785,18 +1853,20 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Dataset&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Sets the name of the dataset
     ///
-    /// The dataset's name is used when displaying the chart legend. Currently, datasets with an
-    /// empty name will show an empty line in the legend, see [PR 527]).
+    /// The dataset's name is used when displaying the chart legend. Datasets don't require a name
+    /// and can be created without specifying one. Once assigned, a name can't be removed, only
+    /// changed
     ///
-    /// [PR 527]: https://github.com/ratatui-org/ratatui/pull/527
+    /// The name can be styled (see [`Line`] for that), but the dataset's style will always have
+    /// precedence.
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>name&lt;S&gt;(<span class="kw-2">mut </span><span class="self">self</span>, name: S) -&gt; Dataset&lt;<span class="lifetime">'a</span>&gt;
     <span class="kw">where
-        </span>S: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+        </span>S: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
-        <span class="self">self</span>.name = name.into();
+        <span class="self">self</span>.name = <span class="prelude-val">Some</span>(name.into());
         <span class="self">self
     </span>}
 
@@ -1849,6 +1919,9 @@
     /// The given style will be used to draw the legend and the data points. Currently the legend
     /// will use the entire style whereas the data points will only use the foreground.
     ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     ///
     /// # Example
@@ -1861,8 +1934,8 @@
     /// let dataset = Dataset::default().red();
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; Dataset&lt;<span class="lifetime">'a</span>&gt; {
-        <span class="self">self</span>.style = style;
+    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; Dataset&lt;<span class="lifetime">'a</span>&gt; {
+        <span class="self">self</span>.style = style.into();
         <span class="self">self
     </span>}
 }
@@ -2017,12 +2090,15 @@
 
     <span class="doccomment">/// Sets the style of the entire chart
     ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
     /// Styles of [`Axis`] and [`Dataset`] will have priority over this style.
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; Chart&lt;<span class="lifetime">'a</span>&gt; {
-        <span class="self">self</span>.style = style;
+    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; Chart&lt;<span class="lifetime">'a</span>&gt; {
+        <span class="self">self</span>.style = style.into();
         <span class="self">self
     </span>}
 
@@ -2199,20 +2275,26 @@
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(legend_position) = <span class="self">self</span>.legend_position {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(inner_width) = <span class="self">self</span>.datasets.iter().map(|d| d.name.width() <span class="kw">as </span>u16).max() {
+            <span class="kw">let </span>legends = <span class="self">self
+                </span>.datasets
+                .iter()
+                .filter_map(|d| <span class="prelude-val">Some</span>(d.name.as_ref()<span class="question-mark">?</span>.width() <span class="kw">as </span>u16));
+
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(inner_width) = legends.clone().max() {
                 <span class="kw">let </span>legend_width = inner_width + <span class="number">2</span>;
-                <span class="kw">let </span>legend_height = <span class="self">self</span>.datasets.len() <span class="kw">as </span>u16 + <span class="number">2</span>;
-                <span class="kw">let </span>max_legend_width = <span class="self">self
-                    </span>.hidden_legend_constraints
-                    .<span class="number">0
-                    </span>.apply(layout.graph_area.width);
-                <span class="kw">let </span>max_legend_height = <span class="self">self
-                    </span>.hidden_legend_constraints
-                    .<span class="number">1
-                    </span>.apply(layout.graph_area.height);
+                <span class="kw">let </span>legend_height = legends.count() <span class="kw">as </span>u16 + <span class="number">2</span>;
+
+                <span class="kw">let </span>[max_legend_width] = Layout::horizontal([<span class="self">self</span>.hidden_legend_constraints.<span class="number">0</span>])
+                    .flex(Flex::Start)
+                    .areas(layout.graph_area);
+
+                <span class="kw">let </span>[max_legend_height] = Layout::vertical([<span class="self">self</span>.hidden_legend_constraints.<span class="number">1</span>])
+                    .flex(Flex::Start)
+                    .areas(layout.graph_area);
+
                 <span class="kw">if </span>inner_width &gt; <span class="number">0
-                    </span>&amp;&amp; legend_width &lt;= max_legend_width
-                    &amp;&amp; legend_height &lt;= max_legend_height
+                    </span>&amp;&amp; legend_width &lt;= max_legend_width.width
+                    &amp;&amp; legend_height &lt;= max_legend_height.height
                 {
                     layout.legend_area = legend_position.layout(
                         layout.graph_area,
@@ -2267,7 +2349,7 @@
     }
 
     <span class="kw">fn </span>render_x_labels(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
         buf: <span class="kw-2">&amp;mut </span>Buffer,
         layout: <span class="kw-2">&amp;</span>ChartLayout,
         chart_area: Rect,
@@ -2350,7 +2432,7 @@
     }
 
     <span class="kw">fn </span>render_y_labels(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
         buf: <span class="kw-2">&amp;mut </span>Buffer,
         layout: <span class="kw-2">&amp;</span>ChartLayout,
         chart_area: Rect,
@@ -2374,25 +2456,26 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Widget <span class="kw">for </span>Chart&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">fn </span>render(<span class="kw-2">mut </span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
-        <span class="kw">if </span>area.area() == <span class="number">0 </span>{
+<span class="kw">impl </span>Widget <span class="kw">for </span>Chart&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>render(<span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
+        <span class="self">self</span>.render_ref(area, buf);
+    }
+}
+
+<span class="kw">impl </span>WidgetRef <span class="kw">for </span>Chart&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>render_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
+        buf.set_style(area, <span class="self">self</span>.style);
+
+        <span class="self">self</span>.block.render_ref(area, buf);
+        <span class="kw">let </span>chart_area = <span class="self">self</span>.block.inner_if_some(area);
+        <span class="kw">if </span>chart_area.is_empty() {
             <span class="kw">return</span>;
         }
-        buf.set_style(area, <span class="self">self</span>.style);
+
         <span class="comment">// Sample the style of the entire widget. This sample will be used to reset the style of
         // the cells that are part of the components put on top of the grah area (i.e legend and
         // axis names).
         </span><span class="kw">let </span>original_style = buf.get(area.left(), area.top()).style();
-
-        <span class="kw">let </span>chart_area = <span class="kw">match </span><span class="self">self</span>.block.take() {
-            <span class="prelude-val">Some</span>(b) =&gt; {
-                <span class="kw">let </span>inner_area = b.inner(area);
-                b.render(area, buf);
-                inner_area
-            }
-            <span class="prelude-val">None </span>=&gt; area,
-        };
 
         <span class="kw">let </span>layout = <span class="self">self</span>.layout(chart_area);
         <span class="kw">let </span>graph_area = layout.graph_area;
@@ -2454,7 +2537,7 @@
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>((x, y)) = layout.title_x {
-            <span class="kw">let </span>title = <span class="self">self</span>.x_axis.title.unwrap();
+            <span class="kw">let </span>title = <span class="self">self</span>.x_axis.title.as_ref().unwrap();
             <span class="kw">let </span>width = graph_area
                 .right()
                 .saturating_sub(x)
@@ -2468,11 +2551,11 @@
                 },
                 original_style,
             );
-            buf.set_line(x, y, <span class="kw-2">&amp;</span>title, width);
+            buf.set_line(x, y, title, width);
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>((x, y)) = layout.title_y {
-            <span class="kw">let </span>title = <span class="self">self</span>.y_axis.title.unwrap();
+            <span class="kw">let </span>title = <span class="self">self</span>.y_axis.title.as_ref().unwrap();
             <span class="kw">let </span>width = graph_area
                 .right()
                 .saturating_sub(x)
@@ -2486,7 +2569,7 @@
                 },
                 original_style,
             );
-            buf.set_line(x, y, <span class="kw-2">&amp;</span>title, width);
+            buf.set_line(x, y, title, width);
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(legend_area) = layout.legend_area {
@@ -2494,12 +2577,22 @@
             Block::default()
                 .borders(Borders::ALL)
                 .render(legend_area, buf);
-            <span class="kw">for </span>(i, dataset) <span class="kw">in </span><span class="self">self</span>.datasets.iter().enumerate() {
-                buf.set_string(
-                    legend_area.x + <span class="number">1</span>,
-                    legend_area.y + <span class="number">1 </span>+ i <span class="kw">as </span>u16,
-                    <span class="kw-2">&amp;</span>dataset.name,
-                    dataset.style,
+
+            <span class="kw">for </span>(i, (dataset_name, dataset_style)) <span class="kw">in </span><span class="self">self
+                </span>.datasets
+                .iter()
+                .filter_map(|ds| <span class="prelude-val">Some</span>((ds.name.as_ref()<span class="question-mark">?</span>, ds.style())))
+                .enumerate()
+            {
+                <span class="kw">let </span>name = dataset_name.clone().patch_style(dataset_style);
+                name.render(
+                    Rect {
+                        x: legend_area.x + <span class="number">1</span>,
+                        y: legend_area.y + <span class="number">1 </span>+ i <span class="kw">as </span>u16,
+                        width: legend_area.width - <span class="number">2</span>,
+                        height: <span class="number">1</span>,
+                    },
+                    buf,
                 );
             }
         }
@@ -2513,7 +2606,7 @@
         <span class="self">self</span>.style
     }
 
-    <span class="kw">fn </span>set_style(<span class="self">self</span>, style: Style) -&gt; <span class="self">Self</span>::Item {
+    <span class="kw">fn </span>set_style&lt;S: Into&lt;Style&gt;&gt;(<span class="self">self</span>, style: S) -&gt; <span class="self">Self</span>::Item {
         <span class="self">self</span>.style(style)
     }
 }
@@ -2525,7 +2618,7 @@
         <span class="self">self</span>.style
     }
 
-    <span class="kw">fn </span>set_style(<span class="self">self</span>, style: Style) -&gt; <span class="self">Self</span>::Item {
+    <span class="kw">fn </span>set_style&lt;S: Into&lt;Style&gt;&gt;(<span class="self">self</span>, style: S) -&gt; <span class="self">Self</span>::Item {
         <span class="self">self</span>.style(style)
     }
 }
@@ -2537,7 +2630,7 @@
         <span class="self">self</span>.style
     }
 
-    <span class="kw">fn </span>set_style(<span class="self">self</span>, style: Style) -&gt; <span class="self">Self</span>::Item {
+    <span class="kw">fn </span>set_style&lt;S: Into&lt;Style&gt;&gt;(<span class="self">self</span>, style: S) -&gt; <span class="self">Self</span>::Item {
         <span class="self">self</span>.style(style)
     }
 }
@@ -2547,7 +2640,10 @@
     <span class="kw">use </span>strum::ParseError;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::style::{Modifier, Stylize};
+    <span class="kw">use crate</span>::{
+        assert_buffer_eq,
+        style::{Modifier, Stylize},
+    };
 
     <span class="kw">struct </span>LegendTestCase {
         chart_area: Rect,
@@ -2644,6 +2740,50 @@
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
 
         <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" "</span>.repeat(<span class="number">8</span>); <span class="number">4</span>]))
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>datasets_without_name_dont_contribute_to_legend_height() {
+        <span class="kw">let </span>data_named_1 = Dataset::default().name(<span class="string">"data1"</span>); <span class="comment">// must occupy a row in legend
+        </span><span class="kw">let </span>data_named_2 = Dataset::default().name(<span class="string">""</span>); <span class="comment">// must occupy a row in legend, even if name is empty
+        </span><span class="kw">let </span>data_unnamed = Dataset::default(); <span class="comment">// must not occupy a row in legend
+        </span><span class="kw">let </span>widget = Chart::new(<span class="macro">vec!</span>[data_named_1, data_unnamed, data_named_2]);
+        <span class="kw">let </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">50</span>, <span class="number">25</span>));
+        <span class="kw">let </span>layout = widget.layout(buffer.area);
+
+        <span class="macro">assert!</span>(layout.legend_area.is_some());
+        <span class="macro">assert_eq!</span>(layout.legend_area.unwrap().height, <span class="number">4</span>); <span class="comment">// 2 for borders, 2 for rows
+    </span>}
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>no_legend_if_no_named_datasets() {
+        <span class="kw">let </span>dataset = Dataset::default();
+        <span class="kw">let </span>widget = Chart::new(<span class="macro">vec!</span>[dataset; <span class="number">3</span>]);
+        <span class="kw">let </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">50</span>, <span class="number">25</span>));
+        <span class="kw">let </span>layout = widget.layout(buffer.area);
+
+        <span class="macro">assert!</span>(layout.legend_area.is_none());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>dataset_legend_style_is_patched() {
+        <span class="kw">let </span>long_dataset_name = Dataset::default().name(<span class="string">"Very long name"</span>);
+        <span class="kw">let </span>short_dataset =
+            Dataset::default().name(Line::from(<span class="string">"Short name"</span>).alignment(Alignment::Right));
+        <span class="kw">let </span>widget = Chart::new(<span class="macro">vec!</span>[long_dataset_name, short_dataset])
+            .hidden_legend_constraints((<span class="number">100</span>.into(), <span class="number">100</span>.into()));
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">5</span>));
+
+        widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
+
+        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="string">"    ┌──────────────┐"</span>,
+            <span class="string">"    │Very long name│"</span>,
+            <span class="string">"    │    Short name│"</span>,
+            <span class="string">"    └──────────────┘"</span>,
+            <span class="string">"                    "</span>,
+        ]);
+        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]

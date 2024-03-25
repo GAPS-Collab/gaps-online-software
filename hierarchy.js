@@ -4,9 +4,12 @@ var hierarchy =
     [ "std::exception", null, [
       [ "Gaps::FatalException", "classGaps_1_1FatalException.html", null ]
     ] ],
+    [ "FromTofPacket< Derived >", "structFromTofPacket.html", null ],
+    [ "FromTofPacket< MtbMoniData >", "structFromTofPacket.html", [
+      [ "MtbMoniData", "structMtbMoniData.html", null ]
+    ] ],
     [ "LTBMoniData", "structLTBMoniData.html", null ],
     [ "MasterTriggerEvent", "structMasterTriggerEvent.html", null ],
-    [ "MtbMoniData", "structMtbMoniData.html", null ],
     [ "Paddle", "structPaddle.html", null ],
     [ "PAMoniData", "structPAMoniData.html", null ],
     [ "PBMoniData", "structPBMoniData.html", null ],

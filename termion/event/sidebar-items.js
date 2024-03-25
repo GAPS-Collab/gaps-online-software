@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Event","Key","MouseButton","MouseEvent"],"fn":["parse_event"]};

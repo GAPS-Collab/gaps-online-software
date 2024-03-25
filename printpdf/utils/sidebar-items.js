@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["calculate_points_for_circle","calculate_points_for_rect"]};

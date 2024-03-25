@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["calculate_pedestal","cfd_simple","find_peaks","get_max_bin","integrate","interpolate_time","time2bin"]};
+window.SIDEBAR_ITEMS = {"fn":["calculate_pedestal","cfd_simple","find_peaks","get_max_bin","get_paddle_t0","integrate","interpolate_time","pos_across","time2bin"]};

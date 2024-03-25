@@ -149,6 +149,12 @@
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Routines for RB commiunication and data reception 
 
 </span><span class="comment">//use std::time::{SystemTime, UNIX_EPOCH};
@@ -173,6 +179,8 @@
     </span>waveform_analysis,
 };
 
+<span class="kw">use </span>liftof_lib::settings::AnalysisEngineSettings;
+
 <span class="comment">/*************************************/
 
 </span><span class="doccomment">/// Receive data from a readoutboard
@@ -184,24 +192,27 @@
 ///
 /// # Arguments:
 ///
-/// * pp_pusher        :
-/// * reso_to_main     :
-/// * tp_to_sink       : Channel which should be connect to a (global) data sink.
-///                      Packets which are of not event type (e.g. header/full binary data)
-///                      will be forwarded to the sink.
-/// * write_rb_raw     : Should readoutboard raw data be written to disk?
-/// * storage_savepath :
-/// * events_per_file  :
-/// * rb               : 
-/// * runid            : Current assigned runid. Will be used in the filenames of saved 
-///                      readoutboard raw data.
-/// * print_packets    : 
+/// * ev_to_builder       :
+/// * tp_to_sink          : Channel which should be connect to a (global) data sink.
+///                         Packets which are of not event type (e.g. header/full binary data)
+///                         will be forwarded to the sink.
+/// * write_rb_raw        : Should readoutboard raw data be written to disk?
+/// * storage_savepath    :
+/// * events_per_file     :
+/// * rb                  : 
+/// * runid               : Current assigned runid. Will be used in the filenames of saved 
+///                         readoutboard raw data.
+/// * print_packets       : 
+/// * run_analysis_engine :
+/// * ae_settings         : Settings to configure peakfinding algorithms etc. 
+///                         These can be configured with an external .toml file
 </span><span class="kw">pub fn </span>readoutboard_communicator(ev_to_builder       : <span class="kw-2">&amp;</span>Sender&lt;RBEvent&gt;,
                                  tp_to_sink          : Sender&lt;TofPacket&gt;,
                                  rb                  : <span class="kw-2">&amp;</span>ReadoutBoard,
                                  runid               : usize,
                                  print_packets       : bool,
-                                 run_analysis_engine : bool) {
+                                 run_analysis_engine : bool,
+                                 ae_settings         : AnalysisEngineSettings) {
   <span class="macro">info!</span>(<span class="string">"Got run id {runid}"</span>);
   <span class="kw">let </span>zmq_ctx = zmq::Context::new();
   <span class="kw">let </span>board_id = rb.rb_id; <span class="comment">//rb.id.unwrap();
@@ -260,7 +271,8 @@
                 <span class="kw">if </span>event.hits.len() == <span class="number">0 </span>{
                   <span class="kw">if </span>run_analysis_engine {
                     <span class="kw">match </span>waveform_analysis(<span class="kw-2">&amp;mut </span>event, 
-                                            <span class="kw-2">&amp;</span>rb) {
+                                            <span class="kw-2">&amp;</span>rb,
+                                            ae_settings) {
                         
                       <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
                       <span class="prelude-val">Err</span>(err) =&gt; {

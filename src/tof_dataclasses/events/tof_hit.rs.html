@@ -399,6 +399,49 @@
 <a href="#398" id="398">398</a>
 <a href="#399" id="399">399</a>
 <a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::errors::SerializationError;
 <span class="kw">use </span><span class="kw">crate</span>::serialization::{
     parse_u8,
@@ -428,7 +471,10 @@
 <span class="comment">//const MIN_PEAK_TIME        : f32 = 0.0;
 </span><span class="kw">const </span>U16TOF32_PEAK_TIME   : f32 = MAX_PEAK_TIME/(u16::MAX <span class="kw">as </span>f32);
 <span class="kw">const </span>F32TOU16_PEAK_TIME   : u16 = ((u16::MAX <span class="kw">as </span>f32)/MAX_PEAK_TIME) <span class="kw">as </span>u16;
-
+<span class="kw">const </span>U16TOF32_T0          : f32 = MAX_PEAK_TIME/(u16::MAX <span class="kw">as </span>f32);
+<span class="kw">const </span>F32TOU16_T0          : u16 = ((u16::MAX <span class="kw">as </span>f32)/MAX_PEAK_TIME) <span class="kw">as </span>u16;
+<span class="kw">const </span>U16TOF32_POS_ACROSS  : f32 = <span class="number">1800.0</span>/(u16::MAX <span class="kw">as </span>f32);
+<span class="kw">const </span>F32TOU16_POS_ACROSS  : u16 = ((u16::MAX <span class="kw">as </span>f32)/<span class="number">1800.0</span>) <span class="kw">as </span>u16;
 
 <span class="doccomment">/// Waveform peak
 ///
@@ -481,7 +527,8 @@
 </span><span class="attr">#[derive(Debug,Copy,Clone,PartialEq)]
 </span><span class="kw">pub struct </span>TofHit {
   
-  <span class="comment">//unsigned short head = 0xF0F0;
+  <span class="doccomment">/// The ID of the paddle in TOF notation
+  /// (1-160)
   </span><span class="kw">pub </span>paddle_id    : u8,
   <span class="kw">pub </span>time_a       : u16,
   <span class="kw">pub </span>time_b       : u16,
@@ -490,8 +537,11 @@
   <span class="kw">pub </span>charge_a     : u16,
   <span class="kw">pub </span>charge_b     : u16,
   <span class="kw">pub </span>charge_min_i : u16,
-  <span class="kw">pub </span>pos_across   : u16,
-  <span class="kw">pub </span>t_average    : u16,
+  <span class="doccomment">/// Reconstructed particle interaction position
+  /// across the paddle
+  </span><span class="kw">pub </span>pos_across   : u16,
+  <span class="doccomment">/// Reconstructed particle interaction time
+  </span><span class="kw">pub </span>t0           : u16,
   <span class="kw">pub </span>ctr_etx      : u8,
 
   <span class="comment">// this might be not needed, 
@@ -502,6 +552,10 @@
   <span class="comment">// fields which won't get 
   // serialized
   </span><span class="kw">pub </span>valid        : bool,
+  <span class="comment">// for debugging purposes
+  </span><span class="kw">pub </span>ftime_a      : f32,
+  <span class="kw">pub </span>ftime_b      : f32,
+  <span class="kw">pub </span>paddle_len   : f32,
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>TofHit {
@@ -513,18 +567,21 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofHit {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="macro">write!</span>(f, <span class="string">"&lt;TofHit:
+  Paddle ID       {}
   Peak:
     LE Time A/B   {:.2} {:.2}   
     Height  A/B   {:.2} {:.2}
     Charge  A/B   {:.2} {:.2}
   charge_min_i    {}   
-  pos_across      {}   
-  t_average       {}   
+  ** reconstructed interaction
+    pos_across    {:.2}   
+    t0            {:.2}   
   ctr_etx         {}   
   timestamp32     {}  
   timestamp16     {}
   |-&gt; timestamp48 {}
   VALID           {}&gt;"</span>, 
+            <span class="self">self</span>.paddle_id,
             <span class="self">self</span>.get_time_a(),
             <span class="self">self</span>.get_time_b(),
             <span class="self">self</span>.get_peak_a(),
@@ -532,8 +589,8 @@
             <span class="self">self</span>.get_charge_a(),
             <span class="self">self</span>.get_charge_b(),
             <span class="self">self</span>.charge_min_i,
-            <span class="self">self</span>.pos_across,
-            <span class="self">self</span>.t_average,
+            <span class="self">self</span>.get_pos_across(),
+            <span class="self">self</span>.get_t0(),
             <span class="self">self</span>.ctr_etx,
             <span class="self">self</span>.timestamp32,
             <span class="self">self</span>.timestamp16,
@@ -568,7 +625,7 @@
     bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.charge_b    .to_le_bytes()); 
     bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.charge_min_i.to_le_bytes()); 
     bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.pos_across  .to_le_bytes()); 
-    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.t_average   .to_le_bytes()); 
+    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.t0          .to_le_bytes()); 
     bytestream.push(<span class="self">self</span>.ctr_etx); 
     bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.timestamp32 .to_le_bytes());
     bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.timestamp16 .to_le_bytes());
@@ -599,7 +656,7 @@
     pp.charge_b      = parse_u16(stream, pos);
     pp.charge_min_i  = parse_u16(stream, pos);
     pp.pos_across    = parse_u16(stream, pos);
-    pp.t_average     = parse_u16(stream, pos);
+    pp.t0            = parse_u16(stream, pos);
     pp.ctr_etx       = parse_u8(stream, pos);
     pp.timestamp32   = parse_u32(stream, pos);
     pp.timestamp16   = parse_u16(stream, pos);
@@ -612,6 +669,30 @@
 
   <span class="comment">// update Feb 2023 - add 4 byte timestamp
   </span><span class="kw">pub const </span>VERSION       : <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"1.2"</span>;
+  
+  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+    <span class="self">Self</span>{
+         paddle_id    : <span class="number">0</span>,
+         time_a       : <span class="number">0</span>,
+         time_b       : <span class="number">0</span>,
+         peak_a       : <span class="number">0</span>,
+         peak_b       : <span class="number">0</span>,
+         charge_a     : <span class="number">0</span>,
+         charge_b     : <span class="number">0</span>,
+         charge_min_i : <span class="number">0</span>,
+         pos_across   : <span class="number">0</span>,
+         t0           : <span class="number">0</span>,
+         ctr_etx      : <span class="number">0</span>,
+         timestamp32  : <span class="number">0</span>,
+         timestamp16  : <span class="number">0</span>,
+         <span class="comment">// non-serialize fields
+         </span>valid        : <span class="bool-val">true</span>,
+         ftime_a      : <span class="number">0.0</span>,
+         ftime_b      : <span class="number">0.0</span>,
+         paddle_len   : <span class="number">0.0</span>,
+    }
+  }
+
 
   <span class="doccomment">/// Get the (official) paddle id
   ///
@@ -653,28 +734,33 @@
     }
   }
 
-  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-    <span class="self">Self</span>{
-         paddle_id    : <span class="number">0</span>,
-         time_a       : <span class="number">0</span>,
-         time_b       : <span class="number">0</span>,
-         peak_a       : <span class="number">0</span>,
-         peak_b       : <span class="number">0</span>,
-         charge_a     : <span class="number">0</span>,
-         charge_b     : <span class="number">0</span>,
-         charge_min_i : <span class="number">0</span>,
-         pos_across   : <span class="number">0</span>,
-         t_average    : <span class="number">0</span>,
-         ctr_etx      : <span class="number">0</span>,
-         timestamp32  : <span class="number">0</span>,
-         timestamp16  : <span class="number">0</span>,
-         <span class="comment">// non-serialize fields
-         </span>valid        : <span class="bool-val">true</span>,
-    }
-  }
 
   <span class="kw">pub fn </span>get_timestamp48(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
     ((<span class="self">self</span>.timestamp16 <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) | <span class="self">self</span>.timestamp32 <span class="kw">as </span>u64
+  }
+  
+  <span class="kw">pub fn </span>set_pos_across(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pa : f32) {
+    <span class="kw">if </span>pa &gt;= <span class="number">1800.0 </span>{
+      <span class="self">self</span>.pos_across = u16::MAX;
+    } <span class="kw">else </span>{
+      <span class="self">self</span>.pos_across = F32TOU16_POS_ACROSS<span class="kw-2">*</span>(pa.floor() <span class="kw">as </span>u16);
+    }
+  }
+
+  <span class="kw">pub fn </span>get_pos_across(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
+    <span class="self">self</span>.pos_across <span class="kw">as </span>f32 * U16TOF32_POS_ACROSS
+  }
+
+  <span class="kw">pub fn </span>set_t0(<span class="kw-2">&amp;mut </span><span class="self">self</span>, t0 : f32) {
+    <span class="kw">if </span>t0 &gt;= MAX_PEAK_TIME {
+      <span class="self">self</span>.t0 = u16::MAX;
+    } <span class="kw">else </span>{
+      <span class="self">self</span>.t0 = F32TOU16_T0<span class="kw-2">*</span>(t0.floor() <span class="kw">as </span>u16);
+    }
+  }
+
+  <span class="kw">pub fn </span>get_t0(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
+    <span class="self">self</span>.t0 <span class="kw">as </span>f32 * U16TOF32_T0
   }
 
   <span class="kw">pub fn </span>set_peak_a(<span class="kw-2">&amp;mut </span><span class="self">self</span>, peak : f32 ) {
@@ -782,7 +868,7 @@
     pp.charge_b     = rng.gen::&lt;u16&gt;();
     pp.charge_min_i = rng.gen::&lt;u16&gt;();
     pp.pos_across   = rng.gen::&lt;u16&gt;();
-    pp.t_average    = rng.gen::&lt;u16&gt;();
+    pp.t0           = rng.gen::&lt;u16&gt;();
     pp.ctr_etx      = rng.gen::&lt;u8&gt;();
     pp.timestamp32  = rng.gen::&lt;u32&gt;();
     pp.timestamp16  = rng.gen::&lt;u16&gt;();

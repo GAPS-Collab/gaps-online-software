@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["DrawingErrorKind","FontFamily","FontStyle","FontTransform"],"mod":["rasterizer","text_anchor"],"struct":["BackendColor"],"trait":["BackendStyle","BackendTextStyle","DrawingBackend"],"type":["BackendCoord"]};

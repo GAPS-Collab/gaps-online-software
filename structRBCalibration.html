@@ -133,10 +133,12 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a8026b38840d099cc45d463e07578d829"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structRBCalibration.html">RBCalibration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRBCalibration.html#a8026b38840d099cc45d463e07578d829">from_bytestream</a> (const Vec&lt; u8 &gt; &amp;bytestream, u64 &amp;pos)</td></tr>
-<tr class="separator:a8026b38840d099cc45d463e07578d829"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06e35ae344be8dc7040823dd16420a71"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structRBCalibration.html">RBCalibration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRBCalibration.html#a06e35ae344be8dc7040823dd16420a71">from_bytestream</a> (const Vec&lt; u8 &gt; &amp;bytestream, u64 &amp;pos, bool discard_events=true)</td></tr>
+<tr class="separator:a06e35ae344be8dc7040823dd16420a71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a13e042d18ab68914ebe48dd1ea1783"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structRBCalibration.html">RBCalibration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRBCalibration.html#a3a13e042d18ab68914ebe48dd1ea1783">from_txtfile</a> (const String &amp;filename)</td></tr>
 <tr class="separator:a3a13e042d18ab68914ebe48dd1ea1783"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3b079190ff34f2575d56a8baf40f3c9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structRBCalibration.html">RBCalibration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRBCalibration.html#ad3b079190ff34f2575d56a8baf40f3c9">from_file</a> (const String &amp;filename, bool discard_events=true)</td></tr>
+<tr class="separator:ad3b079190ff34f2575d56a8baf40f3c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b7713557f7ff9223f3c2dc5b598adb6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRBCalibration.html#a6b7713557f7ff9223f3c2dc5b598adb6">disable_eventdata</a> ()</td></tr>
 <tr class="separator:a6b7713557f7ff9223f3c2dc5b598adb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -220,8 +222,8 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><b>serialize_even
 
 </div>
 </div>
-<a id="a8026b38840d099cc45d463e07578d829"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8026b38840d099cc45d463e07578d829">&#9670;&nbsp;</a></span>from_bytestream()</h2>
+<a id="a06e35ae344be8dc7040823dd16420a71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06e35ae344be8dc7040823dd16420a71">&#9670;&nbsp;</a></span>from_bytestream()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -239,7 +241,13 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><b>serialize_even
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">u64 &amp;&#160;</td>
-          <td class="paramname"><em>pos</em>&#160;</td>
+          <td class="paramname"><em>pos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>discard_events</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -260,6 +268,43 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><b>serialize_even
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="ad3b079190ff34f2575d56a8baf40f3c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3b079190ff34f2575d56a8baf40f3c9">&#9670;&nbsp;</a></span>from_file()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="structRBCalibration.html">RBCalibration</a> RBCalibration::from_file </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>filename</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>discard_events</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Load a calibration from a file with a <a class="el" href="structTofPacket.html">TofPacket</a> of type <a class="el" href="structRBCalibration.html">RBCalibration</a> in it. This should be the default way to load a calibration file </p>
 
 </div>
 </div>

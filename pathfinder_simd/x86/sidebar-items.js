@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["F32x2","F32x4","I32x2","I32x4","U32x2","U32x4"]};

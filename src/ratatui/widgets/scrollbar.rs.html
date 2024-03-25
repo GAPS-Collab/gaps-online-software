@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/scrollbar.rs`."><title>scrollbar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/widgets/scrollbar.rs`."><title>scrollbar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -1024,24 +1024,131 @@
 <a href="#1023" id="1023">1023</a>
 <a href="#1024" id="1024">1024</a>
 <a href="#1025" id="1025">1025</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>strum::{Display, EnumString};
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::iter;
+
+<span class="kw">use </span>strum::{Display, EnumString};
+<span class="kw">use </span>unicode_width::UnicodeWidthStr;
 
 <span class="kw">use </span><span class="kw">super</span>::StatefulWidget;
-<span class="kw">use crate</span>::{
-    buffer::Buffer,
-    layout::Rect,
-    style::Style,
-    symbols::scrollbar::{Set, DOUBLE_HORIZONTAL, DOUBLE_VERTICAL},
-};
+<span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, symbols::scrollbar::<span class="kw-2">*</span>};
 
-<span class="doccomment">/// An enum representing the direction of scrolling in a Scrollbar widget.
-</span><span class="attr">#[derive(Debug, Default, Display, EnumString, Clone, Copy, Eq, PartialEq, Hash)]
-</span><span class="kw">pub enum </span>ScrollDirection {
-    <span class="doccomment">/// Forward scroll direction, usually corresponds to scrolling downwards or rightwards.
+<span class="doccomment">/// A widget to display a scrollbar
+///
+/// The following components of the scrollbar are customizable in symbol and style. Note the
+/// scrollbar is represented horizontally but it can also be set vertically (which is actually the
+/// default).
+///
+/// ```text
+/// &lt;--▮-------&gt;
+/// ^  ^   ^   ^
+/// │  │   │   └ end
+/// │  │   └──── track
+/// │  └──────── thumb
+/// └─────────── begin
+/// ```
+///
+/// # Examples
+///
+/// ```rust
+/// use ratatui::{prelude::*, widgets::*};
+///
+/// # fn render_paragraph_with_scrollbar(frame: &amp;mut Frame, area: Rect) {
+/// let vertical_scroll = 0; // from app state
+///
+/// let items = vec![
+///     Line::from("Item 1"),
+///     Line::from("Item 2"),
+///     Line::from("Item 3"),
+/// ];
+/// let paragraph = Paragraph::new(items.clone())
+///     .scroll((vertical_scroll as u16, 0))
+///     .block(Block::new().borders(Borders::RIGHT)); // to show a background for the scrollbar
+///
+/// let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
+///     .begin_symbol(Some("↑"))
+///     .end_symbol(Some("↓"));
+///
+/// let mut scrollbar_state = ScrollbarState::new(items.len()).position(vertical_scroll);
+///
+/// let area = frame.size();
+/// // Note we render the paragraph
+/// frame.render_widget(paragraph, area);
+/// // and the scrollbar, those are separate widgets
+/// frame.render_stateful_widget(
+///     scrollbar,
+///     area.inner(&amp;Margin {
+///         // using an inner vertical margin of 1 unit makes the scrollbar inside the block
+///         vertical: 1,
+///         horizontal: 0,
+///     }),
+///     &amp;mut scrollbar_state,
+/// );
+/// # }
+/// ```
+</span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>Scrollbar&lt;<span class="lifetime">'a</span>&gt; {
+    orientation: ScrollbarOrientation,
+    thumb_style: Style,
+    thumb_symbol: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
+    track_style: Style,
+    track_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
+    begin_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
+    begin_style: Style,
+    end_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
+    end_style: Style,
+}
+
+<span class="doccomment">/// This is the position of the scrollbar around a given area.
+///
+/// ```plain
+///           HorizontalTop
+///             ┌───────┐
+/// VerticalLeft│       │VerticalRight
+///             └───────┘
+///          HorizontalBottom
+/// ```
+</span><span class="attr">#[derive(Debug, Default, Display, EnumString, Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>ScrollbarOrientation {
+    <span class="doccomment">/// Positions the scrollbar on the right, scrolling vertically
     </span><span class="attr">#[default]
-    </span>Forward,
-    <span class="doccomment">/// Backward scroll direction, usually corresponds to scrolling upwards or leftwards.
-    </span>Backward,
+    </span>VerticalRight,
+    <span class="doccomment">/// Positions the scrollbar on the left, scrolling vertically
+    </span>VerticalLeft,
+    <span class="doccomment">/// Positions the scrollbar on the bottom, scrolling horizontally
+    </span>HorizontalBottom,
+    <span class="doccomment">/// Positions the scrollbar on the top, scrolling horizontally
+    </span>HorizontalTop,
 }
 
 <span class="doccomment">/// A struct representing the state of a Scrollbar widget.
@@ -1068,152 +1175,32 @@
 /// ```
 ///
 /// If you don't have multi-line content, you can leave the `viewport_content_length` set to the
-/// default of 0 and it'll use the track size as a `viewport_content_length`.
+/// default and it'll use the track size as a `viewport_content_length`.
 </span><span class="attr">#[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = <span class="string">"serde"</span>, derive(serde::Serialize, serde::Deserialize))]
 </span><span class="kw">pub struct </span>ScrollbarState {
-    <span class="comment">// The total length of the scrollable content.
+    <span class="doccomment">/// The total length of the scrollable content.
     </span>content_length: usize,
-    <span class="comment">// The current position within the scrollable content.
+    <span class="doccomment">/// The current position within the scrollable content.
     </span>position: usize,
-    <span class="comment">// The length of content in current viewport.
+    <span class="doccomment">/// The length of content in current viewport.
+    ///
+    /// FIXME: this should be `Option&lt;usize&gt;`, but it will break serialization to change it.
     </span>viewport_content_length: usize,
 }
 
-<span class="kw">impl </span>ScrollbarState {
-    <span class="doccomment">/// Constructs a new ScrollbarState with the specified content length.
-    </span><span class="kw">pub fn </span>new(content_length: usize) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            content_length,
-            ..Default::default()
-        }
-    }
-    <span class="doccomment">/// Sets the scroll position of the scrollbar and returns the modified ScrollbarState.
-    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>position(<span class="kw-2">mut </span><span class="self">self</span>, position: usize) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.position = position;
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// Sets the length of the scrollable content and returns the modified ScrollbarState.
-    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>content_length(<span class="kw-2">mut </span><span class="self">self</span>, content_length: usize) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.content_length = content_length;
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// Sets the length of the viewport content and returns the modified ScrollbarState.
-    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>viewport_content_length(<span class="kw-2">mut </span><span class="self">self</span>, viewport_content_length: usize) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.viewport_content_length = viewport_content_length;
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// Decrements the scroll position by one, ensuring it doesn't go below zero.
-    </span><span class="kw">pub fn </span>prev(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="self">self</span>.position = <span class="self">self</span>.position.saturating_sub(<span class="number">1</span>);
-    }
-
-    <span class="doccomment">/// Increments the scroll position by one, ensuring it doesn't exceed the length of the content.
-    </span><span class="kw">pub fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="self">self</span>.position = <span class="self">self
-            </span>.position
-            .saturating_add(<span class="number">1</span>)
-            .clamp(<span class="number">0</span>, <span class="self">self</span>.content_length.saturating_sub(<span class="number">1</span>))
-    }
-
-    <span class="doccomment">/// Sets the scroll position to the start of the scrollable content.
-    </span><span class="kw">pub fn </span>first(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="self">self</span>.position = <span class="number">0</span>;
-    }
-
-    <span class="doccomment">/// Sets the scroll position to the end of the scrollable content.
-    </span><span class="kw">pub fn </span>last(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="self">self</span>.position = <span class="self">self</span>.content_length.saturating_sub(<span class="number">1</span>)
-    }
-
-    <span class="doccomment">/// Changes the scroll position based on the provided ScrollDirection.
-    </span><span class="kw">pub fn </span>scroll(<span class="kw-2">&amp;mut </span><span class="self">self</span>, direction: ScrollDirection) {
-        <span class="kw">match </span>direction {
-            ScrollDirection::Forward =&gt; {
-                <span class="self">self</span>.next();
-            }
-            ScrollDirection::Backward =&gt; {
-                <span class="self">self</span>.prev();
-            }
-        }
-    }
-}
-
-<span class="doccomment">/// Scrollbar Orientation
-</span><span class="attr">#[derive(Debug, Default, Display, EnumString, Clone, Eq, PartialEq, Hash)]
-</span><span class="kw">pub enum </span>ScrollbarOrientation {
-    <span class="attr">#[default]
-    </span>VerticalRight,
-    VerticalLeft,
-    HorizontalBottom,
-    HorizontalTop,
-}
-
-<span class="doccomment">/// A widget to display a scrollbar
+<span class="doccomment">/// An enum representing a scrolling direction.
 ///
-/// The following components of the scrollbar are customizable in symbol and style.
+/// This is used with [`ScrollbarState::scroll`].
 ///
-/// ```text
-/// &lt;--▮-------&gt;
-/// ^  ^   ^   ^
-/// │  │   │   └ end
-/// │  │   └──── track
-/// │  └──────── thumb
-/// └─────────── begin
-/// ```
-///
-/// # Examples
-///
-/// ```rust
-/// use ratatui::{prelude::*, widgets::*};
-///
-/// # fn render_paragraph_with_scrollbar(frame: &amp;mut Frame, area: Rect) {
-///
-/// let vertical_scroll = 0; // from app state
-///
-/// let items = vec![
-///     Line::from("Item 1"),
-///     Line::from("Item 2"),
-///     Line::from("Item 3"),
-/// ];
-/// let paragraph = Paragraph::new(items.clone())
-///     .scroll((vertical_scroll as u16, 0))
-///     .block(Block::new().borders(Borders::RIGHT)); // to show a background for the scrollbar
-///
-/// let scrollbar = Scrollbar::default()
-///     .orientation(ScrollbarOrientation::VerticalRight)
-///     .begin_symbol(Some("↑"))
-///     .end_symbol(Some("↓"));
-/// let mut scrollbar_state = ScrollbarState::new(items.iter().len()).position(vertical_scroll);
-///
-/// let area = frame.size();
-/// frame.render_widget(paragraph, area);
-/// frame.render_stateful_widget(
-///     scrollbar,
-///     area.inner(&amp;Margin {
-///         vertical: 1,
-///         horizontal: 0,
-///     }), // using a inner vertical margin of 1 unit makes the scrollbar inside the block
-///     &amp;mut scrollbar_state,
-/// );
-/// # }
-/// ```
-</span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-</span><span class="kw">pub struct </span>Scrollbar&lt;<span class="lifetime">'a</span>&gt; {
-    orientation: ScrollbarOrientation,
-    thumb_style: Style,
-    thumb_symbol: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
-    track_style: Style,
-    track_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
-    begin_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
-    begin_style: Style,
-    end_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
-    end_style: Style,
+/// It is useful for example when you want to store in which direction to scroll.
+</span><span class="attr">#[derive(Debug, Default, Display, EnumString, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>ScrollDirection {
+    <span class="doccomment">/// Forward scroll direction, usually corresponds to scrolling downwards or rightwards.
+    </span><span class="attr">#[default]
+    </span>Forward,
+    <span class="doccomment">/// Backward scroll direction, usually corresponds to scrolling upwards or leftwards.
+    </span>Backward,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Default <span class="kw">for </span>Scrollbar&lt;<span class="lifetime">'a</span>&gt; {
@@ -1233,16 +1220,26 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Scrollbar&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">pub fn </span>new(orientation: ScrollbarOrientation) -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Creates a new scrollbar with the given position.
+    ///
+    /// Most of the time you'll want [`ScrollbarOrientation::VerticalLeft`] or
+    /// [`ScrollbarOrientation::HorizontalBottom`]. See [`ScrollbarOrientation`] for more options.
+    </span><span class="kw">pub fn </span>new(orientation: ScrollbarOrientation) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default().orientation(orientation)
     }
 
-    <span class="doccomment">/// Sets the orientation of the scrollbar.
-    /// Resets the symbols to [`DOUBLE_VERTICAL`] or [`DOUBLE_HORIZONTAL`] based on orientation
+    <span class="doccomment">/// Sets the position of the scrollbar.
+    ///
+    /// The orientation of the scrollbar is the position it will take around a [`Rect`]. See
+    /// [`ScrollbarOrientation`] for more details.
+    ///
+    /// Resets the symbols to [`DOUBLE_VERTICAL`] or [`DOUBLE_HORIZONTAL`] based on orientation.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>orientation(<span class="kw-2">mut </span><span class="self">self</span>, orientation: ScrollbarOrientation) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.orientation = orientation;
-        <span class="kw">let </span>set = <span class="kw">if </span><span class="self">self</span>.is_vertical() {
+        <span class="kw">let </span>set = <span class="kw">if </span><span class="self">self</span>.orientation.is_vertical() {
             DOUBLE_VERTICAL
         } <span class="kw">else </span>{
             DOUBLE_HORIZONTAL
@@ -1251,6 +1248,11 @@
     }
 
     <span class="doccomment">/// Sets the orientation and symbols for the scrollbar from a [`Set`].
+    ///
+    /// This has the same effect as calling [`Scrollbar::orientation`] and then
+    /// [`Scrollbar::symbols`]. See those for more details.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>orientation_and_symbol(<span class="kw-2">mut </span><span class="self">self</span>, orientation: ScrollbarOrientation, set: Set) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.orientation = orientation;
@@ -1258,20 +1260,37 @@
     }
 
     <span class="doccomment">/// Sets the symbol that represents the thumb of the scrollbar.
+    ///
+    /// The thumb is the handle representing the progression on the scrollbar. See [`Scrollbar`]
+    /// for a visual example of what this represents.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>thumb_symbol(<span class="kw-2">mut </span><span class="self">self</span>, thumb_symbol: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.thumb_symbol = thumb_symbol;
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Sets the style that represents the thumb of the scrollbar.
+    <span class="doccomment">/// Sets the style on the scrollbar thumb.
+    ///
+    /// The thumb is the handle representing the progression on the scrollbar. See [`Scrollbar`]
+    /// for a visual example of what this represents.
+    ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>thumb_style(<span class="kw-2">mut </span><span class="self">self</span>, thumb_style: Style) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.thumb_style = thumb_style;
+    </span><span class="kw">pub fn </span>thumb_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, thumb_style: S) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.thumb_style = thumb_style.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the symbol that represents the track of the scrollbar.
+    ///
+    /// See [`Scrollbar`] for a visual example of what this represents.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>track_symbol(<span class="kw-2">mut </span><span class="self">self</span>, track_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.track_symbol = track_symbol;
@@ -1279,13 +1298,24 @@
     </span>}
 
     <span class="doccomment">/// Sets the style that is used for the track of the scrollbar.
+    ///
+    /// See [`Scrollbar`] for a visual example of what this represents.
+    ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>track_style(<span class="kw-2">mut </span><span class="self">self</span>, track_style: Style) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.track_style = track_style;
+    </span><span class="kw">pub fn </span>track_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, track_style: S) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.track_style = track_style.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the symbol that represents the beginning of the scrollbar.
+    ///
+    /// See [`Scrollbar`] for a visual example of what this represents.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>begin_symbol(<span class="kw-2">mut </span><span class="self">self</span>, begin_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.begin_symbol = begin_symbol;
@@ -1293,13 +1323,24 @@
     </span>}
 
     <span class="doccomment">/// Sets the style that is used for the beginning of the scrollbar.
+    ///
+    /// See [`Scrollbar`] for a visual example of what this represents.
+    ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>begin_style(<span class="kw-2">mut </span><span class="self">self</span>, begin_style: Style) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.begin_style = begin_style;
+    </span><span class="kw">pub fn </span>begin_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, begin_style: S) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.begin_style = begin_style.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the symbol that represents the end of the scrollbar.
+    ///
+    /// See [`Scrollbar`] for a visual example of what this represents.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>end_symbol(<span class="kw-2">mut </span><span class="self">self</span>, end_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.end_symbol = end_symbol;
@@ -1307,9 +1348,16 @@
     </span>}
 
     <span class="doccomment">/// Sets the style that is used for the end of the scrollbar.
+    ///
+    /// See [`Scrollbar`] for a visual example of what this represents.
+    ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>end_style(<span class="kw-2">mut </span><span class="self">self</span>, end_style: Style) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.end_style = end_style;
+    </span><span class="kw">pub fn </span>end_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, end_style: S) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.end_style = end_style.into();
         <span class="self">self
     </span>}
 
@@ -1325,7 +1373,10 @@
     /// ```
     ///
     /// Only sets begin_symbol, end_symbol and track_symbol if they already contain a value.
-    /// If they were set to `None` explicitly, this function will respect that choice.
+    /// If they were set to `None` explicitly, this function will respect that choice. Use their
+    /// respective setters to change their value.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>symbols(<span class="kw-2">mut </span><span class="self">self</span>, symbol: Set) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.thumb_symbol = symbol.thumb;
@@ -1342,6 +1393,10 @@
     </span>}
 
     <span class="doccomment">/// Sets the style used for the various parts of the scrollbar from a [`Style`].
+    ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
     /// ```text
     /// &lt;--▮-------&gt;
     /// ^  ^   ^   ^
@@ -1350,129 +1405,96 @@
     /// │  └──────── thumb
     /// └─────────── begin
     /// ```
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>style = style.into();
         <span class="self">self</span>.track_style = style;
         <span class="self">self</span>.thumb_style = style;
         <span class="self">self</span>.begin_style = style;
         <span class="self">self</span>.end_style = style;
         <span class="self">self
     </span>}
+}
 
-    <span class="kw">fn </span>is_vertical(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">match </span><span class="self">self</span>.orientation {
-            ScrollbarOrientation::VerticalRight | ScrollbarOrientation::VerticalLeft =&gt; <span class="bool-val">true</span>,
-            ScrollbarOrientation::HorizontalBottom | ScrollbarOrientation::HorizontalTop =&gt; <span class="bool-val">false</span>,
+<span class="kw">impl </span>ScrollbarState {
+    <span class="doccomment">/// Constructs a new ScrollbarState with the specified content length.
+    ///
+    /// `content_length` is the total number of element, that can be scrolled. See
+    /// [`ScrollbarState`] for more details.
+    </span><span class="kw">pub fn </span>new(content_length: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            content_length,
+            ..Default::default()
         }
     }
 
-    <span class="kw">fn </span>get_track_area(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect) -&gt; Rect {
-        <span class="comment">// Decrease track area if a begin arrow is present
-        </span><span class="kw">let </span>area = <span class="kw">if </span><span class="self">self</span>.begin_symbol.is_some() {
-            <span class="kw">if </span><span class="self">self</span>.is_vertical() {
-                <span class="comment">// For vertical scrollbar, reduce the height by one
-                </span>Rect::new(
-                    area.x,
-                    area.y + <span class="number">1</span>,
-                    area.width,
-                    area.height.saturating_sub(<span class="number">1</span>),
-                )
-            } <span class="kw">else </span>{
-                <span class="comment">// For horizontal scrollbar, reduce the width by one
-                </span>Rect::new(
-                    area.x + <span class="number">1</span>,
-                    area.y,
-                    area.width.saturating_sub(<span class="number">1</span>),
-                    area.height,
-                )
-            }
-        } <span class="kw">else </span>{
-            area
-        };
-        <span class="comment">// Further decrease scrollbar area if an end arrow is present
-        </span><span class="kw">if </span><span class="self">self</span>.end_symbol.is_some() {
-            <span class="kw">if </span><span class="self">self</span>.is_vertical() {
-                <span class="comment">// For vertical scrollbar, reduce the height by one
-                </span>Rect::new(area.x, area.y, area.width, area.height.saturating_sub(<span class="number">1</span>))
-            } <span class="kw">else </span>{
-                <span class="comment">// For horizontal scrollbar, reduce the width by one
-                </span>Rect::new(area.x, area.y, area.width.saturating_sub(<span class="number">1</span>), area.height)
-            }
-        } <span class="kw">else </span>{
-            area
-        }
-    }
-
-    <span class="kw">fn </span>should_not_render(<span class="kw-2">&amp;</span><span class="self">self</span>, track_start: u16, track_end: u16, content_length: usize) -&gt; bool {
-        <span class="kw">if </span>track_end - track_start == <span class="number">0 </span>|| content_length == <span class="number">0 </span>{
-            <span class="kw">return </span><span class="bool-val">true</span>;
-        }
-        <span class="bool-val">false
+    <span class="doccomment">/// Sets the scroll position of the scrollbar.
+    ///
+    /// This represents the number of scrolled items.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>position(<span class="kw-2">mut </span><span class="self">self</span>, position: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.position = position;
+        <span class="self">self
     </span>}
 
-    <span class="kw">fn </span>get_track_start_end(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect) -&gt; (u16, u16, u16) {
-        <span class="kw">match </span><span class="self">self</span>.orientation {
-            ScrollbarOrientation::VerticalRight =&gt; {
-                (area.top(), area.bottom(), area.right().saturating_sub(<span class="number">1</span>))
-            }
-            ScrollbarOrientation::VerticalLeft =&gt; (area.top(), area.bottom(), area.left()),
-            ScrollbarOrientation::HorizontalBottom =&gt; {
-                (area.left(), area.right(), area.bottom().saturating_sub(<span class="number">1</span>))
-            }
-            ScrollbarOrientation::HorizontalTop =&gt; (area.left(), area.right(), area.top()),
-        }
+    <span class="doccomment">/// Sets the length of the scrollable content.
+    ///
+    /// This is the number of scrollable items. If items have a length of one, then this is the
+    /// same as the number of scrollable cells.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>content_length(<span class="kw-2">mut </span><span class="self">self</span>, content_length: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.content_length = content_length;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the items' size.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>viewport_content_length(<span class="kw-2">mut </span><span class="self">self</span>, viewport_content_length: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.viewport_content_length = viewport_content_length;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Decrements the scroll position by one, ensuring it doesn't go below zero.
+    </span><span class="kw">pub fn </span>prev(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.position = <span class="self">self</span>.position.saturating_sub(<span class="number">1</span>);
     }
 
-    <span class="doccomment">/// Calculate the starting and ending position of a scrollbar thumb.
-    ///
-    /// The scrollbar thumb's position and size are determined based on the current state of the
-    /// scrollbar, and the dimensions of the scrollbar track.
-    ///
-    /// This function returns a tuple `(thumb_start, thumb_end)` where `thumb_start` is the position
-    /// at which the scrollbar thumb begins, and `thumb_end` is the position at which the
-    /// scrollbar thumb ends.
-    ///
-    /// The size of the thumb (i.e., `thumb_end - thumb_start`) is proportional to the ratio of the
-    /// viewport content length to the total content length.
-    ///
-    /// The position of the thumb (i.e., `thumb_start`) is proportional to the ratio of the current
-    /// scroll position to the total content length.
-    </span><span class="kw">fn </span>get_thumb_start_end(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        state: <span class="kw-2">&amp;</span>ScrollbarState,
-        track_start_end: (u16, u16),
-    ) -&gt; (u16, u16) {
-        <span class="comment">// let (track_start, track_end) = track_start_end;
-        // let track_size = track_end - track_start;
-        // let thumb_size =
-        //     ((state.viewport_content_length / state.content_length) * track_size).max(1);
-        // let thumb_start = (state.position / state.content_length) *
-        //                    state.viewport_content_length;
-        // let thumb_end = thumb_size + thumb_start;
-        // (thumb_start, thumb_end)
+    <span class="doccomment">/// Increments the scroll position by one, ensuring it doesn't exceed the length of the content.
+    </span><span class="kw">pub fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.position = <span class="self">self
+            </span>.position
+            .saturating_add(<span class="number">1</span>)
+            .min(<span class="self">self</span>.content_length.saturating_sub(<span class="number">1</span>))
+    }
 
-        </span><span class="kw">let </span>(track_start, track_end) = track_start_end;
+    <span class="doccomment">/// Sets the scroll position to the start of the scrollable content.
+    </span><span class="kw">pub fn </span>first(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.position = <span class="number">0</span>;
+    }
 
-        <span class="kw">let </span>viewport_content_length = <span class="kw">if </span>state.viewport_content_length == <span class="number">0 </span>{
-            (track_end - track_start) <span class="kw">as </span>usize
-        } <span class="kw">else </span>{
-            state.viewport_content_length
-        };
+    <span class="doccomment">/// Sets the scroll position to the end of the scrollable content.
+    </span><span class="kw">pub fn </span>last(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.position = <span class="self">self</span>.content_length.saturating_sub(<span class="number">1</span>)
+    }
 
-        <span class="kw">let </span>scroll_position_ratio = (state.position <span class="kw">as </span>f64 / state.content_length <span class="kw">as </span>f64).min(<span class="number">1.0</span>);
-
-        <span class="kw">let </span>thumb_size = (((viewport_content_length <span class="kw">as </span>f64 / state.content_length <span class="kw">as </span>f64)
-            * (track_end - track_start) <span class="kw">as </span>f64)
-            .round() <span class="kw">as </span>u16)
-            .max(<span class="number">1</span>);
-
-        <span class="kw">let </span>track_size = (track_end - track_start).saturating_sub(thumb_size);
-
-        <span class="kw">let </span>thumb_start = track_start + (scroll_position_ratio * track_size <span class="kw">as </span>f64).round() <span class="kw">as </span>u16;
-
-        <span class="kw">let </span>thumb_end = thumb_start + thumb_size;
-
-        (thumb_start, thumb_end)
+    <span class="doccomment">/// Changes the scroll position based on the provided [`ScrollDirection`].
+    </span><span class="kw">pub fn </span>scroll(<span class="kw-2">&amp;mut </span><span class="self">self</span>, direction: ScrollDirection) {
+        <span class="kw">match </span>direction {
+            ScrollDirection::Forward =&gt; {
+                <span class="self">self</span>.next();
+            }
+            ScrollDirection::Backward =&gt; {
+                <span class="self">self</span>.prev();
+            }
+        }
     }
 }
 
@@ -1480,84 +1502,143 @@
     <span class="kw">type </span>State = ScrollbarState;
 
     <span class="kw">fn </span>render(<span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer, state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::State) {
-        <span class="comment">//
-        // For ScrollbarOrientation::VerticalRight
-        //
-        //                   ┌───────── track_axis  (x)
-        //                   v
-        //   ┌───────────────┐
-        //   │               ║&lt;──────── track_start (y1)
-        //   │               █
-        //   │               █
-        //   │               ║
-        //   │               ║&lt;──────── track_end   (y2)
-        //   └───────────────┘
-        //
-        // For ScrollbarOrientation::HorizontalBottom
-        //
-        //   ┌───────────────┐
-        //   │               │
-        //   │               │
-        //   │               │
-        //   └═══███═════════┘&lt;──────── track_axis  (y)
-        //    ^             ^
-        //    │             └────────── track_end   (x2)
-        //    │
-        //    └──────────────────────── track_start (x1)
-        //
-
-        // Find track_start, track_end, and track_axis
-        </span><span class="kw">let </span>area = <span class="self">self</span>.get_track_area(area);
-        <span class="kw">let </span>(track_start, track_end, track_axis) = <span class="self">self</span>.get_track_start_end(area);
-
-        <span class="kw">if </span><span class="self">self</span>.should_not_render(track_start, track_end, state.content_length) {
+        <span class="kw">if </span>state.content_length == <span class="number">0 </span>|| area.is_empty() {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let </span>(thumb_start, thumb_end) = <span class="self">self</span>.get_thumb_start_end(state, (track_start, track_end));
-
-        <span class="kw">for </span>i <span class="kw">in </span>track_start..track_end {
-            <span class="kw">let </span>(style, symbol) = <span class="kw">if </span>i &gt;= thumb_start &amp;&amp; i &lt; thumb_end {
-                (<span class="self">self</span>.thumb_style, <span class="self">self</span>.thumb_symbol)
-            } <span class="kw">else if let </span><span class="prelude-val">Some</span>(track_symbol) = <span class="self">self</span>.track_symbol {
-                (<span class="self">self</span>.track_style, track_symbol)
-            } <span class="kw">else </span>{
-                <span class="kw">continue</span>;
-            };
-
-            <span class="kw">if </span><span class="self">self</span>.is_vertical() {
-                buf.set_string(track_axis, i, symbol, style);
-            } <span class="kw">else </span>{
-                buf.set_string(i, track_axis, symbol, style);
-            }
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = <span class="self">self</span>.begin_symbol {
-            <span class="kw">if </span><span class="self">self</span>.is_vertical() {
-                buf.set_string(track_axis, track_start - <span class="number">1</span>, s, <span class="self">self</span>.begin_style);
-            } <span class="kw">else </span>{
-                buf.set_string(track_start - <span class="number">1</span>, track_axis, s, <span class="self">self</span>.begin_style);
-            }
-        };
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = <span class="self">self</span>.end_symbol {
-            <span class="kw">if </span><span class="self">self</span>.is_vertical() {
-                buf.set_string(track_axis, track_end, s, <span class="self">self</span>.end_style);
-            } <span class="kw">else </span>{
-                buf.set_string(track_end, track_axis, s, <span class="self">self</span>.end_style);
+        <span class="kw">let </span><span class="kw-2">mut </span>bar = <span class="self">self</span>.bar_symbols(area, state);
+        <span class="kw">let </span>area = <span class="self">self</span>.scollbar_area(area);
+        <span class="kw">for </span>x <span class="kw">in </span>area.left()..area.right() {
+            <span class="kw">for </span>y <span class="kw">in </span>area.top()..area.bottom() {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>((symbol, style))) = bar.next() {
+                    buf.set_string(x, y, symbol, style);
+                }
             }
         }
     }
 }
 
+<span class="kw">impl </span>Scrollbar&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="doccomment">/// Returns an iterator over the symbols and styles of the scrollbar.
+    </span><span class="kw">fn </span>bar_symbols(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        area: Rect,
+        state: <span class="kw-2">&amp;mut </span>ScrollbarState,
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>str, Style)&gt;&gt; {
+        <span class="kw">let </span>(track_start_len, thumb_len, track_end_len) = <span class="self">self</span>.part_lengths(area, state);
+
+        <span class="kw">let </span>begin = <span class="self">self</span>.begin_symbol.map(|s| <span class="prelude-val">Some</span>((s, <span class="self">self</span>.begin_style)));
+        <span class="kw">let </span>track = <span class="prelude-val">Some</span>(<span class="self">self</span>.track_symbol.map(|s| (s, <span class="self">self</span>.track_style)));
+        <span class="kw">let </span>thumb = <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>((<span class="self">self</span>.thumb_symbol, <span class="self">self</span>.thumb_style)));
+        <span class="kw">let </span>end = <span class="self">self</span>.end_symbol.map(|s| <span class="prelude-val">Some</span>((s, <span class="self">self</span>.end_style)));
+
+        <span class="comment">// `&lt;`
+        </span>iter::once(begin)
+            <span class="comment">// `&lt;═══`
+            </span>.chain(iter::repeat(track).take(track_start_len))
+            <span class="comment">// `&lt;═══█████`
+            </span>.chain(iter::repeat(thumb).take(thumb_len))
+            <span class="comment">// `&lt;═══█████═══════`
+            </span>.chain(iter::repeat(track).take(track_end_len))
+            <span class="comment">// `&lt;═══█████═══════&gt;`
+            </span>.chain(iter::once(end))
+            .flatten()
+    }
+
+    <span class="doccomment">/// Returns the lengths of the parts of a scrollbar
+    ///
+    /// The scrollbar has 3 parts of note:
+    /// - `&lt;═══█████═══════&gt;`: full scrollbar
+    /// - ` ═══             `: track start part
+    /// - `    █████        `: thumb part part
+    /// - `         ═══════ `: track end part
+    ///
+    /// This method returns the length of the start, thumb, and end as a tuple.
+    </span><span class="kw">fn </span>part_lengths(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, state: <span class="kw-2">&amp;mut </span>ScrollbarState) -&gt; (usize, usize, usize) {
+        <span class="kw">let </span>track_len = <span class="self">self</span>.track_length_excluding_arrow_heads(area) <span class="kw">as </span>f64;
+        <span class="kw">let </span>viewport_len = <span class="self">self</span>.viewport_length(state, area) <span class="kw">as </span>f64;
+
+        <span class="kw">let </span>content_length = state.content_length <span class="kw">as </span>f64;
+        <span class="comment">// Clamp the position to show at least one line of the content, even if the content is
+        </span><span class="kw">let </span>position = state.position.min(state.content_length - <span class="number">1</span>) <span class="kw">as </span>f64;
+
+        <span class="comment">// vscode style scrolling behavior (allow scrolling past end of content)
+        </span><span class="kw">let </span>scrollable_content_len = content_length + viewport_len - <span class="number">1.0</span>;
+        <span class="kw">let </span>thumb_start = position * track_len / scrollable_content_len;
+        <span class="kw">let </span>thumb_end = (position + viewport_len) * track_len / scrollable_content_len;
+
+        <span class="comment">// We round just the positions (instead of floor / ceil), and then calculate the sizes from
+        // those positions. Rounding the sizes instead causes subtle off by 1 errors.
+        </span><span class="kw">let </span>track_start_len = thumb_start.round() <span class="kw">as </span>usize;
+        <span class="kw">let </span>thumb_end = thumb_end.round() <span class="kw">as </span>usize;
+
+        <span class="kw">let </span>thumb_len = thumb_end.saturating_sub(track_start_len);
+        <span class="kw">let </span>track_end_len = track_len <span class="kw">as </span>usize - track_start_len - thumb_len;
+
+        (track_start_len, thumb_len, track_end_len)
+    }
+
+    <span class="kw">fn </span>scollbar_area(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect) -&gt; Rect {
+        <span class="kw">match </span><span class="self">self</span>.orientation {
+            ScrollbarOrientation::VerticalLeft =&gt; area.columns().next(),
+            ScrollbarOrientation::VerticalRight =&gt; area.columns().last(),
+            ScrollbarOrientation::HorizontalTop =&gt; area.rows().next(),
+            ScrollbarOrientation::HorizontalBottom =&gt; area.rows().last(),
+        }
+        .expect(<span class="string">"Scrollbar area is empty"</span>) <span class="comment">// this should never happen as we check for empty area
+    </span>}
+
+    <span class="doccomment">/// Calculates length of the track excluding the arrow heads
+    ///
+    /// ```plain
+    ///        ┌────────── track_length
+    ///  vvvvvvvvvvvvvvv
+    /// &lt;═══█████═══════&gt;
+    /// ```
+    </span><span class="kw">fn </span>track_length_excluding_arrow_heads(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect) -&gt; u16 {
+        <span class="kw">let </span>start_len = <span class="self">self</span>.begin_symbol.map(|s| s.width() <span class="kw">as </span>u16).unwrap_or(<span class="number">0</span>);
+        <span class="kw">let </span>end_len = <span class="self">self</span>.end_symbol.map(|s| s.width() <span class="kw">as </span>u16).unwrap_or(<span class="number">0</span>);
+        <span class="kw">let </span>arrows_len = start_len + end_len;
+        <span class="kw">if </span><span class="self">self</span>.orientation.is_vertical() {
+            area.height.saturating_sub(arrows_len)
+        } <span class="kw">else </span>{
+            area.width.saturating_sub(arrows_len)
+        }
+    }
+
+    <span class="kw">fn </span>viewport_length(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>ScrollbarState, area: Rect) -&gt; u16 {
+        <span class="kw">if </span>state.viewport_content_length != <span class="number">0 </span>{
+            <span class="kw">return </span>state.viewport_content_length <span class="kw">as </span>u16;
+        }
+        <span class="kw">if </span><span class="self">self</span>.orientation.is_vertical() {
+            area.height
+        } <span class="kw">else </span>{
+            area.width
+        }
+    }
+}
+
+<span class="kw">impl </span>ScrollbarOrientation {
+    <span class="doccomment">/// Returns `true` if the scrollbar is vertical.
+    </span><span class="kw">pub fn </span>is_vertical(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::VerticalRight | <span class="self">Self</span>::VerticalLeft)
+    }
+
+    <span class="doccomment">/// Returns `true` if the scrollbar is horizontal.
+    </span><span class="kw">pub fn </span>is_horizontal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::HorizontalBottom | <span class="self">Self</span>::HorizontalTop)
+    }
+}
+
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::str::FromStr;
+
+    <span class="kw">use </span>rstest::{fixture, rstest};
     <span class="kw">use </span>strum::ParseError;
+    <span class="kw">use </span>unicode_width::UnicodeWidthStr;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use crate</span>::{
-        assert_buffer_eq,
-        symbols::scrollbar::{HORIZONTAL, VERTICAL},
-    };
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>scroll_direction_to_string() {
@@ -1567,486 +1648,467 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>scroll_direction_from_str() {
+        <span class="macro">assert_eq!</span>(<span class="string">"Forward"</span>.parse(), <span class="prelude-val">Ok</span>(ScrollDirection::Forward));
+        <span class="macro">assert_eq!</span>(<span class="string">"Backward"</span>.parse(), <span class="prelude-val">Ok</span>(ScrollDirection::Backward));
         <span class="macro">assert_eq!</span>(
-            <span class="string">"Forward"</span>.parse::&lt;ScrollDirection&gt;(),
-            <span class="prelude-val">Ok</span>(ScrollDirection::Forward)
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="string">"Backward"</span>.parse::&lt;ScrollDirection&gt;(),
-            <span class="prelude-val">Ok</span>(ScrollDirection::Backward)
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="string">""</span>.parse::&lt;ScrollDirection&gt;(),
+            ScrollDirection::from_str(<span class="string">""</span>),
             <span class="prelude-val">Err</span>(ParseError::VariantNotFound)
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>scrollbar_orientation_to_string() {
-        <span class="macro">assert_eq!</span>(
-            ScrollbarOrientation::VerticalRight.to_string(),
-            <span class="string">"VerticalRight"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            ScrollbarOrientation::VerticalLeft.to_string(),
-            <span class="string">"VerticalLeft"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            ScrollbarOrientation::HorizontalBottom.to_string(),
-            <span class="string">"HorizontalBottom"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            ScrollbarOrientation::HorizontalTop.to_string(),
-            <span class="string">"HorizontalTop"
-        </span>);
+        <span class="kw">use </span>ScrollbarOrientation::<span class="kw-2">*</span>;
+        <span class="macro">assert_eq!</span>(VerticalRight.to_string(), <span class="string">"VerticalRight"</span>);
+        <span class="macro">assert_eq!</span>(VerticalLeft.to_string(), <span class="string">"VerticalLeft"</span>);
+        <span class="macro">assert_eq!</span>(HorizontalBottom.to_string(), <span class="string">"HorizontalBottom"</span>);
+        <span class="macro">assert_eq!</span>(HorizontalTop.to_string(), <span class="string">"HorizontalTop"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>scrollbar_orientation_from_str() {
+        <span class="kw">use </span>ScrollbarOrientation::<span class="kw-2">*</span>;
+        <span class="macro">assert_eq!</span>(<span class="string">"VerticalRight"</span>.parse(), <span class="prelude-val">Ok</span>(VerticalRight));
+        <span class="macro">assert_eq!</span>(<span class="string">"VerticalLeft"</span>.parse(), <span class="prelude-val">Ok</span>(VerticalLeft));
+        <span class="macro">assert_eq!</span>(<span class="string">"HorizontalBottom"</span>.parse(), <span class="prelude-val">Ok</span>(HorizontalBottom));
+        <span class="macro">assert_eq!</span>(<span class="string">"HorizontalTop"</span>.parse(), <span class="prelude-val">Ok</span>(HorizontalTop));
         <span class="macro">assert_eq!</span>(
-            <span class="string">"VerticalRight"</span>.parse::&lt;ScrollbarOrientation&gt;(),
-            <span class="prelude-val">Ok</span>(ScrollbarOrientation::VerticalRight)
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="string">"VerticalLeft"</span>.parse::&lt;ScrollbarOrientation&gt;(),
-            <span class="prelude-val">Ok</span>(ScrollbarOrientation::VerticalLeft)
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="string">"HorizontalBottom"</span>.parse::&lt;ScrollbarOrientation&gt;(),
-            <span class="prelude-val">Ok</span>(ScrollbarOrientation::HorizontalBottom)
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="string">"HorizontalTop"</span>.parse::&lt;ScrollbarOrientation&gt;(),
-            <span class="prelude-val">Ok</span>(ScrollbarOrientation::HorizontalTop)
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="string">""</span>.parse::&lt;ScrollbarOrientation&gt;(),
+            ScrollbarOrientation::from_str(<span class="string">""</span>),
             <span class="prelude-val">Err</span>(ParseError::VariantNotFound)
         );
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_renders_empty_with_content_length_is_zero() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">8</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>);
+    <span class="attr">#[fixture]
+    </span><span class="kw">fn </span>scrollbar_no_arrows() -&gt; Scrollbar&lt;<span class="lifetime">'static</span>&gt; {
         Scrollbar::default()
+            .orientation(ScrollbarOrientation::HorizontalTop)
             .begin_symbol(<span class="prelude-val">None</span>)
             .end_symbol(<span class="prelude-val">None</span>)
-            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  "</span>, <span class="string">"  "</span>, <span class="string">"  "</span>, <span class="string">"  "</span>, <span class="string">"  "</span>, <span class="string">"  "</span>, <span class="string">"  "</span>, <span class="string">"  "</span>])
-        );
+            .track_symbol(<span class="prelude-val">Some</span>(<span class="string">"-"</span>))
+            .thumb_symbol(<span class="string">"#"</span>)
+    }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">8</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::new(<span class="number">8</span>).position(<span class="number">0</span>);
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"#-"</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="string">"area 2, position_0"</span>)]
+    #[case(<span class="string">"-#"</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="string">"area 2, position_1"</span>)]
+    </span><span class="kw">fn </span>render_scrollbar_simplest(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
+        scrollbar_no_arrows: Scrollbar,
+    ) {
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, expected.width() <span class="kw">as </span>u16, <span class="number">1</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length);
+        scrollbar_no_arrows.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]), <span class="string">"{description}"</span>,);
+    }
+
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"#####-----"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
+    #[case(<span class="string">"-#####----"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
+    #[case(<span class="string">"-#####----"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
+    #[case(<span class="string">"--#####---"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
+    #[case(<span class="string">"--#####---"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
+    #[case(<span class="string">"---#####--"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
+    #[case(<span class="string">"---#####--"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
+    #[case(<span class="string">"----#####-"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
+    #[case(<span class="string">"----#####-"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
+    #[case(<span class="string">"-----#####"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
+    </span><span class="kw">fn </span>render_scrollbar_simple(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
+        scrollbar_no_arrows: Scrollbar,
+    ) {
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, expected.width() <span class="kw">as </span>u16, <span class="number">1</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length);
+        scrollbar_no_arrows.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]), <span class="string">"{description}"</span>,);
+    }
+
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"          "</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="string">"position_0"</span>)]
+    </span><span class="kw">fn </span>render_scrollbar_nobar(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
+        scrollbar_no_arrows: Scrollbar,
+    ) {
+        <span class="kw">let </span>size = expected.width();
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size <span class="kw">as </span>u16, <span class="number">1</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length);
+        scrollbar_no_arrows.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]), <span class="string">"{description}"</span>,);
+    }
+
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"##########"</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="string">"fullbar position 0"</span>)]
+    #[case(<span class="string">"#########-"</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="string">"almost fullbar position 0"</span>)]
+    #[case(<span class="string">"-#########"</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="string">"almost fullbar position 1"</span>)]
+    </span><span class="kw">fn </span>render_scrollbar_fullbar(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
+        scrollbar_no_arrows: Scrollbar,
+    ) {
+        <span class="kw">let </span>size = expected.width();
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size <span class="kw">as </span>u16, <span class="number">1</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length);
+        scrollbar_no_arrows.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]), <span class="string">"{description}"</span>,);
+    }
+
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"#########-"</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="string">"position_0"</span>)]
+    #[case(<span class="string">"-#########"</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="string">"position_1"</span>)]
+    </span><span class="kw">fn </span>render_scrollbar_almost_fullbar(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
+        scrollbar_no_arrows: Scrollbar,
+    ) {
+        <span class="kw">let </span>size = expected.width();
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size <span class="kw">as </span>u16, <span class="number">1</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length);
+        scrollbar_no_arrows.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]), <span class="string">"{description}"</span>,);
+    }
+
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"█████═════"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
+    #[case(<span class="string">"═█████════"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
+    #[case(<span class="string">"═█████════"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
+    #[case(<span class="string">"══█████═══"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
+    #[case(<span class="string">"══█████═══"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
+    #[case(<span class="string">"═══█████══"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
+    #[case(<span class="string">"═══█████══"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
+    #[case(<span class="string">"════█████═"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
+    #[case(<span class="string">"════█████═"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
+    #[case(<span class="string">"═════█████"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
+    #[case(<span class="string">"═════█████"</span>, <span class="number">100</span>, <span class="number">10</span>, <span class="string">"position_out_of_bounds"</span>)]
+    </span><span class="kw">fn </span>render_scrollbar_without_symbols(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>assertion_message: <span class="kw-2">&amp;</span>str,
+    ) {
+        <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size, <span class="number">1</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length);
         Scrollbar::default()
-            .begin_symbol(<span class="prelude-val">None</span>)
-            .end_symbol(<span class="prelude-val">None</span>)
-            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>])
-        );
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_no_render_when_area_zero() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">1</span>);
-        Scrollbar::default().render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::empty(buffer.area));
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_no_render_when_height_zero_with_without_arrows() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">0</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">1</span>);
-        Scrollbar::default().render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::empty(buffer.area));
-
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">0</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">1</span>);
-        Scrollbar::default()
-            .begin_symbol(<span class="prelude-val">None</span>)
-            .end_symbol(<span class="prelude-val">None</span>)
-            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::empty(buffer.area));
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_no_render_when_height_too_small_for_arrows() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">2</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">1</span>);
-        Scrollbar::default().render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"    "</span>]));
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_renders_all_thumbs_at_minimum_height_without_arrows() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">2</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">1</span>);
-        Scrollbar::default()
-            .begin_symbol(<span class="prelude-val">None</span>)
-            .end_symbol(<span class="prelude-val">None</span>)
-            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"   █"</span>, <span class="string">"   █"</span>]));
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_renders_all_thumbs_at_minimum_height_and_minimum_width_without_arrows() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">1</span>);
-        Scrollbar::default()
-            .begin_symbol(<span class="prelude-val">None</span>)
-            .end_symbol(<span class="prelude-val">None</span>)
-            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"█"</span>, <span class="string">"█"</span>]));
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_renders_two_arrows_one_thumb_at_minimum_height_with_arrows() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">3</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">1</span>);
-        Scrollbar::default().render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"   ▲"</span>, <span class="string">"   █"</span>, <span class="string">"   ▼"</span>]));
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_no_render_when_content_length_zero() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">2</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">0</span>);
-        Scrollbar::default().render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  "</span>, <span class="string">"  "</span>]));
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_renders_all_thumbs_when_height_equals_content_length() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">2</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">2</span>);
-        Scrollbar::default()
-            .begin_symbol(<span class="prelude-val">None</span>)
-            .end_symbol(<span class="prelude-val">None</span>)
-            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" █"</span>, <span class="string">" █"</span>]));
-
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">8</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">8</span>);
-        Scrollbar::default()
-            .begin_symbol(<span class="prelude-val">None</span>)
-            .end_symbol(<span class="prelude-val">None</span>)
-            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>])
-        );
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_renders_single_vertical_thumb_when_content_length_square_of_height() {
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=<span class="number">17 </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">4</span>));
-            <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(i).content_length(<span class="number">16</span>);
-            Scrollbar::default()
-                .begin_symbol(<span class="prelude-val">None</span>)
-                .end_symbol(<span class="prelude-val">None</span>)
-                .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-            <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">2 </span>{
-                <span class="macro">vec!</span>[<span class="string">" █"</span>, <span class="string">" ║"</span>, <span class="string">" ║"</span>, <span class="string">" ║"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">7 </span>{
-                <span class="macro">vec!</span>[<span class="string">" ║"</span>, <span class="string">" █"</span>, <span class="string">" ║"</span>, <span class="string">" ║"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">" ║"</span>, <span class="string">" ║"</span>, <span class="string">" █"</span>, <span class="string">" ║"</span>]
-            } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">" ║"</span>, <span class="string">" ║"</span>, <span class="string">" ║"</span>, <span class="string">" █"</span>]
-            };
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
-        }
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_renders_single_horizontal_thumb_when_content_length_square_of_width() {
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=<span class="number">17 </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">2</span>));
-            <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(i).content_length(<span class="number">16</span>);
-            Scrollbar::default()
-                .begin_symbol(<span class="prelude-val">None</span>)
-                .end_symbol(<span class="prelude-val">None</span>)
-                .orientation(ScrollbarOrientation::HorizontalBottom)
-                .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-            <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">2 </span>{
-                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"█═══"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">7 </span>{
-                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"═█══"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"══█═"</span>]
-            } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"═══█"</span>]
-            };
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
-        }
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_renders_one_thumb_for_large_content_relative_to_height() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">2</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">1600</span>);
-        Scrollbar::default()
-            .begin_symbol(<span class="prelude-val">None</span>)
-            .end_symbol(<span class="prelude-val">None</span>)
             .orientation(ScrollbarOrientation::HorizontalBottom)
-            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="kw">let </span>expected = <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"█═══"</span>];
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
-
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">2</span>));
-        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">800</span>).content_length(<span class="number">1600</span>);
-        Scrollbar::default()
             .begin_symbol(<span class="prelude-val">None</span>)
             .end_symbol(<span class="prelude-val">None</span>)
-            .orientation(ScrollbarOrientation::HorizontalBottom)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="kw">let </span>expected = <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"══█═"</span>];
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
+        <span class="macro">assert_eq!</span>(
+            buffer,
+            Buffer::with_lines(<span class="macro">vec!</span>[expected]),
+            <span class="string">"{}"</span>,
+            assertion_message
+        );
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_renders_two_thumb_default_symbols_for_content_double_height() {
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=<span class="number">7 </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">4</span>));
-            <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(i).content_length(<span class="number">8</span>);
-            Scrollbar::default()
-                .begin_symbol(<span class="prelude-val">None</span>)
-                .end_symbol(<span class="prelude-val">None</span>)
-                .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-            <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" ║"</span>, <span class="string">" ║"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">" ║"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" ║"</span>]
-            } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">" ║"</span>, <span class="string">" ║"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>]
-            };
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
-        }
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"█████     "</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
+    #[case(<span class="string">" █████    "</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
+    #[case(<span class="string">" █████    "</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
+    #[case(<span class="string">"  █████   "</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
+    #[case(<span class="string">"  █████   "</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
+    #[case(<span class="string">"   █████  "</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
+    #[case(<span class="string">"   █████  "</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
+    #[case(<span class="string">"    █████ "</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
+    #[case(<span class="string">"    █████ "</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
+    #[case(<span class="string">"     █████"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
+    #[case(<span class="string">"     █████"</span>, <span class="number">100</span>, <span class="number">10</span>, <span class="string">"position_out_of_bounds"</span>)]
+    </span><span class="kw">fn </span>render_scrollbar_without_track_symbols(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>assertion_message: <span class="kw-2">&amp;</span>str,
+    ) {
+        <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size, <span class="number">1</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length);
+        Scrollbar::default()
+            .orientation(ScrollbarOrientation::HorizontalBottom)
+            .track_symbol(<span class="prelude-val">None</span>)
+            .begin_symbol(<span class="prelude-val">None</span>)
+            .end_symbol(<span class="prelude-val">None</span>)
+            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
+        <span class="macro">assert_eq!</span>(
+            buffer,
+            Buffer::with_lines(<span class="macro">vec!</span>[expected]),
+            <span class="string">"{}"</span>,
+            assertion_message
+        );
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_renders_two_thumb_custom_symbols_for_content_double_height() {
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=<span class="number">7 </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">4</span>));
-            <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(i).content_length(<span class="number">8</span>);
-            Scrollbar::default()
-                .symbols(VERTICAL)
-                .begin_symbol(<span class="prelude-val">None</span>)
-                .end_symbol(<span class="prelude-val">None</span>)
-                .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-            <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" │"</span>, <span class="string">" │"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">" │"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" │"</span>]
-            } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">" │"</span>, <span class="string">" │"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>]
-            };
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
-        }
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"█████-----"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
+    #[case(<span class="string">"-█████----"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
+    #[case(<span class="string">"-█████----"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
+    #[case(<span class="string">"--█████---"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
+    #[case(<span class="string">"--█████---"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
+    #[case(<span class="string">"---█████--"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
+    #[case(<span class="string">"---█████--"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
+    #[case(<span class="string">"----█████-"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
+    #[case(<span class="string">"----█████-"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
+    #[case(<span class="string">"-----█████"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
+    #[case(<span class="string">"-----█████"</span>, <span class="number">100</span>, <span class="number">10</span>, <span class="string">"position_out_of_bounds"</span>)]
+    </span><span class="kw">fn </span>render_scrollbar_without_track_symbols_over_content(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>assertion_message: <span class="kw-2">&amp;</span>str,
+    ) {
+        <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size, <span class="number">1</span>));
+        <span class="kw">let </span>width = buffer.area.width <span class="kw">as </span>usize;
+        <span class="kw">let </span>s = <span class="string">""</span>;
+        Text::from(<span class="macro">format!</span>(<span class="string">"{s:-^width$}"</span>)).render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length);
+        Scrollbar::default()
+            .orientation(ScrollbarOrientation::HorizontalBottom)
+            .track_symbol(<span class="prelude-val">None</span>)
+            .begin_symbol(<span class="prelude-val">None</span>)
+            .end_symbol(<span class="prelude-val">None</span>)
+            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
+        <span class="macro">assert_eq!</span>(
+            buffer,
+            Buffer::with_lines(<span class="macro">vec!</span>[expected]),
+            <span class="string">"{}"</span>,
+            assertion_message
+        );
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_renders_two_thumb_default_symbols_for_content_double_width() {
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=<span class="number">7 </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">2</span>));
-            <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(i).content_length(<span class="number">8</span>);
-            Scrollbar::default()
-                .orientation(ScrollbarOrientation::HorizontalBottom)
-                .begin_symbol(<span class="prelude-val">None</span>)
-                .end_symbol(<span class="prelude-val">None</span>)
-                .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-            <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"██══"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"═██═"</span>]
-            } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"══██"</span>]
-            };
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
-        }
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"&lt;####----&gt;"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
+    #[case(<span class="string">"&lt;#####---&gt;"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
+    #[case(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
+    #[case(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
+    #[case(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
+    #[case(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
+    #[case(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
+    #[case(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
+    #[case(<span class="string">"&lt;---#####&gt;"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
+    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
+    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="string">"position_one_out_of_bounds"</span>)]
+    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">15</span>, <span class="number">10</span>, <span class="string">"position_few_out_of_bounds"</span>)]
+    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">500</span>, <span class="number">10</span>, <span class="string">"position_very_many_out_of_bounds"</span>)]
+    </span><span class="kw">fn </span>render_scrollbar_with_symbols(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>assertion_message: <span class="kw-2">&amp;</span>str,
+    ) {
+        <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size, <span class="number">1</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length);
+        Scrollbar::default()
+            .orientation(ScrollbarOrientation::HorizontalTop)
+            .begin_symbol(<span class="prelude-val">Some</span>(<span class="string">"&lt;"</span>))
+            .end_symbol(<span class="prelude-val">Some</span>(<span class="string">"&gt;"</span>))
+            .track_symbol(<span class="prelude-val">Some</span>(<span class="string">"-"</span>))
+            .thumb_symbol(<span class="string">"#"</span>)
+            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
+        <span class="macro">assert_eq!</span>(
+            buffer,
+            Buffer::with_lines(<span class="macro">vec!</span>[expected]),
+            <span class="string">"{}"</span>,
+            assertion_message,
+        );
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_renders_two_thumb_custom_symbols_for_content_double_width() {
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=<span class="number">7 </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">2</span>));
-            <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(i).content_length(<span class="number">8</span>);
-            Scrollbar::default()
-                .orientation(ScrollbarOrientation::HorizontalBottom)
-                .symbols(HORIZONTAL)
-                .begin_symbol(<span class="prelude-val">None</span>)
-                .end_symbol(<span class="prelude-val">None</span>)
-                .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-            <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"██──"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"─██─"</span>]
-            } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"──██"</span>]
-            };
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
-        }
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"█████═════"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
+    #[case(<span class="string">"═█████════"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
+    #[case(<span class="string">"═█████════"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
+    #[case(<span class="string">"══█████═══"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
+    #[case(<span class="string">"══█████═══"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
+    #[case(<span class="string">"═══█████══"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
+    #[case(<span class="string">"═══█████══"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
+    #[case(<span class="string">"════█████═"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
+    #[case(<span class="string">"════█████═"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
+    #[case(<span class="string">"═════█████"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
+    #[case(<span class="string">"═════█████"</span>, <span class="number">100</span>, <span class="number">10</span>, <span class="string">"position_out_of_bounds"</span>)]
+    </span><span class="kw">fn </span>render_scrollbar_horizontal_bottom(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
+    ) {
+        <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size, <span class="number">2</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length);
+        Scrollbar::default()
+            .orientation(ScrollbarOrientation::HorizontalBottom)
+            .begin_symbol(<span class="prelude-val">None</span>)
+            .end_symbol(<span class="prelude-val">None</span>)
+            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
+        <span class="kw">let </span>empty_string: String = <span class="string">" "</span>.repeat(size <span class="kw">as </span>usize);
+        <span class="macro">assert_eq!</span>(
+            buffer,
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="kw-2">&amp;</span>empty_string, expected]),
+            <span class="string">"{description}"</span>,
+        );
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_rendering_viewport_content_length() {
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=<span class="number">16 </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="number">2</span>));
-            <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
-                .position(i)
-                .content_length(<span class="number">16</span>)
-                .viewport_content_length(<span class="number">4</span>);
-            Scrollbar::default()
-                .orientation(ScrollbarOrientation::HorizontalBottom)
-                .begin_symbol(<span class="prelude-val">Some</span>(DOUBLE_HORIZONTAL.begin))
-                .end_symbol(<span class="prelude-val">Some</span>(DOUBLE_HORIZONTAL.end))
-                .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-            <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄██════►"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═██═══►"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">9 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄══██══►"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═══██═►"</span>]
-            } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄════██►"</span>]
-            };
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
-        }
-
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=<span class="number">16 </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="number">2</span>));
-            <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
-                .position(i)
-                .content_length(<span class="number">16</span>)
-                .viewport_content_length(<span class="number">1</span>);
-            Scrollbar::default()
-                .orientation(ScrollbarOrientation::HorizontalBottom)
-                .begin_symbol(<span class="prelude-val">Some</span>(DOUBLE_HORIZONTAL.begin))
-                .end_symbol(<span class="prelude-val">Some</span>(DOUBLE_HORIZONTAL.end))
-                .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-            <span class="macro">dbg!</span>(i);
-            <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄█═════►"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">4 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═█════►"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">7 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄══█═══►"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">11 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═══█══►"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">14 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄════█═►"</span>]
-            } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═════█►"</span>]
-            };
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
-        }
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"█████═════"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
+    #[case(<span class="string">"═█████════"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
+    #[case(<span class="string">"═█████════"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
+    #[case(<span class="string">"══█████═══"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
+    #[case(<span class="string">"══█████═══"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
+    #[case(<span class="string">"═══█████══"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
+    #[case(<span class="string">"═══█████══"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
+    #[case(<span class="string">"════█████═"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
+    #[case(<span class="string">"════█████═"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
+    #[case(<span class="string">"═════█████"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
+    #[case(<span class="string">"═════█████"</span>, <span class="number">100</span>, <span class="number">10</span>, <span class="string">"position_out_of_bounds"</span>)]
+    </span><span class="kw">fn </span>render_scrollbar_horizontal_top(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
+    ) {
+        <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size, <span class="number">2</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length);
+        Scrollbar::default()
+            .orientation(ScrollbarOrientation::HorizontalTop)
+            .begin_symbol(<span class="prelude-val">None</span>)
+            .end_symbol(<span class="prelude-val">None</span>)
+            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
+        <span class="kw">let </span>empty_string: String = <span class="string">" "</span>.repeat(size <span class="kw">as </span>usize);
+        <span class="macro">assert_eq!</span>(
+            buffer,
+            Buffer::with_lines(<span class="macro">vec!</span>[expected, <span class="kw-2">&amp;</span>empty_string]),
+            <span class="string">"{description}"</span>,
+        );
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_rendering_begin_end_arrows_horizontal_bottom() {
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=<span class="number">16 </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="number">2</span>));
-            <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(i).content_length(<span class="number">16</span>);
-            Scrollbar::default()
-                .orientation(ScrollbarOrientation::HorizontalBottom)
-                .begin_symbol(<span class="prelude-val">Some</span>(DOUBLE_HORIZONTAL.begin))
-                .end_symbol(<span class="prelude-val">Some</span>(DOUBLE_HORIZONTAL.end))
-                .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-            <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄██════►"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═██═══►"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">9 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄══██══►"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═══██═►"</span>]
-            } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄════██►"</span>]
-            };
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
-        }
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"&lt;####----&gt;"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
+    #[case(<span class="string">"&lt;#####---&gt;"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
+    #[case(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
+    #[case(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
+    #[case(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
+    #[case(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
+    #[case(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
+    #[case(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
+    #[case(<span class="string">"&lt;---#####&gt;"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
+    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
+    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="string">"position_one_out_of_bounds"</span>)]
+    </span><span class="kw">fn </span>render_scrollbar_vertical_left(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
+    ) {
+        <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, size));
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length);
+        Scrollbar::default()
+            .orientation(ScrollbarOrientation::VerticalLeft)
+            .begin_symbol(<span class="prelude-val">Some</span>(<span class="string">"&lt;"</span>))
+            .end_symbol(<span class="prelude-val">Some</span>(<span class="string">"&gt;"</span>))
+            .track_symbol(<span class="prelude-val">Some</span>(<span class="string">"-"</span>))
+            .thumb_symbol(<span class="string">"#"</span>)
+            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
+        <span class="kw">let </span>bar = expected.chars().map(|c| <span class="macro">format!</span>(<span class="string">"{c}    "</span>));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(bar), <span class="string">"{description}"</span>);
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_rendering_begin_end_arrows_horizontal_top() {
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=<span class="number">16 </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="number">2</span>));
-            <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(i).content_length(<span class="number">16</span>);
-            Scrollbar::default()
-                .orientation(ScrollbarOrientation::HorizontalTop)
-                .begin_symbol(<span class="prelude-val">Some</span>(DOUBLE_HORIZONTAL.begin))
-                .end_symbol(<span class="prelude-val">Some</span>(DOUBLE_HORIZONTAL.end))
-                .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-            <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">"◄██════►"</span>, <span class="string">"        "</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">"◄═██═══►"</span>, <span class="string">"        "</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">9 </span>{
-                <span class="macro">vec!</span>[<span class="string">"◄══██══►"</span>, <span class="string">"        "</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">"◄═══██═►"</span>, <span class="string">"        "</span>]
-            } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">"◄════██►"</span>, <span class="string">"        "</span>]
-            };
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
-        }
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"&lt;####----&gt;"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
+    #[case(<span class="string">"&lt;#####---&gt;"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
+    #[case(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
+    #[case(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
+    #[case(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
+    #[case(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
+    #[case(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
+    #[case(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
+    #[case(<span class="string">"&lt;---#####&gt;"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
+    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
+    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="string">"position_one_out_of_bounds"</span>)]
+    </span><span class="kw">fn </span>render_scrollbar_vertical_rightl(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
+    ) {
+        <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, size));
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length);
+        Scrollbar::default()
+            .orientation(ScrollbarOrientation::VerticalRight)
+            .begin_symbol(<span class="prelude-val">Some</span>(<span class="string">"&lt;"</span>))
+            .end_symbol(<span class="prelude-val">Some</span>(<span class="string">"&gt;"</span>))
+            .track_symbol(<span class="prelude-val">Some</span>(<span class="string">"-"</span>))
+            .thumb_symbol(<span class="string">"#"</span>)
+            .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
+        <span class="kw">let </span>bar = expected.chars().map(|c| <span class="macro">format!</span>(<span class="string">"    {c}"</span>));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(bar), <span class="string">"{description}"</span>);
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_rendering_only_begin_arrow_horizontal_bottom() {
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=<span class="number">16 </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="number">2</span>));
-            <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(i).content_length(<span class="number">16</span>);
-            Scrollbar::default()
-                .orientation(ScrollbarOrientation::HorizontalBottom)
-                .begin_symbol(<span class="prelude-val">Some</span>(DOUBLE_HORIZONTAL.begin))
-                .end_symbol(<span class="prelude-val">None</span>)
-                .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-            <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄███════"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═███═══"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">9 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄══███══"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═══███═"</span>]
-            } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄════███"</span>]
-            };
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
-        }
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_rendering_without_track_horizontal_bottom() {
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=<span class="number">16 </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="number">2</span>));
-            <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(i).content_length(<span class="number">16</span>);
-            Scrollbar::default()
-                .orientation(ScrollbarOrientation::HorizontalBottom)
-                .track_symbol(<span class="prelude-val">None</span>)
-                .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-            <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄██    ►"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄ ██   ►"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">9 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄  ██  ►"</span>]
-            } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄   ██ ►"</span>]
-            } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄    ██►"</span>]
-            };
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
-        }
+    <span class="attr">#[rstest]
+    #[case(<span class="string">"##--------"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
+    #[case(<span class="string">"-##-------"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
+    #[case(<span class="string">"--##------"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
+    #[case(<span class="string">"---##-----"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
+    #[case(<span class="string">"----#-----"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
+    #[case(<span class="string">"-----#----"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
+    #[case(<span class="string">"-----##---"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
+    #[case(<span class="string">"------##--"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
+    #[case(<span class="string">"-------##-"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
+    #[case(<span class="string">"--------##"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
+    #[case(<span class="string">"--------##"</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="string">"position_one_out_of_bounds"</span>)]
+    </span><span class="kw">fn </span>custom_viewport_length(
+        <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
+        <span class="attr">#[case] </span>position: usize,
+        <span class="attr">#[case] </span>content_length: usize,
+        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
+        scrollbar_no_arrows: Scrollbar,
+    ) {
+        <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size, <span class="number">1</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default()
+            .position(position)
+            .content_length(content_length)
+            .viewport_content_length(<span class="number">2</span>);
+        scrollbar_no_arrows.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]), <span class="string">"{description}"</span>);
     }
 }
 </code></pre></div></section></main></body></html>

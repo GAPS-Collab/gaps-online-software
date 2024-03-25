@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["jis0208","jis0212"]};

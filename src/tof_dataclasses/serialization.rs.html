@@ -312,6 +312,15 @@
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
 <a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Serialization/Deserialization helpers
 //!
 //!
@@ -324,6 +333,8 @@
 
 <span class="kw">use </span>std::collections::VecDeque;
 
+<span class="kw">use </span><span class="kw">crate</span>::packets::TofPacket;
+
 <span class="doccomment">/// Convert a vector of u16 into a vector of u8
 ///
 /// The resulting vector has twice the number
@@ -335,7 +346,6 @@
         .flat_map(|<span class="kw-2">&amp;</span>n| n.to_le_bytes().to_vec())
         .collect()
 }
-
 
 <span class="doccomment">/// Restore a vector of u16 from a vector of u8
 ///
@@ -482,7 +492,7 @@
 }
 
 
-<span class="doccomment">/// Encode/decode structs to Vec::&lt;u8&gt; to write to a file or
+<span class="doccomment">/// Encode/decode structs to `Vec::&lt;u8&gt;` to write to a file or
 /// send over the network
 ///
 </span><span class="kw">pub trait </span>Serialization {
@@ -525,7 +535,15 @@
                      pos        : <span class="kw-2">&amp;mut </span>usize)
     -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt;
     <span class="kw">where </span><span class="self">Self </span>: Sized;
-  
+
+  <span class="doccomment">/// Decode a serializable directly from a TofPacket
+  </span><span class="kw">fn </span>from_tofpacket(packet : <span class="kw-2">&amp;</span>TofPacket)
+    -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt;
+    <span class="kw">where </span><span class="self">Self</span>: Sized {
+    <span class="kw">let </span>unpacked = <span class="self">Self</span>::from_bytestream(<span class="kw-2">&amp;</span>packet.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(unpacked)
+  }
+
   <span class="doccomment">/// Encode a serializable to a bytestream  
   </span><span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
     <span class="macro">println!</span>(<span class="string">"There can't be a default implementation for this trait!"</span>);

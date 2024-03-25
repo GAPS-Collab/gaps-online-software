@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["BGRXPixel","BitMapBackend","RGBPixel","SVGBackend"],"trait":["DrawingBackend","PixelFormat"]};

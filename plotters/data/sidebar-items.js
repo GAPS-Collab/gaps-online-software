@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["fitting_range"],"mod":["float"],"struct":["Quartiles"]};
