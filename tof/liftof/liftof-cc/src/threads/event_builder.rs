@@ -373,9 +373,9 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut n_rbs_per_ev        = 0usize;
   let mut rb_ev_wo_mte        = 0usize;
   let mut debug_timer         = Instant::now();
-    
-  let mut n_receiving_errors = 0;
-  let mut check_tc_update    = Instant::now();
+  let mut met_total_sec       = 0f64;  
+  let mut n_receiving_errors  = 0;
+  let mut check_tc_update     = Instant::now();
   loop {
     if check_tc_update.elapsed().as_secs() > 5 {
       match thread_control.lock() {
@@ -503,9 +503,9 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                   println!("== ==> We saw {:?}, but {} is not part of that!", lg_hits, ev_rbid);
                 }
               } else {
-                if ev.is_complete_from_map(&dsi_map) {
-                  error!("We are adding a RBEvent to a TofEvent which is already complete!");
-                }
+                //if ev.is_complete_from_map(&dsi_map) {
+                //  error!("We are adding a RBEvent to a TofEvent which is already complete!");
+                //}
                 ev.rb_events.push(rb_ev);
                 //println!("[EVTBUILDER] DEBUG n rb expected : {}, n rbs {}",ev.mt_event.get_n_rbs_expected(), ev.rb_events.len());
               }
@@ -538,9 +538,10 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     if settings.build_strategy == BuildStrategy::Adaptive || 
       settings.build_strategy == BuildStrategy::AdaptiveThorough {
       settings.n_rbe_per_loop = av_rb_ev.ceil() as usize;
-      /// when the rb loop gets too long, catch up
+      // if the rb in the pipeline get too long, catch up
+      // and drain it a bit
       if ev_from_rb.len() > 1000 {
-        settings.n_rbe_per_loop = ev_from_rb.len();
+        settings.n_rbe_per_loop = ev_from_rb.len() - 500;
       }
       if settings.n_rbe_per_loop == 0 {
         // failsafe
@@ -564,7 +565,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       //hbs.push(line);
       //let end   = String::from("== == == == == == == == == == == == == == == == == == == ==");
       //hbs.push(end);
-
+      met_total_sec += debug_timer_elapsed;
       let fwidth = 70;
       println!("  {:fwidth$}", ">> == == == == ==  EVTBLDR HEARTBEAT   == == == == == <<".bright_purple().bold());
     //if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
@@ -575,7 +576,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       println!("  {:fwidth$} <<", format!(">> ==> Size of event cache    \t{}", event_cache.len()).bright_purple());
       println!("  {:fwidth$} <<", format!(">> ==> Size of event ID cache \t{}", event_id_cache.len()).bright_purple());
       println!("  {:fwidth$} <<", format!(">> ==> Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!").bright_purple());
-      println!("  {:fwidth$} <<", format!(">> ==> Sent {} events!", n_sent).bright_purple());
+      println!("  {:fwidth$} <<", format!(">> ==> Sent {} events! rate {:4.2} Hz", n_sent, n_sent as f64/met_total_sec).bright_purple());
       println!("  {:fwidth$} <<", format!(">> ==> Chn len MTE receiver\t{}",m_trig_ev.len() ).bright_purple());
       println!("  {:fwidth$} <<", format!(">> ==> Chn len RBE receiver\t{}",ev_from_rb.len()).bright_purple());
       println!("  {:fwidth$} <<", format!(">> ==> Chn len TP  sender  \t{}",data_sink.len()).bright_purple());
@@ -694,7 +695,12 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               //let ev_to_send = ev.clone();
               let ev_to_send = event_cache.remove(&evid).unwrap();
               n_rbs_per_ev  += ev_to_send.rb_events.len(); 
-              if settings.send_flight_packets {
+              //if settings.send_flight_packets {
+              // let's think about this better. 
+              // Where to chop it up? If here, the loop might be
+              // too slow. If we do it in the data publsher, 
+              // can we avoid unpacking and repacking?
+              if false {
                 // we have to chop it up
                 let te_summary = ev_to_send.get_summary();
                 let pack = TofPacket::from(&te_summary);

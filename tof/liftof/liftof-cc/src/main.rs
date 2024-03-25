@@ -230,7 +230,6 @@ fn main() {
     },
   }
   for rb in &rb_list {
-    //rb.load_latest_calibration();
     debug!("     -{}", rb);
     //if verbose {
     //  println!("{}", rb);
