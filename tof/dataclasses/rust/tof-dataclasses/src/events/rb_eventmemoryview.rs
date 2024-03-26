@@ -281,6 +281,7 @@ impl FromRandom for RBEventMemoryView {
 }
 
 #[test]
+#[cfg(feature = "random")]  
 fn serialization_rbmemoryview() {
   let head = RBEventMemoryView::from_random();
   let test = RBEventMemoryView::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();

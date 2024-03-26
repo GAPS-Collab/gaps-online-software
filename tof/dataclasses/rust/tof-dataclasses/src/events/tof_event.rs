@@ -16,7 +16,7 @@ cfg_if::cfg_if! {
   }
 }
 
-use crate::DsiLtbRBMapping;
+//use crate::DsiLtbRBMapping;
 use crate::serialization::{Serialization,
                            parse_u8,
                            parse_u16,
@@ -137,7 +137,7 @@ impl TofEvent {
       compression_level : CompressionLevel::Unknown,
       quality           : EventQuality::Unknown,
       header            : TofEventHeader::new(),
-      mt_event          : MasterTriggerEvent::new(0,0),
+      mt_event          : MasterTriggerEvent::new(),
       rb_events         : Vec::<RBEvent>::new(),
       missing_hits      : Vec::<RBMissingHit>::new(), 
       creation_time     : creation_time,
@@ -156,20 +156,16 @@ impl TofEvent {
     self.creation_time.elapsed().as_secs()
   }
 
-  // Do we have all readoutboards which we are expecting 
-  // in this event?
-  //
-  // This is useful from the perspective of the event builder.
-  // Do we still have to wait for more rbs?
-  // There might still be channels missing, but this is 
-  // nothing the event builder can deal with right now.
+  /// Simple check if the event contains as much RBEvents 
+  /// as expected from the provided boards masks by the MTB
   pub fn is_complete(&self) -> bool {
-    self.mt_event.get_n_rbs_expected() as usize == self.rb_events.len()
+    self.mt_event.get_rb_link_ids().len() == self.rb_events.len()
   }
   
-  pub fn is_complete_from_map(&self, dsimap : &DsiLtbRBMapping) -> bool {
-    self.mt_event.get_n_rbs_exp_from_map(dsimap)  as usize == self.rb_events.len()
-  }
+  //pub fn is_complete_from_map(&self, dsimap : &DsiLtbRBMapping) -> bool {
+  //  //self.mt_event.get_n_rbs_exp_from_map(dsimap)  as usize == self.rb_events.len()
+  //  self.mt_event.get_rb_link_ids().len() == self.rb_events.len()
+  //}
 
   /// Encode the sizes of the vectors holding the 
   /// into an u32
@@ -209,7 +205,8 @@ impl TofEvent {
     //summary.status            = self.header.status;
     //summary.quality           = self.header.quality;
     //summary.trigger_setting   = self.;
-    summary.n_trigger_paddles = self.mt_event.n_paddles;
+    // FIXME - this is not trigger paddles, but trigger hits!
+    summary.n_trigger_paddles = self.mt_event.get_trigger_hits().len() as u8;
     summary.event_id          = self.header.event_id;
     summary.timestamp32       = self.header.timestamp_32;
     summary.timestamp16       = self.header.timestamp_16;
@@ -310,10 +307,10 @@ impl FromRandom for TofEvent {
   }
 }
 
-impl From<&MasterTriggerEvent> for TofEvent {
-  fn from(mte : &MasterTriggerEvent) -> Self {
+impl From<MasterTriggerEvent> for TofEvent {
+  fn from(mte : MasterTriggerEvent) -> Self {
     let mut te : TofEvent = Default::default();
-    te.mt_event = *mte;
+    te.mt_event = mte;
     te.header.event_id = te.mt_event.event_id;
     te
   }
@@ -457,7 +454,7 @@ impl From<&MasterTriggerEvent> for TofEventHeader {
     let mut te               = Self::new();
     te.event_id              = mte.event_id;
     te.timestamp_32          = mte.timestamp;
-    te.n_paddles             = mte.get_hit_paddles();
+    te.n_paddles             = mte.get_trigger_hits().len() as u8;
     te
   }
 }

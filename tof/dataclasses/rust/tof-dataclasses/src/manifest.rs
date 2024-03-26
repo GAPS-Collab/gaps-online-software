@@ -33,6 +33,14 @@ pub fn get_pid_from_pend(pend : u16) -> Option<u8> {
   }
 }
 
+/// Create a mapping of mtb link ids to rb ids
+pub fn get_linkid_rbid_map(rbs : &Vec<ReadoutBoard>) -> HashMap<u8, u8>{
+  let mut mapping = HashMap::<u8, u8>::new();
+  for rb in rbs {
+    mapping.insert(rb.mtb_link_id, rb.rb_id);
+  }
+  mapping
+}
 
 /// Summary of DSI/J/LTBCH (0-319)
 #[cfg(feature = "database")]
@@ -841,6 +849,7 @@ pub struct ReadoutBoard {
   pub cable_lengths            : [f32;8],
   pub calib_file_path          : String,
   pub calibration              : RBCalibrations,       
+  pub mtb_link_id              : u8,
 }
 
 impl ReadoutBoard {
@@ -853,6 +862,7 @@ impl ReadoutBoard {
       cable_lengths            : [0.0;8],
       calib_file_path          : String::from(""),
       calibration              : RBCalibrations::new(0),
+      mtb_link_id              : 0,
     }
   }
 
@@ -1003,6 +1013,7 @@ impl fmt::Display for ReadoutBoard {
     write!(f,
 "<ReadoutBoard:
     ID                  : {}
+    MTB Link ID         : {}
     ** calibration will be loaded from this path:
       \u{021B3} {}
     calibration         : {}
@@ -1011,6 +1022,7 @@ impl fmt::Display for ReadoutBoard {
     PADDLE LENGTHS [mm] : {:?}
     CABLE  LENGTHS [cm] : {:?}>",
       self.rb_id,
+      self.mtb_link_id,
       self.calib_file_path,
       self.calibration,
       self.channel_to_paddle_end_id,

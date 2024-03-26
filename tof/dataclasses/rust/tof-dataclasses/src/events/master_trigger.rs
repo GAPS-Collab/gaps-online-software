@@ -10,7 +10,7 @@ cfg_if::cfg_if! {
 
 use std::fmt;
 //use std::time::Duration;
-use std::collections::HashMap;
+//use std::collections::HashMap;
 
 use crate::serialization::{
     Serialization,
@@ -18,15 +18,17 @@ use crate::serialization::{
     parse_u8,
     parse_u16,
     parse_u32,
+    parse_u64,
 };
 
-use crate::DsiLtbRBMapping;
+//use crate::DsiLtbRBMapping;
+use crate::events::rb_event::EventStatus;
 
 //use crate::events::RBMissingHit;
-use crate::constants::{
-  N_LTBS,
-  N_CHN_PER_LTB,
-};
+//use crate::constants::{
+//  N_LTBS,
+//  N_CHN_PER_LTB,
+//};
 
 //he default values used where thus:
 //  INNER_TOF_THRESH = 3
@@ -57,18 +59,19 @@ use crate::constants::{
 //
 
 
+
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum TriggerType {
   Unknown      = 0u8,
   /// -> 1-10 "pysics" triggers
+  Gaps         = 4u8,
   Any          = 1u8,
   Track        = 2u8,
   TrackCentral = 3u8,
-  Gaps         = 4u8,
-  
   /// > 100 -> Debug triggers
-  Poisson   = 100u8,
+  Poisson      = 100u8,
+  Forced       = 101u8, 
 }
 
 impl fmt::Display for TriggerType {
@@ -141,303 +144,214 @@ pub struct MTBInfo {
 /// crucial information 
 ///
 /// FIXME : implementation of absolute time
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct MasterTriggerEvent {
-  pub event_id      : u32,
-  pub timestamp     : u32,
-  pub tiu_timestamp : u32,
-  pub tiu_gps_32    : u32,
-  pub tiu_gps_16    : u32,
-  pub n_paddles     : u8, 
-  // indicates which LTBs have 
-  // triggered
-  pub board_mask    : [bool; N_LTBS],
-  // one 16 bit value per LTB
-  // the sorting is the same as
-  // in board_mask
-  pub hits          : [[bool;N_CHN_PER_LTB]; N_LTBS],
-  pub crc           : u32,
-  // valid is an internal flag
-  // used by code working with MTEs.
-  // Set it to false will mark the 
-  // package for deletion.
-  // Once invalidated, an event 
-  // never shall be valid again.
-  valid        : bool,
-  pub broken   : bool
+  pub event_status   : EventStatus,
+  pub event_id       : u32,
+  /// Internal timestamp at the time of trigger (1 unit = 10 ns)
+  /// Free running counter, rolling over every ~42 seconds
+  pub timestamp      : u32,
+  /// Timestamp at the edge of the TIU GPS (1 unit = 10 ns)
+  pub tiu_timestamp  : u32,
+  /// Second received from the TIU (format?) 
+  pub tiu_gps32      : u32,
+  pub tiu_gps16      : u16,
+  pub crc            : u32,
+  // NEW - change/extension in API for MTB fw >= 3.0.0
+  /// Trigger source:  
+  pub trigger_source : u16,
+  pub dsi_j_mask     : u32,
+  pub channel_mask   : Vec<u16>,
+  pub mtb_link_mask  : u64,
 }
 
 impl MasterTriggerEvent {
-  // 21 + 4 byte board mask + 4*4 bytes hit mask
-  // => 25 + 16 = 41 
-  // + head + tail
-  // 45
-  const SIZE : usize = 45;
-  const TAIL : u16   = 0x5555;
-  const HEAD : u16   = 0xAAAA;
+  /// Implementation version, might roughly 
+  /// correspond to fw version
+  pub const VERSION : u8 = 3;
 
-  pub fn new(event_id  : u32, 
-             n_paddles : u8) -> Self {
-    Self {
-      event_id      : event_id,
-      timestamp     : 0,
-      tiu_timestamp : 0,
-      tiu_gps_32    : 0,
-      tiu_gps_16    : 0,
-      n_paddles     : n_paddles, 
-      board_mask    : [false;N_LTBS],
-      //ne 16 bit value per LTB
-      hits          : [[false;N_CHN_PER_LTB]; N_LTBS],
-      crc           : 0,
-      broken    : false,
-      // valid does not get serialized
-      valid     : true,
+  pub fn new() -> Self {
+    Self { 
+      event_status   : EventStatus::Unknown,
+      event_id       : 0,
+      timestamp      : 0,
+      tiu_timestamp  : 0,
+      tiu_gps32      : 0,
+      tiu_gps16      : 0,
+      crc            : 0,
+      trigger_source : 0,
+      dsi_j_mask     : 0,
+      channel_mask   : Vec::<u16>::new(),
+      mtb_link_mask  : 0,
     }   
   }
 
-  pub fn get_rbs_exp_from_map(&self, dsimap : &DsiLtbRBMapping) -> Vec<u8> {
-    let mut rbids = Vec::<u8>::new();
-    for k in self.get_dsi_j_ch_for_triggered_ltbs() {
-      rbids.push(dsimap[&k.0][&k.1][&k.2].0)
-    }
-    rbids
-  }
-
-  pub fn get_n_rbs_exp_from_map(&self, dsimap : &DsiLtbRBMapping) -> u8 {
-    self.get_rbs_exp_from_map(dsimap).len() as u8
-  }
-
-  //#[deprecated(since="0.9.2")]
-  pub fn get_n_rbs_expected(&self) -> u8 {
-    let mut n_rbs = 0u8;
-    //println!("SELF HITS : {:?}", self.hits);
-    for h in self.hits {
-      let count = h.iter().filter(|&&x| x).count();
-      //println!("COUNT! {count}"); 
-      if count >= 1 {
-        n_rbs += 1;
-      } 
-      if count > 8 {
-        n_rbs += 1;
+  /// Get the RB link IDs according to the mask
+  pub fn get_rb_link_ids(&self) -> Vec<u8> {
+    let mut links = Vec::<u8>::new();
+    for k in 0..63 {
+      if (self.mtb_link_mask >> k) as u64 & 0x1 == 1 {
+        links.push(k as u8);
       }
     }
-    n_rbs
+    links
   }
 
-  /// Make the connection between the triggered
-  /// boards in the boardmask and convert that
-  /// to DSI/J/CH
-  pub fn get_dsi_j_ch_for_triggered_ltbs(&self) -> Vec<(u8,u8,u8)> {
-    let mut dsi_js = Vec::<(u8,u8,u8)>::new();
-    let mut dsi = 1u8;
-    let mut j   = 1u8;
-    let mut ch  : u8;
-    for k in 0..N_LTBS {
-      if self.board_mask[k] {
-        ch = 1;
-        for n in 0..self.hits[k].len() {
-          if self.hits[k][n] {
-            dsi_js.push((dsi, j, ch));
+  /// Get the combination of triggered DSI/J/CH on 
+  /// the MTB which formed the trigger. This does 
+  /// not include further hits which fall into the 
+  /// integration window. For those, se rb_link_mask
+  ///
+  /// The returned values follow the TOF convention
+  /// to start with 1, so that we can use them to 
+  /// look up LTB ids in the db.
+  ///
+  /// # Returns
+  ///
+  ///   Vec<(hit)> where hit is (DSI, J, CH) 
+  pub fn get_trigger_hits(&self) -> Vec<(u8, u8, u8)> {
+    let mut hits = Vec::<(u8,u8,u8)>::new(); 
+    let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
+    if self.channel_mask.len() < n_masks_needed as usize {
+      error!("We need {} hit masks, but only have {}! This is bad!", n_masks_needed, self.channel_mask.len());
+      return hits;
+    }
+    debug!("Expecting {} hit masks", n_masks_needed);
+    let mut n_mask = 0;
+    for k in 0..31 {
+      if (self.dsi_j_mask >> k) as u32 & 0x1 == 1 {
+        let dsi = (k as f32 / 4.0).floor() as u8 + 1;       
+        let j   = (k % 5) as u8 + 1;
+        let channels = self.channel_mask[n_mask]; 
+        for ch in 0..15 {
+          if channels >> ch as u16 & 0x1 == 1 {
+            hits.push((dsi,j,ch+1));
           }
-          ch += 1;
         }
-      }
-      j += 1;
-      if j > 5 {
-        j = 1;
-        dsi += 1;
+        n_mask += 1;
       }
     }
-    dsi_js
-  }
-  
-  pub fn decode_board_mask(&mut self, mask : u32) {
-    // FIXME -> This basically inverses the order of the LTBs
-    // so bit 0 (rightmost in the mask is the leftmost in the 
-    // array
-    for i in 0..N_LTBS {
-      self.board_mask[i] = (mask & (1 << i)) != 0;
-    }
+    hits
   }
 
-  pub fn decode_hit_mask(&mut self, ltb_idx : usize, mask : u32) {
-    for i in 0..N_CHN_PER_LTB {
-      self.hits[ltb_idx][i] = (mask & (1 << i)) != 0;
-    }
-  }
+  ///// Compatibility with older data.
+  ///// Convert deprecated array type format
+  ///// to new system
+  //fn get_dsi_j_mask_from_old_data(&mut self, mask : u32) {
+  //  // if I am not completly mistaken, this can be saved 
+  //  // directly
+  //  self.dsi_j_mask = mask;
+  //}
 
-  pub fn is_broken(&self) -> bool {
-    self.broken
-  }
-
-
-  fn bitmask_to_str(mask : &[bool]) -> String {
-    let mut m_str = String::from("");
-    for n in mask {
-      if *n {
-        m_str += "1";
-      } else {
-        m_str += "0";
-      }
-    }
-    m_str
-  }
-
-  pub fn boardmask_to_str(&self) -> String {
-    let bm_str = MasterTriggerEvent::bitmask_to_str(&self.board_mask);
-    bm_str
-  }
-
-  pub fn hits_to_str(&self) -> String {
-    let mut hits_str = String::from("");
-    for j in 0..self.hits.len() {
-      hits_str += &(j.to_string() + ": [" + &MasterTriggerEvent::bitmask_to_str(&self.hits[j]) + "]\n");
-    }
-    hits_str
-  }
-
-  pub fn n_ltbs(&self) -> u32 {
-    let mut nboards = 0;
-    for n in self.board_mask { 
-      if n {
-        nboards += 1;
-      }
-    }
-    nboards
-  }
-
-  /// Get the number of hit paddles from 
-  /// the hitmask.
-  ///
-  /// Now the question is 
-  /// what do we consider a hit. 
-  /// Currently we have for the LTB threshold
-  /// 0 = no hit 
-  /// 01 = thr1
-  /// 10 = thr2
-  /// 11 = thr3
-  ///
-  /// For now, we just say everything larger 
-  /// than 01 is a hit
-  pub fn get_hit_paddles(&self) -> u8 {
-    let mut n_paddles = 0u8;
-    // somehow it is messed up how we iterate over
-    // the array (I think this must be reversed.
-    // At least for the number of paddles it does 
-    // not matter.
-    for n in 0..N_LTBS { 
-      for ch in (0..N_CHN_PER_LTB -1).step_by(2) {
-        if self.hits[n][ch] || self.hits[n][ch+1] {
-          n_paddles += 1;
-        }
-      }
-    }
-    n_paddles
-  }
-
-  pub fn check(&self) -> bool {
-    let good = self.n_paddles == self.get_hit_paddles();
-    if !good {
-      error!("Missmatch in expected and registered hit paddles! Expected : {}, seen {}", self.n_paddles, self.get_hit_paddles());
-    }
-    good
-  }
-
-  pub fn invalidate(&mut self) {
-    self.valid = false;
-  }
+  ///// Compatiblity with older data.
+  ///// Convert deprecated array type format
+  ///// to new system
+  //fn get_channel_mask_from_old_data(&mut self, mask : u32) {
+  //  self.channel_mask.push(mask as u16); 
+  //}
 
   /// combine the tiu gps 16 and 32bit timestamps 
   /// into a 48bit timestamp
-  pub fn get_gpstimestamp48(&self) -> u64 {
-    ((self.tiu_gps_16 as u64) << 32) | self.tiu_gps_32 as u64 
+  pub fn get_timestamp_gps48(&self) -> u64 {
+    ((self.tiu_gps16 as u64) << 32) | self.tiu_gps32 as u64 
   }
 
-  //pub fn get_absolute_time(&self) -> u64 {
-  //  let gps = self.get_gpstimestamp48()
-  //  let mt_ts : u64;
-  //  if self.timestamp < self.tiu_timestamp {
-  //    // it has wrapped
-  //  }
-  //  let ts  = 1e9u64 * gps + self
-  //}
+  /// Get absolute timestamp as sent by the GPS
+  pub fn get_timestamp_abs48(&self) -> u64 {
+    let gps = self.get_timestamp_gps48();
+    let mut timestamp = self.timestamp;
+    if timestamp < self.tiu_timestamp {
+      // it has wrapped
+      timestamp += u32::MAX;
+    }
+    let ts  = 1_000_000_000 * gps + (timestamp - self.tiu_timestamp) as u64;
+    return ts;
+  }
+
+  /// Get the trigger sources from trigger source byte
+  /// FIXME! (Does not return anything)
+  pub fn get_trigger_sources(&self) -> Vec<TriggerType> {
+    let mut t_types    = Vec::<TriggerType>::new();
+    let gaps_trigger   = self.trigger_source >> 5 & 0x1 == 1;
+    if gaps_trigger {
+      t_types.push(TriggerType::Gaps);
+    }
+    let any_trigger    = self.trigger_source >> 6 & 0x1 == 1;
+    if any_trigger {
+      t_types.push(TriggerType::Any);
+    }
+    let forced_trigger = self.trigger_source >> 7 & 0x1 == 1;
+    if forced_trigger {
+      t_types.push(TriggerType::Forced);
+    }
+    let track_trigger  = self.trigger_source >> 8 & 0x1 == 1;
+    if track_trigger {
+      t_types.push(TriggerType::Track);
+    }
+    let central_track_trigger
+                       = self.trigger_source >> 9 & 0x1 == 1;
+    if central_track_trigger {
+      t_types.push(TriggerType::TrackCentral);
+    }
+    t_types
+  }
 }
 
 impl Serialization for MasterTriggerEvent {
   
-  // 21 + 4 byte board mask + 4*4 bytes hit mask
-  // => 25 + 16 = 41 
-  // + head + tail
-  // 45
-  const SIZE : usize = 45;
-  const TAIL : u16 = 0x5555;
-  const HEAD : u16 = 0xAAAA;
+  /// Variable size
+  const SIZE : usize = 0;
+  const TAIL : u16   = 0x5555;
+  const HEAD : u16   = 0xAAAA;
 
   fn to_bytestream(&self) -> Vec::<u8> {
     let mut bs = Vec::<u8>::with_capacity(MasterTriggerEvent::SIZE);
     bs.extend_from_slice(&MasterTriggerEvent::HEAD.to_le_bytes());
+    bs.push(self.event_status as u8);
     bs.extend_from_slice(&self.event_id.to_le_bytes()); 
     bs.extend_from_slice(&self.timestamp.to_le_bytes());
     bs.extend_from_slice(&self.tiu_timestamp.to_le_bytes());
-    bs.extend_from_slice(&self.tiu_gps_32.to_le_bytes());
-    bs.extend_from_slice(&self.tiu_gps_16.to_le_bytes());
-    bs.extend_from_slice(&self.n_paddles.to_le_bytes());
-    let mut board_mask : u32 = 0;
-    for n in 0..N_LTBS {
-      if self.board_mask[n] {
-        board_mask += 2_u32.pow(n as u32);
-      }
-    }
-    bs.extend_from_slice(&board_mask.to_le_bytes());
-    for n in 0..N_LTBS {
-      let mut hit_mask : u32 = 0;
-      for j in 0..N_CHN_PER_LTB {
-        if self.hits[n][j] {
-          hit_mask += 2_u32.pow(j as u32);
-        }
-      }
-      bs.extend_from_slice(&hit_mask.to_le_bytes());
-    }
+    bs.extend_from_slice(&self.tiu_gps32.to_le_bytes());
+    bs.extend_from_slice(&self.tiu_gps16.to_le_bytes());
     bs.extend_from_slice(&self.crc.to_le_bytes());
+    bs.extend_from_slice(&self.trigger_source.to_le_bytes());
+    bs.extend_from_slice(&self.dsi_j_mask.to_le_bytes());
+    let n_channel_masks = self.channel_mask.len();
+    bs.push(n_channel_masks as u8);
+    for k in 0..n_channel_masks {
+      bs.extend_from_slice(&self.channel_mask[k].to_le_bytes());
+    }
+    bs.extend_from_slice(&self.mtb_link_mask.to_le_bytes());
     bs.extend_from_slice(&MasterTriggerEvent::TAIL.to_le_bytes());
     bs
   }
 
-  fn from_bytestream(bytestream : &Vec<u8>,
-                     pos        : &mut usize)
+  fn from_bytestream(stream : &Vec<u8>,
+                     pos    : &mut usize)
     -> Result<Self, SerializationError> {
-    let bs     = bytestream;
-    let mut mt = Self::new(0,0);
-    let header = parse_u16(bs, pos); 
+    let mut mt = Self::new();
+    let header = parse_u16(stream, pos); 
     if header != Self::HEAD {
       return Err(SerializationError::HeadInvalid);
     }
-    mt.event_id           = parse_u32(bs, pos);
-    mt.timestamp          = parse_u32(bs, pos);
-    mt.tiu_timestamp      = parse_u32(bs, pos);
-    mt.tiu_gps_32         = parse_u32(bs, pos);
-    mt.tiu_gps_16         = parse_u32(bs, pos);
-    mt.n_paddles          = parse_u8(bs, pos);
-    let board_mask        = parse_u32(bs, pos);
-    mt.decode_board_mask(board_mask);
-    let mut hit_mask : u32;
-    for n in 0..N_LTBS {
-      hit_mask = parse_u32(bs, pos);
-      mt.decode_hit_mask(n, hit_mask);
+    mt.event_status       = parse_u8 (stream, pos).into();
+    mt.event_id           = parse_u32(stream, pos);
+    mt.timestamp          = parse_u32(stream, pos);
+    mt.tiu_timestamp      = parse_u32(stream, pos);
+    mt.tiu_gps32          = parse_u32(stream, pos);
+    mt.tiu_gps16          = parse_u16(stream, pos);
+    mt.crc                = parse_u32(stream, pos);
+    mt.trigger_source     = parse_u16(stream, pos);
+    mt.dsi_j_mask         = parse_u32(stream, pos);
+    let n_channel_masks   = parse_u8(stream, pos);
+    for _ in 0..n_channel_masks {
+      mt.channel_mask.push(parse_u16(stream, pos));
     }
-    mt.crc                = parse_u32(bs, pos);
-    let tail_a              = parse_u8(bs, pos);
-    let tail_b              = parse_u8(bs, pos);
-    if tail_a == 85 && tail_b == 85 {
-      trace!("Correct tail found!");
-    }
-    else if tail_a == 85 && tail_b == 5 {
-      warn!("This is specific to data written with <= 0.6.0 KIHIKIHI! This is a BUG! It needs to be fixed in future versions! Version 0.6.1 should already fix ::to_bytestream, but leaves a modded ::from_bytestream for current analysis.");
-      warn!("Tail for version 0.6.0/0.6.1 found");  
-    } else {
-      error!("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got {} {} but were expecting 85 5", tail_a, tail_b);
-      //error!("Got {} for MTE tail signature! Expecting {}", tail, MasterTriggerEvent::TAIL);
-      return Err(SerializationError::TailInvalid);
+    mt.mtb_link_mask      = parse_u64(stream, pos);
+    let tail              = parse_u16(stream, pos);
+    if tail != Self::TAIL {
+      error!("Invalid tail signature {}!", tail);
+      mt.event_status = EventStatus::TailWrong;
     }
     Ok(mt)
   }
@@ -445,93 +359,39 @@ impl Serialization for MasterTriggerEvent {
 
 impl Default for MasterTriggerEvent {
   fn default() -> Self {
-    Self::new(0,0)
+    Self::new()
   }
 }
 
 impl fmt::Display for MasterTriggerEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let mut dsi_j = HashMap::<u8, &str>::new();
-    dsi_j.insert(0  , "1/1");
-    dsi_j.insert(1  , "1/2");
-    dsi_j.insert(2  , "1/3");
-    dsi_j.insert(3  , "1/4");
-    dsi_j.insert(4  , "1/5");
-    dsi_j.insert(5  , "2/1");
-    dsi_j.insert(6  , "2/2");
-    dsi_j.insert(7  , "2/3");
-    dsi_j.insert(8  , "2/4");
-    dsi_j.insert(9  , "2/5");
-    dsi_j.insert(10 , "3/1");
-    dsi_j.insert(11 , "3/2");
-    dsi_j.insert(12 , "3/3");
-    dsi_j.insert(13 , "3/4");
-    dsi_j.insert(14 , "3/5");
-    dsi_j.insert(15 , "4/1");
-    dsi_j.insert(16 , "4/2");
-    dsi_j.insert(17 , "4/3");
-    dsi_j.insert(18 , "4/4");
-    dsi_j.insert(19 , "4/5");
-    dsi_j.insert(20 , "5/1");
-    dsi_j.insert(21 , "5/2");
-    dsi_j.insert(22 , "5/3");
-    dsi_j.insert(23 , "5/4");
-    dsi_j.insert(24 , "5/5");
-    let mut hit_boards = Vec::<u8>::with_capacity(20);
-    
     let mut repr = String::from("<MasterTriggerEvent");
-    repr += "\n  event_id                    ";
-    repr += &self.event_id.to_string(); 
-    repr += "\n  timestamp                   ";
-    repr += &self.timestamp.to_string(); 
-    repr += "\n  tiu_timestamp               ";
-    repr += &self.tiu_timestamp.to_string(); 
-    repr += "\n  tiu_gps16 (slow)            ";
-    repr += &self.tiu_gps_16.to_string(); 
-    repr += "\n  tiu_gps32 (fast)            ";
-    repr += &self.tiu_gps_32.to_string(); 
-    repr += &(format!("\n  |-> tiu_gps48               {}", self.get_gpstimestamp48()));
-    repr += "\n  n_paddles                   ";
-    repr += &self.n_paddles.to_string(); 
-    repr += "\n  crc                         ";
-    repr += &self.crc.to_string();
-    repr += "\n  broken                      ";
-    repr += &self.broken.to_string();
-    repr += "\n  valid                       ";
-    repr += &self.valid.to_string();
-    // a bit too excessive representation, might 
-    // be useful for debugging though?
-    //repr += "\n -- hit mask --";
-    //repr += "\n [DSI/J]";
-    //repr += "\n 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
-    //repr += " ";
-    //println!("SELFBOARDMASK {:?}", self.board_mask);
-    for k in 0..N_LTBS {
-      if self.board_mask[k] {
-    //    repr += "-X-   ";
-        hit_boards.push(k as u8);
-      } else {
-    //    repr += "-0-   ";
-      }
+    repr += &(format!("\n  EventStatus     : {}", self.event_status));
+    repr += &(format!("\n  EventID         : {}", self.event_id));
+    repr += "\n  ** trigger sources **";
+    for k in self.get_trigger_sources() {
+      repr += &(format!("\n   {}", k));
     }
-    repr += "\n  == == LTB HITS == ==\n";
-    for  k in hit_boards.iter() {
-      //println!("Getting {}", k);
-      repr += "\t DSI/J/CHANNEL ";
-      repr += dsi_j[k];
-      //repr += "\t=> ";
-      for j in 0..N_CHN_PER_LTB {
-        if self.hits[*k as usize][j] {
-          repr += " ";
-          repr += &(j + 1).to_string();
-          repr += " ";
-        } else {
-          continue;
-          //repr += " N.A. ";
-        } 
-      }
-      repr += "\n";
-    }  
+    repr += "\n  ** ** timestamps ** **";
+    repr += &(format!("\n    timestamp     : {}", self.timestamp));
+    repr += &(format!("\n    tiu_timestamp : {}", self.tiu_timestamp));
+    repr += &(format!("\n    gps 48bit     : {}", self.get_timestamp_gps48()));
+    repr += &(format!("\n    absolute 48bit: {}", self.get_timestamp_abs48()));
+    repr += "\n  -- -- --";
+    repr += &(format!("\n  crc             : {}", self.crc));
+    repr += &(format!("\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **", self.dsi_j_mask.count_ones()));
+    for k in self.get_trigger_hits() {
+      repr += &(format!("\n  => {}/{}/{} ", k.0, k.1, k.2));
+    }
+    repr += "\n  ** ** MTB LINK IDs ** **";
+    let mut mtblink_str = String::from("\n  => ");
+    for k in self.get_rb_link_ids() {
+      mtblink_str += &(format!("{} ", k))
+    }
+    repr += &mtblink_str;
+    repr += &(format!("\n  == Trigger hits {}, expected RBEvents {}",
+            self.get_trigger_hits().len(),
+            self.get_rb_link_ids().len()));
     repr += ">";
     write!(f,"{}", repr)
   }
@@ -541,22 +401,23 @@ impl fmt::Display for MasterTriggerEvent {
 impl FromRandom for MasterTriggerEvent {
 
   fn from_random() -> Self {
-    let mut event   = Self::new(0,0);
-    let mut rng = rand::thread_rng();
-    event.event_id      = rng.gen::<u32>();
-    event.timestamp     = rng.gen::<u32>();
-    event.tiu_timestamp = rng.gen::<u32>();
-    event.tiu_gps_32    = rng.gen::<u32>();
-    event.tiu_gps_16    = rng.gen::<u32>();
-    event.n_paddles     = rng.gen::<u8>(); 
-    // broken will not get serializad, so this won't
-    // be set randomly here
-    for k in 0..N_LTBS {
-      event.board_mask[k] = rng.gen::<bool>();
-      for j in 0..N_CHN_PER_LTB {
-        event.hits[k][j]  = rng.gen::<bool>();
-      }
+    let mut event        = Self::new();
+    let mut rng          = rand::thread_rng();
+    // FIXME - P had figured out how to this, copy his approach
+    //event.event_status   = rng.gen::<u8><();
+    event.event_id       = rng.gen::<u32>();
+    event.timestamp      = rng.gen::<u32>();
+    event.tiu_timestamp  = rng.gen::<u32>();
+    event.tiu_gps32      = rng.gen::<u32>();
+    event.tiu_gps16      = rng.gen::<u16>();
+    event.crc            = rng.gen::<u32>();
+    event.trigger_source = rng.gen::<u16>();
+    event.dsi_j_mask     = rng.gen::<u32>();
+    let n_channel_masks  = rng.gen::<u8>();
+    for _ in 0..n_channel_masks {
+      event.channel_mask.push(rng.gen::<u16>());
     }
+    event.mtb_link_mask  = rng.gen::<u64>();
     event
   }
 }

@@ -403,7 +403,7 @@ fn tofpacket_from_tofevent() {
 #[cfg(feature="random")]
 #[test] 
 fn tofpacket_from_mtevent() {
-  let data = MasterTriggerEvent::new(0,0);
+  let data = MasterTriggerEvent::new();
   let pk   = TofPacket::from(&data);
   let test = TofPacket::from_bytestream(&pk.to_bytestream(),&mut 0).unwrap();
   assert_eq!(pk.packet_type, PacketType::MasterTrigger);
