@@ -467,12 +467,12 @@ impl MasterTrigger {
     //const MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = 9; 
     //let n_hit_packets = n_daq_words as u32 - MTB_DAQ_PACKET_FIXED_N_WORDS;
     //println!("We are expecting {}", n_hit_packets);
-    let mut mte = MasterTriggerEvent::new(0,0);
+    let mut mte = MasterTriggerEvent::new();
     mte.event_id      = data[1];
     mte.timestamp     = data[2];
     mte.tiu_timestamp = data[3];
-    mte.tiu_gps_32    = data[4];
-    mte.tiu_gps_16    = data[5] & 0x0000ffff;
+    mte.tiu_gps32     = data[4];
+    mte.tiu_gps16     = (data[5] & 0x0000ffff) as u16;
     //mte.board_mask    = decode_board_mask(data[6]);
     //let mut hitmasks = VecDeque::<[bool;N_CHN_PER_LTB]>::new();
     //for k in 0..n_hit_packets {
@@ -493,7 +493,6 @@ impl MasterTrigger {
     //    }
     //  }
     //}
-    mte.n_paddles = mte.get_hit_paddles(); 
     println!("[MasterTrigger::get_mtevent] => Got MTE {}", mte);
   }
 
