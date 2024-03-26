@@ -230,6 +230,7 @@ if __name__ == '__main__':
             if k in RB_IGNORELIST:
                 continue
             rbs[k].rb_id = k
+            mtb_link_ids = []
             for ch in range(1,9):
                 try:
                     pend = m.PaddleEnd.objects.filter(\
@@ -239,6 +240,12 @@ if __name__ == '__main__':
                     print (f"Can't get info for {rbs[k].rb_id} {ch}")
                     raise
                 rbs[k].set_channel(ch, pend)
+                mtb_link_ids.append(pend.mtb_link_id)
+            if len(set(mtb_link_ids)) != 1:
+                print (rbs)
+                print (pend)
+                raise ValueError("Something is inconsistent! This RB seems to have paddles connected with different MTB Link IDs!")
+
             print (rbs[k])
             if not args.dry_run:
                 rbs[k].save()

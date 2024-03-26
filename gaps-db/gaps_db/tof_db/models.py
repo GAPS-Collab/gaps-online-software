@@ -300,7 +300,8 @@ class PaddleEnd(models.Model):
     dsi           = models.PositiveSmallIntegerField()
     rb_harting_j  = models.PositiveSmallIntegerField()
     ltb_harting_j = models.PositiveSmallIntegerField()
-    
+    mtb_link_id   = models.PositiveSmallIntegerField(unique=False)
+
     def setup_unique_paddle_end_id(self):
         """
         Introduce a uuid. We have 160 paddles with 2 ends. Make the uuid the following
@@ -318,7 +319,10 @@ class PaddleEnd(models.Model):
     def fill_from_spreadsheet(self, data):
         self.paddle_id     = int(data['Paddle Number']) 
         self.end           = data['Paddle End (A/B)'] 
-        self.end_location  = data['Paddle End Location']                       
+        self.end_location  = data['Paddle End Location']           
+        print ("-- -- keys --")
+        print (data)
+        self.mtb_link_id   = data['MTB Link ID']
         panel_id           = str(data['Panel Number'])
         if panel_id.startswith('E'):
             # this are these individual edge paddles
@@ -377,7 +381,8 @@ class PaddleEnd(models.Model):
         _repr += f'\n  ** identifiers **'
         _repr += f'\n   id             : {self.paddle_end_id}'     
         _repr += f'\n   pid            : {self.paddle_id}'     
-        _repr += f'\n   end (A|B)      : {self.end}'  
+        _repr += f'\n   end (A|B)      : {self.end}' 
+        _repr += f'\n   MTB Link ID    : {self.mtb_link_id}'
         _repr += f'\n  ** connedtions **'
         _repr += f'\n   DSI/J/CH (LG)  :  {self.dsi} | {self.ltb_harting_j} | {self.ltb_ch:02}'
         _repr += f'\n   DSI/J/CH (HG)  :  {self.dsi} | {self.rb_harting_j} | {self.rb_ch:02}'
@@ -550,6 +555,7 @@ class RB(models.Model):
     ch6_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
     ch7_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
     ch8_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
+    mtb_link_id      = models.PositiveSmallIntegerField(unique=True, null=True)
 
     def get_pid_for_channel(self, ch):
         return get_channel(ch).paddle_id
@@ -610,17 +616,18 @@ class RB(models.Model):
 
     def __repr__(self):
         _repr  = '<ReadoutBoard:'
-        _repr += f'\n  Board id : {self.rb_id}'            
-        _repr += f'\n  dna      : {self.dna}'          
+        _repr += f'\n  Board id    : {self.rb_id}'            
+        _repr += f'\n  dna         : {self.dna}'          
+        _repr += f'\n  MTB Link ID : {self.mtb_link_id}'
         _repr += f'\n  **Connected paddle ends**'
-        _repr += f'\n  Ch0(1)   : {self.ch1_paddle}'         
-        _repr += f'\n  Ch1(2)   : {self.ch2_paddle}'         
-        _repr += f'\n  Ch2(3)   : {self.ch3_paddle}'         
-        _repr += f'\n  Ch3(4)   : {self.ch4_paddle}'         
-        _repr += f'\n  Ch4(5)   : {self.ch5_paddle}'         
-        _repr += f'\n  Ch5(6)   : {self.ch6_paddle}'         
-        _repr += f'\n  Ch6(7)   : {self.ch7_paddle}'         
-        _repr += f'\n  Ch7(8)   : {self.ch8_paddle}>'         
+        _repr += f'\n  Ch0(1)      : {self.ch1_paddle}'         
+        _repr += f'\n  Ch1(2)      : {self.ch2_paddle}'         
+        _repr += f'\n  Ch2(3)      : {self.ch3_paddle}'         
+        _repr += f'\n  Ch3(4)      : {self.ch4_paddle}'         
+        _repr += f'\n  Ch4(5)      : {self.ch5_paddle}'         
+        _repr += f'\n  Ch5(6)      : {self.ch6_paddle}'         
+        _repr += f'\n  Ch6(7)      : {self.ch7_paddle}'         
+        _repr += f'\n  Ch7(8)      : {self.ch8_paddle}>'         
         return _repr
 
 ####################################################
