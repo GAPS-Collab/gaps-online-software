@@ -58,7 +58,25 @@ use crate::events::rb_event::EventStatus;
 //  REQUIRE_BETA =1
 //
 
-
+/// masks to decode LTB hit masks
+const LTB_CH0 : u16 = 0x3   ;
+const LTB_CH1 : u16 = 0xc   ;
+const LTB_CH2 : u16 = 0x30  ; 
+const LTB_CH3 : u16 = 0xc0  ;
+const LTB_CH4 : u16 = 0x300 ;
+const LTB_CH5 : u16 = 0xc00 ;
+const LTB_CH6 : u16 = 0x3000;
+const LTB_CH7 : u16 = 0xc000;
+const LTB_CHANNELS : [u16;8] = [
+    LTB_CH0,
+    LTB_CH1,
+    LTB_CH2,
+    LTB_CH3,
+    LTB_CH4,
+    LTB_CH5,
+    LTB_CH6,
+    LTB_CH7
+];
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
@@ -85,13 +103,13 @@ impl fmt::Display for TriggerType {
 impl From<u8> for TriggerType {
   fn from(value: u8) -> Self {
     match value {
-      0u8   => TriggerType::Unknown,
-      100u8 => TriggerType::Poisson,
-      1u8   => TriggerType::Any,
-      2u8   => TriggerType::Track,
-      3u8   => TriggerType::TrackCentral,
-      4u8   => TriggerType::TrackCentral,
-      _     => TriggerType::Unknown
+      0   => TriggerType::Unknown,
+      100 => TriggerType::Poisson,
+      1   => TriggerType::Any,
+      2   => TriggerType::Track,
+      3   => TriggerType::TrackCentral,
+      4   => TriggerType::Gaps,
+      _   => TriggerType::Unknown
     }
   }
 }
@@ -107,6 +125,7 @@ impl FromRandom for TriggerType {
       TriggerType::Track,
       TriggerType::TrackCentral,
       TriggerType::Gaps,
+      TriggerType::Forced,
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
@@ -116,6 +135,61 @@ impl FromRandom for TriggerType {
 
 /////////////////////////////////////////////////
 
+/// LTB Thresholds as passed on by the MTB
+/// https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+pub enum LTBThreshold {
+  NoHit = 0u8,
+  /// First threshold, 40mV, about 0.75 minI
+  Hit   = 1u8,
+  /// Second threshold, 32mV (? error in doc ?, about 2.5 minI
+  Beta  = 2u8,
+  /// Third threshold, 375mV about 30 minI
+  Veto  = 3u8,
+  /// Use u8::MAX for Unknown, since 0 is pre-determined for 
+  /// "NoHit, 
+  Unknown = 255u8
+}
+
+impl fmt::Display for LTBThreshold {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("ERROR: DeserializationError!"));
+    write!(f, "<LTBThreshold: {}>", r)
+  }
+}
+
+impl From<u8> for LTBThreshold {
+  fn from(value: u8) -> Self {
+    match value {
+      0 => LTBThreshold::NoHit,
+      1 => LTBThreshold::Hit,
+      2 => LTBThreshold::Beta,
+      3 => LTBThreshold::Veto,
+      _ => LTBThreshold::Unknown
+    }
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for LTBThreshold {
+  
+  fn from_random() -> Self {
+    let choices = [
+      LTBThreshold::NoHit,
+      LTBThreshold::Hit,
+      LTBThreshold::Beta,
+      LTBThreshold::Veto,
+      LTBThreshold::Unknown
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
+  }
+}
+
+/////////////////////////////////////////////////
 
 /// Hold additional information about the status
 /// of the registers on the MTB
@@ -209,8 +283,8 @@ impl MasterTriggerEvent {
   /// # Returns
   ///
   ///   Vec<(hit)> where hit is (DSI, J, CH) 
-  pub fn get_trigger_hits(&self) -> Vec<(u8, u8, u8)> {
-    let mut hits = Vec::<(u8,u8,u8)>::new(); 
+  pub fn get_trigger_hits(&self) -> Vec<(u8, u8, u8, LTBThreshold)> {
+    let mut hits = Vec::<(u8,u8,u8,LTBThreshold)>::new(); 
     let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
     if self.channel_mask.len() < n_masks_needed as usize {
       error!("We need {} hit masks, but only have {}! This is bad!", n_masks_needed, self.channel_mask.len());
@@ -223,12 +297,21 @@ impl MasterTriggerEvent {
         let dsi = (k as f32 / 4.0).floor() as u8 + 1;       
         let j   = (k % 5) as u8 + 1;
         let channels = self.channel_mask[n_mask]; 
-        for ch in 0..15 {
-          if channels >> ch as u16 & 0x1 == 1 {
-            hits.push((dsi,j,ch+1));
-          }
+        let mut thresh    = 0u8;
+        let mut n_channel = 0u8; 
+        for (i,ch) in LTB_CHANNELS.iter().enumerate() {
+          let chn = *ch as u8 + 1;
+          let thresh_bits = (channels & ch >> (i*2)) as u8;
+          hits.push((dsi, j, chn, LTBThreshold::from(thresh_bits)));
         }
         n_mask += 1;
+
+        //for ch in 0..15 {
+        //  if channels >> ch as u16 & 0x1 == 1 {
+        //    
+        //    hits.push((dsi,j,ch+1));
+        //  }
+        //}
       }
     }
     hits
