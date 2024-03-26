@@ -18,11 +18,16 @@ use crossbeam_channel::{
 };
 
 
-use tof_dataclasses::events::{MasterTriggerEvent,
-                              TofEvent,
-                              RBEvent};
+use tof_dataclasses::events::{
+    MasterTriggerEvent,
+    TofEvent,
+    RBEvent
+};
+
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::manifest::get_dsi_j_ltbch_vs_rbch_map;
+//use tof_dataclasses::manifest::{
+//    get_dsi_j_ltbch_vs_rbch_map,
+//};
 use tof_dataclasses::threading::ThreadControl;
 
 //use liftof_lib::heartbeat_printer;
@@ -327,24 +332,28 @@ pub fn heartbeat_formatter() {
 /// * m_trig_ev      : Receive a `MasterTriggerEvent` over this 
 ///                    channel. The event will be either build 
 ///                    immediatly, or cached. 
-///
-/// * pp_query       : Send request to a paddle_packet cache to send
-///                    Paddle packets with the given event id
-/// * paddle_packets : Receive paddle_packets from a paddle_packet
-///                    cache
-/// * cmd_sender     : Sending tof commands to comander thread. This 
-///                    is needed so that the event builder can request
-///                    paddles from readout boards.
+/// * ev_from_rb     : Receive a number of `RBEvents` over this channel.
+///                    The events here shall be associated with the 
+///                    MasterTriggerEvent
+/// * data_sink      : Send assembled events (and everything else in 
+///                    the form of TofPackets to the data sink/
+/// * mtb_link_map   : Map of MTB Link ID - RB ID. Maybe in the future
+///                    RBs will know their link id themselves?
+///                    This is currently only needed for the build strategy
+///                    "AdaptiveThorough"
 /// * settings       : Configure the event builder
 pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                       ev_from_rb     : &Receiver<RBEvent>,
                       data_sink      : &Sender<TofPacket>,
                       run_id         : u32,
-                      db_path        : String,
+                      //db_path        : String,
+                      mtb_link_map   : HashMap<u8,u8>,
                       mut settings   : TofEventBuilderSettings,
                       thread_control : Arc<Mutex<ThreadControl>>) { 
   // debug the number of rb events we have seen 
-  let mut seen_rbevents      = HashMap::<u8, usize>::new();
+  // in production mode, these features should go away
+  // FIXEM - add debug flags to features
+  let mut seen_rbevents = HashMap::<u8, usize>::new();
   // 10, 12, 37,38, 43, 45 don't exist
   for k in 1..47 {
     if k == 10 || k ==12 || k == 37 || k == 38 || k == 43 || k == 45 {
@@ -356,7 +365,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   // event caches for assembled events
   let mut event_cache         = HashMap::<u32, TofEvent>::new();
   let mut event_id_cache      = VecDeque::<u32>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  let dsi_map                 = get_dsi_j_ltbch_vs_rbch_map(db_path.as_ref()); 
+  //let dsi_map                 = get_dsi_j_ltbch_vs_rbch_map(db_path.as_ref()); 
   let mut n_received          : usize;
   //let mut clear_cache       = 0; // clear cache every 
   //let mut event_sending     = 0;
@@ -406,12 +415,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           continue;
         }   
         Ok(mt) => {
-          debug!("Got master trigger for event {} with {} expected hit paddles"
-                 , mt.event_id
-                 , mt.n_paddles);
-          // construct RB requests
-
-          let mut event = TofEvent::from(&mt);
+          debug!("Received MasterTriggerEvent {}!", mt);
+          let mut event = TofEvent::from(mt);
           event.header.run_id = run_id;
           if last_evid != 0 {
             if event.mt_event.event_id != last_evid + 1 {
@@ -489,48 +494,26 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             },
             Some(ev) => {
               if settings.build_strategy == BuildStrategy::AdaptiveThorough {
-                let lg_hits   = ev.mt_event.get_dsi_j_ch_for_triggered_ltbs(); 
-                let mut found = false;
-                let ev_rbid   = rb_ev.header.rb_id; 
-                for h in &lg_hits {
-                  if dsi_map[&h.0][&h.1][&h.2].0 == rb_ev.header.rb_id {
-                    ev.rb_events.push(rb_ev);
-                    found = true;
-                    break;
+                match mtb_link_map.get(&rb_ev.header.rb_id) {
+                  None => {
+                    error!("Don't know MTB Link ID for {}", rb_ev.header.rb_id)
+                  }
+                  Some(link_id) => {
+                    if ev.mt_event.get_rb_link_ids().contains(link_id) {
+                      ev.rb_events.push(rb_ev);
+                    } else {
+                      error!("RBEvent {} has the same event id, but does not show up in MTB Link ID mask!", rb_ev);
+                    }
                   }
                 }
-                if !found {
-                  println!("== ==> We saw {:?}, but {} is not part of that!", lg_hits, ev_rbid);
-                }
               } else {
-                //if ev.is_complete_from_map(&dsi_map) {
-                //  error!("We are adding a RBEvent to a TofEvent which is already complete!");
-                //}
+                // Just ad it without questioning
                 ev.rb_events.push(rb_ev);
                 //println!("[EVTBUILDER] DEBUG n rb expected : {}, n rbs {}",ev.mt_event.get_n_rbs_expected(), ev.rb_events.len());
               }
               //break;
             }
           }
-    
-          //for ev in event_cache.iter_mut() {
-          //  //iter_ev += 1;
-          //  //println!("==> mt event id {}, rb event id {}", ev.mt_event.event_id, rb_ev.header.event_id);
-          //  //println!("==> rb event id {}", rb_ev.header.event_id);
-          //  if ev.mt_event.event_id == rb_ev.header.event_id {
-          //    ev.rb_events.push(rb_ev);
-          //    break;
-          //    //rb_events_added += 1;
-          //    //println!("==> RBEvent added!");
-          //    //break;
-          //  }
-          //}
-          //if iter_ev == event_cache.len() {
-          //  info!("We dropped {}", rb_ev);
-          //}
-          //if n_received % 10 == 0 {
-          //  println!("==> Received 10 more RBEvents");
-          //}
         }
       }
     }
@@ -682,7 +665,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               }
             } else {
               // "normal" build strategy
-              if ev.is_complete_from_map(&dsi_map) || ev_timed_out {
+              //if ev.is_complete_from_map(&dsi_map) || ev_timed_out {
+              if ev.is_complete() || ev_timed_out {
                 cache_it = false;
               } else {
                 cache_it = true;

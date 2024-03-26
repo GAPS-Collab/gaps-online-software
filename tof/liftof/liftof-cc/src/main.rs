@@ -61,6 +61,7 @@ use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::manifest::{
     //ReadoutBoard,
     get_rbs_from_sqlite,
+    get_linkid_rbid_map,
 };
 use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::commands::TofCommandCode;
@@ -235,7 +236,7 @@ fn main() {
     //  println!("{}", rb);
     //}
   }
-
+  let mtb_link_id_map = get_linkid_rbid_map(&rb_list);
   // A global kill timer
   let program_start = Instant::now();
 
@@ -359,7 +360,7 @@ fn main() {
     // start the event builder thread
     if !cali_from_cmdline {
       println!("==> Starting event builder and master trigger threads...");
-      let db_path_string    = config.db_path.clone();
+      //let db_path_string    = config.db_path.clone();
       let settings          = config.event_builder_settings.clone();
       let thread_control_eb = thread_control.clone();
       let _evb_thread = thread::Builder::new()
@@ -369,7 +370,8 @@ fn main() {
                                       &ev_from_rb,
                                       &tp_to_sink,
                                       runid as u32,
-                                      db_path_string,
+                                      //db_path_string,
+                                      mtb_link_id_map,
                                       settings,
                                       thread_control_eb);
          })
