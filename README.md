@@ -6,7 +6,7 @@ This is branch LELEWAA-0.10. [Lelewaa is a whale shark](https://dlnr.hawaii.gov/
 ![Manta ray](resources/assets/lelewaa.png)
 
 >[!TIP] 
->Whale sharks are the largest fish on the planet, and despite their size they are not aggressive towards humans. Whale sharks can be spotted in the Hawaiian waters, however, sightings are rare so if you see enjoy your encounter and please be respectful. 
+>Whale sharks are the largest fish on our planet, and despite their size they are not aggressive towards humans. Whale sharks can be spotted in the Hawaiian waters, however, sightings are rare so if you see one enjoy your encounter and please be respectful. 
 
 >[!NOTE]
 >Apparently the Hawai'ian name Lelewa'a stems from the tale that the whale sharks like to approach and lean on canoe outriggers. 

@@ -26,8 +26,8 @@ crossterm = { version = "0.23", features=["serde"]}
 #crossbeam = "0.8"
 crossbeam-channel = "0.5"
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "database"], version = "0.9"}
-liftof-lib = { path = "../liftof-lib" , features = ["random"], version = "0.9"}
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "database"], version = "0.10"}
+liftof-lib = { path = "../liftof-lib" , features = ["random"], version = "0.10"}
 
 # this is the "one and only" histogram 
 # crate in my opinion

@@ -15,8 +15,8 @@ path = "src/bin/liftof_mt.rs"
 
 [dependencies]
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random","database","tofcontrol","smoothed_z_score"], version = "0.9"} 
-liftof-lib      = { path = "../liftof-lib" , features = ["random"], version="0.9"}
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random","database","tofcontrol","smoothed_z_score"], version = "0.10"} 
+liftof-lib      = { path = "../liftof-lib" , features = ["random"], version="0.10"}
 tof-control     = {path = "../../extern/tof-control", optional = false, version = "0.3", features=[] }
 
 zmq = "0.10.0"
