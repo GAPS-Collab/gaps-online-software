@@ -47,9 +47,14 @@ use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::serialization::Serialization;
 
 use crate::colors::{
-    ColorTheme2,
+    ColorTheme,
 };
 
+use crate::widgets::{
+    //clean_data,
+    prep_data,
+    create_labels,
+};
 
 pub const HIST_LABELS : [&str;100]  = ["0",   "1", "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9",
                                        "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
@@ -85,7 +90,8 @@ pub struct MTTab {
   pub miss_evid      : usize,
   pub last_evid      : u32,
   pub nch_histo      : Hist1D<Uniform<f32>>,
-  pub theme          : ColorTheme2,
+  pub mtb_link_histo : Hist1D<Uniform<f32>>,
+  pub theme          : ColorTheme,
 
   timer              : Instant,
 
@@ -95,8 +101,9 @@ impl MTTab {
 
   pub fn new(tp_receiver  : Receiver<TofPacket>,
              mte_receiver : Receiver<MasterTriggerEvent>,
-             theme        : ColorTheme2) -> MTTab {
-    let bins = Uniform::new(50, -0.5, 49.5);
+             theme        : ColorTheme) -> MTTab {
+    let bins          = Uniform::new(50, -0.5, 49.5);
+    let mtb_link_bins = Uniform::new(50, -0.5, 49.5);
     Self {
       main_layout    : Vec::<Rect>::new(),
       info_layout    : Vec::<Rect>::new(),
@@ -115,13 +122,14 @@ impl MTTab {
       miss_evid      : 0,
       last_evid      : 0,
       nch_histo      : ndhistogram!(bins),
+      mtb_link_histo : ndhistogram!(mtb_link_bins),
       theme          : theme,
       timer          : Instant::now(),
     }
   }
 
   pub fn receive_packet(&mut self) -> Result<(), SerializationError> {
-    let mut mte = MasterTriggerEvent::new(0,0);
+    let mut mte = MasterTriggerEvent::new();
     let met     = self.timer.elapsed().as_secs_f64();
     match self.tp_receiver.try_recv() {
       Err(_err)   => {
@@ -165,10 +173,14 @@ impl MTTab {
       } // end Ok
     } // end match
     if mte.event_id != 0 {
-      let hits = mte.get_dsi_j_ch_for_triggered_ltbs();
+      let hits     = mte.get_trigger_hits();
+      let rb_links = mte.get_rb_link_ids();
       self.nch_histo.fill(&(hits.len() as f32));
+      for k in rb_links {
+        self.mtb_link_histo.fill(&(k as f32));
+      }
       self.n_events += 1;
-      self.event_queue.push_back(mte);
+      self.event_queue.push_back(mte.clone());
       if self.event_queue.len() > self.queue_size {
         self.event_queue.pop_front();
       }
@@ -189,13 +201,14 @@ impl MTTab {
           [Constraint::Percentage(70), Constraint::Percentage(30)].as_ref(),
       )
       .split(*main_window);
-    
+   
+    // these are the 3 plots on the right side
     let info_chunks = Layout::default()
       .direction(Direction::Vertical)
       .constraints(
-          [Constraint::Percentage(32),
-           Constraint::Percentage(32),
-           Constraint::Percentage(32),
+          [Constraint::Percentage(33),
+           Constraint::Percentage(33),
+           Constraint::Percentage(34),
           ].as_ref(),
       )
       .split(main_chunks[1]);
@@ -217,6 +230,15 @@ impl MTTab {
           ].as_ref(),
       )
       .split(detail_chunks[0]);
+    
+    let bottom_row = Layout::default()
+      .direction(Direction::Horizontal)
+      .constraints(
+          [Constraint::Percentage(50),
+           Constraint::Percentage(50),
+          ].as_ref(),
+      ).split(detail_chunks[1]);
+
     self.main_layout   = main_chunks.to_vec();
     self.info_layout   = info_chunks.to_vec();
     self.detail_layout = detail_chunks.to_vec();
@@ -406,15 +428,31 @@ impl MTTab {
                               met,
                               self.miss_evid);
     let summary_view = Paragraph::new(view_summary)
-    .style(Style::default().fg(Color::LightCyan))
-    .alignment(Alignment::Left)
-    .block(
-      Block::default()
-        .borders(Borders::ALL)
-        .style(self.theme.style())
-        .title("Overview")
-        .border_type(BorderType::Rounded),
-    );
+      .style(Style::default().fg(Color::LightCyan))
+      .alignment(Alignment::Left)
+      .block(
+        Block::default()
+          .borders(Borders::ALL)
+          .style(self.theme.style())
+          .title("Overview")
+          .border_type(BorderType::Rounded),
+      );
+
+     // histograms
+     let ml_labels  = create_labels(&self.mtb_link_histo);
+     let mlh_data   = prep_data(&self.mtb_link_histo, &ml_labels, 20); 
+     let mlh_chart  = BarChart::default()
+       .block(Block::default().title("MTB Link ID (!NOT RBID)").borders(Borders::ALL))
+       .data(mlh_data.as_slice())
+       .bar_width(3)
+       .bar_gap(0)
+       .bar_style(self.theme.highlight_fg())
+       .value_style(
+         self.theme.highlight_fg()
+         .add_modifier(Modifier::BOLD),
+       )
+       .style(self.theme.background());
+    frame.render_widget(mlh_chart, bottom_row[1]);   
 
 
     // render everything
@@ -423,7 +461,7 @@ impl MTTab {
     frame.render_widget(fpga_temp_chart, self.info_layout[2]);
     frame.render_widget(event_view,      self.view_layout[0]);
     frame.render_widget(moni_view,       self.view_layout[1]);
-    frame.render_widget(summary_view,    self.detail_layout[1]);
+    frame.render_widget(summary_view,    bottom_row[0]);
   }
 }
     

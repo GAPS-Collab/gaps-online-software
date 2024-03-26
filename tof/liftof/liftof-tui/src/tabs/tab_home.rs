@@ -18,12 +18,12 @@ use ratatui::widgets::{
 };
 
 use liftof_lib::LIFTOF_LOGO_SHOW;
-use crate::colors::ColorTheme2;
+use crate::colors::ColorTheme;
 
 
 #[derive(Debug, Clone)]
 pub struct HomeTab {
-  pub theme      : ColorTheme2,
+  pub theme      : ColorTheme,
   pub streamer   : Arc<Mutex<VecDeque<String>>>,
   pub pack_stat  : Arc<Mutex<HashMap<String, usize>>>,
   pub stream     : String,
@@ -31,7 +31,7 @@ pub struct HomeTab {
 }
 
 impl HomeTab {
-  pub fn new(theme     : ColorTheme2,
+  pub fn new(theme     : ColorTheme,
              streamer  : Arc<Mutex<VecDeque<String>>>,
              pack_stat : Arc<Mutex<HashMap<String,usize>>>) -> HomeTab {
     HomeTab {
@@ -69,7 +69,7 @@ impl HomeTab {
         for k in _stat.keys() {
           //stat_string_render += "  -- -- -- -- -- -- -- -- -- --\n";
           if _stat[k] != 0 {
-            let line = format!("  {} \t=> [{}]\n",  _stat[k],k);
+            let line = format!("  {} \t=> \t[{}]\n",  _stat[k],k);
             stat_string_render += &line;
             sum_pack += _stat[k];
           }
