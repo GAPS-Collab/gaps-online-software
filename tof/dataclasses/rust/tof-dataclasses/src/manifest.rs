@@ -18,7 +18,7 @@ cfg_if::cfg_if! {
 
 use regex::Regex;
 use glob::glob;
-//use chrono::NaiveDateTime;
+use chrono::NaiveDateTime;
 use chrono::DateTime;
 
 use crate::calibrations::RBCalibrations;
@@ -890,7 +890,7 @@ impl ReadoutBoard {
     let re = Regex::new(r"(\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2})")?;
     // Define your file pattern (e.g., "logs/*.log" for all .log files in the logs directory)
     let pattern = format!("{}/RB{:02}_*", self.calib_file_path, self.rb_id); // Adjust this pattern to your files' naming convention
-    let mut newest_file = (String::from(""), DateTime::from_timestamp(0, 0).unwrap());
+    let mut newest_file = (String::from(""), NaiveDateTime::from_timestamp(0, 0));
     
     // Iterate over files that match the pattern
     let mut filename : String;
@@ -908,7 +908,7 @@ impl ReadoutBoard {
         if let Some(caps) = re.captures(&filename) {
           if let Some(timestamp_str) = caps.get(0).map(|m| m.as_str()) {
             //println!("{}",timestamp_str);
-            let timestamp = DateTime::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
+            let timestamp = NaiveDateTime::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
             if timestamp > newest_file.1 {
               // FIXME - into might panic?
               newest_file.1 = timestamp.into();
