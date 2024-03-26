@@ -122,10 +122,10 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
       \\::/  /        /:/  /     \\:\\__\\          \\:\\__\\      \\::/  /       \\:\\__\\    
        \\/__/         \\/__/       \\/__/           \\/__/       \\/__/         \\/__/    
 
-          (LIFTOF - liftof is for tof, Version 0.9 'HAHALUA', Dec 2023)
+          (LIFTOF - liftof is for tof, Version 0.10 'LELEWAA', Mar 2024)
 
           * Documentation
-          ==> GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/HAHALUA-0.9
+          ==> GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/LELEWAA-0.10
           ==> API docs https://gaps-collab.github.io/gaps-online-software/
 
   ";
