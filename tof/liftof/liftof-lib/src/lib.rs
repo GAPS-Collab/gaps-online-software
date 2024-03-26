@@ -501,7 +501,6 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     pids.push(*k);
   }
   for pid in pids {
-    let mut hit : TofHit;
     match paddles.get_mut(&pid) {
       None => {
         error!("The hit is not there, even after we put it in the map!");

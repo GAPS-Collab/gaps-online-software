@@ -18,7 +18,7 @@ use std::time::{Duration, Instant};
 use std::fmt;
 //use std::io;
 //use std::collections::HashMap;
-use std::collections::VecDeque;
+//use std::collections::VecDeque;
 //use std::net::{
 //    UdpSocket,
 //    SocketAddr
@@ -45,10 +45,14 @@ use tof_dataclasses::ipbus::{
 
 //const MT_MAX_PACKSIZE   : usize = 1024;
 
-use tof_dataclasses::constants::{
-    N_LTBS,
-    N_CHN_PER_LTB,
-};
+//use tof_dataclasses::constants::{
+//    // N_LTBS,
+//    N_CHN_PER_LTB,
+//};
+
+/// The DAQ packet from the MTB has a flexible size, but it will
+/// be at least this number of words long.
+const MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = 11; 
 
 /// helper function to parse output for TofBot
 fn remove_from_word(s: String, word: &str) -> String {
@@ -327,10 +331,8 @@ impl Default for MTBSettings {
 /// * bus       : connected IPBus for UDP comms
 pub fn get_mtevent(bus : &mut IPBus)
   -> Result<MasterTriggerEvent, MasterTriggerError> {
-  let mut mte = MasterTriggerEvent::new(0,0);
+  let mut mte = MasterTriggerEvent::new();
   let     n_daq_words  : u32;
-  let mut hits_a       : [bool;N_CHN_PER_LTB];
-  let mut hits_b       : [bool;N_CHN_PER_LTB];
   //let sleeptime = Duration::from_micros(10);
   //FIXME - reduce polling rate. 10micros is the 
   //fasterst
@@ -353,7 +355,7 @@ pub fn get_mtevent(bus : &mut IPBus)
     // interested in
     let nwords = bus.read(0x13)? >> 16;
     if nwords != 0 {
-      n_daq_words = nwords/2;
+      n_daq_words = nwords/2 + nwords % 2;
       //println!("Read {} from SIZE register", nwords);
       break;
     } 
@@ -377,35 +379,31 @@ pub fn get_mtevent(bus : &mut IPBus)
 
   // Number of words which will be always there. 
   // Min event size is +1 word for hits
-  const MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = 9; 
-  let n_hit_packets = n_daq_words - MTB_DAQ_PACKET_FIXED_N_WORDS;
+  let n_hit_words = n_daq_words - MTB_DAQ_PACKET_FIXED_N_WORDS;
   //println!("We are expecting {}", n_hit_packets);
   mte.event_id      = data[1];
   mte.timestamp     = data[2];
   mte.tiu_timestamp = data[3];
-  mte.tiu_gps_32    = data[4];
-  mte.tiu_gps_16    = data[5] & 0x0000ffff;
-  mte.board_mask    = decode_board_mask(data[6]);
-  let mut hitmasks = VecDeque::<[bool;N_CHN_PER_LTB]>::new();
-  for k in 0..n_hit_packets {
-    //println!("hit packet {:?}", data[7usize + k as usize]);
-    (hits_a, hits_b) = decode_hit_mask(data[7usize + k as usize]);
-    hitmasks.push_back(hits_a);
-    hitmasks.push_back(hits_b);
+  mte.tiu_gps32     = data[4];
+  mte.tiu_gps16      = (data[5] & 0x0000ffff) as u16;
+  mte.trigger_source = ((data[5] & 0xffff0000) >> 16) as u16;
+  //mte.get_trigger_sources();
+  let rbmask = (data[7] as u64) << 31 | data[6] as u64; 
+  mte.mtb_link_mask  = rbmask;
+  mte.dsi_j_mask     = data[8];
+  //  this can happen when the subtraction above overflows
+  if n_hit_words > n_daq_words {
+    error!("N hit word calculation failed! Got {} hit words!", n_hit_words);
+    return Err(MasterTriggerError::BrokenPackage);
   }
-  for k in 0..mte.board_mask.len() {
-    if mte.board_mask[k] {
-      match hitmasks.pop_front() { 
-        None => {
-          error!("MTE hit assignment wrong. We expect hits for a certain LTB, but we don't see any!");
-        },
-        Some(_hits) => {
-          mte.hits[k] = _hits;
-        }
-      }
+  for k in 1..n_hit_words+1 {
+    let first  = ( data[8 + k as usize] & 0x0000ffff) as u16;
+    let second = ((data[8 + k as usize] & 0xffff0000) >> 16) as u16; 
+    mte.channel_mask.push(first);
+    if second != 0 {
+      mte.channel_mask.push(second);
     }
   }
-  mte.n_paddles = mte.get_hit_paddles(); 
   Ok(mte)
 }
 
@@ -585,6 +583,12 @@ pub fn master_trigger(mt_address        : String,
       }
     }
     TriggerType::Unknown => {
+      println!("== ==> Not setting any trigger condition. You can set it through pico_hal.py");
+      warn!("Trigger condition undefined! Not setting anything!");
+      error!("Trigger conditions unknown!");
+    }
+    _ => {
+      error!("Trigger type {} not covered!", settings.trigger_type);
       println!("== ==> Not setting any trigger condition. You can set it through pico_hal.py");
       warn!("Trigger condition undefined! Not setting anything!");
       error!("Trigger conditions unknown!");
@@ -897,68 +901,6 @@ pub fn set_gaps_trigger(bus : &mut IPBus, use_beta : bool)
   Ok(())
 }
 
-/// Helper to get the number of the triggered LTB from the bitmask
-pub fn decode_board_mask(board_mask : u32) -> [bool;N_LTBS] {
-  let mut decoded_mask = [false;N_LTBS];
-  // FIXME this implicitly asserts that the fields for non available LTBs 
-  // will be 0 and all the fields will be in order
-  //println!("BOARD MASK {}", board_mask);
-  let mut index = N_LTBS - 1;
-  for n in 0..N_LTBS {
-    let mask = 1 << n;
-    let bit_is_set = (mask & board_mask) > 0;
-    decoded_mask[index] = bit_is_set;
-    if index != 0 {
-        index -= 1;
-    }
-    //decoded_mask[N_LTBS-1 - n] = bit_is_set;
-  }
-  //println!("DECODED MASK {:?}", decoded_mask);
-  // reverse the mask, so actually RAT0 is at position 0
-  decoded_mask.reverse();
-  decoded_mask
-}
-
-/// Helper to get the number of the triggered LTB from the bitmask
-pub fn decode_hit_mask(hit_mask : u32) -> ([bool;N_CHN_PER_LTB],[bool;N_CHN_PER_LTB]) {
-  //println!("HITMASK NON DECODED :{}", hit_mask);
-  let mut decoded_mask_0 = [false;N_CHN_PER_LTB];
-  let mut decoded_mask_1 = [false;N_CHN_PER_LTB];
-  // FIXME this implicitly asserts that the fields for non available LTBs 
-  // will be 0 and all the fields will be in order
-  let mut index = N_CHN_PER_LTB - 1;
-  for n in 0..N_CHN_PER_LTB {
-    let mask = 1 << n;
-    //println!("MASK {:?}", mask);
-    let bit_is_set = (mask & hit_mask) > 0;
-    //println!("bit is set {}, index {}", bit_is_set, index);
-    //decoded_mask_0[N_CHN_PER_LTB-1 - n] = bit_is_set;
-    decoded_mask_0[index] = bit_is_set;
-    if index != 0 {
-      index -= 1;
-    }
-  }
-  index = N_CHN_PER_LTB -1;
-  for n in N_CHN_PER_LTB..2*N_CHN_PER_LTB {
-    let mask = 1 << n;
-    let bit_is_set = (mask & hit_mask) > 0;
-    //FIXME - this is buggy and panics. Until this is fixed,
-    //I'll revive my cringy way to do things.
-    //decoded_mask_1[N_CHN_PER_LTB-1 - n] = bit_is_set;
-    decoded_mask_1[index] = bit_is_set;
-    if index != 0 {
-      index -= 1;
-    }
-  }
-  //println!("DECODED HITMASK 0 {:?}", decoded_mask_0);
-  //println!("DECODED HITMASK 1 {:?}", decoded_mask_1);
-  // reverse everything 
-  // so decoded_mask_0 is still for the first board, but 
-  // let's do the channels so that they count up
-  decoded_mask_0.reverse();
-  decoded_mask_1.reverse();
-  (decoded_mask_0, decoded_mask_1)
-}
 
 
 
