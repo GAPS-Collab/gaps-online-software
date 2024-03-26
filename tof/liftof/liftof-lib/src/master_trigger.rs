@@ -365,15 +365,27 @@ pub fn get_mtevent(bus : &mut IPBus)
   //println!("{}", data[0]);
   if data[0] != 0xAAAAAAAA {
     error!("Got MTB data, but the header is incorrect {}", data[0]);
+    match reset_daq(bus) {
+      Err(err) => error!("Can not reset DAQ, error {err}"),
+      Ok(_)    => ()
+    }
     return Err(MasterTriggerError::PackageHeaderIncorrect);
   }
   let foot_pos = (n_daq_words - 1) as usize;
   if data.len() <= foot_pos {
     error!("Got MTB data, but the format is not correct");
+    match reset_daq(bus) {
+      Err(err) => error!("Can not reset DAQ, error {err}"),
+      Ok(_)    => ()
+    }
     return Err(MasterTriggerError::PackageHeaderIncorrect);
   }
   if data[foot_pos] != 0x55555555 {
     error!("Got MTB data, but the footer is incorrect {}", data[foot_pos]);
+    match reset_daq(bus) {
+      Err(err) => error!("Can not reset DAQ, error {err}"),
+      Ok(_)    => ()
+    }
     return Err(MasterTriggerError::PackageFooterIncorrect);
   }
 
@@ -394,6 +406,10 @@ pub fn get_mtevent(bus : &mut IPBus)
   //  this can happen when the subtraction above overflows
   if n_hit_words > n_daq_words {
     error!("N hit word calculation failed! Got {} hit words!", n_hit_words);
+    match reset_daq(bus) {
+      Err(err) => error!("Can not reset DAQ, error {err}"),
+      Ok(_)    => ()
+    }
     return Err(MasterTriggerError::BrokenPackage);
   }
   for k in 1..n_hit_words+1 {
@@ -417,9 +433,10 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
   if data.len() < 4 {
     return Err(MasterTriggerError::BrokenPackage);
   }
+  // sensors are 12 bit
   let first_word   = 0x00000fff;
   let second_word  = 0x0fff0000;
-  //println!("{:?} data", data);
+  println!("[get_mtbmonidata] => Received data from registers {:?} data", data);
   moni.calibration = ( data[0] & first_word  ) as u16;
   moni.vccpint     = ((data[0] & second_word ) >> 16) as u16;  
   moni.vccpaux     = ( data[1] & first_word  ) as u16;  
@@ -798,7 +815,9 @@ pub fn set_trace_suppression(bus : &mut IPBus,
   Ok(())
 }
 
-/// Reset the state of the MTB DAQ
+/// Reset the state of the MTB DAQ buffer
+/// This can be safely issued without 
+/// resetting the event id
 pub fn reset_daq(bus : &mut IPBus) 
   -> Result<(), Box<dyn Error>> {
   info!("Resetting DAQ!");

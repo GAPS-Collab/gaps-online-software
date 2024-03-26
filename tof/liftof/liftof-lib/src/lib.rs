@@ -573,7 +573,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
               Ok(peaks)  => {
                 //peaks = pks;
                 // Step 5 : Find tdcs
-                println!("Found {} peaks!", peaks.len());
+                //println!("Found {} peaks!", peaks.len());
                 for pk in peaks.iter() {
                   match cfd_simple(&voltages,
                                    &times,
@@ -597,7 +597,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
             if cfd_times.len() > 0 {
               tdc = cfd_times[0];
             }
-            println!("Calucalated tdc {}, charge {}, max {}", tdc, charge, max_volts); 
+            //println!("Calucalated tdc {}, charge {}, max {}", tdc, charge, max_volts); 
             if rb.channel_to_paddle_end_id[*raw_ch as usize] > 2000 {
               hit.ftime_b      = tdc;
               hit.set_time_b(tdc);
@@ -610,7 +610,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
               hit.set_charge_a(charge);
               hit.set_peak_a(max_volts);
             }
-            println!("{}", hit);
+            //println!("{}", hit);
           } else {
             error!("Only one end of a paddle has a channel record! Ch {}, Pid {}", raw_ch, pid);
           }
@@ -618,13 +618,13 @@ pub fn waveform_analysis(event         : &mut RBEvent,
       }
     }
   }
-  println!("{:?}", paddles);
+  //println!("{:?}", paddles);
   for (_, hit) in paddles.iter_mut() {
     let t0 = get_paddle_t0(hit.ftime_a, hit.ftime_b, rb.get_paddle_length(hit.paddle_id));
     let pa = pos_across(hit.ftime_a, t0);
     hit.set_t0(t0);
     hit.set_pos_across(pa);
-    println!("caluclated {} {} for {}",t0, pa, hit);
+    //println!("caluclated {} {} for {}",t0, pa, hit);
   }
   let result = paddles.into_values().collect();
   event.hits = result;
