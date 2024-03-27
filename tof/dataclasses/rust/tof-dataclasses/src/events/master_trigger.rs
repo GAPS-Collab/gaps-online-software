@@ -15,6 +15,7 @@ use std::fmt;
 use crate::serialization::{
     Serialization,
     SerializationError,
+    search_for_u16,
     parse_u8,
     parse_u16,
     parse_u32,
@@ -285,33 +286,33 @@ impl MasterTriggerEvent {
   ///   Vec<(hit)> where hit is (DSI, J, CH) 
   pub fn get_trigger_hits(&self) -> Vec<(u8, u8, u8, LTBThreshold)> {
     let mut hits = Vec::<(u8,u8,u8,LTBThreshold)>::new(); 
-    let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
+    //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
+    let n_masks_needed = self.dsi_j_mask.count_ones();
     if self.channel_mask.len() < n_masks_needed as usize {
       error!("We need {} hit masks, but only have {}! This is bad!", n_masks_needed, self.channel_mask.len());
       return hits;
     }
-    debug!("Expecting {} hit masks", n_masks_needed);
     let mut n_mask = 0;
+    trace!("Expecting {} hit masks", n_masks_needed);
+    trace!("ltb channels {:?}", self.dsi_j_mask);
+    trace!("hit masks {:?}", self.channel_mask); 
+    //println!("We see LTB Channels {:?} with Hit masks {:?} for {} masks requested by us!", self.dsi_j_mask, self.channel_mask, n_masks_needed);
     for k in 0..31 {
       if (self.dsi_j_mask >> k) as u32 & 0x1 == 1 {
         let dsi = (k as f32 / 4.0).floor() as u8 + 1;       
         let j   = (k % 5) as u8 + 1;
+        //println!("n_mask {n_mask}");
         let channels = self.channel_mask[n_mask]; 
-        let mut thresh    = 0u8;
-        let mut n_channel = 0u8; 
         for (i,ch) in LTB_CHANNELS.iter().enumerate() {
           let chn = *ch as u8 + 1;
-          let thresh_bits = (channels & ch >> (i*2)) as u8;
-          hits.push((dsi, j, chn, LTBThreshold::from(thresh_bits)));
+          //println!("i,ch {}, {}", i, ch);
+          let thresh_bits = ((channels & ch) >> (i*2)) as u8;
+          //println!("thresh_bits {}", thresh_bits);
+          if thresh_bits > 0 { // hit over threshold
+            hits.push((dsi, j, chn, LTBThreshold::from(thresh_bits)));
+          }
         }
         n_mask += 1;
-
-        //for ch in 0..15 {
-        //  if channels >> ch as u16 & 0x1 == 1 {
-        //    
-        //    hits.push((dsi,j,ch+1));
-        //  }
-        //}
       }
     }
     hits
@@ -435,6 +436,18 @@ impl Serialization for MasterTriggerEvent {
     if tail != Self::TAIL {
       error!("Invalid tail signature {}!", tail);
       mt.event_status = EventStatus::TailWrong;
+      // PATCH - if this is old data, just skip it and
+      // search the next tail
+      match search_for_u16(Self::TAIL, stream, *pos) {
+        Ok(tail_pos) => {
+          error!("The tail was invalid, but we found a suitable end marker. The data format seems incompatible though, so the MasterTriggerEvents is probably rubbish!");
+          mt.event_status = EventStatus::IncompatibleData; 
+          *pos = tail_pos + 2;
+        },
+        Err(err) => {
+          error!("Tail invalid, we assume the data format is incompatible, however, we could not do anything about it! {err}");
+        }
+      }
     }
     Ok(mt)
   }
@@ -464,7 +477,7 @@ impl fmt::Display for MasterTriggerEvent {
     repr += &(format!("\n  crc             : {}", self.crc));
     repr += &(format!("\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **", self.dsi_j_mask.count_ones()));
     for k in self.get_trigger_hits() {
-      repr += &(format!("\n  => {}/{}/{} ", k.0, k.1, k.2));
+      repr += &(format!("\n  => {}/{}/{} ({}) ", k.0, k.1, k.2, k.3));
     }
     repr += "\n  ** ** MTB LINK IDs ** **";
     let mut mtblink_str = String::from("\n  => ");
