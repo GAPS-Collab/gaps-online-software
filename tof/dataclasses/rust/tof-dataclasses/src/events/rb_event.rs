@@ -59,6 +59,9 @@ pub enum EventStatus {
   TailWrong          = 11u8,
   ChannelIDWrong     = 12u8,
   IncompleteReadout  = 21u8,
+  /// This can be used if there is a version
+  /// missmatch and we have to hack something
+  IncompatibleData   = 22u8,
   Perfect            = 42u8
 }
 
@@ -77,6 +80,8 @@ impl From<u8> for EventStatus {
       10u8 => EventStatus::CRC32Wrong,
       11u8 => EventStatus::TailWrong,
       12u8 => EventStatus::ChannelIDWrong,
+      21u8 => EventStatus::IncompleteReadout,
+      22u8 => EventStatus::IncompatibleData,
       42u8 => EventStatus::Perfect,
       _    => EventStatus::Unknown
     }
@@ -92,6 +97,8 @@ impl FromRandom for EventStatus {
       EventStatus::CRC32Wrong,
       EventStatus::TailWrong,
       EventStatus::ChannelIDWrong,
+      EventStatus::IncompleteReadout,
+      EventStatus::IncompatibleData,
       EventStatus::Perfect,
     ];
     let mut rng  = rand::thread_rng();
@@ -322,6 +329,7 @@ impl RBEvent {
       wf.rb_id       = self.header.rb_id;
       wf.rb_channel  = ch;
       wf.event_id    = self.header.event_id;
+      wf.stop_cell   = self.header.stop_cell;
       // FIXME - can we move this somehow instead of 
       // cloning?
       wf.adc         = self.adc[ch as usize].clone();
@@ -1056,7 +1064,8 @@ impl fmt::Display for RBEventHeader {
     repr += &("\n  has ch9          ".to_owned() + &self.has_ch9().to_string()); 
     //repr += &("\n  DRS4 temp [C]    ".to_owned() + &self.drs4_temp.to_string());  
     repr += &sine_field;
-    repr += &("\n  FPGA temp [\u{00B0}C]    ".to_owned() + &self.get_fpga_temp().to_string()); 
+    //repr += &("\n  FPGA temp [\u{00B0}C]    ".to_owned() + &self.get_fpga_temp().to_string()); 
+    repr += &(format!("\n  FPGA T [\u{00B0}C]    : {:.2}", self.get_fpga_temp()));
     repr += &("\n  timestamp32      ".to_owned() + &self.timestamp32.to_string()); 
     repr += &("\n  timestamp16      ".to_owned() + &self.timestamp16.to_string()); 
     repr += &("\n   |-> timestamp48 ".to_owned() + &self.get_timestamp48().to_string()); 
@@ -1169,6 +1178,8 @@ pub struct RBWaveform {
   pub event_id   : u32,
   pub rb_id      : u8,
   pub rb_channel : u8,
+  /// DRS4 stop cell
+  pub stop_cell  : u16,
   pub adc        : Vec<u16>,
 }
 
@@ -1179,6 +1190,7 @@ impl RBWaveform {
       event_id   : 0,
       rb_id      : 0,
       rb_channel : 0,
+      stop_cell  : 0,
       adc        : Vec::<u16>::new(),
     }
   }
@@ -1198,6 +1210,7 @@ impl Serialization for RBWaveform {
     wf.event_id          = parse_u32(stream, pos);
     wf.rb_id             = parse_u8 (stream, pos);
     wf.rb_channel        = parse_u8 (stream, pos);
+    wf.stop_cell         = parse_u16(stream, pos);
     let data             = &stream[*pos..*pos+2*NWORDS];
     wf.adc               = u8_to_u16(data);
     *pos += 2*NWORDS;
@@ -1214,6 +1227,7 @@ impl Serialization for RBWaveform {
     stream.extend_from_slice(&self.event_id.to_le_bytes());
     stream.extend_from_slice(&self.rb_id.to_le_bytes());
     stream.extend_from_slice(&self.rb_channel.to_le_bytes());
+    stream.extend_from_slice(&self.stop_cell.to_le_bytes());
     if self.adc.len() != 0 {
       for k in 0..NWORDS {
         stream.extend_from_slice(&self.adc[k].to_le_bytes());  
@@ -1227,9 +1241,10 @@ impl Serialization for RBWaveform {
 impl fmt::Display for RBWaveform {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<RBWaveform:");
-    repr += &(format!("\n  Event ID : {}", self.event_id));
-    repr += &(format!("\n  RB       : {}", self.rb_id));
-    repr += &(format!("\n  Channel  : {}", self.rb_channel));
+    repr += &(format!("\n  Event ID  : {}", self.event_id));
+    repr += &(format!("\n  RB        : {}", self.rb_id));
+    repr += &(format!("\n  Channel   : {}", self.rb_channel));
+    repr += &(format!("\n  Stop cell : {}", self.stop_cell));
     if self.adc.len() >= 273 {
       repr += &(format!("\n  adc [{}]      : .. {} {} {} ..",self.adc.len(), self.adc[270], self.adc[271], self.adc[272]));
     } else {
@@ -1248,6 +1263,7 @@ impl FromRandom for RBWaveform {
     wf.event_id   = rng.gen::<u32>();
     wf.rb_id      = rng.gen::<u8>();
     wf.rb_channel = rng.gen::<u8>();
+    wf.stop_cell  = rng.gen::<u16>();
     let random_numbers: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
     wf.adc        = random_numbers;
     wf
