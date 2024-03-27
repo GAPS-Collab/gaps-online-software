@@ -40,7 +40,10 @@ use ndhistogram::axis::{
     Uniform,
 };
 
-use tof_dataclasses::packets::{TofPacket, PacketType};
+use tof_dataclasses::packets::{
+    TofPacket,
+    PacketType
+};
 use tof_dataclasses::events::MasterTriggerEvent;
 use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::errors::SerializationError;
@@ -102,8 +105,8 @@ impl MTTab {
   pub fn new(tp_receiver  : Receiver<TofPacket>,
              mte_receiver : Receiver<MasterTriggerEvent>,
              theme        : ColorTheme) -> MTTab {
-    let bins          = Uniform::new(50, -0.5, 49.5);
-    let mtb_link_bins = Uniform::new(50, -0.5, 49.5);
+    let bins          = Uniform::new(50, 0.0, 49.0);
+    let mtb_link_bins = Uniform::new(50, 0.0, 49.0);
     Self {
       main_layout    : Vec::<Rect>::new(),
       info_layout    : Vec::<Rect>::new(),
@@ -206,9 +209,9 @@ impl MTTab {
     let info_chunks = Layout::default()
       .direction(Direction::Vertical)
       .constraints(
-          [Constraint::Percentage(33),
-           Constraint::Percentage(33),
-           Constraint::Percentage(34),
+          [Constraint::Percentage(30),
+           Constraint::Percentage(30),
+           Constraint::Percentage(40),
           ].as_ref(),
       )
       .split(main_chunks[1]);
@@ -230,14 +233,15 @@ impl MTTab {
           ].as_ref(),
       )
       .split(detail_chunks[0]);
-    
-    let bottom_row = Layout::default()
-      .direction(Direction::Horizontal)
-      .constraints(
-          [Constraint::Percentage(50),
-           Constraint::Percentage(50),
-          ].as_ref(),
-      ).split(detail_chunks[1]);
+   
+    let bottom_row = detail_chunks[1];
+    //let bottom_row = Layout::default()
+    //  .direction(Direction::Horizontal)
+    //  .constraints(
+    //      [Constraint::Percentage(50),
+    //       Constraint::Percentage(50),
+    //      ].as_ref(),
+    //  ).split(detail_chunks[1]);
 
     self.main_layout   = main_chunks.to_vec();
     self.info_layout   = info_chunks.to_vec();
@@ -384,16 +388,16 @@ impl MTTab {
       }
     }
     let event_view = Paragraph::new(view_string)
-    .style(Style::default().fg(Color::LightCyan))
-    .alignment(Alignment::Left)
-    //.scroll((5, 10))
-    .block(
-      Block::default()
-        .borders(Borders::ALL)
-        .style(self.theme.style())
-        .title("Last MasterTriggerEvent")
-        .border_type(BorderType::Rounded),
-    );
+      .style(Style::default().fg(Color::LightCyan))
+      .alignment(Alignment::Left)
+      //.scroll((5, 10))
+      .block(
+        Block::default()
+          .borders(Borders::ALL)
+          .style(self.theme.style())
+          .title("Last MasterTriggerEvent")
+          .border_type(BorderType::Rounded),
+      );
 
     let last_moni = self.moni_queue.back();
     let view_moni : String;
@@ -417,26 +421,26 @@ impl MTTab {
         .border_type(BorderType::Rounded),
     );
     
-    let met = self.met_queue.back().unwrap_or(&0.0);
-    let view_summary = format!("Summary Statistics:
-  N_Events                         : {}
-  N_Moni                           : {}
-  Mission Elapsed Time (MET) [sec] : {:.3}
-  N EventID Missed                 : {}",
-                              self.n_events,
-                              self.n_moni,
-                              met,
-                              self.miss_evid);
-    let summary_view = Paragraph::new(view_summary)
-      .style(Style::default().fg(Color::LightCyan))
-      .alignment(Alignment::Left)
-      .block(
-        Block::default()
-          .borders(Borders::ALL)
-          .style(self.theme.style())
-          .title("Overview")
-          .border_type(BorderType::Rounded),
-      );
+//    let met = self.met_queue.back().unwrap_or(&0.0);
+//    let view_summary = format!("Summary Statistics:
+//  N_Events                         : {}
+//  N_Moni                           : {}
+//  Mission Elapsed Time (MET) [sec] : {:.3}
+//  N EventID Missed                 : {}",
+//                              self.n_events,
+//                              self.n_moni,
+//                              met,
+//                              self.miss_evid);
+//    let summary_view = Paragraph::new(view_summary)
+//      .style(Style::default().fg(Color::LightCyan))
+//      .alignment(Alignment::Left)
+//      .block(
+//        Block::default()
+//          .borders(Borders::ALL)
+//          .style(self.theme.style())
+//          .title("Overview")
+//          .border_type(BorderType::Rounded),
+//      );
 
      // histograms
      let ml_labels  = create_labels(&self.mtb_link_histo);
@@ -452,7 +456,7 @@ impl MTTab {
          .add_modifier(Modifier::BOLD),
        )
        .style(self.theme.background());
-    frame.render_widget(mlh_chart, bottom_row[1]);   
+    frame.render_widget(mlh_chart, bottom_row);   
 
 
     // render everything
@@ -461,7 +465,7 @@ impl MTTab {
     frame.render_widget(fpga_temp_chart, self.info_layout[2]);
     frame.render_widget(event_view,      self.view_layout[0]);
     frame.render_widget(moni_view,       self.view_layout[1]);
-    frame.render_widget(summary_view,    bottom_row[0]);
+    //frame.render_widget(summary_view,    bottom_row[0]);
   }
 }
     

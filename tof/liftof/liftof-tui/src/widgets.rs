@@ -34,25 +34,25 @@ use crate::colors::{
 };
 
 
-#[derive(Debug, Clone)]
-struct HistoDisplay {
-  pub nbin     : usize,
-  pub bin_low  : f32,
-  pub bin_high : f32,
-  pub histo    : Hist1D<Uniform<f32>>,
-}
-
-impl HistoDisplay {
-  pub fn new(nbin : usize, bin_low : f32, bin_high : f32) -> Self {
-    let bins = Uniform::new(nbin, bin_low, bin_high);  
-    Self {
-      nbin     : nbin,
-      bin_low  : bin_low,
-      bin_high : bin_high,
-      histo    : ndhistogram!(bins), 
-    }
-  }
-}
+//#[derive(Debug, Clone)]
+//struct HistoDisplay {
+//  pub nbin     : usize,
+//  pub bin_low  : f32,
+//  pub bin_high : f32,
+//  pub histo    : Hist1D<Uniform<f32>>,
+//}
+//
+//impl HistoDisplay {
+//  pub fn new(nbin : usize, bin_low : f32, bin_high : f32) -> Self {
+//    let bins = Uniform::new(nbin, bin_low, bin_high);  
+//    Self {
+//      nbin     : nbin,
+//      bin_low  : bin_low,
+//      bin_high : bin_high,
+//      histo    : ndhistogram!(bins), 
+//    }
+//  }
+//}
 
 /// Create the labels for a certain histogram
 /// for rendering

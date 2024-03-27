@@ -78,7 +78,7 @@ use liftof_tui::menu::{
 
 use liftof_tui::colors::{
     ColorSet,
-    ColorTheme2,
+    ColorTheme,
     COLORSETOMILU, // current default
 };
 
@@ -93,6 +93,7 @@ use liftof_tui::{
     MTTab,
     CPUTab,
     RBWaveformTab,
+    TofSummaryTab, 
 };
 
 extern crate clap;
@@ -101,7 +102,8 @@ use clap::{arg,
            //value_parser,
            //ArgAction,
            //Command,
-           Parser};
+           Parser
+};
 
 
 #[derive(Parser, Debug)]
@@ -126,7 +128,7 @@ enum Event<I> {
 /// the most recent log messages
 ///
 ///
-fn render_logs<'a>(theme : ColorTheme2) -> TuiLoggerWidget<'a> {
+fn render_logs<'a>(theme : ColorTheme) -> TuiLoggerWidget<'a> {
   TuiLoggerWidget::default()
     .style_error(Style::default().fg(Color::Red))
     .style_debug(Style::default().fg(Color::Green))
@@ -256,6 +258,7 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
                    tp_sender_ev : Sender<TofPacket>,
                    tp_sender_cp : Sender<TofPacket>,
                    rbwf_sender  : Sender<TofPacket>,
+                   tp_sender_ts : Sender<TofPacket>,
                    str_list     : Arc<Mutex<VecDeque<String>>>,
                    pck_map      : Arc<Mutex<HashMap<String, usize>>>) {
   let ctx = zmq::Context::new();
@@ -332,6 +335,12 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
                   Ok(_)    => (),
                 }
               }
+              PacketType::TofEventSummary => {
+                match tp_sender_ts.send(tp) {
+                  Err(err) => error!("Can't send TP! {err}"),
+                  Ok(_)    => (),
+                }
+              }
               PacketType::TofEvent => {
                 match tp_sender_ev.send(tp) {
                   Err(err) => error!("Can't send TP! {err}"),
@@ -399,6 +408,7 @@ struct TabbedInterface<'a> {
   pub th_tab        : TofHitTab<'a>,
   // flight packets
   pub rbwf_tab      : RBWaveformTab,
+  pub ts_tab        : TofSummaryTab,
 
   // latest color set
   pub color_set     : ColorSet,
@@ -419,7 +429,8 @@ impl<'a> TabbedInterface<'a> {
              home_tab     : HomeTab,
              event_tab    : EventTab,
              th_tab       : TofHitTab<'a>,
-             rbwf_tab     : RBWaveformTab) -> Self {
+             rbwf_tab     : RBWaveformTab,
+             ts_tab       : TofSummaryTab) -> Self {
     Self {
       ui_menu     ,
       rb_menu     , 
@@ -436,6 +447,7 @@ impl<'a> TabbedInterface<'a> {
       event_tab   , 
       th_tab      ,
       rbwf_tab    ,
+      ts_tab      ,
       color_set   : COLORSETOMILU,
     }
   }
@@ -471,6 +483,10 @@ impl<'a> TabbedInterface<'a> {
     }
     match self.rbwf_tab.receive_packet() {
       Err(err) => error!("Can not receive RBWaveforms for RBWaveformTab! {err}"),
+      Ok(_)    => ()
+    }
+    match self.ts_tab.receive_packet() {
+      Err(err) => error!("Can not receive TofEventSummaries for TofEventSummaryTab! {err}"),
       Ok(_)    => ()
     }
   }
@@ -530,7 +546,7 @@ impl<'a> TabbedInterface<'a> {
 
   pub fn render_tofsummarytab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
     self.ts_menu.render(&master_lo.rect[0], frame);
-    //self.ts_tab.render(&master_lo.rect[1], frame);
+    self.ts_tab.render(&master_lo.rect[1], frame);
   }
   
   pub fn render_rbwaveformtab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
@@ -772,6 +788,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (ev_pack_send, ev_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (cp_pack_send, cp_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (rbwf_pack_send, rbwf_pack_recv)  : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
+  let (ts_pack_send, ts_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
 
   // sender receiver for inter thread communication with decoded packets
   let (mte_send, mte_recv)         : (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = unbounded();
@@ -787,6 +804,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                       ev_pack_send,
                       cp_pack_send,
                       rbwf_pack_send,
+                      ts_pack_send,
                       home_stream_wd_cnt,
                       packet_map,
                       );
@@ -842,7 +860,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
 
 
   // A color theme, can be changed later
-  let mut color_theme     = ColorTheme2::new();
+  let mut color_theme     = ColorTheme::new();
   color_theme.update(&COLORSETOMILU);
   //let mut color_set_bw    = 
   
@@ -871,6 +889,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let event_tab       = EventTab::new(ev_pack_recv, mte_send, rbe_send, th_send, color_theme);
   let hit_tab         = TofHitTab::new(th_recv,color_theme.clone());
   let rbwf_tab        = RBWaveformTab::new(rbwf_pack_recv, color_theme.clone());
+  let ts_tab          = TofSummaryTab::new(ts_pack_recv, color_theme.clone());
   let tabs            = TabbedInterface::new(ui_menu,
                                              rb_menu,
                                              mt_menu,
@@ -885,7 +904,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                              home_tab,
                                              event_tab,
                                              hit_tab,
-                                             rbwf_tab);
+                                             rbwf_tab,
+                                             ts_tab);
 
   let shared_tabs : Arc<Mutex<TabbedInterface>> = Arc::new(Mutex::new(tabs));
   let shared_tabs_c = shared_tabs.clone();
