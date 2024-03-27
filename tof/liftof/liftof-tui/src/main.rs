@@ -58,6 +58,7 @@ use tof_dataclasses::events::{
     MasterTriggerEvent,
     RBEvent,
     TofHit,
+    TofEventSummary,
     //RBWaveform,
 };
 
@@ -253,12 +254,14 @@ fn packet_sorter(packet_type : &PacketType,
 /// while taking notes of everything
 ///
 /// This is a Pablo Pubsub kind of persona
+/// (see a fantastic talk at RustConf 2023)
 fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
                    tp_sender_rb : Sender<TofPacket>,
                    tp_sender_ev : Sender<TofPacket>,
                    tp_sender_cp : Sender<TofPacket>,
                    rbwf_sender  : Sender<TofPacket>,
-                   tp_sender_ts : Sender<TofPacket>,
+                   ts_send      : Sender<TofEventSummary>,
+                   th_send      : Sender<TofHit>,
                    str_list     : Arc<Mutex<VecDeque<String>>>,
                    pck_map      : Arc<Mutex<HashMap<String, usize>>>) {
   let ctx = zmq::Context::new();
@@ -336,9 +339,22 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
                 }
               }
               PacketType::TofEventSummary => {
-                match tp_sender_ts.send(tp) {
-                  Err(err) => error!("Can't send TP! {err}"),
-                  Ok(_)    => (),
+                match TofEventSummary::from_tofpacket(&tp) {
+                  Err(err) => {
+                    error!("Unable to unpack TofEventSummary! {err}");
+                  }
+                  Ok(ts) => {
+                    for h in &ts.hits {
+                      match th_send.send(*h) {
+                        Err(err) => error!("Can't send TP! {err}"),
+                        Ok(_)    => (),
+                      }
+                    }
+                    match ts_send.send(ts) {
+                      Err(err) => error!("Can't send TP! {err}"),
+                      Ok(_)    => (),
+                    }
+                  }
                 }
               }
               PacketType::TofEvent => {
@@ -788,14 +804,15 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (ev_pack_send, ev_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (cp_pack_send, cp_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (rbwf_pack_send, rbwf_pack_recv)  : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
-  let (ts_pack_send, ts_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
 
   // sender receiver for inter thread communication with decoded packets
   let (mte_send, mte_recv)         : (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = unbounded();
-  let (rbe_send, rbe_recv)         : (Sender<RBEvent>, Receiver<RBEvent>)       = unbounded();
-  let (th_send, th_recv)           : (Sender<TofHit>, Receiver<TofHit>)         = unbounded();
+  let (rbe_send, rbe_recv)         : (Sender<RBEvent>, Receiver<RBEvent>)                       = unbounded();
+  let (th_send, th_recv)           : (Sender<TofHit>, Receiver<TofHit>)                         = unbounded();
+  let (ts_send, ts_recv)           : (Sender<TofEventSummary>, Receiver<TofEventSummary>)       = unbounded();
 
   // FIXME - spawn a new thread per each tab!
+  let th_sender_c = th_send.clone();
   let _packet_recv_thread = thread::Builder::new()
     .name("mt_packet_receiver".into())
     .spawn(move || {
@@ -804,7 +821,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                       ev_pack_send,
                       cp_pack_send,
                       rbwf_pack_send,
-                      ts_pack_send,
+                      ts_send,
+                      th_sender_c,
                       home_stream_wd_cnt,
                       packet_map,
                       );
@@ -889,7 +907,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let event_tab       = EventTab::new(ev_pack_recv, mte_send, rbe_send, th_send, color_theme);
   let hit_tab         = TofHitTab::new(th_recv,color_theme.clone());
   let rbwf_tab        = RBWaveformTab::new(rbwf_pack_recv, color_theme.clone());
-  let ts_tab          = TofSummaryTab::new(ts_pack_recv, color_theme.clone());
+  let ts_tab          = TofSummaryTab::new(ts_recv, color_theme.clone());
   let tabs            = TabbedInterface::new(ui_menu,
                                              rb_menu,
                                              mt_menu,

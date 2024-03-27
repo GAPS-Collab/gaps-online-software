@@ -59,7 +59,7 @@ use crate::widgets::{
 
 #[derive(Debug, Clone)]
 pub struct TofSummaryTab {
-  pub ts_receiver     : Receiver<TofPacket>,
+  pub ts_receiver     : Receiver<TofEventSummary>,
   pub summary_queue   : VecDeque<TofEventSummary>,
   pub queue_size      : usize,
   pub n_trg_pdl_histo : Hist1D<Uniform<f32>>, 
@@ -67,7 +67,7 @@ pub struct TofSummaryTab {
 }
 
 impl TofSummaryTab {
-  pub fn new(ts_receiver : Receiver<TofPacket>,
+  pub fn new(ts_receiver : Receiver<TofEventSummary>,
              theme       : ColorTheme) -> Self {
     
     let bins          = Uniform::new(25, 0.0, 24.0);
@@ -86,8 +86,8 @@ impl TofSummaryTab {
       Err(_err)  => {
         trace!("Unable to receive new TofEventSummary!");
       },
-      Ok(tp)    => {
-        let ts = TofEventSummary::from_tofpacket(&tp)?;
+      Ok(ts)    => {
+        //let ts = TofEventSummary::from_tofpacket(&tp)?;
         self.n_trg_pdl_histo.fill(&(ts.n_trigger_paddles as f32));
         self.summary_queue.push_back(ts);
         if self.summary_queue.len() > self.queue_size {
