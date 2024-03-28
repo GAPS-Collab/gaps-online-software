@@ -208,24 +208,6 @@ void RBCalibration::disable_eventdata() {
 
 /************************************************/
 
-Vec<Vec<f32>> RBCalibration::voltages(const RBEventMemoryView &event,
-                                      bool spike_cleaning) const {
-  Vec<Vec<f32>> all_ch_voltages;
-  for (u8 ch=1;ch<NCHN+1;ch++) {
-    all_ch_voltages.push_back(voltages(event, ch));
-  }
-  if (spike_cleaning) {
-    int spikes[NWORDS];
-    for (usize n=0;n<NWORDS;n++) {
-      spikes[n] = 0;
-    }
-    spike_cleaning_drs4(all_ch_voltages, event.stop_cell, spikes);
-  }
-  return all_ch_voltages;
-}
-
-/************************************************/
-
 Vec<Vec<f32>> RBCalibration::voltages    (const RBEvent &event,
                                           bool spike_cleaning) const {
   Vec<Vec<f32>> all_ch_voltages;
@@ -244,54 +226,12 @@ Vec<Vec<f32>> RBCalibration::voltages    (const RBEvent &event,
 
 /************************************************/
   
-Vec<Vec<f32>> RBCalibration::nanoseconds (const RBEventMemoryView &event) const {
-  Vec<Vec<f32>> all_ch_nanoseconds;
-  for (u8 ch=1;ch<NCHN+1;ch++) {
-    all_ch_nanoseconds.push_back(nanoseconds(event, ch));
-  }
-  return all_ch_nanoseconds;
-}
-
-/************************************************/
-  
 Vec<Vec<f32>> RBCalibration::nanoseconds (const RBEvent &event) const {
   Vec<Vec<f32>> all_ch_nanoseconds;
   for (u8 ch=1;ch<NCHN+1;ch++) {
     all_ch_nanoseconds.push_back(nanoseconds(event, ch));
   }
   return all_ch_nanoseconds;
-}
-
-/************************************************/
-
-Vec<f32> RBCalibration::voltages(const RBEventMemoryView &event, const u8 channel) const {
-  Vec<f32> voltages = Vec<f32>(NWORDS,0);
-  if (!(channel_check(channel))) {
-    return voltages;
-  }
-  Vec<u16> adc = event.get_channel_adc(channel);
-  for (usize i = 0; i < NWORDS; i++) {
-    voltages[i] = (f32) adc[i];
-    ////if (i%100 == 0)
-    //  //printf("%f\n", traceOut[i]);
-    voltages[i] -= v_offsets[channel - 1][(i + event.stop_cell)%NWORDS];
-    voltages[i] -= v_dips[channel - 1][i];
-    voltages[i] *= v_incs[channel - 1][(i+ event.stop_cell)%NWORDS];
-  }
-  return voltages;
-}
-
-/************************************************/
-
-Vec<f32> RBCalibration::nanoseconds(const RBEventMemoryView &event, const u8 channel) const {
-  Vec<f32> nanoseconds = Vec<f32>(NWORDS,0);
-  if (!(channel_check(channel))) {
-    return nanoseconds;
-  }
-  for (usize k = 1; k < NWORDS; k++) {
-    nanoseconds[k] = nanoseconds[k-1] + t_bin[channel - 1][(k-1+event.stop_cell) % NWORDS];
-  }
-  return nanoseconds;
 }
 
 /************************************************/

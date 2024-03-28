@@ -5,10 +5,11 @@
  * Tof event classes. An event is basically anything with an 
  * event id.
  * - events for individual readoutboards
- *   - RBEventMemoryView : representation of event in RB memory
  *   - RBEventHeader     : header information of event
  *   - RBEvent           : contains header + active channels
- *
+ *   - RBWaveform        : A single waveform - this is for the 
+ *                         telemetry stream, since larger packets
+ *                         would be too big
  * - events for the MasterTriggerBoard
  * 
  *
@@ -33,7 +34,6 @@ class RBCalibration;
 
 struct RBEventHeader;
 struct RBEvent;
-struct RBEventMemoryView;
 struct MasterTriggerEvent;
 struct TofHit;
 
@@ -62,61 +62,6 @@ enum class EventStatus : u8 {
 std::ostream& operator<<(std::ostream& os, const EventStatus& status);
 
 /*********************************************************/
-
-/**
- * The "purest" form of an event for a single RB. 
- * Formerly known as "blob". This represents the 
- * layout of the event for each readoutboard in 
- * its internal memory. 
- *
- *
- */ 
-struct RBEventMemoryView {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
-  static const u16 SIZE = 18530; // size in bytes with HEAD and TAIL
-  u16 head; // Head of event marker
-  u16 status;
-  u16 len;
-  u16 roi;
-  u64 dna;
-  u16 fw_hash;
-  u16 id;
-  u16 ch_mask;
-  u32 event_ctr;
-  u16 dtap0;
-  u16 dtap1;
-  u64 timestamp;
-  u16 ch_head[NCHN];
-  u16 ch_adc[NCHN][NWORDS];
-  u32 ch_trail[NCHN];
-  u16 stop_cell;
-  u32 crc32;
-  u16 tail; // End of event marker
-
-  RBEventMemoryView();
- 
-  /**
-   * Factory function for RBEVentMemeoryViews. 
-   *
-   * Create an instance by de-serializing it from a bytestream
-   *
-   * @param bytestream : (Byte) representation of RBEventMemoryView
-   * @param pos        : Index in bytestream where to look for 
-   *                     RBEventMemoryView::HEAD
-   */ 
-  static RBEventMemoryView from_bytestream(const Vec<u8> &bytestream,
-                                           u64 &pos);
-
-
-  /**
-   * Return adc values for specific channel
-   *
-   * @param channel : Channel ID 1-9, channel 9 has calibration sinus data.
-   */
-  Vec<u16> get_channel_adc(u8 channel) const;
-
-};
 
 /**
  * RB binary data header information

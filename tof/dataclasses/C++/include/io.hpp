@@ -2,9 +2,24 @@
 #define TOFIO_H_INCLUDED
 
 #include <fstream>
+#include <functional>
 
 #include "events.h"
 #include "packets/tof_packet.h"
+#include "serialization.h"
+
+//template<typename T>
+//requires HasFromByteStream<T>
+//Vec<T> unpack<T>(String filename) {
+//  usize pos = 0;
+//  auto packets = get_tofpackets(filename);
+//  for (const auto &p : packets) {
+//    T data = T::from_bytestream(p.payload, 0);
+// 
+//
+//  Vec<T> data;
+//  return data;
+//}
 
 /**
  * Extract tof dataclasses from files
@@ -12,31 +27,16 @@
 
 
 /**
- * Get RBEventMemoryViews from a raw data ("*.robin") file
- *
- * This file must have the raw memory data from the readoutboards 
- * directly written to the file, without it being packed in 
- * TofPackets
- * 
- * @param filename : Full path to file with RB binary data
- */
-Vec<RBEventMemoryView> get_rbeventmemoryviews(const String &filename, bool omit_duplicates = false);
-
-
-/**
- * Get RBEventMemoryViews from a vector of bytes
- *
- * @param stream : 
- * @param pos    : 
- */
-Vec<RBEventMemoryView> get_rbeventmemoryviews(const Vec<u8> &stream, u64 start_pos, bool omit_duplicates = false);
-
-
-/**
  * Read event headers from a RB binary file
  *
  */
 Vec<RBEventHeader> get_rbeventheaders(const String &filename, bool is_header=false);
+
+/**
+ * Generic extractor for all types of deserializable dataclasse
+ */ 
+//typedef
+
 
 /**
  * Extract only event ids from a bytestream with raw readoutboard binary data

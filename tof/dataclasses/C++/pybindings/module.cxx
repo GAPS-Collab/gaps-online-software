@@ -543,29 +543,6 @@ PYBIND11_MODULE(gaps_tof, m) {
                                   }) 
 
     ;
-
-    py::class_<RBEventMemoryView>(m, "RBEventMemoryView",
-            "The RBEventMemoryView (formerly 'BlobEvent') is the direct representation of an event as read out by the readoutboard and layout in its RAM memory.")
-       .def(py::init())
-       .def_readonly("status"                  ,&RBEventMemoryView::status )
-       .def_readonly("len"                     ,&RBEventMemoryView::len )
-       .def_readonly("roi"                     ,&RBEventMemoryView::roi )
-       .def_readonly("dna"                     ,&RBEventMemoryView::dna )
-       .def_readonly("fw_hash"                 ,&RBEventMemoryView::fw_hash )
-       .def_readonly("id"                      ,&RBEventMemoryView::id )
-       .def_readonly("ch_mask"                 ,&RBEventMemoryView::ch_mask )
-       .def_readonly("event_ctr"               ,&RBEventMemoryView::event_ctr )
-       .def_readonly("dtap0"                   ,&RBEventMemoryView::dtap0 )
-       .def_readonly("dtap1"                   ,&RBEventMemoryView::dtap1 )
-       .def_readonly("timestamp"               ,&RBEventMemoryView::timestamp )
-       .def("get_channel_adc"                  ,&RBEventMemoryView::get_channel_adc)
-       .def_readonly("stop_cell"               ,&RBEventMemoryView::stop_cell )
-       .def_readonly("crc32"                   ,&RBEventMemoryView::crc32 )
-       .def("__repr__",  [] (const RBEventMemoryView &event) { 
-         return rbeventmemoryview_to_string(event);
-       })
-   ;
-
     
    py::class_<Waveform>(m, "Waveform")
        .def(py::init<int>())
@@ -651,24 +628,13 @@ PYBIND11_MODULE(gaps_tof, m) {
             "Unpack a RBCalibration from a compatible tofpacket") 
        .def("nanoseconds",         wrap_rbcalibration_nanoseconds_allchan_rbevent,
             "Apply timing calibration to adc values of all channels")
-       .def("nanoseconds",         wrap_rbcalibration_nanoseconds_allchan_rbeventmemoryview,
-            "Apply timing calibration to adc values of all channels")
        .def("voltages",         wrap_rbcalibration_voltages_allchan_rbevent,
-            "Apply voltage calibration to adc values of all channels. Allows for spike cleaning (optional)",
-            py::arg("event"), py::arg("spike_cleaning") = false)
-       .def("voltages",         wrap_rbcalibration_voltages_allchan_rbeventmemoryview,
             "Apply voltage calibration to adc values of all channels. Allows for spike cleaning (optional)",
             py::arg("event"), py::arg("spike_cleaning") = false)
        .def("nanoseconds",         wrap_rbcalibration_nanoseconds_rbevent,
             "Apply timing calibration to adc values of a specific channel",
             py::arg("event"), py::arg("channel"))
-       .def("nanoseconds",         wrap_rbcalibration_nanoseconds_rbeventmemoryview,
-            "Apply timing calibration to adc values of a specific channel",
-            py::arg("event"), py::arg("channel"))
        .def("voltages",         wrap_rbcalibration_voltages_rbevent,
-            "Apply voltage calibration to adc values of a specific channel",
-            py::arg("event"), py::arg("channel"))
-       .def("voltages",         wrap_rbcalibration_voltages_rbeventmemoryview,
             "Apply voltage calibration to adc values of a specific channel",
             py::arg("event"), py::arg("channel"))
        .def("from_bytestream",  &RBCalibration::from_bytestream, 
@@ -685,12 +651,6 @@ PYBIND11_MODULE(gaps_tof, m) {
    m.def("get_tofpackets", &wrap_get_tofpackets_from_file,
            "Get TofPackets from a file on disk",
            py::arg("filename"), py::arg("filter") = PacketType::Unknown);
-   m.def("get_rbeventmemoryviews",       &wrap_get_rbeventmemoryviews_from_stream,
-                                          "Get RBEventMemoryViews from list of bytes.\nArgs:\n * bytestream [list of char]\n * pos - start at position in stream\n * omit_duplicates [optional, bool] - reduced duplicate events (costs performance)",
-                                          py::arg("bytestream"), py::arg("pos"), py::arg("omit_duplicates") = false);
-   m.def("get_rbeventmemoryviews",        &wrap_get_rbeventmemoryviews_from_file,
-                                          "Get RBEventMemoryViews from a file on disk.\nArgs:\n * filename - full path to file on disk as written by the readoutboards/liftof.\n              This file can only contain RBEventMemoryViews ('Blobs') without any other wrapper packets.\n * omit_duplicates - set this flag if you want to eeliminate duplicate events in the file. (Costs performance).",
-                                          py::arg("filename"), py::arg("omit_duplicates") = false);
    m.def("unpack_tofevents",              &wrap_unpack_tofevents_from_tofpackets_from_stream,
                                           "Get TofEvents directly from list of bytes but the bytes are encoded TofPackets..\nArgs:\n * bytestream [list of char]\n * pos - start at position in stream\n",
                                           py::arg("bytestream"), py::arg("pos"));

@@ -14,8 +14,6 @@
 #include "events.h"
 
 class RBEvent;
-class RBEventMemoryView;
-
 
 /**
  * The original "RemoveSpikes" from the
@@ -56,15 +54,9 @@ struct RBCalibration {
   RBCalibration();
 
   /// get the voltage values for the traces of the event
-  Vec<Vec<f32>> voltages    (const RBEventMemoryView &event, bool spike_cleaning = false) const;
-  /// get the voltage values for the traces of the event
   Vec<Vec<f32>> voltages    (const RBEvent &event, bool spike_cleaning = false) const;
-  Vec<Vec<f32>> nanoseconds (const RBEventMemoryView &event) const;
   Vec<Vec<f32>> nanoseconds (const RBEvent &event) const;
   
-
-  Vec<f32> voltages   (const RBEventMemoryView &event, const u8 channel) const;
-  Vec<f32> nanoseconds(const RBEventMemoryView &event, const u8 channel) const;
   Vec<f32> voltages   (const RBEvent &event, const u8 channel) const;
   Vec<f32> nanoseconds(const RBEvent &event, const u8 channel) const;
 

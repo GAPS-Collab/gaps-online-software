@@ -55,78 +55,6 @@ Vec<u16> u8_to_u16(const Vec<u8> &vec_u8) {
 
 /*************************************/
 
-RBEventMemoryView::RBEventMemoryView() {
-  status   = 0;
-  len      = 0;
-  roi      = 0;
-  dna      = 0;
-  fw_hash  = 0;
-  id       = 0;
-  ch_mask  = 0;
-  event_ctr = 0;
-  dtap0     = 0;
-  dtap1     = 0;
-  timestamp = 0 ;
-  for (usize k=0; k<NCHN; k++) {
-    ch_head[k]  = 0;
-    ch_trail[k] = 0;
-    for (usize n=0; n<NWORDS;n++) {
-      ch_adc[k][n] = 0;
-    }
-  }
-  stop_cell  = 0;
-  crc32      = 0;
-}
-
-/*************************************/
-
-Vec<u16> RBEventMemoryView::get_channel_adc(u8 channel) const {
-  Vec<u16> adc = Vec<u16>(NWORDS, 0);
-  if (channel == 0) {
-    log_fatal("Please remembmer channel ids are ranged from 1-9! Ch0 does not exist");
-    return adc;
-  }
-  //  adc[k] = ch_adc[channel -1][k];
-  //}
-  return adc;
-}
-
-/*************************************/
-
-RBEventMemoryView RBEventMemoryView::from_bytestream(const Vec<u8> &stream,
-                                                     u64 &pos) {
-  RBEventMemoryView event;
-  event.head      = Gaps::parse_u16( stream, pos); 
-  event.status    = Gaps::parse_u16( stream, pos); 
-  event.len       = Gaps::parse_u16( stream, pos); 
-  event.roi       = Gaps::parse_u16( stream, pos); 
-  event.dna       = decode_uint64_rev( stream, pos); pos += 8;
-  event.fw_hash   = Gaps::parse_u16( stream, pos);
-  // the first byte of the event id short is RESERVED
-  event.id        = stream[pos + 1]; pos += 2;
-  event.ch_mask   = Gaps::parse_u16( stream, pos);
-  event.event_ctr = Gaps::parse_u32_for_16bit_words( stream, pos);
-  event.dtap0     = Gaps::parse_u16( stream, pos); 
-  event.dtap1     = Gaps::parse_u16( stream, pos); 
-  event.timestamp = Gaps::parse_u48_for_16bit_words( stream, pos);
-  for (int i=0; i<NCHN; i++) {
-    event.ch_head[i] = Gaps::parse_u16(stream, pos);
-    // Read the channel data
-    for (int j=0; j<NWORDS; j++) {
-      //event.ch_adc[i][j] = decode_14bit(bytestream, dec_pos); dec_pos += 2;
-      event.ch_adc[i][j] = Gaps::parse_u16(stream, pos) & 0x3FFF; 
-    }
-    event.ch_trail[i] = Gaps::parse_u32_for_16bit_words(stream, pos); 
-  }    
-  
-  event.stop_cell = Gaps::parse_u16(stream, pos); 
-  event.crc32     = Gaps::parse_u32_for_16bit_words(stream, pos);
-  event.tail      = Gaps::parse_u16(stream, pos);
-  return event;
-}
-
-/*************************************/
-
 RBEventHeader::RBEventHeader() {
   rb_id              = 0; 
   event_id           = 0; 
@@ -689,28 +617,6 @@ MasterTriggerEvent::MasterTriggerEvent(usize n_ltbs) {
 
   
 }
-
-/**********************************************************/
-
-/// Helper to get the number of the triggered LTB from the bitmask
-//void MasterTriggerEvent::decode_board_mask(u32 mask_number, bool (&decoded_mask)[N_LTBS]) {
-//  //bool decoded_mask[N_LTBS];
-//  std::fill(decoded_mask, decoded_mask + N_LTBS, false);
-//  //std::fill(board_mask, board_mask + N_LTBS, false);
-//  // FIXME this implicitly asserts that the fields for non available LTBs 
-//  // will be 0 and all the fields will be in order 
-//  usize index = n_ltbs_ - 1;
-//  for (usize n=0;n<n_ltbs_; n++) {
-//    u32 mask = 1 << n;
-//    bool bit_is_set = (mask & mask_number) > 0;
-//    //decoded_mask[index] = bit_is_set;
-//    decoded_mask[index] = bit_is_set;
-//    if (index != 0) {
-//      index -= 1;
-//    }
-//  }
-//  //board_mask = decoded_mask;
-//}
 
 /*************************************/
 
