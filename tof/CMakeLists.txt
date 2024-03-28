@@ -38,7 +38,6 @@ add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
     dataclasses/C++/src/events.cxx
     dataclasses/C++/src/io.cxx
     dataclasses/C++/src/monitoring.cxx
-    dataclasses/C++/src/CommandPacket.cxx
     dataclasses/C++/src/legacy.cxx
     dataclasses/C++/src/logging.cxx
 )
