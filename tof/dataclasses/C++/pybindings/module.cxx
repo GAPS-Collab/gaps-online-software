@@ -64,9 +64,6 @@ std::string tof_response_to_str(const TofResponse &cmd) {
  return "Unknown";
 }
 
-
-
-
 Vec<Vec<f64>> remove_spikes_helper(u16 stop_cell,
                                  Vec<Vec<f64>> waveforms) {
  f64 wf [NCHN][NWORDS];
@@ -108,8 +105,8 @@ double calculate_pedestal_helper(Vec<f64> wave,
 
 
 PYBIND11_MODULE(gaps_tof, m) {
-    m.doc() = "GAPS Tof dataclasses and utility tools";
-    m.attr("__version__") = "0.9.0";
+    m.doc() = "Gaps-online-software Python wrapper for C++ API. gaps-online-software is a software suite designed to read out (mainly) online data from the TOF subsystem of the GAPS experiment. The code has several APIs, this code here wraps the C++ API. Please find the github repo at https://github.com/GAPS-Collab/gaps-online-software to report bugs/issues.";
+    m.attr("__version__") = "0.10.0";
 
     py::class_<Gaps::TofPacketReader>(m, "TofPacketReader") 
       .def(py::init<String>())  
@@ -150,6 +147,15 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("Unknown"              ,TofCommand::Unknown) 
       //.export_values();
       ;
+    
+    py::enum_<TofResponse>(m, "TofResponse")
+      .value("Success"                 ,TofResponse::Success) 
+      .value("GeneralFailure"          ,TofResponse::GeneralFailure) 
+      .value("EventNotReady"           ,TofResponse::EventNotReady) 
+      .value("EventSerializationIssue" ,TofResponse::SerializationIssue) 
+      .value("Unknown"                 ,TofResponse::Unknown) 
+      //.export_values()
+    ;
 
     py::class_<RBEventHeader>(m, "RBEventHeader", "The event header contains the event id, information about active channels, temperatures, trigger stop cell etc. Basically everythin except channel adc data.")
       .def(py::init())
@@ -185,8 +191,6 @@ PYBIND11_MODULE(gaps_tof, m) {
       .def("__repr__",        [](const RBEventHeader &h) {
                                    return h.to_string();
                                  })
-    
-      
     ;
 
     py::class_<RBEvent>(m, "RBEvent", "RBEvent contains an event header for this specific board as well as a (flexible) number of adc channels")
@@ -217,6 +221,8 @@ PYBIND11_MODULE(gaps_tof, m) {
       .def_readonly("rb_channel"         ,&RBWaveform::rb_channel,
            "Channel id (between 0-9). Internal TOF identifier for RB channel. Each paddle has 2 channels")
       .def_readonly("event_id"           ,&RBWaveform::event_id,
+           "Global event id")
+      .def_readonly("stop_cell"          ,&RBWaveform::stop_cell,
            "Global event id")
       .def_readonly("adc"                ,&RBWaveform::adc,
            "Channel adc")
@@ -272,17 +278,7 @@ PYBIND11_MODULE(gaps_tof, m) {
                                  return ev.to_string(); 
                                  }) 
     ;
-  
 
-
-    py::enum_<TofResponse>(m, "TofResponse")
-      .value("Success"                 ,TofResponse::Success) 
-      .value("GeneralFailure"          ,TofResponse::GeneralFailure) 
-      .value("EventNotReady"           ,TofResponse::EventNotReady) 
-      .value("EventSerializationIssue" ,TofResponse::SerializationIssue) 
-      .value("Unknown"                 ,TofResponse::Unknown) 
-      //.export_values()
-    ;
    
     py::enum_<PacketType>(m, "PacketType")
       .value("Unknown",          PacketType::Unknown   )
@@ -544,66 +540,6 @@ PYBIND11_MODULE(gaps_tof, m) {
 
     ;
     
-   py::class_<Waveform>(m, "Waveform")
-       .def(py::init<int>())
-       .def("SetWave"             , &Waveform::SetWave            )
-       .def("SetTime"             , &Waveform::SetTime            )
-       .def("SetThreshold"        , &Waveform::SetThreshold       )
-       .def("GetWaveSize"         , &Waveform::GetWaveSize        ) 
-       .def("SetBin"              , &Waveform::SetBin             )
-       .def("GetBin"              , &Waveform::GetBin             )
-       .def("GetBinTime"          , &Waveform::GetBinTime         )
-
-       // this is simply  not defined
-       //.def("GetBinDC"            , &Waveform::GetBinDC           )
-       .def("GetMaxBin"           , &Waveform::GetMaxBin          )
-       .def("GetMaxBinTime"       , &Waveform::GetMaxBinTime      )
-       .def("GetMaxVal"           , &Waveform::GetMaxVal          )
-       .def("GetMinBin"           , &Waveform::GetMinBin          )
-       .def("GetMinBinTime"       , &Waveform::GetMinBinTime      )
-       .def("GetMinVal"           , &Waveform::GetMinVal          )
-       .def("GetPeakValue"        , &Waveform::GetPeakValue       )
-       .def("Rescale"             , &Waveform::Rescale            ) 
-       .def("Integrate"           , &Waveform::Integrate          )
-       .def("SetPedestal"         , &Waveform::SetPedestal        )
-       .def("SetRunPedestal"      , &Waveform::SetRunPedestal     )
-       .def("SetPedRange"         , &Waveform::SetPedRange        )
-       .def("SetPedBegin"         , &Waveform::SetPedBegin        )
-       .def("GetPedRange"         , &Waveform::GetPedRange        )
-       .def("GetPedBegin"         , &Waveform::GetPedBegin        )
-       .def("GetPedestal"         , &Waveform::GetPedestal        )
-       .def("GetPedsigma"         , &Waveform::GetPedsigma        )
-       .def("CalcPedestalRange"   , &Waveform::CalcPedestalRange  )
-       .def("CalcPedestalDynamic" , &Waveform::CalcPedestalDynamic)
-       .def("SubtractPedestal"    , &Waveform::SubtractPedestal   )
-       .def("SetMaxPeaks"         , &Waveform::SetMaxPeaks        )
-       .def("GetMaxPeaks"         , &Waveform::GetMaxPeaks        )
-       .def("CleanUpPeaks"        , &Waveform::CleanUpPeaks       )
-       .def("GetNumPeaks"         , &Waveform::GetNumPeaks        )
-       .def("SetCFDSFraction"     , &Waveform::SetCFDSFraction    )
-       .def("SetCFDEFraction"     , &Waveform::SetCFDEFraction    )
-       .def("SetCFDEOffset"       , &Waveform::SetCFDEOffset      )
-       .def("FindPeaks"           , &Waveform::FindPeaks          )
-       .def("FindTdc"             , &Waveform::FindTdc            )
-       .def("GetSpikes"           , &Waveform::GetSpikes          )
-       .def("GetTdcs"             , &Waveform::GetTdcs            )
-       .def("GetCharge"           , &Waveform::GetCharge          )
-       .def("GetHeight"           , &Waveform::GetHeight          )
-       .def("GetWidth"            , &Waveform::GetWidth           )
-       .def("GetPulsepars"        , &Waveform::GetPulsepars       ) 
-       .def("GetPulsechi2"        , &Waveform::GetPulsechi2       ) 
-       .def("GetNDF"              , &Waveform::GetNDF             ) 
-       .def("FitPulse"            , &Waveform::FitPulse           )
-       .def("GetNsPerBin"         , &Waveform::GetNsPerBin        ) 
-       .def("GetOffset"           , &Waveform::GetOffset          ) 
-       .def("GetTimingCorr"       , &Waveform::GetTimingCorr      )
-       .def("GetImpedance"        , &Waveform::GetImpedance       ) 
-       .def("SetImpedance"        , &Waveform::SetImpedance       )
-       .def("__repr__",  [] (const Waveform &waveform) { 
-               return "<GAPSWaveform>";
-               })
-   ;
-   
    py::class_<RBCalibration>(m, "RBCalibration", 
       "RBCalibration holds th calibration constants (one per bin) per each channel for a single RB. This needs to be used in order to convert ADC to voltages/nanoseconds!")
        .def(py::init())
@@ -664,6 +600,4 @@ PYBIND11_MODULE(gaps_tof, m) {
 
    // Calibration functions
    m.def("remove_spikes",            &remove_spikes_helper);
-   // waveform stuff
-   m.def("calculate_pedestal",       &calculate_pedestal_helper);
 }
