@@ -95,6 +95,7 @@ var NAVTREEINDEX1 =
 "structRBWaveform.html#a5b2cfc5f548f315e7737e69a6f9099c8":[2,0,16,0],
 "structRBWaveform.html#a67bad83e42b35f710a1c80866cdb39b1":[2,0,16,3],
 "structRBWaveform.html#ac181e3faf63b4e0675e86dad6aa55208":[2,0,16,2],
+"structRBWaveform.html#ae789129964e8dd970c282e40b73745bc":[2,0,16,5],
 "structSimPrimary.html":[2,0,17],
 "structSimPrimary.html#a0c90198bd3a32f751829c5513f09fa96":[2,0,17,1],
 "structSimPrimary.html#a30c9769fe3c2fd170d7d2b1710938b18":[2,0,17,7],

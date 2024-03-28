@@ -1,5 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/master_trigger.rs`."><title>master_trigger.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/master_trigger.rs`."><title>master_trigger.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -534,49 +535,6 @@
 <a href="#533" id="533">533</a>
 <a href="#534" id="534">534</a>
 <a href="#535" id="535">535</a>
-<a href="#536" id="536">536</a>
-<a href="#537" id="537">537</a>
-<a href="#538" id="538">538</a>
-<a href="#539" id="539">539</a>
-<a href="#540" id="540">540</a>
-<a href="#541" id="541">541</a>
-<a href="#542" id="542">542</a>
-<a href="#543" id="543">543</a>
-<a href="#544" id="544">544</a>
-<a href="#545" id="545">545</a>
-<a href="#546" id="546">546</a>
-<a href="#547" id="547">547</a>
-<a href="#548" id="548">548</a>
-<a href="#549" id="549">549</a>
-<a href="#550" id="550">550</a>
-<a href="#551" id="551">551</a>
-<a href="#552" id="552">552</a>
-<a href="#553" id="553">553</a>
-<a href="#554" id="554">554</a>
-<a href="#555" id="555">555</a>
-<a href="#556" id="556">556</a>
-<a href="#557" id="557">557</a>
-<a href="#558" id="558">558</a>
-<a href="#559" id="559">559</a>
-<a href="#560" id="560">560</a>
-<a href="#561" id="561">561</a>
-<a href="#562" id="562">562</a>
-<a href="#563" id="563">563</a>
-<a href="#564" id="564">564</a>
-<a href="#565" id="565">565</a>
-<a href="#566" id="566">566</a>
-<a href="#567" id="567">567</a>
-<a href="#568" id="568">568</a>
-<a href="#569" id="569">569</a>
-<a href="#570" id="570">570</a>
-<a href="#571" id="571">571</a>
-<a href="#572" id="572">572</a>
-<a href="#573" id="573">573</a>
-<a href="#574" id="574">574</a>
-<a href="#575" id="575">575</a>
-<a href="#576" id="576">576</a>
-<a href="#577" id="577">577</a>
-<a href="#578" id="578">578</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerEvent
 
 </span><span class="macro">cfg_if::cfg_if! </span>{
@@ -589,25 +547,28 @@
 
 <span class="kw">use </span>std::fmt;
 <span class="comment">//use std::time::Duration;
-</span><span class="kw">use </span>std::collections::HashMap;
+//use std::collections::HashMap;
 
-<span class="kw">use </span><span class="kw">crate</span>::serialization::{
+</span><span class="kw">use </span><span class="kw">crate</span>::serialization::{
     Serialization,
     SerializationError,
+    search_for_u16,
     parse_u8,
     parse_u16,
     parse_u32,
+    parse_u64,
 };
 
-<span class="kw">use </span><span class="kw">crate</span>::DsiLtbRBMapping;
+<span class="comment">//use crate::DsiLtbRBMapping;
+</span><span class="kw">use </span><span class="kw">crate</span>::events::rb_event::EventStatus;
 
 <span class="comment">//use crate::events::RBMissingHit;
-</span><span class="kw">use </span><span class="kw">crate</span>::constants::{
-  N_LTBS,
-  N_CHN_PER_LTB,
-};
+//use crate::constants::{
+//  N_LTBS,
+//  N_CHN_PER_LTB,
+//};
 
-<span class="comment">//he default values used where thus:
+//he default values used where thus:
 //  INNER_TOF_THRESH = 3
 //  OUTER_TOF_THRESH = 3
 //  TOTAL_TOF_THRESH =8
@@ -635,19 +596,38 @@
 //  REQUIRE_BETA =1
 //
 
+</span><span class="doccomment">/// masks to decode LTB hit masks
+</span><span class="kw">const </span>LTB_CH0 : u16 = <span class="number">0x3   </span>;
+<span class="kw">const </span>LTB_CH1 : u16 = <span class="number">0xc   </span>;
+<span class="kw">const </span>LTB_CH2 : u16 = <span class="number">0x30  </span>; 
+<span class="kw">const </span>LTB_CH3 : u16 = <span class="number">0xc0  </span>;
+<span class="kw">const </span>LTB_CH4 : u16 = <span class="number">0x300 </span>;
+<span class="kw">const </span>LTB_CH5 : u16 = <span class="number">0xc00 </span>;
+<span class="kw">const </span>LTB_CH6 : u16 = <span class="number">0x3000</span>;
+<span class="kw">const </span>LTB_CH7 : u16 = <span class="number">0xc000</span>;
+<span class="kw">const </span>LTB_CHANNELS : [u16;<span class="number">8</span>] = [
+    LTB_CH0,
+    LTB_CH1,
+    LTB_CH2,
+    LTB_CH3,
+    LTB_CH4,
+    LTB_CH5,
+    LTB_CH6,
+    LTB_CH7
+];
 
-</span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>TriggerType {
   Unknown      = <span class="number">0u8</span>,
   <span class="doccomment">/// -&gt; 1-10 "pysics" triggers
-  </span>Any          = <span class="number">1u8</span>,
+  </span>Gaps         = <span class="number">4u8</span>,
+  Any          = <span class="number">1u8</span>,
   Track        = <span class="number">2u8</span>,
   TrackCentral = <span class="number">3u8</span>,
-  Gaps         = <span class="number">4u8</span>,
-  
   <span class="doccomment">/// &gt; 100 -&gt; Debug triggers
-  </span>Poisson   = <span class="number">100u8</span>,
+  </span>Poisson      = <span class="number">100u8</span>,
+  Forced       = <span class="number">101u8</span>, 
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TriggerType {
@@ -661,13 +641,13 @@
 <span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>TriggerType {
   <span class="kw">fn </span>from(value: u8) -&gt; <span class="self">Self </span>{
     <span class="kw">match </span>value {
-      <span class="number">0u8   </span>=&gt; TriggerType::Unknown,
-      <span class="number">100u8 </span>=&gt; TriggerType::Poisson,
-      <span class="number">1u8   </span>=&gt; TriggerType::Any,
-      <span class="number">2u8   </span>=&gt; TriggerType::Track,
-      <span class="number">3u8   </span>=&gt; TriggerType::TrackCentral,
-      <span class="number">4u8   </span>=&gt; TriggerType::TrackCentral,
-      <span class="kw">_     </span>=&gt; TriggerType::Unknown
+      <span class="number">0   </span>=&gt; TriggerType::Unknown,
+      <span class="number">100 </span>=&gt; TriggerType::Poisson,
+      <span class="number">1   </span>=&gt; TriggerType::Any,
+      <span class="number">2   </span>=&gt; TriggerType::Track,
+      <span class="number">3   </span>=&gt; TriggerType::TrackCentral,
+      <span class="number">4   </span>=&gt; TriggerType::Gaps,
+      <span class="kw">_   </span>=&gt; TriggerType::Unknown
     }
   }
 }
@@ -683,6 +663,7 @@
       TriggerType::Track,
       TriggerType::TrackCentral,
       TriggerType::Gaps,
+      TriggerType::Forced,
     ];
     <span class="kw">let </span><span class="kw-2">mut </span>rng  = rand::thread_rng();
     <span class="kw">let </span>idx = rng.gen_range(<span class="number">0</span>..choices.len());
@@ -692,6 +673,61 @@
 
 <span class="comment">/////////////////////////////////////////////////
 
+</span><span class="doccomment">/// LTB Thresholds as passed on by the MTB
+/// https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf
+</span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>LTBThreshold {
+  NoHit = <span class="number">0u8</span>,
+  <span class="doccomment">/// First threshold, 40mV, about 0.75 minI
+  </span>Hit   = <span class="number">1u8</span>,
+  <span class="doccomment">/// Second threshold, 32mV (? error in doc ?, about 2.5 minI
+  </span>Beta  = <span class="number">2u8</span>,
+  <span class="doccomment">/// Third threshold, 375mV about 30 minI
+  </span>Veto  = <span class="number">3u8</span>,
+  <span class="doccomment">/// Use u8::MAX for Unknown, since 0 is pre-determined for 
+  /// "NoHit, 
+  </span>Unknown = <span class="number">255u8
+</span>}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>LTBThreshold {
+  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
+      String::from(<span class="string">"ERROR: DeserializationError!"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;LTBThreshold: {}&gt;"</span>, r)
+  }
+}
+
+<span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>LTBThreshold {
+  <span class="kw">fn </span>from(value: u8) -&gt; <span class="self">Self </span>{
+    <span class="kw">match </span>value {
+      <span class="number">0 </span>=&gt; LTBThreshold::NoHit,
+      <span class="number">1 </span>=&gt; LTBThreshold::Hit,
+      <span class="number">2 </span>=&gt; LTBThreshold::Beta,
+      <span class="number">3 </span>=&gt; LTBThreshold::Veto,
+      <span class="kw">_ </span>=&gt; LTBThreshold::Unknown
+    }
+  }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">impl </span>FromRandom <span class="kw">for </span>LTBThreshold {
+  
+  <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
+    <span class="kw">let </span>choices = [
+      LTBThreshold::NoHit,
+      LTBThreshold::Hit,
+      LTBThreshold::Beta,
+      LTBThreshold::Veto,
+      LTBThreshold::Unknown
+    ];
+    <span class="kw">let </span><span class="kw-2">mut </span>rng  = rand::thread_rng();
+    <span class="kw">let </span>idx = rng.gen_range(<span class="number">0</span>..choices.len());
+    choices[idx]
+  }
+}
+
+<span class="comment">/////////////////////////////////////////////////
 
 </span><span class="doccomment">/// Hold additional information about the status
 /// of the registers on the MTB
@@ -720,303 +756,235 @@
 /// crucial information 
 ///
 /// FIXME : implementation of absolute time
-</span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq)]
+</span><span class="attr">#[derive(Debug, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>MasterTriggerEvent {
-  <span class="kw">pub </span>event_id      : u32,
-  <span class="kw">pub </span>timestamp     : u32,
-  <span class="kw">pub </span>tiu_timestamp : u32,
-  <span class="kw">pub </span>tiu_gps_32    : u32,
-  <span class="kw">pub </span>tiu_gps_16    : u32,
-  <span class="kw">pub </span>n_paddles     : u8, 
-  <span class="comment">// indicates which LTBs have 
-  // triggered
-  </span><span class="kw">pub </span>board_mask    : [bool; N_LTBS],
-  <span class="comment">// one 16 bit value per LTB
-  // the sorting is the same as
-  // in board_mask
-  </span><span class="kw">pub </span>hits          : [[bool;N_CHN_PER_LTB]; N_LTBS],
-  <span class="kw">pub </span>crc           : u32,
-  <span class="comment">// valid is an internal flag
-  // used by code working with MTEs.
-  // Set it to false will mark the 
-  // package for deletion.
-  // Once invalidated, an event 
-  // never shall be valid again.
-  </span>valid        : bool,
-  <span class="kw">pub </span>broken   : bool
+  <span class="kw">pub </span>event_status   : EventStatus,
+  <span class="kw">pub </span>event_id       : u32,
+  <span class="doccomment">/// Internal timestamp at the time of trigger (1 unit = 10 ns)
+  /// Free running counter, rolling over every ~42 seconds
+  </span><span class="kw">pub </span>timestamp      : u32,
+  <span class="doccomment">/// Timestamp at the edge of the TIU GPS (1 unit = 10 ns)
+  </span><span class="kw">pub </span>tiu_timestamp  : u32,
+  <span class="doccomment">/// Second received from the TIU (format?) 
+  </span><span class="kw">pub </span>tiu_gps32      : u32,
+  <span class="kw">pub </span>tiu_gps16      : u16,
+  <span class="kw">pub </span>crc            : u32,
+  <span class="comment">// NEW - change/extension in API for MTB fw &gt;= 3.0.0
+  </span><span class="doccomment">/// Trigger source:  
+  </span><span class="kw">pub </span>trigger_source : u16,
+  <span class="kw">pub </span>dsi_j_mask     : u32,
+  <span class="kw">pub </span>channel_mask   : Vec&lt;u16&gt;,
+  <span class="kw">pub </span>mtb_link_mask  : u64,
 }
 
 <span class="kw">impl </span>MasterTriggerEvent {
-  <span class="comment">// 21 + 4 byte board mask + 4*4 bytes hit mask
-  // =&gt; 25 + 16 = 41 
-  // + head + tail
-  // 45
-  </span><span class="kw">const </span>SIZE : usize = <span class="number">45</span>;
-  <span class="kw">const </span>TAIL : u16   = <span class="number">0x5555</span>;
-  <span class="kw">const </span>HEAD : u16   = <span class="number">0xAAAA</span>;
+  <span class="doccomment">/// Implementation version, might roughly 
+  /// correspond to fw version
+  </span><span class="kw">pub const </span>VERSION : u8 = <span class="number">3</span>;
 
-  <span class="kw">pub fn </span>new(event_id  : u32, 
-             n_paddles : u8) -&gt; <span class="self">Self </span>{
-    <span class="self">Self </span>{
-      event_id      : event_id,
-      timestamp     : <span class="number">0</span>,
-      tiu_timestamp : <span class="number">0</span>,
-      tiu_gps_32    : <span class="number">0</span>,
-      tiu_gps_16    : <span class="number">0</span>,
-      n_paddles     : n_paddles, 
-      board_mask    : [<span class="bool-val">false</span>;N_LTBS],
-      <span class="comment">//ne 16 bit value per LTB
-      </span>hits          : [[<span class="bool-val">false</span>;N_CHN_PER_LTB]; N_LTBS],
-      crc           : <span class="number">0</span>,
-      broken    : <span class="bool-val">false</span>,
-      <span class="comment">// valid does not get serialized
-      </span>valid     : <span class="bool-val">true</span>,
+  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+    <span class="self">Self </span>{ 
+      event_status   : EventStatus::Unknown,
+      event_id       : <span class="number">0</span>,
+      timestamp      : <span class="number">0</span>,
+      tiu_timestamp  : <span class="number">0</span>,
+      tiu_gps32      : <span class="number">0</span>,
+      tiu_gps16      : <span class="number">0</span>,
+      crc            : <span class="number">0</span>,
+      trigger_source : <span class="number">0</span>,
+      dsi_j_mask     : <span class="number">0</span>,
+      channel_mask   : Vec::&lt;u16&gt;::new(),
+      mtb_link_mask  : <span class="number">0</span>,
     }   
   }
 
-  <span class="kw">pub fn </span>get_rbs_exp_from_map(<span class="kw-2">&amp;</span><span class="self">self</span>, dsimap : <span class="kw-2">&amp;</span>DsiLtbRBMapping) -&gt; Vec&lt;u8&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>rbids = Vec::&lt;u8&gt;::new();
-    <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.get_dsi_j_ch_for_triggered_ltbs() {
-      rbids.push(dsimap[<span class="kw-2">&amp;</span>k.<span class="number">0</span>][<span class="kw-2">&amp;</span>k.<span class="number">1</span>][<span class="kw-2">&amp;</span>k.<span class="number">2</span>].<span class="number">0</span>)
-    }
-    rbids
-  }
-
-  <span class="kw">pub fn </span>get_n_rbs_exp_from_map(<span class="kw-2">&amp;</span><span class="self">self</span>, dsimap : <span class="kw-2">&amp;</span>DsiLtbRBMapping) -&gt; u8 {
-    <span class="self">self</span>.get_rbs_exp_from_map(dsimap).len() <span class="kw">as </span>u8
-  }
-
-  <span class="comment">//#[deprecated(since="0.9.2")]
-  </span><span class="kw">pub fn </span>get_n_rbs_expected(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
-    <span class="kw">let </span><span class="kw-2">mut </span>n_rbs = <span class="number">0u8</span>;
-    <span class="comment">//println!("SELF HITS : {:?}", self.hits);
-    </span><span class="kw">for </span>h <span class="kw">in </span><span class="self">self</span>.hits {
-      <span class="kw">let </span>count = h.iter().filter(|&amp;&amp;x| x).count();
-      <span class="comment">//println!("COUNT! {count}"); 
-      </span><span class="kw">if </span>count &gt;= <span class="number">1 </span>{
-        n_rbs += <span class="number">1</span>;
-      } 
-      <span class="kw">if </span>count &gt; <span class="number">8 </span>{
-        n_rbs += <span class="number">1</span>;
+  <span class="doccomment">/// Get the RB link IDs according to the mask
+  </span><span class="kw">pub fn </span>get_rb_link_ids(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>links = Vec::&lt;u8&gt;::new();
+    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">63 </span>{
+      <span class="kw">if </span>(<span class="self">self</span>.mtb_link_mask &gt;&gt; k) <span class="kw">as </span>u64 &amp; <span class="number">0x1 </span>== <span class="number">1 </span>{
+        links.push(k <span class="kw">as </span>u8);
       }
     }
-    n_rbs
+    links
   }
 
-  <span class="doccomment">/// Make the connection between the triggered
-  /// boards in the boardmask and convert that
-  /// to DSI/J/CH
-  </span><span class="kw">pub fn </span>get_dsi_j_ch_for_triggered_ltbs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(u8,u8,u8)&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>dsi_js = Vec::&lt;(u8,u8,u8)&gt;::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>dsi = <span class="number">1u8</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>j   = <span class="number">1u8</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>ch  : u8;
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..N_LTBS {
-      <span class="kw">if </span><span class="self">self</span>.board_mask[k] {
-        ch = <span class="number">1</span>;
-        <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.hits[k].len() {
-          <span class="kw">if </span><span class="self">self</span>.hits[k][n] {
-            dsi_js.push((dsi, j, ch));
+  <span class="doccomment">/// Get the combination of triggered DSI/J/CH on 
+  /// the MTB which formed the trigger. This does 
+  /// not include further hits which fall into the 
+  /// integration window. For those, se rb_link_mask
+  ///
+  /// The returned values follow the TOF convention
+  /// to start with 1, so that we can use them to 
+  /// look up LTB ids in the db.
+  ///
+  /// # Returns
+  ///
+  ///   Vec&lt;(hit)&gt; where hit is (DSI, J, CH) 
+  </span><span class="kw">pub fn </span>get_trigger_hits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(u8, u8, u8, LTBThreshold)&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>hits = Vec::&lt;(u8,u8,u8,LTBThreshold)&gt;::new(); 
+    <span class="comment">//let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
+    </span><span class="kw">let </span>n_masks_needed = <span class="self">self</span>.dsi_j_mask.count_ones();
+    <span class="kw">if </span><span class="self">self</span>.channel_mask.len() &lt; n_masks_needed <span class="kw">as </span>usize {
+      <span class="macro">error!</span>(<span class="string">"We need {} hit masks, but only have {}! This is bad!"</span>, n_masks_needed, <span class="self">self</span>.channel_mask.len());
+      <span class="kw">return </span>hits;
+    }
+    <span class="kw">let </span><span class="kw-2">mut </span>n_mask = <span class="number">0</span>;
+    <span class="macro">trace!</span>(<span class="string">"Expecting {} hit masks"</span>, n_masks_needed);
+    <span class="macro">trace!</span>(<span class="string">"ltb channels {:?}"</span>, <span class="self">self</span>.dsi_j_mask);
+    <span class="macro">trace!</span>(<span class="string">"hit masks {:?}"</span>, <span class="self">self</span>.channel_mask); 
+    <span class="comment">//println!("We see LTB Channels {:?} with Hit masks {:?} for {} masks requested by us!", self.dsi_j_mask, self.channel_mask, n_masks_needed);
+    </span><span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">31 </span>{
+      <span class="kw">if </span>(<span class="self">self</span>.dsi_j_mask &gt;&gt; k) <span class="kw">as </span>u32 &amp; <span class="number">0x1 </span>== <span class="number">1 </span>{
+        <span class="kw">let </span>dsi = (k <span class="kw">as </span>f32 / <span class="number">4.0</span>).floor() <span class="kw">as </span>u8 + <span class="number">1</span>;       
+        <span class="kw">let </span>j   = (k % <span class="number">5</span>) <span class="kw">as </span>u8 + <span class="number">1</span>;
+        <span class="comment">//println!("n_mask {n_mask}");
+        </span><span class="kw">let </span>channels = <span class="self">self</span>.channel_mask[n_mask]; 
+        <span class="kw">for </span>(i,ch) <span class="kw">in </span>LTB_CHANNELS.iter().enumerate() {
+          <span class="kw">let </span>chn = <span class="kw-2">*</span>ch <span class="kw">as </span>u8 + <span class="number">1</span>;
+          <span class="comment">//println!("i,ch {}, {}", i, ch);
+          </span><span class="kw">let </span>thresh_bits = ((channels &amp; ch) &gt;&gt; (i<span class="kw-2">*</span><span class="number">2</span>)) <span class="kw">as </span>u8;
+          <span class="comment">//println!("thresh_bits {}", thresh_bits);
+          </span><span class="kw">if </span>thresh_bits &gt; <span class="number">0 </span>{ <span class="comment">// hit over threshold
+            </span>hits.push((dsi, j, chn, LTBThreshold::from(thresh_bits)));
           }
-          ch += <span class="number">1</span>;
         }
-      }
-      j += <span class="number">1</span>;
-      <span class="kw">if </span>j &gt; <span class="number">5 </span>{
-        j = <span class="number">1</span>;
-        dsi += <span class="number">1</span>;
+        n_mask += <span class="number">1</span>;
       }
     }
-    dsi_js
-  }
-  
-  <span class="kw">pub fn </span>decode_board_mask(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mask : u32) {
-    <span class="comment">// FIXME -&gt; This basically inverses the order of the LTBs
-    // so bit 0 (rightmost in the mask is the leftmost in the 
-    // array
-    </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..N_LTBS {
-      <span class="self">self</span>.board_mask[i] = (mask &amp; (<span class="number">1 </span>&lt;&lt; i)) != <span class="number">0</span>;
-    }
+    hits
   }
 
-  <span class="kw">pub fn </span>decode_hit_mask(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ltb_idx : usize, mask : u32) {
-    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..N_CHN_PER_LTB {
-      <span class="self">self</span>.hits[ltb_idx][i] = (mask &amp; (<span class="number">1 </span>&lt;&lt; i)) != <span class="number">0</span>;
-    }
-  }
-
-  <span class="kw">pub fn </span>is_broken(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-    <span class="self">self</span>.broken
-  }
-
-
-  <span class="kw">fn </span>bitmask_to_str(mask : <span class="kw-2">&amp;</span>[bool]) -&gt; String {
-    <span class="kw">let </span><span class="kw-2">mut </span>m_str = String::from(<span class="string">""</span>);
-    <span class="kw">for </span>n <span class="kw">in </span>mask {
-      <span class="kw">if </span><span class="kw-2">*</span>n {
-        m_str += <span class="string">"1"</span>;
-      } <span class="kw">else </span>{
-        m_str += <span class="string">"0"</span>;
-      }
-    }
-    m_str
-  }
-
-  <span class="kw">pub fn </span>boardmask_to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-    <span class="kw">let </span>bm_str = MasterTriggerEvent::bitmask_to_str(<span class="kw-2">&amp;</span><span class="self">self</span>.board_mask);
-    bm_str
-  }
-
-  <span class="kw">pub fn </span>hits_to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-    <span class="kw">let </span><span class="kw-2">mut </span>hits_str = String::from(<span class="string">""</span>);
-    <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.hits.len() {
-      hits_str += <span class="kw-2">&amp;</span>(j.to_string() + <span class="string">": [" </span>+ <span class="kw-2">&amp;</span>MasterTriggerEvent::bitmask_to_str(<span class="kw-2">&amp;</span><span class="self">self</span>.hits[j]) + <span class="string">"]\n"</span>);
-    }
-    hits_str
-  }
-
-  <span class="kw">pub fn </span>n_ltbs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
-    <span class="kw">let </span><span class="kw-2">mut </span>nboards = <span class="number">0</span>;
-    <span class="kw">for </span>n <span class="kw">in </span><span class="self">self</span>.board_mask { 
-      <span class="kw">if </span>n {
-        nboards += <span class="number">1</span>;
-      }
-    }
-    nboards
-  }
-
-  <span class="doccomment">/// Get the number of hit paddles from 
-  /// the hitmask.
-  ///
-  /// Now the question is 
-  /// what do we consider a hit. 
-  /// Currently we have for the LTB threshold
-  /// 0 = no hit 
-  /// 01 = thr1
-  /// 10 = thr2
-  /// 11 = thr3
-  ///
-  /// For now, we just say everything larger 
-  /// than 01 is a hit
-  </span><span class="kw">pub fn </span>get_hit_paddles(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
-    <span class="kw">let </span><span class="kw-2">mut </span>n_paddles = <span class="number">0u8</span>;
-    <span class="comment">// somehow it is messed up how we iterate over
-    // the array (I think this must be reversed.
-    // At least for the number of paddles it does 
-    // not matter.
-    </span><span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..N_LTBS { 
-      <span class="kw">for </span>ch <span class="kw">in </span>(<span class="number">0</span>..N_CHN_PER_LTB -<span class="number">1</span>).step_by(<span class="number">2</span>) {
-        <span class="kw">if </span><span class="self">self</span>.hits[n][ch] || <span class="self">self</span>.hits[n][ch+<span class="number">1</span>] {
-          n_paddles += <span class="number">1</span>;
-        }
-      }
-    }
-    n_paddles
-  }
-
-  <span class="kw">pub fn </span>check(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-    <span class="kw">let </span>good = <span class="self">self</span>.n_paddles == <span class="self">self</span>.get_hit_paddles();
-    <span class="kw">if </span>!good {
-      <span class="macro">error!</span>(<span class="string">"Missmatch in expected and registered hit paddles! Expected : {}, seen {}"</span>, <span class="self">self</span>.n_paddles, <span class="self">self</span>.get_hit_paddles());
-    }
-    good
-  }
-
-  <span class="kw">pub fn </span>invalidate(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-    <span class="self">self</span>.valid = <span class="bool-val">false</span>;
-  }
-
-  <span class="doccomment">/// combine the tiu gps 16 and 32bit timestamps 
-  /// into a 48bit timestamp
-  </span><span class="kw">pub fn </span>get_gpstimestamp48(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
-    ((<span class="self">self</span>.tiu_gps_16 <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) | <span class="self">self</span>.tiu_gps_32 <span class="kw">as </span>u64 
-  }
-
-  <span class="comment">//pub fn get_absolute_time(&amp;self) -&gt; u64 {
-  //  let gps = self.get_gpstimestamp48()
-  //  let mt_ts : u64;
-  //  if self.timestamp &lt; self.tiu_timestamp {
-  //    // it has wrapped
-  //  }
-  //  let ts  = 1e9u64 * gps + self
+  <span class="comment">///// Compatibility with older data.
+  ///// Convert deprecated array type format
+  ///// to new system
+  //fn get_dsi_j_mask_from_old_data(&amp;mut self, mask : u32) {
+  //  // if I am not completly mistaken, this can be saved 
+  //  // directly
+  //  self.dsi_j_mask = mask;
   //}
-</span>}
+
+  ///// Compatiblity with older data.
+  ///// Convert deprecated array type format
+  ///// to new system
+  //fn get_channel_mask_from_old_data(&amp;mut self, mask : u32) {
+  //  self.channel_mask.push(mask as u16); 
+  //}
+
+  </span><span class="doccomment">/// combine the tiu gps 16 and 32bit timestamps 
+  /// into a 48bit timestamp
+  </span><span class="kw">pub fn </span>get_timestamp_gps48(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+    ((<span class="self">self</span>.tiu_gps16 <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) | <span class="self">self</span>.tiu_gps32 <span class="kw">as </span>u64 
+  }
+
+  <span class="doccomment">/// Get absolute timestamp as sent by the GPS
+  </span><span class="kw">pub fn </span>get_timestamp_abs48(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+    <span class="kw">let </span>gps = <span class="self">self</span>.get_timestamp_gps48();
+    <span class="kw">let </span><span class="kw-2">mut </span>timestamp = <span class="self">self</span>.timestamp;
+    <span class="kw">if </span>timestamp &lt; <span class="self">self</span>.tiu_timestamp {
+      <span class="comment">// it has wrapped
+      </span>timestamp += u32::MAX;
+    }
+    <span class="kw">let </span>ts  = <span class="number">1_000_000_000 </span>* gps + (timestamp - <span class="self">self</span>.tiu_timestamp) <span class="kw">as </span>u64;
+    <span class="kw">return </span>ts;
+  }
+
+  <span class="doccomment">/// Get the trigger sources from trigger source byte
+  /// FIXME! (Does not return anything)
+  </span><span class="kw">pub fn </span>get_trigger_sources(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;TriggerType&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>t_types    = Vec::&lt;TriggerType&gt;::new();
+    <span class="kw">let </span>gaps_trigger   = <span class="self">self</span>.trigger_source &gt;&gt; <span class="number">5 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
+    <span class="kw">if </span>gaps_trigger {
+      t_types.push(TriggerType::Gaps);
+    }
+    <span class="kw">let </span>any_trigger    = <span class="self">self</span>.trigger_source &gt;&gt; <span class="number">6 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
+    <span class="kw">if </span>any_trigger {
+      t_types.push(TriggerType::Any);
+    }
+    <span class="kw">let </span>forced_trigger = <span class="self">self</span>.trigger_source &gt;&gt; <span class="number">7 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
+    <span class="kw">if </span>forced_trigger {
+      t_types.push(TriggerType::Forced);
+    }
+    <span class="kw">let </span>track_trigger  = <span class="self">self</span>.trigger_source &gt;&gt; <span class="number">8 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
+    <span class="kw">if </span>track_trigger {
+      t_types.push(TriggerType::Track);
+    }
+    <span class="kw">let </span>central_track_trigger
+                       = <span class="self">self</span>.trigger_source &gt;&gt; <span class="number">9 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
+    <span class="kw">if </span>central_track_trigger {
+      t_types.push(TriggerType::TrackCentral);
+    }
+    t_types
+  }
+}
 
 <span class="kw">impl </span>Serialization <span class="kw">for </span>MasterTriggerEvent {
   
-  <span class="comment">// 21 + 4 byte board mask + 4*4 bytes hit mask
-  // =&gt; 25 + 16 = 41 
-  // + head + tail
-  // 45
-  </span><span class="kw">const </span>SIZE : usize = <span class="number">45</span>;
-  <span class="kw">const </span>TAIL : u16 = <span class="number">0x5555</span>;
-  <span class="kw">const </span>HEAD : u16 = <span class="number">0xAAAA</span>;
+  <span class="doccomment">/// Variable size
+  </span><span class="kw">const </span>SIZE : usize = <span class="number">0</span>;
+  <span class="kw">const </span>TAIL : u16   = <span class="number">0x5555</span>;
+  <span class="kw">const </span>HEAD : u16   = <span class="number">0xAAAA</span>;
 
   <span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec::&lt;u8&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>bs = Vec::&lt;u8&gt;::with_capacity(MasterTriggerEvent::SIZE);
     bs.extend_from_slice(<span class="kw-2">&amp;</span>MasterTriggerEvent::HEAD.to_le_bytes());
+    bs.push(<span class="self">self</span>.event_status <span class="kw">as </span>u8);
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.event_id.to_le_bytes()); 
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.timestamp.to_le_bytes());
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tiu_timestamp.to_le_bytes());
-    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tiu_gps_32.to_le_bytes());
-    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tiu_gps_16.to_le_bytes());
-    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_paddles.to_le_bytes());
-    <span class="kw">let </span><span class="kw-2">mut </span>board_mask : u32 = <span class="number">0</span>;
-    <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..N_LTBS {
-      <span class="kw">if </span><span class="self">self</span>.board_mask[n] {
-        board_mask += <span class="number">2_u32</span>.pow(n <span class="kw">as </span>u32);
-      }
-    }
-    bs.extend_from_slice(<span class="kw-2">&amp;</span>board_mask.to_le_bytes());
-    <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..N_LTBS {
-      <span class="kw">let </span><span class="kw-2">mut </span>hit_mask : u32 = <span class="number">0</span>;
-      <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..N_CHN_PER_LTB {
-        <span class="kw">if </span><span class="self">self</span>.hits[n][j] {
-          hit_mask += <span class="number">2_u32</span>.pow(j <span class="kw">as </span>u32);
-        }
-      }
-      bs.extend_from_slice(<span class="kw-2">&amp;</span>hit_mask.to_le_bytes());
-    }
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tiu_gps32.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tiu_gps16.to_le_bytes());
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.crc.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.trigger_source.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.dsi_j_mask.to_le_bytes());
+    <span class="kw">let </span>n_channel_masks = <span class="self">self</span>.channel_mask.len();
+    bs.push(n_channel_masks <span class="kw">as </span>u8);
+    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..n_channel_masks {
+      bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.channel_mask[k].to_le_bytes());
+    }
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.mtb_link_mask.to_le_bytes());
     bs.extend_from_slice(<span class="kw-2">&amp;</span>MasterTriggerEvent::TAIL.to_le_bytes());
     bs
   }
 
-  <span class="kw">fn </span>from_bytestream(bytestream : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;,
-                     pos        : <span class="kw-2">&amp;mut </span>usize)
+  <span class="kw">fn </span>from_bytestream(stream : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;,
+                     pos    : <span class="kw-2">&amp;mut </span>usize)
     -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt; {
-    <span class="kw">let </span>bs     = bytestream;
-    <span class="kw">let </span><span class="kw-2">mut </span>mt = <span class="self">Self</span>::new(<span class="number">0</span>,<span class="number">0</span>);
-    <span class="kw">let </span>header = parse_u16(bs, pos); 
+    <span class="kw">let </span><span class="kw-2">mut </span>mt = <span class="self">Self</span>::new();
+    <span class="kw">let </span>header = parse_u16(stream, pos); 
     <span class="kw">if </span>header != <span class="self">Self</span>::HEAD {
       <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::HeadInvalid);
     }
-    mt.event_id           = parse_u32(bs, pos);
-    mt.timestamp          = parse_u32(bs, pos);
-    mt.tiu_timestamp      = parse_u32(bs, pos);
-    mt.tiu_gps_32         = parse_u32(bs, pos);
-    mt.tiu_gps_16         = parse_u32(bs, pos);
-    mt.n_paddles          = parse_u8(bs, pos);
-    <span class="kw">let </span>board_mask        = parse_u32(bs, pos);
-    mt.decode_board_mask(board_mask);
-    <span class="kw">let </span><span class="kw-2">mut </span>hit_mask : u32;
-    <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..N_LTBS {
-      hit_mask = parse_u32(bs, pos);
-      mt.decode_hit_mask(n, hit_mask);
+    mt.event_status       = parse_u8 (stream, pos).into();
+    mt.event_id           = parse_u32(stream, pos);
+    mt.timestamp          = parse_u32(stream, pos);
+    mt.tiu_timestamp      = parse_u32(stream, pos);
+    mt.tiu_gps32          = parse_u32(stream, pos);
+    mt.tiu_gps16          = parse_u16(stream, pos);
+    mt.crc                = parse_u32(stream, pos);
+    mt.trigger_source     = parse_u16(stream, pos);
+    mt.dsi_j_mask         = parse_u32(stream, pos);
+    <span class="kw">let </span>n_channel_masks   = parse_u8(stream, pos);
+    <span class="kw">for _ in </span><span class="number">0</span>..n_channel_masks {
+      mt.channel_mask.push(parse_u16(stream, pos));
     }
-    mt.crc                = parse_u32(bs, pos);
-    <span class="kw">let </span>tail_a              = parse_u8(bs, pos);
-    <span class="kw">let </span>tail_b              = parse_u8(bs, pos);
-    <span class="kw">if </span>tail_a == <span class="number">85 </span>&amp;&amp; tail_b == <span class="number">85 </span>{
-      <span class="macro">trace!</span>(<span class="string">"Correct tail found!"</span>);
-    }
-    <span class="kw">else if </span>tail_a == <span class="number">85 </span>&amp;&amp; tail_b == <span class="number">5 </span>{
-      <span class="macro">warn!</span>(<span class="string">"This is specific to data written with &lt;= 0.6.0 KIHIKIHI! This is a BUG! It needs to be fixed in future versions! Version 0.6.1 should already fix ::to_bytestream, but leaves a modded ::from_bytestream for current analysis."</span>);
-      <span class="macro">warn!</span>(<span class="string">"Tail for version 0.6.0/0.6.1 found"</span>);  
-    } <span class="kw">else </span>{
-      <span class="macro">error!</span>(<span class="string">"Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got {} {} but were expecting 85 5"</span>, tail_a, tail_b);
-      <span class="comment">//error!("Got {} for MTE tail signature! Expecting {}", tail, MasterTriggerEvent::TAIL);
-      </span><span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::TailInvalid);
+    mt.mtb_link_mask      = parse_u64(stream, pos);
+    <span class="kw">let </span>tail              = parse_u16(stream, pos);
+    <span class="kw">if </span>tail != <span class="self">Self</span>::TAIL {
+      <span class="macro">error!</span>(<span class="string">"Invalid tail signature {}!"</span>, tail);
+      mt.event_status = EventStatus::TailWrong;
+      <span class="comment">// PATCH - if this is old data, just skip it and
+      // search the next tail
+      </span><span class="kw">match </span>search_for_u16(<span class="self">Self</span>::TAIL, stream, <span class="kw-2">*</span>pos) {
+        <span class="prelude-val">Ok</span>(tail_pos) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"The tail was invalid, but we found a suitable end marker. The data format seems incompatible though, so the MasterTriggerEvents is probably rubbish!"</span>);
+          mt.event_status = EventStatus::IncompatibleData; 
+          <span class="kw-2">*</span>pos = tail_pos + <span class="number">2</span>;
+        },
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"Tail invalid, we assume the data format is incompatible, however, we could not do anything about it! {err}"</span>);
+        }
+      }
     }
     <span class="prelude-val">Ok</span>(mt)
   }
@@ -1024,93 +992,39 @@
 
 <span class="kw">impl </span>Default <span class="kw">for </span>MasterTriggerEvent {
   <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-    <span class="self">Self</span>::new(<span class="number">0</span>,<span class="number">0</span>)
+    <span class="self">Self</span>::new()
   }
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>MasterTriggerEvent {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="kw">let </span><span class="kw-2">mut </span>dsi_j = HashMap::&lt;u8, <span class="kw-2">&amp;</span>str&gt;::new();
-    dsi_j.insert(<span class="number">0  </span>, <span class="string">"1/1"</span>);
-    dsi_j.insert(<span class="number">1  </span>, <span class="string">"1/2"</span>);
-    dsi_j.insert(<span class="number">2  </span>, <span class="string">"1/3"</span>);
-    dsi_j.insert(<span class="number">3  </span>, <span class="string">"1/4"</span>);
-    dsi_j.insert(<span class="number">4  </span>, <span class="string">"1/5"</span>);
-    dsi_j.insert(<span class="number">5  </span>, <span class="string">"2/1"</span>);
-    dsi_j.insert(<span class="number">6  </span>, <span class="string">"2/2"</span>);
-    dsi_j.insert(<span class="number">7  </span>, <span class="string">"2/3"</span>);
-    dsi_j.insert(<span class="number">8  </span>, <span class="string">"2/4"</span>);
-    dsi_j.insert(<span class="number">9  </span>, <span class="string">"2/5"</span>);
-    dsi_j.insert(<span class="number">10 </span>, <span class="string">"3/1"</span>);
-    dsi_j.insert(<span class="number">11 </span>, <span class="string">"3/2"</span>);
-    dsi_j.insert(<span class="number">12 </span>, <span class="string">"3/3"</span>);
-    dsi_j.insert(<span class="number">13 </span>, <span class="string">"3/4"</span>);
-    dsi_j.insert(<span class="number">14 </span>, <span class="string">"3/5"</span>);
-    dsi_j.insert(<span class="number">15 </span>, <span class="string">"4/1"</span>);
-    dsi_j.insert(<span class="number">16 </span>, <span class="string">"4/2"</span>);
-    dsi_j.insert(<span class="number">17 </span>, <span class="string">"4/3"</span>);
-    dsi_j.insert(<span class="number">18 </span>, <span class="string">"4/4"</span>);
-    dsi_j.insert(<span class="number">19 </span>, <span class="string">"4/5"</span>);
-    dsi_j.insert(<span class="number">20 </span>, <span class="string">"5/1"</span>);
-    dsi_j.insert(<span class="number">21 </span>, <span class="string">"5/2"</span>);
-    dsi_j.insert(<span class="number">22 </span>, <span class="string">"5/3"</span>);
-    dsi_j.insert(<span class="number">23 </span>, <span class="string">"5/4"</span>);
-    dsi_j.insert(<span class="number">24 </span>, <span class="string">"5/5"</span>);
-    <span class="kw">let </span><span class="kw-2">mut </span>hit_boards = Vec::&lt;u8&gt;::with_capacity(<span class="number">20</span>);
-    
     <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;MasterTriggerEvent"</span>);
-    repr += <span class="string">"\n  event_id                    "</span>;
-    repr += <span class="kw-2">&amp;</span><span class="self">self</span>.event_id.to_string(); 
-    repr += <span class="string">"\n  timestamp                   "</span>;
-    repr += <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp.to_string(); 
-    repr += <span class="string">"\n  tiu_timestamp               "</span>;
-    repr += <span class="kw-2">&amp;</span><span class="self">self</span>.tiu_timestamp.to_string(); 
-    repr += <span class="string">"\n  tiu_gps16 (slow)            "</span>;
-    repr += <span class="kw-2">&amp;</span><span class="self">self</span>.tiu_gps_16.to_string(); 
-    repr += <span class="string">"\n  tiu_gps32 (fast)            "</span>;
-    repr += <span class="kw-2">&amp;</span><span class="self">self</span>.tiu_gps_32.to_string(); 
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  |-&gt; tiu_gps48               {}"</span>, <span class="self">self</span>.get_gpstimestamp48()));
-    repr += <span class="string">"\n  n_paddles                   "</span>;
-    repr += <span class="kw-2">&amp;</span><span class="self">self</span>.n_paddles.to_string(); 
-    repr += <span class="string">"\n  crc                         "</span>;
-    repr += <span class="kw-2">&amp;</span><span class="self">self</span>.crc.to_string();
-    repr += <span class="string">"\n  broken                      "</span>;
-    repr += <span class="kw-2">&amp;</span><span class="self">self</span>.broken.to_string();
-    repr += <span class="string">"\n  valid                       "</span>;
-    repr += <span class="kw-2">&amp;</span><span class="self">self</span>.valid.to_string();
-    <span class="comment">// a bit too excessive representation, might 
-    // be useful for debugging though?
-    //repr += "\n -- hit mask --";
-    //repr += "\n [DSI/J]";
-    //repr += "\n 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
-    //repr += " ";
-    //println!("SELFBOARDMASK {:?}", self.board_mask);
-    </span><span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..N_LTBS {
-      <span class="kw">if </span><span class="self">self</span>.board_mask[k] {
-    <span class="comment">//    repr += "-X-   ";
-        </span>hit_boards.push(k <span class="kw">as </span>u8);
-      } <span class="kw">else </span>{
-    <span class="comment">//    repr += "-0-   ";
-      </span>}
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  EventStatus     : {}"</span>, <span class="self">self</span>.event_status));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  EventID         : {}"</span>, <span class="self">self</span>.event_id));
+    repr += <span class="string">"\n  ** trigger sources **"</span>;
+    <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.get_trigger_sources() {
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {}"</span>, k));
     }
-    repr += <span class="string">"\n  == == LTB HITS == ==\n"</span>;
-    <span class="kw">for  </span>k <span class="kw">in </span>hit_boards.iter() {
-      <span class="comment">//println!("Getting {}", k);
-      </span>repr += <span class="string">"\t DSI/J/CHANNEL "</span>;
-      repr += dsi_j[k];
-      <span class="comment">//repr += "\t=&gt; ";
-      </span><span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..N_CHN_PER_LTB {
-        <span class="kw">if </span><span class="self">self</span>.hits[<span class="kw-2">*</span>k <span class="kw">as </span>usize][j] {
-          repr += <span class="string">" "</span>;
-          repr += <span class="kw-2">&amp;</span>(j + <span class="number">1</span>).to_string();
-          repr += <span class="string">" "</span>;
-        } <span class="kw">else </span>{
-          <span class="kw">continue</span>;
-          <span class="comment">//repr += " N.A. ";
-        </span>} 
-      }
-      repr += <span class="string">"\n"</span>;
-    }  
+    repr += <span class="string">"\n  ** ** timestamps ** **"</span>;
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n    timestamp     : {}"</span>, <span class="self">self</span>.timestamp));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n    tiu_timestamp : {}"</span>, <span class="self">self</span>.tiu_timestamp));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n    gps 48bit     : {}"</span>, <span class="self">self</span>.get_timestamp_gps48()));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n    absolute 48bit: {}"</span>, <span class="self">self</span>.get_timestamp_abs48()));
+    repr += <span class="string">"\n  -- -- --"</span>;
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  crc             : {}"</span>, <span class="self">self</span>.crc));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **"</span>, <span class="self">self</span>.dsi_j_mask.count_ones()));
+    <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.get_trigger_hits() {
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  =&gt; {}/{}/{} ({}) "</span>, k.<span class="number">0</span>, k.<span class="number">1</span>, k.<span class="number">2</span>, k.<span class="number">3</span>));
+    }
+    repr += <span class="string">"\n  ** ** MTB LINK IDs ** **"</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>mtblink_str = String::from(<span class="string">"\n  =&gt; "</span>);
+    <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.get_rb_link_ids() {
+      mtblink_str += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"{} "</span>, k))
+    }
+    repr += <span class="kw-2">&amp;</span>mtblink_str;
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  == Trigger hits {}, expected RBEvents {}"</span>,
+            <span class="self">self</span>.get_trigger_hits().len(),
+            <span class="self">self</span>.get_rb_link_ids().len()));
     repr += <span class="string">"&gt;"</span>;
     <span class="macro">write!</span>(f,<span class="string">"{}"</span>, repr)
   }
@@ -1120,22 +1034,23 @@
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>MasterTriggerEvent {
 
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
-    <span class="kw">let </span><span class="kw-2">mut </span>event   = <span class="self">Self</span>::new(<span class="number">0</span>,<span class="number">0</span>);
-    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::thread_rng();
-    event.event_id      = rng.gen::&lt;u32&gt;();
-    event.timestamp     = rng.gen::&lt;u32&gt;();
-    event.tiu_timestamp = rng.gen::&lt;u32&gt;();
-    event.tiu_gps_32    = rng.gen::&lt;u32&gt;();
-    event.tiu_gps_16    = rng.gen::&lt;u32&gt;();
-    event.n_paddles     = rng.gen::&lt;u8&gt;(); 
-    <span class="comment">// broken will not get serializad, so this won't
-    // be set randomly here
-    </span><span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..N_LTBS {
-      event.board_mask[k] = rng.gen::&lt;bool&gt;();
-      <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..N_CHN_PER_LTB {
-        event.hits[k][j]  = rng.gen::&lt;bool&gt;();
-      }
+    <span class="kw">let </span><span class="kw-2">mut </span>event        = <span class="self">Self</span>::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>rng          = rand::thread_rng();
+    <span class="comment">// FIXME - P had figured out how to this, copy his approach
+    //event.event_status   = rng.gen::&lt;u8&gt;&lt;();
+    </span>event.event_id       = rng.gen::&lt;u32&gt;();
+    event.timestamp      = rng.gen::&lt;u32&gt;();
+    event.tiu_timestamp  = rng.gen::&lt;u32&gt;();
+    event.tiu_gps32      = rng.gen::&lt;u32&gt;();
+    event.tiu_gps16      = rng.gen::&lt;u16&gt;();
+    event.crc            = rng.gen::&lt;u32&gt;();
+    event.trigger_source = rng.gen::&lt;u16&gt;();
+    event.dsi_j_mask     = rng.gen::&lt;u32&gt;();
+    <span class="kw">let </span>n_channel_masks  = rng.gen::&lt;u8&gt;();
+    <span class="kw">for _ in </span><span class="number">0</span>..n_channel_masks {
+      event.channel_mask.push(rng.gen::&lt;u16&gt;());
     }
+    event.mtb_link_mask  = rng.gen::&lt;u64&gt;();
     event
   }
 }

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Library for easier and safe Unix signal handling"><title>signal_hook - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="signal_hook" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../signal_hook/index.html">signal_hook</a><span class="version">0.3.17</span></h2></div><div class="sidebar-elems"><ul class="block">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Library for easier and safe Unix signal handling"><title>signal_hook - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="signal_hook" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-4c98445ec4002617.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../signal_hook/index.html">signal_hook</a><span class="version">0.3.17</span></h2></div><div class="sidebar-elems"><ul class="block">
             <li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li></ul></section></div></nav><div class="sidebar-resizer"></div>
     <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../signal_hook/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">signal_hook</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/signal_hook/lib.rs.html#1-414">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Library for easier and safe Unix signal handling</p>
 <p>Unix signals are inherently hard to handle correctly, for several reasons:</p>
@@ -12,7 +12,7 @@ interrupt a thread at any time, making most handling race-prone.</li>
 limited to very few of them. To highlight, mutexes (or other locking mechanisms) and memory
 allocation and deallocation is <em>not</em> allowed.</li>
 </ul>
-<h2 id="the-goal-of-the-library"><a href="#the-goal-of-the-library">The goal of the library</a></h2>
+<h2 id="the-goal-of-the-library"><a class="doc-anchor" href="#the-goal-of-the-library">§</a>The goal of the library</h2>
 <p>The aim is to subscriptions to signals a „structured“ resource, in a similar way memory
 allocation is ‒ parts of the program can independently subscribe and it’s the same part of the
 program that can give them up, independently of what the other parts do. Therefore, it is
@@ -28,7 +28,7 @@ safe Rust, without the application author needing to learn about <em>all</em> th
 <p>Note that despite everything, there are still some quirks around signal handling that are not
 possible to paper over and need to be considered. Also, there are some signal use cases that
 are inherently unsafe and they are not covered by this crate.</p>
-<h2 id="anatomy-of-the-crate"><a href="#anatomy-of-the-crate">Anatomy of the crate</a></h2>
+<h2 id="anatomy-of-the-crate"><a class="doc-anchor" href="#anatomy-of-the-crate">§</a>Anatomy of the crate</h2>
 <p>The crate is split into several modules.</p>
 <p>The easiest way to handle signals is using the <a href="iterator/type.Signals.html" title="type signal_hook::iterator::Signals"><code>Signals</code></a> iterator
 thing. It can register for a set of signals and produce them one by one, in a blocking manner.
@@ -54,7 +54,7 @@ other utilities that are more suited to build other abstractions with than to us
 <li><code>extended-sig-info</code>: Support for providing more information in the iterators or from the
 async adaptor crates. This is off by default.</li>
 </ul>
-<h2 id="limitations"><a href="#limitations">Limitations</a></h2>
+<h2 id="limitations"><a class="doc-anchor" href="#limitations">§</a>Limitations</h2>
 <ul>
 <li>OS limitations still apply. Certain signals are not possible to override or subscribe to ‒
 <code>SIGKILL</code> or <code>SIGSTOP</code>.</li>
@@ -85,8 +85,8 @@ default handlers:
 <ul>
 <li>Ignore. This is easy to emulate.</li>
 <li>Abort. Depending on if you call it from within a signal handler of from outside, the
-<a href="low_level/fn.abort.html" title="fn signal_hook::low_level::abort"><code>low_level::abort</code></a> or <a href="https://doc.rust-lang.org/1.76.0/std/process/fn.abort.html" title="fn std::process::abort"><code>std::process::abort</code></a> can be used.</li>
-<li>Terminate. This can be done with <code>exit</code> (<a href="low_level/fn.exit.html" title="fn signal_hook::low_level::exit"><code>low_level::exit</code></a> or <a href="https://doc.rust-lang.org/1.76.0/std/process/fn.exit.html" title="fn std::process::exit"><code>std::process::exit</code></a>).</li>
+<a href="low_level/fn.abort.html" title="fn signal_hook::low_level::abort"><code>low_level::abort</code></a> or <a href="https://doc.rust-lang.org/1.77.0/std/process/fn.abort.html" title="fn std::process::abort"><code>std::process::abort</code></a> can be used.</li>
+<li>Terminate. This can be done with <code>exit</code> (<a href="low_level/fn.exit.html" title="fn signal_hook::low_level::exit"><code>low_level::exit</code></a> or <a href="https://doc.rust-lang.org/1.77.0/std/process/fn.exit.html" title="fn std::process::exit"><code>std::process::exit</code></a>).</li>
 <li>Stop. It is possible to <a href="low_level/fn.raise.html" title="fn signal_hook::low_level::raise"><code>raise</code></a> the <a href="consts/signal/constant.SIGSTOP.html" title="constant signal_hook::consts::signal::SIGSTOP"><code>SIGSTOP</code></a> signal.
 That one can’t be replaced and always stops the application.</li>
 </ul>
@@ -102,7 +102,7 @@ handler ‒ which still can be done with <a href="low_level/fn.register.html" ti
 due care. Patterns for working safely with realtime signals are not unwanted in the library,
 but nobody contributed them yet.</li>
 </ul>
-<h2 id="signal-masks"><a href="#signal-masks">Signal masks</a></h2>
+<h2 id="signal-masks"><a class="doc-anchor" href="#signal-masks">§</a>Signal masks</h2>
 <p>As the library uses <code>sigaction</code> under the hood, signal masking works as expected (eg. with
 <code>pthread_sigmask</code>). This means, signals will <em>not</em> be delivered if the signal is masked in all
 program’s threads.</p>
@@ -110,7 +110,7 @@ program’s threads.</p>
 <a href="https://lib.rs/crates/nix">nix</a> crate offers safe interface to many low-level functions,
 including
 <a href="https://docs.rs/nix/0.11.0/nix/sys/signal/fn.pthread_sigmask.html"><code>pthread_sigmask</code></a>.</p>
-<h2 id="portability"><a href="#portability">Portability</a></h2>
+<h2 id="portability"><a class="doc-anchor" href="#portability">§</a>Portability</h2>
 <p>It should work on any POSIX.1-2001 system, which are all the major big OSes with the notable
 exception of Windows.</p>
 <p>Non-standard signals are also supported. Pass the signal value directly from <code>libc</code> or use
@@ -139,7 +139,7 @@ the default handler, nevertheless you certainly have registered the handler.</li
 <p>Moreover, signals won’t work as you expected. <code>SIGTERM</code> isn’t actually used and
 not all <code>Ctrl-C</code>s are turned into <code>SIGINT</code>.</p>
 <p>Patches to improve Windows support in this library are welcome.</p>
-<h2 id="features"><a href="#features">Features</a></h2>
+<h2 id="features"><a class="doc-anchor" href="#features">§</a>Features</h2>
 <p>There are several feature flags that control how much is available as part of the crate, some
 enabled by default.</p>
 <ul>
@@ -150,7 +150,7 @@ provides a convenient interface for receiving signals in rust-friendly way.</li>
 <li><code>extended-siginfo</code> adds support for providing extra information as part of the iterator
 interface.</li>
 </ul>
-<h2 id="examples"><a href="#examples">Examples</a></h2><h3 id="using-a-flag-to-terminate-a-loop-based-application"><a href="#using-a-flag-to-terminate-a-loop-based-application">Using a flag to terminate a loop-based application</a></h3>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2><h3 id="using-a-flag-to-terminate-a-loop-based-application"><a class="doc-anchor" href="#using-a-flag-to-terminate-a-loop-based-application">§</a>Using a flag to terminate a loop-based application</h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io::Error;
 <span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::sync::atomic::{AtomicBool, Ordering};
@@ -165,7 +165,7 @@ interface.</li>
     </span>}
     <span class="prelude-val">Ok</span>(())
 }</code></pre></div>
-<h3 id="a-complex-signal-handling-with-a-background-thread"><a href="#a-complex-signal-handling-with-a-background-thread">A complex signal handling with a background thread</a></h3>
+<h3 id="a-complex-signal-handling-with-a-background-thread"><a class="doc-anchor" href="#a-complex-signal-handling-with-a-background-thread">§</a>A complex signal handling with a background thread</h3>
 <p>This also handles the double CTRL+C situation (eg. the second CTRL+C kills) and resetting the
 terminal on <code>SIGTSTP</code> (CTRL+Z, curses-based applications should do something like this).</p>
 
@@ -258,7 +258,7 @@ terminal on <code>SIGTSTP</code> (CTRL+Z, curses-based applications should do so
 
     <span class="prelude-val">Ok</span>(())
 }</code></pre></div>
-<h2 id="asynchronous-runtime-support"><a href="#asynchronous-runtime-support">Asynchronous runtime support</a></h2>
+<h2 id="asynchronous-runtime-support"><a class="doc-anchor" href="#asynchronous-runtime-support">§</a>Asynchronous runtime support</h2>
 <p>If you are looking for integration with an asynchronous runtime take a look at one of the
 following adapter crates:</p>
 <ul>
@@ -267,7 +267,7 @@ following adapter crates:</p>
 <li><a href="https://docs.rs/signal-hook-tokio"><code>signal-hook-tokio</code></a> for Tokio support</li>
 </ul>
 <p>Feel free to open a pull requests if you want to add support for runtimes not mentioned above.</p>
-<h2 id="porting-from-previous-versions"><a href="#porting-from-previous-versions">Porting from previous versions</a></h2>
+<h2 id="porting-from-previous-versions"><a class="doc-anchor" href="#porting-from-previous-versions">§</a>Porting from previous versions</h2>
 <p>There were some noisy changes when going from 0.2 version to the 0.3 version. In particular:</p>
 <ul>
 <li>A lot of things moved around to make the structure of the crate a bit more understandable.
@@ -286,4 +286,4 @@ completely gone in this version. The use case of shutting down the application o
 CTRL+C is now supported by a pattern described in the <a href="flag/index.html" title="mod signal_hook::flag"><code>flag</code></a> submodule. For other similar
 needs, refer above for emulating default handlers.</li>
 </ul>
-</div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="consts/index.html" title="mod signal_hook::consts">consts</a></div><div class="desc docblock-short">The low-level constants.</div></li><li><div class="item-name"><a class="mod" href="flag/index.html" title="mod signal_hook::flag">flag</a></div><div class="desc docblock-short">Module for actions setting flags.</div></li><li><div class="item-name"><a class="mod" href="iterator/index.html" title="mod signal_hook::iterator">iterator</a></div><div class="desc docblock-short">An iterator over incoming signals.</div></li><li><div class="item-name"><a class="mod" href="low_level/index.html" title="mod signal_hook::low_level">low_level</a></div><div class="desc docblock-short">Some low level utilities</div></li></ul><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.SigId.html" title="struct signal_hook::SigId">SigId</a></div><div class="desc docblock-short">An ID of registered action.</div></li></ul></section></div></main></body></html>
+</div></details><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="consts/index.html" title="mod signal_hook::consts">consts</a></div><div class="desc docblock-short">The low-level constants.</div></li><li><div class="item-name"><a class="mod" href="flag/index.html" title="mod signal_hook::flag">flag</a></div><div class="desc docblock-short">Module for actions setting flags.</div></li><li><div class="item-name"><a class="mod" href="iterator/index.html" title="mod signal_hook::iterator">iterator</a></div><div class="desc docblock-short">An iterator over incoming signals.</div></li><li><div class="item-name"><a class="mod" href="low_level/index.html" title="mod signal_hook::low_level">low_level</a></div><div class="desc docblock-short">Some low level utilities</div></li></ul><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.SigId.html" title="struct signal_hook::SigId">SigId</a></div><div class="desc docblock-short">An ID of registered action.</div></li></ul></section></div></main></body></html>

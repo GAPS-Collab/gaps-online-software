@@ -1,5 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_status.rs`."><title>tab_status.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_status.rs`."><title>tab_status.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../liftof_tui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -666,6 +667,16 @@
 <a href="#665" id="665">665</a>
 <a href="#666" id="666">666</a>
 <a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! ReadoutBoard Status tab
 //!
 //! Find connected ReadoutBoards and show their 
@@ -674,7 +685,10 @@
 
 </span><span class="kw">use </span>std::time::Instant;
 <span class="kw">use </span>std::fs;
-<span class="kw">use </span>std::collections::VecDeque;
+<span class="kw">use </span>std::collections::{
+    VecDeque,
+    HashMap,
+};
 
 <span class="comment">//extern crate histo;
 //use histo::Histogram;
@@ -709,12 +723,14 @@
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
 <span class="kw">use </span>tof_dataclasses::monitoring::RBMoniData;
 <span class="kw">use </span>tof_dataclasses::io::RBEventMemoryStreamer;
+<span class="kw">use </span>tof_dataclasses::manifest::ReadoutBoard;
+
 <span class="kw">use </span><span class="kw">crate</span>::widgets::{
     timeseries,
     <span class="comment">//histogram,
 </span>};
 <span class="kw">use </span><span class="kw">crate</span>::colors::{
-  ColorTheme2,
+  ColorTheme,
 };
 
 <span class="attr">#[derive(Debug, Copy, Clone)]
@@ -760,8 +776,10 @@
   <span class="kw">pub </span>nch_histo      : Hist1D&lt;Uniform&lt;f32&gt;&gt;,
   timer              : Instant,
 
-  <span class="kw">pub </span>theme          : ColorTheme2,
+  <span class="kw">pub </span>theme          : ColorTheme,
   <span class="kw">pub </span>view           : RBTabView,
+
+  <span class="kw">pub </span>rbs            : HashMap&lt;u8, ReadoutBoard&gt;,
 
   <span class="comment">// list for the rb selector
   </span><span class="kw">pub </span>rbl_state      : ListState,
@@ -771,9 +789,10 @@
 
 <span class="kw">impl </span>RBTab&lt;<span class="lifetime">'_</span>&gt;  {
 
-  <span class="kw">pub fn </span>new(tp_receiver : Receiver&lt;TofPacket&gt;,
-             rb_receiver : Receiver&lt;RBEvent&gt;,
-             theme       : ColorTheme2) -&gt; RBTab&lt;<span class="lifetime">'static</span>&gt;  {
+  <span class="kw">pub fn </span>new(tp_receiver  : Receiver&lt;TofPacket&gt;,
+             rb_receiver  : Receiver&lt;RBEvent&gt;,
+             rbs          : HashMap&lt;u8, ReadoutBoard&gt;,
+             theme        : ColorTheme) -&gt; RBTab&lt;<span class="lifetime">'static</span>&gt;  {
     <span class="kw">let </span><span class="kw-2">mut </span>rb_select_items = Vec::&lt;ListItem&gt;::new();
     <span class="kw">for </span>k <span class="kw">in </span><span class="number">1</span>..<span class="number">51 </span>{
       <span class="kw">let </span>this_item = <span class="macro">format!</span>(<span class="string">"  RB{:0&gt;2}"</span>, k);
@@ -821,7 +840,9 @@
   
       theme          : theme,
       view           : RBTabView::Waveform,
-    
+   
+      rbs            : rbs,
+
       rbl_state      : ListState::default(),
       rbl_items      : rb_select_items,
       rbl_active     : <span class="bool-val">false</span>,

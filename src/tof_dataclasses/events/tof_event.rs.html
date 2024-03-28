@@ -1,5 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/tof_event.rs`."><title>tof_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/tof_event.rs`."><title>tof_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -759,9 +760,6 @@
 <a href="#758" id="758">758</a>
 <a href="#759" id="759">759</a>
 <a href="#760" id="760">760</a>
-<a href="#761" id="761">761</a>
-<a href="#762" id="762">762</a>
-<a href="#763" id="763">763</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Event strucutures for data reconrded byi the tof
 //!
 //! Compressed format containing analysis results of 
@@ -780,8 +778,8 @@
   }
 }
 
-<span class="kw">use </span><span class="kw">crate</span>::DsiLtbRBMapping;
-<span class="kw">use </span><span class="kw">crate</span>::serialization::{Serialization,
+<span class="comment">//use crate::DsiLtbRBMapping;
+</span><span class="kw">use </span><span class="kw">crate</span>::serialization::{Serialization,
                            parse_u8,
                            parse_u16,
                            parse_u32,
@@ -901,7 +899,7 @@
       compression_level : CompressionLevel::Unknown,
       quality           : EventQuality::Unknown,
       header            : TofEventHeader::new(),
-      mt_event          : MasterTriggerEvent::new(<span class="number">0</span>,<span class="number">0</span>),
+      mt_event          : MasterTriggerEvent::new(),
       rb_events         : Vec::&lt;RBEvent&gt;::new(),
       missing_hits      : Vec::&lt;RBMissingHit&gt;::new(), 
       creation_time     : creation_time,
@@ -920,22 +918,18 @@
     <span class="self">self</span>.creation_time.elapsed().as_secs()
   }
 
-  <span class="comment">// Do we have all readoutboards which we are expecting 
-  // in this event?
-  //
-  // This is useful from the perspective of the event builder.
-  // Do we still have to wait for more rbs?
-  // There might still be channels missing, but this is 
-  // nothing the event builder can deal with right now.
+  <span class="doccomment">/// Simple check if the event contains as much RBEvents 
+  /// as expected from the provided boards masks by the MTB
   </span><span class="kw">pub fn </span>is_complete(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-    <span class="self">self</span>.mt_event.get_n_rbs_expected() <span class="kw">as </span>usize == <span class="self">self</span>.rb_events.len()
+    <span class="self">self</span>.mt_event.get_rb_link_ids().len() == <span class="self">self</span>.rb_events.len()
   }
   
-  <span class="kw">pub fn </span>is_complete_from_map(<span class="kw-2">&amp;</span><span class="self">self</span>, dsimap : <span class="kw-2">&amp;</span>DsiLtbRBMapping) -&gt; bool {
-    <span class="self">self</span>.mt_event.get_n_rbs_exp_from_map(dsimap)  <span class="kw">as </span>usize == <span class="self">self</span>.rb_events.len()
-  }
+  <span class="comment">//pub fn is_complete_from_map(&amp;self, dsimap : &amp;DsiLtbRBMapping) -&gt; bool {
+  //  //self.mt_event.get_n_rbs_exp_from_map(dsimap)  as usize == self.rb_events.len()
+  //  self.mt_event.get_rb_link_ids().len() == self.rb_events.len()
+  //}
 
-  <span class="doccomment">/// Encode the sizes of the vectors holding the 
+  </span><span class="doccomment">/// Encode the sizes of the vectors holding the 
   /// into an u32
   ///
   /// We have one byte (256) max length per vector.
@@ -973,7 +967,8 @@
     <span class="comment">//summary.status            = self.header.status;
     //summary.quality           = self.header.quality;
     //summary.trigger_setting   = self.;
-    </span>summary.n_trigger_paddles = <span class="self">self</span>.mt_event.n_paddles;
+    // FIXME - this is not trigger paddles, but trigger hits!
+    </span>summary.n_trigger_paddles = <span class="self">self</span>.mt_event.get_trigger_hits().len() <span class="kw">as </span>u8;
     summary.event_id          = <span class="self">self</span>.header.event_id;
     summary.timestamp32       = <span class="self">self</span>.header.timestamp_32;
     summary.timestamp16       = <span class="self">self</span>.header.timestamp_16;
@@ -1074,10 +1069,10 @@
   }
 }
 
-<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>MasterTriggerEvent&gt; <span class="kw">for </span>TofEvent {
-  <span class="kw">fn </span>from(mte : <span class="kw-2">&amp;</span>MasterTriggerEvent) -&gt; <span class="self">Self </span>{
+<span class="kw">impl </span>From&lt;MasterTriggerEvent&gt; <span class="kw">for </span>TofEvent {
+  <span class="kw">fn </span>from(mte : MasterTriggerEvent) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span><span class="kw-2">mut </span>te : TofEvent = Default::default();
-    te.mt_event = <span class="kw-2">*</span>mte;
+    te.mt_event = mte;
     te.header.event_id = te.mt_event.event_id;
     te
   }
@@ -1221,7 +1216,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>te               = <span class="self">Self</span>::new();
     te.event_id              = mte.event_id;
     te.timestamp_32          = mte.timestamp;
-    te.n_paddles             = mte.get_hit_paddles();
+    te.n_paddles             = mte.get_trigger_hits().len() <span class="kw">as </span>u8;
     te
   }
 }

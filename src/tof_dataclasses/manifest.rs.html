@@ -1,5 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/manifest.rs`."><title>manifest.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/manifest.rs`."><title>manifest.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1021,6 +1022,20 @@
 <a href="#1020" id="1020">1020</a>
 <a href="#1021" id="1021">1021</a>
 <a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Entities of the tof, that is LocalTriggerBoard, ReadoutBoard, PB, MTB...
 //! 
 //! This provides structs to hold their metainformation,
@@ -1042,6 +1057,7 @@
 <span class="kw">use </span>regex::Regex;
 <span class="kw">use </span>glob::glob;
 <span class="kw">use </span>chrono::NaiveDateTime;
+<span class="kw">use </span>chrono::DateTime;
 
 <span class="kw">use </span><span class="kw">crate</span>::calibrations::RBCalibrations;
 
@@ -1056,6 +1072,14 @@
   }
 }
 
+<span class="doccomment">/// Create a mapping of mtb link ids to rb ids
+</span><span class="kw">pub fn </span>get_linkid_rbid_map(rbs : <span class="kw-2">&amp;</span>Vec&lt;ReadoutBoard&gt;) -&gt; HashMap&lt;u8, u8&gt;{
+  <span class="kw">let </span><span class="kw-2">mut </span>mapping = HashMap::&lt;u8, u8&gt;::new();
+  <span class="kw">for </span>rb <span class="kw">in </span>rbs {
+    mapping.insert(rb.mtb_link_id, rb.rb_id);
+  }
+  mapping
+}
 
 <span class="doccomment">/// Summary of DSI/J/LTBCH (0-319)
 </span><span class="attr">#[cfg(feature = <span class="string">"database"</span>)]
@@ -1864,6 +1888,7 @@
   <span class="kw">pub </span>cable_lengths            : [f32;<span class="number">8</span>],
   <span class="kw">pub </span>calib_file_path          : String,
   <span class="kw">pub </span>calibration              : RBCalibrations,       
+  <span class="kw">pub </span>mtb_link_id              : u8,
 }
 
 <span class="kw">impl </span>ReadoutBoard {
@@ -1876,6 +1901,7 @@
       cable_lengths            : [<span class="number">0.0</span>;<span class="number">8</span>],
       calib_file_path          : String::from(<span class="string">""</span>),
       calibration              : RBCalibrations::new(<span class="number">0</span>),
+      mtb_link_id              : <span class="number">0</span>,
     }
   }
 
@@ -1902,7 +1928,7 @@
     </span><span class="kw">let </span>re = Regex::new(<span class="string">r"(\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2})"</span>)<span class="question-mark">?</span>;
     <span class="comment">// Define your file pattern (e.g., "logs/*.log" for all .log files in the logs directory)
     </span><span class="kw">let </span>pattern = <span class="macro">format!</span>(<span class="string">"{}/RB{:02}_*"</span>, <span class="self">self</span>.calib_file_path, <span class="self">self</span>.rb_id); <span class="comment">// Adjust this pattern to your files' naming convention
-    </span><span class="kw">let </span><span class="kw-2">mut </span>newest_file = (String::from(<span class="string">""</span>), NaiveDateTime::from_timestamp_opt(<span class="number">0</span>, <span class="number">0</span>).unwrap());
+    </span><span class="kw">let </span><span class="kw-2">mut </span>newest_file = (String::from(<span class="string">""</span>), NaiveDateTime::from_timestamp(<span class="number">0</span>, <span class="number">0</span>));
     
     <span class="comment">// Iterate over files that match the pattern
     </span><span class="kw">let </span><span class="kw-2">mut </span>filename : String;
@@ -1922,7 +1948,8 @@
             <span class="comment">//println!("{}",timestamp_str);
             </span><span class="kw">let </span>timestamp = NaiveDateTime::parse_from_str(timestamp_str, <span class="string">"%Y_%m_%d-%H_%M_%S"</span>)<span class="question-mark">?</span>;
             <span class="kw">if </span>timestamp &gt; newest_file.<span class="number">1 </span>{
-              newest_file.<span class="number">1 </span>= timestamp;
+              <span class="comment">// FIXME - into might panic?
+              </span>newest_file.<span class="number">1 </span>= timestamp.into();
               newest_file.<span class="number">0 </span>= filename.clone();
             }
           }
@@ -2026,6 +2053,7 @@
     <span class="macro">write!</span>(f,
 <span class="string">"&lt;ReadoutBoard:
     ID                  : {}
+    MTB Link ID         : {}
     ** calibration will be loaded from this path:
       \u{021B3} {}
     calibration         : {}
@@ -2034,6 +2062,7 @@
     PADDLE LENGTHS [mm] : {:?}
     CABLE  LENGTHS [cm] : {:?}&gt;"</span>,
       <span class="self">self</span>.rb_id,
+      <span class="self">self</span>.mtb_link_id,
       <span class="self">self</span>.calib_file_path,
       <span class="self">self</span>.calibration,
       <span class="self">self</span>.channel_to_paddle_end_id,
