@@ -15,7 +15,7 @@ use rand::Rng;
 /// We will save the values for the peak heigth, time and charge
 /// as u16. The calculations yield f32 though. We need to convert
 /// them using MIN/MAX and a range
-const MAX_PEAK_HEIGHT      : f32 = 500.0; //mV
+const MAX_PEAK_HEIGHT      : f32 = 150.0; //mV
 //const MIN_PEAK_HEIGHT      : f32 = 0.0;
 const U16TOF32_PEAK_HEIGHT : f32 = MAX_PEAK_HEIGHT/(u16::MAX as f32);
 const F32TOU16_PEAK_HEIGHT : u16 = ((u16::MAX as f32)/MAX_PEAK_HEIGHT) as u16;
@@ -31,6 +31,8 @@ const U16TOF32_T0          : f32 = MAX_PEAK_TIME/(u16::MAX as f32);
 const F32TOU16_T0          : u16 = ((u16::MAX as f32)/MAX_PEAK_TIME) as u16;
 const U16TOF32_POS_ACROSS  : f32 = 1800.0/(u16::MAX as f32);
 const F32TOU16_POS_ACROSS  : u16 = ((u16::MAX as f32)/1800.0) as u16;
+const U16TOF32_EDEP        : f32 = 180.0/(u16::MAX as f32);
+const F32TOU16_EDEP        : u16 = ((u16::MAX as f32)/100.0) as u16;
 
 /// Waveform peak
 ///
@@ -111,6 +113,8 @@ pub struct TofHit {
   // for debugging purposes
   pub ftime_a      : f32,
   pub ftime_b      : f32,
+  pub fpeak_a      : f32,
+  pub fpeak_b      : f32,
   pub paddle_len   : f32,
 }
 
@@ -128,8 +132,8 @@ impl fmt::Display for TofHit {
     LE Time A/B   {:.2} {:.2}   
     Height  A/B   {:.2} {:.2}
     Charge  A/B   {:.2} {:.2}
-  charge_min_i    {}   
   ** reconstructed interaction
+    energy_dep    {:.2}   
     pos_across    {:.2}   
     t0            {:.2}   
   ctr_etx         {}   
@@ -144,7 +148,7 @@ impl fmt::Display for TofHit {
             self.get_peak_b(),
             self.get_charge_a(),
             self.get_charge_b(),
-            self.charge_min_i,
+            self.get_edep(),
             self.get_pos_across(),
             self.get_t0(),
             self.ctr_etx,
@@ -245,6 +249,8 @@ impl TofHit {
          valid        : true,
          ftime_a      : 0.0,
          ftime_b      : 0.0,
+         fpeak_a      : 0.0,
+         fpeak_b      : 0.0,
          paddle_len   : 0.0,
     }
   }
@@ -272,6 +278,8 @@ impl TofHit {
     return 0;
   }
 
+  
+
   pub fn add_peak(&mut self, peak : &Peak)  {
     if self.paddle_id != TofHit::get_pid(peak.paddle_end_id) {
       //error!("Can't add peak to 
@@ -293,6 +301,18 @@ impl TofHit {
 
   pub fn get_timestamp48(&self) -> u64 {
     ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
+  }
+  
+  pub fn set_edep(&mut self, edep : f32) {
+    if edep >= 100.0 {
+      self.charge_min_i = u16::MAX;
+    } else {
+      self.charge_min_i = F32TOU16_EDEP*(edep.floor() as u16);
+    }
+  }
+
+  pub fn get_edep(&self) -> f32 {
+    self.charge_min_i as f32 * U16TOF32_EDEP
   }
   
   pub fn set_pos_across(&mut self, pa : f32) {
