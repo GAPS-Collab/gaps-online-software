@@ -112,7 +112,7 @@ if (BUILD_LIFTOF)
     rust-pybindings
       ALL
       COMMAND ${RUST_BUILD_COMMAND} 
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings 
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python 
   )
   add_custom_target(
     liftof-cc
@@ -141,7 +141,7 @@ if (BUILD_LIFTOF)
   install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-tui
       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   )
-  install(FILES ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librust_dataclasses.so
+  install(FILES ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/librust_dataclasses.so
       DESTINATION ${INSTALL_PYTHON_DIR}/
       RENAME rust_dataclasses.so
   )
@@ -199,8 +199,6 @@ install(FILES
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
     DESTINATION ${CMAKE_INSTALL_PREFIX})
-
-
 
 install(TARGETS ${pybindings}
     EXPORT GAPSTargets         

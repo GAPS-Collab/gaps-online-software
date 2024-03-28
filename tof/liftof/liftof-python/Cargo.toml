@@ -1,5 +1,5 @@
 [package]
-name = "rust_dataclasses"
+name = "liftof-python"
 version = "0.10.0"
 edition = "2021"
 
@@ -18,7 +18,8 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-tof-dataclasses = { path = "../tof-dataclasses", features=["advanced-algorithms"]}
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["advanced-algorithms", "database"]} 
+liftof-lib = { path = "../liftof-lib" }
 pyo3 = { version = "0.19.2", features = ["extension-module"] }
 pyo3-log = "0.8"
 numpy = "0.19"
