@@ -87,21 +87,27 @@ pub fn interpolate_time (voltages      : &Vec<f32>,
 /// * impedance : typically this is 
 pub fn integrate(voltages     : &Vec<f32>,
                  nanoseconds  : &Vec<f32>,
-                 lower_bound  : f32,
-                 size         : f32,
-                 impedance    : f32) ->Result<f32, WaveformError>  {
-  if lower_bound < 0.0 { 
-    return Err(WaveformError::NegativeLowerBound);
-  }
-  let lo_bin          = time2bin(nanoseconds,lower_bound)?;
-  let mut size_bin    = time2bin(nanoseconds,lower_bound + size)?;
-  size_bin = size_bin - lo_bin;
-  if lo_bin + size_bin > voltages.len() {
-    warn!("Limiting integration range to waveform size!");
-    size_bin = voltages.len() - lo_bin;
+                 //lower_bound  : f32,
+                 //size         : f32,
+                 lo_bin       : usize,
+                 upper_bin    : usize,
+                 impedance    : f32) -> Result<f32, WaveformError>  {
+  //if lower_bound < 0.0 { 
+  //  return Err(WaveformError::NegativeLowerBound);
+  //}
+  //let lo_bin          = time2bin(nanoseconds,lower_bound)?;
+  //let mut size_bin    = time2bin(nanoseconds,lower_bound + size)?;
+  //println!("lower bound {}, lo bin {}, size bin {}", lower_bound, lo_bin, size_bin);
+  //size_bin = size_bin - lo_bin;
+  //if lo_bin + size_bin > voltages.len() {
+  //  warn!("Limiting integration range to waveform size!");
+  //  size_bin = voltages.len() - lo_bin;
+  //}
+  if upper_bin > voltages.len() {
+    return Err(WaveformError::OutOfRangeUpperBound)
   }
   let mut sum = 0f32;
-  let upper_bin = lo_bin + size_bin;
+  //let upper_bin = lo_bin + size_bin;
   for n in lo_bin..upper_bin {
     sum += voltages[n] * (nanoseconds[n] - nanoseconds[n-1]) ;
   }
@@ -316,6 +322,13 @@ pub fn find_peaks(voltages       : &Vec<f32>,
   Ok(peaks)
 }
 
+/// An approximation to calculate the energy deposition as used by
+/// Philip/Jamie/Jeff
+pub fn calc_edep_simple(peak_voltage : f32) -> f32 {
+  (-1000.0 * peak_voltage) / (21.0 * peak_voltage - 35260.0)
+}
+
+
 /// Calculate the interaction time based on the peak timings measured 
 /// at the paddle ends A and B
 ///
@@ -325,7 +338,7 @@ pub fn find_peaks(voltages       : &Vec<f32>,
 /// * t_b           : (absolute) timing for the peak measured at B side
 /// * paddle_length : the length of the paddle in cm
 pub fn get_paddle_t0(t_a : f32, t_b : f32, paddle_length : f32) -> f32 {
-  0.5*(t_a + t_b - (paddle_length/C_LIGHT_PADDLE))
+  0.5*(t_a + t_b - (paddle_length/(10.0*C_LIGHT_PADDLE)))
 }
 
 /// Calculate the distance from the A side
