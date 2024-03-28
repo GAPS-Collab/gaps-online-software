@@ -542,6 +542,7 @@ struct RBWaveform {
   u32       event_id  ; 
   u8        rb_id     ; 
   u8        rb_channel; 
+  u16       stop_cell ;
   Vec<u16>  adc       ; 
   
   static RBWaveform from_bytestream(const Vec<u8> &bytestream, 

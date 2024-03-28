@@ -1067,6 +1067,7 @@ RBWaveform RBWaveform::from_bytestream(const Vec<u8> &stream,
   wf.event_id   = Gaps::parse_u32(stream, pos);
   wf.rb_id      = Gaps::parse_u8(stream, pos);
   wf.rb_channel = Gaps::parse_u8(stream, pos); 
+  wf.stop_cell  = Gaps::parse_u16(stream, pos);
   Vec<u8>::const_iterator start = stream.begin() + pos;
   Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
   Vec<u8> data(start, end);
@@ -1082,9 +1083,10 @@ RBWaveform RBWaveform::from_bytestream(const Vec<u8> &stream,
 std::string RBWaveform::to_string() const {
   std::string repr = "<RBWaveform";
   //repr += std::format("\n  format test {:.2f}", get_time_a() );
-  repr += std::format("\n  Event ID : {}", event_id);
-  repr += std::format("\n  RB       : {}", rb_id);
-  repr += std::format("\n  Channel  : {}", rb_channel);
+  repr += std::format("\n  Event ID  : {}", event_id);
+  repr += std::format("\n  RB        : {}", rb_id);
+  repr += std::format("\n  Channel   : {}", rb_channel);
+  repr += std::format("\n  Stop cell : {}", stop_cell);
   if (adc.size() >= 273) {
     repr += std::format("\n  adc[{}]    : .. {} {} {} ..", adc.size(), adc[270], adc[271], adc[272]);
   } else {
