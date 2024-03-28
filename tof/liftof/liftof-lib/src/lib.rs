@@ -536,23 +536,6 @@ pub fn waveform_analysis(event         : &mut RBEvent,
               voltages[n] -= ped;
             }
             let mut charge : f32 = 0.0;
-            //debug!("Check impedance value! Just using 50 [Ohm]");
-            // Step 3 : charge integration
-            // FIXME - make impedance a settings parameter
-            // This does not make sense. Why don't we integrate 
-            // the peak?
-            match integrate(&voltages,
-                            &times,
-                            settings.integration_start,
-                            settings.integration_window,
-                            50.0) {
-              Err(err) => {
-                error!("Integration failed! Err {err}");
-              }
-              Ok(chrg)   => {
-                charge = chrg;
-              }
-            }
             //let peaks : Vec::<(usize, usize)>;
             let mut cfd_times = Vec::<f32>::new();
             let mut max_volts = 0.0f32;
@@ -573,7 +556,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
               Ok(peaks)  => {
                 //peaks = pks;
                 // Step 5 : Find tdcs
-                //println!("Found {} peaks!", peaks.len());
+                //println!("Found {} peaks for ch {}! {:?}", peaks.len(), raw_ch, peaks);
                 for pk in peaks.iter() {
                   match cfd_simple(&voltages,
                                    &times,
@@ -589,6 +572,25 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                   // just do the first peak for now
                   let pk_height = voltages[pk.0..pk.1].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
                   max_volts = *pk_height; 
+                  //debug!("Check impedance value! Just using 50 [Ohm]");
+                  // Step 3 : charge integration
+                  // FIXME - make impedance a settings parameter
+                  // This does not make sense. Why don't we integrate 
+                  // the peak?
+                  match integrate(&voltages,
+                                  &times,
+                                  //settings.integration_start,
+                                  //settings.integration_window,
+                                  pk.0, 
+                                  pk.1,
+                                  50.0) {
+                    Err(err) => {
+                      error!("Integration failed! Err {err}");
+                    }
+                    Ok(chrg)   => {
+                      charge = chrg;
+                    }
+                  }
                   break;
                 }
               }// end OK
@@ -600,12 +602,14 @@ pub fn waveform_analysis(event         : &mut RBEvent,
             //println!("Calucalated tdc {}, charge {}, max {}", tdc, charge, max_volts); 
             if rb.channel_to_paddle_end_id[*raw_ch as usize] > 2000 {
               hit.ftime_b      = tdc;
+              hit.fpeak_b      = max_volts;
               hit.set_time_b(tdc);
               hit.set_charge_b(charge);
               hit.set_peak_b(max_volts);
               
             } else {
               hit.ftime_a = tdc;
+              hit.fpeak_b = max_volts;
               hit.set_time_a(tdc);
               hit.set_charge_a(charge);
               hit.set_peak_a(max_volts);
@@ -621,9 +625,15 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   //println!("{:?}", paddles);
   for (_, hit) in paddles.iter_mut() {
     let t0 = get_paddle_t0(hit.ftime_a, hit.ftime_b, rb.get_paddle_length(hit.paddle_id));
+    //println!("Cot t0 :{}", t0);
+    //println!("Hit : {}", hit);
+    //println!("Hit.ftime_a {}", hit.ftime_a);
     let pa = pos_across(hit.ftime_a, t0);
+    //println!("pa : {}", pa);
     hit.set_t0(t0);
     hit.set_pos_across(pa);
+    hit.set_edep((hit.fpeak_a + hit.fpeak_b) / 2.0);
+
     //println!("caluclated {} {} for {}",t0, pa, hit);
   }
   let result = paddles.into_values().collect();
