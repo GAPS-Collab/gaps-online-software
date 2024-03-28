@@ -1,5 +1,6 @@
 use std::collections::{
     VecDeque,
+    HashMap,
 };
 
 use crossbeam_channel::{
@@ -36,8 +37,11 @@ use tof_dataclasses::packets::{
 use tof_dataclasses::events::{
     RBWaveform,
 };
+
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::manifest::ReadoutBoard;
+
 use crate::colors::ColorTheme;
 use crate::widgets::{
     //clean_data,
@@ -55,23 +59,38 @@ pub struct RBWaveformTab {
   pub rb_histo       : Hist1D<Uniform<f32>>,
   cali_loaded        : bool,
   pub exclude_ch9    : bool,
+  pub rbs            : HashMap<u8, ReadoutBoard>,
+
+  voltages           : Vec<f32>,
+  nanoseconds        : Vec<f32>,
 }
 
 impl RBWaveformTab {
 
-  pub fn new(rbw_recv : Receiver<TofPacket>, theme : ColorTheme) -> Self {
+  // FIXME - eventually share rbs with the other tabs,
+  // so we want to have a pointer or a static reference
+  pub fn new(rbw_recv : Receiver<TofPacket>,
+             rbs      : HashMap<u8, ReadoutBoard>,
+             theme    : ColorTheme) -> Self {
     let bins_rb  = Uniform::new(50, 1.0, 51.0);
     // FIXME check if there are calibrations
-    let cali_loaded = false;
+    let mut cali_loaded = false;
+    if rbs.len() > 0 {
+      cali_loaded = true;
+    }
     Self {
       theme   ,
       rbw_recv,
-      rbw_queue  : VecDeque::<RBWaveform>::new(),
-      queue_size : 100, // no need for long queue, since we are displaying 
+      rbw_queue   : VecDeque::<RBWaveform>::new(),
+      queue_size  : 100, // no need for long queue, since we are displaying 
                         // only the last anyway
-      rb_histo   : ndhistogram!(bins_rb),
+      rb_histo    : ndhistogram!(bins_rb),
       cali_loaded,
       exclude_ch9 : true,
+      rbs         : rbs,
+
+      voltages    : vec![0.0;1024],
+      nanoseconds : vec![0.0;1024]
     }
   }
   
@@ -116,7 +135,8 @@ impl RBWaveformTab {
       .split(chunks[1]);
     
     let mut wf_string = String::from("No RBWaveform");
-    let mut wf        = RBWaveform::new();
+    //let mut wf        = RBWaveform::new();
+    let mut wf        : RBWaveform;
     loop {
       match self.rbw_queue.pop_front() {
         Some(_wf) => {
@@ -129,14 +149,26 @@ impl RBWaveformTab {
           wf_string = format!("{}", wf);
         },
         None => {
-          break;
+          return;
         }
       }
     }
     let label       = format!("RBWaveform RB {}-{}", wf.rb_id, wf.rb_channel);
     let wf_theme    = self.theme.clone();
-    let mut wf_data = VecDeque::<(f64, f64)>::new();
+    let mut wf_data = VecDeque::<(f64, f64)>::new();    
     if self.cali_loaded {
+      if wf.rb_channel != 0 {
+        self.rbs[&wf.rb_id].calibration.voltages(wf.rb_channel as usize,
+                                                 wf.stop_cell as usize,
+                                                 &wf.adc,
+                                                 &mut self.voltages); 
+        self.rbs[&wf.rb_id].calibration.nanoseconds(wf.rb_channel as usize,
+                                                    wf.stop_cell as usize,
+                                                    &mut self.nanoseconds);
+        for k in 0..self.nanoseconds.len() {
+          wf_data.push_back((self.nanoseconds[k] as f64, self.voltages[k] as f64));
+        }
+      }
     } else {
       for (i,k) in wf.adc.iter().enumerate() {
         wf_data.push_back((i as f64, *k as f64));

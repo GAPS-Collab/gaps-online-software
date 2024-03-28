@@ -6,7 +6,10 @@
 
 use std::time::Instant;
 use std::fs;
-use std::collections::VecDeque;
+use std::collections::{
+    VecDeque,
+    HashMap,
+};
 
 //extern crate histo;
 //use histo::Histogram;
@@ -41,12 +44,14 @@ use tof_dataclasses::events::RBEvent;
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::monitoring::RBMoniData;
 use tof_dataclasses::io::RBEventMemoryStreamer;
+use tof_dataclasses::manifest::ReadoutBoard;
+
 use crate::widgets::{
     timeseries,
     //histogram,
 };
 use crate::colors::{
-  ColorTheme2,
+  ColorTheme,
 };
 
 #[derive(Debug, Copy, Clone)]
@@ -92,8 +97,10 @@ pub struct RBTab<'a>  {
   pub nch_histo      : Hist1D<Uniform<f32>>,
   timer              : Instant,
 
-  pub theme          : ColorTheme2,
+  pub theme          : ColorTheme,
   pub view           : RBTabView,
+
+  pub rbs            : HashMap<u8, ReadoutBoard>,
 
   // list for the rb selector
   pub rbl_state      : ListState,
@@ -103,9 +110,10 @@ pub struct RBTab<'a>  {
 
 impl RBTab<'_>  {
 
-  pub fn new(tp_receiver : Receiver<TofPacket>,
-             rb_receiver : Receiver<RBEvent>,
-             theme       : ColorTheme2) -> RBTab<'static>  {
+  pub fn new(tp_receiver  : Receiver<TofPacket>,
+             rb_receiver  : Receiver<RBEvent>,
+             rbs          : HashMap<u8, ReadoutBoard>,
+             theme        : ColorTheme) -> RBTab<'static>  {
     let mut rb_select_items = Vec::<ListItem>::new();
     for k in 1..51 {
       let this_item = format!("  RB{:0>2}", k);
@@ -153,7 +161,9 @@ impl RBTab<'_>  {
   
       theme          : theme,
       view           : RBTabView::Waveform,
-    
+   
+      rbs            : rbs,
+
       rbl_state      : ListState::default(),
       rbl_items      : rb_select_items,
       rbl_active     : false,

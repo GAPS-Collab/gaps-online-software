@@ -10,10 +10,18 @@ use std::sync::{
     Mutex,
 };
 
+use std::path::Path;
+
 use std::thread;
-use std::time::{Duration, Instant};
+use std::time::{
+    Duration,
+    Instant
+};
 use std::io;
-use std::collections::{VecDeque, HashMap};
+use std::collections::{
+    VecDeque,
+    HashMap
+};
 #[macro_use] extern crate log;
 
 use tui_logger::TuiLoggerWidget;
@@ -53,6 +61,13 @@ use tof_dataclasses::packets::{
     TofPacket,
     PacketType
 };
+
+use tof_dataclasses::manifest::{
+    get_rbs_from_sqlite,
+    ReadoutBoard,
+};
+//use tof_dataclasses::calibrations::RBCalibrations;
+
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::events::{
     MasterTriggerEvent,
@@ -514,6 +529,7 @@ impl<'a> TabbedInterface<'a> {
     self.mt_menu.theme.update(&cs);
     self.rw_menu.theme.update(&cs);
     self.ts_menu.theme.update(&cs);
+    self.th_menu.theme.update(&cs);
     self.home_tab    .theme.update(&cs);
     self.event_tab   .theme.update(&cs);
     self.wf_tab      .theme.update(&cs);
@@ -522,6 +538,7 @@ impl<'a> TabbedInterface<'a> {
     self.cpu_tab     .theme.update(&cs);
     self.th_tab      .theme.update(&cs);
     self.rbwf_tab    .theme.update(&cs);
+    self.ts_tab      .theme.update(&cs);
     self.color_set = cs;
   }
   
@@ -627,19 +644,7 @@ impl<'a> TabbedInterface<'a> {
               match self.settings_tab.get_colorset() {
                 None => info!("Did not get a new colorset!"),
                 Some(cs) => {
-                  //color_theme.update(&cs);
                   self.update_color_theme(cs);
-                  //tabs.update_color_theme(cs);
-                  //st_menu.theme.update(&cs);
-                  //ui_menu.theme.update(&cs);
-                  //rb_menu.theme.update(&cs);
-                  //mt_menu.theme.update(&cs);
-                  //home_tab.theme.update(&cs);
-                  //event_tab.theme.update(&cs);
-                  //wf_tab.theme.update(&cs);
-                  //mt_tab2.theme.update(&cs);
-                  //settings_tab.theme.update(&cs);
-                  //cpu_tab.theme.update(&cs);
                 }
               }
             }
@@ -650,19 +655,7 @@ impl<'a> TabbedInterface<'a> {
               match self.settings_tab.get_colorset() {
                 None => info!("Did not get a new colorset!"),
                 Some(cs) => {
-                  //color_theme.update(&cs);
                   self.update_color_theme(cs);
-                  //tabs.update_color_theme(cs);
-                  //st_menu.theme.update(&cs);
-                  //ui_menu.theme.update(&cs);
-                  //rb_menu.theme.update(&cs);
-                  //mt_menu.theme.update(&cs);
-                  //home_tab.theme.update(&cs);
-                  //event_tab.theme.update(&cs);
-                  //wf_tab.theme.update(&cs);
-                  //mt_tab2.theme.update(&cs);
-                  //settings_tab.theme.update(&cs);
-                  //cpu_tab.theme.update(&cs);
                 }
               }
             }
@@ -772,6 +765,19 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
 
   let home_stream_wd_cnt : Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
   let home_streamer      = home_stream_wd_cnt.clone();
+
+  // prepare calibrations
+  let mut readoutboards = HashMap::<u8, ReadoutBoard>::new();
+  let rbs = get_rbs_from_sqlite(&Path::new("gaps_flight.db"));
+  for mut rb in rbs {
+    rb.calib_file_path = String::from("calibrations");
+    match rb.load_latest_calibration() {
+      Err(err) => error!("Unable to load calibration for {}! {}", rb, err),
+      Ok(_) => {
+        readoutboards.insert(rb.rb_id, rb);
+      }
+    }
+  }
 
   let mut pm = HashMap::<String, usize>::new();
   pm.insert(String::from("Unknown"          ) ,0);
@@ -893,20 +899,23 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
 
   // The tabs
   let mt_tab          = MTTab::new(mt_pack_recv,
-                                       mte_recv,
-                                       color_theme.clone());
+                                   mte_recv,
+                                   color_theme.clone());
  
   let cpu_tab         = CPUTab::new(cp_pack_recv,
-                                        color_theme.clone());
+                                    color_theme.clone());
   // waifu tab
   let wf_tab          = RBTab::new(rb_pack_recv,
-                                       rbe_recv,
-                                       color_theme.clone());
+                                   rbe_recv,
+                                   readoutboards.clone(),
+                                   color_theme.clone());
   let settings_tab    = SettingsTab::new(color_theme.clone());
   let home_tab        = HomeTab::new(color_theme.clone(), home_streamer, packet_map_home);
   let event_tab       = EventTab::new(ev_pack_recv, mte_send, rbe_send, th_send, color_theme);
   let hit_tab         = TofHitTab::new(th_recv,color_theme.clone());
-  let rbwf_tab        = RBWaveformTab::new(rbwf_pack_recv, color_theme.clone());
+  let rbwf_tab        = RBWaveformTab::new(rbwf_pack_recv,
+                                           readoutboards,
+                                           color_theme.clone());
   let ts_tab          = TofSummaryTab::new(ts_recv, color_theme.clone());
   let tabs            = TabbedInterface::new(ui_menu,
                                              rb_menu,

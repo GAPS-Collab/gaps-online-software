@@ -45,7 +45,7 @@ use tof_dataclasses::errors::SerializationError;
 
 use crate::colors::ColorTheme;
 use crate::widgets::{
-    clean_data,
+    //clean_data,
     prep_data,
     create_labels,
 };
@@ -80,6 +80,7 @@ pub struct TofHitTab<'a> {
   pub pa_histo        : Hist1D<Uniform<f32>>,
   // tzero           
   pub t0_histo        : Hist1D<Uniform<f32>>,
+  pub edep_histo      : Hist1D<Uniform<f32>>,
   // paddle id
   pub pid_histo       : Hist1D<Uniform<f32>>,
   pub view            : TofHitView,
@@ -96,10 +97,11 @@ impl TofHitTab<'_> {
   pub fn new(th_recv : Receiver<TofHit>, theme : ColorTheme) -> TofHitTab<'static> {
     let bins_ph    = Uniform::new(50, 0.0, 200.0);
     let bins_pt    = Uniform::new(50, 0.0, 400.0);
-    let bins_pc    = Uniform::new(50, 0.0, 500.0);
-    let bins_pa    = Uniform::new(50, 0.0, 200.0);
+    let bins_pc    = Uniform::new(30, 0.0, 30.0);
+    let bins_pa    = Uniform::new(90, 0.0, 1800.0);
     let bins_t0    = Uniform::new(50, 0.0, 200.0);
     let bins_pid   = Uniform::new(160,1.0, 161.0);
+    let bins_edep  = Uniform::new(50,0.0,100.0);
     let mut paddle_select_items = Vec::<ListItem>::new();
     let all_pdl = String::from("  All paddles");
     paddle_select_items.push(ListItem::new(Line::from(all_pdl)));
@@ -120,6 +122,7 @@ impl TofHitTab<'_> {
       pcb_histo       : ndhistogram!(bins_pc),
       pa_histo        : ndhistogram!(bins_pa),
       t0_histo        : ndhistogram!(bins_t0),
+      edep_histo      : ndhistogram!(bins_edep),
       pid_histo       : ndhistogram!(bins_pid),
       view            : TofHitView::Pulses,
       paddle_selector : 0,
@@ -132,19 +135,21 @@ impl TofHitTab<'_> {
   }
 
   pub fn init_histos(&mut self) {
-    let bins_ph    = Uniform::new(50, 0.0, 200.0);
-    let bins_pt    = Uniform::new(50, 0.0, 400.0);
-    let bins_pc    = Uniform::new(50, 0.0, 500.0);
-    let bins_pa    = Uniform::new(50, 0.0, 200.0);
-    let bins_t0    = Uniform::new(50, 0.0, 200.0);
-    self.pha_histo = ndhistogram!(bins_ph.clone());
-    self.pta_histo = ndhistogram!(bins_pt.clone());
-    self.pca_histo = ndhistogram!(bins_pc.clone());
-    self.phb_histo = ndhistogram!(bins_ph);
-    self.ptb_histo = ndhistogram!(bins_pt);
-    self.pcb_histo = ndhistogram!(bins_pc);
-    self.pa_histo  = ndhistogram!(bins_pa);
-    self.t0_histo  = ndhistogram!(bins_t0);
+    let bins_ph     = Uniform::new(50, 0.0, 200.0);
+    let bins_pt     = Uniform::new(50, 0.0, 400.0);
+    let bins_pc     = Uniform::new(30, 0.0, 30.0);
+    let bins_pa     = Uniform::new(90, 0.0, 1800.0);
+    let bins_t0     = Uniform::new(50, 0.0, 200.0);
+    let bins_edep   = Uniform::new(50,0.0,100.0);
+    self.pha_histo  = ndhistogram!(bins_ph.clone());
+    self.pta_histo  = ndhistogram!(bins_pt.clone());
+    self.pca_histo  = ndhistogram!(bins_pc.clone());
+    self.phb_histo  = ndhistogram!(bins_ph);
+    self.ptb_histo  = ndhistogram!(bins_pt);
+    self.pcb_histo  = ndhistogram!(bins_pc);
+    self.pa_histo   = ndhistogram!(bins_pa);
+    self.t0_histo   = ndhistogram!(bins_t0);
+    self.edep_histo = ndhistogram!(bins_edep);
   }
 
   pub fn receive_packet(&mut self) -> Result<(), SerializationError> {  
@@ -171,8 +176,9 @@ impl TofHitTab<'_> {
         self.ptb_histo.fill(&hit.get_time_b());
         self.pca_histo.fill(&hit.get_charge_a());
         self.pcb_histo.fill(&hit.get_charge_b());
-        self.t0_histo.fill(&(hit.t0 as f32));
-        self.pa_histo.fill(&(hit.pos_across as f32));
+        self.t0_histo.fill(&(hit.get_t0()));
+        self.pa_histo.fill(&(hit.get_pos_across()));
+        self.edep_histo.fill(&(hit.get_edep()));
         return Ok(());
       }
     }
@@ -211,12 +217,12 @@ impl TofHitTab<'_> {
 
         // histograms
         let ph_labels  = create_labels(&self.pha_histo);
-        let pha_data   = clean_data(&self.pha_histo, &ph_labels, 20); 
+        let pha_data   = prep_data(&self.pha_histo, &ph_labels, 5); 
         let pha_chart  = BarChart::default()
           .block(Block::default().title("Pulse height SideA [mV]").borders(Borders::ALL))
           .data(pha_data.as_slice())
-          .bar_width(1)
-          .bar_gap(1)
+          .bar_width(2)
+          .bar_gap(0)
           //.bar_style(Style::default().fg(Color::Blue))
           .bar_style(self.theme.highlight_fg())
           .value_style(
@@ -227,12 +233,12 @@ impl TofHitTab<'_> {
           )
           .style(self.theme.background());
         frame.render_widget(pha_chart, plots_a[0]);
-        let phb_data   = clean_data(&self.phb_histo, &ph_labels, 20); 
+        let phb_data   = prep_data(&self.phb_histo, &ph_labels, 5); 
         let phb_chart  = BarChart::default()
           .block(Block::default().title("Pulse height SideB [mV]").borders(Borders::ALL))
           .data(phb_data.as_slice())
-          .bar_width(1)
-          .bar_gap(1)
+          .bar_width(2)
+          .bar_gap(0)
           //.bar_style(Style::default().fg(Color::Blue))
           .bar_style(self.theme.highlight_fg())
           .value_style(
@@ -245,12 +251,12 @@ impl TofHitTab<'_> {
         frame.render_widget(phb_chart, plots_b[0]);
         
         let pt_labels  = create_labels(&self.pta_histo);
-        let pta_data   = clean_data(&self.pta_histo, &pt_labels, 20); 
+        let pta_data   = prep_data(&self.pta_histo, &pt_labels, 5); 
         let pta_chart  = BarChart::default()
           .block(Block::default().title("Pulse time SideA [mV]").borders(Borders::ALL))
           .data(pta_data.as_slice())
-          .bar_width(1)
-          .bar_gap(1)
+          .bar_width(2)
+          .bar_gap(0)
           //.bar_style(Style::default().fg(Color::Blue))
           .bar_style(self.theme.highlight_fg())
           .value_style(
@@ -262,12 +268,12 @@ impl TofHitTab<'_> {
           .style(self.theme.background());
         frame.render_widget(pta_chart, plots_a[1]);
 
-        let ptb_data   = clean_data(&self.ptb_histo, &pt_labels, 20); 
+        let ptb_data   = prep_data(&self.ptb_histo, &pt_labels, 5); 
         let ptb_chart  = BarChart::default()
           .block(Block::default().title("Pulse time SideB (a.u.)").borders(Borders::ALL))
           .data(ptb_data.as_slice())
-          .bar_width(1)
-          .bar_gap(1)
+          .bar_width(2)
+          .bar_gap(0)
           //.bar_style(Style::default().fg(Color::Blue))
           .bar_style(self.theme.highlight_fg())
           .value_style(
@@ -280,12 +286,12 @@ impl TofHitTab<'_> {
         frame.render_widget(ptb_chart, plots_b[1]);
         
         let pc_labels  = create_labels(&self.pca_histo);
-        let pca_data   = clean_data(&self.pca_histo, &pc_labels, 20); 
+        let pca_data   = prep_data(&self.pca_histo, &pc_labels, 5); 
         let pca_chart  = BarChart::default()
           .block(Block::default().title("Pulse charge SideA [mC]").borders(Borders::ALL))
           .data(pca_data.as_slice())
-          .bar_width(1)
-          .bar_gap(1)
+          .bar_width(2)
+          .bar_gap(0)
           //.bar_style(Style::default().fg(Color::Blue))
           .bar_style(self.theme.highlight_fg())
           .value_style(
@@ -297,12 +303,12 @@ impl TofHitTab<'_> {
           .style(self.theme.background());
         frame.render_widget(pca_chart, plots_a[2]);
 
-        let pcb_data   = clean_data(&self.pcb_histo, &pc_labels, 20); 
+        let pcb_data   = prep_data(&self.pcb_histo, &pc_labels, 5); 
         let pcb_chart  = BarChart::default()
           .block(Block::default().title("Pulse charge SideB [mC]").borders(Borders::ALL))
           .data(pcb_data.as_slice())
-          .bar_width(1)
-          .bar_gap(1)
+          .bar_width(2)
+          .bar_gap(0)
           //.bar_style(Style::default().fg(Color::Blue))
           .bar_style(self.theme.highlight_fg())
           .value_style(
@@ -344,8 +350,9 @@ impl TofHitTab<'_> {
         let chunks = Layout::default()
           .direction(Direction::Vertical)
           .constraints(
-              [Constraint::Percentage(50),
-               Constraint::Percentage(50)].as_ref(),
+              [Constraint::Percentage(33),
+               Constraint::Percentage(33),
+               Constraint::Percentage(34)].as_ref(),
           )
           .split(*main_window);
         let plots = Layout::default()
@@ -358,12 +365,12 @@ impl TofHitTab<'_> {
         
         // histograms
         let t0_labels  = create_labels(&self.t0_histo);
-        let t0_data    = clean_data(&self.t0_histo, &t0_labels, 40); 
+        let t0_data    = prep_data(&self.t0_histo, &t0_labels, 10); 
         let t0_chart   = BarChart::default()
           .block(Block::default().title("Reco. T0").borders(Borders::ALL))
           .data(t0_data.as_slice())
-          .bar_width(1)
-          .bar_gap(1)
+          .bar_width(2)
+          .bar_gap(0)
           //.bar_style(Style::default().fg(Color::Blue))
           .bar_style(self.theme.highlight_fg())
           .value_style(
@@ -375,14 +382,13 @@ impl TofHitTab<'_> {
           .style(self.theme.background());
         frame.render_widget(t0_chart, plots[0]);
 
-        // position across paddle
-        let pa_labels  = create_labels(&self.pa_histo);
-        let pa_data   = clean_data(&self.pa_histo, &pa_labels, 180); 
-        let pa_chart  = BarChart::default()
-          .block(Block::default().title("Pulse charge SideA [mC]").borders(Borders::ALL))
-          .data(pa_data.as_slice())
-          .bar_width(1)
-          .bar_gap(1)
+        let edep_labels  = create_labels(&self.edep_histo);
+        let edep_data    = prep_data(&self.edep_histo, &edep_labels, 5); 
+        let edep_chart   = BarChart::default()
+          .block(Block::default().title("Reco. EDep").borders(Borders::ALL))
+          .data(edep_data.as_slice())
+          .bar_width(2)
+          .bar_gap(0)
           //.bar_style(Style::default().fg(Color::Blue))
           .bar_style(self.theme.highlight_fg())
           .value_style(
@@ -392,7 +398,26 @@ impl TofHitTab<'_> {
             .add_modifier(Modifier::BOLD),
           )
           .style(self.theme.background());
-        frame.render_widget(pa_chart, plots[1]);
+        frame.render_widget(edep_chart, plots[1]);
+        
+        // position across paddle
+        let pa_labels = create_labels(&self.pa_histo);
+        let pa_data   = prep_data(&self.pa_histo, &pa_labels, 20); 
+        let pa_chart  = BarChart::default()
+          .block(Block::default().title("Position accross paddle").borders(Borders::ALL))
+          .data(pa_data.as_slice())
+          .bar_width(2)
+          .bar_gap(0)
+          //.bar_style(Style::default().fg(Color::Blue))
+          .bar_style(self.theme.highlight_fg())
+          .value_style(
+            self.theme.highlight_fg()
+            //Style::default()
+            //.bg(Color::Blue)
+            .add_modifier(Modifier::BOLD),
+          )
+          .style(self.theme.background());
+        frame.render_widget(pa_chart, chunks[1]);
         
         let pid_labels = create_labels(&self.pid_histo);
         let pid_data   = prep_data(&self.pid_histo, &pid_labels, 10); 
@@ -410,7 +435,7 @@ impl TofHitTab<'_> {
             .add_modifier(Modifier::BOLD),
           )
           .style(self.theme.background());
-        frame.render_widget(pid_chart, chunks[1]);
+        frame.render_widget(pid_chart, chunks[2]);
       },
       TofHitView::SelectPaddle => {
         let list_chunks = Layout::default()

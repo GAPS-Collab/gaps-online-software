@@ -42,10 +42,10 @@ use ratatui::{
     },
 };
 
-use tof_dataclasses::packets::TofPacket;
+//use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::TofEventSummary;
 use tof_dataclasses::errors::SerializationError;
-use tof_dataclasses::serialization::Serialization;
+//use tof_dataclasses::serialization::Serialization;
 
 use crate::colors::{
     ColorTheme,

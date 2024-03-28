@@ -59,7 +59,7 @@ use crate::colors::{
 pub fn create_labels(histo : &Hist1D<Uniform<f32>>) -> Vec<String> {
   let mut labels = Vec::<String>::new();
   for bin in histo.iter() {
-    labels.push(format!("{}",bin.index as u64));
+    labels.push(format!("{}",bin.bin.start().unwrap_or(0.0) as u64));
   }
   labels
 }
