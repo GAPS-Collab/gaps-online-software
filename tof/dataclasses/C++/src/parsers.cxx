@@ -37,8 +37,17 @@ u32 Gaps::parse_u32(const Vec<u8> &bytestream,
 
 u64 Gaps::parse_u64(const Vec<u8> &bytestream,
                     usize &pos) {
-
-  return Gaps::u64_from_le_bytes(bytestream, pos);
+  u64 value = (u64)(
+         ((bytestream[pos+7] & 0xFF) << 56)
+      |  ((bytestream[pos+6] & 0xFF) << 48)
+      |  ((bytestream[pos+5] & 0xFF) << 40)
+      |  ((bytestream[pos+4] & 0xFF) << 32)
+      |  ((bytestream[pos+3] & 0xFF) << 24)
+      |  ((bytestream[pos+2] & 0xFF) << 16)
+      |  ((bytestream[pos+1] & 0xFF) << 8)
+      |   (bytestream[pos+0]));
+  pos += 8;
+  return value;
 }
 
 i32 Gaps::parse_i32(const Vec<u8> &bytestream,
@@ -47,7 +56,8 @@ i32 Gaps::parse_i32(const Vec<u8> &bytestream,
   // Assuming little-endian byte order (LSB first)
   for (int i = 0; i < 4; ++i) {
     result |= (static_cast<int32_t>(bytestream[i]) << (i * 8));
-  }  
+  } 
+  pos += 4; 
   return result;
 }
 
@@ -71,19 +81,6 @@ f64 Gaps::parse_f64(const Vec<u8> &bytestream,
   return result;
 }
 
-
-
-u32 Gaps::u32_from_le_bytes(const Vec<u8> &bytestream,
-                            usize &pos) {
-
-  u32 value = (u32)(
-         ((bytestream[pos+3] & 0xFF) << 24)
-      |  ((bytestream[pos+2] & 0xFF) << 16)
-      |  ((bytestream[pos+1] & 0xFF) << 8)
-      |   (bytestream[pos+0]));
-  pos += 4;
-  return value;
-}
 
 u32 Gaps::u32_from_be_bytes(const Vec<u8> &bytestream,
                             usize &pos) {
@@ -123,30 +120,4 @@ u64 Gaps::parse_u48_for_16bit_words(const Vec<u8> &bytestream,
   return buffer;
 }
 
-u64 Gaps::u64_from_le_bytes(const Vec<u8> &bytestream,
-                            usize &pos) {
 
-  u64 value = (u64)(
-         ((bytestream[pos+7] & 0xFF) << 56)
-      |  ((bytestream[pos+6] & 0xFF) << 48)
-      |  ((bytestream[pos+5] & 0xFF) << 40)
-      |  ((bytestream[pos+4] & 0xFF) << 32)
-      |  ((bytestream[pos+3] & 0xFF) << 24)
-      |  ((bytestream[pos+2] & 0xFF) << 16)
-      |  ((bytestream[pos+1] & 0xFF) << 8)
-      |   (bytestream[pos+0]));
-  pos += 8;
-  return value;
-}
-
-
-void Gaps::u32_to_le_bytes(const u32 value, 
-                           Vec<u8> &bytestream,
-                           usize &pos) {
-
-  bytestream[pos + 3] = (value >> 24) & 0xFF;
-  bytestream[pos + 2] = (value >> 16) & 0xFF;
-  bytestream[pos + 1] = (value >> 8)  & 0xFF;
-  bytestream[pos] = value & 0xFF;
-  pos += 4;
-}
