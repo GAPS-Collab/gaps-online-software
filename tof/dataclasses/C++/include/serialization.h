@@ -41,10 +41,6 @@ struct FromTofPacket {
   }
 };
 
-
-[[deprecated("The assumed byteorder in this function is unclear/confusing")]]
-u64 decode_uint64_rev(const Vec<u8>& bytestream,
-                           unsigned int start_pos=0);
 /***********************************************/
 
 /**

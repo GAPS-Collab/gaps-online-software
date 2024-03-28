@@ -45,17 +45,5 @@ namespace Gaps {
   f64 parse_f64(const Vec<u8> &bytestream,
                 usize &pos);
   
-  [[deprecated("Use parse_u32 instead!")]]
-  u32 u32_from_be_bytes(const Vec<u8> &bytestream,
-                        usize &pos);
-  
-  [[deprecated("The byteorder of this is confusing and it will go away!")]]
-  u32 parse_u32_for_16bit_words(const Vec<u8> &bytestream,
-                                usize &pos);
-  
-  [[deprecated("The byteorder of this is confusing and it will go away!")]]
-  u64 parse_u48_for_16bit_words(const Vec<u8> &bytestream,
-                                usize &pos);
-
 }
 #endif

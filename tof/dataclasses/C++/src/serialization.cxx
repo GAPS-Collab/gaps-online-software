@@ -7,28 +7,7 @@
 #include "logging.hpp"
 #include "serialization.h"
 
-uint64_t decode_uint64_rev(const Vec<u8>& bytestream,
-                           u32 start_pos)
-{
-  uint64_t buffer64 = 0x0000000000000000;
-
-  //unsigned long long value = (unsigned long long)(
-  uint64_t buffer =  
-         ((bytestream[start_pos+1] & 0xFF | buffer64) << 56)
-      |  ((bytestream[start_pos+0] & 0xFF | buffer64) << 48)
-      |  ((bytestream[start_pos+3] & 0xFF | buffer64) << 40)
-      |  ((bytestream[start_pos+2] & 0xFF | buffer64) << 32)
-      |  ((bytestream[start_pos+5] & 0xFF | buffer64) << 24)
-      |  ((bytestream[start_pos+4] & 0xFF | buffer64) << 16)
-      |  ((bytestream[start_pos+7] & 0xFF | buffer64) << 8)
-      |  (bytestream[start_pos+6]);
-
-  return buffer;
-  
-}
-
 // file i/o
-
 bytestream get_bytestream_from_file(const String &filename) {
   spdlog::cfg::load_env_levels();
   // bytestream stream;

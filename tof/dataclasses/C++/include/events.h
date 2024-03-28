@@ -275,8 +275,7 @@ struct MasterTriggerEvent {
   // is what we expect. In case where N_LTB is 25 
   // instead of 20 it will be longer.
   static usize get_packet_size(const Vec<u8> &stream, 
-                               usize pos,
-                               usize expected_size);
+                               usize pos);
 
 
   /**

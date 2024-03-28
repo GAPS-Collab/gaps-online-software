@@ -698,8 +698,7 @@ Vec<std::tuple<u8,u8,u8>>  MasterTriggerEvent::get_dsi_j_ch() {
 /*************************************/
   
 usize MasterTriggerEvent::get_packet_size(const Vec<u8> &stream,
-                                          usize pos,  
-                                          usize expected_size) {
+                                          usize pos) {
   bool has_ended;
   u64 head_pos = search_for_2byte_marker(stream, 0xAA, has_ended, pos);
   u64 tail_pos = search_for_2byte_marker(stream, 0x55, has_ended, pos);
@@ -722,8 +721,7 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
   // now we have to figure out if we have 20 or 25 
   // LTBS
   usize packet_size = MasterTriggerEvent::get_packet_size(bytestream,
-                                                          pos,
-                                                          MasterTriggerEvent::SIZE_LTB20);
+                                                          pos);
   if (packet_size == MasterTriggerEvent::SIZE_LTB20) {
     n_ltbs = 20;
     event = MasterTriggerEvent(n_ltbs);
