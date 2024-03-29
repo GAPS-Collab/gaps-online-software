@@ -361,6 +361,19 @@ pub fn master_trigger(mt_address        : String,
       }
     }
   }
+  let tiu_emulation_mode = settings.tiu_emulation_mode;
+  match set_tiu_emulation_mode(&mut bus, tiu_emulation_mode) {
+    Err(err) => error!("Unable to change tiu emulation mode! {err}"),
+    Ok(_) => {
+      if tiu_emulation_mode {
+        println!("==> Setting TIU emulation mode! This setting is useful if the TIU is NOT connected!");
+      } else {
+        println!("==> Not setting TIU emulation mode! TIU needs to be active and connectected!");
+      }
+    }
+  }
+
+
   info!("Settting rb integration window!");
   let int_wind = settings.rb_int_window;
   match set_rb_int_window(&mut bus, int_wind) {
@@ -748,5 +761,24 @@ pub fn set_gaps_trigger(bus : &mut IPBus, use_beta : bool)
 }
 
 
+/// The TIU emulation mode setting provides the possibility to run the 
+/// TOF without tracker and active TIU. If data should be taken together
+/// with the tracker, we should NOT use the emulation mode and this should
+/// be set to false.
+pub fn set_tiu_emulation_mode(bus : &mut IPBus, set_emulation_mode : bool) 
+  -> Result<(), Box<dyn Error>> {
+    info!("Setting TIU Emulation mode {}", set_emulation_mode);
+    let mut value = bus.read(0xe)?;
+    let bitset : u32;
+    if set_emulation_mode {
+      bitset = 0x1;
+    } else {
+      bitset = 0x0;
+    }
+    value = value & 0xfffffffe;
+    value = value | bitset;
+    bus.write(0xe, value)?;
+    Ok(())
+}
 
 

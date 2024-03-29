@@ -1,8 +1,10 @@
 use std::collections::VecDeque;
 
 use ratatui::symbols;
+use ratatui::symbols::line::*;
 use ratatui::text::Span;
 use ratatui::style::{
+    Modifier,
     Color,
     Style,
 };
@@ -13,6 +15,7 @@ use ratatui::widgets::{
     GraphType,
     Dataset,
     Chart,
+    LineGauge,
     Borders,
 };
 
@@ -24,6 +27,22 @@ use ndhistogram::{
 };
 use ndhistogram::axis::{
     Uniform,
+};
+
+pub const LG_LINE_HORIZONTAL : &str = "░";
+pub const LG_LINE: Set = Set {
+        vertical         : THICK_VERTICAL,
+        //horizontal       : THICK_HORIZONTAL,
+        horizontal       : LG_LINE_HORIZONTAL,
+        top_right        : THICK_TOP_RIGHT,
+        top_left         : THICK_TOP_LEFT,
+        bottom_right     : THICK_BOTTOM_RIGHT,
+        bottom_left      : THICK_BOTTOM_LEFT,
+        vertical_left    : THICK_VERTICAL_LEFT,
+        vertical_right   : THICK_VERTICAL_RIGHT,
+        horizontal_down  : THICK_HORIZONTAL_DOWN,
+        horizontal_up    : THICK_HORIZONTAL_UP,
+        cross            : THICK_CROSS,
 };
 
 //extern crate num_traits;
@@ -222,3 +241,33 @@ pub fn timeseries<'a>(data        : &'a mut VecDeque<(f64,f64)>,
     .style(theme.style());
     chart
 }
+
+
+/// A simple line gauge, that is bacically a progress bar
+pub fn gauge(title : String,
+             label : String,
+             ratio : f64,
+             theme : &ColorTheme) -> LineGauge {
+    let gauge = LineGauge::default()
+      .block(
+        Block::default()
+        .borders(Borders::ALL)
+        .style(theme.style())
+        .title(title)
+        .border_type(BorderType::Rounded)
+      )
+      .gauge_style(
+        Style::default()
+          .fg(theme.fg1)
+          .bg(theme.bg1)
+          .add_modifier(Modifier::BOLD)
+      )
+      //.use_unicode(true)
+      .label(label)
+      //.line_set(symbols::line::THICK)  // THICK
+      .line_set(LG_LINE)
+      //.percent(self.disk_usage as u16);
+      .ratio(ratio);
+    gauge
+}
+

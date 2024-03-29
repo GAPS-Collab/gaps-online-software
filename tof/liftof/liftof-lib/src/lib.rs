@@ -450,7 +450,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   // Step 0 : If desired, fit sine
   if fit_sinus {
     if !channels.contains(&8) {
-      error!("This RB does not have ch9 data!");
+      error!("RB {} does not have ch9 data!", rb.rb_id);
     }
     rb.calibration.voltages(9,
                             event.header.stop_cell as usize,
@@ -616,7 +616,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
             }
             //println!("{}", hit);
           } else {
-            error!("Only one end of a paddle has a channel record! Ch {}, Pid {}", raw_ch, pid);
+            error!("Only one end of a paddle has a channel record! Ch {}, Pid {}, RB {}", raw_ch + 1, pid, rb.rb_id);
           }
         }
       }

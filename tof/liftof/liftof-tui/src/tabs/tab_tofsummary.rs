@@ -55,6 +55,7 @@ use crate::widgets::{
     //clean_data,
     prep_data,
     create_labels,
+    gauge,
 };
 
 #[derive(Debug, Clone)]
@@ -63,7 +64,12 @@ pub struct TofSummaryTab {
   pub summary_queue   : VecDeque<TofEventSummary>,
   pub queue_size      : usize,
   pub n_trg_pdl_histo : Hist1D<Uniform<f32>>, 
-  pub theme           : ColorTheme
+  pub theme           : ColorTheme,
+  // missing event analysis
+  pub event_id_test   : Vec<u32>,
+  pub evid_test_info  : String,
+  pub evid_test_len   : usize,
+  pub n_evid_test     : usize,
 }
 
 impl TofSummaryTab {
@@ -76,7 +82,11 @@ impl TofSummaryTab {
         summary_queue   : VecDeque::<TofEventSummary>::new(),
         queue_size      : 10000,
         n_trg_pdl_histo : ndhistogram!(bins),
-        theme           : theme
+        theme           : theme,
+        event_id_test   : Vec::<u32>::with_capacity(100000),
+        evid_test_info  : String::from("Missing event id analysis"),
+        evid_test_len   : 10000,
+        n_evid_test     : 0,
     }
   }
 
@@ -89,6 +99,23 @@ impl TofSummaryTab {
       Ok(ts)    => {
         //let ts = TofEventSummary::from_tofpacket(&tp)?;
         self.n_trg_pdl_histo.fill(&(ts.n_trigger_paddles as f32));
+        if self.event_id_test.len() != self.evid_test_len {
+          self.event_id_test.push(ts.event_id);
+        } else {
+          let mut missing = 0usize;
+          let mut evid = self.event_id_test[0];
+          for _ in 0..self.event_id_test.len() {
+            if !self.event_id_test.contains(&evid) {
+              missing += 1;
+            }
+            evid += 1;
+          }
+          self.n_evid_test += 1;
+          self.evid_test_info  = format!("Missing event ID search [{}]", self.n_evid_test);
+          self.evid_test_info += &(format!("\n-- in a chunk of {} event ids", self.evid_test_len)); 
+          self.evid_test_info += &(format!("\n-- we found {} event ids missing ({})", missing, 100.0*(missing as f64)/self.event_id_test.len() as f64));
+          self.event_id_test.clear();
+        }
         self.summary_queue.push_back(ts);
         if self.summary_queue.len() > self.queue_size {
           self.summary_queue.pop_front();
@@ -115,6 +142,14 @@ impl TofSummaryTab {
            Constraint::Percentage(34)].as_ref(),
       )  
       .split(layout[1]);
+
+    let evid_test_view = Layout::default()
+      .direction(Direction::Vertical)
+      .constraints(
+        [Constraint::Percentage(70),
+         Constraint::Percentage(30)].as_ref(),
+      )
+      .split(histo_view[2]);
 
     let last_ts = self.summary_queue.back();
     let view_string : String;
@@ -154,5 +189,21 @@ impl TofSummaryTab {
       )
       .style(self.theme.background());
     frame.render_widget(th_chart, histo_view[0]); 
+    
+    let evid_test_data = Paragraph::new(self.evid_test_info.clone())
+      .style(Style::default().fg(self.theme.fg0))
+      .alignment(Alignment::Left)
+      //.scroll((5, 10))
+      .block(
+        Block::default()
+          .borders(Borders::ALL)
+          .style(self.theme.style())
+          .title("Missing event ID test")
+          .border_type(BorderType::Rounded),
+      );
+    frame.render_widget(evid_test_data, evid_test_view[0]);
+    let ratio = self.event_id_test.len() as f64 / self.evid_test_len as f64;
+    let test_gauge = gauge(String::from("Missing event ID check"), String::from("Gathering data"), ratio, &self.theme);
+    frame.render_widget(test_gauge, evid_test_view[1]);
   }
 }
