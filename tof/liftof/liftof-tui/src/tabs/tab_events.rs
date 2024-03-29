@@ -34,11 +34,11 @@ use tof_dataclasses::events::{
     MasterTriggerEvent,
 };
 
-use crate::colors::ColorTheme2;
+use crate::colors::ColorTheme;
 
 #[derive(Debug, Clone)]
 pub struct EventTab {
-  pub theme         : ColorTheme2,
+  pub theme         : ColorTheme,
   pub tp_receiver   : Receiver<TofPacket>,
   pub event_queue   : VecDeque<TofEvent>,
   pub queue_size    : usize,
@@ -56,7 +56,7 @@ impl EventTab {
              mte_sender  : Sender<MasterTriggerEvent>,
              rbe_sender  : Sender<RBEvent>,
              th_sender   : Sender<TofHit>,
-             theme       : ColorTheme2) -> Self {
+             theme       : ColorTheme) -> Self {
              //streamer  : Arc<Mutex<VecDeque<String>>>,
              //pack_stat : Arc<Mutex<HashMap<String,usize>>>) -> HomeTab<T> {
     Self {

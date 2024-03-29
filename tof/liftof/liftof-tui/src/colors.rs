@@ -75,7 +75,7 @@ pub const COLORSETGAPS : ColorSet = ColorSet::new(Color::Rgb(27,51,88),
 
 
 #[derive(Debug, Copy, Clone)]
-pub struct ColorTheme2 {
+pub struct ColorTheme {
   pub bg0 : Color,
   pub bg1 : Color,
   pub fg0 : Color,
@@ -83,9 +83,9 @@ pub struct ColorTheme2 {
   pub hc  : Color,
 }
 
-impl ColorTheme2 {
-  pub fn new() -> ColorTheme2 {
-    ColorTheme2 {
+impl ColorTheme {
+  pub fn new() -> ColorTheme {
+    ColorTheme {
       bg0 : Color::Black,
       bg1 : Color::White,
       fg0 : Color::Black,
@@ -123,7 +123,3 @@ impl ColorTheme2 {
   }
 }
 
-
-/// Helper - eventually rename ColorTheme2 to ColorTheme
-/// FIXME
-pub type ColorTheme = ColorTheme2;

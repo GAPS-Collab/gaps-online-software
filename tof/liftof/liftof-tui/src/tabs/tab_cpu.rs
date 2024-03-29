@@ -32,7 +32,7 @@ use tof_dataclasses::monitoring::CPUMoniData;
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::serialization::Serialization;
 
-use crate::colors::ColorTheme2;
+use crate::colors::ColorTheme;
 use crate::widgets::timeseries;
 
 //pub const LG_LINE_HORIZONTAL : &str = "◉";
@@ -56,7 +56,7 @@ pub const LG_LINE: Set = Set {
 
 #[derive(Debug, Clone)]
 pub struct CPUTab {
-  pub theme      : ColorTheme2,
+  pub theme      : ColorTheme,
   pub freq_queue  : Vec<VecDeque<(f64,f64)>>,
   pub temp_queue  : Vec<VecDeque<(f64,f64)>>,
   pub disk_usage : u8, // disk usage in per cent
@@ -68,7 +68,7 @@ pub struct CPUTab {
 impl CPUTab {
 
   pub fn new(tp_recv : Receiver<TofPacket>,
-             theme : ColorTheme2) -> Self {
+             theme : ColorTheme) -> Self {
     let queue_size    = 1000usize;
     let mut freq_queue = Vec::<VecDeque::<(f64,f64)>>::with_capacity(4);
     let mut temp_queue = Vec::<VecDeque::<(f64,f64)>>::with_capacity(4);

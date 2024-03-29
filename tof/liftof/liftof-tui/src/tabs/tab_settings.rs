@@ -29,7 +29,7 @@ use ratatui::widgets::{
 };
 
 use crate::colors::{
-    ColorTheme2,
+    ColorTheme,
     ColorSet,
     COLORSETOMILU,
     COLORSETBW,
@@ -44,14 +44,14 @@ use crate::colors::{
 
 #[derive(Debug, Clone)]
 pub struct SettingsTab<'a> {
-  pub theme      : ColorTheme2,
+  pub theme      : ColorTheme,
   pub ctl_state  : ListState,
   pub ctl_items  : Vec::<ListItem<'a>>,
   pub ctl_active : bool,
 }
 
 impl SettingsTab<'_> {
-  pub fn new(theme : ColorTheme2) -> SettingsTab<'static> {
+  pub fn new(theme : ColorTheme) -> SettingsTab<'static> {
     let ct_list_items = vec![ListItem::new(Line::from("Black&White")),
                              ListItem::new(Line::from("StarField")),
                              ListItem::new(Line::from("Omiliu")),
