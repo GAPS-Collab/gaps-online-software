@@ -203,6 +203,9 @@ pub enum RBMenuItem {
   Info,
   Waveforms,
   RBMoniData,
+  PAMoniData,
+  PBMoniData,
+  LTBMoniData,
   SelectRB,
   Quit,
 }
@@ -214,8 +217,11 @@ impl From<RBMenuItem> for usize {
       RBMenuItem::Info          => 1,
       RBMenuItem::Waveforms     => 2,
       RBMenuItem::RBMoniData    => 3,
-      RBMenuItem::SelectRB      => 4,
-      RBMenuItem::Quit          => 5,
+      RBMenuItem::PAMoniData    => 4,
+      RBMenuItem::PBMoniData    => 5,
+      RBMenuItem::LTBMoniData   => 6,
+      RBMenuItem::SelectRB      => 7,
+      RBMenuItem::Quit          => 8,
     }   
   }
 }
@@ -236,20 +242,33 @@ impl  RBMenu {
   }
 
   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
-    let menu_titles = vec!["Home", "Info", "Waveforms", "RBMoniData", "SelectRB", "Quit" ];
+    let menu_titles = vec!["Home", "Info", "Waveforms", "RBMoniData", "PAMoniData", "PBMoniData", "LTBMoniData", "SelectRB", "Quit" ];
     let menu : Vec<Line> = menu_titles
                .iter()
                .map(|t| {
-                 let (first, rest) = t.split_at(1);
-                 Line::from(vec![
-                   Span::styled(
-                       first,
+                 if t == &"Paddles" || t == &"Hits" {
+                   let (second, rest) = t.split_at(2);
+                   Line::from(vec![
+                     Span::styled(
+                       second,
                        Style::default()
-                           .fg(Color::Yellow)
-                           .add_modifier(Modifier::UNDERLINED),
-                   ),
-                   Span::styled(rest, self.theme.style()),
-                 ])
+                         .fg(self.theme.hc)
+                         .add_modifier(Modifier::UNDERLINED),
+                     ),
+                     Span::styled(rest, self.theme.style()),
+                   ])
+                 } else {
+                   let (first, rest) = t.split_at(1);
+                   Line::from(vec![
+                     Span::styled(
+                         first,
+                         Style::default()
+                             .fg(self.theme.hc)
+                             .add_modifier(Modifier::UNDERLINED),
+                     ),
+                     Span::styled(rest, self.theme.style()),
+                   ])
+                 }
                })
                .collect();
 
