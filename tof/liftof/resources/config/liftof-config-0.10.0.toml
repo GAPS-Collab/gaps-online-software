@@ -65,7 +65,9 @@ send_flight_packets   = true
 # additonally send MasterTriggerEvent packets. This might use a lot 
 # of bandwidth, so we might not want to do that in flight
 send_mtb_event_packets = false
-
+# in case send_flight_packets == true, use this switch to turn
+# wf sending on/off
+send_rbwaveforms       = true
 
 # not supported yet
 [event_builder_settings]

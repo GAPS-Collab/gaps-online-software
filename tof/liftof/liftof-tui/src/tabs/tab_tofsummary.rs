@@ -113,7 +113,7 @@ impl TofSummaryTab {
           self.n_evid_test += 1;
           self.evid_test_info  = format!("Missing event ID search [{}]", self.n_evid_test);
           self.evid_test_info += &(format!("\n-- in a chunk of {} event ids", self.evid_test_len)); 
-          self.evid_test_info += &(format!("\n-- we found {} event ids missing ({})", missing, 100.0*(missing as f64)/self.event_id_test.len() as f64));
+          self.evid_test_info += &(format!("\n-- we found {} event ids missing ({}%)", missing, 100.0*(missing as f64)/self.event_id_test.len() as f64));
           self.event_id_test.clear();
         }
         self.summary_queue.push_back(ts);

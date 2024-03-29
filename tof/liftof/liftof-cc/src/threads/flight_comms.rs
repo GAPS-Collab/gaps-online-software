@@ -224,8 +224,22 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 n_pack_sent += 1;
               }
             }
-            for rbwave in ev_to_send.get_rbwaveforms() {
-              let pack = TofPacket::from(&rbwave);
+            if settings.send_rbwaveforms {
+              for rbwave in ev_to_send.get_rbwaveforms() {
+                let pack = TofPacket::from(&rbwave);
+                match data_socket.send(pack.to_bytestream(),0) {
+                  Err(err) => {
+                    error!("Packet sending failed! {err}");
+                  }
+                  Ok(_)    => {
+                    //trace!("RB waveform for event id {} send!", evid);
+                    n_pack_sent += 1;
+                  }
+                }
+              }
+            }
+            if settings.send_mtb_event_packets {
+              let pack = TofPacket::from(&ev_to_send.mt_event);
               match data_socket.send(pack.to_bytestream(),0) {
                 Err(err) => {
                   error!("Packet sending failed! {err}");

@@ -255,8 +255,13 @@ pub struct DataPublisherSettings {
   /// TofEvents
   pub send_flight_packets    : bool,
   /// Send also MastertriggerPackets (this should be 
-  /// turned off in flight
+  /// turned off in flight - only useful if 
+  /// send_flight_packets is true, otherwise
+  /// MTB events will get sent as part of TofEvents
   pub send_mtb_event_packets : bool,
+  /// switch off waveform sending (in case of we 
+  /// are sending flight packets)
+  pub send_rbwaveforms       : bool,
 }
 
 impl DataPublisherSettings {
@@ -267,6 +272,7 @@ impl DataPublisherSettings {
       fc_pub_address            : String::from(""),
       send_flight_packets       : false,
       send_mtb_event_packets    : false,
+      send_rbwaveforms          : false,
     }
   }
 }

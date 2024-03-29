@@ -301,44 +301,19 @@ impl MTTab {
       .style(self.theme.style()); 
      
     // NChannel distribution
-    let mut max_pop_bin = 0;
-    let mut vec_index   = 0;
-    let mut bins = Vec::<(u64, u64)>::new();
-    
-    for bin in self.nch_histo.iter() {
-      let bin_value = *bin.value as u64;
-      bins.push((bin.index as u64, bin_value));
-      // always show the first 10 bins, but if 
-      // the bins with index > 10 are not 
-      // populated, discard them
-      if bin_value > 0 && bin.index > 10 {
-        max_pop_bin = vec_index;
-      }
-      vec_index += 1;
-    }
-    bins.retain(|&(x,_)| x <= max_pop_bin);
-    let mut bins_for_bc = Vec::<(&str, u64)>::new();
-    debug!("bins: {:?}", bins);
-    for n in bins.iter() {
-      bins_for_bc.push((HIST_LABELS[n.0 as usize], n.1));
-      //bins_for_bc.push((foo, n.1));
-      //n_iter += 1;
-    }
-    let nch_chart = BarChart::default()
+    let nch_labels  = create_labels(&self.nch_histo);
+    let nch_data    = prep_data(&self.nch_histo, &nch_labels, 2); 
+    let nch_chart   = BarChart::default()
       .block(Block::default().title("N Hits (N CH)").borders(Borders::ALL))
-      .data(bins_for_bc.as_slice())
-      .bar_width(1)
-      .bar_gap(1)
-      //.bar_style(Style::default().fg(Color::Blue))
+      .data(nch_data.as_slice())
+      .bar_width(2)
+      .bar_gap(0)
       .bar_style(self.theme.highlight_fg())
       .value_style(
         self.theme.highlight_fg()
-        //Style::default()
-        //.bg(Color::Blue)
         .add_modifier(Modifier::BOLD),
       )
       .style(self.theme.background());
-
 
     // FPGA temperature
     let tmp_only : Vec::<i64> = self.fpgatmp_queue.iter().map(|z| z.1.round() as i64).collect();
@@ -444,7 +419,7 @@ impl MTTab {
 
      // histograms
      let ml_labels  = create_labels(&self.mtb_link_histo);
-     let mlh_data   = prep_data(&self.mtb_link_histo, &ml_labels, 20); 
+     let mlh_data   = prep_data(&self.mtb_link_histo, &ml_labels, 10); 
      let mlh_chart  = BarChart::default()
        .block(Block::default().title("MTB Link ID (!NOT RBID)").borders(Borders::ALL))
        .data(mlh_data.as_slice())
