@@ -666,7 +666,7 @@ impl fmt::Display for TofEventSummary {
     repr += &(format!("\n   |-> timestamp48 : {}", self.get_timestamp48())); 
     repr += &(format!("\n  PrimaryBeta      : {}", self.get_beta())); 
     repr += &(format!("\n  PrimaryCharge    : {}", self.primary_charge));
-    repr += &String::from("********* HITS *********");
+    repr += &String::from("\n********* HITS *********");
     for h in &self.hits {
       repr += &(format!("\n  {}", h));
     }
