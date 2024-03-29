@@ -62,6 +62,10 @@ packs_per_file = 200000
 fc_pub_address        = "tcp://192.168.37.20:42000"
 # send TofEventSummary & RBWaveform over network instead of TofEvent
 send_flight_packets   = true
+# additonally send MasterTriggerEvent packets. This might use a lot 
+# of bandwidth, so we might not want to do that in flight
+send_mtb_event_packets = false
+
 
 # not supported yet
 [event_builder_settings]

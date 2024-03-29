@@ -244,16 +244,19 @@ impl Default for TofEventBuilderSettings {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DataPublisherSettings {
   /// location to store data on TOF computer
-  pub data_dir       : String,
+  pub data_dir               : String,
   /// TOFPackets per file. This defines the "length" of 
   /// a subrun. 
-  pub packs_per_file : usize,
+  pub packs_per_file         : usize,
   /// The address the flight computer should subscribe 
   /// to to get tof packets
-  pub fc_pub_address : String,
+  pub fc_pub_address         : String,
   /// Send TofSummary + RBWaveforms instead of 
   /// TofEvents
-  pub send_flight_packets : bool,
+  pub send_flight_packets    : bool,
+  /// Send also MastertriggerPackets (this should be 
+  /// turned off in flight
+  pub send_mtb_event_packets : bool,
 }
 
 impl DataPublisherSettings {
@@ -262,7 +265,8 @@ impl DataPublisherSettings {
       data_dir                  : String::from(""),
       packs_per_file            : 1000,
       fc_pub_address            : String::from(""),
-      send_flight_packets       : false
+      send_flight_packets       : false,
+      send_mtb_event_packets    : false,
     }
   }
 }
