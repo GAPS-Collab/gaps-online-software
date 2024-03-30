@@ -193,7 +193,7 @@ impl RBWaveformTab {
     frame.render_widget(wf_info, info[0]);
     
     let rbhist_labels  = create_labels(&self.rb_histo);
-    let rbhist_data    = prep_data(&self.rb_histo, &rbhist_labels, 5); 
+    let rbhist_data    = prep_data(&self.rb_histo, &rbhist_labels, 5, true); 
     let rbhist_chart   = BarChart::default()
       .block(Block::default().title("ReadoutBoards").borders(Borders::ALL))
       .data(rbhist_data.as_slice())

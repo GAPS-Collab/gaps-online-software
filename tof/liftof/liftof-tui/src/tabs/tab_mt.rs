@@ -59,17 +59,6 @@ use crate::widgets::{
     create_labels,
 };
 
-pub const HIST_LABELS : [&str;100]  = ["0",   "1", "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9",
-                                       "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
-                                       "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", 
-                                       "30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
-                                       "40", "41", "42", "43", "44", "45", "46", "47", "48", "49",
-                                       "50", "51", "52", "53", "54", "55", "56", "57", "58", "59",
-                                       "60", "61", "62", "63", "64", "65", "66", "67", "68", "69",
-                                       "70", "71", "72", "73", "74", "75", "76", "77", "78", "79",
-                                       "80", "81", "82", "83", "84", "85", "86", "87", "88", "89",
-                                       "90", "91", "92", "93", "94", "95", "96", "97", "98", "99",
-                                       ];
 
 
 #[derive(Debug, Clone)]
@@ -302,7 +291,7 @@ impl MTTab {
      
     // NChannel distribution
     let nch_labels  = create_labels(&self.nch_histo);
-    let nch_data    = prep_data(&self.nch_histo, &nch_labels, 2); 
+    let nch_data    = prep_data(&self.nch_histo, &nch_labels, 2, true); 
     let nch_chart   = BarChart::default()
       .block(Block::default().title("N Hits (N CH)").borders(Borders::ALL))
       .data(nch_data.as_slice())
@@ -419,7 +408,7 @@ impl MTTab {
 
      // histograms
      let ml_labels  = create_labels(&self.mtb_link_histo);
-     let mlh_data   = prep_data(&self.mtb_link_histo, &ml_labels, 10); 
+     let mlh_data   = prep_data(&self.mtb_link_histo, &ml_labels, 10, true); 
      let mlh_chart  = BarChart::default()
        .block(Block::default().title("MTB Link ID (!NOT RBID)").borders(Borders::ALL))
        .data(mlh_data.as_slice())

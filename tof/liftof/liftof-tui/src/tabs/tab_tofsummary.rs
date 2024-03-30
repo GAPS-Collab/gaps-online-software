@@ -176,7 +176,7 @@ impl TofSummaryTab {
      
     // histograms
     let th_labels  = create_labels(&self.n_trg_pdl_histo);
-    let th_data    = prep_data(&self.n_trg_pdl_histo, &th_labels, 5); 
+    let th_data    = prep_data(&self.n_trg_pdl_histo, &th_labels, 5, true); 
     let th_chart   = BarChart::default()
       .block(Block::default().title("N Trig Paddles").borders(Borders::ALL))
       .data(th_data.as_slice())

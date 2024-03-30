@@ -217,7 +217,7 @@ impl TofHitTab<'_> {
 
         // histograms
         let ph_labels  = create_labels(&self.pha_histo);
-        let pha_data   = prep_data(&self.pha_histo, &ph_labels, 5); 
+        let pha_data   = prep_data(&self.pha_histo, &ph_labels, 5, false); 
         let pha_chart  = BarChart::default()
           .block(Block::default().title("Pulse height SideA [mV]").borders(Borders::ALL))
           .data(pha_data.as_slice())
@@ -233,7 +233,7 @@ impl TofHitTab<'_> {
           )
           .style(self.theme.background());
         frame.render_widget(pha_chart, plots_a[0]);
-        let phb_data   = prep_data(&self.phb_histo, &ph_labels, 5); 
+        let phb_data   = prep_data(&self.phb_histo, &ph_labels, 5, false); 
         let phb_chart  = BarChart::default()
           .block(Block::default().title("Pulse height SideB [mV]").borders(Borders::ALL))
           .data(phb_data.as_slice())
@@ -251,7 +251,7 @@ impl TofHitTab<'_> {
         frame.render_widget(phb_chart, plots_b[0]);
         
         let pt_labels  = create_labels(&self.pta_histo);
-        let pta_data   = prep_data(&self.pta_histo, &pt_labels, 5); 
+        let pta_data   = prep_data(&self.pta_histo, &pt_labels, 5, false); 
         let pta_chart  = BarChart::default()
           .block(Block::default().title("Pulse time SideA [mV]").borders(Borders::ALL))
           .data(pta_data.as_slice())
@@ -268,7 +268,7 @@ impl TofHitTab<'_> {
           .style(self.theme.background());
         frame.render_widget(pta_chart, plots_a[1]);
 
-        let ptb_data   = prep_data(&self.ptb_histo, &pt_labels, 5); 
+        let ptb_data   = prep_data(&self.ptb_histo, &pt_labels, 5, false); 
         let ptb_chart  = BarChart::default()
           .block(Block::default().title("Pulse time SideB (a.u.)").borders(Borders::ALL))
           .data(ptb_data.as_slice())
@@ -286,7 +286,7 @@ impl TofHitTab<'_> {
         frame.render_widget(ptb_chart, plots_b[1]);
         
         let pc_labels  = create_labels(&self.pca_histo);
-        let pca_data   = prep_data(&self.pca_histo, &pc_labels, 5); 
+        let pca_data   = prep_data(&self.pca_histo, &pc_labels, 5, false); 
         let pca_chart  = BarChart::default()
           .block(Block::default().title("Pulse charge SideA [mC]").borders(Borders::ALL))
           .data(pca_data.as_slice())
@@ -303,7 +303,7 @@ impl TofHitTab<'_> {
           .style(self.theme.background());
         frame.render_widget(pca_chart, plots_a[2]);
 
-        let pcb_data   = prep_data(&self.pcb_histo, &pc_labels, 5); 
+        let pcb_data   = prep_data(&self.pcb_histo, &pc_labels, 5, false); 
         let pcb_chart  = BarChart::default()
           .block(Block::default().title("Pulse charge SideB [mC]").borders(Borders::ALL))
           .data(pcb_data.as_slice())
@@ -365,7 +365,7 @@ impl TofHitTab<'_> {
         
         // histograms
         let t0_labels  = create_labels(&self.t0_histo);
-        let t0_data    = prep_data(&self.t0_histo, &t0_labels, 10); 
+        let t0_data    = prep_data(&self.t0_histo, &t0_labels, 10, false); 
         let t0_chart   = BarChart::default()
           .block(Block::default().title("Reco. T0").borders(Borders::ALL))
           .data(t0_data.as_slice())
@@ -383,7 +383,7 @@ impl TofHitTab<'_> {
         frame.render_widget(t0_chart, plots[0]);
 
         let edep_labels  = create_labels(&self.edep_histo);
-        let edep_data    = prep_data(&self.edep_histo, &edep_labels, 5); 
+        let edep_data    = prep_data(&self.edep_histo, &edep_labels, 5, false); 
         let edep_chart   = BarChart::default()
           .block(Block::default().title("Reco. EDep").borders(Borders::ALL))
           .data(edep_data.as_slice())
@@ -402,7 +402,7 @@ impl TofHitTab<'_> {
         
         // position across paddle
         let pa_labels = create_labels(&self.pa_histo);
-        let pa_data   = prep_data(&self.pa_histo, &pa_labels, 20); 
+        let pa_data   = prep_data(&self.pa_histo, &pa_labels, 20, false); 
         let pa_chart  = BarChart::default()
           .block(Block::default().title("Position accross paddle").borders(Borders::ALL))
           .data(pa_data.as_slice())
@@ -420,7 +420,7 @@ impl TofHitTab<'_> {
         frame.render_widget(pa_chart, chunks[1]);
         
         let pid_labels = create_labels(&self.pid_histo);
-        let pid_data   = prep_data(&self.pid_histo, &pid_labels, 10); 
+        let pid_data   = prep_data(&self.pid_histo, &pid_labels, 10, true); 
         let pid_chart  = BarChart::default()
           .block(Block::default().title("Paddle ID").borders(Borders::ALL))
           .data(pid_data.as_slice())

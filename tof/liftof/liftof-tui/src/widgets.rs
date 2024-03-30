@@ -120,18 +120,26 @@ pub fn clean_data<'a>(histo      : &'a Hist1D<Uniform<f32>>,
 }
 
 // FIXME - merge this with clean data
+/// Prepare data for histogram widget
+///
+/// # Arguments:
+///
+/// * remove_uf   : Remove underflow bin
 pub fn prep_data<'a>(histo      : &'a Hist1D<Uniform<f32>>, 
                      labels     : &'a Vec<String>,
-                     spacing    : usize) -> Vec<(&'a str,u64)> {
+                     spacing    : usize,
+                     remove_uf  : bool) -> Vec<(&'a str,u64)> {
   let mut data = Vec::<(&str, u64)>::new();
-  let mut cnt = 0usize;
-  for bin in histo.iter() {
-    if cnt % spacing != 0 {
-      data.push(("", *bin.value as u64));
-    } else {
-      data.push((&labels[cnt], *bin.value as u64));
+  for (k,bin) in histo.iter().enumerate() {
+    if k == 0 && remove_uf {
+      continue;
     }
-    cnt += 1;
+    // k+1 to account for underflow bin
+    if (k+1) % spacing != 0 {
+      data.push(("-", bin.value.ceil() as u64));
+    } else {
+      data.push((&labels[k], *bin.value as u64));
+    }
   }
   data
 }
