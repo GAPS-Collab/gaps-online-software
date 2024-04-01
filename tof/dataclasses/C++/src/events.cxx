@@ -801,7 +801,7 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
   // just search the next footer and don't fill the deprecated fields
   bool has_ended = false;
   u64 tail_pos = search_for_2byte_marker(bytestream,0x55,has_ended,pos);   
-  u16 tail = Gaps::parse_u16(bytestream, pos);
+  u16 tail = Gaps::parse_u16(bytestream, tail_pos);
   if (tail != MasterTriggerEvent::TAIL) {
     log_error("Invalid tail signature!");
   }
