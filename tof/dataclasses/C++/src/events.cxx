@@ -1,6 +1,9 @@
 #include<numeric>
 #include<sstream>
 #include<format>
+#include<limits>
+#include<bitset>
+#include<cmath>
 
 #include "events.h"
 #include "parsers.h"
@@ -9,32 +12,25 @@
 
 #include "spdlog/cfg/env.h"
 
-const static HashMap<u8, std::pair<u8,u8>> LTB_DSI_MAP {
-  {0, {1,1}},
-  {1, {1,2}},
-  {2, {1,3}},
-  {3, {1,4}},
-  {4, {1,5}},
-  {5, {2,1}},
-  {6, {2,2}},
-  {7, {2,3}},
-  {8, {2,4}},
-  {9, {2,5}},
-  {10,{3,1}},
-  {11,{3,2}},
-  {12,{3,3}},
-  {13,{3,4}},
-  {14,{3,5}},
-  {15,{4,1}},
-  {16,{4,2}},
-  {17,{4,3}},
-  {18,{4,4}},
-  {19,{4,5}},
-  {20,{5,1}},
-  {21,{5,2}},
-  {22,{5,3}},
-  {23,{5,4}},
-  {24,{5,5}},
+
+/// masks to decode LTB hit masks
+const u16 LTB_CH0 = 0x3   ;
+const u16 LTB_CH1 = 0xc   ;
+const u16 LTB_CH2 = 0x30  ; 
+const u16 LTB_CH3 = 0xc0  ;
+const u16 LTB_CH4 = 0x300 ;
+const u16 LTB_CH5 = 0xc00 ;
+const u16 LTB_CH6 = 0x3000;
+const u16 LTB_CH7 = 0xc000;
+const u16 LTB_CHANNELS[8] = {
+    LTB_CH0,
+    LTB_CH1,
+    LTB_CH2,
+    LTB_CH3,
+    LTB_CH4,
+    LTB_CH5,
+    LTB_CH6,
+    LTB_CH7
 };
 
 
@@ -477,6 +473,72 @@ std::ostream& operator<<(std::ostream& os, const EventStatus& qual) {
 
 /**********************************************************/
 
+std::ostream& operator<<(std::ostream& os, const TriggerType& t_type) {
+   os << "<TriggerType: " ;
+   switch (t_type) {
+     case TriggerType::Unknown : { 
+       os << "Unknown>";
+       break;
+     }
+     case TriggerType::Gaps : { 
+       os << "Gaps>";
+       break;
+     }
+     case TriggerType::Any : { 
+       os << "Any>";
+       break;
+     }
+     case TriggerType::Track : { 
+       os << "Track>";
+       break;
+     }
+     case TriggerType::TrackCentral : { 
+       os << "TrackCentral>";
+       break;
+     }
+     case TriggerType::Poisson : { 
+       os << "Poisson>";
+       break;
+     }
+     case TriggerType::Forced : { 
+       os << "Forced>";
+       break;
+     }
+   }
+   return os;
+}
+
+/**********************************************************/
+
+std::ostream& operator<<(std::ostream& os, const LTBThreshold& thresh) {
+   os << "<LTBThresholde: " ;
+   switch (thresh) {
+     case LTBThreshold::Unknown : { 
+       os << "Unknown>";
+       break;
+     }
+     case LTBThreshold::NoHit : { 
+       os << "NoHit>";
+       break;
+     }
+     case LTBThreshold::Hit : { 
+       os << "Hit>";
+       break;
+     }
+     case LTBThreshold::Beta : { 
+       os << "Beta>";
+       break;
+     }
+     case LTBThreshold::Veto : { 
+       os << "Veto>";
+       break;
+     }
+   }
+   return os;
+}
+
+/**********************************************************/
+
 u32 TofEvent::get_n_rbmissinghits(u32 mask){
   return ((mask & 0xFF00)     >> 8);
 }
@@ -590,126 +652,116 @@ bool TofEvent::passed_consistency_check() {
 
 /**********************************************************/
 
-MasterTriggerEvent::MasterTriggerEvent() {
-  MasterTriggerEvent(N_LTBS);
-}  
+  
+u64 MasterTriggerEvent::get_timestamp_gps48() {
+  return (((u64)tiu_gps16 << 32) | (u64) tiu_gps32); 
+}
+
+/*************************************/
+
+u64 MasterTriggerEvent::get_timestamp_abs48() {
+  u64 gps = get_timestamp_gps48();
+  u32 ts  = timestamp;
+  // FIXME - I guess we need to cast to u64
+  // This might be a bug
+  if (ts < tiu_timestamp) {
+    // counter rollover
+    ts += (u64)std::numeric_limits<u32>::max();
+  }
+  u64 ts_abs  = 1e9 * gps + (u64)(ts - tiu_timestamp);
+  return ts_abs;
+}
+
+/*************************************/
+
+Vec<TriggerType> MasterTriggerEvent::get_trigger_sources() {
+  auto t_types = Vec<TriggerType>();
+  u16 gaps_trigger = (trigger_source >> 5 & 0x1) == 1;
+  if (gaps_trigger) {
+    t_types.push_back(TriggerType::Gaps);
+  }
+  u16 any_trigger    = (trigger_source >> 6 & 0x1) == 1;
+  if (any_trigger) {
+    t_types.push_back(TriggerType::Any);
+  }
+  u16 forced_trigger = (trigger_source >> 7 & 0x1) == 1;
+  if (forced_trigger) {
+    t_types.push_back(TriggerType::Forced);
+  }
+  u16 track_trigger  = (trigger_source >> 8 & 0x1) == 1;
+  if (track_trigger) {
+    t_types.push_back(TriggerType::Track);
+  }
+  u16 central_track_trigger
+                     = (trigger_source >> 9 & 0x1) == 1;
+  if (central_track_trigger) {
+    t_types.push_back(TriggerType::TrackCentral);
+  }
+  return t_types;
+} 
 
 /**********************************************************/
 
-MasterTriggerEvent::MasterTriggerEvent(usize n_ltbs) {
-  event_id      = 0; 
-  timestamp     = 0; 
-  tiu_timestamp = 0; 
-  tiu_gps_32    = 0; 
-  tiu_gps_16    = 0; 
-  n_paddles     = 0; 
+MasterTriggerEvent::MasterTriggerEvent() {
+  event_id       = 0; 
+  timestamp      = 0; 
+  tiu_timestamp  = 0; 
+  tiu_gps32      = 0; 
+  tiu_gps16      = 0; 
+  crc            = 0;
+  trigger_source = 0;
+  dsi_j_mask     = 0;
+  channel_mask   = Vec<u16>();
+  mtb_link_mask  = 0;
+}  
 
-  // this is the default setting
-  n_ltbs_ = n_ltbs;
-
-  std::fill(board_mask, board_mask + n_ltbs_, 0);
-  for (usize k=0;k<n_ltbs_;k++) {
-    std::fill(hits[k], hits[k] + N_CHN_PER_LTB, 0);
-  }
-  crc = 0;
-  broken = true;
-  valid  = false;
-
+/**********************************************************/
   
-}
-
-/*************************************/
-
-void MasterTriggerEvent::decode_hit_mask(u32 mask_number, bool (&hitmask_1)[N_CHN_PER_LTB], bool (&hitmask_2)[N_CHN_PER_LTB]) {
-  //let mut decoded_mask_0 = [false;N_CHN_PER_LTB];
-  //let mut decoded_mask_1 = [false;N_CHN_PER_LTB];
-  // FIXME this implicitly asserts that the fields for non available LTBs 
-  // will be 0 and all the fields will be in order
-  u32 index = N_CHN_PER_LTB - 1;
-  //for n in 0..N_CHN_PER_LTB {
-  for (usize n=0; n<N_CHN_PER_LTB; n++) {
-    u32 mask = 1 << n;
-    //println!("MASK {:?}", mask);
-    bool bit_is_set = (mask & mask_number) > 0;
-    hitmask_1[index] = bit_is_set;
-    if (index != 0) {
-      index -= 1;
+Vec<u8> MasterTriggerEvent::get_rb_link_ids() {
+  auto links = Vec<u8>();
+  for (u8 k=0;k<64;k++) {
+    if (((u64)(mtb_link_mask >> k) & (u64)0x1) == 1) {
+      links.push_back(k);
     }
   }
-  index = N_CHN_PER_LTB -1;
-  for (usize n=N_CHN_PER_LTB; n<2*N_CHN_PER_LTB; n++) {
-  //for n in N_CHN_PER_LTB..2*N_CHN_PER_LTB {
-    u32 mask = 1 << n;
-    bool bit_is_set = (mask & mask_number) > 0;
-    hitmask_2[index] = bit_is_set;
-    if (index != 0) {
-      index -= 1;
-    }
-  }
+  return links;
 }
+    
+Vec<std::tuple<u8, u8, u8, LTBThreshold>> MasterTriggerEvent::get_trigger_hits() {
 
-/*************************************/
-  
-void MasterTriggerEvent::set_board_mask(u32 mask) {
-  // FIXME -> This basically inverses the order of the LTBs
-  // so bit 0 (rightmost in the mask is the leftmost in the 
-  // array 
-  for (usize i=0;i<n_ltbs_;i++) {
-     board_mask[i] = (mask & (1 << i)) != 0;
-  } 
-}   
-
-/*************************************/
-        
-void MasterTriggerEvent::set_hit_mask(usize ltb_idx, u32 mask) {
-  for (usize i=0;i<N_CHN_PER_LTB;i++) {
-    hits[ltb_idx][i] = (mask & (1 << i)) != 0;
-  } 
-}
-
-/*************************************/
-  
-Vec<std::tuple<u8,u8,u8>>  MasterTriggerEvent::get_dsi_j_ch() {
-  u8 dsi    = 0;
-  u8 j      = 0;
-  u8 ltb_ch = 0;
-  auto hit_boards = Vec<u8>();
-  Vec<std::tuple<u8,u8,u8>> result;  
-  
-  for (u8 k=0;k<n_ltbs_;k++) {
-    if (board_mask[k]) {
-      hit_boards.push_back(k);
-    } 
+  auto hits = Vec<std::tuple<u8,u8,u8,LTBThreshold>>(); 
+  //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
+  auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
+  u32 n_masks_needed   = dsi_j_mask_bits.count();
+  if (channel_mask.size() < n_masks_needed) {
+    log_error("We need " << n_masks_needed << " hit masks, but only have " << channel_mask.size() << "! This is bad!");
+    return hits;
   }
-  for (u8 brd : hit_boards) {
-    for (usize ch=0;ch<N_CHN_PER_LTB;ch++) {
-      if (hits[brd][ch]) {
-        dsi = LTB_DSI_MAP.at(brd).first;
-        j   = LTB_DSI_MAP.at(brd).second; 
-        ltb_ch = (u8) ch;
-        auto hit = std::make_tuple(dsi,j,ltb_ch + 1);
-        result.push_back(hit); 
+  u8 n_mask = 0;
+  for (u8 k=0;k<32;k++) {
+    if ((u32)((dsi_j_mask >> k) & 0x1) == 1) {
+      u8 dsi = (u8)std::floor(((f32) k/ 4.0))  + 1;       
+      u8 j   = (k % 5)  + 1;
+      //println!("n_mask {n_mask}");
+      u32 channels = channel_mask[n_mask]; 
+      for (u8 i=0;i<8; i++) {
+        u32 ch  = LTB_CHANNELS[i];
+        u32 chn = i + 1; 
+        //for (i,ch) in LTB_CHANNELS.iter().enumerate() {
+        //let chn = ch + 1;
+        //println!("i,ch {}, {}", i, ch);
+        u32 thresh_bits = (u8)(channels & (ch) >> (i*2));
+        //println!("thresh_bits {}", thresh_bits);
+        if (thresh_bits > 0) { // hit over threshold
+          hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
+        }
       }
-    }    
+      n_mask += 1;
+    }
   }
-  return result;
+  return hits;
 }
 
-/*************************************/
-  
-usize MasterTriggerEvent::get_packet_size(const Vec<u8> &stream,
-                                          usize pos) {
-  bool has_ended;
-  u64 head_pos = search_for_2byte_marker(stream, 0xAA, has_ended, pos);
-  u64 tail_pos = search_for_2byte_marker(stream, 0x55, has_ended, pos);
-  
-  u64 packet_size = tail_pos + 2 - head_pos;
-  if (has_ended) {
-    log_error("The size of the packet could not be determined!");
-    return 0;
-  }
-  return packet_size;
-}
 
 /*************************************/
 
@@ -717,21 +769,24 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
                                                        u64 &pos) {
 
   MasterTriggerEvent event;
-  usize n_ltbs = 20;
-  // now we have to figure out if we have 20 or 25 
-  // LTBS
-  usize packet_size = MasterTriggerEvent::get_packet_size(bytestream,
-                                                          pos);
-  if (packet_size == MasterTriggerEvent::SIZE_LTB20) {
-    n_ltbs = 20;
-    event = MasterTriggerEvent(n_ltbs);
-  } else if (packet_size == MasterTriggerEvent::SIZE_LTB25) {
-    n_ltbs = 25;
-    event = MasterTriggerEvent(n_ltbs);
-  } else {
-    log_error("Size matches neither 20 nor 25 LTBs!");
-    return event;
-  }
+  
+  // HACK - we make this compatible with the old data, 
+  // but old data won't be useful
+  //usize n_ltbs = 20;
+  //// now we have to figure out if we have 20 or 25 
+  //// LTBS
+  //usize packet_size = MasterTriggerEvent::get_packet_size(bytestream,
+  //                                                        pos);
+  //if (packet_size == MasterTriggerEvent::SIZE_LTB20) {
+  //  n_ltbs = 20;
+  //  event = MasterTriggerEvent(n_ltbs);
+  //} else if (packet_size == MasterTriggerEvent::SIZE_LTB25) {
+  //  n_ltbs = 25;
+  //  event = MasterTriggerEvent(n_ltbs);
+  //} else {
+  //  log_error("Size matches neither 20 nor 25 LTBs!");
+  //  return event;
+  //}
   
   u16 header = Gaps::parse_u16(bytestream, pos);
   if (header != MasterTriggerEvent::HEAD) {
@@ -741,93 +796,45 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
   event.event_id           = Gaps::parse_u32(bytestream, pos);
   event.timestamp          = Gaps::parse_u32(bytestream, pos);
   event.tiu_timestamp      = Gaps::parse_u32(bytestream, pos);
-  event.tiu_gps_32         = Gaps::parse_u32(bytestream, pos);
-  event.tiu_gps_16         = Gaps::parse_u32(bytestream, pos);
-  event.n_paddles          = Gaps::parse_u8 (bytestream, pos);
+  event.tiu_gps32          = Gaps::parse_u32(bytestream, pos);
+  event.tiu_gps16          = Gaps::parse_u32(bytestream, pos);
+  // just search the next footer and don't fill the deprecated fields
+  bool has_ended = false;
+  u64 tail_pos = search_for_2byte_marker(bytestream,0x55,has_ended,pos);   
+  u16 tail = Gaps::parse_u16(bytestream, pos);
+  if (tail != MasterTriggerEvent::TAIL) {
+    log_error("Invalid tail signature!");
+  }
+  //event.n_paddles          = Gaps::parse_u8 (bytestream, pos);
 
-  event.set_board_mask(Gaps::parse_u32(bytestream, pos));
-  // FIXME
-  for (usize k=0;k<n_ltbs;k++) {
-    u32 hitmask = Gaps::parse_u32(bytestream, pos);
-    event.set_hit_mask(k, hitmask);
-  }
-  event.crc = Gaps::parse_u32(bytestream, pos);
-  u8 tail_a = Gaps::parse_u8 (bytestream, pos);
-  u8 tail_b = Gaps::parse_u8 (bytestream, pos);
-  if (tail_a == 85 && tail_b == 85) {
-    log_debug("Correct tail found!");
-  }
-  else if (tail_a == 85 && tail_b == 5) {
-    log_warn("Tail for version 0.6.0/0.6.1 found");
-  } else {
-    log_error("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got " << tail_a << " " << tail_b << " but were expecting 85 5");
-  }
+  //event.set_board_mask(Gaps::parse_u32(bytestream, pos));
+  //// FIXME
+  //for (usize k=0;k<n_ltbs;k++) {
+  //  u32 hitmask = Gaps::parse_u32(bytestream, pos);
+  //  event.set_hit_mask(k, hitmask);
+  //}
+  //event.crc = Gaps::parse_u32(bytestream, pos);
+  //u8 tail_a = Gaps::parse_u8 (bytestream, pos);
+  //u8 tail_b = Gaps::parse_u8 (bytestream, pos);
+  //if (tail_a == 85 && tail_b == 85) {
+  //  log_debug("Correct tail found!");
+  //}
+  //else if (tail_a == 85 && tail_b == 5) {
+  //  log_warn("Tail for version 0.6.0/0.6.1 found");
+  //} else {
+  //  log_error("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got " << tail_a << " " << tail_b << " but were expecting 85 5");
+  //}
   return event;
 }
 
 std::string MasterTriggerEvent::to_string() const {
-  std::string repr = "<MasterTriggerEvent : [N LTBS " + std::to_string(n_ltbs_) + "]";
-  repr += "\n  event_id      : " + std::to_string(event_id                    ); 
-  repr += "\n  timestamp     : " + std::to_string(timestamp                   ); 
-  repr += "\n  tiu_timestamp : " + std::to_string(tiu_timestamp               ); 
-  repr += "\n  tiu_gps_32    : " + std::to_string(tiu_gps_32                  ); 
-  repr += "\n  tiu_gps_16    : " + std::to_string(tiu_gps_16                  ); 
-  repr += "\n  n_paddles     : " + std::to_string(n_paddles                   ); 
-  repr += "\n  crc           : " + std::to_string(crc                         );
-  repr += "\n  broken        : " + std::to_string(broken                      );
-  repr += "\n  valid         : " + std::to_string(valid                       );
-  //repr += "\n  -- hit mask --";
-  //repr += "\n [DSI/J]";
-  //repr += "\n 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
-  Vec<u8> hit_boards = Vec<u8>();
-  HashMap<u8, String> dsi_j = HashMap<u8, String>();
-  dsi_j[0]  = "1/1";
-  dsi_j[1]  = "1/2";
-  dsi_j[2]  = "1/3";
-  dsi_j[3]  = "1/4";
-  dsi_j[4]  = "1/5";
-  dsi_j[5]  = "2/1";
-  dsi_j[6]  = "2/2";
-  dsi_j[7]  = "2/3";
-  dsi_j[8]  = "2/4";
-  dsi_j[9]  = "2/5";
-  dsi_j[10] = "3/1";
-  dsi_j[11] = "3/2";
-  dsi_j[12] = "3/3";
-  dsi_j[13] = "3/4";
-  dsi_j[14] = "3/5";
-  dsi_j[15] = "4/1";
-  dsi_j[16] = "4/2";
-  dsi_j[16] = "4/3";
-  dsi_j[17] = "4/4";
-  dsi_j[19] = "4/5";
-  dsi_j[20] = "5/1";
-  dsi_j[21] = "5/2";
-  dsi_j[22] = "5/3";
-  dsi_j[23] = "5/4";
-  dsi_j[24] = "5/5";
-  //repr += " ";
-  for (usize k=0;k<n_ltbs_;k++) {
-    if (board_mask[k]) {
-      //repr += "-X-   ";
-      hit_boards.push_back(k);
-    } else {
-      //repr += "-0-   ";
-    }
-  }
-  repr += "\n == == LTB HITS DSI/J/CH => [RB_ID CH] == ==\n";
-  for (auto k : hit_boards) {
-    repr += "\t DSI/J " + dsi_j[k];
-    for (usize j=0;j<N_CHN_PER_LTB;j++) {
-      if (hits[k][j]) {
-        repr += " " + std::to_string(j + 1) + " => ?";
-      } else {
-        continue;
-        //repr += " N.A. ";
-      } 
-    }
-    repr += "\n";
-  }  
+  std::string repr = "<MasterTriggerEvent";
+  repr += std::format("\n  event_id      : {}",event_id     ); 
+  repr += std::format("\n  timestamp     : {}",timestamp    ); 
+  repr += std::format("\n  tiu_timestamp : {}",tiu_timestamp); 
+  repr += std::format("\n  tiu_gps32     : {}",tiu_gps32    ); 
+  repr += std::format("\n  tiu_gps16     : {}",tiu_gps16    ); 
+  repr += std::format("\n  crc           : {}",crc          );
   repr += ">";
   return repr;
 }

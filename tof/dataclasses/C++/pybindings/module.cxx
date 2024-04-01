@@ -266,20 +266,44 @@ PYBIND11_MODULE(gaps_tof, m) {
     py::class_<MasterTriggerEvent>(m, "MasterTriggerEvent", "The MasterTriggerEvent contains the information from the MTB.")
       .def(py::init())
       .def("from_bytestream", &MasterTriggerEvent::from_bytestream, "Deserialize from a list of bytes")
-      .def("get_dsi_j_ch"             , &MasterTriggerEvent::get_dsi_j_ch, "Get the value for DSI/J + LTB ch for each hit as seen by the MTB")
+      .def("get_trigger_hits"         , &MasterTriggerEvent::get_trigger_hits, "Get the hits in dsi,j,channel, threshold format whcih formed the trigger")
+      .def("get_rb_link_ids"          , &MasterTriggerEvent::get_rb_link_ids, "Get the Link IDS of the RBs with expected hits within the trigger integration window") 
+      .def("get_trigger_sources"      , &MasterTriggerEvent::get_trigger_sources, "Return all active triggers for this event") 
+      .def("get_timestamp_gps48"      , &MasterTriggerEvent::get_timestamp_gps48, "48bit GPS timestamp") 
+      .def("get_timestamp_abs48"      , &MasterTriggerEvent::get_timestamp_abs48, "Absolute 48bit timestamp") 
       .def_readonly("event_id"        , &MasterTriggerEvent::event_id, "MTB event id" ) 
       .def_readonly("timestamp"       , &MasterTriggerEvent::timestamp                )
       .def_readonly("tiu_timestamp"   , &MasterTriggerEvent::tiu_timestamp            )
-      .def_readonly("gps_timestamp_16", &MasterTriggerEvent::tiu_gps_16               )
-      .def_readonly("gps_timestamp_32", &MasterTriggerEvent::tiu_gps_32               )
-      //.def_readonly("board_mask"      , &MasterTriggerEvent::board_mask               )
-      .def_readonly("n_paddles"       , &MasterTriggerEvent::n_paddles                ) 
+      .def_readonly("tiu_gps16"       , &MasterTriggerEvent::tiu_gps16                )
+      .def_readonly("tiu_gps32"       , &MasterTriggerEvent::tiu_gps32                )
+      .def_readonly("crc"             , &MasterTriggerEvent::crc                      )
+      .def_readonly("trigger_source"  , &MasterTriggerEvent::trigger_source           )
+      .def_readonly("dsi_j_mask"      , &MasterTriggerEvent::dsi_j_mask               )
+      .def_readonly("channel_mask"    , &MasterTriggerEvent::channel_mask             )
+      .def_readonly("mtb_link_mask"   , &MasterTriggerEvent::mtb_link_mask            )
       .def("__repr__",        [](const MasterTriggerEvent &ev) {
                                  return ev.to_string(); 
                                  }) 
     ;
 
-   
+    py::enum_<TriggerType>(m, "TriggerType")
+      .value("Unknown",          TriggerType::Unknown  )
+      .value("Gaps"   ,          TriggerType::Gaps     )
+      .value("Any"    ,          TriggerType::Any      )
+      .value("Track"  ,          TriggerType::Track    )
+      .value("TrackCentral",     TriggerType::TrackCentral)
+      .value("Poisson",          TriggerType::Poisson  )
+      .value("Forced" ,          TriggerType::Forced   )
+      ;
+    
+    py::enum_<LTBThreshold>(m, "LTBThreshold")
+      .value("Unknown",          LTBThreshold::Unknown )
+      .value("NoHit"  ,          LTBThreshold::NoHit   )
+      .value("Hit"    ,          LTBThreshold::Hit     )
+      .value("Beta"   ,          LTBThreshold::Beta    )
+      .value("Veto"   ,          LTBThreshold::Veto    )
+      ;
+
     py::enum_<PacketType>(m, "PacketType")
       .value("Unknown",          PacketType::Unknown   )
       .value("Command",          PacketType::Command   )

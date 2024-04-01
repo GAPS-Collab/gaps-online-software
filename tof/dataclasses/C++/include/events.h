@@ -63,6 +63,61 @@ std::ostream& operator<<(std::ostream& os, const EventStatus& status);
 
 /*********************************************************/
 
+static const u8 TRIGGERTYPE_UNKNOWN      = 0;
+static const u8 TRIGGERTYPE_GAPS         = 4;
+static const u8 TRIGGERTYPE_ANY          = 1;
+static const u8 TRIGGERTYPE_TRACK        = 2;
+static const u8 TRIGGERTYPE_TRACKCENTRAL = 3;
+static const u8 TRIGGERTYPE_POISSON      = 100;
+static const u8 TRIGGERTYPE_FORCED       = 101;
+
+
+/************************************
+ *
+ * GAPS Trigger types/sources. Description
+ * can be found elsewhere. More than oen
+ * of them can be active at the same time
+ *
+ */
+enum class TriggerType : u8 {
+  Unknown      = TRIGGERTYPE_UNKNOWN,
+  /// -> 1-10 "pysics" triggers
+  Gaps         = TRIGGERTYPE_GAPS,
+  Any          = TRIGGERTYPE_ANY,
+  Track        = TRIGGERTYPE_TRACK,
+  TrackCentral = TRIGGERTYPE_TRACKCENTRAL,
+  /// > 100 -> Debug triggers
+  Poisson      = TRIGGERTYPE_POISSON,
+  Forced       = TRIGGERTYPE_FORCED, 
+};
+
+std::ostream& operator<<(std::ostream& os, const TriggerType& t_type);
+
+/*********************************************************/
+
+static const u8 LTBTHRESHOLD_NOHIT   = 0;
+static const u8 LTBTHRESHOLD_HIT     = 1;
+static const u8 LTBTHRESHOLD_BETA    = 2;
+static const u8 LTBTHRESHOLD_VETO    = 3;
+static const u8 LTBTHRESHOLD_UNKNOWN = 255;
+
+enum class LTBThreshold : u8 {
+  NoHit   = LTBTHRESHOLD_NOHIT,
+  /// First threshold, 40mV, about 0.75 minI
+  Hit     = LTBTHRESHOLD_HIT,
+  /// Second threshold, 32mV (? error in doc ?, about 2.5 minI
+  Beta    = LTBTHRESHOLD_BETA,
+  /// Third threshold, 375mV about 30 minI
+  Veto    = LTBTHRESHOLD_VETO,
+  /// Use u8::MAX for Unknown, since 0 is pre-determined for 
+  /// "NoHit, 
+  Unknown = LTBTHRESHOLD_UNKNOWN,
+};
+
+std::ostream& operator<<(std::ostream& os, const LTBThreshold& thresh);
+
+/*********************************************************/
+
 /**
  * RB binary data header information
  *
@@ -233,6 +288,15 @@ std::ostream& operator<<(std::ostream& os, const CompressionLevel& level);
  * a hit mask. The hit mask gives hit channels per DSI/J,
  * which correspond to hit channels on a LTB.
  *
+ * FIXME -compatibiltiy. Reading older data, we have 
+ * 2 scenarios - either 113 bytes of fixed size for 
+ * 20 LTBs, or 133 bytes for 25 LTBs. 
+ * We can modify from_bytestream to at least not 
+ * throw an error when reading older data, but 
+ * this would currently be a #todo of lower 
+ * priority
+ *
+ *
  */
 struct MasterTriggerEvent {
   /// begin struct marker
@@ -241,43 +305,51 @@ struct MasterTriggerEvent {
   static const u16 TAIL = 0x5555;
   /// the struct has a fixed size of SIZE
   static const usize SIZE = 45; // size in bytes
-  static const usize SIZE_LTB20 = 113;
-  static const usize SIZE_LTB25 = 113 + 5*4; 
 
   /// event_id as assigned by the MasterTriggerBoard
-  u32 event_id      ; 
+  u32 event_id          ; 
   /// MTB timestamp
-  u32 timestamp     ; 
+  u32 timestamp         ; 
   /// Tracker (?) timestamp
-  u32 tiu_timestamp ; 
+  u32 tiu_timestamp     ; 
   /// GAPS GPS clock value (slow)
-  u32 tiu_gps_32    ; 
+  u32 tiu_gps32         ; 
   /// GAPS GPS clock value (fast)
-  u32 tiu_gps_16    ; 
+  u32 tiu_gps16         ; 
   /// triggered paddles as seen by the MTB
-  u8  n_paddles     ; 
-  /// bitmask indicating hit LTBs, identified by DSI/J
-  bool board_mask[N_LTBS];
-  /// bitmask per LTB to indicate hit channels. Each 
-  /// channel maps to a RBID/RBCH
-  bool hits[N_LTBS][N_CHN_PER_LTB];
-  u32 crc           ;
-  // these fields won't get serialized
-  bool broken       ;
-  bool valid        ;
+  u32 crc               ;
+  u16 trigger_source    ;
+  u32 dsi_j_mask        ;
+  Vec<u16> channel_mask ;
+  u64 mtb_link_mask     ;
   
-  LtbRBMap channel_map;
-
   MasterTriggerEvent();
   
-  // FIXME - become a concept
-  // Basically verify that the size of the bytestream
-  // is what we expect. In case where N_LTB is 25 
-  // instead of 20 it will be longer.
-  static usize get_packet_size(const Vec<u8> &stream, 
-                               usize pos);
+  Vec<u8> get_rb_link_ids();
+  
+  /// Get the combination of triggered DSI/J/CH on 
+  /// the MTB which formed the trigger. This does 
+  /// not include further hits which fall into the 
+  /// integration window. For those, se rb_link_mask
+  ///
+  /// The returned values follow the TOF convention
+  /// to start with 1, so that we can use them to 
+  /// look up LTB ids in the db.
+  ///
+  /// # Returns
+  ///
+  ///   Vec<(hit)> where hit is (DSI, J, CH) 
+  Vec<std::tuple<u8, u8, u8, LTBThreshold>> get_trigger_hits();
 
+  /// The combined GPS 48bit timestamp
+  /// into a 48bit timestamp
+  u64 get_timestamp_gps48();
 
+  /// Get absolute timestamp as sent by the GPS
+  u64 get_timestamp_abs48();
+
+  /// Get the trigger sources from trigger source byte
+  Vec<TriggerType> get_trigger_sources(); 
   /**
    * Factory function for MasterTriggerEvent
    *
@@ -291,36 +363,8 @@ struct MasterTriggerEvent {
    */
   static MasterTriggerEvent from_bytestream(const Vec<u8> &bytestream,
                                             u64 &pos);
-  //static void decode_board_mask(u32 mask_number, bool (&decoded_mask)[N_LTBS]); 
-
-  static void decode_hit_mask(u32 mask_number, bool (&hitmask_1)[N_CHN_PER_LTB], bool (&hitmask_2)[N_CHN_PER_LTB]);
-
-  void set_board_mask(u32 mask);
-  
-  void set_hit_mask(usize ltb_index,u32 mask);
-
-  /**
-   * Get the hits in terms of DSI/J/CH
-   * This can then be further used to 
-   * calculate RB ID/CHANNEL
-   */
-  Vec<std::tuple<u8,u8,u8>>  get_dsi_j_ch();
-
   /// String representation of the struct
   std::string to_string() const;
-
-  private:
-    // a fix for different versions 
-    // of the data. There are some 
-    // whcih have N_LTBS = 20 and 
-    // others which have N_LTBS = 25
-    // we can set this switch so that 
-    // this does not affect us
-    usize n_ltbs_;
-    // let's have another constructor, to get out of the N_LTB
-    // conundrum
-    MasterTriggerEvent(usize n_ltbs);
-
 
 };
 
