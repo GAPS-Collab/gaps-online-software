@@ -104,7 +104,10 @@ pub fn integrate(voltages     : &Vec<f32>,
   //  size_bin = voltages.len() - lo_bin;
   //}
   if upper_bin > voltages.len() {
-    return Err(WaveformError::OutOfRangeUpperBound)
+    return Err(WaveformError::OutOfRangeUpperBound);
+  }
+  if lo_bin < 1 {
+    return Err(WaveformError::OutOfRangeLowerBound);
   }
   let mut sum = 0f32;
   //let upper_bin = lo_bin + size_bin;
@@ -249,6 +252,9 @@ pub fn find_peaks(voltages       : &Vec<f32>,
     start_bin = 10;
   }
   let window_bin = time2bin(nanoseconds, start_time + window_size)? - start_bin;
+  if start_bin + window_bin > voltages.len () {
+    return Err(WaveformError::OutOfRangeUpperBound);
+  }
 
   let mut pos = 0usize;
   // find the first bin when voltage
@@ -267,6 +273,9 @@ pub fn find_peaks(voltages       : &Vec<f32>,
   let mut nbins_peak   = 0usize;
   let mut begin_peak   = pos;
   let mut end_peak  : usize;
+  if (pos + window_bin) > voltages.len() {
+    return Err(WaveformError::OutOfRangeUpperBound);
+  }
   for k in pos..(pos + window_bin) {
     if voltages[k] >= threshold {
       nbins_peak += 1;
