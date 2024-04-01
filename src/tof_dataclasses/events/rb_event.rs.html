@@ -1365,6 +1365,9 @@
 <a href="#1363" id="1363">1363</a>
 <a href="#1364" id="1364">1364</a>
 <a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Readoutboard binary event formats, former denoted as BLOB (binary large object)
 //! 
 //! The structure is the following
@@ -2578,6 +2581,9 @@
     wf.rb_id             = parse_u8 (stream, pos);
     wf.rb_channel        = parse_u8 (stream, pos);
     wf.stop_cell         = parse_u16(stream, pos);
+    <span class="kw">if </span>stream.len() &lt; <span class="kw-2">*</span>pos+<span class="number">2</span><span class="kw-2">*</span>NWORDS {
+      <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::StreamTooShort);
+    }
     <span class="kw">let </span>data             = <span class="kw-2">&amp;</span>stream[<span class="kw-2">*</span>pos..<span class="kw-2">*</span>pos+<span class="number">2</span><span class="kw-2">*</span>NWORDS];
     wf.adc               = u8_to_u16(data);
     <span class="kw-2">*</span>pos += <span class="number">2</span><span class="kw-2">*</span>NWORDS;

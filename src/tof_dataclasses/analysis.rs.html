@@ -468,6 +468,15 @@
 <a href="#466" id="466">466</a>
 <a href="#467" id="467">467</a>
 <a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implementations of analysis engine
 //! This is based on the original code 
 //! by J.Zweerink
@@ -574,7 +583,10 @@
   //  size_bin = voltages.len() - lo_bin;
   //}
   </span><span class="kw">if </span>upper_bin &gt; voltages.len() {
-    <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::OutOfRangeUpperBound)
+    <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::OutOfRangeUpperBound);
+  }
+  <span class="kw">if </span>lo_bin &lt; <span class="number">1 </span>{
+    <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::OutOfRangeLowerBound);
   }
   <span class="kw">let </span><span class="kw-2">mut </span>sum = <span class="number">0f32</span>;
   <span class="comment">//let upper_bin = lo_bin + size_bin;
@@ -719,6 +731,9 @@
     start_bin = <span class="number">10</span>;
   }
   <span class="kw">let </span>window_bin = time2bin(nanoseconds, start_time + window_size)<span class="question-mark">? </span>- start_bin;
+  <span class="kw">if </span>start_bin + window_bin &gt; voltages.len () {
+    <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::OutOfRangeUpperBound);
+  }
 
   <span class="kw">let </span><span class="kw-2">mut </span>pos = <span class="number">0usize</span>;
   <span class="comment">// find the first bin when voltage
@@ -737,6 +752,9 @@
   </span><span class="kw">let </span><span class="kw-2">mut </span>nbins_peak   = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>begin_peak   = pos;
   <span class="kw">let </span><span class="kw-2">mut </span>end_peak  : usize;
+  <span class="kw">if </span>(pos + window_bin) &gt; voltages.len() {
+    <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::OutOfRangeUpperBound);
+  }
   <span class="kw">for </span>k <span class="kw">in </span>pos..(pos + window_bin) {
     <span class="kw">if </span>voltages[k] &gt;= threshold {
       nbins_peak += <span class="number">1</span>;

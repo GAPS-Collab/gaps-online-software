@@ -535,6 +535,7 @@
 <a href="#533" id="533">533</a>
 <a href="#534" id="534">534</a>
 <a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerEvent
 
 </span><span class="macro">cfg_if::cfg_if! </span>{
@@ -674,7 +675,7 @@
 <span class="comment">/////////////////////////////////////////////////
 
 </span><span class="doccomment">/// LTB Thresholds as passed on by the MTB
-/// https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf
+/// [See also](https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf)
 </span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>LTBThreshold {
@@ -801,7 +802,7 @@
   <span class="doccomment">/// Get the RB link IDs according to the mask
   </span><span class="kw">pub fn </span>get_rb_link_ids(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>links = Vec::&lt;u8&gt;::new();
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">63 </span>{
+    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">64 </span>{
       <span class="kw">if </span>(<span class="self">self</span>.mtb_link_mask &gt;&gt; k) <span class="kw">as </span>u64 &amp; <span class="number">0x1 </span>== <span class="number">1 </span>{
         links.push(k <span class="kw">as </span>u8);
       }
@@ -834,14 +835,15 @@
     <span class="macro">trace!</span>(<span class="string">"ltb channels {:?}"</span>, <span class="self">self</span>.dsi_j_mask);
     <span class="macro">trace!</span>(<span class="string">"hit masks {:?}"</span>, <span class="self">self</span>.channel_mask); 
     <span class="comment">//println!("We see LTB Channels {:?} with Hit masks {:?} for {} masks requested by us!", self.dsi_j_mask, self.channel_mask, n_masks_needed);
-    </span><span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">31 </span>{
+    </span><span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">32 </span>{
       <span class="kw">if </span>(<span class="self">self</span>.dsi_j_mask &gt;&gt; k) <span class="kw">as </span>u32 &amp; <span class="number">0x1 </span>== <span class="number">1 </span>{
         <span class="kw">let </span>dsi = (k <span class="kw">as </span>f32 / <span class="number">4.0</span>).floor() <span class="kw">as </span>u8 + <span class="number">1</span>;       
         <span class="kw">let </span>j   = (k % <span class="number">5</span>) <span class="kw">as </span>u8 + <span class="number">1</span>;
         <span class="comment">//println!("n_mask {n_mask}");
         </span><span class="kw">let </span>channels = <span class="self">self</span>.channel_mask[n_mask]; 
         <span class="kw">for </span>(i,ch) <span class="kw">in </span>LTB_CHANNELS.iter().enumerate() {
-          <span class="kw">let </span>chn = <span class="kw-2">*</span>ch <span class="kw">as </span>u8 + <span class="number">1</span>;
+          <span class="comment">//let chn = *ch as u8 + 1;
+          </span><span class="kw">let </span>chn = i <span class="kw">as </span>u8 + <span class="number">1</span>;
           <span class="comment">//println!("i,ch {}, {}", i, ch);
           </span><span class="kw">let </span>thresh_bits = ((channels &amp; ch) &gt;&gt; (i<span class="kw-2">*</span><span class="number">2</span>)) <span class="kw">as </span>u8;
           <span class="comment">//println!("thresh_bits {}", thresh_bits);

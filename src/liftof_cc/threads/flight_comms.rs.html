@@ -271,6 +271,20 @@
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Communication with the flight computer
 //!
 //! Using two dedicated 0MQ wires - one for 
@@ -497,8 +511,22 @@
                 </span>n_pack_sent += <span class="number">1</span>;
               }
             }
-            <span class="kw">for </span>rbwave <span class="kw">in </span>ev_to_send.get_rbwaveforms() {
-              <span class="kw">let </span>pack = TofPacket::from(<span class="kw-2">&amp;</span>rbwave);
+            <span class="kw">if </span>settings.send_rbwaveforms {
+              <span class="kw">for </span>rbwave <span class="kw">in </span>ev_to_send.get_rbwaveforms() {
+                <span class="kw">let </span>pack = TofPacket::from(<span class="kw-2">&amp;</span>rbwave);
+                <span class="kw">match </span>data_socket.send(pack.to_bytestream(),<span class="number">0</span>) {
+                  <span class="prelude-val">Err</span>(err) =&gt; {
+                    <span class="macro">error!</span>(<span class="string">"Packet sending failed! {err}"</span>);
+                  }
+                  <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+                    <span class="comment">//trace!("RB waveform for event id {} send!", evid);
+                    </span>n_pack_sent += <span class="number">1</span>;
+                  }
+                }
+              }
+            }
+            <span class="kw">if </span>settings.send_mtb_event_packets {
+              <span class="kw">let </span>pack = TofPacket::from(<span class="kw-2">&amp;</span>ev_to_send.mt_event);
               <span class="kw">match </span>data_socket.send(pack.to_bytestream(),<span class="number">0</span>) {
                 <span class="prelude-val">Err</span>(err) =&gt; {
                   <span class="macro">error!</span>(<span class="string">"Packet sending failed! {err}"</span>);

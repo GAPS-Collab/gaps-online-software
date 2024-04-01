@@ -714,7 +714,7 @@
 
         <span class="comment">// histograms
         </span><span class="kw">let </span>ph_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pha_histo);
-        <span class="kw">let </span>pha_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pha_histo, <span class="kw-2">&amp;</span>ph_labels, <span class="number">5</span>); 
+        <span class="kw">let </span>pha_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pha_histo, <span class="kw-2">&amp;</span>ph_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
         <span class="kw">let </span>pha_chart  = BarChart::default()
           .block(Block::default().title(<span class="string">"Pulse height SideA [mV]"</span>).borders(Borders::ALL))
           .data(pha_data.as_slice())
@@ -730,7 +730,7 @@
           )
           .style(<span class="self">self</span>.theme.background());
         frame.render_widget(pha_chart, plots_a[<span class="number">0</span>]);
-        <span class="kw">let </span>phb_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.phb_histo, <span class="kw-2">&amp;</span>ph_labels, <span class="number">5</span>); 
+        <span class="kw">let </span>phb_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.phb_histo, <span class="kw-2">&amp;</span>ph_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
         <span class="kw">let </span>phb_chart  = BarChart::default()
           .block(Block::default().title(<span class="string">"Pulse height SideB [mV]"</span>).borders(Borders::ALL))
           .data(phb_data.as_slice())
@@ -748,7 +748,7 @@
         frame.render_widget(phb_chart, plots_b[<span class="number">0</span>]);
         
         <span class="kw">let </span>pt_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pta_histo);
-        <span class="kw">let </span>pta_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pta_histo, <span class="kw-2">&amp;</span>pt_labels, <span class="number">5</span>); 
+        <span class="kw">let </span>pta_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pta_histo, <span class="kw-2">&amp;</span>pt_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
         <span class="kw">let </span>pta_chart  = BarChart::default()
           .block(Block::default().title(<span class="string">"Pulse time SideA [mV]"</span>).borders(Borders::ALL))
           .data(pta_data.as_slice())
@@ -765,7 +765,7 @@
           .style(<span class="self">self</span>.theme.background());
         frame.render_widget(pta_chart, plots_a[<span class="number">1</span>]);
 
-        <span class="kw">let </span>ptb_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.ptb_histo, <span class="kw-2">&amp;</span>pt_labels, <span class="number">5</span>); 
+        <span class="kw">let </span>ptb_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.ptb_histo, <span class="kw-2">&amp;</span>pt_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
         <span class="kw">let </span>ptb_chart  = BarChart::default()
           .block(Block::default().title(<span class="string">"Pulse time SideB (a.u.)"</span>).borders(Borders::ALL))
           .data(ptb_data.as_slice())
@@ -783,7 +783,7 @@
         frame.render_widget(ptb_chart, plots_b[<span class="number">1</span>]);
         
         <span class="kw">let </span>pc_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pca_histo);
-        <span class="kw">let </span>pca_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pca_histo, <span class="kw-2">&amp;</span>pc_labels, <span class="number">5</span>); 
+        <span class="kw">let </span>pca_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pca_histo, <span class="kw-2">&amp;</span>pc_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
         <span class="kw">let </span>pca_chart  = BarChart::default()
           .block(Block::default().title(<span class="string">"Pulse charge SideA [mC]"</span>).borders(Borders::ALL))
           .data(pca_data.as_slice())
@@ -800,7 +800,7 @@
           .style(<span class="self">self</span>.theme.background());
         frame.render_widget(pca_chart, plots_a[<span class="number">2</span>]);
 
-        <span class="kw">let </span>pcb_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pcb_histo, <span class="kw-2">&amp;</span>pc_labels, <span class="number">5</span>); 
+        <span class="kw">let </span>pcb_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pcb_histo, <span class="kw-2">&amp;</span>pc_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
         <span class="kw">let </span>pcb_chart  = BarChart::default()
           .block(Block::default().title(<span class="string">"Pulse charge SideB [mC]"</span>).borders(Borders::ALL))
           .data(pcb_data.as_slice())
@@ -862,7 +862,7 @@
         
         <span class="comment">// histograms
         </span><span class="kw">let </span>t0_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.t0_histo);
-        <span class="kw">let </span>t0_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.t0_histo, <span class="kw-2">&amp;</span>t0_labels, <span class="number">10</span>); 
+        <span class="kw">let </span>t0_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.t0_histo, <span class="kw-2">&amp;</span>t0_labels, <span class="number">10</span>, <span class="bool-val">false</span>); 
         <span class="kw">let </span>t0_chart   = BarChart::default()
           .block(Block::default().title(<span class="string">"Reco. T0"</span>).borders(Borders::ALL))
           .data(t0_data.as_slice())
@@ -880,7 +880,7 @@
         frame.render_widget(t0_chart, plots[<span class="number">0</span>]);
 
         <span class="kw">let </span>edep_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.edep_histo);
-        <span class="kw">let </span>edep_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.edep_histo, <span class="kw-2">&amp;</span>edep_labels, <span class="number">5</span>); 
+        <span class="kw">let </span>edep_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.edep_histo, <span class="kw-2">&amp;</span>edep_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
         <span class="kw">let </span>edep_chart   = BarChart::default()
           .block(Block::default().title(<span class="string">"Reco. EDep"</span>).borders(Borders::ALL))
           .data(edep_data.as_slice())
@@ -899,7 +899,7 @@
         
         <span class="comment">// position across paddle
         </span><span class="kw">let </span>pa_labels = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pa_histo);
-        <span class="kw">let </span>pa_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pa_histo, <span class="kw-2">&amp;</span>pa_labels, <span class="number">20</span>); 
+        <span class="kw">let </span>pa_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pa_histo, <span class="kw-2">&amp;</span>pa_labels, <span class="number">20</span>, <span class="bool-val">false</span>); 
         <span class="kw">let </span>pa_chart  = BarChart::default()
           .block(Block::default().title(<span class="string">"Position accross paddle"</span>).borders(Borders::ALL))
           .data(pa_data.as_slice())
@@ -917,7 +917,7 @@
         frame.render_widget(pa_chart, chunks[<span class="number">1</span>]);
         
         <span class="kw">let </span>pid_labels = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pid_histo);
-        <span class="kw">let </span>pid_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pid_histo, <span class="kw-2">&amp;</span>pid_labels, <span class="number">10</span>); 
+        <span class="kw">let </span>pid_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pid_histo, <span class="kw-2">&amp;</span>pid_labels, <span class="number">10</span>, <span class="bool-val">true</span>); 
         <span class="kw">let </span>pid_chart  = BarChart::default()
           .block(Block::default().title(<span class="string">"Paddle ID"</span>).borders(Borders::ALL))
           .data(pid_data.as_slice())

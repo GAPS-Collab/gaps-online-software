@@ -527,6 +527,25 @@
 <a href="#525" id="525">525</a>
 <a href="#526" id="526">526</a>
 <a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
 </pre></div><pre class="rust"><code>
 
 <span class="kw">use </span>ratatui::widgets::Tabs;
@@ -732,6 +751,9 @@
   Info,
   Waveforms,
   RBMoniData,
+  PAMoniData,
+  PBMoniData,
+  LTBMoniData,
   SelectRB,
   Quit,
 }
@@ -743,8 +765,11 @@
       RBMenuItem::Info          =&gt; <span class="number">1</span>,
       RBMenuItem::Waveforms     =&gt; <span class="number">2</span>,
       RBMenuItem::RBMoniData    =&gt; <span class="number">3</span>,
-      RBMenuItem::SelectRB      =&gt; <span class="number">4</span>,
-      RBMenuItem::Quit          =&gt; <span class="number">5</span>,
+      RBMenuItem::PAMoniData    =&gt; <span class="number">4</span>,
+      RBMenuItem::PBMoniData    =&gt; <span class="number">5</span>,
+      RBMenuItem::LTBMoniData   =&gt; <span class="number">6</span>,
+      RBMenuItem::SelectRB      =&gt; <span class="number">7</span>,
+      RBMenuItem::Quit          =&gt; <span class="number">8</span>,
     }   
   }
 }
@@ -765,20 +790,33 @@
   }
 
   <span class="kw">pub fn </span>render(<span class="kw-2">&amp;mut </span><span class="self">self</span>, main_window : <span class="kw-2">&amp;</span>Rect, frame : <span class="kw-2">&amp;mut </span>Frame) {
-    <span class="kw">let </span>menu_titles = <span class="macro">vec!</span>[<span class="string">"Home"</span>, <span class="string">"Info"</span>, <span class="string">"Waveforms"</span>, <span class="string">"RBMoniData"</span>, <span class="string">"SelectRB"</span>, <span class="string">"Quit" </span>];
+    <span class="kw">let </span>menu_titles = <span class="macro">vec!</span>[<span class="string">"Home"</span>, <span class="string">"Info"</span>, <span class="string">"Waveforms"</span>, <span class="string">"RBMoniData"</span>, <span class="string">"PAMoniData"</span>, <span class="string">"PBMoniData"</span>, <span class="string">"LTBMoniData"</span>, <span class="string">"SelectRB"</span>, <span class="string">"Quit" </span>];
     <span class="kw">let </span>menu : Vec&lt;Line&gt; = menu_titles
                .iter()
                .map(|t| {
-                 <span class="kw">let </span>(first, rest) = t.split_at(<span class="number">1</span>);
-                 Line::from(<span class="macro">vec!</span>[
-                   Span::styled(
-                       first,
+                 <span class="kw">if </span>t == <span class="kw-2">&amp;</span><span class="string">"Paddles" </span>|| t == <span class="kw-2">&amp;</span><span class="string">"Hits" </span>{
+                   <span class="kw">let </span>(second, rest) = t.split_at(<span class="number">2</span>);
+                   Line::from(<span class="macro">vec!</span>[
+                     Span::styled(
+                       second,
                        Style::default()
-                           .fg(Color::Yellow)
-                           .add_modifier(Modifier::UNDERLINED),
-                   ),
-                   Span::styled(rest, <span class="self">self</span>.theme.style()),
-                 ])
+                         .fg(<span class="self">self</span>.theme.hc)
+                         .add_modifier(Modifier::UNDERLINED),
+                     ),
+                     Span::styled(rest, <span class="self">self</span>.theme.style()),
+                   ])
+                 } <span class="kw">else </span>{
+                   <span class="kw">let </span>(first, rest) = t.split_at(<span class="number">1</span>);
+                   Line::from(<span class="macro">vec!</span>[
+                     Span::styled(
+                         first,
+                         Style::default()
+                             .fg(<span class="self">self</span>.theme.hc)
+                             .add_modifier(Modifier::UNDERLINED),
+                     ),
+                     Span::styled(rest, <span class="self">self</span>.theme.style()),
+                   ])
+                 }
                })
                .collect();
 

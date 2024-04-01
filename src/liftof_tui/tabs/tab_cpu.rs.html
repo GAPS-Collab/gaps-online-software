@@ -328,7 +328,7 @@
 <span class="kw">use </span>tof_dataclasses::errors::SerializationError;
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
 
-<span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme2;
+<span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme;
 <span class="kw">use </span><span class="kw">crate</span>::widgets::timeseries;
 
 <span class="comment">//pub const LG_LINE_HORIZONTAL : &amp;str = "◉";
@@ -352,7 +352,7 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>CPUTab {
-  <span class="kw">pub </span>theme      : ColorTheme2,
+  <span class="kw">pub </span>theme      : ColorTheme,
   <span class="kw">pub </span>freq_queue  : Vec&lt;VecDeque&lt;(f64,f64)&gt;&gt;,
   <span class="kw">pub </span>temp_queue  : Vec&lt;VecDeque&lt;(f64,f64)&gt;&gt;,
   <span class="kw">pub </span>disk_usage : u8, <span class="comment">// disk usage in per cent
@@ -364,7 +364,7 @@
 <span class="kw">impl </span>CPUTab {
 
   <span class="kw">pub fn </span>new(tp_recv : Receiver&lt;TofPacket&gt;,
-             theme : ColorTheme2) -&gt; <span class="self">Self </span>{
+             theme : ColorTheme) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>queue_size    = <span class="number">1000usize</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>freq_queue = Vec::&lt;VecDeque::&lt;(f64,f64)&gt;&gt;::with_capacity(<span class="number">4</span>);
     <span class="kw">let </span><span class="kw-2">mut </span>temp_queue = Vec::&lt;VecDeque::&lt;(f64,f64)&gt;&gt;::with_capacity(<span class="number">4</span>);

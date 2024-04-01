@@ -1811,7 +1811,7 @@
   <span class="comment">// Step 0 : If desired, fit sine
   </span><span class="kw">if </span>fit_sinus {
     <span class="kw">if </span>!channels.contains(<span class="kw-2">&amp;</span><span class="number">8</span>) {
-      <span class="macro">error!</span>(<span class="string">"This RB does not have ch9 data!"</span>);
+      <span class="macro">error!</span>(<span class="string">"RB {} does not have ch9 data!"</span>, rb.rb_id);
     }
     rb.calibration.voltages(<span class="number">9</span>,
                             event.header.stop_cell <span class="kw">as </span>usize,
@@ -1977,7 +1977,7 @@
             }
             <span class="comment">//println!("{}", hit);
           </span>} <span class="kw">else </span>{
-            <span class="macro">error!</span>(<span class="string">"Only one end of a paddle has a channel record! Ch {}, Pid {}"</span>, raw_ch, pid);
+            <span class="macro">error!</span>(<span class="string">"Only one end of a paddle has a channel record! Ch {}, Pid {}, RB {}"</span>, raw_ch + <span class="number">1</span>, pid, rb.rb_id);
           }
         }
       }

@@ -410,7 +410,7 @@
     frame.render_widget(wf_info, info[<span class="number">0</span>]);
     
     <span class="kw">let </span>rbhist_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.rb_histo);
-    <span class="kw">let </span>rbhist_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.rb_histo, <span class="kw-2">&amp;</span>rbhist_labels, <span class="number">5</span>); 
+    <span class="kw">let </span>rbhist_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.rb_histo, <span class="kw-2">&amp;</span>rbhist_labels, <span class="number">5</span>, <span class="bool-val">true</span>); 
     <span class="kw">let </span>rbhist_chart   = BarChart::default()
       .block(Block::default().title(<span class="string">"ReadoutBoards"</span>).borders(Borders::ALL))
       .data(rbhist_data.as_slice())

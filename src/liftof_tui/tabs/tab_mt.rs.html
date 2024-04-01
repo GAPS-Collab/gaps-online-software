@@ -448,42 +448,6 @@
 <a href="#446" id="446">446</a>
 <a href="#447" id="447">447</a>
 <a href="#448" id="448">448</a>
-<a href="#449" id="449">449</a>
-<a href="#450" id="450">450</a>
-<a href="#451" id="451">451</a>
-<a href="#452" id="452">452</a>
-<a href="#453" id="453">453</a>
-<a href="#454" id="454">454</a>
-<a href="#455" id="455">455</a>
-<a href="#456" id="456">456</a>
-<a href="#457" id="457">457</a>
-<a href="#458" id="458">458</a>
-<a href="#459" id="459">459</a>
-<a href="#460" id="460">460</a>
-<a href="#461" id="461">461</a>
-<a href="#462" id="462">462</a>
-<a href="#463" id="463">463</a>
-<a href="#464" id="464">464</a>
-<a href="#465" id="465">465</a>
-<a href="#466" id="466">466</a>
-<a href="#467" id="467">467</a>
-<a href="#468" id="468">468</a>
-<a href="#469" id="469">469</a>
-<a href="#470" id="470">470</a>
-<a href="#471" id="471">471</a>
-<a href="#472" id="472">472</a>
-<a href="#473" id="473">473</a>
-<a href="#474" id="474">474</a>
-<a href="#475" id="475">475</a>
-<a href="#476" id="476">476</a>
-<a href="#477" id="477">477</a>
-<a href="#478" id="478">478</a>
-<a href="#479" id="479">479</a>
-<a href="#480" id="480">480</a>
-<a href="#481" id="481">481</a>
-<a href="#482" id="482">482</a>
-<a href="#483" id="483">483</a>
-<a href="#484" id="484">484</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Master Trigger tab
 //! 
 //! Show current data from the master trigger
@@ -545,17 +509,6 @@
     create_labels,
 };
 
-<span class="kw">pub const </span>HIST_LABELS : [<span class="kw-2">&amp;</span>str;<span class="number">100</span>]  = [<span class="string">"0"</span>,   <span class="string">"1"</span>, <span class="string">"2"</span>,  <span class="string">"3"</span>,  <span class="string">"4"</span>,  <span class="string">"5"</span>,  <span class="string">"6"</span>,  <span class="string">"7"</span>,  <span class="string">"8"</span>,  <span class="string">"9"</span>,
-                                       <span class="string">"10"</span>, <span class="string">"11"</span>, <span class="string">"12"</span>, <span class="string">"13"</span>, <span class="string">"14"</span>, <span class="string">"15"</span>, <span class="string">"16"</span>, <span class="string">"17"</span>, <span class="string">"18"</span>, <span class="string">"19"</span>,
-                                       <span class="string">"20"</span>, <span class="string">"21"</span>, <span class="string">"22"</span>, <span class="string">"23"</span>, <span class="string">"24"</span>, <span class="string">"25"</span>, <span class="string">"26"</span>, <span class="string">"27"</span>, <span class="string">"28"</span>, <span class="string">"29"</span>, 
-                                       <span class="string">"30"</span>, <span class="string">"31"</span>, <span class="string">"32"</span>, <span class="string">"33"</span>, <span class="string">"34"</span>, <span class="string">"35"</span>, <span class="string">"36"</span>, <span class="string">"37"</span>, <span class="string">"38"</span>, <span class="string">"39"</span>,
-                                       <span class="string">"40"</span>, <span class="string">"41"</span>, <span class="string">"42"</span>, <span class="string">"43"</span>, <span class="string">"44"</span>, <span class="string">"45"</span>, <span class="string">"46"</span>, <span class="string">"47"</span>, <span class="string">"48"</span>, <span class="string">"49"</span>,
-                                       <span class="string">"50"</span>, <span class="string">"51"</span>, <span class="string">"52"</span>, <span class="string">"53"</span>, <span class="string">"54"</span>, <span class="string">"55"</span>, <span class="string">"56"</span>, <span class="string">"57"</span>, <span class="string">"58"</span>, <span class="string">"59"</span>,
-                                       <span class="string">"60"</span>, <span class="string">"61"</span>, <span class="string">"62"</span>, <span class="string">"63"</span>, <span class="string">"64"</span>, <span class="string">"65"</span>, <span class="string">"66"</span>, <span class="string">"67"</span>, <span class="string">"68"</span>, <span class="string">"69"</span>,
-                                       <span class="string">"70"</span>, <span class="string">"71"</span>, <span class="string">"72"</span>, <span class="string">"73"</span>, <span class="string">"74"</span>, <span class="string">"75"</span>, <span class="string">"76"</span>, <span class="string">"77"</span>, <span class="string">"78"</span>, <span class="string">"79"</span>,
-                                       <span class="string">"80"</span>, <span class="string">"81"</span>, <span class="string">"82"</span>, <span class="string">"83"</span>, <span class="string">"84"</span>, <span class="string">"85"</span>, <span class="string">"86"</span>, <span class="string">"87"</span>, <span class="string">"88"</span>, <span class="string">"89"</span>,
-                                       <span class="string">"90"</span>, <span class="string">"91"</span>, <span class="string">"92"</span>, <span class="string">"93"</span>, <span class="string">"94"</span>, <span class="string">"95"</span>, <span class="string">"96"</span>, <span class="string">"97"</span>, <span class="string">"98"</span>, <span class="string">"99"</span>,
-                                       ];
 
 
 <span class="attr">#[derive(Debug, Clone)]
@@ -787,44 +740,19 @@
       .style(<span class="self">self</span>.theme.style()); 
      
     <span class="comment">// NChannel distribution
-    </span><span class="kw">let </span><span class="kw-2">mut </span>max_pop_bin = <span class="number">0</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>vec_index   = <span class="number">0</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>bins = Vec::&lt;(u64, u64)&gt;::new();
-    
-    <span class="kw">for </span>bin <span class="kw">in </span><span class="self">self</span>.nch_histo.iter() {
-      <span class="kw">let </span>bin_value = <span class="kw-2">*</span>bin.value <span class="kw">as </span>u64;
-      bins.push((bin.index <span class="kw">as </span>u64, bin_value));
-      <span class="comment">// always show the first 10 bins, but if 
-      // the bins with index &gt; 10 are not 
-      // populated, discard them
-      </span><span class="kw">if </span>bin_value &gt; <span class="number">0 </span>&amp;&amp; bin.index &gt; <span class="number">10 </span>{
-        max_pop_bin = vec_index;
-      }
-      vec_index += <span class="number">1</span>;
-    }
-    bins.retain(|<span class="kw-2">&amp;</span>(x,<span class="kw">_</span>)| x &lt;= max_pop_bin);
-    <span class="kw">let </span><span class="kw-2">mut </span>bins_for_bc = Vec::&lt;(<span class="kw-2">&amp;</span>str, u64)&gt;::new();
-    <span class="macro">debug!</span>(<span class="string">"bins: {:?}"</span>, bins);
-    <span class="kw">for </span>n <span class="kw">in </span>bins.iter() {
-      bins_for_bc.push((HIST_LABELS[n.<span class="number">0 </span><span class="kw">as </span>usize], n.<span class="number">1</span>));
-      <span class="comment">//bins_for_bc.push((foo, n.1));
-      //n_iter += 1;
-    </span>}
-    <span class="kw">let </span>nch_chart = BarChart::default()
+    </span><span class="kw">let </span>nch_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.nch_histo);
+    <span class="kw">let </span>nch_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.nch_histo, <span class="kw-2">&amp;</span>nch_labels, <span class="number">2</span>, <span class="bool-val">true</span>); 
+    <span class="kw">let </span>nch_chart   = BarChart::default()
       .block(Block::default().title(<span class="string">"N Hits (N CH)"</span>).borders(Borders::ALL))
-      .data(bins_for_bc.as_slice())
-      .bar_width(<span class="number">1</span>)
-      .bar_gap(<span class="number">1</span>)
-      <span class="comment">//.bar_style(Style::default().fg(Color::Blue))
-      </span>.bar_style(<span class="self">self</span>.theme.highlight_fg())
+      .data(nch_data.as_slice())
+      .bar_width(<span class="number">2</span>)
+      .bar_gap(<span class="number">0</span>)
+      .bar_style(<span class="self">self</span>.theme.highlight_fg())
       .value_style(
         <span class="self">self</span>.theme.highlight_fg()
-        <span class="comment">//Style::default()
-        //.bg(Color::Blue)
-        </span>.add_modifier(Modifier::BOLD),
+        .add_modifier(Modifier::BOLD),
       )
       .style(<span class="self">self</span>.theme.background());
-
 
     <span class="comment">// FPGA temperature
     </span><span class="kw">let </span>tmp_only : Vec::&lt;i64&gt; = <span class="self">self</span>.fpgatmp_queue.iter().map(|z| z.<span class="number">1</span>.round() <span class="kw">as </span>i64).collect();
@@ -930,7 +858,7 @@
 
      // histograms
      </span><span class="kw">let </span>ml_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.mtb_link_histo);
-     <span class="kw">let </span>mlh_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.mtb_link_histo, <span class="kw-2">&amp;</span>ml_labels, <span class="number">20</span>); 
+     <span class="kw">let </span>mlh_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.mtb_link_histo, <span class="kw-2">&amp;</span>ml_labels, <span class="number">10</span>, <span class="bool-val">true</span>); 
      <span class="kw">let </span>mlh_chart  = BarChart::default()
        .block(Block::default().title(<span class="string">"MTB Link ID (!NOT RBID)"</span>).borders(Borders::ALL))
        .data(mlh_data.as_slice())

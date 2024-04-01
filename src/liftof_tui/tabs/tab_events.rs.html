@@ -179,11 +179,11 @@
     MasterTriggerEvent,
 };
 
-<span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme2;
+<span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme;
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>EventTab {
-  <span class="kw">pub </span>theme         : ColorTheme2,
+  <span class="kw">pub </span>theme         : ColorTheme,
   <span class="kw">pub </span>tp_receiver   : Receiver&lt;TofPacket&gt;,
   <span class="kw">pub </span>event_queue   : VecDeque&lt;TofEvent&gt;,
   <span class="kw">pub </span>queue_size    : usize,
@@ -201,7 +201,7 @@
              mte_sender  : Sender&lt;MasterTriggerEvent&gt;,
              rbe_sender  : Sender&lt;RBEvent&gt;,
              th_sender   : Sender&lt;TofHit&gt;,
-             theme       : ColorTheme2) -&gt; <span class="self">Self </span>{
+             theme       : ColorTheme) -&gt; <span class="self">Self </span>{
              <span class="comment">//streamer  : Arc&lt;Mutex&lt;VecDeque&lt;String&gt;&gt;&gt;,
              //pack_stat : Arc&lt;Mutex&lt;HashMap&lt;String,usize&gt;&gt;&gt;) -&gt; HomeTab&lt;T&gt; {
     </span><span class="self">Self </span>{
