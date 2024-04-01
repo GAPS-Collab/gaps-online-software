@@ -137,7 +137,7 @@ impl FromRandom for TriggerType {
 /////////////////////////////////////////////////
 
 /// LTB Thresholds as passed on by the MTB
-/// https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf
+/// [See also](https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf)
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum LTBThreshold {
@@ -264,7 +264,7 @@ impl MasterTriggerEvent {
   /// Get the RB link IDs according to the mask
   pub fn get_rb_link_ids(&self) -> Vec<u8> {
     let mut links = Vec::<u8>::new();
-    for k in 0..63 {
+    for k in 0..64 {
       if (self.mtb_link_mask >> k) as u64 & 0x1 == 1 {
         links.push(k as u8);
       }
@@ -297,14 +297,15 @@ impl MasterTriggerEvent {
     trace!("ltb channels {:?}", self.dsi_j_mask);
     trace!("hit masks {:?}", self.channel_mask); 
     //println!("We see LTB Channels {:?} with Hit masks {:?} for {} masks requested by us!", self.dsi_j_mask, self.channel_mask, n_masks_needed);
-    for k in 0..31 {
+    for k in 0..32 {
       if (self.dsi_j_mask >> k) as u32 & 0x1 == 1 {
         let dsi = (k as f32 / 4.0).floor() as u8 + 1;       
         let j   = (k % 5) as u8 + 1;
         //println!("n_mask {n_mask}");
         let channels = self.channel_mask[n_mask]; 
         for (i,ch) in LTB_CHANNELS.iter().enumerate() {
-          let chn = *ch as u8 + 1;
+          //let chn = *ch as u8 + 1;
+          let chn = i as u8 + 1;
           //println!("i,ch {}, {}", i, ch);
           let thresh_bits = ((channels & ch) >> (i*2)) as u8;
           //println!("thresh_bits {}", thresh_bits);
