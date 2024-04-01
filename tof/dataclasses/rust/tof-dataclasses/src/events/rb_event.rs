@@ -1211,6 +1211,9 @@ impl Serialization for RBWaveform {
     wf.rb_id             = parse_u8 (stream, pos);
     wf.rb_channel        = parse_u8 (stream, pos);
     wf.stop_cell         = parse_u16(stream, pos);
+    if stream.len() < *pos+2*NWORDS {
+      return Err(SerializationError::StreamTooShort);
+    }
     let data             = &stream[*pos..*pos+2*NWORDS];
     wf.adc               = u8_to_u16(data);
     *pos += 2*NWORDS;
