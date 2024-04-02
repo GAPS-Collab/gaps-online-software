@@ -271,6 +271,7 @@ PYBIND11_MODULE(gaps_tof, m) {
       .def("get_trigger_sources"      , &MasterTriggerEvent::get_trigger_sources, "Return all active triggers for this event") 
       .def("get_timestamp_gps48"      , &MasterTriggerEvent::get_timestamp_gps48, "48bit GPS timestamp") 
       .def("get_timestamp_abs48"      , &MasterTriggerEvent::get_timestamp_abs48, "Absolute 48bit timestamp") 
+      .def_readonly("event_status"    , &MasterTriggerEvent::event_status, "MasterTriggerEvent event status field" ) 
       .def_readonly("event_id"        , &MasterTriggerEvent::event_id, "MTB event id" ) 
       .def_readonly("timestamp"       , &MasterTriggerEvent::timestamp                )
       .def_readonly("tiu_timestamp"   , &MasterTriggerEvent::tiu_timestamp            )

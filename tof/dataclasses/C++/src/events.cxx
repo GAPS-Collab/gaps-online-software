@@ -653,13 +653,13 @@ bool TofEvent::passed_consistency_check() {
 /**********************************************************/
 
   
-u64 MasterTriggerEvent::get_timestamp_gps48() {
+u64 MasterTriggerEvent::get_timestamp_gps48() const {
   return (((u64)tiu_gps16 << 32) | (u64) tiu_gps32); 
 }
 
 /*************************************/
 
-u64 MasterTriggerEvent::get_timestamp_abs48() {
+u64 MasterTriggerEvent::get_timestamp_abs48() const {
   u64 gps = get_timestamp_gps48();
   u32 ts  = timestamp;
   // FIXME - I guess we need to cast to u64
@@ -674,7 +674,7 @@ u64 MasterTriggerEvent::get_timestamp_abs48() {
 
 /*************************************/
 
-Vec<TriggerType> MasterTriggerEvent::get_trigger_sources() {
+Vec<TriggerType> MasterTriggerEvent::get_trigger_sources() const {
   auto t_types = Vec<TriggerType>();
   u16 gaps_trigger = (trigger_source >> 5 & 0x1) == 1;
   if (gaps_trigger) {
@@ -717,7 +717,7 @@ MasterTriggerEvent::MasterTriggerEvent() {
 
 /**********************************************************/
   
-Vec<u8> MasterTriggerEvent::get_rb_link_ids() {
+Vec<u8> MasterTriggerEvent::get_rb_link_ids() const {
   auto links = Vec<u8>();
   for (u8 k=0;k<64;k++) {
     if (((u64)(mtb_link_mask >> k) & (u64)0x1) == 1) {
@@ -727,7 +727,7 @@ Vec<u8> MasterTriggerEvent::get_rb_link_ids() {
   return links;
 }
     
-Vec<std::tuple<u8, u8, u8, LTBThreshold>> MasterTriggerEvent::get_trigger_hits() {
+Vec<std::tuple<u8, u8, u8, LTBThreshold>> MasterTriggerEvent::get_trigger_hits() const {
 
   auto hits = Vec<std::tuple<u8,u8,u8,LTBThreshold>>(); 
   //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
@@ -793,21 +793,32 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
     log_error("Wrong header signature!");
     return event;
   }
-  event.event_id           = Gaps::parse_u32(bytestream, pos);
-  event.timestamp          = Gaps::parse_u32(bytestream, pos);
-  event.tiu_timestamp      = Gaps::parse_u32(bytestream, pos);
-  event.tiu_gps32          = Gaps::parse_u32(bytestream, pos);
-  event.tiu_gps16          = Gaps::parse_u32(bytestream, pos);
+  event.event_status   = (EventStatus)Gaps::parse_u8 (bytestream, pos);
+  event.event_id       = Gaps::parse_u32(bytestream, pos);
+  event.timestamp      = Gaps::parse_u32(bytestream, pos);
+  event.tiu_timestamp  = Gaps::parse_u32(bytestream, pos);
+  event.tiu_gps32      = Gaps::parse_u32(bytestream, pos);
+  event.tiu_gps16      = Gaps::parse_u16(bytestream, pos);
+  event.crc            = Gaps::parse_u32(bytestream, pos);
+  event.trigger_source = Gaps::parse_u16(bytestream, pos);
+  event.dsi_j_mask     = Gaps::parse_u32(bytestream, pos);
+  u8 n_channel_masks   = Gaps::parse_u8 (bytestream, pos);
+  for (u8 k=0;k<n_channel_masks;k++) {
+  //for _ in 0..n_channel_masks {
+    event.channel_mask.push_back(Gaps::parse_u16(bytestream, pos));
+  }
+  event.mtb_link_mask  = Gaps::parse_u64(bytestream, pos);
+
   // just search the next footer and don't fill the deprecated fields
-  bool has_ended = false;
-  u64 tail_pos = search_for_2byte_marker(bytestream,0x55,has_ended,pos);   
-  u16 tail = Gaps::parse_u16(bytestream, tail_pos);
+  //bool has_ended = false;
+  //u64 tail_pos = search_for_2byte_marker(bytestream,0x55,has_ended,pos);   
+  u16 tail = Gaps::parse_u16(bytestream, pos);
   if (tail != MasterTriggerEvent::TAIL) {
     log_error("Invalid tail signature!");
   }
   //event.n_paddles          = Gaps::parse_u8 (bytestream, pos);
 
-  //event.set_board_mask(Gaps::parse_u32(bytestream, pos));
+  //event.set_board_mask(Gaps::parse_u3h2(bytestream, pos));
   //// FIXME
   //for (usize k=0;k<n_ltbs;k++) {
   //  u32 hitmask = Gaps::parse_u32(bytestream, pos);
@@ -829,12 +840,25 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
 
 std::string MasterTriggerEvent::to_string() const {
   std::string repr = "<MasterTriggerEvent";
+  repr += std::format("\n  event_status  : {}",(u8)event_status ); 
   repr += std::format("\n  event_id      : {}",event_id     ); 
   repr += std::format("\n  timestamp     : {}",timestamp    ); 
   repr += std::format("\n  tiu_timestamp : {}",tiu_timestamp); 
   repr += std::format("\n  tiu_gps32     : {}",tiu_gps32    ); 
   repr += std::format("\n  tiu_gps16     : {}",tiu_gps16    ); 
   repr += std::format("\n  crc           : {}",crc          );
+  repr += "\n** Trigger Sources **";
+  for (const auto &ts : get_trigger_sources()) {
+    repr += std::format("\n -- {}", (u8)ts);
+  }
+  repr += "\n** Trigger Hits **";
+  for (const auto &h : get_trigger_hits()) {
+    repr += std::format("\n -- {} {} {} {}", std::get<0>(h), std::get<1>(h), std::get<2>(h), (u8)std::get<3>(h));
+  }
+  repr += "\n** MTB Link IDs **";
+  for (const u8 &lid : get_rb_link_ids()) {
+    repr += std::format("\n -- {}", lid);
+  }
   repr += ">";
   return repr;
 }

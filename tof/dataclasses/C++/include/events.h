@@ -305,27 +305,28 @@ struct MasterTriggerEvent {
   static const u16 TAIL = 0x5555;
   /// the struct has a fixed size of SIZE
   static const usize SIZE = 45; // size in bytes
-
+  /// 
+  EventStatus event_status;
   /// event_id as assigned by the MasterTriggerBoard
-  u32 event_id          ; 
+  u32 event_id            ; 
   /// MTB timestamp
-  u32 timestamp         ; 
+  u32 timestamp           ; 
   /// Tracker (?) timestamp
-  u32 tiu_timestamp     ; 
+  u32 tiu_timestamp       ; 
   /// GAPS GPS clock value (slow)
-  u32 tiu_gps32         ; 
+  u32 tiu_gps32           ; 
   /// GAPS GPS clock value (fast)
-  u32 tiu_gps16         ; 
+  u32 tiu_gps16           ; 
   /// triggered paddles as seen by the MTB
-  u32 crc               ;
-  u16 trigger_source    ;
-  u32 dsi_j_mask        ;
-  Vec<u16> channel_mask ;
-  u64 mtb_link_mask     ;
+  u32 crc                 ;
+  u16 trigger_source      ;
+  u32 dsi_j_mask          ;
+  Vec<u16> channel_mask   ;
+  u64 mtb_link_mask       ;
   
   MasterTriggerEvent();
   
-  Vec<u8> get_rb_link_ids();
+  Vec<u8> get_rb_link_ids() const;
   
   /// Get the combination of triggered DSI/J/CH on 
   /// the MTB which formed the trigger. This does 
@@ -339,17 +340,17 @@ struct MasterTriggerEvent {
   /// # Returns
   ///
   ///   Vec<(hit)> where hit is (DSI, J, CH) 
-  Vec<std::tuple<u8, u8, u8, LTBThreshold>> get_trigger_hits();
+  Vec<std::tuple<u8, u8, u8, LTBThreshold>> get_trigger_hits() const;
 
   /// The combined GPS 48bit timestamp
   /// into a 48bit timestamp
-  u64 get_timestamp_gps48();
+  u64 get_timestamp_gps48() const;
 
   /// Get absolute timestamp as sent by the GPS
-  u64 get_timestamp_abs48();
+  u64 get_timestamp_abs48() const;
 
   /// Get the trigger sources from trigger source byte
-  Vec<TriggerType> get_trigger_sources(); 
+  Vec<TriggerType> get_trigger_sources() const; 
   /**
    * Factory function for MasterTriggerEvent
    *
