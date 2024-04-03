@@ -82,17 +82,17 @@ impl Error for RegisterError {
 ///  A -> /dev/uio1
 ///  B -> /dev/uio2
 #[derive(Debug, Copy, Clone)]
-pub enum BlobBuffer {
+pub enum RamBuffer {
   A,
   B,
   //Both
 }
 
-impl BlobBuffer {
-  pub fn invert(&self) -> BlobBuffer {
+impl RamBuffer {
+  pub fn invert(&self) -> RamBuffer {
     match self {
-      BlobBuffer::A => {return BlobBuffer::B},
-      BlobBuffer::B => {return BlobBuffer::A}
+      RamBuffer::A => {return RamBuffer::B},
+      RamBuffer::B => {return RamBuffer::A}
     }
   }
 }
@@ -212,7 +212,7 @@ pub fn write_control_reg(addr       : u32,
 ///  * which : Select data buffer to read 
 ///  * size  : in bytes
 ///
-pub fn read_data_buffer(which : &BlobBuffer, 
+pub fn read_data_buffer(which : &RamBuffer, 
                         size  : usize)
     -> Result<Vec::<u8>, RegisterError> 
   where
@@ -220,8 +220,8 @@ pub fn read_data_buffer(which : &BlobBuffer,
 
   let addr_space;
   match which {
-    BlobBuffer::A => addr_space = UIO1,
-    BlobBuffer::B => addr_space = UIO2
+    RamBuffer::A => addr_space = UIO1,
+    RamBuffer::B => addr_space = UIO2
   }
   //let blobsize = BlobData::SERIALIZED_SIZE;
   //let vec_size = blobsize*len;
@@ -258,7 +258,7 @@ pub fn read_data_buffer(which : &BlobBuffer,
 ///     * which    : Select data buffer to read 
 ///     * size     : in bytes
 ///     * streamer : an instance of a RBEventMemoryStreamer
-pub fn read_buffer_into_streamer(which    : &BlobBuffer, 
+pub fn read_buffer_into_streamer(which    : &RamBuffer, 
                                  size     : usize,
                                  streamer : &mut RBEventMemoryStreamer)
     -> Result<(), RegisterError> 
@@ -267,8 +267,8 @@ pub fn read_buffer_into_streamer(which    : &BlobBuffer,
 
   let addr_space;
   match which {
-    BlobBuffer::A => addr_space = UIO1,
-    BlobBuffer::B => addr_space = UIO2
+    RamBuffer::A => addr_space = UIO1,
+    RamBuffer::B => addr_space = UIO2
   }
   let m = match map_physical_mem_read(addr_space, 0x0, size) {
   //let mut m = match map_physical_mem_write(addr_space, 0x0, size) {

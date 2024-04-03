@@ -29,9 +29,6 @@ use liftof_lib::settings::{
     RBBufferStrategy
 };
 
-type RamBuffer = BlobBuffer;
-
-
 /// Shutdown a run within the runner thread
 fn termination_seqeunce(prog_ev       : &ProgressBar,
                         prog_a        : &ProgressBar,

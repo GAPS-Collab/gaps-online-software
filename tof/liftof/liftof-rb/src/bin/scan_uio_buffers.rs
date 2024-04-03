@@ -7,7 +7,7 @@ use tof_dataclasses::events::RBEvent;
 use tof_dataclasses::serialization::Serialization;
 
 use liftof_rb::control::*;
-use liftof_rb::memory::BlobBuffer;
+use liftof_rb::memory::RamBuffer;
 use liftof_rb::memory::RegisterError;
 use liftof_rb::memory::map_physical_mem_read;
 #[macro_use] extern crate log;
@@ -87,8 +87,8 @@ fn main() {
 
   
   // get the current cache sizes
-  let buf_a = BlobBuffer::A;
-  let buf_b = BlobBuffer::B;
+  let buf_a = RamBuffer::A;
+  let buf_b = RamBuffer::B;
   reset_dma().unwrap();
   thread::sleep(one_milli);
   let buf_a_start = get_blob_buffer_occ(&buf_a).unwrap();
@@ -141,8 +141,8 @@ fn main() {
   let mut buff_b_max_occ : u32 = 0;
   let mut buff_a_occ : u32;
   let mut buff_b_occ : u32;
-  let buff_a = BlobBuffer::A;
-  let buff_b = BlobBuffer::B;
+  let buff_a = RamBuffer::A;
+  let buff_b = RamBuffer::B;
   let mut n_iter = 0;
   loop {
     n_iter += 1;

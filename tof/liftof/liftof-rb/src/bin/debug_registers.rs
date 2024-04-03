@@ -8,8 +8,8 @@ use std::thread;
 
 fn main () {
 
-  let buff_a = BlobBuffer::A; 
-  let buff_b = BlobBuffer::B; 
+  let buff_a = RamBuffer::A; 
+  let buff_b = RamBuffer::B; 
   
   let one_sec = Duration::from_secs(1);
   println!("=> Idling DAQ...");

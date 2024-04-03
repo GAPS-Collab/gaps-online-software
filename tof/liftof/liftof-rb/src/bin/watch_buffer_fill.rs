@@ -11,7 +11,7 @@ use indicatif::{MultiProgress,
 
 use liftof_rb::api::*;
 use liftof_rb::control::*;
-use liftof_rb::memory::BlobBuffer;
+use liftof_rb::memory::RamBuffer;
 use liftof_rb::memory::RegisterError;
 
 
@@ -41,7 +41,7 @@ const TEMPLATE_BAR_EV : &str = "[{elapsed_precise}] {bar:60.red/white} {pos:>7}/
 ///
 ///  #Arguments: 
 ///
-fn get_buff_size(which : &BlobBuffer, buff_start : &mut u32) ->Result<u32, RegisterError> {
+fn get_buff_size(which : &RamBuffer, buff_start : &mut u32) ->Result<u32, RegisterError> {
   let size : u32;
   let occ = get_blob_buffer_occ(&which)?;
   if *buff_start > occ {
@@ -56,7 +56,7 @@ fn get_buff_size(which : &BlobBuffer, buff_start : &mut u32) ->Result<u32, Regis
   Ok(size)
 }
 
-fn buff_handler(which      : &BlobBuffer,
+fn buff_handler(which      : &RamBuffer,
                 buff_start : u32,
                 prog_bar   : Option<&ProgressBar>) -> u32 {
   
@@ -138,8 +138,8 @@ fn main() {
 
   
   // get the current cache sizes
-  let buf_a = BlobBuffer::A;
-  let buf_b = BlobBuffer::B;
+  let buf_a = RamBuffer::A;
+  let buf_b = RamBuffer::B;
   reset_dma().unwrap();
   thread::sleep(one_milli);
   let mut buf_a_start = get_blob_buffer_occ(&buf_a).unwrap();

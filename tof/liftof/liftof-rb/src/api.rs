@@ -839,8 +839,6 @@ const DMA_RESET_TRIES : u8 = 10;   // if we can not reset the DMA after this num
 /// Dataport is 0MQ PUB for publishing waveform/event data
 pub const DATAPORT : u32 = 42000;
 
-// FIXME
-type RamBuffer = BlobBuffer;
 
 /// Check for the environmental 
 /// variable LIFTOF_IS_SYSTEMD
@@ -973,8 +971,8 @@ pub fn reset_dma_and_buffers() {
   // register writing is on the order of microseconds 
   // (MHz clock) so one_milli is plenty
   let one_milli   = time::Duration::from_millis(1);
-  let buf_a = BlobBuffer::A;
-  let buf_b = BlobBuffer::B;
+  let buf_a = RamBuffer::A;
+  let buf_b = RamBuffer::B;
   let mut n_tries = 0u8;
   let mut failed  = true;
   loop {
@@ -1019,8 +1017,8 @@ pub fn reset_dma_and_buffers() {
 /// 
 ///  - if not, panic. We can't go on like that
 pub fn run_check() {
-  let buf_a = BlobBuffer::A;
-  let buf_b = BlobBuffer::B;
+  let buf_a = RamBuffer::A;
+  let buf_b = RamBuffer::B;
 
   let interval = Duration::from_secs(5);
   let mut n_iter = 0;
@@ -1060,15 +1058,15 @@ pub fn run_check() {
 ///
 ///  #Arguments: 
 ///
-pub fn get_buff_size(which : &BlobBuffer) ->Result<usize, RegisterError> {
+pub fn get_buff_size(which : &RamBuffer) ->Result<usize, RegisterError> {
   let size : u32;
   let occ = get_blob_buffer_occ(&which)?;
   trace!("Got occupancy of {occ} for buff {which:?}");
 
   // the buffer sizes is UIO1_MAX_OCCUPANCY -  occ
   match which {
-    BlobBuffer::A => {size = occ - UIO1_MIN_OCCUPANCY;},
-    BlobBuffer::B => {size = occ - UIO2_MIN_OCCUPANCY;}
+    RamBuffer::A => {size = occ - UIO1_MIN_OCCUPANCY;},
+    RamBuffer::B => {size = occ - UIO2_MIN_OCCUPANCY;}
   }
   let result = size as usize;
   Ok(result)
@@ -1231,8 +1229,8 @@ pub fn ram_buffer_handler(buff_trip     : usize,
 ///  memory map.
 pub fn setup_drs4() -> Result<(), RegisterError> {
 
-  let buf_a = BlobBuffer::A;
-  let buf_b = BlobBuffer::B;
+  let buf_a = RamBuffer::A;
+  let buf_b = RamBuffer::B;
 
   let one_milli   = time::Duration::from_millis(1);
   // DAQ defaults

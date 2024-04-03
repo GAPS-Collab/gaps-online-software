@@ -136,10 +136,10 @@ pub fn idle_drs4_daq() -> Result<(), RegisterError> {
 /// * which : select the blob buffer to query
 ///
 ///
-pub fn get_blob_buffer_occ(which : &BlobBuffer) -> Result<u32, RegisterError> {
+pub fn get_blob_buffer_occ(which : &RamBuffer) -> Result<u32, RegisterError> {
   let address = match which {
-    BlobBuffer::A => RAM_A_OCCUPANCY,
-    BlobBuffer::B => RAM_B_OCCUPANCY,
+    RamBuffer::A => RAM_A_OCCUPANCY,
+    RamBuffer::B => RAM_B_OCCUPANCY,
   };
 
   let value = read_control_reg(address)?;
@@ -175,10 +175,10 @@ pub fn clear_dma_memory() -> Result<(), RegisterError> {
 ///
 /// The writing into the memory thus can start anywhere in memory (does 
 /// not have to be from 0)
-pub fn reset_ram_buffer_occ(which : &BlobBuffer) -> Result<(), RegisterError> {
+pub fn reset_ram_buffer_occ(which : &RamBuffer) -> Result<(), RegisterError> {
   match which { 
-    BlobBuffer::A => write_control_reg(RAM_A_OCC_RST, 0x1)?,
-    BlobBuffer::B => write_control_reg(RAM_B_OCC_RST, 0x1)?
+    RamBuffer::A => write_control_reg(RAM_A_OCC_RST, 0x1)?,
+    RamBuffer::B => write_control_reg(RAM_B_OCC_RST, 0x1)?
   };
   // the reset takes 8 clock cycles at 33 MHz (about 3.4 micro)
   let eight_cycles = Duration::from_micros(4);
