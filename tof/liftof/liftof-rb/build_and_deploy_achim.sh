@@ -14,7 +14,7 @@ get_version() {
 
 deploy_target() {
   echo "Invoking SCP... copy $1-$2 to $3"
-  scp ../target/armv7-unknown-linux-musleabi/release/$1 $3:~/bootstrap-tof/$1-$2
+  rsync -avz ../target/armv7-unknown-linux-musleabi/release/$1 $3:~/bootstrap-tof/$1-$2
   #scp ../target/armv7-unknown-linux-musleabi/release/$1 $3:~/$1-$2
 }
 

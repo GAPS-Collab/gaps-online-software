@@ -445,6 +445,7 @@ fn main() {
                   &dtf_to_evproc,
                   &opmode_to_cache,
                   show_progress,
+                  &config.rb_settings,
                   run_control)
     })
     .expect("Failed to spawn runner thread!");
