@@ -32,6 +32,26 @@ use tof_dataclasses::serialization::{
     SerializationError
 };
 
+/// Readout strategy for RB (onboard) (RAM) memory buffers
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+pub enum RBBufferStrategy {
+  /// Readout and switch the buffers every
+  /// x events
+  NEvents(u16),
+  /// Adapt to the RB rate and readout the buffers
+  /// so that we get switch them every X seconds.
+  /// (Argument is in seconds
+  AdaptToRate(u16),
+}
+
+impl fmt::Display for RBBufferStrategy {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("N.A. - Invalid RBBufferStrategy (error)"));
+    write!(f, "<RBBufferStrategy: {}>", r)
+  }
+}
+
 #[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum BuildStrategy {
   Unknown,
@@ -75,12 +95,17 @@ pub struct RBSettings {
   /// data type, e.g. "VoltageCalibration".
   /// <div class="warning">This might get deprecated in a future version!</div>
   pub data_type               : DataType,
+  /// This allows for different strategies on how to readout 
+  /// the RB buffers. The following refers to the NEvent strategy.
   /// The value when the readout of the RB buffers is triggered.
   /// This number is in size of full events, which correspond to 
   /// 18530 bytes. Maximum buffer size is a bit more than 3000 
   /// events. Smaller buffer allows for a more snappy reaction, 
   /// but might require more CPU resources (on the board)
-  pub rb_buff_size            : u16,
+  /// For RBBufferStrategy::AdaptToRate(k), readout (and switch) the buffers every
+  /// k seconds. The size of the buffer will be determined
+  /// automatically depending on the rate.
+  pub rb_buff_strategy        : RBBufferStrategy,
   /// The general moni interval. Whenever this time in seconds has
   /// passed, the RB will send a RBMoniData packet
   pub rb_moni_interval        : f32,
@@ -101,7 +126,7 @@ impl RBSettings {
       trigger_fixed_rate   : 0,
       trigger_poisson_rate : 0,
       data_type            : DataType::Physics,
-      rb_buff_size         : 50,
+      rb_buff_strategy     : RBBufferStrategy::AdaptToRate(5),
       rb_moni_interval     : 0.0,
       pb_moni_every_x      : 0.0,
       pa_moni_every_x      : 0.0,
@@ -118,7 +143,27 @@ impl RBSettings {
     rcfg.trigger_fixed_rate   = self.trigger_fixed_rate;
     rcfg.trigger_poisson_rate = self.trigger_poisson_rate;
     rcfg.data_type            = self.data_type.clone();
-    rcfg.rb_buff_size         = self.rb_buff_size;
+    let buffer_trip : u16;
+    match self.rb_buff_strategy {
+      RBBufferStrategy::NEvents(buff_size) => {
+        buffer_trip = buff_size;
+      },
+      RBBufferStrategy::AdaptToRate(_) => {
+        // For now, let's just set the initial value to
+        // 50 FIXME
+        buffer_trip = 50;
+        //match rate = get_trigger_rate() {
+        //  Err(err) {
+        //    error!("Unable to obtain trigger rate!");
+        //    buffer_trip = 50;
+        //  },
+        //  Ok(rate) => {
+        //    buffer_trip = rate*n_secs as u16;
+        //  }
+        //}
+      }
+    }
+    rcfg.rb_buff_size         = buffer_trip as u16;
     rcfg
   }
 }

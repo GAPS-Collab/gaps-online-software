@@ -110,11 +110,6 @@ tof_op_mode          = "Default"
 trigger_poisson_rate = 0
 trigger_fixed_rate   = 0
 data_type            = "Physics"
-# this value affects the "responsiveness" of
-# the rbs. Smaller -> more responsive,
-# larger -> less responsive, but more resourceful
-# The value is in size of events with 8 channels
-rb_buff_size         = 50
 # monitoring interval for RBMoniData in seconds
 rb_moni_interval     = 10.0
 # monitoring interval for PBMoniData in x*rb_moni_interval
@@ -124,3 +119,7 @@ pa_moni_every_x      = 2.0
 # monitoring interval for LTBMoniData in x*rb_moni_interval
 ltb_moni_every_x     = 2.0
 
+[rb_settings.rb_buff_strategy]
+# Read out the buffers approximatly every X seconds and 
+# adjust their size based on the RB rate
+AdaptToRate = 5
