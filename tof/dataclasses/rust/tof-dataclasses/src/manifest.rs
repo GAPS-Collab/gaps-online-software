@@ -18,8 +18,11 @@ cfg_if::cfg_if! {
 
 use regex::Regex;
 use glob::glob;
-use chrono::NaiveDateTime;
-use chrono::DateTime;
+use chrono::{
+    NaiveDateTime,
+    DateTime,
+    Utc
+};
 
 use crate::calibrations::RBCalibrations;
 
@@ -249,7 +252,12 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
         Some(v) => {
           //println!("{} = {}", name, v);
           match name {
-            "rb_id"         => {rb.rb_id  = u8::from_str(v).unwrap_or(0);},
+            "rb_id"         => {
+                rb.rb_id  = u8::from_str(v).unwrap_or(0);
+            },
+            "mtb_link_id"   => {
+                rb.mtb_link_id = u8::from_str(v).unwrap_or(0);
+            },
             "ch1_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(1, u16::from_str(v).unwrap_or(0));},
             "ch2_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(2, u16::from_str(v).unwrap_or(0));},
             "ch3_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(3, u16::from_str(v).unwrap_or(0));},
@@ -890,6 +898,7 @@ impl ReadoutBoard {
     let re = Regex::new(r"(\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2})")?;
     // Define your file pattern (e.g., "logs/*.log" for all .log files in the logs directory)
     let pattern = format!("{}/RB{:02}_*", self.calib_file_path, self.rb_id); // Adjust this pattern to your files' naming convention
+    let _timestamp = DateTime::<Utc>::from_timestamp(0,0);
     let mut newest_file = (String::from(""), NaiveDateTime::from_timestamp(0, 0));
     
     // Iterate over files that match the pattern
@@ -907,8 +916,9 @@ impl ReadoutBoard {
         }
         if let Some(caps) = re.captures(&filename) {
           if let Some(timestamp_str) = caps.get(0).map(|m| m.as_str()) {
-            //println!("{}",timestamp_str);
+            println!("{}",timestamp_str);
             let timestamp = NaiveDateTime::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
+            //let _timestamp = DateTime
             if timestamp > newest_file.1 {
               // FIXME - into might panic?
               newest_file.1 = timestamp.into();

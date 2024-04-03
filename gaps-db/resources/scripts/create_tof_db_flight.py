@@ -245,7 +245,8 @@ if __name__ == '__main__':
                 print (rbs)
                 print (pend)
                 raise ValueError("Something is inconsistent! This RB seems to have paddles connected with different MTB Link IDs!")
-
+            
+            rbs[k].mtb_link_id = mtb_link_ids[0]
             print (rbs[k])
             if not args.dry_run:
                 rbs[k].save()
