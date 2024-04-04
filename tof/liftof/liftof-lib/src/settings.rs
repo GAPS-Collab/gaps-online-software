@@ -339,6 +339,9 @@ impl Default for DataPublisherSettings {
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct LiftofSettings {
+  /// read run .toml files from this directory and 
+  /// automotically work through them 1by1
+  pub staging_dir                : String,
   /// default location for RBCalibration files
   pub calibration_dir            : String,
   /// default location for the database
@@ -380,11 +383,12 @@ pub struct LiftofSettings {
 impl LiftofSettings {
   pub fn new() -> Self {
     LiftofSettings {
+      staging_dir               : String::from("/home/gaps/liftof-staging"),
       calibration_dir           : String::from(""),
       db_path                   : String::from("/home/gaps/config/gaps_flight.db"),
       runtime_sec               : 0,
       cc_server_address         : String::from("tcp://10.0.1.10:42000"),   
-      fc_sub_address            : String::from(""),
+      fc_sub_address            : String::from("tcp://192.168.37.200:41662"),
       cmd_listener_interval_sec : 1,
       mtb_address               : String::from("10.0.1.10:50001"),
       cpu_moni_interval_sec     : 60,
