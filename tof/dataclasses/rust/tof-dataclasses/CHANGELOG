@@ -3,6 +3,9 @@
 ## v0.10.0
 * introduces breaking changes to the MasterTriggerEvent. Streamline it 
   and adapt to changes in MTB fw >= 3.0.0
+* Allow to check error bits in RBEventMemoryStreamer for channel and cell
+  sync errors
+
 
 # HAHALUA series
 

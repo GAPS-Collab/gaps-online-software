@@ -27,27 +27,42 @@ pub use rb_event::{
     RBMissingHit,
     RBWaveform,
 };
+  
+cfg_if::cfg_if! {
+  if #[cfg(feature = "random")]  {
+    use crate::FromRandom;
+    extern crate rand;
+    use rand::Rng;
+  }
+}
 
 use std::fmt;
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum EventStatus {
-  Unknown            = 0u8,
-  CRC32Wrong         = 10u8,
-  TailWrong          = 11u8,
-  ChannelIDWrong     = 12u8,
+  Unknown                = 0u8,
+  CRC32Wrong             = 10u8,
+  TailWrong              = 11u8,
+  ChannelIDWrong         = 12u8,
   /// one of the channels cells CellSyncError bits 
   /// has been set (RB)
-  CellSyncErrors     = 13u8,
+  CellSyncErrors         = 13u8,
   /// one of the channels ChannelSyncError bits 
   /// has been set (RB)
-  ChnSyncErrors      = 14u8,
-  IncompleteReadout  = 21u8,
+  ChnSyncErrors          = 14u8,
+  IncompleteReadout      = 21u8,
   /// This can be used if there is a version
   /// missmatch and we have to hack something
-  IncompatibleData   = 22u8,
-  Perfect            = 42u8
+  IncompatibleData       = 22u8,
+  GoodNoCRCOrErrBitCheck = 39u8,
+  /// The event status is good, but we did not 
+  /// perform any CRC32 check
+  GoodNoCRCCheck         = 40u8,
+  /// The event is good, but we did not perform
+  /// error checks
+  GoodNoErrBitCheck      = 41u8,
+  Perfect                = 42u8
 }
 
 impl fmt::Display for EventStatus {
@@ -69,6 +84,9 @@ impl From<u8> for EventStatus {
       14u8 => EventStatus::ChnSyncErrors,
       21u8 => EventStatus::IncompleteReadout,
       22u8 => EventStatus::IncompatibleData,
+      39u8 => EventStatus::GoodNoCRCOrErrBitCheck,
+      40u8 => EventStatus::GoodNoCRCCheck,
+      41u8 => EventStatus::GoodNoErrBitCheck,
       42u8 => EventStatus::Perfect,
       _    => EventStatus::Unknown
     }
@@ -88,6 +106,9 @@ impl FromRandom for EventStatus {
       EventStatus::ChnSyncErrors,
       EventStatus::IncompleteReadout,
       EventStatus::IncompatibleData,
+      EventStatus::GoodNoCRCOrErrBitCheck,
+      EventStatus::GoodNoCRCCheck,
+      EventStatus::GoodNoErrBitCheck,
       EventStatus::Perfect,
     ];
     let mut rng  = rand::thread_rng();

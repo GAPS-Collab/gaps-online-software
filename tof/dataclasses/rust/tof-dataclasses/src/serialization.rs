@@ -38,7 +38,7 @@ pub fn u8_to_u16(vec_u8: &[u8]) -> Vec<u16> {
 ///
 /// This interpretes two following u8 as an u16
 /// Useful for deserialization of waveforms.
-/// Additionally it masks the last 2 bits 
+/// Additionally it masks the first 2 bits 
 /// binary adding 0x3ff to each u16.
 pub fn u8_to_u16_14bit(vec_u8: &[u8]) -> Vec<u16> {
     vec_u8.chunks_exact(2)
@@ -46,6 +46,33 @@ pub fn u8_to_u16_14bit(vec_u8: &[u8]) -> Vec<u16> {
         .collect()
 }
 
+/// Restore a vector of u16 from a vector of u8, using the first 2 bits of each u16 
+/// to get channel/cell error bit information
+///
+/// This interpretes two following u8 as an u16
+/// Useful for deserialization of waveforms.
+/// Additioanlly, it preserves the error bits
+///
+/// # Arguments:
+///
+/// # Returns:
+///
+///   Vec<u16>, ch_sync_err, cell_sync_err : if one of the error bits is
+///                                          set, ch_sync_err or cell_sync_err
+///                                          will be set to true
+pub fn u8_to_u16_err_check(vec_u8: &[u8]) -> (Vec<u16>, bool, bool) {
+    let mut ch_sync_err   = true;
+    let mut cell_sync_err = true;
+    let vec_u16 = vec_u8.chunks_exact(2)
+        .map(|chunk| {
+          let value     =  u16::from_le_bytes([chunk[0], chunk[1]]);
+          ch_sync_err   = ch_sync_err   && (((0x8000 & value) >> 15) == 0x1); 
+          cell_sync_err = cell_sync_err && (((0x4000 & value) >> 14) == 0x1) ;
+          return 0x3fff & value;
+        })
+        .collect();
+    (vec_u16, ch_sync_err, cell_sync_err)
+}
 
 pub fn parse_u8(bs : &Vec::<u8>, pos : &mut usize) -> u8 {
   let value = u8::from_le_bytes([bs[*pos]]);

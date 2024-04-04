@@ -73,6 +73,7 @@ use crate::serialization::{
     Serialization,
     SerializationError,
     u8_to_u16_14bit,
+    u8_to_u16_err_check,
     search_for_u16,
     parse_u8,
     parse_u16,
@@ -189,62 +190,67 @@ pub fn read_file(filename: &Path) -> io::Result<Vec<u8>> {
 pub struct RBEventMemoryStreamer {
   /// Raw stream read out from the RB buffers.
   pub stream         : Vec<u8>,
+  /// Error checking mode - check error bits for 
+  /// channels/cells
+  pub check_channel_errors : bool,
+
   /// Current position in the stream
-  pos            : usize,
+  pos                      : usize,
   /// The current posion marker points to a header 
   /// signature in the stream.
-  pos_at_head    : bool,
+  pos_at_head              : bool,
   /// An optional crossbeam::channel Sender, which 
   /// will allow to send TofPackets
-  pub tp_sender      : Option<Sender<TofPacket>>,
+  pub tp_sender            : Option<Sender<TofPacket>>,
   /// number of extracted events from stream
   /// this manages how we are draining the stream
-  n_events_ext            : usize,
-  pub is_depleted         : bool,
+  n_events_ext             : usize,
+  pub is_depleted          : bool,
   /// Calculate the crc32 checksum for the channels 
   /// everytime next() is called
-  pub calc_crc32          : bool,
+  pub calc_crc32           : bool,
   /// placeholder for checksum calculator
-  crc32_sum               : Crc::<u32>,
-  pub request_mode        : bool,
-  pub request_cache       : VecDeque<(u32,u8)>,
+  crc32_sum                : Crc::<u32>,
+  pub request_mode         : bool,
+  pub request_cache        : VecDeque<(u32,u8)>,
   /// an index for the events in the stream
   /// this links eventid and start position
   /// in the stream together
-  pub event_map           : HashMap<u32,(usize,usize)>,
-  pub first_evid          : u32,
-  pub last_evid           : u32,
-  pub last_event_complete : bool,
-  pub last_event_pos      : usize,
+  pub event_map            : HashMap<u32,(usize,usize)>,
+  pub first_evid           : u32,
+  pub last_evid            : u32,
+  pub last_event_complete  : bool,
+  pub last_event_pos       : usize,
   /// When in request mode, number of events the last event in the stream is behind the
   /// first request
-  pub is_behind_by        : usize,
+  pub is_behind_by         : usize,
   /// When in request mode, number of events the last event in the stream is ahead the
   /// last request
-  pub is_ahead_by         : usize,
+  pub is_ahead_by          : usize,
 }
 
 impl RBEventMemoryStreamer {
 
   pub fn new() -> Self {
     Self {
-      stream              : Vec::<u8>::new(),
-      pos                 : 0,
-      pos_at_head         : false,
-      tp_sender           : None,
-      n_events_ext        : 0,
-      is_depleted         : false,
-      calc_crc32          : false,
-      crc32_sum           : Crc::<u32>::new(&ALGO),
-      request_mode        : false,
-      request_cache       : VecDeque::<(u32,u8)>::new(),
-      event_map           : HashMap::<u32,(usize,usize)>::new(),
-      first_evid          : 0,
-      last_evid           : 0,
-      last_event_complete : false,
-      last_event_pos      : 0,
-      is_behind_by        : 0,
-      is_ahead_by         : 0,
+      stream               : Vec::<u8>::new(),
+      check_channel_errors : false,
+      pos                  : 0,
+      pos_at_head          : false,
+      tp_sender            : None,
+      n_events_ext         : 0,
+      is_depleted          : false,
+      calc_crc32           : false,
+      crc32_sum            : Crc::<u32>::new(&ALGO),
+      request_mode         : false,
+      request_cache        : VecDeque::<(u32,u8)>::new(),
+      event_map            : HashMap::<u32,(usize,usize)>::new(),
+      first_evid           : 0,
+      last_evid            : 0,
+      last_event_complete  : false,
+      last_event_pos       : 0,
+      is_behind_by         : 0,
+      is_ahead_by          : 0,
     }
   }
  
@@ -439,12 +445,19 @@ impl RBEventMemoryStreamer {
       -> Option<RBEvent> {
     let mut header       = RBEventHeader::new();
     let mut event        = RBEvent::new();
-    let mut event_status : EventStatus;
+    let mut event_status = EventStatus::Unknown;
     //let begin_pos = self.pos;
-    if self.calc_crc32 {
+    if self.calc_crc32 && self.check_channel_errors {
       event_status = EventStatus::Perfect;
-    } else {
-      event_status = EventStatus::Unknown;
+    }
+    if !self.calc_crc32 && !self.check_channel_errors {
+      event_status = EventStatus::GoodNoCRCOrErrBitCheck;
+    }
+    if !self.calc_crc32 && self.check_channel_errors {
+      event_status = EventStatus::GoodNoCRCCheck;
+    }
+    if self.calc_crc32 && !self.check_channel_errors {
+      event_status = EventStatus::GoodNoErrBitCheck;
     }
     // start parsing
     //let first_pos = self.pos;
@@ -556,11 +569,33 @@ impl RBEventMemoryStreamer {
           for _ in 0..nwords {
             let this_field = parse_u16(&self.stream, &mut self.pos);
             dig.update(&this_field.to_le_bytes());
+            if self.check_channel_errors {
+              if ((0x8000 & this_field) >> 15) == 0x1 {
+                error!("Ch error bit set for ch {}!", ch);
+                event_status = EventStatus::ChnSyncErrors;
+              }
+              if ((0x4000 & this_field) >> 14) == 0x1 {
+                error!("Cell error bit set for ch {}!", ch);
+                event_status = EventStatus::CellSyncErrors;
+              }
+            }
             this_ch_adc.push(0x3fff & this_field)
           }
           event.adc[*ch as usize] = this_ch_adc;
         } else {
-          event.adc[*ch as usize] = u8_to_u16_14bit(&self.stream[self.pos..self.pos + 2*nwords]);
+          if self.check_channel_errors {
+            let adc_w_errs = u8_to_u16_err_check(&self.stream[self.pos..self.pos + 2*nwords]);
+            if adc_w_errs.1 {
+              error!("Ch error bit set for ch {}!", ch);
+              event_status = EventStatus::ChnSyncErrors;
+            } else if adc_w_errs.2 {
+              error!("Cell error bit set for ch {}!", ch);
+              event_status = EventStatus::CellSyncErrors;
+            }
+            event.adc[*ch as usize] = adc_w_errs.0;
+          } else {
+            event.adc[*ch as usize] = u8_to_u16_14bit(&self.stream[self.pos..self.pos + 2*nwords]);
+          }
           self.pos += 2*nwords;
         } 
         //let data = &self.stream[self.pos..self.pos+2*nwords];
