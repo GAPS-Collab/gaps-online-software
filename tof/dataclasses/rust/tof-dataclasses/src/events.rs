@@ -37,6 +37,12 @@ pub enum EventStatus {
   CRC32Wrong         = 10u8,
   TailWrong          = 11u8,
   ChannelIDWrong     = 12u8,
+  /// one of the channels cells CellSyncError bits 
+  /// has been set (RB)
+  CellSyncErrors     = 13u8,
+  /// one of the channels ChannelSyncError bits 
+  /// has been set (RB)
+  ChnSyncErrors      = 14u8,
   IncompleteReadout  = 21u8,
   /// This can be used if there is a version
   /// missmatch and we have to hack something
@@ -59,6 +65,8 @@ impl From<u8> for EventStatus {
       10u8 => EventStatus::CRC32Wrong,
       11u8 => EventStatus::TailWrong,
       12u8 => EventStatus::ChannelIDWrong,
+      13u8 => EventStatus::CellSyncErrors,
+      14u8 => EventStatus::ChnSyncErrors,
       21u8 => EventStatus::IncompleteReadout,
       22u8 => EventStatus::IncompatibleData,
       42u8 => EventStatus::Perfect,
@@ -76,6 +84,8 @@ impl FromRandom for EventStatus {
       EventStatus::CRC32Wrong,
       EventStatus::TailWrong,
       EventStatus::ChannelIDWrong,
+      EventStatus::CellSyncErrors,
+      EventStatus::ChnSyncErrors,
       EventStatus::IncompleteReadout,
       EventStatus::IncompatibleData,
       EventStatus::Perfect,
