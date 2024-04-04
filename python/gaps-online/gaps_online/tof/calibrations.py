@@ -142,10 +142,11 @@ def load_calibrations(cali_dir : Path, load_event_data = False):
     calibs = dict()
     for fname in tqdm.tqdm(calib_files, desc="Loading calibration files"):
         fname = str(fname)
-    try:
-        rb_id = int(pattern.search(fname).groupdict()['rb_id'])
-    except Exception as e:
-        print(f'Failed to get RB ID from file {fname}')   
-    calibs[rb_id] = RBCalibration.from_file(fname)
+        try:
+            rb_id = int(pattern.search(fname).groupdict()['rb_id'])
+        except Exception as e:
+            print(f'Failed to get RB ID from file {fname}')   
+            continue
+        calibs[rb_id] = RBCalibration.from_file(fname)
     
     return calibs
