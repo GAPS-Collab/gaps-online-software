@@ -23,7 +23,7 @@ use crate::serialization::{
 };
 
 //use crate::DsiLtbRBMapping;
-use crate::events::rb_event::EventStatus;
+use crate::events::EventStatus;
 
 //use crate::events::RBMissingHit;
 //use crate::constants::{

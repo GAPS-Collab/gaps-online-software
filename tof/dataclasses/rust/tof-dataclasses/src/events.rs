@@ -26,7 +26,63 @@ pub use rb_event::{
     RBEvent,
     RBMissingHit,
     RBWaveform,
-    EventStatus
 };
 
-// TODO what is this file?
+use std::fmt;
+
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+pub enum EventStatus {
+  Unknown            = 0u8,
+  CRC32Wrong         = 10u8,
+  TailWrong          = 11u8,
+  ChannelIDWrong     = 12u8,
+  IncompleteReadout  = 21u8,
+  /// This can be used if there is a version
+  /// missmatch and we have to hack something
+  IncompatibleData   = 22u8,
+  Perfect            = 42u8
+}
+
+impl fmt::Display for EventStatus {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this EventStatus"));
+    write!(f, "<EventStatus: {}>", r)
+  }
+}
+
+impl From<u8> for EventStatus {
+  fn from(value: u8) -> Self {
+    match value {
+      0u8  => EventStatus::Unknown,
+      10u8 => EventStatus::CRC32Wrong,
+      11u8 => EventStatus::TailWrong,
+      12u8 => EventStatus::ChannelIDWrong,
+      21u8 => EventStatus::IncompleteReadout,
+      22u8 => EventStatus::IncompatibleData,
+      42u8 => EventStatus::Perfect,
+      _    => EventStatus::Unknown
+    }
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for EventStatus {
+  
+  fn from_random() -> Self {
+    let choices = [
+      EventStatus::Unknown,
+      EventStatus::CRC32Wrong,
+      EventStatus::TailWrong,
+      EventStatus::ChannelIDWrong,
+      EventStatus::IncompleteReadout,
+      EventStatus::IncompatibleData,
+      EventStatus::Perfect,
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
+  }
+}
+
