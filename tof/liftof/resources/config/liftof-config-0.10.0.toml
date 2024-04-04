@@ -1,10 +1,12 @@
 ##########################################
 # Master configuration file for 
-# liftof-cc, HAHALUA edition (>= 0.9.2)
+# liftof-cc, LELEWAAedition (>= 0.10.0)
 #
 ##########################################
 
-
+# run files (.toml like this one) stored in this dir
+# get worked on automatically
+staging_dir           = "/home/gaps/liftof-staging/"
 # location to store calibration files on the TOF CPUE
 calibration_dir       = "/tofdata/calibration/latest/"
 # location of the database
@@ -78,6 +80,8 @@ n_rbe_per_loop = 40
 # if the event is not completed within this timewindow
 # it is sent despite the fact
 te_timeout_sec = 600
+# try sorting the events by event id as best as possible
+sort_events    = false
 # Decide on event builder strategy. Adaptive will automatically 
 # adjust the number of expected RBEvents for each MTBEvent and 
 # wait for this number of RBEvents come in 
