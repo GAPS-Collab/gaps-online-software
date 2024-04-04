@@ -1036,6 +1036,16 @@
 <a href="#1034" id="1034">1034</a>
 <a href="#1035" id="1035">1035</a>
 <a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Entities of the tof, that is LocalTriggerBoard, ReadoutBoard, PB, MTB...
 //! 
 //! This provides structs to hold their metainformation,
@@ -1056,8 +1066,11 @@
 
 <span class="kw">use </span>regex::Regex;
 <span class="kw">use </span>glob::glob;
-<span class="kw">use </span>chrono::NaiveDateTime;
-<span class="kw">use </span>chrono::DateTime;
+<span class="kw">use </span>chrono::{
+    NaiveDateTime,
+    DateTime,
+    Utc
+};
 
 <span class="kw">use </span><span class="kw">crate</span>::calibrations::RBCalibrations;
 
@@ -1287,7 +1300,12 @@
         <span class="prelude-val">Some</span>(v) =&gt; {
           <span class="comment">//println!("{} = {}", name, v);
           </span><span class="kw">match </span>name {
-            <span class="string">"rb_id"         </span>=&gt; {rb.rb_id  = u8::from_str(v).unwrap_or(<span class="number">0</span>);},
+            <span class="string">"rb_id"         </span>=&gt; {
+                rb.rb_id  = u8::from_str(v).unwrap_or(<span class="number">0</span>);
+            },
+            <span class="string">"mtb_link_id"   </span>=&gt; {
+                rb.mtb_link_id = u8::from_str(v).unwrap_or(<span class="number">0</span>);
+            },
             <span class="string">"ch1_paddle_id" </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">1</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
             <span class="string">"ch2_paddle_id" </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">2</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
             <span class="string">"ch3_paddle_id" </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">3</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
@@ -1928,7 +1946,8 @@
     </span><span class="kw">let </span>re = Regex::new(<span class="string">r"(\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2})"</span>)<span class="question-mark">?</span>;
     <span class="comment">// Define your file pattern (e.g., "logs/*.log" for all .log files in the logs directory)
     </span><span class="kw">let </span>pattern = <span class="macro">format!</span>(<span class="string">"{}/RB{:02}_*"</span>, <span class="self">self</span>.calib_file_path, <span class="self">self</span>.rb_id); <span class="comment">// Adjust this pattern to your files' naming convention
-    </span><span class="kw">let </span><span class="kw-2">mut </span>newest_file = (String::from(<span class="string">""</span>), NaiveDateTime::from_timestamp(<span class="number">0</span>, <span class="number">0</span>));
+    </span><span class="kw">let </span>_timestamp = DateTime::&lt;Utc&gt;::from_timestamp(<span class="number">0</span>,<span class="number">0</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>newest_file = (String::from(<span class="string">""</span>), NaiveDateTime::from_timestamp(<span class="number">0</span>, <span class="number">0</span>));
     
     <span class="comment">// Iterate over files that match the pattern
     </span><span class="kw">let </span><span class="kw-2">mut </span>filename : String;
@@ -1945,9 +1964,10 @@
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(caps) = re.captures(<span class="kw-2">&amp;</span>filename) {
           <span class="kw">if let </span><span class="prelude-val">Some</span>(timestamp_str) = caps.get(<span class="number">0</span>).map(|m| m.as_str()) {
-            <span class="comment">//println!("{}",timestamp_str);
-            </span><span class="kw">let </span>timestamp = NaiveDateTime::parse_from_str(timestamp_str, <span class="string">"%Y_%m_%d-%H_%M_%S"</span>)<span class="question-mark">?</span>;
-            <span class="kw">if </span>timestamp &gt; newest_file.<span class="number">1 </span>{
+            <span class="macro">println!</span>(<span class="string">"{}"</span>,timestamp_str);
+            <span class="kw">let </span>timestamp = NaiveDateTime::parse_from_str(timestamp_str, <span class="string">"%Y_%m_%d-%H_%M_%S"</span>)<span class="question-mark">?</span>;
+            <span class="comment">//let _timestamp = DateTime
+            </span><span class="kw">if </span>timestamp &gt; newest_file.<span class="number">1 </span>{
               <span class="comment">// FIXME - into might panic?
               </span>newest_file.<span class="number">1 </span>= timestamp.into();
               newest_file.<span class="number">0 </span>= filename.clone();

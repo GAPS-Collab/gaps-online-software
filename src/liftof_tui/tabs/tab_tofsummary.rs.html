@@ -209,6 +209,27 @@
 <a href="#207" id="207">207</a>
 <a href="#208" id="208">208</a>
 <a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::VecDeque;
 
 <span class="kw">use </span>crossbeam_channel::Receiver;
@@ -235,8 +256,8 @@
     },
     style::{
         <span class="comment">//Color,
-        </span>Modifier,
-        Style
+        //Modifier,
+        </span>Style
     },
     <span class="comment">//text::Span,
     </span>terminal::Frame,
@@ -247,7 +268,8 @@
         //GraphType,
         </span>BorderType,
         <span class="comment">//Chart,
-        </span>BarChart,
+        //BarChart,
+        </span>Sparkline,
         Borders,
         Paragraph
     },
@@ -266,6 +288,7 @@
     <span class="comment">//clean_data,
     </span>prep_data,
     create_labels,
+    histogram,
     gauge,
 };
 
@@ -281,13 +304,14 @@
   <span class="kw">pub </span>evid_test_info  : String,
   <span class="kw">pub </span>evid_test_len   : usize,
   <span class="kw">pub </span>n_evid_test     : usize,
+  <span class="kw">pub </span>evid_test_chnks : VecDeque&lt;u64&gt;,
 }
 
 <span class="kw">impl </span>TofSummaryTab {
   <span class="kw">pub fn </span>new(ts_receiver : Receiver&lt;TofEventSummary&gt;,
              theme       : ColorTheme) -&gt; <span class="self">Self </span>{
     
-    <span class="kw">let </span>bins          = Uniform::new(<span class="number">25</span>, <span class="number">0.0</span>, <span class="number">24.0</span>);
+    <span class="kw">let </span>bins          = Uniform::new(<span class="number">25</span>, <span class="number">0.0</span>, <span class="number">25.0</span>);
     <span class="self">Self </span>{
         ts_receiver     : ts_receiver,
         summary_queue   : VecDeque::&lt;TofEventSummary&gt;::new(),
@@ -296,8 +320,9 @@
         theme           : theme,
         event_id_test   : Vec::&lt;u32&gt;::with_capacity(<span class="number">100000</span>),
         evid_test_info  : String::from(<span class="string">"Missing event id analysis"</span>),
-        evid_test_len   : <span class="number">10000</span>,
+        evid_test_len   : <span class="number">20000</span>,
         n_evid_test     : <span class="number">0</span>,
+        evid_test_chnks : VecDeque::&lt;u64&gt;::new(),
     }
   }
 
@@ -313,19 +338,26 @@
         <span class="kw">if </span><span class="self">self</span>.event_id_test.len() != <span class="self">self</span>.evid_test_len {
           <span class="self">self</span>.event_id_test.push(ts.event_id);
         } <span class="kw">else </span>{
-          <span class="kw">let </span><span class="kw-2">mut </span>missing = <span class="number">0usize</span>;
+          <span class="comment">//let mut miss_pos = Vec::&lt;usize&gt;::new();
+          </span><span class="kw">let </span><span class="kw-2">mut </span>missing = <span class="number">0usize</span>;
           <span class="kw">let </span><span class="kw-2">mut </span>evid = <span class="self">self</span>.event_id_test[<span class="number">0</span>];
           <span class="kw">for _ in </span><span class="number">0</span>..<span class="self">self</span>.event_id_test.len() {
             <span class="kw">if </span>!<span class="self">self</span>.event_id_test.contains(<span class="kw-2">&amp;</span>evid) {
               missing += <span class="number">1</span>;
-            }
+              <span class="comment">//miss_pos.push(k);
+            </span>}
             evid += <span class="number">1</span>;
           }
           <span class="self">self</span>.n_evid_test += <span class="number">1</span>;
+          <span class="self">self</span>.evid_test_chnks.push_back(missing <span class="kw">as </span>u64);
+          <span class="kw">if </span><span class="self">self</span>.evid_test_chnks.len() &gt; <span class="number">100 </span>{
+            <span class="self">self</span>.evid_test_chnks.pop_front();
+          }
           <span class="self">self</span>.evid_test_info  = <span class="macro">format!</span>(<span class="string">"Missing event ID search [{}]"</span>, <span class="self">self</span>.n_evid_test);
           <span class="self">self</span>.evid_test_info += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n-- in a chunk of {} event ids"</span>, <span class="self">self</span>.evid_test_len)); 
           <span class="self">self</span>.evid_test_info += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n-- we found {} event ids missing ({}%)"</span>, missing, <span class="number">100.0</span><span class="kw-2">*</span>(missing <span class="kw">as </span>f64)/<span class="self">self</span>.event_id_test.len() <span class="kw">as </span>f64));
-          <span class="self">self</span>.event_id_test.clear();
+          <span class="comment">//self.evid_test_info += &amp;(format!("\n-- {:?}", miss_pos));
+          </span><span class="self">self</span>.event_id_test.clear();
         }
         <span class="self">self</span>.summary_queue.push_back(ts);
         <span class="kw">if </span><span class="self">self</span>.summary_queue.len() &gt; <span class="self">self</span>.queue_size {
@@ -361,6 +393,14 @@
          Constraint::Percentage(<span class="number">30</span>)].as_ref(),
       )
       .split(histo_view[<span class="number">2</span>]);
+    
+    <span class="kw">let </span>evid_test_view_0 = Layout::default()
+      .direction(Direction::Horizontal)
+      .constraints(
+        [Constraint::Percentage(<span class="number">30</span>),
+         Constraint::Percentage(<span class="number">70</span>)].as_ref(),
+      )
+      .split(evid_test_view[<span class="number">0</span>]);
 
     <span class="kw">let </span>last_ts = <span class="self">self</span>.summary_queue.back();
     <span class="kw">let </span>view_string : String;
@@ -388,17 +428,7 @@
     <span class="comment">// histograms
     </span><span class="kw">let </span>th_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.n_trg_pdl_histo);
     <span class="kw">let </span>th_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.n_trg_pdl_histo, <span class="kw-2">&amp;</span>th_labels, <span class="number">5</span>, <span class="bool-val">true</span>); 
-    <span class="kw">let </span>th_chart   = BarChart::default()
-      .block(Block::default().title(<span class="string">"N Trig Paddles"</span>).borders(Borders::ALL))
-      .data(th_data.as_slice())
-      .bar_width(<span class="number">2</span>)
-      .bar_gap(<span class="number">0</span>)
-      .bar_style(<span class="self">self</span>.theme.highlight_fg())
-      .value_style(
-        <span class="self">self</span>.theme.highlight_fg()
-        .add_modifier(Modifier::BOLD),
-      )
-      .style(<span class="self">self</span>.theme.background());
+    <span class="kw">let </span>th_chart   = histogram(th_data, String::from(<span class="string">"N Trig Paddles"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
     frame.render_widget(th_chart, histo_view[<span class="number">0</span>]); 
     
     <span class="kw">let </span>evid_test_data = Paragraph::new(<span class="self">self</span>.evid_test_info.clone())
@@ -412,7 +442,19 @@
           .title(<span class="string">"Missing event ID test"</span>)
           .border_type(BorderType::Rounded),
       );
-    frame.render_widget(evid_test_data, evid_test_view[<span class="number">0</span>]);
+    <span class="kw">let </span>sparkline = Sparkline::default()
+      .style(<span class="self">self</span>.theme.style())
+      <span class="comment">//.direction(RenderDirection::LeftToRight)
+      </span>.data(<span class="self">self</span>.evid_test_chnks.make_contiguous())
+      .block(
+        Block::default()
+        .borders(Borders::ALL)
+        .style(<span class="self">self</span>.theme.style())
+        .title(<span class="string">"Missing event IDs in chunks"</span>)
+      );
+
+    frame.render_widget(evid_test_data, evid_test_view_0[<span class="number">0</span>]);
+    frame.render_widget(sparkline, evid_test_view_0[<span class="number">1</span>]);
     <span class="kw">let </span>ratio = <span class="self">self</span>.event_id_test.len() <span class="kw">as </span>f64 / <span class="self">self</span>.evid_test_len <span class="kw">as </span>f64;
     <span class="kw">let </span>test_gauge = gauge(String::from(<span class="string">"Missing event ID check"</span>), String::from(<span class="string">"Gathering data"</span>), ratio, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
     frame.render_widget(test_gauge, evid_test_view[<span class="number">1</span>]);

@@ -1352,6 +1352,41 @@
 <a href="#1350" id="1350">1350</a>
 <a href="#1351" id="1351">1351</a>
 <a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a>
+<a href="#1356" id="1356">1356</a>
+<a href="#1357" id="1357">1357</a>
+<a href="#1358" id="1358">1358</a>
+<a href="#1359" id="1359">1359</a>
+<a href="#1360" id="1360">1360</a>
+<a href="#1361" id="1361">1361</a>
+<a href="#1362" id="1362">1362</a>
+<a href="#1363" id="1363">1363</a>
+<a href="#1364" id="1364">1364</a>
+<a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
+<a href="#1372" id="1372">1372</a>
+<a href="#1373" id="1373">1373</a>
+<a href="#1374" id="1374">1374</a>
+<a href="#1375" id="1375">1375</a>
+<a href="#1376" id="1376">1376</a>
+<a href="#1377" id="1377">1377</a>
+<a href="#1378" id="1378">1378</a>
+<a href="#1379" id="1379">1379</a>
+<a href="#1380" id="1380">1380</a>
+<a href="#1381" id="1381">1381</a>
+<a href="#1382" id="1382">1382</a>
+<a href="#1383" id="1383">1383</a>
+<a href="#1384" id="1384">1384</a>
+<a href="#1385" id="1385">1385</a>
+<a href="#1386" id="1386">1386</a>
+<a href="#1387" id="1387">1387</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Dataio - readino/writing of different types
 //! of TOF data products.
 //!
@@ -1427,6 +1462,7 @@
     Serialization,
     SerializationError,
     u8_to_u16_14bit,
+    u8_to_u16_err_check,
     search_for_u16,
     parse_u8,
     parse_u16,
@@ -1543,62 +1579,67 @@
 </span><span class="kw">pub struct </span>RBEventMemoryStreamer {
   <span class="doccomment">/// Raw stream read out from the RB buffers.
   </span><span class="kw">pub </span>stream         : Vec&lt;u8&gt;,
+  <span class="doccomment">/// Error checking mode - check error bits for 
+  /// channels/cells
+  </span><span class="kw">pub </span>check_channel_errors : bool,
+
   <span class="doccomment">/// Current position in the stream
-  </span>pos            : usize,
+  </span>pos                      : usize,
   <span class="doccomment">/// The current posion marker points to a header 
   /// signature in the stream.
-  </span>pos_at_head    : bool,
+  </span>pos_at_head              : bool,
   <span class="doccomment">/// An optional crossbeam::channel Sender, which 
   /// will allow to send TofPackets
-  </span><span class="kw">pub </span>tp_sender      : <span class="prelude-ty">Option</span>&lt;Sender&lt;TofPacket&gt;&gt;,
+  </span><span class="kw">pub </span>tp_sender            : <span class="prelude-ty">Option</span>&lt;Sender&lt;TofPacket&gt;&gt;,
   <span class="doccomment">/// number of extracted events from stream
   /// this manages how we are draining the stream
-  </span>n_events_ext            : usize,
-  <span class="kw">pub </span>is_depleted         : bool,
+  </span>n_events_ext             : usize,
+  <span class="kw">pub </span>is_depleted          : bool,
   <span class="doccomment">/// Calculate the crc32 checksum for the channels 
   /// everytime next() is called
-  </span><span class="kw">pub </span>calc_crc32          : bool,
+  </span><span class="kw">pub </span>calc_crc32           : bool,
   <span class="doccomment">/// placeholder for checksum calculator
-  </span>crc32_sum               : Crc::&lt;u32&gt;,
-  <span class="kw">pub </span>request_mode        : bool,
-  <span class="kw">pub </span>request_cache       : VecDeque&lt;(u32,u8)&gt;,
+  </span>crc32_sum                : Crc::&lt;u32&gt;,
+  <span class="kw">pub </span>request_mode         : bool,
+  <span class="kw">pub </span>request_cache        : VecDeque&lt;(u32,u8)&gt;,
   <span class="doccomment">/// an index for the events in the stream
   /// this links eventid and start position
   /// in the stream together
-  </span><span class="kw">pub </span>event_map           : HashMap&lt;u32,(usize,usize)&gt;,
-  <span class="kw">pub </span>first_evid          : u32,
-  <span class="kw">pub </span>last_evid           : u32,
-  <span class="kw">pub </span>last_event_complete : bool,
-  <span class="kw">pub </span>last_event_pos      : usize,
+  </span><span class="kw">pub </span>event_map            : HashMap&lt;u32,(usize,usize)&gt;,
+  <span class="kw">pub </span>first_evid           : u32,
+  <span class="kw">pub </span>last_evid            : u32,
+  <span class="kw">pub </span>last_event_complete  : bool,
+  <span class="kw">pub </span>last_event_pos       : usize,
   <span class="doccomment">/// When in request mode, number of events the last event in the stream is behind the
   /// first request
-  </span><span class="kw">pub </span>is_behind_by        : usize,
+  </span><span class="kw">pub </span>is_behind_by         : usize,
   <span class="doccomment">/// When in request mode, number of events the last event in the stream is ahead the
   /// last request
-  </span><span class="kw">pub </span>is_ahead_by         : usize,
+  </span><span class="kw">pub </span>is_ahead_by          : usize,
 }
 
 <span class="kw">impl </span>RBEventMemoryStreamer {
 
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
-      stream              : Vec::&lt;u8&gt;::new(),
-      pos                 : <span class="number">0</span>,
-      pos_at_head         : <span class="bool-val">false</span>,
-      tp_sender           : <span class="prelude-val">None</span>,
-      n_events_ext        : <span class="number">0</span>,
-      is_depleted         : <span class="bool-val">false</span>,
-      calc_crc32          : <span class="bool-val">false</span>,
-      crc32_sum           : Crc::&lt;u32&gt;::new(<span class="kw-2">&amp;</span>ALGO),
-      request_mode        : <span class="bool-val">false</span>,
-      request_cache       : VecDeque::&lt;(u32,u8)&gt;::new(),
-      event_map           : HashMap::&lt;u32,(usize,usize)&gt;::new(),
-      first_evid          : <span class="number">0</span>,
-      last_evid           : <span class="number">0</span>,
-      last_event_complete : <span class="bool-val">false</span>,
-      last_event_pos      : <span class="number">0</span>,
-      is_behind_by        : <span class="number">0</span>,
-      is_ahead_by         : <span class="number">0</span>,
+      stream               : Vec::&lt;u8&gt;::new(),
+      check_channel_errors : <span class="bool-val">false</span>,
+      pos                  : <span class="number">0</span>,
+      pos_at_head          : <span class="bool-val">false</span>,
+      tp_sender            : <span class="prelude-val">None</span>,
+      n_events_ext         : <span class="number">0</span>,
+      is_depleted          : <span class="bool-val">false</span>,
+      calc_crc32           : <span class="bool-val">false</span>,
+      crc32_sum            : Crc::&lt;u32&gt;::new(<span class="kw-2">&amp;</span>ALGO),
+      request_mode         : <span class="bool-val">false</span>,
+      request_cache        : VecDeque::&lt;(u32,u8)&gt;::new(),
+      event_map            : HashMap::&lt;u32,(usize,usize)&gt;::new(),
+      first_evid           : <span class="number">0</span>,
+      last_evid            : <span class="number">0</span>,
+      last_event_complete  : <span class="bool-val">false</span>,
+      last_event_pos       : <span class="number">0</span>,
+      is_behind_by         : <span class="number">0</span>,
+      is_ahead_by          : <span class="number">0</span>,
     }
   }
  
@@ -1793,12 +1834,19 @@
       -&gt; <span class="prelude-ty">Option</span>&lt;RBEvent&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>header       = RBEventHeader::new();
     <span class="kw">let </span><span class="kw-2">mut </span>event        = RBEvent::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>event_status : EventStatus;
+    <span class="kw">let </span><span class="kw-2">mut </span>event_status = EventStatus::Unknown;
     <span class="comment">//let begin_pos = self.pos;
-    </span><span class="kw">if </span><span class="self">self</span>.calc_crc32 {
+    </span><span class="kw">if </span><span class="self">self</span>.calc_crc32 &amp;&amp; <span class="self">self</span>.check_channel_errors {
       event_status = EventStatus::Perfect;
-    } <span class="kw">else </span>{
-      event_status = EventStatus::Unknown;
+    }
+    <span class="kw">if </span>!<span class="self">self</span>.calc_crc32 &amp;&amp; !<span class="self">self</span>.check_channel_errors {
+      event_status = EventStatus::GoodNoCRCOrErrBitCheck;
+    }
+    <span class="kw">if </span>!<span class="self">self</span>.calc_crc32 &amp;&amp; <span class="self">self</span>.check_channel_errors {
+      event_status = EventStatus::GoodNoCRCCheck;
+    }
+    <span class="kw">if </span><span class="self">self</span>.calc_crc32 &amp;&amp; !<span class="self">self</span>.check_channel_errors {
+      event_status = EventStatus::GoodNoErrBitCheck;
     }
     <span class="comment">// start parsing
     //let first_pos = self.pos;
@@ -1910,11 +1958,33 @@
           <span class="kw">for _ in </span><span class="number">0</span>..nwords {
             <span class="kw">let </span>this_field = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
             dig.update(<span class="kw-2">&amp;</span>this_field.to_le_bytes());
+            <span class="kw">if </span><span class="self">self</span>.check_channel_errors {
+              <span class="kw">if </span>((<span class="number">0x8000 </span>&amp; this_field) &gt;&gt; <span class="number">15</span>) == <span class="number">0x1 </span>{
+                <span class="macro">error!</span>(<span class="string">"Ch error bit set for ch {}!"</span>, ch);
+                event_status = EventStatus::ChnSyncErrors;
+              }
+              <span class="kw">if </span>((<span class="number">0x4000 </span>&amp; this_field) &gt;&gt; <span class="number">14</span>) == <span class="number">0x1 </span>{
+                <span class="macro">error!</span>(<span class="string">"Cell error bit set for ch {}!"</span>, ch);
+                event_status = EventStatus::CellSyncErrors;
+              }
+            }
             this_ch_adc.push(<span class="number">0x3fff </span>&amp; this_field)
           }
           event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = this_ch_adc;
         } <span class="kw">else </span>{
-          event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = u8_to_u16_14bit(<span class="kw-2">&amp;</span><span class="self">self</span>.stream[<span class="self">self</span>.pos..<span class="self">self</span>.pos + <span class="number">2</span><span class="kw-2">*</span>nwords]);
+          <span class="kw">if </span><span class="self">self</span>.check_channel_errors {
+            <span class="kw">let </span>adc_w_errs = u8_to_u16_err_check(<span class="kw-2">&amp;</span><span class="self">self</span>.stream[<span class="self">self</span>.pos..<span class="self">self</span>.pos + <span class="number">2</span><span class="kw-2">*</span>nwords]);
+            <span class="kw">if </span>adc_w_errs.<span class="number">1 </span>{
+              <span class="macro">error!</span>(<span class="string">"Ch error bit set for ch {}!"</span>, ch);
+              event_status = EventStatus::ChnSyncErrors;
+            } <span class="kw">else if </span>adc_w_errs.<span class="number">2 </span>{
+              <span class="macro">error!</span>(<span class="string">"Cell error bit set for ch {}!"</span>, ch);
+              event_status = EventStatus::CellSyncErrors;
+            }
+            event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = adc_w_errs.<span class="number">0</span>;
+          } <span class="kw">else </span>{
+            event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = u8_to_u16_14bit(<span class="kw-2">&amp;</span><span class="self">self</span>.stream[<span class="self">self</span>.pos..<span class="self">self</span>.pos + <span class="number">2</span><span class="kw-2">*</span>nwords]);
+          }
           <span class="self">self</span>.pos += <span class="number">2</span><span class="kw-2">*</span>nwords;
         } 
         <span class="comment">//let data = &amp;self.stream[self.pos..self.pos+2*nwords];

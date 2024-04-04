@@ -322,6 +322,33 @@
 <a href="#320" id="320">320</a>
 <a href="#321" id="321">321</a>
 <a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Serialization/Deserialization helpers
 //!
 //!
@@ -362,7 +389,7 @@
 ///
 /// This interpretes two following u8 as an u16
 /// Useful for deserialization of waveforms.
-/// Additionally it masks the last 2 bits 
+/// Additionally it masks the first 2 bits 
 /// binary adding 0x3ff to each u16.
 </span><span class="kw">pub fn </span>u8_to_u16_14bit(vec_u8: <span class="kw-2">&amp;</span>[u8]) -&gt; Vec&lt;u16&gt; {
     vec_u8.chunks_exact(<span class="number">2</span>)
@@ -370,6 +397,33 @@
         .collect()
 }
 
+<span class="doccomment">/// Restore a vector of u16 from a vector of u8, using the first 2 bits of each u16 
+/// to get channel/cell error bit information
+///
+/// This interpretes two following u8 as an u16
+/// Useful for deserialization of waveforms.
+/// Additioanlly, it preserves the error bits
+///
+/// # Arguments:
+///
+/// # Returns:
+///
+///   Vec&lt;u16&gt;, ch_sync_err, cell_sync_err : if one of the error bits is
+///                                          set, ch_sync_err or cell_sync_err
+///                                          will be set to true
+</span><span class="kw">pub fn </span>u8_to_u16_err_check(vec_u8: <span class="kw-2">&amp;</span>[u8]) -&gt; (Vec&lt;u16&gt;, bool, bool) {
+    <span class="kw">let </span><span class="kw-2">mut </span>ch_sync_err   = <span class="bool-val">true</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>cell_sync_err = <span class="bool-val">true</span>;
+    <span class="kw">let </span>vec_u16 = vec_u8.chunks_exact(<span class="number">2</span>)
+        .map(|chunk| {
+          <span class="kw">let </span>value     =  u16::from_le_bytes([chunk[<span class="number">0</span>], chunk[<span class="number">1</span>]]);
+          ch_sync_err   = ch_sync_err   &amp;&amp; (((<span class="number">0x8000 </span>&amp; value) &gt;&gt; <span class="number">15</span>) == <span class="number">0x1</span>); 
+          cell_sync_err = cell_sync_err &amp;&amp; (((<span class="number">0x4000 </span>&amp; value) &gt;&gt; <span class="number">14</span>) == <span class="number">0x1</span>) ;
+          <span class="kw">return </span><span class="number">0x3fff </span>&amp; value;
+        })
+        .collect();
+    (vec_u16, ch_sync_err, cell_sync_err)
+}
 
 <span class="kw">pub fn </span>parse_u8(bs : <span class="kw-2">&amp;</span>Vec::&lt;u8&gt;, pos : <span class="kw-2">&amp;mut </span>usize) -&gt; u8 {
   <span class="kw">let </span>value = u8::from_le_bytes([bs[<span class="kw-2">*</span>pos]]);

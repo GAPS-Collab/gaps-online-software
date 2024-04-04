@@ -215,6 +215,8 @@
 <a href="#213" id="213">213</a>
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{
     VecDeque,
     HashMap,
@@ -242,8 +244,8 @@
     BorderType,
     Borders,
     Paragraph,
-    BarChart,
-    <span class="comment">//List,
+    <span class="comment">//BarChart,
+    //List,
     //ListItem,
     //ListState,
 </span>};
@@ -264,6 +266,7 @@
     <span class="comment">//clean_data,
     </span>prep_data,
     timeseries,
+    histogram,
     create_labels,
 };
 
@@ -411,21 +414,22 @@
     
     <span class="kw">let </span>rbhist_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.rb_histo);
     <span class="kw">let </span>rbhist_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.rb_histo, <span class="kw-2">&amp;</span>rbhist_labels, <span class="number">5</span>, <span class="bool-val">true</span>); 
-    <span class="kw">let </span>rbhist_chart   = BarChart::default()
-      .block(Block::default().title(<span class="string">"ReadoutBoards"</span>).borders(Borders::ALL))
-      .data(rbhist_data.as_slice())
-      .bar_width(<span class="number">3</span>)
-      .bar_gap(<span class="number">0</span>)
-      <span class="comment">//.bar_style(Style::default().fg(Color::Blue))
-      </span>.bar_style(<span class="self">self</span>.theme.highlight_fg())
-      .value_style(
-        <span class="self">self</span>.theme.highlight_fg()
-        <span class="comment">//Style::default()
-        //.bg(Color::Blue)
-        </span>.add_modifier(Modifier::BOLD),
-      )
-      .style(<span class="self">self</span>.theme.background());
-    frame.render_widget(rbhist_chart, info[<span class="number">1</span>]);
+    <span class="kw">let </span>rbhist_chart   = histogram(rbhist_data, String::from(<span class="string">"ReadoutBoards"</span>), <span class="number">3</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+    <span class="comment">//let rbhist_chart   = BarChart::default()
+    //  .block(Block::default().title("ReadoutBoards").borders(Borders::ALL))
+    //  .data(rbhist_data.as_slice())
+    //  .bar_width(3)
+    //  .bar_gap(0)
+    //  //.bar_style(Style::default().fg(Color::Blue))
+    //  .bar_style(self.theme.highlight_fg())
+    //  .value_style(
+    //    self.theme.highlight_fg()
+    //    //Style::default()
+    //    //.bg(Color::Blue)
+    //    .add_modifier(Modifier::BOLD),
+    //  )
+    //  .style(self.theme.background());
+    </span>frame.render_widget(rbhist_chart, info[<span class="number">1</span>]);
      
   }
 }

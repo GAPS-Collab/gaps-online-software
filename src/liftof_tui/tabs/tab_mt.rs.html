@@ -432,22 +432,6 @@
 <a href="#430" id="430">430</a>
 <a href="#431" id="431">431</a>
 <a href="#432" id="432">432</a>
-<a href="#433" id="433">433</a>
-<a href="#434" id="434">434</a>
-<a href="#435" id="435">435</a>
-<a href="#436" id="436">436</a>
-<a href="#437" id="437">437</a>
-<a href="#438" id="438">438</a>
-<a href="#439" id="439">439</a>
-<a href="#440" id="440">440</a>
-<a href="#441" id="441">441</a>
-<a href="#442" id="442">442</a>
-<a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
-<a href="#445" id="445">445</a>
-<a href="#446" id="446">446</a>
-<a href="#447" id="447">447</a>
-<a href="#448" id="448">448</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Master Trigger tab
 //! 
 //! Show current data from the master trigger
@@ -461,7 +445,10 @@
 <span class="kw">use </span>ratatui::{
     symbols,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{Color, Modifier, Style},
+    style::{
+        Color,
+        <span class="comment">//Modifier,
+        </span>Style},
     text::Span,
     terminal::Frame,
     widgets::{
@@ -471,8 +458,8 @@
         GraphType,
         BorderType,
         Chart,
-        BarChart,
-        Borders,
+        <span class="comment">//BarChart,
+        </span>Borders,
         Paragraph
     },
 };
@@ -507,6 +494,7 @@
     <span class="comment">//clean_data,
     </span>prep_data,
     create_labels,
+    histogram,
 };
 
 
@@ -544,8 +532,8 @@
   <span class="kw">pub fn </span>new(tp_receiver  : Receiver&lt;TofPacket&gt;,
              mte_receiver : Receiver&lt;MasterTriggerEvent&gt;,
              theme        : ColorTheme) -&gt; MTTab {
-    <span class="kw">let </span>bins          = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">49.0</span>);
-    <span class="kw">let </span>mtb_link_bins = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">49.0</span>);
+    <span class="kw">let </span>bins          = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">50.0</span>);
+    <span class="kw">let </span>mtb_link_bins = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">50.0</span>);
     <span class="self">Self </span>{
       main_layout    : Vec::&lt;Rect&gt;::new(),
       info_layout    : Vec::&lt;Rect&gt;::new(),
@@ -742,17 +730,7 @@
     <span class="comment">// NChannel distribution
     </span><span class="kw">let </span>nch_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.nch_histo);
     <span class="kw">let </span>nch_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.nch_histo, <span class="kw-2">&amp;</span>nch_labels, <span class="number">2</span>, <span class="bool-val">true</span>); 
-    <span class="kw">let </span>nch_chart   = BarChart::default()
-      .block(Block::default().title(<span class="string">"N Hits (N CH)"</span>).borders(Borders::ALL))
-      .data(nch_data.as_slice())
-      .bar_width(<span class="number">2</span>)
-      .bar_gap(<span class="number">0</span>)
-      .bar_style(<span class="self">self</span>.theme.highlight_fg())
-      .value_style(
-        <span class="self">self</span>.theme.highlight_fg()
-        .add_modifier(Modifier::BOLD),
-      )
-      .style(<span class="self">self</span>.theme.background());
+    <span class="kw">let </span>nch_chart   = histogram(nch_data, String::from(<span class="string">"N Hits (N CH)"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
 
     <span class="comment">// FPGA temperature
     </span><span class="kw">let </span>tmp_only : Vec::&lt;i64&gt; = <span class="self">self</span>.fpgatmp_queue.iter().map(|z| z.<span class="number">1</span>.round() <span class="kw">as </span>i64).collect();
@@ -859,18 +837,8 @@
      // histograms
      </span><span class="kw">let </span>ml_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.mtb_link_histo);
      <span class="kw">let </span>mlh_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.mtb_link_histo, <span class="kw-2">&amp;</span>ml_labels, <span class="number">10</span>, <span class="bool-val">true</span>); 
-     <span class="kw">let </span>mlh_chart  = BarChart::default()
-       .block(Block::default().title(<span class="string">"MTB Link ID (!NOT RBID)"</span>).borders(Borders::ALL))
-       .data(mlh_data.as_slice())
-       .bar_width(<span class="number">3</span>)
-       .bar_gap(<span class="number">0</span>)
-       .bar_style(<span class="self">self</span>.theme.highlight_fg())
-       .value_style(
-         <span class="self">self</span>.theme.highlight_fg()
-         .add_modifier(Modifier::BOLD),
-       )
-       .style(<span class="self">self</span>.theme.background());
-    frame.render_widget(mlh_chart, bottom_row);   
+     <span class="kw">let </span>mlh_chart  = histogram(mlh_data, String::from(<span class="string">"MTB Link ID (NOT RBID(!))"</span>), <span class="number">3</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+     frame.render_widget(mlh_chart, bottom_row);   
 
 
     <span class="comment">// render everything
