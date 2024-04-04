@@ -336,36 +336,6 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         continue;
       } // end if terminate
       
-      // in case we chose a dynamic buffer strategy, 
-      // adapt the buffer size
-      match settings.rb_buff_strategy {
-        // first case we have a fixed buffer size
-        RBBufferStrategy::NEvents(_) => (),
-        RBBufferStrategy::AdaptToRate(n_secs) => {
-          match get_trigger_rate() {
-            Err(err) => {
-              error!("Unable to obtain trigger rate! {err}");
-              // FIXME - Reasonable default?
-              buffer_trip = 50;
-            },
-            Ok(rate) => {
-              buffer_trip = rate as usize*n_secs as usize*EVENT_SIZE ;
-              trace!("Dynamic setting of buffer trip size for rate {} and n_secs {}! Setting buffer trip size to {}",rate, n_secs, buffer_trip);
-            }
-          }
-        }
-      }
-      // check again if buffer trip exceeds total size
-      if (buffer_trip > DATABUF_TOTAL_SIZE) 
-      || (buffer_trip > DATABUF_TOTAL_SIZE) {
-        error!("Tripsize of {buffer_trip} exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}");
-        warn!("Will set buffer_trip to {DATABUF_TOTAL_SIZE}");
-        buffer_trip = DATABUF_TOTAL_SIZE;
-      } else {
-        uio1_total_size = buffer_trip;
-        uio2_total_size = buffer_trip;
-      }
-      
       // We did not terminate the run,
       // that means we are still going!
       if force_trigger {
@@ -423,6 +393,41 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         Ok(result) => {
           which_buff = result.0;
           buff_size  = result.1;
+          if result.2 { // buffer has tripped
+            // in case we chose a dynamic buffer strategy, 
+            // adapt the buffer size for the next time
+            match settings.rb_buff_strategy {
+              // first case we have a fixed buffer size
+              RBBufferStrategy::NEvents(_) => (),
+              RBBufferStrategy::AdaptToRate(n_secs) => {
+                match get_trigger_rate() {
+                  Err(err) => {
+                    error!("Unable to obtain trigger rate! {err}");
+                    // FIXME - Reasonable default?
+                    buffer_trip = 50;
+                  },
+                  Ok(rate) => {
+                    buffer_trip = rate as usize*n_secs as usize*EVENT_SIZE ;
+                    trace!("Dynamic setting of buffer trip size for rate {} and n_secs {}! Setting buffer trip size to {}",rate, n_secs, buffer_trip);
+                  }
+                }
+              }
+            }
+            // check again if buffer trip exceeds total size
+            if (buffer_trip > DATABUF_TOTAL_SIZE) 
+            || (buffer_trip > DATABUF_TOTAL_SIZE) {
+              error!("Tripsize of {buffer_trip} exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}");
+              warn!("Will set buffer_trip to {DATABUF_TOTAL_SIZE}");
+              buffer_trip = DATABUF_TOTAL_SIZE;
+            } else {
+              uio1_total_size = buffer_trip;
+              uio2_total_size = buffer_trip;
+            }
+            if show_progress {
+              prog_a.set_length(uio1_total_size as u64);
+              prog_b.set_length(uio2_total_size as u64);
+            }
+          }
         }
       }
       if force_trigger {

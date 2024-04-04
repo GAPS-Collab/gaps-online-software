@@ -9,6 +9,7 @@
 
 //use std::collections::HashMap;
 //use std::path::PathBuf;
+use std::path::Path;
 use std::os::raw::c_int;
 use std::process::exit;
 use std::{
@@ -68,6 +69,7 @@ use tof_dataclasses::commands::{
 
 use tof_dataclasses::events::DataType;
 use tof_dataclasses::run::RunConfig;
+use tof_dataclasses::manifest::get_rbs_from_sqlite;
 use tof_dataclasses::io::{
     get_califilename,
     get_runfilename
@@ -230,8 +232,18 @@ fn main() {
   let only_perfect_events   = config.rb_settings.only_perfect_events;
   let cmd_server_address    = config.cc_server_address.clone();
   let mut run_config        = config.rb_settings.get_runconfig();
+  let db_path               = Path::new(&config.db_path);
   run_config.nseconds       = args.runtime_secs;
-  
+ 
+  let rbs = get_rbs_from_sqlite(db_path);
+  let mut rb_expected_link_id = 0u8;
+  for rb  in rbs {
+    if rb.rb_id == rb_info.board_id {
+      rb_expected_link_id = rb.mtb_link_id;
+      break;
+    }
+  }
+  println!("We found MTB Link ID {} for this RB (RB ID {}) in the database!", rb_expected_link_id, rb_info.board_id);
   // FIXME - instead of passing the run config around,
   // just offer it through a mutex
   //let mut global_run_config = Arc::new(Mutex::new(run_config));
@@ -263,12 +275,13 @@ fn main() {
   match get_mtb_link_id() {
     Err(err) => error!("Unable to obtain MTB link id! {err}"),
     Ok(link_id) => {
-      if link_id == rb_info.board_id as u32 {
+      if link_id as u8 != rb_expected_link_id {
         println!("=> We received the correct link id from the MTB!");
       } else {
         error!("Received unexpected MTB link ID {}!", link_id);
         error!("Incorrect link ID. This might hint to issues with the MTB mapping!");
         error!("******************************************************************");
+        panic!("The RB/Link ID mapping is wrong for this board!");
       }
     }
   }

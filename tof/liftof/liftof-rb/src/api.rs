@@ -1151,8 +1151,9 @@ pub fn experimental_ram_buffer_handler(buff_trip : usize,
 /// * buff_trip : size which triggers buffer readout.
 pub fn ram_buffer_handler(buff_trip     : usize,
                           bs_sender     : &Sender<Vec<u8>>)
-    -> Result<(RamBuffer, usize), RegisterError> {
+    -> Result<(RamBuffer, usize, bool), RegisterError> {
   let mut switch_buff = false;
+  let mut has_tripped = false;
   if buff_trip < DATABUF_TOTAL_SIZE {
     switch_buff = true;
   }
@@ -1165,6 +1166,7 @@ pub fn ram_buffer_handler(buff_trip     : usize,
     // 1) switch buffer
     // 2) read out
     // 3) reset
+    has_tripped = true;
     if switch_buff {
       // maybe do the switch when the DRS4 is not 
       // busy atm
@@ -1216,7 +1218,7 @@ pub fn ram_buffer_handler(buff_trip     : usize,
     }
     buff_size = 0;
   }
-  Ok((which, buff_size))
+  Ok((which, buff_size, has_tripped))
 }
 
 ///  Prepare the whole readoutboard for data taking.
