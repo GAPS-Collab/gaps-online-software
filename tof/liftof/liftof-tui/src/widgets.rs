@@ -12,6 +12,7 @@ use ratatui::widgets::{
     Axis,
     Block,
     BorderType,
+    BarChart,
     GraphType,
     Dataset,
     Chart,
@@ -21,7 +22,7 @@ use ratatui::widgets::{
 
 //extern crate ndhistogram;
 use ndhistogram::{
-    ndhistogram,
+    //ndhistogram,
     Histogram,
     Hist1D,
 };
@@ -73,15 +74,6 @@ use crate::colors::{
 //  }
 //}
 
-/// Create the labels for a certain histogram
-/// for rendering
-pub fn create_labels(histo : &Hist1D<Uniform<f32>>) -> Vec<String> {
-  let mut labels = Vec::<String>::new();
-  for bin in histo.iter() {
-    labels.push(format!("{}",bin.bin.start().unwrap_or(0.0) as u64));
-  }
-  labels
-}
 
 /// Adapt the bins of the histogram for the 
 /// bar chart which will get rendered.
@@ -119,6 +111,23 @@ pub fn clean_data<'a>(histo      : &'a Hist1D<Uniform<f32>>,
   clean_data
 }
 
+/// Create the labels for a certain histogram
+/// for rendering
+pub fn create_labels(histo : &Hist1D<Uniform<f32>>) -> Vec<String> {
+  let mut labels = Vec::<String>::new();
+  for bin in histo.iter() {
+    match bin.bin.start() {
+      None => {
+        labels.push(String::from("x"));
+      },
+      Some(value) => {
+        labels.push(format!("{}", value as u64));
+      }
+    }
+  }
+  labels
+}
+
 // FIXME - merge this with clean data
 /// Prepare data for histogram widget
 ///
@@ -134,9 +143,13 @@ pub fn prep_data<'a>(histo      : &'a Hist1D<Uniform<f32>>,
     if k == 0 && remove_uf {
       continue;
     }
+    if k == 1 && remove_uf {
+      data.push((&labels[k], *bin.value as u64));
+      continue;
+    }
     // k+1 to account for underflow bin
-    if (k+1) % spacing != 0 {
-      data.push(("-", bin.value.ceil() as u64));
+    if k % spacing != 0 {
+      data.push(("-", *bin.value as u64));
     } else {
       data.push((&labels[k], *bin.value as u64));
     }
@@ -144,15 +157,31 @@ pub fn prep_data<'a>(histo      : &'a Hist1D<Uniform<f32>>,
   data
 }
 
-pub fn histogram(nbin : usize, bin_low : f32,
-                 bin_high : f32,
-                 data : Vec<f32>) -> Hist1D<Uniform<f32>> {
-  let bins = Uniform::new(nbin, bin_low, bin_high);
-  let mut histo = ndhistogram!(bins);
-  for k in data {
-    histo.fill(&k);
-  }
-  histo
+pub fn histogram<'a>(hist_data : Vec<(&'a str, u64)>,
+                     title     : String,
+                     bar_width : u16,
+                     bar_gap   : u16,
+                     theme     : &ColorTheme) -> BarChart<'a> {
+  //let bins = Uniform::new(nbin, bin_low, bin_high);
+  //let mut histo = ndhistogram!(bins);
+  //for k in data {
+  //  histo.fill(&k);
+  //}
+  let chart  = BarChart::default()
+    .block(Block::default().title(title).borders(Borders::ALL))
+    .data(hist_data.as_slice())
+    .bar_width(bar_width)
+    .bar_gap(bar_gap)
+    //.bar_style(Style::default().fg(Color::Blue))
+    .bar_style(theme.style())
+    .value_style(
+      theme.style()
+      //Style::default()
+      //.bg(Color::Blue)
+      .add_modifier(Modifier::BOLD),
+    )
+    .style(theme.background());
+  chart
 }
 
 pub fn timeseries<'a>(data        : &'a mut VecDeque<(f64,f64)>,
@@ -266,7 +295,7 @@ pub fn gauge(title : String,
       )
       .gauge_style(
         Style::default()
-          .fg(theme.fg1)
+          .fg(theme.hc)
           .bg(theme.bg1)
           .add_modifier(Modifier::BOLD)
       )

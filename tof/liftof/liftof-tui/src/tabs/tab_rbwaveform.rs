@@ -25,7 +25,7 @@ use ratatui::widgets::{
     BorderType,
     Borders,
     Paragraph,
-    BarChart,
+    //BarChart,
     //List,
     //ListItem,
     //ListState,
@@ -47,6 +47,7 @@ use crate::widgets::{
     //clean_data,
     prep_data,
     timeseries,
+    histogram,
     create_labels,
 };
 
@@ -194,20 +195,21 @@ impl RBWaveformTab {
     
     let rbhist_labels  = create_labels(&self.rb_histo);
     let rbhist_data    = prep_data(&self.rb_histo, &rbhist_labels, 5, true); 
-    let rbhist_chart   = BarChart::default()
-      .block(Block::default().title("ReadoutBoards").borders(Borders::ALL))
-      .data(rbhist_data.as_slice())
-      .bar_width(3)
-      .bar_gap(0)
-      //.bar_style(Style::default().fg(Color::Blue))
-      .bar_style(self.theme.highlight_fg())
-      .value_style(
-        self.theme.highlight_fg()
-        //Style::default()
-        //.bg(Color::Blue)
-        .add_modifier(Modifier::BOLD),
-      )
-      .style(self.theme.background());
+    let rbhist_chart   = histogram(rbhist_data, String::from("ReadoutBoards"), 3, 0, &self.theme);
+    //let rbhist_chart   = BarChart::default()
+    //  .block(Block::default().title("ReadoutBoards").borders(Borders::ALL))
+    //  .data(rbhist_data.as_slice())
+    //  .bar_width(3)
+    //  .bar_gap(0)
+    //  //.bar_style(Style::default().fg(Color::Blue))
+    //  .bar_style(self.theme.highlight_fg())
+    //  .value_style(
+    //    self.theme.highlight_fg()
+    //    //Style::default()
+    //    //.bg(Color::Blue)
+    //    .add_modifier(Modifier::BOLD),
+    //  )
+    //  .style(self.theme.background());
     frame.render_widget(rbhist_chart, info[1]);
      
   }

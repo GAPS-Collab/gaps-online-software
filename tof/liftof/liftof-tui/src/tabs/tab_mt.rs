@@ -11,7 +11,10 @@ use std::time::{
 use ratatui::{
     symbols,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{Color, Modifier, Style},
+    style::{
+        Color,
+        //Modifier,
+        Style},
     text::Span,
     terminal::Frame,
     widgets::{
@@ -21,7 +24,7 @@ use ratatui::{
         GraphType,
         BorderType,
         Chart,
-        BarChart,
+        //BarChart,
         Borders,
         Paragraph
     },
@@ -57,6 +60,7 @@ use crate::widgets::{
     //clean_data,
     prep_data,
     create_labels,
+    histogram,
 };
 
 
@@ -94,8 +98,8 @@ impl MTTab {
   pub fn new(tp_receiver  : Receiver<TofPacket>,
              mte_receiver : Receiver<MasterTriggerEvent>,
              theme        : ColorTheme) -> MTTab {
-    let bins          = Uniform::new(50, 0.0, 49.0);
-    let mtb_link_bins = Uniform::new(50, 0.0, 49.0);
+    let bins          = Uniform::new(50, 0.0, 50.0);
+    let mtb_link_bins = Uniform::new(50, 0.0, 50.0);
     Self {
       main_layout    : Vec::<Rect>::new(),
       info_layout    : Vec::<Rect>::new(),
@@ -292,17 +296,7 @@ impl MTTab {
     // NChannel distribution
     let nch_labels  = create_labels(&self.nch_histo);
     let nch_data    = prep_data(&self.nch_histo, &nch_labels, 2, true); 
-    let nch_chart   = BarChart::default()
-      .block(Block::default().title("N Hits (N CH)").borders(Borders::ALL))
-      .data(nch_data.as_slice())
-      .bar_width(2)
-      .bar_gap(0)
-      .bar_style(self.theme.highlight_fg())
-      .value_style(
-        self.theme.highlight_fg()
-        .add_modifier(Modifier::BOLD),
-      )
-      .style(self.theme.background());
+    let nch_chart   = histogram(nch_data, String::from("N Hits (N CH)"), 2, 0, &self.theme);
 
     // FPGA temperature
     let tmp_only : Vec::<i64> = self.fpgatmp_queue.iter().map(|z| z.1.round() as i64).collect();
@@ -409,18 +403,8 @@ impl MTTab {
      // histograms
      let ml_labels  = create_labels(&self.mtb_link_histo);
      let mlh_data   = prep_data(&self.mtb_link_histo, &ml_labels, 10, true); 
-     let mlh_chart  = BarChart::default()
-       .block(Block::default().title("MTB Link ID (!NOT RBID)").borders(Borders::ALL))
-       .data(mlh_data.as_slice())
-       .bar_width(3)
-       .bar_gap(0)
-       .bar_style(self.theme.highlight_fg())
-       .value_style(
-         self.theme.highlight_fg()
-         .add_modifier(Modifier::BOLD),
-       )
-       .style(self.theme.background());
-    frame.render_widget(mlh_chart, bottom_row);   
+     let mlh_chart  = histogram(mlh_data, String::from("MTB Link ID (NOT RBID(!))"), 3, 0, &self.theme);
+     frame.render_widget(mlh_chart, bottom_row);   
 
 
     // render everything

@@ -14,7 +14,7 @@ use ratatui::widgets::{
     BorderType,
     Borders,
     Paragraph,
-    BarChart,
+    //BarChart,
     List,
     ListItem,
     ListState,
@@ -48,6 +48,7 @@ use crate::widgets::{
     //clean_data,
     prep_data,
     create_labels,
+    histogram,
 };
 
 #[derive(Debug, Clone)]
@@ -218,106 +219,28 @@ impl TofHitTab<'_> {
         // histograms
         let ph_labels  = create_labels(&self.pha_histo);
         let pha_data   = prep_data(&self.pha_histo, &ph_labels, 5, false); 
-        let pha_chart  = BarChart::default()
-          .block(Block::default().title("Pulse height SideA [mV]").borders(Borders::ALL))
-          .data(pha_data.as_slice())
-          .bar_width(2)
-          .bar_gap(0)
-          //.bar_style(Style::default().fg(Color::Blue))
-          .bar_style(self.theme.highlight_fg())
-          .value_style(
-            self.theme.highlight_fg()
-            //Style::default()
-            //.bg(Color::Blue)
-            .add_modifier(Modifier::BOLD),
-          )
-          .style(self.theme.background());
+        let pha_chart  = histogram(pha_data, String::from("Pulse height SideA [mV]"), 2, 0, &self.theme);
         frame.render_widget(pha_chart, plots_a[0]);
         let phb_data   = prep_data(&self.phb_histo, &ph_labels, 5, false); 
-        let phb_chart  = BarChart::default()
-          .block(Block::default().title("Pulse height SideB [mV]").borders(Borders::ALL))
-          .data(phb_data.as_slice())
-          .bar_width(2)
-          .bar_gap(0)
-          //.bar_style(Style::default().fg(Color::Blue))
-          .bar_style(self.theme.highlight_fg())
-          .value_style(
-            self.theme.highlight_fg()
-            //Style::default()
-            //.bg(Color::Blue)
-            .add_modifier(Modifier::BOLD),
-          )
-          .style(self.theme.background());
+        let phb_chart  = histogram(phb_data, String::from("Pulse height SideB [mV]"), 2, 0, &self.theme);
         frame.render_widget(phb_chart, plots_b[0]);
         
         let pt_labels  = create_labels(&self.pta_histo);
         let pta_data   = prep_data(&self.pta_histo, &pt_labels, 5, false); 
-        let pta_chart  = BarChart::default()
-          .block(Block::default().title("Pulse time SideA [mV]").borders(Borders::ALL))
-          .data(pta_data.as_slice())
-          .bar_width(2)
-          .bar_gap(0)
-          //.bar_style(Style::default().fg(Color::Blue))
-          .bar_style(self.theme.highlight_fg())
-          .value_style(
-            self.theme.highlight_fg()
-            //Style::default()
-            //.bg(Color::Blue)
-            .add_modifier(Modifier::BOLD),
-          )
-          .style(self.theme.background());
+        let pta_chart  = histogram(pta_data, String::from("Pulse time SideA [a.u.]"), 2, 0, &self.theme);
         frame.render_widget(pta_chart, plots_a[1]);
 
         let ptb_data   = prep_data(&self.ptb_histo, &pt_labels, 5, false); 
-        let ptb_chart  = BarChart::default()
-          .block(Block::default().title("Pulse time SideB (a.u.)").borders(Borders::ALL))
-          .data(ptb_data.as_slice())
-          .bar_width(2)
-          .bar_gap(0)
-          //.bar_style(Style::default().fg(Color::Blue))
-          .bar_style(self.theme.highlight_fg())
-          .value_style(
-            self.theme.highlight_fg()
-            //Style::default()
-            //.bg(Color::Blue)
-            .add_modifier(Modifier::BOLD),
-          )
-          .style(self.theme.background());
+        let ptb_chart  = histogram(ptb_data, String::from("Pulse time SideB [a.u.]"), 2, 0, &self.theme);
         frame.render_widget(ptb_chart, plots_b[1]);
         
         let pc_labels  = create_labels(&self.pca_histo);
         let pca_data   = prep_data(&self.pca_histo, &pc_labels, 5, false); 
-        let pca_chart  = BarChart::default()
-          .block(Block::default().title("Pulse charge SideA [mC]").borders(Borders::ALL))
-          .data(pca_data.as_slice())
-          .bar_width(2)
-          .bar_gap(0)
-          //.bar_style(Style::default().fg(Color::Blue))
-          .bar_style(self.theme.highlight_fg())
-          .value_style(
-            self.theme.highlight_fg()
-            //Style::default()
-            //.bg(Color::Blue)
-            .add_modifier(Modifier::BOLD),
-          )
-          .style(self.theme.background());
+        let pca_chart  = histogram(pca_data, String::from("Pulse charge SideA [mC]"), 2, 0, &self.theme);
         frame.render_widget(pca_chart, plots_a[2]);
 
         let pcb_data   = prep_data(&self.pcb_histo, &pc_labels, 5, false); 
-        let pcb_chart  = BarChart::default()
-          .block(Block::default().title("Pulse charge SideB [mC]").borders(Borders::ALL))
-          .data(pcb_data.as_slice())
-          .bar_width(2)
-          .bar_gap(0)
-          //.bar_style(Style::default().fg(Color::Blue))
-          .bar_style(self.theme.highlight_fg())
-          .value_style(
-            self.theme.highlight_fg()
-            //Style::default()
-            //.bg(Color::Blue)
-            .add_modifier(Modifier::BOLD),
-          )
-          .style(self.theme.background());
+        let pcb_chart  = histogram(pcb_data, String::from("Pulse charge SideB [mC]"), 2, 0, &self.theme);
         frame.render_widget(pcb_chart, plots_b[2]);
         
       },
@@ -366,75 +289,23 @@ impl TofHitTab<'_> {
         // histograms
         let t0_labels  = create_labels(&self.t0_histo);
         let t0_data    = prep_data(&self.t0_histo, &t0_labels, 10, false); 
-        let t0_chart   = BarChart::default()
-          .block(Block::default().title("Reco. T0").borders(Borders::ALL))
-          .data(t0_data.as_slice())
-          .bar_width(2)
-          .bar_gap(0)
-          //.bar_style(Style::default().fg(Color::Blue))
-          .bar_style(self.theme.highlight_fg())
-          .value_style(
-            self.theme.highlight_fg()
-            //Style::default()
-            //.bg(Color::Blue)
-            .add_modifier(Modifier::BOLD),
-          )
-          .style(self.theme.background());
+        let t0_chart   = histogram(t0_data, String::from("Reco. T0"), 2, 0, &self.theme);
         frame.render_widget(t0_chart, plots[0]);
 
         let edep_labels  = create_labels(&self.edep_histo);
         let edep_data    = prep_data(&self.edep_histo, &edep_labels, 5, false); 
-        let edep_chart   = BarChart::default()
-          .block(Block::default().title("Reco. EDep").borders(Borders::ALL))
-          .data(edep_data.as_slice())
-          .bar_width(2)
-          .bar_gap(0)
-          //.bar_style(Style::default().fg(Color::Blue))
-          .bar_style(self.theme.highlight_fg())
-          .value_style(
-            self.theme.highlight_fg()
-            //Style::default()
-            //.bg(Color::Blue)
-            .add_modifier(Modifier::BOLD),
-          )
-          .style(self.theme.background());
+        let edep_chart   = histogram(edep_data, String::from("Reco. EDep"), 2, 0, &self.theme);
         frame.render_widget(edep_chart, plots[1]);
         
         // position across paddle
         let pa_labels = create_labels(&self.pa_histo);
         let pa_data   = prep_data(&self.pa_histo, &pa_labels, 20, false); 
-        let pa_chart  = BarChart::default()
-          .block(Block::default().title("Position accross paddle").borders(Borders::ALL))
-          .data(pa_data.as_slice())
-          .bar_width(2)
-          .bar_gap(0)
-          //.bar_style(Style::default().fg(Color::Blue))
-          .bar_style(self.theme.highlight_fg())
-          .value_style(
-            self.theme.highlight_fg()
-            //Style::default()
-            //.bg(Color::Blue)
-            .add_modifier(Modifier::BOLD),
-          )
-          .style(self.theme.background());
+        let pa_chart  = histogram(pa_data, String::from("Position accross paddle"), 2, 0, &self.theme);
         frame.render_widget(pa_chart, chunks[1]);
         
         let pid_labels = create_labels(&self.pid_histo);
         let pid_data   = prep_data(&self.pid_histo, &pid_labels, 10, true); 
-        let pid_chart  = BarChart::default()
-          .block(Block::default().title("Paddle ID").borders(Borders::ALL))
-          .data(pid_data.as_slice())
-          .bar_width(3)
-          .bar_gap(0)
-          //.bar_style(Style::default().fg(Color::Blue))
-          .bar_style(self.theme.highlight_fg())
-          .value_style(
-            self.theme.highlight_fg()
-            //Style::default()
-            //.bg(Color::Blue)
-            .add_modifier(Modifier::BOLD),
-          )
-          .style(self.theme.background());
+        let pid_chart  = histogram(pid_data, String::from("Paddle ID"), 3, 0, &self.theme);
         frame.render_widget(pid_chart, chunks[2]);
       },
       TofHitView::SelectPaddle => {
@@ -490,6 +361,5 @@ impl TofHitTab<'_> {
         frame.render_stateful_widget(paddle_select_list, list_chunks[0], &mut self.pl_state );
       }
     }
-
   }
 }
