@@ -312,28 +312,9 @@ pub fn master_trigger(mt_address        : String,
                       settings          : MTBSettings,
                       verbose           : bool) {
 
-  // data buffer for MTB readout - allocate once and reuse
-  //let mut buffer = [0u8;MT_MAX_PACKSIZE];  
-  
-  // FIXME - this panics. However, it seems there is no way to init an UdpSocket 
-  // without binding it. And if it can't bind, it panics.
-  //let mut socket = connect_to_mtb(&mt_address).expect("Can not establish initial connection to MTB");
-  // unfortunatly something like this won't compile
-  //let mut socket : UdpSocket; 
-  //while !connected {
-  //  match connect_to_mtb(&mt_address) {
-  //    Err(err) => {
-  //      error!("Can not create local UDP socket fro MTB connections!, {err}");
-  //      thread::sleep(connection_timeout);
-  //      continue;
-  //    },
-  //    Ok(_sock) => {
-  //      info!("Successfully created local UDP socket for MTB connection!");
-  //      socket = _sock;
-  //      connected = true;
-  //    }
-  //  }
-  //}
+  // missing event analysis - has to go away eventually
+  //let mut event_id_test = Vec::<u32>::new();
+
   let mut bus : IPBus;
   match IPBus::new(mt_address.clone()) {
     // if that doesn't work, then probably the 
@@ -580,6 +561,7 @@ pub fn master_trigger(mt_address        : String,
           if last_event_id != 0 {
             error!("We skipped {} events!", _ev.event_id - last_event_id); 
             n_ev_missed += (_ev.event_id - last_event_id) as u64;
+            //event_id_test.push(_ev.event_id);
           }
         }
         last_event_id = _ev.event_id;
@@ -599,25 +581,32 @@ pub fn master_trigger(mt_address        : String,
     }
     if verbose {
       let verbose_timer_elapsed = verbose_timer.elapsed().as_secs_f64();
+      //let mut missing = 0usize;
+      //if event_id_test.len() > 0 {
+      //  let mut evid = event_id_test[0];
+      //  for _ in 0..event_id_test.len() {
+      //    if !event_id_test.contains(&evid) {
+      //      missing += 1;
+      //    }
+      //    evid += 1;
+      //  }
+      //}
+      //let evid_check_str = format!(">> ==> In a chunk of {} events, we missed {} ({}%) <<", event_id_test.len(), missing, 100.0*(missing as f64)/event_id_test.len() as f64);
+      //event_id_test.clear();
       if verbose_timer_elapsed > 30.0 {
         total_elapsed += verbose_timer_elapsed;
-        println!("  {}", ">> == == == == ==  MT HEARTBEAT   == == == == == <<".bright_blue().bold());
-        println!("  {}{:.1}{}", ">> ==> ".bright_blue(),total_elapsed, " mission elapsed time (sec)           <<".bright_blue());
-        println!("  {}{}{}", ">> ==> ".bright_blue(),n_events, " events recorded                       <<".bright_blue());
+        println!("  {:<60} <<", ">> == == == == == == ==  MT HEARTBEAT == ==  == == == == ==".bright_blue().bold());
+        println!("  {:<60} <<", format!(">> ==> MET (Mission Elapsed Time) (sec) {:.1}",total_elapsed).bright_blue());
+        println!("  {:<60} <<", format!(">> ==> Recorded Events                  {}", n_events).bright_blue());
+        println!("  {:<60} <<", format!(">> ==> -- trigger rate (Hz)             {:.2}", n_events as f64/total_elapsed).bright_blue());
+        
         if n_ev_unsent > 0 {
           println!("  {}{}{}", ">> ==> ".yellow().bold(),n_ev_unsent, " sent errors                       <<".yellow().bold());
         }
         if n_ev_missed > 0 {
           println!("  {}{}{}", ">> ==> ".yellow().bold(),n_events, " missed events                       <<".yellow().bold());
         }
-        println!("  {}{:.2}{}", ">> ==> -- trigger rate: ".bright_blue(), n_events as f64/total_elapsed, " Hz                 <<".bright_blue());
-        //match rate_from_reg {
-        //  None => (),
-        //  Some(_rate) => {
-        //    println!("  {}{:.3}{}",">> ==> -- expected rate ".bright_blue(),_rate," Hz (from register)    <<".bright_blue());   
-        //  }
-        //}
-        println!("  {}",">> == == == == ==  END HEARTBEAT! == == == == == <<".bright_blue().bold());
+        println!("  {:<60} <<", ">> == == == == == == ==  END HEARTBEAT = ==  == == == == ==".bright_blue().bold());
         verbose_timer = Instant::now();
       }
     }
@@ -757,6 +746,88 @@ pub fn set_gaps_trigger(bus : &mut IPBus, use_beta : bool)
     trig_settings = trig_settings | u32::pow(2,25);
   }
   bus.write(0x14, trig_settings)?;
+  Ok(())
+}
+
+
+pub fn set_inner_tof_threshold(bus : &mut IPBus, thresh : u8)
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting inner TOF threshold {}!", thresh);
+  let mut trig_settings = bus.read(0x14)?;
+  trig_settings = trig_settings | thresh as u32;
+  bus.write(0x14, trig_settings)?;
+  Ok(())
+}
+
+pub fn set_outer_tof_threshold(bus : &mut IPBus, thresh : u8)
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting outer TOF threshold {}!", thresh);
+  let mut trig_settings = bus.read(0x14)?;
+  trig_settings = trig_settings | ((thresh as u32) << 8);
+  bus.write(0x14, trig_settings)?;
+  Ok(())
+}
+
+pub fn set_total_tof_threshold(bus : &mut IPBus, thresh : u8)
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting total TOF threshold {}!", thresh);
+  let mut trig_settings = bus.read(0x14)?;
+  trig_settings = trig_settings | ((thresh as u32) << 16);
+  bus.write(0x14, trig_settings)?;
+  Ok(())
+}
+
+pub fn set_cube_side_threshold(bus : &mut IPBus, thresh : u8)
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting cube side threshold {}!", thresh);
+  let mut trig_settings = bus.read(0x15)?;
+  trig_settings = trig_settings | thresh as u32;
+  bus.write(0x15, trig_settings)?;
+  Ok(())
+}
+
+pub fn set_cube_top_threshold(bus : &mut IPBus, thresh : u8)
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting cube top threshold {}!", thresh);
+  let mut trig_settings = bus.read(0x15)?;
+  trig_settings = trig_settings | ((thresh as u32) << 8);
+  bus.write(0x15, trig_settings)?;
+  Ok(())
+}
+
+pub fn set_cube_bottom_threshold(bus : &mut IPBus, thresh : u8)
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting cube bottom threshold {}!", thresh);
+  let mut trig_settings = bus.read(0x15)?;
+  trig_settings = trig_settings | ((thresh as u32) << 16);
+  bus.write(0x15, trig_settings)?;
+  Ok(())
+}
+
+pub fn set_cube_corner_threshold(bus : &mut IPBus, thresh : u8)
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting cube corner threshold {}!", thresh);
+  let mut trig_settings = bus.read(0x15)?;
+  trig_settings = trig_settings | ((thresh as u32) << 24);
+  bus.write(0x15, trig_settings)?;
+  Ok(())
+}
+
+pub fn set_umbrella_threshold(bus : &mut IPBus, thresh : u8)
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting umbrella threshold {}!", thresh);
+  let mut trig_settings = bus.read(0x16)?;
+  trig_settings = trig_settings | thresh as u32;
+  bus.write(0x16, trig_settings)?;
+  Ok(())
+}
+
+pub fn set_cortina_threshold(bus : &mut IPBus, thresh : u8)
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting cortina threshold {}!", thresh);
+  let mut trig_settings = bus.read(0x16)?;
+  trig_settings = trig_settings | ((thresh as u32) << 16);
+  bus.write(0x16, trig_settings)?;
   Ok(())
 }
 
