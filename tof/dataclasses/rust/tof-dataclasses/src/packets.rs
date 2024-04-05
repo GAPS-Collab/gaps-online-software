@@ -94,9 +94,8 @@ impl fmt::Display for TofPacket {
     if p_len < 4 {
       write!(f, "<TofPacket: type {:?}, payload size {}>", self.packet_type, p_len)
     } else {
-      write!(f, "<TofPacket: type {:?}, multi {}, payload [ {} {} {} {} .. {} {} {} {}] of size {} >",
+      write!(f, "<TofPacket: type {:?}, payload [ {} {} {} {} .. {} {} {} {}] of size {} >",
              self.packet_type,
-             self.is_multi_packet,
              self.payload[0], self.payload[1], self.payload[2], self.payload[3],
              self.payload[p_len-4], self.payload[p_len-3], self.payload[p_len - 2], self.payload[p_len-1], p_len ) 
     }
