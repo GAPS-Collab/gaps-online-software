@@ -58,6 +58,25 @@ use crate::events::EventStatus;
 //  TOTAL_TOF_THRESH =0
 //  REQUIRE_BETA =1
 //
+//  This is from Andrew's email about Philip's debugging triggers:
+//  I am proposing to just add a single new trigger, which is configured by:
+//  
+//  cube_side_thresh   
+//  cube_top_thresh    
+//  cube_bot_thresh    
+//  cube_corner_thresh 
+//  umbrella_thresh    
+//  cortina_thresh     
+//  inner_tof_thresh 
+//  outer_tof_thresh
+//  total_tof_thresh 
+//  
+//  The trigger is just
+//  
+//  cube_side_cnt >= cube_side_thresh AND cube_top_cnt >= cube_top_thresh AND .... etc.
+//  
+//  So setting thresh to zero disables a condition, and should let you implement any of these combinations except 3, which would need some new parameter.
+
 
 /// masks to decode LTB hit masks
 const LTB_CH0 : u16 = 0x3   ;
@@ -88,6 +107,17 @@ pub enum TriggerType {
   Any          = 1u8,
   Track        = 2u8,
   TrackCentral = 3u8,
+  /// -> 20+ "Philip's triggers"
+  /// Any paddle HIT in UMB  + any paddle HIT in CUB
+  UmbCube      = 21u8,
+  /// Any paddle HIT in UMB + any paddle HIT in CUB top
+  UmbCubeZ     = 22u8,
+  /// Any paddle HIT in UMB + any paddle hit in COR + any paddle hit in CUB 
+  UmbCorCube   = 23u8,
+  /// Any paddle HIT in COR + any paddle HIT in CUB SIDES
+  CorCubeSide  = 24u8,
+  /// Any paddle hit in UMB + any three paddles HIT in CUB
+  Umb3Cube     = 25u8,
   /// > 100 -> Debug triggers
   Poisson      = 100u8,
   Forced       = 101u8, 
@@ -110,6 +140,11 @@ impl From<u8> for TriggerType {
       2   => TriggerType::Track,
       3   => TriggerType::TrackCentral,
       4   => TriggerType::Gaps,
+      21  => TriggerType::UmbCube,
+      22  => TriggerType::UmbCubeZ,
+      23  => TriggerType::UmbCorCube,
+      24  => TriggerType::CorCubeSide,
+      25  => TriggerType::Umb3Cube,
       _   => TriggerType::Unknown
     }
   }
@@ -127,6 +162,11 @@ impl FromRandom for TriggerType {
       TriggerType::TrackCentral,
       TriggerType::Gaps,
       TriggerType::Forced,
+      TriggerType::UmbCube,
+      TriggerType::UmbCubeZ,
+      TriggerType::UmbCorCube,
+      TriggerType::CorCubeSide,
+      TriggerType::Umb3Cube,
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
