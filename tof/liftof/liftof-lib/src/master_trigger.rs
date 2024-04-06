@@ -425,6 +425,56 @@ pub fn master_trigger(mt_address        : String,
       warn!("Trigger condition undefined! Not setting anything!");
       error!("Trigger conditions unknown!");
     }
+    TriggerType::UmbCube => {
+      match unset_all_triggers(&mut bus) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_umbcube_trigger(&mut bus) {
+        Err(err) => error!("Unable to set UmbCube trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
+    TriggerType::UmbCubeZ => {
+      match unset_all_triggers(&mut bus) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_umbcubez_trigger(&mut bus) {
+        Err(err) => error!("Unable to set UmbCubeZ trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
+    TriggerType::UmbCorCube => {
+      match unset_all_triggers(&mut bus) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_umbcorcube_trigger(&mut bus) {
+        Err(err) => error!("Unable to set UmbCorCube trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
+    TriggerType::CorCubeSide => {
+      match unset_all_triggers(&mut bus) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_corcubeside_trigger(&mut bus) {
+        Err(err) => error!("Unable to set CorCubeSide trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
+    TriggerType::Umb3Cube => {
+      match unset_all_triggers(&mut bus) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_umb3cube_trigger(&mut bus) {
+        Err(err) => error!("Unable to set Umb3Cube trigger! {err}"), 
+        Ok(_)    => ()
+      }
+    }
     _ => {
       error!("Trigger type {} not covered!", settings.trigger_type);
       println!("== ==> Not setting any trigger condition. You can set it through pico_hal.py");
@@ -732,6 +782,7 @@ pub fn unset_all_triggers(bus : &mut IPBus)
   set_poisson_trigger(bus, 0)?;
   set_any_trigger    (bus, 0.0)?;
   set_track_trigger  (bus, 0.0)?;
+  set_configurable_trigger(bus, false)?;
   set_central_track_trigger(bus, 0.0)?;
   Ok(())
 }
@@ -749,6 +800,22 @@ pub fn set_gaps_trigger(bus : &mut IPBus, use_beta : bool)
   Ok(())
 }
 
+pub fn set_configurable_trigger(bus : &mut IPBus, enable : bool) 
+  -> Result<(), Box<dyn Error>> {
+  if enable {
+    info!("Enabling configurable trigger!");
+  } else {
+    info!("Disabling configurable trigger!");
+  }
+  let mut trig_settings = bus.read(0x14)?;
+  if enable {
+    trig_settings = trig_settings | u32::pow(2,31);
+  } else {
+    trig_settings = trig_settings | !(u32::pow(2,31));
+  }
+  bus.write(0x14, trig_settings)?;
+  Ok(())
+}
 
 pub fn set_inner_tof_threshold(bus : &mut IPBus, thresh : u8)
   -> Result<(), Box<dyn Error>> {
@@ -851,5 +918,49 @@ pub fn set_tiu_emulation_mode(bus : &mut IPBus, set_emulation_mode : bool)
     bus.write(0xe, value)?;
     Ok(())
 }
+
+// the "Philip" triggers
+pub fn set_umbcube_trigger(bus : &mut IPBus) 
+  ->Result<(), Box<dyn Error>> {
+  set_configurable_trigger(bus,true)?;
+  set_umbrella_threshold(bus,1)?;
+  set_inner_tof_threshold(bus,1)?;
+  Ok(())
+}
+
+pub fn set_umbcubez_trigger(bus : &mut IPBus) 
+  ->Result<(), Box<dyn Error>> {
+  set_configurable_trigger(bus,true)?;
+  set_umbrella_threshold(bus,1)?;
+  set_cube_top_threshold(bus,1)?;
+  Ok(())
+}
+
+pub fn set_umbcorcube_trigger(bus : &mut IPBus) 
+  ->Result<(), Box<dyn Error>> {
+  set_configurable_trigger(bus,true)?;
+  set_umbrella_threshold(bus,1)?;
+  set_cortina_threshold(bus, 1)?;
+  set_inner_tof_threshold(bus, 1);
+  Ok(())
+}
+
+pub fn set_corcubeside_trigger(bus : &mut IPBus) 
+  ->Result<(), Box<dyn Error>> {
+  set_configurable_trigger(bus,true)?;
+  set_cortina_threshold(bus,1)?;
+  set_cube_side_threshold(bus,1)?;
+  Ok(())
+}
+
+pub fn set_umb3cube_trigger(bus : &mut IPBus) 
+  ->Result<(), Box<dyn Error>> {
+  set_configurable_trigger(bus,true)?;
+  set_umbrella_threshold(bus,1)?;
+  set_inner_tof_threshold(bus,3)?;
+  Ok(())
+}
+
+
 
 
