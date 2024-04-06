@@ -79,15 +79,15 @@ use crate::events::EventStatus;
 
 
 /// masks to decode LTB hit masks
-const LTB_CH0 : u16 = 0x3   ;
-const LTB_CH1 : u16 = 0xc   ;
-const LTB_CH2 : u16 = 0x30  ; 
-const LTB_CH3 : u16 = 0xc0  ;
-const LTB_CH4 : u16 = 0x300 ;
-const LTB_CH5 : u16 = 0xc00 ;
-const LTB_CH6 : u16 = 0x3000;
-const LTB_CH7 : u16 = 0xc000;
-const LTB_CHANNELS : [u16;8] = [
+pub const LTB_CH0 : u16 = 0x3   ;
+pub const LTB_CH1 : u16 = 0xc   ;
+pub const LTB_CH2 : u16 = 0x30  ; 
+pub const LTB_CH3 : u16 = 0xc0  ;
+pub const LTB_CH4 : u16 = 0x300 ;
+pub const LTB_CH5 : u16 = 0xc00 ;
+pub const LTB_CH6 : u16 = 0x3000;
+pub const LTB_CH7 : u16 = 0xc000;
+pub const LTB_CHANNELS : [u16;8] = [
     LTB_CH0,
     LTB_CH1,
     LTB_CH2,

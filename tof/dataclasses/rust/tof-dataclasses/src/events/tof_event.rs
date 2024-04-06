@@ -17,11 +17,14 @@ cfg_if::cfg_if! {
 }
 
 //use crate::DsiLtbRBMapping;
-use crate::serialization::{Serialization,
-                           parse_u8,
-                           parse_u16,
-                           parse_u32,
-                           search_for_u16};
+use crate::serialization::{
+    Serialization,
+    parse_u8,
+    parse_u16,
+    parse_u32,
+    parse_u64,
+    search_for_u16
+};
 use crate::errors::SerializationError;
 
 use crate::events::{
@@ -32,6 +35,11 @@ use crate::events::{
     RBMissingHit,
     TriggerType,
     EventStatus,
+};
+
+use crate::events::master_trigger::{
+    LTBThreshold,
+    LTB_CHANNELS
 };
 
 // This looks like a TODO
@@ -220,6 +228,9 @@ impl TofEvent {
     summary.timestamp16       = ((mt_timestamp & 0x00ff0000 ) >> 16) as u16;
     summary.primary_beta      = self.header.primary_beta; 
     summary.primary_charge    = self.header.primary_charge; 
+    summary.dsi_j_mask        = self.mt_event.dsi_j_mask;
+    summary.channel_mask      = self.mt_event.channel_mask.clone();
+    summary.mtb_link_mask     = self.mt_event.mtb_link_mask;
     summary.hits              = Vec::<TofHit>::new();
     for ev in &self.rb_events {
       for hit in &ev.hits {
@@ -540,7 +551,10 @@ pub struct TofEventSummary {
   pub primary_beta      : u16, 
   /// reconstructed primary charge
   pub primary_charge    : u16, 
-  pub hits : Vec<TofHit>,
+  pub dsi_j_mask        : u32,
+  pub channel_mask      : Vec<u16>,
+  pub mtb_link_mask     : u64,
+  pub hits              : Vec<TofHit>,
 }
 
 impl TofEventSummary {
@@ -556,9 +570,70 @@ impl TofEventSummary {
       timestamp16       : 0,
       primary_beta      : 0, 
       primary_charge    : 0, 
+      dsi_j_mask        : 0,
+      channel_mask      : Vec::<u16>::new(),
+      mtb_link_mask     : 0,
       hits              : Vec::<TofHit>::new(),
     }
   }
+  /// Get the RB link IDs according to the mask
+  pub fn get_rb_link_ids(&self) -> Vec<u8> {
+    let mut links = Vec::<u8>::new();
+    for k in 0..64 {
+      if (self.mtb_link_mask >> k) as u64 & 0x1 == 1 {
+        links.push(k as u8);
+      }
+    }
+    links
+  }
+
+  /// Get the combination of triggered DSI/J/CH on 
+  /// the MTB which formed the trigger. This does 
+  /// not include further hits which fall into the 
+  /// integration window. For those, se rb_link_mask
+  ///
+  /// The returned values follow the TOF convention
+  /// to start with 1, so that we can use them to 
+  /// look up LTB ids in the db.
+  ///
+  /// # Returns
+  ///
+  ///   Vec<(hit)> where hit is (DSI, J, CH) 
+  pub fn get_trigger_hits(&self) -> Vec<(u8, u8, u8, LTBThreshold)> {
+    let mut hits = Vec::<(u8,u8,u8,LTBThreshold)>::new(); 
+    //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
+    let n_masks_needed = self.dsi_j_mask.count_ones();
+    if self.channel_mask.len() < n_masks_needed as usize {
+      error!("We need {} hit masks, but only have {}! This is bad!", n_masks_needed, self.channel_mask.len());
+      return hits;
+    }
+    let mut n_mask = 0;
+    trace!("Expecting {} hit masks", n_masks_needed);
+    trace!("ltb channels {:?}", self.dsi_j_mask);
+    trace!("hit masks {:?}", self.channel_mask); 
+    //println!("We see LTB Channels {:?} with Hit masks {:?} for {} masks requested by us!", self.dsi_j_mask, self.channel_mask, n_masks_needed);
+    for k in 0..32 {
+      if (self.dsi_j_mask >> k) as u32 & 0x1 == 1 {
+        let dsi = (k as f32 / 4.0).floor() as u8 + 1;       
+        let j   = (k % 5) as u8 + 1;
+        //println!("n_mask {n_mask}");
+        let channels = self.channel_mask[n_mask]; 
+        for (i,ch) in LTB_CHANNELS.iter().enumerate() {
+          //let chn = *ch as u8 + 1;
+          let chn = i as u8 + 1;
+          //println!("i,ch {}, {}", i, ch);
+          let thresh_bits = ((channels & ch) >> (i*2)) as u8;
+          //println!("thresh_bits {}", thresh_bits);
+          if thresh_bits > 0 { // hit over threshold
+            hits.push((dsi, j, chn, LTBThreshold::from(thresh_bits)));
+          }
+        }
+        n_mask += 1;
+      }
+    }
+    hits
+  }
+
   
   /// Get the trigger sources from trigger source byte
   /// FIXME! (Does not return anything)
@@ -625,6 +700,13 @@ impl Serialization for TofEventSummary {
     stream.extend_from_slice(&self.timestamp16.to_le_bytes());
     stream.extend_from_slice(&self.primary_beta.to_le_bytes());
     stream.extend_from_slice(&self.primary_charge.to_le_bytes());
+    stream.extend_from_slice(&self.dsi_j_mask.to_le_bytes());
+    let n_channel_masks = self.channel_mask.len();
+    stream.push(n_channel_masks as u8);
+    for k in 0..n_channel_masks {
+      stream.extend_from_slice(&self.channel_mask[k].to_le_bytes());
+    }
+    stream.extend_from_slice(&self.mtb_link_mask.to_le_bytes());
     let nhits = self.hits.len() as u16;
     stream.extend_from_slice(&nhits.to_le_bytes());
     for k in 0..self.hits.len() {
@@ -652,6 +734,12 @@ impl Serialization for TofEventSummary {
     summary.timestamp16       = parse_u16(stream, pos);
     summary.primary_beta      = parse_u16(stream, pos); 
     summary.primary_charge    = parse_u16(stream, pos); 
+    summary.dsi_j_mask        = parse_u32(stream, pos);
+    let n_channel_masks       = parse_u8(stream, pos);
+    for _ in 0..n_channel_masks {
+      summary.channel_mask.push(parse_u16(stream, pos));
+    }
+    summary.mtb_link_mask     = parse_u64(stream, pos);
     let nhits                 = parse_u16(stream, pos);
     for _ in 0..nhits {
       summary.hits.push(TofHit::from_bytestream(stream, pos)?);
@@ -683,7 +771,20 @@ impl fmt::Display for TofEventSummary {
     repr += &(format!("\n   |-> timestamp48 : {}", self.get_timestamp48())); 
     repr += &(format!("\n  PrimaryBeta      : {}", self.get_beta())); 
     repr += &(format!("\n  PrimaryCharge    : {}", self.primary_charge));
-    repr += &String::from("\n********* HITS *********");
+    repr += &(format!("\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **", self.dsi_j_mask.count_ones()));
+    for k in self.get_trigger_hits() {
+      repr += &(format!("\n  => {}/{}/{} ({}) ", k.0, k.1, k.2, k.3));
+    }
+    repr += "\n  ** ** MTB LINK IDs ** **";
+    let mut mtblink_str = String::from("\n  => ");
+    for k in self.get_rb_link_ids() {
+      mtblink_str += &(format!("{} ", k))
+    }
+    repr += &mtblink_str;
+    repr += &(format!("\n  == Trigger hits {}, expected RBEvents {}",
+            self.get_trigger_hits().len(),
+            self.get_rb_link_ids().len()));
+    repr += &String::from("\n  ** ** ** HITS ** ** **");
     for h in &self.hits {
       repr += &(format!("\n  {}", h));
     }
