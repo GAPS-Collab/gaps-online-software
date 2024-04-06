@@ -10,7 +10,10 @@ pub mod rb_eventmemoryview;
 pub mod data_type;
 pub mod tof_hit;
 
-pub use master_trigger::MasterTriggerEvent;
+pub use master_trigger::{
+    MasterTriggerEvent,
+    TriggerType,
+};
 pub use tof_event::{
     TofEvent,
     TofEventHeader,
@@ -73,6 +76,49 @@ impl fmt::Display for EventStatus {
   }
 }
 
+impl EventStatus {
+  pub fn to_u8(&self) -> u8 {
+    match self {
+      EventStatus::Unknown => {
+        return 0;
+      }
+      EventStatus::CRC32Wrong => {
+        return 10;
+      }
+      EventStatus::TailWrong => {
+        return 11;
+      }
+      EventStatus::ChannelIDWrong => {
+        return 12;
+      }
+      EventStatus::CellSyncErrors => {
+        return 13;
+      }
+      EventStatus::ChnSyncErrors => {
+        return 14;
+      }
+      EventStatus::IncompleteReadout => {
+        return 21;
+      }
+      EventStatus::IncompatibleData => {
+        return 22;
+      }
+      EventStatus::GoodNoCRCOrErrBitCheck => {
+        return 39;
+      }
+      EventStatus::GoodNoCRCCheck => {
+        return 40;
+      }
+      EventStatus::GoodNoErrBitCheck => {
+        return 41;
+      }
+      EventStatus::Perfect => {
+        return 42;
+      }
+    }
+  }
+}
+
 impl From<u8> for EventStatus {
   fn from(value: u8) -> Self {
     match value {
@@ -114,6 +160,17 @@ impl FromRandom for EventStatus {
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
     choices[idx]
+  }
+}
+
+#[test]
+#[cfg(feature = "random")]
+fn test_event_status() {
+  for _ in 0..100 {
+    let ev_stat    = EventStatus::from_random();
+    let ev_stat_u8 = ev_stat.to_u8();
+    let u8_ev_stat = EventStatus::from(ev_stat_u8);
+    assert_eq!(u8_ev_stat, u8_ev_stat);
   }
 }
 

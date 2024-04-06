@@ -131,11 +131,55 @@ impl fmt::Display for TriggerType {
   }
 }
 
+impl TriggerType {
+  pub fn to_u8(&self) -> u8 {
+    match self {
+      TriggerType::Unknown => {
+        return 0;
+      }
+      TriggerType::Poisson => {
+        return 100;
+      }
+      TriggerType::Forced => {
+        return 101;
+      }
+      TriggerType::Any => {
+        return 1;
+      }
+      TriggerType::Track => {
+        return 2;
+      }
+      TriggerType::TrackCentral => {
+        return 3;
+      }
+      TriggerType::Gaps => {
+        return 4;
+      }
+      TriggerType::UmbCube => {
+        return 21;
+      }
+      TriggerType::UmbCubeZ => {
+        return 22; 
+      }
+      TriggerType::UmbCorCube => {
+        return 23;
+      }
+      TriggerType::CorCubeSide => {
+        return 24;
+      }
+      TriggerType::Umb3Cube => {
+        return 25;
+      }
+    }
+  }
+}
+
 impl From<u8> for TriggerType {
   fn from(value: u8) -> Self {
     match value {
       0   => TriggerType::Unknown,
       100 => TriggerType::Poisson,
+      101 => TriggerType::Forced,
       1   => TriggerType::Any,
       2   => TriggerType::Track,
       3   => TriggerType::TrackCentral,
@@ -559,6 +603,16 @@ impl FromRandom for MasterTriggerEvent {
   }
 }
 
+#[test]
+#[cfg(feature = "random")]
+fn test_trigger_type() {
+  for _ in 0..100 {
+    let ttype = TriggerType::from_random();
+    let ttype_u8 = ttype.to_u8();
+    let u8_ttype = TriggerType::from(ttype_u8);
+    assert_eq!(ttype, u8_ttype);
+  }
+}
 
 #[cfg(all(test,feature = "random"))]
 mod test_mastertriggerevent {

@@ -29,7 +29,9 @@ use crate::events::{
     RBEvent,
     TofHit,
     RBWaveform,
-    RBMissingHit
+    RBMissingHit,
+    TriggerType,
+    EventStatus,
 };
 
 // This looks like a TODO
@@ -202,14 +204,20 @@ impl TofEvent {
 
   pub fn get_summary(&self) -> TofEventSummary {
     let mut summary = TofEventSummary::new();
-    //summary.status            = self.header.status;
-    //summary.quality           = self.header.quality;
-    //summary.trigger_setting   = self.;
+    let mut stati = Vec::<u8>::new();
+    for k in &self.rb_events {
+      stati.push(k.status.to_u8());
+    }
+    //summary.status          = self.header.status;
+    //summary.quality         = self.header.quality;
+    //summary.status            = self.header.event_status;
     // FIXME - this is not trigger paddles, but trigger hits!
+    summary.trigger_sources   = self.mt_event.trigger_source;
     summary.n_trigger_paddles = self.mt_event.get_trigger_hits().len() as u8;
     summary.event_id          = self.header.event_id;
-    summary.timestamp32       = self.header.timestamp_32;
-    summary.timestamp16       = self.header.timestamp_16;
+    let mt_timestamp          = self.mt_event.get_timestamp_abs48();
+    summary.timestamp32       = (mt_timestamp & 0x0000ffff ) as u32;
+    summary.timestamp16       = ((mt_timestamp & 0x00ff0000 ) >> 16) as u16;
     summary.primary_beta      = self.header.primary_beta; 
     summary.primary_charge    = self.header.primary_charge; 
     summary.hits              = Vec::<TofHit>::new();
@@ -461,47 +469,28 @@ impl From<&MasterTriggerEvent> for TofEventHeader {
 
 impl fmt::Display for TofEventHeader {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-  let mut repr = String::from("<TofEventHeader"); 
-  repr += &("\n  Run   ID          : ".to_owned() + &self.run_id              .to_string());
-  repr += &("\n  Event ID          : ".to_owned() + &self.event_id            .to_string());
-  repr += &("\n  Timestamp 32      : ".to_owned() + &self.timestamp_32        .to_string());
-  repr += &("\n  Timestamp 16      : ".to_owned() + &self.timestamp_16        .to_string());
-  repr += &("\n  Prim. Beta        : ".to_owned() + &self.primary_beta        .to_string());
-  repr += &("\n  Prim. Beta Unc    : ".to_owned() + &self.primary_beta_unc    .to_string());
-  repr += &("\n  Prim. Charge      : ".to_owned() + &self.primary_charge      .to_string());
-  repr += &("\n  Prim. Charge unc  : ".to_owned() + &self.primary_charge_unc  .to_string());
-  repr += &("\n  Prim. Outer Tof X : ".to_owned() + &self.primary_outer_tof_x .to_string());
-  repr += &("\n  Prim. Outer Tof Y : ".to_owned() + &self.primary_outer_tof_y .to_string());
-  repr += &("\n  Prim. Outer Tof Z : ".to_owned() + &self.primary_outer_tof_z .to_string());
-  repr += &("\n  Prim. Inner Tof X : ".to_owned() + &self.primary_inner_tof_x .to_string());
-  repr += &("\n  Prim. Inner Tof Y : ".to_owned() + &self.primary_inner_tof_y .to_string());
-  repr += &("\n  Prim. Inner Tof Z : ".to_owned() + &self.primary_inner_tof_z .to_string());
-  repr += &("\n  NHit  Outer Tof   : ".to_owned() + &self.nhit_outer_tof      .to_string());
-  repr += &("\n  NHit  Inner Tof   : ".to_owned() + &self.nhit_inner_tof      .to_string());
-  repr += &("\n  TriggerInfo       : ".to_owned() + &self.trigger_info        .to_string());
-  repr += &("\n  Ctr ETX           : ".to_owned() + &self.ctr_etx             .to_string());
-  repr += &("\n  NPaddles          : ".to_owned() + &self.n_paddles           .to_string());
-  repr += ">";
+    let mut repr = String::from("<TofEventHeader"); 
+    repr += &("\n  Run   ID          : ".to_owned() + &self.run_id              .to_string());
+    repr += &("\n  Event ID          : ".to_owned() + &self.event_id            .to_string());
+    repr += &("\n  Timestamp 32      : ".to_owned() + &self.timestamp_32        .to_string());
+    repr += &("\n  Timestamp 16      : ".to_owned() + &self.timestamp_16        .to_string());
+    repr += &("\n  Prim. Beta        : ".to_owned() + &self.primary_beta        .to_string());
+    repr += &("\n  Prim. Beta Unc    : ".to_owned() + &self.primary_beta_unc    .to_string());
+    repr += &("\n  Prim. Charge      : ".to_owned() + &self.primary_charge      .to_string());
+    repr += &("\n  Prim. Charge unc  : ".to_owned() + &self.primary_charge_unc  .to_string());
+    repr += &("\n  Prim. Outer Tof X : ".to_owned() + &self.primary_outer_tof_x .to_string());
+    repr += &("\n  Prim. Outer Tof Y : ".to_owned() + &self.primary_outer_tof_y .to_string());
+    repr += &("\n  Prim. Outer Tof Z : ".to_owned() + &self.primary_outer_tof_z .to_string());
+    repr += &("\n  Prim. Inner Tof X : ".to_owned() + &self.primary_inner_tof_x .to_string());
+    repr += &("\n  Prim. Inner Tof Y : ".to_owned() + &self.primary_inner_tof_y .to_string());
+    repr += &("\n  Prim. Inner Tof Z : ".to_owned() + &self.primary_inner_tof_z .to_string());
+    repr += &("\n  NHit  Outer Tof   : ".to_owned() + &self.nhit_outer_tof      .to_string());
+    repr += &("\n  NHit  Inner Tof   : ".to_owned() + &self.nhit_inner_tof      .to_string());
+    repr += &("\n  TriggerInfo       : ".to_owned() + &self.trigger_info        .to_string());
+    repr += &("\n  Ctr ETX           : ".to_owned() + &self.ctr_etx             .to_string());
+    repr += &("\n  NPaddles          : ".to_owned() + &self.n_paddles           .to_string());
+    repr += ">";
   write!(f,"{}", repr)
-  //run_id       : u32,
-  //event_id     : u32,
-  //timestamp_32 : u32,
-  //timestamp_16 : u16, // -> 14 byres
-  //primary_beta        : u16, 
-  //primary_beta_unc    : u16, 
-  //primary_charge      : u16, 
-  //primary_charge_unc  : u16, 
-  //primary_outer_tof_x : u16, 
-  //primary_outer_tof_y : u16, 
-  //primary_outer_tof_z : u16, 
-  //primary_inner_tof_x : u16, 
-  //primary_inner_tof_y : u16, 
-  //primary_inner_tof_z : u16, //-> 20bytes primary 
-  //nhit_outer_tof       : u8,  
-  //nhit_inner_tof       : u8, 
-  //trigger_info         : u8,
-  //ctr_etx              : u8,
-  //n_paddles           : u8, // we don't have more than 
   }
 }
 
@@ -537,9 +526,9 @@ impl FromRandom for TofEventHeader {
 /// Smaller packet for in-flight telemetry stream
 #[derive(Debug, Clone, PartialEq)]
 pub struct TofEventSummary {
-  pub status            : u8,
+  pub status            : EventStatus,
   pub quality           : u8,
-  pub trigger_setting   : u8,
+  pub trigger_sources   : u16,
   /// the number of triggered paddles coming
   /// from the MTB directly. This might NOT be
   /// the same as the number of hits!
@@ -558,9 +547,9 @@ impl TofEventSummary {
 
   pub fn new() -> Self {
     Self {
-      status            : 0,
+      status            : EventStatus::Unknown,
       quality           : 0,
-      trigger_setting   : 0,
+      trigger_sources   : 0,
       n_trigger_paddles : 0,
       event_id          : 0,
       timestamp32       : 0,
@@ -569,6 +558,34 @@ impl TofEventSummary {
       primary_charge    : 0, 
       hits              : Vec::<TofHit>::new(),
     }
+  }
+  
+  /// Get the trigger sources from trigger source byte
+  /// FIXME! (Does not return anything)
+  pub fn get_trigger_sources(&self) -> Vec<TriggerType> {
+    let mut t_types    = Vec::<TriggerType>::new();
+    let gaps_trigger   = self.trigger_sources >> 5 & 0x1 == 1;
+    if gaps_trigger {
+      t_types.push(TriggerType::Gaps);
+    }
+    let any_trigger    = self.trigger_sources >> 6 & 0x1 == 1;
+    if any_trigger {
+      t_types.push(TriggerType::Any);
+    }
+    let forced_trigger = self.trigger_sources >> 7 & 0x1 == 1;
+    if forced_trigger {
+      t_types.push(TriggerType::Forced);
+    }
+    let track_trigger  = self.trigger_sources >> 8 & 0x1 == 1;
+    if track_trigger {
+      t_types.push(TriggerType::Track);
+    }
+    let central_track_trigger
+                       = self.trigger_sources >> 9 & 0x1 == 1;
+    if central_track_trigger {
+      t_types.push(TriggerType::TrackCentral);
+    }
+    t_types
   }
   
   pub fn get_timestamp48(&self) -> u64 {
@@ -599,11 +616,11 @@ impl Serialization for TofEventSummary {
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::new();
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
-    stream.extend_from_slice(&self.status.to_le_bytes());
-    stream.extend_from_slice(&self.quality.to_le_bytes());
-    stream.extend_from_slice(&self.trigger_setting.to_le_bytes());
+    stream.push(self.status.to_u8());
+    stream.extend_from_slice(&self.trigger_sources.to_le_bytes());
     stream.extend_from_slice(&self.n_trigger_paddles.to_le_bytes());
     stream.extend_from_slice(&self.event_id.to_le_bytes());
+    stream.extend_from_slice(&self.quality.to_le_bytes());
     stream.extend_from_slice(&self.timestamp32.to_le_bytes());
     stream.extend_from_slice(&self.timestamp16.to_le_bytes());
     stream.extend_from_slice(&self.primary_beta.to_le_bytes());
@@ -626,11 +643,11 @@ impl Serialization for TofEventSummary {
       error!("Decoding of HEAD failed! Got {} instead!", head);
       return Err(SerializationError::HeadInvalid);
     }
-    summary.status            = parse_u8(stream, pos);
-    summary.quality           = parse_u8(stream, pos);
-    summary.trigger_setting   = parse_u8(stream, pos);
+    summary.status            = EventStatus::from(parse_u8(stream, pos));
+    summary.trigger_sources   = parse_u16(stream, pos);
     summary.n_trigger_paddles = parse_u8(stream, pos);
     summary.event_id          = parse_u32(stream, pos);
+    summary.quality           = parse_u8(stream, pos);
     summary.timestamp32       = parse_u32(stream, pos);
     summary.timestamp16       = parse_u16(stream, pos);
     summary.primary_beta      = parse_u16(stream, pos); 
@@ -657,8 +674,8 @@ impl Default for TofEventSummary {
 impl fmt::Display for TofEventSummary {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<TofEventSummary");
-    repr += &(format!("\n  Status           : {}", self.status));
-    repr += &(format!("\n  TriggerSetting   : {}", self.trigger_setting));
+    repr += &(format!("\n  EventStatus      : {}", self.status));
+    repr += &(format!("\n  TriggerSources   : {:?}", self.get_trigger_sources()));
     repr += &(format!("\n  NTrigPaddles     : {}", self.n_trigger_paddles));
     repr += &(format!("\n  EventID          : {}", self.event_id));
     repr += &(format!("\n  timestamp32      : {}", self.timestamp32)); 
@@ -681,9 +698,9 @@ impl FromRandom for TofEventSummary {
     let mut summary = Self::new();
     let mut rng     = rand::thread_rng();
 
-    summary.status            = rng.gen::<u8>();
+    summary.status            = EventStatus::from_random();
     summary.quality           = rng.gen::<u8>();
-    summary.trigger_setting   = rng.gen::<u8>();
+    summary.trigger_sources   = rng.gen::<u16>();
     summary.n_trigger_paddles = rng.gen::<u8>();
     summary.event_id          = rng.gen::<u32>();
     summary.timestamp32       = rng.gen::<u32>();
