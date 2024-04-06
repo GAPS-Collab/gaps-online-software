@@ -553,7 +553,7 @@ struct TofEventSummary {
 
   u8          status            ; 
   u8          quality           ; 
-  u8          trigger_setting   ; 
+  u16         trigger_sources   ; 
   /// the number of triggered paddles coming
   /// from the MTB directly. This might NOT be
   /// the same as the number of hits!
@@ -565,6 +565,9 @@ struct TofEventSummary {
   u16         primary_beta      ; 
   /// reconstructed primary charge
   u16         primary_charge    ; 
+  u32         dsi_j_mask        ;
+  Vec<u16>    channel_mask      ;
+  u64         mtb_link_mask     ;
   Vec<TofHit> hits              ;
   
   static TofEventSummary from_bytestream(const Vec<u8> &stream, 

@@ -227,7 +227,7 @@ PYBIND11_MODULE(gaps_tof, m) {
       .def_readonly("adc"                ,&RBWaveform::adc,
            "Channel adc")
       .def("from_bytestream"            , &RBWaveform::from_bytestream,
-           "deserialize TofEventSummary from a list of bytes")
+           "deserialize RBWaveform from a list of bytes")
       .def("__repr__",        [](const RBWaveform &wf) {
                                  return wf.to_string(); 
                                  }) 
@@ -239,8 +239,8 @@ PYBIND11_MODULE(gaps_tof, m) {
            "Event Status byte")
       .def_readonly("quality"           ,&TofEventSummary::quality,
            "Event Quality byte")
-      .def_readonly("trigger_setting"   ,&TofEventSummary::trigger_setting,
-           "Active Trigger Setting")
+      .def_readonly("trigger_sources"   ,&TofEventSummary::trigger_sources,
+           "Active Trigger Sources")
       .def_readonly("n_trigger_paddles" ,&TofEventSummary::n_trigger_paddles,
            "Number of triggered paddles (hits)")
       .def_readonly("event_id"          ,&TofEventSummary::event_id,
@@ -249,8 +249,11 @@ PYBIND11_MODULE(gaps_tof, m) {
            "Timestamp 16bit (slow)")
       .def_readonly("timestamp32"       ,&TofEventSummary::timestamp32,
            "Timestamp 32bit (fast)")
+      .def_readonly("primary_beta"      ,&TofEventSummary::primary_beta,
+           "Beta from online track reconstruction. This might be a crude approximation")
       .def_property_readonly("timestamp48",   &TofEventSummary::get_timestamp48,
            "Complete timestamp (48 bits)")
+      
       //.def_property_readonly("primary_beta",  &TofEventSummary::get_prim,
       //     "Complete timestamp (48 bits)")
       // primary charge and beta missing

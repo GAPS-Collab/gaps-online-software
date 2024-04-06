@@ -1040,14 +1040,19 @@ TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream,
     //return Err(SerializationError::HeadInvalid);
   }
   tes.status            = Gaps::parse_u8(stream, pos);
-  tes.quality           = Gaps::parse_u8(stream, pos);
-  tes.trigger_setting   = Gaps::parse_u8(stream, pos);
+  tes.trigger_sources   = Gaps::parse_u16(stream, pos);
   tes.n_trigger_paddles = Gaps::parse_u8(stream, pos);
   tes.event_id          = Gaps::parse_u32(stream, pos);
+  tes.quality           = Gaps::parse_u8(stream, pos);
   tes.timestamp32       = Gaps::parse_u32(stream, pos);
   tes.timestamp16       = Gaps::parse_u16(stream, pos);
   tes.primary_beta      = Gaps::parse_u16(stream, pos); 
   tes.primary_charge    = Gaps::parse_u16(stream, pos); 
+  u8 n_channel_masks    = Gaps::parse_u8(stream, pos);
+  for (u8 k=0;k<n_channel_masks;k++) {
+    tes.channel_mask.push_back(Gaps::parse_u16(stream, pos));
+  }
+  tes.mtb_link_mask     = Gaps::parse_u64(stream, pos);
   u16 nhits             = Gaps::parse_u16(stream, pos);
   for (u16 k=0; k<nhits; k++) {
     TofHit h = TofHit::from_bytestream(stream, pos);
@@ -1069,7 +1074,7 @@ std::string TofEventSummary::to_string() const {
   //repr += std::format("\n  format test {:.2f}", get_time_a() );
   repr += std::format("\n  Status             : {}", status);
   repr += std::format("\n  Quality            : {}", quality);
-  repr += std::format("\n  Trigger            : {}", trigger_setting);
+  repr += std::format("\n  Trigger Sources    : {}", trigger_sources);
   repr += std::format("\n  N trig paddles     : {}", n_trigger_paddles);
   repr += std::format("\n  Event ID           : {}", event_id);
   repr += std::format("\n  timestamp32        : {}", timestamp32)      ;
@@ -1078,6 +1083,22 @@ std::string TofEventSummary::to_string() const {
   repr += std::format("\n  NHits       (reco) : {}", hits.size());
   repr += std::format("\n  Prim Beta   (reco) : {}", primary_beta);
   repr += std::format("\n  Prim Charge (reco) : {}", primary_beta);
+  //repr += std::format("\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **", self.dsi_j_mask.count_ones()));
+  //for k in self.get_trigger_hits() {
+  //  repr += &(format!("\n  => {}/{}/{} ({}) ", k.0, k.1, k.2, k.3));
+  //}
+  //repr += "\n  ** ** MTB LINK IDs ** **";
+  //let mut mtblink_str = String::from("\n  => ");
+  //for k in self.get_rb_link_ids() {
+  //  mtblink_str += &(format!("{} ", k))
+  //}
+  //repr += &mtblink_str;
+  //repr += &(format!("\n  == Trigger hits {}, expected RBEvents {}",
+  //        self.get_trigger_hits().len(),
+  //        self.get_rb_link_ids().len()));
+  //repr += &String::from("\n  ** ** ** HITS ** ** **");
+
+
   repr += "\n  **** **** ****";
   for (auto const &h : hits) {
     repr += std::format("\n  {}",h.to_string()); 
