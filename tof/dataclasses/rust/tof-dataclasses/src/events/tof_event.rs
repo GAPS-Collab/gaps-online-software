@@ -614,8 +614,26 @@ impl TofEventSummary {
     //println!("We see LTB Channels {:?} with Hit masks {:?} for {} masks requested by us!", self.dsi_j_mask, self.channel_mask, n_masks_needed);
     for k in 0..32 {
       if (self.dsi_j_mask >> k) as u32 & 0x1 == 1 {
-        let dsi = (k as f32 / 4.0).floor() as u8 + 1;       
-        let j   = (k % 5) as u8 + 1;
+        let mut dsi = 0u8;
+        let mut j   = 0u8;
+        if k < 5 {
+          dsi = 1;
+          j   = k as u8 + 1;
+        } else if k < 10 {
+          dsi = 2;
+          j   = k as u8 - 5 + 1;
+        } else if k < 15 {
+          dsi = 3;
+          j   = k as u8- 10 + 1;
+        } else if k < 20 {
+          dsi = 4;
+          j   = k as u8- 15 + 1;
+        } else if k < 25 {
+          dsi = 5;
+          j   = k as u8 - 20 + 1;
+        } 
+        //let dsi = (k as f32 / 4.0).floor() as u8 + 1;       
+        //let j   = (k % 5) as u8 + 1;
         //println!("n_mask {n_mask}");
         let channels = self.channel_mask[n_mask]; 
         for (i,ch) in LTB_CHANNELS.iter().enumerate() {
@@ -626,6 +644,7 @@ impl TofEventSummary {
           //println!("thresh_bits {}", thresh_bits);
           if thresh_bits > 0 { // hit over threshold
             hits.push((dsi, j, chn, LTBThreshold::from(thresh_bits)));
+            
           }
         }
         n_mask += 1;
@@ -808,6 +827,12 @@ impl FromRandom for TofEventSummary {
     summary.timestamp16       = rng.gen::<u16>();
     summary.primary_beta      = rng.gen::<u16>(); 
     summary.primary_charge    = rng.gen::<u16>(); 
+    summary.dsi_j_mask        = rng.gen::<u32>();
+    let n_channel_masks       = rng.gen::<u8>();
+    for _ in 0..n_channel_masks {
+      summary.channel_mask.push(rng.gen::<u16>());
+    }
+    summary.mtb_link_mask     = rng.gen::<u64>();
     let nhits                 = rng.gen::<u8>();
     for _ in 0..nhits {
       summary.hits.push(TofHit::from_random());

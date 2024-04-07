@@ -23,7 +23,10 @@ use crate::serialization::{
 };
 
 //use crate::DsiLtbRBMapping;
-use crate::events::EventStatus;
+use crate::events::{
+    EventStatus,
+    TofEventSummary,
+};
 
 //use crate::events::RBMissingHit;
 //use crate::constants::{
@@ -381,10 +384,30 @@ impl MasterTriggerEvent {
     trace!("ltb channels {:?}", self.dsi_j_mask);
     trace!("hit masks {:?}", self.channel_mask); 
     //println!("We see LTB Channels {:?} with Hit masks {:?} for {} masks requested by us!", self.dsi_j_mask, self.channel_mask, n_masks_needed);
+    
+    // one k here is for one ltb
     for k in 0..32 {
       if (self.dsi_j_mask >> k) as u32 & 0x1 == 1 {
-        let dsi = (k as f32 / 4.0).floor() as u8 + 1;       
-        let j   = (k % 5) as u8 + 1;
+        let mut dsi = 0u8;
+        let mut j   = 0u8;
+        if k < 5 {
+          dsi = 1;
+          j   = k as u8 + 1;
+        } else if k < 10 {
+          dsi = 2;
+          j   = k as u8 - 5 + 1;
+        } else if k < 15 {
+          dsi = 3;
+          j   = k as u8- 10 + 1;
+        } else if k < 20 {
+          dsi = 4;
+          j   = k as u8- 15 + 1;
+        } else if k < 25 {
+          dsi = 5;
+          j   = k as u8 - 20 + 1;
+        } 
+        //let dsi = (k as f32 / 4.0).floor() as u8 + 1;       
+        //let j   = (k % 5) as u8 + 1;
         //println!("n_mask {n_mask}");
         let channels = self.channel_mask[n_mask]; 
         for (i,ch) in LTB_CHANNELS.iter().enumerate() {
@@ -398,7 +421,9 @@ impl MasterTriggerEvent {
           }
         }
         n_mask += 1;
-      }
+      } // next ltb
+
+
     }
     hits
   }
@@ -575,6 +600,20 @@ impl fmt::Display for MasterTriggerEvent {
             self.get_rb_link_ids().len()));
     repr += ">";
     write!(f,"{}", repr)
+  }
+}
+
+impl From<&TofEventSummary> for MasterTriggerEvent {
+  fn from(tes: &TofEventSummary) -> Self {
+    let mut mte = MasterTriggerEvent::new();
+    mte.event_status   = tes.status;
+    mte.trigger_source = tes.trigger_sources;
+    mte.tiu_gps32      = tes.timestamp32;
+    mte.tiu_gps16      = tes.timestamp16;
+    mte.dsi_j_mask     = tes.dsi_j_mask;
+    mte.channel_mask   = tes.channel_mask.clone(); 
+    mte.mtb_link_mask  = tes.mtb_link_mask;
+    mte
   }
 }
 
