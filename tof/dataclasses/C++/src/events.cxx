@@ -1048,6 +1048,7 @@ TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream,
   tes.timestamp16       = Gaps::parse_u16(stream, pos);
   tes.primary_beta      = Gaps::parse_u16(stream, pos); 
   tes.primary_charge    = Gaps::parse_u16(stream, pos); 
+  tes.dsi_j_mask        = Gaps::parse_u32(stream, pos);
   u8 n_channel_masks    = Gaps::parse_u8(stream, pos);
   for (u8 k=0;k<n_channel_masks;k++) {
     tes.channel_mask.push_back(Gaps::parse_u16(stream, pos));
