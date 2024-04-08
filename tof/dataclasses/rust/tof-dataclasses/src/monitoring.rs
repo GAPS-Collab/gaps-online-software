@@ -65,13 +65,13 @@ use crate::serialization::{
 };
 
 // re-export
-//pub use crate::series::{
-//  Series,
-//  PAMoniDataSeries,
-//  PBMoniDataSeries,
-//  LTBMoniDataSeries,
-//  RBMoniDataSeries
-//};
+pub use crate::series::{
+  Series,
+  PAMoniDataSeries,
+  PBMoniDataSeries,
+  LTBMoniDataSeries,
+  RBMoniDataSeries
+};
 
 pub trait HasBoardId {
   fn get_board_id(&self) -> u8;

@@ -37,6 +37,7 @@ pub mod run;
 pub mod io;
 pub mod analysis;
 pub mod ipbus;
+pub mod series;
 
 #[macro_use] extern crate log;
 
