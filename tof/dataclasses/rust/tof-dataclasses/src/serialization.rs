@@ -10,7 +10,11 @@ use std::path::Path;
 
 use std::collections::VecDeque;
 
-use crate::packets::TofPacket;
+use crate::packets::{
+    TofPacket,
+    PacketType,
+};
+
 
 /// Convert a vector of u16 into a vector of u8
 ///
@@ -193,6 +197,23 @@ pub fn get_json_from_file(filename : &Path)
   let file_content = std::fs::read_to_string(filename)?;
   let config = serde_json::from_str(&file_content)?;
   Ok(config)
+}
+
+
+/// Can be wrapped within a TofPacket. To do, we just have
+/// to define a packet type
+pub trait Packable {
+  const PACKET_TYPE : PacketType;
+
+  /// Wrap myself in a TofPacket
+  fn pack(&self) -> TofPacket 
+    where Self: Serialization {
+    let mut tp     = TofPacket::new();
+    tp.payload     = self.to_bytestream();
+    //tp.packet_type = self.get_packet_type();
+    tp.packet_type = Self::PACKET_TYPE;
+    tp
+  }
 }
 
 
