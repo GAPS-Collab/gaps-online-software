@@ -26,6 +26,12 @@ use chrono::{
 
 use crate::calibrations::RBCalibrations;
 
+
+/// This will hold a map of dsi,j,ch to 
+/// Paddle ID, Panel ID
+#[cfg(feature = "database")]
+pub type DsiJChPidMapping = DsiLtbRBMapping; 
+
 pub fn get_pid_from_pend(pend : u16) -> Option<u8> {
   if pend < 1000 {
     return None;
@@ -44,6 +50,64 @@ pub fn get_linkid_rbid_map(rbs : &Vec<ReadoutBoard>) -> HashMap<u8, u8>{
     mapping.insert(rb.mtb_link_id, rb.rb_id);
   }
   mapping
+}
+
+#[cfg(feature = "database")]
+pub fn get_dsi_j_ch_pid_map(filename : &Path) -> DsiJChPidMapping {
+  let mut map     = DsiJChPidMapping::new();
+  for dsi in 1..6 {
+    let mut jmap = HashMap::<u8, HashMap<u8, (u8, u8)>>::new();
+    for j in 1..6 {
+      let mut rbidch_map : HashMap<u8, (u8,u8)> = HashMap::new();
+      for ch in 1..17 {
+        let rbidch = (0,0);
+        rbidch_map.insert(ch,rbidch);
+        //map[dsi] = 
+      }
+      jmap.insert(j,rbidch_map);
+    }
+    map.insert(dsi,jmap);
+  }
+  let ltb_rb_map  = get_dsi_j_ltbch_vs_rbch_map(filename);
+  let connection = sqlite::open(filename).unwrap();
+  for dsi in 1..6 {
+    for j in 1..6 { 
+      for ch in 1..17 {
+        let (rb_id, rb_ch) = ltb_rb_map[&dsi][&j][&ch];
+        let query = format!("SELECT * FROM tof_db_paddleend where rb_id == {} and rb_ch == {}", rb_id, rb_ch);
+        match connection.iterate(query, |pairs| {
+          for &(name, value) in pairs.iter() {
+            match value {
+              None    => {continue;},
+              Some(v) => {
+                //println!("{} = {}", name, v);
+                match name {
+                  "paddle_id"  => {
+                    let paddle_id = u8::from_str(v).unwrap_or(0);
+                    map.get_mut(&dsi).unwrap().get_mut(&j).unwrap().get_mut(&ch).unwrap().0 = paddle_id; 
+                  },
+                  "panel_id"   => {
+                    let panel_id  = u8::from_str(v).unwrap_or(0);
+                    map.get_mut(&dsi).unwrap().get_mut(&j).unwrap().get_mut(&ch).unwrap().1 = panel_id; 
+                  },
+                  _ => {warn!("Found name {}, but not mapping it to self!", name);}                         
+                }
+              }
+            }
+          } // end loop over rbs
+          true
+        }) {
+          Err(err) => {
+            error!("Unable to query DB! {err}");
+          },
+          Ok(_) => {
+            debug!("DB query successful!");
+          }
+        }
+      }
+    }
+  }
+  map
 }
 
 /// Summary of DSI/J/LTBCH (0-319)
@@ -169,9 +233,9 @@ pub struct LocalTriggerBoard {
   pub ltb_id        : u8, 
   pub ltb_dsi       : u8, 
   pub ltb_j         : u8,
-  // rb id for ltb channel
+  /// rb id for ltb channel
   pub ltb_ch_rb_id  : [u8;16],
-  // rb channel for ltb channel
+  /// rb channel for ltb channel
   pub ltb_ch_rb_ch  : [u8;16]
 }
 
