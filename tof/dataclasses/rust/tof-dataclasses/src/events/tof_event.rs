@@ -19,12 +19,14 @@ cfg_if::cfg_if! {
 //use crate::DsiLtbRBMapping;
 use crate::serialization::{
     Serialization,
+    Packable,
     parse_u8,
     parse_u16,
     parse_u32,
     parse_u64,
     search_for_u16
 };
+use crate::packets::PacketType;
 use crate::errors::SerializationError;
 
 use crate::events::{
@@ -172,11 +174,6 @@ impl TofEvent {
     self.mt_event.get_rb_link_ids().len() == self.rb_events.len()
   }
   
-  //pub fn is_complete_from_map(&self, dsimap : &DsiLtbRBMapping) -> bool {
-  //  //self.mt_event.get_n_rbs_exp_from_map(dsimap)  as usize == self.rb_events.len()
-  //  self.mt_event.get_rb_link_ids().len() == self.rb_events.len()
-  //}
-
   /// Encode the sizes of the vectors holding the 
   /// into an u32
   ///
@@ -240,6 +237,10 @@ impl TofEvent {
     summary
   }
 
+}
+
+impl Packable for TofEvent {
+  const PACKET_TYPE : PacketType = PacketType::TofEvent;
 }
 
 impl Serialization for TofEvent {
@@ -700,6 +701,10 @@ impl TofEventSummary {
   pub fn get_beta(&self) -> f32 {
     self.primary_beta as f32/u32::MAX as f32 
   }
+}
+
+impl Packable for TofEventSummary {
+  const PACKET_TYPE        : PacketType = PacketType::TofEventSummary;
 }
 
 impl Serialization for TofEventSummary {

@@ -34,6 +34,7 @@ use crate::serialization::{
     u8_to_u16,
     Serialization,
     SerializationError,
+    Packable,
     parse_u8,
     parse_u16,
     parse_u32,
@@ -60,6 +61,7 @@ cfg_if::cfg_if! {
 /// These hits have been seen by the MTB, but we are unable to determine where 
 /// they are coming from, why they are there or we simply have lost the RB 
 /// information for these hits.
+#[deprecated(since = "0.10.0", note="feature was never really used")]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBMissingHit {
   pub event_id      : u32,
@@ -357,15 +359,6 @@ impl RBEvent {
     Ok(event_id)
   }
 
-  //pub fn get_nchan(&self) -> usize {
-  //  let mut nchan = 0usize;
-  //  if self.ch9_adc.len() > 0 {
-  //    nchan += 1;
-  //  }
-  //  nchan += self.adc.len();
-  //  nchan
-  //}
-  
   pub fn get_ndatachan(&self) -> usize {
     self.adc.len()
   }
@@ -493,6 +486,10 @@ impl RBEvent {
   //  }
   //  Ok(event)
   //}
+}
+
+impl Packable for RBEvent {
+  const PACKET_TYPE : PacketType = PacketType::RBEvent;
 }
 
 impl Serialization for RBEvent {
@@ -1142,6 +1139,10 @@ impl RBWaveform {
       adc        : Vec::<u16>::new(),
     }
   }
+}
+
+impl Packable for RBWaveform {
+  const PACKET_TYPE : PacketType = PacketType::RBWaveform;
 }
 
 impl Serialization for RBWaveform {

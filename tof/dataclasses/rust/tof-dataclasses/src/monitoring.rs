@@ -9,6 +9,9 @@
 //! [GAPS wiki](https://gaps1.astro.ucla.edu/wiki/gaps/index.php?title=TOF_environmental_sensors)
 
 use std::fmt;
+//use std::collections::HashMap;
+
+use crate::packets::PacketType;
 
 // Takeru's tof-control code
 #[cfg(feature = "tof-control")]
@@ -54,12 +57,25 @@ use tof_control::helper::cpu_type::{
 use crate::serialization::{
     Serialization,
     SerializationError,
+    Packable,
     parse_u8,
     parse_u16,
     parse_u32,
     parse_f32
 };
 
+// re-export
+//pub use crate::series::{
+//  Series,
+//  PAMoniDataSeries,
+//  PBMoniDataSeries,
+//  LTBMoniDataSeries,
+//  RBMoniDataSeries
+//};
+
+pub trait HasBoardId {
+  fn get_board_id(&self) -> u8;
+}
 
 /// Sensors on the power boards (PB)
 ///
@@ -203,6 +219,10 @@ impl FromRandom for PBMoniData {
   }
 }
 
+impl Packable for PBMoniData {
+  const PACKET_TYPE : PacketType = PacketType::PBMoniData;
+}
+
 impl Serialization for PBMoniData {
   
   const HEAD : u16 = 0xAAAA;
@@ -296,6 +316,8 @@ impl PAMoniData {
     }
   }
 
+  
+
   #[cfg(feature = "tof-control")]
   pub fn add_temps(&mut self, pt : &PreampTemp ) {
     self.temps = pt.preamp_temps;
@@ -304,6 +326,12 @@ impl PAMoniData {
   #[cfg(feature = "tof-control")]
   pub fn add_biases(&mut self, pb : &PreampReadBias) {
     self.biases = pb.read_biases;
+  }
+}
+
+impl HasBoardId for PAMoniData {
+  fn get_board_id(&self) -> u8 {
+    return self.board_id;
   }
 }
 
@@ -404,6 +432,10 @@ impl FromRandom for PAMoniData {
   }
 }
 
+impl Packable for PAMoniData {
+  const PACKET_TYPE : PacketType = PacketType::PAMoniData;
+}
+
 impl Serialization for PAMoniData {
   
   const HEAD : u16 = 0xAAAA;
@@ -491,7 +523,7 @@ impl fmt::Display for LTBMoniData {
   TRENZ TMP : {:.2} [\u{00B0}C]
   LTB   TMP : {:.2} [\u{00B0}C]
   ** Threshold Voltages **
-  THR1, THR2, THR3 : {:.3} | {:.3} | {:.3} [V]>",
+  THR HIT, THR BETA, THR VETO : {:.3} | {:.3} | {:.3} [mV]>",
   self.board_id,
   self.trenz_temp,
   self.ltb_temp,
@@ -515,6 +547,10 @@ impl FromRandom for LTBMoniData {
     }
     moni
   }
+}
+
+impl Packable for LTBMoniData {
+  const PACKET_TYPE : PacketType = PacketType::LTBMoniData;
 }
 
 impl Serialization for LTBMoniData {
@@ -827,6 +863,9 @@ impl FromRandom for RBMoniData {
   }
 }
 
+impl Packable for RBMoniData {
+  const PACKET_TYPE : PacketType = PacketType::RBMoni;
+}
 
 impl Serialization for RBMoniData {
   
@@ -1008,6 +1047,10 @@ impl fmt::Display for CPUMoniData {
   }
 }
 
+impl Packable for CPUMoniData {
+  const PACKET_TYPE : PacketType = PacketType::CPUMoniData;
+}
+
 impl Serialization for CPUMoniData {
   
   const SIZE : usize = 41;
@@ -1146,6 +1189,10 @@ impl fmt::Display for MtbMoniData {
            MtbMoniData::adc_vcc_conversion(self.vccbram   ),
            )
   }
+}
+
+impl Packable for MtbMoniData {
+  const PACKET_TYPE : PacketType = PacketType::MonitorMtb;
 }
 
 impl Serialization for MtbMoniData {

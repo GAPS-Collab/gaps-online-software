@@ -9,6 +9,7 @@
 //! per board and is an automated 
 //! process.
 //!
+
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::Path;
@@ -26,6 +27,7 @@ use crate::constants::{NWORDS, NCHN};
 use crate::errors::{WaveformError,
                     CalibrationError};
 use crate::serialization::{Serialization,
+                           Packable,
                            parse_bool,
                            parse_u8,
                            parse_u16,
@@ -35,8 +37,11 @@ use crate::serialization::{Serialization,
 use crate::events::RBEvent;
 use crate::events::rb_event::unpack_traces_f32;
 
-use crate::packets::{PacketType,
-                     TofPacket};
+use crate::packets::{
+    PacketType,
+    TofPacket
+};
+
 use crate::io::{
     read_file,
     TofPacketReader,
@@ -1248,6 +1253,10 @@ impl RBCalibrations {
   self.rb_id = rb_id;
   rb_id
   }
+}
+
+impl Packable for RBCalibrations {
+  const PACKET_TYPE : PacketType = PacketType::RBCalibration;
 }
 
 impl Serialization for RBCalibrations {

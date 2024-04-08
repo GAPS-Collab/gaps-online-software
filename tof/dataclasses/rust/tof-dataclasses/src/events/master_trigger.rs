@@ -14,12 +14,17 @@ use std::fmt;
 
 use crate::serialization::{
     Serialization,
+    Packable,
     SerializationError,
     search_for_u16,
     parse_u8,
     parse_u16,
     parse_u32,
     parse_u64,
+};
+
+use crate::packets::{
+  PacketType
 };
 
 //use crate::DsiLtbRBMapping;
@@ -491,6 +496,11 @@ impl MasterTriggerEvent {
   }
 }
 
+impl Packable for MasterTriggerEvent {
+  const PACKET_TYPE : PacketType = PacketType::MasterTrigger;
+}
+
+
 impl Serialization for MasterTriggerEvent {
   
   /// Variable size
@@ -605,8 +615,9 @@ impl fmt::Display for MasterTriggerEvent {
 
 impl From<&TofEventSummary> for MasterTriggerEvent {
   fn from(tes: &TofEventSummary) -> Self {
-    let mut mte = MasterTriggerEvent::new();
+    let mut mte        = MasterTriggerEvent::new();
     mte.event_status   = tes.status;
+    mte.event_id       = tes.event_id;
     mte.trigger_source = tes.trigger_sources;
     mte.tiu_gps32      = tes.timestamp32;
     mte.tiu_gps16      = tes.timestamp16;
