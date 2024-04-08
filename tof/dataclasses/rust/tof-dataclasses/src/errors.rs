@@ -121,6 +121,7 @@ pub enum SerializationError {
   ValueNotFound,
   EventFragment,
   UnknownPayload,
+  IncorrectPacketType,
   WrongByteSize,
   JsonDecodingError,
   TomlDecodingError,
