@@ -251,6 +251,9 @@ PYBIND11_MODULE(gaps_tof, m) {
            "Timestamp 32bit (fast)")
       .def_readonly("primary_beta"      ,&TofEventSummary::primary_beta,
            "Beta from online track reconstruction. This might be a crude approximation")
+      .def("get_trigger_hits"           , &TofEventSummary::get_trigger_hits, "Get the hits in dsi,j,channel, threshold format whcih formed the trigger")
+      .def("get_rb_link_ids"            , &TofEventSummary::get_rb_link_ids, "Get the Link IDS of the RBs with expected hits within the trigger integration window") 
+      .def("get_trigger_sources"        , &TofEventSummary::get_trigger_sources, "Return all active triggers for this event") 
       .def_property_readonly("timestamp48",   &TofEventSummary::get_timestamp48,
            "Complete timestamp (48 bits)")
       

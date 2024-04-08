@@ -326,6 +326,13 @@ struct MasterTriggerEvent {
   
   MasterTriggerEvent();
   
+  /// The combined GPS 48bit timestamp
+  /// into a 48bit timestamp
+  u64 get_timestamp_gps48() const;
+
+  /// Get absolute timestamp as sent by the GPS
+  u64 get_timestamp_abs48() const;
+  
   Vec<u8> get_rb_link_ids() const;
   
   /// Get the combination of triggered DSI/J/CH on 
@@ -342,12 +349,6 @@ struct MasterTriggerEvent {
   ///   Vec<(hit)> where hit is (DSI, J, CH) 
   Vec<std::tuple<u8, u8, u8, LTBThreshold>> get_trigger_hits() const;
 
-  /// The combined GPS 48bit timestamp
-  /// into a 48bit timestamp
-  u64 get_timestamp_gps48() const;
-
-  /// Get absolute timestamp as sent by the GPS
-  u64 get_timestamp_abs48() const;
 
   /// Get the trigger sources from trigger source byte
   Vec<TriggerType> get_trigger_sources() const; 
@@ -574,6 +575,26 @@ struct TofEventSummary {
                                          u64 &pos);
   // combined timestamp
   u64  get_timestamp48()    const;
+ 
+  Vec<u8> get_rb_link_ids() const;
+  
+  /// Get the combination of triggered DSI/J/CH on 
+  /// the MTB which formed the trigger. This does 
+  /// not include further hits which fall into the 
+  /// integration window. For those, se rb_link_mask
+  ///
+  /// The returned values follow the TOF convention
+  /// to start with 1, so that we can use them to 
+  /// look up LTB ids in the db.
+  ///
+  /// # Returns
+  ///
+  ///   Vec<(hit)> where hit is (DSI, J, CH) 
+  Vec<std::tuple<u8, u8, u8, LTBThreshold>> get_trigger_hits() const;
+
+
+  /// Get the trigger sources from trigger source byte
+  Vec<TriggerType> get_trigger_sources() const; 
   
   std::string to_string() const;
 };

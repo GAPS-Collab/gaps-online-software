@@ -740,9 +740,24 @@ Vec<std::tuple<u8, u8, u8, LTBThreshold>> MasterTriggerEvent::get_trigger_hits()
   u8 n_mask = 0;
   for (u8 k=0;k<32;k++) {
     if ((u32)((dsi_j_mask >> k) & 0x1) == 1) {
-      u8 dsi = (u8)std::floor(((f32) k/ 4.0))  + 1;       
-      u8 j   = (k % 5)  + 1;
-      //println!("n_mask {n_mask}");
+      u8 dsi = 0;
+      u8 j   = 0;
+      if (k < 5) {
+        dsi = 1;
+        j   = k  + 1;
+      } else if (k < 10) {
+        dsi = 2;
+        j   = k  - 5 + 1;
+      } else if (k < 15) {
+        dsi = 3;
+        j   = k - 10 + 1;
+      } else if (k < 20) {
+        dsi = 4;
+        j   = k - 15 + 1;
+      } else if (k < 25) {
+        dsi = 5;
+        j   = k - 20 + 1;
+      } 
       u32 channels = channel_mask[n_mask]; 
       for (u8 i=0;i<8; i++) {
         u32 ch  = LTB_CHANNELS[i];
@@ -1030,7 +1045,94 @@ std::string RBWaveform::to_string() const {
   repr += ">";
   return repr;
 }
-  
+
+Vec<TriggerType> TofEventSummary::get_trigger_sources() const {
+  auto t_types = Vec<TriggerType>();
+  u16 gaps_trigger = (trigger_sources >> 5 & 0x1) == 1;
+  if (gaps_trigger) {
+    t_types.push_back(TriggerType::Gaps);
+  }
+  u16 any_trigger    = (trigger_sources >> 6 & 0x1) == 1;
+  if (any_trigger) {
+    t_types.push_back(TriggerType::Any);
+  }
+  u16 forced_trigger = (trigger_sources >> 7 & 0x1) == 1;
+  if (forced_trigger) {
+    t_types.push_back(TriggerType::Forced);
+  }
+  u16 track_trigger  = (trigger_sources >> 8 & 0x1) == 1;
+  if (track_trigger) {
+    t_types.push_back(TriggerType::Track);
+  }
+  u16 central_track_trigger
+                     = (trigger_sources >> 9 & 0x1) == 1;
+  if (central_track_trigger) {
+    t_types.push_back(TriggerType::TrackCentral);
+  }
+  return t_types;
+} 
+
+Vec<std::tuple<u8, u8, u8, LTBThreshold>> TofEventSummary::get_trigger_hits() const {
+  auto hits = Vec<std::tuple<u8,u8,u8,LTBThreshold>>(); 
+  //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
+  auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
+  u32 n_masks_needed   = dsi_j_mask_bits.count();
+  if (channel_mask.size() < n_masks_needed) {
+    log_error("We need " << n_masks_needed << " hit masks, but only have " << channel_mask.size() << "! This is bad!");
+    return hits;
+  }
+  u8 n_mask = 0;
+  for (u8 k=0;k<32;k++) {
+    if ((u32)((dsi_j_mask >> k) & 0x1) == 1) {
+      u8 dsi = 0;
+      u8 j   = 0;
+      if (k < 5) {
+        dsi = 1;
+        j   = k  + 1;
+      } else if (k < 10) {
+        dsi = 2;
+        j   = k  - 5 + 1;
+      } else if (k < 15) {
+        dsi = 3;
+        j   = k - 10 + 1;
+      } else if (k < 20) {
+        dsi = 4;
+        j   = k - 15 + 1;
+      } else if (k < 25) {
+        dsi = 5;
+        j   = k - 20 + 1;
+      } 
+      //println!("n_mask {n_mask}");
+      u32 channels = channel_mask[n_mask]; 
+      for (u8 i=0;i<8; i++) {
+        u32 ch  = LTB_CHANNELS[i];
+        u32 chn = i + 1; 
+        //for (i,ch) in LTB_CHANNELS.iter().enumerate() {
+        //let chn = ch + 1;
+        //println!("i,ch {}, {}", i, ch);
+        u32 thresh_bits = (u8)(channels & (ch) >> (i*2));
+        //println!("thresh_bits {}", thresh_bits);
+        if (thresh_bits > 0) { // hit over threshold
+          hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
+        }
+      }
+      n_mask += 1;
+    }
+  }
+  return hits;
+}
+
+Vec<u8> TofEventSummary::get_rb_link_ids() const {
+  auto links = Vec<u8>();
+  for (u8 k=0;k<64;k++) {
+    if (((u64)(mtb_link_mask >> k) & (u64)0x1) == 1) {
+      links.push_back(k);
+    }
+  }
+  return links;
+}
+
+
 TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream, 
                                                  u64 &pos) {
   TofEventSummary tes;
@@ -1084,22 +1186,19 @@ std::string TofEventSummary::to_string() const {
   repr += std::format("\n  NHits       (reco) : {}", hits.size());
   repr += std::format("\n  Prim Beta   (reco) : {}", primary_beta);
   repr += std::format("\n  Prim Charge (reco) : {}", primary_beta);
-  //repr += std::format("\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **", self.dsi_j_mask.count_ones()));
-  //for k in self.get_trigger_hits() {
-  //  repr += &(format!("\n  => {}/{}/{} ({}) ", k.0, k.1, k.2, k.3));
-  //}
-  //repr += "\n  ** ** MTB LINK IDs ** **";
-  //let mut mtblink_str = String::from("\n  => ");
-  //for k in self.get_rb_link_ids() {
-  //  mtblink_str += &(format!("{} ", k))
-  //}
-  //repr += &mtblink_str;
-  //repr += &(format!("\n  == Trigger hits {}, expected RBEvents {}",
-  //        self.get_trigger_hits().len(),
-  //        self.get_rb_link_ids().len()));
-  //repr += &String::from("\n  ** ** ** HITS ** ** **");
-
-
+  repr += "\n** Trigger Sources **";
+  for (const auto &ts : get_trigger_sources()) {
+    repr += std::format("\n -- {}", (u8)ts);
+  }
+  repr += "\n** Trigger Hits **";
+  for (const auto &h : get_trigger_hits()) {
+    repr += std::format("\n -- {} {} {} {}", std::get<0>(h), std::get<1>(h), std::get<2>(h), (u8)std::get<3>(h));
+  }
+  repr += "\n** MTB Link IDs **";
+  for (const u8 &lid : get_rb_link_ids()) {
+    repr += std::format("\n -- {}", lid);
+  }
+  repr += ">";
   repr += "\n  **** **** ****";
   for (auto const &h : hits) {
     repr += std::format("\n  {}",h.to_string()); 
