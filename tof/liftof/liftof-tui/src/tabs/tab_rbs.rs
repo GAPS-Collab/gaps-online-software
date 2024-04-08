@@ -26,8 +26,14 @@ use ratatui::{
     //backend::CrosstermBackend,
     terminal::Frame,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{Modifier, Style},
-    text::{Span, Line},
+    style::{
+        Modifier,
+        //Style
+    },
+    text::{
+        //Span,
+        Line
+    },
     widgets::{
         Block, BorderType, Borders, List, ListItem, ListState, Paragraph},
 };
@@ -37,12 +43,23 @@ use crossbeam_channel::{
 };
 
 
-use tof_dataclasses::packets::{TofPacket, PacketType};
+use tof_dataclasses::packets::{
+    TofPacket,
+    PacketType
+};
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::events::RBEvent;
-use tof_dataclasses::serialization::Serialization;
-use tof_dataclasses::monitoring::RBMoniData;
+//use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::monitoring::{
+    Series,
+    RBMoniData,
+    LTBMoniData,
+    PAMoniData,
+    RBMoniDataSeries,
+    LTBMoniDataSeries,
+    PAMoniDataSeries,
+};
 use tof_dataclasses::io::RBEventMemoryStreamer;
 use tof_dataclasses::manifest::ReadoutBoard;
 
@@ -55,57 +72,69 @@ use crate::colors::{
 };
 
 #[derive(Debug, Copy, Clone)]
+pub enum RBLTBListFocus {
+  RBList,
+  LTBList,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum RBTabView {
   Info,
   Waveform,
   RBMoniData,
+  PAMoniData,
+  PBMoniData,
+  LTBMoniData,
   SelectRB,
 }
 
 #[derive(Debug, Clone)]
 pub struct RBTab<'a>  {
-  pub tp_receiver    : Receiver<TofPacket>,
-  pub rb_receiver    : Receiver<RBEvent>,
-  pub rb_selector    : u8,
-  pub rb_changed     : bool,
-  pub rb_calibration : RBCalibrations,
-  pub cali_loaded    : bool,
-  pub event_queue    : VecDeque<RBEvent>,
-  pub moni_queue     : VecDeque<RBMoniData>,
-  pub met_queue      : VecDeque<f64>,
-  pub met_queue_moni : VecDeque<f64>,
+  pub tp_receiver        : Receiver<TofPacket>,
+  pub rb_receiver        : Receiver<RBEvent>,
+  pub rb_selector        : u8,
+  pub ltb_selector       : u8,
+  pub rb_changed         : bool,
+  pub rb_calibration     : RBCalibrations,
+  pub cali_loaded        : bool,
+  pub event_queue        : VecDeque<RBEvent>,
+  pub moni_queue         : RBMoniDataSeries,
+  pub ltb_moni_queue     : LTBMoniDataSeries,  
+  pub pa_show_biases     : bool,
+  pub pa_moni_queue      : PAMoniDataSeries,
+  pub met_queue          : VecDeque<f64>,
+  pub met_queue_moni     : HashMap<u8,VecDeque<f64>>,
+  pub met_queue_ltb_moni : HashMap<u8,VecDeque<f64>>,
+  pub met_queue_pa_moni  : HashMap<u8,VecDeque<f64>>,
   /// Holds waveform data
-  pub ch_data        : Vec<Vec<(f64,f64)>>,
+  pub ch_data            : Vec<Vec<(f64,f64)>>,
   /// Holds the monitoring qunatities
-  pub rate_queue     : VecDeque<(f64,f64)>,
-  pub fpgatmp_queue  : VecDeque<(f64,f64)>,
+  pub fpgatmp_queue      : VecDeque<(f64,f64)>,
+  pub fpgatmp_fr_moni    : bool,
+
+  pub queue_size         : usize,
   
-  pub pressure       : VecDeque<(f64,f64)>,
-  pub humidity       : VecDeque<(f64,f64)>,
-  
-  pub mag_x          : VecDeque<(f64,f64)>,
-  pub mag_y          : VecDeque<(f64,f64)>,
-  pub mag_z          : VecDeque<(f64,f64)>,
-  pub mag_tot        : VecDeque<(f64,f64)>,
+  pub n_events           : usize,
+  pub n_moni             : usize,
+  pub miss_evid          : usize,
+  pub last_evid          : u32,
+  pub nch_histo          : Hist1D<Uniform<f32>>,
+  timer                  : Instant,
 
-  pub queue_size     : usize,
-  
-  pub n_events       : usize,
-  pub n_moni         : usize,
-  pub miss_evid      : usize,
-  pub last_evid      : u32,
-  pub nch_histo      : Hist1D<Uniform<f32>>,
-  timer              : Instant,
+  pub theme              : ColorTheme,
+  pub view               : RBTabView,
 
-  pub theme          : ColorTheme,
-  pub view           : RBTabView,
+  pub rbs                : HashMap<u8, ReadoutBoard>,
 
-  pub rbs            : HashMap<u8, ReadoutBoard>,
-
+  pub list_focus         : RBLTBListFocus,
   // list for the rb selector
-  pub rbl_state      : ListState,
-  pub rbl_items      : Vec::<ListItem<'a>>,
-  pub rbl_active     : bool,
+  pub rbl_state          : ListState,
+  pub rbl_items          : Vec::<ListItem<'a>>,
+  pub rbl_active         : bool,
+  // list for the ltb selector
+  pub ltbl_state         : ListState,
+  pub ltbl_items         : Vec::<ListItem<'a>>,
+  pub ltbl_active        : bool,
 }
 
 impl RBTab<'_>  {
@@ -119,6 +148,11 @@ impl RBTab<'_>  {
       let this_item = format!("  RB{:0>2}", k);
       rb_select_items.push(ListItem::new(Line::from(this_item)));
     }
+    let mut ltb_select_items = Vec::<ListItem>::new();
+    for k in 1..21 {
+      let this_item = format!("  LTB{:0>2}", k);
+      ltb_select_items.push(ListItem::new(Line::from(this_item)));
+    }
 
     let queue_size = 1000usize;
     let mut ch_data    = Vec::<Vec::<(f64,f64)>>::with_capacity(1024);
@@ -129,44 +163,51 @@ impl RBTab<'_>  {
     }
     let bins = Uniform::new(50,-0.5,49.5);
     RBTab {
-      tp_receiver    : tp_receiver,
-      rb_receiver    : rb_receiver,
-      rb_selector    : 0,
-      rb_changed     : false,
-      rb_calibration : RBCalibrations::new(0),
-      cali_loaded    : false,
-      event_queue    : VecDeque::<RBEvent>::with_capacity(queue_size),
-      moni_queue     : VecDeque::<RBMoniData>::with_capacity(queue_size),
-      met_queue      : VecDeque::<f64>::with_capacity(queue_size),
-      met_queue_moni : VecDeque::<f64>::with_capacity(queue_size),
-      rate_queue     : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      fpgatmp_queue  : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      pressure       : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      humidity       : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      mag_x          : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      mag_y          : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      mag_z          : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      mag_tot        : VecDeque::<(f64,f64)>::with_capacity(queue_size),
+      tp_receiver        : tp_receiver,
+      rb_receiver        : rb_receiver,
+      rb_selector        : 0,
+      ltb_selector       : 9,
+      rb_changed         : false,
+      rb_calibration     : RBCalibrations::new(0),
+      cali_loaded        : false,
+      event_queue        : VecDeque::<RBEvent>::with_capacity(queue_size),
+      //moni_queue         : VecDeque::<RBMoniData>::with_capacity(queue_size),
+      moni_queue         : RBMoniDataSeries::new(),
+      met_queue          : VecDeque::<f64>::with_capacity(queue_size),
+      met_queue_moni     : HashMap::<u8, VecDeque<f64>>::new(),
+      ltb_moni_queue     : LTBMoniDataSeries::new(),
+      met_queue_ltb_moni : HashMap::<u8, VecDeque<f64>>::new(),
+      pa_show_biases     : false,
+      pa_moni_queue      : PAMoniDataSeries::new(),
+      met_queue_pa_moni  : HashMap::<u8, VecDeque<f64>>::new(),
+      fpgatmp_queue      : VecDeque::<(f64,f64)>::with_capacity(queue_size),
+      fpgatmp_fr_moni    : true,
 
-      ch_data        : ch_data,
+      ch_data            : ch_data,
 
-      queue_size     : queue_size,
+      queue_size         : queue_size,
       
-      n_events       : 0,
-      n_moni         : 0,
-      miss_evid      : 0,
-      last_evid      : 0,
-      nch_histo      : ndhistogram!(bins),
-      timer          : Instant::now(),
+      n_events           : 0,
+      n_moni             : 0,
+      miss_evid          : 0,
+      last_evid          : 0,
+      nch_histo          : ndhistogram!(bins),
+      timer              : Instant::now(),
   
-      theme          : theme,
-      view           : RBTabView::Waveform,
+      theme              : theme,
+      view               : RBTabView::Waveform,
    
-      rbs            : rbs,
+      rbs                : rbs,
 
-      rbl_state      : ListState::default(),
-      rbl_items      : rb_select_items,
-      rbl_active     : false,
+      list_focus         : RBLTBListFocus::RBList,
+
+      rbl_state          : ListState::default(),
+      rbl_items          : rb_select_items,
+      rbl_active         : false,
+      
+      ltbl_state         : ListState::default(),
+      ltbl_items         : ltb_select_items,
+      ltbl_active        : false,
     }
   }
   
@@ -177,17 +218,10 @@ impl RBTab<'_>  {
     
     if self.rb_changed {
       // currently, only one RB at a time is supported
-      self.moni_queue.clear();
-      self.rate_queue.clear();
-      self.pressure.clear();
-      self.humidity.clear();
-      self.mag_x.clear();
-      self.mag_y.clear();
-      self.mag_z.clear();
-      self.mag_tot.clear();
+      //self.moni_queue.clear();
       self.event_queue.clear();
       self.met_queue.clear();
-      self.met_queue_moni.clear();
+      //self.met_queue_moni.clear();
       self.fpgatmp_queue.clear();
       self.nch_histo = ndhistogram!(bins);
       // try to get a new calibration
@@ -227,53 +261,52 @@ impl RBTab<'_>  {
         Ok(pack)    => {
           debug!("Got next packet {}!", pack);
           match pack.packet_type {
+            PacketType::PAMoniData => {
+              info!("Received new PAMoniData!");
+              let moni : PAMoniData = pack.unpack()?;
+              self.pa_moni_queue.add(moni);
+              if !self.met_queue_pa_moni.contains_key(&moni.board_id) {
+                self.met_queue_pa_moni.insert(moni.board_id, VecDeque::<f64>::with_capacity(1000));
+              } else {
+                self.met_queue_pa_moni.get_mut(&moni.board_id).unwrap().push_back(met);
+                if self.met_queue_pa_moni.get(&moni.board_id).unwrap().len() > self.queue_size {
+                  self.met_queue_pa_moni.get_mut(&moni.board_id).unwrap().pop_front();
+                }
+              }
+              return Ok(());
+            }
+            PacketType::LTBMoniData => {
+              info!("Received new LTBMoniData!");
+              let moni : LTBMoniData = pack.unpack()?;
+              self.ltb_moni_queue.add(moni);
+              if !self.met_queue_ltb_moni.contains_key(&moni.board_id) {
+                self.met_queue_ltb_moni.insert(moni.board_id, VecDeque::<f64>::with_capacity(1000));
+              } else {
+                self.met_queue_ltb_moni.get_mut(&moni.board_id).unwrap().push_back(met);
+                if self.met_queue_ltb_moni.get(&moni.board_id).unwrap().len() > self.queue_size {
+                  self.met_queue_ltb_moni.get_mut(&moni.board_id).unwrap().pop_front();
+                }
+              }
+              return Ok(());
+            },
             PacketType::RBMoni   => {
-              trace!("Got new RBMoniData!");
-              let moni = RBMoniData::from_bytestream(&pack.payload, &mut 0)?;
+              info!("Received new RBMoniData!");
+              let moni : RBMoniData = pack.unpack()?;
+              self.moni_queue.add(moni);
               self.n_moni += 1;
-              if moni.board_id == self.rb_selector {
-                self.met_queue_moni.push_back(met); 
-                if self.met_queue_moni.len() > self.queue_size {
-                  self.met_queue_moni.pop_front();
-                }
-                self.moni_queue.push_back(moni);
-                if self.moni_queue.len() > self.queue_size {
-                  self.moni_queue.pop_front();
-                }
-                self.rate_queue.push_back((met, moni.rate as f64));
-                if self.rate_queue.len() > self.queue_size {
-                  self.rate_queue.pop_front();
-                }
-                
-                self.pressure.push_back((met, moni.pressure as f64));
-                if self.pressure.len() > self.queue_size {
-                  self.pressure.pop_front();
-                }
-                self.humidity.push_back((met, moni.humidity as f64));
-                if self.humidity.len() > self.queue_size {
-                  self.humidity.pop_front();
-                }
-                self.mag_x.push_back((met, moni.mag_x as f64));
-                if self.mag_x.len() > self.queue_size {
-                  self.mag_x.pop_front();
-                }
-                self.mag_y.push_back((met, moni.mag_y as f64));
-                if self.mag_y.len() > self.queue_size {
-                  self.mag_y.pop_front();
-                }
-                self.mag_z.push_back((met, moni.mag_z as f64));
-                if self.mag_z.len() > self.queue_size {
-                  self.mag_z.pop_front();
-                }
-                self.mag_tot.push_back((met, moni.get_mag_tot() as f64));
-                if self.mag_tot.len() > self.queue_size {
-                  self.mag_tot.pop_front();
+              if !self.met_queue_moni.contains_key(&moni.board_id) {
+                // FIXME - make the 1000 (which is queue size) a member
+                self.met_queue_moni.insert(moni.board_id, VecDeque::<f64>::with_capacity(1000));
+              } else {
+                self.met_queue_moni.get_mut(&moni.board_id).unwrap().push_back(met);
+                if self.met_queue_moni.get(&moni.board_id).unwrap().len() > self.queue_size {
+                  self.met_queue_moni.get_mut(&moni.board_id).unwrap().pop_front();
                 }
               }
               return Ok(());
             },
             PacketType::RBEvent => {
-              ev = RBEvent::from_bytestream(&pack.payload, &mut 0)?;
+              ev = pack.unpack()?;
             },
             PacketType::RBEventMemoryView => {
               let mut streamer = RBEventMemoryStreamer::new();
@@ -327,6 +360,7 @@ impl RBTab<'_>  {
       }
       self.last_evid = ev.header.event_id;
       self.fpgatmp_queue.push_back((met, ev.header.get_fpga_temp() as f64));
+      self.fpgatmp_fr_moni = false; // choose this as source
       if self.fpgatmp_queue.len() > self.queue_size {
         self.fpgatmp_queue.pop_front();
       }
@@ -373,6 +407,38 @@ impl RBTab<'_>  {
   pub fn unselect_rbl(&mut self) {
     self.rbl_state.select(None);
   }
+  
+  pub fn next_ltb(&mut self) {
+    let i = match self.ltbl_state.selected() {
+      Some(i) => {
+        if i >= self.ltbl_items.len() - 1 {
+          self.ltbl_items.len() - 1
+        } else {
+          i + 1
+        }
+      }
+      None => 0,
+    };
+    self.ltbl_state.select(Some(i));
+  }
+
+  pub fn previous_ltb(&mut self) {
+    let i = match self.ltbl_state.selected() {
+      Some(i) => {
+        if i == 0 {
+          0 
+        } else {
+          i - 1
+        }
+      }
+      None => 0,
+    };
+    self.ltbl_state.select(Some(i));
+  }
+
+  pub fn unselect_ltbl(&mut self) {
+    self.ltbl_state.select(None);
+  }
 
   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
     match self.view {
@@ -380,50 +446,82 @@ impl RBTab<'_>  {
         let list_chunks = Layout::default()
           .direction(Direction::Horizontal)
           .constraints(
-              [Constraint::Percentage(20), Constraint::Percentage(80)].as_ref(),
+              [Constraint::Percentage(20),
+               Constraint::Percentage(20),
+               Constraint::Percentage(60)].as_ref(),
           )
           .split(*main_window);
-        let par_title_string = String::from("Select ReadoutBoard (RB)");
-        let (first, rest) = par_title_string.split_at(1);
-        let par_title = Line::from(vec![
-          Span::styled(
-              first,
-              Style::default()
-                  .fg(self.theme.hc)
-                  .add_modifier(Modifier::UNDERLINED),
-          ),
-          Span::styled(rest, self.theme.style()),
-        ]);
+        //let par_rb_title_string = String::from("Select ReadoutBoard (RB)");
+        //let (first, rest) = par_title_string.split_at(1);
+        //let par_title = Line::from(vec![
+        //  Span::styled(
+        //      first,
+        //      Style::default()
+        //          .fg(self.theme.hc)
+        //          .add_modifier(Modifier::UNDERLINED),
+        //  ),
+        //  Span::styled(rest, self.theme.style()),
+        //]);
         let rbs = Block::default()
           .borders(Borders::ALL)
           .style(self.theme.style())
-          .title(par_title)
+          .title("Select ReadoutBoard (RB)")
           .border_type(BorderType::Plain);
         let rb_select_list = List::new(self.rbl_items.clone()).block(rbs)
           .highlight_style(self.theme.highlight().add_modifier(Modifier::BOLD))
           .highlight_symbol(">>")
           .repeat_highlight_symbol(true);
-        match self.rbl_state.selected() {
-          None    => {
-            let selector =  1;
-            if self.rb_selector != selector {
-              self.rb_changed = true;
-              self.rb_selector = selector;
-            } else {
-              self.rb_changed = false;
+        let ltbs = Block::default()
+          .borders(Borders::ALL)
+          .style(self.theme.style())
+          .title("Select LocalTriggerBoard (LTB)")
+          .border_type(BorderType::Plain);
+        let ltb_select_list = List::new(self.ltbl_items.clone()).block(ltbs)
+          .highlight_style(self.theme.highlight().add_modifier(Modifier::BOLD))
+          .highlight_symbol(">>")
+          .repeat_highlight_symbol(true);
+        match self.list_focus {
+          RBLTBListFocus::RBList => {
+            match self.rbl_state.selected() {
+              None    => {
+                let selector =  1;
+                if self.rb_selector != selector {
+                  self.rb_changed = true;
+                  self.rb_selector = selector;
+                } else {
+                  self.rb_changed = false;
+                }
+              },
+              Some(_rbid) => {
+                let selector =  _rbid as u8 + 1;
+                if self.rb_selector != selector {
+                  self.rb_changed = true;
+                  self.rb_selector = selector;
+                } else {
+                  self.rb_changed = false;
+                }
+              },
             }
           },
-          Some(_rbid) => {
-            let selector =  _rbid as u8 + 1;
-            if self.rb_selector != selector {
-              self.rb_changed = true;
-              self.rb_selector = selector;
-            } else {
-              self.rb_changed = false;
+          RBLTBListFocus::LTBList => {
+            match self.ltbl_state.selected() {
+              None    => {
+                let selector =  1;
+                if self.ltb_selector != selector {
+                  self.ltb_selector = selector;
+                } 
+              },
+              Some(_ltbid) => {
+                let selector =  _ltbid as u8 + 1;
+                if self.ltb_selector != selector {
+                  self.ltb_selector = selector;
+                }
+              },
             }
-          },
+          }
         }
-        frame.render_stateful_widget(rb_select_list, list_chunks[0], &mut self.rbl_state );
+        frame.render_stateful_widget(rb_select_list,  list_chunks[0], &mut self.rbl_state );
+        frame.render_stateful_widget(ltb_select_list, list_chunks[1], &mut self.ltbl_state );
       },
       RBTabView::Waveform => {
         // set up general layout
@@ -515,7 +613,8 @@ impl RBTab<'_>  {
         frame.render_widget(event_view, detail_and_ch9_chunks[1]);
       }, // end Waveform
       RBTabView::RBMoniData => {
-        // Have 4 columns a 3 plots each (12 in total)
+        // Have 4 columns a 4 plots each. We use col(0,0) for the RBMoniData string,
+        // so this leaves us with 13 plots
         let columns = Layout::default()
           .direction(Direction::Horizontal)
           .constraints(
@@ -526,43 +625,52 @@ impl RBTab<'_>  {
               ].as_ref(),
           )
           .split(*main_window);
-
+        let col0 = Layout::default()
+          .direction(Direction::Vertical)
+          .constraints(
+              [Constraint::Percentage(75),
+               Constraint::Percentage(25)].as_ref()
+          )
+          .split(columns[0]);
         let col1 = Layout::default()
           .direction(Direction::Vertical)
           .constraints(
-              [Constraint::Percentage(34),
-               Constraint::Percentage(33),
-               Constraint::Percentage(33),
+              [Constraint::Percentage(25),
+               Constraint::Percentage(25),
+               Constraint::Percentage(25),
+               Constraint::Percentage(25),
               ].as_ref(),
           )
           .split(columns[1]);
         let col2 = Layout::default()
           .direction(Direction::Vertical)
           .constraints(
-              [Constraint::Percentage(34),
-               Constraint::Percentage(33),
-               Constraint::Percentage(33),
+              [Constraint::Percentage(25),
+               Constraint::Percentage(25),
+               Constraint::Percentage(25),
+               Constraint::Percentage(25),
               ].as_ref(),
           )
           .split(columns[2]);
         let col3 = Layout::default()
           .direction(Direction::Vertical)
           .constraints(
-              [Constraint::Percentage(34),
-               Constraint::Percentage(33),
-               Constraint::Percentage(33),
+              [Constraint::Percentage(25),
+               Constraint::Percentage(25),
+               Constraint::Percentage(25),
+               Constraint::Percentage(25),
               ].as_ref(),
           )
           .split(columns[3]);
 
-        let last_moni = self.moni_queue.back();
+        let last_moni = self.moni_queue.get_last_moni(self.rb_selector);
         let view_string : String;
         match last_moni {
           Some(_moni) => { 
             view_string = _moni.to_string();
           }, 
           None => {
-            view_string = String::from("MONI QUEUE EMPTY!");
+            view_string = format!("No RBMoniData for board {} avaiable", self.rb_selector);
           }
         }
         
@@ -577,72 +685,536 @@ impl RBTab<'_>  {
             .title("Last RBMoniData")
             .border_type(BorderType::Rounded),
         );
-        frame.render_widget(moni_view, columns[0]);
+        frame.render_widget(moni_view, col0[0]);
        
-        let fpga_ds_name   = String::from("FPGA T");
-        let fpga_ds_title  = String::from("FPGA T [\u{00B0}C] ");
-        let fpga_tc_theme  = self.theme.clone();
-        let fpga_tc = timeseries(&mut self.fpgatmp_queue,
-                                 fpga_ds_name,
-                                 fpga_ds_title,
-                                 &fpga_tc_theme  );
-        frame.render_widget(fpga_tc, col1[0]);
+        let rate_ds_name   = String::from("Rate");
+        let rate_ds_title  = String::from("RB Rate [Hz]");
+        let rate_data      = self.moni_queue.get_var_for_rb("rate", self.rb_selector);
+        let mut rate_ts    = VecDeque::<(f64, f64)>::new(); 
+        match rate_data {
+          None => {
+            error!("No rate data available for board {}", self.rb_selector);
+          },
+          Some(rdata) => {
+            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+              rate_ts.push_back((*time, rdata[k] as f64));
+            }
+            if rate_ts.len() == 0 {
+              error!("We have 0 length rate data for board {}!", self.rb_selector);
+            }
+          }
+        }
+        let rate_tc = timeseries(&mut rate_ts,
+                                 rate_ds_name,
+                                 rate_ds_title,
+                                 &self.theme);
+        frame.render_widget(rate_tc, col0[1]);
+
+        // ambience
+        let mag_tot_ds_name   = String::from("Magnetic Field");
+        let mag_tot_ds_title  = String::from("Tot mag field [Gauss]");
+        let mag_tot_data      = self.moni_queue.get_var_for_rb("mag_tot", self.rb_selector);
+        let mut mag_tot_ts    = VecDeque::<(f64, f64)>::new(); 
+        match mag_tot_data  {
+          None => {
+            error!("No mag_tot data available for board {}", self.rb_selector);
+          },
+          Some(data) => {
+            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+              mag_tot_ts.push_back((*time, data[k] as f64));
+            }
+          }
+        }
+        let mag_tot_tc = timeseries(&mut mag_tot_ts,
+                                 mag_tot_ds_name,
+                                 mag_tot_ds_title,
+                                 &self.theme);
+        frame.render_widget(mag_tot_tc, col1[0]);
+
+        let pres_ds_name   = String::from("Atmospheric pressure");
+        let pres_ds_title  = String::from("Atmospheric pressure [hPa]");
+        let pres_data      = self.moni_queue.get_var_for_rb("pressure", self.rb_selector);
+        let mut pres_ts    = VecDeque::<(f64, f64)>::new(); 
+        match pres_data {
+          None => {
+            error!("No atmos pressure data available for board {}", self.rb_selector);
+          },
+          Some(data) => {
+            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+              pres_ts.push_back((*time, data[k] as f64));
+            }
+          }
+        }
         
-        let humi_ds_name   = String::from("Humidity %");
-        let humi_ds_title  = String::from("Humidity %");
-        let humi_tc_theme  = self.theme.clone();
-        let humi_tc = timeseries(&mut self.humidity,
-                                 humi_ds_name,
-                                 humi_ds_title,
-                                 &humi_tc_theme);
-        frame.render_widget(humi_tc, col2[0]);
-        
-        let pres_ds_name   = String::from("Pressure [hPa]");
-        let pres_ds_title  = String::from("Pressure [hPa]");
-        let pres_tc_theme  = self.theme.clone();
-        let pres_tc = timeseries(&mut self.pressure,
+        let pres_tc = timeseries(&mut pres_ts,
                                  pres_ds_name,
                                  pres_ds_title,
-                                 &pres_tc_theme);
-        frame.render_widget(pres_tc, col2[1]);
+                                 &self.theme);
+        frame.render_widget(pres_tc, col1[1]);
         
-        let mag_ds_x_name   = String::from("Magnetic x [G]");
-        let mag_ds_x_title  = String::from("Magnetic x [G}");
-        let mag_tc_x_theme  = self.theme.clone();
-        let mag_tc_x = timeseries(&mut self.mag_x,
-                                  mag_ds_x_name,
-                                  mag_ds_x_title,
-                                  &mag_tc_x_theme);
-        frame.render_widget(mag_tc_x, col3[0]);
-        
-        let mag_ds_y_name   = String::from("Magnetic y [G]");
-        let mag_ds_y_title  = String::from("Magnetic y [G}");
-        let mag_tc_y_theme  = self.theme.clone();
-        let mag_tc_y = timeseries(&mut self.mag_y,
-                                  mag_ds_y_name,
-                                  mag_ds_y_title,
-                                  &mag_tc_y_theme);
-        frame.render_widget(mag_tc_y, col3[1]);
-        
-        let mag_ds_z_name   = String::from("Magnetic z [G]");
-        let mag_ds_z_title  = String::from("Magnetic z [G}");
-        let mag_tc_z_theme  = self.theme.clone();
-        let mag_tc_z = timeseries(&mut self.mag_z,
-                                  mag_ds_z_name,
-                                  mag_ds_z_title,
-                                  &mag_tc_z_theme);
-        frame.render_widget(mag_tc_z, col3[2]);
-        
-        let mag_ds_tot_name   = String::from("Magnetic TOT [G]");
-        let mag_ds_tot_title  = String::from("Magnetic TOT [G}");
-        let mag_tc_tot_theme  = self.theme.clone();
-        let mag_tc_tot = timeseries(&mut self.mag_tot,
-                                     mag_ds_tot_name,
-                                     mag_ds_tot_title,
-                                    &mag_tc_tot_theme);
-        frame.render_widget(mag_tc_tot, col2[2]);
+        let humi_ds_name   = String::from("Ambient humidity");
+        let humi_ds_title  = String::from("Humidity [%]");
+        let humi_data      = self.moni_queue.get_var_for_rb("humidity", self.rb_selector);
+        let mut humi_ts    = VecDeque::<(f64, f64)>::new(); 
+        match humi_data {
+          None => {
+            error!("No humidity data available for board {}", self.rb_selector);
+          },
+          Some(data) => {
+            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+              humi_ts.push_back((*time, data[k] as f64));
+            }
+          }
+        }
+        let humi_tc = timeseries(&mut humi_ts,
+                                 humi_ds_name,
+                                 humi_ds_title,
+                                 &self.theme);
+        frame.render_widget(humi_tc, col1[2]);
 
+        // Temperatures (one is missing because of display constraints)
+        let fpga_ds_name   = String::from("FPGA (DRS) Temperature");
+        let fpga_ds_title  = String::from("DRS Temp [\u{00B0}C]");
+        // in case we are receiving RBEvents, these have the FPGA temperature as well
+        // since this is more fine-grained (once every event) we will use that instead
+        if !self.fpgatmp_fr_moni {
+          let fpga_tc = timeseries(&mut self.fpgatmp_queue,
+                                   fpga_ds_name,
+                                   fpga_ds_title,
+                                   &self.theme  );
+          frame.render_widget(fpga_tc, col1[3]);
+        } else {
+          // we will get it from the RBMoniData
+          let fpga_data      = self.moni_queue.get_var_for_rb("tmp_drs", self.rb_selector);
+          let mut fpga_ts    = VecDeque::<(f64, f64)>::new(); 
+          match fpga_data {
+            None => {
+              error!("No DRS4 temperature data available for board {}", self.rb_selector);
+            },
+            Some(data) => {
+              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                fpga_ts.push_back((*time, data[k] as f64));
+              }
+            }
+          }
+          let fpga_tc = timeseries(&mut fpga_ts,
+                                   fpga_ds_name,
+                                   fpga_ds_title,
+                                   &self.theme);
+          frame.render_widget(fpga_tc, col1[3]);
+        }
+
+        let tmp_clk_ds_name   = String::from("CLK Temperature");
+        let tmp_clk_ds_title  = String::from("CLK Temp. [\u{00B0}C]");
+        let tmp_clk_data      = self.moni_queue.get_var_for_rb("tmp_clk", self.rb_selector);
+        let mut tmp_clk_ts    = VecDeque::<(f64, f64)>::new(); 
+        match tmp_clk_data {
+          None => {
+            error!("No CLK temperature data available for board {}", self.rb_selector);
+          },
+          Some(data) => {
+            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+              tmp_clk_ts.push_back((*time, data[k] as f64));
+            }
+          }
+        }
+        let tmp_clk_tc = timeseries(&mut tmp_clk_ts,
+                                    tmp_clk_ds_name,
+                                    tmp_clk_ds_title,
+                                    &self.theme);
+        frame.render_widget(tmp_clk_tc, col2[0]);
+        
+        let tmp_adc_ds_name   = String::from("ADC Temperature");
+        let tmp_adc_ds_title  = String::from("ADC Temp. [\u{00B0}C]");
+        let tmp_adc_data      = self.moni_queue.get_var_for_rb("tmp_adc", self.rb_selector);
+        let mut tmp_adc_ts    = VecDeque::<(f64, f64)>::new(); 
+        match tmp_adc_data {
+          None => {
+            error!("No ADC temperature data available for board {}", self.rb_selector);
+          },
+          Some(data) => {
+            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+              tmp_adc_ts.push_back((*time, data[k] as f64));
+            }
+          }
+        }
+        let tmp_adc_tc = timeseries(&mut tmp_adc_ts,
+                                    tmp_adc_ds_name,
+                                    tmp_adc_ds_title,
+                                    &self.theme);
+        frame.render_widget(tmp_adc_tc, col2[1]);
+        
+        let tmp_zynq_ds_name   = String::from("ZYNQ Temperature");
+        let tmp_zynq_ds_title  = String::from("ZYNQ Temp. [\u{00B0}C]");
+        let tmp_zynq_data      = self.moni_queue.get_var_for_rb("tmp_zynq", self.rb_selector);
+        let mut tmp_zynq_ts    = VecDeque::<(f64, f64)>::new(); 
+        match tmp_zynq_data {
+          None => {
+            error!("No ZYNQ temperature data available for board {}", self.rb_selector);
+          },
+          Some(data) => {
+            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+              tmp_zynq_ts.push_back((*time, data[k] as f64));
+            }
+          }
+        }
+        let tmp_zynq_tc = timeseries(&mut tmp_zynq_ts,
+                                     tmp_zynq_ds_name,
+                                     tmp_zynq_ds_title,
+                                     &self.theme);
+        frame.render_widget(tmp_zynq_tc, col2[2]);
+        
+        let tmp_bm280_name   = String::from("BM280 Temperature");
+        let tmp_bm280_title  = String::from("BM280 Temp. [\u{00B0}C]");
+        let tmp_bm280_data      = self.moni_queue.get_var_for_rb("tmp_bm280", self.rb_selector);
+        let mut tmp_bm280_ts    = VecDeque::<(f64, f64)>::new(); 
+        match tmp_bm280_data {
+          None => {
+            error!("No BM280 temperature data available for board {}", self.rb_selector);
+          },
+          Some(data) => {
+            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+              tmp_bm280_ts.push_back((*time, data[k] as f64));
+            }
+          }
+        }
+        let tmp_bm280_tc = timeseries(&mut tmp_bm280_ts,
+                                      tmp_bm280_name,
+                                      tmp_bm280_title,
+                                      &self.theme);
+        frame.render_widget(tmp_bm280_tc, col2[3]);
+       
+        // Currents 
+        let drs_c_name   = String::from("DRS Current");
+        let drs_c_title  = String::from("DRS Curr. [mA]");
+        let drs_c_data   = self.moni_queue.get_var_for_rb("drs_dvdd_current", self.rb_selector);
+        let mut drs_c_ts = VecDeque::<(f64, f64)>::new(); 
+        match drs_c_data {
+          None => {
+            error!("No DRS4 current data available for board {}", self.rb_selector);
+          },
+          Some(data) => {
+            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+              drs_c_ts.push_back((*time, data[k] as f64));
+            }
+          }
+        }
+        let drs_c_tc = timeseries(&mut drs_c_ts,
+                                  drs_c_name,
+                                  drs_c_title,
+                                  &self.theme);
+        frame.render_widget(drs_c_tc, col3[0]);
+
+        let zynq_c_name   = String::from("Zynq Current");
+        let zynq_c_title  = String::from("Zynq Curr. [mA]");
+        let zynq_c_data   = self.moni_queue.get_var_for_rb("zynq_current", self.rb_selector);
+        let mut zynq_c_ts = VecDeque::<(f64, f64)>::new(); 
+        match zynq_c_data {
+          None => {
+            error!("No ZYNQ current data available for board {}", self.rb_selector);
+          },
+          Some(data) => {
+            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+              zynq_c_ts.push_back((*time, data[k] as f64));
+            }
+          }
+        }
+        let zynq_c_tc = timeseries(&mut zynq_c_ts,
+                                   zynq_c_name,
+                                   zynq_c_title,
+                                   &self.theme);
+        frame.render_widget(zynq_c_tc, col3[1]);
+        
+        let p3v3_c_name   = String::from("P3V3 Current");
+        let p3v3_c_title  = String::from("P3V3 Curr. [mA]");
+        let p3v3_c_data   = self.moni_queue.get_var_for_rb("p3v3_current", self.rb_selector);
+        let mut p3v3_c_ts = VecDeque::<(f64, f64)>::new(); 
+        match p3v3_c_data {
+          None => {
+            error!("No P3V3 current data available for board {}", self.rb_selector);
+          },
+          Some(data) => {
+            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+              p3v3_c_ts.push_back((*time, data[k] as f64));
+            }
+          }
+        }
+        let p3v3_c_tc = timeseries(&mut p3v3_c_ts,
+                                   p3v3_c_name,
+                                   p3v3_c_title,
+                                   &self.theme);
+        frame.render_widget(p3v3_c_tc, col3[2]);
+        
+        let p3v5_c_name   = String::from("P3V5 Current");
+        let p3v5_c_title  = String::from("P3V5 Curr. [mA]");
+        let p3v5_c_data   = self.moni_queue.get_var_for_rb("p3v5_current", self.rb_selector);
+        let mut p3v5_c_ts = VecDeque::<(f64, f64)>::new(); 
+        match p3v5_c_data {
+          None => {
+            error!("No P3V5 current data available for board {}", self.rb_selector);
+          },
+          Some(data) => {
+            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+              p3v5_c_ts.push_back((*time, data[k] as f64));
+            }
+          }
+        }
+        let p3v5_c_tc = timeseries(&mut p3v5_c_ts,
+                                   p3v5_c_name,
+                                   p3v5_c_title,
+                                   &self.theme);
+        frame.render_widget(p3v5_c_tc, col3[3]);
       },
+      RBTabView::LTBMoniData => {
+        let columns = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(
+                [Constraint::Percentage(30),
+                 Constraint::Percentage(70)].as_ref(),
+            )
+            .split(*main_window);
+        let rows = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(
+                [Constraint::Percentage(30),
+                 Constraint::Percentage(30),
+                 Constraint::Percentage(40)].as_ref(),
+            )
+            .split(columns[1]);
+        
+        let last_ltb_moni = self.ltb_moni_queue.get_last_moni(self.ltb_selector);
+        let mut ltb_moni_str = format!("No data for board {}!", self.ltb_selector);
+        let mut ltb_thr_str  = format!("No data for board {}!", self.ltb_selector);
+        match last_ltb_moni {
+          None => (),
+          Some(mon) => {
+            ltb_moni_str = format!("{}", mon);
+            ltb_thr_str  = format!("  Hit  : {:.3} [mV]", mon.thresh[0]);
+            ltb_thr_str += &(format!("\n  Beta : {:.3} [mV]", mon.thresh[1]));
+            ltb_thr_str += &(format!("\n  Veto : {:.3} [mV]", mon.thresh[2]));
+          }
+        }
+        let moni_view = Paragraph::new(ltb_moni_str)
+          .style(self.theme.style())
+          .alignment(Alignment::Left)
+          //.scroll((5, 10))
+          .block(
+          Block::default()
+            .borders(Borders::ALL)
+            .style(self.theme.style())
+            .title("Last LTBMoniData")
+            .border_type(BorderType::Rounded),
+        );
+        frame.render_widget(moni_view, columns[0]);
+        let thr_view = Paragraph::new(ltb_thr_str)
+          .style(self.theme.style())
+          .alignment(Alignment::Left)
+          //.scroll((5, 10))
+          .block(
+          Block::default()
+            .borders(Borders::ALL)
+            .style(self.theme.style())
+            .title("Thresholds")
+            .border_type(BorderType::Rounded),
+        );
+        frame.render_widget(thr_view, rows[2]);
+
+        let tt_name   = String::from("Trenz Temp");
+        let tt_title  = String::from("Trenz Temp [\u{00B0}C]");
+        let tt_data   = self.ltb_moni_queue.get_var_for_board("trenz_temp", self.ltb_selector);
+        let mut tt_ts = VecDeque::<(f64, f64)>::new(); 
+        match tt_data {
+          None => {
+            error!("No trenz temp data available for board {}", self.ltb_selector);
+          },
+          Some(data) => {
+            for (k, time) in self.met_queue_ltb_moni.get(&self.ltb_selector).unwrap().iter().enumerate() {
+              tt_ts.push_back((*time, data[k] as f64));
+            }
+          }
+        }
+        let tt_tc = timeseries(&mut tt_ts,
+                               tt_name,
+                               tt_title,
+                               &self.theme);
+        frame.render_widget(tt_tc, rows[0]);
+
+        let lt_name   = String::from("LTB Temperature");
+        let lt_title  = String::from("LTB Temp. [\u{00B0}C]");
+        let lt_data      = self.ltb_moni_queue.get_var_for_board("ltb_temp", self.ltb_selector);
+        let mut lt_ts    = VecDeque::<(f64, f64)>::new(); 
+        match lt_data {
+          None => {
+            error!("No LTB temp data available for board {}", self.ltb_selector);
+          },
+          Some(data) => {
+            for (k, time) in self.met_queue_ltb_moni.get(&self.ltb_selector).unwrap().iter().enumerate() {
+              lt_ts.push_back((*time, data[k] as f64));
+            }
+          }
+        }
+        let lt_tc = timeseries(&mut lt_ts,
+                               lt_name,
+                               lt_title,
+                               &self.theme);
+        frame.render_widget(lt_tc, rows[1]);
+
+      }
+      RBTabView::PAMoniData => {
+        let rows = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(
+                [Constraint::Percentage(8),
+                 Constraint::Percentage(92)].as_ref(),
+            )
+            .split(*main_window);
+          let columns = Layout::default()
+              .direction(Direction::Horizontal)
+              .constraints(
+                  [Constraint::Percentage(25),
+                   Constraint::Percentage(25),
+                   Constraint::Percentage(25),
+                   Constraint::Percentage(25)].as_ref(),
+              )
+              .split(rows[1]);
+          let col0 = Layout::default()
+              .direction(Direction::Vertical)
+              .constraints(
+                  [Constraint::Percentage(24),
+                   Constraint::Percentage(24),
+                   Constraint::Percentage(24),
+                   Constraint::Percentage(24)].as_ref(),
+              )
+              .split(columns[0]);
+          let col1 = Layout::default()
+              .direction(Direction::Vertical)
+              .constraints(
+                  [Constraint::Percentage(24),
+                   Constraint::Percentage(24),
+                   Constraint::Percentage(24),
+                   Constraint::Percentage(24)].as_ref(),
+              )
+              .split(columns[1]);
+          let col2 = Layout::default()
+              .direction(Direction::Vertical)
+              .constraints(
+                  [Constraint::Percentage(24),
+                   Constraint::Percentage(24),
+                   Constraint::Percentage(24),
+                   Constraint::Percentage(24)].as_ref(),
+              )
+              .split(columns[2]);
+          let col3 = Layout::default()
+              .direction(Direction::Vertical)
+              .constraints(
+                  [Constraint::Percentage(24),
+                   Constraint::Percentage(24),
+                   Constraint::Percentage(24),
+                   Constraint::Percentage(24)].as_ref(),
+              )
+              .split(columns[3]);
+        // the preamps don't have their own board, the board id refers to the RB
+        let pa_str  = format!("PreampMoniData for ReadoutBoard {}", self.rb_selector);
+        let pa_view = Paragraph::new(pa_str)
+          .style(self.theme.style())
+          .alignment(Alignment::Left)
+          .block(
+          Block::default()
+            .borders(Borders::ALL)
+            .style(self.theme.style())
+            //.title("Thresholds")
+            .border_type(BorderType::Rounded),
+        );
+        frame.render_widget(pa_view, rows[0]);
+        
+        if self.pa_show_biases {
+          //let mut moni_str  = String::from("No PAMoniData avaiable!");
+          //match self.pa_moni_queue.get_last_moni(self.rb_selector) {
+          //  None => (),
+          //  Some(moni) => {
+          //    moni_str = format!("{}", moni);
+          //  }
+          //}
+          //let moni_view = Paragraph::new(moni_str)
+          //  .style(self.theme.style())
+          //  .alignment(Alignment::Left)
+          //  .block(
+          //  Block::default()
+          //    .borders(Borders::ALL)
+          //    .style(self.theme.style())
+          //    //.title("Thresholds")
+          //    .border_type(BorderType::Rounded),
+          //);
+          //frame.render_widget(moni_view, rows[1]);
+          // the temperature plots
+          for k in 0..16 {
+            let identifier = format!("bias_{}", k+1);
+            let name   = format!("Ch {} Bias Voltage", k+1);
+            let title  = format!("Ch {} Bias [V]", k+1);
+            let c_data = self.pa_moni_queue.get_var_for_rb(&identifier, self.rb_selector);
+            let mut ts = VecDeque::<(f64, f64)>::new(); 
+            match c_data {
+              None => {
+                error!("No {} data available for board {}", identifier, self.rb_selector);
+              },
+              Some(data) => {
+                for (k, time) in self.met_queue_pa_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                  ts.push_back((*time, data[k] as f64));
+                }
+              }
+            }
+            let tc = timeseries(&mut ts,
+                                name,
+                                title,
+                                &self.theme);
+            if k < 4 {
+              frame.render_widget(tc, col0[k]);
+            } else if k < 8 {
+              frame.render_widget(tc, col1[k-4]);
+            } else if k < 12 {
+              frame.render_widget(tc, col2[k-8]);
+            } else if k < 16 {
+              frame.render_widget(tc, col3[k-12]);
+            }
+          }
+        } else {
+          // the temperature plots
+          for k in 0..16 {
+            let identifier = format!("temp_{}", k+1);
+            let name   = format!("Ch {} Temperature", k+1);
+            let title  = format!("Ch {} Temp [\u{00B0}C]", k+1);
+            let c_data = self.pa_moni_queue.get_var_for_rb(&identifier, self.rb_selector);
+            let mut ts = VecDeque::<(f64, f64)>::new(); 
+            match c_data {
+              None => {
+                error!("No {} data available for board {}", identifier, self.rb_selector);
+              },
+              Some(data) => {
+                for (k, time) in self.met_queue_pa_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                  ts.push_back((*time, data[k] as f64));
+                }
+              }
+            }
+            let tc = timeseries(&mut ts,
+                                name,
+                                title,
+                                &self.theme);
+            if k < 4 {
+              frame.render_widget(tc, col0[k]);
+            } else if k < 8 {
+              frame.render_widget(tc, col1[k-4]);
+            } else if k < 12 {
+              frame.render_widget(tc, col2[k-8]);
+            } else if k < 16 {
+              frame.render_widget(tc, col3[k-12]);
+            }
+          }
+
+        }
+
+      }
+      RBTabView::PBMoniData => {
+      }
       RBTabView::Info => {
         let main_view = Layout::default()
           .direction(Direction::Horizontal)

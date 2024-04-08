@@ -14,7 +14,8 @@ pub use crate::tab_home::HomeTab;
 pub use crate::tab_events::EventTab;
 pub use crate::tab_rbs::{
         RBTab,
-        RBTabView
+        RBTabView,
+        RBLTBListFocus,
 };
 
 pub use crate::tab_rbwaveform::RBWaveformTab;

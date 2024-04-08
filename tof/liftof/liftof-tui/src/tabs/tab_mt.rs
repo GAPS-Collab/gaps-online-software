@@ -50,8 +50,9 @@ use tof_dataclasses::packets::{
 use tof_dataclasses::events::MasterTriggerEvent;
 use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::errors::SerializationError;
-use tof_dataclasses::serialization::Serialization;
-
+//use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::manifest::DsiJChPidMapping;
+use tof_dataclasses::events::master_trigger::LTBThreshold;
 use crate::colors::{
     ColorTheme,
 };
@@ -87,8 +88,11 @@ pub struct MTTab {
   pub last_evid      : u32,
   pub nch_histo      : Hist1D<Uniform<f32>>,
   pub mtb_link_histo : Hist1D<Uniform<f32>>,
+  pub panel_histo    : Hist1D<Uniform<f32>>,
   pub theme          : ColorTheme,
 
+  pub mapping        : DsiJChPidMapping,
+  pub problem_hits   : Vec<(u8, u8, u8, LTBThreshold)>,
   timer              : Instant,
 
 }
@@ -97,9 +101,11 @@ impl MTTab {
 
   pub fn new(tp_receiver  : Receiver<TofPacket>,
              mte_receiver : Receiver<MasterTriggerEvent>,
+             mapping      : DsiJChPidMapping,
              theme        : ColorTheme) -> MTTab {
     let bins          = Uniform::new(50, 0.0, 50.0);
     let mtb_link_bins = Uniform::new(50, 0.0, 50.0);
+    let panel_bins    = Uniform::new(22, 1.0, 22.0);
     Self {
       main_layout    : Vec::<Rect>::new(),
       info_layout    : Vec::<Rect>::new(),
@@ -119,7 +125,10 @@ impl MTTab {
       last_evid      : 0,
       nch_histo      : ndhistogram!(bins),
       mtb_link_histo : ndhistogram!(mtb_link_bins),
+      panel_histo    : ndhistogram!(panel_bins),
       theme          : theme,
+      mapping        : mapping,
+      problem_hits   : Vec::<(u8, u8, u8, LTBThreshold)>::new(),
       timer          : Instant::now(),
     }
   }
@@ -137,14 +146,22 @@ impl MTTab {
         }
       },
       Ok(pack)    => {
-        info!("Got next packet {}!", pack);
+        //error!("Got next packet {}!", pack);
         match pack.packet_type {
           PacketType::MasterTrigger => {
-            mte = MasterTriggerEvent::from_bytestream(&pack.payload, &mut 0)?;
+            match pack.unpack() {
+              Ok(_ev) => {
+                mte = _ev;
+              },
+              Err(err) => {
+                error!("Unable to unpack MasterTriggerEvent! {err}");
+                return Err(err);
+              }
+            }
           },
           PacketType::MonitorMtb   => {
             info!("Got new MtbMoniData!");
-            let moni = MtbMoniData::from_bytestream(&pack.payload, &mut 0)?;
+            let moni : MtbMoniData = pack.unpack()?;
             self.n_moni += 1;
             self.moni_queue.push_back(moni);
             if self.moni_queue.len() > self.queue_size {
@@ -171,6 +188,34 @@ impl MTTab {
     if mte.event_id != 0 {
       let hits     = mte.get_trigger_hits();
       let rb_links = mte.get_rb_link_ids();
+      for h in &hits {
+        match self.mapping.get(&h.0) {
+          None => {
+            error!("Can't get mapping for hit {:?}", h);
+            //self.problem_hits.push(*h);
+          },
+          Some(jmap) => {
+            match jmap.get(&h.1) {
+              None => {
+                error!("Can't get mapping for hit {:?}", h);
+                self.problem_hits.push(*h);
+              },
+              Some(chmap) => {
+                match chmap.get(&h.2) {
+                  None => {
+                    error!("Can't get mapping for hit {:?}", h);
+                    self.problem_hits.push(*h);
+                  },
+                  Some((_,panel_id)) => {
+                    self.panel_histo.fill(&(*panel_id as f32));
+                  }
+                }
+              }
+            }
+          }
+        }
+        //self.panel_histo.fill(&(self.mapping[&h.0][&h.1][&h.2].1 as f32));
+      }
       self.nch_histo.fill(&(hits.len() as f32));
       for k in rb_links {
         self.mtb_link_histo.fill(&(k as f32));
@@ -221,8 +266,9 @@ impl MTTab {
     let view_chunks = Layout::default()
       .direction(Direction::Horizontal)
       .constraints(
-          [Constraint::Percentage(50),
-           Constraint::Percentage(50),
+          [Constraint::Percentage(33),
+           Constraint::Percentage(33),
+           Constraint::Percentage(34),
           ].as_ref(),
       )
       .split(detail_chunks[0]);
@@ -379,33 +425,17 @@ impl MTTab {
         .border_type(BorderType::Rounded),
     );
     
-//    let met = self.met_queue.back().unwrap_or(&0.0);
-//    let view_summary = format!("Summary Statistics:
-//  N_Events                         : {}
-//  N_Moni                           : {}
-//  Mission Elapsed Time (MET) [sec] : {:.3}
-//  N EventID Missed                 : {}",
-//                              self.n_events,
-//                              self.n_moni,
-//                              met,
-//                              self.miss_evid);
-//    let summary_view = Paragraph::new(view_summary)
-//      .style(Style::default().fg(Color::LightCyan))
-//      .alignment(Alignment::Left)
-//      .block(
-//        Block::default()
-//          .borders(Borders::ALL)
-//          .style(self.theme.style())
-//          .title("Overview")
-//          .border_type(BorderType::Rounded),
-//      );
 
      // histograms
      let ml_labels  = create_labels(&self.mtb_link_histo);
      let mlh_data   = prep_data(&self.mtb_link_histo, &ml_labels, 10, true); 
      let mlh_chart  = histogram(mlh_data, String::from("MTB Link ID (NOT RBID(!))"), 3, 0, &self.theme);
      frame.render_widget(mlh_chart, bottom_row);   
-
+     
+     let tp_labels  = create_labels(&self.panel_histo);
+     let tph_data   = prep_data(&self.panel_histo, &tp_labels, 2, true); 
+     let tpc_chart  = histogram(tph_data, String::from("Triggered Panel ID"), 3, 0, &self.theme);
+     frame.render_widget(tpc_chart,   self.view_layout[2]);
 
     // render everything
     frame.render_widget(rate_chart,      self.info_layout[0]); 

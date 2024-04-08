@@ -64,11 +64,15 @@ use tof_dataclasses::packets::{
 
 use tof_dataclasses::manifest::{
     get_rbs_from_sqlite,
+    get_dsi_j_ch_pid_map,
     ReadoutBoard,
 };
 //use tof_dataclasses::calibrations::RBCalibrations;
 
-use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::serialization::{
+    Serialization,
+    Packable,
+};
 use tof_dataclasses::events::{
     MasterTriggerEvent,
     RBEvent,
@@ -77,11 +81,15 @@ use tof_dataclasses::events::{
     //RBWaveform,
 };
 
+use liftof_lib::settings::LiftofSettings;
+
 use liftof_tui::menu::{
     MenuItem,
     MainMenu,
     RBMenuItem,
     RBMenu,
+    PAMoniMenuItem,
+    PAMoniMenu,
     MTMenu,
     SettingsMenu,
     THMenu,
@@ -95,7 +103,8 @@ use liftof_tui::menu::{
 use liftof_tui::colors::{
     ColorSet,
     ColorTheme,
-    COLORSETOMILU, // current default
+    COLORSETBW, // current default (valkyrie)
+    //COLORSETOMILU
 };
 
 use liftof_tui::{
@@ -110,6 +119,7 @@ use liftof_tui::{
     CPUTab,
     RBWaveformTab,
     TofSummaryTab, 
+    RBLTBListFocus,
 };
 
 extern crate clap;
@@ -133,6 +143,10 @@ struct Args {
   /// this parameter. 
   #[arg(short, long, default_value_t = 1000.0)]
   refresh_rate: f32,
+  ///// generic liftof config file. If not given, we 
+  ///// assume liftof-config.toml in this directory
+  //#[arg(short, long)]
+  //config: Option<String>,
 }
 
 enum Event<I> {
@@ -295,6 +309,10 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
   }
   let mut n_pack = 0usize;
   info!("0MQ SUB socket connected to address {address}");
+  // per default, we create master trigger packets from TofEventSummary, 
+  // except we have "real" mtb packets
+  let mut craft_mte_packets = true;
+
   loop {
     match data_socket.recv_bytes(0) {
       Err(err) => error!("Can't receive TofPacket! {err}"),
@@ -309,7 +327,7 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
                 error!("Don't understand bytestream! {err}"); 
               },
               Ok(tp) => {
-                println!("{:?}", pck_map);
+                //println!("{:?}", pck_map);
                 packet_sorter(&tp.packet_type, &pck_map);
                 n_pack += 1;
                 //println!("Got TP {}", tp);
@@ -342,6 +360,12 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
             match tp.packet_type {
               PacketType::MonitorMtb |
               PacketType::MasterTrigger => {
+                // apparently, we are getting MasterTriggerEvents, 
+                // sow we won't be needing to craft them from 
+                // TofEventSummary packets
+                if tp.packet_type == PacketType::MasterTrigger {
+                  craft_mte_packets = false;
+                }
                 match tp_sender_mt.send(tp) {
                   Err(err) => error!("Can't send TP! {err}"),
                   Ok(_)    => (),
@@ -359,6 +383,15 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
                     error!("Unable to unpack TofEventSummary! {err}");
                   }
                   Ok(ts) => {
+                    if craft_mte_packets {
+                      let mte    = MasterTriggerEvent::from(&ts);
+                      let mte_tp = mte.pack();
+                      //error!("We are sending the following tp {}", mte_tp);
+                      match tp_sender_mt.send(mte_tp) {
+                        Err(err) => error!("Can't send MTE TP! {err}"),
+                        Ok(_)    => ()
+                      }
+                    }
                     for h in &ts.hits {
                       match th_send.send(*h) {
                         Err(err) => error!("Can't send TP! {err}"),
@@ -373,6 +406,9 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
                 }
               }
               PacketType::TofEvent => {
+                // since the tof event contains MTEs, we don't need
+                // to craft them
+                craft_mte_packets = false;
                 match tp_sender_ev.send(tp) {
                   Err(err) => error!("Can't send TP! {err}"),
                   Ok(_)    => (),
@@ -392,6 +428,9 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
               }
               PacketType::RBEvent |
               PacketType::RBEventMemoryView | 
+              PacketType::LTBMoniData |
+              PacketType::PAMoniData  |
+              PacketType::PBMoniData  |
               PacketType::RBMoni => {
                 match tp_sender_rb.send(tp) {
                   Err(err) => error!("Can't send TP! {err}"),
@@ -426,6 +465,7 @@ struct TabbedInterface<'a> {
   pub th_menu       :  THMenu,
   pub ts_menu       :  TSMenu,
   pub rw_menu       :  RWMenu,
+  pub pa_menu       :  PAMoniMenu,
 
   // The tabs
   pub mt_tab        : MTTab,
@@ -453,6 +493,7 @@ impl<'a> TabbedInterface<'a> {
              th_menu      : THMenu,
              ts_menu      : TSMenu,
              rw_menu      : RWMenu,
+             pa_menu      : PAMoniMenu,
              mt_tab       : MTTab,
              cpu_tab      : CPUTab,
              wf_tab       : RBTab<'a>,
@@ -470,6 +511,7 @@ impl<'a> TabbedInterface<'a> {
       th_menu     ,
       ts_menu     ,
       rw_menu     ,
+      pa_menu     ,
       mt_tab      , 
       cpu_tab     , 
       wf_tab      , 
@@ -479,17 +521,13 @@ impl<'a> TabbedInterface<'a> {
       th_tab      ,
       rbwf_tab    ,
       ts_tab      ,
-      color_set   : COLORSETOMILU,
+      color_set   : COLORSETBW,
     }
   }
 
   pub fn get_colorset(&self) -> ColorSet {
     self.color_set.clone()
   }
-
-  //pub fn set_menu_item(&mut self, item : &MenuItem) {
-  //  self.ui_menu.active_menu_item = item.clone();
-  //}
 
   pub fn receive_packet(&mut self) {
     match self.mt_tab.receive_packet() {
@@ -587,6 +625,11 @@ impl<'a> TabbedInterface<'a> {
     self.rbwf_tab.render(&master_lo.rect[1], frame);
   }
 
+  pub fn render_pamonidatatab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.pa_menu.render(&master_lo.rect[0], frame);
+    self.wf_tab.render(&master_lo.rect[1], frame);
+  }
+
   pub fn render(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
     match self.ui_menu.active_menu_item {
       MenuItem::Home => {
@@ -602,7 +645,11 @@ impl<'a> TabbedInterface<'a> {
         self.render_mt(master_lo, frame);
       },
       MenuItem::ReadoutBoards => {
-        self.render_rbs(master_lo, frame);
+        if self.wf_tab.view == RBTabView::PAMoniData {
+          self.render_pamonidatatab(master_lo, frame);
+        } else {
+          self.render_rbs(master_lo, frame);
+        }
       },
       MenuItem::Settings => {
         self.render_settings(master_lo, frame);
@@ -671,14 +718,38 @@ impl<'a> TabbedInterface<'a> {
         self.settings_tab.ctl_active = false;
 
         match key_code {
+          KeyCode::Right => {
+            if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
+              self.wf_tab.list_focus = RBLTBListFocus::LTBList;
+            }
+          },
+          KeyCode::Left => {
+            if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
+              self.wf_tab.list_focus = RBLTBListFocus::RBList;
+            }
+          },
           KeyCode::Up  => {
             if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-              self.wf_tab.previous_rb();
+              match self.wf_tab.list_focus {
+                RBLTBListFocus::RBList => {
+                  self.wf_tab.previous_rb();
+                },
+                RBLTBListFocus::LTBList => {
+                  self.wf_tab.previous_ltb();    
+                }
+              }
             }
           },
           KeyCode::Down => {
             if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-              self.wf_tab.next_rb();
+              match self.wf_tab.list_focus {
+                RBLTBListFocus::RBList => {
+                  self.wf_tab.next_rb();
+                },
+                RBLTBListFocus::LTBList => {
+                  self.wf_tab.next_ltb();    
+                }
+              }
             }
           },
           KeyCode::Char('h') => {
@@ -686,21 +757,49 @@ impl<'a> TabbedInterface<'a> {
             self.rb_menu.active_menu_item = RBMenuItem::Home;
           },
           KeyCode::Char('i') => {
-            self.rb_menu.active_menu_item = RBMenuItem::Info;
-            self.wf_tab.view = RBTabView::Info;
-          },
-          KeyCode::Char('r') => {
-            self.rb_menu.active_menu_item = RBMenuItem::RBMoniData;
-            self.wf_tab.view = RBTabView::RBMoniData;
+            if self.wf_tab.view == RBTabView::PAMoniData {
+              self.pa_menu.active_menu_item = PAMoniMenuItem::Biases;
+              self.wf_tab.pa_show_biases = true;
+            } else {
+              self.rb_menu.active_menu_item = RBMenuItem::Info;
+              self.wf_tab.view = RBTabView::Info;
+            }
           },
           KeyCode::Char('w') => {
             self.rb_menu.active_menu_item = RBMenuItem::Waveforms;
             self.wf_tab.view = RBTabView::Waveform;
           },
+          KeyCode::Char('r') => {
+            self.rb_menu.active_menu_item = RBMenuItem::RBMoniData;
+            self.wf_tab.view = RBTabView::RBMoniData;
+          },
+          KeyCode::Char('p') => {
+            self.rb_menu.active_menu_item = RBMenuItem::PAMoniData;
+            self.wf_tab.view = RBTabView::PAMoniData;
+          },
+          KeyCode::Char('b') => {
+            if self.wf_tab.view == RBTabView::PAMoniData {
+              self.pa_menu.active_menu_item = PAMoniMenuItem::Back;
+              self.wf_tab.view = RBTabView::Info;
+            } else {
+              self.rb_menu.active_menu_item = RBMenuItem::PBMoniData;
+              self.wf_tab.view = RBTabView::PBMoniData;
+            }
+          },
+          KeyCode::Char('l') => {
+            self.rb_menu.active_menu_item = RBMenuItem::LTBMoniData;
+            self.wf_tab.view = RBTabView::LTBMoniData;
+          },
           KeyCode::Char('s') => {
             self.rb_menu.active_menu_item = RBMenuItem::SelectRB;
             self.wf_tab.view = RBTabView::SelectRB;
           },
+          KeyCode::Char('t') => {
+            if self.wf_tab.view == RBTabView::PAMoniData {
+              self.pa_menu.active_menu_item = PAMoniMenuItem::Temperatures;
+              self.wf_tab.pa_show_biases = false;
+            }
+          }
           KeyCode::Char('q') => {
             return true; // we want to quit the app
           },
@@ -762,6 +861,8 @@ impl<'a> TabbedInterface<'a> {
 }
 
 fn main () -> Result<(), Box<dyn std::error::Error>>{
+  
+
 
   let home_stream_wd_cnt : Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
   let home_streamer      = home_stream_wd_cnt.clone();
@@ -778,6 +879,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
       }
     }
   }
+  let dsijch_paddle_map = get_dsi_j_ch_pid_map(Path::new("gaps_flight.db"));
 
   let mut pm = HashMap::<String, usize>::new();
   pm.insert(String::from("Unknown"          ) ,0);
@@ -885,7 +987,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
 
   // A color theme, can be changed later
   let mut color_theme     = ColorTheme::new();
-  color_theme.update(&COLORSETOMILU);
+  color_theme.update(&COLORSETBW);
   //let mut color_set_bw    = 
   
   // The menus
@@ -896,10 +998,12 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let th_menu         = THMenu::new(color_theme.clone());
   let ts_menu         = TSMenu::new(color_theme.clone());
   let rw_menu         = RWMenu::new(color_theme.clone());
+  let pa_menu         = PAMoniMenu::new(color_theme.clone());
 
   // The tabs
   let mt_tab          = MTTab::new(mt_pack_recv,
                                    mte_recv,
+                                   dsijch_paddle_map,
                                    color_theme.clone());
  
   let cpu_tab         = CPUTab::new(cp_pack_recv,
@@ -924,6 +1028,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                              th_menu,
                                              ts_menu,
                                              rw_menu,
+                                             pa_menu,
                                              mt_tab,
                                              cpu_tab,
                                              wf_tab,

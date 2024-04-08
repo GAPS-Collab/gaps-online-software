@@ -23,7 +23,7 @@ use ratatui::widgets::{
     Paragraph,
 };
 
-use tof_dataclasses::serialization::Serialization;
+//use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::{
@@ -80,7 +80,7 @@ impl EventTab {
         return Ok(());
       },
       Ok(pack)    => {
-        let ev = TofEvent::from_bytestream(&pack.payload, &mut 0)?;
+        let ev : TofEvent = pack.unpack()?;
         match self.mte_sender.send(ev.mt_event.clone()) {
           Err(err) => error!("Can send MasterTriggerEvent! {err}"),
           Ok(_)    => ()

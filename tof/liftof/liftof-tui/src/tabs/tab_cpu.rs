@@ -30,7 +30,10 @@ use tof_dataclasses::packets::{
 };
 use tof_dataclasses::monitoring::CPUMoniData;
 use tof_dataclasses::errors::SerializationError;
-use tof_dataclasses::serialization::Serialization;
+//use tof_dataclasses::serialization::{
+//    Serialization,
+//    Packable
+//};
 
 use crate::colors::ColorTheme;
 use crate::widgets::timeseries;
@@ -63,6 +66,7 @@ pub struct CPUTab {
   pub tp_recv    : Receiver<TofPacket>,
   timer          : Instant,
   queue_size     : usize,
+  pub last_moni  : CPUMoniData,
 }
 
 impl CPUTab {
@@ -72,7 +76,7 @@ impl CPUTab {
     let queue_size    = 1000usize;
     let mut freq_queue = Vec::<VecDeque::<(f64,f64)>>::with_capacity(4);
     let mut temp_queue = Vec::<VecDeque::<(f64,f64)>>::with_capacity(4);
-    
+
     for _core in 0..4 {
       let core_queue  = VecDeque::<(f64,f64)>::with_capacity(queue_size);
       freq_queue.push(core_queue);
@@ -91,6 +95,7 @@ impl CPUTab {
       disk_usage : 0u8,
       tp_recv    : tp_recv,
       queue_size : 1000usize,
+      last_moni  : CPUMoniData::new(),
     }
   }
   
@@ -106,7 +111,9 @@ impl CPUTab {
         trace!("Got next packet {}!", pack);
         match pack.packet_type {
           PacketType::CPUMoniData => {
-            moni = CPUMoniData::from_bytestream(&pack.payload, &mut 0)?;
+            //moni = CPUMoniData::from_bytestream(&pack.payload, &mut 0)?;
+            // new API!
+            moni = pack.unpack()?;
           }
           _ => {
             return Ok(());
@@ -132,6 +139,7 @@ impl CPUTab {
       }
     }
     self.disk_usage = moni.disk_usage;
+    self.last_moni  = moni;
     Ok(())
   }
 
@@ -180,9 +188,7 @@ impl CPUTab {
           .split(graph_chunks[1]).to_vec();
 
 
-        let info_view_str = String::from("foo1");
-        //let foo3 = String::from("foo3");
-        //let foo4 = String::from("foo4");
+        let info_view_str = format!("{}", self.last_moni);
 
         let info_view = Paragraph::new(info_view_str)
         .style(self.theme.style())

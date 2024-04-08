@@ -226,6 +226,82 @@ impl From<RBMenuItem> for usize {
   }
 }
 
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum PAMoniMenuItem {
+  Back,
+  Temperatures,
+  Biases,
+  Quit,
+}
+
+impl From<PAMoniMenuItem> for usize {
+  fn from(input: PAMoniMenuItem) -> usize {
+    match input {
+      PAMoniMenuItem::Back          => 0,
+      PAMoniMenuItem::Temperatures  => 1,
+      PAMoniMenuItem::Biases        => 2,
+      PAMoniMenuItem::Quit          => 3
+    }
+  }
+}
+
+#[derive(Debug, Clone)]
+pub struct PAMoniMenu {
+  pub theme : ColorTheme,
+  pub active_menu_item : PAMoniMenuItem,
+}
+
+impl PAMoniMenu {
+  pub fn new(theme : ColorTheme) -> Self {
+    Self {
+      theme,
+      active_menu_item : PAMoniMenuItem::Temperatures,
+    }
+  }
+  
+  pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
+    let menu_titles = vec!["Back", "Temperatures", "Biases", "Quit"];
+    let menu : Vec<Line> = menu_titles
+               .iter()
+               .map(|t| {
+                 if t == &"Biases" {
+                   let (a, b) = t.split_at(2);
+                   let (highlight, c) = b.split_at(1);
+                   Line::from(vec![
+                     Span::styled(a, self.theme.style()),
+                     Span::styled(
+                         highlight,
+                         Style::default()
+                             .fg(self.theme.hc)
+                             .add_modifier(Modifier::UNDERLINED),
+                     ),
+                     Span::styled(c, self.theme.style()),
+                   ])
+                 } else {
+                   let (first, rest) = t.split_at(1);
+                   Line::from(vec![
+                     Span::styled(
+                         first,
+                         Style::default()
+                             .fg(self.theme.hc)
+                             .add_modifier(Modifier::UNDERLINED),
+                     ),
+                     Span::styled(rest, self.theme.style()),
+                   ])
+                 }
+               })
+               .collect();
+
+    let tabs = Tabs::new(menu)
+        .select(self.active_menu_item.into())
+        .block(Block::default().title("Menu").borders(Borders::ALL))
+        .style(self.theme.style())
+        .highlight_style(self.theme.highlight())
+        .divider(Span::raw("|"));
+    frame.render_widget(tabs, *main_window);
+  }
+}
+
 #[derive(Debug, Clone)]
 pub struct RBMenu  {
   pub theme : ColorTheme,
@@ -242,11 +318,11 @@ impl  RBMenu {
   }
 
   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
-    let menu_titles = vec!["Home", "Info", "Waveforms", "RBMoniData", "PAMoniData", "PBMoniData", "LTBMoniData", "SelectRB", "Quit" ];
+    let menu_titles = vec!["Home", "Info", "Waveforms", "RBMoniData", "PAMoniData", "PBMoniData", "LTBMoniData", "SelectBoards [LTB & RB]", "Quit" ];
     let menu : Vec<Line> = menu_titles
                .iter()
                .map(|t| {
-                 if t == &"Paddles" || t == &"Hits" {
+                 if t == &"PBMoniData" || t == &"Hits" {
                    let (second, rest) = t.split_at(2);
                    Line::from(vec![
                      Span::styled(

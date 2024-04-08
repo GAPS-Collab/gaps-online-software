@@ -32,7 +32,7 @@ impl ColorSet {
 
 pub const COLORSETBW : ColorSet = ColorSet::new(Color::Black, Color::White, 
                                                 Color::White, Color::White,
-                                                Color::Red);
+                                                Color::Rgb(244,133,0));
 pub const COLORSETOMILU : ColorSet = ColorSet::new(Color::Rgb(5, 59, 80),
                                                    Color::Rgb(23, 107, 135),
                                                    Color::Rgb(100, 204, 197),

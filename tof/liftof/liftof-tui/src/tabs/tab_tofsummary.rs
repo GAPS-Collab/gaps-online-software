@@ -124,7 +124,7 @@ impl TofSummaryTab {
           self.evid_test_info  = format!("Missing event ID search [{}]", self.n_evid_test);
           self.evid_test_info += &(format!("\n-- in a chunk of {} event ids", self.evid_test_len)); 
           self.evid_test_info += &(format!("\n-- we found {} event ids missing ({}%)", missing, 100.0*(missing as f64)/self.event_id_test.len() as f64));
-          //self.evid_test_info += &(format!("\n-- {:?}", miss_pos));
+          self.evid_test_info += &(format!("\n-- -- previous: {:?}", self.evid_test_chnks));
           self.event_id_test.clear();
         }
         self.summary_queue.push_back(ts);
@@ -210,10 +210,18 @@ impl TofSummaryTab {
           .title("Missing event ID test")
           .border_type(BorderType::Rounded),
       );
+    let mut spl_data  = Vec::<u64>::new();
+    spl_data.extend_from_slice(self.evid_test_chnks.make_contiguous());
+    // that the sparkline does something, it can't be zero. 
+    // There is no axis marker, so we just add 1 to every bin
+    for k in 0..spl_data.len() {
+      spl_data[k] += 1;
+    }
     let sparkline = Sparkline::default()
       .style(self.theme.style())
       //.direction(RenderDirection::LeftToRight)
-      .data(self.evid_test_chnks.make_contiguous())
+      //.data(self.evid_test_chnks.make_contiguous())
+      .data(&spl_data)
       .block(
         Block::default()
         .borders(Borders::ALL)

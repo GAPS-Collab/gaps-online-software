@@ -263,7 +263,7 @@ pub fn timeseries<'a>(data        : &'a mut VecDeque<(f64,f64)>,
         .borders(Borders::ALL)
         .style(theme.style())
         .title(xlabel )
-        .border_type(BorderType::Double),
+        .border_type(BorderType::Rounded),
     )
     .x_axis(Axis::default()
       .title(Span::styled("MET [s]", Style::default().fg(Color::White)))
