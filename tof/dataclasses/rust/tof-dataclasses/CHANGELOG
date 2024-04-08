@@ -5,6 +5,10 @@
   and adapt to changes in MTB fw >= 3.0.0
 * Allow to check error bits in RBEventMemoryStreamer for channel and cell
   sync errors
+* A new Packable trait together with TofPacket::unpack() -> T will streamline
+  TofPacket packing and unpacking
+* New series module. Allows to aggregate monitoring data (and maybe other data in 
+  the future)
 
 
 # HAHALUA series

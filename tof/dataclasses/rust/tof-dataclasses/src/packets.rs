@@ -13,11 +13,12 @@
 //!
 //! The total packet size is thus 13 + SIZE
 
+pub mod packet_type;
+pub use packet_type::PacketType;
 
-
-// re-imports
 use std::time::Instant;
 use std::fmt;
+// re-exports
 pub use crate::monitoring::{
     RBMoniData,
     PBMoniData,
@@ -29,6 +30,7 @@ pub use crate::monitoring::{
 
 use crate::serialization::{
     Serialization, 
+    Packable,
     parse_u8,
     parse_u16,
     parse_u32
@@ -49,12 +51,13 @@ use crate::events::{
     TofEventSummary,
 };
 
-use crate::commands::{TofCommand,
-                      RBCommand};
+use crate::commands::{
+    TofCommand,
+    RBCommand
+};
+
 use crate::calibrations::RBCalibrations;
 
-pub mod packet_type;
-pub use packet_type::PacketType;
 
 /// The most basic of all packets
 ///  
@@ -137,16 +140,18 @@ impl TofPacket {
       valid            : true,
     }
   }
-
-  /// Unpack possible content
-  pub fn unpack_rbevent(&self) -> Result<RBEvent, Box<dyn Error>> {
-    if self.packet_type != PacketType::RBEvent {
-      error!("We expeckt packet type {}, but got packet type {} instead!", PacketType::RBEvent, self.packet_type);
-      return Err(Box::new(PacketError::WrongPacketType));
+ 
+  /// Unpack the TofPacket and return its content
+  pub fn unpack<T>(&self) -> Result<T, SerializationError>
+    where T: Packable + Serialization {
+    if T::PACKET_TYPE != self.packet_type {
+      error!("This bytestream is not for a {} packet!", self.packet_type);
+      return Err(SerializationError::IncorrectPacketType);
     }
-    Ok(RBEvent::from_bytestream(&self.payload, &mut 0)?)
+    let unpacked : T = T::from_bytestream(&self.payload, &mut 0)?;
+    Ok(unpacked)
   }
-
+  
   pub fn age(&self) -> u64 {
     self.creation_time.elapsed().as_secs()
   }
@@ -162,6 +167,9 @@ impl TofPacket {
   }
 }
 
+
+/// FIXME - all these can go away now, because we have the
+/// Packable trait! Amazing!
 impl From<&RBWaveform> for TofPacket {
   fn from(rbwave : &RBWaveform) -> Self {
     let mut tp     = Self::new();
@@ -314,6 +322,11 @@ impl From<&RBEventHeader> for TofPacket {
     tp
   }
 }
+
+// I would LOOVE to implement the Packable trait here and have 
+// a matroshka doll for TofPackets. I just don't know why that 
+// would be useful. It might be leading to a new approach 
+// for multipackets
 
 impl Serialization for TofPacket {
   const HEAD : u16 = 0xaaaa;
