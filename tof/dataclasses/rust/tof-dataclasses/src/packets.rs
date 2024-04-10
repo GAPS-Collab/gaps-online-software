@@ -36,10 +36,10 @@ use crate::serialization::{
     parse_u32
 };
 
-use std::error::Error;
+//use std::error::Error;
 use crate::errors::{
     SerializationError,
-    PacketError
+    //PacketError
 };
 
 use crate::events::{

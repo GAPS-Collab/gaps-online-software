@@ -128,7 +128,8 @@ pub enum TriggerType {
   Umb3Cube     = 25u8,
   /// > 100 -> Debug triggers
   Poisson      = 100u8,
-  Forced       = 101u8, 
+  Forced       = 101u8,
+  FixedRate    = 102u8,
 }
 
 impl fmt::Display for TriggerType {
@@ -150,6 +151,9 @@ impl TriggerType {
       }
       TriggerType::Forced => {
         return 101;
+      }
+      TriggerType::FixedRate => {
+        return 102;
       }
       TriggerType::Any => {
         return 1;
@@ -188,6 +192,7 @@ impl From<u8> for TriggerType {
       0   => TriggerType::Unknown,
       100 => TriggerType::Poisson,
       101 => TriggerType::Forced,
+      102 => TriggerType::FixedRate,
       1   => TriggerType::Any,
       2   => TriggerType::Track,
       3   => TriggerType::TrackCentral,
@@ -209,11 +214,12 @@ impl FromRandom for TriggerType {
     let choices = [
       TriggerType::Unknown,
       TriggerType::Poisson,
+      TriggerType::Forced,
+      TriggerType::FixedRate,
       TriggerType::Any,
       TriggerType::Track,
       TriggerType::TrackCentral,
       TriggerType::Gaps,
-      TriggerType::Forced,
       TriggerType::UmbCube,
       TriggerType::UmbCubeZ,
       TriggerType::UmbCorCube,
