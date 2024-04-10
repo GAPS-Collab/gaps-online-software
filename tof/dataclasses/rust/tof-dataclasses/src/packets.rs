@@ -77,9 +77,6 @@ use crate::calibrations::RBCalibrations;
 pub struct TofPacket {
   pub packet_type        : PacketType,
   pub payload            : Vec<u8>,
-  // FUTURE EXTENSION: Be able to send
-  /// packets which contain multiple of the same packets
-  pub is_multi_packet    : bool,
   // fields which won't get serialized
   /// mark a packet as not eligible to be written to disk
   pub no_write_to_disk   : bool,
@@ -117,7 +114,6 @@ impl PartialEq for TofPacket {
   fn eq(&self, other: &Self) -> bool {
     (self.packet_type == other.packet_type)           &&
     (self.payload == other.payload)                   &&
-    (self.is_multi_packet == other.is_multi_packet)   &&
     (self.no_write_to_disk == other.no_write_to_disk) &&
     (self.no_send_over_nw == other.no_send_over_nw)   &&
     (self.valid == other.valid)
@@ -126,14 +122,11 @@ impl PartialEq for TofPacket {
 
 impl TofPacket {
 
-  pub const PRELUDE_SIZE : usize = 7; 
- 
   pub fn new() -> Self {
     let creation_time = Instant::now();
     Self {
       packet_type      : PacketType::Unknown,
       payload          : Vec::<u8>::new(),
-      is_multi_packet  : false,
       no_write_to_disk : false,
       no_send_over_nw  : false,
       creation_time    : creation_time,
@@ -154,16 +147,6 @@ impl TofPacket {
   
   pub fn age(&self) -> u64 {
     self.creation_time.elapsed().as_secs()
-  }
- 
-  pub fn get_n_packets(&self) -> u32 {
-    if !self.is_multi_packet {
-      return 1; 
-    }
-    todo!("Can not deal with multipackets right now!");
-    #[allow(unreachable_code)] {
-      return 1;
-    }
   }
 }
 
@@ -366,9 +349,6 @@ impl Serialization for TofPacket {
   
   fn to_bytestream(&self) 
     -> Vec<u8> {
-    if self.is_multi_packet {
-      todo!("Can not deal with multipackets right now!");
-    }
     let mut bytestream = Vec::<u8>::with_capacity(6 + self.payload.len());
     bytestream.extend_from_slice(&TofPacket::HEAD.to_le_bytes());
     let p_type = self.packet_type as u8;
