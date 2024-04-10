@@ -528,6 +528,7 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def(py::init())
         .def("from_bytestream",       &TofPacket::from_bytestream)
         .def_readonly("payload",      &TofPacket::payload)
+        .def("unpack",                &TofPacket::unpack<TofEvent>)
         .def_readonly("payload_size", &TofPacket::payload_size)
         .def_readonly("packet_type",  &TofPacket::packet_type)
         .def("__repr__",          [](const TofPacket &pkg) {

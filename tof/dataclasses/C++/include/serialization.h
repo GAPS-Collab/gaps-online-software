@@ -13,27 +13,8 @@
 #include "packets/tof_packet.h"
 #include "serialization.h"
 
-/// Concept - allow to require a from_bytestream method from 
-/// consumers
-template<typename T>
-concept HasFromByteStream = requires(const Vec<u8>& stream, usize &pos) {
-  { T::from_bytestream(stream, pos) } -> std::same_as<T>;
-};
-//template<typename T>
-//concept HasFromByteStream = requires {
-//  T::from_bytestream -> std::same_as<T>;
-//}
-
-
 /// Allow to extend all classes with a from_tofpacket method 
-//  concept HasFromByteStream = requires(const Vec<u8>& stream, usize &pos) {
-//    { Derived::from_bytestream(stream, pos) } -> std::same_as<Derived>;
-//  };
-//requires HasFromByteStream<Derived>
-//requires(const Vec<u8> &stream, usize &pos) {
-//    Derived::from_bytestream(stream, pos)} -> std::same_as<Derived>
 template<typename Derived>
-//requires HasFromByteStream<Derived>
 struct FromTofPacket {
   static Derived from_tofpacket(const TofPacket &p) {
       usize pos = 0;
@@ -59,12 +40,11 @@ struct FromTofPacket {
  * @param end_pos   : Restrict searching only until this position
  *                    in the bytestream                   
  */
-u64 search_for_2byte_marker(
-           const Vec<u8> &bytestream,
-           u8 marker,
-           bool &has_ended,
-           u64 start_pos=0,
-           u64 end_pos=0);
+u64 search_for_2byte_marker(const Vec<u8> &bytestream,
+                            u8 marker,
+                            bool &has_ended,
+                            u64 start_pos=0,
+                            u64 end_pos=0);
 
 /***********************************************/
 

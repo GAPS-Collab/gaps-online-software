@@ -26,7 +26,9 @@ static const u8 RBEVENTPAYLOAD     = 110;
 static const u8 RBEVENTMEMORYVIEW  = 120;
 static const u8 RBCALIBRATION      = 130;
 
-
+/// The PacketType is essential to identify 
+/// individual TofPackets. This has to 
+/// resemble the Rust API
 enum class PacketType : u8 {
   Unknown           = UNKNOWN            ,
   Command           = COMMAND            ,
@@ -50,30 +52,32 @@ enum class PacketType : u8 {
 };
 
 
-/**
- * String representation of enum "PacketType"
- *
- */ 
+
+/// String representation of enum "PacketType"
 std::string packet_type_to_string(PacketType pt);
 
 std::ostream& operator<<(std::ostream& os, const PacketType& pck);
 
+/// Ensures that <T> has a method ::from_bytestream
+template<typename T>
+concept HasFromByteStream = requires(const Vec<u8>& stream, usize &pos) {
+  { T::from_bytestream(stream, pos) } -> std::same_as<T>;
+};
 
-/*********************************************************
- * The most basic of all packets
- *
- * A wrapper packet for an arbitrary bytestream
- * 
- * It looks like the following
- * 
- * HEAD    : u16 = 0xAAAA
- * TYPE    : u8  = PacketType
- * SIZE    : u64
- * PAYLOAD : [u8;6-SIZE]
- * TAIL    : u16 = 0x5555
- * => The packet has a fixed size of 9 bytes
- * => The packet has a size of 9 + PAYLOAD.size()
- */
+/// The most basic of all packets
+/// 
+/// A wrapper packet for an arbitrary bytestream
+/// 
+/// It looks like the following
+/// 
+/// HEAD    : u16 = 0xAAAA
+/// TYPE    : u8  = PacketType
+/// SIZE    : u64
+/// PAYLOAD : [u8;6-SIZE]
+/// TAIL    : u16 = 0x5555
+/// => The packet has a fixed size of 9 bytes
+/// => The packet has a size of 9 + PAYLOAD.size()
+/// 
 struct TofPacket {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
@@ -82,7 +86,6 @@ struct TofPacket {
   u16 tail = 0x5555;
 
   // head (2) + tail (2) + type (1) + payload size (4)
-  //u8  p_size_fixed = 9;
   PacketType  packet_type; 
   // just the size of the payload, 
   // not including type, header or tail
@@ -91,25 +94,25 @@ struct TofPacket {
   Vec<u8> payload;
 
   TofPacket();
-  /**
-   * Transcode from bytestream
-   *
-   */
+  
+  /// Transcode the bytestream into the respective 
+  /// TofPacket
   static TofPacket from_bytestream(const Vec<u8> &bytestream,
                                    u64 &pos);
 
-  //! Just to be used for debugging - NO SERIALIZATION. 
+  /// A representative representation of the TofPacket 
+  /// very usefule for debugging
   std::string to_string() const;
   
-  //! A generic unpacking method - unpack everything which
-  //! is stored within the payload 
-  template <typename T>
+  /// A generic unpacking method - unpack everything which
+  /// is stored within the payload 
+  /// This requires that T has a ::from_bytestream method,
+  /// which is enforced at compile time by 
+  /// the concept HasFromByteStream
+  template <HasFromByteStream T>
   T unpack() {
-    // Check if T has a 'from_bytestream' method.
-    static_assert(
-        std::is_member_function_pointer<decltype(&T::from_bytestream)>::value,
-        "T must have a 'from_bytestream' method.");
-    return T::from_bytestream(payload, 0);
+    usize pos = 0;
+    return T::from_bytestream(payload, pos);
   }
 }; // end TofPacket
 
