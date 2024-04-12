@@ -93,7 +93,8 @@ private:
   float   TCorrFixed[NPAD];          // Timing correction (cables, pad_len)
   float   TCorrEvent[NPAD];          // Timing correction (ch9)
   int     EarlyPaddle;               // Which paddle is first hit
-  
+  float   EarlyTime;                 // Time of earliest hit
+   
   float   Pedestal[NTOT];             // Pedestal values
   float   PedRMS[NTOT];               // Pedestal RMS values
   bool    RBInData[NRB];              // RB in data stream?
@@ -105,6 +106,7 @@ private:
   float   VPeak[NTOT];                // Pulse peak value
   float   QInt[NTOT];                 // Pulse charge value
   float   TDC[NTOT];                  // TDC value (CFD method)
+  float   TDC_Cor[NTOT];              // Corrected TDC value (CFD method)
 
   bool    IsHit[NPAD];                // Do we have Hit info?
   int     Hits[NPAD];                 // Hit mask for paddle 
@@ -113,6 +115,7 @@ private:
   float   HitZ[NPAD];                 // Z location in detector
   float   HitT[NPAD];                 // Time of hit in detector
   float   delta[NPAD];                // displacement from center
+  float   beta;                       // beta of particle
   int     NPadCube;
   int     NPadUmbrella;
   int     NPadCortina;
@@ -136,7 +139,11 @@ private:
   TH3F    *HitCortina;                 // Hit Position in detector (mm)
   TH3F    *HitUmbrella;                // Hit Position in detector (mm)
   TProfile *QvPosition[NPAD];          // Avg Q vs position along paddle
+  TProfile *QvPositionA[NPAD];         // Q vs position - End A
+  TProfile *QvPositionB[NPAD];         // Q vs position - End B
   TH1I    *FirstPaddle;
+  TH1F    *FirstTime;
+  TH1F    *BetaDist;
   TH1I    *NPaddlesCube;
   TH1I    *NPaddlesUmbrella;
   TH1I    *NPaddlesCortina;

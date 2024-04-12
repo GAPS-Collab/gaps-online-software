@@ -342,7 +342,7 @@ void Waveform::InitializeVariables(int no_acq) {
   // stuff related to the pedestals
   // Need to do after setting wf_size
   wf_ped_begin   = 100;
-  wf_ped_range   = 400;
+  wf_ped_range   = 100;
   //wf_ped_range   = wf_size - wf_ped_begin;
   //saturated_hi   =  1000.0;
   //saturated_lo   = -1000.0;
@@ -1111,7 +1111,9 @@ double Waveform::GetPeakValue(float lo = 0.0, float size = -1.0) {
   double maxval = GetBin(lo_bin);
   
   for(int i = lo_bin ; i < hi_bin; i++){
-    if(GetBin(i) > maxval){ maxval = GetBin(i); }
+    if(GetBin(i) > maxval){
+      maxval = GetBin(i);
+      PeakValueTime = WaveTime[i]; }
   }
   return(maxval);
 }

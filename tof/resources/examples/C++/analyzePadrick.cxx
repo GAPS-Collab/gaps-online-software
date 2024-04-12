@@ -24,7 +24,8 @@
 #include "./include/constants.h"
 #include "./include/EventPadrick.h"
 
-void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm);
+void   GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm);
+double FitSine(std::vector<double> volts, std::vector<double> times);
 
 int main(int argc, char *argv[]){
   spdlog::cfg::load_env_levels();
@@ -32,7 +33,7 @@ int main(int argc, char *argv[]){
   cxxopts::Options options("unpack-tofpackets", "Unpack example for .tof.gaps files with TofPackets.");
   options.add_options()
   ("h,help", "Print help")
-  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value(""))
+  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/mnt/tof-nas/nevis-data/tofdata/calibration/latest/"))
   ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
   ("f,files", "List of Files", cxxopts::value<bool>()->default_value("false"))
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
@@ -238,6 +239,7 @@ int main(int argc, char *argv[]){
 	GAPS::Waveform *wch9[NRB];
 	for (int i=0;i<NTOT;i++) wave[i] = NULL;
 	for (int i=0;i<NRB;i++)  wch9[i] = NULL;
+	float Phi[NRB] = { -999.0 };
 	
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
@@ -280,6 +282,11 @@ int main(int argc, char *argv[]){
 	    // First, store the waveform for channel 9
 	    Vec<f64> ch9_volts(volts[8].begin(), volts[8].end());
 	    Vec<f64> ch9_times(times[8].begin(), times[8].end());
+	    // Before making waveforms, lets calculate the ch9
+	    // phase. For now, if we have ch9 data for this RB, we
+	    // want to analyze it.
+	    Phi[rbid] = FitSine(ch9_volts,ch9_times);
+	    // Now, initialize the ch9 Waveform for this RB. 
 	    wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),
 					    ch9_times.data(), rbid,0);
 	    //printf(" %d", rbid);
@@ -312,15 +319,23 @@ int main(int argc, char *argv[]){
 	  float tdc = Event.GetTDC(i);
 	  //if (tdc > 5) printf("%ld: %d -> %.2f\n", evt_ctr, i, tdc);
 	}
+	// Now that we have TDC values available, process the ch9 phases
+	Event.AnalyzePhases(Phi);
 	
 	// Analyze each paddle: position on paddle, hitmask, etc
-	Event.AnalyzePaddles(10.0, 5.0); //Args: Peak and Charge cuts
+	Event.AnalyzePaddles(10.0, CHmin); //Args: Peak and Charge cuts
 
 	// Now calculate beta, charge, and inner/outer tof x,y,z, etc.
 	Event.AnalyzeEvent();
-	
+	//std::cout << "here: "<< NTOT << "  " << std::endl;
+	//std::cout << "here: "<< Event.evtno << "  " << std::endl;
+	std::cout << "Event id: "<< evt_ctr << "  " << std::endl;
 	// Now fill out histograms
 	Event.FillChannelHistos(0);
+
+
+	
+
 	Event.FillPaddleHistos();
 
 	Event.UnsetWaveforms();
@@ -390,6 +405,9 @@ void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
 
   FILE *fp;
   char label[50], line[500];
+  char srcdir[200] = "/home/gaps/software/gaps-online-software/";
+  char codedir[200] = "src/gaps-db/resources/master-spreadsheet/";
+  char fname[501];
   int status;
   float value;
 
@@ -402,7 +420,8 @@ void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
   int tmp_vid;
   float tmp_x, tmp_y, tmp_z;
   float tmp_dimx, tmp_dimy, tmp_dimz;
-  fp = fopen("/home/gaps/software/gaps-online-software/src/gaps-db/resources/master-spreadsheet/paddleid_vs_volid.json", "r");
+  snprintf(fname, 500, "%s/%s/paddleid_vs_volid.json", srcdir, codedir);
+  fp = fopen(fname, "r");
   if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
     while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9] %d", &tmp_pad, &tmp_vol) != EOF) {
       vol_id[tmp_pad] = tmp_vol;
@@ -414,7 +433,8 @@ void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
   
   // Now that we have the vol_id for each paddle, map read in the
   // vol_id to location map.
-  fp = fopen("/home/gaps/software/gaps-online-software/src/gaps-db/resources/master-spreadsheet/level0_coordinates.json", "r");
+  snprintf(fname, 500, "%s/%s/level0_coordinates.json", srcdir, codedir);
+  fp = fopen(fname, "r");
   int ctr=0;
   if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
     while (fscanf(fp,"%*[^-0-9]%d ", &tmp_vid) != EOF) { // Read VolID
@@ -442,11 +462,19 @@ void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
   fclose(fp); // Finished with file
   
   int tmp_o;
+  float coax, harting;
   // One last task: Get the paddle orientation from paddle_to_orientation.json
-  fp = fopen("/home/gaps/software/gaps-online-software/src/gaps-db/resources/master-spreadsheet/paddle_to_orientation.json", "r");
+  snprintf(fname, 500, "%s/%s/paddle_orient_cable.jaz", srcdir, codedir);
+  fp = fopen(fname, "r");
   if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
-    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9]%d ", &tmp_pad, &tmp_o) != EOF) {
-      if (tmp_pad > 0) pad->Orientation[tmp_pad] = tmp_o;
+    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9]%d %*[^-0-9]%f  %*[^-0-9]%f ",
+		  &tmp_pad, &tmp_o, &coax, &harting) != EOF) {
+      if (tmp_pad > 0) {
+	pad->Orientation[tmp_pad] = tmp_o;
+	pad->CoaxLen[tmp_pad]     = coax;
+	pad->HardingLen[tmp_pad]  = harting;
+	//printf("%3d %2d %8.3f %8.3f\n", tmp_pad, tmp_o, coax, harting);
+      }
     }
   }
 
@@ -455,20 +483,13 @@ void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
   // but I need the map for development purposes here.
   int paddle_map[NRB][NCH] = { 0 }; // Stored value will be paddle ID;
   int rb_num, rb_ch, ch_num, pad_id;
-  fp = fopen("/home/gaps/software/gaps-online-software/src/gaps-db/resources/master-spreadsheet/rbch-vs-paddle.json", "r");
+  snprintf(fname, 500, "%s/%s/rbch-vs-paddle.json", srcdir, codedir);
+  fp = fopen(fname, "r");
   if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
     while (fscanf(fp, "%*[^-0-9]%d  %[^\n]", &rb_num, line) != EOF) { 
       if (rb_num>0 && rb_num<50) {
-	//if (strncmp(label, "\"", 1) == 0) { // Found an RB line
-	//int rb_len = strlen(label)-3;     // RB<=9 or RB>=10
-	//char tmp[6];
-	//if (rb_len == 1) snprintf(tmp, sizeof(tmp), "%.1s", label+1);
-	//if (rb_len == 2) snprintf(tmp, sizeof(tmp), "%.2s", label+1);
-	//rb_num = atoi(tmp);
 	for(int i=0;i<NCH;i++) {
 	  status = fscanf(fp, "%*[^-0-9]%d  %*[^-0-9]%d ", &rb_ch, &pad_id);
-	  //snprintf(tmp, sizeof(tmp), "%.4s", line);
-	  //int pad_id = atoi(tmp);
 	  // Store the SiPM Channel for each Paddle end
 	  int paddle = pad_id % 1000;
 	  int ch_num = (rb_num-1)*NCH + (rb_ch)-1; // Map the value to NTOT
@@ -483,16 +504,129 @@ void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
 	    pad->SiPM_A[paddle] = ch_num; 
 	    sipm->PaddleEnd[ch_num] = 0;
 	  }
-
-	  //printf("RBnum = %s %s %d; %d %d\n",label,line,rb_num,i,pad_id);
-	  //paddle_map[rb_num][i] = pad_id;
 	}
 	status = fscanf(fp, "%s", line); // read in the closing "}" for RB
       }
     }
   }
   fclose(fp); // Finished with file
+}
+
+double FitSine(std::vector<double> volts, std::vector<double> times)
+//if you want to get all three fit parameters:
+//std::vector<double> FitSine(std::vector<double> volts, std::vector<double> times, float cm)
+{
+  //float ns_off = 0; //cm*0.08; //Harting cable signal propagation is supposed to be 5.13 ns/m or 0.0513 ns/cm. crude measurement gives  0.08 ns/cm
+  int start_bin = 20;
+  int size_bin = 900; //can probably make this smaller
   
+  int data_size = 0;
+  double pi = 3.14159265;
+  double a;
+  double b;
+  //if you want to get all fit params
+  //double c;
+  double p[3]; // product of fitting equation
+  double XiYi = 0.0;
+  double XiZi = 0.0;
+  double YiZi = 0.0;
+  double XiXi = 0.0;
+  double YiYi = 0.0;
+  double Xi = 0.0;
+  double Yi = 0.0;
+  double Zi = 0.0;
+  double xi = 0.0;
+  double yi = 0.0;
+  double zi = 0.0;
 
+  for(int i=start_bin; i < start_bin+size_bin; i++)
+  {
 
+// condition left over from when the sine wave was truncated 
+//    if (volts[i] > -80.0)
+//    {
+
+      xi = cos(2*pi*0.02*(times[i]));  //for this fit we know the frequency is 0.02 waves/ns
+      yi = sin(2*pi*0.02*(times[i]));
+      zi = volts[i];
+      XiYi += xi*yi;
+      XiZi += xi*zi;
+      YiZi += yi*zi;
+      XiXi += xi*xi;
+      YiYi += yi*yi;
+      Xi   += xi;
+      Yi   += yi;
+      Zi   += zi;
+      data_size++;
+//    }
+  }
+
+  double A[3][3];
+  double B[3][3];
+  double X[3][3];
+  double x = 0;
+  double n = 0; //n is the determinant of A
+
+  //the matrix A is XTX where X is the matrix of dimensions (data_size x 3) <cos(2pifreq*time), sin(2pifreq*time),1>
+  A[0][0] = XiXi;
+  A[0][1] = XiYi;
+  A[0][2] = Xi;
+  A[1][0] = XiYi;
+  A[1][1] = YiYi;
+  A[1][2] = Yi;
+  A[2][0] = Xi;
+  A[2][1] = Yi;
+  A[2][2] = data_size;
+
+  n += A[0][0] * A[1][1] * A[2][2];
+  n += A[0][1] * A[1][2] * A[2][0];
+  n += A[0][2] * A[1][0] * A[2][1];
+  n -= A[0][0] * A[1][2] * A[2][1];
+  n -= A[0][1] * A[1][0] * A[2][2];
+  n -= A[0][2] * A[1][1] * A[2][0];
+  x = 1.0/n;
+
+  //find cofactor matrix of A, call this B
+  B[0][0] =  (A[1][1] * A[2][2]) - (A[2][1] * A[1][2]);
+  B[0][1] = ((A[1][0] * A[2][2]) - (A[2][0] * A[1][2])) * (-1);
+  B[0][2] =  (A[1][0] * A[2][1]) - (A[2][0] * A[1][1]);
+  B[1][0] = ((A[0][1] * A[2][2]) - (A[2][1] * A[0][2])) * (-1);
+  B[1][1] =  (A[0][0] * A[2][2]) - (A[2][0] * A[0][2]);
+  B[1][2] = ((A[0][0] * A[2][1]) - (A[2][0] * A[0][1])) * (-1);
+  B[2][0] =  (A[0][1] * A[1][2]) - (A[1][1] * A[0][2]);
+  B[2][1] = ((A[0][0] * A[1][2]) - (A[1][0] * A[0][2])) * (-1);
+  B[2][2] =  (A[0][0] * A[1][1]) - (A[1][0] * A[0][1]);
+
+  //take the transpose of the cofactor matrix and divide by the determinant to get the inverse matrix X
+  for(int i=0;i<3;i++)
+  {
+    for(int j=0;j<3;j++)
+    {
+      X[i][j] = B[j][i] * x;
+    }
+  }
+
+  //multiply p = zTX by the result
+  p[0] = XiZi;
+  p[1] = YiZi;
+  p[2] = Zi;
+  a = X[0][0] * p[0] + X[1][0] * p[1] + X[2][0] * p[2];
+  b = X[0][1] * p[0] + X[1][1] * p[1] + X[2][1] * p[2];
+  //offset parameter
+  //c = X[0][2] * p[0] + X[1][2] * p[1] + X[2][2] * p[2];
+  
+  double phi = atan2(a,b);
+  
+  return phi;
+
+  //amplitude parameter
+  //double amp2 = pow(a,2)+pow(b,2);
+  
+  //return all three params
+  //std::vector<double> v;
+  //v.push_back(phi);
+  //v.push_back(amp2);
+  //v.push_back(c);
+
+  //return v;
 }

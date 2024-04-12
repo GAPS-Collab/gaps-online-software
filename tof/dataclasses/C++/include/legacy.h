@@ -119,7 +119,8 @@ public:
   double  GetCharge(int i);
   double  GetHeight(int i);
   double  GetWidth(int i);
-
+  double  GetPeakTime(void) {return PeakValueTime;}
+  
   // Stuff related to the pulses
   double  GetPulsepars(int i) {return pulsepars[i];}
   double  GetPulsechi2() {return pulsechi2;}
@@ -147,7 +148,8 @@ private:
   double  *WaveData;                 // 'in memory' waveform data
   double  *WaveTime;                 // 'in memory' waveform times
   double  *wf_baseline;              // To subtract reference baseline (mV)
-
+  double  PeakValueTime;             // Time of peak (GetPeakValue sets)
+  
   // Stuff related to the pedestals
   int     wf_ped_range;              // How much data used for ped calcs
   int     wf_ped_begin;              // Start of trace for ped calcs
