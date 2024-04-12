@@ -26,6 +26,7 @@ var classGAPS_1_1Waveform =
     [ "GetNsPerBin", "classGAPS_1_1Waveform.html#ab82d25fe8c3d3d8dc2141a6423937087", null ],
     [ "GetNumPeaks", "classGAPS_1_1Waveform.html#a1b6f58b80c057620aecb1f4f72d59af6", null ],
     [ "GetOffset", "classGAPS_1_1Waveform.html#af9652ede7b1b9d7a5d9f8a673446163d", null ],
+    [ "GetPeakTime", "classGAPS_1_1Waveform.html#adcd5dec9bd1c0c5e0e76429d7e43538a", null ],
     [ "GetPeakValue", "classGAPS_1_1Waveform.html#aa00c94f5e0224bc9ef7203b392844ccd", null ],
     [ "GetPedBegin", "classGAPS_1_1Waveform.html#a54688e8139ad8f240018519ca734f562", null ],
     [ "GetPedestal", "classGAPS_1_1Waveform.html#a2bb2ff6563b42d38f22484dde4f4cd23", null ],

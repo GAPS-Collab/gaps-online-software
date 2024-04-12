@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"trait":["AsPyPointer","FromPyObject","FromPyPointer","IntoPy","IntoPyPointer","PyTryFrom","PyTryInto","ToPyObject"]};

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/master_trigger.rs`."><title>master_trigger.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/master_trigger.rs`."><title>master_trigger.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../liftof_lib/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -784,6 +784,186 @@
 <a href="#782" id="782">782</a>
 <a href="#783" id="783">783</a>
 <a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard communications
 //!
 //! The MTB (MasterTriggerBoard) is currently
@@ -804,8 +984,8 @@
 <span class="kw">use </span>std::fmt;
 <span class="comment">//use std::io;
 //use std::collections::HashMap;
-//use std::collections::VecDeque;
-//use std::net::{
+</span><span class="kw">use </span>std::collections::VecDeque;
+<span class="comment">//use std::net::{
 //    UdpSocket,
 //    SocketAddr
 //};
@@ -831,14 +1011,10 @@
 
 <span class="comment">//const MT_MAX_PACKSIZE   : usize = 1024;
 
-//use tof_dataclasses::constants::{
-//    // N_LTBS,
-//    N_CHN_PER_LTB,
-//};
-
-</span><span class="doccomment">/// The DAQ packet from the MTB has a flexible size, but it will
-/// be at least this number of words long.
-</span><span class="kw">const </span>MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = <span class="number">11</span>; 
+</span><span class="kw">use </span>tof_dataclasses::constants::{
+    N_LTBS,
+    N_CHN_PER_LTB,
+};
 
 <span class="doccomment">/// helper function to parse output for TofBot
 </span><span class="kw">fn </span>remove_from_word(s: String, word: <span class="kw-2">&amp;</span>str) -&gt; String {
@@ -851,8 +1027,181 @@
   }
 }
 
+<span class="comment">///// The IPBus standard encodes several packet types.
+/////
+///// The packet type then will 
+///// instruct the receiver to either 
+///// write/read/etc. values from its
+///// registers.
+//#[derive(Debug, PartialEq, Copy, Clone, serde::Deserialize, serde::Serialize)]
+//#[repr(u8)]
+//pub enum IPBusPacketType {
+//  Read                 = 0,
+//  Write                = 1,
+//  ReadNonIncrement     = 2,
+//  WriteNonIncrement    = 3,
+//  RMW                  = 4
+//}
+//
+//impl fmt::Display for IPBusPacketType {
+//  fn fmt(&amp;self, f: &amp;mut fmt::Formatter) -&gt; fmt::Result {
+//    let r = serde_json::to_string(self).unwrap_or(
+//      String::from("Error: cannot unwrap this IPBusPacketType"));
+//    write!(f, "&lt;IPBusPacketType: {}&gt;", r)
+//  }
+//}
+//
+//impl TryFrom&lt;u8&gt; for IPBusPacketType {
+//  type Error = IPBusError;
+//  
+//  fn try_from(pt : u8)
+//    -&gt; Result&lt;IPBusPacketType,IPBusError&gt; {
+//    match pt {
+//      0 =&gt; Ok(IPBusPacketType::Read),
+//      1 =&gt; Ok(IPBusPacketType::Write),
+//      2 =&gt; Ok(IPBusPacketType::ReadNonIncrement),
+//      3 =&gt; Ok(IPBusPacketType::WriteNonIncrement),
+//      4 =&gt; Ok(IPBusPacketType::RMW),
+//      _ =&gt; {
+//        error!("Unable to decode packet type {}", pt);
+//        return Err(IPBusError::DecodingFailed);
+//      }
+//    }
+//  }
+//}
 
-<span class="doccomment">/// Configure the trigger
+//#[cfg(feature = "random")]
+//impl FromRandom for IPBusPacketType {
+//  
+//  fn from_random() -&gt; Self {
+//    let choices = [
+//      IPBusPacketType::Read,
+//      IPBusPacketType::Write,
+//      IPBusPacketType::ReadNonIncrement,
+//      IPBusPacketType::WriteNonIncrement,
+//      IPBusPacketType::RMW,
+//    ];
+//    let mut rng  = rand::thread_rng();
+//    let idx = rng.gen_range(0..choices.len());
+//    choices[idx]
+//  }
+//}
+
+
+///// Encode register addresses and values in IPBus packet
+/////
+///// # Arguments:
+/////
+///// * addr        : register addresss
+///// * packet_type : read/write register?
+///// * data        : the data value at the specific
+/////                 register.
+/////
+//pub fn encode_ipbus(addr        : u32,
+//                    packet_type : IPBusPacketType,
+//                    data        : &amp;Vec&lt;u32&gt;) -&gt; Vec&lt;u8&gt; {
+//  // this will silently overflow, but 
+//  // if the message is that long, then 
+//  // most likely there will be a 
+//  // problem elsewhere, so we 
+//  // don't care
+//  let size = data.len() as u8;
+//
+//  let packet_id = 0u8;
+//  let mut udp_data = Vec::&lt;u8&gt;::from([
+//    // Transaction Header
+//    0x20 as u8, // Protocol version &amp; RSVD
+//    0x00 as u8, // Transaction ID (0 or bug)
+//    0x00 as u8, // Transaction ID (0 or bug)
+//    0xf0 as u8, // Packet order &amp; packet_type
+//    // Packet Header
+//    //
+//    // FIXME - in the original python script, 
+//    // the 0xf0 is a 0xf00, but this does not
+//    // make any sense in my eyes...
+//    (0x20 as u8 | ((packet_id &amp; 0xf0 as u8) as u32 &gt;&gt; 8) as u8), // Protocol version &amp; Packet ID MSB
+//    (packet_id &amp; 0xff as u8), // Packet ID LSB,
+//    size, // Words
+//    (((packet_type as u8 &amp; 0xf as u8) &lt;&lt; 4) | 0xf as u8), // Packet_Type &amp; Info code
+//    // Address
+//    ((addr &amp; 0xff000000 as u32) &gt;&gt; 24) as u8,
+//
+//    ((addr &amp; 0x00ff0000 as u32) &gt;&gt; 16) as u8,
+//    ((addr &amp; 0x0000ff00 as u32) &gt;&gt; 8)  as u8,
+//    (addr  &amp; 0x000000ff as u32) as u8]);
+//
+//  if packet_type    == IPBusPacketType::Write
+//     || packet_type == IPBusPacketType::WriteNonIncrement {
+//    for i in 0..size as usize {
+//      udp_data.push (((data[i] &amp; 0xff000000 as u32) &gt;&gt; 24) as u8);
+//      udp_data.push (((data[i] &amp; 0x00ff0000 as u32) &gt;&gt; 16) as u8);
+//      udp_data.push (((data[i] &amp; 0x0000ff00 as u32) &gt;&gt; 8)  as u8);
+//      udp_data.push ( (data[i] &amp; 0x000000ff as u32)        as u8);
+//    }
+//  }
+//  //for n in 0..udp_data.len() {
+//  //    println!("-- -- {}",udp_data[n]);
+//  //}
+//  udp_data
+//}
+//
+///// Unpack a binary representation of an IPBusPacket
+/////
+/////
+///// # Arguments:
+/////
+///// * message : The binary representation following 
+/////             the specs of IPBus protocoll
+///// * verbose : print information for debugging.
+/////
+///// FIXME - currently this is always successful.
+///// Should we check for garbage?
+//pub fn decode_ipbus( message : &amp;[u8;MT_MAX_PACKSIZE],
+//                     verbose : bool)
+//    -&gt; Result&lt;Vec&lt;u32&gt;, IPBusError&gt; {
+//
+//    // Response
+//    let ipbus_version = message[0] &gt;&gt; 4;
+//    let id            = (((message[4] &amp; 0xf as u8) as u32) &lt;&lt; 8) as u8 | message[5];
+//    let size          = message[6];
+//    let pt_val        = (message[7] &amp; 0xf0 as u8) &gt;&gt; 4;
+//    let info_code     = message[7] &amp; 0xf as u8;
+//    let mut data      = Vec::&lt;u32&gt;::new(); //[None]*size
+//
+//    let packet_type = IPBusPacketType::try_from(pt_val)?;
+//    // Read
+//
+//    match packet_type {
+//      IPBusPacketType::Read |
+//      IPBusPacketType::ReadNonIncrement =&gt; {
+//        for i in 0..size as usize {
+//          data.push(  ((message[8 + i * 4]  as u32) &lt;&lt; 24) 
+//                    | ((message[9 + i * 4]  as u32) &lt;&lt; 16) 
+//                    | ((message[10 + i * 4] as u32) &lt;&lt; 8)  
+//                    |  message[11 + i * 4]  as u32)
+//        }
+//      },
+//      IPBusPacketType::Write =&gt; data.push(0),
+//      IPBusPacketType::WriteNonIncrement
+//        =&gt; error!("I am sorry, I don't know what to do with this packet!"),
+//      IPBusPacketType::RMW
+//        =&gt; error!("I am sorry, I don't know what to do with this packet!")
+//    }
+//
+//    if verbose { 
+//      println!("Decoding IPBus Packet:");
+//      println!(" &gt; Msg = {:?}", message);
+//      println!(" &gt; IPBus version = {}", ipbus_version);
+//      println!(" &gt; ID = {}", id);
+//      println!(" &gt; Size = {}", size);
+//      println!(" &gt; Type = {:?}", packet_type);
+//      println!(" &gt; Info = {}", info_code);
+//      println!(" &gt; data = {:?}", data);
+//    }
+//    Ok(data)
+//}
+
+</span><span class="doccomment">/// Configure the trigger
 </span><span class="attr">#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 </span><span class="kw">pub struct </span>MTBSettings {
   <span class="doccomment">/// Select the trigger type for this run
@@ -944,8 +1293,10 @@
 /// * bus       : connected IPBus for UDP comms
 </span><span class="kw">pub fn </span>get_mtevent(bus : <span class="kw-2">&amp;mut </span>IPBus)
   -&gt; <span class="prelude-ty">Result</span>&lt;MasterTriggerEvent, MasterTriggerError&gt; {
-  <span class="kw">let </span><span class="kw-2">mut </span>mte = MasterTriggerEvent::new();
+  <span class="kw">let </span><span class="kw-2">mut </span>mte = MasterTriggerEvent::new(<span class="number">0</span>,<span class="number">0</span>);
   <span class="kw">let     </span>n_daq_words  : u32;
+  <span class="kw">let </span><span class="kw-2">mut </span>hits_a       : [bool;N_CHN_PER_LTB];
+  <span class="kw">let </span><span class="kw-2">mut </span>hits_b       : [bool;N_CHN_PER_LTB];
   <span class="comment">//let sleeptime = Duration::from_micros(10);
   //FIXME - reduce polling rate. 10micros is the 
   //fasterst
@@ -968,7 +1319,7 @@
     // interested in
     </span><span class="kw">let </span>nwords = bus.read(<span class="number">0x13</span>)<span class="question-mark">? </span>&gt;&gt; <span class="number">16</span>;
     <span class="kw">if </span>nwords != <span class="number">0 </span>{
-      n_daq_words = nwords/<span class="number">2 </span>+ nwords % <span class="number">2</span>;
+      n_daq_words = nwords/<span class="number">2</span>;
       <span class="comment">//println!("Read {} from SIZE register", nwords);
       </span><span class="kw">break</span>;
     } 
@@ -978,61 +1329,49 @@
   <span class="comment">//println!("{}", data[0]);
   </span><span class="kw">if </span>data[<span class="number">0</span>] != <span class="number">0xAAAAAAAA </span>{
     <span class="macro">error!</span>(<span class="string">"Got MTB data, but the header is incorrect {}"</span>, data[<span class="number">0</span>]);
-    <span class="kw">match </span>reset_daq(bus) {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not reset DAQ, error {err}"</span>),
-      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-    }
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::PackageHeaderIncorrect);
   }
   <span class="kw">let </span>foot_pos = (n_daq_words - <span class="number">1</span>) <span class="kw">as </span>usize;
   <span class="kw">if </span>data.len() &lt;= foot_pos {
     <span class="macro">error!</span>(<span class="string">"Got MTB data, but the format is not correct"</span>);
-    <span class="kw">match </span>reset_daq(bus) {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not reset DAQ, error {err}"</span>),
-      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-    }
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::PackageHeaderIncorrect);
   }
   <span class="kw">if </span>data[foot_pos] != <span class="number">0x55555555 </span>{
     <span class="macro">error!</span>(<span class="string">"Got MTB data, but the footer is incorrect {}"</span>, data[foot_pos]);
-    <span class="kw">match </span>reset_daq(bus) {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not reset DAQ, error {err}"</span>),
-      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-    }
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::PackageFooterIncorrect);
   }
 
   <span class="comment">// Number of words which will be always there. 
   // Min event size is +1 word for hits
-  </span><span class="kw">let </span>n_hit_words = n_daq_words - MTB_DAQ_PACKET_FIXED_N_WORDS;
+  </span><span class="kw">const </span>MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = <span class="number">9</span>; 
+  <span class="kw">let </span>n_hit_packets = n_daq_words - MTB_DAQ_PACKET_FIXED_N_WORDS;
   <span class="comment">//println!("We are expecting {}", n_hit_packets);
   </span>mte.event_id      = data[<span class="number">1</span>];
   mte.timestamp     = data[<span class="number">2</span>];
   mte.tiu_timestamp = data[<span class="number">3</span>];
-  mte.tiu_gps32     = data[<span class="number">4</span>];
-  mte.tiu_gps16      = (data[<span class="number">5</span>] &amp; <span class="number">0x0000ffff</span>) <span class="kw">as </span>u16;
-  mte.trigger_source = ((data[<span class="number">5</span>] &amp; <span class="number">0xffff0000</span>) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;
-  <span class="comment">//mte.get_trigger_sources();
-  </span><span class="kw">let </span>rbmask = (data[<span class="number">7</span>] <span class="kw">as </span>u64) &lt;&lt; <span class="number">31 </span>| data[<span class="number">6</span>] <span class="kw">as </span>u64; 
-  mte.mtb_link_mask  = rbmask;
-  mte.dsi_j_mask     = data[<span class="number">8</span>];
-  <span class="comment">//  this can happen when the subtraction above overflows
-  </span><span class="kw">if </span>n_hit_words &gt; n_daq_words {
-    <span class="macro">error!</span>(<span class="string">"N hit word calculation failed! Got {} hit words!"</span>, n_hit_words);
-    <span class="kw">match </span>reset_daq(bus) {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not reset DAQ, error {err}"</span>),
-      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-    }
-    <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::BrokenPackage);
+  mte.tiu_gps_32    = data[<span class="number">4</span>];
+  mte.tiu_gps_16    = data[<span class="number">5</span>] &amp; <span class="number">0x0000ffff</span>;
+  mte.board_mask    = decode_board_mask(data[<span class="number">6</span>]);
+  <span class="kw">let </span><span class="kw-2">mut </span>hitmasks = VecDeque::&lt;[bool;N_CHN_PER_LTB]&gt;::new();
+  <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..n_hit_packets {
+    <span class="comment">//println!("hit packet {:?}", data[7usize + k as usize]);
+    </span>(hits_a, hits_b) = decode_hit_mask(data[<span class="number">7usize </span>+ k <span class="kw">as </span>usize]);
+    hitmasks.push_back(hits_a);
+    hitmasks.push_back(hits_b);
   }
-  <span class="kw">for </span>k <span class="kw">in </span><span class="number">1</span>..n_hit_words+<span class="number">1 </span>{
-    <span class="kw">let </span>first  = ( data[<span class="number">8 </span>+ k <span class="kw">as </span>usize] &amp; <span class="number">0x0000ffff</span>) <span class="kw">as </span>u16;
-    <span class="kw">let </span>second = ((data[<span class="number">8 </span>+ k <span class="kw">as </span>usize] &amp; <span class="number">0xffff0000</span>) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16; 
-    mte.channel_mask.push(first);
-    <span class="kw">if </span>second != <span class="number">0 </span>{
-      mte.channel_mask.push(second);
+  <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..mte.board_mask.len() {
+    <span class="kw">if </span>mte.board_mask[k] {
+      <span class="kw">match </span>hitmasks.pop_front() { 
+        <span class="prelude-val">None </span>=&gt; {
+          <span class="macro">error!</span>(<span class="string">"MTE hit assignment wrong. We expect hits for a certain LTB, but we don't see any!"</span>);
+        },
+        <span class="prelude-val">Some</span>(_hits) =&gt; {
+          mte.hits[k] = _hits;
+        }
+      }
     }
   }
+  mte.n_paddles = mte.get_hit_paddles(); 
   <span class="prelude-val">Ok</span>(mte)
 }
 
@@ -1046,11 +1385,10 @@
   <span class="kw">if </span>data.len() &lt; <span class="number">4 </span>{
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::BrokenPackage);
   }
-  <span class="comment">// sensors are 12 bit
-  </span><span class="kw">let </span>first_word   = <span class="number">0x00000fff</span>;
+  <span class="kw">let </span>first_word   = <span class="number">0x00000fff</span>;
   <span class="kw">let </span>second_word  = <span class="number">0x0fff0000</span>;
-  <span class="macro">println!</span>(<span class="string">"[get_mtbmonidata] =&gt; Received data from registers {:?} data"</span>, data);
-  moni.calibration = ( data[<span class="number">0</span>] &amp; first_word  ) <span class="kw">as </span>u16;
+  <span class="comment">//println!("{:?} data", data);
+  </span>moni.calibration = ( data[<span class="number">0</span>] &amp; first_word  ) <span class="kw">as </span>u16;
   moni.vccpint     = ((data[<span class="number">0</span>] &amp; second_word ) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;  
   moni.vccpaux     = ( data[<span class="number">1</span>] &amp; first_word  ) <span class="kw">as </span>u16;  
   moni.vccoddr     = ((data[<span class="number">1</span>] &amp; second_word ) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;  
@@ -1147,19 +1485,6 @@
       }
     }
   }
-  <span class="kw">let </span>tiu_emulation_mode = settings.tiu_emulation_mode;
-  <span class="kw">match </span>set_tiu_emulation_mode(<span class="kw-2">&amp;mut </span>bus, tiu_emulation_mode) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to change tiu emulation mode! {err}"</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-      <span class="kw">if </span>tiu_emulation_mode {
-        <span class="macro">println!</span>(<span class="string">"==&gt; Setting TIU emulation mode! This setting is useful if the TIU is NOT connected!"</span>);
-      } <span class="kw">else </span>{
-        <span class="macro">println!</span>(<span class="string">"==&gt; Not setting TIU emulation mode! TIU needs to be active and connectected!"</span>);
-      }
-    }
-  }
-
-
   <span class="macro">info!</span>(<span class="string">"Settting rb integration window!"</span>);
   <span class="kw">let </span>int_wind = settings.rb_int_window;
   <span class="kw">match </span>set_rb_int_window(<span class="kw-2">&amp;mut </span>bus, int_wind) {
@@ -1226,12 +1551,6 @@
       }
     }
     TriggerType::Unknown =&gt; {
-      <span class="macro">println!</span>(<span class="string">"== ==&gt; Not setting any trigger condition. You can set it through pico_hal.py"</span>);
-      <span class="macro">warn!</span>(<span class="string">"Trigger condition undefined! Not setting anything!"</span>);
-      <span class="macro">error!</span>(<span class="string">"Trigger conditions unknown!"</span>);
-    }
-    <span class="kw">_ </span>=&gt; {
-      <span class="macro">error!</span>(<span class="string">"Trigger type {} not covered!"</span>, settings.trigger_type);
       <span class="macro">println!</span>(<span class="string">"== ==&gt; Not setting any trigger condition. You can set it through pico_hal.py"</span>);
       <span class="macro">warn!</span>(<span class="string">"Trigger condition undefined! Not setting anything!"</span>);
       <span class="macro">error!</span>(<span class="string">"Trigger conditions unknown!"</span>);
@@ -1441,9 +1760,7 @@
   <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Reset the state of the MTB DAQ buffer
-/// This can be safely issued without 
-/// resetting the event id
+<span class="doccomment">/// Reset the state of the MTB DAQ
 </span><span class="kw">pub fn </span>reset_daq(bus : <span class="kw-2">&amp;mut </span>IPBus) 
   -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
   <span class="macro">info!</span>(<span class="string">"Resetting DAQ!"</span>);
@@ -1546,26 +1863,69 @@
   <span class="prelude-val">Ok</span>(())
 }
 
-
-<span class="doccomment">/// The TIU emulation mode setting provides the possibility to run the 
-/// TOF without tracker and active TIU. If data should be taken together
-/// with the tracker, we should NOT use the emulation mode and this should
-/// be set to false.
-</span><span class="kw">pub fn </span>set_tiu_emulation_mode(bus : <span class="kw-2">&amp;mut </span>IPBus, set_emulation_mode : bool) 
-  -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
-    <span class="macro">info!</span>(<span class="string">"Setting TIU Emulation mode {}"</span>, set_emulation_mode);
-    <span class="kw">let </span><span class="kw-2">mut </span>value = bus.read(<span class="number">0xe</span>)<span class="question-mark">?</span>;
-    <span class="kw">let </span>bitset : u32;
-    <span class="kw">if </span>set_emulation_mode {
-      bitset = <span class="number">0x1</span>;
-    } <span class="kw">else </span>{
-      bitset = <span class="number">0x0</span>;
+<span class="doccomment">/// Helper to get the number of the triggered LTB from the bitmask
+</span><span class="kw">pub fn </span>decode_board_mask(board_mask : u32) -&gt; [bool;N_LTBS] {
+  <span class="kw">let </span><span class="kw-2">mut </span>decoded_mask = [<span class="bool-val">false</span>;N_LTBS];
+  <span class="comment">// FIXME this implicitly asserts that the fields for non available LTBs 
+  // will be 0 and all the fields will be in order
+  //println!("BOARD MASK {}", board_mask);
+  </span><span class="kw">let </span><span class="kw-2">mut </span>index = N_LTBS - <span class="number">1</span>;
+  <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..N_LTBS {
+    <span class="kw">let </span>mask = <span class="number">1 </span>&lt;&lt; n;
+    <span class="kw">let </span>bit_is_set = (mask &amp; board_mask) &gt; <span class="number">0</span>;
+    decoded_mask[index] = bit_is_set;
+    <span class="kw">if </span>index != <span class="number">0 </span>{
+        index -= <span class="number">1</span>;
     }
-    value = value &amp; <span class="number">0xfffffffe</span>;
-    value = value | bitset;
-    bus.write(<span class="number">0xe</span>, value)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(())
+    <span class="comment">//decoded_mask[N_LTBS-1 - n] = bit_is_set;
+  </span>}
+  <span class="comment">//println!("DECODED MASK {:?}", decoded_mask);
+  // reverse the mask, so actually RAT0 is at position 0
+  </span>decoded_mask.reverse();
+  decoded_mask
 }
+
+<span class="doccomment">/// Helper to get the number of the triggered LTB from the bitmask
+</span><span class="kw">pub fn </span>decode_hit_mask(hit_mask : u32) -&gt; ([bool;N_CHN_PER_LTB],[bool;N_CHN_PER_LTB]) {
+  <span class="comment">//println!("HITMASK NON DECODED :{}", hit_mask);
+  </span><span class="kw">let </span><span class="kw-2">mut </span>decoded_mask_0 = [<span class="bool-val">false</span>;N_CHN_PER_LTB];
+  <span class="kw">let </span><span class="kw-2">mut </span>decoded_mask_1 = [<span class="bool-val">false</span>;N_CHN_PER_LTB];
+  <span class="comment">// FIXME this implicitly asserts that the fields for non available LTBs 
+  // will be 0 and all the fields will be in order
+  </span><span class="kw">let </span><span class="kw-2">mut </span>index = N_CHN_PER_LTB - <span class="number">1</span>;
+  <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..N_CHN_PER_LTB {
+    <span class="kw">let </span>mask = <span class="number">1 </span>&lt;&lt; n;
+    <span class="comment">//println!("MASK {:?}", mask);
+    </span><span class="kw">let </span>bit_is_set = (mask &amp; hit_mask) &gt; <span class="number">0</span>;
+    <span class="comment">//println!("bit is set {}, index {}", bit_is_set, index);
+    //decoded_mask_0[N_CHN_PER_LTB-1 - n] = bit_is_set;
+    </span>decoded_mask_0[index] = bit_is_set;
+    <span class="kw">if </span>index != <span class="number">0 </span>{
+      index -= <span class="number">1</span>;
+    }
+  }
+  index = N_CHN_PER_LTB -<span class="number">1</span>;
+  <span class="kw">for </span>n <span class="kw">in </span>N_CHN_PER_LTB..<span class="number">2</span><span class="kw-2">*</span>N_CHN_PER_LTB {
+    <span class="kw">let </span>mask = <span class="number">1 </span>&lt;&lt; n;
+    <span class="kw">let </span>bit_is_set = (mask &amp; hit_mask) &gt; <span class="number">0</span>;
+    <span class="comment">//FIXME - this is buggy and panics. Until this is fixed,
+    //I'll revive my cringy way to do things.
+    //decoded_mask_1[N_CHN_PER_LTB-1 - n] = bit_is_set;
+    </span>decoded_mask_1[index] = bit_is_set;
+    <span class="kw">if </span>index != <span class="number">0 </span>{
+      index -= <span class="number">1</span>;
+    }
+  }
+  <span class="comment">//println!("DECODED HITMASK 0 {:?}", decoded_mask_0);
+  //println!("DECODED HITMASK 1 {:?}", decoded_mask_1);
+  // reverse everything 
+  // so decoded_mask_0 is still for the first board, but 
+  // let's do the channels so that they count up
+  </span>decoded_mask_0.reverse();
+  decoded_mask_1.reverse();
+  (decoded_mask_0, decoded_mask_1)
+}
+
 
 
 </code></pre></div></section></main></body></html>

@@ -26,9 +26,9 @@ var NAVTREE =
 [
   [ "gaps-online-software", "index.html", [
     [ "gaps-online-software documentation", "index.html", [
-      [ "Rust API", "index.html#autotoc_md2", null ],
-      [ "CXX/python API", "index.html#autotoc_md3", null ],
-      [ "Executable programs and higher level libraries [liftof]", "index.html#autotoc_md4", null ]
+      [ "Rust API", "index.html#autotoc_md1", null ],
+      [ "CXX/python API", "index.html#autotoc_md2", null ],
+      [ "Executable programs and higher level libraries [liftof]", "index.html#autotoc_md3", null ]
     ] ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
@@ -56,7 +56,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "CommandPacket_8h_source.html",
-"structRBEventHeader.html#a98b9ecd391dc19cda125971e97867210"
+"structRBEventHeader.html#a44e82686e000d50421986f51071075f7"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/tof_hit.rs`."><title>tof_hit.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/tof_hit.rs`."><title>tof_hit.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -443,26 +443,6 @@
 <a href="#441" id="441">441</a>
 <a href="#442" id="442">442</a>
 <a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
-<a href="#445" id="445">445</a>
-<a href="#446" id="446">446</a>
-<a href="#447" id="447">447</a>
-<a href="#448" id="448">448</a>
-<a href="#449" id="449">449</a>
-<a href="#450" id="450">450</a>
-<a href="#451" id="451">451</a>
-<a href="#452" id="452">452</a>
-<a href="#453" id="453">453</a>
-<a href="#454" id="454">454</a>
-<a href="#455" id="455">455</a>
-<a href="#456" id="456">456</a>
-<a href="#457" id="457">457</a>
-<a href="#458" id="458">458</a>
-<a href="#459" id="459">459</a>
-<a href="#460" id="460">460</a>
-<a href="#461" id="461">461</a>
-<a href="#462" id="462">462</a>
-<a href="#463" id="463">463</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::errors::SerializationError;
 <span class="kw">use </span><span class="kw">crate</span>::serialization::{
     parse_u8,
@@ -480,7 +460,7 @@
 <span class="doccomment">/// We will save the values for the peak heigth, time and charge
 /// as u16. The calculations yield f32 though. We need to convert
 /// them using MIN/MAX and a range
-</span><span class="kw">const </span>MAX_PEAK_HEIGHT      : f32 = <span class="number">150.0</span>; <span class="comment">//mV
+</span><span class="kw">const </span>MAX_PEAK_HEIGHT      : f32 = <span class="number">500.0</span>; <span class="comment">//mV
 //const MIN_PEAK_HEIGHT      : f32 = 0.0;
 </span><span class="kw">const </span>U16TOF32_PEAK_HEIGHT : f32 = MAX_PEAK_HEIGHT/(u16::MAX <span class="kw">as </span>f32);
 <span class="kw">const </span>F32TOU16_PEAK_HEIGHT : u16 = ((u16::MAX <span class="kw">as </span>f32)/MAX_PEAK_HEIGHT) <span class="kw">as </span>u16;
@@ -496,8 +476,6 @@
 <span class="kw">const </span>F32TOU16_T0          : u16 = ((u16::MAX <span class="kw">as </span>f32)/MAX_PEAK_TIME) <span class="kw">as </span>u16;
 <span class="kw">const </span>U16TOF32_POS_ACROSS  : f32 = <span class="number">1800.0</span>/(u16::MAX <span class="kw">as </span>f32);
 <span class="kw">const </span>F32TOU16_POS_ACROSS  : u16 = ((u16::MAX <span class="kw">as </span>f32)/<span class="number">1800.0</span>) <span class="kw">as </span>u16;
-<span class="kw">const </span>U16TOF32_EDEP        : f32 = <span class="number">180.0</span>/(u16::MAX <span class="kw">as </span>f32);
-<span class="kw">const </span>F32TOU16_EDEP        : u16 = ((u16::MAX <span class="kw">as </span>f32)/<span class="number">100.0</span>) <span class="kw">as </span>u16;
 
 <span class="doccomment">/// Waveform peak
 ///
@@ -578,8 +556,6 @@
   <span class="comment">// for debugging purposes
   </span><span class="kw">pub </span>ftime_a      : f32,
   <span class="kw">pub </span>ftime_b      : f32,
-  <span class="kw">pub </span>fpeak_a      : f32,
-  <span class="kw">pub </span>fpeak_b      : f32,
   <span class="kw">pub </span>paddle_len   : f32,
 }
 
@@ -597,8 +573,8 @@
     LE Time A/B   {:.2} {:.2}   
     Height  A/B   {:.2} {:.2}
     Charge  A/B   {:.2} {:.2}
+  charge_min_i    {}   
   ** reconstructed interaction
-    energy_dep    {:.2}   
     pos_across    {:.2}   
     t0            {:.2}   
   ctr_etx         {}   
@@ -613,7 +589,7 @@
             <span class="self">self</span>.get_peak_b(),
             <span class="self">self</span>.get_charge_a(),
             <span class="self">self</span>.get_charge_b(),
-            <span class="self">self</span>.get_edep(),
+            <span class="self">self</span>.charge_min_i,
             <span class="self">self</span>.get_pos_across(),
             <span class="self">self</span>.get_t0(),
             <span class="self">self</span>.ctr_etx,
@@ -714,8 +690,6 @@
          </span>valid        : <span class="bool-val">true</span>,
          ftime_a      : <span class="number">0.0</span>,
          ftime_b      : <span class="number">0.0</span>,
-         fpeak_a      : <span class="number">0.0</span>,
-         fpeak_b      : <span class="number">0.0</span>,
          paddle_len   : <span class="number">0.0</span>,
     }
   }
@@ -743,8 +717,6 @@
     <span class="kw">return </span><span class="number">0</span>;
   }
 
-  
-
   <span class="kw">pub fn </span>add_peak(<span class="kw-2">&amp;mut </span><span class="self">self</span>, peak : <span class="kw-2">&amp;</span>Peak)  {
     <span class="kw">if </span><span class="self">self</span>.paddle_id != TofHit::get_pid(peak.paddle_end_id) {
       <span class="comment">//error!("Can't add peak to 
@@ -766,18 +738,6 @@
 
   <span class="kw">pub fn </span>get_timestamp48(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
     ((<span class="self">self</span>.timestamp16 <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) | <span class="self">self</span>.timestamp32 <span class="kw">as </span>u64
-  }
-  
-  <span class="kw">pub fn </span>set_edep(<span class="kw-2">&amp;mut </span><span class="self">self</span>, edep : f32) {
-    <span class="kw">if </span>edep &gt;= <span class="number">100.0 </span>{
-      <span class="self">self</span>.charge_min_i = u16::MAX;
-    } <span class="kw">else </span>{
-      <span class="self">self</span>.charge_min_i = F32TOU16_EDEP<span class="kw-2">*</span>(edep.floor() <span class="kw">as </span>u16);
-    }
-  }
-
-  <span class="kw">pub fn </span>get_edep(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
-    <span class="self">self</span>.charge_min_i <span class="kw">as </span>f32 * U16TOF32_EDEP
   }
   
   <span class="kw">pub fn </span>set_pos_across(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pa : f32) {

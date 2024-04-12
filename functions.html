@@ -28,7 +28,7 @@
   <td id="projectlogo"><img alt="Logo" src="GAPSLOGO_2023_ico.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">gaps-online-software
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.9</span>
    </div>
    <div id="projectbrief">online software for the TOF system for the GAPS experiment</div>
   </td>
@@ -91,15 +91,15 @@ $(document).ready(function(){initNavTree('functions.html',''); initResizable(); 
 <li>board_id
 : <a class="el" href="structLTBMoniData.html#abfcd64701cbaa993a72148c220ab02be">LTBMoniData</a>
 </li>
+<li>board_mask
+: <a class="el" href="structMasterTriggerEvent.html#a3e2850cccfd9056e60da6512216a7aff">MasterTriggerEvent</a>
+</li>
 </ul>
 
 
 <h3><a id="index_c"></a>- c -</h3><ul>
 <li>calc_baseline()
 : <a class="el" href="structRBEvent.html#a8d2136632b5e60dd4b9f317ed4f0a473">RBEvent</a>
-</li>
-<li>crc
-: <a class="el" href="structMasterTriggerEvent.html#ab438df14fccd804df45411f51a85719b">MasterTriggerEvent</a>
 </li>
 </ul>
 
@@ -130,6 +130,7 @@ $(document).ready(function(){initNavTree('functions.html',''); initResizable(); 
 , <a class="el" href="structPAMoniData.html#a8576c002af8a04e3660ab40dba03cc55">PAMoniData</a>
 , <a class="el" href="structPBMoniData.html#a307509a33e6e6fe59f6c50ed35b736a8">PBMoniData</a>
 , <a class="el" href="structRBCalibration.html#a06e35ae344be8dc7040823dd16420a71">RBCalibration</a>
+, <a class="el" href="structRBEventMemoryView.html#a0c29583eaf1c834bbacd4533c295b1f9">RBEventMemoryView</a>
 , <a class="el" href="structTofEvent.html#ac62d2f3b9db6a01c93cfa7f76ad30451">TofEvent</a>
 , <a class="el" href="structTofPacket.html#a7ab592f11c676473ff62dac29e9e9861">TofPacket</a>
 </li>
@@ -146,6 +147,12 @@ $(document).ready(function(){initNavTree('functions.html',''); initResizable(); 
 
 
 <h3><a id="index_g"></a>- g -</h3><ul>
+<li>get_channel_adc()
+: <a class="el" href="structRBEventMemoryView.html#a9d21fcd750ff7629b1648691363a9449">RBEventMemoryView</a>
+</li>
+<li>get_dsi_j_ch()
+: <a class="el" href="structMasterTriggerEvent.html#a7fb481cacc0a272a464bba031b880669">MasterTriggerEvent</a>
+</li>
 <li>get_rbevent()
 : <a class="el" href="structTofEvent.html#a794247ff0963ea316256d0423b9460f7">TofEvent</a>
 </li>
@@ -156,18 +163,6 @@ $(document).ready(function(){initNavTree('functions.html',''); initResizable(); 
 : <a class="el" href="structRBEventHeader.html#a824de6e619d8ccb6fa71fa7a73d4017b">RBEventHeader</a>
 , <a class="el" href="structTofEventHeader.html#a16fd4aad49cf4719f5bc1025ff513215">TofEventHeader</a>
 </li>
-<li>get_timestamp_abs48()
-: <a class="el" href="structMasterTriggerEvent.html#a39fdaf7835bd4691d17e3dcad9d64cda">MasterTriggerEvent</a>
-</li>
-<li>get_timestamp_gps48()
-: <a class="el" href="structMasterTriggerEvent.html#a455353807880e3474df222b7f42d7268">MasterTriggerEvent</a>
-</li>
-<li>get_trigger_hits()
-: <a class="el" href="structMasterTriggerEvent.html#aaf8974dcebd34ca3b46078f5ded868ce">MasterTriggerEvent</a>
-</li>
-<li>get_trigger_sources()
-: <a class="el" href="structMasterTriggerEvent.html#a10e4d924cea6d9cf121290f7effab1e0">MasterTriggerEvent</a>
-</li>
 </ul>
 
 
@@ -175,6 +170,9 @@ $(document).ready(function(){initNavTree('functions.html',''); initResizable(); 
 <li>HEAD
 : <a class="el" href="structLTBMoniData.html#a5e3f068b6f47c51b99e386ba8baa654b">LTBMoniData</a>
 , <a class="el" href="structMasterTriggerEvent.html#a237c05d33e1485cf4bace993c9ae6ee9">MasterTriggerEvent</a>
+</li>
+<li>hits
+: <a class="el" href="structMasterTriggerEvent.html#aa92539d1bcffb9b8cadf5f909a11d916">MasterTriggerEvent</a>
 </li>
 <li>humidity
 : <a class="el" href="structRBMoniData.html#a412fc44c126e97ef56e2d4bc7344ed6a">RBMoniData</a>
@@ -193,6 +191,9 @@ $(document).ready(function(){initNavTree('functions.html',''); initResizable(); 
 
 
 <h3><a id="index_n"></a>- n -</h3><ul>
+<li>n_paddles
+: <a class="el" href="structMasterTriggerEvent.html#a3584e8178fab07839e43d3eec831d0bc">MasterTriggerEvent</a>
+</li>
 <li>n_trigger_paddles
 : <a class="el" href="structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e">TofEventSummary</a>
 </li>
@@ -252,11 +253,11 @@ $(document).ready(function(){initNavTree('functions.html',''); initResizable(); 
 <li>timestamp32
 : <a class="el" href="structTofEventHeader.html#a30d35e7ff4f51562a82e6797d4cc6471">TofEventHeader</a>
 </li>
-<li>tiu_gps16
-: <a class="el" href="structMasterTriggerEvent.html#ab7def730b945ec5fb1da944dbd95ab25">MasterTriggerEvent</a>
+<li>tiu_gps_16
+: <a class="el" href="structMasterTriggerEvent.html#a812af2c197e987f663477039dfb349da">MasterTriggerEvent</a>
 </li>
-<li>tiu_gps32
-: <a class="el" href="structMasterTriggerEvent.html#aa49962e24c04ede5087ff1876feecd36">MasterTriggerEvent</a>
+<li>tiu_gps_32
+: <a class="el" href="structMasterTriggerEvent.html#aa02e973d0cf453f05bf1c9c591a14af8">MasterTriggerEvent</a>
 </li>
 <li>tiu_timestamp
 : <a class="el" href="structMasterTriggerEvent.html#a30d57d1dc8bd9e7fc55d1af7ad6ebc92">MasterTriggerEvent</a>
@@ -294,7 +295,7 @@ $(document).ready(function(){initNavTree('functions.html',''); initResizable(); 
 : <a class="el" href="structRBCalibration.html#a7b2b7e4fd0b4e106a8ec53d0c019be3a">RBCalibration</a>
 </li>
 <li>voltages()
-: <a class="el" href="structRBCalibration.html#adfab387bd6bebb965be054e754076452">RBCalibration</a>
+: <a class="el" href="structRBCalibration.html#ac1986aa0fb98cfd5010a7e67af1fe160">RBCalibration</a>
 </li>
 </ul>
 </div><!-- contents -->

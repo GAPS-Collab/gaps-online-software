@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/rb_event.rs`."><title>rb_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0 (aedd173a2 2024-03-17)" data-channel="1.77.0" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/rb_event.rs`."><title>rb_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1316,6 +1316,39 @@
 <a href="#1314" id="1314">1314</a>
 <a href="#1315" id="1315">1315</a>
 <a href="#1316" id="1316">1316</a>
+<a href="#1317" id="1317">1317</a>
+<a href="#1318" id="1318">1318</a>
+<a href="#1319" id="1319">1319</a>
+<a href="#1320" id="1320">1320</a>
+<a href="#1321" id="1321">1321</a>
+<a href="#1322" id="1322">1322</a>
+<a href="#1323" id="1323">1323</a>
+<a href="#1324" id="1324">1324</a>
+<a href="#1325" id="1325">1325</a>
+<a href="#1326" id="1326">1326</a>
+<a href="#1327" id="1327">1327</a>
+<a href="#1328" id="1328">1328</a>
+<a href="#1329" id="1329">1329</a>
+<a href="#1330" id="1330">1330</a>
+<a href="#1331" id="1331">1331</a>
+<a href="#1332" id="1332">1332</a>
+<a href="#1333" id="1333">1333</a>
+<a href="#1334" id="1334">1334</a>
+<a href="#1335" id="1335">1335</a>
+<a href="#1336" id="1336">1336</a>
+<a href="#1337" id="1337">1337</a>
+<a href="#1338" id="1338">1338</a>
+<a href="#1339" id="1339">1339</a>
+<a href="#1340" id="1340">1340</a>
+<a href="#1341" id="1341">1341</a>
+<a href="#1342" id="1342">1342</a>
+<a href="#1343" id="1343">1343</a>
+<a href="#1344" id="1344">1344</a>
+<a href="#1345" id="1345">1345</a>
+<a href="#1346" id="1346">1346</a>
+<a href="#1347" id="1347">1347</a>
+<a href="#1348" id="1348">1348</a>
+<a href="#1349" id="1349">1349</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Readoutboard binary event formats, former denoted as BLOB (binary large object)
 //! 
 //! The structure is the following
@@ -1357,10 +1390,7 @@
     parse_u32,
 };
 
-<span class="kw">use </span><span class="kw">crate</span>::events::{
-    DataType,
-    EventStatus,
-};
+<span class="kw">use </span><span class="kw">crate</span>::events::DataType;
 <span class="kw">use </span><span class="kw">crate</span>::errors::UserError;
 <span class="kw">use </span><span class="kw">crate</span>::io::RBEventMemoryStreamer;
 
@@ -1372,6 +1402,54 @@
   }
 }
 
+<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>EventStatus {
+  Unknown            = <span class="number">0u8</span>,
+  CRC32Wrong         = <span class="number">10u8</span>,
+  TailWrong          = <span class="number">11u8</span>,
+  ChannelIDWrong     = <span class="number">12u8</span>,
+  IncompleteReadout  = <span class="number">21u8</span>,
+  Perfect            = <span class="number">42u8
+</span>}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>EventStatus {
+  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
+      String::from(<span class="string">"Error: cannot unwrap this EventStatus"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;EventStatus: {}&gt;"</span>, r)
+  }
+}
+
+<span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>EventStatus {
+  <span class="kw">fn </span>from(value: u8) -&gt; <span class="self">Self </span>{
+    <span class="kw">match </span>value {
+      <span class="number">0u8  </span>=&gt; EventStatus::Unknown,
+      <span class="number">10u8 </span>=&gt; EventStatus::CRC32Wrong,
+      <span class="number">11u8 </span>=&gt; EventStatus::TailWrong,
+      <span class="number">12u8 </span>=&gt; EventStatus::ChannelIDWrong,
+      <span class="number">42u8 </span>=&gt; EventStatus::Perfect,
+      <span class="kw">_    </span>=&gt; EventStatus::Unknown
+    }
+  }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">impl </span>FromRandom <span class="kw">for </span>EventStatus {
+  
+  <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
+    <span class="kw">let </span>choices = [
+      EventStatus::Unknown,
+      EventStatus::CRC32Wrong,
+      EventStatus::TailWrong,
+      EventStatus::ChannelIDWrong,
+      EventStatus::Perfect,
+    ];
+    <span class="kw">let </span><span class="kw-2">mut </span>rng  = rand::thread_rng();
+    <span class="kw">let </span>idx = rng.gen_range(<span class="number">0</span>..choices.len());
+    choices[idx]
+  }
+}
 
 <span class="doccomment">/// Debug information for missing hits. 
 ///
@@ -1595,7 +1673,6 @@
       wf.rb_id       = <span class="self">self</span>.header.rb_id;
       wf.rb_channel  = ch;
       wf.event_id    = <span class="self">self</span>.header.event_id;
-      wf.stop_cell   = <span class="self">self</span>.header.stop_cell;
       <span class="comment">// FIXME - can we move this somehow instead of 
       // cloning?
       </span>wf.adc         = <span class="self">self</span>.adc[ch <span class="kw">as </span>usize].clone();
@@ -2330,8 +2407,7 @@
     repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  has ch9          "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.has_ch9().to_string()); 
     <span class="comment">//repr += &amp;("\n  DRS4 temp [C]    ".to_owned() + &amp;self.drs4_temp.to_string());  
     </span>repr += <span class="kw-2">&amp;</span>sine_field;
-    <span class="comment">//repr += &amp;("\n  FPGA temp [\u{00B0}C]    ".to_owned() + &amp;self.get_fpga_temp().to_string()); 
-    </span>repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  FPGA T [\u{00B0}C]    : {:.2}"</span>, <span class="self">self</span>.get_fpga_temp()));
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  FPGA temp [\u{00B0}C]    "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.get_fpga_temp().to_string()); 
     repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  timestamp32      "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp32.to_string()); 
     repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  timestamp16      "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp16.to_string()); 
     repr += <span class="kw-2">&amp;</span>(<span class="string">"\n   |-&gt; timestamp48 "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.get_timestamp48().to_string()); 
@@ -2444,8 +2520,6 @@
   <span class="kw">pub </span>event_id   : u32,
   <span class="kw">pub </span>rb_id      : u8,
   <span class="kw">pub </span>rb_channel : u8,
-  <span class="doccomment">/// DRS4 stop cell
-  </span><span class="kw">pub </span>stop_cell  : u16,
   <span class="kw">pub </span>adc        : Vec&lt;u16&gt;,
 }
 
@@ -2456,7 +2530,6 @@
       event_id   : <span class="number">0</span>,
       rb_id      : <span class="number">0</span>,
       rb_channel : <span class="number">0</span>,
-      stop_cell  : <span class="number">0</span>,
       adc        : Vec::&lt;u16&gt;::new(),
     }
   }
@@ -2476,10 +2549,6 @@
     wf.event_id          = parse_u32(stream, pos);
     wf.rb_id             = parse_u8 (stream, pos);
     wf.rb_channel        = parse_u8 (stream, pos);
-    wf.stop_cell         = parse_u16(stream, pos);
-    <span class="kw">if </span>stream.len() &lt; <span class="kw-2">*</span>pos+<span class="number">2</span><span class="kw-2">*</span>NWORDS {
-      <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::StreamTooShort);
-    }
     <span class="kw">let </span>data             = <span class="kw-2">&amp;</span>stream[<span class="kw-2">*</span>pos..<span class="kw-2">*</span>pos+<span class="number">2</span><span class="kw-2">*</span>NWORDS];
     wf.adc               = u8_to_u16(data);
     <span class="kw-2">*</span>pos += <span class="number">2</span><span class="kw-2">*</span>NWORDS;
@@ -2496,7 +2565,6 @@
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.event_id.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.rb_id.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.rb_channel.to_le_bytes());
-    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.stop_cell.to_le_bytes());
     <span class="kw">if </span><span class="self">self</span>.adc.len() != <span class="number">0 </span>{
       <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..NWORDS {
         stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.adc[k].to_le_bytes());  
@@ -2510,10 +2578,9 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>RBWaveform {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;RBWaveform:"</span>);
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Event ID  : {}"</span>, <span class="self">self</span>.event_id));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  RB        : {}"</span>, <span class="self">self</span>.rb_id));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Channel   : {}"</span>, <span class="self">self</span>.rb_channel));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Stop cell : {}"</span>, <span class="self">self</span>.stop_cell));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Event ID : {}"</span>, <span class="self">self</span>.event_id));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  RB       : {}"</span>, <span class="self">self</span>.rb_id));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Channel  : {}"</span>, <span class="self">self</span>.rb_channel));
     <span class="kw">if </span><span class="self">self</span>.adc.len() &gt;= <span class="number">273 </span>{
       repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  adc [{}]      : .. {} {} {} .."</span>,<span class="self">self</span>.adc.len(), <span class="self">self</span>.adc[<span class="number">270</span>], <span class="self">self</span>.adc[<span class="number">271</span>], <span class="self">self</span>.adc[<span class="number">272</span>]));
     } <span class="kw">else </span>{
@@ -2532,7 +2599,6 @@
     wf.event_id   = rng.gen::&lt;u32&gt;();
     wf.rb_id      = rng.gen::&lt;u8&gt;();
     wf.rb_channel = rng.gen::&lt;u8&gt;();
-    wf.stop_cell  = rng.gen::&lt;u16&gt;();
     <span class="kw">let </span>random_numbers: Vec&lt;u16&gt; = (<span class="number">0</span>..NWORDS).map(|<span class="kw">_</span>| rng.gen()).collect();
     wf.adc        = random_numbers;
     wf

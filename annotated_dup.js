@@ -18,6 +18,7 @@ var annotated_dup =
     [ "RBCalibration", "structRBCalibration.html", "structRBCalibration" ],
     [ "RBEvent", "structRBEvent.html", "structRBEvent" ],
     [ "RBEventHeader", "structRBEventHeader.html", "structRBEventHeader" ],
+    [ "RBEventMemoryView", "structRBEventMemoryView.html", "structRBEventMemoryView" ],
     [ "RBMissingHit", "structRBMissingHit.html", "structRBMissingHit" ],
     [ "RBMoniData", "structRBMoniData.html", "structRBMoniData" ],
     [ "RBWaveform", "structRBWaveform.html", "structRBWaveform" ],

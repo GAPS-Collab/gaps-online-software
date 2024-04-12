@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Complex","ParseComplexError"],"trait":["ComplexFloat"],"type":["Complex32","Complex64"]};
+window.SIDEBAR_ITEMS = {"struct":["Complex","ParseComplexError"],"type":["Complex32","Complex64"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["wrap_calc_edep_simple","wrap_cfd_simple","wrap_find_zero_crossings","wrap_get_periods","wrap_interpolate_time"],"mod":["dataclasses"],"struct":["IPBus","MasterTrigger"]};
