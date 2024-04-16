@@ -27,7 +27,7 @@ pub use rb_eventmemoryview::RBEventMemoryView;
 pub use rb_event::{
     RBEventHeader,
     RBEvent,
-    RBMissingHit,
+    //RBMissingHit,
     RBWaveform,
 };
   

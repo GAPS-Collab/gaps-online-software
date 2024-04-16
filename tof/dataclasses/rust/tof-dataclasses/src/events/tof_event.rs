@@ -34,7 +34,7 @@ use crate::events::{
     RBEvent,
     TofHit,
     RBWaveform,
-    RBMissingHit,
+    //RBMissingHit,
     TriggerType,
     EventStatus,
 };
@@ -111,7 +111,7 @@ pub struct TofEvent {
   pub header            : TofEventHeader,
   pub mt_event          : MasterTriggerEvent,
   pub rb_events         : Vec::<RBEvent>,
-  pub missing_hits      : Vec::<RBMissingHit>, 
+  //pub missing_hits      : Vec::<RBMissingHit>, 
   
   // won't get serialized
   pub creation_time     : Instant,
@@ -125,13 +125,11 @@ impl fmt::Display for TofEvent {
      quality        :  {}
      {} 
      {}
-     n RBEvents      : {}
-     n RBMissingHit  : {} >"
+     n RBEvents      : {}>"
             ,self.quality,
             self.header,
             self.mt_event,
-            self.rb_events.len(),
-            self.missing_hits.len())
+            self.rb_events.len())
   }
 }
 
@@ -151,7 +149,7 @@ impl TofEvent {
       header            : TofEventHeader::new(),
       mt_event          : MasterTriggerEvent::new(),
       rb_events         : Vec::<RBEvent>::new(),
-      missing_hits      : Vec::<RBMissingHit>::new(), 
+      //missing_hits      : Vec::<RBMissingHit>::new(), 
       creation_time     : creation_time,
       valid             : true,
     }
@@ -180,7 +178,9 @@ impl TofEvent {
   /// We have one byte (256) max length per vector.
   pub fn construct_sizes_header(&self) -> u32 {
      let rb_event_len = self.rb_events.len() as u32;
-     let miss_len     = self.missing_hits.len() as u32;
+     // disable missing hits
+     //let miss_len     = self.missing_hits.len() as u32;
+     let miss_len     = 0u32;
      let mut mask     = 0u32;
      mask = mask | rb_event_len;
      mask = mask | (miss_len << 8);
@@ -196,7 +196,7 @@ impl TofEvent {
   
   pub fn get_combined_vector_sizes(&self) -> usize {
     self.rb_events.len() 
-    + self.missing_hits.len() 
+    //+ self.missing_hits.len() 
   }
 
   pub fn get_rbwaveforms(&self) -> Vec<RBWaveform> {
@@ -261,9 +261,9 @@ impl Serialization for TofEvent {
     for k in 0..self.rb_events.len() {
       stream.extend_from_slice(&self.rb_events[k].to_bytestream());
     }
-    for k in 0..self.missing_hits.len() {
-      stream.extend_from_slice(&self.missing_hits[k].to_bytestream());
-    }
+    //for k in 0..self.missing_hits.len() {
+    //  stream.extend_from_slice(&self.missing_hits[k].to_bytestream());
+    //}
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
   }
@@ -287,14 +287,14 @@ impl Serialization for TofEvent {
         }
       }
     }
-    for k in 0..v_sizes.1 {
-      match RBMissingHit::from_bytestream(stream, pos) {
-        Err(err) => error!("Expected RBMissingHit {} of {}, but got serialization error {}!", k,  v_sizes.1, err),
-        Ok(miss) => {
-          event.missing_hits.push(miss);
-        }
-      }
-    }
+    //for k in 0..v_sizes.1 {
+    //  match RBMissingHit::from_bytestream(stream, pos) {
+    //    Err(err) => error!("Expected RBMissingHit {} of {}, but got serialization error {}!", k,  v_sizes.1, err),
+    //    Ok(miss) => {
+    //      event.missing_hits.push(miss);
+    //    }
+    //  }
+    //}
     let tail = parse_u16(stream, pos);
     if tail != Self::TAIL {
       error!("Decoding of TAIL failed! Got {} instead!", tail);
@@ -317,9 +317,9 @@ impl FromRandom for TofEvent {
     for _ in 0..n_boards {
       event.rb_events.push(RBEvent::from_random());
     }
-    for _ in 0..n_missing {
-      event.missing_hits.push(RBMissingHit::from_random());
-    }
+    //for _ in 0..n_missing {
+    //  event.missing_hits.push(RBMissingHit::from_random());
+    //}
     // for now, we do not randomize CompressionLevel and qualtiy
     //event.compression_level : CompressionLevel::,
     //event.quality           : EventQuality::Unknown,
@@ -874,7 +874,7 @@ mod test_tofevents {
       let mask = data.construct_sizes_header();
       let size = TofEvent::decode_size_header(&mask);
       assert_eq!(size.0, data.rb_events.len());
-      assert_eq!(size.1, data.missing_hits.len());
+      //assert_eq!(size.1, data.missing_hits.len());
     }
   }
 
@@ -888,8 +888,8 @@ mod test_tofevents {
       assert_eq!(data.quality, test.quality);
       assert_eq!(data.mt_event, test.mt_event);
       assert_eq!(data.rb_events.len(), test.rb_events.len());
-      assert_eq!(data.missing_hits.len(), test.missing_hits.len());
-      assert_eq!(data.missing_hits, test.missing_hits);
+      //assert_eq!(data.missing_hits.len(), test.missing_hits.len());
+      //assert_eq!(data.missing_hits, test.missing_hits);
       assert_eq!(data.rb_events, test.rb_events);
       //assert_eq!(data, test);
       //println!("{}", data);

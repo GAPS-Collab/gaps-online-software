@@ -74,6 +74,7 @@ pub struct RBMissingHit {
   pub rb_ch         : u8,
 }
 
+#[allow(deprecated)]
 impl Serialization for RBMissingHit {
   const HEAD               : u16    = 43690; //0xAAAA
   const TAIL               : u16    = 21845; //0x5555
@@ -112,6 +113,7 @@ impl Serialization for RBMissingHit {
   }
 }
 
+#[allow(deprecated)]
 impl RBMissingHit {
 
   pub fn new() -> Self {
@@ -128,6 +130,7 @@ impl RBMissingHit {
   }
 }
 
+#[allow(deprecated)]
 impl fmt::Display for RBMissingHit {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<RBMissingHit:
@@ -150,6 +153,7 @@ impl fmt::Display for RBMissingHit {
   }
 }
 
+#[allow(deprecated)]
 impl Default for RBMissingHit {
 
   fn default() -> Self {
@@ -158,6 +162,7 @@ impl Default for RBMissingHit {
 }
 
 #[cfg(feature = "random")]
+#[allow(deprecated)]
 impl FromRandom for RBMissingHit {
     
   fn from_random() -> Self {
