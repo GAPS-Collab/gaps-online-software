@@ -456,6 +456,8 @@ if __name__ == '__main__':
                         mch.rb_ch       = pdl.rb_chB
                     mch.paddle_id   = pdl.paddle_id
                     mch.paddle_isA  = pdl_isA
+                    rb = m.ReadoutBoard.objects.filter(rb_id = pdl.rb_id)[0]
+                    mch.mtb_link_id = rb.mtb_link_id
                     mch.set_hg_channel()
                     mch.set_lg_channel()
                     mtb_ch += 1

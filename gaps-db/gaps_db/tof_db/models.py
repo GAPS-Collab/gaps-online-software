@@ -349,6 +349,22 @@ class Panel(models.Model):
     @property 
     def rbs(self) -> list:
         rbs = list(set([k.rb_id for k in self.paddles]))
+        return rbs
+
+    @property
+    def dsis(self) -> list:
+        dsi = list(set([k.dsi for k in self.paddles]))
+        return dsi
+
+    @property
+    def j_ltbs(self) -> list:
+        js = list(set([k.j_ltb for k in self.paddles]))
+        return js
+    
+    @property
+    def j_rbs(self) -> list:
+        js = list(set([k.j_rb for k in self.paddles]))
+        return js
 
     def __repr__(self):
         _repr = '<Panel:'
@@ -614,6 +630,20 @@ class ReadoutBoard(models.Model):
     def panels(self) -> list:
         return list(set([k.panel_id for k in self.paddles]))
 
+    @property
+    def dsis(self) -> list:
+        return list(set([k.dsi for k in self.paddles]))
+
+    @property
+    def j_ltbs(self) -> list:
+        js = list(set([k.j_ltb for k in self.paddles]))
+        return js
+    
+    @property
+    def j_rbs(self) -> list:
+        js = list(set([k.j_rb for k in self.paddles]))
+        return js
+
     def get_paddle(self, channel):
         """
         Returns the paddle connected to channel
@@ -673,6 +703,7 @@ class MTBChannel(models.Model):
     ltb_ch      = models.PositiveSmallIntegerField(null=True)
     rb_id       = models.PositiveSmallIntegerField(null=True)
     rb_ch       = models.PositiveSmallIntegerField(null=True)
+    mtb_link_id = models.PositiveSmallIntegerField(null=True)
     paddle_id   = models.PositiveSmallIntegerField(null=True)
     paddle_isA  = models.BooleanField(null=True) 
     hg_ch       = models.PositiveSmallIntegerField(unique=True, null=True)
@@ -696,6 +727,7 @@ class MTBChannel(models.Model):
         _repr += f'\n  DSI/J/     : {self.dsi}/{self.j}' 
         _repr += '\n  LTB ID/CH => RB ID/CH'
         _repr += f'\n   |-> {self.ltb_id}/{self.ltb_ch} => {self.rb_id}/{self.rb_ch}'
+        _repr += f'\n  MTB Link ID [RB] : {self.mtb_link_id}'
         _repr += '\n  LG CH => HG CH'
         _repr += f'\n   |-> {self.lg_ch} => {self.hg_ch}'
         _repr += f'\n  Paddle Id: {self.paddle_id}'
