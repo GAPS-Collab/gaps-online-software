@@ -5,9 +5,7 @@ django.setup()
 
 import json
 import sys
-import pandas
 import re
-# FIXME - move from pandas to polars!
 import polars
 import numpy as np
 
@@ -33,20 +31,18 @@ if __name__ == '__main__':
                         help=".json file with mapping volid->l0 geo coord")
     parser.add_argument('--dry-run', action='store_true', default=False,\
                         help="Don't do anything, just print.")
-    parser.add_argument('--create-paddle-end-table', action='store_true', default=False,\
-                        help="(Re)create the paddle end table from the spreadsheet")
     parser.add_argument('--create-rat-table',        action='store_true', default=False,\
                         help="(Re)create the rat table from the spreadsheet")
     parser.add_argument('--create-dsi-table',        action='store_true', default=False,\
                         help="(Re)create the dsi card table from the spreadsheet")
+    parser.add_argument('--create-paddle-table',      action='store_true', default=False,\
+                        help="(Re)create the Paddle ID table from the spreadsheet")
     parser.add_argument('--create-panel-table',      action='store_true', default=False,\
-                        help="(Re)create the panel table from the spreadsheet")
-    parser.add_argument('--create-rb-table',      action='store_true', default=False,\
                         help="(Re)create the panel table from the spreadsheet")
     parser.add_argument('--create-ltb-table',      action='store_true', default=False,\
                         help="(Re)create the LTB table from the spreadsheet")
-    parser.add_argument('--create-pid-table',      action='store_true', default=False,\
-                        help="(Re)create the Paddle ID table from the spreadsheet")
+    parser.add_argument('--create-rb-table',      action='store_true', default=False,\
+                        help="(Re)create the panel table from the spreadsheet")
     parser.add_argument('--create-mtbchannel-table',      action='store_true', default=False,\
                         help="(Re)create the MTB channel table")
     parser.add_argument('--create-all-tables',      action='store_true', default=False,\
@@ -54,273 +50,417 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     if args.create_all_tables:
-        args.create_paddle_end_table = True
         args.create_rat_table        = True
         args.create_dsi_table        = True
+        args.create_paddle_table     = True
         args.create_panel_table      = True
         args.create_rb_table         = True
         args.create_ltb_table        = True
-        args.create_pid_table        = True
         args.create_mtbchannel_table = True
     
     if not args.volid_map or not args.level0_geo:
-        args.create_pid_table = False
-        print("Not creating PID tablew without volid map and level0 geo!")
-    #sure = input(f'Whatever you have selected, it is likely that current values in the global GAPS DB will get overwriten. Are you certain that you want to proceed? (YES/<any>\n\t')
-    #if not sure:
-    #    print(f'Abort! Nothing happend.')
-    #    sys.exit(0)
-    if args.create_dsi_table:
-        try:
-            sheet = pandas.read_excel(args.input, sheet_name=SPREADSHEET_MTB)
-        except Exception as e:
-            print (f'Can not read spreadsheet with name {SPREADSHEET_MTB}. Exception {e} thrown. Abort!')
-            sys.exit(1)
-        dsi_card_header = sheet.loc[1,:]
-        dsi_cards_row = [k for k in dsi_card_header.index if not k.startswith('Unnamed')]
-        pattern = re.compile('DSI card (?P<dsi_id>1|2|3|4|5)')
-        dsi_cards = dict()
-        print (dsi_card_header)
-        for k in dsi_cards_row:
-            card_id = int(pattern.search(k).groupdict()['dsi_id'])
-            dsi_cards[card_id] = m.DSICard()
-            dsi_cards[card_id].dsi_id = card_id
-            
-        pattern = re.compile('RBs RAT(?P<rat_id>\d{1,2})')
-        for row in range(2,len(sheet.index)):
-            row_data = sheet.loc[row,:]
-            cols_for_dsi = {1 : 'Unnamed: 1',\
-                            2 : 'Unnamed: 4',\
-                            3 : 'Unnamed: 7',\
-                            4 : 'Unnamed: 10',\
-                            5 : 'Unnamed: 13'}
-            for k in dsi_cards.keys():
-                key = f'DSI card {k}'
-                print ('key',key)
-                print (row_data[key])
-                if not row_data[key].startswith('J'):
-                    continue
-                if row_data[key].endswith('_1'):
-                    continue
-                this_j   = int(row_data[key][1])
-                print (cols_for_dsi, k)
-                print (this_j)
-                print (row_data)
-                thiscol = cols_for_dsi[int(k)]
-                try:
-                    row_data[thiscol] 
-                except KeyError as e:
-                    print(f'Can not find key {key}! {e}, skipping..')
-                    continue
-                if row_data[thiscol] == 'X':
-                    continue
-                
-                #if np.isnan(row_data[thiscol]):
-                #    continue
-                try:
-                    rat_id = pattern.search(row_data[thiscol]).groupdict()['rat_id']
-                except TypeError as e:
-                    print (thiscol)
-                    print (row_data[thiscol])
-                    print (f"Error, can't parse! {e}")
-                    continue
-                dsi_cards[int(k)].add_rat_id_for_j(this_j, rat_id)
-        for card in dsi_cards:
-            print (f"Found DSI card {dsi_cards[card]}")
-            if not args.dry_run:
-                dsi_cards[card].save()
-
+        args.create_paddle_table = False
+        print("Not creating PID table without volid map and level0 geo!")
+    
     if args.create_rat_table:
         try:
-            sheet = pandas.read_excel(args.input, sheet_name=SPREADSHEET_RATS)
+            sheet = polars.read_excel(args.input, sheet_name=SPREADSHEET_RATS)
         except Exception as e:
             print (f'Can not read spreadsheet with name {SPREADSHEET_RATS}. Exception {e} thrown. Abort!')
             sys.exit(1)
-        for row in range(1,len(sheet.index)):
+        rows = [k for k in sheet.rows()][1:] # first 2 rows are garbage, as are the last 2
+        rows = [k for k in map(lambda x : (int(x[0]), int(x[1]), int(x[2]), int(x[3]), int(x[4]), float(x[5])*30.48), rows)]
+        n_rats = 0
+        for row in rows:
             rat = m.RAT()
-            row_data = sheet.loc[row,:]
-            print (row_data.keys())
-            try:
-                rat.fill_from_spreadsheet(row_data)
-            except ValueError as e:
-                print (f'Can not convert row {row}. Exception {e} thrown. Row data {row_data}. Skipping this RAT')
-                continue
+            rat.rat_id = row[0]
+            rat.pb_id  = row[1]
+            # yes, rb2 comes first in the spreadsheet!
+            rat.rb2_id = row[2]
+            rat.rb1_id = row[3]
+            rat.ltb_id = row[4]
+            rat.ltb_harting_cable_length = row[5]
             print (rat)
+            n_rats += 1
             if not args.dry_run:
                 rat.save()
-
-    if args.create_panel_table:
+        print(f'-- {n_rats} RATs added to the DB!') 
+    if args.create_dsi_table:
         try:
-            sheet = pandas.read_excel(args.input, sheet_name=SPREADSHEET_PANELS)
+            # this NEEDS polars >= 0.20 and the calamine engine, otherwise this spreadsheet
+            # won't be parsed correctly and misses DSI5
+            sheet = polars.read_excel(args.input,engine='calamine', sheet_name=SPREADSHEET_MTB)
+        except Exception as e:
+            print (f'Can not read spreadsheet with name {SPREADSHEET_MTB}. Exception {e} thrown. Abort!')
+            sys.exit(1)
+        rows = sheet.rows()[2:]
+
+        def format_row(r):
+            pattern = re.compile('RAT(?P<ratid>[0-9]*)')
+            js      = [k for k in map(lambda x :int(x[1]), [r[0],r[2],r[4],r[6],r[8]])]
+            rats    = [int(pattern.search(k).groupdict()['ratid']) if k is not None else None for k in [r[1],r[3],r[5],r[7],r[9]]]
+            return js, rats
+
+        dsis = {k : m.DSICard() for k in range(1,6)}
+        # take every other row, since rat and ltb js are the same
+        for r in rows[::2]:
+            js, rats = format_row(r)
+            assert len(js) == len(rats) == 5
+            js  = set(js)
+            assert len(js) == 1
+            j = list(js)[0]
+            match j:
+                case 1:
+                    for k in range(5):
+                        dsis[k+1].j1_rat_id = rats[k]
+                case 2:
+                    for k in range(5):
+                        dsis[k+1].j2_rat_id = rats[k]
+                case 3:
+                    for k in range(5):
+                        dsis[k+1].j3_rat_id = rats[k]
+                case 4:
+                    for k in range(5):
+                        dsis[k+1].j4_rat_id = rats[k]
+                case 5:
+                    for k in range(5):
+                        dsis[k+1].j5_rat_id = rats[k]
+        for k in dsis.keys():
+            dsis[k].dsi_id = k
+            print (dsis[k])
+            if not args.dry_run:
+                dsis[k].save()
+
+    if args.create_paddle_table:
+        print('-- Creating paddle table!')
+        volid_map  = json.load(open(args.volid_map))
+        level0_geo = json.load(open(args.level0_geo))
+        sheet      = polars.read_excel(args.input, sheet_name=SPREADSHEET_PADDLE_END)
+        rows       = [r for r in sheet.rows()][1:321]
+        # how this works is that we have line 0,1 for paddle 1, 2,3 for paddle 2 etc...
+        paddle     = m.Paddle()
+        for k,r in enumerate(rows):
+            if k%2 == 0:
+                paddle = m.Paddle()
+            paddle.paddle_id           = int(r[0]) 
+            #print (r)
+            #print (paddle.paddle_id)
+            assert paddle.paddle_id > 0
+            assert paddle.paddle_id < 161
+            paddle_end                 = r[1]
+            if k%2==0:
+                assert paddle_end == 'A'
+            else:
+                assert paddle_end == 'B'
+            # FIXME - string look up
+            paddle.volume_id           = int(volid_map[str(r[0])])
+            panel_id                   = r[3]
+            if panel_id.startswith('E'):
+                # this are these individual edge paddles
+                # we replace them with 1000 + the number 
+                # after E-X
+                panel_id = panel_id.replace("E-X","")
+                paddle.panel_id = int(panel_id) + 1000
+            else:
+                paddle.panel_id = int(panel_id)
+            paddle.cable_len           = float(r[6])
+            ltb_nmb_ch                 = r[8].split('-')
+            rb_nmb_ch                  = r[9].split('-')
+            pb_nmb_ch                  = r[13].split('-')
+            paddle.ltb_id              = int(ltb_nmb_ch[0]) 
+            paddle.rb_id               = int(rb_nmb_ch[0])
+            paddle.pb_id               = int(pb_nmb_ch[0])
+            if paddle_end == 'A':
+                paddle.ltb_chA         = int(ltb_nmb_ch[1])
+                paddle.rb_chA          = int(rb_nmb_ch[1])
+                paddle.pb_chA          = int(pb_nmb_ch[1])
+            else:
+                paddle.ltb_chB         = int(ltb_nmb_ch[1])
+                paddle.rb_chB          = int(rb_nmb_ch[1])
+                paddle.pb_chB          = int(pb_nmb_ch[1])
+            paddle.dsi                 = int(r[10]) 
+            paddle.j_ltb               = int(r[11][1])
+            paddle.j_rb                = int(r[12][1])
+            paddle.mtb_link_id         = int(r[18]) 
+            l0_coord = level0_geo[str(paddle.volume_id)]
+            x,y,z                      = l0_coord['x'], l0_coord['y'], l0_coord['z']
+            length, width, height      = l0_coord['length'], l0_coord['width'], l0_coord['height']
+            paddle.global_pos_x_l0     = float(x) 
+            paddle.global_pos_y_l0     = float(y)
+            paddle.global_pos_z_l0     = float(z)
+            paddle.length              = float(length)
+            paddle.height              = float(height)
+            paddle.width               = float(width )
+            # check in which direction the paddle is oriented, 
+            # hopefully this is global coordinate
+            paddle_end_loc             = r[2]
+            match paddle_end_loc:
+                case '+X':
+                    paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0 + paddle.length/2 
+                    paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
+                case '-X':
+                    paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0 - paddle.length/2 
+                    paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
+                case '+Y':
+                    paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0  
+                    paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0 + paddle.length/2
+                    paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
+                case '-Y':
+                    paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0 
+                    paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0 - paddle.length/2
+                    paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
+                case '+Z':
+                    paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0  
+                    paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0 + paddle.length/2
+                case '-Z':
+                    paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0  
+                    paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0 + paddle.length/2
+                case _:
+                    raise ValueError("Can not parse {paddle_end_loc} for paddle end location!")
+            if k%2 != 0:
+                print (paddle)
+                if not args.dry_run:
+                    paddle.save()
+    
+    if args.create_panel_table:
+        print ('-- Creating panel table!')
+        try:
+            sheet = polars.read_excel(args.input, sheet_name=SPREADSHEET_PANELS)
         except Exception as e:
             print (f'Can not read spreadsheet with name {SPREADSHEET_PANELS}. Exception {e} thrown. Abort!')
             sys.exit(1)
-        for row in range(1,len(sheet.index)):
-            row_data = sheet.loc[row,:]
+        rows    = sheet.rows()[:25]
+        for r in rows:
             panel = m.Panel()
-            try:
-                panel.fill_from_spreadsheet(row_data)
-            except Exception as e:
-                print (row_data)
-                print (f"Can't parse panel! {e}")
-                continue
+            panel_id    = r[0]
+            if panel_id.startswith('E'):
+                # this are these individual edge paddles
+                # we replace them with 1000 + the number 
+                # after E-X
+                panel_id = panel_id.replace("E-X","")
+                panel.panel_id = int(panel_id) + 1000
+            else:
+                panel.panel_id = int(panel_id)
+            desc = r[1]
+            panel.description = desc
+            # hardcode the orientation, too tired for 
+            # pattern matching, sorry...
+            if 'umbrella' in desc or 'top' in desc or 'bottom' in desc:
+                normal = [0,0,1]
+            else:
+                match panel.panel_id:
+                    case 3 | 14:
+                        normal = [1,0,0]
+                    case 5 | 16:
+                        normal = [-1,0,0]
+                    case 4 | 15:
+                        normal = [0,1,0]
+                    case 6 | 17:
+                        normal = [0,-1,0]
+                    case 18 | 1045:
+                        normal = [1,1,0]
+                    case 19 | 1135:
+                        normal = [-1,1,0]
+                    case 20 | 1225:
+                        normal = [-1,-1,0]
+                    case 21 | 1315:
+                        normal = [1,-1,0]
+            panel.normal_x = normal[0]
+            panel.normal_y = normal[1]
+            panel.normal_z = normal[2]
+
+            paddles = m.Paddle.objects.filter(panel_id=panel.panel_id)
+            if not len (paddles):
+                raise ValueError("Need to create Paddle table first!")
+            paddles = sorted(paddles, key=lambda x: x.paddle_id) 
+            for k,pdl in enumerate(paddles):
+                match k:
+                    case 0:
+                        panel.paddle0 = pdl
+                    case 1:
+                        panel.paddle1 = pdl
+                    case 2:
+                        panel.paddle2 = pdl
+                    case 3:
+                        panel.paddle3 = pdl
+                    case 4:
+                        panel.paddle4 = pdl
+                    case 5:
+                        panel.paddle5 = pdl
+                    case 6:
+                        panel.paddle6 = pdl
+                    case 7:
+                        panel.paddle7 = pdl
+                    case 8:
+                        panel.paddle8 = pdl
+                    case 9:
+                        panel.paddle9 = pdl
+                    case 10:
+                        panel.paddle10 = pdl
+                    case 11:
+                        panel.paddle11 = pdl
+                    case _:
+                        ValueError("Too many paddles for this panel!")
+
             print (panel)
+            #print (panel.description, panel.normal_x, panel.normal_y, panel.normal_z)
             if not args.dry_run:
                 panel.save()
 
-    if args.create_paddle_end_table:
-        try:
-            sheet = pandas.read_excel(args.input, sheet_name=SPREADSHEET_PADDLE_END)
-        except Exception as e:
-            print (f'Can not read spreadsheet with name {SPREADSHEET_PADDLE_END}. Exception {e} thrown. Abort!')
-            sys.exit(1)
-        try:
-            sheet_plr = polars.read_excel(args.input, sheet_name=SPREADSHEET_PADDLE_END)
-        except Exception as e:
-            print (f'Can not read spreadsheet with name {SPREADSHEET_PADDLE_END}. Exception {e} thrown. Abort!')
-            sys.exit(1)
-        
-        ploc_col = sheet_plr.get_column("Paddle Location in Panel ")
-        for row in range(1,len(sheet.index)):
-            paddle_end = m.PaddleEnd()
-            row_data = sheet.loc[row,:]
-            print ('++++++++')
-            print(row_data)
-            paddle_end.fill_from_spreadsheet(row_data)
-            paddle_end.setup_unique_paddle_end_id()
-            paddle_end.pos_in_panel = ploc_col[row]
-            #print (row_data.keys())
-            #print (row_data)
-            #print ('----')
-            if paddle_end.panel_id is None:
-                print ('Error, no panel_id, setting 99')
-                paddle_end.panel_id = 99
-            print (paddle_end)
-            if not args.dry_run:
-                paddle_end.save()
-    if args.create_pid_table:
-        paddle_ends = m.PaddleEnd.objects.all()
-        if len(paddle_ends) == 0:
-            print (f'[FATAL] - need to create paddle end table first! Abort..')
-            sys.exit(1)
-        pid_dict = {k : m.Paddle() for k in range(1,161)}
-        
-        volid_map  = json.load(open(args.volid_map))
-        level0_geo = json.load(open(args.level0_geo))
-        for k in pid_dict.keys():
-            pid_dict[k].paddle_id = k
-            vid = int(volid_map[str(k)])
-            pid_dict[k].volume_id = vid
-            l0_coord = level0_geo[str(vid)]
-            x,y,z = l0_coord['x'], l0_coord['y'], l0_coord['z']
-            pid_dict[k].global_pos_x_l0 = x
-            pid_dict[k].global_pos_y_l0 = y
-            pid_dict[k].global_pos_z_l0 = z
-            pid_dict[k].length          = l0_coord['length']
-            pid_dict[k].height          = l0_coord['height']
-            pid_dict[k].width           = l0_coord['width']
-            if not args.dry_run:
-                print (f'{pid_dict[k]}')
-                pid_dict[k].save()
 
     if args.create_rb_table:
-        rbs = {k : m.RB() for k in range(1,51)}
-        
-        for k in rbs:
-            if k in RB_IGNORELIST:
-                continue
-            rbs[k].rb_id = k
-            mtb_link_ids = []
-            for ch in range(1,9):
-                try:
-                    pend = m.PaddleEnd.objects.filter(\
-                            rb_id = rbs[k].rb_id,\
-                            rb_ch = ch)[0]
-                except Exception as e:
-                    print (f"Can't get info for {rbs[k].rb_id} {ch}")
-                    raise
-                rbs[k].set_channel(ch, pend)
-                mtb_link_ids.append(pend.mtb_link_id)
-            if len(set(mtb_link_ids)) != 1:
-                print (rbs)
-                print (pend)
-                raise ValueError("Something is inconsistent! This RB seems to have paddles connected with different MTB Link IDs!")
-            
-            rbs[k].mtb_link_id = mtb_link_ids[0]
-            print (rbs[k])
+        # The readoutboard table can be generated completely from 
+        # a list of eligible RBs and the paddle table
+        rb_ids = [k for k in range(1,51) if not k in RB_IGNORELIST]
+        print('-- creating RB table for ids {rb_ids}')
+        for rid in rb_ids:
+            rb = m.ReadoutBoard()
+            paddles = m.Paddle.objects.filter(rb_id = rid)
+            assert len(paddles) == 4
+            dsi = set([pdl.dsi for pdl in paddles])
+            assert len(dsi) == 1
+            dsi = list(dsi)[0]
+            j   = set([pdl.j_rb for pdl in paddles])
+            assert len(j) == 1
+            j   = list(j)[0] 
+            mtb_link_id = set([pdl.mtb_link_id for pdl in paddles])
+            assert len (mtb_link_id) == 1
+            mtb_link_id    = list(mtb_link_id)[0]
+            rb.rb_id       = rid
+            rb.dsi         = dsi
+            rb.j           = j
+            rb.mtb_link_id = mtb_link_id 
+            for pdl in paddles:
+                match pdl.rb_chA:
+                    case 1:
+                        rb.paddle12     = pdl
+                        rb.paddle12_chA = 1
+                    case 2:
+                        rb.paddle12     = pdl
+                        rb.paddle12_chA = 2
+                    case 3:
+                        rb.paddle34     = pdl
+                        rb.paddle34_chA = 3
+                    case 4:
+                        rb.paddle34     = pdl
+                        rb.paddle34_chA = 4
+                    case 5:
+                        rb.paddle56     = pdl
+                        rb.paddle56_chA = 5
+                    case 6:
+                        rb.paddle56     = pdl
+                        rb.paddle56_chA = 6
+                    case 7:
+                        rb.paddle78     = pdl
+                        rb.paddle78_chA = 7
+                    case 8:
+                        rb.paddle78     = pdl
+                        rb.paddle78_chA = 8
+            print (rb)
             if not args.dry_run:
-                rbs[k].save()
+                rb.save()
+
 
     if args.create_ltb_table:
-        print ("Creating LTB table")
-        paddle_ends = m.PaddleEnd.objects.all()
+        print ("-- Creating LTB table")
         dsi_cards   = m.DSICard.objects.all()
-        #paddle_ends_rb = { : []}
-        #for k in paddle_ends:
-        print (f'We got {len(paddle_ends)} Paddle ends.')
-        #ltbs = {k : m.LTB() for k in range(1,21)}
-        #
-        #for k in ltbs:
-        #    ltbs[k].ltb_id = k
-        ltbs = dict()
-        for paddle_end in paddle_ends:
-            ltb_id = paddle_end.ltb_id
-            if not ltb_id in ltbs:
-                print (f"Adding {ltb_id}")
-                ltbs[ltb_id] = m.LTB()
-                ltbs[ltb_id].ltb_id = ltb_id
-            ltb_ch = paddle_end.ltb_ch
-            data   = {ltb_ch : [paddle_end.rb_id, paddle_end.rb_ch]}
-            ltbs[ltb_id].set_channels_to_rb(data)
-        
-        rats = m.RAT.objects.all()
-        for ltb in ltbs:
-            m.get_dsi_j_for_ltb(ltbs[ltb], rats, dsi_cards, dry_run=args.dry_run)
-            if not ltbs[ltb].is_populated():
-                continue
-            print (ltbs[ltb])
+        rats        = m.RAT.objects.all()
+        ltbs        = dict()
+        # let's loop over the RAT table first, to find 
+        # out which ltbs exist
+        for rat in rats:
+            ltb           = m.LocalTriggerBoard()
+            ltb.rat       = rat.rat_id
+            ltb.board_id  = rat.rat_id
+            ltb.cable_len = rat.ltb_harting_cable_length
+            # populate the dsi/j fields
+            for dsi in dsi_cards:
+                if not dsi.has_rat(ltb.rat):
+                    continue
+                ltb.dsi = dsi.dsi_id
+                ltb.j   = dsi.get_j(ltb.rat)
+            # for later
+            paddles = m.Paddle.objects.filter(ltb_id = ltb.board_id)
+            assert len(paddles) == 8
+            paddles = sorted([k for k in paddles], key=lambda x : x.ltb_chA)  
+            for k,pdl in enumerate(paddles):
+                match k:
+                    case 0:
+                        ltb.paddle1 = pdl
+                    case 1:
+                        ltb.paddle2 = pdl
+                    case 2:
+                        ltb.paddle3 = pdl
+                    case 3:
+                        ltb.paddle4 = pdl
+                    case 4:
+                        ltb.paddle5 = pdl
+                    case 5:
+                        ltb.paddle6 = pdl
+                    case 6:
+                        ltb.paddle7 = pdl
+                    case 7:
+                        ltb.paddle8 = pdl
+
+            ltbs[ltb.board_id]  = ltb
+
+        for k in ltbs:
+            print (ltbs[k])
             if not args.dry_run:
-                ltbs[ltb].save()
+                ltbs[k].save()
 
     if args.create_mtbchannel_table:
-        ltbs = m.LTB.objects.all()
-        mtbch = 0
-        for ltb in ltbs:
-            channels = ltb.get_channels_to_rb()
-            for ch in channels:
-                mtb             = m.MTBChannel()
-                mtb.mtb_channel = mtbch
-                mtb.dsi         = ltb.ltb_dsi
-                mtb.j           = ltb.ltb_j
-                mtb.ltb_id      = ltb.ltb_id
-                mtb.ltb_channel = ch
-                mtb.rb_id       = channels[ch][0]
-                mtb.rb_channel  = channels[ch][1] 
-                mtb.set_hg_channel()
-                mtb.set_lg_channel()
-                mtbch += 1
-                if mtb.hg_channel is None or mtb.lg_channel is None:
-                    print (f"WARN - not enough information for {ltb}, {ch} => {channels[ch]}")
-                    print (mtb)
+        # mtbchannels go from 0-320
+        #ltbs = m.LocalTriggerBoard.objects.all()
+        #ifor ltb in ltbs:
+        mtb_ch = 0
+        for dsi in range(1,6):
+            for j in range(1,6):
+                print (dsi, j)
+                try:
+                    ltb = m.LocalTriggerBoard.objects.filter(dsi=dsi, j=j)[0]
+                except Exception as e:
+                    print (f"No LTB for {dsi}/{j}!")
+                    mch = m.MTBChannel()
+                    mch.mtb_ch = mtb_ch
+                    for ch in range(1,17):
+                        mtb_ch += 1
+                        if not args.dry_run:
+                            mch.save()
                     continue
+                ltb_channels = dict()
+                for ch in range(1,17):
+                    pdl_isA = True
+                    pdl = [k for k in filter(lambda x : x.ltb_chA == ch, ltb.paddles)]
+                    if not pdl:
+                        pdl_isA = False
+                        pdl = [k for k in filter(lambda x : x.ltb_chB == ch, ltb.paddles)]
+                    assert len(pdl) == 1
+                    pdl = pdl[0]
+                    print (pdl)
+                    mch = m.MTBChannel()
+                    mch.mtb_ch      = mtb_ch
+                    mch.dsi         = dsi
+                    mch.j           = j
+                    mch.ltb_id      = ltb.board_id
+                    mch.rb_id       = pdl.rb_id
+                    if pdl_isA:
+                        mch.ltb_ch      = pdl.ltb_chA
+                        mch.rb_ch       = pdl.rb_chA
+                    else:
+                        mch.ltb_ch      = pdl.ltb_chB
+                        mch.rb_ch       = pdl.rb_chB
+                    mch.paddle_id   = pdl.paddle_id
+                    mch.paddle_isA  = pdl_isA
+                    mch.set_hg_channel()
+                    mch.set_lg_channel()
+                    mtb_ch += 1
+                    print (mch)
+                    if not args.dry_run:
+                        mch.save()
+        print (f"-- Added {mtb_ch} MTBChannels to the DB!")
 
-                ltb_pend = m.PaddleEnd.objects.filter(ltb_id = ltb.ltb_id, ltb_ch = ch)
-                assert (len(ltb_pend) == 1)
-                ltb_pend = ltb_pend[0]
-                rb_pend  = m.PaddleEnd.objects.filter(rb_id  = mtb.rb_id, rb_ch = mtb.rb_channel)
-                assert (len(rb_pend) == 1)
-                rb_pend  = rb_pend[0]
-                assert(ltb_pend.paddle_end_id == rb_pend.paddle_end_id)
-                mtb.p_end_id = rb_pend.paddle_end_id
-                if not args.dry_run:
-                    print (mtb)
-                    try:
-                        mtb.save()
-                    except Exception as e:
-                        print (e)
-                        foo = m.MTBChannel.objects.filter(lg_channel = mtb.lg_channel)
-                        for k in foo:
-                            print (k)
-                        raise 
-                else:
-                    print (mtb)
