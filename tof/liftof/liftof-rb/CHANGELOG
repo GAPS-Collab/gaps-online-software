@@ -1,6 +1,11 @@
 # LELEWAA series
 
-# NIUHI series
+## v0.10.0
+* adapt to new ReadoutBoard model in 
+  the database
+* introduces error bit checks on channels
+
+# HAHALUA series
 
 ## v0.9.5
 * revamps configuration - use the same
@@ -29,6 +34,8 @@
 ## v0.9.0
 * preamp, powerboard and LTB monitoring
 * integration of Paolo's command suite
+
+# NIUHI series
 
 ## v0.8.6
 * logo show to welcome user

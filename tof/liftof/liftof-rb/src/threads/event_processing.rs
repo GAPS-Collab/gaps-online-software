@@ -98,7 +98,9 @@ pub fn event_processing(board_id            : u8,
   let mut data_type       : DataType   = DataType::Unknown;
   //let one_milli           = Duration::from_millis(1);
   let mut streamer        = RBEventMemoryStreamer::new();
-  streamer.calc_crc32     = calc_crc32;
+  // FIXME
+  streamer.check_channel_errors = true;
+  streamer.calc_crc32           = calc_crc32;
   // our cachesize is 50 events. This means each time we 
   // receive data over bs_recv, we have received 50 more 
   // events. This means we might want to wait for 50 MTE

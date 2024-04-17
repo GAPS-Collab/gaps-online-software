@@ -69,7 +69,13 @@ use tof_dataclasses::commands::{
 
 use tof_dataclasses::events::DataType;
 use tof_dataclasses::run::RunConfig;
-use tof_dataclasses::manifest::get_rbs_from_sqlite;
+//use tof_dataclasses::manifest::get_rbs_from_sqlite;
+
+use tof_dataclasses::database::{
+    ReadoutBoard,
+    connect_to_db,
+};
+
 use tof_dataclasses::io::{
     get_califilename,
     get_runfilename
@@ -229,20 +235,43 @@ fn main() {
     } // end Some
   }
   let calc_crc32            = config.rb_settings.calc_crc32;
-  let only_perfect_events   = config.rb_settings.only_perfect_events;
+  if config.rb_settings.only_perfect_events {
+    error!("Currently we are not supporting the only_perfect_events setting. See issue #57");
+  }
+  //let only_perfect_events   = config.rb_settings.only_perfect_events;
+  let only_perfect_events   = false;
   let cmd_server_address    = config.cc_server_address.clone();
   let mut run_config        = config.rb_settings.get_runconfig();
-  let db_path               = Path::new(&config.db_path);
+  //let db_path               = Path::new(&config.db_path);
+  let db_path               = config.db_path.clone();
   run_config.nseconds       = args.runtime_secs;
- 
-  let rbs = get_rbs_from_sqlite(db_path);
+
+  // Query the db for this RBs information
+  let conn = connect_to_db(db_path);
   let mut rb_expected_link_id = 0u8;
-  for rb  in rbs {
-    if rb.rb_id == rb_info.board_id {
-      rb_expected_link_id = rb.mtb_link_id;
-      break;
+  match conn {
+    Err(err) => {
+      error!("Unable to connect to database at {}", config.db_path);
+      panic!("Without db connection, we are currently unable to perform the RB Id/MTB Link Id check!");
+    }
+    Ok(mut conn) => {
+      match ReadoutBoard::all(&mut conn) {
+        None => {
+          error!("We could connect to the database, however, we were unable to retrieve any RB information!");
+          panic!("Without RB information, we won't be able to perform the RB Id/MTB Link Id check!");
+        }
+        Some(rbs) => {
+          for rb  in rbs {
+            if rb.rb_id == rb_info.board_id {
+              rb_expected_link_id = rb.mtb_link_id;
+              break;
+            }
+          }
+        }
+      }
     }
   }
+  //let rbs = get_rbs_from_sqlite(db_path);
   println!("We found MTB Link ID {} for this RB (RB ID {}) in the database!", rb_expected_link_id, rb_info.board_id);
   // FIXME - instead of passing the run config around,
   // just offer it through a mutex
@@ -277,6 +306,7 @@ fn main() {
     Ok(link_id) => {
       if link_id as u8 != rb_expected_link_id {
         println!("=> We received the correct link id from the MTB!");
+        panic!("Unable to perform RB/Link ID mapping check!");
       } else {
         error!("Received unexpected MTB link ID {}!", link_id);
         error!("Incorrect link ID. This might hint to issues with the MTB mapping!");
