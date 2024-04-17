@@ -12,6 +12,17 @@ which are implemented for most of the classes. They will (de)serialize the
 respective class to a vector of bytes, which also allows transportation 
 over the network or writing to disk.
 
+# Access to the database
+
+The gaps-online-software ships a project `gaps-db` containing a sqlite database
+with the TOF configuration at flight. This includes the different RBs, LTBs, 
+paddles, geometry and so on. To access this database (no writing possible)
+we are using diesel. To get started with diesel, it is a few easy steps.
+
+* make sure diesel.toml is available in this directory
+* set `DATABASE_URL` to the gaps flight database
+* `diesel setup` (this will create the migrations directory, only needed once
+* `diesel print-schema > src/db_schema.rs` to generate the database schema 
 
 # How to run the tests?
 

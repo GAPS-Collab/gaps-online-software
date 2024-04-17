@@ -4,6 +4,8 @@ export PYTHONPATH=$PYTHONPATH:@CMAKE_INSTALL_PREFIX@/python:@CMAKE_CURRENT_SOURC
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@CMAKE_INSTALL_PREFIX@/lib
 export DJANGO_SETTINGS_MODULE=gaps_db.settings
 export GapsOnlineSoftware_DIR=@CMAKE_INSTALL_PREFIX@
+# this is the database for diesel
+export DATABASE_URL=@CMAKE_CURRENT_SOURCE_DIR@/gaps-db/gaps_db/gaps-flight.db
 
 echo -e "\n\n"
 echo -e "  ************************************************+++"

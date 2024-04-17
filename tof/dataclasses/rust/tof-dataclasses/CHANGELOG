@@ -9,7 +9,8 @@
   TofPacket packing and unpacking
 * New series module. Allows to aggregate monitoring data (and maybe other data in 
   the future)
-
+* Switch database engine from sqlite to diesel. This is more flexible for different 
+  datasources e.g. PostgreSQL
 
 # HAHALUA series
 
