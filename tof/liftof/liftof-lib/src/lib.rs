@@ -19,9 +19,8 @@ use constants::{
 };
 
 pub use master_trigger::{
-    //connect_to_mtb,
     master_trigger,
-    MTBSettings
+    MTBSettings,
 };
 
 pub use settings::{
@@ -59,11 +58,8 @@ extern crate env_logger;
 //use ndarray::{array, Array1};
 //use nlopt::{Algorithm, Objective, Optimization, Result};
 
-//use tof_dataclasses::manifest as mf;
 use tof_dataclasses::DsiLtbRBMapping;
-use tof_dataclasses::manifest::{
-    ReadoutBoard,
-};
+use tof_dataclasses::database::ReadoutBoard;
 
 use tof_dataclasses::constants::NWORDS;
 use tof_dataclasses::calibrations::{
@@ -472,159 +468,131 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     event.header.set_sine_fit(fit_result);
   }
 
-  //// Step 1: Prepare the data. Currently, we 
-  //// only support one peak per channel
+  // structure to store final result
+  // extend with Vec<TofHit> in case
+  // we want to have multiple hits
   let mut paddles    = HashMap::<u8, TofHit>::new();
-  for raw_ch in channels.iter() {
-    if *raw_ch == 8 {
-      continue; // ignore ch9 for now (no hits) 
-    }
-    let pend = rb.channel_to_paddle_end_id[*raw_ch as usize];
-    // check which side it is
-    let pid : u8;
-    if pend > 2000 {
-      pid = (pend - 2000) as u8;
-    } else {
-      pid = (pend - 1000) as u8;
-    }
-    if !paddles.contains_key(&pid) {
-      let mut hit = TofHit::new();
-      hit.paddle_id = pid;
-      paddles.insert(pid, hit);
-    }
-  }
-
-  // Step 2. Walk over the paddles and fill the 
-  // values
-  let mut pids = Vec::<u8>::new();
-  for k in paddles.keys() {
-    pids.push(*k);
-  }
-  for pid in pids {
-    match paddles.get_mut(&pid) {
-      None => {
-        error!("The hit is not there, even after we put it in the map!");
-        error!("I am chugging along, but something is amiss here!");
-        continue;
-      },
-      Some(hit) => {
-        for raw_ch in rb.paddle_id_to_channel.get(&pid).unwrap() {
-          if channels.contains(&raw_ch) {
-            // Step 1: Calibration
-            rb.calibration.voltages(*raw_ch as usize+ 1,
-                                    event.header.stop_cell as usize,
-                                    &event.adc[*raw_ch as usize],
-                                    &mut voltages);
-            //FIXME - spike cleaning!
-            //match RBCalibrations::spike_cleaning(&mut ch_voltages,
-            //                                     event.header.stop_cell) {
-            //  Err(err) => {
-            //    error!("Spike cleaning failed! {err}");
-            //  }
-            //  Ok(_)    => ()
-            //}
-            rb.calibration.nanoseconds(*raw_ch as usize + 1,
-                                       event.header.stop_cell as usize,
-                                       &mut times);
-            // Step 2: Pedestal subtraction
-            let (ped, ped_err) = calculate_pedestal(&voltages,
-                                                    settings.pedestal_thresh,
-                                                    settings.pedestal_begin_bin,
-                                                    settings.pedestal_win_bins);
-            trace!("Calculated pedestal of {} +- {}", ped, ped_err);
-            for n in 0..voltages.len() {
-              voltages[n] -= ped;
-            }
-            let mut charge : f32 = 0.0;
-            //let peaks : Vec::<(usize, usize)>;
-            let mut cfd_times = Vec::<f32>::new();
-            let mut max_volts = 0.0f32;
-            // Step 4 : Find peaks
-            // FIXME - what do we do for multiple peaks?
-            // Currently we basically throw them away
-            match find_peaks(&voltages ,
-                             &times    ,
-                             settings.find_pks_t_start , 
-                             settings.find_pks_t_window,
-                             settings.min_peak_size    ,
-                             settings.find_pks_thresh  ,
-                             settings.max_peaks      ) {
+  for pid in rb.get_paddle_ids() {
+    // cant' fail by constructon of pid
+    let ch_a = rb.get_pid_rbchA(pid).unwrap() as usize;
+    let ch_b = rb.get_pid_rbchB(pid).unwrap() as usize;
+    let mut hit = TofHit::new();
+    hit.paddle_id = pid;
+    for (k, ch) in [ch_a, ch_b].iter().enumerate() {
+      // Step 1: Calibration
+      rb.calibration.voltages(*ch,
+                              event.header.stop_cell as usize,
+                              &event.adc[*ch as usize -1],
+                              &mut voltages);
+      //FIXME - spike cleaning!
+      //match RBCalibrations::spike_cleaning(&mut ch_voltages,
+      //                                     event.header.stop_cell) {
+      //  Err(err) => {
+      //    error!("Spike cleaning failed! {err}");
+      //  }
+      //  Ok(_)    => ()
+      //}
+      rb.calibration.nanoseconds(*ch,
+                                 event.header.stop_cell as usize,
+                                 &mut times);
+      // Step 2: Pedestal subtraction
+      let (ped, ped_err) = calculate_pedestal(&voltages,
+                                              settings.pedestal_thresh,
+                                              settings.pedestal_begin_bin,
+                                              settings.pedestal_win_bins);
+      trace!("Calculated pedestal of {} +- {}", ped, ped_err);
+      for n in 0..voltages.len() {
+        voltages[n] -= ped;
+      }
+      let mut charge : f32 = 0.0;
+      //let peaks : Vec::<(usize, usize)>;
+      let mut cfd_times = Vec::<f32>::new();
+      let mut max_volts = 0.0f32;
+      // Step 4 : Find peaks
+      // FIXME - what do we do for multiple peaks?
+      // Currently we basically throw them away
+      match find_peaks(&voltages ,
+                       &times    ,
+                       settings.find_pks_t_start , 
+                       settings.find_pks_t_window,
+                       settings.min_peak_size    ,
+                       settings.find_pks_thresh  ,
+                       settings.max_peaks      ) {
+        Err(err) => {
+          error!("Unable to find peaks for ch {ch}! Ignoring this channel!");
+          error!("We won't be able to calculate timing information for this channel! Err {err}");
+        },
+        Ok(peaks)  => {
+          //peaks = pks;
+          // Step 5 : Find tdcs
+          //println!("Found {} peaks for ch {}! {:?}", peaks.len(), raw_ch, peaks);
+          for pk in peaks.iter() {
+            match cfd_simple(&voltages,
+                             &times,
+                             settings.cfd_fraction,
+                             pk.0, pk.1) {
               Err(err) => {
-                error!("Unable to find peaks for ch {raw_ch}! Ignoring this channel!");
-                error!("We won't be able to calculate timing information for this channel! Err {err}");
-              },
-              Ok(peaks)  => {
-                //peaks = pks;
-                // Step 5 : Find tdcs
-                //println!("Found {} peaks for ch {}! {:?}", peaks.len(), raw_ch, peaks);
-                for pk in peaks.iter() {
-                  match cfd_simple(&voltages,
-                                   &times,
-                                   settings.cfd_fraction,
-                                   pk.0, pk.1) {
-                    Err(err) => {
-                      debug!("Unable to calculate cfd for peak {} {}! {}", pk.0, pk.1, err);
-                    }
-                    Ok(cfd) => {
-                      cfd_times.push(cfd);
-                    }
-                  }
-                  // just do the first peak for now
-                  let pk_height = voltages[pk.0..pk.1].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
-                  max_volts = *pk_height; 
-                  //debug!("Check impedance value! Just using 50 [Ohm]");
-                  // Step 3 : charge integration
-                  // FIXME - make impedance a settings parameter
-                  // This does not make sense. Why don't we integrate 
-                  // the peak?
-                  match integrate(&voltages,
-                                  &times,
-                                  //settings.integration_start,
-                                  //settings.integration_window,
-                                  pk.0, 
-                                  pk.1,
-                                  50.0) {
-                    Err(err) => {
-                      error!("Integration failed! Err {err}");
-                    }
-                    Ok(chrg)   => {
-                      charge = chrg;
-                    }
-                  }
-                  break;
-                }
-              }// end OK
-            } // end match find_peaks 
-            let mut tdc : f32 = 0.0; 
-            if cfd_times.len() > 0 {
-              tdc = cfd_times[0];
+                debug!("Unable to calculate cfd for peak {} {}! {}", pk.0, pk.1, err);
+              }
+              Ok(cfd) => {
+                cfd_times.push(cfd);
+              }
             }
-            //println!("Calucalated tdc {}, charge {}, max {}", tdc, charge, max_volts); 
-            if rb.channel_to_paddle_end_id[*raw_ch as usize] > 2000 {
-              hit.ftime_b      = tdc;
-              hit.fpeak_b      = max_volts;
-              hit.set_time_b(tdc);
-              hit.set_charge_b(charge);
-              hit.set_peak_b(max_volts);
-              
-            } else {
-              hit.ftime_a = tdc;
-              hit.fpeak_b = max_volts;
-              hit.set_time_a(tdc);
-              hit.set_charge_a(charge);
-              hit.set_peak_a(max_volts);
+            // just do the first peak for now
+            let pk_height = voltages[pk.0..pk.1].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
+            max_volts = *pk_height; 
+            //debug!("Check impedance value! Just using 50 [Ohm]");
+            // Step 3 : charge integration
+            // FIXME - make impedance a settings parameter
+            // This does not make sense. Why don't we integrate 
+            // the peak?
+            match integrate(&voltages,
+                            &times,
+                            //settings.integration_start,
+                            //settings.integration_window,
+                            pk.0, 
+                            pk.1,
+                            50.0) {
+              Err(err) => {
+                error!("Integration failed! Err {err}");
+              }
+              Ok(chrg)   => {
+                charge = chrg;
+              }
             }
-            //println!("{}", hit);
-          } else {
-            error!("Only one end of a paddle has a channel record! Ch {}, Pid {}, RB {}", raw_ch + 1, pid, rb.rb_id);
+            break;
           }
-        }
+        }// end OK
+      } // end match find_peaks 
+      let mut tdc : f32 = 0.0; 
+      if cfd_times.len() > 0 {
+        tdc = cfd_times[0];
+      }
+      //println!("Calucalated tdc {}, charge {}, max {}", tdc, charge, max_volts); 
+      //if rb.channel_to_paddle_end_id[*raw_ch as usize] > 2000 {
+      if k == 0 {
+        hit.ftime_b      = tdc;
+        hit.fpeak_b      = max_volts;
+        hit.set_time_b(tdc);
+        hit.set_charge_b(charge);
+        hit.set_peak_b(max_volts);
+        
+      } else {
+        hit.ftime_a = tdc;
+        hit.fpeak_b = max_volts;
+        hit.set_time_a(tdc);
+        hit.set_charge_a(charge);
+        hit.set_peak_a(max_volts);
+        // this is the seoond iteration,
+        // we are done!
+        paddles.insert(pid, hit);
       }
     }
   }
   //println!("{:?}", paddles);
   for (_, hit) in paddles.iter_mut() {
-    let t0 = get_paddle_t0(hit.ftime_a, hit.ftime_b, rb.get_paddle_length(hit.paddle_id));
+    // unwrap should not fail by construction
+    let t0 = get_paddle_t0(hit.ftime_a, hit.ftime_b, rb.get_paddle_length(hit.paddle_id).unwrap_or(1.0));
     //println!("Cot t0 :{}", t0);
     //println!("Hit : {}", hit);
     //println!("Hit.ftime_a {}", hit.ftime_a);
@@ -633,7 +601,6 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     hit.set_t0(t0);
     hit.set_pos_across(pa);
     hit.set_edep((hit.fpeak_a + hit.fpeak_b) / 2.0);
-
     //println!("caluclated {} {} for {}",t0, pa, hit);
   }
   let result = paddles.into_values().collect();
@@ -769,6 +736,9 @@ pub fn to_board_id_string(rb_id: u32) -> String {
 pub enum Command {
   /// Listen for flight CPU commands.
   Listen(ListenCmd),
+  /// Staging mode - work through all .toml files
+  /// in the staging area
+  Staging(StagingCmd),
   /// Ping a TOF sub-system.
   Ping(PingCmd),
   /// Monitor a TOF sub-system.
@@ -808,6 +778,9 @@ pub enum CommandRB {
 /// TOF SW cmds ====================================================
 #[derive(Debug, Copy, Clone, Args, PartialEq)]
 pub struct ListenCmd { }
+
+#[derive(Debug, Copy, Clone, Args, PartialEq)]
+pub struct StagingCmd { }
 
 #[derive(Debug, Args, PartialEq)]
 pub struct PingCmd {

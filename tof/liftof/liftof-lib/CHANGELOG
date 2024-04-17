@@ -1,5 +1,13 @@
 # LELEWAA series
 
+## v0.10.0
+* refactors the MasterTrigger code complex and introduces
+  seperate modules for registers and control
+* implements a number of new, modifiable triggers (adapt 
+  to MTB fw)
+* settings::RBBufferStrategy - allow for more dynamic
+  setting of RB RAM event buffer size.
+
 # HAHALUA series
 
 ## v0.9.2

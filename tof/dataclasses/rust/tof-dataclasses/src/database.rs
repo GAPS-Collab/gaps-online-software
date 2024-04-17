@@ -9,6 +9,12 @@
 //!
 
 use std::fmt;
+use glob::glob;
+use chrono::NaiveDateTime;
+use chrono::Utc;
+use chrono::DateTime;
+use regex::Regex;
+
 use diesel::prelude::*;
 mod schema;
     
@@ -17,6 +23,9 @@ use schema::tof_db_rat::dsl::*;
 use schema::tof_db_dsicard::dsl::*;
 use schema::tof_db_mtbchannel::dsl::*;
 use schema::tof_db_localtriggerboard::dsl::*;
+
+use crate::calibrations::RBCalibrations;
+
 
 /// Universal function to connect to the database
 pub fn connect_to_db(database_url : String) -> Result<diesel::SqliteConnection, ConnectionError>  {
@@ -366,6 +375,7 @@ impl fmt::Display for Paddle {
 #[derive(Debug,PartialEq,Queryable, Selectable)]
 #[diesel(table_name = schema::tof_db_mtbchannel)]
 #[diesel(primary_key(mtb_ch))]
+#[allow(non_snake_case)]
 pub struct MTBChannel {
   pub mtb_ch      : i64,         
   pub dsi         : Option<i16>, 
@@ -760,36 +770,42 @@ impl fmt::Display for DBReadoutBoard {
 #[derive(Debug, Clone)]
 #[allow(non_snake_case)]
 pub struct ReadoutBoard {
-  pub rb_id        : u8, 
-  pub dsi          : u8, 
-  pub j            : u8, 
-  pub mtb_link_id  : u8, 
-  pub paddle12     : Paddle,
-  pub paddle12_chA : u8,
-  pub paddle34     : Paddle,
-  pub paddle34_chA : u8,
-  pub paddle56     : Paddle,
-  pub paddle56_chA : u8,
-  pub paddle78     : Paddle,
-  pub paddle78_chA : u8,
+  pub rb_id           : u8, 
+  pub dsi             : u8, 
+  pub j               : u8, 
+  pub mtb_link_id     : u8, 
+  pub paddle12        : Paddle,
+  pub paddle12_chA    : u8,
+  pub paddle34        : Paddle,
+  pub paddle34_chA    : u8,
+  pub paddle56        : Paddle,
+  pub paddle56_chA    : u8,
+  pub paddle78        : Paddle,
+  pub paddle78_chA    : u8,
+  // extra stuff, not from the db
+  // or maybe in the future?
+  pub calib_file_path : String,
+  pub calibration     : RBCalibrations,       
 }
 
 impl ReadoutBoard {
 
   pub fn new() -> Self {
     Self {
-      rb_id        : 0, 
-      dsi          : 0, 
-      j            : 0, 
-      mtb_link_id  : 0, 
-      paddle12     : Paddle::new(),
-      paddle12_chA : 0,
-      paddle34     : Paddle::new(),
-      paddle34_chA : 0,
-      paddle56     : Paddle::new(),
-      paddle56_chA : 0,
-      paddle78     : Paddle::new(),
-      paddle78_chA : 0,
+      rb_id           : 0, 
+      dsi             : 0, 
+      j               : 0, 
+      mtb_link_id     : 0, 
+      paddle12        : Paddle::new(),
+      paddle12_chA    : 0,
+      paddle34        : Paddle::new(),
+      paddle34_chA    : 0,
+      paddle56        : Paddle::new(),
+      paddle56_chA    : 0,
+      paddle78        : Paddle::new(),
+      paddle78_chA    : 0,
+      calib_file_path : String::from(""),
+      calibration     : RBCalibrations::new(0),
     }
   }
 
@@ -798,7 +814,80 @@ impl ReadoutBoard {
     let ip_address = format!("10.0.1.1{:02}", self.rb_id);
     return ip_address;
   }
+ 
+  pub fn get_paddle_ids(&self) -> [u8;4] {
+    let pid0 = self.paddle12.paddle_id as u8;
+    let pid1 = self.paddle34.paddle_id as u8;
+    let pid2 = self.paddle56.paddle_id as u8;
+    let pid3 = self.paddle78.paddle_id as u8;
+    [pid0, pid1, pid2, pid3]
+  }
+
+  #[allow(non_snake_case)]
+  pub fn get_A_sides(&self) -> [u8;4] {
+    let pa_0 = self.paddle12_chA;
+    let pa_1 = self.paddle34_chA;
+    let pa_2 = self.paddle56_chA;
+    let pa_3 = self.paddle78_chA;
+    [pa_0, pa_1, pa_2, pa_3]
+  }
+
+  #[allow(non_snake_case)]
+  pub fn get_pid_rbchA(&self, pid : u8) -> Option<u8> {
+    if self.paddle12.paddle_id as u8 == pid {
+      let rv = self.paddle12.rb_chA as u8;
+      return Some(rv);
+    } else if self.paddle34.paddle_id as u8 == pid {
+      let rv = self.paddle34.rb_chA as u8;
+      return Some(rv);
+    } else if self.paddle56.paddle_id as u8 == pid {
+      let rv = self.paddle56.rb_chA as u8;
+      return Some(rv);
+    } else if self.paddle78.paddle_id as u8== pid {
+      let rv = self.paddle78.rb_chA as u8;
+      return Some(rv);
+    } else {
+      return None;
+    }
+  }
   
+  #[allow(non_snake_case)]
+  pub fn get_pid_rbchB(&self, pid : u8) -> Option<u8> {
+    if self.paddle12.paddle_id as u8 == pid {
+      let rv = self.paddle12.rb_chB as u8;
+      return Some(rv);
+    } else if self.paddle34.paddle_id as u8== pid {
+      let rv = self.paddle34.rb_chB as u8;
+      return Some(rv);
+    } else if self.paddle56.paddle_id as u8== pid {
+      let rv = self.paddle56.rb_chB as u8;
+      return Some(rv);
+    } else if self.paddle78.paddle_id as u8 == pid {
+      let rv = self.paddle78.rb_chB as u8;
+      return Some(rv);
+    } else {
+      return None;
+    }
+  }
+
+  pub fn get_paddle_length(&self, pid : u8) -> Option<f32> {
+    if self.paddle12.paddle_id as u8 == pid {
+      let rv = self.paddle12.length;
+      return Some(rv);
+    } else if self.paddle34.paddle_id as u8== pid {
+      let rv = self.paddle34.length;
+      return Some(rv);
+    } else if self.paddle56.paddle_id as u8== pid {
+      let rv = self.paddle56.length;
+      return Some(rv);
+    } else if self.paddle78.paddle_id as u8 == pid {
+      let rv = self.paddle78.length;
+      return Some(rv);
+    } else {
+      return None;
+    }
+  }
+
   pub fn all(conn: &mut SqliteConnection) -> Option<Vec<ReadoutBoard>> {
     use schema::tof_db_readoutboard::dsl::*;
     let mut db_rbs = Vec::<DBReadoutBoard>::new();
@@ -859,6 +948,54 @@ impl ReadoutBoard {
     }
     Some(rbs)
   }
+
+  /// Load the newest calibration from the calibration file path
+  pub fn load_latest_calibration(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    //  files look like RB20_2024_01_26-08_15_54.cali.tof.gaps
+    let re = Regex::new(r"(\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2})")?;
+    // Define your file pattern (e.g., "logs/*.log" for all .log files in the logs directory)
+    let pattern = format!("{}/RB{:02}_*", self.calib_file_path, self.rb_id); // Adjust this pattern to your files' naming convention
+    let _timestamp = DateTime::<Utc>::from_timestamp(0,0);
+    let mut newest_file = (String::from(""), NaiveDateTime::from_timestamp(0, 0));
+    
+    // Iterate over files that match the pattern
+    let mut filename : String;
+    for entry in glob(&pattern)? {
+      if let Ok(path) = entry {
+        // Get the filename as a string
+        //let cpath = path.clone();
+        match path.file_name() {
+          None => continue,
+          Some(fname) => {
+              // the expect might be ok, since this is something done during initialization
+              filename = fname.to_os_string().into_string().expect("Unwrapping filename failed!");
+          }
+        }
+        if let Some(caps) = re.captures(&filename) {
+          if let Some(timestamp_str) = caps.get(0).map(|m| m.as_str()) {
+            println!("{}",timestamp_str);
+            let timestamp = NaiveDateTime::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
+            //let _timestamp = DateTime
+            if timestamp > newest_file.1 {
+              // FIXME - into might panic?
+              newest_file.1 = timestamp.into();
+              newest_file.0 = filename.clone();
+            }
+          }
+        }
+      }
+    }
+    
+    if newest_file.0.is_empty() {
+      error!("No matching calibration available for board {}!", self.rb_id);
+    } else {
+      let file_to_load = self.calib_file_path.clone() + "/" + &newest_file.0;
+      println!("== ==> Loading calibration from file: {}", file_to_load);
+      self.calibration = RBCalibrations::from_file(file_to_load, true)?;
+      //println!("==> Loaded calibration {}", self.calibration);
+    }
+    Ok(())
+  }
 }
 
 impl fmt::Display for ReadoutBoard {
@@ -876,6 +1013,9 @@ impl fmt::Display for ReadoutBoard {
     repr += &(format!("\n    A-side    : {}", self.paddle56_chA));
     repr += &(format!("\n  Ch3/4(4/5)  : {}>",self.paddle78));         
     repr += &(format!("\n    A-side    : {}", self.paddle78_chA));
+    repr += "** calibration will be loaded from this path:";
+    repr += &(format!("\n      \u{021B3} {}", self.calib_file_path));
+    repr += &(format!("\n  calibration : {}>", self.calibration));
     write!(f, "{}", repr)
   }
 }
