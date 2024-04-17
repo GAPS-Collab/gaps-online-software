@@ -19,8 +19,8 @@
 //! * random - allow random number generated data classes for 
 //!            testing
 //!
-//! * database - access the SQLite data base for advanced paddle
-//!              mapping
+//! * database - access a data base for advanced paddle
+//!              mapping, readoutboard and ltb information etc.
 //!
 
 pub mod events;
@@ -32,12 +32,18 @@ pub mod calibrations;
 pub mod threading;
 pub mod commands;
 pub mod monitoring;
-pub mod manifest;
+//pub mod manifest;
 pub mod run;
 pub mod io;
 pub mod analysis;
 pub mod ipbus;
 pub mod series;
+#[cfg(feature="database")]
+#[macro_use]
+extern crate diesel;
+#[cfg(feature="database")]
+pub mod database;
+
 
 #[macro_use] extern crate log;
 
