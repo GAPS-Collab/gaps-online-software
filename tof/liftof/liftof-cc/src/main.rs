@@ -1,7 +1,7 @@
 //! LIFTOF-CC - Main C&C (command and control) server application for 
 //! tof datataking and control.
 //!
-//!
+//! This is meant to be run as a systemd service on the main tof computer.
 //!
 //!
 
@@ -34,7 +34,7 @@ use std::{
     time
 };
 use std::path::{
-    Path,
+    //Path,
     PathBuf,
 };
 
@@ -53,16 +53,18 @@ use indicatif::{
 use tof_dataclasses::errors::CmdError;
 use tof_dataclasses::events::{MasterTriggerEvent,
                               RBEvent};
+
 use tof_dataclasses::threading::{
     ThreadControl,
 };
 
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::manifest::{
-    //ReadoutBoard,
-    get_rbs_from_sqlite,
+use tof_dataclasses::database::{
+    connect_to_db,
     get_linkid_rbid_map,
+    ReadoutBoard,
 };
+
 use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::commands::TofCommandCode;
 use liftof_lib::{
@@ -78,6 +80,7 @@ use liftof_lib::{
     TofComponent,
     SetCmd
 };
+
 use liftof_cc::threads::{
     event_builder,
     flight_cpu_listener,
@@ -100,20 +103,20 @@ struct LiftofCCArgs {
   write_stream: bool,
   /// Define a run id for later identification
   #[arg(short, long, default_value_t=0)]
-  run_id: usize,
+  run_id      : usize,
   /// More detailed output for debugging
   #[arg(short, long, default_value_t = false)]
-  verbose: bool,
+  verbose     : bool,
   /// Configuration of liftof-cc. Configure analysis engine,
   /// event builder and general settings.
   #[arg(short, long)]
-  config: Option<String>,
+  config      : Option<String>,
   /// For cmd debug purposes
   #[arg(short, long)]
-  only_cmd : bool,
+  only_cmd    : bool,
   /// List of possible commands
   #[command(subcommand)]
-  command: Command,
+  command     : Command,
 }
 
 /*************************************/
@@ -148,7 +151,7 @@ fn main() {
   // deal with command line arguments
   let config          : LiftofSettings;
   let nboards         : usize;
-  
+  let mut staging     = false;
   let args = LiftofCCArgs::parse();
   let verbose = args.verbose;
   let mut cali_from_cmdline = false;   
@@ -160,7 +163,10 @@ fn main() {
         },
         _ => ()
       }
-    },
+    }
+    Command::Staging(_) => {
+      staging = true;
+    }
     _ => ()
   }
   
@@ -179,7 +185,7 @@ fn main() {
     } // end Some
   } // end match
   
-  println!("=> Using the following config as parsed from the config file:\n{}", config);
+  //println!("=> Using the following config as parsed from the config file:\n{}", config);
 
   let mtb_address           = config.mtb_address.clone();
   info!("Will connect to the master trigger board at {}!", mtb_address);
@@ -195,7 +201,7 @@ fn main() {
   let calib_file_path       = config.calibration_dir.clone();
   let runtime_nseconds      = config.runtime_sec;
   //let write_npack_file      = config.packs_per_file;
-  let db_path               = Path::new(&config.db_path);
+  let db_path               = config.db_path.clone();
   let cpu_moni_interval     = config.cpu_moni_interval_sec;
   //let flight_address        = config.fc_pub_address.clone();
   let flight_sub_address    = config.fc_sub_address.clone();
@@ -204,12 +210,10 @@ fn main() {
   let flight_pub_address    = config.data_publisher_settings.fc_pub_address.clone();
   let cmd_listener_interval_sec    = config.cmd_listener_interval_sec;
   let run_analysis_engine   = config.run_analysis_engine;
-  //let ltb_rb_map            = get_dsi_j_ltbch_vs_rbch_map(db_path);
-  let mut rb_list           = get_rbs_from_sqlite(db_path);
-  //let mut rb_list           = vec![ReadoutBoard::new();50];
-  //for k in 0..rb_list.len() {
-  //  rb_list[k].rb_id = k as u8 + 1;
-  //}
+  
+  let mut conn              = connect_to_db(db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
+  // if this call does not go through, we might as well fail early.
+  let mut rb_list           = ReadoutBoard::all(&mut conn).expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
   let rb_ignorelist         = config.rb_ignorelist.clone();
   for k in 0..rb_ignorelist.len() {
     let bad_rb = rb_ignorelist[k];
@@ -232,11 +236,12 @@ fn main() {
   }
   for rb in &rb_list {
     debug!("     -{}", rb);
-    //if verbose {
-    //  println!("{}", rb);
-    //}
+    if verbose {
+      //println!("{}", rb);
+    }
   }
   let mtb_link_id_map = get_linkid_rbid_map(&rb_list);
+  
   // A global kill timer
   let program_start = Instant::now();
 
@@ -295,7 +300,7 @@ fn main() {
               tp_to_sink_c,
               cpu_moni_interval,
               _thread_control_c,
-              verbose) // don't print when we are calibrating
+              false) 
             })
           .expect("Failed to spawn cpu-monitoring thread!");
     }
@@ -311,39 +316,12 @@ fn main() {
                          write_stream,
                          runid,
                          &gds_settings,
-                         verbose,
+                         false,
                          thread_control_gds);
       })
       .expect("Failed to spawn data-sink thread!");
     println!("==> data sink thread started!");
-    println!("==> Will now start rb threads..");
 
-    for n in 0..nboards {
-      let mut this_rb           = rb_list[n].clone();
-      let this_tp_to_sink_clone = tp_to_sink.clone();
-      this_rb.calib_file_path   = calib_file_path.clone();
-      match this_rb.load_latest_calibration() {
-        Err(err) => error!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
-        Ok(_)    => ()
-      }
-      println!("==> Starting RB thread for {}", this_rb);
-      let ev_to_builder_c = ev_to_builder.clone();
-      let thread_name     = format!("rb-comms-{}", this_rb.rb_id);
-      let settings        = config.analysis_engine_settings.clone();
-      let _rb_comm_thread = thread::Builder::new()
-        .name(thread_name)
-        .spawn(move || {
-          readoutboard_communicator(&ev_to_builder_c,
-                                    this_tp_to_sink_clone,
-                                    &this_rb,
-                                    runid,
-                                    false,
-                                    run_analysis_engine,
-                                    settings);
-        })
-        .expect("Failed to spawn readoutboard-communicator thread!");
-    } // end for loop over nboards
-    println!("==> All RB threads started!");
     
     let one_second = time::Duration::from_millis(1000);
     println!("==> Starting RB commander thread!");
@@ -354,21 +332,19 @@ fn main() {
          readoutboard_commander(&_cmd_receiver_rb_comms);
        })
       .expect("Failed to spawn rb-commander thread!");
-    println!("==> Sleeping 5 seconds to give the rb's a chance to fire up..");
-    thread::sleep(5*one_second);
-    println!("==> Sleeping done!");
     // start the event builder thread
     if !cali_from_cmdline {
       println!("==> Starting event builder and master trigger threads...");
       //let db_path_string    = config.db_path.clone();
       let settings          = config.event_builder_settings.clone();
       let thread_control_eb = thread_control.clone();
+      let tp_to_sink_c      = tp_to_sink.clone();
       let _evb_thread = thread::Builder::new()
         .name("event-builder".into())
         .spawn(move || {
                         event_builder(&master_ev_rec,
                                       &ev_from_rb,
-                                      &tp_to_sink,
+                                      &tp_to_sink_c,
                                       runid as u32,
                                       //db_path_string,
                                       mtb_link_id_map,
@@ -378,6 +354,7 @@ fn main() {
         .expect("Failed to spawn event-builder thread!");
       // master trigger
       //let thread_control_mt = thread_control.clone();
+      
       let _mtb_thread = thread::Builder::new()
         .name("master-trigger".into())
         .spawn(move || {
@@ -391,6 +368,36 @@ fn main() {
         })
       .expect("Failed to spawn master-trigger thread!");
     } 
+    thread::sleep(one_second);
+    println!("==> Will now start rb threads..");
+    for n in 0..nboards {
+      let mut this_rb           = rb_list[n].clone();
+      let this_tp_to_sink_clone = tp_to_sink.clone();
+      this_rb.calib_file_path   = calib_file_path.clone();
+      match this_rb.load_latest_calibration() {
+        Err(err) => error!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
+        Ok(_)    => ()
+      }
+      println!("==> Starting RB thread for {}", this_rb.rb_id);
+      let ev_to_builder_c = ev_to_builder.clone();
+      let thread_name     = format!("rb-comms-{}", this_rb.rb_id);
+      let settings        = config.analysis_engine_settings.clone();
+      let _rb_comm_thread = thread::Builder::new()
+        .name(thread_name)
+        .spawn(move || {
+          readoutboard_communicator(&ev_to_builder_c,
+                                    this_tp_to_sink_clone,
+                                    &this_rb,
+                                    false,
+                                    run_analysis_engine,
+                                    settings);
+        })
+        .expect("Failed to spawn readoutboard-communicator thread!");
+    } // end for loop over nboards
+    println!("==> All RB threads started!");
+    println!("==> Sleeping 5 seconds to give the rb's a chance to fire up..");
+    thread::sleep(5*one_second);
+    println!("==> Sleeping done!");
 
     // set the handler for SIGINT
     let cmd_sender_1 = cmd_sender.clone();
@@ -633,6 +640,10 @@ fn main() {
                                                                   rb_id);
         }
       }
+    }
+    _ => {
+      // FIXME
+      return_val = Ok(TofCommandCode::CmdListen);
     }
   }
   // deal with return values
