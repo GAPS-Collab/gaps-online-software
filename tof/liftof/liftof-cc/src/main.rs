@@ -8,10 +8,10 @@
 #[macro_use] extern crate log;
 extern crate env_logger;
 extern crate clap;
-extern crate ctrlc;
 extern crate tof_dataclasses;
 extern crate crossbeam_channel;
 extern crate colored;
+extern crate signal_hook;
 
 extern crate liftof_lib;
 extern crate liftof_cc;
@@ -37,10 +37,21 @@ use std::path::{
     //Path,
     PathBuf,
 };
+use std::os::raw::c_int;
 
-use clap::{arg,
-           command,
-           Parser};
+use signal_hook::iterator::Signals;
+use signal_hook::consts::signal::{
+    SIGTERM,
+    SIGINT
+};
+
+use clap::{
+    arg,
+    command,
+    Parser
+};
+
+use colored::Colorize;
 
 use crossbeam_channel as cbc; 
 //use colored::Colorize;
@@ -284,6 +295,10 @@ fn main() {
 
   let one_minute = time::Duration::from_millis(60000);
   let only_cmd   = args.only_cmd;
+
+  // set up signal handline
+  let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
+
   // no cpu monitoring for cmdline calibration tasks
   if !only_cmd {
     if !cali_from_cmdline && cpu_moni_interval > 0 {
@@ -401,20 +416,6 @@ fn main() {
 
     // set the handler for SIGINT
     let cmd_sender_1 = cmd_sender.clone();
-    ctrlc::set_handler(move || {
-      println!("==> \u{1F6D1} Caught [SIGING] (allegedly Ctrl+C has been pressed)! Sending >>end run<< signal to all boards!");
-      let end_run =
-        TofCommand::from_command_code(TofCommandCode::CmdDataRunStop,0u32);
-      let tp = TofPacket::from(&end_run);
-      match cmd_sender_1.send(tp) {
-      Err(err) => error!("Can not send end run command! {err}"),
-      Ok(_)    => ()
-      }
-      thread::sleep(one_second);
-      println!(">> So long and thanks for all the \u{1F41F} <<"); 
-      exit(0);
-    })
-    .expect("Error setting Ctrl-C handler");
 
   let return_val: Result<TofCommandCode, CmdError>;
   let cmd_sender_c = cmd_sender.clone();
@@ -645,7 +646,7 @@ fn main() {
       // FIXME
       return_val = Ok(TofCommandCode::CmdListen);
     }
-  }
+  } 
   // deal with return values
   match return_val {
     Err(cmd_error) => {
@@ -676,11 +677,50 @@ fn main() {
   //);
   pb.set_message(".. acquiring data ..");
   loop{
-    // first we issue start commands until we receive
-    // at least 1 positive
-    //cmd_sender.send(start_run);
-    thread::sleep(1*one_minute);
-    thread::sleep(Duration::from_millis(500));
+    // take out the heat a bit
+    thread::sleep(1*one_second);
+    let mut term_int_sig_caught = false;
+    for signal in signals.pending() {
+      match signal as c_int {
+        SIGTERM => {
+          println!("=> {}", String::from("SIGTERM received").red().bold());
+          term_int_sig_caught = true;
+        }
+        SIGINT  => {
+          println!("=> {}", String::from("SIGINT received. Maybe Ctrl+C has been pressed!").red().bold());
+          term_int_sig_caught = true;
+        }
+        _       => {
+          error!("Received signal, but I don't have instructions what to do about it!");
+        }
+
+      }
+    }
+    if term_int_sig_caught {
+      println!("==> \u{1F6D1} Sending >>end run<< signal to all boards!");
+      let end_run =
+        TofCommand::from_command_code(TofCommandCode::CmdDataRunStop,0u32);
+      let tp = TofPacket::from(&end_run);
+      match cmd_sender_1.send(tp) {
+        Err(err) => error!("Can not send end run command! {err}"),
+        Ok(_)    => ()
+      }
+      thread::sleep(one_second);
+      println!("=> Shutting down threads...");
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          tc.stop_flag = true;
+        },
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        },
+      }
+      thread::sleep(one_second);
+      println!(">> So long and thanks for all the \u{1F41F} <<"); 
+      exit(0);
+    }
+
+
     //println!("...");
     // I think the main shouldn't die if we are in listening mode
     if dont_stop {
