@@ -185,7 +185,7 @@ void Waveplot::InitializeVariables(int no_acq) {
   // stuff related to the pedestals
   // Need to do after setting wf_size
   wf_ped_begin   = 100;
-  wf_ped_range   = 400;
+  wf_ped_range   = 100;
   //wf_ped_range   = wf_size - wf_ped_begin;
   saturated_hi   =  1000.0;
   saturated_lo   = -1000.0;

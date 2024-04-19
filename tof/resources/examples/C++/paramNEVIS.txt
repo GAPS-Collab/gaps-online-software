@@ -1,7 +1,7 @@
-ped_lo      10       # start of pedestal window in ns
-ped_win     80       # width of pedestal window in ns
-pulse_lo    100      # pulse window start (ns)
-pulse_win   100      # pulse window width (ns)
+ped_lo      350      # start of pedestal window in ns
+ped_win     100      # width of pedestal window in ns
+pulse_lo     10      # pulse window start (ns), brds 1-6
+pulse_win   190      # pulse window width (ns), brds 1-6
 charge_min  5.0      # minimum charge in pC
-thresh     10.0      # constant threshold in mV
+thresh      10.0     # constant threshold in mV
 cfd_frac    0.10     # cfd fraction

@@ -63,7 +63,7 @@ int main(int argc, char *argv[]){
   cxxopts::Options options("unpack-tofpackets", "Unpack example for .tof.gaps files with TofPackets.");
   options.add_options()
   ("h,help", "Print help")
-  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value(""))
+  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/mnt/tof-nas/nevis-data/tofdata/calibration/latest/"))
   ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
   ;
@@ -141,6 +141,35 @@ int main(int argc, char *argv[]){
       cali[i] = RBCalibration::from_txtfile(f_str);
     }
     }*/
+
+  // Some useful variables (some initialized to default values)
+  // but overwritten from file (if it exists)
+  float Ped_low   = 10;
+  float Ped_win   = 90;
+  float CThresh   = 5.0;
+  float CFDS_frac = 0.10;
+  float Qwin_low  = 100;
+  float Qwin_size = 100;
+  float CHmin     = 5.0;
+
+  char label[50], line[500];
+  int status;
+  float value;
+  // One last task before reading the data file processing events
+  // -- read in some analysis parameters.
+  // Doing this in a kludgy way since we will not use later.
+  FILE *fp = fopen("paramNEVIS.txt", "r");
+  while (fscanf(fp, "%s %f", label, &value) != EOF) {
+    if (strcmp(label,"ped_lo") ==0 )     Ped_low = value; 
+    if (strcmp(label,"ped_win") ==0 )    Ped_win = value;
+    if (strcmp(label,"pulse_lo") ==0 )   Qwin_low = value;
+    if (strcmp(label,"pulse_win") ==0 )  Qwin_size = value;
+    if (strcmp(label,"charge_min") ==0 ) CHmin = value;
+    if (strcmp(label,"thresh") ==0 )     CThresh = value;
+    if (strcmp(label,"cfd_frac") ==0 )   CFDS_frac = value;
+    status = fscanf(fp,"%[^\n]",line); // Scan the rest of the line
+  }
+  fclose(fp); 
 
   // the reader is something for the future, when the 
   // files get bigger so they might not fit into memory
@@ -241,6 +270,17 @@ int main(int argc, char *argv[]){
 		rbid==16 || rbid==25 || rbid==44 || rbid==46 || // cube-top
 		rbid==1  || rbid==11 || rbid==41 || rbid==42 ) ) {// cube-bot
 	  */
+	  /*if (calname != "" &&  // For combined data all boards calibrated
+              ( rbid==17  || rbid==19 || rbid==13 || rbid==20 || 
+                rbid==26) ) {// RBs with strange 
+          */
+	 // if (calname != "" &&  // For combined data all boards calibrated
+         //     ( rbid==13 || rbid==20 || 
+         //       rbid==26) ) {// RBs with strange 
+
+
+
+
 	    nrbs++;
 	    // Vec<f32> is a typedef for std::vector<float32>
 	    volts = cali[rbid].voltages(rb_event, false); // second argument is for spike cleaning
@@ -269,8 +309,8 @@ int main(int argc, char *argv[]){
 	      wave[cw]->SetThreshold(5.0);
 	      
 	      // Calculate the pedestal
-	      wave[cw]->SetPedBegin(10);
-	      wave[cw]->SetPedRange(90);
+	      wave[cw]->SetPedBegin(Ped_low);
+	      wave[cw]->SetPedRange(Ped_win);
 	      wave[cw]->CalcPedestalRange(); 
 	      wave[cw]->SubtractPedestal(); 
 	      //if (c==0) printf("%ld(%.2f) ", cw, wave[cw]->GetPedestal());

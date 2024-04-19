@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
   cxxopts::Options options("unpack-tofpackets", "Unpack example for .tof.gaps files with TofPackets.");
   options.add_options()
   ("h,help", "Print help")
-  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value(""))
+  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/mnt/tof-nas/nevis-data/tofdata/calibration/latest/"))
   ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
   ("f,files", "List of Files", cxxopts::value<bool>()->default_value("false"))
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
@@ -323,7 +323,7 @@ int main(int argc, char *argv[]){
 	Event.AnalyzePhases(Phi);
 	
 	// Analyze each paddle: position on paddle, hitmask, etc
-	Event.AnalyzePaddles(10.0, 5.0); //Args: Peak and Charge cuts
+	Event.AnalyzePaddles(10.0, CHmin); //Args: Peak and Charge cuts
 
 	// Now calculate beta, charge, and inner/outer tof x,y,z, etc.
 	Event.AnalyzeEvent();
