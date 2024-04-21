@@ -32,6 +32,50 @@ use tof_dataclasses::serialization::{
     SerializationError
 };
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct CommandDispatcherSettings {
+  /// Log all commands into this file
+  /// Set to "/dev/null" to turn off.
+  /// The mode will be always "append", since we don't 
+  /// expect a lot of logging
+  pub cmd_log                    : String,
+  /// The address of the liftof-command & control server
+  /// that is the ip address on the RBNetwork which the 
+  /// liftof-cc instance runs on 
+  /// This address will be used as "PUB" for the CommandDispather
+  pub cc_server_address          : String,   
+  /// The address ("tcp://xx.xx.xx.xx:xxxxx") the tof computer should subscribe to 
+  /// to get commands from the flight computer
+  pub fc_sub_address             : String,
+  /// Interval of time that will elapse from a cmd check to the other
+  pub cmd_listener_interval_sec  : u64,
+}
+
+impl CommandDispatcherSettings {
+  pub fn new() -> Self {
+    Self {
+      cmd_log                   : String::from("/home/gaps/log"),
+      cc_server_address         : String::from("tcp://10.0.1.10:42000"),   
+      fc_sub_address            : String::from("tcp://192.168.37.200:41662"),
+      cmd_listener_interval_sec : 1,
+    }
+  }
+}
+
+impl fmt::Display for CommandDispatcherSettings {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = toml::to_string(self).unwrap_or(
+      String::from("-- DESERIALIZATION ERROR! --"));
+    write!(f, "<CommandDispatcherSettings :\n{}>", disp)
+  }
+}
+
+impl Default for CommandDispatcherSettings {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
 /// Readout strategy for RB (onboard) (RAM) memory buffers
 #[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum RBBufferStrategy {
@@ -351,15 +395,6 @@ pub struct LiftofSettings {
   pub db_path                    : String,
   /// Runtime in seconds
   pub runtime_sec                : u64,
-  /// The address of the liftof-command & control server
-  /// that is the ip address on the RBNetwork which the 
-  /// liftof-cc instance runs on 
-  pub cc_server_address          : String,   
-  /// The address ("tcp://xx.xx.xx.xx:xxxxx") the tof computer should subscribe to 
-  /// to get commands from the flight computer
-  pub fc_sub_address             : String,
-  /// Interval of time that will elapse from a cmd check to the other
-  pub cmd_listener_interval_sec  : u64,
   /// The UDP port to be used to get packets from the 
   /// MTB
   pub mtb_address                : String,
@@ -379,6 +414,8 @@ pub struct LiftofSettings {
   pub analysis_engine_settings   : AnalysisEngineSettings,
   /// Configure data publshing and saving on local disc
   pub data_publisher_settings    : DataPublisherSettings,
+  /// Configure cmmand reception and sending
+  pub cmd_dispatcher_settings    : CommandDispatcherSettings,
   /// Settings for the individual RBs
   pub rb_settings                : RBSettings,
 }
@@ -390,9 +427,6 @@ impl LiftofSettings {
       calibration_dir           : String::from(""),
       db_path                   : String::from("/home/gaps/config/gaps_flight.db"),
       runtime_sec               : 0,
-      cc_server_address         : String::from("tcp://10.0.1.10:42000"),   
-      fc_sub_address            : String::from("tcp://192.168.37.200:41662"),
-      cmd_listener_interval_sec : 1,
       mtb_address               : String::from("10.0.1.10:50001"),
       cpu_moni_interval_sec     : 60,
       rb_ignorelist             : Vec::<u8>::new(),
@@ -401,6 +435,7 @@ impl LiftofSettings {
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),
       data_publisher_settings   : DataPublisherSettings::new(),
+      cmd_dispatcher_settings   : CommandDispatcherSettings::new(),
       rb_settings               : RBSettings::new(),
     }
   }
