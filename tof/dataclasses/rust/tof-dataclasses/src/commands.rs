@@ -733,6 +733,7 @@ pub enum TofResponse {
   /// command again.
   SerializationIssue(u32),
   ZMQProblem(u32),
+  TimeOut(u32),
   Unknown
 }
 
@@ -756,6 +757,7 @@ impl FromRandom for TofResponse {
       TofResponse::EventNotReady(val),
       TofResponse::SerializationIssue(val),
       TofResponse::ZMQProblem(val),
+      TofResponse::TimeOut(val),
       TofResponse::Unknown,
     ];
     let idx = rng.gen_range(0..choices.len());
@@ -763,11 +765,13 @@ impl FromRandom for TofResponse {
   }
 }
 
-impl TofResponse {
-  const HEAD : u16 = 0xAAAA;
-  const TAIL : u16 = 0x5555;
 
-  pub fn to_bytestream(&self) -> Vec<u8> {
+impl Serialization for TofResponse {
+  const HEAD : u16   = 0xAAAA;
+  const TAIL : u16   = 0x5555;
+  const SIZE : usize = 9; //FIXME
+  
+  fn to_bytestream(&self) -> Vec<u8> {
     let mut bytestream = Vec::<u8>::with_capacity(9);
     bytestream.extend_from_slice(&TofResponse::HEAD.to_le_bytes());
     let cc = u8::from(*self);
@@ -779,49 +783,23 @@ impl TofResponse {
       TofResponse::EventNotReady(data)      => value = *data,
       TofResponse::SerializationIssue(data) => value = *data,
       TofResponse::ZMQProblem(data)         => value = *data,
+      TofResponse::TimeOut(data)            => value = *data,
       TofResponse::Unknown => ()
     }
     bytestream.extend_from_slice(&value.to_le_bytes());
     bytestream.extend_from_slice(&TofResponse::TAIL.to_le_bytes());
     bytestream
   }
-}
-
-impl Serialization for TofResponse {
-  const HEAD : u16 = 0xAAAA;
-  const TAIL : u16 = 0x5555;
-  const SIZE : usize = 0; //FIXME
 
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
     -> Result<TofResponse, SerializationError>{
-  
-    let mut two_bytes : [u8;2];
-    let four_bytes    : [u8;4];
-    two_bytes = [stream[*pos],
-                 stream[*pos+1]];
-    *pos += 2;
-    if TofResponse::HEAD != u16::from_le_bytes(two_bytes) {
-      warn!("Packet does not start with HEAD signature");
-      return Err(SerializationError::HeadInvalid {});
-    }
-   
-    let cc   = stream[*pos];
-    *pos += 1;
-    four_bytes = [stream[*pos],
-                  stream[*pos+1],
-                  stream[*pos+2],
-                  stream[*pos+3]];
-    *pos += 4;
-    let value = u32::from_le_bytes(four_bytes);
-    two_bytes = [stream[*pos],
-                 stream[*pos+1]];
-    let pair = (cc, value);
+    Self::verify_fixed(stream, pos)?;  
+    let cc       = parse_u8(stream, pos);
+    let value    = parse_u32(stream, pos);
+    let pair     = (cc, value);
     let response = TofResponse::from(pair);
-    if TofResponse::TAIL != u16::from_le_bytes(two_bytes) {
-      warn!("Packet does not end with TAIL signature");
-      return Err(SerializationError::TailInvalid {});
-    }
+    *pos += 2; // acccount for TAIL
     Ok(response)
   }
 }
@@ -829,11 +807,12 @@ impl Serialization for TofResponse {
 impl From<TofResponse> for u8 {
   fn from(input : TofResponse) -> u8 {
     match input {
-      TofResponse::Success(_)       => 1,
-      TofResponse::GeneralFail(_)   => 2,
-      TofResponse::EventNotReady(_) => 3,
+      TofResponse::Success(_)            => 1,
+      TofResponse::GeneralFail(_)        => 2,
+      TofResponse::EventNotReady(_)      => 3,
       TofResponse::SerializationIssue(_) => 4,
-      TofResponse::ZMQProblem(_) => 5,
+      TofResponse::ZMQProblem(_)         => 5,
+      TofResponse::TimeOut(_)            => 6,
       TofResponse::Unknown => 0
     }
   }
@@ -843,12 +822,12 @@ impl From<(u8, u32)> for TofResponse {
   fn from(pair : (u8, u32)) -> TofResponse {
     let (input, value) = pair;
     match input {
-
       1 => TofResponse::Success(value),
       2 => TofResponse::GeneralFail(value),
       3 => TofResponse::EventNotReady(value),
       4 => TofResponse::SerializationIssue(value),
       5 => TofResponse::ZMQProblem(value),
+      6 => TofResponse::TimeOut(value),
       _ => TofResponse::Unknown
     }
   }
@@ -877,3 +856,20 @@ fn serialization_rbcommand() {
   let test = RBCommand::from_bytestream(&cmd.to_bytestream(), &mut 0).unwrap();
   assert_eq!(cmd, test);
 }
+
+#[cfg(feature = "random")]
+#[test]
+fn serialization_tofresponse() {
+  let resp = TofResponse::from_random();
+  let test = TofResponse::from_bytestream(&resp.to_bytestream(), &mut 0).unwrap();
+  assert_eq!(resp, test);
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn serialization_tofcommand() {
+  let cmd  = TofCommand::from_random();
+  let test = TofCommand::from_bytestream(&cmd.to_bytestream(), &mut 0).unwrap();
+  assert_eq!(cmd, test);
+}
+
