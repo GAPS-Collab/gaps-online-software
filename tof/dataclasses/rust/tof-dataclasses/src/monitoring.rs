@@ -50,7 +50,7 @@ cfg_if::cfg_if! {
 #[cfg(feature = "tof-control")]
 use tof_control::helper::cpu_type::{
     CPUTempDebug,
-    CPUInfo,
+    CPUInfoDebug,
 };
 
 
@@ -864,7 +864,7 @@ impl FromRandom for RBMoniData {
 }
 
 impl Packable for RBMoniData {
-  const PACKET_TYPE : PacketType = PacketType::RBMoni;
+  const PACKET_TYPE : PacketType = PacketType::RBMoniData;
 }
 
 impl Serialization for RBMoniData {
@@ -1011,7 +1011,7 @@ impl CPUMoniData {
   }
 
   #[cfg(feature = "tof-control")]
-  pub fn add_info(&mut self, cpu_info : &CPUInfo) {
+  pub fn add_info(&mut self, cpu_info : &CPUInfoDebug) {
     self.uptime = cpu_info.uptime;
     self.disk_usage = cpu_info.disk_usage;
     self.cpu_freq   = cpu_info.cpu_freq;
@@ -1268,54 +1268,65 @@ mod test_monitoring {
   use crate::monitoring::LTBMoniData;
   use crate::monitoring::CPUMoniData;
 
-  #[test]
-  fn serialization_ltbmonidata() {
-    for k in 0..100 {
-      let data = LTBMoniData::from_random();
-      let test = LTBMoniData::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
-      assert_eq!(data, test);
-    }
-  }
-
-  #[test]
-  fn serialization_pamonidata() {
-    for k in 0..100 {
-      let data = PAMoniData::from_random();
-      let test = PAMoniData::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
-      assert_eq!(data, test);
-    }
-  }
-
-  #[test]
-  fn serialization_pbmonidata() {
-    for k in 0..100 {
-      let data = PBMoniData::from_random();
-      let test = PBMoniData::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
-      assert_eq!(data, test);
-    }
-  }
-
-  #[test]
-  fn serialization_mtbmonidata() {
-    let data = MtbMoniData::from_random();
-    let test = MtbMoniData::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
-    assert_eq!(data, test);
-  }
-
-  #[test]
-  fn serialization_rbmonidata() {
-    let data = RBMoniData::from_random();
-    let test = RBMoniData::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
-    assert_eq!(data, test);
-  }
+}
   
-  #[test]
-  fn serialization_cpumonidata() {
-    for k in 0..100 {
-      let data = CPUMoniData::from_random();
-      let test = CPUMoniData::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
-      assert_eq!(data, test);
-    }
+#[test]
+#[cfg(feature = "random")]
+fn pack_ltbmonidata() {
+  for _ in 0..100 {
+    let data = LTBMoniData::from_random();
+    let test : LTBMoniData = data.pack().unpack().unwrap();
+    assert_eq!(data, test);
+  }
+}
+
+#[test]
+#[cfg(feature = "random")]
+fn pack_pamonidata() {
+  for _ in 0..100 {
+    let data = PAMoniData::from_random();
+    let test : PAMoniData = data.pack().unpack().unwrap();
+    assert_eq!(data, test);
+  }
+}
+
+#[test]
+#[cfg(feature = "random")]
+fn pack_pbmonidata() {
+  for _ in 0..100 {
+    let data = PBMoniData::from_random();
+    let test : PBMoniData = data.pack().unpack().unwrap();
+    assert_eq!(data, test);
+  }
+}
+
+#[test]
+#[cfg(feature = "random")]
+fn pack_mtbmonidata() {
+  for _ in 0..100 {
+    let data = MtbMoniData::from_random();
+    let test : MtbMoniData = data.pack().unpack().unwrap();
+    assert_eq!(data, test);
+  }
+}
+
+#[test]
+#[cfg(feature = "random")]
+fn pack_rbmonidata() {
+  for _ in 0..100 {
+    let data = RBMoniData::from_random();
+    let test : RBMoniData = data.pack().unpack().unwrap();
+    assert_eq!(data, test);
+  }
+}
+
+#[test]
+#[cfg(feature = "random")]
+fn pack_cpumonidata() {
+  for _ in 0..100 {
+    let data = CPUMoniData::from_random();
+    let test : CPUMoniData = data.pack().unpack().unwrap();
+    assert_eq!(data, test);
   }
 }
 

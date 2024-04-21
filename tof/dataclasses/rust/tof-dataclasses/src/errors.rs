@@ -167,7 +167,7 @@ impl Error for DecodingError {
 #[repr(u8)]
 pub enum MasterTriggerError {
   Unknown,
-  QueueEmpty,
+  EventQueueEmpty,
   MaskTooLarge,
   BrokenPackage,
   DAQNotAvailable,

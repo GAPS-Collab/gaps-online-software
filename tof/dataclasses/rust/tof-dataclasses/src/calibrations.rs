@@ -1043,6 +1043,9 @@ impl RBCalibrations {
 
   /// Apply the voltage calibration to a single channel 
   /// FIXME - mixing of naming conventions for the channels
+  ///
+  /// FIXME - make it return Result<(), CalibrationError>
+  ///
   /// # Arguments
   ///
   /// * channel   : Channel id 1-9
@@ -1061,7 +1064,7 @@ impl RBCalibrations {
       return;
     }
     if adc.len() != waveform.len() {
-      error!("Input len {} and output len {} don't match!", adc.len(), waveform.len());
+      error!("Ch{} has {} adc values, however we are expecting {}!", channel,  adc.len(), waveform.len());
       return;
     }
 

@@ -27,7 +27,7 @@ pub enum PacketType {
   RBEventHeader       = 70u8,    // needs to go away
   CPUMoniData         = 80u8,
   MonitorMtb          = 90u8,
-  RBMoni              = 100u8,
+  RBMoniData          = 100u8,
   PBMoniData          = 101u8,
   LTBMoniData         = 102u8,
   PAMoniData          = 103u8,
@@ -35,6 +35,7 @@ pub enum PacketType {
                                // still needs to be processed.
   RBCalibration       = 130u8,
   TofCommand          = 140u8,
+  TofResponse         = 142u8,
   RBCommand           = 150u8,
   Ping                = 160u8,
   // use the > 200 values for transmitting
@@ -70,13 +71,14 @@ impl From<u8> for PacketType {
       70u8  => PacketType::RBEventHeader,
       80u8  => PacketType::CPUMoniData,
       90u8  => PacketType::MonitorMtb,
-      100u8 => PacketType::RBMoni,
+      100u8 => PacketType::RBMoniData,
       101u8 => PacketType::PBMoniData   ,
       102u8 => PacketType::LTBMoniData  ,
       103u8 => PacketType::PAMoniData   ,
       120u8 => PacketType::RBEventMemoryView,
       130u8 => PacketType::RBCalibration,
       140u8 => PacketType::TofCommand,
+      142u8 => PacketType::TofResponse,
       150u8 => PacketType::RBCommand,
       160u8 => PacketType::Ping,
       201u8 => PacketType::ConfigBinary,
@@ -105,8 +107,9 @@ impl FromRandom for PacketType {
       PacketType::RBEvent,
       PacketType::RBEventMemoryView,
       PacketType::TofCommand,
+      PacketType::TofResponse,
       PacketType::RBCommand,
-      PacketType::RBMoni,
+      PacketType::RBMoniData,
       PacketType::PBMoniData,
       PacketType::LTBMoniData,
       PacketType::PAMoniData,
@@ -138,8 +141,9 @@ fn test_packet_types() {
   type_codes.push(PacketType::RBEvent as u8);
   type_codes.push(PacketType::RBEventMemoryView as u8);
   type_codes.push(PacketType::TofCommand as u8);
+  type_codes.push(PacketType::TofResponse as u8);
   type_codes.push(PacketType::RBCommand as u8);
-  type_codes.push(PacketType::RBMoni as u8);
+  type_codes.push(PacketType::RBMoniData as u8);
   type_codes.push(PacketType::PBMoniData as u8);
   type_codes.push(PacketType::LTBMoniData as u8);
   type_codes.push(PacketType::PAMoniData as u8);

@@ -210,7 +210,6 @@ pub trait Packable {
     where Self: Serialization {
     let mut tp     = TofPacket::new();
     tp.payload     = self.to_bytestream();
-    //tp.packet_type = self.get_packet_type();
     tp.packet_type = Self::PACKET_TYPE;
     tp
   }

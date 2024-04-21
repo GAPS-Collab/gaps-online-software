@@ -256,7 +256,7 @@ impl From<&MasterTriggerEvent> for TofPacket {
 impl From<&RBMoniData> for TofPacket {
   fn from(moni : &RBMoniData) -> Self {
     let mut tp     = Self::new();
-    tp.packet_type = PacketType::RBMoni;
+    tp.packet_type = PacketType::RBMoniData;
     tp.payload     = moni.to_bytestream();
     tp
   }
@@ -410,7 +410,7 @@ fn tofpacket_from_rbmonidata() {
   let data = RBMoniData::new();
   let pk   = TofPacket::from(&data);
   let test = TofPacket::from_bytestream(&pk.to_bytestream(),&mut 0).unwrap();
-  assert_eq!(pk.packet_type, PacketType::RBMoni);
+  assert_eq!(pk.packet_type, PacketType::RBMoniData);
   assert_eq!(pk, test);
   let data_test = RBMoniData::from_bytestream(&pk.payload, &mut 0).unwrap();
   assert_eq!(data, data_test);

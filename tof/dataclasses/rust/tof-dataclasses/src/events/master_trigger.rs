@@ -33,23 +33,19 @@ use crate::events::{
     TofEventSummary,
 };
 
-//use crate::events::RBMissingHit;
-//use crate::constants::{
-//  N_LTBS,
-//  N_CHN_PER_LTB,
-//};
-
-//he default values used where thus:
+// A comment about the GAPS (antiparticle) trigger
+//
+//  The default values used where thus:
 //  INNER_TOF_THRESH = 3
 //  OUTER_TOF_THRESH = 3
 //  TOTAL_TOF_THRESH =8
 //  REQUIRE_BETA =1
 //
-//so this corresponds to the BETA being set (required) and the loose settings for the number of hits.
-//Is this correct?
+//  so this corresponds to the BETA being set (required) and the loose settings for the number of hits.
+//  Is this correct?
 //
-//If so, at some point (not yet because we are not getting data through the system), I'd like us to run
-//for a while with these three settings:
+//  If so, at some point (not yet because we are not getting data through the system), I'd like us to run
+//  for a while with these three settings:
 //
 //  INNER_TOF_THRESH = 3
 //  OUTER_TOF_THRESH = 3
@@ -106,6 +102,12 @@ pub const LTB_CHANNELS : [u16;8] = [
     LTB_CH7
 ];
 
+///// Combine 32 + 16bit timestamp to 48 bit timestamp
+//fn timestamp48(bits32 : u32, bits16 : u16) -> u64 {
+//  (bits32 as u64) << 16 | bits 16 as u64 
+//}
+
+
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum TriggerType {
@@ -130,6 +132,10 @@ pub enum TriggerType {
   Poisson      = 100u8,
   Forced       = 101u8,
   FixedRate    = 102u8,
+  /// > 200 -> These triggers can not be set, they are merely
+  /// the result of what we read out from the trigger mask of 
+  /// the ltb
+  ConfigurableTrigger = 200u8,
 }
 
 impl fmt::Display for TriggerType {
@@ -182,6 +188,9 @@ impl TriggerType {
       TriggerType::Umb3Cube => {
         return 25;
       }
+      TriggerType::ConfigurableTrigger => {
+        return 200;  
+      }
     }
   }
 }
@@ -202,6 +211,7 @@ impl From<u8> for TriggerType {
       23  => TriggerType::UmbCorCube,
       24  => TriggerType::CorCubeSide,
       25  => TriggerType::Umb3Cube,
+      200 => TriggerType::ConfigurableTrigger,
       _   => TriggerType::Unknown
     }
   }
@@ -225,6 +235,7 @@ impl FromRandom for TriggerType {
       TriggerType::UmbCorCube,
       TriggerType::CorCubeSide,
       TriggerType::Umb3Cube,
+      TriggerType::ConfigurableTrigger,
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
@@ -381,9 +392,11 @@ impl MasterTriggerEvent {
   ///
   /// # Returns
   ///
-  ///   Vec<(hit)> where hit is (DSI, J, CH) 
-  pub fn get_trigger_hits(&self) -> Vec<(u8, u8, u8, LTBThreshold)> {
-    let mut hits = Vec::<(u8,u8,u8,LTBThreshold)>::new(); 
+  ///   Vec<(hit)> where hit is (DSI, J, (CH,CH), threshold) 
+  pub fn get_trigger_hits(&self) -> Vec<(u8, u8, (u8, u8), LTBThreshold)> {
+    let mut hits = Vec::<(u8,u8,(u8,u8),LTBThreshold)>::with_capacity(5); 
+    let physical_channels = [(1u8,  2u8), (3u8,4u8), (5u8, 6u8), (7u8, 8u8),
+                             (9u8, 10u8), (11u8,12u8), (13u8, 14u8), (15u8, 16u8)];
     //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
     let n_masks_needed = self.dsi_j_mask.count_ones();
     if self.channel_mask.len() < n_masks_needed as usize {
@@ -423,18 +436,17 @@ impl MasterTriggerEvent {
         let channels = self.channel_mask[n_mask]; 
         for (i,ch) in LTB_CHANNELS.iter().enumerate() {
           //let chn = *ch as u8 + 1;
+          let ph_chn = physical_channels[i];
           let chn = i as u8 + 1;
           //println!("i,ch {}, {}", i, ch);
           let thresh_bits = ((channels & ch) >> (i*2)) as u8;
           //println!("thresh_bits {}", thresh_bits);
           if thresh_bits > 0 { // hit over threshold
-            hits.push((dsi, j, chn, LTBThreshold::from(thresh_bits)));
+            hits.push((dsi, j, ph_chn, LTBThreshold::from(thresh_bits)));
           }
         }
         n_mask += 1;
       } // next ltb
-
-
     }
     hits
   }
@@ -474,7 +486,11 @@ impl MasterTriggerEvent {
   }
 
   /// Get the trigger sources from trigger source byte
-  /// FIXME! (Does not return anything)
+  /// In case of the custom (configurable triggers, this
+  ///
+  /// will only return "ConfigurableTrigger" since the 
+  /// MTB does not know about these triggers as individual
+  /// types
   pub fn get_trigger_sources(&self) -> Vec<TriggerType> {
     let mut t_types    = Vec::<TriggerType>::new();
     let gaps_trigger   = self.trigger_source >> 5 & 0x1 == 1;
@@ -497,6 +513,30 @@ impl MasterTriggerEvent {
                        = self.trigger_source >> 9 & 0x1 == 1;
     if central_track_trigger {
       t_types.push(TriggerType::TrackCentral);
+    }
+    let conf_trigger   = self.trigger_source >> 10 & 0x1 == 1;
+      t_types.push(TriggerType::ConfigurableTrigger);
+    t_types
+  }
+
+  /// Returns the trigger types which have to be defined as "global"
+  ///
+  /// Global triggers will force a readout of all panels and can 
+  /// be operated in conjuction with the set trigger
+  pub fn get_global_trigger_soures(&self) -> Vec<TriggerType> {
+    let mut t_types = Vec::<TriggerType>::new();
+    let central_track_trigger
+                       = self.trigger_source >> 13 & 0x1 == 1;
+    if central_track_trigger {
+      t_types.push(TriggerType::TrackCentral);
+    }
+    let track_trigger  = self.trigger_source >> 14 & 0x1 == 1;
+    if track_trigger {
+      t_types.push(TriggerType::Track);
+    }
+    let any_trigger    = self.trigger_source >> 15 & 0x1 == 1;
+    if any_trigger {
+      t_types.push(TriggerType::Any);
     }
     t_types
   }
@@ -594,6 +634,12 @@ impl fmt::Display for MasterTriggerEvent {
     for k in self.get_trigger_sources() {
       repr += &(format!("\n   {}", k));
     }
+    if self.get_global_trigger_soures().len() > 0 {
+      repr += "\n -- global";
+      for k in self.get_global_trigger_soures() {
+        repr += &(format!("\n  {}", k));
+      }
+    }
     repr += "\n  ** ** timestamps ** **";
     repr += &(format!("\n    timestamp     : {}", self.timestamp));
     repr += &(format!("\n    tiu_timestamp : {}", self.tiu_timestamp));
@@ -603,7 +649,7 @@ impl fmt::Display for MasterTriggerEvent {
     repr += &(format!("\n  crc             : {}", self.crc));
     repr += &(format!("\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **", self.dsi_j_mask.count_ones()));
     for k in self.get_trigger_hits() {
-      repr += &(format!("\n  => {}/{}/{} ({}) ", k.0, k.1, k.2, k.3));
+      repr += &(format!("\n  => {}/{}/({},{}) ({}) ", k.0, k.1, k.2.0, k.2.1, k.3));
     }
     repr += "\n  ** ** MTB LINK IDs ** **";
     let mut mtblink_str = String::from("\n  => ");

@@ -11,9 +11,6 @@
 //!                    Each RBEvent has a header and a body which is the channel 
 //!                    data. Data in this form represents compression level 1
 //!
-//! - RBMissingHit   - a placeholder for debugging. If the MTB claims there is a hit,
-//!                    but we do not see it, RBMissingHit accounts for the fact
-//!
 //! - RBWaveform     - a single waveform from a single RB. This can be used to 
 //!                    deconstruct TofEvents so that the flight computer does not
 //!                    struggle with the large packet size.
@@ -1226,15 +1223,24 @@ impl FromRandom for RBWaveform {
     wf
   }
 }
+  
+#[test]
+#[cfg(feature = "random")]
+fn pack_rbwaveform() {
+  for _ in 0..100 {
+    let wf   = RBWaveform::from_random();
+    let test : RBWaveform = wf.pack().unpack().unwrap();
+    assert_eq!(wf, test);
+  }
+}
+
 #[cfg(all(test,feature = "random"))]
 mod test_rbevents {
   use crate::serialization::Serialization;
   use crate::FromRandom;
   use crate::events::{
       RBEvent,
-      RBMissingHit,
       RBEventHeader,
-      RBWaveform
   };
   #[test]
   fn serialization_rbeventheader() {
@@ -1301,22 +1307,4 @@ mod test_rbevents {
     }
   }
   
-  #[test]
-  fn serialization_rbwaveform() {
-    for _ in 0..100 {
-      let wf     = RBWaveform::from_random();
-      let stream = wf.to_bytestream();
-      let test   = RBWaveform::from_bytestream(&stream, &mut 0).unwrap();
-      assert_eq!(wf, test);
-    }
-  }
-
-  #[test]
-  fn serialization_rbmissinghit() {
-    let mut pos = 0usize;
-    let head = RBMissingHit::from_random();
-    let test = RBMissingHit::from_bytestream(&head.to_bytestream(), &mut pos).unwrap();
-    assert_eq!(head, test);
-    assert_eq!(pos, RBMissingHit::SIZE);
-  }  
 }
