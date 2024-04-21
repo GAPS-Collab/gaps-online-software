@@ -28,6 +28,7 @@ use std::fmt;
 
 use crate::serialization::{
     Serialization,
+    Packable,
     SerializationError,
     parse_u8,
     parse_u32
@@ -468,6 +469,10 @@ pub enum TofCommand {
   Listen                  (u32),
 }
 
+impl Packable for TofCommand {
+  const PACKET_TYPE : PacketType = PacketType::TofCommand;
+}
+
 impl fmt::Display for TofCommand {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let r = serde_json::to_string(self).unwrap_or(
@@ -734,7 +739,12 @@ pub enum TofResponse {
   SerializationIssue(u32),
   ZMQProblem(u32),
   TimeOut(u32),
+  NotImplemented(u32),
   Unknown
+}
+
+impl Packable for TofResponse {
+  const PACKET_TYPE : PacketType = PacketType::TofResponse;
 }
 
 impl fmt::Display for TofResponse {
@@ -758,6 +768,7 @@ impl FromRandom for TofResponse {
       TofResponse::SerializationIssue(val),
       TofResponse::ZMQProblem(val),
       TofResponse::TimeOut(val),
+      TofResponse::NotImplemented(val),
       TofResponse::Unknown,
     ];
     let idx = rng.gen_range(0..choices.len());
@@ -784,6 +795,7 @@ impl Serialization for TofResponse {
       TofResponse::SerializationIssue(data) => value = *data,
       TofResponse::ZMQProblem(data)         => value = *data,
       TofResponse::TimeOut(data)            => value = *data,
+      TofResponse::NotImplemented(data)     => value = *data,
       TofResponse::Unknown => ()
     }
     bytestream.extend_from_slice(&value.to_le_bytes());
@@ -813,6 +825,7 @@ impl From<TofResponse> for u8 {
       TofResponse::SerializationIssue(_) => 4,
       TofResponse::ZMQProblem(_)         => 5,
       TofResponse::TimeOut(_)            => 6,
+      TofResponse::NotImplemented(_)     => 7,
       TofResponse::Unknown => 0
     }
   }
@@ -828,6 +841,7 @@ impl From<(u8, u32)> for TofResponse {
       4 => TofResponse::SerializationIssue(value),
       5 => TofResponse::ZMQProblem(value),
       6 => TofResponse::TimeOut(value),
+      7 => TofResponse::NotImplemented(value),
       _ => TofResponse::Unknown
     }
   }
@@ -861,15 +875,19 @@ fn serialization_rbcommand() {
 #[test]
 fn serialization_tofresponse() {
   let resp = TofResponse::from_random();
-  let test = TofResponse::from_bytestream(&resp.to_bytestream(), &mut 0).unwrap();
+  let test : TofResponse = resp.pack().unpack().unwrap();
   assert_eq!(resp, test);
 }
 
 #[cfg(feature = "random")]
 #[test]
-fn serialization_tofcommand() {
-  let cmd  = TofCommand::from_random();
-  let test = TofCommand::from_bytestream(&cmd.to_bytestream(), &mut 0).unwrap();
-  assert_eq!(cmd, test);
+fn pack_tofcommand() {
+  for _ in 0..100 {
+    let cmd  = TofCommand::from_random();
+    let test : TofCommand = cmd.pack().unpack().unwrap();
+    assert_eq!(cmd, test);
+  }
 }
+
+
 
