@@ -26,7 +26,13 @@
 
 use std::fmt;
 
-use crate::serialization::{Serialization, SerializationError, parse_u8, parse_u32};
+use crate::serialization::{
+    Serialization,
+    SerializationError,
+    parse_u8,
+    parse_u32
+};
+
 use crate::packets::{TofPacket,
                      PacketType};
 
@@ -88,7 +94,9 @@ pub enum TofCommandCode {
   /// command code for restarting systemd
   CmdSystemdReboot           = 60u8,
   /// command code for putting liftof-cc in listening mode
-  CmdListen                  = 70u8
+  CmdListen                  = 70u8,
+  /// command code for putting liftof-cc in staging mode
+  CmdStaging                 = 71u8
 }
 
 impl fmt::Display for TofCommandCode {
@@ -122,6 +130,8 @@ impl From<u8> for TofCommandCode {
       24u8 => TofCommandCode::CmdTriggerModeForced,
       25u8 => TofCommandCode::CmdTriggerModeForcedMTB,
       60u8 => TofCommandCode::CmdSystemdReboot,
+      70u8 => TofCommandCode::CmdListen,
+      71u8 => TofCommandCode::CmdStaging,
       _    => TofCommandCode::CmdUnknown
     }
   }
@@ -150,7 +160,9 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::CmdSetRBDataBufSize,
       TofCommandCode::CmdTriggerModeForced,
       TofCommandCode::CmdTriggerModeForcedMTB,
-      TofCommandCode::CmdSystemdReboot
+      TofCommandCode::CmdSystemdReboot,
+      TofCommandCode::CmdListen,
+      TofCommandCode::CmdStaging
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
@@ -465,64 +477,6 @@ impl fmt::Display for TofCommand {
 }
 
 impl TofCommand { 
-  const HEAD : u16 = 0xAAAA;
-  const TAIL : u16 = 0x5555;
-  ///// The size of TofCommand when 
-  ///// in byte representation is 
-  ///// fixed:
-  ///// it is 4 bytes (header/footer)
-  ///// + 1 byte command code
-  ///// + 4 bytes value
-  ///// => 9 bytes
-  const SIZE : usize = 9; 
-
-
-  /// Returns the serialized data stream
-  /// as byte array
-  /// 
-  /// Might be faster thant its sister
-  /// ::to_bytestream(), however is not
-  /// a trait, since the return type 
-  /// depends on the size. 
-  /// FIXME - can we somehow make this 
-  /// a trait? It seems we can not return 
-  /// &[u8] when we have the corresponding
-  /// array allocated in the function
-  pub fn to_bytearray(&self) -> [u8;TofCommand::SIZE] {
-
-    let mut bytes = [0u8;TofCommand::SIZE];
-    bytes[0] = 0xAA;
-    bytes[1] = 0xAA;
-    bytes[2] = TofCommand::to_command_code(&self)
-      .expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!") as u8; 
-    let value_bytes = self.get_value().to_le_bytes();
-   
-    for n in 0..4 {
-      bytes[3+n] = value_bytes[n];
-    }
-    bytes[7] = 0x55;
-    bytes[8] = 0x55;
-    bytes
-  }
-  
-  pub fn to_bytestream(&self) -> Vec<u8> {
-
-    //let mut stream = Vec::<u8>::with_capacity(TofCommand::SIZE);
-    let mut stream : Vec::<u8> = vec![0,0,0,0,0,0,0,0,0];
-    stream[0] = 0xAA;
-    stream[1] = 0xAA;
-    stream[2] = TofCommand::to_command_code(&self)
-      .expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!") as u8; 
-    let value_bytes = self.get_value().to_le_bytes();
-   
-    for n in 0..4 {
-      stream[3+n] = value_bytes[n];
-    }
-    stream[7] = 0x55;
-    stream[8] = 0x55;
-    stream
-  }
-
 
   // this can not fail
   pub fn get_value(&self) -> u32 {
@@ -577,7 +531,8 @@ impl TofCommand {
       TofCommandCode::CmdTriggerModeForced       => TofCommand::TriggerModeForced       (value),
       TofCommandCode::CmdTriggerModeForcedMTB    => TofCommand::TriggerModeForcedMTB    (value),
       TofCommandCode::CmdSystemdReboot           => TofCommand::SystemdReboot           (value),
-      TofCommandCode::CmdListen                  => TofCommand::Listen                  (value)
+      TofCommandCode::CmdListen                  => TofCommand::Listen                  (value),
+      _                                          => TofCommand::Unknown                 (value),
     }
   }
     
@@ -604,7 +559,7 @@ impl TofCommand {
       TofCommand::TriggerModeForced       (_) => Some(TofCommandCode::CmdTriggerModeForced),
       TofCommand::TriggerModeForcedMTB    (_) => Some(TofCommandCode::CmdTriggerModeForcedMTB),
       TofCommand::SystemdReboot           (_) => Some(TofCommandCode::CmdSystemdReboot),
-      TofCommand::Listen                  (_) => Some(TofCommandCode::CmdListen)
+      TofCommand::Listen                  (_) => Some(TofCommandCode::CmdListen),
     }
   }
 
@@ -629,6 +584,9 @@ impl TofCommand {
     } // end match
   }
 } // end impl TofCommand
+
+//impl From<&TofPacket> for TofCommand {
+//  fn from(tp : &TofPacket) -> Self {
 
 impl From<(u8, u32)> for TofCommand {
   
@@ -670,7 +628,7 @@ impl FromRandom for TofCommand {
       TofCommand::TriggerModeForced       (val),
       TofCommand::TriggerModeForcedMTB    (val),
       TofCommand::SystemdReboot           (val),
-      TofCommand::Listen                  (val)
+      TofCommand::Listen                  (val),
     ];
     let idx = rng.gen_range(0..choices.len());
     choices[idx]
@@ -689,37 +647,62 @@ impl Serialization for TofCommand {
   ///// + 4 bytes value
   ///// => 9 bytes
   const SIZE : usize = 9; 
+  
+  ///// Returns the serialized data stream
+  ///// as byte array
+  ///// 
+  ///// Might be faster thant its sister
+  ///// ::to_bytestream(), however is not
+  ///// a trait, since the return type 
+  ///// depends on the size. 
+  ///// FIXME - can we somehow make this 
+  ///// a trait? It seems we can not return 
+  ///// &[u8] when we have the corresponding
+  ///// array allocated in the function
+  //pub fn to_bytearray(&self) -> [u8;TofCommand::SIZE] {
+
+  //  let mut bytes = [0u8;TofCommand::SIZE];
+  //  bytes[0] = 0xAA;
+  //  bytes[1] = 0xAA;
+  //  bytes[2] = TofCommand::to_command_code(&self)
+  //    .expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!") as u8; 
+  //  let value_bytes = self.get_value().to_le_bytes();
+  // 
+  //  for n in 0..4 {
+  //    bytes[3+n] = value_bytes[n];
+  //  }
+  //  bytes[7] = 0x55;
+  //  bytes[8] = 0x55;
+  //  bytes
+  //}
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    //let mut stream = Vec::<u8>::with_capacity(TofCommand::SIZE);
+    let mut stream : Vec::<u8> = vec![0,0,0,0,0,0,0,0,0];
+    stream[0] = 0xAA;
+    stream[1] = 0xAA;
+    stream[2] = TofCommand::to_command_code(&self)
+      .expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!") as u8; 
+    let value_bytes = self.get_value().to_le_bytes();
+   
+    for n in 0..4 {
+      stream[3+n] = value_bytes[n];
+    }
+    stream[7] = 0x55;
+    stream[8] = 0x55;
+    stream
+  }
+
 
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
     -> Result<Self, SerializationError>{
-  
-    //let mut pos      = start_pos; 
-    let mut two_bytes : [u8;2];
-    let four_bytes    : [u8;4];
-    two_bytes = [stream[*pos],
-                 stream[*pos+1]];
-    *pos += 2;
-    if Self::HEAD != u16::from_le_bytes(two_bytes) {
-      error!("Packet does not start with HEAD signature");
-      return Err(SerializationError::HeadInvalid {});
-    }
-    let cc   = stream[*pos];
-    *pos += 1;
-    four_bytes = [stream[*pos],
-                  stream[*pos+1],
-                  stream[*pos+2],
-                  stream[*pos+3]];
-    *pos += 4;
-    let value = u32::from_le_bytes(four_bytes);
-    two_bytes = [stream[*pos],
-                 stream[*pos+1]];
+    Self::verify_fixed(stream, pos)?;  
+    let cc      = parse_u8(stream, pos);
+    let value   = parse_u32(stream, pos); 
     let pair    = (cc, value);
     let command = Self::from(pair);
-    if Self::TAIL != u16::from_le_bytes(two_bytes) {
-      error!("Packet does not end with TAIL signature");
-      return Err(SerializationError::TailInvalid {});
-    }
+    *pos += 2; // for the TAIL
     Ok(command)
   }
 }
