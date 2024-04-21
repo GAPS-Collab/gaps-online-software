@@ -233,7 +233,7 @@ RBEvent::RBEvent() {
   header = RBEventHeader();
   adc    = Vec<Vec<u16>>(); 
   for (usize k=0; k<NCHN; k++) {
-    adc.push_back(Vec<u16>(NWORDS/2,0));
+    adc.push_back(Vec<u16>(NWORDS));
   }
   hits  = Vec<TofHit>();
 }
