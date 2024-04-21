@@ -2,6 +2,7 @@
 //! FIXME - this should go to liftof-lib
 
 use std::collections::HashMap;
+use std::fmt;
 
 /// Send runtime information 
 /// to threads via shared memory
@@ -9,23 +10,55 @@ use std::collections::HashMap;
 #[derive(Default, Debug)]
 pub struct ThreadControl {
   /// Stop ALL threads
-  pub stop_flag: bool,
+  pub stop_flag                  : bool,
   /// Trigger calibration thread
-  pub calibration_active: bool,
+  pub calibration_active         : bool,
   /// Keep track on how many calibration 
   /// packets we have received
-  pub finished_calibrations : HashMap<u8,bool>,
+  pub finished_calibrations      : HashMap<u8,bool>,
+  /// alive indicator for cmd dispatch thread
+  pub thread_cmd_dispatch_active : bool,
+  /// alive indicator for data sink thread
+  pub thread_data_sink_active    : bool,
+  /// alive indicator for runner thread
+  pub thread_runner_active       : bool,
+  /// alive indicator for event builder thread
+  pub thread_event_bldr_active   : bool,
+  /// alive indicator for master trigger thread
+  pub thread_master_trg_active   : bool,
 }
 
 impl ThreadControl {
   pub fn new() -> Self {
     Self {
-      stop_flag             : false,
-      calibration_active    : false,
-      finished_calibrations : HashMap::<u8,bool>::new(),
+      stop_flag                  : false,
+      calibration_active         : false,
+      finished_calibrations      : HashMap::<u8,bool>::new(),
+      thread_cmd_dispatch_active : false,
+      thread_data_sink_active    : false,
+      thread_runner_active       : false,
+      thread_event_bldr_active   : false,
+      thread_master_trg_active   : false,
     }
   }
 }
+
+impl fmt::Display for ThreadControl {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<ThreadControl:");
+    repr        += &(format!("\n  stop flag : {}", self.stop_flag));
+    repr        += "    -- reported RB calibration activity:";
+    repr        += &(format!("\n  RB cali active : {}", self.calibration_active));
+    repr        += &(format!("\n  -- finished    : {:?}", self.finished_calibrations));       
+    repr        += "    -- reported thread activity:";
+    repr        += &(format!("\n  cmd dispatcher : {}", self.thread_cmd_dispatch_active));
+    repr        += &(format!("\n  runner         : {}", self.thread_data_sink_active));
+    repr        += &(format!("\n  data sink      : {}", self.thread_runner_active));
+    repr        += &(format!("\n  master trig    : {}>", self.thread_master_trg_active));
+    write!(f, "{}", repr)
+  }
+}
+
 
 //enum Message {
 //  NewJob(Job),
