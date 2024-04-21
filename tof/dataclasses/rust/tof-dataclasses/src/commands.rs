@@ -34,8 +34,10 @@ use crate::serialization::{
     parse_u32
 };
 
-use crate::packets::{TofPacket,
-                     PacketType};
+use crate::packets::{
+    TofPacket,
+    PacketType
+};
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
@@ -53,6 +55,8 @@ pub enum TofCommandCode {
   CmdPing                    = 1u8,
   /// command code for getting the monitoring data from the component
   CmdMoni                    = 2u8,
+  /// Kill myself
+  CmdKill                    = 4u8, // Shi!
   /// command code for power management
   CmdPower                   = 10u8,
   /// command code for "Set LTB Thresholds"
@@ -97,7 +101,11 @@ pub enum TofCommandCode {
   /// command code for putting liftof-cc in listening mode
   CmdListen                  = 70u8,
   /// command code for putting liftof-cc in staging mode
-  CmdStaging                 = 71u8
+  CmdStaging                 = 71u8,
+  /// lock the cmd dispatcher
+  CmdLock                    = 80u8,
+  /// unlock the cmd dispatcher
+  CmdUnlock                  = 81u8,
 }
 
 impl fmt::Display for TofCommandCode {
@@ -114,6 +122,7 @@ impl From<u8> for TofCommandCode {
       0u8  => TofCommandCode::CmdUnknown,
       1u8  => TofCommandCode::CmdPing,
       2u8  => TofCommandCode::CmdMoni,
+      4u8  => TofCommandCode::CmdKill,
       10u8 => TofCommandCode::CmdPower,
       21u8 => TofCommandCode::CmdSetThresholds,
       22u8 => TofCommandCode::CmdSetMTConfig,
@@ -133,6 +142,8 @@ impl From<u8> for TofCommandCode {
       60u8 => TofCommandCode::CmdSystemdReboot,
       70u8 => TofCommandCode::CmdListen,
       71u8 => TofCommandCode::CmdStaging,
+      80u8 => TofCommandCode::CmdLock,
+      81u8 => TofCommandCode::CmdUnlock,
       _    => TofCommandCode::CmdUnknown
     }
   }
@@ -163,7 +174,10 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::CmdTriggerModeForcedMTB,
       TofCommandCode::CmdSystemdReboot,
       TofCommandCode::CmdListen,
-      TofCommandCode::CmdStaging
+      TofCommandCode::CmdStaging,
+      TofCommandCode::CmdLock,
+      TofCommandCode::CmdUnlock,
+      TofCommandCode::CmdKill,
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
@@ -177,10 +191,11 @@ impl FromRandom for TofCommandCode {
 // e.g. event id
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u32)]
-pub enum TofCommandResp {
+pub enum TofResponseCode {
   Unknown                            = 0u32,
   /// response code for: Command can not be executed on the server side
   RespErrUnexecutable                = 500u32,
+  RespErrAccessDenied                = 403u32,
   RespErrNotImplemented              = 404u32, 
   /// response code for: Something did not work quite right, 
   /// however, the problem has either fixed itself or it is 
@@ -212,51 +227,53 @@ pub enum TofCommandResp {
   RespErrCmdStuck                    = 503u32
 }
 
-impl fmt::Display for TofCommandResp {
+impl fmt::Display for TofResponseCode {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let r = serde_json::to_string(self).unwrap_or(
-      String::from("Error: cannot unwrap this TofCommandResp"));
-    write!(f, "<TofCommandResp: {}>", r)
+      String::from("Error: cannot unwrap this TofResponseCode"));
+    write!(f, "<TofResponseCode: {}>", r)
   }
 }
 
-impl From<u32> for TofCommandResp {
+impl From<u32> for TofResponseCode {
   fn from(value: u32) -> Self {
     match value {
-      500u32   => TofCommandResp::RespErrUnexecutable,
-      404u32   => TofCommandResp::RespErrNotImplemented,
-      4000u32  => TofCommandResp::RespErrLevelNoProblem,
-      4010u32  => TofCommandResp::RespErrLevelMedium,
-      4020u32  => TofCommandResp::RespErrLevelSevere,
-      4030u32  => TofCommandResp::RespErrLevelCritical,
-      4040u32  => TofCommandResp::RespErrLevelMissionCritical,
-      99999u32 => TofCommandResp::RespErrLevelRunFoolRun,
-      200u32   => TofCommandResp::RespSuccFingersCrossed,
-      501u32   => TofCommandResp::RespErrNoRunActive,
-      502u32   => TofCommandResp::RespErrRunActive,
-      503u32   => TofCommandResp::RespErrCmdStuck,
-      _        => TofCommandResp::Unknown
+      500u32   => TofResponseCode::RespErrUnexecutable,
+      403u32   => TofResponseCode::RespErrAccessDenied,
+      404u32   => TofResponseCode::RespErrNotImplemented,
+      4000u32  => TofResponseCode::RespErrLevelNoProblem,
+      4010u32  => TofResponseCode::RespErrLevelMedium,
+      4020u32  => TofResponseCode::RespErrLevelSevere,
+      4030u32  => TofResponseCode::RespErrLevelCritical,
+      4040u32  => TofResponseCode::RespErrLevelMissionCritical,
+      99999u32 => TofResponseCode::RespErrLevelRunFoolRun,
+      200u32   => TofResponseCode::RespSuccFingersCrossed,
+      501u32   => TofResponseCode::RespErrNoRunActive,
+      502u32   => TofResponseCode::RespErrRunActive,
+      503u32   => TofResponseCode::RespErrCmdStuck,
+      _        => TofResponseCode::Unknown
     }
   }
 }
 
 #[cfg(feature = "random")]
-impl FromRandom for TofCommandResp {
+impl FromRandom for TofResponseCode {
   
   fn from_random() -> Self {
     let choices = [
-      TofCommandResp::RespErrUnexecutable,
-      TofCommandResp::RespErrNotImplemented,
-      TofCommandResp::RespErrLevelNoProblem,
-      TofCommandResp::RespErrLevelMedium,
-      TofCommandResp::RespErrLevelSevere,
-      TofCommandResp::RespErrLevelCritical,
-      TofCommandResp::RespErrLevelMissionCritical,
-      TofCommandResp::RespErrLevelRunFoolRun,
-      TofCommandResp::RespSuccFingersCrossed,
-      TofCommandResp::RespErrNoRunActive,
-      TofCommandResp::RespErrRunActive,
-      TofCommandResp::RespErrCmdStuck
+      TofResponseCode::RespErrAccessDenied,
+      TofResponseCode::RespErrUnexecutable,
+      TofResponseCode::RespErrNotImplemented,
+      TofResponseCode::RespErrLevelNoProblem,
+      TofResponseCode::RespErrLevelMedium,
+      TofResponseCode::RespErrLevelSevere,
+      TofResponseCode::RespErrLevelCritical,
+      TofResponseCode::RespErrLevelMissionCritical,
+      TofResponseCode::RespErrLevelRunFoolRun,
+      TofResponseCode::RespSuccFingersCrossed,
+      TofResponseCode::RespErrNoRunActive,
+      TofResponseCode::RespErrRunActive,
+      TofResponseCode::RespErrCmdStuck
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
@@ -467,6 +484,9 @@ pub enum TofCommand {
   TriggerModeForcedMTB    (u32),
   SystemdReboot           (u32),
   Listen                  (u32),
+  Lock                    (u32),
+  Unlock                  (u32),
+  Kill                    (u32),
 }
 
 impl Packable for TofCommand {
@@ -508,6 +528,9 @@ impl TofCommand {
       TofCommand::TriggerModeForcedMTB    (data) => { value = *data;},
       TofCommand::SystemdReboot           (data) => { value = *data;},
       TofCommand::Listen                  (data) => { value = *data;}
+      TofCommand::Kill                    (data) => { value = *data;}
+      TofCommand::Lock                    (data) => { value = *data;}
+      TofCommand::Unlock                  (data) => { value = *data;}
     }
     value
   }  
@@ -537,6 +560,9 @@ impl TofCommand {
       TofCommandCode::CmdTriggerModeForcedMTB    => TofCommand::TriggerModeForcedMTB    (value),
       TofCommandCode::CmdSystemdReboot           => TofCommand::SystemdReboot           (value),
       TofCommandCode::CmdListen                  => TofCommand::Listen                  (value),
+      TofCommandCode::CmdKill                    => TofCommand::Kill                    (value),
+      TofCommandCode::CmdLock                    => TofCommand::Lock                    (value),
+      TofCommandCode::CmdUnlock                  => TofCommand::Unlock                  (value),
       _                                          => TofCommand::Unknown                 (value),
     }
   }
@@ -565,6 +591,9 @@ impl TofCommand {
       TofCommand::TriggerModeForcedMTB    (_) => Some(TofCommandCode::CmdTriggerModeForcedMTB),
       TofCommand::SystemdReboot           (_) => Some(TofCommandCode::CmdSystemdReboot),
       TofCommand::Listen                  (_) => Some(TofCommandCode::CmdListen),
+      TofCommand::Kill                    (_) => Some(TofCommandCode::CmdKill),
+      TofCommand::Lock                    (_) => Some(TofCommandCode::CmdLock),
+      TofCommand::Unlock                  (_) => Some(TofCommandCode::CmdUnlock),
     }
   }
 
@@ -634,6 +663,9 @@ impl FromRandom for TofCommand {
       TofCommand::TriggerModeForcedMTB    (val),
       TofCommand::SystemdReboot           (val),
       TofCommand::Listen                  (val),
+      TofCommand::Kill                    (val),
+      TofCommand::Lock                    (val),
+      TofCommand::Unlock                  (val),
     ];
     let idx = rng.gen_range(0..choices.len());
     choices[idx]
@@ -740,6 +772,7 @@ pub enum TofResponse {
   ZMQProblem(u32),
   TimeOut(u32),
   NotImplemented(u32),
+  AccessDenied(u32),
   Unknown
 }
 
@@ -769,6 +802,7 @@ impl FromRandom for TofResponse {
       TofResponse::ZMQProblem(val),
       TofResponse::TimeOut(val),
       TofResponse::NotImplemented(val),
+      TofResponse::AccessDenied(val),
       TofResponse::Unknown,
     ];
     let idx = rng.gen_range(0..choices.len());
@@ -796,6 +830,7 @@ impl Serialization for TofResponse {
       TofResponse::ZMQProblem(data)         => value = *data,
       TofResponse::TimeOut(data)            => value = *data,
       TofResponse::NotImplemented(data)     => value = *data,
+      TofResponse::AccessDenied(data)       => value = *data,
       TofResponse::Unknown => ()
     }
     bytestream.extend_from_slice(&value.to_le_bytes());
@@ -826,6 +861,7 @@ impl From<TofResponse> for u8 {
       TofResponse::ZMQProblem(_)         => 5,
       TofResponse::TimeOut(_)            => 6,
       TofResponse::NotImplemented(_)     => 7,
+      TofResponse::AccessDenied(_)       => 8,
       TofResponse::Unknown => 0
     }
   }
@@ -842,6 +878,7 @@ impl From<(u8, u32)> for TofResponse {
       5 => TofResponse::ZMQProblem(value),
       6 => TofResponse::TimeOut(value),
       7 => TofResponse::NotImplemented(value),
+      8 => TofResponse::AccessDenied(value),
       _ => TofResponse::Unknown
     }
   }
@@ -873,7 +910,7 @@ fn serialization_rbcommand() {
 
 #[cfg(feature = "random")]
 #[test]
-fn serialization_tofresponse() {
+fn pack_tofresponse() {
   let resp = TofResponse::from_random();
   let test : TofResponse = resp.pack().unpack().unwrap();
   assert_eq!(resp, test);
