@@ -53,7 +53,12 @@ use clap::{
 
 use colored::Colorize;
 
-use crossbeam_channel as cbc; 
+use crossbeam_channel::{
+    Sender,
+    Receiver,
+    unbounded,
+};
+
 //use colored::Colorize;
 extern crate indicatif;
 use indicatif::{
@@ -61,12 +66,17 @@ use indicatif::{
     ProgressStyle,
 };
 
-use tof_dataclasses::errors::CmdError;
-use tof_dataclasses::events::{MasterTriggerEvent,
-                              RBEvent};
+use tof_dataclasses::events::{
+    MasterTriggerEvent,
+    RBEvent
+};
 
 use tof_dataclasses::threading::{
     ThreadControl,
+};
+use tof_dataclasses::serialization::{
+    Serialization,
+    Packable
 };
 
 use tof_dataclasses::packets::TofPacket;
@@ -76,32 +86,33 @@ use tof_dataclasses::database::{
     ReadoutBoard,
 };
 
-use tof_dataclasses::commands::TofCommand;
-use tof_dataclasses::commands::TofCommandCode;
+use tof_dataclasses::constants::PAD_CMD_32BIT;
+use tof_dataclasses::commands::{
+    TofCommand,
+    //TofCommandCode,
+    TofResponse,
+};
+
 use liftof_lib::{
-    master_trigger,
-    readoutboard_commander,
+    //readoutboard_commander,
     init_env_logger,
     //color_log,
     LIFTOF_LOGO_SHOW,
+    master_trigger,
+    LiftofSettings,
     RunCmd,
+    CommandCC,
     CalibrationCmd,
-    PowerCmd,
-    PowerStatusEnum,
-    TofComponent,
-    SetCmd
 };
 
 use liftof_cc::threads::{
     event_builder,
-    flight_cpu_listener,
+    //flight_cpu_listener,
+    command_dispatcher,
     global_data_sink,
     monitor_cpu,
     readoutboard_communicator
 };
-
-use liftof_lib::settings::LiftofSettings;
-use liftof_lib::Command;
 
 /*************************************/
 
@@ -122,21 +133,31 @@ struct LiftofCCArgs {
   /// event builder and general settings.
   #[arg(short, long)]
   config      : Option<String>,
-  /// For cmd debug purposes
-  #[arg(short, long)]
-  only_cmd    : bool,
   /// List of possible commands
   #[command(subcommand)]
-  command     : Command,
+  command     : CommandCC,
+}
+
+/*************************************/
+
+/// Deal with the "result" of the command
+/// inquiry
+//use liftof_lib::{
+//    StartRunOpts,
+//    DefaultOpts,
+//};
+
+/// Little helper, just makes sure that all the 
+/// channels are of same type
+fn init_channels<T>() -> (Sender<T>, Receiver<T>) {
+  let channels : (Sender<T>, Receiver<T>) = unbounded(); 
+  channels
 }
 
 /*************************************/
 
 fn main() {
   init_env_logger();
-
-  // global thread control
-  let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
 
   // welcome banner!
   println!("{}", LIFTOF_LOGO_SHOW);
@@ -158,28 +179,15 @@ fn main() {
   //info!("info");
   //debug!("debug");
   //trace!("trace");
+  // global thread control
+  let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
+  let one_second = time::Duration::from_millis(1000);
 
   // deal with command line arguments
   let config          : LiftofSettings;
   let nboards         : usize;
-  let mut staging     = false;
-  let args = LiftofCCArgs::parse();
-  let verbose = args.verbose;
-  let mut cali_from_cmdline = false;   
-  match args.command {
-    Command::Calibration(ref calibration_cmd) => {
-      match calibration_cmd {
-        CalibrationCmd::Default(_default_opts) => {
-          cali_from_cmdline = true;
-        },
-        _ => ()
-      }
-    }
-    Command::Staging(_) => {
-      staging = true;
-    }
-    _ => ()
-  }
+  let args              = LiftofCCArgs::parse();
+  let verbose           = args.verbose;
   
   match args.config {
     None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
@@ -215,11 +223,10 @@ fn main() {
   let db_path               = config.db_path.clone();
   let cpu_moni_interval     = config.cpu_moni_interval_sec;
   //let flight_address        = config.fc_pub_address.clone();
-  let flight_sub_address    = config.fc_sub_address.clone();
+  //let flight_sub_address    = config.fc_sub_address.clone();
+  let cmd_dispatch_settings = config.cmd_dispatcher_settings.clone();
   let mtb_settings          = config.mtb_settings.clone();
   let mut gds_settings      = config.data_publisher_settings.clone();
-  let flight_pub_address    = config.data_publisher_settings.fc_pub_address.clone();
-  let cmd_listener_interval_sec    = config.cmd_listener_interval_sec;
   let run_analysis_engine   = config.run_analysis_engine;
   
   let mut conn              = connect_to_db(db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
@@ -281,385 +288,132 @@ fn main() {
     println!("=> Writing settings to {}!", settings_fname);
     config.to_toml(settings_fname);
   }
-  
-  // prepare channels for inter thread communications
-  let (tp_to_sink, tp_from_client) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
-  let mtb_moni_sender = tp_to_sink.clone();
 
-  // master thread -> event builder ocmmuncations
-  let (master_ev_send, master_ev_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
-  
-  // readout boards <-> paddle cache communications 
-  let (ev_to_builder, ev_from_rb) : (cbc::Sender<RBEvent>, cbc::Receiver<RBEvent>) = cbc::unbounded();
-  let (cmd_sender, cmd_receiver)  : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
+  /*******************************************************
+   * Channels (crossbeam, unbounded) for inter-thread
+   * communications.
+   *
+   * FIXME - do we need to use bounded channels
+   * just in case?
+   *
+   */ 
 
-  let one_minute = time::Duration::from_millis(60000);
-  let only_cmd   = args.only_cmd;
+  // all threads who send TofPackets to the global data sink, can clone this receiver
+  let (tp_to_sink, tp_from_threads)   = init_channels::<TofPacket>();
+
+  // master thread -> event builder MasterTriggerEvent transmission
+  let (master_ev_send, master_ev_rec) = init_channels::<MasterTriggerEvent>(); 
+  
+  // readout boards -> event builder RBEvent transmission 
+  let (ev_to_builder, ev_from_rb)     = init_channels::<RBEvent>();
+  let (ack_to_cmd_disp, ack_from_rb)  = init_channels::<TofResponse>();   
+
+  //let one_minute = time::Duration::from_millis(60000);
 
   // set up signal handline
   let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
 
   // no cpu monitoring for cmdline calibration tasks
-  if !only_cmd {
-    if !cali_from_cmdline && cpu_moni_interval > 0 {
-      println!("==> Starting main monitoring thread...");
-      let tp_to_sink_c = tp_to_sink.clone();
-      let _thread_control_c = thread_control.clone();
-      // this is anonymus, but we control the thread
-      // through the thread control mechanism, so we
-      // can still end it.
-      let _cpu_moni_thread = thread::Builder::new()
-          .name("cpu-monitoring".into())
-          .spawn(move || {
-            monitor_cpu(
-              tp_to_sink_c,
-              cpu_moni_interval,
-              _thread_control_c,
-              false) 
-            })
-          .expect("Failed to spawn cpu-monitoring thread!");
-    }
-    write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
-    gds_settings.data_dir = write_stream_path;
-
-    println!("==> Starting data sink thread!");
-    let thread_control_gds = thread_control.clone();
-    let _data_sink_thread = thread::Builder::new()
-      .name("data-sink".into())
-      .spawn(move || {
-        global_data_sink(&tp_from_client,
-                         write_stream,
-                         runid,
-                         &gds_settings,
-                         false,
-                         thread_control_gds);
-      })
-      .expect("Failed to spawn data-sink thread!");
-    println!("==> data sink thread started!");
-
-    
-    let one_second = time::Duration::from_millis(1000);
-    println!("==> Starting RB commander thread!");
-    let _cmd_receiver_rb_comms = cmd_receiver.clone();
-    let _rb_cmd_thread = thread::Builder::new()
-      .name("rb-commander".into())
-      .spawn(move || {
-         readoutboard_commander(&_cmd_receiver_rb_comms);
-       })
-      .expect("Failed to spawn rb-commander thread!");
-    // start the event builder thread
-    if !cali_from_cmdline {
-      println!("==> Starting event builder and master trigger threads...");
-      //let db_path_string    = config.db_path.clone();
-      let settings          = config.event_builder_settings.clone();
-      let thread_control_eb = thread_control.clone();
-      let tp_to_sink_c      = tp_to_sink.clone();
-      let _evb_thread = thread::Builder::new()
-        .name("event-builder".into())
+  if cpu_moni_interval > 0 {
+    println!("==> Starting main monitoring thread...");
+    let tp_to_sink_c = tp_to_sink.clone();
+    let _thread_control_c = thread_control.clone();
+    // this is anonymus, but we control the thread
+    // through the thread control mechanism, so we
+    // can still end it.
+    let _cpu_moni_thread = thread::Builder::new()
+        .name("cpu-monitoring".into())
         .spawn(move || {
-                        event_builder(&master_ev_rec,
-                                      &ev_from_rb,
-                                      &tp_to_sink_c,
-                                      runid as u32,
-                                      //db_path_string,
-                                      mtb_link_id_map,
-                                      settings,
-                                      thread_control_eb);
-         })
-        .expect("Failed to spawn event-builder thread!");
-      // master trigger
-      //let thread_control_mt = thread_control.clone();
-      
-      let _mtb_thread = thread::Builder::new()
-        .name("master-trigger".into())
-        .spawn(move || {
-                        master_trigger(mtb_address, 
-                                       &master_ev_send,
-                                       &mtb_moni_sender,
-                                       mtb_settings,
-                                       // verbosity is currently too much 
-                                       // output
-                                       verbose);
-        })
-      .expect("Failed to spawn master-trigger thread!");
-    } 
-    thread::sleep(one_second);
-    println!("==> Will now start rb threads..");
-    for n in 0..nboards {
-      let mut this_rb           = rb_list[n].clone();
-      let this_tp_to_sink_clone = tp_to_sink.clone();
-      this_rb.calib_file_path   = calib_file_path.clone();
-      match this_rb.load_latest_calibration() {
-        Err(err) => error!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
-        Ok(_)    => ()
-      }
-      println!("==> Starting RB thread for {}", this_rb.rb_id);
-      let ev_to_builder_c = ev_to_builder.clone();
-      let thread_name     = format!("rb-comms-{}", this_rb.rb_id);
-      let settings        = config.analysis_engine_settings.clone();
-      let _rb_comm_thread = thread::Builder::new()
-        .name(thread_name)
-        .spawn(move || {
-          readoutboard_communicator(&ev_to_builder_c,
-                                    this_tp_to_sink_clone,
-                                    &this_rb,
-                                    false,
-                                    run_analysis_engine,
-                                    settings);
-        })
-        .expect("Failed to spawn readoutboard-communicator thread!");
-    } // end for loop over nboards
-    println!("==> All RB threads started!");
-    println!("==> Sleeping 5 seconds to give the rb's a chance to fire up..");
-    thread::sleep(5*one_second);
-    println!("==> Sleeping done!");
-
-    // set the handler for SIGINT
-    let cmd_sender_1 = cmd_sender.clone();
-
-  let return_val: Result<TofCommandCode, CmdError>;
-  let cmd_sender_c = cmd_sender.clone();
-  let mut dont_stop = false;
-  // let's give everything a little time to come up
-  // before we issues the commands
-  thread::sleep(5*one_second);
-  match args.command {
-    Command::Listen(_) => {
-      let _flight_address_sub_c = flight_sub_address.clone();
-      let _flight_address_pub_c = flight_pub_address;
-      let _thread_control_c = thread_control.clone();
-      let _cmd_sender_c = cmd_sender.clone();
-      let _cmd_receiver_c = cmd_receiver.clone();
-      let _cmd_interval_sec: u64 = cmd_listener_interval_sec;
-      let _flight_cpu_listener = thread::Builder::new()
-                    .name("flight-cpu-listener".into())
-                    .spawn(move || {
-                                    flight_cpu_listener(&_flight_address_sub_c,
-                                                        &_flight_address_pub_c,
-                                                        &_cmd_receiver_c,
-                                                        &_cmd_sender_c,
-                                                        _cmd_interval_sec,
-                                                        _thread_control_c);
-                    })
-                    .expect("Failed to spawn flight-cpu-listener thread!");
-      dont_stop = true;
-      return_val = Ok(TofCommandCode::CmdListen);
-    },
-    Command::Ping(ping_cmd) => {
-      match ping_cmd.component {
-        TofComponent::TofCpu => return_val = liftof_cc::send_ping_response(None),
-        TofComponent::RB  |
-        TofComponent::LTB |
-        TofComponent::MT     => return_val = liftof_cc::send_ping(None,
-                                                                  cmd_sender_c,
-                                                                  ping_cmd.component,
-                                                                  ping_cmd.id),
-        _                    => {
-          error!("The ping command is not implemented for this TofComponent!");
-          return_val = Err(CmdError::NotImplementedError);
-        }
-      }
-    },
-    Command::Moni(moni_cmd) => {
-      match moni_cmd.component {
-        TofComponent::TofCpu => return_val = liftof_cc::send_moni_response(None),
-        TofComponent::RB    |
-        TofComponent::LTB   |
-        TofComponent::MT     => return_val = liftof_cc::send_moni(None,
-                                                                  cmd_sender_c,
-                                                                  moni_cmd.component,
-                                                                  moni_cmd.id),
-        _                    => {
-          error!("The moni command is not implemented for this TofComponent!");
-          return_val = Err(CmdError::NotImplementedError);
-        }
-      }
-    },
-    Command::SystemdReboot(systemd_reboot_cmd) => {
-      let rb_id = systemd_reboot_cmd.id;
-      return_val = liftof_cc::send_systemd_reboot(None,
-                                                                  cmd_sender_c,
-                                                                  rb_id);
-    },
-    Command::Power(power_cmd) => {
-      match power_cmd {
-        PowerCmd::All(power_status) => {
-          let power_status_enum: PowerStatusEnum = power_status.status;
-          return_val = liftof_cc::send_power(None,
-                                                                  cmd_sender_c,
-                                                                  TofComponent::All,
-                                                                  power_status_enum);
-        },
-        PowerCmd::MT(power_status) => {
-          let power_status_enum: PowerStatusEnum = power_status.status;
-          return_val = liftof_cc::send_power(None,
-                                                                  cmd_sender_c,
-                                                                  TofComponent::MT,
-                                                                  power_status_enum);
-        },
-        PowerCmd::AllButMT(power_status) => {
-          let power_status_enum: PowerStatusEnum = power_status.status;
-          return_val = liftof_cc::send_power(None,
-                                                                  cmd_sender_c,
-                                                                  TofComponent::AllButMT,
-                                                                  power_status_enum);
-        },
-        PowerCmd::LTB(ltb_power_opts) => {
-          let power_status_enum: PowerStatusEnum = ltb_power_opts.status;
-          let ltb_id = ltb_power_opts.id;
-          return_val = liftof_cc::send_power_id(None,
-                                                                  cmd_sender_c,
-                                                                  TofComponent::LTB,
-                                                                  power_status_enum,
-                                                                  ltb_id);
-        },
-        PowerCmd::Preamp(preamp_power_opts) => {
-          let power_status_enum: PowerStatusEnum = preamp_power_opts.status;
-          let preamp_id = preamp_power_opts.id;
-          let preamp_bias = preamp_power_opts.bias;
-          return_val = liftof_cc::send_power_preamp(None,
-                                                                  cmd_sender_c,
-                                                                  power_status_enum,
-                                                                  preamp_id,
-                                                                  preamp_bias);
-        }
-      }
-    },
-    Command::Calibration(calibration_cmd) => {
-      match calibration_cmd {
-        CalibrationCmd::Default(default_opts) => {
-          let voltage_level = default_opts.level;
-          let rb_id = default_opts.id;
-          let extra = default_opts.extra;
-          println!("=> Received calibration default command! Will init run start...");
-          return_val = liftof_cc::send_default_calibration(None,cmd_sender_c, voltage_level, rb_id, extra);
-          println!("=> calibration default command resulted in {:?}", return_val);
-          println!("=> .. now we need to wait until the calibration is finished!");
-          // if that is successful, we need to wait
-          match thread_control.lock() {
-            Ok(mut tc) => {
-              tc.calibration_active = true;
-            },
-            Err(err) => {
-              error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-            },
-          }
-          // now we wait until the calibrations are finished
-          //let cali_wait_timer     = Instant::now();
-          let mut cali_received   : u64;
-          let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
-          let bar_label  = String::from("Acquiring RB calibration data");
-          let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
-          let bar = ProgressBar::new(rb_list.len() as u64); 
-          bar.set_position(0);
-          bar.set_message (bar_label);
-          bar.set_prefix  ("\u{2699}\u{1F4D0}");
-          bar.set_style   (bar_style);
-
-          loop {
-            cali_received = 0;
-            match thread_control.lock() {
-              Ok(tc) => {
-                for rbid in &rb_list {
-                  if tc.finished_calibrations[&rbid.rb_id] {
-                    cali_received += 1;
-                  }
-                }
-              },
-              Err(err) => {
-                error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-              },
-            }
-            bar.set_position(cali_received);
-            thread::sleep(5*one_second);
-            if cali_received as usize == rb_list.len() {
-              break;
-            }
-          }
-          bar.finish();
-          println!("=> All calibrations acquired!");
-          println!(">> So long and thanks for all the \u{1F41F} <<"); 
-          exit(0);
-        },
-        CalibrationCmd::Noi(noi_opts) => {
-          let rb_id = noi_opts.id;
-          let extra = noi_opts.extra;
-          return_val = liftof_cc::send_noi_calibration(None,cmd_sender_c, rb_id, extra);
-        },
-        CalibrationCmd::Voltage(voltage_opts) => {
-          let voltage_level = voltage_opts.level;
-          let rb_id = voltage_opts.id;
-          let extra = voltage_opts.extra;
-          return_val = liftof_cc::send_voltage_calibration(None,cmd_sender_c, voltage_level, rb_id, extra);
-        },
-        CalibrationCmd::Timing(timing_opts) => {
-          let voltage_level = timing_opts.level;
-          let rb_id = timing_opts.id;
-          let extra = timing_opts.extra;
-          return_val = liftof_cc::send_timing_calibration(None,cmd_sender_c, voltage_level, rb_id, extra);
-        }
-      }
-    }
-    Command::Set(set_cmd) => {
-      match set_cmd {
-        SetCmd::LtbThreshold(ltb_threshold_opts) => {
-          let ltb_id = ltb_threshold_opts.id;
-          let threshold_name = ltb_threshold_opts.name;
-          let threshold_level = ltb_threshold_opts.level;
-          return_val = liftof_cc::send_ltb_threshold_set(None,
-                                                                  cmd_sender_c,
-                                                                  ltb_id,
-                                                                  threshold_name,
-                                                                  threshold_level);
-        },
-        SetCmd::PreampBias(preamp_bias_opts) => {
-          let preamp_id = preamp_bias_opts.id;
-          let preamp_bias = preamp_bias_opts.bias;
-          return_val = liftof_cc::send_preamp_bias_set(None,
-                                                                  cmd_sender_c,
-                                                                  preamp_id,
-                                                                  preamp_bias);
-        }
-      }
-    },
-    Command::Run(run_cmd) => {
-      match run_cmd {
-        RunCmd::Start(run_start_opts) => {
-          let run_type = run_start_opts.run_type;
-          let rb_id = run_start_opts.id;
-          let event_no = run_start_opts.no;
-          return_val = liftof_cc::send_run_start(None,
-                                                                  cmd_sender_c,
-                                                                  run_type,
-                                                                  rb_id,
-                                                                  event_no);
-        },
-        RunCmd::Stop(run_stop_opts) => {
-          let rb_id = run_stop_opts.id;
-          return_val = liftof_cc::send_run_stop(None,
-                                                                  cmd_sender_c,
-                                                                  rb_id);
-        }
-      }
-    }
-    _ => {
-      // FIXME
-      return_val = Ok(TofCommandCode::CmdListen);
-    }
-  } 
-  // deal with return values
-  match return_val {
-    Err(cmd_error) => {
-      error!("Error in sending command {cmd_error}");
-    },
-    Ok(tof_command)  => {
-      info!("Successfully sent command {tof_command}");
-    }
+          monitor_cpu(
+            tp_to_sink_c,
+            cpu_moni_interval,
+            _thread_control_c,
+            false) 
+          })
+        .expect("Failed to spawn cpu-monitoring thread!");
   }
+  write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
+  gds_settings.data_dir = write_stream_path;
 
+  println!("==> Starting data sink thread!");
+  let thread_control_gds = thread_control.clone();
+  let _data_sink_thread = thread::Builder::new()
+    .name("data-sink".into())
+    .spawn(move || {
+      global_data_sink(&tp_from_threads,
+                       write_stream,
+                       runid,
+                       &gds_settings,
+                       false,
+                       thread_control_gds);
+    })
+    .expect("Failed to spawn data-sink thread!");
+  println!("==> data sink thread started!");
+
+  println!("==> Starting event builder and master trigger threads...");
+  //let db_path_string    = config.db_path.clone();
+  let evb_settings      = config.event_builder_settings.clone();
+  let thread_control_eb = thread_control.clone();
+  let tp_to_sink_c      = tp_to_sink.clone();
+  let _evb_thread = thread::Builder::new()
+    .name("event-builder".into())
+    .spawn(move || {
+                    event_builder(&master_ev_rec,
+                                  &ev_from_rb,
+                                  &tp_to_sink_c,
+                                  runid as u32,
+                                  //db_path_string,
+                                  mtb_link_id_map,
+                                  evb_settings,
+                                  thread_control_eb);
+     })
+    .expect("Failed to spawn event-builder thread!");
+  // master trigger
+  //let thread_control_mt = thread_control.clone();
+  let mtb_moni_sender = tp_to_sink.clone(); 
+  let _mtb_thread = thread::Builder::new()
+    .name("master-trigger".into())
+    .spawn(move || {
+                    master_trigger(mtb_address, 
+                                   &master_ev_send,
+                                   &mtb_moni_sender,
+                                   mtb_settings,
+                                   // verbosity is currently too much 
+                                   // output
+                                   verbose);
+    })
+  .expect("Failed to spawn master-trigger thread!");
+  
+  thread::sleep(one_second);
+  println!("==> Will now start rb threads..");
+  for n in 0..nboards {
+    let mut this_rb           = rb_list[n].clone();
+    let this_tp_to_sink_clone = tp_to_sink.clone();
+    this_rb.calib_file_path   = calib_file_path.clone();
+    match this_rb.load_latest_calibration() {
+      Err(err) => error!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
+      Ok(_)    => ()
+    }
+    println!("==> Starting RB thread for {}", this_rb.rb_id);
+    let ev_to_builder_c = ev_to_builder.clone();
+    let thread_name     = format!("rb-comms-{}", this_rb.rb_id);
+    let settings        = config.analysis_engine_settings.clone();
+    let _rb_comm_thread = thread::Builder::new()
+      .name(thread_name)
+      .spawn(move || {
+        readoutboard_communicator(&ev_to_builder_c,
+                                  this_tp_to_sink_clone,
+                                  &this_rb,
+                                  false,
+                                  run_analysis_engine,
+                                  settings);
+      })
+      .expect("Failed to spawn readoutboard-communicator thread!");
+  } // end for loop over nboards
+  println!("==> All RB threads started!");
   println!("==> All threads initialized!");
-  let pb = ProgressBar::new_spinner();
-  pb.enable_steady_tick(Duration::from_millis(500));
+  
+  // Now we are ready. Let's decide what to do!
   //pb.set_style(
   //    ProgressStyle::with_template("{spinner:.blue} {msg}")
   //        .unwrap()
@@ -675,37 +429,235 @@ fn main() {
   //            "▪▪▪▪▪",
   //        ]),
   //);
-  pb.set_message(".. acquiring data ..");
+ 
+  //----------------------------------------------------
+  //  Now we have a bunch of scenarios, depending on the 
+  //  input. Most of this might go away, but we keep it 
+  //  for now.
+  // 
+  //  1) If listening - we start the event builder and 
+  //     master trigger and cpu moni threads as 
+  //     well as the command dispatcher and continue 
+  //     to the main program loop
+  // 
+  //  2) Staging. This requires we load ANOTHER configuration
+  //     from the staging directory and work through them. 
+  //     We do have to kill/restart threads with updated settings.
+  //     TODO.
+  //     FIXME: When we are in staging mode, do we want the cmd 
+  //     dispatcher?
+  //  3) Run - we just immediatly start a run.
+  // 
+
+  // possible progress bar
+  let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
+  let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
+  let mut bar    = ProgressBar::hidden();
+
+  // default  behavriour is to stop
+  // when we are done
+  let mut dont_stop = false;
+  match args.command {
+    CommandCC::Listen(_) => {
+      dont_stop = true;
+      // start command dispatcher thread
+      let tc = thread_control.clone();
+      let ts = tp_to_sink.clone();
+      let _cmd_dispatcher = thread::Builder::new()
+        .name("command-dispatcher".into())
+        .spawn(move || {
+          command_dispatcher(
+            cmd_dispatch_settings,
+            tc,
+            ts,
+            ack_from_rb
+          )
+        })
+      .expect("Failed to spawn cpu-monitoring thread!");
+    },
+    CommandCC::Calibration(ref calibration_cmd) => {
+      match calibration_cmd {
+        CalibrationCmd::Default(cali_opts) => {
+
+          let voltage_level = cali_opts.level;
+          let rb_id         = cali_opts.id;
+          let extra         = cali_opts.extra;
+          println!("=> Received calibration default command! Will init calibration run of all RBs...");
+          let cmd_payload: u32
+            = (voltage_level as u32) << 16 | (rb_id as u32) << 8 | (extra as u32);
+          let default_calib = TofCommand::DefaultCalibration(cmd_payload);
+          let tp = default_calib.pack();
+          let mut payload  = String::from("BRCT").into_bytes();
+          payload.append(&mut tp.to_bytestream());
+          
+          // open 0MQ socket here
+          let ctx = zmq::Context::new();
+          let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+          let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
+          cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+
+          match cmd_sender.send(&payload, 0) {
+            Err(err) => {
+              error!("Unable to send command, error{err}");
+              exit(1);
+            },
+            Ok(_) => {
+              println!("=> Calibration  initialized!");
+            }
+          }
+          println!("=> .. now we need to wait until the calibration is finished!");
+          let bar_label  = String::from("Acquiring RB calibration data");
+
+          bar = ProgressBar::new(rb_list.len() as u64); 
+          bar.set_position(0);
+          bar.set_message (bar_label);
+          bar.set_prefix  ("\u{2699}\u{1F4D0}");
+          bar.set_style   (bar_style);
+          // if that is successful, we need to wait
+          match thread_control.lock() {
+            Ok(mut tc) => {
+              tc.calibration_active = true;
+            },
+            Err(err) => {
+              error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+            },
+          }
+          //// now we wait until the calibrations are finished
+          ////let cali_wait_timer     = Instant::now();
+          //let mut cali_received = 0u32;
+          //// progress bar setup
+
+          //loop {
+          //  match thread_control.lock() {
+          //    Ok(tc) => {
+          //      for rbid in &rb_list {
+          //        if tc.finished_calibrations[&rbid.rb_id] {
+          //          cali_received += 1;
+          //        }
+          //      }
+          //    },
+          //    Err(err) => {
+          //      error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+          //    },
+          //  }
+          //  bar.set_position(cali_received);
+          //  thread::sleep(5*one_second);
+          //  if cali_received as usize == rb_list.len() {
+          //    break;
+          //  }
+          //}
+          //bar.finish();
+          //println!("=> All calibrations acquired!");
+          //println!(">> So long and thanks for all the \u{1F41F} <<"); 
+          //exit(0);
+            },
+        _ => {
+          panic!("Non default calibration not supported!");
+        }
+      }
+    }
+    CommandCC::Staging(_) => {
+      error!("Staging sequence not implemented!");
+    }
+    CommandCC::Run(run_cmd) => {
+      match run_cmd {
+        RunCmd::Start(_run_start_opts) => {
+          // in this scenario, we want to end
+          // after we are done
+          dont_stop = false;
+          // technically, it is run_typ, rb_id, event number
+          // all to the max means run start for all
+          // We don't need this - just need to make sure it gets broadcasted
+          let cmd_payload: u32 =  PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
+          let cmd          = TofCommand::DataRunStart(cmd_payload);
+          let packet       = cmd.pack();
+          let mut payload  = String::from("BRCT").into_bytes();
+          payload.append(&mut packet.to_bytestream());
+          
+          // open 0MQ socket here
+          let ctx = zmq::Context::new();
+          let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+          let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
+          cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+
+          match cmd_sender.send(&payload, 0) {
+            Err(err) => {
+              error!("Unable to send command, error{err}");
+            },
+            Ok(_) => {
+              println!("Run initialized!");
+            }
+          }
+          let run_start_timeout  = Instant::now();
+          // let's wait 20 seconds here
+          let mut n_rb_ack_rcved = 0;
+          while run_start_timeout.elapsed().as_secs() < 20 {
+            //println!("{}", run_start_timeout.elapsed().as_secs());
+            match ack_from_rb.try_recv() {
+              Err(_) => {
+                continue;
+              }
+              Ok(_ack_pack) => {
+                //FIXME - do something with it
+                n_rb_ack_rcved += 1;
+              }
+            }
+            if n_rb_ack_rcved == rb_list.len() {
+              break; 
+            }
+          }
+          bar = ProgressBar::new_spinner();
+          bar.enable_steady_tick(Duration::from_millis(500));
+          bar.set_message(".. acquiring data ..");
+        }
+        _ => {
+          panic!("Pattern not covered!");
+        }
+      }
+    }
+    _ => {
+      panic!("Unable to execute request for this command!");
+    }
+  }
+
+  //---------------------------------------------------------
+  // 
+  // Program main loop. Remember, most work is done in the 
+  // individual threads. Here we have to check for ongoing
+  // calibrations
+  // 
+
+
+  // a counter for the number 
+  // or RBCalibrations we have
+  // received
+  let mut end_program   = false;
+  // a counter for number of RBCalibrations
+  // received to understand when a calibration 
+  // procedure is finished
+  let mut cali_received  = 0u64;
   loop{
     // take out the heat a bit
     thread::sleep(1*one_second);
-    let mut term_int_sig_caught = false;
+
+    // check pending signals and handle
+    // SIGTERM and SIGINT
     for signal in signals.pending() {
       match signal as c_int {
         SIGTERM => {
-          println!("=> {}", String::from("SIGTERM received").red().bold());
-          term_int_sig_caught = true;
-        }
-        SIGINT  => {
           println!("=> {}", String::from("SIGINT received. Maybe Ctrl+C has been pressed!").red().bold());
-          term_int_sig_caught = true;
+          end_program = true;
+        } 
+        SIGINT => {
+          println!("=> {}", String::from("SIGTERM received").red().bold());
+          end_program = true;
         }
-        _       => {
+        _ => {
           error!("Received signal, but I don't have instructions what to do about it!");
         }
-
       }
     }
-    if term_int_sig_caught {
-      println!("==> \u{1F6D1} Sending >>end run<< signal to all boards!");
-      let end_run =
-        TofCommand::from_command_code(TofCommandCode::CmdDataRunStop,0u32);
-      let tp = TofPacket::from(&end_run);
-      match cmd_sender_1.send(tp) {
-        Err(err) => error!("Can not send end run command! {err}"),
-        Ok(_)    => ()
-      }
-      thread::sleep(one_second);
+    if end_program {
       println!("=> Shutting down threads...");
       match thread_control.lock() {
         Ok(mut tc) => {
@@ -715,23 +667,74 @@ fn main() {
           error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
         },
       }
-      thread::sleep(one_second);
+      // wait actually until all threads have been finished
+      let timeout = Instant::now();
+      loop {
+        match thread_control.lock() {
+          Ok(mut tc) => {
+            tc.stop_flag = true;
+            // each thread will report here if
+            // it is done
+            if !tc.thread_cmd_dispatch_active 
+            && !tc.thread_data_sink_active
+            && !tc.thread_event_bldr_active 
+            && !tc.thread_master_trg_active {
+              break;
+            }
+          },
+          Err(err) => {
+            error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+          },
+        }
+        // in any case, break after timeout
+        if timeout.elapsed() > 5*one_second {
+          break;
+        }
+      }
       println!(">> So long and thanks for all the \u{1F41F} <<"); 
       exit(0);
     }
 
+    // check thread control - this is useful 
+    // for everything
 
-    //println!("...");
-    // I think the main shouldn't die if we are in listening mode
-    if dont_stop {
-      continue;
-    } else if program_start.elapsed().as_secs_f64() > runtime_nseconds as f64 {
-      pb.finish_with_message("Done");
+    match thread_control.lock() {
+      Ok(mut tc) => {
+        if tc.calibration_active {
+          for rbid in &rb_list {
+            // the global data sink sets these flags
+            if tc.finished_calibrations[&rbid.rb_id] {
+              cali_received += 1;
+              bar.set_position(cali_received);
+            }
+          }
+          // FIXME - this or a timer
+          if cali_received as usize == rb_list.len() {
+            cali_received = 0;
+            // if we want to redo a calibration, 
+            // somebody else has to set this 
+            // flag again.
+            tc.calibration_active = false;
+            // reset the counters
+            for rbid in &rb_list {
+              *tc.finished_calibrations.get_mut(&rbid.rb_id).unwrap() = false; 
+            }
+            bar.finish_with_message("Done");
+            if !dont_stop {
+              end_program = true;
+            }
+          }
+        }
+      }
+      Err(err) => {
+        error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+      }
+    }
+    // in case the runtime seconds are over, we can end the program
+    if program_start.elapsed().as_secs_f64() > runtime_nseconds as f64 && !dont_stop {
       println!("=> Runtime seconds of {} have expired!", runtime_nseconds);
       println!("=> Ending program. If you don't want that behaviour, change the confifguration file.");
-      println!(">> So long and thanks for all the \u{1F41F} <<"); 
-      exit(0);    
+      end_program = true;
     }
-  }
   }
 }
