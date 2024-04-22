@@ -16,13 +16,13 @@ use zmq::Socket;
 extern crate clap;
 extern crate colored;
 
-//extern crate local_ip_address;
 extern crate crossbeam_channel;
-extern crate liftof_lib;
 
 extern crate zmq;
+extern crate comfy_table;
 extern crate tof_dataclasses;
 extern crate tof_control;
+extern crate liftof_lib;
 
 pub mod constants;
 pub mod threads;

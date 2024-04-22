@@ -1,5 +1,13 @@
 # LELEWAA series
 
+# v0.10.2
+* WIP: systemd integration
+* refactored commandeering interface
+* decluttered command line args
+
+# v0.10.1
+* adaptions to upstream DB changes
+
 # HAHALUA series
 
 # v0.9.6

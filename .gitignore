@@ -12,12 +12,16 @@ Makefile
 .idea/*
 
 # Cargo lock files
+Cargo.lock
 tof/dataclasses/rust/tof-dataclasses/Cargo.lock
 tof/dataclasses/rust/pybindings/target/*
 tof/dataclasses/rust/pybindings/Cargo.lock
 tof/dataclasses/rust/pybindings/rust_dataclasses.so
 tof/liftof/Cargo.lock
 tof/liftof/liftof-tui/Cargo.lock
+tof/liftof/liftof-cc/Cargo.lock
+tof/liftof/liftof-rb/Cargo.lock
+tof/liftof/liftof-python/Cargo.lock
 
 # pycache
 gaps-db/gaps_db/gaps_db/__pycache__/
