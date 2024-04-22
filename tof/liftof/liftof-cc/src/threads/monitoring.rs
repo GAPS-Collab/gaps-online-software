@@ -22,7 +22,7 @@ use tof_dataclasses::threading::ThreadControl;
 
 use tof_control::helper::cpu_type::{
     CPUTempDebug,
-    CPUInfo,
+    CPUInfoDebug,
 };
 
 
@@ -47,8 +47,8 @@ pub fn monitor_cpu(tp_sender      : Sender<TofPacket>,
   let mut timer     = Instant::now();
   let sleep_time    = Duration::from_secs(moni_interval);
   'main: loop {
-    let cpu_info  = CPUInfo::new();
-    let cpu_temp  = CPUTempDebug::new();
+    let cpu_info    = CPUInfoDebug::new();
+    let cpu_temp    = CPUTempDebug::new();
     if timer.elapsed().as_secs() >= moni_interval {
       moni_data.add_temps(&cpu_temp);
       moni_data.add_info(&cpu_info);
