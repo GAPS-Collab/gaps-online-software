@@ -7,18 +7,16 @@
 //};
 use crossbeam_channel::Sender;
 
-use tof_dataclasses::manifest::ReadoutBoard;
+use tof_dataclasses::database::ReadoutBoard;
 use tof_dataclasses::events::RBEvent;
 use tof_dataclasses::packets::{
     TofPacket,
     PacketType
 };
 use tof_dataclasses::serialization::Serialization;
-//use tof_dataclasses::RBChannelPaddleEndIDMap;
+use tof_dataclasses::commands::TofResponse;
 
 use liftof_lib::{
-    //build_tcp_from_ip,
-    //get_rb_ch_pid_map,
     waveform_analysis,
 };
 
@@ -35,28 +33,26 @@ use liftof_lib::settings::AnalysisEngineSettings;
 ///
 /// # Arguments:
 ///
-/// * ev_to_builder       :
+/// * ev_to_builder       : This thread will receive RBEvent data from the assigned RB, 
+///                         if desired (see run_analysis_engine) run analysis and extract
+///                         TofHits and then pass the result on to the event builder.
 /// * tp_to_sink          : Channel which should be connect to a (global) data sink.
 ///                         Packets which are of not event type (e.g. header/full binary data)
 ///                         will be forwarded to the sink.
-/// * write_rb_raw        : Should readoutboard raw data be written to disk?
-/// * storage_savepath    :
-/// * events_per_file     :
-/// * rb                  : 
-/// * runid               : Current assigned runid. Will be used in the filenames of saved 
-///                         readoutboard raw data.
-/// * print_packets       : 
-/// * run_analysis_engine :
+/// * rb                  : ReadoutBoard instance, as loaded from the database. This will be used
+///                         for readoutboard id as well as paddle assignment.
+/// * print_packets       : Increase verbosity and print incoming packets from the RB
+/// * run_analysis_engine : Extract TofHits from the waveforms and attach them to RBEvent
 /// * ae_settings         : Settings to configure peakfinding algorithms etc. 
 ///                         These can be configured with an external .toml file
-pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
+/// * ack_sender          : Intercept acknowledgement packets and forward them to elswhere
+pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                                  tp_to_sink          : Sender<TofPacket>,
-                                 rb                  : &ReadoutBoard,
-                                 runid               : usize,
+                                 rb                  : ReadoutBoard,
                                  print_packets       : bool,
                                  run_analysis_engine : bool,
-                                 ae_settings         : AnalysisEngineSettings) {
-  info!("Got run id {runid}");
+                                 ae_settings         : AnalysisEngineSettings,
+                                 ack_sender          : Sender<TofResponse>) {
   let zmq_ctx = zmq::Context::new();
   let board_id = rb.rb_id; //rb.id.unwrap();
   info!("initializing RB thread for board {}!", board_id);
@@ -81,13 +77,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
    Err(err) => error!("Unable to subscribe to topic! {err}"),
    Ok(_)    => info!("Subscribed to {:?}!", topic),
   }
-  //let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-  //let mut n_events   = 0usize;
-  //let mut n_received = 0usize;
-  //let map_file  = format!("{}/rb{:02}_paddle_map.json", ASSET_DIR, board_id);
-  //let rb_ch_map = get_rb_ch_pid_map(map_file.into(),rb.rb_id);
   loop {
-
     // check if we got new data
     // this is blocking the thread
     match socket.recv_bytes(0) {
@@ -100,7 +90,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
         // board id
         match TofPacket::from_bytestream(&buffer, &mut 4) { 
           Err(err) => {
-            error!("Unknown packet...{:?}", err);
+            error!("Unknown bytestream...{:?}", err);
             continue;  
           },
           Ok(tp) => {
@@ -109,6 +99,17 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
             }
             //n_received += 1;
             match tp.packet_type {
+              PacketType::TofResponse => {
+                match tp.unpack::<TofResponse>() {
+                  Err(err)   => error!("Unable to send ACK packet! {err}"),
+                  Ok(tr)     => {
+                    match ack_sender.send(tr) {
+                      Err(err) => error!("Unable to send ACK packet! {err}"),
+                      Ok(_)    => ()
+                    }
+                  }
+                }
+              }
               PacketType::RBEvent | PacketType::RBEventMemoryView => {
                 let mut event = RBEvent::from(&tp);
                 if event.hits.len() == 0 {
@@ -116,7 +117,6 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
                     match waveform_analysis(&mut event, 
                                             &rb,
                                             ae_settings) {
-                        
                       Ok(_) => (),
                       Err(err) => {
                         error!("Unable to analyze waveforms for this event! {err}");

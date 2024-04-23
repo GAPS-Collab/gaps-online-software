@@ -398,15 +398,17 @@ fn main() {
     let ev_to_builder_c = ev_to_builder.clone();
     let thread_name     = format!("rb-comms-{}", this_rb.rb_id);
     let settings        = config.analysis_engine_settings.clone();
+    let ack_sender      = ack_to_cmd_disp.clone();
     let _rb_comm_thread = thread::Builder::new()
       .name(thread_name)
       .spawn(move || {
-        readoutboard_communicator(&ev_to_builder_c,
+        readoutboard_communicator(ev_to_builder_c,
                                   this_tp_to_sink_clone,
-                                  &this_rb,
+                                  this_rb,
                                   false,
                                   run_analysis_engine,
-                                  settings);
+                                  settings,
+                                  ack_sender);
       })
       .expect("Failed to spawn readoutboard-communicator thread!");
   } // end for loop over nboards
