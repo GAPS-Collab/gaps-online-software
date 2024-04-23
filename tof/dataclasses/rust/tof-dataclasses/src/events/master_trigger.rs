@@ -437,7 +437,7 @@ impl MasterTriggerEvent {
         for (i,ch) in LTB_CHANNELS.iter().enumerate() {
           //let chn = *ch as u8 + 1;
           let ph_chn = physical_channels[i];
-          let chn = i as u8 + 1;
+          //let chn = i as u8 + 1;
           //println!("i,ch {}, {}", i, ch);
           let thresh_bits = ((channels & ch) >> (i*2)) as u8;
           //println!("thresh_bits {}", thresh_bits);
@@ -515,7 +515,9 @@ impl MasterTriggerEvent {
       t_types.push(TriggerType::TrackCentral);
     }
     let conf_trigger   = self.trigger_source >> 10 & 0x1 == 1;
+    if conf_trigger {
       t_types.push(TriggerType::ConfigurableTrigger);
+    }
     t_types
   }
 
