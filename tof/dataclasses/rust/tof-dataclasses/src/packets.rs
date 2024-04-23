@@ -133,7 +133,25 @@ impl TofPacket {
       valid            : true,
     }
   }
- 
+
+  /// Generate a bytestream of self for ZMQ, prefixed with 
+  /// BRCT so all RBs will see it
+  pub fn zmq_payload_brdcast(&self) -> Vec<u8> {
+    let mut payload     = String::from("BRCT").into_bytes(); 
+    let mut stream  = self.to_bytestream();
+    payload.append(&mut stream);
+    payload
+  }
+  
+  /// Generate a bytestream of self for ZMQ, prefixed with 
+  /// RBX, to address only a certain board
+  pub fn zmq_payload_rb(&self, rb_id : u8) -> Vec<u8> {
+    let mut payload     = format!("RB{:02}", rb_id).into_bytes(); 
+    let mut stream  = self.to_bytestream();
+    payload.append(&mut stream);
+    payload
+  }
+
   /// Unpack the TofPacket and return its content
   pub fn unpack<T>(&self) -> Result<T, SerializationError>
     where T: Packable + Serialization {

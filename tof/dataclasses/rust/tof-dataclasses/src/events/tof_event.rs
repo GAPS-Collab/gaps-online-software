@@ -313,7 +313,6 @@ impl FromRandom for TofEvent {
     let mut rng     = rand::thread_rng();
     let n_boards    = rng.gen::<u8>() as usize;
     //let n_paddles   = rng.gen::<u8>() as usize;
-    let n_missing   = rng.gen::<u8>() as usize;
     for _ in 0..n_boards {
       event.rb_events.push(RBEvent::from_random());
     }
@@ -852,6 +851,34 @@ impl FromRandom for TofEventSummary {
 //
 // ============================================
 
+#[test]
+fn packable_tofeventsummary() {
+  for _ in 0..100 {
+    let data = TofEventSummary::from_random();
+    let test = data.pack().unpack().unwrap();
+    assert_eq!(data, test);
+  }
+}  
+
+#[test]
+#[cfg(feature = "random")]
+fn packable_tofevent() {
+  for _ in 0..5 {
+    let data = TofEvent::from_random();
+    let test = data.pack().unpack().unwrap();
+    assert_eq!(data.header, test.header);
+    assert_eq!(data.compression_level, test.compression_level);
+    assert_eq!(data.quality, test.quality);
+    assert_eq!(data.mt_event, test.mt_event);
+    assert_eq!(data.rb_events.len(), test.rb_events.len());
+    //assert_eq!(data.missing_hits.len(), test.missing_hits.len());
+    //assert_eq!(data.missing_hits, test.missing_hits);
+    assert_eq!(data.rb_events, test.rb_events);
+    //assert_eq!(data, test);
+    //println!("{}", data);
+  }
+}
+
 #[cfg(all(test,feature = "random"))]
 mod test_tofevents {
   use crate::serialization::Serialization;
@@ -875,33 +902,6 @@ mod test_tofevents {
       let size = TofEvent::decode_size_header(&mask);
       assert_eq!(size.0, data.rb_events.len());
       //assert_eq!(size.1, data.missing_hits.len());
-    }
-  }
-
-  #[test]
-  fn serialization_tofevent() {
-    for _ in 0..5 {
-      let data = TofEvent::from_random();
-      let test = TofEvent::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
-      assert_eq!(data.header, test.header);
-      assert_eq!(data.compression_level, test.compression_level);
-      assert_eq!(data.quality, test.quality);
-      assert_eq!(data.mt_event, test.mt_event);
-      assert_eq!(data.rb_events.len(), test.rb_events.len());
-      //assert_eq!(data.missing_hits.len(), test.missing_hits.len());
-      //assert_eq!(data.missing_hits, test.missing_hits);
-      assert_eq!(data.rb_events, test.rb_events);
-      //assert_eq!(data, test);
-      //println!("{}", data);
-    }
-  }
-  
-  #[test]
-  fn serialization_tofeventsummary() {
-    for _ in 0..100 {
-      let data = TofEventSummary::from_random();
-      let test = TofEventSummary::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
-      assert_eq!(data, test);
     }
   }
 }
