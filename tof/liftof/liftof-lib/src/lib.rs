@@ -436,16 +436,16 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   // ch -> pid
   // pid -> (ch, ch) (for the two paddle ends)
   //let mut pid_vs_chs = HashMap::<u8, (PaddleEndIdentifier,[u8;2])>::new();
-  let channels       = event.header.get_channels();
+  let active_channels = event.header.get_channels();
   // will become a parameter
-  let fit_sinus      = true;
+  let fit_sinus       = true;
   // allocate memory for the calbration results
-  let mut voltages : Vec<f32>= vec![0.0; NWORDS];
-  let mut times    : Vec<f32>= vec![0.0; NWORDS];
+  let mut voltages    : Vec<f32>= vec![0.0; NWORDS];
+  let mut times       : Vec<f32>= vec![0.0; NWORDS];
 
   // Step 0 : If desired, fit sine
   if fit_sinus {
-    if !channels.contains(&8) {
+    if !active_channels.contains(&8) {
       error!("RB {} does not have ch9 data!", rb.rb_id);
     }
     rb.calibration.voltages(9,
@@ -472,14 +472,24 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   // extend with Vec<TofHit> in case
   // we want to have multiple hits
   let mut paddles    = HashMap::<u8, TofHit>::new();
+  //println!("RBID {}, Paddles {:?}", rb.rb_id ,rb.get_paddle_ids());
   for pid in rb.get_paddle_ids() {
     // cant' fail by constructon of pid
     let ch_a = rb.get_pid_rbchA(pid).unwrap() as usize;
     let ch_b = rb.get_pid_rbchB(pid).unwrap() as usize;
     let mut hit = TofHit::new();
     hit.paddle_id = pid;
+    //println!("{ch_a}, {ch_b}, active_channels {:?}", active_channels);
     for (k, ch) in [ch_a, ch_b].iter().enumerate() {
       // Step 1: Calibration
+      //println!("Ch {}, event {}", ch, event);
+      //println!("---------------------------");
+      //println!("pid {}, active channels : {:?}, ch {}",pid, active_channels, ch);
+      if !active_channels.contains(&(*ch as u8 -1)) {
+        trace!("Skipping channel {} because it is not marked to be readout in the event header channel mask!", ch);
+        continue;
+      }
+      //println!("Will do waveform analysis for ch {}", ch);
       rb.calibration.voltages(*ch,
                               event.header.stop_cell as usize,
                               &event.adc[*ch as usize -1],
@@ -544,8 +554,6 @@ pub fn waveform_analysis(event         : &mut RBEvent,
             //debug!("Check impedance value! Just using 50 [Ohm]");
             // Step 3 : charge integration
             // FIXME - make impedance a settings parameter
-            // This does not make sense. Why don't we integrate 
-            // the peak?
             match integrate(&voltages,
                             &times,
                             //settings.integration_start,
@@ -568,7 +576,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
       if cfd_times.len() > 0 {
         tdc = cfd_times[0];
       }
-      //println!("Calucalated tdc {}, charge {}, max {}", tdc, charge, max_volts); 
+      //println!("Calucalated tdc {}, charge {}, max {} for ch {}!", tdc, charge, max_volts, ch); 
       //if rb.channel_to_paddle_end_id[*raw_ch as usize] > 2000 {
       if k == 0 {
         hit.ftime_b      = tdc;
@@ -576,7 +584,6 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         hit.set_time_b(tdc);
         hit.set_charge_b(charge);
         hit.set_peak_b(max_volts);
-        
       } else {
         hit.ftime_a = tdc;
         hit.fpeak_b = max_volts;
@@ -589,7 +596,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
       }
     }
   }
-  //println!("{:?}", paddles);
+  //println!("Paddles {:?}", paddles);
   for (_, hit) in paddles.iter_mut() {
     // unwrap should not fail by construction
     let t0 = get_paddle_t0(hit.ftime_a, hit.ftime_b, rb.get_paddle_length(hit.paddle_id).unwrap_or(1.0));
@@ -605,6 +612,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   }
   let result = paddles.into_values().collect();
   event.hits = result;
+  //print ("EVENT {}", event);
   Ok(())
 }
 
@@ -733,7 +741,7 @@ pub fn to_board_id_string(rb_id: u32) -> String {
 /**********************************************************/
 /// Command Enums and stucts
 #[derive(Debug, Parser, PartialEq)]
-pub enum Command {
+pub enum CommandCC {
   /// Listen for flight CPU commands.
   Listen(ListenCmd),
   /// Staging mode - work through all .toml files
