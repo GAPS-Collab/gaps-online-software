@@ -1,5 +1,9 @@
 # LELEWAA series
 
+## v0.10.1
+* changes timestamp for file saving to the same %y%m%d_%h%m% format as 
+  bfsw, however, due to rusts increased desire of safety, add UTC.
+
 ## v0.10.0
 * introduces breaking changes to the MasterTriggerEvent. Streamline it 
   and adapt to changes in MTB fw >= 3.0.0

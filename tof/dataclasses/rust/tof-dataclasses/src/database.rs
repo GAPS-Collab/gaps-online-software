@@ -9,11 +9,14 @@
 //!
 
 use std::fmt;
+use std::collections::HashMap;
+
 use glob::glob;
-use chrono::NaiveDateTime;
-use chrono::Utc;
-use chrono::DateTime;
 use regex::Regex;
+use chrono::{
+    DateTime,
+    Utc,
+};
 
 use diesel::prelude::*;
 mod schema;
@@ -25,7 +28,7 @@ use schema::tof_db_mtbchannel::dsl::*;
 use schema::tof_db_localtriggerboard::dsl::*;
 
 use crate::calibrations::RBCalibrations;
-
+use crate::constants::HUMAN_TIMESTAMP_FORMAT;
 
 /// Universal function to connect to the database
 pub fn connect_to_db(database_url : String) -> Result<diesel::SqliteConnection, ConnectionError>  {
@@ -33,6 +36,23 @@ pub fn connect_to_db(database_url : String) -> Result<diesel::SqliteConnection, 
     SqliteConnection::establish(&database_url)
 }
 
+/// Create a mapping of mtb link ids to rb ids
+pub fn get_linkid_rbid_map(rbs : &Vec<ReadoutBoard>) -> HashMap<u8, u8>{
+  let mut mapping = HashMap::<u8, u8>::new();
+  for rb in rbs {
+    mapping.insert(rb.mtb_link_id, rb.rb_id);
+  }
+  mapping
+}
+
+/// Create a mapping of rb id to mtb link ids
+pub fn get_rbid_linkid_map(rbs : &Vec<ReadoutBoard>) -> HashMap<u8, u8> {
+  let mut mapping = HashMap::<u8, u8>::new();
+  for rb in rbs {
+    mapping.insert(rb.rb_id, rb.mtb_link_id);
+  }
+  mapping
+}
 
 /// Representation of a local trigger board.
 /// 
@@ -60,7 +80,7 @@ pub fn connect_to_db(database_url : String) -> Result<diesel::SqliteConnection, 
 /// Again: rb_ch0 does NOT necessarily correspond to the A side!
 /// 
 
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_rat)]
 #[diesel(primary_key(rat_id))]
 pub struct RAT {
@@ -620,7 +640,7 @@ impl LocalTriggerBoard {
   }
   
   pub fn all(conn: &mut SqliteConnection) -> Option<Vec<LocalTriggerBoard>> {
-    let mut db_ltbs = Vec::<DBLocalTriggerBoard>::new();
+    let db_ltbs : Vec<DBLocalTriggerBoard>;
     match tof_db_localtriggerboard
         //.inner_join(tof_db_localtriggerboard.on(schema::tof_db_paddle::dsl::paddle_id.eq(schema::tof_db_localtriggerboard::dsl::paddle1_id)))
         .load::<DBLocalTriggerBoard>(conn) {
@@ -720,18 +740,20 @@ impl fmt::Display for LocalTriggerBoard {
 #[diesel(primary_key(rb_id_id))]
 #[allow(non_snake_case)]
 pub struct DBReadoutBoard {
+  // FIXME - this HAS TO BE (MUST!) the same order
+  // as in schema.rs !!
   pub rb_id        : i16, 
   pub dsi          : i16, 
   pub j            : i16, 
   pub mtb_link_id  : i16, 
-  pub paddle12_id  : Option<i16>,
   pub paddle12_chA : Option<i16>,
-  pub paddle34_id  : Option<i16>,
   pub paddle34_chA : Option<i16>,
-  pub paddle56_id  : Option<i16>,
   pub paddle56_chA : Option<i16>,
-  pub paddle78_id  : Option<i16>,
   pub paddle78_chA : Option<i16>,
+  pub paddle12_id  : Option<i16>,
+  pub paddle34_id  : Option<i16>,
+  pub paddle56_id  : Option<i16>,
+  pub paddle78_id  : Option<i16>,
 }
 
 impl DBReadoutBoard {
@@ -810,9 +832,10 @@ impl ReadoutBoard {
   }
 
   /// Returns the ip address following a convention
-  pub fn guess_address(self) -> String {
-    let ip_address = format!("10.0.1.1{:02}", self.rb_id);
-    return ip_address;
+  ///
+  /// This does NOT GUARANTEE that the address is correct!
+  pub fn guess_address(&self) -> String {
+    format!("tcp://10.0.1.1{:02}:42000", self.rb_id)
   }
  
   pub fn get_paddle_ids(&self) -> [u8;4] {
@@ -890,7 +913,7 @@ impl ReadoutBoard {
 
   pub fn all(conn: &mut SqliteConnection) -> Option<Vec<ReadoutBoard>> {
     use schema::tof_db_readoutboard::dsl::*;
-    let mut db_rbs = Vec::<DBReadoutBoard>::new();
+    let db_rbs : Vec<DBReadoutBoard>;
     match tof_db_readoutboard
         //.inner_join(tof_db_localtriggerboard.on(schema::tof_db_paddle::dsl::paddle_id.eq(schema::tof_db_localtriggerboard::dsl::paddle1_id)))
         .load::<DBReadoutBoard>(conn) {
@@ -916,6 +939,14 @@ impl ReadoutBoard {
     println!("Iterating over {} rbs in the DB!", db_rbs.len());
     for dbrb in db_rbs {
       let mut rb  = ReadoutBoard::new();
+      rb.rb_id        = dbrb.rb_id as u8;        
+      rb.dsi          = dbrb.dsi as u8;
+      rb.j            = dbrb.j  as u8;     
+      rb.mtb_link_id  = dbrb.mtb_link_id  as u8;    
+      rb.paddle12_chA = dbrb.paddle12_chA.unwrap() as u8;
+      rb.paddle34_chA = dbrb.paddle34_chA.unwrap() as u8;
+      rb.paddle56_chA = dbrb.paddle56_chA.unwrap() as u8;
+      rb.paddle78_chA = dbrb.paddle78_chA.unwrap() as u8;
       for pdl in paddles.iter() {
         // this call ensures that the following unwraps
         // go through
@@ -924,15 +955,7 @@ impl ReadoutBoard {
         //  continue;
         //}
         if pdl.paddle_id == dbrb.paddle12_id.unwrap() {
-          rb.rb_id        = dbrb.rb_id as u8;        
-          rb.dsi          = dbrb.dsi as u8;
-          rb.j            = dbrb.j  as u8;     
-          rb.mtb_link_id  = dbrb.mtb_link_id  as u8;    
           rb.paddle12     = pdl.clone();
-          rb.paddle12_chA = dbrb.paddle12_chA.unwrap() as u8;
-          rb.paddle34_chA = dbrb.paddle34_chA.unwrap() as u8;
-          rb.paddle56_chA = dbrb.paddle56_chA.unwrap() as u8;
-          rb.paddle78_chA = dbrb.paddle78_chA.unwrap() as u8;
         }
         if pdl.paddle_id == dbrb.paddle34_id.unwrap() {
           rb.paddle34   = pdl.clone();
@@ -952,12 +975,16 @@ impl ReadoutBoard {
   /// Load the newest calibration from the calibration file path
   pub fn load_latest_calibration(&mut self) -> Result<(), Box<dyn std::error::Error>> {
     //  files look like RB20_2024_01_26-08_15_54.cali.tof.gaps
-    let re = Regex::new(r"(\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2})")?;
+    //let re = Regex::new(r"(\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2})")?;
+    let re = Regex::new(r"(\d{6}_\d{6})")?;
     // Define your file pattern (e.g., "logs/*.log" for all .log files in the logs directory)
     let pattern = format!("{}/RB{:02}_*", self.calib_file_path, self.rb_id); // Adjust this pattern to your files' naming convention
-    let _timestamp = DateTime::<Utc>::from_timestamp(0,0);
-    let mut newest_file = (String::from(""), NaiveDateTime::from_timestamp(0, 0));
-    
+    let timestamp = DateTime::<Utc>::from_timestamp(0,0).unwrap(); // I am not sure what to do here
+                                                                   // otherwise than unwrap. How is
+                                                                   // this allowed to fail?
+    //let mut newest_file = (String::from(""), NaiveDateTime::from_timestamp(0, 0));
+    let mut newest_file = (String::from(""), timestamp);
+
     // Iterate over files that match the pattern
     let mut filename : String;
     for entry in glob(&pattern)? {
@@ -974,7 +1001,9 @@ impl ReadoutBoard {
         if let Some(caps) = re.captures(&filename) {
           if let Some(timestamp_str) = caps.get(0).map(|m| m.as_str()) {
             println!("{}",timestamp_str);
-            let timestamp = NaiveDateTime::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
+            //let timestamp = NaiveDateTime::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
+            //let timestamp = DateTime::<Utc>::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
+            let timestamp = DateTime::parse_from_str(timestamp_str, HUMAN_TIMESTAMP_FORMAT)?;
             //let _timestamp = DateTime
             if timestamp > newest_file.1 {
               // FIXME - into might panic?
@@ -1028,13 +1057,18 @@ impl fmt::Display for ReadoutBoard {
 #[diesel(table_name = schema::tof_db_panel)]
 #[diesel(primary_key(panel_id))]
 pub struct DBPanel {
+  // ORDER OF THESE FIELDS HAS TO BE THE SAME AS IN schema.rs!!
   pub  panel_id    : i16        ,   
   pub  description : String     ,   
   pub  normal_x    : i16        ,   
   pub  normal_y    : i16        ,   
   pub  normal_z    : i16        ,   
+  pub  dw_paddle   : Option<i16>,   
+  pub  dh_paddle   : Option<i16>,   
   pub  paddle0_id  : Option<i16>,   
   pub  paddle1_id  : Option<i16>,   
+  pub  paddle10_id : Option<i16>,   
+  pub  paddle11_id : Option<i16>,   
   pub  paddle2_id  : Option<i16>,   
   pub  paddle3_id  : Option<i16>,   
   pub  paddle4_id  : Option<i16>,   
@@ -1043,10 +1077,6 @@ pub struct DBPanel {
   pub  paddle7_id  : Option<i16>,   
   pub  paddle8_id  : Option<i16>,   
   pub  paddle9_id  : Option<i16>,   
-  pub  paddle10_id : Option<i16>,   
-  pub  paddle11_id : Option<i16>,   
-  pub  dh_paddle   : Option<i16>,   
-  pub  dw_paddle   : Option<i16>,   
 }
 
 impl DBPanel {
@@ -1254,7 +1284,7 @@ impl Panel {
   
   pub fn all(conn: &mut SqliteConnection) -> Option<Vec<Panel>> {
     use schema::tof_db_panel::dsl::*;
-    let mut db_panels = Vec::<DBPanel>::new();
+    let db_panels : Vec<DBPanel>;
     match tof_db_panel
         //.inner_join(tof_db_localtriggerboard.on(schema::tof_db_paddle::dsl::paddle_id.eq(schema::tof_db_localtriggerboard::dsl::paddle1_id)))
         .load::<DBPanel>(conn) {

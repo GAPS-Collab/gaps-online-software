@@ -811,12 +811,12 @@ impl RBMoniDataSeries {
   //  return values[&rb_id]; 
   //}
 
-  fn cache_it(&mut self) {
-    let mut values = HashMap::<u8, Vec<f32>>::new();
-    for varname in self.keys() {
-      
-    }
-  }
+  //fn cache_it(&mut self) {
+  //  let mut values = HashMap::<u8, Vec<f32>>::new();
+  //  for varname in self.keys() {
+  //    
+  //  }
+  //}
 
   pub fn get_var_for_rb(&self, varname : &str,  rb_id : u8) -> Option<Vec<f32>> {
     if !self.data.contains_key(&rb_id) {

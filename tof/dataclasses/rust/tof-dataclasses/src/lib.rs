@@ -39,7 +39,6 @@ pub mod analysis;
 pub mod ipbus;
 pub mod series;
 #[cfg(feature="database")]
-#[macro_use]
 extern crate diesel;
 #[cfg(feature="database")]
 pub mod database;

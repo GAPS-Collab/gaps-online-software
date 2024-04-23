@@ -6,6 +6,9 @@
 //!   now. There is an active issue #18
 //!
 
+/// The TimeStamp format for Human readable timestamps
+pub static HUMAN_TIMESTAMP_FORMAT : &str = "%y%m%d_%H%M%S%Z"; 
+
 /// Speed of light in the scintillator paddles
 /// (divine number from the TOF team)
 /// This value is in cm/ns

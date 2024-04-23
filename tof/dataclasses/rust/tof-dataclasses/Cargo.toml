@@ -17,6 +17,7 @@ required-features = ["random"]
 random=["rand"]
 #database=["sqlite", "diesel"]
 database=["diesel"]
+#database=[]
 tofcontrol=["tof-control"]
 advanced-algorithms=["smoothed_z_score"]
 
@@ -27,20 +28,24 @@ advanced-algorithms=["smoothed_z_score"]
 criterion = "0.4"
 
 [dependencies]
+#chrono = { version = "0.4", features = ["serde", "tz"] }
 chrono = "0.4"
-regex = "1.5"
-glob = "0.3"
+regex  = "1.5"
+glob   = "0.3"
 
 # logging
 log  = "0.4"
 rand = {version = "0.8", optional = true}
-# for the database
-diesel = { version = "2.1", features = ["postgres","sqlite","64-column-tables"], optional=true }
+# for the database - in case we want to use postgres, 
+# the feature needs to be added here, however, this would
+# also require libpq to be installed.
+diesel = { version = "2.1", features = ["sqlite","64-column-tables"], optional=true }
 
 # Takeru's tof-control
-tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.3", features=[] }
+tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.5", features=[] }
 smoothed_z_score = {version = "0.1", optional = true}
 #sqlite = {version = "0.30", optional = true}
+#sqlite = "0.30"
 statistical = "1.0"
 
 serde = { version = "1.0", features = ["derive"] }

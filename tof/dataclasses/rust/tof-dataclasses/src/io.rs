@@ -68,7 +68,10 @@ use crate::packets::{
     TofPacket,
     PacketType,
 };
-use crate::constants::NWORDS;
+use crate::constants::{
+    NWORDS,
+    HUMAN_TIMESTAMP_FORMAT
+};
 use crate::serialization::{
     Serialization,
     SerializationError,
@@ -92,8 +95,8 @@ pub enum FileType {
 /// Get a human readable timestamp
 pub fn get_utc_timestamp() -> String {
   let now: DateTime<Utc> = Utc::now();
-  // Format the timestamp as "YYYY_MM_DD_HH_MM"
-  let timestamp_str = now.format("%Y_%m_%d-%H_%M_%S").to_string();
+  //let timestamp_str = now.format("%Y_%m_%d-%H_%M_%S").to_string();
+  let timestamp_str = now.format(HUMAN_TIMESTAMP_FORMAT).to_string();
   timestamp_str
 }
 
