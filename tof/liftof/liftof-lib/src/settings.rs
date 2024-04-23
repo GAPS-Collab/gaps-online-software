@@ -38,26 +38,32 @@ pub struct CommandDispatcherSettings {
   /// Set to "/dev/null" to turn off.
   /// The mode will be always "append", since we don't 
   /// expect a lot of logging
-  pub cmd_log                    : String,
+  pub cmd_log_path               : String,
   /// The address of the liftof-command & control server
   /// that is the ip address on the RBNetwork which the 
   /// liftof-cc instance runs on 
   /// This address will be used as "PUB" for the CommandDispather
+  /// This address has to be within the RB network
   pub cc_server_address          : String,   
   /// The address ("tcp://xx.xx.xx.xx:xxxxx") the tof computer should subscribe to 
-  /// to get commands from the flight computer
+  /// to get commands from the flight computer. This address is within the 
+  /// flight network
   pub fc_sub_address             : String,
   /// Interval of time that will elapse from a cmd check to the other
   pub cmd_listener_interval_sec  : u64,
+  /// Safety mechanism - is this is on, the command listener will deny 
+  /// every request. E.g. in staging mode to guarantee no tinkering
+  pub deny_all_requests          : bool
 }
 
 impl CommandDispatcherSettings {
   pub fn new() -> Self {
     Self {
-      cmd_log                   : String::from("/home/gaps/log"),
-      cc_server_address         : String::from("tcp://10.0.1.10:42000"),   
-      fc_sub_address            : String::from("tcp://192.168.37.200:41662"),
-      cmd_listener_interval_sec : 1,
+      cmd_log_path                   : String::from("/home/gaps/log"),
+      cc_server_address              : String::from("tcp://10.0.1.10:42000"),   
+      fc_sub_address                 : String::from("tcp://192.168.37.200:41662"),
+      cmd_listener_interval_sec      : 1,
+      deny_all_requests              : false
     }
   }
 }
