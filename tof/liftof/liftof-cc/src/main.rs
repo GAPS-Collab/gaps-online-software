@@ -579,13 +579,17 @@ fn main() {
           let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
           let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
           cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+          // after we opened the socket, give the RBs a chance to connect
+          println!("=> Give the RBs a chance to connect and wait a bit..");
+          thread::sleep(10*one_second);
 
+          println!("=> Initializing Run Start!");
           match cmd_sender.send(&payload, 0) {
             Err(err) => {
               error!("Unable to send command, error{err}");
             },
             Ok(_) => {
-              println!("Run initialized!");
+              debug!("We sent {:?}", payload);
             }
           }
           let run_start_timeout  = Instant::now();
@@ -606,6 +610,7 @@ fn main() {
               break; 
             }
           }
+          println!("Run initialized!");
           bar = ProgressBar::new_spinner();
           bar.enable_steady_tick(Duration::from_millis(500));
           bar.set_message(".. acquiring data ..");
