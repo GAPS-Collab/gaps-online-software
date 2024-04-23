@@ -23,9 +23,9 @@ compile_and_deploy_target() {
   
   CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build --target=x86_64-unknown-linux-musl --bin $1 --release
   #scp ../target/x86_64-unknown-linux-musl/release/$1 $2:~/bin/liftof-cc-0.9.3-paolo
-  scp ../target/x86_64-unknown-linux-musl/release/$1 $3:~/bin/liftof-cc-0.9.6-paolo
+  scp ../target/x86_64-unknown-linux-musl/release/$1 $3:~/bin/liftof-cc-0.9.7-paolo
   #scp liftof-cc-config-0.9.3-paolo.toml $2:~/config/
-  scp liftof-cc-config-0.9.6-paolo.toml $3:~/config/
+  scp liftof-cc-config-0.9.7-paolo.toml $3:~/config/
   cargo clean
 }
 

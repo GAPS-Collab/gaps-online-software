@@ -21,6 +21,7 @@ use crossbeam_channel::Receiver;
 
 use colored::Colorize;
 
+use tof_dataclasses::commands::TofResponse;
 use tof_dataclasses::packets::{
     TofPacket,
     PacketType
@@ -133,7 +134,12 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
             let mut cali_writer = TofPacketWriter::new(write_stream_path.clone(), file_type);
             cali_writer.add_tof_packet(&pack);
             drop(cali_writer);
-          }
+          },
+          PacketType::TofResponse => {
+            let mut pos = 0;
+            let r = TofResponse::from_bytestream(&pack.payload, &mut pos).unwrap();
+            debug!("Received TofResponse: {r}")
+          },
           _ => ()
         }
         if print_moni_packets {

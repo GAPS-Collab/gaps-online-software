@@ -60,7 +60,8 @@ packs_per_file = 200000
 #fc_pub_address       = "tcp://100.101.96.10:42000"
 # flight computer needs to subscribe to this address to 
 # recieve tof packets
-fc_pub_address        = "tcp://192.168.37.20:42000"
+#fc_pub_address        = "tcp://192.168.37.20:42000"
+fc_pub_address        = "tcp://10.97.108.30:42002"
 
 # not supported yet
 [event_builder_settings]

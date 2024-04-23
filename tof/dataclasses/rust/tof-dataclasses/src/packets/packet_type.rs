@@ -37,6 +37,7 @@ pub enum PacketType {
   TofCommand          = 140u8,
   RBCommand           = 150u8,
   Ping                = 160u8,
+  TofResponse         = 170u8,
   // use the > 200 values for transmitting
   // various binary files
   ConfigBinary        = 201u8,

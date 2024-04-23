@@ -305,14 +305,16 @@ fn main() {
     gds_settings.data_dir = write_stream_path;
 
     println!("==> Starting data sink thread!");
+    let gds_settings_c = gds_settings.clone();
+    let tp_from_client_c = tp_from_client.clone();
     let thread_control_gds = thread_control.clone();
     let _data_sink_thread = thread::Builder::new()
       .name("data-sink".into())
       .spawn(move || {
-        global_data_sink(&tp_from_client,
+        global_data_sink(&tp_from_client_c,
                          write_stream,
                          runid,
-                         &gds_settings,
+                         &gds_settings_c,
                          verbose,
                          thread_control_gds);
       })
@@ -362,12 +364,13 @@ fn main() {
       let db_path_string    = config.db_path.clone();
       let settings          = config.event_builder_settings;
       let thread_control_eb = thread_control.clone();
+      let tp_to_sink_c = tp_to_sink.clone();
       let _evb_thread = thread::Builder::new()
         .name("event-builder".into())
         .spawn(move || {
                         event_builder(&master_ev_rec,
                                       &ev_from_rb,
-                                      &tp_to_sink,
+                                      &tp_to_sink_c,
                                       runid as u32,
                                       db_path_string,
                                       settings,
@@ -409,18 +412,37 @@ fn main() {
   }
 
   let return_val: Result<TofCommandCode, CmdError>;
-  let cmd_sender_c = cmd_sender.clone();
   let mut dont_stop = false;
   // let's give everything a little time to come up
   // before we issues the commands
+  println!("==> Starting data sink thread!");
+  let gds_settings_c1 = gds_settings.clone();
+  let tp_from_client_c1 = tp_from_client.clone();
+  let thread_control_gds = thread_control.clone();
+  let _data_sink_thread = thread::Builder::new()
+    .name("data-sink".into())
+    .spawn(move || {
+      global_data_sink(&tp_from_client_c1,
+                        write_stream,
+                        runid,
+                        &gds_settings_c1,
+                        verbose,
+                        thread_control_gds);
+    })
+    .expect("Failed to spawn data-sink thread!");
+  println!("==> data sink thread started!");
+  println!("==> Will now start rb threads..");
+  // must be globa data sink
+  let cmd_sender_c = tp_to_sink.clone();
+  let cmd_sender_c1 = tp_to_sink.clone();
   thread::sleep(5*one_second);
   match args.command {
     Command::Listen(_) => {
       let _flight_address_sub_c = flight_sub_address.clone();
       let _flight_address_pub_c = flight_pub_address;
       let _thread_control_c = thread_control.clone();
-      let _cmd_sender_c = cmd_sender.clone();
       let _cmd_receiver_c = cmd_receiver.clone();
+      let _cmd_sender_c = cmd_sender_c1.clone();
       let _cmd_interval_sec: u64 = cmd_listener_interval_sec;
       let _flight_cpu_listener = thread::Builder::new()
                     .name("flight-cpu-listener".into())

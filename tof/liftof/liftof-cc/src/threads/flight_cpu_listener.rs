@@ -347,15 +347,36 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
               }
             }
             // deal with return values
-            let resp_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-            info!("Will set up 0MQ PUB socket to send status to flight cpu commands at address {flight_address_pub}");
-            resp_socket.connect(flight_address_pub).expect("Unable to bind to data (PUB) socket {data_adress}");
-            info!("ZMQ SUB Socket for flight cpu responder bound to {flight_address_pub}");
+            // let resp_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+            // info!("Will set up 0MQ PUB socket to send status to flight cpu commands at address {flight_address_pub}");
+            // resp_socket.connect(flight_address_pub).expect("Unable to bind to data (PUB) socket {data_adress}");
+            // info!("ZMQ SUB Socket for flight cpu responder bound to {flight_address_pub}");
+            // match return_val {
+            //   Err(cmd_error) => {
+            //     info!("Cmd Error: {cmd_error}");
+            //     let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
+            //     match resp_socket.send(r.to_bytestream(),0) {
+            //       Err(err) => warn!("Can not send response!, Err {err}"),
+            //       Ok(_)    => info!("Responded to {cmd_error}!")
+            //     }
+            //   },
+            //   Ok(tof_command)  => {
+            //     info!("Cmd resp: {tof_command}");
+            //     let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+            //     match resp_socket.send(r.to_bytestream(),0) {
+            //       Err(err) => warn!("Can not send response!, Err {err}"),
+            //       Ok(_)    => info!("Responded to {tof_command}!")
+            //     }
+            //   }
+            // }
+            // using crossbeam
+            let outgoing_c1 = outgoing.clone();
             match return_val {
               Err(cmd_error) => {
                 info!("Cmd Error: {cmd_error}");
-                let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
-                match resp_socket.send(r.to_bytestream(),0) {
+                let r = TofResponse::GeneralFail(TofCommandResp::RespErrCmdStuck as u32);
+                let tp = TofPacket::from(&r);
+                match outgoing_c1.send(tp) {
                   Err(err) => warn!("Can not send response!, Err {err}"),
                   Ok(_)    => info!("Responded to {cmd_error}!")
                 }
@@ -363,7 +384,8 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
               Ok(tof_command)  => {
                 info!("Cmd resp: {tof_command}");
                 let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
-                match resp_socket.send(r.to_bytestream(),0) {
+                let tp = TofPacket::from(&r);
+                match outgoing_c1.send(tp) {
                   Err(err) => warn!("Can not send response!, Err {err}"),
                   Ok(_)    => info!("Responded to {tof_command}!")
                 }
