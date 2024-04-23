@@ -37,7 +37,12 @@ use tof_dataclasses::monitoring::{
 };
 
 //use tof_dataclasses::events::TofEvent;
-use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::serialization::{
+    Serialization,
+    Packable
+};
+use tof_dataclasses::errors::SerializationError;
+
 use tof_dataclasses::io::{
     TofPacketWriter,
     FileType
@@ -73,6 +78,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let write_npack_file    = settings.packs_per_file;
   let mut met_time_secs   = 0f32; // mission elapsed time
 
+  let mut evid_check      = Vec::<u32>::new();
+
   let ctx = zmq::Context::new();
   // FIXME - should we just move to another socket if that one is not working?
   let data_socket = ctx.socket(zmq::PUB).expect("Can not create socket!");
@@ -97,6 +104,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
 
   let mut n_pack_sent = 0;
   //let mut last_evid   = 0u32;
+  let mut n_pack_write_disk = 0usize;
+  let mut bytes_sec_disk    = 0f64;
 
   // for debugging/profiling
   let mut timer = Instant::now();
@@ -107,6 +116,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         debug!("Got new tof packet {}", pack.packet_type);
         if writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(&pack);
+          n_pack_write_disk += 1;
+          bytes_sec_disk += pack.payload.len() as f64;
         }
         // yeah, this is it. 
         // catch RBCalibration packets here,
@@ -144,23 +155,24 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
           let mut pos = 0;
           // some output to the console
           match pack.packet_type {
-            PacketType::RBMoni => {
-              let moni = RBMoniData::from_bytestream(&pack.payload, &mut pos);
-              match moni {
+            PacketType::RBMoniData => {
+              //let moni : Result<RBMoniData, SerializationError> = pack.unpack(); 
+              match pack.unpack::<RBMoniData>() {
+              //match moni {
                 Ok(data) => {
                   debug!("Sending RBMoniData {}", data);
                 },
-                Err(err) => error!("Can not unpack RBMoniData! {err}")}
-              }, 
+                Err(err) => error!("Can not unpack RBMoniData! {err}")
+              }
+            }, 
             PacketType::CPUMoniData => {
-              let moni = CPUMoniData::from_bytestream(&pack.payload, &mut pos);
-              match moni {
+              match pack.unpack::<CPUMoniData>() {
                 Ok(data) => {println!("{}", data);},
                 Err(err) => error!("Can not unpack TofCmpData! {err}")}
               },
             PacketType::MonitorMtb => {
-              let moni = MtbMoniData::from_bytestream(&pack.payload, &mut pos);
-              match moni {
+              //let moni = MtbMoniData::from_bytestream(&pack.payload, &mut pos);
+              match pack.unpack::<MtbMoniData>() {
                 Ok(data) => {println!("{}", data);},
                 Err(err) => error!("Can not unpack MtbMoniData! {err}")}
               },
@@ -197,7 +209,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         //} else {
         // FIXME - disentangle network and disk I/O?
         if pack.packet_type == PacketType::TofEvent {
-          if settings.send_flight_packets {
+          if settings.send_tof_summary_packets ||
+             settings.send_rbwaveform_packets {
             let mut pos = 0;
             // unfortunatly we have to do this unnecessary step
             // I have to think about fast tracking these.
@@ -213,18 +226,24 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 ev_to_send = _ev_to_send;
               }
             }
-            let te_summary = ev_to_send.get_summary();
-            let pack = TofPacket::from(&te_summary);
-            match data_socket.send(pack.to_bytestream(),0) {
-              Err(err) => {
-                error!("Packet sending failed! {err}");
+            if settings.send_tof_summary_packets {
+              let te_summary = ev_to_send.get_summary();
+              // debug
+              if evid_check.len() < 20000 {
+                evid_check.push(te_summary.event_id);
               }
-              Ok(_)    => {
-                //trace!("Event Summary for event id {} send!", evid);
-                n_pack_sent += 1;
+              let pack = TofPacket::from(&te_summary);
+              match data_socket.send(pack.to_bytestream(),0) {
+                Err(err) => {
+                  error!("Packet sending failed! {err}");
+                }
+                Ok(_)    => {
+                  //trace!("Event Summary for event id {} send!", evid);
+                  n_pack_sent += 1;
+                }
               }
             }
-            if settings.send_rbwaveforms {
+            if settings.send_rbwaveform_packets {
               for rbwave in ev_to_send.get_rbwaveforms() {
                 let pack = TofPacket::from(&rbwave);
                 match data_socket.send(pack.to_bytestream(),0) {
@@ -250,7 +269,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 }
               }
             }
-          } else {
+          }
+          if settings.send_tof_event_packets {
             match data_socket.send(pack.to_bytestream(),0) {
               Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
               Ok(_)    => {
@@ -259,7 +279,6 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
               }
             } // end match
           }
-        // FIXME else branching not optimal
         } else {
           match data_socket.send(pack.to_bytestream(),0) {
             Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
@@ -268,17 +287,39 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
               n_pack_sent += 1;
             }
           } // end match
-        } // end else
+        }
       } // end if pk == event packet
     } // end incoming.recv
-    if timer.elapsed().as_secs() > 60 {
+    if timer.elapsed().as_secs() > 120 {
+      let evid_check_len = evid_check.len();
+      //println!("DEBUG .1.");
+      //let mut evid_test_missing = 0usize;
+      let mut evid_missing = 0;
+      if evid_check_len > 0 {
+        let mut evid = evid_check[0];
+        //println!("DEBUG 1.5");
+        //println!("len of evid_id_test {}", evid_id_test_len);
+        for _ in 0..evid_check_len {
+          if !evid_check.contains(&evid) {
+            evid_missing += 1;
+          }
+          evid += 1;
+        }
+      }
+      evid_check.clear();
+      ////println!("DEBUG 2");
+      //event_id_test.clear();
+      //println!("DEBUG 3");
+
       met_time_secs += timer.elapsed().as_secs_f32();
       let packet_rate = n_pack_sent as f32 /met_time_secs;
-      println!("  {:<60}", ">> == == == == ==  DATA SINK HEARTBEAT   == == == == == <<".bright_cyan().bold());
-      println!("  {:<60} <<", format!(">> ==> Sent \t{} TofPackets! (packet rate {:.2}/s)", n_pack_sent ,packet_rate).bright_cyan());
-      println!("  {:<60} <<", format!(">> ==> Incoming cb channel len {}", incoming.len()).bright_cyan());
+      println!("  {:<75}", ">> == == == == == == DATA SINK HEARTBEAT  == == == == == == <<".bright_cyan().bold());
+      println!("  {:<75} <<", format!(">> ==> Sent {} TofPackets! (packet rate {:.2}/s)", n_pack_sent ,packet_rate).bright_cyan());
+      println!("  {:<75} <<", format!(">> ==> Incoming cb channel len {}", incoming.len()).bright_cyan());
+      println!("  {:<75} <<", format!(">> ==> Writing events to disk: {} packets written, data write rate {:.2} MB/sec", n_pack_write_disk, bytes_sec_disk/(1e6*met_time_secs as f64)).bright_purple());
+      println!("  {:<75} <<", format!(">> ==> Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)", evid_missing, evid_check_len, 100.0*(evid_missing as f64/evid_check_len as f64)).bright_purple());
 
-      println!("  {:<60}", ">> == == == == ==  == == == == == == ==  == == == == == <<".bright_cyan().bold());
+      println!("  {:<75}", ">> == == == == == == == == == == == == == == == == == == == <<".bright_cyan().bold());
       timer = Instant::now();
     }
   }
