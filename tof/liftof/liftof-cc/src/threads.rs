@@ -1,6 +1,6 @@
 pub mod readoutboard_comm;
 pub mod event_builder;
-pub mod flight_comms;
+pub mod global_data_sink;
 pub mod monitoring;
 pub mod command_dispatcher;
 
