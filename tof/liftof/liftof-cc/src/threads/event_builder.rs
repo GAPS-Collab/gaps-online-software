@@ -371,7 +371,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   // event caches for assembled events
   let mut event_cache          = HashMap::<u32, TofEvent>::new();
   let mut event_id_cache       = VecDeque::<u32>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  let mut idx_to_remove = Vec::<usize>::with_capacity(20);
+  //let mut idx_to_remove = Vec::<usize>::with_capacity(20);
   //let mut event_id_cache_a    = VecDeque:
   //let dsi_map                 = get_dsi_j_ltbch_vs_rbch_map(db_path.as_ref()); 
   let mut n_received           : usize;
@@ -398,7 +398,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut check_tc_update      = Instant::now();
   let mut n_gathered_fr_cache  = 0usize;
   let mut misaligned_cache_err = 0usize; 
-  let mut mtb_ev_cache_size    = 0usize;
   loop {
     if check_tc_update.elapsed().as_secs() > 5 {
       match thread_control.lock() {

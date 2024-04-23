@@ -39,9 +39,7 @@ use tof_dataclasses::monitoring::{
 //use tof_dataclasses::events::TofEvent;
 use tof_dataclasses::serialization::{
     Serialization,
-    Packable
 };
-use tof_dataclasses::errors::SerializationError;
 
 use tof_dataclasses::io::{
     TofPacketWriter,
@@ -152,7 +150,6 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
           _ => ()
         }
         if print_moni_packets {
-          let mut pos = 0;
           // some output to the console
           match pack.packet_type {
             PacketType::RBMoniData => {
@@ -211,13 +208,13 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         if pack.packet_type == PacketType::TofEvent {
           if settings.send_tof_summary_packets ||
              settings.send_rbwaveform_packets {
-            let mut pos = 0;
             // unfortunatly we have to do this unnecessary step
             // I have to think about fast tracking these.
             // maybe sending TofEvents over the channel instead
             // of TofPackets?
             let ev_to_send : TofEvent;
-            match TofEvent::from_bytestream(&pack.payload, &mut pos) {
+            match pack.unpack::<TofEvent>() {
+            //match TofEvent::from_bytestream(&pack.payload, &mut pos) {
               Err(err) => {
                 error!("Unable to unpack TofEvent! {err}");
                 continue;
