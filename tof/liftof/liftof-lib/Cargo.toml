@@ -5,6 +5,7 @@ edition = "2021"
 
 [features]
 random = []
+debug = []
 
 #[[lib]]
 #name = "liftof-lib"
@@ -12,44 +13,33 @@ random = []
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
 #ndarray = "0.15"
 #nlopt = "0.7"
 
 #nalgebra = "0.32"
 #nalgebra-linalg = "0.32"
 
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-toml = "0.8"
-# multi-producer/multi-consumer channels
-#crossbeam = "0.8"
+[dependencies]
+
+serde             = { version = "1.0", features = ["derive"] }
+serde_json        = "1.0"
+toml              = "0.8"
 crossbeam-channel = "0.5"
 
 tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random","database","tofcontrol","smoothed_z_score"], version = "0.10"} 
 
-zmq = "0.10.0"
+zmq         = "0.10.0"
 
-log = "0.4"
-colored = "2.0"
-env_logger = "0.10"
+log         = "0.4"
+colored     = "2.0"
+env_logger  = "0.10"
+# parse command line arguments
+clap        = { version = "4.0", features = ["derive"] }
 
-ureq = "2.1"
-
-#local-ip-address = "0.5"
-
-# this is just for fun
-indicatif = "0.17"
-
-# for connection to rb's at arbitrary ports
-#port_scanner = "0.1"
-#arp-toolkit = { verion = "0.3", features = ["sync"] }
-#mac_address = "1.1"
-#netneighbours = "0.1"
-#macaddr = {version="1.0", features = ["serde"]}
+ureq        = "2.1"
+indicatif   = "0.17"
+#cfg-if      = "1.0" # TODO - have a propper debugging feature
 
 #[target.armv7-unknown-linux-gnueabi]
 #linker = "/usr/bin/arm-none-eabi-gcc"
 
-# parse command line arguments
-clap = { version = "4.0", features = ["derive"] }
