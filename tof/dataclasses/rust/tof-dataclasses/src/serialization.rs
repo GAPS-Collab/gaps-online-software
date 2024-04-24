@@ -61,9 +61,9 @@ pub fn u8_to_u16_14bit(vec_u8: &[u8]) -> Vec<u16> {
 ///
 /// # Returns:
 ///
-///   Vec<u16>, ch_sync_err, cell_sync_err : if one of the error bits is
-///                                          set, ch_sync_err or cell_sync_err
-///                                          will be set to true
+///   `Vec<u16>`, ch_sync_err, cell_sync_err : if one of the error bits is
+///                                            set, ch_sync_err or cell_sync_err
+///                                            will be set to true
 pub fn u8_to_u16_err_check(vec_u8: &[u8]) -> (Vec<u16>, bool, bool) {
     let mut ch_sync_err   = true;
     let mut cell_sync_err = true;

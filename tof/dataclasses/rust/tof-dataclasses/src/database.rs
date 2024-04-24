@@ -21,14 +21,16 @@ use chrono::{
 use diesel::prelude::*;
 mod schema;
     
-use schema::tof_db_paddle::dsl::*;
 use schema::tof_db_rat::dsl::*;
 use schema::tof_db_dsicard::dsl::*;
-use schema::tof_db_mtbchannel::dsl::*;
-use schema::tof_db_localtriggerboard::dsl::*;
 
 use crate::calibrations::RBCalibrations;
 use crate::constants::HUMAN_TIMESTAMP_FORMAT;
+use crate::DsiLtbRBMapping;
+
+// FIXME - probably we should make this nicer
+pub type DsiJChPidMapping = DsiLtbRBMapping; 
+
 
 /// Universal function to connect to the database
 pub fn connect_to_db(database_url : String) -> Result<diesel::SqliteConnection, ConnectionError>  {
@@ -53,6 +55,36 @@ pub fn get_rbid_linkid_map(rbs : &Vec<ReadoutBoard>) -> HashMap<u8, u8> {
   }
   mapping
 }
+
+pub fn get_dsi_j_ch_pid_map(paddles : &Vec<Paddle>) -> DsiJChPidMapping {
+  let mut mapping = DsiJChPidMapping::new();
+  for dsi in 1..6 {
+    let mut jmap = HashMap::<u8, HashMap<u8, (u8, u8)>>::new();
+    for j in 1..6 {
+      let mut rbidch_map : HashMap<u8, (u8,u8)> = HashMap::new();
+      for ch in 1..17 {
+        let rbidch = (0,0);
+        rbidch_map.insert(ch,rbidch);
+        //map[dsi] = 
+      }
+      jmap.insert(j,rbidch_map);
+    }
+    mapping.insert(dsi,jmap);
+  }
+  for pdl in paddles {
+    let dsi  = pdl.dsi as u8;
+    let   j  = pdl.j_ltb   as u8;
+    let ch_b = pdl.ltb_chA as u8;
+    let ch_a = pdl.ltb_chB as u8;
+    let pid  = pdl.paddle_id as u8;
+    let panel_id = pdl.panel_id as u8;
+    mapping.get_mut(&dsi).unwrap().get_mut(&j).unwrap().insert(ch_a,(pid, panel_id));
+    mapping.get_mut(&dsi).unwrap().get_mut(&j).unwrap().insert(ch_b,(pid, panel_id));
+  }
+  return mapping;
+}
+
+
 
 /// Representation of a local trigger board.
 /// 
@@ -278,7 +310,7 @@ impl fmt::Display for DSICard {
 
 /// A single TOF paddle with 2 ends 
 /// comnected
-#[derive(Debug,PartialEq, Clone,Queryable, Selectable)]
+#[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_paddle)]
 #[diesel(primary_key(paddle_id))]
 #[allow(non_snake_case)]
@@ -344,6 +376,7 @@ impl Paddle {
   }
 
   pub fn all(conn: &mut SqliteConnection) -> Option<Vec<Paddle>> {
+    use schema::tof_db_paddle::dsl::*;
     match tof_db_paddle.load::<Paddle>(conn) {
       Err(err) => {
         error!("Unable to load paddles from db! {err}");
@@ -431,6 +464,7 @@ impl MTBChannel {
   }
   
   pub fn all(conn: &mut SqliteConnection) -> Option<Vec<MTBChannel>> {
+    use schema::tof_db_mtbchannel::dsl::*;
     match tof_db_mtbchannel.load::<MTBChannel>(conn) {
       Err(err) => {
         error!("Unable to load RATs from db! {err}");
@@ -559,6 +593,7 @@ impl DBLocalTriggerBoard {
   }
   
   pub fn all(conn: &mut SqliteConnection) -> Option<Vec<DBLocalTriggerBoard>> {
+    use schema::tof_db_localtriggerboard::dsl::*;
     match tof_db_localtriggerboard
         //.inner_join(tof_db_localtriggerboard.on(schema::tof_db_paddle::dsl::paddle_id.eq(schema::tof_db_localtriggerboard::dsl::paddle1_id)))
         .load::<DBLocalTriggerBoard>(conn) {
@@ -640,6 +675,7 @@ impl LocalTriggerBoard {
   }
   
   pub fn all(conn: &mut SqliteConnection) -> Option<Vec<LocalTriggerBoard>> {
+    use schema::tof_db_localtriggerboard::dsl::*;
     let db_ltbs : Vec<DBLocalTriggerBoard>;
     match tof_db_localtriggerboard
         //.inner_join(tof_db_localtriggerboard.on(schema::tof_db_paddle::dsl::paddle_id.eq(schema::tof_db_localtriggerboard::dsl::paddle1_id)))
