@@ -10,7 +10,7 @@ use std::sync::{
     Mutex,
 };
 
-use std::path::Path;
+//use std::path::Path;
 
 use std::thread;
 use std::time::{
@@ -62,11 +62,18 @@ use tof_dataclasses::packets::{
     PacketType
 };
 
-use tof_dataclasses::manifest::{
-    get_rbs_from_sqlite,
+use tof_dataclasses::database::{
+    connect_to_db,
     get_dsi_j_ch_pid_map,
     ReadoutBoard,
+    Paddle,
 };
+
+//use tof_dataclasses::manifest::{
+//    get_rbs_from_sqlite,
+//    //get_dsi_j_ch_pid_map,
+//    ReadoutBoard,
+//};
 //use tof_dataclasses::calibrations::RBCalibrations;
 
 use tof_dataclasses::serialization::{
@@ -81,7 +88,7 @@ use tof_dataclasses::events::{
     //RBWaveform,
 };
 
-use liftof_lib::settings::LiftofSettings;
+//use liftof_lib::settings::LiftofSettings;
 
 use liftof_tui::menu::{
     MenuItem,
@@ -231,8 +238,8 @@ fn packet_sorter(packet_type : &PacketType,
         PacketType::MonitorMtb         => { 
           *pm.get_mut("MonitorMtb").unwrap() += 1;
         },
-        PacketType::RBMoni             => { 
-          *pm.get_mut("RBMoni").unwrap() += 1;
+        PacketType::RBMoniData         => { 
+          *pm.get_mut("RBMoniData").unwrap() += 1;
         },
         PacketType::RBEventMemoryView  => { 
           *pm.get_mut("RBEventMemoryView").unwrap() += 1;
@@ -431,7 +438,7 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
               PacketType::LTBMoniData |
               PacketType::PAMoniData  |
               PacketType::PBMoniData  |
-              PacketType::RBMoni => {
+              PacketType::RBMoniData => {
                 match tp_sender_rb.send(tp) {
                   Err(err) => error!("Can't send TP! {err}"),
                   Ok(_)    => (),
@@ -869,7 +876,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
 
   // prepare calibrations
   let mut readoutboards = HashMap::<u8, ReadoutBoard>::new();
-  let rbs = get_rbs_from_sqlite(&Path::new("gaps_flight.db"));
+  let mut rb_conn = connect_to_db(String::from("gaps_flight2.db")).expect("Will need database access. Make sure gaps_flight2.db is installed!");
+  let rbs     = ReadoutBoard::all(&mut rb_conn).expect("Will need database access. Make sure gaps_flight2.db is installed!");
   for mut rb in rbs {
     rb.calib_file_path = String::from("calibrations");
     match rb.load_latest_calibration() {
@@ -879,7 +887,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
       }
     }
   }
-  let dsijch_paddle_map = get_dsi_j_ch_pid_map(Path::new("gaps_flight.db"));
+  let paddles = Paddle::all(&mut rb_conn).expect("Database corrupt!");
+  let dsijch_paddle_map = get_dsi_j_ch_pid_map(&paddles);
 
   let mut pm = HashMap::<String, usize>::new();
   pm.insert(String::from("Unknown"          ) ,0);
@@ -890,7 +899,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   pm.insert(String::from("RBEventHeader"    ) ,0);
   pm.insert(String::from("CPUMoniData"      ) ,0); 
   pm.insert(String::from("MonitorMtb"       ) ,0); 
-  pm.insert(String::from("RBMoni"           ) ,0); 
+  pm.insert(String::from("RBMoniData"       ) ,0); 
   pm.insert(String::from("PAMoniData"       ) ,0); 
   pm.insert(String::from("PBMoniData"       ) ,0); 
   pm.insert(String::from("LTBMoniData"      ) ,0); 

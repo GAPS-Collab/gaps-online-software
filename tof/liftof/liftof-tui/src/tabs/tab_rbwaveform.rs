@@ -40,7 +40,7 @@ use tof_dataclasses::events::{
 
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::serialization::Serialization;
-use tof_dataclasses::manifest::ReadoutBoard;
+use tof_dataclasses::database::ReadoutBoard;
 
 use crate::colors::ColorTheme;
 use crate::widgets::{

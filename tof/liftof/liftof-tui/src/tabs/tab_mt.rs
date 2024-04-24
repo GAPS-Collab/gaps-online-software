@@ -51,7 +51,7 @@ use tof_dataclasses::events::MasterTriggerEvent;
 use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::errors::SerializationError;
 //use tof_dataclasses::serialization::Serialization;
-use tof_dataclasses::manifest::DsiJChPidMapping;
+use tof_dataclasses::database::DsiJChPidMapping;
 use tof_dataclasses::events::master_trigger::LTBThreshold;
 use crate::colors::{
     ColorTheme,
@@ -92,7 +92,7 @@ pub struct MTTab {
   pub theme          : ColorTheme,
 
   pub mapping        : DsiJChPidMapping,
-  pub problem_hits   : Vec<(u8, u8, u8, LTBThreshold)>,
+  pub problem_hits   : Vec<(u8, u8, (u8, u8), LTBThreshold)>,
   timer              : Instant,
 
 }
@@ -128,7 +128,7 @@ impl MTTab {
       panel_histo    : ndhistogram!(panel_bins),
       theme          : theme,
       mapping        : mapping,
-      problem_hits   : Vec::<(u8, u8, u8, LTBThreshold)>::new(),
+      problem_hits   : Vec::<(u8, u8, (u8, u8), LTBThreshold)>::new(),
       timer          : Instant::now(),
     }
   }
@@ -201,7 +201,10 @@ impl MTTab {
                 self.problem_hits.push(*h);
               },
               Some(chmap) => {
-                match chmap.get(&h.2) {
+                // let's just consider one side of the paddle 
+                // here. If the two sides are not connected to 
+                // the same LTB we have bigger problems
+                match chmap.get(&h.2.0) {
                   None => {
                     error!("Can't get mapping for hit {:?}", h);
                     self.problem_hits.push(*h);

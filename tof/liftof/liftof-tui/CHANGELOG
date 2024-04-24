@@ -1,7 +1,14 @@
 # LELEWAA series
 
-# HAHALUA series
+##v0.10.0
+* get MasterTrigger information from TofEventSummary
+  or MasterTriggerEvent, automatic switching
+* Displays for PAMoniData and LTBMoniData, LTB selector
+* Triggered Panel display
+* nicer B/W color theme with orange highlight
+* switch to new TofPacket API
 
+# HAHALUA series
 
 ##v0.9.2
 * dedictaed tabs for RBWaveforms, TofSummary and TofHit

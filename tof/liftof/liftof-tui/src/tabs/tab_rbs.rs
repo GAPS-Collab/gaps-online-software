@@ -61,7 +61,7 @@ use tof_dataclasses::monitoring::{
     PAMoniDataSeries,
 };
 use tof_dataclasses::io::RBEventMemoryStreamer;
-use tof_dataclasses::manifest::ReadoutBoard;
+use tof_dataclasses::database::ReadoutBoard;
 
 use crate::widgets::{
     timeseries,
@@ -162,6 +162,10 @@ impl RBTab<'_>  {
       ch_data.push(tmp_vec);
     }
     let bins = Uniform::new(50,-0.5,49.5);
+    let mut rbl_state    = ListState::default();
+    rbl_state.select(Some(1));
+    let mut ltbl_state   = ListState::default();
+    ltbl_state.select(Some(1));
     RBTab {
       tp_receiver        : tp_receiver,
       rb_receiver        : rb_receiver,
@@ -201,11 +205,11 @@ impl RBTab<'_>  {
 
       list_focus         : RBLTBListFocus::RBList,
 
-      rbl_state          : ListState::default(),
+      rbl_state          : rbl_state,
       rbl_items          : rb_select_items,
       rbl_active         : false,
       
-      ltbl_state         : ListState::default(),
+      ltbl_state         : ltbl_state,
       ltbl_items         : ltb_select_items,
       ltbl_active        : false,
     }
@@ -289,7 +293,7 @@ impl RBTab<'_>  {
               }
               return Ok(());
             },
-            PacketType::RBMoni   => {
+            PacketType::RBMoniData   => {
               info!("Received new RBMoniData!");
               let moni : RBMoniData = pack.unpack()?;
               self.moni_queue.add(moni);

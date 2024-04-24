@@ -3,18 +3,18 @@ name = "liftof-tui"
 version = "0.10.0"
 edition = "2021"
 
+[features]
+telemetry  = ["telemetry-dataclasses"]
 
 [dependencies]
 
-serde = {version = "1.0", features = ["derive"] }
+serde      = {version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-chrono = { version = "0.4", features = ["serde"] }
-rand = { version = "0.7.3", default-features = false, features = ["std"] }
-#tui = { version = "0.19", default-features = false, features = ['crossterm', 'serde'] }
-#thiserror = "1.0"
+chrono     = { version = "0.4", features = ["serde"] }
+rand       = { version = "0.7.3", default-features = false, features = ["std"] }
 
 tui-logger = { version = "0.11" } 
-ratatui = { version = "0.26", features = ["all-widgets"]}
+ratatui    = { version = "0.26", features = ["all-widgets"]}
 
 crossterm = { version = "0.23", features=["serde"]}
 #tokio = { version = "1", features = ["full"] }
@@ -26,8 +26,10 @@ crossterm = { version = "0.23", features=["serde"]}
 #crossbeam = "0.8"
 crossbeam-channel = "0.5"
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "database"], version = "0.10"}
-liftof-lib = { path = "../liftof-lib" , features = ["random"], version = "0.10"}
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["database"], version = "0.10"}
+liftof-lib      = { path = "../liftof-lib" , features = ["random"], version = "0.10"}
+telemetry-dataclasses = { path = "../../../telemetry/dataclasses/rust/telemetry-dataclasses", optional = true }
+
 
 # this is the "one and only" histogram 
 # crate in my opinion

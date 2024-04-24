@@ -124,8 +124,8 @@ impl EventTab {
       None => (),
       Some(ev)   => {
         header_string = ev.header.to_string();
-        let info_field = format!("\n --> NRBs {}\n --> NMissingHit {}\n Quality: {}\n CompressionLevel {}",
-                                 ev.rb_events.len(), ev.missing_hits.len(), ev.quality, ev.compression_level);
+        let info_field = format!("\n --> NRBs {}\n --> Quality: {}\n CompressionLevel {}",
+                                 ev.rb_events.len(), ev.quality, ev.compression_level);
         header_string += &info_field;
       }
     }
