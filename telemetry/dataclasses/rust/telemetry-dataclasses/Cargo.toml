@@ -1,0 +1,32 @@
+[package]
+name = "telemetry-dataclasses"
+version = "0.10.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bench]]
+name = "bench"
+harness = false
+
+[[test]]
+name = "test"
+required-features = ["random"]
+
+[features]
+random=["rand"]
+#database=["sqlite"]
+
+[dev-dependencies]
+# for testing
+# used for the random number generation
+#rand = "0.8"
+criterion = "0.4"
+
+[dependencies]
+
+# logging
+log  = "0.4"
+tof-dataclasses = {version = "0.10", path = "../../../../tof/dataclasses/rust/tof-dataclasses/", features=["database"]}
+rand = {version = "0.8", optional = true}
+#sqlite = {version = "0.30", optional = true}
