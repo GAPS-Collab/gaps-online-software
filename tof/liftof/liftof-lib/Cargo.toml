@@ -21,20 +21,22 @@ debug = []
 
 [dependencies]
 
-serde             = { version = "1.0", features = ["derive"] }
-serde_json        = "1.0"
+serde             = { workspace = true } 
+serde_json        = { workspace = true } 
+crossbeam-channel = { workspace = true } 
+zmq               = { workspace = true }
+log               = { workspace = true }
+# parse command line arguments
+clap              = { workspace = true }
+
+
 toml              = "0.8"
-crossbeam-channel = "0.5"
 
 tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random","database","tofcontrol","smoothed_z_score"], version = "0.10"} 
 
-zmq         = "0.10.0"
 
-log         = "0.4"
 colored     = "2.0"
 env_logger  = "0.10"
-# parse command line arguments
-clap        = { version = "4.0", features = ["derive"] }
 
 ureq        = "2.1"
 indicatif   = "0.17"
