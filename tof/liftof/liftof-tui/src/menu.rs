@@ -25,6 +25,7 @@ pub enum MenuItem {
   ReadoutBoards,
   MasterTrigger,
   TOFCpu, 
+  Telemetry,
   Settings,
   Quit,
 }
@@ -44,8 +45,9 @@ impl From<MenuItem> for usize {
       //MenuItem::Dashboard     => 4,
       MenuItem::MasterTrigger => 6,
       MenuItem::TOFCpu        => 7,
-      MenuItem::Settings      => 8,
-      MenuItem::Quit          => 9,
+      MenuItem::Telemetry     => 8,
+      MenuItem::Settings      => 9,
+      MenuItem::Quit          => 10,
     }   
   }
 }
@@ -66,7 +68,7 @@ impl MainMenu {
   }
 
   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
-    let menu_titles  = vec!["Home", "TofEvents", "TofSummary", "RBWaveform", "TofHits",  "ReadoutBoards", "MasterTrigger", "CPUMoni" , "Settings", "Quit" ];
+    let menu_titles  = vec!["Home", "TofEvents", "TofSummary", "RBWaveform", "TofHits",  "ReadoutBoards", "MasterTrigger", "CPUMoniData", "Telemetry" , "Settings", "Quit" ];
     let menu : Vec<Line> = menu_titles
                .iter()
                .map(|t| {
@@ -99,6 +101,20 @@ impl MainMenu {
                  } else if t == &"TofHits" {
                    // none of these handpicked strings has 0 len
                    let (a, b) = t.split_at(2);
+                   let (highlight, c) = b.split_at(1);
+                   Line::from(vec![
+                     Span::styled(a, self.theme.style()),
+                     Span::styled(
+                         highlight,
+                         Style::default()
+                             .fg(self.theme.hc)
+                             .add_modifier(Modifier::UNDERLINED),
+                     ),
+                     Span::styled(c, self.theme.style()),
+                   ])
+                 } else if t == &"Telemetry" {
+                   // none of these handpicked strings has 0 len
+                   let (a, b) = t.split_at(1);
                    let (highlight, c) = b.split_at(1);
                    Line::from(vec![
                      Span::styled(a, self.theme.style()),
@@ -160,10 +176,71 @@ pub struct MTMenu {
 
 impl MTMenu {
 
-  pub fn new(theme : ColorTheme) -> MTMenu  {
-    MTMenu {
+  pub fn new(theme : ColorTheme) -> Self  {
+    Self {
       theme,
       active_menu_item : MTMenuItem::Home,
+    }
+  }
+
+  pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
+    let menu_titles : Vec<&str> = vec!["Home", "Quit" ];
+    let menu : Vec<Line> = menu_titles
+               .iter()
+               .map(|t| {
+                 let (first, rest) = t.split_at(1);
+                 Line::from(vec![
+                   Span::styled(
+                       first,
+                       Style::default()
+                           .fg(self.theme.hc)
+                           .add_modifier(Modifier::UNDERLINED),
+                   ),
+                   Span::styled(rest, self.theme.style()),
+                 ])
+               })
+               .collect();
+
+    let tabs = Tabs::new(menu)
+        .select(self.active_menu_item.into())
+        .block(Block::default().title("Menu").borders(Borders::ALL))
+        .style(self.theme.style())
+        .highlight_style(self.theme.highlight())
+        .divider(Span::raw("|"));
+    frame.render_widget(tabs, *main_window);
+  }
+}
+
+///////////////////////////////////////////
+
+/// Telemetry menu
+#[derive(Debug, Copy, Clone)]
+pub enum TEMenuItem {
+  Home,
+  Quit
+}
+
+impl From<TEMenuItem> for usize {
+  fn from(input: TEMenuItem) -> usize {
+    match input {
+      TEMenuItem::Home          => 0,
+      TEMenuItem::Quit          => 1,
+    }   
+  }
+}
+
+#[derive(Debug, Clone)]
+pub struct TEMenu {
+  pub theme : ColorTheme,
+  pub active_menu_item : TEMenuItem,
+}
+
+impl TEMenu {
+
+  pub fn new(theme : ColorTheme) -> Self  {
+    Self {
+      theme,
+      active_menu_item : TEMenuItem::Home,
     }
   }
 

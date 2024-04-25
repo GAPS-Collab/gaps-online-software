@@ -1,43 +1,42 @@
 [package]
 name = "liftof-tui"
-version = "0.10.0"
+version = "0.10.1"
 edition = "2021"
 
 [features]
 telemetry  = ["telemetry-dataclasses"]
+default    = ["telemetry"]
 
 [dependencies]
 
-serde      = {version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-chrono     = { version = "0.4", features = ["serde"] }
-rand       = { version = "0.7.3", default-features = false, features = ["std"] }
+cfg-if     = { workspace = true }
 
+zmq        = { workspace = true } 
+log        = { worksapce = true }
+clap       = { workspace = true } 
+serde      = { worksapce = true }
+serde_json = { workspace = true } 
+
+chrono     = { version = "0.4", features = ["serde"] }
+
+# tui stuff
 tui-logger = { version = "0.11" } 
 ratatui    = { version = "0.26", features = ["all-widgets"]}
+crossterm  = { version = "0.23", features=["serde"]}
 
-crossterm = { version = "0.23", features=["serde"]}
 #tokio = { version = "1", features = ["full"] }
-
 #eyre = "0.6"
 #sysinfo = "0.27"
 
-# multi-producer/multi-consumer channels
-#crossbeam = "0.8"
-crossbeam-channel = "0.5"
+crossbeam-channel = { workspace = true }
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["database"], version = "0.10"}
+tof-dataclasses = { workspace = true }
 liftof-lib      = { path = "../liftof-lib" , features = ["random"], version = "0.10"}
 telemetry-dataclasses = { path = "../../../telemetry/dataclasses/rust/telemetry-dataclasses", optional = true }
-
 
 # this is the "one and only" histogram 
 # crate in my opinion
 ndhistogram = "0.9.0"
-zmq = "0.10.0"
-
-log = "0.4"
-clap = { version = "4.0", features = ["derive"] }
 
 #num-traits = "0.2"
 

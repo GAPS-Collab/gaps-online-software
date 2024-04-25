@@ -1,5 +1,11 @@
 # LELEWAA series
 
+##v0.10.1
+* support to read direclty from the GAPS telemetry 
+  stream and parse relevant data to the other tabs.
+  This adds the --from-telemetry commandline 
+  argument
+
 ##v0.10.0
 * get MasterTrigger information from TofEventSummary
   or MasterTriggerEvent, automatic switching

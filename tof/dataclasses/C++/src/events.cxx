@@ -232,9 +232,9 @@ RBEvent::RBEvent() {
   status    = EventStatus::Unknown;
   header = RBEventHeader();
   adc    = Vec<Vec<u16>>(); 
-  for (usize k=0; k<NCHN; k++) {
-    adc.push_back(Vec<u16>(NWORDS));
-  }
+  //for (usize k=0; k<NCHN; k++) {
+  //  adc.push_back(Vec<u16>(NWORDS));
+  //}
   hits  = Vec<TofHit>();
 }
 

@@ -69,13 +69,6 @@ use tof_dataclasses::database::{
     Paddle,
 };
 
-//use tof_dataclasses::manifest::{
-//    get_rbs_from_sqlite,
-//    //get_dsi_j_ch_pid_map,
-//    ReadoutBoard,
-//};
-//use tof_dataclasses::calibrations::RBCalibrations;
-
 use tof_dataclasses::serialization::{
     Serialization,
     Packable,
@@ -104,6 +97,7 @@ use liftof_tui::menu::{
     TSMenu,
     //TSMenuItem,
     RWMenu,
+    TEMenu,
     //RWMenuItem,
 };
 
@@ -127,6 +121,7 @@ use liftof_tui::{
     RBWaveformTab,
     TofSummaryTab, 
     RBLTBListFocus,
+    TelemetryTab,
 };
 
 extern crate clap;
@@ -137,6 +132,118 @@ use clap::{arg,
            //Command,
            Parser
 };
+
+cfg_if::cfg_if! {
+  if #[cfg(feature = "telemetry")]  {
+    use telemetry_dataclasses::packets::{
+      TelemetryHeader,
+      TelemetryPacket,
+    };
+
+    /// Get the GAPS merged event telemetry stream and 
+    /// broadcast it to the relevant tab
+    ///
+    /// # Arguments
+    ///
+    /// * tele_sender : Channel to forward the received telemetry
+    ///                 packets
+    /// * address     : Address to susbscribe to for telemetry 
+    ///                 stream (must be zmq.PUB) on the Sender
+    ///                 side
+    fn socket_wrap_telemetry(address     : &str,
+                             tele_sender : Sender<TelemetryPacket>) {
+      let ctx = zmq::Context::new();
+      // FIXME - don't hardcode this IP
+      // typically how it is done is that this program runs either on a gse
+      // or there is a local forwarding of the port thrugh ssh
+      //let address : &str = "tcp://127.0.0.1:55555";
+      let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
+      match socket.connect(&address) {
+        Err(err) => {
+          error!("Unable to connect to data (PUB) socket {address}! {err}");
+          panic!("Can not connect to zmq PUB socket!");
+        }
+        Ok(_) => ()
+      }
+      socket.set_subscribe(b"") .expect("Can't subscribe to any message on 0MQ socket! {err}");
+      loop {
+        match socket.recv_bytes(0) {
+          Err(err)    => error!("Can't receive TofPacket! {err}"),
+          Ok(mut payload) => {
+            match TelemetryHeader::from_bytestream(&payload, &mut 0) {
+              Err(err) => {
+                error!("Can not decode telemtry header! {err}");
+                //for k in pos - 5 .. pos + 5 {
+                //  println!("{}",stream[k]);
+                //}
+              }
+              Ok(header) => {
+                let mut packet = TelemetryPacket::new();
+                if payload.len() > TelemetryHeader::SIZE {
+                  payload.drain(0..TelemetryHeader::SIZE);
+                }
+                packet.header  = header;
+                packet.payload = payload;
+                match tele_sender.send(packet) {
+                  Err(err) => error!("Can not send telemetry packet to downstream! {err}"),
+                  Ok(_)    => ()
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+/// ZMQ socket wrapper for the zmq socket which is 
+/// supposed to receive data from the TOF system.
+fn socket_wrap_tofstream(address   : &str,
+                         tp_sender : Sender<TofPacket>) {
+  let ctx = zmq::Context::new();
+  // FIXME - don't hardcode this IP
+  let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
+  socket.connect(address).expect("Unable to connect to data (PUB) socket {adress}");
+  socket.set_subscribe(b"").expect("Can't subscribe to any message on 0MQ socket!");
+  //let mut n_pack = 0usize;
+  info!("0MQ SUB socket connected to address {address}");
+  // per default, we create master trigger packets from TofEventSummary, 
+  // except we have "real" mtb packets
+  //let mut craft_mte_packets = true;
+  loop {
+    match socket.recv_bytes(0) {
+      Err(err) => error!("Can't receive TofPacket! {err}"),
+      Ok(payload)    => {
+        match TofPacket::from_bytestream(&payload, &mut 0) {
+          Ok(tp) => {
+            match tp_sender.send(tp) {
+              Ok(_) => (),
+              Err(err) => error!("Can't send TofPacket over channel! {err}")
+            }
+          }
+          Err(err) => {
+            debug!("Can't decode payload! {err}");
+            // that might have an RB prefix, forward 
+            // it 
+            match TofPacket::from_bytestream(&payload, &mut 4) {
+              Err(err) => {
+                error!("Don't understand bytestream! {err}"); 
+              },
+              Ok(tp) => {
+                match tp_sender.send(tp) {
+                  Ok(_) => (),
+                  Err(err) => error!("Can't send TofPacket over channel! {err}")
+                }
+              }
+            }
+          }  
+        }
+      }
+    }
+  }
+}
 
 
 #[derive(Parser, Debug)]
@@ -150,6 +257,12 @@ struct Args {
   /// this parameter. 
   #[arg(short, long, default_value_t = 1000.0)]
   refresh_rate: f32,
+  /// Get the TofData not from the TOF stream, 
+  /// but extract it from the telemetry data instead
+  /// THIS NEEDS THAT THE CODE HAS BEEN COMPILED WITH 
+  /// --features=telemetry
+  #[arg(short, long, default_value_t = false)]
+  from_telemetry : bool,
   ///// generic liftof config file. If not given, we 
   ///// assume liftof-config.toml in this directory
   //#[arg(short, long)]
@@ -160,6 +273,7 @@ enum Event<I> {
     Input(I),
     Tick,
 }
+
 
 /// Use the TuiLoggerWidget to display 
 /// the most recent log messages
@@ -285,185 +399,170 @@ fn packet_sorter(packet_type : &PacketType,
   }
 }
 
+
+
+
+
 /// Receive packets from an IP address
 /// and distrubute them to their receivers
 /// while taking notes of everything
 ///
 /// This is a Pablo Pubsub kind of persona
 /// (see a fantastic talk at RustConf 2023)
-fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
-                   tp_sender_rb : Sender<TofPacket>,
-                   tp_sender_ev : Sender<TofPacket>,
-                   tp_sender_cp : Sender<TofPacket>,
-                   rbwf_sender  : Sender<TofPacket>,
-                   ts_send      : Sender<TofEventSummary>,
-                   th_send      : Sender<TofHit>,
-                   str_list     : Arc<Mutex<VecDeque<String>>>,
-                   pck_map      : Arc<Mutex<HashMap<String, usize>>>) {
-  let ctx = zmq::Context::new();
-  // FIXME - don't hardcode this IP
-  // tof-computer tailscale is 100.101.96.10/32
-  //let address    : &str = "tcp://100.96.207.91:42000";
-  //let address_rb : &str = "tcp://100.96.207.91:42001";
-  let address : &str = "tcp://192.168.37.20:42000";
-  //let address : &str = "tcp://100.101.96.10:42000";
-  let data_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
-  data_socket.connect(address).expect("Unable to connect to data (PUB) socket {adress}");
-  //data_socket.connect(address_rb).expect("Unable to connect to (PUB) socket {address_rb}");
-  match data_socket.set_subscribe(b"") {
-    Err(err) => error!("Can't subscribe to any message on 0MQ socket! {err}"),
-    Ok(_)    => (),
-  }
+fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
+                      tp_sender_mt : Sender<TofPacket>,
+                      tp_sender_rb : Sender<TofPacket>,
+                      tp_sender_ev : Sender<TofPacket>,
+                      tp_sender_cp : Sender<TofPacket>,
+                      rbwf_sender  : Sender<TofPacket>,
+                      ts_send      : Sender<TofEventSummary>,
+                      th_send      : Sender<TofHit>,
+                      str_list     : Arc<Mutex<VecDeque<String>>>,
+                      pck_map      : Arc<Mutex<HashMap<String, usize>>>) {
+  //let ctx = zmq::Context::new();
+  //// FIXME - don't hardcode this IP
+  //// tof-computer tailscale is 100.101.96.10/32
+  ////let address    : &str = "tcp://100.96.207.91:42000";
+  ////let address_rb : &str = "tcp://100.96.207.91:42001";
+  //let address : &str = "tcp://192.168.37.20:42000";
+  ////let address : &str = "tcp://100.101.96.10:42000";
+  //let data_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
+  //data_socket.connect(address).expect("Unable to connect to data (PUB) socket {adress}");
+  ////data_socket.connect(address_rb).expect("Unable to connect to (PUB) socket {address_rb}");
+  //match data_socket.set_subscribe(b"") {
+  //  Err(err) => error!("Can't subscribe to any message on 0MQ socket! {err}"),
+  //  Ok(_)    => (),
+  //}
   let mut n_pack = 0usize;
-  info!("0MQ SUB socket connected to address {address}");
-  // per default, we create master trigger packets from TofEventSummary, 
-  // except we have "real" mtb packets
+  //info!("0MQ SUB socket connected to address {address}");
+  //// per default, we create master trigger packets from TofEventSummary, 
+  //// except we have "real" mtb packets
   let mut craft_mte_packets = true;
 
   loop {
-    match data_socket.recv_bytes(0) {
+    //match data_socket.recv_bytes(0) {
+    match tp_from_sock.recv() {
       Err(err) => error!("Can't receive TofPacket! {err}"),
-      Ok(payload)    => {
-        match TofPacket::from_bytestream(&payload, &mut 0) {
-          Err(err) => {
-            debug!("Can't decode payload! {err}");
-            // that might have an RB prefix, forward 
-            // it 
-            match TofPacket::from_bytestream(&payload, &mut 4) {
-              Err(err) => {
-                error!("Don't understand bytestream! {err}"); 
-              },
-              Ok(tp) => {
-                //println!("{:?}", pck_map);
-                packet_sorter(&tp.packet_type, &pck_map);
-                n_pack += 1;
-                //println!("Got TP {}", tp);
-                match str_list.lock() {
-                  Err(err) => error!("Can't lock shared memory! {err}"),
-                  Ok(mut _list)    => {
-                    let prefix  = String::from_utf8(payload[0..4].to_vec()).expect("Can't get prefix!");
-                    let message = format!("{}-{} {}", n_pack,prefix, tp.to_string());
-                    _list.push_back(message);
-                  }
-                }
-            
-                match tp_sender_rb.send(tp) {
-                  Err(err) => error!("Can't send TP! {err}"),
-                  Ok(_)    => (),
-                }
-              }
-            }
-          },
-          Ok(tp)   => {
-            packet_sorter(&tp.packet_type, &pck_map);
-            n_pack += 1;
-            match str_list.lock() {
-              Err(err) => error!("Can't lock shared memory! {err}"),
-              Ok(mut _list)    => {
-                let message = format!("{} {}", n_pack, tp.to_string());
-                _list.push_back(message);
-              }
-            }
-            match tp.packet_type {
-              PacketType::MonitorMtb |
-              PacketType::MasterTrigger => {
-                // apparently, we are getting MasterTriggerEvents, 
-                // sow we won't be needing to craft them from 
-                // TofEventSummary packets
-                if tp.packet_type == PacketType::MasterTrigger {
-                  craft_mte_packets = false;
-                }
-                match tp_sender_mt.send(tp) {
-                  Err(err) => error!("Can't send TP! {err}"),
-                  Ok(_)    => (),
-                }
-              },
-              PacketType::RBWaveform => {
-                match rbwf_sender.send(tp) {
-                  Err(err) => error!("Can't send TP! {err}"),
-                  Ok(_)    => (),
-                }
-              }
-              PacketType::TofEventSummary => {
-                match TofEventSummary::from_tofpacket(&tp) {
-                  Err(err) => {
-                    error!("Unable to unpack TofEventSummary! {err}");
-                  }
-                  Ok(ts) => {
-                    if craft_mte_packets {
-                      let mte    = MasterTriggerEvent::from(&ts);
-                      let mte_tp = mte.pack();
-                      //error!("We are sending the following tp {}", mte_tp);
-                      match tp_sender_mt.send(mte_tp) {
-                        Err(err) => error!("Can't send MTE TP! {err}"),
-                        Ok(_)    => ()
-                      }
-                    }
-                    for h in &ts.hits {
-                      match th_send.send(*h) {
-                        Err(err) => error!("Can't send TP! {err}"),
-                        Ok(_)    => (),
-                      }
-                    }
-                    match ts_send.send(ts) {
-                      Err(err) => error!("Can't send TP! {err}"),
-                      Ok(_)    => (),
-                    }
-                  }
-                }
-              }
-              PacketType::TofEvent => {
-                // since the tof event contains MTEs, we don't need
-                // to craft them
-                craft_mte_packets = false;
-                match tp_sender_ev.send(tp) {
-                  Err(err) => error!("Can't send TP! {err}"),
-                  Ok(_)    => (),
-                }
-                // Disasemble the packets
-                //match TofEvent::from_bytestream(tp.payload, &mut 0) {
-                //  Err(err) => {
-                //    error!("Can't decode TofEvent");
-                //  },
-                //  Ok(ev) => {
-                //    //for rbev in ev.rb_events {
-                //    //  let 
-                //    //  match tp_sender_rb.send
-                //    //}
-                //  }
-                //}
-              }
-              PacketType::RBEvent |
-              PacketType::RBEventMemoryView | 
-              PacketType::LTBMoniData |
-              PacketType::PAMoniData  |
-              PacketType::PBMoniData  |
-              PacketType::RBMoniData => {
-                match tp_sender_rb.send(tp) {
-                  Err(err) => error!("Can't send TP! {err}"),
-                  Ok(_)    => (),
-                }
-              }
-              PacketType::CPUMoniData => {
-                match tp_sender_cp.send(tp) {
-                  Err(err) => error!("Can't send TP! {err}"),
-                  Ok(_)    => (),
-                }
-              }
-              _ => () 
-            }
+      //Ok(payload)    => {
+      //  match TofPacket::from_bytestream(&payload, &mut 0) {
+      //    Err(err) => {
+      //      debug!("Can't decode payload! {err}");
+      //      // that might have an RB prefix, forward 
+      //      // it 
+      //      match TofPacket::from_bytestream(&payload, &mut 4) {
+      //        Err(err) => {
+      //          error!("Don't understand bytestream! {err}"); 
+      //        },
+      Ok(tp) => {
+        //println!("{:?}", pck_map);
+        packet_sorter(&tp.packet_type, &pck_map);
+        n_pack += 1;
+        //println!("Got TP {}", tp);
+        match str_list.lock() {
+          Err(err) => error!("Can't lock shared memory! {err}"),
+          Ok(mut _list)    => {
+            //let prefix  = String::from_utf8(payload[0..4].to_vec()).expect("Can't get prefix!");
+            //let message = format!("{}-{} {}", n_pack,prefix, tp.to_string());
+            let message = format!("{} : {}", n_pack, tp);
+            _list.push_back(message);
           }
         }
+        match tp.packet_type {
+          PacketType::MonitorMtb |
+          PacketType::MasterTrigger => {
+            // apparently, we are getting MasterTriggerEvents, 
+            // sow we won't be needing to craft them from 
+            // TofEventSummary packets
+            if tp.packet_type == PacketType::MasterTrigger {
+              craft_mte_packets = false;
+            }
+            match tp_sender_mt.send(tp) {
+              Err(err) => error!("Can't send TP! {err}"),
+              Ok(_)    => (),
+            }
+          },
+          PacketType::RBWaveform => {
+            match rbwf_sender.send(tp) {
+              Err(err) => error!("Can't send TP! {err}"),
+              Ok(_)    => (),
+            }
+          }
+          PacketType::TofEventSummary => {
+            match TofEventSummary::from_tofpacket(&tp) {
+              Err(err) => {
+                error!("Unable to unpack TofEventSummary! {err}");
+              }
+              Ok(ts) => {
+                if craft_mte_packets {
+                  let mte    = MasterTriggerEvent::from(&ts);
+                  let mte_tp = mte.pack();
+                  //error!("We are sending the following tp {}", mte_tp);
+                  match tp_sender_mt.send(mte_tp) {
+                    Err(err) => error!("Can't send MTE TP! {err}"),
+                    Ok(_)    => ()
+                  }
+                }
+                for h in &ts.hits {
+                  match th_send.send(*h) {
+                    Err(err) => error!("Can't send TP! {err}"),
+                    Ok(_)    => (),
+                  }
+                }
+                match ts_send.send(ts) {
+                  Err(err) => error!("Can't send TP! {err}"),
+                  Ok(_)    => (),
+                }
+              }
+            }
+          }
+          PacketType::TofEvent => {
+            // since the tof event contains MTEs, we don't need
+            // to craft them
+            craft_mte_packets = false;
+            match tp_sender_ev.send(tp) {
+              Err(err) => error!("Can't send TP! {err}"),
+              Ok(_)    => (),
+            }
+            // Disasemble the packets
+            //match TofEvent::from_bytestream(tp.payload, &mut 0) {
+            //  Err(err) => {
+            //    error!("Can't decode TofEvent");
+            //  },
+            //  Ok(ev) => {
+            //    //for rbev in ev.rb_events {
+            //    //  let 
+            //    //  match tp_sender_rb.send
+            //    //}
+            //  }
+            //}
+          }
+          PacketType::RBEvent |
+          PacketType::RBEventMemoryView | 
+          PacketType::LTBMoniData |
+          PacketType::PAMoniData  |
+          PacketType::PBMoniData  |
+          PacketType::RBMoniData => {
+            match tp_sender_rb.send(tp) {
+              Err(err) => error!("Can't send TP! {err}"),
+              Ok(_)    => (),
+            }
+          }
+          PacketType::CPUMoniData => {
+            match tp_sender_cp.send(tp) {
+              Err(err) => error!("Can't send TP! {err}"),
+              Ok(_)    => (),
+            }
+          }
+          _ => () 
+        }
       }
-    }
-  } 
+    } 
+  }
 }
-
 
 // make a "holder" for all the tabs and menus, 
 // so that it can be put in an Arc(Mutex), so
 // we can multithread it
-#[derive(Debug, Clone)]
 struct TabbedInterface<'a> {
   pub ui_menu       :  MainMenu,
   pub rb_menu       :  RBMenu,
@@ -473,6 +572,7 @@ struct TabbedInterface<'a> {
   pub ts_menu       :  TSMenu,
   pub rw_menu       :  RWMenu,
   pub pa_menu       :  PAMoniMenu,
+  pub te_menu       :  TEMenu,
 
   // The tabs
   pub mt_tab        : MTTab,
@@ -487,6 +587,9 @@ struct TabbedInterface<'a> {
   // flight packets
   pub rbwf_tab      : RBWaveformTab,
   pub ts_tab        : TofSummaryTab,
+  
+  // telemetry 
+  pub te_tab       : TelemetryTab,
 
   // latest color set
   pub color_set     : ColorSet,
@@ -501,6 +604,7 @@ impl<'a> TabbedInterface<'a> {
              ts_menu      : TSMenu,
              rw_menu      : RWMenu,
              pa_menu      : PAMoniMenu,
+             te_menu      : TEMenu,
              mt_tab       : MTTab,
              cpu_tab      : CPUTab,
              wf_tab       : RBTab<'a>,
@@ -509,7 +613,8 @@ impl<'a> TabbedInterface<'a> {
              event_tab    : EventTab,
              th_tab       : TofHitTab<'a>,
              rbwf_tab     : RBWaveformTab,
-             ts_tab       : TofSummaryTab) -> Self {
+             ts_tab       : TofSummaryTab,
+             te_tab       : TelemetryTab) -> Self {
     Self {
       ui_menu     ,
       rb_menu     , 
@@ -519,6 +624,7 @@ impl<'a> TabbedInterface<'a> {
       ts_menu     ,
       rw_menu     ,
       pa_menu     ,
+      te_menu     ,
       mt_tab      , 
       cpu_tab     , 
       wf_tab      , 
@@ -528,6 +634,7 @@ impl<'a> TabbedInterface<'a> {
       th_tab      ,
       rbwf_tab    ,
       ts_tab      ,
+      te_tab      ,
       color_set   : COLORSETBW,
     }
   }
@@ -565,6 +672,13 @@ impl<'a> TabbedInterface<'a> {
       Err(err) => error!("Can not receive TofEventSummaries for TofEventSummaryTab! {err}"),
       Ok(_)    => ()
     }
+    // technically, this should live in a seperate thread! This tab as its own 
+    // ZMQ socket, and is independent of the others. The frequency should be about 
+    // the same though, so maybe for now it is fine
+    match self.te_tab.receive_packet() {
+      Err(err) => error!("Can not receive a new packet from the Telemetry Stream! {err}"),
+      Ok(_)    => ()
+    }
   }
 
   fn update_color_theme(&mut self, cs : ColorSet) {
@@ -575,6 +689,7 @@ impl<'a> TabbedInterface<'a> {
     self.rw_menu.theme.update(&cs);
     self.ts_menu.theme.update(&cs);
     self.th_menu.theme.update(&cs);
+    self.te_menu.theme.update(&cs);
     self.home_tab    .theme.update(&cs);
     self.event_tab   .theme.update(&cs);
     self.wf_tab      .theme.update(&cs);
@@ -584,6 +699,7 @@ impl<'a> TabbedInterface<'a> {
     self.th_tab      .theme.update(&cs);
     self.rbwf_tab    .theme.update(&cs);
     self.ts_tab      .theme.update(&cs);
+    self.te_tab      .theme.update(&cs);
     self.color_set = cs;
   }
   
@@ -636,6 +752,11 @@ impl<'a> TabbedInterface<'a> {
     self.pa_menu.render(&master_lo.rect[0], frame);
     self.wf_tab.render(&master_lo.rect[1], frame);
   }
+  
+  pub fn render_telemetrytab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.te_menu.render(&master_lo.rect[0], frame);
+    self.te_tab.render(&master_lo.rect[1], frame);
+  }
 
   pub fn render(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
     match self.ui_menu.active_menu_item {
@@ -669,6 +790,9 @@ impl<'a> TabbedInterface<'a> {
       }
       MenuItem::TofSummary => {
         self.render_tofsummarytab(master_lo, frame);
+      }
+      MenuItem::Telemetry => {
+        self.render_telemetrytab(master_lo, frame);
       }
       _ => {
         self.ui_menu.render(&master_lo.rect[0], frame);
@@ -852,6 +976,7 @@ impl<'a> TabbedInterface<'a> {
           KeyCode::Char('y') => self.ui_menu.active_menu_item = MenuItem::TofSummary,
           KeyCode::Char('w') => self.ui_menu.active_menu_item = MenuItem::RBWaveform,
           KeyCode::Char('f') => self.ui_menu.active_menu_item = MenuItem::TofHits,
+          KeyCode::Char('e') => self.ui_menu.active_menu_item = MenuItem::Telemetry,
           KeyCode::Char('s') => self.ui_menu.active_menu_item = MenuItem::Settings,
           KeyCode::Char('m') => self.ui_menu.active_menu_item = MenuItem::MasterTrigger,
           KeyCode::Char('c') => self.ui_menu.active_menu_item = MenuItem::TOFCpu,
@@ -869,7 +994,7 @@ impl<'a> TabbedInterface<'a> {
 
 fn main () -> Result<(), Box<dyn std::error::Error>>{
   
-
+  let args = Args::parse();                   
 
   let home_stream_wd_cnt : Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
   let home_streamer      = home_stream_wd_cnt.clone();
@@ -915,12 +1040,17 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let packet_map : Arc<Mutex<HashMap<String, usize>>> = Arc::new(Mutex::new(pm));
   let packet_map_home = packet_map.clone();
 
+  // this determines the source of all TofPackets
+  let (tp_to_distrib, tp_from_sock)     : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
+
   // sender receiver combo to subscribe to tofpackets
   let (mt_pack_send, mt_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (rb_pack_send, rb_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (ev_pack_send, ev_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (cp_pack_send, cp_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (rbwf_pack_send, rbwf_pack_recv)  : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
+  #[cfg(feature = "telemetry")]
+  let (te_pack_send,  te_pack_recv)     : (Sender<TelemetryPacket>, Receiver<TelemetryPacket>) = unbounded();
 
   // sender receiver for inter thread communication with decoded packets
   let (mte_send, mte_recv)         : (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = unbounded();
@@ -928,24 +1058,74 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (th_send, th_recv)           : (Sender<TofHit>, Receiver<TofHit>)                         = unbounded();
   let (ts_send, ts_recv)           : (Sender<TofEventSummary>, Receiver<TofEventSummary>)       = unbounded();
 
+  // depending on the switch in the 
+  // commandline args, we either 
+  // connect to the telemetry stream 
+  // or directly to the tof data strea
+  // ROUTING: In this case we reroute the 
+  // packets through the TelemetryTab, 
+  // which unpacks them and then it will 
+  // funnel in the packet-distributor 
+  // thread
+  // This also means, that in case where we 
+  // don't want the packets from telemetry,
+  // we have to spawn an additional thread which 
+  // receives the packets from the TOF stream
+  // instead
+  //if args.from_telemetry {
+  if !args.from_telemetry {
+    let _tp_to_distrib = tp_to_distrib.clone();
+    let tofcpu_address : &str = "tcp://192.168.37.20:42000";
+    let _packet_recv_thread = thread::Builder::new()
+      .name("socket-wrap-tofstream".into())
+      .spawn(move || {
+        socket_wrap_tofstream(tofcpu_address,
+                              _tp_to_distrib);
+      }).expect("Unable to spawn socket-wrap-tofstream thread!");
+  }
+  //  let _packet_recv_thread = thread::Builder::new()
+  //    .name("packet-receiver".into())
+  //    .spawn(move || {
+  //      let telemetry_address : &str = "tcp://127.0.0.1:55555";
+  //      socket_wrap_telemetry(telemetry_address, 
+  //                            tp_to_distrib );
+  //    })
+  //  .expect("Failed to spawn mt packet receiver thread!");
+
+
   // FIXME - spawn a new thread per each tab!
   let th_sender_c = th_send.clone();
-  let _packet_recv_thread = thread::Builder::new()
-    .name("mt_packet_receiver".into())
+  let _packet_dist_thread = thread::Builder::new()
+    .name("packet-distributor".into())
     .spawn(move || {
-      packet_receiver(mt_pack_send, 
-                      rb_pack_send,
-                      ev_pack_send,
-                      cp_pack_send,
-                      rbwf_pack_send,
-                      ts_send,
-                      th_sender_c,
-                      home_stream_wd_cnt,
-                      packet_map,
-                      );
-    })
-    .expect("Failed to spawn mt packet receiver thread!");
+      packet_distributor(tp_from_sock,
+                         mt_pack_send, 
+                         rb_pack_send,
+                         ev_pack_send,
+                         cp_pack_send,
+                         rbwf_pack_send,
+                         ts_send,
+                         th_sender_c,
+                         home_stream_wd_cnt,
+                         packet_map,
+                         );
+    }).expect("Failed to spawn mt packet receiver thread!");
   
+  // spawn the telemetry receiver thread
+  cfg_if::cfg_if! {
+    if #[cfg(feature = "telemetry")] {
+      let telemetry_address : &str = "tcp://127.0.0.1:55555";
+      let _telemetry_receiver_thread = thread::Builder::new()
+        .name("socket-wrap-telemetry".into())
+        .spawn(move || {
+          socket_wrap_telemetry(
+            telemetry_address,
+            te_pack_send
+          );
+        })
+        .expect("Failed to spawn mt packet receiver thread!");
+    }
+  }
   // Set max_log_level to Trace
   match tui_logger::init_logger(log::LevelFilter::Info) {
     Err(err) => panic!("Something bad just happened {err}"),
@@ -954,7 +1134,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   // Set default level for unknown targets to Trace ("Trace"/"Info") 
   tui_logger::set_default_level(log::LevelFilter::Info);
   
-  let args = Args::parse();                   
   
   // set up the terminal
   enable_raw_mode().expect("Unable to enter raw mode");
@@ -1008,6 +1187,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let ts_menu         = TSMenu::new(color_theme.clone());
   let rw_menu         = RWMenu::new(color_theme.clone());
   let pa_menu         = PAMoniMenu::new(color_theme.clone());
+  let te_menu         = TEMenu::new(color_theme.clone());
 
   // The tabs
   let mt_tab          = MTTab::new(mt_pack_recv,
@@ -1030,6 +1210,18 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                            readoutboards,
                                            color_theme.clone());
   let ts_tab          = TofSummaryTab::new(ts_recv, color_theme.clone());
+  let te_tab          : TelemetryTab;
+  if args.from_telemetry {
+    te_tab            = TelemetryTab::new(Some(tp_to_distrib),
+                                          te_pack_recv,
+                                          color_theme.clone());
+  } else {
+    te_tab      = TelemetryTab::new(None,
+                                    te_pack_recv, 
+                                    color_theme.clone());
+  
+  
+  }
   let tabs            = TabbedInterface::new(ui_menu,
                                              rb_menu,
                                              mt_menu,
@@ -1038,6 +1230,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                              ts_menu,
                                              rw_menu,
                                              pa_menu,
+                                             te_menu,
                                              mt_tab,
                                              cpu_tab,
                                              wf_tab,
@@ -1046,23 +1239,23 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                              event_tab,
                                              hit_tab,
                                              rbwf_tab,
-                                             ts_tab);
+                                             ts_tab,
+                                             te_tab);
 
   let shared_tabs : Arc<Mutex<TabbedInterface>> = Arc::new(Mutex::new(tabs));
   let shared_tabs_c = shared_tabs.clone();
   let _update_thread = thread::Builder::new()
     .name("tab-packet-receiver".into())
     .spawn(move || {
-                     loop {
-                       match shared_tabs_c.lock() {
-                         Err(err) => error!("Can't get lock on shared tabs! {err}"),
-                         Ok(mut tabs) => {
-                           tabs.receive_packet();
-                         }
-                       }
-                     }
-                   }
-    ).expect("Failed to spawn tab-packet-receiver thread!");
+      loop {
+        match shared_tabs_c.lock() {
+          Err(err) => error!("Can't get lock on shared tabs! {err}"),
+          Ok(mut tabs) => {
+            tabs.receive_packet();
+          }
+        }
+      }
+    }).expect("Failed to spawn tab-packet-receiver thread!");
 
   let mut quit_app = false;
   loop {
