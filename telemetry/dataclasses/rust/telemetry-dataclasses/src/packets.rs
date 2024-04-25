@@ -10,13 +10,15 @@ use tof_dataclasses::serialization::{
   parse_u16,
   parse_u32,
   parse_u64,
+  Serialization,
 };
 
 use tof_dataclasses::events::TofEventSummary;
+use tof_dataclasses::packets::TofPacket;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
-pub enum TelemtryPacketType {
+pub enum TelemetryPacketType {
   RBWaveform  = 91,
   Tracker     = 80,
   MergedEvent = 90,
@@ -38,9 +40,24 @@ pub enum TelemtryPacketType {
   TmP255      = 255
 }
 
-//impl TelemtryPacketType {
+//impl TelemetryPacketType {
 //
 //}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TelemetryPacket {
+  pub header  : TelemetryHeader,
+  pub payload : Vec<u8>
+}
+
+impl TelemetryPacket {
+  pub fn new() -> Self {
+    Self {
+      header  : TelemetryHeader::new(),
+      payload : Vec::<u8>::new()
+    }
+  }
+}
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct TelemetryHeader {
@@ -59,8 +76,6 @@ pub struct TelemetryHeader {
 
 impl TelemetryHeader {
 
-  const SIZE : usize = 15;
-
   pub fn new() -> Self {
     Self {
       sync      : 0,
@@ -71,9 +86,16 @@ impl TelemetryHeader {
       checksum  : 0,
     }
   }
+}
 
-  pub fn from_bytestream(stream : &Vec<u8>,
-                         pos    : &mut usize)
+impl Serialization for TelemetryHeader {
+  
+  const HEAD : u16 = 0x90eb;
+  const TAIL : u16 = 0x0000; // there is no tail for telemetry packets
+  const SIZE : usize = 13; 
+
+  fn from_bytestream(stream : &Vec<u8>,
+                    pos    : &mut usize)
     -> Result<Self, SerializationError> {
     if stream.len() < *pos + Self::SIZE {
       return Err(SerializationError::StreamTooShort);
@@ -138,18 +160,31 @@ impl MergedEvent {
     -> Result<Self, SerializationError> {
     let mut me        = MergedEvent::new();
     let _version      = parse_u8(stream, pos);
+    //println!("_version {}", _version);
     me.flags0         = parse_u8(stream, pos);
+    //println!("flags0 {}", me.flags0);
     me.flags1         = parse_u8(stream, pos);
+    //println!("flags1 {}", me.flags1);
+    //let a = parse_u8(stream, pos);
+    //let b = parse_u8(stream, pos);
+    //let c = parse_u8(stream, pos);
+    //let d = parse_u8(stream, pos);
+    //println!("a,b,c,d {} {} {} {}", a,b,c,d);
     me.event_id       = parse_u32(stream, pos);
-    let tof_delim     = parse_u8(stream, pos);
-    println!("TOF delim : {}", tof_delim);
+    //println!("EVENT ID {}", me.event_id);
+    let _tof_delim    = parse_u8(stream, pos);
+    //println!("TOF delim : {}", _tof_delim);
     let num_tof_bytes = parse_u16(stream, pos);
-    println!("Num TOF bytes : {}", num_tof_bytes);
+    //println!("Num TOF bytes : {}", num_tof_bytes);
+    if stream.len() < *pos+num_tof_bytes as usize {
+      println!("Not enough bytes for TOF packet! Expected {}, seen {}", *pos+num_tof_bytes as usize, stream.len());
+      return Err(SerializationError::StreamTooShort); 
+    }
     for _ in *pos..*pos+num_tof_bytes as usize {
       me.tof_data.push(parse_u8(stream, pos));
     }
     let trk_delim    = parse_u8(stream, pos);
-    println!("TRK delim {}", trk_delim);
+    //println!("TRK delim {}", trk_delim);
     if trk_delim != 0xbb {
       return Err(SerializationError::HeadInvalid);
     }
@@ -157,7 +192,7 @@ impl MergedEvent {
     if (num_trk_bytes as usize + *pos - 2) > stream.len() {
       return Err(SerializationError::StreamTooShort);
     }
-    println!("Num TRK bytes : {}", num_trk_bytes);
+    //println!("Num TRK bytes : {}", num_trk_bytes);
     // for now, don't unpack tracker data
     //*pos += num_trk_bytes as usize;
     let max_pos = *pos + num_trk_bytes as usize;
@@ -175,7 +210,6 @@ impl MergedEvent {
        //println!("{}",te);
        te.event_id = me.event_id;
        me.tracker_events.push(te);
-       //panic!("Auf der titanic!");
        //if(rc < 0)
        //{
        //   spdlog::info("DEBUG event.unpack rc = {}", rc);
@@ -188,6 +222,48 @@ impl MergedEvent {
        //}
     }
     Ok(me)
+  }
+}
+
+impl fmt::Display for MergedEvent {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr     = String::from("<MergedEvent:");
+    let mut tof_str  = String::from("- UNABLE TO PARSE TOF DATA!");
+    let mut tof_evid = 0u32;
+    match TofPacket::from_bytestream(&self.tof_data, &mut 0) {
+      Err(err) => error!("Unable to parse TofPacket! {err}"),
+      Ok(pack) => {
+        match pack.unpack::<TofEventSummary>() {
+          Err(err) => error!("Unable to parse TofEventSummary! {err}"),
+          Ok(ts)    => {
+            tof_str  = format!("\n  {}", ts);
+            tof_evid = ts.event_id;
+          }
+        }
+      }
+    }
+    let mut good_hits = 0;
+    let mut evids = Vec::<u32>::new();
+    for ev in &self.tracker_events {
+      evids.push(ev.event_id);
+      for h in &ev.hits { 
+        if h.adc != 0 {
+          good_hits += 1;
+        }
+      }
+    }
+    evids.sort();
+    evids.dedup();
+    repr += &(format!("  {}", self.header));
+    repr += "\n  ** ** ** MERGED  ** ** **";
+    repr += &(format!("\n  event ID        {}", self.event_id));  
+    repr += &(format!("\n  -- TOF          {}", tof_evid));
+    repr += &(format!("\n  -- TRK          {:?}", evids));
+    repr += "\n  ** ** ** TRACKER ** ** **";
+    repr += &(format!("\n  N Trk events    {}", self.tracker_events.len()));
+    repr += &(format!("\n  N Good Trk Hits {}", good_hits));
+    repr += &tof_str;
+    write!(f,"{}", repr)
   }
 }
 
