@@ -62,21 +62,16 @@ use crate::widgets::{
     prep_data,
     create_labels,
     histogram,
+    timeseries
 };
-
-
 
 #[derive(Debug, Clone)]
 pub struct MTTab {
-  pub main_layout    : Vec<Rect>,
-  pub info_layout    : Vec<Rect>,
-  pub detail_layout  : Vec<Rect>,
-  pub view_layout    : Vec<Rect>,
-
   pub event_queue    : VecDeque<MasterTriggerEvent>,
   pub moni_queue     : VecDeque<MtbMoniData>,
   pub met_queue      : VecDeque<f64>,
   pub rate_queue     : VecDeque<(f64,f64)>,
+  pub lost_r_queue   : VecDeque<(f64,f64)>,
   pub fpgatmp_queue  : VecDeque<(f64,f64)>,
   pub tp_receiver    : Receiver<TofPacket>,
   pub mte_receiver   : Receiver<MasterTriggerEvent>,
@@ -94,7 +89,6 @@ pub struct MTTab {
   pub mapping        : DsiJChPidMapping,
   pub problem_hits   : Vec<(u8, u8, (u8, u8), LTBThreshold)>,
   timer              : Instant,
-
 }
 
 impl MTTab {
@@ -107,14 +101,11 @@ impl MTTab {
     let mtb_link_bins = Uniform::new(50, 0.0, 50.0);
     let panel_bins    = Uniform::new(22, 1.0, 22.0);
     Self {
-      main_layout    : Vec::<Rect>::new(),
-      info_layout    : Vec::<Rect>::new(),
-      detail_layout  : Vec::<Rect>::new(),
-      view_layout    : Vec::<Rect>::new(),
       event_queue    : VecDeque::<MasterTriggerEvent>::with_capacity(1000),
       moni_queue     : VecDeque::<MtbMoniData>::with_capacity(1000),
       met_queue      : VecDeque::<f64>::with_capacity(1000),
       rate_queue     : VecDeque::<(f64,f64)>::with_capacity(1000),
+      lost_r_queue   : VecDeque::<(f64,f64)>::with_capacity(1000),
       fpgatmp_queue  : VecDeque::<(f64,f64)>::with_capacity(1000),
       tp_receiver    : tp_receiver,
       mte_receiver   : mte_receiver,
@@ -242,7 +233,8 @@ impl MTTab {
     let main_chunks = Layout::default()
       .direction(Direction::Horizontal)
       .constraints(
-          [Constraint::Percentage(70), Constraint::Percentage(30)].as_ref(),
+          [Constraint::Percentage(70),
+           Constraint::Percentage(30)].as_ref(),
       )
       .split(*main_window);
    
@@ -275,20 +267,20 @@ impl MTTab {
           ].as_ref(),
       )
       .split(detail_chunks[0]);
-   
+    let trig_pan_and_hits = Layout::default()
+      .direction(Direction::Vertical)
+      .constraints(
+          [Constraint::Percentage(50),
+           Constraint::Percentage(50)].as_ref(),
+      )
+      .split(view_chunks[2]);
+      
     let bottom_row = detail_chunks[1];
-    //let bottom_row = Layout::default()
-    //  .direction(Direction::Horizontal)
-    //  .constraints(
-    //      [Constraint::Percentage(50),
-    //       Constraint::Percentage(50),
-    //      ].as_ref(),
-    //  ).split(detail_chunks[1]);
 
-    self.main_layout   = main_chunks.to_vec();
-    self.info_layout   = info_chunks.to_vec();
-    self.detail_layout = detail_chunks.to_vec();
-    self.view_layout   = view_chunks.to_vec();
+    //let main_layout   = main_chunks.to_vec();
+    //let detail_layout = detail_chunks.to_vec();
+    let info_layout   = info_chunks.to_vec();
+    let view_layout   = view_chunks.to_vec();
 
     let t_min = *self.met_queue.front().unwrap_or(&0.0) as u64;
     let t_max = *self.met_queue.back().unwrap_or(&0.0)  as u64;
@@ -347,7 +339,26 @@ impl MTTab {
     let nch_data    = prep_data(&self.nch_histo, &nch_labels, 2, true); 
     let nch_chart   = histogram(nch_data, String::from("N Hits (N CH)"), 2, 0, &self.theme);
 
-    // FPGA temperature
+    // FPGA temperature (future)
+    //let fpga_t_label    = String::from("FPGA T [\u{00B0}C] ");
+    //let fpga_t_theme    = self.theme.clone();
+    //let mut fpga_t_data = self.fpgatmp_queue.clone(); //.make_contiguous();
+    //let mut fpga_t_ts   = timeseries(&mut fpga_t_data,
+    //                                 fpga_t_label.clone(),
+    //                                 fpga_t_label.clone(),
+    //                                 &fpga_t_theme);
+    //frame.render_widget(fpga_t_ts, info_layout[2]);
+
+    // Lost Trigger rate
+    let lost_t_label    = String::from("Lost Trigger Rate [Hz]");
+    let lost_t_theme    = self.theme.clone();
+    let mut lost_t_data = self.lost_r_queue.clone(); //.make_contiguous();
+    let lost_t_ts       = timeseries(&mut lost_t_data,
+                                     lost_t_label.clone(),
+                                     lost_t_label.clone(),
+                                     &lost_t_theme);
+
+    
     let tmp_only : Vec::<i64> = self.fpgatmp_queue.iter().map(|z| z.1.round() as i64).collect();
     let tmp_max = *tmp_only.iter().max().unwrap_or(&0) + 5;
     let tmp_min = *tmp_only.iter().min().unwrap_or(&0) - 5;
@@ -428,38 +439,27 @@ impl MTTab {
         .border_type(BorderType::Rounded),
     );
     
-
-     // histograms
-     let ml_labels  = create_labels(&self.mtb_link_histo);
-     let mlh_data   = prep_data(&self.mtb_link_histo, &ml_labels, 10, true); 
-     let mlh_chart  = histogram(mlh_data, String::from("MTB Link ID (NOT RBID(!))"), 3, 0, &self.theme);
-     frame.render_widget(mlh_chart, bottom_row);   
-     
-     let tp_labels  = create_labels(&self.panel_histo);
-     let tph_data   = prep_data(&self.panel_histo, &tp_labels, 2, true); 
-     let tpc_chart  = histogram(tph_data, String::from("Triggered Panel ID"), 3, 0, &self.theme);
-     frame.render_widget(tpc_chart,   self.view_layout[2]);
+    // histograms
+    let ml_labels  = create_labels(&self.mtb_link_histo);
+    let mlh_data   = prep_data(&self.mtb_link_histo, &ml_labels, 10, true); 
+    let mlh_chart  = histogram(mlh_data, String::from("MTB Link ID (NOT RBID(!))"), 3, 0, &self.theme);
+    frame.render_widget(mlh_chart, bottom_row);   
+    
+    let tp_labels  = create_labels(&self.panel_histo);
+    let tph_data   = prep_data(&self.panel_histo, &tp_labels, 2, true); 
+    let tpc_chart  = histogram(tph_data, String::from("Triggered Panel ID"), 3, 0, &self.theme);
+    //frame.render_widget(tpc_chart,      view_layout[2]);
+    frame.render_widget(tpc_chart, trig_pan_and_hits[0]);
+    frame.render_widget(nch_chart, trig_pan_and_hits[1]);
 
     // render everything
-    frame.render_widget(rate_chart,      self.info_layout[0]); 
-    frame.render_widget(nch_chart,       self.info_layout[1]);
-    frame.render_widget(fpga_temp_chart, self.info_layout[2]);
-    frame.render_widget(event_view,      self.view_layout[0]);
-    frame.render_widget(moni_view,       self.view_layout[1]);
+    frame.render_widget(rate_chart,      info_layout[0]); 
+    frame.render_widget(lost_t_ts,       info_layout[1]);
+    //frame.render_widget(nch_chart,       info_layout[1]);
+    frame.render_widget(fpga_temp_chart, info_layout[2]);
+    frame.render_widget(event_view,      view_layout[0]);
+    frame.render_widget(moni_view,       view_layout[1]);
     //frame.render_widget(summary_view,    bottom_row[0]);
   }
 }
     
-//    let network = Sparkline::default()
-//    .block(
-//      Block::default()
-//        .borders(Borders::ALL)
-//        .style(Style::default().fg(Color::White))
-//        .title("Network I/O")
-//        .border_type(BorderType::Double),
-//    ) // or THREE_LEVELS
-//    .bar_set(tui::symbols::bar::NINE_LEVELS)
-//    .data(&[0, 2, 3, 4, 1, 4, 10])
-//    .max(5)
-//    .style(Style::default().fg(Color::Blue).bg(Color::Black));
-
