@@ -457,7 +457,7 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def_readonly("adc_avdd_voltage",&RBMoniData::adc_avdd_voltage)           
         .def_readonly("adc_avdd_current",&RBMoniData::adc_avdd_current)           
         .def_readonly("adc_avdd_power",  &RBMoniData::adc_avdd_power)           
-        .def_readonly("drs_avdd_voltage",&RBMoniData::adc_avdd_power)           
+        .def_readonly("drs_avdd_voltage",&RBMoniData::drs_avdd_voltage)          
         .def_readonly("drs_avdd_current",&RBMoniData::drs_avdd_current)           
         .def_readonly("drs_avdd_power",  &RBMoniData::drs_avdd_power)           
         .def_readonly("n1v5_voltage",    &RBMoniData::n1v5_voltage)                 
