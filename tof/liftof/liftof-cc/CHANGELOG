@@ -4,6 +4,7 @@
 * WIP: systemd integration
 * refactored commandeering interface
 * decluttered command line args
+* renames threads/flight_comms.rs -> threads/global_data_sink.rs
 
 # v0.10.1
 * adaptions to upstream DB changes

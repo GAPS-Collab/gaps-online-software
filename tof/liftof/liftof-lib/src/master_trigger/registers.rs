@@ -1784,6 +1784,16 @@ pub const RB_CNTS_SNAP : MTBRegister<'static> = MTBRegister {
   pulse : false,
 };
 
+/// Add the central track trigger to all triggers
+/// TRACK_CENTRAL_IS_GLOBAL   0xb     0x2c    2   rw  0x0     1 makes the TRACK central read all paddles.
+pub const TRACK_CENTRAL_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
+  addr  : 0xb,
+  mask  : 0x00000001,
+  descr : "Allow everything to always trigger on a track trigger",
+  rmw   : true,
+  ro    : false,
+  pulse : false,
+};
 
 
 
@@ -1804,6 +1814,7 @@ pub const RB_CNTS_SNAP : MTBRegister<'static> = MTBRegister {
 //RESYNC    0xa     0x28    0   w   Pulse   Write 1 to resync
 //ANY_TRIG_IS_GLOBAL    0xb     0x2c    0   rw  0x0     1 makes the ANY trigger read all paddles.
 //TRACK_TRIG_IS_GLOBAL  0xb     0x2c    1   rw  0x0     1 makes the TRACK trigger read all paddles.
+//TRACK_CENTRAL_IS_GLOBAL   0xb     0x2c    2   rw  0x0     1 makes the TRACK central read all paddles.
 //TRACK_CENTRAL_IS_GLOBAL   0xb     0x2c    2   rw  0x0     1 makes the TRACK central read all paddles.
 //TIU_USE_AUX_LINK  0xe     0x38    1   rw  0x0     1 to use J11; 0 to use J3
 //TIU_EMU_BUSY_CNT  0xe     0x38    [31:14]     rw  0xC350  Number of 10 ns clock cyles that the emulator will remain busy
