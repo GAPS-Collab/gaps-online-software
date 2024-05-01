@@ -1,19 +1,26 @@
 //use std::collections::VecDeque;
 use std::collections::HashMap;
 use std::path::Path;
-
 pub mod dataclasses;
+pub mod master_trigger;
+//pub mod mtb_registers;
 
 use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
 
 extern crate pyo3_log;
+extern crate comfy_table;
+
 use numpy::PyArray1;
 
 use crate::dataclasses::{
     PyRBCalibration,
     PyMasterTriggerEvent,
     PyRBEvent,
+    PyIPBus,
+};
+use crate::master_trigger::{
+    PyMasterTrigger,
 };
 
 use tof_dataclasses::analysis::{
@@ -34,25 +41,31 @@ use tof_dataclasses::calibrations::{
     Edge,
 };
 
+use tof_dataclasses::database::{
+    RAT,
+    DSICard,
+    Paddle,
+    MTBChannel,
+    LocalTriggerBoard,
+    ReadoutBoard,
+    Panel,
+    connect_to_db,
+};
+
 use tof_dataclasses::events::{
-    MasterTriggerEvent,
     RBEvent, 
     TofEvent
 };
 
-use tof_dataclasses::manifest::get_rbs_from_sqlite;
-
 use tof_dataclasses::packets::PacketType;
-
 use tof_dataclasses::io::TofPacketReader;
-
 use tof_dataclasses::serialization::Serialization;
-
-use tof_dataclasses::ipbus as ipbus;
-use tof_dataclasses::manifest::ReadoutBoard;
 
 use liftof_lib::waveform_analysis;
 use liftof_lib::settings::AnalysisEngineSettings;
+
+
+
 
 ///helper
 fn convert_pyarray1(arr : &PyArray1<f32>) -> Vec<f32> {
@@ -61,6 +74,40 @@ fn convert_pyarray1(arr : &PyArray1<f32>) -> Vec<f32> {
     vec.extend_from_slice(arr.as_slice().unwrap());
   }
   return vec;
+}
+
+#[pyfunction]
+#[pyo3(name="test_db")]
+pub fn test_db() {
+  let mut conn = connect_to_db(String::from("/srv/gaps/gaps-online-software/gaps-db/gaps_db/gaps_flight.db")).unwrap();
+  let rats = RAT::all(&mut conn).unwrap();
+  for r in rats {
+    println!("{}", r);
+  }
+  let dsis = DSICard::all(&mut conn).unwrap();
+  for dsi in dsis {
+    println!("{}", dsi);
+  }
+  let paddles = Paddle::all(&mut conn).unwrap();
+  for pdl in paddles {
+    println!("{}", pdl);
+  }
+  let mtbch = MTBChannel::all(&mut conn).unwrap();
+  for chnl in mtbch {
+    println!("{}", chnl);
+  }
+  let ltbs = LocalTriggerBoard::all(&mut conn).unwrap();
+  for ltb in ltbs {
+    println!("{}", ltb);
+  }
+  let rbs = ReadoutBoard::all(&mut conn).unwrap();
+  for rb in rbs {
+    println!("{}", rb);
+  }
+  let panels = Panel::all(&mut conn).unwrap();
+  for pnl in panels {
+    println!("{}", pnl);
+  }
 }
 
 #[pyfunction]
@@ -274,23 +321,26 @@ fn test_waveform_analysis(filename : String) -> PyRBEvent {
   settings.find_pks_t_start  = 60.0;
   settings.find_pks_t_window = 300.0;
   settings.min_peak_size     = 10;
-  let rb             = ReadoutBoard::new();
-  let pth            = Path::new("/srv/gaps/gaps-online-software/gaps-db/gaps_db/gaps_flight.db");
-  let rbs            = get_rbs_from_sqlite(pth);
-  let mut rb_map     = HashMap::<u8, ReadoutBoard>::new();
+  let rb         = ReadoutBoard::new();
+  let pth        = String::from("/srv/gaps/gaps-online-software/gaps-db/gaps_db/gaps_flight.db");
+  let mut conn   = connect_to_db(pth).unwrap();
+  let rbs        = ReadoutBoard::all(&mut conn).unwrap();
+  let mut rb_map = HashMap::<u8, ReadoutBoard>::new();
   for mut rb in rbs {
     rb.calib_file_path = String::from("/data0/gaps/nevis/calib/latest/"); 
     rb.load_latest_calibration();
     rb_map.insert(rb.rb_id, rb);
   }
-  let mut reader = TofPacketReader::new(filename);
+  let mut reader  = TofPacketReader::new(filename);
   let mut py_rbev = PyRBEvent::new();
+  //let mut n_ev    = 0u32;
   loop {
     match reader.next()  {
       Some(tp) => {
         match tp.packet_type {
           PacketType::TofEvent => {
-            match TofEvent::from_tofpacket(&tp) {
+            match tp.unpack::<TofEvent>() {
+            //match TofEvent::from_tofpacket(&tp) {
               Err(err) => (),
               Ok(te) => {
                 //println!("{}", te);
@@ -299,7 +349,7 @@ fn test_waveform_analysis(filename : String) -> PyRBEvent {
                 }
                 for mut rbev in te.rb_events {
                   let rb_id = rbev.header.rb_id;
-                  println!("{}", rbev); 
+                  //println!("{}", rbev); 
                   py_rbev.set_event(rbev.clone());
                   waveform_analysis(
                       &mut rbev,
@@ -326,351 +376,7 @@ fn test_waveform_analysis(filename : String) -> PyRBEvent {
   return py_rbev;
 }
 
-#[pyclass]
-pub struct IPBus {
-  ipbus : ipbus::IPBus,
-}
 
-#[pymethods]
-impl IPBus {
-  #[new]
-  fn new(target_address : String) -> Self {
-    let ipbus = ipbus::IPBus::new(target_address).expect("Unable to connect to {target_address}");
-    Self {
-      ipbus : ipbus,
-    }
-  }
-
-  /// Make a IPBus status query
-  pub fn get_status(&mut self) -> PyResult<()> {
-    match self.ipbus.get_status() {
-      Ok(_) => {
-        return Ok(());
-      },
-      Err(err)   => {
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-    }
-  }
- 
-  pub fn get_buffer(&self) -> [u8;ipbus::MT_MAX_PACKSIZE] {
-    return self.ipbus.buffer.clone();
-  }
-
-  pub fn set_packet_id(&mut self, pid : u16) {
-    self.ipbus.pid = pid;
-  }
- 
-  pub fn get_packet_id(&self) -> u16 {
-    self.ipbus.pid
-  }
-
-  pub fn get_expected_packet_id(&self) -> u16 {
-    self.ipbus.expected_pid
-  }
-
-  /// Set the packet id to that what is expected from the targetr
-  pub fn realign_packet_id(&mut self) -> PyResult<()> {
-    match self.ipbus.realign_packet_id() {
-      Ok(_) => {
-        return Ok(());
-      },
-      Err(err)   => {
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-    }
-  }
-  
-  /// Get the next packet id, which is expected by the target
-  pub fn get_target_next_expected_packet_id(&mut self) 
-    -> PyResult<u16> {
-    match self.ipbus.get_target_next_expected_packet_id() {
-      Ok(result) => {
-        return Ok(result);
-      },
-      Err(err)   => {
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-    }
-  }
-
-  pub fn read_multiple(&mut self,
-                       addr           : u32,
-                       nwords         : usize,
-                       increment_addr : bool) 
-    -> PyResult<Vec<u32>> {
-  
-    match self.ipbus.read_multiple(addr,
-                                   nwords,
-                                   increment_addr) {
-      Ok(result) => {
-        return Ok(result);
-      },
-      Err(err)   => {
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-    }
-  }
-
-  pub fn write(&mut self,
-               addr   : u32,
-               data   : u32) 
-    -> PyResult<()> {
-    
-    match self.ipbus.write(addr, data) {
-      Ok(_) => Ok(()),
-      Err(err)   => {
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-    }
-  }
- 
-
-  pub fn read(&mut self, addr   : u32) 
-    -> PyResult<u32> {
-    match self.ipbus.read(addr) {
-      Ok(result) => {
-        return Ok(result);
-      },
-      Err(err)   => {
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-    }
-  }
-}
-
-
-#[pyclass]
-pub struct MasterTrigger {
-  ipbus : ipbus::IPBus,
-}
-
-#[pymethods]
-impl MasterTrigger {
-  #[new]
-  fn new(target_address : String) -> Self {
-    let ipbus = ipbus::IPBus::new(target_address).expect("Unable to connect to {target_address}");
-    Self {
-      ipbus : ipbus,
-    }
-  }
-
-  fn reset_daq(&mut self) -> PyResult<()>{
-    match self.ipbus.write(0x10,1) {
-      Ok(result) => {
-        return Ok(result); 
-      }
-      Err(err) => {
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-    }
-  }
-
-
-  fn get_expected_pid(&mut self) -> PyResult<u16> {
-    match self.ipbus.get_target_next_expected_packet_id(){
-      Ok(result) => {
-        return Ok(result); 
-      }
-      Err(err) => {
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-    }
-  }
-
-  fn realign_packet_id(&mut self) -> PyResult<()> {
-    match self.ipbus.realign_packet_id() {
-      Ok(_) => {
-        return Ok(()); 
-      }
-      Err(err) => {
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-    }
-  }
-
-  fn set_packet_id(&mut self, pid : u16) {
-    self.ipbus.pid = pid;
-  }
-
-  fn get_packet_id(&mut self) -> u16 {
-    self.ipbus.pid
-  }
-
-  fn get_event(&mut self, read_until_footer : bool, verbose : bool)
-    -> PyResult<PyMasterTriggerEvent> {
-    let mut n_daq_words : u16;
-    let mut n_daq_words_actual : u16;
-    loop {
-      match self.ipbus.read(0x13) { 
-        Err(_err) => {
-          // A timeout does not ncecessarily mean that there 
-          // is no event, it can also just mean that 
-          // the rate is low.
-          //trace!("Timeout in read_register for MTB! {err}");
-          continue;
-        },
-        Ok(_n_words) => {
-          n_daq_words = (_n_words >> 16) as u16;
-          if _n_words == 0 {
-            continue;
-          }
-          //trace!("Got n_daq_words {n_daq_words}");
-          let rest = n_daq_words % 2;
-          n_daq_words /= 2 + rest; //mtb internally operates in 16bit words, but 
-          //                  //registers return 32bit words.
-          
-          break;
-        }
-      }
-    }
-    let mut data : Vec<u32>;
-    if verbose {
-      println!("[MasterTrigger::get_event] => Will query DAQ for {n_daq_words} words!");
-    }
-    n_daq_words_actual = n_daq_words;
-    match self.ipbus.read_multiple(
-                                   0x11,
-                                   n_daq_words as usize,
-                                   false) {
-      Err(err) => {
-        if verbose {
-          println!("[MasterTrigger::get_event] => failed! {err}");
-        }
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-      Ok(_data) => {
-        data = _data;
-        for (i,word) in data.iter().enumerate() {
-          let desc : &str;
-          let mut desc_str = String::from("");
-          let mut nhit_words = 0;
-          match i {
-            0 => desc = "HEADER",
-            1 => desc = "EVENTID",
-            2 => desc = "TIMESTAMP",
-            3 => desc = "TIU_TIMESTAMP",
-            4 => desc = "TIU_GPS32",
-            5 => desc = "TIU_GPS16 + TRIG_SOURCE",
-            6 => desc = "RB MASK 0",
-            7 => desc = "RB MASK 1",
-            8 => {
-              nhit_words = nhit_words / 2 + nhit_words % 2;
-              desc_str  = format!("BOARD MASK ({} ltbs)", word.count_ones());
-              desc  = &desc_str;
-            },
-            _ => desc = "?"
-          }
-          if verbose {
-            println!("[MasterTrigger::get_event] => DAQ word {} \t({:x}) \t[{}]", word, word, desc);
-          }
-        }
-      }
-    }
-    if data[0] != 0xAAAAAAAA {
-      if verbose {
-        println!("[MasterTrigger::get_event] => Got MTB data, but the header is incorrect {}", data[0]);
-      }
-      return Err(PyValueError::new_err(String::from("Incorrect header value!")));
-    }
-    let mut foot_pos = (n_daq_words - 1) as usize;
-    if data.len() <= foot_pos {
-      if verbose {
-        println!("[MasterTrigger::get_event] => Got MTB data, but the format is not correct");
-      }
-      return Err(PyValueError::new_err(String::from("Empty data!")));
-    }
-    if data[foot_pos] != 0x55555555 {
-      if verbose {
-        println!("[MasterTrigger::get_event] => Did not read unti footer!");
-      }
-      if read_until_footer {
-        if verbose {
-          println!("[MasterTrigger::get_event] => .. will read additional words!");
-        }
-        loop {
-          match self.ipbus.read(0x11) {
-            Err(err) => {
-              if verbose {
-                println!("[MasterTrigger::get_event] => Issues reading from 0x11");
-              }
-              return Err(PyValueError::new_err(err.to_string()));
-            },
-            Ok(next_word) => {
-              n_daq_words_actual += 1;
-              data.push(next_word);
-              if next_word == 0x55555555 {
-                break;
-              }
-            }
-          }
-        }
-        foot_pos = n_daq_words_actual as usize - 1;
-        if verbose {
-          println!("[MasterTrigger::get_event] => We read {} additional words!", n_daq_words_actual - n_daq_words);
-        }
-      } else {
-        if verbose {
-          println!("[MasterTrigger::get_event] => Got MTB data, but the footer is incorrect {}", data[foot_pos]);
-        }
-        return Err(PyValueError::new_err(String::from("Footer incorrect!")));
-      }
-    }
-
-    // Number of words which will be always there. 
-    // Min event size is +1 word for hits
-    //const MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = 9; 
-    //let n_hit_packets = n_daq_words as u32 - MTB_DAQ_PACKET_FIXED_N_WORDS;
-    //println!("We are expecting {}", n_hit_packets);
-    let mut mte = MasterTriggerEvent::new();
-    mte.event_id       = data[1];
-    mte.timestamp      = data[2];
-    mte.tiu_timestamp  = data[3];
-    mte.tiu_gps32      = data[4];
-    mte.tiu_gps16      = (data[5] & 0x0000ffff) as u16;
-    mte.trigger_source = ((data[5] & 0xffff0000) >> 16) as u16;
-    //mte.get_trigger_sources();
-    let rbmask = (data[7] as u64) << 31 | data[6] as u64; 
-    mte.mtb_link_mask  = rbmask;
-    mte.dsi_j_mask     = data[8];
-    let mut n_hit_words    = n_daq_words_actual - 9 - 2; // fixed part is 11 words
-    if n_hit_words > n_daq_words_actual {
-      n_hit_words = 0;
-      println!("[MasterTrigger::get_event] N hit word calculation failed! fixing... {}", n_hit_words);
-    }
-    if verbose {
-      println!("[MasterTrigger::get_event] => Will read {} hit word", n_hit_words);
-    }
-    for k in 1..n_hit_words+1 {
-      if verbose {
-        println!("[MasterTrigger::get_event] => Getting word {}", k);
-      }
-      let first  = (data[8 + k as usize] & 0x0000ffff) as u16;
-      let second = ((data[8 + k as usize] & 0xffff0000) >> 16) as u16; 
-      mte.channel_mask.push(first);
-      if second != 0 {
-        mte.channel_mask.push(second);
-      }
-    }
-    if verbose {
-      println!("[MasterTrigger::get_event] => Got MTE \n{}", mte);
-    }
-    let mut event = PyMasterTriggerEvent::new();
-    event.set_event(mte);
-    Ok(event)
-  }
-
-  fn get_rate(&mut self) -> PyResult<u32> {
-    match self.ipbus.read(0x17) {
-      Ok(rate) => {
-        return Ok(rate & 0x00ffffff); 
-      }
-      Err(err) => {
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-    }
-  }
-}
 
 /// Python API to rust version of tof-dataclasses.
 ///
@@ -690,8 +396,9 @@ fn rust_dataclasses(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(wrap_get_periods,m)?)?;
     m.add_function(wrap_pyfunction!(test_waveform_analysis,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_calc_edep_simple,m)?)?;
-    m.add_class::<IPBus>()?;
-    m.add_class::<MasterTrigger>()?;
+    m.add_function(wrap_pyfunction!(test_db,m)?)?;
+    m.add_class::<PyIPBus>()?;
+    m.add_class::<PyMasterTrigger>()?;
     m.add_class::<PyMasterTriggerEvent>()?;
     m.add_class::<PyRBCalibration>()?;
     Ok(())
