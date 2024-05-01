@@ -65,13 +65,17 @@ use std::io::Cursor;
 
 use liftof_lib::settings::LiftofSettings;
 
-use tof_dataclasses::manifest::get_rbs_from_sqlite;
+use tof_dataclasses::database::{
+    connect_to_db,
+    ReadoutBoard
+};
 
 use tof_dataclasses::io::TofPacketReader;
 
 use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::events::TofEvent;
 use tof_dataclasses::serialization::Serialization;
+
 #[derive(Parser, Default, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {
@@ -133,10 +137,12 @@ fn main() {
   for k in data_files.iter() {
     println!("-- -- {}", k);
   }
-
+  let db_path = config.db_path.clone();
   println!("-- Using data base at {}", config.db_path);
   println!("-- Will read calibration data from {}", config.calibration_dir);
-  let mut rb_list = get_rbs_from_sqlite(config.db_path.as_ref());
+  let mut conn              = connect_to_db(db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
+  // if this call does not go through, we might as well fail early.
+  let mut rb_list           = ReadoutBoard::all(&mut conn).expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
   let rb_ignorelist = config.rb_ignorelist.clone();
   for k in 0..rb_ignorelist.len() {
     let bad_rb = rb_ignorelist[k];
@@ -278,7 +284,7 @@ fn main() {
             },
             Ok(event) => {
               let event_id = event.header.event_id;
-              let nhit_exp = event.mt_event.get_dsi_j_ch_for_triggered_ltbs();
+              let nhit_exp = event.mt_event.get_trigger_hits();
               n_trigger_hits += nhit_exp.len() as u64;
               for rbevent in event.rb_events {
                 let hits = rbevent.header.get_channels().len();
