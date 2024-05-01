@@ -12,7 +12,12 @@ use std::sync::{
 //use std::path::Path;
 use crossbeam_channel::Sender;
 
-use tof_dataclasses::commands::{TofCommand, TofCommandCode, TofCommandResp, TofResponse};
+use tof_dataclasses::commands::{
+    TofCommand,
+    TofCommandCode,
+    TofResponse,
+    TofResponseCode,
+};
 use tof_dataclasses::errors::CmdError;
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
@@ -174,7 +179,7 @@ pub fn cmd_responder(cmd_server_address        : String,
                   Ok(cmd)  => {
                     // we got a valid tof command, forward it and wait for the 
                     // response
-                    //let tof_resp  = TofResponse::GeneralFail(TofCommandResp::RespErrNotImplemented as u32);
+                    //let tof_resp  = TofResponse::GeneralFail(TofResponseCode::RespErrNotImplemented as u32);
                     //let resp_not_implemented = prefix_board_id(&mut tof_resp.to_bytestream());
                     //let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
                     let return_val: Result<TofCommandCode, CmdError>;
@@ -455,6 +460,7 @@ pub fn cmd_responder(cmd_server_address        : String,
                         warn!("Not implemented");
                         return_val = Err(CmdError::NotImplementedError);
                       },
+                      // This won't be a thing for RBs
                       TofCommand::GetFullWaveforms  (_) => {
                         warn!("Not implemented");
                         return_val = Err(CmdError::NotImplementedError);
@@ -587,18 +593,22 @@ pub fn cmd_responder(cmd_server_address        : String,
                         warn!("Not implemented");
                         return_val = Err(CmdError::NotImplementedError);
                       }
+                      _ => {
+                        error!("{} is not implemented!", cmd);
+                        return_val = Err(CmdError::NotImplementedError);
+                      }
                     }
                     // deal with return values
                     match return_val {
                       Err(cmd_error) => {
-                        let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
+                        let r = TofResponse::GeneralFail(TofResponseCode::RespErrUnexecutable as u32);
                         match cmd_socket.send(r.to_bytestream(),0) {
                           Err(err) => warn!("Can not send response!, Err {err}"),
                           Ok(_)    => info!("Responded to {cmd_error}!")
                         }
                       },
                       Ok(tof_command)  => {
-                        let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                        let r = TofResponse::Success(TofResponseCode::RespSuccFingersCrossed as u32);
                         match cmd_socket.send(r.to_bytestream(),0) {
                           Err(err) => warn!("Can not send response!! {err}"),
                           Ok(_)    => info!("Responded to {tof_command}!")

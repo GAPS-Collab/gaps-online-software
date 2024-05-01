@@ -9,7 +9,7 @@
 
 //use std::collections::HashMap;
 //use std::path::PathBuf;
-use std::path::Path;
+//use std::path::Path;
 use std::os::raw::c_int;
 use std::process::exit;
 use std::{
@@ -142,16 +142,6 @@ struct Args {
 /**********************************************************/
 
 fn main() {
-  //env_logger::builder()
-  //  .format(|buf, record| {
-  //  writeln!( buf, "[{level}][{module_path}:{line}] {args}",
-  //    level = color_log(&record.level()),
-  //    module_path = record.module_path().unwrap_or("<unknown>"),
-  //    //target = record.target(),
-  //    line = record.line().unwrap_or(0),
-  //    args = record.args()
-  //    )
-  //  }).init();
   init_env_logger();
   let program_start_time       = Instant::now();
   
@@ -240,7 +230,7 @@ fn main() {
   }
   //let only_perfect_events   = config.rb_settings.only_perfect_events;
   let only_perfect_events   = false;
-  let cmd_server_address    = config.cc_server_address.clone();
+  let cmd_server_address    = config.cmd_dispatcher_settings.cc_server_address.clone();
   let mut run_config        = config.rb_settings.get_runconfig();
   //let db_path               = Path::new(&config.db_path);
   let db_path               = config.db_path.clone();
@@ -251,7 +241,7 @@ fn main() {
   let mut rb_expected_link_id = 0u8;
   match conn {
     Err(err) => {
-      error!("Unable to connect to database at {}", config.db_path);
+      error!("Unable to connect to database at {}! {}", config.db_path, err);
       panic!("Without db connection, we are currently unable to perform the RB Id/MTB Link Id check!");
     }
     Ok(mut conn) => {
@@ -271,8 +261,8 @@ fn main() {
       }
     }
   }
-  //let rbs = get_rbs_from_sqlite(db_path);
-  println!("We found MTB Link ID {} for this RB (RB ID {}) in the database!", rb_expected_link_id, rb_info.board_id);
+  
+  println!("=> We found a MTB Link ID {} for this RB (RB ID {}) in the database!", rb_expected_link_id, rb_info.board_id);
   // FIXME - instead of passing the run config around,
   // just offer it through a mutex
   //let mut global_run_config = Arc::new(Mutex::new(run_config));
