@@ -108,14 +108,35 @@ PYBIND11_MODULE(gaps_tof, m) {
     m.doc() = "Gaps-online-software Python wrapper for C++ API. gaps-online-software is a software suite designed to read out (mainly) online data from the TOF subsystem of the GAPS experiment. The code has several APIs, this code here wraps the C++ API. Please find the github repo at https://github.com/GAPS-Collab/gaps-online-software to report bugs/issues.";
     m.attr("__version__") = "0.10.0";
 
+    //py::class_<PyTofPacketReader>(m, "PTofPacketReader") 
+    //  .def(py::init<String>())  
+    //  .def("__next__", &PyTofPacketReader::next,
+    //          "iterate over the packets and get the next packet from the file")
+    //  .def("__iter__", &[](PyTofPacketReader &self) { return self; })
+    //  .def("__repr__",        [](const PyTofPacketReader &reader) {
+    //                              return "<PyTofPacketReader : "
+    //                              + reader.open_file_name + ">";
+    //                              }) 
+    //;
+    
     py::class_<Gaps::TofPacketReader>(m, "TofPacketReader") 
-      .def(py::init<String>())  
-      .def("get_next_packet", &Gaps::TofPacketReader::get_next_packet,
-                              "iterate over the packets and get the next packet from the file")
-      .def("__repr__",        [](const Gaps::TofPacketReader &reader) {
-                                  return "<TofPacketReader : "
-                                  + reader.get_filename() + ">";
-                                  }) 
+      .def(py::init<String>(), py::return_value_policy::take_ownership)  
+      .def("get_next_tp", &Gaps::TofPacketReader::get_next_packet,
+              "iterate over the packets and get the next packet from the file",
+              py::return_value_policy::take_ownership)
+      .def_property_readonly("n_packets_read", &Gaps::TofPacketReader::n_packets_read,
+                    "The number of TOF packets already read from the file")
+      .def_property_readonly("exhausted", &Gaps::TofPacketReader::is_exhausted,
+                    "Indicates if the reader is exhausted and needs to be recreated") 
+      .def("__repr__", [](const Gaps::TofPacketReader &reader) {
+                          if (reader.is_exhausted()) {
+                            return "<TofPacketReader [exhausted!!] : " + reader.get_filename() + " - read " + 
+                            std::to_string(reader.n_packets_read()) +
+                            " TofPackets>";
+                          }
+                          return "<TofPacketReader : " + 
+                          reader.get_filename() + " - read " + std::to_string(reader.n_packets_read()) + " TofPackets>";
+                          })
     ;
   
     py::enum_<EventStatus>(m, "EventStatus") 
