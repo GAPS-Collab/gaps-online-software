@@ -12,7 +12,7 @@
 #include "packets/monitoring.h"
 #include "events/tof_event_header.hpp"
 
-#include "legacy.h"
+//#include "legacy.h"
 #include "io.hpp"
 #include "serialization.h"
 #include "calibration.h"
@@ -22,7 +22,7 @@
 
 #include "helpers.hpp"
 
-using namespace GAPS;
+//using namespace GAPS;
 using namespace pybind11::literals;
 namespace py = pybind11;
 
@@ -64,42 +64,42 @@ std::string tof_response_to_str(const TofResponse &cmd) {
  return "Unknown";
 }
 
-Vec<Vec<f64>> remove_spikes_helper(u16 stop_cell,
-                                 Vec<Vec<f64>> waveforms) {
- f64 wf [NCHN][NWORDS];
- i32 spikes[NWORDS];
- Vec<Vec<f64>> unspiked;
- for (size_t ch=0; ch<NCHN; ch++) {
-   unspiked.push_back({});
-   for (size_t n=0; n<NWORDS; n++) {
-     wf[ch][n] = waveforms[ch][n];
-   }
+//Vec<Vec<f64>> remove_spikes_helper(u16 stop_cell,
+//                                 Vec<Vec<f64>> waveforms) {
+// f64 wf [NCHN][NWORDS];
+// i32 spikes[NWORDS];
+// Vec<Vec<f64>> unspiked;
+// for (size_t ch=0; ch<NCHN; ch++) {
+//   unspiked.push_back({});
+//   for (size_t n=0; n<NWORDS; n++) {
+//     wf[ch][n] = waveforms[ch][n];
+//   }
+//
+// }
+// RemoveSpikes(wf, stop_cell, spikes);
+// for (size_t ch=0; ch<NCHN; ch++) {
+//   for (size_t n=0; n<NWORDS; n++) {
+//     unspiked[ch].push_back(wf[ch][n]);
+//   } 
+// }
+// return unspiked;
+//}
 
- }
- RemoveSpikes(wf, stop_cell, spikes);
- for (size_t ch=0; ch<NCHN; ch++) {
-   for (size_t n=0; n<NWORDS; n++) {
-     unspiked[ch].push_back(wf[ch][n]);
-   } 
- }
- return unspiked;
-}
-
-/********************/
-
-double calculate_pedestal_helper(Vec<f64> wave,
-                                 Vec<f64> time,
-                                 size_t ch)
-{
-  double* wave_arr = wave.data();
-  double* time_arr = time.data();
-  Waveform waveform = Waveform(wave_arr, time_arr, ch, 0);
-  waveform.SetPedBegin(10); // 10-100                               
-  waveform.SetPedRange(50);
-  waveform.CalcPedestalRange();
-  //waveform.SubtractPedestal();
-  return waveform.GetPedestal();
-}
+///********************/
+//
+//double calculate_pedestal_helper(Vec<f64> wave,
+//                                 Vec<f64> time,
+//                                 size_t ch)
+//{
+//  double* wave_arr = wave.data();
+//  double* time_arr = time.data();
+//  Waveform waveform = Waveform(wave_arr, time_arr, ch, 0);
+//  waveform.SetPedBegin(10); // 10-100                               
+//  waveform.SetPedRange(50);
+//  waveform.CalcPedestalRange();
+//  //waveform.SubtractPedestal();
+//  return waveform.GetPedestal();
+//}
 
 /********************/
 
@@ -351,12 +351,12 @@ PYBIND11_MODULE(gaps_tof, m) {
       ;
       //.export_values();
 
-    py::enum_<PADDLE_END>(m, "PADDLE_END")
-        .value("A", PADDLE_END::A)
-        .value("B", PADDLE_END::B)
-        .value("UNKNOWN", PADDLE_END::UNKNOWN)
-        //.export_values();
-        ;
+    //py::enum_<PADDLE_END>(m, "PADDLE_END")
+    //    .value("A", PADDLE_END::A)
+    //    .value("B", PADDLE_END::B)
+    //    .value("UNKNOWN", PADDLE_END::UNKNOWN)
+    //    //.export_values();
+    //    ;
 
     py::class_<MtbMoniData>(m, "MtbMoniData",
             "Monitoring data from the master trigger board.")
@@ -652,5 +652,6 @@ PYBIND11_MODULE(gaps_tof, m) {
    
 
    // Calibration functions
-   m.def("remove_spikes",            &remove_spikes_helper);
+   m.def("spike_cleaning_drs4",            &spike_cleaning_drs4, 
+           "Semi-Original Spike removal routine provided by the DRS4 folks.");
 }
