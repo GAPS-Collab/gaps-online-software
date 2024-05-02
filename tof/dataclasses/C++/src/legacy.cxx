@@ -1,3 +1,5 @@
+#ifdef BUILD_ROOTCOMPONENTS
+
 #include <cstring>
 #include <math.h>
 #include <stdlib.h>
@@ -1146,4 +1148,4 @@ double Waveform::Integrate(float lo = 0, float size = -1) {
   return(sum);
 }
 
-
+#endif
