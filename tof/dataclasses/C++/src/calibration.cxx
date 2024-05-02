@@ -242,6 +242,9 @@ Vec<f32> RBCalibration::voltages(const RBEvent &event, const u8 channel) const {
     return voltages;
   }
   Vec<u16> adc = event.get_channel_adc(channel);
+  if (adc.size() == 0) {
+    return voltages;
+  }
   for (usize i = 0; i < NWORDS; i++) {
     voltages[i] = (f32) adc[i];
     ////if (i%100 == 0)
