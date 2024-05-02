@@ -1,6 +1,6 @@
 //use std::collections::VecDeque;
 use std::collections::HashMap;
-use std::path::Path;
+//use std::path::Path;
 pub mod dataclasses;
 pub mod master_trigger;
 //pub mod mtb_registers;
@@ -53,13 +53,13 @@ use tof_dataclasses::database::{
 };
 
 use tof_dataclasses::events::{
-    RBEvent, 
+    //RBEvent, 
     TofEvent
 };
 
 use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::io::TofPacketReader;
-use tof_dataclasses::serialization::Serialization;
+//use tof_dataclasses::serialization::Serialization;
 
 use liftof_lib::waveform_analysis;
 use liftof_lib::settings::AnalysisEngineSettings;
@@ -214,26 +214,26 @@ fn wrap_time2bin(nanoseconds : &PyArray1<f32>,
  }
 }
 
-//#[pyfunction]
-//#[pyo3(name="integrate")]
-//fn wrap_integrate(voltages    : &PyArray1<f32>,
-//                  nanoseconds : &PyArray1<f32>,
-//                  lower_bound  : f32,
-//                  size         : f32,
-//                  impedance    : f32) -> PyResult<f32>  {
-// let mut voltages_vec    = Vec::<f32>::new();
-// let mut nanoseconds_vec = Vec::<f32>::new(); 
-// unsafe {
-//   voltages_vec.extend_from_slice(voltages.as_slice().unwrap());
-//   nanoseconds_vec.extend_from_slice(nanoseconds.as_slice().unwrap());
-// }
-// match integrate(&voltages_vec, &nanoseconds_vec, lower_bound, size, impedance) {
-//   Ok(result) => Ok(result),
-//   Err(err)   => {
-//    return Err(PyValueError::new_err(err.to_string()));
-//   }
-// }
-//}
+#[pyfunction]
+#[pyo3(name="integrate")]
+fn wrap_integrate(voltages    : &PyArray1<f32>,
+                  nanoseconds : &PyArray1<f32>,
+                  lower_bin   : usize,
+                  upper_bin   : usize,
+                  impedance    : f32) -> PyResult<f32>  {
+ let mut voltages_vec    = Vec::<f32>::new();
+ let mut nanoseconds_vec = Vec::<f32>::new(); 
+ unsafe {
+   voltages_vec.extend_from_slice(voltages.as_slice().unwrap());
+   nanoseconds_vec.extend_from_slice(nanoseconds.as_slice().unwrap());
+ }
+ match integrate(&voltages_vec, &nanoseconds_vec, lower_bin, upper_bin, impedance) {
+   Ok(result) => Ok(result),
+   Err(err)   => {
+    return Err(PyValueError::new_err(err.to_string()));
+   }
+ }
+}
 
 #[pyfunction]
 #[pyo3(name = "find_peaks")]
@@ -321,14 +321,20 @@ fn test_waveform_analysis(filename : String) -> PyRBEvent {
   settings.find_pks_t_start  = 60.0;
   settings.find_pks_t_window = 300.0;
   settings.min_peak_size     = 10;
-  let rb         = ReadoutBoard::new();
+  //let rb         = ReadoutBoard::new();
   let pth        = String::from("/srv/gaps/gaps-online-software/gaps-db/gaps_db/gaps_flight.db");
   let mut conn   = connect_to_db(pth).unwrap();
   let rbs        = ReadoutBoard::all(&mut conn).unwrap();
   let mut rb_map = HashMap::<u8, ReadoutBoard>::new();
   for mut rb in rbs {
     rb.calib_file_path = String::from("/data0/gaps/nevis/calib/latest/"); 
-    rb.load_latest_calibration();
+    match rb.load_latest_calibration() {
+      Err(_err) => {
+        // FIXME - come up with error thing
+        //error!("Unable to laod calibration data for ReadoutBoards!");
+      }
+      Ok(_) => ()
+    }
     rb_map.insert(rb.rb_id, rb);
   }
   let mut reader  = TofPacketReader::new(filename);
@@ -341,7 +347,9 @@ fn test_waveform_analysis(filename : String) -> PyRBEvent {
           PacketType::TofEvent => {
             match tp.unpack::<TofEvent>() {
             //match TofEvent::from_tofpacket(&tp) {
-              Err(err) => (),
+              Err(_err) => {
+                //error!("Unable to unpack TofEvent!");
+              },
               Ok(te) => {
                 //println!("{}", te);
                 if te.rb_events.is_empty() {
@@ -351,11 +359,15 @@ fn test_waveform_analysis(filename : String) -> PyRBEvent {
                   let rb_id = rbev.header.rb_id;
                   //println!("{}", rbev); 
                   py_rbev.set_event(rbev.clone());
-                  waveform_analysis(
-                      &mut rbev,
-                      &rb_map[&rb_id],
-                      settings.clone()
-                  );
+                  match waveform_analysis(
+                    &mut rbev,
+                    &rb_map[&rb_id],
+                    settings.clone()
+                  ) {
+                    // FIXME!
+                    Err(_err) => (),
+                    Ok(_)     => ()
+                  }
                   for h in rbev.hits {
                     println!("{}", h);
                   }
@@ -389,7 +401,7 @@ fn rust_dataclasses(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(wrap_time2bin,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_find_peaks,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_find_peaks_zscore,m)?)?;
-    //m.add_function(wrap_pyfunction!(wrap_integrate,m)?)?;
+    m.add_function(wrap_pyfunction!(wrap_integrate,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_interpolate_time,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_cfd_simple,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_find_zero_crossings,m)?)?;

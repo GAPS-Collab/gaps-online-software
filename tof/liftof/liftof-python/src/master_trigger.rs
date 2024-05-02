@@ -4,7 +4,7 @@ use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
 
 extern crate pyo3_log;
-use numpy::PyArray1;
+//use numpy::PyArray1;
 
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
@@ -409,8 +409,8 @@ impl PyMasterTrigger {
   fn reset_rb_counters(&mut self) -> PyResult<()> {
     println!("{}", RB_CNTS_RESET);
     match RB_CNTS_RESET.set(&mut self.ipbus, 1) {
-      Ok(cnt) => {
-        return Ok(cnt);
+      Ok(_) => {
+        return Ok(());
       }
       Err(err) => {
         return Err(PyValueError::new_err(err.to_string()));
@@ -421,8 +421,8 @@ impl PyMasterTrigger {
   /// Reset all the LTB counters
   fn reset_ltb_counters(&mut self) -> PyResult<()> {
     match LT_HIT_CNT_RESET.set(&mut self.ipbus, 1) {
-      Ok(cnt) => {
-        return Ok(cnt);
+      Ok(_) => {
+        return Ok(());
       }
       Err(err) => {
         return Err(PyValueError::new_err(err.to_string()));
@@ -447,7 +447,7 @@ impl PyMasterTrigger {
     }
 
     match registers[lt_link as usize].set(&mut self.ipbus, mask as u32) {
-      Ok(cnt) => {
+      Ok(_) => {
         return Ok(());
       }
       Err(err) => {
@@ -465,7 +465,7 @@ impl PyMasterTrigger {
       read_all_rb = 1;
     }
     match RB_READ_ALL_CHANNELS.set(&mut self.ipbus, read_all_rb) {
-      Ok(cnt)  => {
+      Ok(_)  => {
         Ok(())
       }
       Err(err) => {
@@ -487,7 +487,7 @@ impl PyMasterTrigger {
   
   fn set_total_tof_thresh(&mut self, value : u32) -> PyResult<()> {
     match TOTAL_TOF_THRESH.set(&mut self.ipbus, value) {
-      Ok(cnt)  => {
+      Ok(_)  => {
         Ok(())
       }
       Err(err) => {
@@ -509,7 +509,7 @@ impl PyMasterTrigger {
   
   fn set_inner_tof_thresh(&mut self, value : u32) -> PyResult<()> {
     match INNER_TOF_THRESH.set(&mut self.ipbus, value) {
-      Ok(cnt) =>  {
+      Ok(_) =>  {
         return Ok(());
       }
       Err(err) => {
@@ -531,7 +531,7 @@ impl PyMasterTrigger {
 
   fn set_outer_tof_thresh(&mut self, value : u32) -> PyResult<()> {
     match OUTER_TOF_THRESH.set(&mut self.ipbus, value) {
-      Ok(cnt) =>  {
+      Ok(_) =>  {
         return Ok(());
       }
       Err(err) => {
@@ -553,7 +553,7 @@ impl PyMasterTrigger {
 
   fn set_cube_side_thresh(&mut self, value : u32) -> PyResult<()> {
     match CUBE_SIDE_THRESH.set(&mut self.ipbus, value) {
-      Ok(cnt) =>  {
+      Ok(_) =>  {
         return Ok(());
       }
       Err(err) => {
@@ -575,7 +575,7 @@ impl PyMasterTrigger {
 
   fn set_cube_top_thresh(&mut self, value : u32) -> PyResult<()> {
     match CUBE_TOP_THRESH.set(&mut self.ipbus, value) {
-      Ok(cnt) =>  {
+      Ok(_) =>  {
         return Ok(());
       }
       Err(err) => {
@@ -597,7 +597,7 @@ impl PyMasterTrigger {
 
   fn set_cube_bot_thresh(&mut self, value : u32) -> PyResult<()> {
     match CUBE_BOT_THRESH.set(&mut self.ipbus, value) {
-      Ok(cnt) =>  {
+      Ok(_) =>  {
         return Ok(());
       }
       Err(err) => {
@@ -619,7 +619,7 @@ impl PyMasterTrigger {
 
   fn set_cube_corner_thresh(&mut self, value : u32) -> PyResult<()> {
     match CUBE_CORNER_THRESH.set(&mut self.ipbus, value) {
-      Ok(cnt) =>  {
+      Ok(_) =>  {
         return Ok(());
       }
       Err(err) => {
@@ -641,7 +641,7 @@ impl PyMasterTrigger {
  
   fn set_umbrella_thresh(&mut self, value : u32) -> PyResult<()> {
     match UMBRELLA_THRESH.set(&mut self.ipbus, value) {
-      Ok(cnt) =>  {
+      Ok(_) =>  {
         return Ok(());
       }
       Err(err) => {
@@ -663,7 +663,7 @@ impl PyMasterTrigger {
 
   fn set_umbrella_center_thresh(&mut self, value : u32) -> PyResult<()> {
     match UMBRELLA_CENTER_THRESH.set(&mut self.ipbus, value) {
-      Ok(cnt) =>  {
+      Ok(_) =>  {
         return Ok(());
       }
       Err(err) => {
@@ -685,7 +685,7 @@ impl PyMasterTrigger {
 
   fn set_cortina_thresh(&mut self, value : u32) -> PyResult<()> {
     match CORTINA_THRESH.set(&mut self.ipbus, value) {
-      Ok(cnt) =>  {
+      Ok(_) =>  {
         return Ok(());
       }
       Err(err) => {
@@ -707,7 +707,7 @@ impl PyMasterTrigger {
 
   fn set_configurable_trigger(&mut self, value : u32) -> PyResult<()> {
     match CONFIGURABLE_TRIGGER_EN.set(&mut self.ipbus, value) {
-      Ok(cnt) => {
+      Ok(_) => {
         return Ok(());
       }
       Err(err) => {
@@ -729,7 +729,7 @@ impl PyMasterTrigger {
 
   fn set_any_trigger(&mut self, prescale : u32) -> PyResult<()> {
     match ANY_TRIG_PRESCALE.set(&mut self.ipbus, prescale) {
-      Ok(cnt) =>  {
+      Ok(_) =>  {
         return Ok(());
       }
       Err(err) => {
@@ -740,7 +740,7 @@ impl PyMasterTrigger {
 
   fn set_track_trigger(&mut self, prescale : u32) -> PyResult<()> {
     match TRACK_TRIG_PRESCALE.set(&mut self.ipbus, prescale) {
-      Ok(cnt) =>  {
+      Ok(_) =>  {
         return Ok(());
       }
       Err(err) => {
@@ -751,7 +751,7 @@ impl PyMasterTrigger {
   
   fn set_central_track_trigger(&mut self, prescale : u32) -> PyResult<()> {
     match TRACK_CENTRAL_PRESCALE.set(&mut self.ipbus, prescale) {
-      Ok(cnt) =>  {
+      Ok(_) =>  {
         return Ok(());
       }
       Err(err) => {
@@ -951,8 +951,8 @@ impl PyMasterTrigger {
           data = _data;
           for (i,word) in data.iter().enumerate() {
             let desc : &str;
-            let mut desc_str = String::from("");
-            let mut nhit_words = 0;
+            let desc_str : String;
+            //let mut nhit_words = 0;
             match i {
               0 => desc = "HEADER",
               1 => desc = "EVENTID",
@@ -963,7 +963,7 @@ impl PyMasterTrigger {
               6 => desc = "RB MASK 0",
               7 => desc = "RB MASK 1",
               8 => {
-                nhit_words = nhit_words / 2 + nhit_words % 2;
+                //nhit_words = nhit_words / 2 + nhit_words % 2;
                 desc_str  = format!("BOARD MASK ({} ltbs)", word.count_ones());
                 desc  = &desc_str;
               },
@@ -981,7 +981,7 @@ impl PyMasterTrigger {
         }
         return Err(PyValueError::new_err(String::from("Incorrect header value!")));
       }
-      let mut foot_pos = (n_daq_words - 1) as usize;
+      let foot_pos = (n_daq_words - 1) as usize;
       if data.len() <= foot_pos {
         if verbose {
           println!("[MasterTrigger::get_event] => Got MTB data, but the format is not correct");
@@ -1013,7 +1013,6 @@ impl PyMasterTrigger {
               }
             }
           }
-          foot_pos = n_daq_words_actual as usize - 1;
           if verbose {
             println!("[MasterTrigger::get_event] => We read {} additional words!", n_daq_words_actual - n_daq_words);
           }
