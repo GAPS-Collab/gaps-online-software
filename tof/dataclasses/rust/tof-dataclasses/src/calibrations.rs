@@ -1506,7 +1506,7 @@ impl FromRandom for RBCalibrations {
 #[test]
 fn serialization_rbcalibration_noeventpayload() {
   let mut calis = Vec::<RBCalibrations>::new();
-  for n in 0..100 {
+  for _ in 0..100 {
     let cali = RBCalibrations::from_random();
     if cali.serialize_event_data {
       continue;
@@ -1522,7 +1522,7 @@ fn serialization_rbcalibration_noeventpayload() {
 #[test]
 fn serialization_rbcalibration_witheventpayload() {
   let mut calis = Vec::<RBCalibrations>::new();
-  for n in 0..100 {
+  for _ in 0..100 {
     let cali = RBCalibrations::from_random();
     if !cali.serialize_event_data {
       continue;

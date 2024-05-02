@@ -862,6 +862,18 @@ fn packable_tofeventsummary() {
 
 #[test]
 #[cfg(feature = "random")]
+fn tofevent_sizes_header() {
+  for _ in 0..100 {
+    let data = TofEvent::from_random();
+    let mask = data.construct_sizes_header();
+    let size = TofEvent::decode_size_header(&mask);
+    assert_eq!(size.0, data.rb_events.len());
+    //assert_eq!(size.1, data.missing_hits.len());
+  }
+}
+
+#[test]
+#[cfg(feature = "random")]
 fn packable_tofevent() {
   for _ in 0..5 {
     let data = TofEvent::from_random();
@@ -879,30 +891,11 @@ fn packable_tofevent() {
   }
 }
 
-#[cfg(all(test,feature = "random"))]
-mod test_tofevents {
-  use crate::serialization::Serialization;
-  use crate::FromRandom;
-  use crate::events::{TofEvent,
-                      TofEventHeader,
-                      TofEventSummary};
-
-  #[test]
-  fn serialize_tofeventheader() {
-    let data = TofEventHeader::from_random();
-    let test = TofEventHeader::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
-    assert_eq!(data, test);
-  }
-
-  #[test]
-  fn tofevent_sizes_header() {
-    for n in 0..100 {
-      let data = TofEvent::from_random();
-      let mask = data.construct_sizes_header();
-      let size = TofEvent::decode_size_header(&mask);
-      assert_eq!(size.0, data.rb_events.len());
-      //assert_eq!(size.1, data.missing_hits.len());
-    }
-  }
+#[test]
+#[cfg(feature = "random")]
+fn serialize_tofeventheader() {
+  let data = TofEventHeader::from_random();
+  let test = TofEventHeader::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
+  assert_eq!(data, test);
 }
 
