@@ -8,6 +8,7 @@
 #include "packets/tof_packet.h"
 #include "serialization.h"
 
+
 //template<typename T>
 //requires HasFromByteStream<T>
 //Vec<T> unpack<T>(String filename) {
@@ -104,17 +105,30 @@ namespace Gaps {
   /// a file and emit them as packets
   class TofPacketReader {
     public: 
+      TofPacketReader();
       TofPacketReader(String filename);
-      void process_chunk();
+      TofPacketReader(const TofPacketReader&) = delete;
+      //TofPacketReader& operator=(const TofPacketReader&) = delete;
+      /// Set a filename where to read packets from. This is a binary file format,
+      /// typically ending in ".tof.gaps"
+      void      set_filename(String filename);
+      /// Walk over the file and return the next packet
       TofPacket get_next_packet();
-      String get_filename() const;
+      /// Return the filename we assigned
+      String    get_filename() const;
+      /// All packets have been read from the file. 
+      /// If they should be read again, the reader 
+      /// has to be created again
+      bool      is_exhausted() const;
+      /// The number of files this reader has read
+      /// from the file
+      usize     n_packets_read() const;
+
     private:
-      String filename_;
-      usize  file_size_;
-      usize  nchunks_;
-      usize  current_pos_;
-      TofPacket last_packet_;
-      std::ifstream stream_file_;
+      std::ifstream  stream_file_;
+      bool           exhausted_;
+      usize          n_packets_read_;
+      String         filename_;
   };
 }
 

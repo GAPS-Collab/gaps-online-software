@@ -1,5 +1,5 @@
 #include <filesystem>
-
+#include <algorithm>
 #include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
 
@@ -10,8 +10,6 @@
 
 namespace fs = std::filesystem;
 
-// has to be larger than max packet size
-const usize CHUNK_SIZE = 20000;
 
 
 /***************************************************/
@@ -161,61 +159,82 @@ Vec<TofEvent> unpack_tofevents_from_tofpackets(const String filename) {
 
 /***************************************************/
 
-
-Vec<u8> read_chunk(const String& filename, usize offset) {
-
-  Vec<u8> buffer;
-  buffer.reserve(CHUNK_SIZE);
-  
-
-  char chunk[CHUNK_SIZE];
-  std::ifstream file(filename, std::ios::binary);
-  file.seekg(offset);
-  while (file.read(chunk, CHUNK_SIZE)) {
-    buffer.insert(buffer.end(), chunk, chunk + file.gcount());
-  }
-
-  if (file.eof()) {
-    // Reached the end of the file
-    buffer.insert(buffer.end(), chunk, chunk + file.gcount());
-  } else if (!file) {
-    // Error occurred while reading the file
-    log_error("Failed to read file " << filename);
-    buffer.clear();
-  }
-  return buffer;
+Gaps::TofPacketReader::TofPacketReader() {
+  // here it is exhausted because we did not 
+  // set a file yet
+  exhausted_  = true;
+  n_packets_read_ = 0;
 }
 
 /***************************************************/
 
-Gaps::TofPacketReader::TofPacketReader(String filename) {
+void Gaps::TofPacketReader::set_filename(String filename) {
   if (fs::exists(filename)) {
-    log_info("Will read packets from " << filename);
-    filename_ = filename;
+    filename_  = filename;
+    exhausted_ = false;
+    stream_file_ = std::ifstream(filename, std::ios::binary);   
+    stream_file_.seekg (0, stream_file_.end);
+    auto file_size = stream_file_.tellg();
+    stream_file_.seekg (0, stream_file_.beg);
+    auto fs_string = std::format("{:4.2f}", (f64)file_size/1e6);
+    log_info("Will read packets from " << filename  << " [" << fs_string << " MB]");
   } else {
-    log_error("File " << filename << " does not exist!"); 
-    filename_ = "";
-    return;
+    auto msg = std::format("File {} does not exist!", filename);
+    log_error(msg); 
+    throw std::runtime_error(msg);
   }
-  stream_file_ = std::ifstream(filename_);   
-  std::streampos file_s = stream_file_.tellg();
-  file_size_ = static_cast<usize>(file_s);
-  nchunks_ = file_size_ / CHUNK_SIZE;
-  current_pos_ = 0;
-  last_packet_ = TofPacket();
 }
 
 /***************************************************/
 
-void Gaps::TofPacketReader::process_chunk() {
-  auto stream = read_chunk(filename_, current_pos_);
-  bool has_ended = false;
-  u64 head_pos = search_for_2byte_marker(stream, 0xAA, has_ended);
-  if (!(has_ended)) {
-    stream = read_chunk(filename_, head_pos);
-    last_packet_ = TofPacket::from_bytestream(stream, head_pos);  
-  } else {
-    last_packet_ = TofPacket();
+Gaps::TofPacketReader::TofPacketReader(String filename) : Gaps::TofPacketReader() {
+  set_filename(filename);
+}
+
+/***************************************************/
+
+bool Gaps::TofPacketReader::is_exhausted() const {
+  return exhausted_;
+}
+
+/***************************************************/
+
+usize Gaps::TofPacketReader::n_packets_read() const {
+  return n_packets_read_;
+}
+
+/***************************************************/
+
+TofPacket Gaps::TofPacketReader::get_next_packet() {
+  while (true) {
+    if (stream_file_.eof()) {
+      exhausted_ = true;
+      throw std::runtime_error("No more packets in file!");
+    } 
+    u8 byte = stream_file_.get();
+    if (byte == 0xAA) {
+      byte = stream_file_.get();
+      if (stream_file_.eof()) {
+        exhausted_ = true;
+        throw std::runtime_error("No more packets in file!");
+      } 
+      if (byte == 0xAA) {
+        u8 packet_type = stream_file_.get();
+        bytestream buffer = bytestream(4);
+        stream_file_.read(reinterpret_cast<char*>(buffer.data()), 4);
+        usize pos = 0;
+        u32 p_size       = Gaps::parse_u32(buffer, pos);
+        TofPacket packet;
+        packet.packet_type  = static_cast<PacketType>(packet_type);
+        packet.payload_size = p_size;
+        buffer = bytestream(p_size);
+        stream_file_.read(reinterpret_cast<char*>(buffer.data()), p_size);
+        buffer.resize(stream_file_.gcount());
+        packet.payload = std::move(buffer);
+        n_packets_read_++;
+        return packet;
+      }
+    } 
   }
 }
 
@@ -223,12 +242,5 @@ void Gaps::TofPacketReader::process_chunk() {
 
 String Gaps::TofPacketReader::get_filename() const {
   return filename_;
-}
-
-/***************************************************/
-
-TofPacket Gaps::TofPacketReader::get_next_packet() {
-    process_chunk();
-    return last_packet_;
 }
 

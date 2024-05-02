@@ -30,20 +30,19 @@ u64 search_for_2byte_marker(const Vec<u8> &bytestream,
                             u64 start_pos,
                             u64 end_pos) {
   has_ended = false;
-  if ((end_pos == bytestream.size()) || (end_pos == 0)) 
-    { end_pos = bytestream.size() - 1;} 
+  if ((end_pos == bytestream.size()) || (end_pos == 0)) {
+    end_pos = bytestream.size() - 1;
+  } 
   if (start_pos >= end_pos) {
     has_ended = true;
     spdlog::warn("Start and end positions are invalid! Start pos {}, end pos {}", start_pos, end_pos);
     return 0;
   }
   for (u64 k=start_pos; k<end_pos; k++) { 
-      if ((bytestream[k] == marker) && (bytestream[k+1] == marker))  {
-        //std::cout << "endpos " << end_pos << std::endl;
-        //std::cout << "Found marker at pos " << k << " " << bytestream[k] << std::endl;
-        return k;
-      }
+    if ((bytestream[k] == marker) && (bytestream[k+1] == marker))  {
+      return k;
     }
+  }
   has_ended = true;
   return 0;
 }
