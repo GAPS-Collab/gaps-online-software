@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/extern/tof-control/src/tui/rb_ui.rs`."><title>rb_ui.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_control" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/extern/tof-control/src/tui/rb_ui.rs`."><title>rb_ui.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_control" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../tof_control/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -52,6 +52,104 @@
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
 <a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>ratatui::{
     prelude::<span class="kw-2">*</span>,
     widgets::<span class="kw-2">*</span>,
@@ -62,14 +160,40 @@
 <span class="kw">pub fn </span>draw_rb_tab(f: <span class="kw-2">&amp;mut </span>Frame, app: <span class="kw-2">&amp;mut </span>App, area: Rect) {
     <span class="kw">let </span>chunks = Layout::default()
         .constraints([
-            Constraint::Length(<span class="number">9</span>),
-            Constraint::Min(<span class="number">8</span>),
-            Constraint::Length(<span class="number">7</span>),
+            Constraint::Percentage(<span class="number">30</span>),
+            Constraint::Percentage(<span class="number">70</span>),
         ])
+        .direction(Direction::Horizontal)
         .split(area);
 
-    <span class="comment">// draw_rb_info(f, chunks[0]);
-    </span>draw_rb_temp(f, app, chunks[<span class="number">0</span>]);
+    <span class="kw">let </span>sub_chunks_1 = Layout::default()
+        .constraints([
+            Constraint::Percentage(<span class="number">50</span>),
+            Constraint::Percentage(<span class="number">50</span>),
+        ])
+        .split(chunks[<span class="number">1</span>]);
+
+    <span class="kw">let </span>sub_chunks_2 = Layout::default()
+        .constraints([
+            Constraint::Percentage(<span class="number">50</span>),
+            Constraint::Percentage(<span class="number">50</span>),
+        ])
+        .direction(Direction::Horizontal)
+        .split(sub_chunks_1[<span class="number">0</span>]);
+
+    <span class="kw">let </span>sub_chunks_3 = Layout::default()
+        .constraints([
+            Constraint::Percentage(<span class="number">50</span>),
+            Constraint::Percentage(<span class="number">50</span>),
+        ])
+        .split(sub_chunks_2[<span class="number">1</span>]);
+
+
+    draw_rb_info(f, app, chunks[<span class="number">0</span>]);
+    draw_rb_temp(f, app, sub_chunks_2[<span class="number">0</span>]);
+    draw_rb_ph(f, app, sub_chunks_3[<span class="number">0</span>]);
+    draw_rb_mag(f, app, sub_chunks_3[<span class="number">1</span>]);
+    draw_rb_vcp(f, app, sub_chunks_1[<span class="number">1</span>]);
 }
 
 <span class="comment">// fn draw_rb_info(f: &amp;mut Frame, area: Rect) {
@@ -87,7 +211,30 @@
 //     f.render_widget(paragraph, area);
 // }
 
-</span><span class="kw">fn </span>draw_rb_temp(f: <span class="kw-2">&amp;mut </span>Frame, app: <span class="kw-2">&amp;mut </span>App, area: Rect) {
+</span><span class="kw">fn </span>draw_rb_info(f: <span class="kw-2">&amp;mut </span>Frame, app: <span class="kw-2">&amp;mut </span>App, area: Rect) {
+    <span class="kw">let </span>rb_info = <span class="kw-2">&amp;</span>app.rb_data.info;
+
+    <span class="kw">let </span><span class="kw-2">mut </span>rb_info_list_items = Vec::&lt;ListItem&gt;::new();
+    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"Board ID:                {}"</span>, rb_info.board_id), Style::default()))));
+    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"Firmware Version:        {}"</span>, rb_info.fw_version), Style::default()))));
+    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"Firmware Hash:           {}"</span>, rb_info.fw_hash), Style::default()))));
+    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"Sub Board:               {}"</span>, <span class="kw">if </span>rb_info.sub_board == <span class="number">1 </span>{ <span class="string">"LTB" </span>} <span class="kw">else if </span>rb_info.sub_board == <span class="number">2 </span>{ <span class="string">"PB/Preamp" </span>} <span class="kw">else </span>{ <span class="string">"NC" </span>}), Style::default()))));
+    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"RAT Number:              {}"</span>, <span class="kw">if let </span><span class="number">1</span>..=<span class="number">22 </span>= rb_info.rat_num {rb_info.rat_num.to_string()} <span class="kw">else </span>{ <span class="string">"Not in RAT"</span>.to_string() }), Style::default()))));
+    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"RAT Position:            {}"</span>, <span class="kw">match </span>rb_info.rat_pos { <span class="number">0 </span>=&gt; { <span class="string">"Not Flight RAT" </span>}, <span class="number">1 </span>=&gt; { <span class="string">"CBE" </span>}, <span class="number">2 </span>=&gt; { <span class="string">"UMB" </span>}, <span class="number">3 </span>=&gt; { <span class="string">"COR" </span>}, <span class="number">4 </span>=&gt; { <span class="string">"CBE/COR" </span>}, <span class="kw">_ </span>=&gt; { <span class="string">"Not in RAT" </span>} }), Style::default()))));
+    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"RB Position in RAT:      {}"</span>, <span class="kw">match </span>rb_info.rb_pos { <span class="number">1 </span>=&gt; { <span class="string">"RB1" </span>}, <span class="number">2 </span>=&gt; { <span class="string">"RB2" </span>}, <span class="kw">_ </span>=&gt; { <span class="string">"Not in RAT" </span>} }), Style::default()))));
+    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"Loss-of-Lock:            {}"</span>, <span class="kw">if </span>rb_info.lol == <span class="number">0x01 </span>{ <span class="string">"Unlocked" </span>} <span class="kw">else </span>{ <span class="string">"Locked" </span>}), Style::default()))));
+    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"Loss-of-Lock (Stable):   {}"</span>, <span class="kw">if </span>rb_info.lol_stable == <span class="number">0x01 </span>{ <span class="string">"Unlocked Past Second" </span>} <span class="kw">else </span>{ <span class="string">"Locked Past Second" </span>}), Style::default()))));
+    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"Uptime:                  {}[s]"</span>, rb_info.uptime), Style::default()))));
+    rb_info_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"Input Mode:              {}"</span>, rb_info.input_mode), Style::default()))));
+    
+    <span class="kw">let </span>rb_info_list = List::new(rb_info_list_items)
+    .block(Block::default().borders(Borders::ALL).title(Span::styled(<span class="string">"RB Information"</span>, 
+    Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD))));
+
+    f.render_widget(rb_info_list, area)
+}
+
+<span class="kw">fn </span>draw_rb_temp(f: <span class="kw-2">&amp;mut </span>Frame, app: <span class="kw-2">&amp;mut </span>App, area: Rect) {
     <span class="kw">let </span>rb_temp = <span class="kw-2">&amp;</span>app.rb_data.temp;
 
     <span class="kw">let </span><span class="kw-2">mut </span>rb_temp_list_items = Vec::&lt;ListItem&gt;::new();
@@ -103,4 +250,53 @@
     Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD))));
 
     f.render_widget(rb_temp_list, area)
+}
+
+<span class="kw">fn </span>draw_rb_vcp(f: <span class="kw-2">&amp;mut </span>Frame, app: <span class="kw-2">&amp;mut </span>App, area: Rect) {
+    <span class="kw">let </span>rb_vcp = <span class="kw-2">&amp;</span>app.rb_data.vcp;
+
+    <span class="kw">let </span><span class="kw-2">mut </span>rb_vcp_list_items = Vec::&lt;ListItem&gt;::new();
+    rb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"ZYNQ 3.3V Line:           {:.3}[V] | {:.3}[A] | {:.3}[W]"</span>, rb_vcp.zynq_vcp[<span class="number">0</span>], rb_vcp.zynq_vcp[<span class="number">1</span>], rb_vcp.zynq_vcp[<span class="number">2</span>]), Style::default()))));
+    rb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"RB 3.3V Line:             {:.3}[V] | {:.3}[A] | {:.3}[W]"</span>, rb_vcp.p3v3_vcp[<span class="number">0</span>], rb_vcp.p3v3_vcp[<span class="number">1</span>], rb_vcp.p3v3_vcp[<span class="number">2</span>]), Style::default()))));
+    rb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"RB 3.5V Line:             {:.3}[V] | {:.3}[A] | {:.3}[W]"</span>, rb_vcp.p3v5_vcp[<span class="number">0</span>], rb_vcp.p3v5_vcp[<span class="number">1</span>], rb_vcp.p3v5_vcp[<span class="number">2</span>]), Style::default()))));
+    rb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"RB -1.5V Line:            {:.2}[V] | {:.3}[A] | {:.3}[W]"</span>, rb_vcp.n1v5_vcp[<span class="number">0</span>], rb_vcp.n1v5_vcp[<span class="number">1</span>], rb_vcp.n1v5_vcp[<span class="number">2</span>]), Style::default()))));
+    rb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"DRS 2.5V Digital Line:    {:.3}[V] | {:.3}[A] | {:.3}[W]"</span>, rb_vcp.drs_dvdd_vcp[<span class="number">0</span>], rb_vcp.drs_dvdd_vcp[<span class="number">1</span>], rb_vcp.drs_dvdd_vcp[<span class="number">2</span>]), Style::default()))));
+    rb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"DRS 2.5V Analog Line:     {:.3}[V] | {:.3}[A] | {:.3}[W]"</span>, rb_vcp.drs_avdd_vcp[<span class="number">0</span>], rb_vcp.drs_avdd_vcp[<span class="number">1</span>], rb_vcp.drs_avdd_vcp[<span class="number">2</span>]), Style::default()))));
+    rb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"ADC 2.5V Digital Line:    {:.3}[V] | {:.3}[A] | {:.3}[W]"</span>, rb_vcp.adc_dvdd_vcp[<span class="number">0</span>], rb_vcp.adc_dvdd_vcp[<span class="number">1</span>], rb_vcp.adc_dvdd_vcp[<span class="number">2</span>]), Style::default()))));
+    rb_vcp_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"ADC 3.0V Analog Line:     {:.3}[V] | {:.3}[A] | {:.3}[W]"</span>, rb_vcp.adc_avdd_vcp[<span class="number">0</span>], rb_vcp.adc_avdd_vcp[<span class="number">1</span>], rb_vcp.adc_avdd_vcp[<span class="number">2</span>]), Style::default()))));
+
+    <span class="kw">let </span>rb_vcp_list = List::new(rb_vcp_list_items)
+    .block(Block::default().borders(Borders::ALL).title(Span::styled(<span class="string">"RB VCP (Voltage, Current &amp; Power)"</span>, 
+    Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD))));
+
+    f.render_widget(rb_vcp_list, area)
+}
+
+<span class="kw">fn </span>draw_rb_ph(f: <span class="kw-2">&amp;mut </span>Frame, app: <span class="kw-2">&amp;mut </span>App, area: Rect) {
+    <span class="kw">let </span>rb_ph = <span class="kw-2">&amp;</span>app.rb_data.ph;
+
+    <span class="kw">let </span><span class="kw-2">mut </span>rb_ph_list_items = Vec::&lt;ListItem&gt;::new();
+    rb_ph_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"Pressure:      {:.3}[hPa]"</span>, rb_ph.pressure), Style::default()))));
+    rb_ph_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"Humidity:      {:.3}[%]"</span>, rb_ph.humidity), Style::default()))));
+    
+    <span class="kw">let </span>rb_ph_list = List::new(rb_ph_list_items)
+    .block(Block::default().borders(Borders::ALL).title(Span::styled(<span class="string">"RB Pressure &amp; Humidity"</span>, 
+    Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD))));
+
+    f.render_widget(rb_ph_list, area)
+}
+
+<span class="kw">fn </span>draw_rb_mag(f: <span class="kw-2">&amp;mut </span>Frame, app: <span class="kw-2">&amp;mut </span>App, area: Rect) {
+    <span class="kw">let </span>rb_mag = <span class="kw-2">&amp;</span>app.rb_data.mag;
+
+    <span class="kw">let </span><span class="kw-2">mut </span>rb_mag_list_items = Vec::&lt;ListItem&gt;::new();
+    rb_mag_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"X-Axis:      {:.3}[G]"</span>, rb_mag.mag_xyz[<span class="number">0</span>]), Style::default()))));
+    rb_mag_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"Y-Axis:      {:.3}[G]"</span>, rb_mag.mag_xyz[<span class="number">1</span>]), Style::default()))));
+    rb_mag_list_items.push(ListItem::new(Line::from(Span::styled(<span class="macro">format!</span>(<span class="string">"Z-Axis:      {:.3}[G]"</span>, rb_mag.mag_xyz[<span class="number">2</span>]), Style::default()))));
+    
+    <span class="kw">let </span>rb_mag_list = List::new(rb_mag_list_items)
+    .block(Block::default().borders(Borders::ALL).title(Span::styled(<span class="string">"RB Magnetometer"</span>, 
+    Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD))));
+
+    f.render_widget(rb_mag_list, area)
 }</code></pre></div></section></main></body></html>

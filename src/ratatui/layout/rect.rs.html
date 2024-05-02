@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/layout/rect.rs`."><title>rect.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/layout/rect.rs`."><title>rect.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -622,6 +622,13 @@
 <a href="#620" id="620">620</a>
 <a href="#621" id="621">621</a>
 <a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
 </pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
 </span><span class="kw">use </span>std::{
     cmp::{max, min},
@@ -641,13 +648,13 @@
 </span><span class="attr">#[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = <span class="string">"serde"</span>, derive(serde::Serialize, serde::Deserialize))]
 </span><span class="kw">pub struct </span>Rect {
-    <span class="doccomment">/// The x coordinate of the top left corner of the rect.
+    <span class="doccomment">/// The x coordinate of the top left corner of the `Rect`.
     </span><span class="kw">pub </span>x: u16,
-    <span class="doccomment">/// The y coordinate of the top left corner of the rect.
+    <span class="doccomment">/// The y coordinate of the top left corner of the `Rect`.
     </span><span class="kw">pub </span>y: u16,
-    <span class="doccomment">/// The width of the rect.
+    <span class="doccomment">/// The width of the `Rect`.
     </span><span class="kw">pub </span>width: u16,
-    <span class="doccomment">/// The height of the rect.
+    <span class="doccomment">/// The height of the `Rect`.
     </span><span class="kw">pub </span>height: u16,
 }
 
@@ -671,9 +678,9 @@
 }
 
 <span class="kw">impl </span>Rect {
-    <span class="doccomment">/// Creates a new rect, with width and height limited to keep the area under max u16. If
+    <span class="doccomment">/// Creates a new `Rect`, with width and height limited to keep the area under max `u16`. If
     /// clipped, aspect ratio will be preserved.
-    </span><span class="kw">pub fn </span>new(x: u16, y: u16, width: u16, height: u16) -&gt; Rect {
+    </span><span class="kw">pub fn </span>new(x: u16, y: u16, width: u16, height: u16) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>max_area = u16::max_value();
         <span class="kw">let </span>(clipped_width, clipped_height) =
             <span class="kw">if </span>u32::from(width) * u32::from(height) &gt; u32::from(max_area) {
@@ -685,7 +692,7 @@
             } <span class="kw">else </span>{
                 (width, height)
             };
-        Rect {
+        <span class="self">Self </span>{
             x,
             y,
             width: clipped_width,
@@ -693,54 +700,57 @@
         }
     }
 
-    <span class="doccomment">/// The area of the rect. If the area is larger than the maximum value of u16, it will be
-    /// clamped to u16::MAX.
+    <span class="doccomment">/// The area of the `Rect`. If the area is larger than the maximum value of `u16`, it will be
+    /// clamped to `u16::MAX`.
     </span><span class="kw">pub const fn </span>area(<span class="self">self</span>) -&gt; u16 {
         <span class="self">self</span>.width.saturating_mul(<span class="self">self</span>.height)
     }
 
-    <span class="doccomment">/// Returns true if the rect has no area.
+    <span class="doccomment">/// Returns true if the `Rect` has no area.
     </span><span class="kw">pub const fn </span>is_empty(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.width == <span class="number">0 </span>|| <span class="self">self</span>.height == <span class="number">0
     </span>}
 
-    <span class="doccomment">/// Returns the left coordinate of the rect.
+    <span class="doccomment">/// Returns the left coordinate of the `Rect`.
     </span><span class="kw">pub const fn </span>left(<span class="self">self</span>) -&gt; u16 {
         <span class="self">self</span>.x
     }
 
-    <span class="doccomment">/// Returns the right coordinate of the rect. This is the first coordinate outside of the rect.
+    <span class="doccomment">/// Returns the right coordinate of the `Rect`. This is the first coordinate outside of the
+    /// `Rect`.
     ///
     /// If the right coordinate is larger than the maximum value of u16, it will be clamped to
-    /// u16::MAX.
+    /// `u16::MAX`.
     </span><span class="kw">pub const fn </span>right(<span class="self">self</span>) -&gt; u16 {
         <span class="self">self</span>.x.saturating_add(<span class="self">self</span>.width)
     }
 
-    <span class="doccomment">/// Returns the top coordinate of the rect.
+    <span class="doccomment">/// Returns the top coordinate of the `Rect`.
     </span><span class="kw">pub const fn </span>top(<span class="self">self</span>) -&gt; u16 {
         <span class="self">self</span>.y
     }
 
-    <span class="doccomment">/// Returns the bottom coordinate of the rect. This is the first coordinate outside of the rect.
+    <span class="doccomment">/// Returns the bottom coordinate of the `Rect`. This is the first coordinate outside of the
+    /// `Rect`.
     ///
     /// If the bottom coordinate is larger than the maximum value of u16, it will be clamped to
-    /// u16::MAX.
+    /// `u16::MAX`.
     </span><span class="kw">pub const fn </span>bottom(<span class="self">self</span>) -&gt; u16 {
         <span class="self">self</span>.y.saturating_add(<span class="self">self</span>.height)
     }
 
-    <span class="doccomment">/// Returns a new rect inside the current one, with the given margin on each side.
+    <span class="doccomment">/// Returns a new `Rect` inside the current one, with the given margin on each side.
     ///
-    /// If the margin is larger than the rect, the returned rect will have no area.
-    </span><span class="kw">pub fn </span>inner(<span class="self">self</span>, margin: <span class="kw-2">&amp;</span>Margin) -&gt; Rect {
+    /// If the margin is larger than the `Rect`, the returned `Rect` will have no area.
+    </span><span class="attr">#[must_use = <span class="string">"method returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>inner(<span class="self">self</span>, margin: <span class="kw-2">&amp;</span>Margin) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>doubled_margin_horizontal = margin.horizontal.saturating_mul(<span class="number">2</span>);
         <span class="kw">let </span>doubled_margin_vertical = margin.vertical.saturating_mul(<span class="number">2</span>);
 
         <span class="kw">if </span><span class="self">self</span>.width &lt; doubled_margin_horizontal || <span class="self">self</span>.height &lt; doubled_margin_vertical {
-            Rect::default()
+            <span class="self">Self</span>::default()
         } <span class="kw">else </span>{
-            Rect {
+            <span class="self">Self </span>{
                 x: <span class="self">self</span>.x.saturating_add(margin.horizontal),
                 y: <span class="self">self</span>.y.saturating_add(margin.vertical),
                 width: <span class="self">self</span>.width.saturating_sub(doubled_margin_horizontal),
@@ -757,25 +767,27 @@
     /// - Positive `y` moves the whole `Rect` to the bottom, negative to the top.
     ///
     /// See [`Offset`] for details.
-    </span><span class="kw">pub fn </span>offset(<span class="self">self</span>, offset: Offset) -&gt; Rect {
-        Rect {
+    </span><span class="attr">#[must_use = <span class="string">"method returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>offset(<span class="self">self</span>, offset: Offset) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
             x: i32::from(<span class="self">self</span>.x)
                 .saturating_add(offset.x)
-                .clamp(<span class="number">0</span>, (u16::MAX - <span class="self">self</span>.width) <span class="kw">as </span>i32) <span class="kw">as </span>u16,
+                .clamp(<span class="number">0</span>, i32::from(u16::MAX - <span class="self">self</span>.width)) <span class="kw">as </span>u16,
             y: i32::from(<span class="self">self</span>.y)
                 .saturating_add(offset.y)
-                .clamp(<span class="number">0</span>, (u16::MAX - <span class="self">self</span>.height) <span class="kw">as </span>i32) <span class="kw">as </span>u16,
+                .clamp(<span class="number">0</span>, i32::from(u16::MAX - <span class="self">self</span>.height)) <span class="kw">as </span>u16,
             ..<span class="self">self
         </span>}
     }
 
-    <span class="doccomment">/// Returns a new rect that contains both the current one and the given one.
-    </span><span class="kw">pub fn </span>union(<span class="self">self</span>, other: Rect) -&gt; Rect {
+    <span class="doccomment">/// Returns a new `Rect` that contains both the current one and the given one.
+    </span><span class="attr">#[must_use = <span class="string">"method returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>union(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>x1 = min(<span class="self">self</span>.x, other.x);
         <span class="kw">let </span>y1 = min(<span class="self">self</span>.y, other.y);
         <span class="kw">let </span>x2 = max(<span class="self">self</span>.right(), other.right());
         <span class="kw">let </span>y2 = max(<span class="self">self</span>.bottom(), other.bottom());
-        Rect {
+        <span class="self">Self </span>{
             x: x1,
             y: y1,
             width: x2.saturating_sub(x1),
@@ -783,15 +795,16 @@
         }
     }
 
-    <span class="doccomment">/// Returns a new rect that is the intersection of the current one and the given one.
+    <span class="doccomment">/// Returns a new `Rect` that is the intersection of the current one and the given one.
     ///
-    /// If the two rects do not intersect, the returned rect will have no area.
-    </span><span class="kw">pub fn </span>intersection(<span class="self">self</span>, other: Rect) -&gt; Rect {
+    /// If the two `Rect`s do not intersect, the returned `Rect` will have no area.
+    </span><span class="attr">#[must_use = <span class="string">"method returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>intersection(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>x1 = max(<span class="self">self</span>.x, other.x);
         <span class="kw">let </span>y1 = max(<span class="self">self</span>.y, other.y);
         <span class="kw">let </span>x2 = min(<span class="self">self</span>.right(), other.right());
         <span class="kw">let </span>y2 = min(<span class="self">self</span>.bottom(), other.bottom());
-        Rect {
+        <span class="self">Self </span>{
             x: x1,
             y: y1,
             width: x2.saturating_sub(x1),
@@ -799,17 +812,17 @@
         }
     }
 
-    <span class="doccomment">/// Returns true if the two rects intersect.
-    </span><span class="kw">pub const fn </span>intersects(<span class="self">self</span>, other: Rect) -&gt; bool {
+    <span class="doccomment">/// Returns true if the two `Rect`s intersect.
+    </span><span class="kw">pub const fn </span>intersects(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; bool {
         <span class="self">self</span>.x &lt; other.right()
             &amp;&amp; <span class="self">self</span>.right() &gt; other.x
             &amp;&amp; <span class="self">self</span>.y &lt; other.bottom()
             &amp;&amp; <span class="self">self</span>.bottom() &gt; other.y
     }
 
-    <span class="doccomment">/// Returns true if the given position is inside the rect.
+    <span class="doccomment">/// Returns true if the given position is inside the `Rect`.
     ///
-    /// The position is considered inside the rect if it is on the rect's border.
+    /// The position is considered inside the `Rect` if it is on the `Rect`'s border.
     ///
     /// # Examples
     ///
@@ -825,20 +838,20 @@
             &amp;&amp; position.y &lt; <span class="self">self</span>.bottom()
     }
 
-    <span class="doccomment">/// Clamp this rect to fit inside the other rect.
+    <span class="doccomment">/// Clamp this `Rect` to fit inside the other `Rect`.
     ///
-    /// If the width or height of this rect is larger than the other rect, it will be clamped to the
-    /// other rect's width or height.
+    /// If the width or height of this `Rect` is larger than the other `Rect`, it will be clamped to
+    /// the other `Rect`'s width or height.
     ///
-    /// If the left or top coordinate of this rect is smaller than the other rect, it will be
-    /// clamped to the other rect's left or top coordinate.
+    /// If the left or top coordinate of this `Rect` is smaller than the other `Rect`, it will be
+    /// clamped to the other `Rect`'s left or top coordinate.
     ///
-    /// If the right or bottom coordinate of this rect is larger than the other rect, it will be
-    /// clamped to the other rect's right or bottom coordinate.
+    /// If the right or bottom coordinate of this `Rect` is larger than the other `Rect`, it will be
+    /// clamped to the other `Rect`'s right or bottom coordinate.
     ///
-    /// This is different from [`Rect::intersection`] because it will move this rect to fit inside
-    /// the other rect, while [`Rect::intersection`] instead would keep this rect's position and
-    /// truncate its size to only that which is inside the other rect.
+    /// This is different from [`Rect::intersection`] because it will move this `Rect` to fit inside
+    /// the other `Rect`, while [`Rect::intersection`] instead would keep this `Rect`'s position and
+    /// truncate its size to only that which is inside the other `Rect`.
     ///
     /// # Examples
     ///
@@ -849,12 +862,13 @@
     /// let rect = Rect::new(0, 0, 100, 100).clamp(area);
     /// # }
     /// ```
-    </span><span class="kw">pub fn </span>clamp(<span class="self">self</span>, other: Rect) -&gt; Rect {
+    </span><span class="attr">#[must_use = <span class="string">"method returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>clamp(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>width = <span class="self">self</span>.width.min(other.width);
         <span class="kw">let </span>height = <span class="self">self</span>.height.min(other.height);
         <span class="kw">let </span>x = <span class="self">self</span>.x.clamp(other.x, other.right().saturating_sub(width));
         <span class="kw">let </span>y = <span class="self">self</span>.y.clamp(other.y, other.bottom().saturating_sub(height));
-        Rect::new(x, y, width, height)
+        <span class="self">Self</span>::new(x, y, width, height)
     }
 
     <span class="doccomment">/// An iterator over rows within the `Rect`.
@@ -869,7 +883,7 @@
     ///     }
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>rows(<span class="self">self</span>) -&gt; Rows {
+    </span><span class="kw">pub const fn </span>rows(<span class="self">self</span>) -&gt; Rows {
         Rows::new(<span class="self">self</span>)
     }
 
@@ -885,7 +899,7 @@
     ///     }
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>columns(<span class="self">self</span>) -&gt; Columns {
+    </span><span class="kw">pub const fn </span>columns(<span class="self">self</span>) -&gt; Columns {
         Columns::new(<span class="self">self</span>)
     }
 
@@ -903,11 +917,11 @@
     ///     }
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>positions(<span class="self">self</span>) -&gt; Positions {
+    </span><span class="kw">pub const fn </span>positions(<span class="self">self</span>) -&gt; Positions {
         Positions::new(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Returns a [`Position`] with the same coordinates as this rect.
+    <span class="doccomment">/// Returns a [`Position`] with the same coordinates as this `Rect`.
     ///
     /// # Examples
     ///
@@ -916,15 +930,15 @@
     /// let rect = Rect::new(1, 2, 3, 4);
     /// let position = rect.as_position();
     /// ````
-    </span><span class="kw">pub fn </span>as_position(<span class="self">self</span>) -&gt; Position {
+    </span><span class="kw">pub const fn </span>as_position(<span class="self">self</span>) -&gt; Position {
         Position {
             x: <span class="self">self</span>.x,
             y: <span class="self">self</span>.y,
         }
     }
 
-    <span class="doccomment">/// Converts the rect into a size struct.
-    </span><span class="kw">pub fn </span>as_size(<span class="self">self</span>) -&gt; Size {
+    <span class="doccomment">/// Converts the `Rect` into a size struct.
+    </span><span class="kw">pub const fn </span>as_size(<span class="self">self</span>) -&gt; Size {
         Size {
             width: <span class="self">self</span>.width,
             height: <span class="self">self</span>.height,
@@ -934,7 +948,7 @@
 
 <span class="kw">impl </span>From&lt;(Position, Size)&gt; <span class="kw">for </span>Rect {
     <span class="kw">fn </span>from((position, size): (Position, Size)) -&gt; <span class="self">Self </span>{
-        Rect {
+        <span class="self">Self </span>{
             x: position.x,
             y: position.y,
             width: size.width,

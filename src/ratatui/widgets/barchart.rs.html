@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/widgets/barchart.rs`."><title>barchart.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/widgets/barchart.rs`."><title>barchart.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1351,6 +1351,8 @@
 <a href="#1349" id="1349">1349</a>
 <a href="#1350" id="1350">1350</a>
 <a href="#1351" id="1351">1351</a>
+<a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, widgets::Block};
 
 <span class="kw">mod </span>bar;
@@ -1391,8 +1393,8 @@
 ///
 /// # Examples
 ///
-/// The following example creates a `BarChart` with two groups of bars.  
-/// The first group is added by an array slice (`&amp;[(&amp;str, u64)]`).  
+/// The following example creates a `BarChart` with two groups of bars.
+/// The first group is added by an array slice (`&amp;[(&amp;str, u64)]`).
 /// The second group is added by a [`BarGroup`] instance.
 /// ```
 /// use ratatui::{prelude::*, widgets::*};
@@ -1439,8 +1441,8 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Default <span class="kw">for </span>BarChart&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">fn </span>default() -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
-        BarChart {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
             block: <span class="prelude-val">None</span>,
             max: <span class="prelude-val">None</span>,
             data: Vec::new(),
@@ -1458,11 +1460,11 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="doccomment">/// Add group of bars to the BarChart
+    <span class="doccomment">/// Add group of bars to the `BarChart`
     ///
     /// # Examples
     ///
-    /// The following example creates a BarChart with two groups of bars.  
+    /// The following example creates a `BarChart` with two groups of bars.
     /// The first group is added by an array slice (`&amp;[(&amp;str, u64)]`).
     /// The second group is added by a [`BarGroup`] instance.
     /// ```
@@ -1471,7 +1473,8 @@
     ///     .data(&amp;[("B0", 0), ("B1", 2), ("B2", 4), ("B3", 3)])
     ///     .data(BarGroup::default().bars(&amp;[Bar::default().value(10), Bar::default().value(20)]));
     /// ```
-    </span><span class="kw">pub fn </span>data(<span class="kw-2">mut </span><span class="self">self</span>, data: <span class="kw">impl </span>Into&lt;BarGroup&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">mut </span><span class="self">self</span>, data: <span class="kw">impl </span>Into&lt;BarGroup&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>group: BarGroup = data.into();
         <span class="kw">if </span>!group.bars.is_empty() {
             <span class="self">self</span>.data.push(group);
@@ -1481,7 +1484,7 @@
 
     <span class="doccomment">/// Surround the [`BarChart`] with a [`Block`].
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">'a</span>&gt;) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.block = <span class="prelude-val">Some</span>(block);
         <span class="self">self
     </span>}
@@ -1516,7 +1519,7 @@
     /// // f b b
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>max(<span class="kw-2">mut </span><span class="self">self</span>, max: u64) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>max(<span class="kw-2">mut </span><span class="self">self</span>, max: u64) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.max = <span class="prelude-val">Some</span>(max);
         <span class="self">self
     </span>}
@@ -1529,7 +1532,7 @@
     /// It is also possible to set individually the style of each [`Bar`].
     /// In this case the default style will be patched by the individual style
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>bar_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>bar_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.bar_style = style.into();
         <span class="self">self
     </span>}
@@ -1539,17 +1542,17 @@
     /// For [`Horizontal`](crate::layout::Direction::Horizontal) bars this becomes the height of
     /// the bar.
     ///
-    /// If not set, this defaults to `1`.  
+    /// If not set, this defaults to `1`.
     /// The bar label also uses this value as its width.
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>bar_width(<span class="kw-2">mut </span><span class="self">self</span>, width: u16) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>bar_width(<span class="kw-2">mut </span><span class="self">self</span>, width: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.bar_width = width;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the gap between each bar.
     ///
-    /// If not set, this defaults to `1`.  
+    /// If not set, this defaults to `1`.
     /// The bar label will never be larger than the bar itself, even if the gap is sufficient.
     ///
     /// # Example
@@ -1566,7 +1569,7 @@
     /// // f   b
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>bar_gap(<span class="kw-2">mut </span><span class="self">self</span>, gap: u16) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>bar_gap(<span class="kw-2">mut </span><span class="self">self</span>, gap: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.bar_gap = gap;
         <span class="self">self
     </span>}
@@ -1575,7 +1578,7 @@
     ///
     /// If not set, the default is [`bar::NINE_LEVELS`](crate::symbols::bar::NINE_LEVELS).
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>bar_set(<span class="kw-2">mut </span><span class="self">self</span>, bar_set: symbols::bar::Set) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>bar_set(<span class="kw-2">mut </span><span class="self">self</span>, bar_set: symbols::bar::Set) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.bar_set = bar_set;
         <span class="self">self
     </span>}
@@ -1590,9 +1593,9 @@
     ///
     /// # See also
     ///
-    /// [Bar::value_style] to set the value style individually.
+    /// [`Bar::value_style`] to set the value style individually.
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>value_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>value_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.value_style = style.into();
         <span class="self">self
     </span>}
@@ -1607,16 +1610,16 @@
     ///
     /// # See also
     ///
-    /// [Bar::label] to set the label style individually.
+    /// [`Bar::label`] to set the label style individually.
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>label_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>label_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.label_style = style.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the gap between [`BarGroup`].
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>group_gap(<span class="kw-2">mut </span><span class="self">self</span>, gap: u16) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>group_gap(<span class="kw-2">mut </span><span class="self">self</span>, gap: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.group_gap = gap;
         <span class="self">self
     </span>}
@@ -1628,7 +1631,7 @@
     ///
     /// The style will be applied to everything that isn't styled (borders, bars, labels, ...).
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.style = style.into();
         <span class="self">self
     </span>}
@@ -1653,13 +1656,14 @@
     /// █bar██
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>direction(<span class="kw-2">mut </span><span class="self">self</span>, direction: Direction) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>direction(<span class="kw-2">mut </span><span class="self">self</span>, direction: Direction) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.direction = direction;
         <span class="self">self
     </span>}
 }
 
-<span class="kw">struct </span>LabelInfo {
+<span class="attr">#[derive(Clone, Copy)]
+</span><span class="kw">struct </span>LabelInfo {
     group_label_visible: bool,
     bar_label_visible: bool,
     height: u16,
@@ -1751,13 +1755,13 @@
             .iter()
             .flat_map(|group| group.bars.iter().map(|bar| <span class="kw-2">&amp;</span>bar.label))
             .flatten() <span class="comment">// bar.label is an Option&lt;Line&gt;
-            </span>.map(|label| label.width())
+            </span>.map(Line::width)
             .max()
             .unwrap_or(<span class="number">0</span>) <span class="kw">as </span>u16;
 
         <span class="kw">let </span>label_x = area.x;
         <span class="kw">let </span>bars_area = {
-            <span class="kw">let </span>margin = <span class="kw">if </span>label_size == <span class="number">0 </span>{ <span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">1 </span>};
+            <span class="kw">let </span>margin = u16::from(label_size != <span class="number">0</span>);
             Rect {
                 x: area.x + label_size + margin,
                 width: area.width - label_size - margin,
@@ -1881,7 +1885,7 @@
                     .max()
                     .unwrap_or_default()
             })
-            .max(<span class="number">1u64</span>)
+            .max(<span class="number">1</span>)
     }
 
     <span class="kw">fn </span>render_labels_and_values(
@@ -1951,7 +1955,7 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>BarChart&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">type </span>Item = BarChart&lt;<span class="lifetime">'a</span>&gt;;
+    <span class="kw">type </span>Item = <span class="self">Self</span>;
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
     }
@@ -2201,7 +2205,7 @@
                 .fg(Color::Black)
                 .bg(Color::White)
                 .add_modifier(Modifier::BOLD)
-        )
+        );
     }
 
     <span class="attr">#[test]
@@ -2342,7 +2346,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_horizontal_bars_label_width_greater_than_bar_with_style() {
-        test_horizontal_bars_label_width_greater_than_bar(<span class="prelude-val">Some</span>(Color::White))
+        test_horizontal_bars_label_width_greater_than_bar(<span class="prelude-val">Some</span>(Color::White));
     }
 
     <span class="doccomment">/// Tests horizontal bars label are presents

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/text/line.rs`."><title>line.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/text/line.rs`."><title>line.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -872,11 +872,271 @@
 <a href="#870" id="870">870</a>
 <a href="#871" id="871">871</a>
 <a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+<a href="#1057" id="1057">1057</a>
+<a href="#1058" id="1058">1058</a>
+<a href="#1059" id="1059">1059</a>
+<a href="#1060" id="1060">1060</a>
+<a href="#1061" id="1061">1061</a>
+<a href="#1062" id="1062">1062</a>
+<a href="#1063" id="1063">1063</a>
+<a href="#1064" id="1064">1064</a>
+<a href="#1065" id="1065">1065</a>
+<a href="#1066" id="1066">1066</a>
+<a href="#1067" id="1067">1067</a>
+<a href="#1068" id="1068">1068</a>
+<a href="#1069" id="1069">1069</a>
+<a href="#1070" id="1070">1070</a>
+<a href="#1071" id="1071">1071</a>
+<a href="#1072" id="1072">1072</a>
+<a href="#1073" id="1073">1073</a>
+<a href="#1074" id="1074">1074</a>
+<a href="#1075" id="1075">1075</a>
+<a href="#1076" id="1076">1076</a>
+<a href="#1077" id="1077">1077</a>
+<a href="#1078" id="1078">1078</a>
+<a href="#1079" id="1079">1079</a>
+<a href="#1080" id="1080">1080</a>
+<a href="#1081" id="1081">1081</a>
+<a href="#1082" id="1082">1082</a>
+<a href="#1083" id="1083">1083</a>
+<a href="#1084" id="1084">1084</a>
+<a href="#1085" id="1085">1085</a>
+<a href="#1086" id="1086">1086</a>
+<a href="#1087" id="1087">1087</a>
+<a href="#1088" id="1088">1088</a>
+<a href="#1089" id="1089">1089</a>
+<a href="#1090" id="1090">1090</a>
+<a href="#1091" id="1091">1091</a>
+<a href="#1092" id="1092">1092</a>
+<a href="#1093" id="1093">1093</a>
+<a href="#1094" id="1094">1094</a>
+<a href="#1095" id="1095">1095</a>
+<a href="#1096" id="1096">1096</a>
+<a href="#1097" id="1097">1097</a>
+<a href="#1098" id="1098">1098</a>
+<a href="#1099" id="1099">1099</a>
+<a href="#1100" id="1100">1100</a>
+<a href="#1101" id="1101">1101</a>
+<a href="#1102" id="1102">1102</a>
+<a href="#1103" id="1103">1103</a>
+<a href="#1104" id="1104">1104</a>
+<a href="#1105" id="1105">1105</a>
+<a href="#1106" id="1106">1106</a>
+<a href="#1107" id="1107">1107</a>
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
+<a href="#1112" id="1112">1112</a>
+<a href="#1113" id="1113">1113</a>
+<a href="#1114" id="1114">1114</a>
+<a href="#1115" id="1115">1115</a>
+<a href="#1116" id="1116">1116</a>
+<a href="#1117" id="1117">1117</a>
+<a href="#1118" id="1118">1118</a>
+<a href="#1119" id="1119">1119</a>
+<a href="#1120" id="1120">1120</a>
+<a href="#1121" id="1121">1121</a>
+<a href="#1122" id="1122">1122</a>
+<a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
+<a href="#1126" id="1126">1126</a>
+<a href="#1127" id="1127">1127</a>
+<a href="#1128" id="1128">1128</a>
+<a href="#1129" id="1129">1129</a>
+<a href="#1130" id="1130">1130</a>
+<a href="#1131" id="1131">1131</a>
+<a href="#1132" id="1132">1132</a>
 </pre></div><pre class="rust"><code><span class="attr">#![deny(missing_docs)]
 </span><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span><span class="kw">super</span>::StyledGrapheme;
-<span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, widgets::Widget};
+<span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A line of text, consisting of one or more [`Span`]s.
 ///
@@ -884,27 +1144,20 @@
 /// text. When a [`Line`] is rendered, it is rendered as a single line of text, with each [`Span`]
 /// being rendered in order (left to right).
 ///
-/// [`Line`]s can be created from [`Span`]s, [`String`]s, and [`&amp;str`]s. They can be styled with a
-/// [`Style`], and have an [`Alignment`].
-///
-/// The line's [`Alignment`] is used by the rendering widget to determine how to align the line
-/// within the available space. If the line is longer than the available space, the alignment is
-/// ignored and the line is truncated.
-///
-/// The line's [`Style`] is used by the rendering widget to determine how to style the line. If the
-/// line is longer than the available space, the style is applied to the entire line, and the line
-/// is truncated. Each [`Span`] in the line will be styled with the [`Style`] of the line, and then
-/// with its own [`Style`].
-///
-/// `Line` implements the [`Widget`] trait, which means it can be rendered to a [`Buffer`]. Usually
-/// apps will use the [`Paragraph`] widget instead of rendering a [`Line`] directly as it provides
-/// more functionality.
-///
 /// # Constructor Methods
 ///
 /// - [`Line::default`] creates a line with empty content and the default style.
 /// - [`Line::raw`] creates a line with the given content and the default style.
 /// - [`Line::styled`] creates a line with the given content and style.
+///
+/// # Conversion Methods
+///
+/// - [`Line::from`] creates a `Line` from a [`String`].
+/// - [`Line::from`] creates a `Line` from a [`&amp;str`].
+/// - [`Line::from`] creates a `Line` from a [`Vec`] of [`Span`]s.
+/// - [`Line::from`] creates a `Line` from single [`Span`].
+/// - [`String::from`] converts a line into a [`String`].
+/// - [`Line::from_iter`] creates a line from an iterator of items that are convertible to [`Span`].
 ///
 /// # Setter Methods
 ///
@@ -913,6 +1166,15 @@
 /// - [`Line::spans`] sets the content of the line.
 /// - [`Line::style`] sets the style of the line.
 /// - [`Line::alignment`] sets the alignment of the line.
+/// - [`Line::left_aligned`] sets the alignment of the line to [`Alignment::Left`].
+/// - [`Line::centered`] sets the alignment of the line to [`Alignment::Center`].
+/// - [`Line::right_aligned`] sets the alignment of the line to [`Alignment::Right`].
+///
+/// # Iteration Methods
+///
+/// - [`Line::iter`] returns an iterator over the spans of this line.
+/// - [`Line::iter_mut`] returns a mutable iterator over the spans of this line.
+/// - [`Line::into_iter`] returns an iterator over the spans of this line.
 ///
 /// # Other Methods
 ///
@@ -920,6 +1182,7 @@
 /// - [`Line::reset_style`] resets the style of the line.
 /// - [`Line::width`] returns the unicode width of the content held by this line.
 /// - [`Line::styled_graphemes`] returns an iterator over the graphemes held by this line.
+/// - [`Line::push_span`] adds a span to the line.
 ///
 /// # Compatibility Notes
 ///
@@ -930,17 +1193,88 @@
 ///
 /// # Examples
 ///
+/// ## Creating Lines
+/// [`Line`]s can be created from [`Span`]s, [`String`]s, and [`&amp;str`]s. They can be styled with a
+/// [`Style`].
+///
 /// ```rust
 /// use ratatui::prelude::*;
 ///
-/// Line::raw("unstyled");
-/// Line::styled("yellow text", Style::new().yellow());
-/// Line::from("red text").style(Style::new().red());
-/// Line::from(String::from("unstyled"));
-/// Line::from(vec![
+/// let style = Style::new().yellow();
+/// let line = Line::raw("Hello, world!").style(style);
+/// let line = Line::styled("Hello, world!", style);
+/// let line = Line::styled("Hello, world!", (Color::Yellow, Modifier::BOLD));
+///
+/// let line = Line::from("Hello, world!");
+/// let line = Line::from(String::from("Hello, world!"));
+/// let line = Line::from(vec![
 ///     Span::styled("Hello", Style::new().blue()),
 ///     Span::raw(" world!"),
 /// ]);
+/// ```
+///
+/// ## Styling Lines
+///
+/// The line's [`Style`] is used by the rendering widget to determine how to style the line. Each
+/// [`Span`] in the line will be styled with the [`Style`] of the line, and then with its own
+/// [`Style`]. If the line is longer than the available space, the style is applied to the entire
+/// line, and the line is truncated. `Line` also implements [`Styled`] which means you can use the
+/// methods of the [`Stylize`] trait.
+///
+/// ```rust
+/// # use ratatui::prelude::*;
+/// let line = Line::from("Hello world!").style(Style::new().yellow().italic());
+/// let line = Line::from("Hello world!").style(Color::Yellow);
+/// let line = Line::from("Hello world!").style((Color::Yellow, Color::Black));
+/// let line = Line::from("Hello world!").style((Color::Yellow, Modifier::ITALIC));
+/// let line = Line::from("Hello world!").yellow().italic();
+/// ```
+///
+/// ## Aligning Lines
+///
+/// The line's [`Alignment`] is used by the rendering widget to determine how to align the line
+/// within the available space. If the line is longer than the available space, the alignment is
+/// ignored and the line is truncated.
+///
+/// ```rust
+/// # use ratatui::prelude::*;
+/// let line = Line::from("Hello world!").alignment(Alignment::Right);
+/// let line = Line::from("Hello world!").centered();
+/// let line = Line::from("Hello world!").left_aligned();
+/// let line = Line::from("Hello world!").right_aligned();
+/// ```
+///
+/// ## Rendering Lines
+///
+/// `Line` implements the [`Widget`] trait, which means it can be rendered to a [`Buffer`].
+///
+/// ```rust
+/// # use ratatui::prelude::*;
+/// # fn render(area: Rect, buf: &amp;mut Buffer) {
+/// // in another widget's render method
+/// let line = Line::from("Hello world!").style(Style::new().yellow().italic());
+/// line.render(area, buf);
+/// # }
+///
+/// # fn draw(frame: &amp;mut Frame, area: Rect) {
+/// // in a terminal.draw closure
+/// let line = Line::from("Hello world!").style(Style::new().yellow().italic());
+/// frame.render_widget(line, area);
+/// # }
+/// ```
+/// ## Rendering Lines with a Paragraph widget
+///
+/// Usually apps will use the [`Paragraph`] widget instead of rendering a [`Line`] directly as it
+/// provides more functionality.
+///
+/// ```rust
+/// # use ratatui::{prelude::*, widgets::*};
+/// # fn render(area: Rect, buf: &amp;mut Buffer) {
+/// let line = Line::from("Hello world!").yellow().italic();
+/// Paragraph::new(line)
+///     .wrap(Wrap { trim: true })
+///     .render(area, buf);
+/// # }
 /// ```
 ///
 /// [`Paragraph`]: crate::widgets::Paragraph
@@ -976,11 +1310,11 @@
     /// Line::raw(String::from("test content"));
     /// Line::raw(Cow::from("test content"));
     /// ```
-    </span><span class="kw">pub fn </span>raw&lt;T&gt;(content: T) -&gt; Line&lt;<span class="lifetime">'a</span>&gt;
-    <span class="kw">where
+    </span><span class="kw">pub fn </span>raw&lt;T&gt;(content: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>T: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     {
-        Line {
+        <span class="self">Self </span>{
             spans: content
                 .into()
                 .lines()
@@ -1009,12 +1343,12 @@
     /// Line::styled(String::from("My text"), style);
     /// Line::styled(Cow::from("test content"), style);
     /// ```
-    </span><span class="kw">pub fn </span>styled&lt;T, S&gt;(content: T, style: S) -&gt; Line&lt;<span class="lifetime">'a</span>&gt;
-    <span class="kw">where
+    </span><span class="kw">pub fn </span>styled&lt;T, S&gt;(content: T, style: S) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>T: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
         S: Into&lt;Style&gt;,
     {
-        Line {
+        <span class="self">Self </span>{
             spans: content
                 .into()
                 .lines()
@@ -1252,6 +1586,56 @@
     </span><span class="kw">pub fn </span>iter_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; std::slice::IterMut&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt; {
         <span class="self">self</span>.spans.iter_mut()
     }
+
+    <span class="doccomment">/// Returns a line that's truncated corresponding to it's alignment and result width
+    </span><span class="attr">#[must_use = <span class="string">"method returns the modified value"</span>]
+    </span><span class="kw">fn </span>truncated(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>, result_width: u16) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>truncated_line = Line::default();
+        <span class="kw">let </span>width = <span class="self">self</span>.width() <span class="kw">as </span>u16;
+        <span class="kw">let </span><span class="kw-2">mut </span>offset = <span class="kw">match </span><span class="self">self</span>.alignment {
+            <span class="prelude-val">Some</span>(Alignment::Center) =&gt; (width.saturating_sub(result_width)) / <span class="number">2</span>,
+            <span class="prelude-val">Some</span>(Alignment::Right) =&gt; width.saturating_sub(result_width),
+            <span class="kw">_ </span>=&gt; <span class="number">0</span>,
+        };
+        <span class="kw">let </span><span class="kw-2">mut </span>x = <span class="number">0</span>;
+        <span class="kw">for </span>span <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.spans {
+            <span class="kw">let </span>span_width = span.width() <span class="kw">as </span>u16;
+            <span class="kw">if </span>offset &gt;= span_width {
+                offset -= span_width;
+                <span class="kw">continue</span>;
+            }
+            <span class="kw">let </span><span class="kw-2">mut </span>new_span = span.clone();
+            <span class="kw">let </span>new_span_width = span_width - offset;
+            <span class="kw">if </span>x + new_span_width &gt; result_width {
+                <span class="kw">let </span>span_end = (result_width - x + offset) <span class="kw">as </span>usize;
+                new_span.content = Cow::from(<span class="kw-2">&amp;</span>span.content[offset <span class="kw">as </span>usize..span_end]);
+                truncated_line.spans.push(new_span);
+                <span class="kw">break</span>;
+            }
+
+            new_span.content = Cow::from(<span class="kw-2">&amp;</span>span.content[offset <span class="kw">as </span>usize..]);
+            truncated_line.spans.push(new_span);
+            x += new_span_width;
+            offset = <span class="number">0</span>;
+        }
+        truncated_line
+    }
+    <span class="doccomment">/// Adds a span to the line.
+    ///
+    /// `span` can be any type that is convertible into a `Span`. For example, you can pass a
+    /// `&amp;str`, a `String`, or a `Span`.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use ratatui::prelude::*;
+    /// let mut line = Line::from("Hello, ");
+    /// line.push_span(Span::raw("world!"));
+    /// line.push_span(" How are you?");
+    /// ```
+    </span><span class="kw">pub fn </span>push_span&lt;T: Into&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, span: T) {
+        <span class="self">self</span>.spans.push(span.into());
+    }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; IntoIterator <span class="kw">for </span>Line&lt;<span class="lifetime">'a</span>&gt; {
@@ -1309,11 +1693,20 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt; <span class="kw">for </span>String {
-    <span class="kw">fn </span>from(line: Line&lt;<span class="lifetime">'a</span>&gt;) -&gt; String {
-        line.iter().fold(String::new(), |<span class="kw-2">mut </span>acc, s| {
+    <span class="kw">fn </span>from(line: Line&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
+        line.iter().fold(<span class="self">Self</span>::new(), |<span class="kw-2">mut </span>acc, s| {
             acc.push_str(s.content.as_ref());
             acc
         })
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T&gt; FromIterator&lt;T&gt; <span class="kw">for </span>Line&lt;<span class="lifetime">'a</span>&gt;
+<span class="kw">where
+    </span>T: Into&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt;,
+{
+    <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = T&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from(iter.into_iter().map(Into::into).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;())
     }
 }
 
@@ -1328,18 +1721,23 @@
         <span class="kw">let </span>area = area.intersection(buf.area);
         buf.set_style(area, <span class="self">self</span>.style);
         <span class="kw">let </span>width = <span class="self">self</span>.width() <span class="kw">as </span>u16;
-        <span class="kw">let </span>offset = <span class="kw">match </span><span class="self">self</span>.alignment {
-            <span class="prelude-val">Some</span>(Alignment::Left) =&gt; <span class="number">0</span>,
-            <span class="prelude-val">Some</span>(Alignment::Center) =&gt; (area.width.saturating_sub(width)) / <span class="number">2</span>,
-            <span class="prelude-val">Some</span>(Alignment::Right) =&gt; area.width.saturating_sub(width),
-            <span class="prelude-val">None </span>=&gt; <span class="number">0</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>x = area.left();
+        <span class="kw">let </span>line = <span class="kw">if </span>width &gt; area.width {
+            <span class="self">self</span>.truncated(area.width)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>offset = <span class="kw">match </span><span class="self">self</span>.alignment {
+                <span class="prelude-val">Some</span>(Alignment::Center) =&gt; (area.width.saturating_sub(width)) / <span class="number">2</span>,
+                <span class="prelude-val">Some</span>(Alignment::Right) =&gt; area.width.saturating_sub(width),
+                <span class="prelude-val">Some</span>(Alignment::Left) | <span class="prelude-val">None </span>=&gt; <span class="number">0</span>,
+            };
+            x = x.saturating_add(offset);
+            <span class="self">self</span>.to_owned()
         };
-        <span class="kw">let </span><span class="kw-2">mut </span>x = area.left().saturating_add(offset);
-        <span class="kw">for </span>span <span class="kw">in </span><span class="self">self</span>.spans.iter() {
+        <span class="kw">for </span>span <span class="kw">in </span><span class="kw-2">&amp;</span>line.spans {
             <span class="kw">let </span>span_width = span.width() <span class="kw">as </span>u16;
             <span class="kw">let </span>span_area = Rect {
                 x,
-                width: span_width.min(area.right() - x),
+                width: span_width.min(area.right().saturating_sub(x)),
                 ..area
             };
             span.render(span_area, buf);
@@ -1360,11 +1758,31 @@
     }
 }
 
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>Line&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="self">Self</span>;
+
+    <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
+        <span class="self">self</span>.style
+    }
+
+    <span class="kw">fn </span>set_style&lt;S: Into&lt;Style&gt;&gt;(<span class="self">self</span>, style: S) -&gt; <span class="self">Self</span>::Item {
+        <span class="self">self</span>.style(style)
+    }
+}
+
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::iter;
+
     <span class="kw">use </span>rstest::{fixture, rstest};
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::assert_buffer_eq;
+
+    <span class="attr">#[fixture]
+    </span><span class="kw">fn </span>small_buf() -&gt; Buffer {
+        Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">1</span>))
+    }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>raw_str() {
@@ -1476,6 +1894,16 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>stylize() {
+        <span class="macro">assert_eq!</span>(Line::default().green().style, Color::Green.into());
+        <span class="macro">assert_eq!</span>(
+            Line::default().on_green().style,
+            Style::new().bg(Color::Green)
+        );
+        <span class="macro">assert_eq!</span>(Line::default().italic().style, Modifier::ITALIC.into());
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>from_string() {
         <span class="kw">let </span>s = String::from(<span class="string">"Hello, world!"</span>);
         <span class="kw">let </span>line = Line::from(s);
@@ -1497,6 +1925,32 @@
         ];
         <span class="kw">let </span>line = Line::from(spans.clone());
         <span class="macro">assert_eq!</span>(spans, line.spans);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>from_iter() {
+        <span class="kw">let </span>line = Line::from_iter(<span class="macro">vec!</span>[<span class="string">"Hello"</span>.blue(), <span class="string">" world!"</span>.green()]);
+        <span class="macro">assert_eq!</span>(
+            line.spans,
+            <span class="macro">vec!</span>[
+                Span::styled(<span class="string">"Hello"</span>, Style::new().blue()),
+                Span::styled(<span class="string">" world!"</span>, Style::new().green()),
+            ]
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>collect() {
+        <span class="kw">let </span>line: Line = iter::once(<span class="string">"Hello"</span>.blue())
+            .chain(iter::once(<span class="string">" world!"</span>.green()))
+            .collect();
+        <span class="macro">assert_eq!</span>(
+            line.spans,
+            <span class="macro">vec!</span>[
+                Span::styled(<span class="string">"Hello"</span>, Style::new().blue()),
+                Span::styled(<span class="string">" world!"</span>, Style::new().green()),
+            ]
+        );
     }
 
     <span class="attr">#[test]
@@ -1567,6 +2021,82 @@
 
         <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{line_from_styled_span}"</span>), <span class="string">"Hello, world!"</span>);
     }
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>render_truncates_left() {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">1</span>));
+        Line::from(<span class="string">"Hello world"</span>)
+            .left_aligned()
+            .render(buf.area, <span class="kw-2">&amp;mut </span>buf);
+        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello"</span>]);
+        <span class="macro">assert_buffer_eq!</span>(buf, expected);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>render_truncates_right() {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">1</span>));
+        Line::from(<span class="string">"Hello world"</span>)
+            .right_aligned()
+            .render(buf.area, <span class="kw-2">&amp;mut </span>buf);
+        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"world"</span>]);
+        <span class="macro">assert_buffer_eq!</span>(buf, expected);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>render_truncates_center() {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">1</span>));
+        Line::from(<span class="string">"Hello world"</span>)
+            .centered()
+            .render(buf.area, <span class="kw-2">&amp;mut </span>buf);
+        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"lo wo"</span>]);
+        <span class="macro">assert_buffer_eq!</span>(buf, expected);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>truncate_line_with_multiple_spans() {
+        <span class="kw">let </span>line = Line::default().spans(<span class="macro">vec!</span>[<span class="string">"foo"</span>, <span class="string">"bar"</span>]);
+        <span class="macro">assert_eq!</span>(
+            line.right_aligned().truncated(<span class="number">4</span>).to_string(),
+            String::from(<span class="string">"obar"</span>)
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>truncation_ignores_useless_spans() {
+        <span class="kw">let </span>line = Line::default().spans(<span class="macro">vec!</span>[<span class="string">"foo"</span>, <span class="string">"bar"</span>]);
+        <span class="macro">assert_eq!</span>(
+            line.right_aligned().truncated(<span class="number">3</span>),
+            Line::default().spans(<span class="macro">vec!</span>[<span class="string">"bar"</span>])
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>left_aligned() {
+        <span class="kw">let </span>line = Line::from(<span class="string">"Hello, world!"</span>).left_aligned();
+        <span class="macro">assert_eq!</span>(line.alignment, <span class="prelude-val">Some</span>(Alignment::Left));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>centered() {
+        <span class="kw">let </span>line = Line::from(<span class="string">"Hello, world!"</span>).centered();
+        <span class="macro">assert_eq!</span>(line.alignment, <span class="prelude-val">Some</span>(Alignment::Center));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>right_aligned() {
+        <span class="kw">let </span>line = Line::from(<span class="string">"Hello, world!"</span>).right_aligned();
+        <span class="macro">assert_eq!</span>(line.alignment, <span class="prelude-val">Some</span>(Alignment::Right));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">pub fn </span>push_span() {
+        <span class="kw">let </span><span class="kw-2">mut </span>line = Line::from(<span class="string">"A"</span>);
+        line.push_span(Span::raw(<span class="string">"B"</span>));
+        line.push_span(<span class="string">"C"</span>);
+        <span class="macro">assert_eq!</span>(
+            line.spans,
+            <span class="macro">vec!</span>[Span::raw(<span class="string">"A"</span>), Span::raw(<span class="string">"B"</span>), Span::raw(<span class="string">"C"</span>)]
+        );
+    }
 
     <span class="kw">mod </span>widget {
         <span class="kw">use super</span>::<span class="kw-2">*</span>;
@@ -1575,7 +2105,8 @@
         <span class="kw">const </span>GREEN: Style = Style::new().fg(Color::Green);
         <span class="kw">const </span>ITALIC: Style = Style::new().add_modifier(Modifier::ITALIC);
 
-        <span class="kw">fn </span>hello_world() -&gt; Line&lt;<span class="lifetime">'static</span>&gt; {
+        <span class="attr">#[fixture]
+        </span><span class="kw">fn </span>hello_world() -&gt; Line&lt;<span class="lifetime">'static</span>&gt; {
             Line::from(<span class="macro">vec!</span>[
                 Span::styled(<span class="string">"Hello "</span>, BLUE),
                 Span::styled(<span class="string">"world!"</span>, GREEN),
@@ -1592,6 +2123,13 @@
             expected.set_style(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">6</span>, <span class="number">1</span>), BLUE);
             expected.set_style(Rect::new(<span class="number">6</span>, <span class="number">0</span>, <span class="number">6</span>, <span class="number">1</span>), GREEN);
             <span class="macro">assert_buffer_eq!</span>(buf, expected);
+        }
+
+        <span class="attr">#[rstest]
+        </span><span class="kw">fn </span>render_out_of_bounds(hello_world: Line&lt;<span class="lifetime">'static</span>&gt;, <span class="kw-2">mut </span>small_buf: Buffer) {
+            <span class="kw">let </span>out_of_bounds = Rect::new(<span class="number">20</span>, <span class="number">20</span>, <span class="number">10</span>, <span class="number">1</span>);
+            hello_world.render(out_of_bounds, <span class="kw-2">&amp;mut </span>small_buf);
+            <span class="macro">assert_buffer_eq!</span>(small_buf, Buffer::empty(small_buf.area));
         }
 
         <span class="attr">#[test]
@@ -1636,24 +2174,6 @@
             expected.set_style(Rect::new(<span class="number">9</span>, <span class="number">0</span>, <span class="number">6</span>, <span class="number">1</span>), GREEN);
             <span class="macro">assert_buffer_eq!</span>(buf, expected);
         }
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>left_aligned() {
-        <span class="kw">let </span>line = Line::from(<span class="string">"Hello, world!"</span>).left_aligned();
-        <span class="macro">assert_eq!</span>(line.alignment, <span class="prelude-val">Some</span>(Alignment::Left));
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>centered() {
-        <span class="kw">let </span>line = Line::from(<span class="string">"Hello, world!"</span>).centered();
-        <span class="macro">assert_eq!</span>(line.alignment, <span class="prelude-val">Some</span>(Alignment::Center));
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>right_aligned() {
-        <span class="kw">let </span>line = Line::from(<span class="string">"Hello, world!"</span>).right_aligned();
-        <span class="macro">assert_eq!</span>(line.alignment, <span class="prelude-val">Some</span>(Alignment::Right));
     }
 
     <span class="kw">mod </span>iterators {

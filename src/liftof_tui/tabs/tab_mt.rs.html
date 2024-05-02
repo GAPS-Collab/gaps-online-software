@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_mt.rs`."><title>tab_mt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_mt.rs`."><title>tab_mt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../liftof_tui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -442,6 +442,29 @@
 <a href="#440" id="440">440</a>
 <a href="#441" id="441">441</a>
 <a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Master Trigger tab
 //! 
 //! Show current data from the master trigger
@@ -455,7 +478,10 @@
 <span class="kw">use </span>ratatui::{
     symbols,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{Color, Modifier, Style},
+    style::{
+        Color,
+        <span class="comment">//Modifier,
+        </span>Style},
     text::Span,
     terminal::Frame,
     widgets::{
@@ -465,8 +491,8 @@
         GraphType,
         BorderType,
         Chart,
-        BarChart,
-        Borders,
+        <span class="comment">//BarChart,
+        </span>Borders,
         Paragraph
     },
 };
@@ -484,41 +510,35 @@
     Uniform,
 };
 
-<span class="kw">use </span>tof_dataclasses::packets::{TofPacket, PacketType};
+<span class="kw">use </span>tof_dataclasses::packets::{
+    TofPacket,
+    PacketType
+};
 <span class="kw">use </span>tof_dataclasses::events::MasterTriggerEvent;
 <span class="kw">use </span>tof_dataclasses::monitoring::MtbMoniData;
 <span class="kw">use </span>tof_dataclasses::errors::SerializationError;
-<span class="kw">use </span>tof_dataclasses::serialization::Serialization;
-
+<span class="comment">//use tof_dataclasses::serialization::Serialization;
+</span><span class="kw">use </span>tof_dataclasses::database::DsiJChPidMapping;
+<span class="kw">use </span>tof_dataclasses::events::master_trigger::LTBThreshold;
 <span class="kw">use </span><span class="kw">crate</span>::colors::{
-    ColorTheme2,
+    ColorTheme,
 };
 
-
-<span class="kw">pub const </span>HIST_LABELS : [<span class="kw-2">&amp;</span>str;<span class="number">100</span>]  = [<span class="string">"0"</span>,   <span class="string">"1"</span>, <span class="string">"2"</span>,  <span class="string">"3"</span>,  <span class="string">"4"</span>,  <span class="string">"5"</span>,  <span class="string">"6"</span>,  <span class="string">"7"</span>,  <span class="string">"8"</span>,  <span class="string">"9"</span>,
-                                       <span class="string">"10"</span>, <span class="string">"11"</span>, <span class="string">"12"</span>, <span class="string">"13"</span>, <span class="string">"14"</span>, <span class="string">"15"</span>, <span class="string">"16"</span>, <span class="string">"17"</span>, <span class="string">"18"</span>, <span class="string">"19"</span>,
-                                       <span class="string">"20"</span>, <span class="string">"21"</span>, <span class="string">"22"</span>, <span class="string">"23"</span>, <span class="string">"24"</span>, <span class="string">"25"</span>, <span class="string">"26"</span>, <span class="string">"27"</span>, <span class="string">"28"</span>, <span class="string">"29"</span>, 
-                                       <span class="string">"30"</span>, <span class="string">"31"</span>, <span class="string">"32"</span>, <span class="string">"33"</span>, <span class="string">"34"</span>, <span class="string">"35"</span>, <span class="string">"36"</span>, <span class="string">"37"</span>, <span class="string">"38"</span>, <span class="string">"39"</span>,
-                                       <span class="string">"40"</span>, <span class="string">"41"</span>, <span class="string">"42"</span>, <span class="string">"43"</span>, <span class="string">"44"</span>, <span class="string">"45"</span>, <span class="string">"46"</span>, <span class="string">"47"</span>, <span class="string">"48"</span>, <span class="string">"49"</span>,
-                                       <span class="string">"50"</span>, <span class="string">"51"</span>, <span class="string">"52"</span>, <span class="string">"53"</span>, <span class="string">"54"</span>, <span class="string">"55"</span>, <span class="string">"56"</span>, <span class="string">"57"</span>, <span class="string">"58"</span>, <span class="string">"59"</span>,
-                                       <span class="string">"60"</span>, <span class="string">"61"</span>, <span class="string">"62"</span>, <span class="string">"63"</span>, <span class="string">"64"</span>, <span class="string">"65"</span>, <span class="string">"66"</span>, <span class="string">"67"</span>, <span class="string">"68"</span>, <span class="string">"69"</span>,
-                                       <span class="string">"70"</span>, <span class="string">"71"</span>, <span class="string">"72"</span>, <span class="string">"73"</span>, <span class="string">"74"</span>, <span class="string">"75"</span>, <span class="string">"76"</span>, <span class="string">"77"</span>, <span class="string">"78"</span>, <span class="string">"79"</span>,
-                                       <span class="string">"80"</span>, <span class="string">"81"</span>, <span class="string">"82"</span>, <span class="string">"83"</span>, <span class="string">"84"</span>, <span class="string">"85"</span>, <span class="string">"86"</span>, <span class="string">"87"</span>, <span class="string">"88"</span>, <span class="string">"89"</span>,
-                                       <span class="string">"90"</span>, <span class="string">"91"</span>, <span class="string">"92"</span>, <span class="string">"93"</span>, <span class="string">"94"</span>, <span class="string">"95"</span>, <span class="string">"96"</span>, <span class="string">"97"</span>, <span class="string">"98"</span>, <span class="string">"99"</span>,
-                                       ];
-
+<span class="kw">use </span><span class="kw">crate</span>::widgets::{
+    <span class="comment">//clean_data,
+    </span>prep_data,
+    create_labels,
+    histogram,
+    timeseries
+};
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>MTTab {
-  <span class="kw">pub </span>main_layout    : Vec&lt;Rect&gt;,
-  <span class="kw">pub </span>info_layout    : Vec&lt;Rect&gt;,
-  <span class="kw">pub </span>detail_layout  : Vec&lt;Rect&gt;,
-  <span class="kw">pub </span>view_layout    : Vec&lt;Rect&gt;,
-
   <span class="kw">pub </span>event_queue    : VecDeque&lt;MasterTriggerEvent&gt;,
   <span class="kw">pub </span>moni_queue     : VecDeque&lt;MtbMoniData&gt;,
   <span class="kw">pub </span>met_queue      : VecDeque&lt;f64&gt;,
   <span class="kw">pub </span>rate_queue     : VecDeque&lt;(f64,f64)&gt;,
+  <span class="kw">pub </span>lost_r_queue   : VecDeque&lt;(f64,f64)&gt;,
   <span class="kw">pub </span>fpgatmp_queue  : VecDeque&lt;(f64,f64)&gt;,
   <span class="kw">pub </span>tp_receiver    : Receiver&lt;TofPacket&gt;,
   <span class="kw">pub </span>mte_receiver   : Receiver&lt;MasterTriggerEvent&gt;,
@@ -529,27 +549,30 @@
   <span class="kw">pub </span>miss_evid      : usize,
   <span class="kw">pub </span>last_evid      : u32,
   <span class="kw">pub </span>nch_histo      : Hist1D&lt;Uniform&lt;f32&gt;&gt;,
-  <span class="kw">pub </span>theme          : ColorTheme2,
+  <span class="kw">pub </span>mtb_link_histo : Hist1D&lt;Uniform&lt;f32&gt;&gt;,
+  <span class="kw">pub </span>panel_histo    : Hist1D&lt;Uniform&lt;f32&gt;&gt;,
+  <span class="kw">pub </span>theme          : ColorTheme,
 
+  <span class="kw">pub </span>mapping        : DsiJChPidMapping,
+  <span class="kw">pub </span>problem_hits   : Vec&lt;(u8, u8, (u8, u8), LTBThreshold)&gt;,
   timer              : Instant,
-
 }
 
 <span class="kw">impl </span>MTTab {
 
   <span class="kw">pub fn </span>new(tp_receiver  : Receiver&lt;TofPacket&gt;,
              mte_receiver : Receiver&lt;MasterTriggerEvent&gt;,
-             theme        : ColorTheme2) -&gt; MTTab {
-    <span class="kw">let </span>bins = Uniform::new(<span class="number">50</span>, -<span class="number">0.5</span>, <span class="number">49.5</span>);
+             mapping      : DsiJChPidMapping,
+             theme        : ColorTheme) -&gt; MTTab {
+    <span class="kw">let </span>bins          = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">50.0</span>);
+    <span class="kw">let </span>mtb_link_bins = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">50.0</span>);
+    <span class="kw">let </span>panel_bins    = Uniform::new(<span class="number">22</span>, <span class="number">1.0</span>, <span class="number">22.0</span>);
     <span class="self">Self </span>{
-      main_layout    : Vec::&lt;Rect&gt;::new(),
-      info_layout    : Vec::&lt;Rect&gt;::new(),
-      detail_layout  : Vec::&lt;Rect&gt;::new(),
-      view_layout    : Vec::&lt;Rect&gt;::new(),
       event_queue    : VecDeque::&lt;MasterTriggerEvent&gt;::with_capacity(<span class="number">1000</span>),
       moni_queue     : VecDeque::&lt;MtbMoniData&gt;::with_capacity(<span class="number">1000</span>),
       met_queue      : VecDeque::&lt;f64&gt;::with_capacity(<span class="number">1000</span>),
       rate_queue     : VecDeque::&lt;(f64,f64)&gt;::with_capacity(<span class="number">1000</span>),
+      lost_r_queue   : VecDeque::&lt;(f64,f64)&gt;::with_capacity(<span class="number">1000</span>),
       fpgatmp_queue  : VecDeque::&lt;(f64,f64)&gt;::with_capacity(<span class="number">1000</span>),
       tp_receiver    : tp_receiver,
       mte_receiver   : mte_receiver,
@@ -559,13 +582,17 @@
       miss_evid      : <span class="number">0</span>,
       last_evid      : <span class="number">0</span>,
       nch_histo      : <span class="macro">ndhistogram!</span>(bins),
+      mtb_link_histo : <span class="macro">ndhistogram!</span>(mtb_link_bins),
+      panel_histo    : <span class="macro">ndhistogram!</span>(panel_bins),
       theme          : theme,
+      mapping        : mapping,
+      problem_hits   : Vec::&lt;(u8, u8, (u8, u8), LTBThreshold)&gt;::new(),
       timer          : Instant::now(),
     }
   }
 
   <span class="kw">pub fn </span>receive_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), SerializationError&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>mte = MasterTriggerEvent::new(<span class="number">0</span>,<span class="number">0</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>mte = MasterTriggerEvent::new();
     <span class="kw">let </span>met     = <span class="self">self</span>.timer.elapsed().as_secs_f64();
     <span class="kw">match </span><span class="self">self</span>.tp_receiver.try_recv() {
       <span class="prelude-val">Err</span>(_err)   =&gt; {
@@ -577,14 +604,22 @@
         }
       },
       <span class="prelude-val">Ok</span>(pack)    =&gt; {
-        <span class="macro">info!</span>(<span class="string">"Got next packet {}!"</span>, pack);
-        <span class="kw">match </span>pack.packet_type {
+        <span class="comment">//error!("Got next packet {}!", pack);
+        </span><span class="kw">match </span>pack.packet_type {
           PacketType::MasterTrigger =&gt; {
-            mte = MasterTriggerEvent::from_bytestream(<span class="kw-2">&amp;</span>pack.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>)<span class="question-mark">?</span>;
+            <span class="kw">match </span>pack.unpack() {
+              <span class="prelude-val">Ok</span>(_ev) =&gt; {
+                mte = _ev;
+              },
+              <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="macro">error!</span>(<span class="string">"Unable to unpack MasterTriggerEvent! {err}"</span>);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(err);
+              }
+            }
           },
           PacketType::MonitorMtb   =&gt; {
             <span class="macro">info!</span>(<span class="string">"Got new MtbMoniData!"</span>);
-            <span class="kw">let </span>moni = MtbMoniData::from_bytestream(<span class="kw-2">&amp;</span>pack.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>moni : MtbMoniData = pack.unpack()<span class="question-mark">?</span>;
             <span class="self">self</span>.n_moni += <span class="number">1</span>;
             <span class="self">self</span>.moni_queue.push_back(moni);
             <span class="kw">if </span><span class="self">self</span>.moni_queue.len() &gt; <span class="self">self</span>.queue_size {
@@ -609,10 +644,45 @@
       } <span class="comment">// end Ok
     </span>} <span class="comment">// end match
     </span><span class="kw">if </span>mte.event_id != <span class="number">0 </span>{
-      <span class="kw">let </span>hits = mte.get_dsi_j_ch_for_triggered_ltbs();
+      <span class="kw">let </span>hits     = mte.get_trigger_hits();
+      <span class="kw">let </span>rb_links = mte.get_rb_link_ids();
+      <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;</span>hits {
+        <span class="kw">match </span><span class="self">self</span>.mapping.get(<span class="kw-2">&amp;</span>h.<span class="number">0</span>) {
+          <span class="prelude-val">None </span>=&gt; {
+            <span class="macro">error!</span>(<span class="string">"Can't get mapping for hit {:?}"</span>, h);
+            <span class="comment">//self.problem_hits.push(*h);
+          </span>},
+          <span class="prelude-val">Some</span>(jmap) =&gt; {
+            <span class="kw">match </span>jmap.get(<span class="kw-2">&amp;</span>h.<span class="number">1</span>) {
+              <span class="prelude-val">None </span>=&gt; {
+                <span class="macro">error!</span>(<span class="string">"Can't get mapping for hit {:?}"</span>, h);
+                <span class="self">self</span>.problem_hits.push(<span class="kw-2">*</span>h);
+              },
+              <span class="prelude-val">Some</span>(chmap) =&gt; {
+                <span class="comment">// let's just consider one side of the paddle 
+                // here. If the two sides are not connected to 
+                // the same LTB we have bigger problems
+                </span><span class="kw">match </span>chmap.get(<span class="kw-2">&amp;</span>h.<span class="number">2.0</span>) {
+                  <span class="prelude-val">None </span>=&gt; {
+                    <span class="macro">error!</span>(<span class="string">"Can't get mapping for hit {:?}"</span>, h);
+                    <span class="self">self</span>.problem_hits.push(<span class="kw-2">*</span>h);
+                  },
+                  <span class="prelude-val">Some</span>((<span class="kw">_</span>,panel_id)) =&gt; {
+                    <span class="self">self</span>.panel_histo.fill(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span>panel_id <span class="kw">as </span>f32));
+                  }
+                }
+              }
+            }
+          }
+        }
+        <span class="comment">//self.panel_histo.fill(&amp;(self.mapping[&amp;h.0][&amp;h.1][&amp;h.2].1 as f32));
+      </span>}
       <span class="self">self</span>.nch_histo.fill(<span class="kw-2">&amp;</span>(hits.len() <span class="kw">as </span>f32));
+      <span class="kw">for </span>k <span class="kw">in </span>rb_links {
+        <span class="self">self</span>.mtb_link_histo.fill(<span class="kw-2">&amp;</span>(k <span class="kw">as </span>f32));
+      }
       <span class="self">self</span>.n_events += <span class="number">1</span>;
-      <span class="self">self</span>.event_queue.push_back(mte);
+      <span class="self">self</span>.event_queue.push_back(mte.clone());
       <span class="kw">if </span><span class="self">self</span>.event_queue.len() &gt; <span class="self">self</span>.queue_size {
         <span class="self">self</span>.event_queue.pop_front();
       }
@@ -630,16 +700,18 @@
     <span class="kw">let </span>main_chunks = Layout::default()
       .direction(Direction::Horizontal)
       .constraints(
-          [Constraint::Percentage(<span class="number">70</span>), Constraint::Percentage(<span class="number">30</span>)].as_ref(),
+          [Constraint::Percentage(<span class="number">70</span>),
+           Constraint::Percentage(<span class="number">30</span>)].as_ref(),
       )
       .split(<span class="kw-2">*</span>main_window);
-    
-    <span class="kw">let </span>info_chunks = Layout::default()
+   
+    <span class="comment">// these are the 3 plots on the right side
+    </span><span class="kw">let </span>info_chunks = Layout::default()
       .direction(Direction::Vertical)
       .constraints(
-          [Constraint::Percentage(<span class="number">32</span>),
-           Constraint::Percentage(<span class="number">32</span>),
-           Constraint::Percentage(<span class="number">32</span>),
+          [Constraint::Percentage(<span class="number">30</span>),
+           Constraint::Percentage(<span class="number">30</span>),
+           Constraint::Percentage(<span class="number">40</span>),
           ].as_ref(),
       )
       .split(main_chunks[<span class="number">1</span>]);
@@ -656,15 +728,26 @@
     <span class="kw">let </span>view_chunks = Layout::default()
       .direction(Direction::Horizontal)
       .constraints(
-          [Constraint::Percentage(<span class="number">50</span>),
-           Constraint::Percentage(<span class="number">50</span>),
+          [Constraint::Percentage(<span class="number">33</span>),
+           Constraint::Percentage(<span class="number">33</span>),
+           Constraint::Percentage(<span class="number">34</span>),
           ].as_ref(),
       )
       .split(detail_chunks[<span class="number">0</span>]);
-    <span class="self">self</span>.main_layout   = main_chunks.to_vec();
-    <span class="self">self</span>.info_layout   = info_chunks.to_vec();
-    <span class="self">self</span>.detail_layout = detail_chunks.to_vec();
-    <span class="self">self</span>.view_layout   = view_chunks.to_vec();
+    <span class="kw">let </span>trig_pan_and_hits = Layout::default()
+      .direction(Direction::Vertical)
+      .constraints(
+          [Constraint::Percentage(<span class="number">50</span>),
+           Constraint::Percentage(<span class="number">50</span>)].as_ref(),
+      )
+      .split(view_chunks[<span class="number">2</span>]);
+      
+    <span class="kw">let </span>bottom_row = detail_chunks[<span class="number">1</span>];
+
+    <span class="comment">//let main_layout   = main_chunks.to_vec();
+    //let detail_layout = detail_chunks.to_vec();
+    </span><span class="kw">let </span>info_layout   = info_chunks.to_vec();
+    <span class="kw">let </span>view_layout   = view_chunks.to_vec();
 
     <span class="kw">let </span>t_min = <span class="kw-2">*</span><span class="self">self</span>.met_queue.front().unwrap_or(<span class="kw-2">&amp;</span><span class="number">0.0</span>) <span class="kw">as </span>u64;
     <span class="kw">let </span>t_max = <span class="kw-2">*</span><span class="self">self</span>.met_queue.back().unwrap_or(<span class="kw-2">&amp;</span><span class="number">0.0</span>)  <span class="kw">as </span>u64;
@@ -719,47 +802,31 @@
       .style(<span class="self">self</span>.theme.style()); 
      
     <span class="comment">// NChannel distribution
-    </span><span class="kw">let </span><span class="kw-2">mut </span>max_pop_bin = <span class="number">0</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>vec_index   = <span class="number">0</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>bins = Vec::&lt;(u64, u64)&gt;::new();
+    </span><span class="kw">let </span>nch_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.nch_histo);
+    <span class="kw">let </span>nch_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.nch_histo, <span class="kw-2">&amp;</span>nch_labels, <span class="number">2</span>, <span class="bool-val">true</span>); 
+    <span class="kw">let </span>nch_chart   = histogram(nch_data, String::from(<span class="string">"N Hits (N CH)"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+
+    <span class="comment">// FPGA temperature (future)
+    //let fpga_t_label    = String::from("FPGA T [\u{00B0}C] ");
+    //let fpga_t_theme    = self.theme.clone();
+    //let mut fpga_t_data = self.fpgatmp_queue.clone(); //.make_contiguous();
+    //let mut fpga_t_ts   = timeseries(&amp;mut fpga_t_data,
+    //                                 fpga_t_label.clone(),
+    //                                 fpga_t_label.clone(),
+    //                                 &amp;fpga_t_theme);
+    //frame.render_widget(fpga_t_ts, info_layout[2]);
+
+    // Lost Trigger rate
+    </span><span class="kw">let </span>lost_t_label    = String::from(<span class="string">"Lost Trigger Rate [Hz]"</span>);
+    <span class="kw">let </span>lost_t_theme    = <span class="self">self</span>.theme.clone();
+    <span class="kw">let </span><span class="kw-2">mut </span>lost_t_data = <span class="self">self</span>.lost_r_queue.clone(); <span class="comment">//.make_contiguous();
+    </span><span class="kw">let </span>lost_t_ts       = timeseries(<span class="kw-2">&amp;mut </span>lost_t_data,
+                                     lost_t_label.clone(),
+                                     lost_t_label.clone(),
+                                     <span class="kw-2">&amp;</span>lost_t_theme);
+
     
-    <span class="kw">for </span>bin <span class="kw">in </span><span class="self">self</span>.nch_histo.iter() {
-      <span class="kw">let </span>bin_value = <span class="kw-2">*</span>bin.value <span class="kw">as </span>u64;
-      bins.push((bin.index <span class="kw">as </span>u64, bin_value));
-      <span class="comment">// always show the first 10 bins, but if 
-      // the bins with index &gt; 10 are not 
-      // populated, discard them
-      </span><span class="kw">if </span>bin_value &gt; <span class="number">0 </span>&amp;&amp; bin.index &gt; <span class="number">10 </span>{
-        max_pop_bin = vec_index;
-      }
-      vec_index += <span class="number">1</span>;
-    }
-    bins.retain(|<span class="kw-2">&amp;</span>(x,<span class="kw">_</span>)| x &lt;= max_pop_bin);
-    <span class="kw">let </span><span class="kw-2">mut </span>bins_for_bc = Vec::&lt;(<span class="kw-2">&amp;</span>str, u64)&gt;::new();
-    <span class="macro">debug!</span>(<span class="string">"bins: {:?}"</span>, bins);
-    <span class="kw">for </span>n <span class="kw">in </span>bins.iter() {
-      bins_for_bc.push((HIST_LABELS[n.<span class="number">0 </span><span class="kw">as </span>usize], n.<span class="number">1</span>));
-      <span class="comment">//bins_for_bc.push((foo, n.1));
-      //n_iter += 1;
-    </span>}
-    <span class="kw">let </span>nch_chart = BarChart::default()
-      .block(Block::default().title(<span class="string">"N Hits (N CH)"</span>).borders(Borders::ALL))
-      .data(bins_for_bc.as_slice())
-      .bar_width(<span class="number">1</span>)
-      .bar_gap(<span class="number">1</span>)
-      <span class="comment">//.bar_style(Style::default().fg(Color::Blue))
-      </span>.bar_style(<span class="self">self</span>.theme.highlight_fg())
-      .value_style(
-        <span class="self">self</span>.theme.highlight_fg()
-        <span class="comment">//Style::default()
-        //.bg(Color::Blue)
-        </span>.add_modifier(Modifier::BOLD),
-      )
-      .style(<span class="self">self</span>.theme.background());
-
-
-    <span class="comment">// FPGA temperature
-    </span><span class="kw">let </span>tmp_only : Vec::&lt;i64&gt; = <span class="self">self</span>.fpgatmp_queue.iter().map(|z| z.<span class="number">1</span>.round() <span class="kw">as </span>i64).collect();
+    <span class="kw">let </span>tmp_only : Vec::&lt;i64&gt; = <span class="self">self</span>.fpgatmp_queue.iter().map(|z| z.<span class="number">1</span>.round() <span class="kw">as </span>i64).collect();
     <span class="kw">let </span>tmp_max = <span class="kw-2">*</span>tmp_only.iter().max().unwrap_or(<span class="kw-2">&amp;</span><span class="number">0</span>) + <span class="number">5</span>;
     <span class="kw">let </span>tmp_min = <span class="kw-2">*</span>tmp_only.iter().min().unwrap_or(<span class="kw-2">&amp;</span><span class="number">0</span>) - <span class="number">5</span>;
     <span class="kw">let </span>tmp_spacing = (tmp_max - tmp_min)/<span class="number">5</span>;
@@ -806,16 +873,16 @@
       }
     }
     <span class="kw">let </span>event_view = Paragraph::new(view_string)
-    .style(Style::default().fg(Color::LightCyan))
-    .alignment(Alignment::Left)
-    <span class="comment">//.scroll((5, 10))
-    </span>.block(
-      Block::default()
-        .borders(Borders::ALL)
-        .style(<span class="self">self</span>.theme.style())
-        .title(<span class="string">"Last MasterTriggerEvent"</span>)
-        .border_type(BorderType::Rounded),
-    );
+      .style(Style::default().fg(Color::LightCyan))
+      .alignment(Alignment::Left)
+      <span class="comment">//.scroll((5, 10))
+      </span>.block(
+        Block::default()
+          .borders(Borders::ALL)
+          .style(<span class="self">self</span>.theme.style())
+          .title(<span class="string">"Last MasterTriggerEvent"</span>)
+          .border_type(BorderType::Rounded),
+      );
 
     <span class="kw">let </span>last_moni = <span class="self">self</span>.moni_queue.back();
     <span class="kw">let </span>view_moni : String;
@@ -839,49 +906,28 @@
         .border_type(BorderType::Rounded),
     );
     
-    <span class="kw">let </span>met = <span class="self">self</span>.met_queue.back().unwrap_or(<span class="kw-2">&amp;</span><span class="number">0.0</span>);
-    <span class="kw">let </span>view_summary = <span class="macro">format!</span>(<span class="string">"Summary Statistics:
-  N_Events                         : {}
-  N_Moni                           : {}
-  Mission Elapsed Time (MET) [sec] : {:.3}
-  N EventID Missed                 : {}"</span>,
-                              <span class="self">self</span>.n_events,
-                              <span class="self">self</span>.n_moni,
-                              met,
-                              <span class="self">self</span>.miss_evid);
-    <span class="kw">let </span>summary_view = Paragraph::new(view_summary)
-    .style(Style::default().fg(Color::LightCyan))
-    .alignment(Alignment::Left)
-    .block(
-      Block::default()
-        .borders(Borders::ALL)
-        .style(<span class="self">self</span>.theme.style())
-        .title(<span class="string">"Overview"</span>)
-        .border_type(BorderType::Rounded),
-    );
-
+    <span class="comment">// histograms
+    </span><span class="kw">let </span>ml_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.mtb_link_histo);
+    <span class="kw">let </span>mlh_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.mtb_link_histo, <span class="kw-2">&amp;</span>ml_labels, <span class="number">10</span>, <span class="bool-val">true</span>); 
+    <span class="kw">let </span>mlh_chart  = histogram(mlh_data, String::from(<span class="string">"MTB Link ID (NOT RBID(!))"</span>), <span class="number">3</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+    frame.render_widget(mlh_chart, bottom_row);   
+    
+    <span class="kw">let </span>tp_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.panel_histo);
+    <span class="kw">let </span>tph_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.panel_histo, <span class="kw-2">&amp;</span>tp_labels, <span class="number">2</span>, <span class="bool-val">true</span>); 
+    <span class="kw">let </span>tpc_chart  = histogram(tph_data, String::from(<span class="string">"Triggered Panel ID"</span>), <span class="number">3</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+    <span class="comment">//frame.render_widget(tpc_chart,      view_layout[2]);
+    </span>frame.render_widget(tpc_chart, trig_pan_and_hits[<span class="number">0</span>]);
+    frame.render_widget(nch_chart, trig_pan_and_hits[<span class="number">1</span>]);
 
     <span class="comment">// render everything
-    </span>frame.render_widget(rate_chart,      <span class="self">self</span>.info_layout[<span class="number">0</span>]); 
-    frame.render_widget(nch_chart,       <span class="self">self</span>.info_layout[<span class="number">1</span>]);
-    frame.render_widget(fpga_temp_chart, <span class="self">self</span>.info_layout[<span class="number">2</span>]);
-    frame.render_widget(event_view,      <span class="self">self</span>.view_layout[<span class="number">0</span>]);
-    frame.render_widget(moni_view,       <span class="self">self</span>.view_layout[<span class="number">1</span>]);
-    frame.render_widget(summary_view,    <span class="self">self</span>.detail_layout[<span class="number">1</span>]);
-  }
+    </span>frame.render_widget(rate_chart,      info_layout[<span class="number">0</span>]); 
+    frame.render_widget(lost_t_ts,       info_layout[<span class="number">1</span>]);
+    <span class="comment">//frame.render_widget(nch_chart,       info_layout[1]);
+    </span>frame.render_widget(fpga_temp_chart, info_layout[<span class="number">2</span>]);
+    frame.render_widget(event_view,      view_layout[<span class="number">0</span>]);
+    frame.render_widget(moni_view,       view_layout[<span class="number">1</span>]);
+    <span class="comment">//frame.render_widget(summary_view,    bottom_row[0]);
+  </span>}
 }
     
-<span class="comment">//    let network = Sparkline::default()
-//    .block(
-//      Block::default()
-//        .borders(Borders::ALL)
-//        .style(Style::default().fg(Color::White))
-//        .title("Network I/O")
-//        .border_type(BorderType::Double),
-//    ) // or THREE_LEVELS
-//    .bar_set(tui::symbols::bar::NINE_LEVELS)
-//    .data(&amp;[0, 2, 3, 4, 1, 4, 10])
-//    .max(5)
-//    .style(Style::default().fg(Color::Blue).bg(Color::Black));
-
-</span></code></pre></div></section></main></body></html>
+</code></pre></div></section></main></body></html>

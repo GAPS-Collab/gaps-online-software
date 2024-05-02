@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/widgets/borders.rs`."><title>borders.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/widgets/borders.rs`."><title>borders.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -109,6 +109,56 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Debug};
 
 <span class="kw">use </span>bitflags::bitflags;
@@ -148,7 +198,7 @@
         }
         <span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
         <span class="kw">for </span>(name, border) <span class="kw">in </span><span class="self">self</span>.iter_names() {
-            <span class="kw">if </span>border == Borders::NONE {
+            <span class="kw">if </span>border == <span class="self">Self</span>::NONE {
                 <span class="kw">continue</span>;
             }
             <span class="kw">if </span>first {
@@ -162,39 +212,52 @@
     }
 }
 
-<span class="doccomment">/// Macro that constructs and returns a [`Borders`] object from TOP, BOTTOM, LEFT, RIGHT, NONE, and
-/// ALL. Internally it creates an empty `Borders` object and then inserts each bit flag specified
-/// into it using `Borders::insert()`.
+<span class="doccomment">/// Macro that constructs and returns a combination of the [`Borders`] object from TOP, BOTTOM, LEFT
+/// and RIGHT.
+///
+/// When used with NONE you should consider omitting this completely. For ALL you should consider
+/// [`Block::bordered()`](crate::widgets::Block::bordered) instead.
 ///
 /// ## Examples
 ///
-///```
-/// use ratatui::{border, prelude::*, widgets::*};
-///
-/// Block::default()
-///     //Construct a `Borders` object and use it in place
+/// ```
+/// # use ratatui::{border, prelude::*, widgets::*};
+/// Block::new()
+///     .title("Construct Borders and use them in place")
 ///     .borders(border!(TOP, BOTTOM));
+/// ```
 ///
-/// //`border!` can be called with any order of individual sides
-/// let bottom_first = border!(BOTTOM, LEFT, TOP);
-/// //with the ALL keyword which works as expected
-/// let all = border!(ALL);
-/// //or with nothing to return a `Borders::NONE' bitflag.
-/// let none = border!(NONE);
+/// `border!` can be called with any number of individual sides:
+///
+/// ```
+/// # use ratatui::{border, prelude::*, widgets::*};
+/// let right_open = border!(TOP, LEFT, BOTTOM);
+/// assert_eq!(right_open, Borders::TOP | Borders::LEFT | Borders::BOTTOM);
+/// ```
+///
+/// Single borders work but using `Borders::` directly would be simpler.
+///
+/// ```
+/// # use ratatui::{border, prelude::*, widgets::*};
+/// assert_eq!(border!(TOP), Borders::TOP);
+/// assert_eq!(border!(ALL), Borders::ALL);
+/// assert_eq!(border!(), Borders::NONE);
 /// ```
 </span><span class="attr">#[cfg(feature = <span class="string">"macros"</span>)]
 #[macro_export]
 </span><span class="macro">macro_rules! </span>border {
-( $(<span class="macro-nonterminal">$b</span>:tt), +) =&gt; {{
-        <span class="kw">let </span><span class="kw-2">mut </span>border = Borders::empty();
-        $(
-           border.insert(Borders::<span class="macro-nonterminal">$b</span>);
+    () =&gt; {
+        Borders::NONE
+    };
+    (<span class="macro-nonterminal">$b</span>:ident) =&gt; {
+        Borders::<span class="macro-nonterminal">$b
+    </span>};
+    (<span class="macro-nonterminal">$first</span>:ident,$(<span class="macro-nonterminal">$other</span>:ident),<span class="kw-2">*</span>) =&gt; {
+        Borders::<span class="macro-nonterminal">$first
+        </span>$(
+            .union(Borders::<span class="macro-nonterminal">$other</span>)
         )*
-        border
-}};
-() =&gt;{
-    Borders::NONE
-}
+    };
 }
 
 <span class="attr">#[cfg(test)]
@@ -216,6 +279,43 @@
             <span class="macro">format!</span>(<span class="string">"{:?}"</span>, Borders::TOP | Borders::BOTTOM),
             <span class="string">"TOP | BOTTOM"
         </span>);
+    }
+}
+
+<span class="attr">#[cfg(all(test, feature = <span class="string">"macros"</span>))]
+</span><span class="kw">mod </span>macro_tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>can_be_const() {
+        <span class="kw">const </span>NOTHING: Borders = <span class="macro">border!</span>();
+        <span class="kw">const </span>JUST_TOP: Borders = <span class="macro">border!</span>(TOP);
+        <span class="kw">const </span>TOP_BOTTOM: Borders = <span class="macro">border!</span>(TOP, BOTTOM);
+        <span class="kw">const </span>RIGHT_OPEN: Borders = <span class="macro">border!</span>(TOP, LEFT, BOTTOM);
+
+        <span class="macro">assert_eq!</span>(NOTHING, Borders::NONE);
+        <span class="macro">assert_eq!</span>(JUST_TOP, Borders::TOP);
+        <span class="macro">assert_eq!</span>(TOP_BOTTOM, Borders::TOP | Borders::BOTTOM);
+        <span class="macro">assert_eq!</span>(RIGHT_OPEN, Borders::TOP | Borders::LEFT | Borders::BOTTOM);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>border_empty() {
+        <span class="kw">let </span>empty = Borders::NONE;
+        <span class="macro">assert_eq!</span>(empty, <span class="macro">border!</span>());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>border_all() {
+        <span class="kw">let </span>all = Borders::ALL;
+        <span class="macro">assert_eq!</span>(all, <span class="macro">border!</span>(ALL));
+        <span class="macro">assert_eq!</span>(all, <span class="macro">border!</span>(TOP, BOTTOM, LEFT, RIGHT));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>border_left_right() {
+        <span class="kw">let </span>left_right = Borders::from_bits(Borders::LEFT.bits() | Borders::RIGHT.bits());
+        <span class="macro">assert_eq!</span>(left_right, <span class="prelude-val">Some</span>(<span class="macro">border!</span>(RIGHT, LEFT)));
     }
 }
 </code></pre></div></section></main></body></html>

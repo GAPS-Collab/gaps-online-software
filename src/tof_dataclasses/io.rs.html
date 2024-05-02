@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/io.rs`."><title>io.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/io.rs`."><title>io.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1352,6 +1352,44 @@
 <a href="#1350" id="1350">1350</a>
 <a href="#1351" id="1351">1351</a>
 <a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a>
+<a href="#1356" id="1356">1356</a>
+<a href="#1357" id="1357">1357</a>
+<a href="#1358" id="1358">1358</a>
+<a href="#1359" id="1359">1359</a>
+<a href="#1360" id="1360">1360</a>
+<a href="#1361" id="1361">1361</a>
+<a href="#1362" id="1362">1362</a>
+<a href="#1363" id="1363">1363</a>
+<a href="#1364" id="1364">1364</a>
+<a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
+<a href="#1372" id="1372">1372</a>
+<a href="#1373" id="1373">1373</a>
+<a href="#1374" id="1374">1374</a>
+<a href="#1375" id="1375">1375</a>
+<a href="#1376" id="1376">1376</a>
+<a href="#1377" id="1377">1377</a>
+<a href="#1378" id="1378">1378</a>
+<a href="#1379" id="1379">1379</a>
+<a href="#1380" id="1380">1380</a>
+<a href="#1381" id="1381">1381</a>
+<a href="#1382" id="1382">1382</a>
+<a href="#1383" id="1383">1383</a>
+<a href="#1384" id="1384">1384</a>
+<a href="#1385" id="1385">1385</a>
+<a href="#1386" id="1386">1386</a>
+<a href="#1387" id="1387">1387</a>
+<a href="#1388" id="1388">1388</a>
+<a href="#1389" id="1389">1389</a>
+<a href="#1390" id="1390">1390</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Dataio - readino/writing of different types
 //! of TOF data products.
 //!
@@ -1422,11 +1460,15 @@
     TofPacket,
     PacketType,
 };
-<span class="kw">use </span><span class="kw">crate</span>::constants::NWORDS;
+<span class="kw">use </span><span class="kw">crate</span>::constants::{
+    NWORDS,
+    HUMAN_TIMESTAMP_FORMAT
+};
 <span class="kw">use </span><span class="kw">crate</span>::serialization::{
     Serialization,
     SerializationError,
     u8_to_u16_14bit,
+    u8_to_u16_err_check,
     search_for_u16,
     parse_u8,
     parse_u16,
@@ -1445,8 +1487,8 @@
 <span class="doccomment">/// Get a human readable timestamp
 </span><span class="kw">pub fn </span>get_utc_timestamp() -&gt; String {
   <span class="kw">let </span>now: DateTime&lt;Utc&gt; = Utc::now();
-  <span class="comment">// Format the timestamp as "YYYY_MM_DD_HH_MM"
-  </span><span class="kw">let </span>timestamp_str = now.format(<span class="string">"%Y_%m_%d-%H_%M_%S"</span>).to_string();
+  <span class="comment">//let timestamp_str = now.format("%Y_%m_%d-%H_%M_%S").to_string();
+  </span><span class="kw">let </span>timestamp_str = now.format(HUMAN_TIMESTAMP_FORMAT).to_string();
   timestamp_str
 }
 
@@ -1543,62 +1585,67 @@
 </span><span class="kw">pub struct </span>RBEventMemoryStreamer {
   <span class="doccomment">/// Raw stream read out from the RB buffers.
   </span><span class="kw">pub </span>stream         : Vec&lt;u8&gt;,
+  <span class="doccomment">/// Error checking mode - check error bits for 
+  /// channels/cells
+  </span><span class="kw">pub </span>check_channel_errors : bool,
+
   <span class="doccomment">/// Current position in the stream
-  </span>pos            : usize,
+  </span>pos                      : usize,
   <span class="doccomment">/// The current posion marker points to a header 
   /// signature in the stream.
-  </span>pos_at_head    : bool,
+  </span>pos_at_head              : bool,
   <span class="doccomment">/// An optional crossbeam::channel Sender, which 
   /// will allow to send TofPackets
-  </span><span class="kw">pub </span>tp_sender      : <span class="prelude-ty">Option</span>&lt;Sender&lt;TofPacket&gt;&gt;,
+  </span><span class="kw">pub </span>tp_sender            : <span class="prelude-ty">Option</span>&lt;Sender&lt;TofPacket&gt;&gt;,
   <span class="doccomment">/// number of extracted events from stream
   /// this manages how we are draining the stream
-  </span>n_events_ext            : usize,
-  <span class="kw">pub </span>is_depleted         : bool,
+  </span>n_events_ext             : usize,
+  <span class="kw">pub </span>is_depleted          : bool,
   <span class="doccomment">/// Calculate the crc32 checksum for the channels 
   /// everytime next() is called
-  </span><span class="kw">pub </span>calc_crc32          : bool,
+  </span><span class="kw">pub </span>calc_crc32           : bool,
   <span class="doccomment">/// placeholder for checksum calculator
-  </span>crc32_sum               : Crc::&lt;u32&gt;,
-  <span class="kw">pub </span>request_mode        : bool,
-  <span class="kw">pub </span>request_cache       : VecDeque&lt;(u32,u8)&gt;,
+  </span>crc32_sum                : Crc::&lt;u32&gt;,
+  <span class="kw">pub </span>request_mode         : bool,
+  <span class="kw">pub </span>request_cache        : VecDeque&lt;(u32,u8)&gt;,
   <span class="doccomment">/// an index for the events in the stream
   /// this links eventid and start position
   /// in the stream together
-  </span><span class="kw">pub </span>event_map           : HashMap&lt;u32,(usize,usize)&gt;,
-  <span class="kw">pub </span>first_evid          : u32,
-  <span class="kw">pub </span>last_evid           : u32,
-  <span class="kw">pub </span>last_event_complete : bool,
-  <span class="kw">pub </span>last_event_pos      : usize,
+  </span><span class="kw">pub </span>event_map            : HashMap&lt;u32,(usize,usize)&gt;,
+  <span class="kw">pub </span>first_evid           : u32,
+  <span class="kw">pub </span>last_evid            : u32,
+  <span class="kw">pub </span>last_event_complete  : bool,
+  <span class="kw">pub </span>last_event_pos       : usize,
   <span class="doccomment">/// When in request mode, number of events the last event in the stream is behind the
   /// first request
-  </span><span class="kw">pub </span>is_behind_by        : usize,
+  </span><span class="kw">pub </span>is_behind_by         : usize,
   <span class="doccomment">/// When in request mode, number of events the last event in the stream is ahead the
   /// last request
-  </span><span class="kw">pub </span>is_ahead_by         : usize,
+  </span><span class="kw">pub </span>is_ahead_by          : usize,
 }
 
 <span class="kw">impl </span>RBEventMemoryStreamer {
 
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
-      stream              : Vec::&lt;u8&gt;::new(),
-      pos                 : <span class="number">0</span>,
-      pos_at_head         : <span class="bool-val">false</span>,
-      tp_sender           : <span class="prelude-val">None</span>,
-      n_events_ext        : <span class="number">0</span>,
-      is_depleted         : <span class="bool-val">false</span>,
-      calc_crc32          : <span class="bool-val">false</span>,
-      crc32_sum           : Crc::&lt;u32&gt;::new(<span class="kw-2">&amp;</span>ALGO),
-      request_mode        : <span class="bool-val">false</span>,
-      request_cache       : VecDeque::&lt;(u32,u8)&gt;::new(),
-      event_map           : HashMap::&lt;u32,(usize,usize)&gt;::new(),
-      first_evid          : <span class="number">0</span>,
-      last_evid           : <span class="number">0</span>,
-      last_event_complete : <span class="bool-val">false</span>,
-      last_event_pos      : <span class="number">0</span>,
-      is_behind_by        : <span class="number">0</span>,
-      is_ahead_by         : <span class="number">0</span>,
+      stream               : Vec::&lt;u8&gt;::new(),
+      check_channel_errors : <span class="bool-val">false</span>,
+      pos                  : <span class="number">0</span>,
+      pos_at_head          : <span class="bool-val">false</span>,
+      tp_sender            : <span class="prelude-val">None</span>,
+      n_events_ext         : <span class="number">0</span>,
+      is_depleted          : <span class="bool-val">false</span>,
+      calc_crc32           : <span class="bool-val">false</span>,
+      crc32_sum            : Crc::&lt;u32&gt;::new(<span class="kw-2">&amp;</span>ALGO),
+      request_mode         : <span class="bool-val">false</span>,
+      request_cache        : VecDeque::&lt;(u32,u8)&gt;::new(),
+      event_map            : HashMap::&lt;u32,(usize,usize)&gt;::new(),
+      first_evid           : <span class="number">0</span>,
+      last_evid            : <span class="number">0</span>,
+      last_event_complete  : <span class="bool-val">false</span>,
+      last_event_pos       : <span class="number">0</span>,
+      is_behind_by         : <span class="number">0</span>,
+      is_ahead_by          : <span class="number">0</span>,
     }
   }
  
@@ -1793,12 +1840,19 @@
       -&gt; <span class="prelude-ty">Option</span>&lt;RBEvent&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>header       = RBEventHeader::new();
     <span class="kw">let </span><span class="kw-2">mut </span>event        = RBEvent::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>event_status : EventStatus;
+    <span class="kw">let </span><span class="kw-2">mut </span>event_status = EventStatus::Unknown;
     <span class="comment">//let begin_pos = self.pos;
-    </span><span class="kw">if </span><span class="self">self</span>.calc_crc32 {
+    </span><span class="kw">if </span><span class="self">self</span>.calc_crc32 &amp;&amp; <span class="self">self</span>.check_channel_errors {
       event_status = EventStatus::Perfect;
-    } <span class="kw">else </span>{
-      event_status = EventStatus::Unknown;
+    }
+    <span class="kw">if </span>!<span class="self">self</span>.calc_crc32 &amp;&amp; !<span class="self">self</span>.check_channel_errors {
+      event_status = EventStatus::GoodNoCRCOrErrBitCheck;
+    }
+    <span class="kw">if </span>!<span class="self">self</span>.calc_crc32 &amp;&amp; <span class="self">self</span>.check_channel_errors {
+      event_status = EventStatus::GoodNoCRCCheck;
+    }
+    <span class="kw">if </span><span class="self">self</span>.calc_crc32 &amp;&amp; !<span class="self">self</span>.check_channel_errors {
+      event_status = EventStatus::GoodNoErrBitCheck;
     }
     <span class="comment">// start parsing
     //let first_pos = self.pos;
@@ -1910,11 +1964,33 @@
           <span class="kw">for _ in </span><span class="number">0</span>..nwords {
             <span class="kw">let </span>this_field = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
             dig.update(<span class="kw-2">&amp;</span>this_field.to_le_bytes());
+            <span class="kw">if </span><span class="self">self</span>.check_channel_errors {
+              <span class="kw">if </span>((<span class="number">0x8000 </span>&amp; this_field) &gt;&gt; <span class="number">15</span>) == <span class="number">0x1 </span>{
+                <span class="macro">error!</span>(<span class="string">"Ch error bit set for ch {}!"</span>, ch);
+                event_status = EventStatus::ChnSyncErrors;
+              }
+              <span class="kw">if </span>((<span class="number">0x4000 </span>&amp; this_field) &gt;&gt; <span class="number">14</span>) == <span class="number">0x1 </span>{
+                <span class="macro">error!</span>(<span class="string">"Cell error bit set for ch {}!"</span>, ch);
+                event_status = EventStatus::CellSyncErrors;
+              }
+            }
             this_ch_adc.push(<span class="number">0x3fff </span>&amp; this_field)
           }
           event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = this_ch_adc;
         } <span class="kw">else </span>{
-          event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = u8_to_u16_14bit(<span class="kw-2">&amp;</span><span class="self">self</span>.stream[<span class="self">self</span>.pos..<span class="self">self</span>.pos + <span class="number">2</span><span class="kw-2">*</span>nwords]);
+          <span class="kw">if </span><span class="self">self</span>.check_channel_errors {
+            <span class="kw">let </span>adc_w_errs = u8_to_u16_err_check(<span class="kw-2">&amp;</span><span class="self">self</span>.stream[<span class="self">self</span>.pos..<span class="self">self</span>.pos + <span class="number">2</span><span class="kw-2">*</span>nwords]);
+            <span class="kw">if </span>adc_w_errs.<span class="number">1 </span>{
+              <span class="macro">error!</span>(<span class="string">"Ch error bit set for ch {}!"</span>, ch);
+              event_status = EventStatus::ChnSyncErrors;
+            } <span class="kw">else if </span>adc_w_errs.<span class="number">2 </span>{
+              <span class="macro">error!</span>(<span class="string">"Cell error bit set for ch {}!"</span>, ch);
+              event_status = EventStatus::CellSyncErrors;
+            }
+            event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = adc_w_errs.<span class="number">0</span>;
+          } <span class="kw">else </span>{
+            event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = u8_to_u16_14bit(<span class="kw-2">&amp;</span><span class="self">self</span>.stream[<span class="self">self</span>.pos..<span class="self">self</span>.pos + <span class="number">2</span><span class="kw-2">*</span>nwords]);
+          }
           <span class="self">self</span>.pos += <span class="number">2</span><span class="kw-2">*</span>nwords;
         } 
         <span class="comment">//let data = &amp;self.stream[self.pos..self.pos+2*nwords];

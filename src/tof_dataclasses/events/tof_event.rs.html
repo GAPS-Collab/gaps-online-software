@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/tof_event.rs`."><title>tof_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/tof_event.rs`."><title>tof_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -763,6 +763,144 @@
 <a href="#761" id="761">761</a>
 <a href="#762" id="762">762</a>
 <a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Event strucutures for data reconrded byi the tof
 //!
 //! Compressed format containing analysis results of 
@@ -781,12 +919,17 @@
   }
 }
 
-<span class="kw">use </span><span class="kw">crate</span>::DsiLtbRBMapping;
-<span class="kw">use </span><span class="kw">crate</span>::serialization::{Serialization,
-                           parse_u8,
-                           parse_u16,
-                           parse_u32,
-                           search_for_u16};
+<span class="comment">//use crate::DsiLtbRBMapping;
+</span><span class="kw">use </span><span class="kw">crate</span>::serialization::{
+    Serialization,
+    Packable,
+    parse_u8,
+    parse_u16,
+    parse_u32,
+    parse_u64,
+    search_for_u16
+};
+<span class="kw">use </span><span class="kw">crate</span>::packets::PacketType;
 <span class="kw">use </span><span class="kw">crate</span>::errors::SerializationError;
 
 <span class="kw">use </span><span class="kw">crate</span>::events::{
@@ -794,7 +937,14 @@
     RBEvent,
     TofHit,
     RBWaveform,
-    RBMissingHit
+    <span class="comment">//RBMissingHit,
+    </span>TriggerType,
+    EventStatus,
+};
+
+<span class="kw">use </span><span class="kw">crate</span>::events::master_trigger::{
+    LTBThreshold,
+    LTB_CHANNELS
 };
 
 <span class="comment">// This looks like a TODO
@@ -864,9 +1014,9 @@
   <span class="kw">pub </span>header            : TofEventHeader,
   <span class="kw">pub </span>mt_event          : MasterTriggerEvent,
   <span class="kw">pub </span>rb_events         : Vec::&lt;RBEvent&gt;,
-  <span class="kw">pub </span>missing_hits      : Vec::&lt;RBMissingHit&gt;, 
+  <span class="comment">//pub missing_hits      : Vec::&lt;RBMissingHit&gt;, 
   
-  <span class="comment">// won't get serialized
+  // won't get serialized
   </span><span class="kw">pub </span>creation_time     : Instant,
   <span class="kw">pub </span>valid             : bool, 
 }
@@ -878,13 +1028,11 @@
      quality        :  {}
      {} 
      {}
-     n RBEvents      : {}
-     n RBMissingHit  : {} &gt;"
+     n RBEvents      : {}&gt;"
             </span>,<span class="self">self</span>.quality,
             <span class="self">self</span>.header,
             <span class="self">self</span>.mt_event,
-            <span class="self">self</span>.rb_events.len(),
-            <span class="self">self</span>.missing_hits.len())
+            <span class="self">self</span>.rb_events.len())
   }
 }
 
@@ -902,10 +1050,10 @@
       compression_level : CompressionLevel::Unknown,
       quality           : EventQuality::Unknown,
       header            : TofEventHeader::new(),
-      mt_event          : MasterTriggerEvent::new(<span class="number">0</span>,<span class="number">0</span>),
+      mt_event          : MasterTriggerEvent::new(),
       rb_events         : Vec::&lt;RBEvent&gt;::new(),
-      missing_hits      : Vec::&lt;RBMissingHit&gt;::new(), 
-      creation_time     : creation_time,
+      <span class="comment">//missing_hits      : Vec::&lt;RBMissingHit&gt;::new(), 
+      </span>creation_time     : creation_time,
       valid             : <span class="bool-val">true</span>,
     }
   }
@@ -921,28 +1069,21 @@
     <span class="self">self</span>.creation_time.elapsed().as_secs()
   }
 
-  <span class="comment">// Do we have all readoutboards which we are expecting 
-  // in this event?
-  //
-  // This is useful from the perspective of the event builder.
-  // Do we still have to wait for more rbs?
-  // There might still be channels missing, but this is 
-  // nothing the event builder can deal with right now.
+  <span class="doccomment">/// Simple check if the event contains as much RBEvents 
+  /// as expected from the provided boards masks by the MTB
   </span><span class="kw">pub fn </span>is_complete(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-    <span class="self">self</span>.mt_event.get_n_rbs_expected() <span class="kw">as </span>usize == <span class="self">self</span>.rb_events.len()
+    <span class="self">self</span>.mt_event.get_rb_link_ids().len() == <span class="self">self</span>.rb_events.len()
   }
   
-  <span class="kw">pub fn </span>is_complete_from_map(<span class="kw-2">&amp;</span><span class="self">self</span>, dsimap : <span class="kw-2">&amp;</span>DsiLtbRBMapping) -&gt; bool {
-    <span class="self">self</span>.mt_event.get_n_rbs_exp_from_map(dsimap)  <span class="kw">as </span>usize == <span class="self">self</span>.rb_events.len()
-  }
-
   <span class="doccomment">/// Encode the sizes of the vectors holding the 
   /// into an u32
   ///
   /// We have one byte (256) max length per vector.
   </span><span class="kw">pub fn </span>construct_sizes_header(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
      <span class="kw">let </span>rb_event_len = <span class="self">self</span>.rb_events.len() <span class="kw">as </span>u32;
-     <span class="kw">let </span>miss_len     = <span class="self">self</span>.missing_hits.len() <span class="kw">as </span>u32;
+     <span class="comment">// disable missing hits
+     //let miss_len     = self.missing_hits.len() as u32;
+     </span><span class="kw">let </span>miss_len     = <span class="number">0u32</span>;
      <span class="kw">let </span><span class="kw-2">mut </span>mask     = <span class="number">0u32</span>;
      mask = mask | rb_event_len;
      mask = mask | (miss_len &lt;&lt; <span class="number">8</span>);
@@ -958,8 +1099,8 @@
   
   <span class="kw">pub fn </span>get_combined_vector_sizes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
     <span class="self">self</span>.rb_events.len() 
-    + <span class="self">self</span>.missing_hits.len() 
-  }
+    <span class="comment">//+ self.missing_hits.len() 
+  </span>}
 
   <span class="kw">pub fn </span>get_rbwaveforms(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;RBWaveform&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>wf = Vec::&lt;RBWaveform&gt;::new();
@@ -971,15 +1112,25 @@
 
   <span class="kw">pub fn </span>get_summary(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TofEventSummary {
     <span class="kw">let </span><span class="kw-2">mut </span>summary = TofEventSummary::new();
-    <span class="comment">//summary.status            = self.header.status;
-    //summary.quality           = self.header.quality;
-    //summary.trigger_setting   = self.;
-    </span>summary.n_trigger_paddles = <span class="self">self</span>.mt_event.n_paddles;
+    <span class="kw">let </span><span class="kw-2">mut </span>stati = Vec::&lt;u8&gt;::new();
+    <span class="kw">for </span>k <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.rb_events {
+      stati.push(k.status.to_u8());
+    }
+    <span class="comment">//summary.status          = self.header.status;
+    //summary.quality         = self.header.quality;
+    //summary.status            = self.header.event_status;
+    // FIXME - this is not trigger paddles, but trigger hits!
+    </span>summary.trigger_sources   = <span class="self">self</span>.mt_event.trigger_source;
+    summary.n_trigger_paddles = <span class="self">self</span>.mt_event.get_trigger_hits().len() <span class="kw">as </span>u8;
     summary.event_id          = <span class="self">self</span>.header.event_id;
-    summary.timestamp32       = <span class="self">self</span>.header.timestamp_32;
-    summary.timestamp16       = <span class="self">self</span>.header.timestamp_16;
+    <span class="kw">let </span>mt_timestamp          = <span class="self">self</span>.mt_event.get_timestamp_abs48();
+    summary.timestamp32       = (mt_timestamp &amp; <span class="number">0x0000ffff </span>) <span class="kw">as </span>u32;
+    summary.timestamp16       = ((mt_timestamp &amp; <span class="number">0x00ff0000 </span>) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;
     summary.primary_beta      = <span class="self">self</span>.header.primary_beta; 
     summary.primary_charge    = <span class="self">self</span>.header.primary_charge; 
+    summary.dsi_j_mask        = <span class="self">self</span>.mt_event.dsi_j_mask;
+    summary.channel_mask      = <span class="self">self</span>.mt_event.channel_mask.clone();
+    summary.mtb_link_mask     = <span class="self">self</span>.mt_event.mtb_link_mask;
     summary.hits              = Vec::&lt;TofHit&gt;::new();
     <span class="kw">for </span>ev <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.rb_events {
       <span class="kw">for </span>hit <span class="kw">in </span><span class="kw-2">&amp;</span>ev.hits {
@@ -989,6 +1140,10 @@
     summary
   }
 
+}
+
+<span class="kw">impl </span>Packable <span class="kw">for </span>TofEvent {
+  <span class="kw">const </span>PACKET_TYPE : PacketType = PacketType::TofEvent;
 }
 
 <span class="kw">impl </span>Serialization <span class="kw">for </span>TofEvent {
@@ -1009,10 +1164,10 @@
     <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.rb_events.len() {
       stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.rb_events[k].to_bytestream());
     }
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.missing_hits.len() {
-      stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.missing_hits[k].to_bytestream());
-    }
-    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::TAIL.to_le_bytes());
+    <span class="comment">//for k in 0..self.missing_hits.len() {
+    //  stream.extend_from_slice(&amp;self.missing_hits[k].to_bytestream());
+    //}
+    </span>stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::TAIL.to_le_bytes());
     stream
   }
   
@@ -1035,15 +1190,15 @@
         }
       }
     }
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..v_sizes.<span class="number">1 </span>{
-      <span class="kw">match </span>RBMissingHit::from_bytestream(stream, pos) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Expected RBMissingHit {} of {}, but got serialization error {}!"</span>, k,  v_sizes.<span class="number">1</span>, err),
-        <span class="prelude-val">Ok</span>(miss) =&gt; {
-          event.missing_hits.push(miss);
-        }
-      }
-    }
-    <span class="kw">let </span>tail = parse_u16(stream, pos);
+    <span class="comment">//for k in 0..v_sizes.1 {
+    //  match RBMissingHit::from_bytestream(stream, pos) {
+    //    Err(err) =&gt; error!("Expected RBMissingHit {} of {}, but got serialization error {}!", k,  v_sizes.1, err),
+    //    Ok(miss) =&gt; {
+    //      event.missing_hits.push(miss);
+    //    }
+    //  }
+    //}
+    </span><span class="kw">let </span>tail = parse_u16(stream, pos);
     <span class="kw">if </span>tail != <span class="self">Self</span>::TAIL {
       <span class="macro">error!</span>(<span class="string">"Decoding of TAIL failed! Got {} instead!"</span>, tail);
     }
@@ -1061,24 +1216,23 @@
     <span class="kw">let </span><span class="kw-2">mut </span>rng     = rand::thread_rng();
     <span class="kw">let </span>n_boards    = rng.gen::&lt;u8&gt;() <span class="kw">as </span>usize;
     <span class="comment">//let n_paddles   = rng.gen::&lt;u8&gt;() as usize;
-    </span><span class="kw">let </span>n_missing   = rng.gen::&lt;u8&gt;() <span class="kw">as </span>usize;
-    <span class="kw">for _ in </span><span class="number">0</span>..n_boards {
+    </span><span class="kw">for _ in </span><span class="number">0</span>..n_boards {
       event.rb_events.push(RBEvent::from_random());
     }
-    <span class="kw">for _ in </span><span class="number">0</span>..n_missing {
-      event.missing_hits.push(RBMissingHit::from_random());
-    }
-    <span class="comment">// for now, we do not randomize CompressionLevel and qualtiy
+    <span class="comment">//for _ in 0..n_missing {
+    //  event.missing_hits.push(RBMissingHit::from_random());
+    //}
+    // for now, we do not randomize CompressionLevel and qualtiy
     //event.compression_level : CompressionLevel::,
     //event.quality           : EventQuality::Unknown,
     </span>event
   }
 }
 
-<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>MasterTriggerEvent&gt; <span class="kw">for </span>TofEvent {
-  <span class="kw">fn </span>from(mte : <span class="kw-2">&amp;</span>MasterTriggerEvent) -&gt; <span class="self">Self </span>{
+<span class="kw">impl </span>From&lt;MasterTriggerEvent&gt; <span class="kw">for </span>TofEvent {
+  <span class="kw">fn </span>from(mte : MasterTriggerEvent) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span><span class="kw-2">mut </span>te : TofEvent = Default::default();
-    te.mt_event = <span class="kw-2">*</span>mte;
+    te.mt_event = mte;
     te.header.event_id = te.mt_event.event_id;
     te
   }
@@ -1222,55 +1376,36 @@
     <span class="kw">let </span><span class="kw-2">mut </span>te               = <span class="self">Self</span>::new();
     te.event_id              = mte.event_id;
     te.timestamp_32          = mte.timestamp;
-    te.n_paddles             = mte.get_hit_paddles();
+    te.n_paddles             = mte.get_trigger_hits().len() <span class="kw">as </span>u8;
     te
   }
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofEventHeader {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-  <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;TofEventHeader"</span>); 
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Run   ID          : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.run_id              .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Event ID          : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.event_id            .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Timestamp 32      : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp_32        .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Timestamp 16      : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp_16        .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Beta        : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_beta        .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Beta Unc    : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_beta_unc    .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Charge      : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_charge      .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Charge unc  : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_charge_unc  .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Outer Tof X : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_x .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Outer Tof Y : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_y .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Outer Tof Z : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_z .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Inner Tof X : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_x .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Inner Tof Y : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_y .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Inner Tof Z : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_z .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  NHit  Outer Tof   : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.nhit_outer_tof      .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  NHit  Inner Tof   : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.nhit_inner_tof      .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  TriggerInfo       : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.trigger_info        .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Ctr ETX           : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.ctr_etx             .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  NPaddles          : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.n_paddles           .to_string());
-  repr += <span class="string">"&gt;"</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;TofEventHeader"</span>); 
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Run   ID          : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.run_id              .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Event ID          : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.event_id            .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Timestamp 32      : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp_32        .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Timestamp 16      : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp_16        .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Beta        : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_beta        .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Beta Unc    : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_beta_unc    .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Charge      : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_charge      .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Charge unc  : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_charge_unc  .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Outer Tof X : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_x .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Outer Tof Y : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_y .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Outer Tof Z : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_z .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Inner Tof X : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_x .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Inner Tof Y : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_y .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Inner Tof Z : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_z .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  NHit  Outer Tof   : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.nhit_outer_tof      .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  NHit  Inner Tof   : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.nhit_inner_tof      .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  TriggerInfo       : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.trigger_info        .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Ctr ETX           : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.ctr_etx             .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  NPaddles          : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.n_paddles           .to_string());
+    repr += <span class="string">"&gt;"</span>;
   <span class="macro">write!</span>(f,<span class="string">"{}"</span>, repr)
-  <span class="comment">//run_id       : u32,
-  //event_id     : u32,
-  //timestamp_32 : u32,
-  //timestamp_16 : u16, // -&gt; 14 byres
-  //primary_beta        : u16, 
-  //primary_beta_unc    : u16, 
-  //primary_charge      : u16, 
-  //primary_charge_unc  : u16, 
-  //primary_outer_tof_x : u16, 
-  //primary_outer_tof_y : u16, 
-  //primary_outer_tof_z : u16, 
-  //primary_inner_tof_x : u16, 
-  //primary_inner_tof_y : u16, 
-  //primary_inner_tof_z : u16, //-&gt; 20bytes primary 
-  //nhit_outer_tof       : u8,  
-  //nhit_inner_tof       : u8, 
-  //trigger_info         : u8,
-  //ctr_etx              : u8,
-  //n_paddles           : u8, // we don't have more than 
-  </span>}
+  }
 }
 
 <span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
@@ -1305,9 +1440,9 @@
 <span class="doccomment">/// Smaller packet for in-flight telemetry stream
 </span><span class="attr">#[derive(Debug, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>TofEventSummary {
-  <span class="kw">pub </span>status            : u8,
+  <span class="kw">pub </span>status            : EventStatus,
   <span class="kw">pub </span>quality           : u8,
-  <span class="kw">pub </span>trigger_setting   : u8,
+  <span class="kw">pub </span>trigger_sources   : u16,
   <span class="doccomment">/// the number of triggered paddles coming
   /// from the MTB directly. This might NOT be
   /// the same as the number of hits!
@@ -1319,24 +1454,135 @@
   </span><span class="kw">pub </span>primary_beta      : u16, 
   <span class="doccomment">/// reconstructed primary charge
   </span><span class="kw">pub </span>primary_charge    : u16, 
-  <span class="kw">pub </span>hits : Vec&lt;TofHit&gt;,
+  <span class="kw">pub </span>dsi_j_mask        : u32,
+  <span class="kw">pub </span>channel_mask      : Vec&lt;u16&gt;,
+  <span class="kw">pub </span>mtb_link_mask     : u64,
+  <span class="kw">pub </span>hits              : Vec&lt;TofHit&gt;,
 }
 
 <span class="kw">impl </span>TofEventSummary {
 
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
-      status            : <span class="number">0</span>,
+      status            : EventStatus::Unknown,
       quality           : <span class="number">0</span>,
-      trigger_setting   : <span class="number">0</span>,
+      trigger_sources   : <span class="number">0</span>,
       n_trigger_paddles : <span class="number">0</span>,
       event_id          : <span class="number">0</span>,
       timestamp32       : <span class="number">0</span>,
       timestamp16       : <span class="number">0</span>,
       primary_beta      : <span class="number">0</span>, 
       primary_charge    : <span class="number">0</span>, 
+      dsi_j_mask        : <span class="number">0</span>,
+      channel_mask      : Vec::&lt;u16&gt;::new(),
+      mtb_link_mask     : <span class="number">0</span>,
       hits              : Vec::&lt;TofHit&gt;::new(),
     }
+  }
+  <span class="doccomment">/// Get the RB link IDs according to the mask
+  </span><span class="kw">pub fn </span>get_rb_link_ids(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>links = Vec::&lt;u8&gt;::new();
+    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">64 </span>{
+      <span class="kw">if </span>(<span class="self">self</span>.mtb_link_mask &gt;&gt; k) <span class="kw">as </span>u64 &amp; <span class="number">0x1 </span>== <span class="number">1 </span>{
+        links.push(k <span class="kw">as </span>u8);
+      }
+    }
+    links
+  }
+
+  <span class="doccomment">/// Get the combination of triggered DSI/J/CH on 
+  /// the MTB which formed the trigger. This does 
+  /// not include further hits which fall into the 
+  /// integration window. For those, se rb_link_mask
+  ///
+  /// The returned values follow the TOF convention
+  /// to start with 1, so that we can use them to 
+  /// look up LTB ids in the db.
+  ///
+  /// # Returns
+  ///
+  ///   Vec&lt;(hit)&gt; where hit is (DSI, J, CH) 
+  </span><span class="kw">pub fn </span>get_trigger_hits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(u8, u8, u8, LTBThreshold)&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>hits = Vec::&lt;(u8,u8,u8,LTBThreshold)&gt;::new(); 
+    <span class="comment">//let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
+    </span><span class="kw">let </span>n_masks_needed = <span class="self">self</span>.dsi_j_mask.count_ones();
+    <span class="kw">if </span><span class="self">self</span>.channel_mask.len() &lt; n_masks_needed <span class="kw">as </span>usize {
+      <span class="macro">error!</span>(<span class="string">"We need {} hit masks, but only have {}! This is bad!"</span>, n_masks_needed, <span class="self">self</span>.channel_mask.len());
+      <span class="kw">return </span>hits;
+    }
+    <span class="kw">let </span><span class="kw-2">mut </span>n_mask = <span class="number">0</span>;
+    <span class="macro">trace!</span>(<span class="string">"Expecting {} hit masks"</span>, n_masks_needed);
+    <span class="macro">trace!</span>(<span class="string">"ltb channels {:?}"</span>, <span class="self">self</span>.dsi_j_mask);
+    <span class="macro">trace!</span>(<span class="string">"hit masks {:?}"</span>, <span class="self">self</span>.channel_mask); 
+    <span class="comment">//println!("We see LTB Channels {:?} with Hit masks {:?} for {} masks requested by us!", self.dsi_j_mask, self.channel_mask, n_masks_needed);
+    </span><span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">32 </span>{
+      <span class="kw">if </span>(<span class="self">self</span>.dsi_j_mask &gt;&gt; k) <span class="kw">as </span>u32 &amp; <span class="number">0x1 </span>== <span class="number">1 </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>dsi = <span class="number">0u8</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>j   = <span class="number">0u8</span>;
+        <span class="kw">if </span>k &lt; <span class="number">5 </span>{
+          dsi = <span class="number">1</span>;
+          j   = k <span class="kw">as </span>u8 + <span class="number">1</span>;
+        } <span class="kw">else if </span>k &lt; <span class="number">10 </span>{
+          dsi = <span class="number">2</span>;
+          j   = k <span class="kw">as </span>u8 - <span class="number">5 </span>+ <span class="number">1</span>;
+        } <span class="kw">else if </span>k &lt; <span class="number">15 </span>{
+          dsi = <span class="number">3</span>;
+          j   = k <span class="kw">as </span>u8- <span class="number">10 </span>+ <span class="number">1</span>;
+        } <span class="kw">else if </span>k &lt; <span class="number">20 </span>{
+          dsi = <span class="number">4</span>;
+          j   = k <span class="kw">as </span>u8- <span class="number">15 </span>+ <span class="number">1</span>;
+        } <span class="kw">else if </span>k &lt; <span class="number">25 </span>{
+          dsi = <span class="number">5</span>;
+          j   = k <span class="kw">as </span>u8 - <span class="number">20 </span>+ <span class="number">1</span>;
+        } 
+        <span class="comment">//let dsi = (k as f32 / 4.0).floor() as u8 + 1;       
+        //let j   = (k % 5) as u8 + 1;
+        //println!("n_mask {n_mask}");
+        </span><span class="kw">let </span>channels = <span class="self">self</span>.channel_mask[n_mask]; 
+        <span class="kw">for </span>(i,ch) <span class="kw">in </span>LTB_CHANNELS.iter().enumerate() {
+          <span class="comment">//let chn = *ch as u8 + 1;
+          </span><span class="kw">let </span>chn = i <span class="kw">as </span>u8 + <span class="number">1</span>;
+          <span class="comment">//println!("i,ch {}, {}", i, ch);
+          </span><span class="kw">let </span>thresh_bits = ((channels &amp; ch) &gt;&gt; (i<span class="kw-2">*</span><span class="number">2</span>)) <span class="kw">as </span>u8;
+          <span class="comment">//println!("thresh_bits {}", thresh_bits);
+          </span><span class="kw">if </span>thresh_bits &gt; <span class="number">0 </span>{ <span class="comment">// hit over threshold
+            </span>hits.push((dsi, j, chn, LTBThreshold::from(thresh_bits)));
+            
+          }
+        }
+        n_mask += <span class="number">1</span>;
+      }
+    }
+    hits
+  }
+
+  
+  <span class="doccomment">/// Get the trigger sources from trigger source byte
+  /// FIXME! (Does not return anything)
+  </span><span class="kw">pub fn </span>get_trigger_sources(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;TriggerType&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>t_types    = Vec::&lt;TriggerType&gt;::new();
+    <span class="kw">let </span>gaps_trigger   = <span class="self">self</span>.trigger_sources &gt;&gt; <span class="number">5 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
+    <span class="kw">if </span>gaps_trigger {
+      t_types.push(TriggerType::Gaps);
+    }
+    <span class="kw">let </span>any_trigger    = <span class="self">self</span>.trigger_sources &gt;&gt; <span class="number">6 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
+    <span class="kw">if </span>any_trigger {
+      t_types.push(TriggerType::Any);
+    }
+    <span class="kw">let </span>forced_trigger = <span class="self">self</span>.trigger_sources &gt;&gt; <span class="number">7 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
+    <span class="kw">if </span>forced_trigger {
+      t_types.push(TriggerType::Forced);
+    }
+    <span class="kw">let </span>track_trigger  = <span class="self">self</span>.trigger_sources &gt;&gt; <span class="number">8 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
+    <span class="kw">if </span>track_trigger {
+      t_types.push(TriggerType::Track);
+    }
+    <span class="kw">let </span>central_track_trigger
+                       = <span class="self">self</span>.trigger_sources &gt;&gt; <span class="number">9 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
+    <span class="kw">if </span>central_track_trigger {
+      t_types.push(TriggerType::TrackCentral);
+    }
+    t_types
   }
   
   <span class="kw">pub fn </span>get_timestamp48(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
@@ -1359,6 +1605,10 @@
   }
 }
 
+<span class="kw">impl </span>Packable <span class="kw">for </span>TofEventSummary {
+  <span class="kw">const </span>PACKET_TYPE        : PacketType = PacketType::TofEventSummary;
+}
+
 <span class="kw">impl </span>Serialization <span class="kw">for </span>TofEventSummary {
   
   <span class="kw">const </span>HEAD               : u16   = <span class="number">43690</span>; <span class="comment">//0xAAAA
@@ -1367,15 +1617,22 @@
   </span><span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>stream = Vec::&lt;u8&gt;::new();
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::HEAD.to_le_bytes());
-    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.status.to_le_bytes());
-    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.quality.to_le_bytes());
-    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.trigger_setting.to_le_bytes());
+    stream.push(<span class="self">self</span>.status.to_u8());
+    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.trigger_sources.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_trigger_paddles.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.event_id.to_le_bytes());
+    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.quality.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.timestamp32.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.timestamp16.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.primary_beta.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.primary_charge.to_le_bytes());
+    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.dsi_j_mask.to_le_bytes());
+    <span class="kw">let </span>n_channel_masks = <span class="self">self</span>.channel_mask.len();
+    stream.push(n_channel_masks <span class="kw">as </span>u8);
+    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..n_channel_masks {
+      stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.channel_mask[k].to_le_bytes());
+    }
+    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.mtb_link_mask.to_le_bytes());
     <span class="kw">let </span>nhits = <span class="self">self</span>.hits.len() <span class="kw">as </span>u16;
     stream.extend_from_slice(<span class="kw-2">&amp;</span>nhits.to_le_bytes());
     <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.hits.len() {
@@ -1394,15 +1651,21 @@
       <span class="macro">error!</span>(<span class="string">"Decoding of HEAD failed! Got {} instead!"</span>, head);
       <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::HeadInvalid);
     }
-    summary.status            = parse_u8(stream, pos);
-    summary.quality           = parse_u8(stream, pos);
-    summary.trigger_setting   = parse_u8(stream, pos);
+    summary.status            = EventStatus::from(parse_u8(stream, pos));
+    summary.trigger_sources   = parse_u16(stream, pos);
     summary.n_trigger_paddles = parse_u8(stream, pos);
     summary.event_id          = parse_u32(stream, pos);
+    summary.quality           = parse_u8(stream, pos);
     summary.timestamp32       = parse_u32(stream, pos);
     summary.timestamp16       = parse_u16(stream, pos);
     summary.primary_beta      = parse_u16(stream, pos); 
     summary.primary_charge    = parse_u16(stream, pos); 
+    summary.dsi_j_mask        = parse_u32(stream, pos);
+    <span class="kw">let </span>n_channel_masks       = parse_u8(stream, pos);
+    <span class="kw">for _ in </span><span class="number">0</span>..n_channel_masks {
+      summary.channel_mask.push(parse_u16(stream, pos));
+    }
+    summary.mtb_link_mask     = parse_u64(stream, pos);
     <span class="kw">let </span>nhits                 = parse_u16(stream, pos);
     <span class="kw">for _ in </span><span class="number">0</span>..nhits {
       summary.hits.push(TofHit::from_bytestream(stream, pos)<span class="question-mark">?</span>);
@@ -1425,8 +1688,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofEventSummary {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;TofEventSummary"</span>);
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Status           : {}"</span>, <span class="self">self</span>.status));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  TriggerSetting   : {}"</span>, <span class="self">self</span>.trigger_setting));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  EventStatus      : {}"</span>, <span class="self">self</span>.status));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  TriggerSources   : {:?}"</span>, <span class="self">self</span>.get_trigger_sources()));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  NTrigPaddles     : {}"</span>, <span class="self">self</span>.n_trigger_paddles));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  EventID          : {}"</span>, <span class="self">self</span>.event_id));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  timestamp32      : {}"</span>, <span class="self">self</span>.timestamp32)); 
@@ -1434,7 +1697,20 @@
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   |-&gt; timestamp48 : {}"</span>, <span class="self">self</span>.get_timestamp48())); 
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  PrimaryBeta      : {}"</span>, <span class="self">self</span>.get_beta())); 
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  PrimaryCharge    : {}"</span>, <span class="self">self</span>.primary_charge));
-    repr += <span class="kw-2">&amp;</span>String::from(<span class="string">"********* HITS *********"</span>);
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **"</span>, <span class="self">self</span>.dsi_j_mask.count_ones()));
+    <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.get_trigger_hits() {
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  =&gt; {}/{}/{} ({}) "</span>, k.<span class="number">0</span>, k.<span class="number">1</span>, k.<span class="number">2</span>, k.<span class="number">3</span>));
+    }
+    repr += <span class="string">"\n  ** ** MTB LINK IDs ** **"</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>mtblink_str = String::from(<span class="string">"\n  =&gt; "</span>);
+    <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.get_rb_link_ids() {
+      mtblink_str += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"{} "</span>, k))
+    }
+    repr += <span class="kw-2">&amp;</span>mtblink_str;
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  == Trigger hits {}, expected RBEvents {}"</span>,
+            <span class="self">self</span>.get_trigger_hits().len(),
+            <span class="self">self</span>.get_rb_link_ids().len()));
+    repr += <span class="kw-2">&amp;</span>String::from(<span class="string">"\n  ** ** ** HITS ** ** **"</span>);
     <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.hits {
       repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  {}"</span>, h));
     }
@@ -1449,15 +1725,21 @@
     <span class="kw">let </span><span class="kw-2">mut </span>summary = <span class="self">Self</span>::new();
     <span class="kw">let </span><span class="kw-2">mut </span>rng     = rand::thread_rng();
 
-    summary.status            = rng.gen::&lt;u8&gt;();
+    summary.status            = EventStatus::from_random();
     summary.quality           = rng.gen::&lt;u8&gt;();
-    summary.trigger_setting   = rng.gen::&lt;u8&gt;();
+    summary.trigger_sources   = rng.gen::&lt;u16&gt;();
     summary.n_trigger_paddles = rng.gen::&lt;u8&gt;();
     summary.event_id          = rng.gen::&lt;u32&gt;();
     summary.timestamp32       = rng.gen::&lt;u32&gt;();
     summary.timestamp16       = rng.gen::&lt;u16&gt;();
     summary.primary_beta      = rng.gen::&lt;u16&gt;(); 
     summary.primary_charge    = rng.gen::&lt;u16&gt;(); 
+    summary.dsi_j_mask        = rng.gen::&lt;u32&gt;();
+    <span class="kw">let </span>n_channel_masks       = rng.gen::&lt;u8&gt;();
+    <span class="kw">for _ in </span><span class="number">0</span>..n_channel_masks {
+      summary.channel_mask.push(rng.gen::&lt;u16&gt;());
+    }
+    summary.mtb_link_mask     = rng.gen::&lt;u64&gt;();
     <span class="kw">let </span>nhits                 = rng.gen::&lt;u8&gt;();
     <span class="kw">for _ in </span><span class="number">0</span>..nhits {
       summary.hits.push(TofHit::from_random());
@@ -1472,58 +1754,52 @@
 //
 // ============================================
 
-</span><span class="attr">#[cfg(all(test,feature = <span class="string">"random"</span>))]
-</span><span class="kw">mod </span>test_tofevents {
-  <span class="kw">use </span><span class="kw">crate</span>::serialization::Serialization;
-  <span class="kw">use </span><span class="kw">crate</span>::FromRandom;
-  <span class="kw">use </span><span class="kw">crate</span>::events::{TofEvent,
-                      TofEventHeader,
-                      TofEventSummary};
-
-  <span class="attr">#[test]
-  </span><span class="kw">fn </span>serialize_tofeventheader() {
-    <span class="kw">let </span>data = TofEventHeader::from_random();
-    <span class="kw">let </span>test = TofEventHeader::from_bytestream(<span class="kw-2">&amp;</span>data.to_bytestream(), <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
+</span><span class="attr">#[test]
+</span><span class="kw">fn </span>packable_tofeventsummary() {
+  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+    <span class="kw">let </span>data = TofEventSummary::from_random();
+    <span class="kw">let </span>test : TofEventSummary = data.pack().unpack().unwrap();
     <span class="macro">assert_eq!</span>(data, test);
   }
+}  
 
-  <span class="attr">#[test]
-  </span><span class="kw">fn </span>tofevent_sizes_header() {
-    <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..<span class="number">100 </span>{
-      <span class="kw">let </span>data = TofEvent::from_random();
-      <span class="kw">let </span>mask = data.construct_sizes_header();
-      <span class="kw">let </span>size = TofEvent::decode_size_header(<span class="kw-2">&amp;</span>mask);
-      <span class="macro">assert_eq!</span>(size.<span class="number">0</span>, data.rb_events.len());
-      <span class="macro">assert_eq!</span>(size.<span class="number">1</span>, data.missing_hits.len());
-    }
-  }
+<span class="attr">#[test]
+#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">fn </span>tofevent_sizes_header() {
+  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+    <span class="kw">let </span>data = TofEvent::from_random();
+    <span class="kw">let </span>mask = data.construct_sizes_header();
+    <span class="kw">let </span>size = TofEvent::decode_size_header(<span class="kw-2">&amp;</span>mask);
+    <span class="macro">assert_eq!</span>(size.<span class="number">0</span>, data.rb_events.len());
+    <span class="comment">//assert_eq!(size.1, data.missing_hits.len());
+  </span>}
+}
 
-  <span class="attr">#[test]
-  </span><span class="kw">fn </span>serialization_tofevent() {
-    <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">5 </span>{
-      <span class="kw">let </span>data = TofEvent::from_random();
-      <span class="kw">let </span>test = TofEvent::from_bytestream(<span class="kw-2">&amp;</span>data.to_bytestream(), <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
-      <span class="macro">assert_eq!</span>(data.header, test.header);
-      <span class="macro">assert_eq!</span>(data.compression_level, test.compression_level);
-      <span class="macro">assert_eq!</span>(data.quality, test.quality);
-      <span class="macro">assert_eq!</span>(data.mt_event, test.mt_event);
-      <span class="macro">assert_eq!</span>(data.rb_events.len(), test.rb_events.len());
-      <span class="macro">assert_eq!</span>(data.missing_hits.len(), test.missing_hits.len());
-      <span class="macro">assert_eq!</span>(data.missing_hits, test.missing_hits);
-      <span class="macro">assert_eq!</span>(data.rb_events, test.rb_events);
-      <span class="comment">//assert_eq!(data, test);
-      //println!("{}", data);
-    </span>}
-  }
-  
-  <span class="attr">#[test]
-  </span><span class="kw">fn </span>serialization_tofeventsummary() {
-    <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
-      <span class="kw">let </span>data = TofEventSummary::from_random();
-      <span class="kw">let </span>test = TofEventSummary::from_bytestream(<span class="kw-2">&amp;</span>data.to_bytestream(), <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
-      <span class="macro">assert_eq!</span>(data, test);
-    }
-  }
+<span class="attr">#[test]
+#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">fn </span>packable_tofevent() {
+  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">5 </span>{
+    <span class="kw">let </span>data = TofEvent::from_random();
+    <span class="kw">let </span>test : TofEvent = data.pack().unpack().unwrap();
+    <span class="macro">assert_eq!</span>(data.header, test.header);
+    <span class="macro">assert_eq!</span>(data.compression_level, test.compression_level);
+    <span class="macro">assert_eq!</span>(data.quality, test.quality);
+    <span class="macro">assert_eq!</span>(data.mt_event, test.mt_event);
+    <span class="macro">assert_eq!</span>(data.rb_events.len(), test.rb_events.len());
+    <span class="comment">//assert_eq!(data.missing_hits.len(), test.missing_hits.len());
+    //assert_eq!(data.missing_hits, test.missing_hits);
+    </span><span class="macro">assert_eq!</span>(data.rb_events, test.rb_events);
+    <span class="comment">//assert_eq!(data, test);
+    //println!("{}", data);
+  </span>}
+}
+
+<span class="attr">#[test]
+#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">fn </span>serialize_tofeventheader() {
+  <span class="kw">let </span>data = TofEventHeader::from_random();
+  <span class="kw">let </span>test = TofEventHeader::from_bytestream(<span class="kw-2">&amp;</span>data.to_bytestream(), <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
+  <span class="macro">assert_eq!</span>(data, test);
 }
 
 </code></pre></div></section></main></body></html>

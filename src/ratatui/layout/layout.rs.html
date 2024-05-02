@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/layout/layout.rs`."><title>layout.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/layout/layout.rs`."><title>layout.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -2572,21 +2572,6 @@
 <a href="#2570" id="2570">2570</a>
 <a href="#2571" id="2571">2571</a>
 <a href="#2572" id="2572">2572</a>
-<a href="#2573" id="2573">2573</a>
-<a href="#2574" id="2574">2574</a>
-<a href="#2575" id="2575">2575</a>
-<a href="#2576" id="2576">2576</a>
-<a href="#2577" id="2577">2577</a>
-<a href="#2578" id="2578">2578</a>
-<a href="#2579" id="2579">2579</a>
-<a href="#2580" id="2580">2580</a>
-<a href="#2581" id="2581">2581</a>
-<a href="#2582" id="2582">2582</a>
-<a href="#2583" id="2583">2583</a>
-<a href="#2584" id="2584">2584</a>
-<a href="#2585" id="2585">2585</a>
-<a href="#2586" id="2586">2586</a>
-<a href="#2587" id="2587">2587</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{cell::RefCell, collections::HashMap, iter, num::NonZeroUsize, rc::Rc, sync::OnceLock};
 
 <span class="kw">use </span>cassowary::{
@@ -2626,7 +2611,7 @@
 </span><span class="kw">const </span>FLOAT_PRECISION_MULTIPLIER: f64 = <span class="number">100.0</span>;
 
 <span class="macro">thread_local! </span>{
-    <span class="kw">static </span>LAYOUT_CACHE: OnceLock&lt;RefCell&lt;Cache&gt;&gt; = OnceLock::new();
+    <span class="kw">static </span>LAYOUT_CACHE: OnceLock&lt;RefCell&lt;Cache&gt;&gt; = <span class="kw">const </span>{ OnceLock::new() };
 }
 
 <span class="doccomment">/// A layout is a set of constraints that can be applied to a given area to split it into smaller
@@ -2647,7 +2632,7 @@
 /// many of the constraints in order of their priorities.
 ///
 /// When the layout is computed, the result is cached in a thread-local cache, so that subsequent
-/// calls with the same parameters are faster. The cache is a LruCache, and the size of the cache
+/// calls with the same parameters are faster. The cache is a `LruCache`, and the size of the cache
 /// can be configured using [`Layout::init_cache()`].
 ///
 /// # Constructors
@@ -2716,13 +2701,13 @@
     ///
     /// The `constraints` parameter accepts any type that implements `IntoIterator&lt;Item =
     /// Into&lt;Constraint&gt;&gt;`. This includes arrays, slices, vectors, iterators. `Into&lt;Constraint&gt;` is
-    /// implemented on u16, so you can pass an array, vec, etc. of u16 to this function to create a
-    /// layout with fixed size chunks.
+    /// implemented on `u16`, so you can pass an array, `Vec`, etc. of `u16` to this function to
+    /// create a layout with fixed size chunks.
     ///
     /// Default values for the other fields are:
     ///
     /// - `margin`: 0, 0
-    /// - `flex`: Flex::Start
+    /// - `flex`: [`Flex::Start`]
     /// - `spacing`: 0
     ///
     /// # Examples
@@ -2741,15 +2726,15 @@
     ///
     /// Layout::new(Direction::Horizontal, vec![1, 2]);
     /// ```
-    </span><span class="kw">pub fn </span>new&lt;I&gt;(direction: Direction, constraints: I) -&gt; Layout
-    <span class="kw">where
+    </span><span class="kw">pub fn </span>new&lt;I&gt;(direction: Direction, constraints: I) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>I: IntoIterator,
         I::Item: Into&lt;Constraint&gt;,
     {
-        Layout {
+        <span class="self">Self </span>{
             direction,
             constraints: constraints.into_iter().map(Into::into).collect(),
-            ..Layout::default()
+            ..<span class="self">Self</span>::default()
         }
     }
 
@@ -2764,12 +2749,12 @@
     /// # use ratatui::prelude::*;
     /// let layout = Layout::vertical([Constraint::Length(5), Constraint::Min(0)]);
     /// ```
-    </span><span class="kw">pub fn </span>vertical&lt;I&gt;(constraints: I) -&gt; Layout
-    <span class="kw">where
+    </span><span class="kw">pub fn </span>vertical&lt;I&gt;(constraints: I) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>I: IntoIterator,
         I::Item: Into&lt;Constraint&gt;,
     {
-        Layout::new(Direction::Vertical, constraints.into_iter().map(Into::into))
+        <span class="self">Self</span>::new(Direction::Vertical, constraints.into_iter().map(Into::into))
     }
 
     <span class="doccomment">/// Creates a new horizontal layout with default values.
@@ -2783,19 +2768,19 @@
     /// # use ratatui::prelude::*;
     /// let layout = Layout::horizontal([Constraint::Length(5), Constraint::Min(0)]);
     /// ```
-    </span><span class="kw">pub fn </span>horizontal&lt;I&gt;(constraints: I) -&gt; Layout
-    <span class="kw">where
+    </span><span class="kw">pub fn </span>horizontal&lt;I&gt;(constraints: I) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>I: IntoIterator,
         I::Item: Into&lt;Constraint&gt;,
     {
-        Layout::new(
+        <span class="self">Self</span>::new(
             Direction::Horizontal,
             constraints.into_iter().map(Into::into),
         )
     }
 
     <span class="doccomment">/// Initialize an empty cache with a custom size. The cache is keyed on the layout and area, so
-    /// that subsequent calls with the same parameters are faster. The cache is a LruCache, and
+    /// that subsequent calls with the same parameters are faster. The cache is a `LruCache`, and
     /// grows until `cache_size` is reached.
     ///
     /// Returns true if the cell's value was set by this call.
@@ -2803,7 +2788,7 @@
     /// has set this value or that the cache size is already initialized.
     ///
     /// Note that a custom cache size will be set only if this function:
-    /// * is called before [Layout::split()] otherwise, the cache size is
+    /// * is called before [`Layout::split()`] otherwise, the cache size is
     ///   [`Self::DEFAULT_CACHE_SIZE`].
     /// * is called for the first time, subsequent calls do not modify the cache size.
     </span><span class="kw">pub fn </span>init_cache(cache_size: usize) -&gt; bool {
@@ -2835,7 +2820,7 @@
     /// assert_eq!(layout[..], [Rect::new(0, 0, 10, 5), Rect::new(0, 5, 10, 5)]);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub const fn </span>direction(<span class="kw-2">mut </span><span class="self">self</span>, direction: Direction) -&gt; Layout {
+    </span><span class="kw">pub const fn </span>direction(<span class="kw-2">mut </span><span class="self">self</span>, direction: Direction) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.direction = direction;
         <span class="self">self
     </span>}
@@ -2885,8 +2870,8 @@
     /// Layout::default().constraints(vec![1, 2, 3]);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>constraints&lt;I&gt;(<span class="kw-2">mut </span><span class="self">self</span>, constraints: I) -&gt; Layout
-    <span class="kw">where
+    </span><span class="kw">pub fn </span>constraints&lt;I&gt;(<span class="kw-2">mut </span><span class="self">self</span>, constraints: I) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>I: IntoIterator,
         I::Item: Into&lt;Constraint&gt;,
     {
@@ -2907,7 +2892,7 @@
     /// assert_eq!(layout[..], [Rect::new(2, 2, 6, 6)]);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub const fn </span>margin(<span class="kw-2">mut </span><span class="self">self</span>, margin: u16) -&gt; Layout {
+    </span><span class="kw">pub const fn </span>margin(<span class="kw-2">mut </span><span class="self">self</span>, margin: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.margin = Margin {
             horizontal: margin,
             vertical: margin,
@@ -2928,7 +2913,7 @@
     /// assert_eq!(layout[..], [Rect::new(2, 0, 6, 10)]);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub const fn </span>horizontal_margin(<span class="kw-2">mut </span><span class="self">self</span>, horizontal: u16) -&gt; Layout {
+    </span><span class="kw">pub const fn </span>horizontal_margin(<span class="kw-2">mut </span><span class="self">self</span>, horizontal: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.margin.horizontal = horizontal;
         <span class="self">self
     </span>}
@@ -2946,7 +2931,7 @@
     /// assert_eq!(layout[..], [Rect::new(0, 2, 10, 6)]);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub const fn </span>vertical_margin(<span class="kw-2">mut </span><span class="self">self</span>, vertical: u16) -&gt; Layout {
+    </span><span class="kw">pub const fn </span>vertical_margin(<span class="kw-2">mut </span><span class="self">self</span>, vertical: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.margin.vertical = vertical;
         <span class="self">self
     </span>}
@@ -2955,8 +2940,8 @@
     ///
     /// # Arguments
     ///
-    /// * `flex`: A `Flex` enum value that represents the flex behavior of the layout. It can be one
-    ///   of the following:
+    /// * `flex`: A [`Flex`] enum value that represents the flex behavior of the layout. It can be
+    ///   one of the following:
     ///   - [`Flex::Legacy`]: The last item is stretched to fill the excess space.
     ///   - [`Flex::Start`]: The items are aligned to the start of the layout.
     ///   - [`Flex::Center`]: The items are aligned to the center of the layout.
@@ -2980,7 +2965,8 @@
     /// # use ratatui::layout::{Flex, Layout, Constraint::*};
     /// let layout = Layout::horizontal([Length(20), Length(20), Length(20)]).flex(Flex::Legacy);
     /// ```
-    </span><span class="kw">pub const fn </span>flex(<span class="kw-2">mut </span><span class="self">self</span>, flex: Flex) -&gt; Layout {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub const fn </span>flex(<span class="kw-2">mut </span><span class="self">self</span>, flex: Flex) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.flex = flex;
         <span class="self">self
     </span>}
@@ -3003,13 +2989,14 @@
     /// # Notes
     ///
     /// - If the layout has only one item, the spacing will not be applied.
-    /// - Spacing will not be applied for `Flex::SpaceAround` and `Flex::SpaceBetween`
-    </span><span class="kw">pub const fn </span>spacing(<span class="kw-2">mut </span><span class="self">self</span>, spacing: u16) -&gt; Layout {
+    /// - Spacing will not be applied for [`Flex::SpaceAround`] and [`Flex::SpaceBetween`]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub const fn </span>spacing(<span class="kw-2">mut </span><span class="self">self</span>, spacing: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.spacing = spacing;
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Split the rect into a number of sub-rects according to the given [`Layout`]`.
+    <span class="doccomment">/// Split the rect into a number of sub-rects according to the given [`Layout`].
     ///
     /// An ergonomic wrapper around [`Layout::split`] that returns an array of `Rect`s instead of
     /// `Rc&lt;[Rect]&gt;`.
@@ -3038,7 +3025,7 @@
         areas.to_vec().try_into().expect(<span class="string">"invalid number of rects"</span>)
     }
 
-    <span class="doccomment">/// Split the rect into a number of sub-rects according to the given [`Layout`]` and return just
+    <span class="doccomment">/// Split the rect into a number of sub-rects according to the given [`Layout`] and return just
     /// the spacers between the areas.
     ///
     /// This method requires the number of constraints to be known at compile time. If you don't
@@ -3084,8 +3071,8 @@
     ///
     /// This method stores the result of the computation in a thread-local cache keyed on the layout
     /// and area, so that subsequent calls with the same parameters are faster. The cache is a
-    /// LruCache, and grows until [`Self::DEFAULT_CACHE_SIZE`] is reached by default, if the cache
-    /// is initialized with the [Layout::init_cache()] grows until the initialized cache size.
+    /// `LruCache`, and grows until [`Self::DEFAULT_CACHE_SIZE`] is reached by default, if the cache
+    /// is initialized with the [`Layout::init_cache()`] grows until the initialized cache size.
     ///
     /// There is a helper method that can be used to split the whole area into smaller ones based on
     /// the layout: [`Layout::areas()`]. That method is a shortcut for calling this method. It
@@ -3121,8 +3108,8 @@
     ///
     /// This method stores the result of the computation in a thread-local cache keyed on the layout
     /// and area, so that subsequent calls with the same parameters are faster. The cache is a
-    /// LruCache, and grows until [`Self::DEFAULT_CACHE_SIZE`] is reached by default, if the cache
-    /// is initialized with the [Layout::init_cache()] grows until the initialized cache size.
+    /// `LruCache`, and grows until [`Self::DEFAULT_CACHE_SIZE`] is reached by default, if the cache
+    /// is initialized with the [`Layout::init_cache()`] grows until the initialized cache size.
     ///
     /// # Examples
     ///
@@ -3287,7 +3274,7 @@
     area: Element,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(), AddConstraintError&gt; {
     <span class="comment">// all variables are in the range [area.start, area.end]
-    </span><span class="kw">for </span><span class="kw-2">&amp;</span>variable <span class="kw">in </span>variables.iter() {
+    </span><span class="kw">for </span><span class="kw-2">&amp;</span>variable <span class="kw">in </span>variables {
         solver.add_constraint(variable | GE(REQUIRED) | area.start)<span class="question-mark">?</span>;
         solver.add_constraint(variable | LE(REQUIRED) | area.end)<span class="question-mark">?</span>;
     }
@@ -3322,8 +3309,8 @@
                 }
             }
             Constraint::Length(length) =&gt; {
-                solver.add_constraint(element.has_int_size(length, LENGTH_SIZE_EQ))<span class="question-mark">?
-            </span>}
+                solver.add_constraint(element.has_int_size(length, LENGTH_SIZE_EQ))<span class="question-mark">?</span>;
+            }
             Constraint::Percentage(p) =&gt; {
                 <span class="kw">let </span>size = area.size() * f64::from(p) / <span class="number">100.00</span>;
                 solver.add_constraint(element.has_size(size, PERCENTAGE_SIZE_EQ))<span class="question-mark">?</span>;
@@ -3353,7 +3340,7 @@
     <span class="kw">let </span>spacing_f64 = f64::from(spacing) * FLOAT_PRECISION_MULTIPLIER;
     <span class="kw">match </span>flex {
         Flex::Legacy =&gt; {
-            <span class="kw">for </span>spacer <span class="kw">in </span>spacers_except_first_and_last.iter() {
+            <span class="kw">for </span>spacer <span class="kw">in </span>spacers_except_first_and_last {
                 solver.add_constraint(spacer.has_size(spacing_f64, SPACER_SIZE_EQ))<span class="question-mark">?</span>;
             }
             <span class="kw">if let </span>(<span class="prelude-val">Some</span>(first), <span class="prelude-val">Some</span>(last)) = (spacers.first(), spacers.last()) {
@@ -3365,9 +3352,9 @@
         // constraints are satisfied
         </span>Flex::SpaceAround =&gt; {
             <span class="kw">for </span>(left, right) <span class="kw">in </span>spacers.iter().tuple_combinations() {
-                solver.add_constraint(left.has_size(right, SPACER_SIZE_EQ))<span class="question-mark">?
-            </span>}
-            <span class="kw">for </span>spacer <span class="kw">in </span>spacers.iter() {
+                solver.add_constraint(left.has_size(right, SPACER_SIZE_EQ))<span class="question-mark">?</span>;
+            }
+            <span class="kw">for </span>spacer <span class="kw">in </span>spacers {
                 solver.add_constraint(spacer.has_min_size(spacing, SPACER_SIZE_EQ))<span class="question-mark">?</span>;
                 solver.add_constraint(spacer.has_size(area, SPACE_GROW))<span class="question-mark">?</span>;
             }
@@ -3377,12 +3364,12 @@
         // constraints are satisfied, but the first and last spacers are zero size
         </span>Flex::SpaceBetween =&gt; {
             <span class="kw">for </span>(left, right) <span class="kw">in </span>spacers_except_first_and_last.iter().tuple_combinations() {
-                solver.add_constraint(left.has_size(right.size(), SPACER_SIZE_EQ))<span class="question-mark">?
-            </span>}
-            <span class="kw">for </span>spacer <span class="kw">in </span>spacers_except_first_and_last.iter() {
+                solver.add_constraint(left.has_size(right.size(), SPACER_SIZE_EQ))<span class="question-mark">?</span>;
+            }
+            <span class="kw">for </span>spacer <span class="kw">in </span>spacers_except_first_and_last {
                 solver.add_constraint(spacer.has_min_size(spacing, SPACER_SIZE_EQ))<span class="question-mark">?</span>;
             }
-            <span class="kw">for </span>spacer <span class="kw">in </span>spacers_except_first_and_last.iter() {
+            <span class="kw">for </span>spacer <span class="kw">in </span>spacers_except_first_and_last {
                 solver.add_constraint(spacer.has_size(area, SPACE_GROW))<span class="question-mark">?</span>;
             }
             <span class="kw">if let </span>(<span class="prelude-val">Some</span>(first), <span class="prelude-val">Some</span>(last)) = (spacers.first(), spacers.last()) {
@@ -3435,7 +3422,7 @@
 /// │abcdef││abcdefabcdef│
 /// └──────┘└────────────┘
 ///
-/// size == base_element * scaling_factor
+/// `size == base_element * scaling_factor`
 </span><span class="kw">fn </span>configure_fill_constraints(
     solver: <span class="kw-2">&amp;mut </span>Solver,
     segments: <span class="kw-2">&amp;</span>[Element],
@@ -3664,8 +3651,6 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span>std::iter;
-
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
     <span class="attr">#[test]
@@ -3693,7 +3678,7 @@
         <span class="macro">assert!</span>(!Layout::init_cache(<span class="number">15</span>));
         LAYOUT_CACHE.with(|c| {
             <span class="macro">assert_eq!</span>(c.get().unwrap().borrow().cap().get(), <span class="number">10</span>);
-        })
+        });
     }
 
     <span class="attr">#[test]
@@ -3719,7 +3704,7 @@
                 c.get().unwrap().borrow().cap().get(),
                 Layout::DEFAULT_CACHE_SIZE
             );
-        })
+        });
     }
 
     <span class="attr">#[test]
@@ -3796,7 +3781,7 @@
     }
 
     <span class="doccomment">/// The purpose of this test is to ensure that layout can be constructed with any type that
-    /// implements IntoIterator&lt;Item = AsRef&lt;Constraint&gt;&gt;.
+    /// implements `IntoIterator&lt;Item = AsRef&lt;Constraint&gt;&gt;`.
     </span><span class="attr">#[test]
     #[allow(
         clippy::needless_borrow,
@@ -3842,14 +3827,14 @@
             <span class="string">"constraints should be settable with an iter"
         </span>);
 
-        <span class="kw">let </span>iterator = CONSTRAINTS.iter().map(|c| c.to_owned());
+        <span class="kw">let </span>iterator = CONSTRAINTS.iter().map(ToOwned::to_owned);
         <span class="macro">assert_eq!</span>(
             Layout::default().constraints(iterator).constraints,
             CONSTRAINTS,
             <span class="string">"constraints should be settable with an iterator"
         </span>);
 
-        <span class="kw">let </span>iterator_ref = CONSTRAINTS.iter().map(|c| c.as_ref());
+        <span class="kw">let </span>iterator_ref = CONSTRAINTS.iter().map(AsRef::as_ref);
         <span class="macro">assert_eq!</span>(
             Layout::default().constraints(iterator_ref).constraints,
             CONSTRAINTS,
@@ -3995,7 +3980,7 @@
             <span class="attr">#[case] </span>constraints: <span class="kw-2">&amp;</span>[Constraint],
             <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         ) {
-            letters(flex, constraints, width, expected)
+            letters(flex, constraints, width, expected);
         }
 
         <span class="attr">#[rstest]
@@ -4038,7 +4023,7 @@
             <span class="attr">#[case] </span>constraints: <span class="kw-2">&amp;</span>[Constraint],
             <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         ) {
-            letters(flex, constraints, width, expected)
+            letters(flex, constraints, width, expected);
         }
 
         <span class="attr">#[rstest]
@@ -4074,7 +4059,7 @@
             <span class="attr">#[case] </span>constraints: <span class="kw-2">&amp;</span>[Constraint],
             <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         ) {
-            letters(flex, constraints, width, expected)
+            letters(flex, constraints, width, expected);
         }
 
         <span class="attr">#[rstest] </span><span class="comment">// flex, width, lengths, expected
@@ -4207,7 +4192,7 @@
             <span class="attr">#[case] </span>constraints: <span class="kw-2">&amp;</span>[Constraint],
             <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         ) {
-            letters(flex, constraints, width, expected)
+            letters(flex, constraints, width, expected);
         }
 
         <span class="attr">#[rstest]
@@ -4244,7 +4229,7 @@
             <span class="attr">#[case] </span>constraints: <span class="kw-2">&amp;</span>[Constraint],
             <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         ) {
-            letters(flex, constraints, width, expected)
+            letters(flex, constraints, width, expected);
         }
 
         <span class="attr">#[rstest]
@@ -4281,7 +4266,7 @@
             <span class="attr">#[case] </span>constraints: <span class="kw-2">&amp;</span>[Constraint],
             <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         ) {
-            letters(flex, constraints, width, expected)
+            letters(flex, constraints, width, expected);
         }
 
         <span class="attr">#[rstest]
@@ -4384,7 +4369,7 @@
             <span class="attr">#[case] </span>constraints: <span class="kw-2">&amp;</span>[Constraint],
             <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         ) {
-            letters(flex, constraints, width, expected)
+            letters(flex, constraints, width, expected);
         }
 
         <span class="attr">#[rstest]
@@ -4421,7 +4406,7 @@
             <span class="attr">#[case] </span>constraints: <span class="kw-2">&amp;</span>[Constraint],
             <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         ) {
-            letters(flex, constraints, width, expected)
+            letters(flex, constraints, width, expected);
         }
 
         <span class="attr">#[rstest]
@@ -4458,7 +4443,7 @@
             <span class="attr">#[case] </span>constraints: <span class="kw-2">&amp;</span>[Constraint],
             <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         ) {
-            letters(flex, constraints, width, expected)
+            letters(flex, constraints, width, expected);
         }
 
         <span class="attr">#[test]
@@ -4573,7 +4558,6 @@
                 .flex(Flex::Legacy)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| r.width)
                 .collect::&lt;Vec&lt;u16&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4593,7 +4577,6 @@
                 .flex(Flex::Start)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| (r.x, r.width))
                 .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4625,7 +4608,6 @@
                 .flex(Flex::Legacy)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| r.width)
                 .collect::&lt;Vec&lt;u16&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4656,7 +4638,6 @@
                 .flex(Flex::Start)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| r.width)
                 .collect::&lt;Vec&lt;u16&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4666,7 +4647,6 @@
                 .flex(Flex::Center)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| r.width)
                 .collect::&lt;Vec&lt;u16&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4676,7 +4656,6 @@
                 .flex(Flex::End)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| r.width)
                 .collect::&lt;Vec&lt;u16&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4686,7 +4665,6 @@
                 .flex(Flex::SpaceAround)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| r.width)
                 .collect::&lt;Vec&lt;u16&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4696,7 +4674,6 @@
                 .flex(Flex::SpaceBetween)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| r.width)
                 .collect::&lt;Vec&lt;u16&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4711,7 +4688,6 @@
                 .flex(Flex::Legacy)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| r.width)
                 .collect::&lt;Vec&lt;u16&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4759,7 +4735,6 @@
                 .flex(Flex::Legacy)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| r.width)
                 .collect::&lt;Vec&lt;u16&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4777,7 +4752,6 @@
                 .flex(Flex::Legacy)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| r.width)
                 .collect::&lt;Vec&lt;u16&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4796,7 +4770,6 @@
                 .flex(Flex::Legacy)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| r.width)
                 .collect::&lt;Vec&lt;u16&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4861,7 +4834,6 @@
                 .flex(flex)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| (r.x, r.width))
                 .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4920,7 +4892,6 @@
                 .flex(Flex::Legacy)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| (r.x, r.width))
                 .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);
@@ -4945,7 +4916,6 @@
                 .flex(flex)
                 .split(rect)
                 .iter()
-                .cloned()
                 .map(|r| (r.x, r.width))
                 .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
             <span class="macro">assert_eq!</span>(expected, r);

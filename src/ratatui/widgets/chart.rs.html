@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/widgets/chart.rs`."><title>chart.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/widgets/chart.rs`."><title>chart.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1539,16 +1539,26 @@
 <a href="#1537" id="1537">1537</a>
 <a href="#1538" id="1538">1538</a>
 <a href="#1539" id="1539">1539</a>
+<a href="#1540" id="1540">1540</a>
+<a href="#1541" id="1541">1541</a>
+<a href="#1542" id="1542">1542</a>
+<a href="#1543" id="1543">1543</a>
+<a href="#1544" id="1544">1544</a>
+<a href="#1545" id="1545">1545</a>
+<a href="#1546" id="1546">1546</a>
+<a href="#1547" id="1547">1547</a>
+<a href="#1548" id="1548">1548</a>
+<a href="#1549" id="1549">1549</a>
+<a href="#1550" id="1550">1550</a>
+<a href="#1551" id="1551">1551</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::max;
 
 <span class="kw">use </span>strum::{Display, EnumString};
 <span class="kw">use </span>unicode_width::UnicodeWidthStr;
 
-<span class="kw">use </span><span class="kw">super</span>::block::BlockExt;
 <span class="kw">use crate</span>::{
     layout::Flex,
     prelude::<span class="kw-2">*</span>,
-    symbols,
     widgets::{
         canvas::{Canvas, Line <span class="kw">as </span>CanvasLine, Points},
         Block, Borders,
@@ -1597,8 +1607,8 @@
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>title&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, title: T) -&gt; Axis&lt;<span class="lifetime">'a</span>&gt;
-    <span class="kw">where
+    </span><span class="kw">pub fn </span>title&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, title: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>T: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">self</span>.title = <span class="prelude-val">Some</span>(title.into());
@@ -1611,7 +1621,7 @@
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>bounds(<span class="kw-2">mut </span><span class="self">self</span>, bounds: [f64; <span class="number">2</span>]) -&gt; Axis&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>bounds(<span class="kw-2">mut </span><span class="self">self</span>, bounds: [f64; <span class="number">2</span>]) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.bounds = bounds;
         <span class="self">self
     </span>}
@@ -1639,7 +1649,7 @@
     ///         .labels(vec!["0".bold(), "25".into(), "50".bold()]);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>labels(<span class="kw-2">mut </span><span class="self">self</span>, labels: Vec&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; Axis&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>labels(<span class="kw-2">mut </span><span class="self">self</span>, labels: Vec&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.labels = <span class="prelude-val">Some</span>(labels);
         <span class="self">self
     </span>}
@@ -1661,7 +1671,7 @@
     /// let axis = Axis::default().red();
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; Axis&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.style = style.into();
         <span class="self">self
     </span>}
@@ -1674,7 +1684,7 @@
     ///
     /// On the X axis, this parameter only affects the first label.
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>labels_alignment(<span class="kw-2">mut </span><span class="self">self</span>, alignment: Alignment) -&gt; Axis&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>labels_alignment(<span class="kw-2">mut </span><span class="self">self</span>, alignment: Alignment) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.labels_alignment = alignment;
         <span class="self">self
     </span>}
@@ -1719,14 +1729,14 @@
 
 <span class="kw">impl </span>LegendPosition {
     <span class="kw">fn </span>layout(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="self">self</span>,
         area: Rect,
         legend_width: u16,
         legend_height: u16,
         x_title_width: u16,
         y_title_width: u16,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;Rect&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>height_margin = (area.height - legend_height) <span class="kw">as </span>i32;
+        <span class="kw">let </span><span class="kw-2">mut </span>height_margin = i32::from(area.height - legend_height);
         <span class="kw">if </span>x_title_width != <span class="number">0 </span>{
             height_margin -= <span class="number">1</span>;
         }
@@ -1863,8 +1873,8 @@
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>name&lt;S&gt;(<span class="kw-2">mut </span><span class="self">self</span>, name: S) -&gt; Dataset&lt;<span class="lifetime">'a</span>&gt;
-    <span class="kw">where
+    </span><span class="kw">pub fn </span>name&lt;S&gt;(<span class="kw-2">mut </span><span class="self">self</span>, name: S) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>S: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">self</span>.name = <span class="prelude-val">Some</span>(name.into());
@@ -1873,7 +1883,7 @@
 
     <span class="doccomment">/// Sets the data points of this dataset
     ///
-    /// Points will then either be rendered as scrattered points or with lines between them
+    /// Points will then either be rendered as scattered points or with lines between them
     /// depending on [`Dataset::graph_type`].
     ///
     /// Data consist in an array of `f64` tuples (`(f64, f64)`), the first element being X and the
@@ -1882,7 +1892,7 @@
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>data(<span class="kw-2">mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(f64, f64)]) -&gt; Dataset&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>data(<span class="kw-2">mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(f64, f64)]) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.data = data;
         <span class="self">self
     </span>}
@@ -1890,14 +1900,14 @@
     <span class="doccomment">/// Sets the kind of character to use to display this dataset
     ///
     /// You can use dots (`•`), blocks (`█`), bars (`▄`), braille (`⠓`, `⣇`, `⣿`) or half-blocks
-    /// (`█`, `▄`, and `▀`). See [symbols::Marker] for more details.
+    /// (`█`, `▄`, and `▀`). See [`symbols::Marker`] for more details.
     ///
     /// Note [`Marker::Braille`](symbols::Marker::Braille) requires a font that supports Unicode
     /// Braille Patterns.
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>marker(<span class="kw-2">mut </span><span class="self">self</span>, marker: symbols::Marker) -&gt; Dataset&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>marker(<span class="kw-2">mut </span><span class="self">self</span>, marker: symbols::Marker) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.marker = marker;
         <span class="self">self
     </span>}
@@ -1910,7 +1920,7 @@
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>graph_type(<span class="kw-2">mut </span><span class="self">self</span>, graph_type: GraphType) -&gt; Dataset&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>graph_type(<span class="kw-2">mut </span><span class="self">self</span>, graph_type: GraphType) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.graph_type = graph_type;
         <span class="self">self
     </span>}
@@ -1935,7 +1945,7 @@
     /// let dataset = Dataset::default().red();
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; Dataset&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.style = style.into();
         <span class="self">self
     </span>}
@@ -1943,7 +1953,6 @@
 
 <span class="doccomment">/// A container that holds all the infos about where to display each elements of the chart (axis,
 /// labels, legend, ...).
-</span><span class="attr">#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
 </span><span class="kw">struct </span>ChartLayout {
     <span class="doccomment">/// Location of the title of the x axis
     </span>title_x: <span class="prelude-ty">Option</span>&lt;(u16, u16)&gt;,
@@ -2037,7 +2046,7 @@
     </span>style: Style,
     <span class="doccomment">/// Constraints used to determine whether the legend should be shown or not
     </span>hidden_legend_constraints: (Constraint, Constraint),
-    <span class="doccomment">/// The position detnermine where the legenth is shown or hide regaurdless of
+    <span class="doccomment">/// The position determine where the length is shown or hide regardless of
     /// `hidden_legend_constraints`
     </span>legend_position: <span class="prelude-ty">Option</span>&lt;LegendPosition&gt;,
 }
@@ -2068,8 +2077,8 @@
     ///     Dataset::default().data(&amp;data_points2),
     /// ]);
     /// ```
-    </span><span class="kw">pub fn </span>new(datasets: Vec&lt;Dataset&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; Chart&lt;<span class="lifetime">'a</span>&gt; {
-        Chart {
+    </span><span class="kw">pub fn </span>new(datasets: Vec&lt;Dataset&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
             block: <span class="prelude-val">None</span>,
             x_axis: Axis::default(),
             y_axis: Axis::default(),
@@ -2084,7 +2093,7 @@
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">'a</span>&gt;) -&gt; Chart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.block = <span class="prelude-val">Some</span>(block);
         <span class="self">self
     </span>}
@@ -2098,7 +2107,7 @@
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; Chart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.style = style.into();
         <span class="self">self
     </span>}
@@ -2121,7 +2130,7 @@
     /// );
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>x_axis(<span class="kw-2">mut </span><span class="self">self</span>, axis: Axis&lt;<span class="lifetime">'a</span>&gt;) -&gt; Chart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>x_axis(<span class="kw-2">mut </span><span class="self">self</span>, axis: Axis&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.x_axis = axis;
         <span class="self">self
     </span>}
@@ -2144,7 +2153,7 @@
     /// );
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>y_axis(<span class="kw-2">mut </span><span class="self">self</span>, axis: Axis&lt;<span class="lifetime">'a</span>&gt;) -&gt; Chart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>y_axis(<span class="kw-2">mut </span><span class="self">self</span>, axis: Axis&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.y_axis = axis;
         <span class="self">self
     </span>}
@@ -2180,7 +2189,7 @@
     /// let chart = Chart::new(vec![]).hidden_legend_constraints(constraints);
     /// ```
     ///
-    /// Always hide the legend. Note this can be accomplished more exclicitely by passing `None` to
+    /// Always hide the legend. Note this can be accomplished more explicitly by passing `None` to
     /// [`Chart::legend_position`].
     ///
     /// ```
@@ -2189,7 +2198,10 @@
     /// let chart = Chart::new(vec![]).hidden_legend_constraints(constraints);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>hidden_legend_constraints(<span class="kw-2">mut </span><span class="self">self</span>, constraints: (Constraint, Constraint)) -&gt; Chart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>hidden_legend_constraints(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        constraints: (Constraint, Constraint),
+    ) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.hidden_legend_constraints = constraints;
         <span class="self">self
     </span>}
@@ -2224,57 +2236,70 @@
     /// let chart = Chart::new(vec![]).legend_position(None);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>legend_position(<span class="kw-2">mut </span><span class="self">self</span>, position: <span class="prelude-ty">Option</span>&lt;LegendPosition&gt;) -&gt; Chart&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>legend_position(<span class="kw-2">mut </span><span class="self">self</span>, position: <span class="prelude-ty">Option</span>&lt;LegendPosition&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.legend_position = position;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Compute the internal layout of the chart given the area. If the area is too small some
     /// elements may be automatically hidden
-    </span><span class="kw">fn </span>layout(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect) -&gt; ChartLayout {
-        <span class="kw">let </span><span class="kw-2">mut </span>layout = ChartLayout::default();
+    </span><span class="kw">fn </span>layout(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect) -&gt; <span class="prelude-ty">Option</span>&lt;ChartLayout&gt; {
         <span class="kw">if </span>area.height == <span class="number">0 </span>|| area.width == <span class="number">0 </span>{
-            <span class="kw">return </span>layout;
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
         <span class="kw">let </span><span class="kw-2">mut </span>x = area.left();
         <span class="kw">let </span><span class="kw-2">mut </span>y = area.bottom() - <span class="number">1</span>;
 
+        <span class="kw">let </span><span class="kw-2">mut </span>label_x = <span class="prelude-val">None</span>;
         <span class="kw">if </span><span class="self">self</span>.x_axis.labels.is_some() &amp;&amp; y &gt; area.top() {
-            layout.label_x = <span class="prelude-val">Some</span>(y);
+            label_x = <span class="prelude-val">Some</span>(y);
             y -= <span class="number">1</span>;
         }
 
-        layout.label_y = <span class="self">self</span>.y_axis.labels.as_ref().and(<span class="prelude-val">Some</span>(x));
+        <span class="kw">let </span>label_y = <span class="self">self</span>.y_axis.labels.as_ref().and(<span class="prelude-val">Some</span>(x));
         x += <span class="self">self</span>.max_width_of_labels_left_of_y_axis(area, <span class="self">self</span>.y_axis.labels.is_some());
 
+        <span class="kw">let </span><span class="kw-2">mut </span>axis_x = <span class="prelude-val">None</span>;
         <span class="kw">if </span><span class="self">self</span>.x_axis.labels.is_some() &amp;&amp; y &gt; area.top() {
-            layout.axis_x = <span class="prelude-val">Some</span>(y);
+            axis_x = <span class="prelude-val">Some</span>(y);
             y -= <span class="number">1</span>;
         }
 
+        <span class="kw">let </span><span class="kw-2">mut </span>axis_y = <span class="prelude-val">None</span>;
         <span class="kw">if </span><span class="self">self</span>.y_axis.labels.is_some() &amp;&amp; x + <span class="number">1 </span>&lt; area.right() {
-            layout.axis_y = <span class="prelude-val">Some</span>(x);
+            axis_y = <span class="prelude-val">Some</span>(x);
             x += <span class="number">1</span>;
         }
 
-        <span class="kw">if </span>x &lt; area.right() &amp;&amp; y &gt; <span class="number">1 </span>{
-            layout.graph_area = Rect::new(x, area.top(), area.right() - x, y - area.top() + <span class="number">1</span>);
-        }
+        <span class="kw">let </span>graph_width = area.right().saturating_sub(x);
+        <span class="kw">let </span>graph_height = y.saturating_sub(area.top()).saturating_add(<span class="number">1</span>);
+        <span class="macro">debug_assert_ne!</span>(
+            graph_width, <span class="number">0</span>,
+            <span class="string">"Axis and labels should have been hidden due to the small area"
+        </span>);
+        <span class="macro">debug_assert_ne!</span>(
+            graph_height, <span class="number">0</span>,
+            <span class="string">"Axis and labels should have been hidden due to the small area"
+        </span>);
+        <span class="kw">let </span>graph_area = Rect::new(x, area.top(), graph_width, graph_height);
 
+        <span class="kw">let </span><span class="kw-2">mut </span>title_x = <span class="prelude-val">None</span>;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>title) = <span class="self">self</span>.x_axis.title {
             <span class="kw">let </span>w = title.width() <span class="kw">as </span>u16;
-            <span class="kw">if </span>w &lt; layout.graph_area.width &amp;&amp; layout.graph_area.height &gt; <span class="number">2 </span>{
-                layout.title_x = <span class="prelude-val">Some</span>((x + layout.graph_area.width - w, y));
+            <span class="kw">if </span>w &lt; graph_area.width &amp;&amp; graph_area.height &gt; <span class="number">2 </span>{
+                title_x = <span class="prelude-val">Some</span>((x + graph_area.width - w, y));
             }
         }
 
+        <span class="kw">let </span><span class="kw-2">mut </span>title_y = <span class="prelude-val">None</span>;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>title) = <span class="self">self</span>.y_axis.title {
             <span class="kw">let </span>w = title.width() <span class="kw">as </span>u16;
-            <span class="kw">if </span>w + <span class="number">1 </span>&lt; layout.graph_area.width &amp;&amp; layout.graph_area.height &gt; <span class="number">2 </span>{
-                layout.title_y = <span class="prelude-val">Some</span>((x, area.top()));
+            <span class="kw">if </span>w + <span class="number">1 </span>&lt; graph_area.width &amp;&amp; graph_area.height &gt; <span class="number">2 </span>{
+                title_y = <span class="prelude-val">Some</span>((x, area.top()));
             }
         }
 
+        <span class="kw">let </span><span class="kw-2">mut </span>legend_area = <span class="prelude-val">None</span>;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(legend_position) = <span class="self">self</span>.legend_position {
             <span class="kw">let </span>legends = <span class="self">self
                 </span>.datasets
@@ -2287,27 +2312,25 @@
 
                 <span class="kw">let </span>[max_legend_width] = Layout::horizontal([<span class="self">self</span>.hidden_legend_constraints.<span class="number">0</span>])
                     .flex(Flex::Start)
-                    .areas(layout.graph_area);
+                    .areas(graph_area);
 
                 <span class="kw">let </span>[max_legend_height] = Layout::vertical([<span class="self">self</span>.hidden_legend_constraints.<span class="number">1</span>])
                     .flex(Flex::Start)
-                    .areas(layout.graph_area);
+                    .areas(graph_area);
 
                 <span class="kw">if </span>inner_width &gt; <span class="number">0
                     </span>&amp;&amp; legend_width &lt;= max_legend_width.width
                     &amp;&amp; legend_height &lt;= max_legend_height.height
                 {
-                    layout.legend_area = legend_position.layout(
-                        layout.graph_area,
+                    legend_area = legend_position.layout(
+                        graph_area,
                         legend_width,
                         legend_height,
-                        layout
-                            .title_x
+                        title_x
                             .and(<span class="self">self</span>.x_axis.title.as_ref())
                             .map(|t| t.width() <span class="kw">as </span>u16)
                             .unwrap_or_default(),
-                        layout
-                            .title_y
+                        title_y
                             .and(<span class="self">self</span>.y_axis.title.as_ref())
                             .map(|t| t.width() <span class="kw">as </span>u16)
                             .unwrap_or_default(),
@@ -2315,7 +2338,16 @@
                 }
             }
         }
-        layout
+        <span class="prelude-val">Some</span>(ChartLayout {
+            title_x,
+            title_y,
+            label_x,
+            label_y,
+            axis_x,
+            axis_y,
+            legend_area,
+            graph_area,
+        })
     }
 
     <span class="kw">fn </span>max_width_of_labels_left_of_y_axis(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, has_y_axis: bool) -&gt; u16 {
@@ -2464,25 +2496,21 @@
 }
 
 <span class="kw">impl </span>WidgetRef <span class="kw">for </span>Chart&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="kw">fn </span>render_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
+    <span class="attr">#[allow(clippy::too_many_lines)]
+    </span><span class="kw">fn </span>render_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         buf.set_style(area, <span class="self">self</span>.style);
 
         <span class="self">self</span>.block.render_ref(area, buf);
         <span class="kw">let </span>chart_area = <span class="self">self</span>.block.inner_if_some(area);
-        <span class="kw">if </span>chart_area.is_empty() {
+        <span class="kw">let </span><span class="prelude-val">Some</span>(layout) = <span class="self">self</span>.layout(chart_area) <span class="kw">else </span>{
             <span class="kw">return</span>;
-        }
+        };
+        <span class="kw">let </span>graph_area = layout.graph_area;
 
         <span class="comment">// Sample the style of the entire widget. This sample will be used to reset the style of
         // the cells that are part of the components put on top of the grah area (i.e legend and
         // axis names).
         </span><span class="kw">let </span>original_style = buf.get(area.left(), area.top()).style();
-
-        <span class="kw">let </span>layout = <span class="self">self</span>.layout(chart_area);
-        <span class="kw">let </span>graph_area = layout.graph_area;
-        <span class="kw">if </span>graph_area.width &lt; <span class="number">1 </span>|| graph_area.height &lt; <span class="number">1 </span>{
-            <span class="kw">return</span>;
-        }
 
         <span class="self">self</span>.render_x_labels(buf, <span class="kw-2">&amp;</span>layout, chart_area, graph_area);
         <span class="self">self</span>.render_y_labels(buf, <span class="kw-2">&amp;</span>layout, chart_area, graph_area);
@@ -2522,7 +2550,7 @@
                         coords: dataset.data,
                         color: dataset.style.fg.unwrap_or(Color::Reset),
                     });
-                    <span class="kw">if let </span>GraphType::Line = dataset.graph_type {
+                    <span class="kw">if </span>dataset.graph_type == GraphType::Line {
                         <span class="kw">for </span>data <span class="kw">in </span>dataset.data.windows(<span class="number">2</span>) {
                             ctx.draw(<span class="kw-2">&amp;</span>CanvasLine {
                                 x1: data[<span class="number">0</span>].<span class="number">0</span>,
@@ -2601,7 +2629,7 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>Axis&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">type </span>Item = Axis&lt;<span class="lifetime">'a</span>&gt;;
+    <span class="kw">type </span>Item = <span class="self">Self</span>;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
@@ -2613,7 +2641,7 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>Dataset&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">type </span>Item = Dataset&lt;<span class="lifetime">'a</span>&gt;;
+    <span class="kw">type </span>Item = <span class="self">Self</span>;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
@@ -2625,7 +2653,7 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>Chart&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">type </span>Item = Chart&lt;<span class="lifetime">'a</span>&gt;;
+    <span class="kw">type </span>Item = <span class="self">Self</span>;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
@@ -2641,10 +2669,7 @@
     <span class="kw">use </span>strum::ParseError;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use crate</span>::{
-        assert_buffer_eq,
-        style::{Modifier, Stylize},
-    };
+    <span class="kw">use </span><span class="kw">crate</span>::assert_buffer_eq;
 
     <span class="kw">struct </span>LegendTestCase {
         chart_area: Rect,
@@ -2678,7 +2703,7 @@
                 .x_axis(Axis::default().title(<span class="string">"X axis"</span>))
                 .y_axis(Axis::default().title(<span class="string">"Y axis"</span>))
                 .hidden_legend_constraints(case.hidden_legend_constraints);
-            <span class="kw">let </span>layout = chart.layout(case.chart_area);
+            <span class="kw">let </span>layout = chart.layout(case.chart_area).unwrap();
             <span class="macro">assert_eq!</span>(layout.legend_area, case.legend_area);
         }
     }
@@ -2692,7 +2717,7 @@
                 .bg(Color::White)
                 .add_modifier(Modifier::BOLD)
                 .remove_modifier(Modifier::DIM)
-        )
+        );
     }
 
     <span class="attr">#[test]
@@ -2704,7 +2729,7 @@
                 .bg(Color::White)
                 .add_modifier(Modifier::BOLD)
                 .remove_modifier(Modifier::DIM)
-        )
+        );
     }
 
     <span class="attr">#[test]
@@ -2716,7 +2741,7 @@
                 .bg(Color::White)
                 .add_modifier(Modifier::BOLD)
                 .remove_modifier(Modifier::DIM)
-        )
+        );
     }
 
     <span class="attr">#[test]
@@ -2740,7 +2765,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="number">4</span>));
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
 
-        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" "</span>.repeat(<span class="number">8</span>); <span class="number">4</span>]))
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" "</span>.repeat(<span class="number">8</span>); <span class="number">4</span>]));
     }
 
     <span class="attr">#[test]
@@ -2750,7 +2775,7 @@
         </span><span class="kw">let </span>data_unnamed = Dataset::default(); <span class="comment">// must not occupy a row in legend
         </span><span class="kw">let </span>widget = Chart::new(<span class="macro">vec!</span>[data_named_1, data_unnamed, data_named_2]);
         <span class="kw">let </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">50</span>, <span class="number">25</span>));
-        <span class="kw">let </span>layout = widget.layout(buffer.area);
+        <span class="kw">let </span>layout = widget.layout(buffer.area).unwrap();
 
         <span class="macro">assert!</span>(layout.legend_area.is_some());
         <span class="macro">assert_eq!</span>(layout.legend_area.unwrap().height, <span class="number">4</span>); <span class="comment">// 2 for borders, 2 for rows
@@ -2761,7 +2786,7 @@
         <span class="kw">let </span>dataset = Dataset::default();
         <span class="kw">let </span>widget = Chart::new(<span class="macro">vec!</span>[dataset; <span class="number">3</span>]);
         <span class="kw">let </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">50</span>, <span class="number">25</span>));
-        <span class="kw">let </span>layout = widget.layout(buffer.area);
+        <span class="kw">let </span>layout = widget.layout(buffer.area).unwrap();
 
         <span class="macro">assert!</span>(layout.legend_area.is_none());
     }
@@ -2896,7 +2921,7 @@
 
         <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"┌────┐"</span>, <span class="string">"│Data│"</span>, <span class="string">"└────┘"</span>]);
 
-        [
+        <span class="kw">for </span>position <span class="kw">in </span>[
             LegendPosition::TopLeft,
             LegendPosition::Top,
             LegendPosition::TopRight,
@@ -2905,17 +2930,16 @@
             LegendPosition::Bottom,
             LegendPosition::BottomLeft,
             LegendPosition::BottomRight,
-        ]
-        .iter()
-        .for_each(|<span class="kw-2">&amp;</span>position| {
+        ] {
             <span class="kw">let </span>chart = chart.clone().legend_position(<span class="prelude-val">Some</span>(position));
             buffer.reset();
             chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
             <span class="macro">assert_eq!</span>(buffer, expected);
-        });
+        }
     }
 
-    <span class="attr">#[test]
+    <span class="attr">#[allow(clippy::too_many_lines)]
+    #[test]
     </span><span class="kw">fn </span>test_legend_of_chart_have_odd_margin_size() {
         <span class="kw">let </span>name = <span class="string">"Data"</span>;
         <span class="kw">let </span>base_chart = Chart::new(<span class="macro">vec!</span>[Dataset::default().name(name)])

@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Fundamental properties of objects tied to the Python interpreter."><title>pyo3::marker - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="pyo3" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../pyo3/index.html">pyo3</a><span class="version">0.19.2</span></h2></div><h2 class="location"><a href="#">Module marker</a></h2><div class="sidebar-elems"><section><ul class="block"><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li></ul></section><h2><a href="../index.html">In crate pyo3</a></h2></div></nav><div class="sidebar-resizer"></div>
+    <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../pyo3/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Module <a href="../index.html">pyo3</a>::<wbr><a class="mod" href="#">marker</a><button id="copy-path" title="Copy item path to clipboard"><img src="../../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../../src/pyo3/marker.rs.html#1-1169">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Fundamental properties of objects tied to the Python interpreter.</p>
+<p>The Python interpreter is not threadsafe. To protect the Python interpreter in multithreaded
+scenarios there is a global lock, the <em>global interpreter lock</em> (hereafter referred to as <em>GIL</em>)
+that must be held to safely interact with Python objects. This is why in PyO3 when you acquire
+the GIL you get a <a href="struct.Python.html" title="struct pyo3::marker::Python"><code>Python</code></a> marker token that carries the <em>lifetime</em> of holding the GIL and all
+borrowed references to Python objects carry this lifetime as well. This will statically ensure
+that you can never use Python objects after dropping the lock - if you mess this up it will be
+caught at compile time and your program will fail to compile.</p>
+<p>It also supports this pattern that many extension modules employ:</p>
+<ul>
+<li>Drop the GIL, so that other Python threads can acquire it and make progress themselves</li>
+<li>Do something independently of the Python interpreter, like IO, a long running calculation or
+awaiting a future</li>
+<li>Once that is done, reacquire the GIL</li>
+</ul>
+<p>That API is provided by <a href="struct.Python.html#method.allow_threads" title="method pyo3::marker::Python::allow_threads"><code>Python::allow_threads</code></a> and enforced via the <a href="trait.Ungil.html" title="trait pyo3::marker::Ungil"><code>Ungil</code></a> bound on the
+closure and the return type. This is done by relying on the <a href="https://doc.rust-lang.org/1.77.2/core/marker/trait.Send.html" title="trait core::marker::Send"><code>Send</code></a> auto trait. <code>Ungil</code> is
+defined as the following:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">pub unsafe trait </span>Ungil {}
+
+<span class="kw">unsafe impl</span>&lt;T: Send&gt; Ungil <span class="kw">for </span>T {}</code></pre></div>
+<p>We piggy-back off the <code>Send</code> auto trait because it is not possible to implement custom auto
+traits on stable Rust. This is the solution which enables it for as many types as possible while
+making the API usable.</p>
+<p>In practice this API works quite well, but it comes with some drawbacks:</p>
+<h3 id="drawbacks"><a class="doc-anchor" href="#drawbacks">§</a>Drawbacks</h3>
+<p>There is no reason to prevent <code>!Send</code> types like <a href="https://doc.rust-lang.org/1.77.2/alloc/rc/struct.Rc.html" title="struct alloc::rc::Rc"><code>Rc</code></a> from crossing the closure. After all,
+<a href="struct.Python.html#method.allow_threads" title="method pyo3::marker::Python::allow_threads"><code>Python::allow_threads</code></a> just lets other Python threads run - it does not itself launch a new
+thread.</p>
+
+<div class="example-wrap compile_fail"><a href="#" class="tooltip" title="This example deliberately fails to compile">ⓘ</a><pre class="rust rust-example-rendered"><code><span class="kw">use </span>pyo3::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::rc::Rc;
+
+<span class="kw">fn </span>main() {
+    Python::with_gil(|py| {
+        <span class="kw">let </span>rc = Rc::new(<span class="number">5</span>);
+
+        py.allow_threads(|| {
+            <span class="comment">// This would actually be fine...
+            </span><span class="macro">println!</span>(<span class="string">"{:?}"</span>, <span class="kw-2">*</span>rc);
+        });
+    });
+}</code></pre></div>
+<p>Because we are using <code>Send</code> for something it’s not quite meant for, other code that
+(correctly) upholds the invariants of <a href="https://doc.rust-lang.org/1.77.2/core/marker/trait.Send.html" title="trait core::marker::Send"><code>Send</code></a> can cause problems.</p>
+<p><a href="https://docs.rs/send_wrapper/latest/send_wrapper/struct.SendWrapper.html"><code>SendWrapper</code></a> is one of those. Per its documentation:</p>
+<blockquote>
+<p>A wrapper which allows you to move around non-Send-types between threads, as long as you
+access the contained value only from within the original thread and make sure that it is
+dropped from within the original thread.</p>
+</blockquote>
+<p>This will “work” to smuggle Python references across the closure, because we’re not actually
+doing anything with threads:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>pyo3::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>pyo3::types::PyString;
+<span class="kw">use </span>send_wrapper::SendWrapper;
+
+Python::with_gil(|py| {
+    <span class="kw">let </span>string = PyString::new(py, <span class="string">"foo"</span>);
+
+    <span class="kw">let </span>wrapped = SendWrapper::new(string);
+
+    py.allow_threads(|| {
+        <span class="comment">// 💥 Unsound! 💥
+        </span><span class="kw">let </span>smuggled: <span class="kw-2">&amp;</span>PyString = <span class="kw-2">*</span>wrapped;
+        <span class="macro">println!</span>(<span class="string">"{:?}"</span>, smuggled);
+    });
+});</code></pre></div>
+<p>For now the answer to that is “don’t do that”.</p>
+<h2 id="a-proper-implementation-using-an-auto-trait"><a class="doc-anchor" href="#a-proper-implementation-using-an-auto-trait">§</a>A proper implementation using an auto trait</h2>
+<p>However on nightly Rust and when PyO3’s <code>nightly</code> feature is
+enabled, <code>Ungil</code> is defined as the following:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#![feature(auto_traits, negative_impls)]
+
+</span><span class="kw">pub unsafe </span>auto <span class="kw">trait </span>Ungil {}
+
+<span class="comment">// It is unimplemented for the `Python` struct and Python objects.
+</span><span class="kw">impl </span>!Ungil <span class="kw">for </span>Python&lt;<span class="lifetime">'_</span>&gt; {}
+<span class="kw">impl </span>!Ungil <span class="kw">for </span>ffi::PyObject {}
+
+<span class="comment">// `Py` wraps it in  a safe api, so this is OK
+</span><span class="kw">unsafe impl</span>&lt;T&gt; Ungil <span class="kw">for </span>Py&lt;T&gt; {}</code></pre></div>
+<p>With this feature enabled, the above two examples will start working and not working, respectively.</p>
+</div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.Python.html" title="struct pyo3::marker::Python">Python</a></div><div class="desc docblock-short">A marker token that represents holding the GIL.</div></li></ul><h2 id="traits" class="section-header">Traits<a href="#traits" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="trait" href="trait.Ungil.html" title="trait pyo3::marker::Ungil">Ungil</a></div><div class="desc docblock-short">Types that are safe to access while the GIL is not held.</div></li></ul></section></div></main></body></html>

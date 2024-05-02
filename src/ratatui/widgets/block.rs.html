@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/widgets/block.rs`."><title>block.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/widgets/block.rs`."><title>block.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1524,6 +1524,7 @@
 <a href="#1522" id="1522">1522</a>
 <a href="#1523" id="1523">1523</a>
 <a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Elements related to the `Block` base widget.
 //!
 //! This holds everything needed to display and configure a [`Block`].
@@ -1553,7 +1554,7 @@
 /// both centered and non-centered titles are rendered, the centered space is calculated based on
 /// the full width of the block, rather than the leftover width.
 ///
-/// Titles are not rendered in the corners of the block unless there is no border on that edge.  
+/// Titles are not rendered in the corners of the block unless there is no border on that edge.
 /// If the block is too small and multiple titles overlap, the border may get cut off at a corner.
 ///
 /// ```plain
@@ -1700,7 +1701,7 @@
 
     <span class="doccomment">/// Create a new block with [all borders](Borders::ALL) shown
     </span><span class="kw">pub const fn </span>bordered() -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>block = Block::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>block = <span class="self">Self</span>::new();
         block.borders = Borders::ALL;
         block
     }
@@ -1719,7 +1720,7 @@
     /// [spans](crate::text::Span) (`Vec&lt;Span&gt;`).
     ///
     /// By default, the titles will avoid being rendered in the corners of the block but will align
-    /// against the left or right edge of the block if there is no border on that edge.  
+    /// against the left or right edge of the block if there is no border on that edge.
     /// The following demonstrates this behavior, notice the second title is one character off to
     /// the left.
     ///
@@ -1760,8 +1761,9 @@
     /// - [`Block::title_style`]
     /// - [`Block::title_alignment`]
     /// - [`Block::title_position`]
-    </span><span class="kw">pub fn </span>title&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, title: T) -&gt; Block&lt;<span class="lifetime">'a</span>&gt;
-    <span class="kw">where
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>title&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, title: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>T: Into&lt;Title&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">self</span>.titles.push(title.into());
@@ -1831,7 +1833,7 @@
     ///
     /// If a [`Title`] already has a style, the title's style will add on top of this one.
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>title_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; Block&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>title_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.titles_style = style.into();
         <span class="self">self
     </span>}
@@ -1858,7 +1860,7 @@
     ///     .title_alignment(Alignment::Center);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub const fn </span>title_alignment(<span class="kw-2">mut </span><span class="self">self</span>, alignment: Alignment) -&gt; Block&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>title_alignment(<span class="kw-2">mut </span><span class="self">self</span>, alignment: Alignment) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.titles_alignment = alignment;
         <span class="self">self
     </span>}
@@ -1885,7 +1887,7 @@
     ///     .title_position(Position::Bottom);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub const fn </span>title_position(<span class="kw-2">mut </span><span class="self">self</span>, position: Position) -&gt; Block&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>title_position(<span class="kw-2">mut </span><span class="self">self</span>, position: Position) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.titles_position = position;
         <span class="self">self
     </span>}
@@ -1907,7 +1909,7 @@
     ///     .border_style(Style::new().blue());
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>border_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; Block&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>border_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.border_style = style.into();
         <span class="self">self
     </span>}
@@ -1923,7 +1925,7 @@
     ///
     /// This will also apply to the widget inside that block, unless the inner widget is styled.
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; Block&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.style = style.into();
         <span class="self">self
     </span>}
@@ -1946,7 +1948,7 @@
     /// Block::default().borders(Borders::LEFT | Borders::RIGHT);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub const fn </span>borders(<span class="kw-2">mut </span><span class="self">self</span>, flag: Borders) -&gt; Block&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>borders(<span class="kw-2">mut </span><span class="self">self</span>, flag: Borders) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.borders = flag;
         <span class="self">self
     </span>}
@@ -1972,7 +1974,7 @@
     /// // ╰─────╯
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub const fn </span>border_type(<span class="kw-2">mut </span><span class="self">self</span>, border_type: BorderType) -&gt; Block&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>border_type(<span class="kw-2">mut </span><span class="self">self</span>, border_type: BorderType) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.border_set = border_type.to_border_set();
         <span class="self">self
     </span>}
@@ -1991,7 +1993,7 @@
     /// // ║     ║
     /// // ╚═════╝
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub const fn </span>border_set(<span class="kw-2">mut </span><span class="self">self</span>, border_set: border::Set) -&gt; Block&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>border_set(<span class="kw-2">mut </span><span class="self">self</span>, border_set: border::Set) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.border_set = border_set;
         <span class="self">self
     </span>}
@@ -2088,7 +2090,7 @@
     /// // └───────────┘
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub const fn </span>padding(<span class="kw-2">mut </span><span class="self">self</span>, padding: Padding) -&gt; Block&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>padding(<span class="kw-2">mut </span><span class="self">self</span>, padding: Padding) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.padding = padding;
         <span class="self">self
     </span>}
@@ -2096,14 +2098,14 @@
 
 <span class="kw">impl </span>BorderType {
     <span class="doccomment">/// Convert this `BorderType` into the corresponding [`Set`](border::Set) of border symbols.
-    </span><span class="kw">pub const fn </span>border_symbols(border_type: BorderType) -&gt; border::Set {
+    </span><span class="kw">pub const fn </span>border_symbols(border_type: <span class="self">Self</span>) -&gt; border::Set {
         <span class="kw">match </span>border_type {
-            BorderType::Plain =&gt; border::PLAIN,
-            BorderType::Rounded =&gt; border::ROUNDED,
-            BorderType::Double =&gt; border::DOUBLE,
-            BorderType::Thick =&gt; border::THICK,
-            BorderType::QuadrantInside =&gt; border::QUADRANT_INSIDE,
-            BorderType::QuadrantOutside =&gt; border::QUADRANT_OUTSIDE,
+            <span class="self">Self</span>::Plain =&gt; border::PLAIN,
+            <span class="self">Self</span>::Rounded =&gt; border::ROUNDED,
+            <span class="self">Self</span>::Double =&gt; border::DOUBLE,
+            <span class="self">Self</span>::Thick =&gt; border::THICK,
+            <span class="self">Self</span>::QuadrantInside =&gt; border::QUADRANT_INSIDE,
+            <span class="self">Self</span>::QuadrantOutside =&gt; border::QUADRANT_OUTSIDE,
         }
     }
 
@@ -2235,7 +2237,8 @@
     /// Currently (due to the way lines are truncated), the right side of the leftmost title will
     /// be cut off if the block is too small to fit all titles. This is not ideal and should be
     /// the left side of that leftmost that is cut off. This is due to the line being truncated
-    /// incorrectly. See https://github.com/ratatui-org/ratatui/issues/932
+    /// incorrectly. See &lt;https://github.com/ratatui-org/ratatui/issues/932&gt;
+    </span><span class="attr">#[allow(clippy::similar_names)]
     </span><span class="kw">fn </span>render_right_titles(<span class="kw-2">&amp;</span><span class="self">self</span>, position: Position, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         <span class="kw">let </span>titles = <span class="self">self</span>.filtered_titles(position, Alignment::Right);
         <span class="kw">let </span><span class="kw-2">mut </span>titles_area = <span class="self">self</span>.titles_area(area, position);
@@ -2270,6 +2273,7 @@
     /// Currently this method aligns the titles to the left inside a centered area. This is not
     /// ideal and should be fixed in the future to align the titles to the center of the block and
     /// truncate both sides of the titles if the block is too small to fit all titles.
+    </span><span class="attr">#[allow(clippy::similar_names)]
     </span><span class="kw">fn </span>render_center_titles(<span class="kw-2">&amp;</span><span class="self">self</span>, position: Position, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         <span class="kw">let </span>titles = <span class="self">self
             </span>.filtered_titles(position, Alignment::Center)
@@ -2304,6 +2308,7 @@
     }
 
     <span class="doccomment">/// Render titles aligned to the left of the block
+    </span><span class="attr">#[allow(clippy::similar_names)]
     </span><span class="kw">fn </span>render_left_titles(<span class="kw-2">&amp;</span><span class="self">self</span>, position: Position, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         <span class="kw">let </span>titles = <span class="self">self</span>.filtered_titles(position, Alignment::Left);
         <span class="kw">let </span><span class="kw-2">mut </span>titles_area = <span class="self">self</span>.titles_area(area, position);
@@ -2375,7 +2380,7 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>Block&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">type </span>Item = Block&lt;<span class="lifetime">'a</span>&gt;;
+    <span class="kw">type </span>Item = <span class="self">Self</span>;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
@@ -2391,11 +2396,7 @@
     <span class="kw">use </span>strum::ParseError;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use crate</span>::{
-        assert_buffer_eq,
-        layout::{Alignment, Rect},
-        style::{Color, Modifier, Stylize},
-    };
+    <span class="kw">use </span><span class="kw">crate</span>::assert_buffer_eq;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>create_with_all_borders() {
@@ -2403,7 +2404,8 @@
         <span class="macro">assert_eq!</span>(block.borders, Borders::all());
     }
 
-    <span class="attr">#[test]
+    <span class="attr">#[allow(clippy::too_many_lines)]
+    #[test]
     </span><span class="kw">fn </span>inner_takes_into_account_the_borders() {
         <span class="comment">// No borders
         </span><span class="macro">assert_eq!</span>(
@@ -2633,7 +2635,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>border_type_can_be_const() {
+    </span><span class="kw">const fn </span>border_type_can_be_const() {
         <span class="kw">const </span>_PLAIN: border::Set = BorderType::border_symbols(BorderType::Plain);
     }
 
@@ -2652,11 +2654,11 @@
                 style: Style::new(),
                 padding: Padding::zero(),
             }
-        )
+        );
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>block_can_be_const() {
+    </span><span class="kw">const fn </span>block_can_be_const() {
         <span class="kw">const </span>_DEFAULT_STYLE: Style = Style::new();
         <span class="kw">const </span>_DEFAULT_PADDING: Padding = Padding::uniform(<span class="number">1</span>);
         <span class="kw">const </span>_DEFAULT_BLOCK: Block = Block::new()
@@ -2670,7 +2672,7 @@
             .padding(_DEFAULT_PADDING);
     }
 
-    <span class="doccomment">/// This test ensures that we have some coverage on the Style::from() implementations
+    <span class="doccomment">/// This test ensures that we have some coverage on the [`Style::from()`] implementations
     </span><span class="attr">#[test]
     </span><span class="kw">fn </span>block_style() {
         <span class="comment">// nominal style
@@ -2724,14 +2726,14 @@
                 .bg(Color::White)
                 .add_modifier(Modifier::BOLD)
                 .remove_modifier(Modifier::DIM)
-        )
+        );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>title() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
         <span class="kw">use </span>Alignment::<span class="kw-2">*</span>;
         <span class="kw">use </span>Position::<span class="kw-2">*</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
         Block::bordered()
             .title(Title::from(<span class="string">"A"</span>).position(Top).alignment(Left))
             .title(Title::from(<span class="string">"B"</span>).position(Top).alignment(Center))
@@ -2805,7 +2807,7 @@
         }
     }
 
-    <span class="doccomment">/// This is a regression test for bug https://github.com/ratatui-org/ratatui/issues/929
+    <span class="doccomment">/// This is a regression test for bug &lt;https://github.com/ratatui-org/ratatui/issues/929&gt;
     </span><span class="attr">#[test]
     </span><span class="kw">fn </span>render_right_aligned_empty_title() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/threads/event_builder.rs`."><title>event_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_cc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/threads/event_builder.rs`."><title>event_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_cc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../liftof_cc/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -749,6 +749,111 @@
 <a href="#747" id="747">747</a>
 <a href="#748" id="748">748</a>
 <a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::thread;
 <span class="kw">use </span>std::time::{
     Instant,
@@ -768,12 +873,20 @@
     Sender,
 };
 
+<span class="kw">use </span>comfy_table::modifiers::{
+    UTF8_ROUND_CORNERS,
+    UTF8_SOLID_INNER_BORDERS,
+};
+<span class="kw">use </span>comfy_table::presets::UTF8_FULL;
+<span class="kw">use </span>comfy_table::<span class="kw-2">*</span>;
 
-<span class="kw">use </span>tof_dataclasses::events::{MasterTriggerEvent,
-                              TofEvent,
-                              RBEvent};
+<span class="kw">use </span>tof_dataclasses::events::{
+    MasterTriggerEvent,
+    TofEvent,
+    RBEvent
+};
+
 <span class="kw">use </span>tof_dataclasses::packets::TofPacket;
-<span class="kw">use </span>tof_dataclasses::manifest::get_dsi_j_ltbch_vs_rbch_map;
 <span class="kw">use </span>tof_dataclasses::threading::ThreadControl;
 
 <span class="comment">//use liftof_lib::heartbeat_printer;
@@ -1078,24 +1191,31 @@
 /// * m_trig_ev      : Receive a `MasterTriggerEvent` over this 
 ///                    channel. The event will be either build 
 ///                    immediatly, or cached. 
-///
-/// * pp_query       : Send request to a paddle_packet cache to send
-///                    Paddle packets with the given event id
-/// * paddle_packets : Receive paddle_packets from a paddle_packet
-///                    cache
-/// * cmd_sender     : Sending tof commands to comander thread. This 
-///                    is needed so that the event builder can request
-///                    paddles from readout boards.
+/// * ev_from_rb     : Receive a number of `RBEvents` over this channel.
+///                    The events here shall be associated with the 
+///                    MasterTriggerEvent
+/// * data_sink      : Send assembled events (and everything else in 
+///                    the form of TofPackets to the data sink/
+/// * mtb_link_map   : Map of MTB Link ID - RB ID. Maybe in the future
+///                    RBs will know their link id themselves?
+///                    This is currently only needed for the build strategy
+///                    "AdaptiveThorough"
 /// * settings       : Configure the event builder
 </span><span class="kw">pub fn </span>event_builder (m_trig_ev      : <span class="kw-2">&amp;</span>Receiver&lt;MasterTriggerEvent&gt;,
                       ev_from_rb     : <span class="kw-2">&amp;</span>Receiver&lt;RBEvent&gt;,
                       data_sink      : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
                       run_id         : u32,
-                      db_path        : String,
+                      mtb_link_map   : HashMap&lt;u8,u8&gt;,
                       <span class="kw-2">mut </span>settings   : TofEventBuilderSettings,
                       thread_control : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;) { 
-  <span class="comment">// debug the number of rb events we have seen 
-  </span><span class="kw">let </span><span class="kw-2">mut </span>seen_rbevents      = HashMap::&lt;u8, usize&gt;::new();
+  <span class="comment">// missing event analysis
+  //let mut event_id_test = Vec::&lt;u32&gt;::new();
+
+
+  // debug the number of rb events we have seen 
+  // in production mode, these features should go away
+  // FIXEM - add debug flags to features
+  </span><span class="kw">let </span><span class="kw-2">mut </span>seen_rbevents = HashMap::&lt;u8, usize&gt;::new();
   <span class="comment">// 10, 12, 37,38, 43, 45 don't exist
   </span><span class="kw">for </span>k <span class="kw">in </span><span class="number">1</span>..<span class="number">47 </span>{
     <span class="kw">if </span>k == <span class="number">10 </span>|| k ==<span class="number">12 </span>|| k == <span class="number">37 </span>|| k == <span class="number">38 </span>|| k == <span class="number">43 </span>|| k == <span class="number">45 </span>{
@@ -1105,28 +1225,35 @@
     }
   }
   <span class="comment">// event caches for assembled events
-  </span><span class="kw">let </span><span class="kw-2">mut </span>event_cache         = HashMap::&lt;u32, TofEvent&gt;::new();
-  <span class="kw">let </span><span class="kw-2">mut </span>event_id_cache      = VecDeque::&lt;u32&gt;::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  <span class="kw">let </span>dsi_map                 = get_dsi_j_ltbch_vs_rbch_map(db_path.as_ref()); 
-  <span class="kw">let </span><span class="kw-2">mut </span>n_received          : usize;
-  <span class="comment">//let mut clear_cache       = 0; // clear cache every 
-  //let mut event_sending     = 0;
-  </span><span class="kw">let </span><span class="kw-2">mut </span>n_mte_received_tot  = <span class="number">0u64</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_mte_skipped       = <span class="number">0u32</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_received_tot  = <span class="number">0u64</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_discarded_tot = <span class="number">0u64</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>first_evid          : u32;
-  <span class="kw">let </span><span class="kw-2">mut </span>last_evid           = <span class="number">0</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_sent              = <span class="number">0usize</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_timed_out         = <span class="number">0usize</span>; 
+  </span><span class="kw">let </span><span class="kw-2">mut </span>event_cache          = HashMap::&lt;u32, TofEvent&gt;::new();
+  <span class="kw">let </span><span class="kw-2">mut </span>event_id_cache       = VecDeque::&lt;u32&gt;::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
+  <span class="comment">//let mut idx_to_remove = Vec::&lt;usize&gt;::with_capacity(20);
+  //let mut event_id_cache_a    = VecDeque:
+  //let dsi_map                 = get_dsi_j_ltbch_vs_rbch_map(db_path.as_ref()); 
+  </span><span class="kw">let </span><span class="kw-2">mut </span>n_received           : usize;
+  <span class="comment">//let mut clear_cache        = 0; // clear cache every 
+  //let mut event_sending      = 0;
+  </span><span class="kw">let </span><span class="kw-2">mut </span>n_mte_received_tot   = <span class="number">0u64</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>n_mte_skipped        = <span class="number">0u32</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_received_tot   = <span class="number">0u64</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_discarded_tot  = <span class="number">0u64</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>first_evid           : u32;
+  <span class="kw">let </span><span class="kw-2">mut </span>last_evid            = <span class="number">0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>n_sent               = <span class="number">0usize</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>n_sent_ch_err        = <span class="number">0usize</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>n_timed_out          = <span class="number">0usize</span>; 
   <span class="comment">// debug
-  </span><span class="kw">let </span><span class="kw-2">mut </span>last_rb_evid        = <span class="number">0u32</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_rbs_per_ev        = <span class="number">0usize</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>rb_ev_wo_mte        = <span class="number">0usize</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>debug_timer         = Instant::now();
-  <span class="kw">let </span><span class="kw-2">mut </span>met_total_sec       = <span class="number">0f64</span>;  
-  <span class="kw">let </span><span class="kw-2">mut </span>n_receiving_errors  = <span class="number">0</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>check_tc_update     = Instant::now();
+  </span><span class="kw">let </span><span class="kw-2">mut </span>last_rb_evid         = <span class="number">0u32</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>n_rbs_per_ev         = <span class="number">0usize</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>rb_ev_wo_mte         = <span class="number">0usize</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_from_past      = <span class="number">0usize</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_orphan         = <span class="number">0usize</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>debug_timer          = Instant::now();
+  <span class="kw">let </span><span class="kw-2">mut </span>met_total_sec        = <span class="number">0f64</span>;  
+  <span class="comment">//let mut n_receiving_errors  = 0;
+  </span><span class="kw">let </span><span class="kw-2">mut </span>check_tc_update      = Instant::now();
+  <span class="kw">let </span><span class="kw-2">mut </span>n_gathered_fr_cache  = <span class="number">0usize</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>misaligned_cache_err = <span class="number">0usize</span>; 
   <span class="kw">loop </span>{
     <span class="kw">if </span>check_tc_update.elapsed().as_secs() &gt; <span class="number">5 </span>{
       <span class="kw">match </span>thread_control.lock() {
@@ -1143,26 +1270,18 @@
         },
       }
     }
-    <span class="kw">if </span>n_receiving_errors == <span class="number">1000 </span>{
-      <span class="macro">error!</span>(<span class="string">"Trying to get a new MTEvent failed {}"</span>, n_receiving_errors);
-      n_receiving_errors = <span class="number">0</span>;
-    }
     n_received = <span class="number">0</span>;
     <span class="kw">while </span>n_received &lt; settings.n_mte_per_loop {
       <span class="comment">// every iteration, we welcome a new master event
       </span><span class="kw">match </span>m_trig_ev.try_recv() {
         <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
           <span class="macro">trace!</span>(<span class="string">"No new event ready yet!"</span>);
-          n_receiving_errors += <span class="number">1</span>;
-          <span class="kw">continue</span>;
+          <span class="comment">//n_receiving_errors += 1;
+          </span><span class="kw">continue</span>;
         }   
         <span class="prelude-val">Ok</span>(mt) =&gt; {
-          <span class="macro">debug!</span>(<span class="string">"Got master trigger for event {} with {} expected hit paddles"
-                 </span>, mt.event_id
-                 , mt.n_paddles);
-          <span class="comment">// construct RB requests
-
-          </span><span class="kw">let </span><span class="kw-2">mut </span>event = TofEvent::from(<span class="kw-2">&amp;</span>mt);
+          <span class="macro">debug!</span>(<span class="string">"Received MasterTriggerEvent {}!"</span>, mt);
+          <span class="kw">let </span><span class="kw-2">mut </span>event = TofEvent::from(mt);
           event.header.run_id = run_id;
           <span class="kw">if </span>last_evid != <span class="number">0 </span>{
             <span class="kw">if </span>event.mt_event.event_id != last_evid + <span class="number">1 </span>{
@@ -1188,11 +1307,7 @@
     </span>} <span class="comment">// end getting MTEvents
     </span><span class="macro">trace!</span>(<span class="string">"Debug timer MTE received! {:?}"</span>, debug_timer.elapsed());
     first_evid = event_id_cache[<span class="number">0</span>]; 
-    <span class="comment">//let last_cache_evid = event_id_cache.back().unwrap(); 
-    // check this timeout
-    //let mut rb_events_added   = 0usize;
-    //let mut iter_ev           = 0usize;
-    //let mut rb_events_dropped = 0usize;
+    <span class="comment">// recycle that variable for the rb events as well
     </span>n_received = <span class="number">0</span>;
     <span class="comment">//let mut attempts = 0usize;
     </span><span class="lifetime">'main</span>: <span class="kw">while </span>!ev_from_rb.is_empty() &amp;&amp; n_received &lt; settings.n_rbe_per_loop {
@@ -1222,9 +1337,10 @@
           </span>last_rb_evid = rb_ev.header.event_id;
           <span class="kw">if </span>last_rb_evid &lt; first_evid {
             n_received -= <span class="number">1</span>;
-            <span class="macro">debug!</span>(<span class="string">".. re-synchrnoizing .."</span>);
+            <span class="macro">debug!</span>(<span class="string">"The received RBEvent {} is from the ancient past! Currently, we don't have a way to deal with that and this event will be DISCARDED! The RBEvent queue will be re-synchronized..."</span>, last_rb_evid);
             <span class="comment">//attempts += 1;
             </span>n_rbe_discarded_tot += <span class="number">1</span>;
+            n_rbe_from_past += <span class="number">1</span>;
             <span class="kw">continue</span>;
           }
           <span class="kw">match </span>event_cache.get_mut(<span class="kw-2">&amp;</span>last_rb_evid) {
@@ -1235,54 +1351,34 @@
               //let new_ev = TofEvent::new();
               </span>rb_ev_wo_mte += <span class="number">1</span>;
               n_rbe_discarded_tot += <span class="number">1</span>;
+              n_rbe_orphan += <span class="number">1</span>;
               <span class="comment">//error!("No MTEvent for RBEvent. rb event id {}, first mte {}, last mte {}", last_rb_evid, first_evid, last_cache_evid);
               </span><span class="kw">continue </span><span class="lifetime">'main</span>;
             },
             <span class="prelude-val">Some</span>(ev) =&gt; {
               <span class="kw">if </span>settings.build_strategy == BuildStrategy::AdaptiveThorough {
-                <span class="kw">let </span>lg_hits   = ev.mt_event.get_dsi_j_ch_for_triggered_ltbs(); 
-                <span class="kw">let </span><span class="kw-2">mut </span>found = <span class="bool-val">false</span>;
-                <span class="kw">let </span>ev_rbid   = rb_ev.header.rb_id; 
-                <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;</span>lg_hits {
-                  <span class="kw">if </span>dsi_map[<span class="kw-2">&amp;</span>h.<span class="number">0</span>][<span class="kw-2">&amp;</span>h.<span class="number">1</span>][<span class="kw-2">&amp;</span>h.<span class="number">2</span>].<span class="number">0 </span>== rb_ev.header.rb_id {
-                    ev.rb_events.push(rb_ev);
-                    found = <span class="bool-val">true</span>;
-                    <span class="kw">break</span>;
+                <span class="kw">match </span>mtb_link_map.get(<span class="kw-2">&amp;</span>rb_ev.header.rb_id) {
+                  <span class="prelude-val">None </span>=&gt; {
+                    <span class="macro">error!</span>(<span class="string">"Don't know MTB Link ID for {}"</span>, rb_ev.header.rb_id)
+                  }
+                  <span class="prelude-val">Some</span>(link_id) =&gt; {
+                    <span class="kw">if </span>ev.mt_event.get_rb_link_ids().contains(link_id) {
+                      ev.rb_events.push(rb_ev);
+                    } <span class="kw">else </span>{
+                      <span class="macro">error!</span>(<span class="string">"MT Event {}"</span>, ev.mt_event);
+                      <span class="macro">error!</span>(<span class="string">"RBEvent {} has the same event id, but does not show up in MTB Link ID mask!"</span>, rb_ev);
+                    }
                   }
                 }
-                <span class="kw">if </span>!found {
-                  <span class="macro">println!</span>(<span class="string">"== ==&gt; We saw {:?}, but {} is not part of that!"</span>, lg_hits, ev_rbid);
-                }
               } <span class="kw">else </span>{
-                <span class="comment">//if ev.is_complete_from_map(&amp;dsi_map) {
-                //  error!("We are adding a RBEvent to a TofEvent which is already complete!");
-                //}
+                <span class="comment">// Just ad it without questioning
                 </span>ev.rb_events.push(rb_ev);
                 <span class="comment">//println!("[EVTBUILDER] DEBUG n rb expected : {}, n rbs {}",ev.mt_event.get_n_rbs_expected(), ev.rb_events.len());
               </span>}
               <span class="comment">//break;
             </span>}
           }
-    
-          <span class="comment">//for ev in event_cache.iter_mut() {
-          //  //iter_ev += 1;
-          //  //println!("==&gt; mt event id {}, rb event id {}", ev.mt_event.event_id, rb_ev.header.event_id);
-          //  //println!("==&gt; rb event id {}", rb_ev.header.event_id);
-          //  if ev.mt_event.event_id == rb_ev.header.event_id {
-          //    ev.rb_events.push(rb_ev);
-          //    break;
-          //    //rb_events_added += 1;
-          //    //println!("==&gt; RBEvent added!");
-          //    //break;
-          //  }
-          //}
-          //if iter_ev == event_cache.len() {
-          //  info!("We dropped {}", rb_ev);
-          //}
-          //if n_received % 10 == 0 {
-          //  println!("==&gt; Received 10 more RBEvents");
-          //}
-        </span>}
+        }
       }
     }
     <span class="kw">let </span>av_rb_ev = n_rbs_per_ev <span class="kw">as </span>f64 / n_sent <span class="kw">as </span>f64;
@@ -1307,8 +1403,39 @@
       }
     }
     <span class="kw">let </span>debug_timer_elapsed = debug_timer.elapsed().as_secs_f64();
-    <span class="kw">if </span>debug_timer_elapsed &gt; <span class="number">35.0  </span>{
-      <span class="comment">//let mut hbs : Vec&lt;String&gt;;
+    <span class="comment">//println!("Debug timer elapsed {}", debug_timer_elapsed);
+    </span><span class="kw">if </span>debug_timer_elapsed &gt; <span class="number">35.0  </span>{
+      <span class="comment">// missing event id check
+      </span><span class="kw">let </span><span class="kw-2">mut </span>evid_check = event_id_cache[<span class="number">0</span>];
+      <span class="kw">let </span><span class="kw-2">mut </span>missing = <span class="number">0usize</span>;
+      <span class="kw">for _ in </span><span class="number">0</span>..event_id_cache.len() {
+        <span class="kw">if </span>!event_id_cache.contains(<span class="kw-2">&amp;</span>evid_check) {
+          missing += <span class="number">1</span>;
+        }
+        evid_check += <span class="number">1</span>;
+      }
+      <span class="comment">//event_id_test.dedup();
+      //println!("DEBUG 1");
+      //let evid_id_test_len = event_id_test.len();
+      //println!("DEBUG .1.");
+      //let evid_test_len = event_id_cache.len();
+      //let mut evid_test_missing = 0usize;
+      //if evid_test_len &gt; 0 {
+      //  let mut evid = event_id_cache[0];
+      //  //println!("DEBUG 1.5");
+      //  //println!("len of evid_id_test {}", evid_id_test_len);
+      //  for _ in 0..evid_test_len {
+      //    if !event_id_cache.contains(&amp;evid) {
+      //      evid_test_missing += 1;
+      //    }
+      //    evid += 1;
+      //  }
+      //}
+      ////println!("DEBUG 2");
+      //event_id_test.clear();
+      //println!("DEBUG 3");
+      
+      //let mut hbs : Vec&lt;String&gt;;
       //let mut line :String;
       //let title = String::from("== == == == == == EVENTBUILDER HEARTBTEAT == == == == == ==");
       //hbs.push(title);
@@ -1317,184 +1444,267 @@
       //let end   = String::from("== == == == == == == == == == == == == == == == == == == ==");
       //hbs.push(end);
       </span>met_total_sec += debug_timer_elapsed;
-      <span class="kw">let </span>fwidth = <span class="number">70</span>;
-      <span class="macro">println!</span>(<span class="string">"  {:fwidth$}"</span>, <span class="string">"&gt;&gt; == == == == ==  EVTBLDR HEARTBEAT   == == == == == &lt;&lt;"</span>.bright_purple().bold());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="string">"&gt;&gt; == == == == == == ==  EVTBLDR HEARTBEAT == ==  == == == == =="</span>.bright_purple().bold());
     <span class="comment">//if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
-      </span><span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Received MTEvents \t{}"</span>, n_mte_received_tot).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Received RBEvents \t{}"</span>, n_rbe_received_tot).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Skipped MTEvents  \t{}"</span>, n_mte_skipped).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Delta Last MTE evid - Last RB evid  {}"</span>, last_evid - last_rb_evid).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:fwidth$} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Size of event cache    \t{}"</span>, event_cache.len()).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:fwidth$} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Size of event ID cache \t{}"</span>, event_id_cache.len()).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:fwidth$} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!"</span>).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:fwidth$} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Sent {} events! rate {:4.2} Hz"</span>, n_sent, n_sent <span class="kw">as </span>f64/met_total_sec).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:fwidth$} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Chn len MTE receiver\t{}"</span>,m_trig_ev.len() ).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:fwidth$} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Chn len RBE receiver\t{}"</span>,ev_from_rb.len()).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:fwidth$} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Chn len TP  sender  \t{}"</span>,data_sink.len()).bright_purple());
+      </span><span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Received MTEvents {}"</span>, n_mte_received_tot).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Received RBEvents {}"</span>, n_rbe_received_tot).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Skipped MTEvents  {}"</span>, n_mte_skipped).bright_purple());
+      <span class="comment">//println!("  {:&lt;80}", format!("&gt;&gt; ==&gt; Missing evid analysis:  {} of {} events missing ({:.2}%)&lt;&lt;", ev_id_test_missing, ev_id_test_len, 100.0*(ev_id_test_missing as f64/evid_test_len as f64)).bright_purple());
+      </span><span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Delta Last MTE evid - Last RB evid  {}"</span>, last_evid - last_rb_evid).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Size of event cache    {}"</span>, event_cache.len()).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Size of event ID cache {}"</span>, event_id_cache.len()).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Gathered events from cache, last iter {}"</span>, n_gathered_fr_cache).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Misaligned cache errs  {}"</span>, misaligned_cache_err).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!"</span>).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Sent {} events! rate   {:4.2} Hz"</span>, n_sent, n_sent <span class="kw">as </span>f64/met_total_sec).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Failed in sending {} events!"</span>, n_sent_ch_err).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Chn len MTE receiver   {}"</span>,m_trig_ev.len() ).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Chn len RBE receiver   {}"</span>,ev_from_rb.len()).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Chn len TP  sender     {}"</span>,data_sink.len()).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Event id check: {:4.2}% of events missing in the event ID cache"</span>, missing <span class="kw">as </span>f64 / event_cache.len() <span class="kw">as </span>f64).bright_purple());
       <span class="kw">if </span>n_sent &gt; <span class="number">0 </span>{
         <span class="kw">let </span>av_rb_ev = n_rbs_per_ev <span class="kw">as </span>f64 / n_sent <span class="kw">as </span>f64;
-        <span class="macro">println!</span>(<span class="string">"  {:fwidth$} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Average number of RBEvents/TofEvent {:4.2}"</span>, av_rb_ev).bright_purple());
+        <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Average number of RBEvents/TofEvent {:4.2}"</span>, av_rb_ev).bright_purple());
         <span class="kw">let </span>to_frac = <span class="number">100.0 </span>* n_timed_out <span class="kw">as </span>f64 / n_sent <span class="kw">as </span>f64;
-        <span class="macro">println!</span>(<span class="string">"  {:fwidth$} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Fraction of timed out events {:4.2}%"</span>, to_frac).bright_purple());
+        <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Fraction of timed out events {:4.2}%"</span>, to_frac).bright_purple());
         <span class="kw">let </span>recv_sent_frac = <span class="number">100.0</span>* n_mte_received_tot <span class="kw">as </span>f64 / n_sent <span class="kw">as </span>f64;
-        <span class="macro">println!</span>(<span class="string">"  {:fwidth$} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Fraction of incoming vs outgoing MTEvents {:4.2}%"</span>, recv_sent_frac).bright_purple());
+        <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Fraction of incoming vs outgoing MTEvents {:4.2}%"</span>, recv_sent_frac).bright_purple());
       }
       <span class="kw">if </span>n_rbe_received_tot &gt; <span class="number">0 </span>{
         <span class="kw">let </span>rbe_discarded_frac = <span class="number">100.0 </span>* n_rbe_discarded_tot <span class="kw">as </span>f64 / n_rbe_received_tot <span class="kw">as </span>f64;
-        <span class="macro">println!</span>(<span class="string">"  {:fwidth$} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Fraction of discarded RBEvents {:4.2}%"</span>, rbe_discarded_frac).bright_purple());
+        <span class="kw">let </span>rbe_fpast_frac     = <span class="number">100.0 </span>* n_rbe_from_past   <span class="kw">as </span>f64 / n_rbe_received_tot <span class="kw">as </span>f64;
+        <span class="kw">let </span>rbe_orphaned_frac  = <span class="number">100.0 </span>* n_rbe_orphan        <span class="kw">as </span>f64 / n_rbe_received_tot <span class="kw">as </span>f64;
+        <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Fraction of discarded RBEvents {:4.2}%"</span>, rbe_discarded_frac).bright_purple());
+        <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; RBEvents discarded (too early) {} ({:4.2}%)"</span>,n_rbe_from_past, rbe_fpast_frac).bright_purple());
+        <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; RBEvents discarded (orphaned, too late?) {} ({:4.2}%)"</span>,n_rbe_orphan, rbe_orphaned_frac).bright_purple());
       }
-      <span class="macro">println!</span>(<span class="string">"&gt;&gt; ==&gt; RBEvents received overview:"</span>);
-      <span class="comment">//let mut rbtable_repr = String::from("&gt;&gt; ");
-      //for k in seen_rbevents.keys() {
-      //  println!("&gt;&gt; &gt;&gt; RB {}  : {}", k, seen_rbevents[k]);
-      //}
-      
-      </span><span class="kw">let </span><span class="kw-2">mut </span>key_value_pairs: Vec&lt;<span class="kw">_</span>&gt; = seen_rbevents.iter().collect();
-      <span class="kw">let </span><span class="kw-2">mut </span>head0 = String::from(<span class="string">"&gt;&gt; &gt;&gt; "</span>);
-      <span class="kw">let </span><span class="kw-2">mut </span>row0  = String::from(<span class="string">"&gt;&gt; &gt;&gt; "</span>);
-      <span class="kw">let </span><span class="kw-2">mut </span>head1 = String::from(<span class="string">"&gt;&gt; &gt;&gt; "</span>);
-      <span class="kw">let </span><span class="kw-2">mut </span>row1  = String::from(<span class="string">"&gt;&gt; &gt;&gt; "</span>);
-      <span class="kw">let </span><span class="kw-2">mut </span>head2 = String::from(<span class="string">"&gt;&gt; &gt;&gt; "</span>);
-      <span class="kw">let </span><span class="kw-2">mut </span>row2  = String::from(<span class="string">"&gt;&gt; &gt;&gt; "</span>);
-      <span class="kw">let </span><span class="kw-2">mut </span>head3 = String::from(<span class="string">"&gt;&gt; &gt;&gt; "</span>);
-      <span class="kw">let </span><span class="kw-2">mut </span>row3  = String::from(<span class="string">"&gt;&gt; &gt;&gt; "</span>);
-      <span class="kw">let </span><span class="kw-2">mut </span>head4 = String::from(<span class="string">"&gt;&gt; &gt;&gt; "</span>);
-      <span class="kw">let </span><span class="kw-2">mut </span>row4  = String::from(<span class="string">"&gt;&gt; &gt;&gt; "</span>);
-      key_value_pairs.sort_by(|a, b| a.<span class="number">0</span>.cmp(b.<span class="number">0</span>));
-      <span class="kw">for </span>(key, value) <span class="kw">in </span>key_value_pairs {
-          <span class="kw">if </span>key &lt; <span class="kw-2">&amp;</span><span class="number">10 </span>{
-            head0 += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">" RB {:02}\t| "</span>, key)); 
-            row0  += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">" {}\t| "</span>, value));
-            <span class="kw">continue</span>;
-          }
-          <span class="kw">if </span>key &lt; <span class="kw-2">&amp;</span><span class="number">20 </span>{
-            head1 += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">" RB {:02}\t| "</span>, key)); 
-            row1  += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">" {}\t| "</span>, value));
-            <span class="kw">continue</span>;
-          }
-          <span class="kw">if </span>key &lt; <span class="kw-2">&amp;</span><span class="number">30 </span>{
-            head2 += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">" RB {:02}\t| "</span>, key)); 
-            row2  += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">" {}\t| "</span>, value));
-            <span class="kw">continue</span>;
-          }
-          <span class="kw">if </span>key &lt; <span class="kw-2">&amp;</span><span class="number">40 </span>{
-            head3 += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">" RB {:02}\t| "</span>, key)); 
-            row3  += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">" {}\t| "</span>, value));
-            <span class="kw">continue</span>;
-          }
-          <span class="kw">if </span>key &lt; <span class="kw-2">&amp;</span><span class="number">50 </span>{
-            head4 += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">" RB {:02}\t| "</span>, key)); 
-            row4  += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">" {}\t| "</span>, value));
-            <span class="kw">continue</span>;
-          }
-          <span class="comment">//println!("&gt;&gt; &gt;&gt; RB {} : {}", key, value);
-      </span>}
-      <span class="macro">println!</span>(<span class="string">"  {}"</span>, head0);
-      <span class="macro">println!</span>(<span class="string">"  {}"</span>, row0);
-      <span class="macro">println!</span>(<span class="string">"  {}"</span>, head1);
-      <span class="macro">println!</span>(<span class="string">"  {}"</span>, row1);
-      <span class="macro">println!</span>(<span class="string">"  {}"</span>, head2);
-      <span class="macro">println!</span>(<span class="string">"  {}"</span>, row2);
-      <span class="macro">println!</span>(<span class="string">"  {}"</span>, head3);
-      <span class="macro">println!</span>(<span class="string">"  {}"</span>, row3);
-      <span class="macro">println!</span>(<span class="string">"  {}"</span>, head4);
-      <span class="macro">println!</span>(<span class="string">"  {}"</span>, row4);
+      <span class="macro">println!</span>(<span class="string">"RBEvents received overview (rate/RB [Hz]):"</span>);
+
+      <span class="comment">//let mut key_value_pairs: Vec&lt;_&gt; = seen_rbevents.iter().collect();
+      //key_value_pairs.sort_by(|a, b| a.0.cmp(b.0));
+      //for (key, value) in key_value_pairs {
+      //    if key &lt; &amp;10 {
+      //      head0 += &amp;(format!(" RB {:02}\t| ", key)); 
+      //      row0  += &amp;(format!(" {:.1}\t| ", *value as f64/met_total_sec as f64));
+      //      continue;
+      </span><span class="kw">let </span><span class="kw-2">mut </span>counters = HashMap::&lt;u8,f64&gt;::new();
+      <span class="kw">for </span>k <span class="kw">in </span>seen_rbevents.keys() {
+        counters.insert(<span class="kw-2">*</span>k, seen_rbevents[<span class="kw-2">&amp;</span>k] <span class="kw">as </span>f64/met_total_sec <span class="kw">as </span>f64);
+      }
+      <span class="kw">let </span><span class="kw-2">mut </span>table = Table::new();
+      table
+        .load_preset(UTF8_FULL)
+        .apply_modifier(UTF8_ROUND_CORNERS)
+        .apply_modifier(UTF8_SOLID_INNER_BORDERS)
+        .set_content_arrangement(ContentArrangement::Dynamic)
+        .set_width(<span class="number">80</span>)
+        <span class="comment">//.set_header(vec!["Readoutboard Rates:"])
+        </span>.add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB01 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">1</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB02 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">2</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB03 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">3</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB04 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">4</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB05 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">5</span>]))),
+            <span class="comment">//Cell::new("Center aligned").set_alignment(CellAlignment::Center),
+        </span>])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB06 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">6</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB07 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">7</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB08 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">8</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB09 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">9</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB10 {}"</span>, <span class="string">"N.A."</span>))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB11 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">11</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB12 {}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB13 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">13</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB14 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">14</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB15 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">15</span>]))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB16 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">16</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB17 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">17</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB18 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">18</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB19 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">19</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB20 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">20</span>]))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB21 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">21</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB22 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">22</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB23 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">23</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB24 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">24</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB25 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">25</span>]))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB26 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">26</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB27 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">27</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB28 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">28</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB29 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">29</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB30 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">30</span>]))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB31 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">31</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB32 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">32</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB33 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">33</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB34 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">34</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB35 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">35</span>]))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB36 {:.1}"</span>, counters[<span class="kw-2">&amp;</span><span class="number">36</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB37 {}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB38 {}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB39 {:.1}"</span>, counters[<span class="kw-2">&amp;</span><span class="number">39</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB40 {:.1}"</span>, counters[<span class="kw-2">&amp;</span><span class="number">40</span>]))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB41 {:.1}"</span>, counters[<span class="kw-2">&amp;</span><span class="number">41</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB43 {:.1}"</span>, counters[<span class="kw-2">&amp;</span><span class="number">42</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB42 {}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB44 {:.1}"</span>, counters[<span class="kw-2">&amp;</span><span class="number">44</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB45 {}"</span>, <span class="string">"N.A."</span>))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB46 {:.1} Hz"</span>, counters[<span class="kw-2">&amp;</span><span class="number">46</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, <span class="string">"N.A."</span>))),
+        ]);
+
+      <span class="comment">// Set the default alignment for the third column to right
+      //let column = table.column_mut(2).expect("Our table has three columns");
+      //column.set_cell_alignment(CellAlignment::Right);
+      </span><span class="macro">println!</span>(<span class="string">"{table}"</span>);
       <span class="macro">println!</span>(<span class="string">"  {}"</span>,<span class="string">"&gt;&gt; == == == == ==  END HEARTBEAT! == == == == == &lt;&lt;"</span>.bright_purple().bold());
       <span class="comment">//println!("[EVTBLDR] ==&gt; Last RB evid {last_rb_evid}");
       </span>debug_timer = Instant::now(); 
     }
     <span class="macro">trace!</span>(<span class="string">"Debug timer RBE received! {:?}"</span>, debug_timer.elapsed());
     <span class="comment">//if event_sending == send_every_x_event {
-    </span><span class="kw">if </span><span class="bool-val">true </span>{
-      <span class="comment">//for ev in event_cache.iter_mut() {
-      </span><span class="kw">let </span>this_cache_size = event_id_cache.len();
-      <span class="kw">for _ in </span><span class="number">0</span>..this_cache_size {
-        <span class="comment">// if there wasn't a first element, size would be 0
-        </span><span class="kw">let </span>evid = event_id_cache.pop_front().unwrap();
-        <span class="kw">match </span>event_cache.get(<span class="kw-2">&amp;</span>evid) {
-          <span class="prelude-val">None </span>=&gt; {
-            <span class="macro">error!</span>(<span class="string">"This should not happen!"</span>);
-            event_id_cache.push_back(evid);
-            <span class="kw">continue</span>;
-          },
-          <span class="prelude-val">Some</span>(ev) =&gt; {
-          <span class="comment">//for evid in event_id_cache.iter() {
-            //println!("{}",ev.age());
-            </span><span class="kw">let </span>ev_timed_out = ev.age() &gt;= settings.te_timeout_sec <span class="kw">as </span>u64;
-            <span class="kw">let </span>cache_it : bool;
-            <span class="kw">if </span>ev_timed_out {
+    </span>n_gathered_fr_cache = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>prior_ev_sent = <span class="number">0u32</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>first_ev_sent = <span class="bool-val">false</span>;
+    
+    <span class="kw">for </span>idx <span class="kw">in </span><span class="number">0</span>..event_id_cache.len() {
+      <span class="comment">// if there wasn't a first element, size would be 0
+      </span><span class="kw">let </span>evid = event_id_cache.pop_front().unwrap();
+      <span class="comment">// this is an alternative approach, but it seems much slower
+      //let evid : u32;
+      //match event_id_cache.get(idx) {
+      //  None =&gt; {
+      //    error!("Unable to get index {} from event_id_cache with len {}", idx, event_id_cache.len());
+      //    continue;
+      //  },
+      //  Some(_evid) =&gt; {
+      //    evid = *_evid;
+      //  }
+      //}
+      </span><span class="kw">match </span>event_cache.get(<span class="kw-2">&amp;</span>evid) {
+        <span class="prelude-val">None </span>=&gt; {
+          <span class="macro">error!</span>(<span class="string">"Event id and event caches are misaligned for event id {}, idx {} and sizes {} {}! This is BAD and most likely a BUG!"</span>, evid, idx, event_cache.len(), event_id_cache.len());
+          <span class="comment">//event_id_cache.push_back(evid);
+          </span>misaligned_cache_err += <span class="number">1</span>;
+          <span class="kw">continue</span>;
+        },
+        <span class="prelude-val">Some</span>(ev) =&gt; {
+          <span class="kw">let </span>ev_timed_out = ev.age() &gt;= settings.te_timeout_sec <span class="kw">as </span>u64;
+          <span class="comment">//let cache_it : bool;
+          </span><span class="kw">if </span>ev_timed_out {
+            <span class="kw">if </span>!ev.is_complete() {
               n_timed_out += <span class="number">1</span>;
             }
-            <span class="kw">if let </span>BuildStrategy::WaitForNBoards(wait_nrb) = settings.build_strategy {
-              <span class="kw">if </span>ev_timed_out || ev.rb_events.len() == wait_nrb {
-                cache_it = <span class="bool-val">false</span>;
-              } <span class="kw">else </span>{
-                cache_it = <span class="bool-val">true</span>;
-              }
-            } <span class="kw">else </span>{
-              <span class="comment">// "normal" build strategy
-              </span><span class="kw">if </span>ev.is_complete_from_map(<span class="kw-2">&amp;</span>dsi_map) || ev_timed_out {
-                cache_it = <span class="bool-val">false</span>;
-              } <span class="kw">else </span>{
-                cache_it = <span class="bool-val">true</span>;
+          }
+          <span class="comment">// always ready when the event is timed out
+          </span><span class="kw">let </span><span class="kw-2">mut </span>ready_to_send = ev_timed_out;
+          <span class="kw">if </span>!ev_timed_out {
+            <span class="comment">// we are earlier than our time out, maybe the 
+            // event is already complete
+            </span><span class="kw">match </span>settings.build_strategy {
+              BuildStrategy::WaitForNBoards(wait_nrb) =&gt; {
+                <span class="comment">// we will always wait for the expected number of boards, 
+                // except the event times out
+                </span><span class="kw">if </span>ev.rb_events.len() == wait_nrb {
+                  ready_to_send = <span class="bool-val">true</span>;
+                  <span class="comment">//n_gathered_fr_cache += 1;
+                </span>} <span class="comment">// else ready_to_send is still false 
+              </span>},
+              BuildStrategy::Adaptive 
+              | BuildStrategy::AdaptiveThorough
+              | BuildStrategy::AdaptiveGreedy(<span class="kw">_</span>)
+              | BuildStrategy::Smart 
+              | BuildStrategy::Unknown =&gt; {
+                <span class="kw">if </span>ev.is_complete() {
+                  ready_to_send = <span class="bool-val">true</span>;
+                }
               }
             }
-            <span class="kw">if </span>cache_it {
-              event_id_cache.push_back(evid);
-            } <span class="kw">else </span>{
-              <span class="comment">// if we don't cache it, we have to send it. 
-              //let ev_to_send = ev.clone();
-              </span><span class="kw">let </span>ev_to_send = event_cache.remove(<span class="kw-2">&amp;</span>evid).unwrap();
-              n_rbs_per_ev  += ev_to_send.rb_events.len(); 
-              <span class="comment">//if settings.send_flight_packets {
-              // let's think about this better. 
-              // Where to chop it up? If here, the loop might be
-              // too slow. If we do it in the data publsher, 
-              // can we avoid unpacking and repacking?
-              </span><span class="kw">if </span><span class="bool-val">false </span>{
-                <span class="comment">// we have to chop it up
-                </span><span class="kw">let </span>te_summary = ev_to_send.get_summary();
-                <span class="kw">let </span>pack = TofPacket::from(<span class="kw-2">&amp;</span>te_summary);
-                <span class="kw">match </span>data_sink.send(pack) {
-                  <span class="prelude-val">Err</span>(err) =&gt; {
-                    <span class="macro">error!</span>(<span class="string">"Packet sending failed! {err}"</span>);
-                  }
-                  <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-                    <span class="macro">trace!</span>(<span class="string">"Event Summary for event id {} send!"</span>, evid);
-                    n_sent += <span class="number">1</span>;
-                  }
-                }
-                <span class="kw">for </span>rbwave <span class="kw">in </span>ev_to_send.get_rbwaveforms() {
-                  <span class="kw">let </span>pack = TofPacket::from(<span class="kw-2">&amp;</span>rbwave);
-                  <span class="kw">match </span>data_sink.send(pack) {
-                    <span class="prelude-val">Err</span>(err) =&gt; {
-                      <span class="macro">error!</span>(<span class="string">"Packet sending failed! {err}"</span>);
-                    }
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-                      <span class="macro">trace!</span>(<span class="string">"RB waveform for event id {} send!"</span>, evid);
-                    }
-                  }
-                }
+          } 
+          <span class="comment">// this feature tries to sort the events which are getting sent
+          // by id. This might lead to timed out events and more resources needed
+          </span><span class="kw">if </span>settings.sort_events {
+            <span class="kw">if </span>ready_to_send &amp;&amp; !ev_timed_out {
+              <span class="kw">if </span>idx == <span class="number">0 </span>{
+                first_ev_sent = <span class="bool-val">true</span>;
+                prior_ev_sent = ev.header.event_id;
               } <span class="kw">else </span>{
-                <span class="kw">let </span>pack       = TofPacket::from(<span class="kw-2">&amp;</span>ev_to_send);
-                <span class="kw">match </span>data_sink.send(pack) {
-                  <span class="prelude-val">Err</span>(err) =&gt; {
-                    <span class="macro">error!</span>(<span class="string">"Packet sending failed! Err {}"</span>, err);
-                  }
-                  <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-                    <span class="macro">debug!</span>(<span class="string">"Event with id {} send!"</span>, evid);
-                    n_sent += <span class="number">1</span>;
+                <span class="kw">if </span>idx == <span class="number">1 </span>{
+                  <span class="kw">if </span>!first_ev_sent {
+                    <span class="comment">// we wait and check the others too see if something 
+                    // else timed out
+                    </span>ready_to_send = <span class="bool-val">false</span>;
                   }
                 }
+                <span class="kw">if </span>ev.header.event_id != (prior_ev_sent + <span class="number">1</span>) {
+                  <span class="comment">// we wait and check the others too see if something 
+                  // else timed out
+                  </span>ready_to_send = <span class="bool-val">false</span>;
+                }
+                prior_ev_sent = ev.header.event_id;
               }
             }
           }
+          <span class="kw">if </span>ready_to_send {
+            <span class="comment">// if we don't cache it, we have to send it. 
+            //let ev_to_send = ev.clone();
+            // so the idea here is that this happens way less 
+            // often (a few times per main loop iteration)
+            // than the cache it case, so we rather do something
+            // here even if it might require re-allocating memory
+            // we should have an eye on performance though
+            //idx_to_remove.push(idx);
+            </span><span class="kw">let </span>ev_to_send = event_cache.remove(<span class="kw-2">&amp;</span>evid).unwrap();
+            n_rbs_per_ev  += ev_to_send.rb_events.len(); 
+            <span class="comment">// can we avoid unpacking and repacking?
+            </span><span class="kw">let </span>pack       = TofPacket::from(<span class="kw-2">&amp;</span>ev_to_send);
+            <span class="kw">match </span>data_sink.send(pack) {
+              <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="macro">error!</span>(<span class="string">"Packet sending failed! Err {}"</span>, err);
+                n_sent_ch_err += <span class="number">1</span>; 
+              }
+              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+                <span class="macro">debug!</span>(<span class="string">"Event with id {} send!"</span>, evid);
+                n_sent += <span class="number">1</span>;
+              }
+            }
+          } <span class="kw">else </span>{
+            event_id_cache.push_front(evid);
+          }
         }
       }
-      <span class="comment">//event_sending = 0;
-      //event_cache.retain(|ev| ev.valid);
-      </span><span class="macro">debug!</span>(<span class="string">"Debug timer! EVT SENDING {:?}"</span>, debug_timer.elapsed());
-    } 
+    } <span class="comment">// end loop over event_id_cache
+    // this is related to the above way to deal with the
+    // event_id_cache. But it might be too slow.
+    //let mut to_remove : usize;
+    //let mut idx_mod   = 0usize;
+    //for idx in &amp;idx_to_remove {
+    //  to_remove = idx - idx_mod;
+    //  event_id_cache.remove(to_remove);
+    //  idx_mod += 1;
+    //}
+    //idx_to_remove.clear();
+    //event_sending = 0;
+    //event_cache.retain(|ev| ev.valid);
+    </span><span class="macro">debug!</span>(<span class="string">"Debug timer! EVT SENDING {:?}"</span>, debug_timer.elapsed());
   } <span class="comment">// end loop
 </span>}
 

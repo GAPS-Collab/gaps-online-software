@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/monitoring.rs`."><title>monitoring.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/monitoring.rs`."><title>monitoring.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1274,6 +1274,52 @@
 <a href="#1272" id="1272">1272</a>
 <a href="#1273" id="1273">1273</a>
 <a href="#1274" id="1274">1274</a>
+<a href="#1275" id="1275">1275</a>
+<a href="#1276" id="1276">1276</a>
+<a href="#1277" id="1277">1277</a>
+<a href="#1278" id="1278">1278</a>
+<a href="#1279" id="1279">1279</a>
+<a href="#1280" id="1280">1280</a>
+<a href="#1281" id="1281">1281</a>
+<a href="#1282" id="1282">1282</a>
+<a href="#1283" id="1283">1283</a>
+<a href="#1284" id="1284">1284</a>
+<a href="#1285" id="1285">1285</a>
+<a href="#1286" id="1286">1286</a>
+<a href="#1287" id="1287">1287</a>
+<a href="#1288" id="1288">1288</a>
+<a href="#1289" id="1289">1289</a>
+<a href="#1290" id="1290">1290</a>
+<a href="#1291" id="1291">1291</a>
+<a href="#1292" id="1292">1292</a>
+<a href="#1293" id="1293">1293</a>
+<a href="#1294" id="1294">1294</a>
+<a href="#1295" id="1295">1295</a>
+<a href="#1296" id="1296">1296</a>
+<a href="#1297" id="1297">1297</a>
+<a href="#1298" id="1298">1298</a>
+<a href="#1299" id="1299">1299</a>
+<a href="#1300" id="1300">1300</a>
+<a href="#1301" id="1301">1301</a>
+<a href="#1302" id="1302">1302</a>
+<a href="#1303" id="1303">1303</a>
+<a href="#1304" id="1304">1304</a>
+<a href="#1305" id="1305">1305</a>
+<a href="#1306" id="1306">1306</a>
+<a href="#1307" id="1307">1307</a>
+<a href="#1308" id="1308">1308</a>
+<a href="#1309" id="1309">1309</a>
+<a href="#1310" id="1310">1310</a>
+<a href="#1311" id="1311">1311</a>
+<a href="#1312" id="1312">1312</a>
+<a href="#1313" id="1313">1313</a>
+<a href="#1314" id="1314">1314</a>
+<a href="#1315" id="1315">1315</a>
+<a href="#1316" id="1316">1316</a>
+<a href="#1317" id="1317">1317</a>
+<a href="#1318" id="1318">1318</a>
+<a href="#1319" id="1319">1319</a>
+<a href="#1320" id="1320">1320</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Tof housekeeping/monitoring
 //!
 //! Contains structs to hold monitoring
@@ -1285,6 +1331,9 @@
 //! [GAPS wiki](https://gaps1.astro.ucla.edu/wiki/gaps/index.php?title=TOF_environmental_sensors)
 
 </span><span class="kw">use </span>std::fmt;
+<span class="comment">//use std::collections::HashMap;
+
+</span><span class="kw">use </span><span class="kw">crate</span>::packets::PacketType;
 
 <span class="comment">// Takeru's tof-control code
 </span><span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
@@ -1323,19 +1372,32 @@
 <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
 </span><span class="kw">use </span>tof_control::helper::cpu_type::{
     CPUTempDebug,
-    CPUInfo,
+    CPUInfoDebug,
 };
 
 
 <span class="kw">use </span><span class="kw">crate</span>::serialization::{
     Serialization,
     SerializationError,
+    Packable,
     parse_u8,
     parse_u16,
     parse_u32,
     parse_f32
 };
 
+<span class="comment">// re-export
+</span><span class="kw">pub use </span><span class="kw">crate</span>::series::{
+  Series,
+  PAMoniDataSeries,
+  PBMoniDataSeries,
+  LTBMoniDataSeries,
+  RBMoniDataSeries
+};
+
+<span class="kw">pub trait </span>HasBoardId {
+  <span class="kw">fn </span>get_board_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
+}
 
 <span class="doccomment">/// Sensors on the power boards (PB)
 ///
@@ -1479,6 +1541,10 @@
   }
 }
 
+<span class="kw">impl </span>Packable <span class="kw">for </span>PBMoniData {
+  <span class="kw">const </span>PACKET_TYPE : PacketType = PacketType::PBMoniData;
+}
+
 <span class="kw">impl </span>Serialization <span class="kw">for </span>PBMoniData {
   
   <span class="kw">const </span>HEAD : u16 = <span class="number">0xAAAA</span>;
@@ -1572,6 +1638,8 @@
     }
   }
 
+  
+
   <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
   </span><span class="kw">pub fn </span>add_temps(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pt : <span class="kw-2">&amp;</span>PreampTemp ) {
     <span class="self">self</span>.temps = pt.preamp_temps;
@@ -1580,6 +1648,12 @@
   <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
   </span><span class="kw">pub fn </span>add_biases(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pb : <span class="kw-2">&amp;</span>PreampReadBias) {
     <span class="self">self</span>.biases = pb.read_biases;
+  }
+}
+
+<span class="kw">impl </span>HasBoardId <span class="kw">for </span>PAMoniData {
+  <span class="kw">fn </span>get_board_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+    <span class="kw">return </span><span class="self">self</span>.board_id;
   }
 }
 
@@ -1680,6 +1754,10 @@
   }
 }
 
+<span class="kw">impl </span>Packable <span class="kw">for </span>PAMoniData {
+  <span class="kw">const </span>PACKET_TYPE : PacketType = PacketType::PAMoniData;
+}
+
 <span class="kw">impl </span>Serialization <span class="kw">for </span>PAMoniData {
   
   <span class="kw">const </span>HEAD : u16 = <span class="number">0xAAAA</span>;
@@ -1767,7 +1845,7 @@
   TRENZ TMP : {:.2} [\u{00B0}C]
   LTB   TMP : {:.2} [\u{00B0}C]
   ** Threshold Voltages **
-  THR1, THR2, THR3 : {:.3} | {:.3} | {:.3} [V]&gt;"</span>,
+  THR HIT, THR BETA, THR VETO : {:.3} | {:.3} | {:.3} [mV]&gt;"</span>,
   <span class="self">self</span>.board_id,
   <span class="self">self</span>.trenz_temp,
   <span class="self">self</span>.ltb_temp,
@@ -1791,6 +1869,10 @@
     }
     moni
   }
+}
+
+<span class="kw">impl </span>Packable <span class="kw">for </span>LTBMoniData {
+  <span class="kw">const </span>PACKET_TYPE : PacketType = PacketType::LTBMoniData;
 }
 
 <span class="kw">impl </span>Serialization <span class="kw">for </span>LTBMoniData {
@@ -2103,6 +2185,9 @@
   }
 }
 
+<span class="kw">impl </span>Packable <span class="kw">for </span>RBMoniData {
+  <span class="kw">const </span>PACKET_TYPE : PacketType = PacketType::RBMoniData;
+}
 
 <span class="kw">impl </span>Serialization <span class="kw">for </span>RBMoniData {
   
@@ -2248,7 +2333,7 @@
   }
 
   <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
-  </span><span class="kw">pub fn </span>add_info(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cpu_info : <span class="kw-2">&amp;</span>CPUInfo) {
+  </span><span class="kw">pub fn </span>add_info(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cpu_info : <span class="kw-2">&amp;</span>CPUInfoDebug) {
     <span class="self">self</span>.uptime = cpu_info.uptime;
     <span class="self">self</span>.disk_usage = cpu_info.disk_usage;
     <span class="self">self</span>.cpu_freq   = cpu_info.cpu_freq;
@@ -2282,6 +2367,10 @@
            <span class="self">self</span>.disk_usage,
            <span class="self">self</span>.uptime)
   }
+}
+
+<span class="kw">impl </span>Packable <span class="kw">for </span>CPUMoniData {
+  <span class="kw">const </span>PACKET_TYPE : PacketType = PacketType::CPUMoniData;
 }
 
 <span class="kw">impl </span>Serialization <span class="kw">for </span>CPUMoniData {
@@ -2424,6 +2513,10 @@
   }
 }
 
+<span class="kw">impl </span>Packable <span class="kw">for </span>MtbMoniData {
+  <span class="kw">const </span>PACKET_TYPE : PacketType = PacketType::MonitorMtb;
+}
+
 <span class="kw">impl </span>Serialization <span class="kw">for </span>MtbMoniData {
   
   <span class="kw">const </span>SIZE : usize = <span class="number">24</span>;
@@ -2486,65 +2579,64 @@
   }
 }
 
-<span class="attr">#[cfg(all(test,feature = <span class="string">"random"</span>))]
-</span><span class="kw">mod </span>test_monitoring {
-  <span class="kw">use </span><span class="kw">crate</span>::serialization::Serialization;
-  <span class="kw">use </span><span class="kw">crate</span>::FromRandom;
-  <span class="kw">use </span><span class="kw">crate</span>::monitoring::RBMoniData;
-  <span class="kw">use </span><span class="kw">crate</span>::monitoring::MtbMoniData;
-  <span class="kw">use </span><span class="kw">crate</span>::monitoring::PBMoniData;  
-  <span class="kw">use </span><span class="kw">crate</span>::monitoring::PAMoniData;
-  <span class="kw">use </span><span class="kw">crate</span>::monitoring::LTBMoniData;
-  <span class="kw">use </span><span class="kw">crate</span>::monitoring::CPUMoniData;
-
-  <span class="attr">#[test]
-  </span><span class="kw">fn </span>serialization_ltbmonidata() {
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">100 </span>{
-      <span class="kw">let </span>data = LTBMoniData::from_random();
-      <span class="kw">let </span>test = LTBMoniData::from_bytestream(<span class="kw-2">&amp;</span>data.to_bytestream(), <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
-      <span class="macro">assert_eq!</span>(data, test);
-    }
-  }
-
-  <span class="attr">#[test]
-  </span><span class="kw">fn </span>serialization_pamonidata() {
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">100 </span>{
-      <span class="kw">let </span>data = PAMoniData::from_random();
-      <span class="kw">let </span>test = PAMoniData::from_bytestream(<span class="kw-2">&amp;</span>data.to_bytestream(), <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
-      <span class="macro">assert_eq!</span>(data, test);
-    }
-  }
-
-  <span class="attr">#[test]
-  </span><span class="kw">fn </span>serialization_pbmonidata() {
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">100 </span>{
-      <span class="kw">let </span>data = PBMoniData::from_random();
-      <span class="kw">let </span>test = PBMoniData::from_bytestream(<span class="kw-2">&amp;</span>data.to_bytestream(), <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
-      <span class="macro">assert_eq!</span>(data, test);
-    }
-  }
-
-  <span class="attr">#[test]
-  </span><span class="kw">fn </span>serialization_mtbmonidata() {
-    <span class="kw">let </span>data = MtbMoniData::from_random();
-    <span class="kw">let </span>test = MtbMoniData::from_bytestream(<span class="kw-2">&amp;</span>data.to_bytestream(), <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
-    <span class="macro">assert_eq!</span>(data, test);
-  }
-
-  <span class="attr">#[test]
-  </span><span class="kw">fn </span>serialization_rbmonidata() {
-    <span class="kw">let </span>data = RBMoniData::from_random();
-    <span class="kw">let </span>test = RBMoniData::from_bytestream(<span class="kw-2">&amp;</span>data.to_bytestream(), <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
-    <span class="macro">assert_eq!</span>(data, test);
-  }
   
-  <span class="attr">#[test]
-  </span><span class="kw">fn </span>serialization_cpumonidata() {
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">100 </span>{
-      <span class="kw">let </span>data = CPUMoniData::from_random();
-      <span class="kw">let </span>test = CPUMoniData::from_bytestream(<span class="kw-2">&amp;</span>data.to_bytestream(), <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
-      <span class="macro">assert_eq!</span>(data, test);
-    }
+<span class="attr">#[test]
+#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">fn </span>pack_ltbmonidata() {
+  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+    <span class="kw">let </span>data = LTBMoniData::from_random();
+    <span class="kw">let </span>test : LTBMoniData = data.pack().unpack().unwrap();
+    <span class="macro">assert_eq!</span>(data, test);
+  }
+}
+
+<span class="attr">#[test]
+#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">fn </span>pack_pamonidata() {
+  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+    <span class="kw">let </span>data = PAMoniData::from_random();
+    <span class="kw">let </span>test : PAMoniData = data.pack().unpack().unwrap();
+    <span class="macro">assert_eq!</span>(data, test);
+  }
+}
+
+<span class="attr">#[test]
+#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">fn </span>pack_pbmonidata() {
+  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+    <span class="kw">let </span>data = PBMoniData::from_random();
+    <span class="kw">let </span>test : PBMoniData = data.pack().unpack().unwrap();
+    <span class="macro">assert_eq!</span>(data, test);
+  }
+}
+
+<span class="attr">#[test]
+#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">fn </span>pack_mtbmonidata() {
+  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+    <span class="kw">let </span>data = MtbMoniData::from_random();
+    <span class="kw">let </span>test : MtbMoniData = data.pack().unpack().unwrap();
+    <span class="macro">assert_eq!</span>(data, test);
+  }
+}
+
+<span class="attr">#[test]
+#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">fn </span>pack_rbmonidata() {
+  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+    <span class="kw">let </span>data = RBMoniData::from_random();
+    <span class="kw">let </span>test : RBMoniData = data.pack().unpack().unwrap();
+    <span class="macro">assert_eq!</span>(data, test);
+  }
+}
+
+<span class="attr">#[test]
+#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">fn </span>pack_cpumonidata() {
+  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+    <span class="kw">let </span>data = CPUMoniData::from_random();
+    <span class="kw">let </span>test : CPUMoniData = data.pack().unpack().unwrap();
+    <span class="macro">assert_eq!</span>(data, test);
   }
 }
 

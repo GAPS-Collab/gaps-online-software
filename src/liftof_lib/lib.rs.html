@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../liftof_lib/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1340,16 +1340,6 @@
 <a href="#1338" id="1338">1338</a>
 <a href="#1339" id="1339">1339</a>
 <a href="#1340" id="1340">1340</a>
-<a href="#1341" id="1341">1341</a>
-<a href="#1342" id="1342">1342</a>
-<a href="#1343" id="1343">1343</a>
-<a href="#1344" id="1344">1344</a>
-<a href="#1345" id="1345">1345</a>
-<a href="#1346" id="1346">1346</a>
-<a href="#1347" id="1347">1347</a>
-<a href="#1348" id="1348">1348</a>
-<a href="#1349" id="1349">1349</a>
-<a href="#1350" id="1350">1350</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
 <span class="kw">pub mod </span>settings;
 <span class="kw">pub mod </span>constants;
@@ -1371,9 +1361,8 @@
 };
 
 <span class="kw">pub use </span>master_trigger::{
-    <span class="comment">//connect_to_mtb,
-    </span>master_trigger,
-    MTBSettings
+    master_trigger,
+    MTBSettings,
 };
 
 <span class="kw">pub use </span>settings::{
@@ -1411,11 +1400,8 @@
 <span class="comment">//use ndarray::{array, Array1};
 //use nlopt::{Algorithm, Objective, Optimization, Result};
 
-//use tof_dataclasses::manifest as mf;
 </span><span class="kw">use </span>tof_dataclasses::DsiLtbRBMapping;
-<span class="kw">use </span>tof_dataclasses::manifest::{
-    ReadoutBoard,
-};
+<span class="kw">use </span>tof_dataclasses::database::ReadoutBoard;
 
 <span class="kw">use </span>tof_dataclasses::constants::NWORDS;
 <span class="kw">use </span>tof_dataclasses::calibrations::{
@@ -1474,10 +1460,10 @@
       \\::/  /        /:/  /     \\:\\__\\          \\:\\__\\      \\::/  /       \\:\\__\\    
        \\/__/         \\/__/       \\/__/           \\/__/       \\/__/         \\/__/    
 
-          (LIFTOF - liftof is for tof, Version 0.9 'HAHALUA', Dec 2023)
+          (LIFTOF - liftof is for tof, Version 0.10 'LELEWAA', Mar 2024)
 
           * Documentation
-          ==&gt; GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/HAHALUA-0.9
+          ==&gt; GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/LELEWAA-0.10
           ==&gt; API docs https://gaps-collab.github.io/gaps-online-software/
 
   "</span>;
@@ -1792,17 +1778,17 @@
   // ch -&gt; pid
   // pid -&gt; (ch, ch) (for the two paddle ends)
   //let mut pid_vs_chs = HashMap::&lt;u8, (PaddleEndIdentifier,[u8;2])&gt;::new();
-  </span><span class="kw">let </span>channels       = event.header.get_channels();
+  </span><span class="kw">let </span>active_channels = event.header.get_channels();
   <span class="comment">// will become a parameter
-  </span><span class="kw">let </span>fit_sinus      = <span class="bool-val">true</span>;
+  </span><span class="kw">let </span>fit_sinus       = <span class="bool-val">true</span>;
   <span class="comment">// allocate memory for the calbration results
-  </span><span class="kw">let </span><span class="kw-2">mut </span>voltages : Vec&lt;f32&gt;= <span class="macro">vec!</span>[<span class="number">0.0</span>; NWORDS];
-  <span class="kw">let </span><span class="kw-2">mut </span>times    : Vec&lt;f32&gt;= <span class="macro">vec!</span>[<span class="number">0.0</span>; NWORDS];
+  </span><span class="kw">let </span><span class="kw-2">mut </span>voltages    : Vec&lt;f32&gt;= <span class="macro">vec!</span>[<span class="number">0.0</span>; NWORDS];
+  <span class="kw">let </span><span class="kw-2">mut </span>times       : Vec&lt;f32&gt;= <span class="macro">vec!</span>[<span class="number">0.0</span>; NWORDS];
 
   <span class="comment">// Step 0 : If desired, fit sine
   </span><span class="kw">if </span>fit_sinus {
-    <span class="kw">if </span>!channels.contains(<span class="kw-2">&amp;</span><span class="number">8</span>) {
-      <span class="macro">error!</span>(<span class="string">"This RB does not have ch9 data!"</span>);
+    <span class="kw">if </span>!active_channels.contains(<span class="kw-2">&amp;</span><span class="number">8</span>) {
+      <span class="macro">error!</span>(<span class="string">"RB {} does not have ch9 data!"</span>, rb.rb_id);
     }
     rb.calibration.voltages(<span class="number">9</span>,
                             event.header.stop_cell <span class="kw">as </span>usize,
@@ -1824,80 +1810,98 @@
     </span>event.header.set_sine_fit(fit_result);
   }
 
-  <span class="comment">//// Step 1: Prepare the data. Currently, we 
-  //// only support one peak per channel
+  <span class="comment">// structure to store final result
+  // extend with Vec&lt;TofHit&gt; in case
+  // we want to have multiple hits
   </span><span class="kw">let </span><span class="kw-2">mut </span>paddles    = HashMap::&lt;u8, TofHit&gt;::new();
-  <span class="kw">for </span>raw_ch <span class="kw">in </span>channels.iter() {
-    <span class="kw">if </span><span class="kw-2">*</span>raw_ch == <span class="number">8 </span>{
-      <span class="kw">continue</span>; <span class="comment">// ignore ch9 for now (no hits) 
-    </span>}
-    <span class="kw">let </span>pend = rb.channel_to_paddle_end_id[<span class="kw-2">*</span>raw_ch <span class="kw">as </span>usize];
-    <span class="comment">// check which side it is
-    </span><span class="kw">let </span>pid : u8;
-    <span class="kw">if </span>pend &gt; <span class="number">2000 </span>{
-      pid = (pend - <span class="number">2000</span>) <span class="kw">as </span>u8;
-    } <span class="kw">else </span>{
-      pid = (pend - <span class="number">1000</span>) <span class="kw">as </span>u8;
-    }
-    <span class="kw">if </span>!paddles.contains_key(<span class="kw-2">&amp;</span>pid) {
-      <span class="kw">let </span><span class="kw-2">mut </span>hit = TofHit::new();
-      hit.paddle_id = pid;
-      paddles.insert(pid, hit);
-    }
-  }
-
-  <span class="comment">// Step 2. Walk over the paddles and fill the 
-  // values
-  </span><span class="kw">let </span><span class="kw-2">mut </span>pids = Vec::&lt;u8&gt;::new();
-  <span class="kw">for </span>k <span class="kw">in </span>paddles.keys() {
-    pids.push(<span class="kw-2">*</span>k);
-  }
-  <span class="kw">for </span>pid <span class="kw">in </span>pids {
-    <span class="kw">let </span><span class="kw-2">mut </span>hit : TofHit;
-    <span class="kw">match </span>paddles.get_mut(<span class="kw-2">&amp;</span>pid) {
-      <span class="prelude-val">None </span>=&gt; {
-        <span class="macro">error!</span>(<span class="string">"The hit is not there, even after we put it in the map!"</span>);
-        <span class="macro">error!</span>(<span class="string">"I am chugging along, but something is amiss here!"</span>);
+  <span class="comment">//println!("RBID {}, Paddles {:?}", rb.rb_id ,rb.get_paddle_ids());
+  </span><span class="kw">for </span>pid <span class="kw">in </span>rb.get_paddle_ids() {
+    <span class="comment">// cant' fail by constructon of pid
+    </span><span class="kw">let </span>ch_a = rb.get_pid_rbchA(pid).unwrap() <span class="kw">as </span>usize;
+    <span class="kw">let </span>ch_b = rb.get_pid_rbchB(pid).unwrap() <span class="kw">as </span>usize;
+    <span class="kw">let </span><span class="kw-2">mut </span>hit = TofHit::new();
+    hit.paddle_id = pid;
+    <span class="comment">//println!("{ch_a}, {ch_b}, active_channels {:?}", active_channels);
+    </span><span class="kw">for </span>(k, ch) <span class="kw">in </span>[ch_a, ch_b].iter().enumerate() {
+      <span class="comment">// Step 1: Calibration
+      //println!("Ch {}, event {}", ch, event);
+      //println!("---------------------------");
+      //println!("pid {}, active channels : {:?}, ch {}",pid, active_channels, ch);
+      </span><span class="kw">if </span>!active_channels.contains(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span>ch <span class="kw">as </span>u8 -<span class="number">1</span>)) {
+        <span class="macro">trace!</span>(<span class="string">"Skipping channel {} because it is not marked to be readout in the event header channel mask!"</span>, ch);
         <span class="kw">continue</span>;
-      },
-      <span class="prelude-val">Some</span>(hit) =&gt; {
-        <span class="kw">for </span>raw_ch <span class="kw">in </span>rb.paddle_id_to_channel.get(<span class="kw-2">&amp;</span>pid).unwrap() {
-          <span class="kw">if </span>channels.contains(<span class="kw-2">&amp;</span>raw_ch) {
-            <span class="comment">// Step 1: Calibration
-            </span>rb.calibration.voltages(<span class="kw-2">*</span>raw_ch <span class="kw">as </span>usize+ <span class="number">1</span>,
-                                    event.header.stop_cell <span class="kw">as </span>usize,
-                                    <span class="kw-2">&amp;</span>event.adc[<span class="kw-2">*</span>raw_ch <span class="kw">as </span>usize],
-                                    <span class="kw-2">&amp;mut </span>voltages);
-            <span class="comment">//FIXME - spike cleaning!
-            //match RBCalibrations::spike_cleaning(&amp;mut ch_voltages,
-            //                                     event.header.stop_cell) {
-            //  Err(err) =&gt; {
-            //    error!("Spike cleaning failed! {err}");
-            //  }
-            //  Ok(_)    =&gt; ()
-            //}
-            </span>rb.calibration.nanoseconds(<span class="kw-2">*</span>raw_ch <span class="kw">as </span>usize + <span class="number">1</span>,
-                                       event.header.stop_cell <span class="kw">as </span>usize,
-                                       <span class="kw-2">&amp;mut </span>times);
-            <span class="comment">// Step 2: Pedestal subtraction
-            </span><span class="kw">let </span>(ped, ped_err) = calculate_pedestal(<span class="kw-2">&amp;</span>voltages,
-                                                    settings.pedestal_thresh,
-                                                    settings.pedestal_begin_bin,
-                                                    settings.pedestal_win_bins);
-            <span class="macro">trace!</span>(<span class="string">"Calculated pedestal of {} +- {}"</span>, ped, ped_err);
-            <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..voltages.len() {
-              voltages[n] -= ped;
+      }
+      <span class="comment">//println!("Will do waveform analysis for ch {}", ch);
+      </span>rb.calibration.voltages(<span class="kw-2">*</span>ch,
+                              event.header.stop_cell <span class="kw">as </span>usize,
+                              <span class="kw-2">&amp;</span>event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize -<span class="number">1</span>],
+                              <span class="kw-2">&amp;mut </span>voltages);
+      <span class="comment">//FIXME - spike cleaning!
+      //match RBCalibrations::spike_cleaning(&amp;mut ch_voltages,
+      //                                     event.header.stop_cell) {
+      //  Err(err) =&gt; {
+      //    error!("Spike cleaning failed! {err}");
+      //  }
+      //  Ok(_)    =&gt; ()
+      //}
+      </span>rb.calibration.nanoseconds(<span class="kw-2">*</span>ch,
+                                 event.header.stop_cell <span class="kw">as </span>usize,
+                                 <span class="kw-2">&amp;mut </span>times);
+      <span class="comment">// Step 2: Pedestal subtraction
+      </span><span class="kw">let </span>(ped, ped_err) = calculate_pedestal(<span class="kw-2">&amp;</span>voltages,
+                                              settings.pedestal_thresh,
+                                              settings.pedestal_begin_bin,
+                                              settings.pedestal_win_bins);
+      <span class="macro">trace!</span>(<span class="string">"Calculated pedestal of {} +- {}"</span>, ped, ped_err);
+      <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..voltages.len() {
+        voltages[n] -= ped;
+      }
+      <span class="kw">let </span><span class="kw-2">mut </span>charge : f32 = <span class="number">0.0</span>;
+      <span class="comment">//let peaks : Vec::&lt;(usize, usize)&gt;;
+      </span><span class="kw">let </span><span class="kw-2">mut </span>cfd_times = Vec::&lt;f32&gt;::new();
+      <span class="kw">let </span><span class="kw-2">mut </span>max_volts = <span class="number">0.0f32</span>;
+      <span class="comment">// Step 4 : Find peaks
+      // FIXME - what do we do for multiple peaks?
+      // Currently we basically throw them away
+      </span><span class="kw">match </span>find_peaks(<span class="kw-2">&amp;</span>voltages ,
+                       <span class="kw-2">&amp;</span>times    ,
+                       settings.find_pks_t_start , 
+                       settings.find_pks_t_window,
+                       settings.min_peak_size    ,
+                       settings.find_pks_thresh  ,
+                       settings.max_peaks      ) {
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"Unable to find peaks for ch {ch}! Ignoring this channel!"</span>);
+          <span class="macro">error!</span>(<span class="string">"We won't be able to calculate timing information for this channel! Err {err}"</span>);
+        },
+        <span class="prelude-val">Ok</span>(peaks)  =&gt; {
+          <span class="comment">//peaks = pks;
+          // Step 5 : Find tdcs
+          //println!("Found {} peaks for ch {}! {:?}", peaks.len(), raw_ch, peaks);
+          </span><span class="kw">for </span>pk <span class="kw">in </span>peaks.iter() {
+            <span class="kw">match </span>cfd_simple(<span class="kw-2">&amp;</span>voltages,
+                             <span class="kw-2">&amp;</span>times,
+                             settings.cfd_fraction,
+                             pk.<span class="number">0</span>, pk.<span class="number">1</span>) {
+              <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="macro">debug!</span>(<span class="string">"Unable to calculate cfd for peak {} {}! {}"</span>, pk.<span class="number">0</span>, pk.<span class="number">1</span>, err);
+              }
+              <span class="prelude-val">Ok</span>(cfd) =&gt; {
+                cfd_times.push(cfd);
+              }
             }
-            <span class="kw">let </span><span class="kw-2">mut </span>charge : f32 = <span class="number">0.0</span>;
+            <span class="comment">// just do the first peak for now
+            </span><span class="kw">let </span>pk_height = voltages[pk.<span class="number">0</span>..pk.<span class="number">1</span>].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
+            max_volts = <span class="kw-2">*</span>pk_height; 
             <span class="comment">//debug!("Check impedance value! Just using 50 [Ohm]");
             // Step 3 : charge integration
             // FIXME - make impedance a settings parameter
-            // This does not make sense. Why don't we integrate 
-            // the peak?
             </span><span class="kw">match </span>integrate(<span class="kw-2">&amp;</span>voltages,
                             <span class="kw-2">&amp;</span>times,
-                            settings.integration_start,
-                            settings.integration_window,
+                            <span class="comment">//settings.integration_start,
+                            //settings.integration_window,
+                            </span>pk.<span class="number">0</span>, 
+                            pk.<span class="number">1</span>,
                             <span class="number">50.0</span>) {
               <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="macro">error!</span>(<span class="string">"Integration failed! Err {err}"</span>);
@@ -1906,82 +1910,52 @@
                 charge = chrg;
               }
             }
-            <span class="comment">//let peaks : Vec::&lt;(usize, usize)&gt;;
-            </span><span class="kw">let </span><span class="kw-2">mut </span>cfd_times = Vec::&lt;f32&gt;::new();
-            <span class="kw">let </span><span class="kw-2">mut </span>max_volts = <span class="number">0.0f32</span>;
-            <span class="comment">// Step 4 : Find peaks
-            // FIXME - what do we do for multiple peaks?
-            // Currently we basically throw them away
-            </span><span class="kw">match </span>find_peaks(<span class="kw-2">&amp;</span>voltages ,
-                             <span class="kw-2">&amp;</span>times    ,
-                             settings.find_pks_t_start , 
-                             settings.find_pks_t_window,
-                             settings.min_peak_size    ,
-                             settings.find_pks_thresh  ,
-                             settings.max_peaks      ) {
-              <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="macro">error!</span>(<span class="string">"Unable to find peaks for ch {raw_ch}! Ignoring this channel!"</span>);
-                <span class="macro">error!</span>(<span class="string">"We won't be able to calculate timing information for this channel! Err {err}"</span>);
-              },
-              <span class="prelude-val">Ok</span>(peaks)  =&gt; {
-                <span class="comment">//peaks = pks;
-                // Step 5 : Find tdcs
-                </span><span class="macro">println!</span>(<span class="string">"Found {} peaks!"</span>, peaks.len());
-                <span class="kw">for </span>pk <span class="kw">in </span>peaks.iter() {
-                  <span class="kw">match </span>cfd_simple(<span class="kw-2">&amp;</span>voltages,
-                                   <span class="kw-2">&amp;</span>times,
-                                   settings.cfd_fraction,
-                                   pk.<span class="number">0</span>, pk.<span class="number">1</span>) {
-                    <span class="prelude-val">Err</span>(err) =&gt; {
-                      <span class="macro">debug!</span>(<span class="string">"Unable to calculate cfd for peak {} {}! {}"</span>, pk.<span class="number">0</span>, pk.<span class="number">1</span>, err);
-                    }
-                    <span class="prelude-val">Ok</span>(cfd) =&gt; {
-                      cfd_times.push(cfd);
-                    }
-                  }
-                  <span class="comment">// just do the first peak for now
-                  </span><span class="kw">let </span>pk_height = voltages[pk.<span class="number">0</span>..pk.<span class="number">1</span>].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
-                  max_volts = <span class="kw-2">*</span>pk_height; 
-                  <span class="kw">break</span>;
-                }
-              }<span class="comment">// end OK
-            </span>} <span class="comment">// end match find_peaks 
-            </span><span class="kw">let </span><span class="kw-2">mut </span>tdc : f32 = <span class="number">0.0</span>; 
-            <span class="kw">if </span>cfd_times.len() &gt; <span class="number">0 </span>{
-              tdc = cfd_times[<span class="number">0</span>];
-            }
-            <span class="macro">println!</span>(<span class="string">"Calucalated tdc {}, charge {}, max {}"</span>, tdc, charge, max_volts); 
-            <span class="kw">if </span>rb.channel_to_paddle_end_id[<span class="kw-2">*</span>raw_ch <span class="kw">as </span>usize] &gt; <span class="number">2000 </span>{
-              hit.ftime_b      = tdc;
-              hit.set_time_b(tdc);
-              hit.set_charge_b(charge);
-              hit.set_peak_b(max_volts);
-              
-            } <span class="kw">else </span>{
-              hit.ftime_a = tdc;
-              hit.set_time_a(tdc);
-              hit.set_charge_a(charge);
-              hit.set_peak_a(max_volts);
-            }
-            <span class="macro">println!</span>(<span class="string">"{}"</span>, hit);
-          } <span class="kw">else </span>{
-            <span class="macro">error!</span>(<span class="string">"Only one end of a paddle has a channel record! Ch {}, Pid {}"</span>, raw_ch, pid);
+            <span class="kw">break</span>;
           }
-        }
+        }<span class="comment">// end OK
+      </span>} <span class="comment">// end match find_peaks 
+      </span><span class="kw">let </span><span class="kw-2">mut </span>tdc : f32 = <span class="number">0.0</span>; 
+      <span class="kw">if </span>cfd_times.len() &gt; <span class="number">0 </span>{
+        tdc = cfd_times[<span class="number">0</span>];
+      }
+      <span class="comment">//println!("Calucalated tdc {}, charge {}, max {} for ch {}!", tdc, charge, max_volts, ch); 
+      //if rb.channel_to_paddle_end_id[*raw_ch as usize] &gt; 2000 {
+      </span><span class="kw">if </span>k == <span class="number">0 </span>{
+        hit.ftime_b      = tdc;
+        hit.fpeak_b      = max_volts;
+        hit.set_time_b(tdc);
+        hit.set_charge_b(charge);
+        hit.set_peak_b(max_volts);
+      } <span class="kw">else </span>{
+        hit.ftime_a = tdc;
+        hit.fpeak_b = max_volts;
+        hit.set_time_a(tdc);
+        hit.set_charge_a(charge);
+        hit.set_peak_a(max_volts);
+        <span class="comment">// this is the seoond iteration,
+        // we are done!
+        </span>paddles.insert(pid, hit);
       }
     }
   }
-  <span class="macro">println!</span>(<span class="string">"{:?}"</span>, paddles);
-  <span class="kw">for </span>(<span class="kw">_</span>, hit) <span class="kw">in </span>paddles.iter_mut() {
-    <span class="kw">let </span>t0 = get_paddle_t0(hit.ftime_a, hit.ftime_b, rb.get_paddle_length(hit.paddle_id));
-    <span class="kw">let </span>pa = pos_across(hit.ftime_a, t0);
-    hit.set_t0(t0);
+  <span class="comment">//println!("Paddles {:?}", paddles);
+  </span><span class="kw">for </span>(<span class="kw">_</span>, hit) <span class="kw">in </span>paddles.iter_mut() {
+    <span class="comment">// unwrap should not fail by construction
+    </span><span class="kw">let </span>t0 = get_paddle_t0(hit.ftime_a, hit.ftime_b, rb.get_paddle_length(hit.paddle_id).unwrap_or(<span class="number">1.0</span>));
+    <span class="comment">//println!("Cot t0 :{}", t0);
+    //println!("Hit : {}", hit);
+    //println!("Hit.ftime_a {}", hit.ftime_a);
+    </span><span class="kw">let </span>pa = pos_across(hit.ftime_a, t0);
+    <span class="comment">//println!("pa : {}", pa);
+    </span>hit.set_t0(t0);
     hit.set_pos_across(pa);
-    <span class="macro">println!</span>(<span class="string">"caluclated {} {} for {}"</span>,t0, pa, hit);
-  }
+    hit.set_edep((hit.fpeak_a + hit.fpeak_b) / <span class="number">2.0</span>);
+    <span class="comment">//println!("caluclated {} {} for {}",t0, pa, hit);
+  </span>}
   <span class="kw">let </span>result = paddles.into_values().collect();
   event.hits = result;
-  <span class="prelude-val">Ok</span>(())
+  <span class="comment">//print ("EVENT {}", event);
+  </span><span class="prelude-val">Ok</span>(())
 }
 
 <span class="comment">//**********************************************
@@ -2109,9 +2083,12 @@
 <span class="comment">/**********************************************************/
 </span><span class="doccomment">/// Command Enums and stucts
 </span><span class="attr">#[derive(Debug, Parser, PartialEq)]
-</span><span class="kw">pub enum </span>Command {
+</span><span class="kw">pub enum </span>CommandCC {
   <span class="doccomment">/// Listen for flight CPU commands.
   </span>Listen(ListenCmd),
+  <span class="doccomment">/// Staging mode - work through all .toml files
+  /// in the staging area
+  </span>Staging(StagingCmd),
   <span class="doccomment">/// Ping a TOF sub-system.
   </span>Ping(PingCmd),
   <span class="doccomment">/// Monitor a TOF sub-system.
@@ -2151,6 +2128,9 @@
 <span class="doccomment">/// TOF SW cmds ====================================================
 </span><span class="attr">#[derive(Debug, Copy, Clone, Args, PartialEq)]
 </span><span class="kw">pub struct </span>ListenCmd { }
+
+<span class="attr">#[derive(Debug, Copy, Clone, Args, PartialEq)]
+</span><span class="kw">pub struct </span>StagingCmd { }
 
 <span class="attr">#[derive(Debug, Args, PartialEq)]
 </span><span class="kw">pub struct </span>PingCmd {

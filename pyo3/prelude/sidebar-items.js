@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"attr":["pyclass","pyfunction","pymethods","pymodule"],"derive":["FromPyObject"],"macro":["wrap_pyfunction"],"struct":["Py","PyErr"],"type":["PyObject","PyResult"]};

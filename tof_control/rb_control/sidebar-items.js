@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["rb_clk","rb_config","rb_dac","rb_gpioe","rb_info","rb_init","rb_input","rb_mag","rb_mode","rb_ph","rb_temp","rb_vcp"]};
+window.SIDEBAR_ITEMS = {"mod":["rb_clk","rb_config","rb_dac","rb_gpioe","rb_info","rb_init","rb_input","rb_mag","rb_mode","rb_ph","rb_reset","rb_temp","rb_vcp"]};

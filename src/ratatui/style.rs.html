@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/style.rs`."><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/style.rs`."><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -887,6 +887,7 @@
 <a href="#885" id="885">885</a>
 <a href="#886" id="886">886</a>
 <a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! `style` contains the primitives used to control how your user interface will look.
 //!
 //! There are two ways to set styles:
@@ -922,7 +923,7 @@
 //! that implements [`Styled`]. E.g.:
 //! - Strings and string slices when styled return a [`Span`]
 //! - [`Span`]s can be styled again, which will merge the styles.
-//! - Many widget types can be styled directly rather than calling their style() method.
+//! - Many widget types can be styled directly rather than calling their `style()` method.
 //!
 //! See the [`Stylize`] and [`Styled`] traits for more information. These traits are re-exported in
 //! the [`prelude`] module for convenience.
@@ -1123,26 +1124,26 @@
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>Style {
-    <span class="kw">fn </span>default() -&gt; Style {
-        Style::new()
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
 <span class="kw">impl </span>Styled <span class="kw">for </span>Style {
-    <span class="kw">type </span>Item = Style;
+    <span class="kw">type </span>Item = <span class="self">Self</span>;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="kw-2">*</span><span class="self">self
     </span>}
 
-    <span class="kw">fn </span>set_style&lt;S: Into&lt;Style&gt;&gt;(<span class="self">self</span>, style: S) -&gt; <span class="self">Self</span>::Item {
+    <span class="kw">fn </span>set_style&lt;S: Into&lt;<span class="self">Self</span>&gt;&gt;(<span class="self">self</span>, style: S) -&gt; <span class="self">Self</span>::Item {
         <span class="self">self</span>.patch(style)
     }
 }
 
 <span class="kw">impl </span>Style {
-    <span class="kw">pub const fn </span>new() -&gt; Style {
-        Style {
+    <span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
             fg: <span class="prelude-val">None</span>,
             bg: <span class="prelude-val">None</span>,
             <span class="attr">#[cfg(feature = <span class="string">"underline-color"</span>)]
@@ -1153,8 +1154,8 @@
     }
 
     <span class="doccomment">/// Returns a `Style` resetting all properties.
-    </span><span class="kw">pub const fn </span>reset() -&gt; Style {
-        Style {
+    </span><span class="kw">pub const fn </span>reset() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
             fg: <span class="prelude-val">Some</span>(Color::Reset),
             bg: <span class="prelude-val">Some</span>(Color::Reset),
             <span class="attr">#[cfg(feature = <span class="string">"underline-color"</span>)]
@@ -1175,7 +1176,7 @@
     /// assert_eq!(style.patch(diff), Style::default().fg(Color::Red));
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"`fg` returns the modified style without modifying the original"</span>]
-    </span><span class="kw">pub const fn </span>fg(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; Style {
+    </span><span class="kw">pub const fn </span>fg(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.fg = <span class="prelude-val">Some</span>(color);
         <span class="self">self
     </span>}
@@ -1191,7 +1192,7 @@
     /// assert_eq!(style.patch(diff), Style::default().bg(Color::Red));
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"`bg` returns the modified style without modifying the original"</span>]
-    </span><span class="kw">pub const fn </span>bg(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; Style {
+    </span><span class="kw">pub const fn </span>bg(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.bg = <span class="prelude-val">Some</span>(color);
         <span class="self">self
     </span>}
@@ -1225,7 +1226,7 @@
     /// ```
     </span><span class="attr">#[cfg(feature = <span class="string">"underline-color"</span>)]
     #[must_use = <span class="string">"`underline_color` returns the modified style without modifying the original"</span>]
-    </span><span class="kw">pub const fn </span>underline_color(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; Style {
+    </span><span class="kw">pub const fn </span>underline_color(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.underline_color = <span class="prelude-val">Some</span>(color);
         <span class="self">self
     </span>}
@@ -1245,7 +1246,7 @@
     /// assert_eq!(patched.sub_modifier, Modifier::empty());
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"`add_modifier` returns the modified style without modifying the original"</span>]
-    </span><span class="kw">pub const fn </span>add_modifier(<span class="kw-2">mut </span><span class="self">self</span>, modifier: Modifier) -&gt; Style {
+    </span><span class="kw">pub const fn </span>add_modifier(<span class="kw-2">mut </span><span class="self">self</span>, modifier: Modifier) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.sub_modifier = <span class="self">self</span>.sub_modifier.difference(modifier);
         <span class="self">self</span>.add_modifier = <span class="self">self</span>.add_modifier.union(modifier);
         <span class="self">self
@@ -1266,7 +1267,7 @@
     /// assert_eq!(patched.sub_modifier, Modifier::ITALIC);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"`remove_modifier` returns the modified style without modifying the original"</span>]
-    </span><span class="kw">pub const fn </span>remove_modifier(<span class="kw-2">mut </span><span class="self">self</span>, modifier: Modifier) -&gt; Style {
+    </span><span class="kw">pub const fn </span>remove_modifier(<span class="kw-2">mut </span><span class="self">self</span>, modifier: Modifier) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.add_modifier = <span class="self">self</span>.add_modifier.difference(modifier);
         <span class="self">self</span>.sub_modifier = <span class="self">self</span>.sub_modifier.union(modifier);
         <span class="self">self
@@ -1290,7 +1291,7 @@
     /// );
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"`patch` returns the modified style without modifying the original"</span>]
-    </span><span class="kw">pub fn </span>patch&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, other: S) -&gt; Style {
+    </span><span class="kw">pub fn </span>patch&lt;S: Into&lt;<span class="self">Self</span>&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, other: S) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>other = other.into();
         <span class="self">self</span>.fg = other.fg.or(<span class="self">self</span>.fg);
         <span class="self">self</span>.bg = other.bg.or(<span class="self">self</span>.bg);
@@ -1549,10 +1550,11 @@
                 .bg(Color::Black)
                 .add_modifier(Modifier::BOLD)
                 .remove_modifier(Modifier::ITALIC)
-        )
+        );
     }
 
-    <span class="attr">#[test]
+    <span class="attr">#[allow(clippy::too_many_lines)]
+    #[test]
     </span><span class="kw">fn </span>style_can_be_stylized() {
         <span class="comment">// foreground colors
         </span><span class="macro">assert_eq!</span>(Style::new().black(), Style::new().fg(Color::Black));

@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A bridge from Rust to Python logging"><title>pyo3_log - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="pyo3_log" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-4c98445ec4002617.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../pyo3_log/index.html">pyo3_log</a><span class="version">0.8.4</span></h2></div><div class="sidebar-elems"><ul class="block">
+            <li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li></ul></section></div></nav><div class="sidebar-resizer"></div>
+    <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../pyo3_log/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">pyo3_log</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/pyo3_log/lib.rs.html#1-613">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A bridge from Rust to Python logging</p>
+<p>The library can be used to install a <a href="../log/trait.Log.html" title="trait log::Log">logger</a> into Rust that will send the messages
+over to the Python <a href="https://docs.python.org/3/library/logging.html">logging</a>. This can be
+useful when writing a native Python extension module in Rust and it is desirable to log from
+the Rust side too.</p>
+<p>The library internally depends on the <a href="../pyo3/index.html" title="mod pyo3"><code>pyo3</code></a> crate. This is not exposed through the public
+API and it should work from extension modules not using <a href="../pyo3/index.html" title="mod pyo3"><code>pyo3</code></a> directly. It’ll nevertheless
+still bring the dependency in, so this might be considered if the module doesn’t want to use
+it.</p>
+<h2 id="simple-usage"><a class="doc-anchor" href="#simple-usage">§</a>Simple usage</h2>
+<p>Each extension module has its own global variables, therefore the used logger is also
+independent of other Rust native extensions. Therefore, it is up to each one to set a logger
+for itself if it wants one.</p>
+<p>By using <a href="fn.init.html" title="fn pyo3_log::init"><code>init</code></a> function from a place that’s run only once (maybe from the top-level module
+of the extension), the logger is registered and the log messages (eg. <a href="../log/macro.info.html" title="macro log::info"><code>info</code></a>) send
+their messages over to the Python side.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>log::info;
+<span class="kw">use </span>pyo3::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[pyfunction]
+</span><span class="kw">fn </span>log_something() {
+    <span class="macro">info!</span>(<span class="string">"Something!"</span>);
+}
+
+<span class="attr">#[pymodule]
+</span><span class="kw">fn </span>my_module(_py: Python&lt;<span class="lifetime">'_</span>&gt;, m: <span class="kw-2">&amp;</span>PyModule) -&gt; PyResult&lt;()&gt; {
+    pyo3_log::init();
+
+    m.add_wrapped(<span class="macro">wrap_pyfunction!</span>(log_something))<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(())
+}</code></pre></div>
+<h2 id="performance-filtering-and-caching"><a class="doc-anchor" href="#performance-filtering-and-caching">§</a>Performance, Filtering and Caching</h2>
+<p>Ideally, the logging system would always consult the Python loggers to know which messages
+should or should not be logged. However, one of the reasons of using Rust instead of Python is
+performance. Part of that is giving up the GIL in long-running computations to let other
+threads run at the same time.</p>
+<p>Therefore, acquiring the GIL and calling into the Python interpreter on each
+<a href="../log/macro.trace.html" title="macro log::trace"><code>trace</code></a> message only to figure out it is not to be logged would be prohibitively
+slow. There are two techniques employed here.</p>
+<p>First, level filters are applied before consulting the Python side. By default, only the
+<a href="../log/enum.Level.html#variant.Debug" title="variant log::Level::Debug"><code>Debug</code></a> level and more severe is considered to be sent over to Python. This can
+be overridden using the <a href="struct.Logger.html#method.filter" title="method pyo3_log::Logger::filter"><code>filter</code></a> and <a href="struct.Logger.html#method.filter_target" title="method pyo3_log::Logger::filter_target"><code>filter_target</code></a>
+methods.</p>
+<p>Second, the Python loggers and their effective log levels are cached on the Rust side on the
+first use of the given module. This means that on a disabled level, only the first logging
+attempt in the given module will acquire GIL while the future ones will short-circuit before
+ever reaching Python.</p>
+<p>This is good for performance, but could lead to the incorrect messages to be logged or not
+logged in certain situations ‒ if Rust logs before the Python logging system is set up properly
+or when it is reconfigured at runtime.</p>
+<p>For these reasons it is possible to turn caching off on construction of the logger (at the cost
+of performance) and to clear the cache manually through the <a href="struct.ResetHandle.html" title="struct pyo3_log::ResetHandle"><code>ResetHandle</code></a>.</p>
+<p>To tune the caching and filtering, the logger needs to be created manually:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>handle = Logger::new(py, Caching::LoggersAndLevels)<span class="question-mark">?
+    </span>.filter(LevelFilter::Trace)
+    .filter_target(<span class="string">"my_module::verbose_submodule"</span>.to_owned(), LevelFilter::Warn)
+    .install()
+    .expect(<span class="string">"Someone installed a logger before us :-("</span>);
+
+<span class="comment">// Some time in the future when logging changes, reset the caches:
+</span>handle.reset();</code></pre></div>
+<h2 id="mapping"><a class="doc-anchor" href="#mapping">§</a>Mapping</h2>
+<p>The logging <code>target</code> is mapped into the name of the logger on the Python side, replacing all
+<code>::</code> occurrences with <code>.</code> (both form hierarchy in their respective language).</p>
+<p>Log levels are mapped to the same-named ones. The <a href="../log/enum.Level.html#variant.Trace" title="variant log::Level::Trace"><code>Trace</code></a> doesn’t exist on the
+Python side, but is mapped to a level with value 5.</p>
+<h2 id="interaction-with-python-gil"><a class="doc-anchor" href="#interaction-with-python-gil">§</a>Interaction with Python GIL</h2>
+<p>Under the hook, the logging routines call into Python. That means they need to acquire the
+Global Interpreter Lock of Python.</p>
+<p>This has several consequences. One of them is the above mentioned performance considerations.</p>
+<p>The other is a risk of deadlocks if threads are used from within the extension code without
+releasing the GIL.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::thread;
+<span class="kw">use </span>log::info;
+<span class="kw">use </span>pyo3::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[pyfunction]
+</span><span class="kw">fn </span>deadlock() {
+    <span class="macro">info!</span>(<span class="string">"This logs fine"</span>);
+
+    <span class="kw">let </span>background_thread = thread::spawn(|| {
+        <span class="macro">info!</span>(<span class="string">"This'll deadlock"</span>);
+    });
+
+    background_thread.join().unwrap();
+}</code></pre></div>
+<p>The above code will deadlock, because the <code>info</code> call in the background thread needs the GIL
+that’s held by the deadlock function. One needs to give up the GIL to let the other threads
+run, something like this:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::thread;
+<span class="kw">use </span>log::info;
+<span class="kw">use </span>pyo3::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[pyfunction]
+</span><span class="kw">fn </span>dont_deadlock(py: Python&lt;<span class="lifetime">'_</span>&gt;) {
+    <span class="macro">info!</span>(<span class="string">"This logs fine"</span>);
+
+    py.allow_threads(|| {
+        <span class="kw">let </span>background_thread = thread::spawn(|| {
+            <span class="macro">info!</span>(<span class="string">"This'll not deadlock"</span>);
+        });
+
+        background_thread.join().unwrap();
+    });
+}</code></pre></div>
+</div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.Logger.html" title="struct pyo3_log::Logger">Logger</a></div><div class="desc docblock-short">The <code>Logger</code></div></li><li><div class="item-name"><a class="struct" href="struct.ResetHandle.html" title="struct pyo3_log::ResetHandle">ResetHandle</a></div><div class="desc docblock-short">A handle into a <a href="struct.Logger.html" title="struct pyo3_log::Logger"><code>Logger</code></a>, able to reset its caches.</div></li></ul><h2 id="enums" class="section-header">Enums<a href="#enums" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.Caching.html" title="enum pyo3_log::Caching">Caching</a></div><div class="desc docblock-short">What the <a href="struct.Logger.html" title="struct pyo3_log::Logger"><code>Logger</code></a> can cache.</div></li></ul><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="fn" href="fn.init.html" title="fn pyo3_log::init">init</a></div><div class="desc docblock-short">Similar to <a href="fn.try_init.html" title="fn pyo3_log::try_init"><code>try_init</code></a>, but panics if there’s a previous logger already installed.</div></li><li><div class="item-name"><a class="fn" href="fn.try_init.html" title="fn pyo3_log::try_init">try_init</a></div><div class="desc docblock-short">Installs a default instance of the logger.</div></li></ul></section></div></main></body></html>

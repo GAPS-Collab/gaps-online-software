@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rustls-pki-types-1.4.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustls_pki_types" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rustls-pki-types-1.5.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustls_pki_types" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../rustls_pki_types/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -814,6 +814,32 @@
 <a href="#812" id="812">812</a>
 <a href="#813" id="813">813</a>
 <a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This crate provides types for representing X.509 certificates, keys and other types as
 //! commonly used in the rustls ecosystem. It is intended to be used by crates that need to work
 //! with such X.509 types, such as [rustls](https://crates.io/crates/rustls),
@@ -1065,14 +1091,14 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]&gt; <span class="kw">for </span>PrivatePkcs1KeyDer&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from(slice: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(Der(DerInner::Borrowed(slice)))
+        <span class="self">Self</span>(Der(BytesInner::Borrowed(slice)))
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
 </span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>PrivatePkcs1KeyDer&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from(vec: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(Der(DerInner::Owned(vec)))
+        <span class="self">Self</span>(Der(BytesInner::Owned(vec)))
     }
 }
 
@@ -1107,14 +1133,14 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]&gt; <span class="kw">for </span>PrivateSec1KeyDer&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from(slice: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(Der(DerInner::Borrowed(slice)))
+        <span class="self">Self</span>(Der(BytesInner::Borrowed(slice)))
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
 </span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>PrivateSec1KeyDer&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from(vec: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(Der(DerInner::Owned(vec)))
+        <span class="self">Self</span>(Der(BytesInner::Owned(vec)))
     }
 }
 
@@ -1149,14 +1175,14 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]&gt; <span class="kw">for </span>PrivatePkcs8KeyDer&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from(slice: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(Der(DerInner::Borrowed(slice)))
+        <span class="self">Self</span>(Der(BytesInner::Borrowed(slice)))
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
 </span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>PrivatePkcs8KeyDer&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from(vec: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(Der(DerInner::Owned(vec)))
+        <span class="self">Self</span>(Der(BytesInner::Owned(vec)))
     }
 }
 
@@ -1313,6 +1339,52 @@
     </span><span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
     </span><span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; CertificateDer&lt;<span class="lifetime">'static</span>&gt; {
         CertificateDer(Der(<span class="self">self</span>.<span class="number">0 </span>.<span class="number">0</span>.into_owned()))
+    }
+}
+
+<span class="doccomment">/// A TLS-encoded Encrypted Client Hello (ECH) configuration list (`ECHConfigList`); as specified in
+/// [draft-ietf-tls-esni-18 §4](https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-18#section-4)
+</span><span class="attr">#[derive(Clone, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>EchConfigListBytes&lt;<span class="lifetime">'a</span>&gt;(BytesInner&lt;<span class="lifetime">'a</span>&gt;);
+
+<span class="kw">impl </span>EchConfigListBytes&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="doccomment">/// Converts this config into its owned variant, unfreezing borrowed content (if any)
+    </span><span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
+    </span><span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; EchConfigListBytes&lt;<span class="lifetime">'static</span>&gt; {
+        EchConfigListBytes(<span class="self">self</span>.<span class="number">0</span>.into_owned())
+    }
+}
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>EchConfigListBytes&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        hex(f, <span class="self">self</span>.as_ref())
+    }
+}
+
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>EchConfigListBytes&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.<span class="number">0</span>.as_ref()
+    }
+}
+
+<span class="kw">impl </span>Deref <span class="kw">for </span>EchConfigListBytes&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">type </span>Target = [u8];
+
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="self">self</span>.as_ref()
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]&gt; <span class="kw">for </span>EchConfigListBytes&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(slice: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(BytesInner::Borrowed(slice))
+    }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>EchConfigListBytes&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(vec: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(BytesInner::Owned(vec))
     }
 }
 
@@ -1473,23 +1545,19 @@
 /// This wrapper type is used to represent DER-encoded data in a way that is agnostic to whether
 /// the data is owned (by a `Vec&lt;u8&gt;`) or borrowed (by a `&amp;[u8]`). Support for the owned
 /// variant is only available when the `alloc` feature is enabled.
-</span><span class="attr">#[derive(Clone)]
-</span><span class="kw">pub struct </span>Der&lt;<span class="lifetime">'a</span>&gt;(DerInner&lt;<span class="lifetime">'a</span>&gt;);
+</span><span class="attr">#[derive(Clone, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>Der&lt;<span class="lifetime">'a</span>&gt;(BytesInner&lt;<span class="lifetime">'a</span>&gt;);
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Der&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// A const constructor to create a `Der` from a borrowed slice
     </span><span class="kw">pub const fn </span>from_slice(der: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(DerInner::Borrowed(der))
+        <span class="self">Self</span>(BytesInner::Borrowed(der))
     }
 }
 
 <span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>Der&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
-        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
-            <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
-            </span>DerInner::Owned(vec) =&gt; vec.as_ref(),
-            DerInner::Borrowed(slice) =&gt; slice,
-        }
+        <span class="self">self</span>.<span class="number">0</span>.as_ref()
     }
 }
 
@@ -1503,14 +1571,14 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]&gt; <span class="kw">for </span>Der&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from(slice: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(DerInner::Borrowed(slice))
+        <span class="self">Self</span>(BytesInner::Borrowed(slice))
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
 </span><span class="kw">impl </span>From&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>Der&lt;<span class="lifetime">'static</span>&gt; {
     <span class="kw">fn </span>from(vec: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(DerInner::Owned(vec))
+        <span class="self">Self</span>(BytesInner::Owned(vec))
     }
 }
 
@@ -1520,30 +1588,40 @@
     }
 }
 
-<span class="kw">impl </span>PartialEq <span class="kw">for </span>Der&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="self">self</span>.as_ref().eq(other.as_ref())
-    }
-}
-
-<span class="kw">impl </span>Eq <span class="kw">for </span>Der&lt;<span class="lifetime">'_</span>&gt; {}
-
-<span class="attr">#[derive(Clone)]
-</span><span class="kw">enum </span>DerInner&lt;<span class="lifetime">'a</span>&gt; {
+<span class="attr">#[derive(Debug, Clone)]
+</span><span class="kw">enum </span>BytesInner&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
     </span>Owned(Vec&lt;u8&gt;),
     Borrowed(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]),
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
-</span><span class="kw">impl </span>DerInner&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="kw">fn </span>into_owned(<span class="self">self</span>) -&gt; DerInner&lt;<span class="lifetime">'static</span>&gt; {
-        DerInner::Owned(<span class="kw">match </span><span class="self">self </span>{
+</span><span class="kw">impl </span>BytesInner&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>into_owned(<span class="self">self</span>) -&gt; BytesInner&lt;<span class="lifetime">'static</span>&gt; {
+        BytesInner::Owned(<span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Owned(vec) =&gt; vec,
             <span class="self">Self</span>::Borrowed(slice) =&gt; slice.to_vec(),
         })
     }
 }
+
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>BytesInner&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
+            <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
+            </span>BytesInner::Owned(vec) =&gt; vec.as_ref(),
+            BytesInner::Borrowed(slice) =&gt; slice,
+        }
+    }
+}
+
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>BytesInner&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.as_ref() == other.as_ref()
+    }
+}
+
+<span class="kw">impl </span>Eq <span class="kw">for </span>BytesInner&lt;<span class="lifetime">'_</span>&gt; {}
 
 <span class="comment">// Format an iterator of u8 into a hex string
 </span><span class="kw">fn </span>hex&lt;<span class="lifetime">'a</span>&gt;(f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;, payload: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">'a </span>u8&gt;) -&gt; fmt::Result {
@@ -1571,61 +1649,35 @@
         <span class="kw">let </span>alg_id = AlgorithmIdentifier::from_slice(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>, <span class="number">0x02</span>, <span class="number">0x03</span>]);
         <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{:?}"</span>, alg_id), <span class="string">"0x010203"</span>);
     }
-}
-
-<span class="attr">#[cfg(test)]
-</span><span class="kw">mod </span>non_std_tests {
-    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_private_key_from_der() {
-        <span class="kw">fn </span>is_pkcs8(key: <span class="kw-2">&amp;</span>PrivateKeyDer&lt;<span class="lifetime">'_</span>&gt;) -&gt; bool {
-            <span class="macro">matches!</span>(key, PrivateKeyDer::Pkcs8(<span class="kw">_</span>))
-        }
-        <span class="kw">fn </span>is_pkcs1(key: <span class="kw-2">&amp;</span>PrivateKeyDer&lt;<span class="lifetime">'_</span>&gt;) -&gt; bool {
-            <span class="macro">matches!</span>(key, PrivateKeyDer::Pkcs1(<span class="kw">_</span>))
-        }
-        <span class="kw">fn </span>is_sec1(key: <span class="kw-2">&amp;</span>PrivateKeyDer&lt;<span class="lifetime">'_</span>&gt;) -&gt; bool {
-            <span class="macro">matches!</span>(key, PrivateKeyDer::Sec1(<span class="kw">_</span>))
-        }
+    </span><span class="kw">fn </span>bytes_inner_equality() {
+        <span class="kw">let </span>owned_a = BytesInner::Owned(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
+        <span class="kw">let </span>owned_b = BytesInner::Owned(<span class="macro">vec!</span>[<span class="number">4</span>, <span class="number">5</span>]);
+        <span class="kw">let </span>borrowed_a = BytesInner::Borrowed(<span class="kw-2">&amp;</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
+        <span class="kw">let </span>borrowed_b = BytesInner::Borrowed(<span class="kw-2">&amp;</span>[<span class="number">99</span>]);
 
-        <span class="kw">let </span>test_cases: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>[u8], <span class="kw">fn</span>(<span class="kw-2">&amp;</span>PrivateKeyDer&lt;<span class="lifetime">'_</span>&gt;) -&gt; bool); <span class="number">11</span>] = <span class="kw-2">&amp;</span>[
-            (<span class="kw-2">&amp;</span><span class="macro">include_bytes!</span>(<span class="string">"test_keys/eddsakey.der"</span>)[..], is_pkcs8),
-            (<span class="kw-2">&amp;</span><span class="macro">include_bytes!</span>(<span class="string">"test_keys/nistp256key.der"</span>)[..], is_sec1),
-            (
-                <span class="kw-2">&amp;</span><span class="macro">include_bytes!</span>(<span class="string">"test_keys/nistp256key.pkcs8.der"</span>)[..],
-                is_pkcs8,
-            ),
-            (<span class="kw-2">&amp;</span><span class="macro">include_bytes!</span>(<span class="string">"test_keys/nistp384key.der"</span>)[..], is_sec1),
-            (
-                <span class="kw-2">&amp;</span><span class="macro">include_bytes!</span>(<span class="string">"test_keys/nistp384key.pkcs8.der"</span>)[..],
-                is_pkcs8,
-            ),
-            (<span class="kw-2">&amp;</span><span class="macro">include_bytes!</span>(<span class="string">"test_keys/nistp521key.der"</span>)[..], is_sec1),
-            (
-                <span class="kw-2">&amp;</span><span class="macro">include_bytes!</span>(<span class="string">"test_keys/nistp521key.pkcs8.der"</span>)[..],
-                is_pkcs8,
-            ),
-            (
-                <span class="kw-2">&amp;</span><span class="macro">include_bytes!</span>(<span class="string">"test_keys/rsa2048key.pkcs1.der"</span>)[..],
-                is_pkcs1,
-            ),
-            (
-                <span class="kw-2">&amp;</span><span class="macro">include_bytes!</span>(<span class="string">"test_keys/rsa2048key.pkcs8.der"</span>)[..],
-                is_pkcs8,
-            ),
-            (
-                <span class="kw-2">&amp;</span><span class="macro">include_bytes!</span>(<span class="string">"test_keys/rsa4096key.pkcs8.der"</span>)[..],
-                is_pkcs8,
-            ),
-            (<span class="kw-2">&amp;</span><span class="macro">include_bytes!</span>(<span class="string">"test_keys/edd25519_v2.der"</span>)[..], is_pkcs8),
-        ];
+        <span class="comment">// Self-equality.
+        </span><span class="macro">assert_eq!</span>(owned_a, owned_a);
+        <span class="macro">assert_eq!</span>(owned_b, owned_b);
+        <span class="macro">assert_eq!</span>(borrowed_a, borrowed_a);
+        <span class="macro">assert_eq!</span>(borrowed_b, borrowed_b);
 
-        <span class="kw">for </span>(key_bytes, expected_check_fn) <span class="kw">in </span>test_cases.iter() {
-            <span class="macro">assert!</span>(expected_check_fn(
-                <span class="kw-2">&amp;</span>PrivateKeyDer::try_from(<span class="kw-2">*</span>key_bytes).unwrap()
-            ));
-        }
+        <span class="comment">// Borrowed vs Owned equality
+        </span><span class="macro">assert_eq!</span>(owned_a, borrowed_a);
+        <span class="macro">assert_eq!</span>(borrowed_a, owned_a);
+
+        <span class="comment">// Owned inequality
+        </span><span class="macro">assert_ne!</span>(owned_a, owned_b);
+        <span class="macro">assert_ne!</span>(owned_b, owned_a);
+
+        <span class="comment">// Borrowed inequality
+        </span><span class="macro">assert_ne!</span>(borrowed_a, borrowed_b);
+        <span class="macro">assert_ne!</span>(borrowed_b, borrowed_a);
+
+        <span class="comment">// Borrowed vs Owned inequality
+        </span><span class="macro">assert_ne!</span>(owned_a, borrowed_b);
+        <span class="macro">assert_ne!</span>(borrowed_b, owned_a);
     }
 }
 </code></pre></div></section></main></body></html>

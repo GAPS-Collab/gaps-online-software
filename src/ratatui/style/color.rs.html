@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/style/color.rs`."><title>color.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/style/color.rs`."><title>color.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -580,7 +580,11 @@
 <a href="#578" id="578">578</a>
 <a href="#579" id="579">579</a>
 <a href="#580" id="580">580</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::{
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+</pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::unreadable_literal)]
+
+</span><span class="kw">use </span>std::{
     fmt::{<span class="self">self</span>, Debug, Display},
     str::FromStr,
 };
@@ -713,11 +717,11 @@
     <span class="doccomment">/// Convert a u32 to a Color
     ///
     /// The u32 should be in the format 0x00RRGGBB.
-    </span><span class="kw">pub const fn </span>from_u32(u: u32) -&gt; Color {
+    </span><span class="kw">pub const fn </span>from_u32(u: u32) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>r = (u &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u8;
         <span class="kw">let </span>g = (u &gt;&gt; <span class="number">8</span>) <span class="kw">as </span>u8;
         <span class="kw">let </span>b = u <span class="kw">as </span>u8;
-        Color::Rgb(r, g, b)
+        <span class="self">Self</span>::Rgb(r, g, b)
     }
 }
 
@@ -832,25 +836,25 @@
 <span class="kw">impl </span>Display <span class="kw">for </span>Color {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            Color::Reset =&gt; <span class="macro">write!</span>(f, <span class="string">"Reset"</span>),
-            Color::Black =&gt; <span class="macro">write!</span>(f, <span class="string">"Black"</span>),
-            Color::Red =&gt; <span class="macro">write!</span>(f, <span class="string">"Red"</span>),
-            Color::Green =&gt; <span class="macro">write!</span>(f, <span class="string">"Green"</span>),
-            Color::Yellow =&gt; <span class="macro">write!</span>(f, <span class="string">"Yellow"</span>),
-            Color::Blue =&gt; <span class="macro">write!</span>(f, <span class="string">"Blue"</span>),
-            Color::Magenta =&gt; <span class="macro">write!</span>(f, <span class="string">"Magenta"</span>),
-            Color::Cyan =&gt; <span class="macro">write!</span>(f, <span class="string">"Cyan"</span>),
-            Color::Gray =&gt; <span class="macro">write!</span>(f, <span class="string">"Gray"</span>),
-            Color::DarkGray =&gt; <span class="macro">write!</span>(f, <span class="string">"DarkGray"</span>),
-            Color::LightRed =&gt; <span class="macro">write!</span>(f, <span class="string">"LightRed"</span>),
-            Color::LightGreen =&gt; <span class="macro">write!</span>(f, <span class="string">"LightGreen"</span>),
-            Color::LightYellow =&gt; <span class="macro">write!</span>(f, <span class="string">"LightYellow"</span>),
-            Color::LightBlue =&gt; <span class="macro">write!</span>(f, <span class="string">"LightBlue"</span>),
-            Color::LightMagenta =&gt; <span class="macro">write!</span>(f, <span class="string">"LightMagenta"</span>),
-            Color::LightCyan =&gt; <span class="macro">write!</span>(f, <span class="string">"LightCyan"</span>),
-            Color::White =&gt; <span class="macro">write!</span>(f, <span class="string">"White"</span>),
-            Color::Rgb(r, g, b) =&gt; <span class="macro">write!</span>(f, <span class="string">"#{:02X}{:02X}{:02X}"</span>, r, g, b),
-            Color::Indexed(i) =&gt; <span class="macro">write!</span>(f, <span class="string">"{}"</span>, i),
+            <span class="self">Self</span>::Reset =&gt; <span class="macro">write!</span>(f, <span class="string">"Reset"</span>),
+            <span class="self">Self</span>::Black =&gt; <span class="macro">write!</span>(f, <span class="string">"Black"</span>),
+            <span class="self">Self</span>::Red =&gt; <span class="macro">write!</span>(f, <span class="string">"Red"</span>),
+            <span class="self">Self</span>::Green =&gt; <span class="macro">write!</span>(f, <span class="string">"Green"</span>),
+            <span class="self">Self</span>::Yellow =&gt; <span class="macro">write!</span>(f, <span class="string">"Yellow"</span>),
+            <span class="self">Self</span>::Blue =&gt; <span class="macro">write!</span>(f, <span class="string">"Blue"</span>),
+            <span class="self">Self</span>::Magenta =&gt; <span class="macro">write!</span>(f, <span class="string">"Magenta"</span>),
+            <span class="self">Self</span>::Cyan =&gt; <span class="macro">write!</span>(f, <span class="string">"Cyan"</span>),
+            <span class="self">Self</span>::Gray =&gt; <span class="macro">write!</span>(f, <span class="string">"Gray"</span>),
+            <span class="self">Self</span>::DarkGray =&gt; <span class="macro">write!</span>(f, <span class="string">"DarkGray"</span>),
+            <span class="self">Self</span>::LightRed =&gt; <span class="macro">write!</span>(f, <span class="string">"LightRed"</span>),
+            <span class="self">Self</span>::LightGreen =&gt; <span class="macro">write!</span>(f, <span class="string">"LightGreen"</span>),
+            <span class="self">Self</span>::LightYellow =&gt; <span class="macro">write!</span>(f, <span class="string">"LightYellow"</span>),
+            <span class="self">Self</span>::LightBlue =&gt; <span class="macro">write!</span>(f, <span class="string">"LightBlue"</span>),
+            <span class="self">Self</span>::LightMagenta =&gt; <span class="macro">write!</span>(f, <span class="string">"LightMagenta"</span>),
+            <span class="self">Self</span>::LightCyan =&gt; <span class="macro">write!</span>(f, <span class="string">"LightCyan"</span>),
+            <span class="self">Self</span>::White =&gt; <span class="macro">write!</span>(f, <span class="string">"White"</span>),
+            <span class="self">Self</span>::Rgb(r, g, b) =&gt; <span class="macro">write!</span>(f, <span class="string">"#{r:02X}{g:02X}{b:02X}"</span>),
+            <span class="self">Self</span>::Indexed(i) =&gt; <span class="macro">write!</span>(f, <span class="string">"{i}"</span>),
         }
     }
 }
@@ -890,8 +894,8 @@
 <span class="doccomment">/// Converts normalized HSL (Hue, Saturation, Lightness) values to RGB (Red, Green, Blue) color
 /// representation. H, S, and L values should be in the range [0, 1].
 ///
-/// Based on https://github.com/killercup/hsl-rs/blob/b8a30e11afd75f262e0550725333293805f4ead0/src/lib.rs
-</span><span class="kw">fn </span>normalized_hsl_to_rgb(h: f64, s: f64, l: f64) -&gt; Color {
+/// Based on &lt;https://github.com/killercup/hsl-rs/blob/b8a30e11afd75f262e0550725333293805f4ead0/src/lib.rs&gt;
+</span><span class="kw">fn </span>normalized_hsl_to_rgb(hue: f64, saturation: f64, lightness: f64) -&gt; Color {
     <span class="comment">// This function can be made into `const` in the future.
     // This comment contains the relevant information for making it `const`.
     //
@@ -911,33 +915,33 @@
     // ```
 
     // Initialize RGB components
-    </span><span class="kw">let </span>r: f64;
-    <span class="kw">let </span>g: f64;
-    <span class="kw">let </span>b: f64;
+    </span><span class="kw">let </span>red: f64;
+    <span class="kw">let </span>green: f64;
+    <span class="kw">let </span>blue: f64;
 
     <span class="comment">// Check if the color is achromatic (grayscale)
-    </span><span class="kw">if </span>s == <span class="number">0.0 </span>{
-        r = l;
-        g = l;
-        b = l;
+    </span><span class="kw">if </span>saturation == <span class="number">0.0 </span>{
+        red = lightness;
+        green = lightness;
+        blue = lightness;
     } <span class="kw">else </span>{
         <span class="comment">// Calculate RGB components for colored cases
-        </span><span class="kw">let </span>q = <span class="kw">if </span>l &lt; <span class="number">0.5 </span>{
-            l * (<span class="number">1.0 </span>+ s)
+        </span><span class="kw">let </span>q = <span class="kw">if </span>lightness &lt; <span class="number">0.5 </span>{
+            lightness * (<span class="number">1.0 </span>+ saturation)
         } <span class="kw">else </span>{
-            l + s - l * s
+            lightness + saturation - lightness * saturation
         };
-        <span class="kw">let </span>p = <span class="number">2.0 </span>* l - q;
-        r = hue_to_rgb(p, q, h + <span class="number">1.0 </span>/ <span class="number">3.0</span>);
-        g = hue_to_rgb(p, q, h);
-        b = hue_to_rgb(p, q, h - <span class="number">1.0 </span>/ <span class="number">3.0</span>);
+        <span class="kw">let </span>p = <span class="number">2.0 </span>* lightness - q;
+        red = hue_to_rgb(p, q, hue + <span class="number">1.0 </span>/ <span class="number">3.0</span>);
+        green = hue_to_rgb(p, q, hue);
+        blue = hue_to_rgb(p, q, hue - <span class="number">1.0 </span>/ <span class="number">3.0</span>);
     }
 
     <span class="comment">// Scale RGB components to the range [0, 255] and create a Color::Rgb instance
     </span>Color::Rgb(
-        (r * <span class="number">255.0</span>).round() <span class="kw">as </span>u8,
-        (g * <span class="number">255.0</span>).round() <span class="kw">as </span>u8,
-        (b * <span class="number">255.0</span>).round() <span class="kw">as </span>u8,
+        (red * <span class="number">255.0</span>).round() <span class="kw">as </span>u8,
+        (green * <span class="number">255.0</span>).round() <span class="kw">as </span>u8,
+        (blue * <span class="number">255.0</span>).round() <span class="kw">as </span>u8,
     )
 }
 

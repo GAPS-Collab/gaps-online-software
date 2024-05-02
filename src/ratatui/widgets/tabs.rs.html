@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/widgets/tabs.rs`."><title>tabs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/widgets/tabs.rs`."><title>tabs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -516,6 +516,10 @@
 <a href="#514" id="514">514</a>
 <a href="#515" id="515">515</a>
 <a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, widgets::Block};
 
 <span class="kw">const </span>DEFAULT_HIGHLIGHT_STYLE: Style = Style::new().add_modifier(Modifier::REVERSED);
@@ -602,12 +606,12 @@
     /// # use ratatui::{prelude::*, widgets::Tabs};
     /// let tabs = Tabs::new(vec!["Tab 1".red(), "Tab 2".blue()]);
     /// ```
-    </span><span class="kw">pub fn </span>new&lt;Iter&gt;(titles: Iter) -&gt; Tabs&lt;<span class="lifetime">'a</span>&gt;
-    <span class="kw">where
+    </span><span class="kw">pub fn </span>new&lt;Iter&gt;(titles: Iter) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>Iter: IntoIterator,
         Iter::Item: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
-        Tabs {
+        <span class="self">Self </span>{
             block: <span class="prelude-val">None</span>,
             titles: titles.into_iter().map(Into::into).collect(),
             selected: <span class="number">0</span>,
@@ -621,7 +625,7 @@
 
     <span class="doccomment">/// Surrounds the `Tabs` with a [`Block`].
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">'a</span>&gt;) -&gt; Tabs&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.block = <span class="prelude-val">Some</span>(block);
         <span class="self">self
     </span>}
@@ -631,7 +635,7 @@
     /// The first tab has index 0 (this is also the default index).
     /// The selected tab can have a different style with [`Tabs::highlight_style`].
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>select(<span class="kw-2">mut </span><span class="self">self</span>, selected: usize) -&gt; Tabs&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub const fn </span>select(<span class="kw-2">mut </span><span class="self">self</span>, selected: usize) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.selected = selected;
         <span class="self">self
     </span>}
@@ -657,7 +661,7 @@
     ///
     /// Highlighted tab can be selected with [`Tabs::select`].
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>highlight_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; Tabs&lt;<span class="lifetime">'a</span>&gt; {
+    </span><span class="kw">pub fn </span>highlight_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.highlight_style = style.into();
         <span class="self">self
     </span>}
@@ -678,8 +682,9 @@
     /// # use ratatui::{prelude::*, widgets::Tabs};
     /// let tabs = Tabs::new(vec!["Tab 1", "Tab 2"]).divider("-");
     /// ```
-    </span><span class="kw">pub fn </span>divider&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, divider: T) -&gt; Tabs&lt;<span class="lifetime">'a</span>&gt;
-    <span class="kw">where
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>divider&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, divider: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>T: Into&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">self</span>.divider = divider.into();
@@ -702,8 +707,9 @@
     /// # use ratatui::{prelude::*, widgets::Tabs};
     /// let tabs = Tabs::new(vec!["Tab 1", "Tab 2"]).padding("", "");
     /// ```
-    </span><span class="kw">pub fn </span>padding&lt;T, U&gt;(<span class="kw-2">mut </span><span class="self">self</span>, left: T, right: U) -&gt; Tabs&lt;<span class="lifetime">'a</span>&gt;
-    <span class="kw">where
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>padding&lt;T, U&gt;(<span class="kw-2">mut </span><span class="self">self</span>, left: T, right: U) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>T: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
         U: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
@@ -723,8 +729,9 @@
     /// # use ratatui::{prelude::*, widgets::Tabs};
     /// let tabs = Tabs::new(vec!["Tab 1", "Tab 2"]).padding_left("-&gt;");
     /// ```
-    </span><span class="kw">pub fn </span>padding_left&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, padding: T) -&gt; Tabs&lt;<span class="lifetime">'a</span>&gt;
-    <span class="kw">where
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>padding_left&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, padding: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>T: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">self</span>.padding_left = padding.into();
@@ -742,8 +749,9 @@
     /// # use ratatui::{prelude::*, widgets::Tabs};
     /// let tabs = Tabs::new(vec!["Tab 1", "Tab 2"]).padding_right("&lt;-");
     /// ```
-    </span><span class="kw">pub fn </span>padding_right&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, padding: T) -&gt; Tabs&lt;<span class="lifetime">'a</span>&gt;
-    <span class="kw">where
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>padding_right&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, padding: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
         </span>T: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">self</span>.padding_left = padding.into();
@@ -752,7 +760,7 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>Tabs&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">type </span>Item = Tabs&lt;<span class="lifetime">'a</span>&gt;;
+    <span class="kw">type </span>Item = <span class="self">Self</span>;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
@@ -1029,7 +1037,7 @@
                 .bg(Color::White)
                 .add_modifier(Modifier::BOLD)
                 .remove_modifier(Modifier::ITALIC)
-        )
+        );
     }
 }
 </code></pre></div></section></main></body></html>

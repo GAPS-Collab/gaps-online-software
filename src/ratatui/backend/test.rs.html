@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/backend/test.rs`."><title>test.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/backend/test.rs`."><title>test.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -653,37 +653,6 @@
 <a href="#651" id="651">651</a>
 <a href="#652" id="652">652</a>
 <a href="#653" id="653">653</a>
-<a href="#654" id="654">654</a>
-<a href="#655" id="655">655</a>
-<a href="#656" id="656">656</a>
-<a href="#657" id="657">657</a>
-<a href="#658" id="658">658</a>
-<a href="#659" id="659">659</a>
-<a href="#660" id="660">660</a>
-<a href="#661" id="661">661</a>
-<a href="#662" id="662">662</a>
-<a href="#663" id="663">663</a>
-<a href="#664" id="664">664</a>
-<a href="#665" id="665">665</a>
-<a href="#666" id="666">666</a>
-<a href="#667" id="667">667</a>
-<a href="#668" id="668">668</a>
-<a href="#669" id="669">669</a>
-<a href="#670" id="670">670</a>
-<a href="#671" id="671">671</a>
-<a href="#672" id="672">672</a>
-<a href="#673" id="673">673</a>
-<a href="#674" id="674">674</a>
-<a href="#675" id="675">675</a>
-<a href="#676" id="676">676</a>
-<a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-<a href="#679" id="679">679</a>
-<a href="#680" id="680">680</a>
-<a href="#681" id="681">681</a>
-<a href="#682" id="682">682</a>
-<a href="#683" id="683">683</a>
-<a href="#684" id="684">684</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module provides the `TestBackend` implementation for the [`Backend`] trait.
 //! It is used in the integration tests to verify the correctness of the library.
 
@@ -695,6 +664,7 @@
 <span class="kw">use </span>unicode_width::UnicodeWidthStr;
 
 <span class="kw">use crate</span>::{
+    assert_buffer_eq,
     backend::{Backend, ClearType, WindowSize},
     buffer::{Buffer, Cell},
     layout::{Rect, Size},
@@ -758,9 +728,9 @@
 }
 
 <span class="kw">impl </span>TestBackend {
-    <span class="doccomment">/// Creates a new TestBackend with the specified width and height.
-    </span><span class="kw">pub fn </span>new(width: u16, height: u16) -&gt; TestBackend {
-        TestBackend {
+    <span class="doccomment">/// Creates a new `TestBackend` with the specified width and height.
+    </span><span class="kw">pub fn </span>new(width: u16, height: u16) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
             width,
             height,
             buffer: Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, width, height)),
@@ -769,60 +739,29 @@
         }
     }
 
-    <span class="doccomment">/// Returns a reference to the internal buffer of the TestBackend.
-    </span><span class="kw">pub fn </span>buffer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Buffer {
+    <span class="doccomment">/// Returns a reference to the internal buffer of the `TestBackend`.
+    </span><span class="kw">pub const fn </span>buffer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Buffer {
         <span class="kw-2">&amp;</span><span class="self">self</span>.buffer
     }
 
-    <span class="doccomment">/// Resizes the TestBackend to the specified width and height.
+    <span class="doccomment">/// Resizes the `TestBackend` to the specified width and height.
     </span><span class="kw">pub fn </span>resize(<span class="kw-2">&amp;mut </span><span class="self">self</span>, width: u16, height: u16) {
         <span class="self">self</span>.buffer.resize(Rect::new(<span class="number">0</span>, <span class="number">0</span>, width, height));
         <span class="self">self</span>.width = width;
         <span class="self">self</span>.height = height;
     }
 
-    <span class="doccomment">/// Asserts that the TestBackend's buffer is equal to the expected buffer.
+    <span class="doccomment">/// Asserts that the `TestBackend`'s buffer is equal to the expected buffer.
     /// If the buffers are not equal, a panic occurs with a detailed error message
     /// showing the differences between the expected and actual buffers.
     </span><span class="attr">#[track_caller]
     </span><span class="kw">pub fn </span>assert_buffer(<span class="kw-2">&amp;</span><span class="self">self</span>, expected: <span class="kw-2">&amp;</span>Buffer) {
-        <span class="macro">assert_eq!</span>(expected.area, <span class="self">self</span>.buffer.area);
-        <span class="kw">let </span>diff = expected.diff(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer);
-        <span class="kw">if </span>diff.is_empty() {
-            <span class="kw">return</span>;
-        }
-
-        <span class="kw">let </span><span class="kw-2">mut </span>debug_info = String::from(<span class="string">"Buffers are not equal"</span>);
-        debug_info.push(<span class="string">'\n'</span>);
-        debug_info.push_str(<span class="string">"Expected:"</span>);
-        debug_info.push(<span class="string">'\n'</span>);
-        <span class="kw">let </span>expected_view = buffer_view(expected);
-        debug_info.push_str(<span class="kw-2">&amp;</span>expected_view);
-        debug_info.push(<span class="string">'\n'</span>);
-        debug_info.push_str(<span class="string">"Got:"</span>);
-        debug_info.push(<span class="string">'\n'</span>);
-        <span class="kw">let </span>view = buffer_view(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer);
-        debug_info.push_str(<span class="kw-2">&amp;</span>view);
-        debug_info.push(<span class="string">'\n'</span>);
-
-        debug_info.push_str(<span class="string">"Diff:"</span>);
-        debug_info.push(<span class="string">'\n'</span>);
-        <span class="kw">let </span>nice_diff = diff
-            .iter()
-            .enumerate()
-            .map(|(i, (x, y, cell))| {
-                <span class="kw">let </span>expected_cell = expected.get(<span class="kw-2">*</span>x, <span class="kw-2">*</span>y);
-                <span class="macro">format!</span>(<span class="string">"{i}: at ({x}, {y}) expected {expected_cell:?} got {cell:?}"</span>)
-            })
-            .collect::&lt;Vec&lt;String&gt;&gt;()
-            .join(<span class="string">"\n"</span>);
-        debug_info.push_str(<span class="kw-2">&amp;</span>nice_diff);
-        <span class="macro">panic!</span>(<span class="string">"{debug_info}"</span>);
+        <span class="macro">assert_buffer_eq!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer, expected);
     }
 }
 
 <span class="kw">impl </span>Display <span class="kw">for </span>TestBackend {
-    <span class="doccomment">/// Formats the TestBackend for display by calling the buffer_view function
+    <span class="doccomment">/// Formats the `TestBackend` for display by calling the `buffer_view` function
     /// on its internal buffer.
     </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
         <span class="macro">write!</span>(f, <span class="string">"{}"</span>, buffer_view(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer))
@@ -830,7 +769,7 @@
 }
 
 <span class="kw">impl </span>Backend <span class="kw">for </span>TestBackend {
-    <span class="kw">fn </span>draw&lt;<span class="lifetime">'a</span>, I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: I) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt;
+    <span class="kw">fn </span>draw&lt;<span class="lifetime">'a</span>, I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: I) -&gt; io::Result&lt;()&gt;
     <span class="kw">where
         </span>I: Iterator&lt;Item = (u16, u16, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Cell)&gt;,
     {
@@ -841,26 +780,26 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn </span>hide_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
+    <span class="kw">fn </span>hide_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
         <span class="self">self</span>.cursor = <span class="bool-val">false</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn </span>show_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
+    <span class="kw">fn </span>show_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
         <span class="self">self</span>.cursor = <span class="bool-val">true</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn </span>get_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(u16, u16), io::Error&gt; {
+    <span class="kw">fn </span>get_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;(u16, u16)&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.pos)
     }
 
-    <span class="kw">fn </span>set_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u16, y: u16) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
+    <span class="kw">fn </span>set_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u16, y: u16) -&gt; io::Result&lt;()&gt; {
         <span class="self">self</span>.pos = (x, y);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
+    <span class="kw">fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
         <span class="self">self</span>.buffer.reset();
         <span class="prelude-val">Ok</span>(())
     }
@@ -930,11 +869,11 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Rect, io::Error&gt; {
+    <span class="kw">fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;Rect&gt; {
         <span class="prelude-val">Ok</span>(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="self">self</span>.width, <span class="self">self</span>.height))
     }
 
-    <span class="kw">fn </span>window_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;WindowSize, io::Error&gt; {
+    <span class="kw">fn </span>window_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;WindowSize&gt; {
         <span class="comment">// Some arbitrary window pixel size, probably doesn't need much testing.
         </span><span class="kw">static </span>WINDOW_PIXEL_SIZE: Size = Size {
             width: <span class="number">640</span>,
@@ -946,7 +885,7 @@
         })
     }
 
-    <span class="kw">fn </span>flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
+    <span class="kw">fn </span>flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
         <span class="prelude-val">Ok</span>(())
     }
 }
@@ -983,7 +922,6 @@
             <span class="macro">format!</span>(
                 <span class="string">r#""{multi_byte_char}" Hidden by multi-width symbols: [(1, " "), (2, " "), (3, " "), (4, " "), (5, " "), (6, " "), (7, " ")]
 "#</span>,
-                multi_byte_char = multi_byte_char
             )
         );
     }
@@ -1009,7 +947,7 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic]
+    #[should_panic = <span class="string">"buffer contents not equal"</span>]
     </span><span class="kw">fn </span>assert_buffer_panics() {
         <span class="kw">let </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">2</span>);
         <span class="kw">let </span>buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"aaaaaaaaaa"</span>; <span class="number">2</span>]);
@@ -1019,7 +957,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>display() {
         <span class="kw">let </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, backend), <span class="string">"\"          \"\n\"          \"\n"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{backend}"</span>), <span class="string">"\"          \"\n\"          \"\n"</span>);
     }
 
     <span class="attr">#[test]

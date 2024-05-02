@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.1/src/widgets/table/table.rs`."><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/widgets/table/table.rs`."><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1789,9 +1789,6 @@
 <a href="#1787" id="1787">1787</a>
 <a href="#1788" id="1788">1788</a>
 <a href="#1789" id="1789">1789</a>
-<a href="#1790" id="1790">1790</a>
-<a href="#1791" id="1791">1791</a>
-<a href="#1792" id="1792">1792</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>itertools::Itertools;
 
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
@@ -2017,16 +2014,16 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Default <span class="kw">for </span>Table&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            rows: Default::default(),
-            header: Default::default(),
-            footer: Default::default(),
-            widths: Default::default(),
+            rows: Vec::new(),
+            header: <span class="prelude-val">None</span>,
+            footer: <span class="prelude-val">None</span>,
+            widths: Vec::new(),
             column_spacing: <span class="number">1</span>,
-            block: Default::default(),
-            style: Default::default(),
-            highlight_style: Default::default(),
-            highlight_symbol: Default::default(),
-            highlight_spacing: Default::default(),
+            block: <span class="prelude-val">None</span>,
+            style: Style::new(),
+            highlight_style: Style::new(),
+            highlight_symbol: Text::default(),
+            highlight_spacing: HighlightSpacing::default(),
             flex: Flex::Start,
         }
     }
@@ -2194,7 +2191,7 @@
     /// let table = Table::new(rows, widths).column_spacing(1);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>column_spacing(<span class="kw-2">mut </span><span class="self">self</span>, spacing: u16) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub const fn </span>column_spacing(<span class="kw-2">mut </span><span class="self">self</span>, spacing: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.column_spacing = spacing;
         <span class="self">self
     </span>}
@@ -2324,7 +2321,7 @@
     /// let table = Table::new(rows, widths).highlight_spacing(HighlightSpacing::Always);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>highlight_spacing(<span class="kw-2">mut </span><span class="self">self</span>, value: HighlightSpacing) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub const fn </span>highlight_spacing(<span class="kw-2">mut </span><span class="self">self</span>, value: HighlightSpacing) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.highlight_spacing = value;
         <span class="self">self
     </span>}
@@ -2351,6 +2348,7 @@
     /// ];
     /// let table = Table::new(Vec::&lt;Row&gt;::new(), widths).flex(Flex::Legacy);
     /// ```
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub const fn </span>flex(<span class="kw-2">mut </span><span class="self">self</span>, flex: Flex) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.flex = flex;
         <span class="self">self
@@ -2412,7 +2410,7 @@
             <span class="kw-2">&amp;</span>columns_widths,
         );
 
-        <span class="self">self</span>.render_footer(footer_area, buf, columns_widths);
+        <span class="self">self</span>.render_footer(footer_area, buf, <span class="kw-2">&amp;</span>columns_widths);
     }
 }
 
@@ -2449,7 +2447,7 @@
         }
     }
 
-    <span class="kw">fn </span>render_footer(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer, column_widths: Vec&lt;(u16, u16)&gt;) {
+    <span class="kw">fn </span>render_footer(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer, column_widths: <span class="kw-2">&amp;</span>[(u16, u16)]) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>footer) = <span class="self">self</span>.footer {
             buf.set_style(area, footer.style);
             <span class="kw">for </span>((x, width), cell) <span class="kw">in </span>column_widths.iter().zip(footer.cells.iter()) {
@@ -2530,7 +2528,7 @@
             <span class="comment">// Divide the space between each column equally
             </span><span class="macro">vec!</span>[Constraint::Length(max_width / col_count.max(<span class="number">1</span>) <span class="kw">as </span>u16); col_count]
         } <span class="kw">else </span>{
-            <span class="self">self</span>.widths.to_vec()
+            <span class="self">self</span>.widths.clone()
         };
         <span class="comment">// this will always allocate a selection area
         </span><span class="kw">let </span>[_selection_area, columns_area] =
@@ -2581,8 +2579,8 @@
         (start, end)
     }
 
-    <span class="doccomment">/// Returns the width of the selection column if a row is selected, or the highlight_spacing is
-    /// set to show the column always, otherwise 0.
+    <span class="doccomment">/// Returns the width of the selection column if a row is selected, or the `highlight_spacing`
+    /// is set to show the column always, otherwise 0.
     </span><span class="kw">fn </span>selection_width(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>TableState) -&gt; u16 {
         <span class="kw">let </span>has_selection = state.selected().is_some();
         <span class="kw">if </span><span class="self">self</span>.highlight_spacing.should_add(has_selection) {
@@ -2594,18 +2592,18 @@
 }
 
 <span class="kw">fn </span>ensure_percentages_less_than_100(widths: <span class="kw-2">&amp;</span>[Constraint]) {
-    widths.iter().for_each(|<span class="kw-2">&amp;</span>w| {
+    <span class="kw">for </span>w <span class="kw">in </span>widths {
         <span class="kw">if let </span>Constraint::Percentage(p) = w {
             <span class="macro">assert!</span>(
-                p &lt;= <span class="number">100</span>,
+                <span class="kw-2">*</span>p &lt;= <span class="number">100</span>,
                 <span class="string">"Percentages should be between 0 and 100 inclusively."
-            </span>)
+            </span>);
         }
-    });
+    }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>Table&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">type </span>Item = Table&lt;<span class="lifetime">'a</span>&gt;;
+    <span class="kw">type </span>Item = <span class="self">Self</span>;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
@@ -2626,7 +2624,7 @@
     /// `Table::widths` after construction.
     </span><span class="kw">fn </span>from_iter&lt;Iter: IntoIterator&lt;Item = Item&gt;&gt;(rows: Iter) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>widths: [Constraint; <span class="number">0</span>] = [];
-        Table::new(rows, widths)
+        <span class="self">Self</span>::new(rows, widths)
     }
 }
 
@@ -2635,12 +2633,7 @@
     <span class="kw">use </span>std::vec;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use crate</span>::{
-        layout::Constraint::<span class="kw-2">*</span>,
-        style::{Color, Modifier, Style, Stylize},
-        text::Line,
-        widgets::Borders,
-    };
+    <span class="kw">use crate</span>::{layout::Constraint::<span class="kw-2">*</span>, style::Style, text::Line, widgets::Borders};
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>new() {
@@ -2767,7 +2760,7 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic]
+    #[should_panic = <span class="string">"Percentages should be between 0 and 100 inclusively"</span>]
     </span><span class="kw">fn </span>table_invalid_percentages() {
         <span class="kw">let _ </span>= Table::default().widths([Constraint::Percentage(<span class="number">110</span>)]);
     }
@@ -2799,7 +2792,7 @@
     <span class="attr">#[cfg(test)]
     </span><span class="kw">mod </span>render {
         <span class="kw">use super</span>::<span class="kw-2">*</span>;
-        <span class="kw">use crate</span>::{assert_buffer_eq, widgets::Borders};
+        <span class="kw">use </span><span class="kw">crate</span>::assert_buffer_eq;
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>render_empty_area() {
@@ -3131,7 +3124,7 @@
             );
         }
 
-        <span class="doccomment">/// NOTE: segment_size is deprecated use flex instead!
+        <span class="doccomment">/// NOTE: `segment_size` is deprecated use flex instead!
         </span><span class="attr">#[allow(deprecated)]
         #[test]
         </span><span class="kw">fn </span>underconstrained_segment_size() {
@@ -3164,7 +3157,7 @@
             <span class="macro">assert_eq!</span>(
                 table.get_columns_widths(<span class="number">30</span>, <span class="number">0</span>),
                 <span class="kw-2">&amp;</span>[(<span class="number">0</span>, <span class="number">10</span>), (<span class="number">10</span>, <span class="number">10</span>), (<span class="number">20</span>, <span class="number">10</span>)]
-            )
+            );
         }
 
         <span class="attr">#[test]
@@ -3173,7 +3166,7 @@
                 .rows(<span class="macro">vec!</span>[])
                 .header(Row::new(<span class="macro">vec!</span>[<span class="string">"f"</span>, <span class="string">"g"</span>]))
                 .column_spacing(<span class="number">0</span>);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">10</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">5</span>), (<span class="number">5</span>, <span class="number">5</span>)])
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">10</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">5</span>), (<span class="number">5</span>, <span class="number">5</span>)]);
         }
 
         <span class="attr">#[test]
@@ -3182,7 +3175,7 @@
                 .rows(<span class="macro">vec!</span>[])
                 .footer(Row::new(<span class="macro">vec!</span>[<span class="string">"h"</span>, <span class="string">"i"</span>]))
                 .column_spacing(<span class="number">0</span>);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">10</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">5</span>), (<span class="number">5</span>, <span class="number">5</span>)])
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">10</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">5</span>), (<span class="number">5</span>, <span class="number">5</span>)]);
         }
 
         <span class="kw">fn </span>test_table_with_selection(
@@ -3314,7 +3307,8 @@
             );
         }
 
-        <span class="attr">#[test]
+        <span class="attr">#[allow(clippy::too_many_lines)]
+        #[test]
         </span><span class="kw">fn </span>insufficient_area_highlight_symbol_and_column_spacing_allocation() {
             <span class="comment">// column spacing is prioritized over every other constraint
             </span><span class="macro">assert_buffer_eq!</span>(
@@ -3581,7 +3575,7 @@
                 .bg(Color::White)
                 .add_modifier(Modifier::BOLD)
                 .remove_modifier(Modifier::CROSSED_OUT)
-        )
+        );
     }
 }
 </code></pre></div></section></main></body></html>
