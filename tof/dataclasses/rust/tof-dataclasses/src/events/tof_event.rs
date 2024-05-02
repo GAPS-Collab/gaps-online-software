@@ -855,7 +855,7 @@ impl FromRandom for TofEventSummary {
 fn packable_tofeventsummary() {
   for _ in 0..100 {
     let data = TofEventSummary::from_random();
-    let test = data.pack().unpack().unwrap();
+    let test : TofEventSummary = data.pack().unpack().unwrap();
     assert_eq!(data, test);
   }
 }  
@@ -865,7 +865,7 @@ fn packable_tofeventsummary() {
 fn packable_tofevent() {
   for _ in 0..5 {
     let data = TofEvent::from_random();
-    let test = data.pack().unpack().unwrap();
+    let test : TofEvent = data.pack().unpack().unwrap();
     assert_eq!(data.header, test.header);
     assert_eq!(data.compression_level, test.compression_level);
     assert_eq!(data.quality, test.quality);
