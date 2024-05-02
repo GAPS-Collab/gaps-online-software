@@ -232,9 +232,9 @@ RBEvent::RBEvent() {
   status    = EventStatus::Unknown;
   header = RBEventHeader();
   adc    = Vec<Vec<u16>>(); 
-  //for (usize k=0; k<NCHN; k++) {
-  //  adc.push_back(Vec<u16>(NWORDS));
-  //}
+  for (usize k=0; k<NCHN; k++) {
+    adc.push_back(Vec<u16>());
+  }
   hits  = Vec<TofHit>();
 }
 
@@ -348,8 +348,11 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
   if (event.header.is_event_fragment() || event.header.drs_lost_trigger()) {
     return event;
   }
-  for (auto const &ch : event.header.get_channels()) {
-    log_debug("Found active data channel " <<  ch);
+  for (auto ch : event.header.get_channels()) {
+    if (stream.size() < pos + 2*NWORDS) {
+      event.status = EventStatus::IncompleteReadout;
+      return event;
+    }
     Vec<u8>::const_iterator start = stream.begin() + pos;
     Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
     Vec<u8> data(start, end);
@@ -580,6 +583,8 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEvent::HEAD)  {
     log_error("No header signature found!");  
+    event.status = EventStatus::IncompleteReadout;
+    return event;
   }
   // for now skip quality and compression level
   pos += 2;
