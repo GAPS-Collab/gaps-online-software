@@ -652,6 +652,8 @@ PYBIND11_MODULE(gaps_tof, m) {
    
 
    // Calibration functions
-   m.def("spike_cleaning_drs4",            &spike_cleaning_drs4, 
+   m.def("spike_cleaning_simple",         &spike_cleaning_simple, 
+           "A more simpler spike cleaing routine written by Jamie.");
+   m.def("spike_cleaning_drs4",           &spike_cleaning_drs4, 
            "Semi-Original Spike removal routine provided by the DRS4 folks.");
 }

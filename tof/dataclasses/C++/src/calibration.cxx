@@ -19,6 +19,69 @@ u8 extract_rbid(const String& filename) {
   }
 }
 
+/************************************************/
+
+/// A simple version of the spike cleaning, which does not rely on 
+/// all channels being present and can work independently on each 
+/// channel
+void spike_cleaning_simple(Vec<Vec<f32>> &wf, bool calibrated) {
+//    # TODO: make robust (symmetric, doubles, fixed/estimated spike height)
+//    thresh = 360
+//    if vcaldone:
+//        thresh = 16
+//    spikefilter = -wf[:,:-3]+wf[:,1:-2]+wf[:,2:-1]-wf[:,3:]
+//    spikes = np.where(np.sum(spikefilter > thresh,axis=0) >= 2)[0]
+//    for i in spikes:
+//        dV = (wf[:,i+3]-wf[:,i])/3.0
+//        wf[:,i+1] = wf[:,i] + dV
+//        wf[:,i+2] = wf[:,i] + 2*dV
+//    return wf
+  int thresh = 360;
+  if (calibrated) {
+    thresh = 16;
+  }
+
+  std::vector<std::vector<double>> spikefilter(wf.size());
+  for (size_t i = 0; i < wf.size(); ++i) {
+    for (size_t j = 0; j < wf[i].size() - 3; ++j) {
+      double value = -wf[i][j] + wf[i][j + 1] + wf[i][j + 2] - wf[i][j + 3];
+      spikefilter[i].push_back(value);
+    }
+  }
+
+  // Finding spikes
+  std::vector<int> spikes;
+  for (size_t j = 0; j < spikefilter[0].size(); ++j) {
+    int count = 0;
+    for (size_t i = 0; i < spikefilter.size(); ++i) {
+      if (spikefilter[i][j] > thresh) {
+        count++;
+      }
+    }
+    if (count >= 2) {
+      spikes.push_back(j);
+    }
+  }
+
+  // Adjusting wf based on spikes
+  for (int i : spikes) {
+    for (size_t row = 0; row < wf.size(); ++row) {
+      if (i + 3 < (int)wf[row].size()) {  // Check to avoid out-of-bounds
+        double dV = (wf[row][i + 3] - wf[row][i]) / 3.0;
+        wf[row][i + 1] = wf[row][i] + dV;
+        wf[row][i + 2] = wf[row][i] + 2 * dV;
+      }
+    }
+  }
+
+  // Printing the adjusted wf for demonstration
+  //for (const auto& row : wf) {
+  //  for (double num : row) {
+  //    std::cout << num << " ";
+  //  }
+  //  std::cout << "\n";
+  //}
+}
 
 /************************************************/
 
