@@ -1054,10 +1054,9 @@ impl ReadoutBoard {
     if newest_file.0.is_empty() {
       error!("No matching calibration available for board {}!", self.rb_id);
     } else {
-      let file_to_load = self.calib_file_path.clone() + "/" + &newest_file.0;
+      let file_to_load = format!("{}/{}", self.calib_file_path, newest_file.0);
       println!("== ==> Loading calibration from file: {}", file_to_load);
       self.calibration = RBCalibrations::from_file(file_to_load, true)?;
-      //println!("==> Loaded calibration {}", self.calibration);
     }
     Ok(())
   }

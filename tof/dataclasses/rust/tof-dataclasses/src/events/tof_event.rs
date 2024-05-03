@@ -481,25 +481,25 @@ impl From<&MasterTriggerEvent> for TofEventHeader {
 impl fmt::Display for TofEventHeader {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<TofEventHeader"); 
-    repr += &("\n  Run   ID          : ".to_owned() + &self.run_id              .to_string());
-    repr += &("\n  Event ID          : ".to_owned() + &self.event_id            .to_string());
-    repr += &("\n  Timestamp 32      : ".to_owned() + &self.timestamp_32        .to_string());
-    repr += &("\n  Timestamp 16      : ".to_owned() + &self.timestamp_16        .to_string());
-    repr += &("\n  Prim. Beta        : ".to_owned() + &self.primary_beta        .to_string());
-    repr += &("\n  Prim. Beta Unc    : ".to_owned() + &self.primary_beta_unc    .to_string());
-    repr += &("\n  Prim. Charge      : ".to_owned() + &self.primary_charge      .to_string());
-    repr += &("\n  Prim. Charge unc  : ".to_owned() + &self.primary_charge_unc  .to_string());
-    repr += &("\n  Prim. Outer Tof X : ".to_owned() + &self.primary_outer_tof_x .to_string());
-    repr += &("\n  Prim. Outer Tof Y : ".to_owned() + &self.primary_outer_tof_y .to_string());
-    repr += &("\n  Prim. Outer Tof Z : ".to_owned() + &self.primary_outer_tof_z .to_string());
-    repr += &("\n  Prim. Inner Tof X : ".to_owned() + &self.primary_inner_tof_x .to_string());
-    repr += &("\n  Prim. Inner Tof Y : ".to_owned() + &self.primary_inner_tof_y .to_string());
-    repr += &("\n  Prim. Inner Tof Z : ".to_owned() + &self.primary_inner_tof_z .to_string());
-    repr += &("\n  NHit  Outer Tof   : ".to_owned() + &self.nhit_outer_tof      .to_string());
-    repr += &("\n  NHit  Inner Tof   : ".to_owned() + &self.nhit_inner_tof      .to_string());
-    repr += &("\n  TriggerInfo       : ".to_owned() + &self.trigger_info        .to_string());
-    repr += &("\n  Ctr ETX           : ".to_owned() + &self.ctr_etx             .to_string());
-    repr += &("\n  NPaddles          : ".to_owned() + &self.n_paddles           .to_string());
+    repr += &(format!("\n  Run   ID          : {}", self.run_id              ));
+    repr += &(format!("\n  Event ID          : {}", self.event_id            ));
+    repr += &(format!("\n  Timestamp 32      : {}", self.timestamp_32        ));
+    repr += &(format!("\n  Timestamp 16      : {}", self.timestamp_16        ));
+    repr += &(format!("\n  Prim. Beta        : {}", self.primary_beta        ));
+    repr += &(format!("\n  Prim. Beta Unc    : {}", self.primary_beta_unc    ));
+    repr += &(format!("\n  Prim. Charge      : {}", self.primary_charge      ));
+    repr += &(format!("\n  Prim. Charge unc  : {}", self.primary_charge_unc  ));
+    repr += &(format!("\n  Prim. Outer Tof X : {}", self.primary_outer_tof_x ));
+    repr += &(format!("\n  Prim. Outer Tof Y : {}", self.primary_outer_tof_y ));
+    repr += &(format!("\n  Prim. Outer Tof Z : {}", self.primary_outer_tof_z ));
+    repr += &(format!("\n  Prim. Inner Tof X : {}", self.primary_inner_tof_x ));
+    repr += &(format!("\n  Prim. Inner Tof Y : {}", self.primary_inner_tof_y ));
+    repr += &(format!("\n  Prim. Inner Tof Z : {}", self.primary_inner_tof_z ));
+    repr += &(format!("\n  NHit  Outer Tof   : {}", self.nhit_outer_tof      ));
+    repr += &(format!("\n  NHit  Inner Tof   : {}", self.nhit_inner_tof      ));
+    repr += &(format!("\n  TriggerInfo       : {}", self.trigger_info        ));
+    repr += &(format!("\n  Ctr ETX           : {}", self.ctr_etx             ));
+    repr += &(format!("\n  NPaddles          : {}", self.n_paddles           ));
     repr += ">";
   write!(f,"{}", repr)
   }

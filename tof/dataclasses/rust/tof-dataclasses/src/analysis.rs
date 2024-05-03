@@ -87,8 +87,6 @@ pub fn interpolate_time (voltages      : &Vec<f32>,
 /// * impedance : typically this is 
 pub fn integrate(voltages     : &Vec<f32>,
                  nanoseconds  : &Vec<f32>,
-                 //lower_bound  : f32,
-                 //size         : f32,
                  lo_bin       : usize,
                  upper_bin    : usize,
                  impedance    : f32) -> Result<f32, WaveformError>  {

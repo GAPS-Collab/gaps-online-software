@@ -940,13 +940,14 @@ impl TofPacketWriter {
         file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
       }
       FileType::RunFile(runid) => {
-        let filename = file_path.clone() + &get_runfilename(runid,1, None);
+        let filename = format!("{}{}", file_path, get_runfilename(runid, 1, None));
         let path     = Path::new(&filename); 
         info!("Writing to file {filename}");
         file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
       }
       FileType::CalibrationFile(rbid) => {
-        let filename = file_path.clone() + &get_califilename(rbid,false);
+        let filename = format!("{}{}", file_path, get_califilename(rbid, false));
+        //let filename = file_path.clone() + &get_califilename(rbid,false);
         let path     = Path::new(&filename); 
         info!("Writing to file {filename}");
         file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
@@ -972,13 +973,15 @@ impl TofPacketWriter {
         file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
       }
       FileType::RunFile(runid) => {
-        let filename = self.file_path.clone() + &get_runfilename(runid,self.file_id as u64, None);
+        let filename = format!("{}{}", self.file_path, get_runfilename(runid, self.file_id as u64, None));
+        //let filename = self.file_path.clone() + &get_runfilename(runid,self.file_id as u64, None);
         let path     = Path::new(&filename); 
         info!("Writing to file {filename}");
         file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
       }
       FileType::CalibrationFile(rbid) => {
-        let filename = self.file_path.clone() + &get_califilename(rbid,false);
+        //let filename = self.file_path.clone() + &get_califilename(rbid,false);
+        let filename = format!("{}{}", self.file_path, get_califilename(rbid, false));
         let path     = Path::new(&filename); 
         info!("Writing to file {filename}");
         file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
