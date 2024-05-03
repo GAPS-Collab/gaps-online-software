@@ -13,23 +13,19 @@ use std::fmt;
 
 use crate::packets::PacketType;
 
+cfg_if::cfg_if! {
+  if #[cfg(feature = "random")]  {
+    use crate::FromRandom;
+    extern crate rand;
+    use rand::Rng;
+  }
+}
+
 // Takeru's tof-control code
 #[cfg(feature = "tof-control")]
-use tof_control::helper::pb_type::{
-    PBTemp,
-    PBVcp,
-};
-
-#[cfg(feature = "tof-control")]
-use tof_control::helper::preamp_type::{
-    PreampTemp,
-    PreampReadBias,
-};
-
-#[cfg(feature = "tof-control")]
-use tof_control::helper::ltb_type::{
-    LTBTemp,
-    LTBThreshold,
+use tof_control::helper::cpu_type::{
+    CPUTempDebug,
+    CPUInfoDebug,
 };
 
 #[cfg(feature = "tof-control")]
@@ -40,19 +36,24 @@ use tof_control::helper::rb_type::{
     RBPh,
 };
 
-cfg_if::cfg_if! {
-  if #[cfg(feature = "random")]  {
-    use crate::FromRandom;
-    extern crate rand;
-    use rand::Rng;
-  }
-}
+
 #[cfg(feature = "tof-control")]
-use tof_control::helper::cpu_type::{
-    CPUTempDebug,
-    CPUInfoDebug,
+use tof_control::helper::ltb_type::{
+    LTBTemp,
+    LTBThreshold,
 };
 
+#[cfg(feature = "tof-control")]
+use tof_control::helper::preamp_type::{
+    PreampTemp,
+    PreampReadBias,
+};
+
+#[cfg(feature = "tof-control")]
+use tof_control::helper::pb_type::{
+    PBTemp,
+    PBVcp,
+};
 
 use crate::serialization::{
     Serialization,
@@ -66,15 +67,28 @@ use crate::serialization::{
 
 // re-export
 pub use crate::series::{
-  Series,
+  MoniSeries,
   PAMoniDataSeries,
   PBMoniDataSeries,
   LTBMoniDataSeries,
   RBMoniDataSeries
 };
 
-pub trait HasBoardId {
+/// Monitoring data shall share the same kind 
+/// of interface. 
+pub trait MoniData {
+  /// Monitoring data is always tied to a specific
+  /// board. This might not be its own board, but 
+  /// maybe the RB the data was gathered from
+  /// This is an unique identifier for the 
+  /// monitoring data
   fn get_board_id(&self) -> u8;
+  
+  /// Access the (data) members by name 
+  fn get(&self, varname : &str) -> Option<f32>;
+
+  /// A list of the variables in this MoniData
+  fn keys() -> Vec<&'static str>;
 }
 
 /// Sensors on the power boards (PB)
@@ -180,51 +194,59 @@ impl fmt::Display for PBMoniData {
   }
 }
 
-#[cfg(feature = "random")]
-impl FromRandom for PBMoniData {
-    
-  fn from_random() -> PBMoniData {
-    let mut moni = Self::new();
-    let mut rng = rand::thread_rng();
-    moni.board_id           = rng.gen::<u8>(); 
-    for k in 0..3 {
-      let foo = rng.gen::<f32>();
-      moni.p3v6_preamp_vcp[k] = foo;
-    }
-    for k in 0..3 {
-      let foo = rng.gen::<f32>();
-      moni.n1v6_preamp_vcp[k] = foo;
-    }
-    for k in 0..3 {
-      let foo = rng.gen::<f32>();
-      moni.p3v4f_ltb_vcp[k] = foo;
-    }
-    for k in 0..3 {
-      let foo = rng.gen::<f32>();
-      moni.p3v4d_ltb_vcp[k] = foo;
-    }
-    for k in 0..3 {
-      let foo = rng.gen::<f32>();
-      moni.p3v6_ltb_vcp[k] = foo;
-    }
-    for k in 0..3 {
-      let foo = rng.gen::<f32>();
-      moni.n1v6_ltb_vcp[k] = foo;
-    }
-    moni.pds_temp = rng.gen::<f32>(); 
-    moni.pas_temp = rng.gen::<f32>(); 
-    moni.nas_temp = rng.gen::<f32>(); 
-    moni.shv_temp = rng.gen::<f32>(); 
-    moni
-  }
-}
-
 impl Packable for PBMoniData {
   const PACKET_TYPE : PacketType = PacketType::PBMoniData;
 }
 
-impl Serialization for PBMoniData {
+impl MoniData for PBMoniData {
+
+  fn get_board_id(&self) -> u8 {
+    self.board_id 
+  }
   
+  fn get(&self, varname : &str) -> Option<f32> {
+    match varname {
+      "board_id"      => Some(0.0f32),
+      "p3v6_preamp_v" => Some(self.p3v6_preamp_vcp[0]), 
+      "p3v6_preamp_c" => Some(self.p3v6_preamp_vcp[1]), 
+      "p3v6_preamp_p" => Some(self.p3v6_preamp_vcp[2]), 
+      "n1v6_preamp_v" => Some(self.n1v6_preamp_vcp[0]), 
+      "n1v6_preamp_c" => Some(self.n1v6_preamp_vcp[1]), 
+      "n1v6_preamp_p" => Some(self.n1v6_preamp_vcp[2]), 
+      "p3v4f_ltb_v"   => Some(self.p3v4f_ltb_vcp[0]), 
+      "p3v4f_ltb_c"   => Some(self.p3v4f_ltb_vcp[1]), 
+      "p3v4f_ltb_p"   => Some(self.p3v4f_ltb_vcp[2]), 
+      "p3v4d_ltb_v"   => Some(self.p3v4d_ltb_vcp[0]), 
+      "p3v4d_ltb_c"   => Some(self.p3v4d_ltb_vcp[1]), 
+      "p3v4d_ltb_p"   => Some(self.p3v4d_ltb_vcp[2]), 
+      "p3v6_ltb_v"    => Some(self.p3v6_ltb_vcp[0]), 
+      "p3v6_ltb_c"    => Some(self.p3v6_ltb_vcp[1]), 
+      "p3v6_ltb_p"    => Some(self.p3v6_ltb_vcp[2]), 
+      "n1v6_ltb_v"    => Some(self.n1v6_ltb_vcp[0]), 
+      "n1v6_ltb_c"    => Some(self.n1v6_ltb_vcp[1]), 
+      "n1v6_ltb_p"    => Some(self.n1v6_ltb_vcp[2]), 
+      "pds_temp"      => Some(self.pds_temp),
+      "pas_temp"      => Some(self.pas_temp),
+      "nas_temp"      => Some(self.nas_temp),
+      "shv_temp"      => Some(self.shv_temp),
+      _               => None, 
+    }
+  }
+
+  fn keys() -> Vec<&'static str> {
+    vec!["board_id",
+         "p3v6_preamp_v", "p3v6_preamp_c", "p3v6_preamp_p",
+         "n1v6_preamp_v", "n1v6_preamp_c", "n1v6_preamp_p",
+         "p3v4f_ltb_v", "p3v4f_ltb_c", "p3v4f_ltb_p",
+         "p3v4d_ltb_v", "p3v4d_ltb_c", "p3v4d_ltb_p",
+         "p3v6_ltb_v", "p3v6_ltb_c", "p3v6_ltb_p",
+         "n1v6_ltb_v", "n1v6_ltb_c", "n1v6_ltb_p",
+         "pds_temp", "pas_temp", "nas_temp", "shv_temp"]
+  }
+}
+
+
+impl Serialization for PBMoniData {
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
   /// The data size when serialized to a bytestream
@@ -296,6 +318,45 @@ impl Serialization for PBMoniData {
   }
 }
 
+#[cfg(feature = "random")]
+impl FromRandom for PBMoniData {
+    
+  fn from_random() -> PBMoniData {
+    let mut moni = Self::new();
+    let mut rng = rand::thread_rng();
+    moni.board_id           = rng.gen::<u8>(); 
+    for k in 0..3 {
+      let foo = rng.gen::<f32>();
+      moni.p3v6_preamp_vcp[k] = foo;
+    }
+    for k in 0..3 {
+      let foo = rng.gen::<f32>();
+      moni.n1v6_preamp_vcp[k] = foo;
+    }
+    for k in 0..3 {
+      let foo = rng.gen::<f32>();
+      moni.p3v4f_ltb_vcp[k] = foo;
+    }
+    for k in 0..3 {
+      let foo = rng.gen::<f32>();
+      moni.p3v4d_ltb_vcp[k] = foo;
+    }
+    for k in 0..3 {
+      let foo = rng.gen::<f32>();
+      moni.p3v6_ltb_vcp[k] = foo;
+    }
+    for k in 0..3 {
+      let foo = rng.gen::<f32>();
+      moni.n1v6_ltb_vcp[k] = foo;
+    }
+    moni.pds_temp = rng.gen::<f32>(); 
+    moni.pas_temp = rng.gen::<f32>(); 
+    moni.nas_temp = rng.gen::<f32>(); 
+    moni.shv_temp = rng.gen::<f32>(); 
+    moni
+  }
+}
+
 ///////////////////////////////////////////////////////
 
 /// Preamp temperature and bias data
@@ -303,7 +364,9 @@ impl Serialization for PBMoniData {
 pub struct PAMoniData {
   pub board_id           : u8,
   pub temps              : [f32;16],
-  pub biases             : [f32;16]
+  pub biases             : [f32;16],
+  //#[cfg(feature = "polars")]
+  //pub mapped             : HashMap<String, f32>,
 }
 
 impl PAMoniData {
@@ -312,11 +375,11 @@ impl PAMoniData {
     Self {
       board_id  : 0,
       temps     : [f32::MAX;16],
-      biases    : [f32::MAX;16]
+      biases    : [f32::MAX;16],
+      //#[cfg(feature = "polars")]
+      //mapped    : HashMap::<String, f32>::new(),
     }
   }
-
-  
 
   #[cfg(feature = "tof-control")]
   pub fn add_temps(&mut self, pt : &PreampTemp ) {
@@ -326,12 +389,6 @@ impl PAMoniData {
   #[cfg(feature = "tof-control")]
   pub fn add_biases(&mut self, pb : &PreampReadBias) {
     self.biases = pb.read_biases;
-  }
-}
-
-impl HasBoardId for PAMoniData {
-  fn get_board_id(&self) -> u8 {
-    return self.board_id;
   }
 }
 
@@ -415,23 +472,6 @@ impl fmt::Display for PAMoniData {
   }
 }
 
-#[cfg(feature = "random")]
-impl FromRandom for PAMoniData {
-    
-  fn from_random() -> Self {
-    let mut moni = Self::new();
-    let mut rng = rand::thread_rng();
-    moni.board_id     = rng.gen::<u8>(); 
-    for k in 0..16 {
-      moni.temps[k]   = rng.gen::<f32>(); 
-    }
-    for k in 0..16 {
-      moni.biases[k]  = rng.gen::<f32>(); 
-    }
-    moni
-  }
-}
-
 impl Packable for PAMoniData {
   const PACKET_TYPE : PacketType = PacketType::PAMoniData;
 }
@@ -473,6 +513,82 @@ impl Serialization for PAMoniData {
     }
     *pos += 2;
     Ok(moni_data)
+  }
+}
+
+impl MoniData for PAMoniData {
+  
+  fn get_board_id(&self) -> u8 {
+    return self.board_id;
+  }
+
+  fn keys() -> Vec<&'static str> {
+    vec!["board_id",
+         "temps1", "temps2", "temps3", "temps4",
+         "temps5", "temps6", "temps7", "temps8", 
+         "temps9", "temps10", "temps11", "temps12",
+         "temps13", "temps14", "temps15", "temps16",
+         "biases1", "biases2", "biases3", "biases4", 
+         "biases5", "biases6", "biases7", "biases8",
+         "biases9", "biases10", "biases11", "biases12",
+         "biases13", "biases14", "biases15", "biases16"]
+  }
+
+  fn get(&self, varname : &str) -> Option<f32> {
+    match varname {
+      "board_id" =>  Some(self.board_id as f32),
+      "temps1"   =>  Some(self.temps[0]  ),
+      "temps2"   =>  Some(self.temps[1]  ),
+      "temps3"   =>  Some(self.temps[2]  ),
+      "temps4"   =>  Some(self.temps[3]  ),
+      "temps5"   =>  Some(self.temps[4]  ),
+      "temps6"   =>  Some(self.temps[5]  ),
+      "temps7"   =>  Some(self.temps[6]  ),
+      "temps8"   =>  Some(self.temps[7]  ),
+      "temps9"   =>  Some(self.temps[8]  ),
+      "temps10"  =>  Some(self.temps[9]  ),
+      "temps11"  =>  Some(self.temps[10] ),
+      "temps12"  =>  Some(self.temps[11] ),
+      "temps13"  =>  Some(self.temps[12] ),
+      "temps14"  =>  Some(self.temps[13] ),
+      "temps15"  =>  Some(self.temps[14] ),
+      "temps16"  =>  Some(self.temps[15] ),
+      "biases1"  =>  Some(self.biases[0] ),
+      "biases2"  =>  Some(self.biases[1] ),
+      "biases3"  =>  Some(self.biases[2] ),
+      "biases4"  =>  Some(self.biases[3] ),
+      "biases5"  =>  Some(self.biases[4] ),
+      "biases6"  =>  Some(self.biases[5] ),
+      "biases7"  =>  Some(self.biases[6] ),
+      "biases8"  =>  Some(self.biases[7] ),
+      "biases9"  =>  Some(self.biases[8] ),
+      "biases10" =>  Some(self.biases[9] ),
+      "biases11" =>  Some(self.biases[10]),
+      "biases12" =>  Some(self.biases[11]),
+      "biases13" =>  Some(self.biases[12]),
+      "biases14" =>  Some(self.biases[13]),
+      "biases15" =>  Some(self.biases[14]),
+      "biases16" =>  Some(self.biases[15]),
+      _          =>  None
+    }
+  }
+  
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for PAMoniData {
+    
+  fn from_random() -> Self {
+    let mut moni = Self::new();
+    let mut rng = rand::thread_rng();
+    moni.board_id     = rng.gen::<u8>(); 
+    for k in 0..16 {
+      moni.temps[k]   = rng.gen::<f32>(); 
+    }
+    for k in 0..16 {
+      moni.biases[k]  = rng.gen::<f32>(); 
+    }
+    moni
   }
 }
 
@@ -533,21 +649,6 @@ impl fmt::Display for LTBMoniData {
   }
 }
 
-#[cfg(feature = "random")]
-impl FromRandom for LTBMoniData {
-    
-  fn from_random() -> LTBMoniData {
-    let mut moni  = Self::new();
-    let mut rng   = rand::thread_rng();
-    moni.board_id = rng.gen::<u8>(); 
-    moni.trenz_temp = rng.gen::<f32>();
-    moni.ltb_temp   = rng.gen::<f32>();
-    for k in 0..3 {
-      moni.thresh[k] = rng.gen::<f32>();
-    }
-    moni
-  }
-}
 
 impl Packable for LTBMoniData {
   const PACKET_TYPE : PacketType = PacketType::LTBMoniData;
@@ -589,6 +690,47 @@ impl Serialization for LTBMoniData {
     }
     *pos += 2;
     Ok(moni)
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for LTBMoniData {
+    
+  fn from_random() -> LTBMoniData {
+    let mut moni  = Self::new();
+    let mut rng   = rand::thread_rng();
+    moni.board_id = rng.gen::<u8>(); 
+    moni.trenz_temp = rng.gen::<f32>();
+    moni.ltb_temp   = rng.gen::<f32>();
+    for k in 0..3 {
+      moni.thresh[k] = rng.gen::<f32>();
+    }
+    moni
+  }
+}
+
+impl MoniData for LTBMoniData {
+  fn get_board_id(&self) -> u8 {
+    self.board_id
+  }
+  
+  /// Access the (data) members by name 
+  fn get(&self, varname : &str) -> Option<f32> {
+    match varname {
+    "board_id"    => Some(self.board_id as f32),
+    "trenz_temp"  => Some(self.trenz_temp),
+    "ltb_temp"    => Some(self.ltb_temp),
+    "thresh0"     => Some(self.thresh[0]),
+    "thresh1"     => Some(self.thresh[1]),
+    "thresh2"     => Some(self.thresh[2]),
+    _             => None
+    }
+  }
+
+  /// A list of the variables in this MoniData
+  fn keys() -> Vec<&'static str> {
+    vec!["board_id", "trenz_temp", "ltb_temp",
+         "thresh0", "thresh1", "thresh2"]
   }
 }
 
@@ -816,50 +958,96 @@ impl fmt::Display for RBMoniData {
   }
 }
 
-#[cfg(feature = "random")]
-impl FromRandom for RBMoniData {
-    
-  fn from_random() -> RBMoniData {
-    let mut moni = RBMoniData::new();
-    let mut rng = rand::thread_rng();
-    moni.board_id           = rng.gen::<u8>(); 
-    moni.rate               = rng.gen::<u16>();
-    moni.tmp_drs            = rng.gen::<f32>();
-    moni.tmp_clk            = rng.gen::<f32>();
-    moni.tmp_adc            = rng.gen::<f32>();
-    moni.tmp_zynq           = rng.gen::<f32>();
-    moni.tmp_lis3mdltr      = rng.gen::<f32>();
-    moni.tmp_bm280          = rng.gen::<f32>();
-    moni.pressure           = rng.gen::<f32>();
-    moni.humidity           = rng.gen::<f32>();
-    moni.mag_x              = rng.gen::<f32>();
-    moni.mag_y              = rng.gen::<f32>();
-    moni.mag_z              = rng.gen::<f32>();
-    moni.drs_dvdd_voltage   = rng.gen::<f32>(); 
-    moni.drs_dvdd_current   = rng.gen::<f32>();
-    moni.drs_dvdd_power     = rng.gen::<f32>();
-    moni.p3v3_voltage       = rng.gen::<f32>();
-    moni.p3v3_current       = rng.gen::<f32>();
-    moni.p3v3_power         = rng.gen::<f32>();
-    moni.zynq_voltage       = rng.gen::<f32>();
-    moni.zynq_current       = rng.gen::<f32>();
-    moni.zynq_power         = rng.gen::<f32>();
-    moni.p3v5_voltage       = rng.gen::<f32>(); 
-    moni.p3v5_current       = rng.gen::<f32>();
-    moni.p3v5_power         = rng.gen::<f32>();
-    moni.adc_dvdd_voltage   = rng.gen::<f32>();
-    moni.adc_dvdd_current   = rng.gen::<f32>();
-    moni.adc_dvdd_power     = rng.gen::<f32>();
-    moni.adc_avdd_voltage   = rng.gen::<f32>();
-    moni.adc_avdd_current   = rng.gen::<f32>();
-    moni.adc_avdd_power     = rng.gen::<f32>();
-    moni.drs_avdd_voltage   = rng.gen::<f32>(); 
-    moni.drs_avdd_current   = rng.gen::<f32>();
-    moni.drs_avdd_power     = rng.gen::<f32>();
-    moni.n1v5_voltage       = rng.gen::<f32>();
-    moni.n1v5_current       = rng.gen::<f32>();
-    moni.n1v5_power         = rng.gen::<f32>();
-    moni
+impl MoniData for RBMoniData {
+
+  fn get_board_id(&self) -> u8 {
+    self.board_id
+  }
+  
+  /// Access the (data) members by name 
+  fn get(&self, varname : &str) -> Option<f32> {
+    match varname {
+      "board_id"         => Some(self.board_id as   f32),
+      "rate"             => Some(self.rate as f32      ), 
+      "tmp_drs"          => Some(self.tmp_drs          ), 
+      "tmp_clk"          => Some(self.tmp_clk          ), 
+      "tmp_adc"          => Some(self.tmp_adc          ), 
+      "tmp_zynq"         => Some(self.tmp_zynq         ), 
+      "tmp_lis3mdltr"    => Some(self.tmp_lis3mdltr    ), 
+      "tmp_bm280"        => Some(self.tmp_bm280        ), 
+      "pressure"         => Some(self.pressure         ), 
+      "humidity"         => Some(self.humidity         ), 
+      "mag_x"            => Some(self.mag_x            ), 
+      "mag_y"            => Some(self.mag_y            ), 
+      "mag_z"            => Some(self.mag_z            ), 
+      "drs_dvdd_voltage" => Some(self.drs_dvdd_voltage ), 
+      "drs_dvdd_current" => Some(self.drs_dvdd_current ), 
+      "drs_dvdd_power"   => Some(self.drs_dvdd_power   ), 
+      "p3v3_voltage"     => Some(self.p3v3_voltage     ), 
+      "p3v3_current"     => Some(self.p3v3_current     ), 
+      "p3v3_power"       => Some(self.p3v3_power       ), 
+      "zynq_voltage"     => Some(self.zynq_voltage     ), 
+      "zynq_current"     => Some(self.zynq_current     ), 
+      "zynq_power"       => Some(self.zynq_power       ), 
+      "p3v5_voltage"     => Some(self.p3v5_voltage     ), 
+      "p3v5_current"     => Some(self.p3v5_current     ), 
+      "p3v5_power"       => Some(self.p3v5_power       ), 
+      "adc_dvdd_voltage" => Some(self.adc_dvdd_voltage ), 
+      "adc_dvdd_current" => Some(self.adc_dvdd_current ), 
+      "adc_dvdd_power"   => Some(self.adc_dvdd_power   ), 
+      "adc_avdd_voltage" => Some(self.adc_avdd_voltage ), 
+      "adc_avdd_current" => Some(self.adc_avdd_current ), 
+      "adc_avdd_power"   => Some(self.adc_avdd_power   ), 
+      "drs_avdd_voltage" => Some(self.drs_avdd_voltage ), 
+      "drs_avdd_current" => Some(self.drs_avdd_current ), 
+      "drs_avdd_power"   => Some(self.drs_avdd_power   ), 
+      "n1v5_voltage"     => Some(self.n1v5_voltage     ), 
+      "n1v5_current"     => Some(self.n1v5_current     ), 
+      "n1v5_power"       => Some(self.n1v5_power       ), 
+      _             => None
+    }
+  }
+
+  /// A list of the variables in this MoniData
+  fn keys() -> Vec<&'static str> {
+    vec![
+      "board_id"        , 
+      "rate"            , 
+      "tmp_drs"         , 
+      "tmp_clk"         , 
+      "tmp_adc"         , 
+      "tmp_zynq"        , 
+      "tmp_lis3mdltr"   , 
+      "tmp_bm280"       , 
+      "pressure"        , 
+      "humidity"        , 
+      "mag_x"           , 
+      "mag_y"           , 
+      "mag_z"           , 
+      "drs_dvdd_voltage", 
+      "drs_dvdd_current", 
+      "drs_dvdd_power"  , 
+      "p3v3_voltage"    , 
+      "p3v3_current"    , 
+      "p3v3_power"      , 
+      "zynq_voltage"    , 
+      "zynq_current"    , 
+      "zynq_power"      , 
+      "p3v5_voltage"    , 
+      "p3v5_current"    , 
+      "p3v5_power"      , 
+      "adc_dvdd_voltage", 
+      "adc_dvdd_current", 
+      "adc_dvdd_power"  , 
+      "adc_avdd_voltage", 
+      "adc_avdd_current", 
+      "adc_avdd_power"  , 
+      "drs_avdd_voltage", 
+      "drs_avdd_current", 
+      "drs_avdd_power"  , 
+      "n1v5_voltage"    , 
+      "n1v5_current"    , 
+      "n1v5_power"      ] 
   }
 }
 
@@ -971,6 +1159,54 @@ impl Serialization for RBMoniData {
     Ok(moni_data) 
   }
 }
+
+#[cfg(feature = "random")]
+impl FromRandom for RBMoniData {
+    
+  fn from_random() -> RBMoniData {
+    let mut moni = RBMoniData::new();
+    let mut rng = rand::thread_rng();
+    moni.board_id           = rng.gen::<u8>(); 
+    moni.rate               = rng.gen::<u16>();
+    moni.tmp_drs            = rng.gen::<f32>();
+    moni.tmp_clk            = rng.gen::<f32>();
+    moni.tmp_adc            = rng.gen::<f32>();
+    moni.tmp_zynq           = rng.gen::<f32>();
+    moni.tmp_lis3mdltr      = rng.gen::<f32>();
+    moni.tmp_bm280          = rng.gen::<f32>();
+    moni.pressure           = rng.gen::<f32>();
+    moni.humidity           = rng.gen::<f32>();
+    moni.mag_x              = rng.gen::<f32>();
+    moni.mag_y              = rng.gen::<f32>();
+    moni.mag_z              = rng.gen::<f32>();
+    moni.drs_dvdd_voltage   = rng.gen::<f32>(); 
+    moni.drs_dvdd_current   = rng.gen::<f32>();
+    moni.drs_dvdd_power     = rng.gen::<f32>();
+    moni.p3v3_voltage       = rng.gen::<f32>();
+    moni.p3v3_current       = rng.gen::<f32>();
+    moni.p3v3_power         = rng.gen::<f32>();
+    moni.zynq_voltage       = rng.gen::<f32>();
+    moni.zynq_current       = rng.gen::<f32>();
+    moni.zynq_power         = rng.gen::<f32>();
+    moni.p3v5_voltage       = rng.gen::<f32>(); 
+    moni.p3v5_current       = rng.gen::<f32>();
+    moni.p3v5_power         = rng.gen::<f32>();
+    moni.adc_dvdd_voltage   = rng.gen::<f32>();
+    moni.adc_dvdd_current   = rng.gen::<f32>();
+    moni.adc_dvdd_power     = rng.gen::<f32>();
+    moni.adc_avdd_voltage   = rng.gen::<f32>();
+    moni.adc_avdd_current   = rng.gen::<f32>();
+    moni.adc_avdd_power     = rng.gen::<f32>();
+    moni.drs_avdd_voltage   = rng.gen::<f32>(); 
+    moni.drs_avdd_current   = rng.gen::<f32>();
+    moni.drs_avdd_power     = rng.gen::<f32>();
+    moni.n1v5_voltage       = rng.gen::<f32>();
+    moni.n1v5_current       = rng.gen::<f32>();
+    moni.n1v5_power         = rng.gen::<f32>();
+    moni
+  }
+}
+
 
 ///////////////////////////////////////////////////////
 
@@ -1091,7 +1327,42 @@ impl Serialization for CPUMoniData {
   }
 }
 
-///////////////////////////////////////////////////////
+impl MoniData for CPUMoniData {
+
+  fn get_board_id(&self) -> u8 {
+    return 0;
+  }
+  
+  fn get(&self, varname : &str) -> Option<f32> {
+    match varname {
+      "uptime"     =>    Some(self.uptime as f32),
+      "disk_usage" =>    Some(self.disk_usage as f32),
+      "cpu_freq0"  =>    Some(self.cpu_freq[0] as f32),
+      "cpu_freq1"  =>    Some(self.cpu_freq[1] as f32),
+      "cpu_freq2"  =>    Some(self.cpu_freq[2] as f32),
+      "cpu_freq3"  =>    Some(self.cpu_freq[0] as f32),
+      "cpu_temp"   =>    Some(self.cpu_temp),
+      "cpu0_temp"  =>    Some(self.cpu0_temp),
+      "cpu1_temp"  =>    Some(self.cpu1_temp),
+      "mb_temp"    =>    Some(self.mb_temp),
+      _            =>    None
+    }
+  }
+  
+  fn keys() -> Vec<&'static str> {
+    vec![
+      "uptime"     ,
+      "disk_usage" ,
+      "cpu_freq0"  ,
+      "cpu_freq1"  ,
+      "cpu_freq2"  ,
+      "cpu_freq3"  ,
+      "cpu_temp"   ,
+      "cpu0_temp"  ,
+      "cpu1_temp"  ,
+      "mb_temp"]
+  }
+}
 
 #[cfg(feature = "random")]
 impl FromRandom for CPUMoniData {
@@ -1111,6 +1382,8 @@ impl FromRandom for CPUMoniData {
     moni
   }
 }
+
+///////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////
 
@@ -1238,6 +1511,45 @@ impl Serialization for MtbMoniData {
   }
 }
 
+impl MoniData for MtbMoniData {
+
+  fn get_board_id(&self) -> u8 {
+    return 0;
+  }
+  
+  fn get(&self, varname : &str) -> Option<f32> {
+    match varname {
+      "board_id"     => Some(0.0f32),
+      "calibration"  => Some(self.calibration as f32), 
+      "vccpint"      => Some(Self::adc_vcc_conversion(self.vccpint)), 
+      "vccpaux"      => Some(Self::adc_vcc_conversion(self.vccpaux)), 
+      "vccoddr"      => Some(Self::adc_vcc_conversion(self.vccoddr)), 
+      "temp"         => Some(self.get_fpga_temp()), 
+      "vccint"       => Some(Self::adc_vcc_conversion(self.vccint)), 
+      "vccaux"       => Some(Self::adc_vcc_conversion(self.vccaux)), 
+      "vccbram"      => Some(Self::adc_vcc_conversion(self.vccbram)), 
+      "rate"         => Some(self.rate as f32), 
+      "lost_rate"    => Some(self.lost_rate as f32), 
+      _              => None
+    }
+  }
+  
+  fn keys() -> Vec<&'static str> {
+    vec![
+      "board_id"   ,  
+      "calibration", 
+      "vccpint"    , 
+      "vccpaux"    , 
+      "vccoddr"    , 
+      "temp"       , 
+      "vccint"     , 
+      "vccaux"     , 
+      "vccbram"    , 
+      "rate"       , 
+      "lost_rate"] 
+  }
+}
+
 #[cfg(feature = "random")]
 impl FromRandom for MtbMoniData {
   fn from_random() -> Self {
@@ -1307,6 +1619,67 @@ fn pack_rbmonidata() {
     assert_eq!(data, test);
   }
 }
+
+#[test]
+#[cfg(feature = "random")]
+fn monidata_pamonidata() {
+  let data = PAMoniData::from_random();
+  for k in PAMoniData::keys() {
+    assert!(data.get(k).is_some());
+  }
+  assert_eq!(data.get_board_id(), data.board_id);
+}
+
+#[test]
+#[cfg(feature = "random")]
+fn monidata_pbmonidata() {
+  let data = PBMoniData::from_random();
+  for k in PBMoniData::keys() {
+    assert!(data.get(k).is_some());
+  }
+  assert_eq!(data.get_board_id(), data.board_id);
+}
+
+#[test]
+#[cfg(feature = "random")]
+fn monidata_ltbmonidata() {
+  let data = LTBMoniData::from_random();
+  for k in LTBMoniData::keys() {
+    assert!(data.get(k).is_some());
+  }
+  assert_eq!(data.get_board_id(), data.board_id);
+}
+
+#[test]
+#[cfg(feature = "random")]
+fn monidata_rbmonidata() {
+  let data = RBMoniData::from_random();
+  for k in RBMoniData::keys() {
+    assert!(data.get(k).is_some());
+  }
+  assert_eq!(data.get_board_id(), data.board_id);
+}
+
+#[test]
+#[cfg(feature = "random")]
+fn monidata_cpumonidata() {
+  let data = CPUMoniData::from_random();
+  for k in CPUMoniData::keys() {
+    assert!(data.get(k).is_some());
+  }
+  assert_eq!(data.get_board_id(), 0u8);
+}
+
+#[test]
+#[cfg(feature = "random")]
+fn monidata_mtbmonidata() {
+  let data = MtbMoniData::from_random();
+  for k in MtbMoniData::keys() {
+    assert!(data.get(k).is_some());
+  }
+  assert_eq!(data.get_board_id(), 0u8);
+}
+
 
 #[test]
 #[cfg(feature = "random")]
