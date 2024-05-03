@@ -1257,18 +1257,6 @@ impl FromRandom for MtbMoniData {
   }
 }
 
-#[cfg(all(test,feature = "random"))]
-mod test_monitoring {
-  use crate::serialization::Serialization;
-  use crate::FromRandom;
-  use crate::monitoring::RBMoniData;
-  use crate::monitoring::MtbMoniData;
-  use crate::monitoring::PBMoniData;  
-  use crate::monitoring::PAMoniData;
-  use crate::monitoring::LTBMoniData;
-  use crate::monitoring::CPUMoniData;
-
-}
   
 #[test]
 #[cfg(feature = "random")]

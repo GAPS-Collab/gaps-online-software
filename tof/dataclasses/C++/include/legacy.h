@@ -1,3 +1,4 @@
+#ifdef BUILD_ROOTCOMPONENTS
 #ifndef LEGACY_H_INCLUDED
 #define LEGACY_H_INCLUDED
 
@@ -212,4 +213,5 @@ private:
 
 } // end of namespace GAPS
 
+#endif
 #endif

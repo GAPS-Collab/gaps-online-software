@@ -15,14 +15,13 @@
 
 class RBEvent;
 
-/**
- * The original "RemoveSpikes" from the
- * DRS4 manual
- *
- */
-void spike_cleaning_drs4(Vec<f32> &voltages);
 
+/// The original "RemoveSpikes" from the
+/// DRS4 manual
+void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]);
 
+/// An adjusted, simpler version of the spike cleaing written by Jamie
+void spike_cleaning_simple(Vec<Vec<f32>> &voltages, bool calibrated = true);
 
 /** 
  * A set of calibration constants for a single readoutboard
