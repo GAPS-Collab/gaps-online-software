@@ -310,7 +310,8 @@ pub fn read_value_from_file(file_path: &str) -> io::Result<u32> {
 /// Helper function to generate a proper tcp string starting
 /// from the ip one.
 pub fn build_tcp_from_ip(ip: String, port: String) -> String {
-  String::from("tcp://") + &ip + ":" + &port
+  //String::from("tcp://") + &ip + ":" + &port
+  format!("tcp://{}:{}", ip, port)
 }
 
 /// Broadcast commands over the tof-computer network
@@ -529,7 +530,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                        settings.find_pks_thresh  ,
                        settings.max_peaks      ) {
         Err(err) => {
-          error!("Unable to find peaks for ch {ch}! Ignoring this channel!");
+          error!("Unable to find peaks for RB{:02} ch {ch}! Ignoring this channel!", rb.rb_id);
           error!("We won't be able to calculate timing information for this channel! Err {err}");
         },
         Ok(peaks)  => {
@@ -735,7 +736,9 @@ pub fn get_ltb_dsi_j_ch_mapping(mapping_file : PathBuf) -> DsiLtbRBMapping {
 
 /// Convert an int value to the board ID string.
 pub fn to_board_id_string(rb_id: u32) -> String {
-  String::from("RB") + &format!("{:02}", rb_id)
+
+  //String::from("RB") + &format!("{:02}", rb_id)
+  format!("RB{:02}", rb_id)
 }
 
 /**********************************************************/
