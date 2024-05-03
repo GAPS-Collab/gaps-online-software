@@ -300,6 +300,7 @@ if (BUILD_EXAMPLES)
     set(analyze-sydney "analyzeSydney")
     add_executable(${analyze-sydney}
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeSydney.cxx
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventSydney.cpp
     )
     target_include_directories(${analyze-sydney} 
                               PUBLIC
@@ -309,7 +310,10 @@ if (BUILD_EXAMPLES)
                               )
     target_link_libraries(${analyze-sydney}
                           PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED})
+                          ${GAPSTOF_LIBRARY_SHARED}
+      			  $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
+      			  ROOT::Gui ROOT::Core ROOT::RIO ROOT::Net ROOT::Hist ROOT::Tree ROOT::Rint
+			  )
     install(TARGETS ${analyze-sydney}
             DESTINATION ${INSTALL_EXAMPLES_DIR}
     )

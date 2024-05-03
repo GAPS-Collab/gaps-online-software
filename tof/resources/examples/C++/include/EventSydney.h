@@ -25,13 +25,13 @@ enum THRTYPE { CONSTANT, CFD_ELEC, CFD_SIMPLE, PCONSTANT, PCFD };
 class EventGAPS {
 
 public:
-  
+
   EventGAPS (void);
-  
+
   ~EventGAPS (void);
-  
+
   // MEMBER FUNCTIONS
-  
+
   void    InitializeVariables(unsigned long int evt_ctr);
   void    InitializeWaveforms(GAPS::Waveform *wave[], GAPS::Waveform *wch9[]);
   void    UnsetWaveforms(void);
@@ -47,7 +47,7 @@ public:
   void    AnalyzePhases(float phi[NRB]);
   void    AnalyzePaddles(float pk_cut, float ch_cut);
   void    AnalyzeEvent(void);
-  
+
   float   GetTDC(int ch) {return TDC[ch];}
   
   // Stuff related to plotting
@@ -55,31 +55,31 @@ public:
   void    FillChannelHistos(int old);
   void    FillPaddleHistos(void);
   void    WriteHistograms(void);
-  
+
   
 private:
-  
+
   // DATA MEMBERS
-  
+
   // Local pointers to waveforms
   GAPS::Waveform  *wData[NTOT];
   GAPS::Waveform  *wClock[NRB];       
-  
+
   int     ch;                        // channel we are working with
   int     runno;                     // Run Number
   unsigned long int  evtno;          // Event Number
   float   sc_speed;                  // Speed(mm/s) in scintillator
-  
+
   float   Threshold;                 // PMT Threshold in DC (for now...)
   float   CFDFraction;               // CFD Fraction for TDC calculation
-  
+
   // SiPM channel info (index references NTOT value)
   int     max_sipm;                 // Largest SiPM channel
   int     RB[NTOT];
   int     RB_ch[NTOT];
   int     Paddle[NTOT];
   int     PadEnd[NTOT];
-  
+
   // Since paddles start at 1, we include one extra value
   int     max_paddle;                // Largest paddle ID
   int     Paddle_A[NPAD];            // Channel for this PadddleA
@@ -94,7 +94,7 @@ private:
   float   TCorrEvent[NPAD];          // Timing correction (ch9)
   int     EarlyPaddle;               // Which paddle is first hit
   float   EarlyTime;                 // Time of earliest hit
-  
+   
   float   Pedestal[NTOT];             // Pedestal values
   float   PedRMS[NTOT];               // Pedestal RMS values
   bool    RBInData[NRB];              // RB in data stream?
@@ -107,7 +107,7 @@ private:
   float   QInt[NTOT];                 // Pulse charge value
   float   TDC[NTOT];                  // TDC value (CFD method)
   float   TDC_Cor[NTOT];              // Corrected TDC value (CFD method)
-  
+
   bool    IsHit[NPAD];                // Do we have Hit info?
   int     Hits[NPAD];                 // Hit mask for paddle 
   float   HitX[NPAD];                 // X location in detector
@@ -127,13 +127,11 @@ private:
   TH1D    *Charge[NTOT];               // Charge histograms
   TH1D    *Charge_cut[NTOT];           // Charge (cut) histograms
   TH1D    *tdcCFD[NTOT];                  // TDC histograms
-  
+
   TH2D    *QEnd2End[NPAD];             // End 2 End charge 
   TH1I    *HitMask[NPAD];              // Hit mask of paddle
   TH1D    *tDiff[NPAD];                // tdc diff of paddle ends
   TH1D    *Ch9Shift[NPAD];             // T shift from ch9 analysis
-  TH2F    *Ch9Good[2];                // T shift from ch9 analysis
-  TH2F    *Ch9Bad[2];                // T shift from ch9 analysis
   TH1F    *HitTime[NPAD];              // Hit Time in detector
   TH1F    *HitPosition[NPAD];          // Hit Position along paddle (cm)
   TH3F    *HitGAPS;                    // Hit Position in detector (mm)
@@ -145,11 +143,7 @@ private:
   TProfile *QvPositionB[NPAD];         // Q vs position - End B
   TH1I    *FirstPaddle;
   TH1F    *FirstTime;
-  TH1F    *FirstTimeBad;
-  TH1F    *BetaDist1;
-  TH1F    *BetaDist2;
-  TH1F    *BetaDist3;
-  TH1F    *BetaDist4;
+  TH1F    *BetaDist;
   TH1I    *NPaddlesCube;
   TH1I    *NPaddlesUmbrella;
   TH1I    *NPaddlesCortina;

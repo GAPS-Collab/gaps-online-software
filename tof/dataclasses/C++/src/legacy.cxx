@@ -572,7 +572,6 @@ void Waveform::CleanUpPeaks(void)
   {
     delete[] begin_pk;
     delete[] end_pk;
-    //delete[] sat_pk;
     delete[] spikes;
     peaks_found = 0;
   }
@@ -622,6 +621,8 @@ void Waveform::FindPeaks(float start, float size) {
   begin_pk  = new int[max_num_peaks];
   end_pk    = new int[max_num_peaks];
   spikes    = new int[max_num_peaks];
+  end_pk[0] = wf_size; // Initialize so no seg-fault occurs if no peaks
+
   // Step through trace until we are above threshold
   while ((WaveData[pos] < Threshold) && (pos < wf_size))
     pos++;
@@ -635,7 +636,7 @@ void Waveform::FindPeaks(float start, float size) {
         }
 	    begin_pk[pk_ctr] = i - (min_wid - 1);
         spikes[pk_ctr] = 0;
-        end_pk[pk_ctr] = 0;
+        end_pk[pk_ctr] = i;
         pk_ctr++;
       } else if (peak_bins > min_wid) {
         // each "bump" counts as a separate peak
@@ -646,8 +647,7 @@ void Waveform::FindPeaks(float start, float size) {
         }
         if (grad == 0)
           continue;
-        if (end_pk[pk_ctr-1] == 0)
-          end_pk[pk_ctr-1] = i; // Set last bin included in peak
+	end_pk[pk_ctr-1] = i; // Set last bin included in peak
       }
     } else {
       peak_bins = 0;  // Reset bin counter at each bin not meeting requirement

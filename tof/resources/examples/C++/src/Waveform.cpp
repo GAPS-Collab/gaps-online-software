@@ -153,7 +153,7 @@ void Waveplot::InitializeVariables(int no_acq) {
   num_peaks       = 0;
   peaks_found     = 0;
   peaks_allocated = 0;
-  peak_plot = 0;  // Turn off peak plotting by default.  Can be turned
+  peak_plot = 1;  // Turn off peak plotting by default.  Can be turned
                   // back on with SetPeakPlot() method
   cfds_frac       = 0.25;
   cfde_frac       = 0.50;
@@ -389,15 +389,15 @@ void Waveplot::PlotWaveform(int npoints, float x_lo, float x_hi,
         x[1] = WaveTime[peaks[i]] + width[i]/2.0;
         w[0] = (wf_pedestal - height[i])/2.0;
         w[1] = (wf_pedestal - height[i])/2.0;
-        gwidth[i] = new TGraph(2, x, w);
-        gwidth[i]->SetLineColor(4);
-        gwidth[i]->Draw("L");
+        //gwidth[i] = new TGraph(2, x, w);
+        //gwidth[i]->SetLineColor(4);
+        //gwidth[i]->Draw("L");
         // ..and the peak height...
         h[0] = wf_pedestal - height[i];
         h[1] = wf_pedestal;        
-        gheight[i] = new TGraph(2, p, h);
-        gheight[i]->SetLineColor(4);
-        gheight[i]->Draw("L");
+        //gheight[i] = new TGraph(2, p, h);
+        //gheight[i]->SetLineColor(4);
+        //gheight[i]->Draw("L");
       }
     }
   }
@@ -878,10 +878,10 @@ void Waveplot::MeasurePeaksThresh(float start, float size, int th_type) {
     }
     // Find the peak location
     //peaks[i]  = (double) GetMinBin(begin_pk[i], end_pk[i]-begin_pk[i] );
-    peaks[i]  = GetMinBin(begin_pk[i], end_pk[i]-begin_pk[i]);
+    peaks[i]  = GetMaxBin(begin_pk[i], end_pk[i]-begin_pk[i]);
     // Extract the pulse height from the peak location.
     //height[i] = wf_pedestal - WaveData[peaks[i]];
-    height[i] = -WaveData[peaks[i]];
+    height[i] = WaveData[peaks[i]];
     width[i] = CalculateWidth(i, -0.5*height[i]);
     // Now for the charge contained in the pulse.  The 'PEAK_OFFSET' and
     // 'PEAK_LENGTH' are arbitrary at this point.
@@ -913,11 +913,13 @@ void Waveplot::FindPeaks(float start, float size) {
   end_pk    = new int[max_num_peaks];
   sat_pk    = new int[max_num_peaks];
   spikes    = new int[max_num_peaks];
-  // Step through trace until we are below threshold
+  end_pk[0] = wf_size; // Initialize so no seg-fault occurs if no peaks
+
+  // Step through trace until we are above threshold
   while ((WaveData[pos] < Threshold) && (pos < wf_size))
     pos++;
-  for (int i = pos + 1; i < start_bin + size_bin; i++) {
-    if (WaveData[i] < Threshold) {
+  for (int i = pos; i < start_bin + size_bin; i++) {
+    if (WaveData[i] > Threshold) {
       peak_bins++;
       if (peak_bins == min_wid) { // new peak detected
         if (pk_ctr == max_num_peaks) {
@@ -926,22 +928,19 @@ void Waveplot::FindPeaks(float start, float size) {
         }
         begin_pk[pk_ctr] = i - (min_wid - 1);
         spikes[pk_ctr] = 0;
-        end_pk[pk_ctr] = 0;
-        sat_pk[pk_ctr] = (WaveData[i] < saturated_lo) ? SAT : NOT_SAT;
+        end_pk[pk_ctr] = i;
         pk_ctr++;
       } else if (peak_bins > min_wid) {
-        if (WaveData[i] < saturated_lo)
-          sat_pk[pk_ctr-1] = SAT;
         // each "bump" counts as a separate peak
         int grad = 1;
         for (int k = 0; k < 3; k++) {
-          if (WaveData[i-k] < WaveData[i-(k+1)])
+          if (WaveData[i-k] > WaveData[i-(k+1)])
             grad = 0;
         }
         if (grad == 0)
           continue;
-        if (end_pk[pk_ctr-1] == 0)
-          end_pk[pk_ctr-1] = i; // Set last bin included in peak
+        //if (end_pk[pk_ctr-1] == 0)
+	end_pk[pk_ctr-1] = i; // Set last bin included in peak
       }
     } else {
       peak_bins = 0;  // Reset bin counter at each bin not meeting requirement
@@ -954,10 +953,10 @@ void Waveplot::FindPeaks(float start, float size) {
   // Alocate memory and get peak parameters
   AllocatePeaks();
   for(int i = 0; i < num_peaks; i++) {
-    peaks[i]  = GetMinBin(begin_pk[i], end_pk[i]-begin_pk[i]);
+    peaks[i]  = GetMaxBin(begin_pk[i], end_pk[i]-begin_pk[i]);
     height[i] = WaveData[peaks[i]];
     width[i]  = CalculateWidth(i, 0.5*height[i]);
-    charge[i] = -Integrate( WaveTime[peaks[i]]+(int)PEAK_OFFSET, PEAK_LENGTH);
+    charge[i] = Integrate( WaveTime[peaks[i]]+(int)PEAK_OFFSET, PEAK_LENGTH);
   }
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -1126,7 +1125,7 @@ double Waveplot::FindInterpolatedTime(float thresh, int idx, int size){
       (thresh-lval)/(hval-lval) * (WaveTime[idx+1]-WaveTime[idx]) ;
     /*printf("%2d(%d) -- %.2f, %.2f  -- %.2f, %.2f, %.2f    %.2f\n", ch, 
            num_peaks, WaveTime[idx], WaveTime[idx+1], thresh, lval, 
-           hval, time);*/
+           hval, time); */
     return time;
   }
 }
@@ -1191,18 +1190,18 @@ double Waveplot::FindCFDSimpTime(int pk_num){
   // Determine the threshold for finding the time. Use 25% of the
   // average of the bin of the highest peak and the two bins next to
   // it.
-  int idx = GetMinBin(begin_pk[pk_num], end_pk[pk_num]-begin_pk[pk_num]);
-  
+  int idx = GetMaxBin(begin_pk[pk_num], end_pk[pk_num]-begin_pk[pk_num]);
+
   double sum = 0.0;
   for (int i=idx-1; i<=idx+1; i++) sum += WaveData[i];
   double tmp_thresh = abs(cfds_frac * (sum / 3.0));
-
+  
   // Now scan through the waveform around the peak to find the bin
   // crossing the calculated threshold. Bin idx is the peak so it is
   // definitely above threshold. So let's walk backwards through the
   // trace until we find a bin value less than the threshold.
   int lo_bin = wf_size;
-  for (int i=idx; i>begin_pk[pk_num]-10; i--) {
+  for (int i=idx; i>begin_pk[pk_num]-20; i--) {
     if ( abs(WaveData[i]) < tmp_thresh ) {
       lo_bin = i;
       i=0;

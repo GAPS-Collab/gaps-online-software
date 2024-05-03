@@ -144,8 +144,8 @@ int main(int argc, char *argv[]){
 
   // Some useful variables (some initialized to default values)
   // but overwritten from file (if it exists)
-  float Ped_low   = 10;
-  float Ped_win   = 90;
+  float Ped_low   = 350;
+  float Ped_win   = 100;
   float CThresh   = 5.0;
   float CFDS_frac = 0.10;
   float Qwin_low  = 100;
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]){
   x_sc_lo =    0.0;    // in ns
   x_sc_hi =  500.0;    // in ns
   y_sc_lo =  -20.0;    // in mV
-  y_sc_hi =   60.0;    // in mV
+  y_sc_hi =  160.0;    // in mV
   //y_sc_lo = -500.0;    // in mV
   //y_sc_hi = 1500.0;    // in mV
   //x_sc_lo =  -9999;    // in ns
@@ -242,20 +242,24 @@ int main(int argc, char *argv[]){
 	usize ch_start;
 	int nrbs=0;
 	// Delete any waveforms 
-	for(int c=0;c<NTOT;c++) 
-	  if ( wave[c] != NULL ) { delete wave[c]; wave[c] = NULL; }
-	for(int c=0;c<NRB;c++) 
-	  if ( wch9[c] != NULL ) { delete wch9[c]; wch9[c] = NULL; }
+	for (int i=0;i<NTOT;i++) wave[i] = NULL;
+	for (int i=0;i<NRB;i++)  wch9[i] = NULL;
+	//for(int c=0;c<NTOT;c++) 
+	// if ( wave[c] != NULL ) { delete wave[c]; wave[c] = NULL; }
+	//for(int c=0;c<NRB;c++) 
+	//  if ( wch9[c] != NULL ) { delete wch9[c]; wch9[c] = NULL; }
 	
 	
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
-	printf("%ld.", evt_ctr);
+	printf("%ld.", evt_ctr); fflush(stdout);
 	for (auto const &rbid : ev.get_rbids()) {
 	  RBEvent rb_event = ev.get_rbevent(rbid);
 	  if (verbose) {
 	    std::cout << rb_event << std::endl;
           }
+	  //printf(" %d (%d)", rbid, rb_event.header.channel_mask);
+	  int ch_mask = rb_event.header.channel_mask;
 	  // Now that we know the RBID, we can set the starting ch_no
 	  // Eventually we will use a function to map RB_ch to GAPS_ch
 	  ch_start = (rbid-1)*NCH; // first RB is #1
@@ -301,19 +305,30 @@ int main(int argc, char *argv[]){
 	    
 	    // Now, deal with all the SiPM data
 	    for(int c=0;c<NCH;c++) {
-	      Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
-	      Vec<f64> ch_times(times[c].begin(), times[c].end());
-
-	      usize cw = c+ch_start; 
-	      wave[cw] = new Waveplot(ch_volts.data(),ch_times.data(), cw,0);
-	      wave[cw]->SetThreshold(5.0);
-	      
-	      // Calculate the pedestal
-	      wave[cw]->SetPedBegin(Ped_low);
-	      wave[cw]->SetPedRange(Ped_win);
-	      wave[cw]->CalcPedestalRange(); 
-	      wave[cw]->SubtractPedestal(); 
-	      //if (c==0) printf("%ld(%.2f) ", cw, wave[cw]->GetPedestal());
+	      //bool e = (ch_mask & (1 << c) > 0 ? true : false);
+	      unsigned int inEvent = ch_mask & (1 << c);
+	      if (inEvent > 0 ) {
+		Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
+		Vec<f64> ch_times(times[c].begin(), times[c].end());
+		
+		usize cw = c+ch_start; 
+		wave[cw] = new Waveplot(ch_volts.data(),ch_times.data(), cw,0);
+		wave[cw]->SetThreshold(CThresh);
+		wave[cw]->SetCFDSFraction(CFDS_frac);
+		
+		// Calculate the pedestal
+		wave[cw]->SetPedBegin(Ped_low);
+		wave[cw]->SetPedRange(Ped_win);
+		wave[cw]->CalcPedestalRange(); 
+		wave[cw]->SubtractPedestal(); 
+		if (wave[cw]->GetPedsigma() < 60.6) {
+		  wave[cw]->FindPeaks(Qwin_low, Qwin_size);
+		  wave[cw]->FindTdc(0, CFD_SIMPLE);
+		  //wave[cw]->FindTdc(0, CONSTANT);
+		  //printf("%ld: %ld - %7.3f\n",evt_ctr,cw,wave[cw]->GetTdcs(0));
+		}
+		//if (c==0) printf("%ld(%.2f) ", cw, wave[cw]->GetPedestal());
+	      } // Only for channels in ch_mask for this RB
 	    }
 	  }
 	}
@@ -380,6 +395,10 @@ int main(int argc, char *argv[]){
 	    }		  
 	  } // Move on to the next RB
 	} 
+	for (int i=0;i<NTOT;i++) //{delete wave[i]; wave[i] = NULL;}
+	  if ( wave[i] != NULL ) { delete wave[i]; wave[i] = NULL; }
+	for (int i=0;i<NRB;i++)  //{delete wch9[i]; wch9[i] = NULL;}
+	  if ( wch9[i] != NULL ) { delete wch9[i]; wch9[i] = NULL; }
 	n_tofevents++;
         break;
       }
@@ -524,11 +543,13 @@ void plotall(int n_ch, int nrbs) {
     cm->Clear();
     cm->cd(0);
     ch = plot_ch;
-    //wave[ch]->SetPeakPlot(1); // Put some additional info on the plot
-    if (restrict_range)
-      wave[ch]->PlotWaveform(0, x_scr_lo, x_scr_hi, y_scr_lo, y_scr_hi);
-    else
-      wave[ch]->PlotWaveform(0, x_sc_lo, x_sc_hi, y_sc_lo, y_sc_hi);
+    if (wave[ch] != NULL) {
+      //wave[ch]->SetPeakPlot(1); // Put some additional info on the plot
+      if (restrict_range)
+	wave[ch]->PlotWaveform(0, x_scr_lo, x_scr_hi, y_scr_lo, y_scr_hi);
+      else
+	wave[ch]->PlotWaveform(0, x_sc_lo, x_sc_hi, y_sc_lo, y_sc_hi);
+    }
   }
   
   if (plot_flag == ALLCH) {
@@ -545,9 +566,9 @@ void plotall(int n_ch, int nrbs) {
     int ctr = 0, pl_num, ch_num=0;
     int rbid;
     for (int i = 0; i < n_ch; i++) {
-      if (wave[i] != NULL) {
 	pl_num = ctr*(NCH+1)+1 + ch_num++;
 	cm->cd( pl_num ); 
+      if (wave[i] != NULL) {
 	//wave[ch]->SetPeakPlot(1); // Put some additional info on the plot  
 	//printf("Plotting (%d %d).", i, pl_num);fflush(stdout);
 	if (restrict_range)

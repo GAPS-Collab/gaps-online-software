@@ -59,8 +59,12 @@ int main(int argc, char *argv[]){
   int j=0;
   if (files) {
     fp = fopen(fname.c_str(), "r");
-    while (fscanf(fp, "%s", tmpline) != EOF) fnames[j++] = tmpline;
-    fclose(fp);
+    if (fp != NULL) {
+      while (fscanf(fp, "%s", tmpline) != EOF) fnames[j++] = tmpline;
+      fclose(fp);
+    } else {
+      printf("Unable to open file %s\n", fname.c_str());
+    }
   } else {
     fnames[j++] = fname;
   }
@@ -156,18 +160,22 @@ int main(int argc, char *argv[]){
   // -- read in some analysis parameters.
   // Doing this in a kludgy way since we will not use later.
   fp = fopen("paramNEVIS.txt", "r");
-  while (fscanf(fp, "%s %f", label, &value) != EOF) {
-    if (strcmp(label,"ped_lo") ==0 )     Ped_low = value; 
-    if (strcmp(label,"ped_win") ==0 )    Ped_win = value;
-    if (strcmp(label,"pulse_lo") ==0 )   Qwin_low = value;
-    if (strcmp(label,"pulse_win") ==0 )  Qwin_size = value;
-    if (strcmp(label,"charge_min") ==0 ) CHmin = value;
-    if (strcmp(label,"thresh") ==0 )     CThresh = value;
-    if (strcmp(label,"cfd_frac") ==0 )   CFDS_frac = value;
-    status = fscanf(fp,"%[^\n]",line); // Scan the rest of the line
-  }
-  fclose(fp); 
-
+  if (fp != NULL) { // Actually opened file
+    while (fscanf(fp, "%s %f", label, &value) != EOF) {
+      if (strcmp(label,"ped_lo") ==0 )     Ped_low = value; 
+      if (strcmp(label,"ped_win") ==0 )    Ped_win = value;
+      if (strcmp(label,"pulse_lo") ==0 )   Qwin_low = value;
+      if (strcmp(label,"pulse_win") ==0 )  Qwin_size = value;
+      if (strcmp(label,"charge_min") ==0 ) CHmin = value;
+      if (strcmp(label,"thresh") ==0 )     CThresh = value;
+      if (strcmp(label,"cfd_frac") ==0 )   CFDS_frac = value;
+      status = fscanf(fp,"%[^\n]",line); // Scan the rest of the line
+    }
+    fclose(fp); 
+  } else
+    printf("Using default Nevis parameters.\n");
+  
+  
   // Now, we want to store information about the SiPM channels and
   // paddle relationships for analysis purpose. Read all that info
   // into the relevant structures.
@@ -239,7 +247,8 @@ int main(int argc, char *argv[]){
 	GAPS::Waveform *wch9[NRB];
 	for (int i=0;i<NTOT;i++) wave[i] = NULL;
 	for (int i=0;i<NRB;i++)  wch9[i] = NULL;
-	float Phi[NRB] = { -999.0 };
+	float Phi[NRB];
+	for (int i=0;i<NRB;i++) Phi[i] = -999.0;
 	
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;

@@ -4,4 +4,4 @@ pulse_lo     10      # pulse window start (ns), brds 1-6
 pulse_win   190      # pulse window width (ns), brds 1-6
 charge_min  5.0      # minimum charge in pC
 thresh      10.0     # constant threshold in mV
-cfd_frac    0.10     # cfd fraction
+cfd_frac    0.25     # cfd fraction
