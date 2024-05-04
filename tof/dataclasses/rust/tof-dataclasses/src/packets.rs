@@ -58,6 +58,10 @@ use crate::commands::{
 
 use crate::calibrations::RBCalibrations;
 
+#[cfg(feature = "random")]
+use crate::FromRandom;
+#[cfg(feature = "random")]
+use rand::Rng;
 
 /// The most basic of all packets
 ///  
@@ -165,6 +169,90 @@ impl TofPacket {
   
   pub fn age(&self) -> u64 {
     self.creation_time.elapsed().as_secs()
+  }
+}
+
+#[cfg(feature="random")]
+impl FromRandom for TofPacket {
+
+  fn from_random() -> Self {
+    // FIXME - this should be an actual, realistic
+    // distribution
+    let choices = [
+      PacketType::TofEvent,
+      PacketType::TofEvent,
+      PacketType::TofEvent,
+      PacketType::TofEvent,
+      PacketType::TofEvent,
+      PacketType::TofEvent,
+      PacketType::TofEvent,
+      PacketType::RBWaveform,
+      PacketType::RBWaveform,
+      PacketType::TofEventSummary,
+      PacketType::TofEventSummary,
+      PacketType::TofEventSummary,
+      PacketType::TofEventSummary,
+      PacketType::TofEventSummary,
+      PacketType::TofEventSummary,
+      PacketType::MasterTrigger,
+      PacketType::MasterTrigger,
+      PacketType::MasterTrigger,
+      PacketType::RBMoniData,
+      PacketType::PBMoniData,
+      PacketType::LTBMoniData,
+      PacketType::PAMoniData,
+      PacketType::CPUMoniData,
+      PacketType::MonitorMtb,
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    let packet_type = choices[idx];
+    match packet_type {
+      PacketType::TofEvent => {
+        let te = TofEvent::from_random();
+        return te.pack()
+      }
+      PacketType::TofEventSummary => {
+        let te = TofEventSummary::from_random();
+        return te.pack()
+      }
+      PacketType::RBWaveform => {
+        let te = RBWaveform::from_random();
+        return te.pack()
+      }
+      PacketType::MasterTrigger => {
+        let te = MasterTriggerEvent::from_random();
+        return te.pack()
+      }
+      PacketType::RBMoniData => {
+        let te = RBMoniData::from_random();
+        return te.pack()
+      }
+      PacketType::PAMoniData => {
+        let te = PAMoniData::from_random();
+        return te.pack()
+      }
+      PacketType::LTBMoniData => {
+        let te = LTBMoniData::from_random();
+        return te.pack()
+      }
+      PacketType::PBMoniData => {
+        let te = PBMoniData::from_random();
+        return te.pack()
+      }
+      PacketType::CPUMoniData => {
+        let te = CPUMoniData::from_random();
+        return te.pack()
+      }
+      PacketType::MonitorMtb  => {
+        let te = MtbMoniData::from_random();
+        return te.pack()
+      }
+      _ => {
+        let te = TofEvent::from_random();
+        return te.pack()
+      }
+    }
   }
 }
 
