@@ -311,7 +311,8 @@ impl FromRandom for TofEvent {
     event.mt_event  = MasterTriggerEvent::from_random();
     event.header    = TofEventHeader::from_random();
     let mut rng     = rand::thread_rng();
-    let n_boards    = rng.gen::<u8>() as usize;
+    let n_boards    = rng.gen_range(1..41) as u8;
+    //let n_boards    = rng.gen::<u8>() as usize;
     //let n_paddles   = rng.gen::<u8>() as usize;
     for _ in 0..n_boards {
       event.rb_events.push(RBEvent::from_random());
