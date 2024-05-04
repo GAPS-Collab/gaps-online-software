@@ -26,6 +26,7 @@ advanced-algorithms=["smoothed_z_score"]
 # used for the random number generation
 #rand = "0.8"
 criterion = "0.4"
+#tempfile  = "3.10"
 
 [dependencies]
 chrono            = "0.4"

@@ -45,7 +45,9 @@ set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20")
 #endif()
 
 # -- pybindings with pybind11
-option(BUILD_PYBINDINGS "build pybindings with pybind11" OFF)
+option(BUILD_PYBINDINGS "build C++ pybindings with pybind11" OFF)
+option(BUILD_RUSTPYBIDINGS "build Rust \\U+1F980 pybindings wiut pyO3 (better)" OFF)
+
 if (BUILD_PYBINDINGS)
 message(STATUS "Checking for pyoind11....")
 # populates Python_INCLUDE_DIRS
@@ -147,4 +149,4 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/gaps-online/gaps_online
         DESTINATION ${INSTALL_PYTHON_DIR}
        )
 
-
+## Be a bit more fine grained and install        

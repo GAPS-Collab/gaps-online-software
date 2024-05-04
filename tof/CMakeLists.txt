@@ -41,10 +41,10 @@ add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
     dataclasses/C++/src/legacy.cxx
     dataclasses/C++/src/logging.cxx
 )
+
 target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
 target_include_directories(${GAPSTOF_LIBRARY_SHARED}
                             PUBLIC
-    
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
                             $<INSTALL_INTERFACE:include> 
@@ -53,6 +53,7 @@ target_include_directories(${GAPSTOF_LIBRARY_SHARED}
                               $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
                               #  ${Boost_INCLUDE_DIR}
                           )
+
 target_link_libraries(${GAPSTOF_LIBRARY_SHARED}
                       PUBLIC
                          $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
@@ -89,13 +90,14 @@ execute_process(
   OUTPUT_QUIET
 )
 
-if (BUILD_LIFTOF)
+if (BUILD_LIFTOF OR BUILD_RUSTPYBIDINGS)
   if(CARGO_RESULT EQUAL 0)
     message(STATUS "-- found `cargo` - will be able to build liftof!")
   else()
     message(WARNING "-- `cargo` NOT found! Unable to build liftof.")
     message(STATUS "Please install a rust toolchain including cargo if you want to build liftof, and make sure cargo is in your $PATH!")
     option (BUILD_LIFTOF OFF)
+    option (BUILD_RUSTPYBIDINGS OFF)
   endif()
 endif()
 
@@ -132,6 +134,8 @@ if (BUILD_LIFTOF)
       COMMAND ${RUST_BUILD_COMMAND}
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-tui
   )
+  
+  # installation directives for liftof components
   install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-cc
       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   )
@@ -145,12 +149,41 @@ if (BUILD_LIFTOF)
       DESTINATION ${INSTALL_PYTHON_DIR}/
       RENAME rust_dataclasses.so
   )
-
 endif(BUILD_LIFTOF)
+
+if(BUILD_RUSTPYBIDINGS)
+  # Define the command to build your Rust project
+  message(STATUS "building Rust \\U+1F980 pybindings wiut pyO3...")
+  set(RUST_BUILD_COMMAND cargo build --release --all-features)
+  add_custom_target(
+    tof-pydataclasses-rust
+      ALL
+      COMMAND ${RUST_BUILD_COMMAND} 
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings
+  )
+  add_custom_target(
+    tof-pydataclasses-rust-doc
+      COMMAND cargo doc 
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings
+  )
+  #install(TARGETS tof-pydataclasses-rust
+  #    EXPORT GAPSTargets         
+  #    LIBRARY DESTINATION ${INSTALL_PYTHON_DIR}
+  #    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
+  #    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
+  #)
+  install(FILES
+          "${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librpy_tof_dataclasses.so"
+          DESTINATION ${INSTALL_PYTHON_DIR}
+          RENAME rpy_tof_dataclasses.so
+  )
+
+endif(BUILD_RUSTPYBIDINGS)
 
 #################################################
 # installation
 #################################################
+
 set(INSTALL_EXAMPLES_DIR "${CMAKE_INSTALL_PREFIX}/examples" CACHE PATH "installation directory for exanokes" FORCE)
 
 # Make relative paths absolute (needed later on)
