@@ -21,7 +21,7 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-tof-dataclasses = { path = "../tof-dataclasses", features = ["polars", "database", "advanced-algorithms"] } 
+tof-dataclasses = { path = "../tof-dataclasses", features = ["polars", "database", "advanced-algorithms","pybindings"] } 
 # somehow pyo3 is very picky with the version
 pyo3            = { version = "0.21", features = ["extension-module"] }
 pyo3-log        = "0.10"

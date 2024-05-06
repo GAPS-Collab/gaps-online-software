@@ -5,10 +5,14 @@ pub mod io;
 pub mod dataclasses;
 
 use pyo3::prelude::*;
+use pyo3::wrap_pymodule;
 
 use crate::analysis::*;
 use crate::dataclasses::*;
 use crate::io::*;
+
+// this is already wrapped in a pyclass
+use tof_dataclasses::packets::PacketType;
 
 
 //#[pyfunction]
@@ -45,6 +49,73 @@ use crate::io::*;
 //  }
 //}
 
+
+#[pymodule]
+#[pyo3(name = "analysis")]
+fn tof_analysis<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  m.add_function(wrap_pyfunction!(py_get_periods, m)?)?;
+  m.add_function(wrap_pyfunction!(py_time2bin,m)?)?;
+  m.add_function(wrap_pyfunction!(py_find_peaks,m)?)?;
+  m.add_function(wrap_pyfunction!(py_find_peaks_zscore,m)?)?;
+  m.add_function(wrap_pyfunction!(py_integrate,m)?)?;
+  m.add_function(wrap_pyfunction!(py_interpolate_time,m)?)?;
+  m.add_function(wrap_pyfunction!(py_cfd_simple,m)?)?;
+  m.add_function(wrap_pyfunction!(py_find_zero_crossings,m)?)?;
+  Ok(())
+}
+
+#[pymodule]
+#[pyo3(name = "moni")]
+fn tof_moni<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  m.add_class::<PyPAMoniSeries>()?;
+  m.add_class::<PyPBMoniSeries>()?;
+  m.add_class::<PyRBMoniSeries>()?;
+  m.add_class::<PyMtbMoniSeries>()?;
+  m.add_class::<PyCPUMoniSeries>()?;
+  m.add_class::<PyLTBMoniSeries>()?;
+  m.add_class::<PyRBMoniData>()?;
+  Ok(())
+}
+
+
+/// I/O features to read TofPackets from disk
+///
+/// # Example 
+/// ```
+/// import gaps_online.rust_api as api
+/// # read 100 TofEvents from the file
+/// reader = api.io.TofPacketReader("/path/to/your/file", filter=api.io.PacketType.TofEvent, nevents=100)
+/// for pack in reader:
+///    ev = api.events.TofEvent()
+///    ev.from_tofpacket(ev)
+///    for h in ev.hits:
+///        print (h.t0)
+///        print (h)
+///
+///
+/// ```
+#[pymodule]
+#[pyo3(name = "io")]
+fn tof_io<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  m.add_class::<PyTofPacket>()?;
+  m.add_class::<PyTofPacketReader>()?;
+  m.add_class::<PacketType>()?;
+  Ok(())
+}
+
+/// Event structures for the TOF part of the GAPS experiment
+#[pymodule]
+#[pyo3(name = "events")]
+fn tof_events<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  m.add_class::<PyMasterTriggerEvent>()?;
+  m.add_class::<PyRBEvent>()?;
+  m.add_class::<PyRBEventHeader>()?;
+  m.add_class::<PyTofEvent>()?;
+  m.add_class::<PyRBWaveform>()?;
+  m.add_class::<PyRBCalibration>()?;
+  Ok(())
+}
+
 /// Python API to rust version of tof-dataclasses.
 ///
 /// Currently, this contains only the analysis 
@@ -53,25 +124,14 @@ use crate::io::*;
 #[pyo3(name = "rpy_tof_dataclasses")]
 fn rpy_tof_dataclasses<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { //: Python<'_>, m: &PyModule) -> PyResult<()> {
   pyo3_log::init();
-  m.add_function(wrap_pyfunction!(py_get_periods,m)?)?;
-  m.add_function(wrap_pyfunction!(py_time2bin,m)?)?;
-  m.add_function(wrap_pyfunction!(py_find_peaks,m)?)?;
-  m.add_function(wrap_pyfunction!(py_find_peaks_zscore,m)?)?;
-  m.add_function(wrap_pyfunction!(py_integrate,m)?)?;
-  m.add_function(wrap_pyfunction!(py_interpolate_time,m)?)?;
-  m.add_function(wrap_pyfunction!(py_cfd_simple,m)?)?;
-  m.add_function(wrap_pyfunction!(py_find_zero_crossings,m)?)?;
+  //m.add_function(wrap_pyfunction!(py_get_periods,m)?)?;
+  m.add_wrapped(wrap_pymodule!(tof_analysis))?;
+  m.add_wrapped(wrap_pymodule!(tof_moni))?;
+  m.add_wrapped(wrap_pymodule!(tof_io))?;
+  m.add_wrapped(wrap_pymodule!(tof_events))?;
   //m.add_function(wrap_pyfunction!(test_waveform_analysis,m)?)?;
   //m.add_function(wrap_pyfunction!(wrap_calc_edep_simple,m)?)?;
   //m.add_function(wrap_pyfunction!(test_db,m)?)?;
-  m.add_class::<PyTofPacket>()?;
-  m.add_class::<PyTofPacketReader>()?;
-  m.add_class::<PyPAMoniSeries>()?;
-  m.add_class::<PyPBMoniSeries>()?;
-  m.add_class::<PyRBMoniSeries>()?;
-  m.add_class::<PyMtbMoniSeries>()?;
-  m.add_class::<PyCPUMoniSeries>()?;
-  m.add_class::<PyLTBMoniSeries>()?;
   //m.add_class::<PyPAMoniSeries>()?;
   //m.add_class::<PyIPBus>()?;
   //m.add_class::<PyMasterTrigger>()?;

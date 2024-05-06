@@ -3,6 +3,8 @@ use tof_dataclasses::io as io_api;
 use pyo3::prelude::*;
 //use pyo3::exceptions::PyValueError;
 
+use tof_dataclasses::packets::PacketType;
+
 use crate::dataclasses::PyTofPacket;
 
 #[pyclass]
@@ -15,10 +17,15 @@ pub struct PyTofPacketReader {
 impl PyTofPacketReader {
   
   #[new]
-  fn new(filename : String) -> Self {
-    Self {
+  #[pyo3(signature = (filename, filter=PacketType::Unknown,start=0, nevents=0))]
+  fn new(filename : String, filter : PacketType, start : usize, nevents : usize) -> Self {
+    let mut pyreader = Self {
       reader : io_api::TofPacketReader::new(filename),
-    }
+    };
+    pyreader.reader.filter     = filter;
+    pyreader.reader.skip_ahead = start;
+    pyreader.reader.stop_after = nevents;
+    pyreader
   }
 
   //fn set_filter(&self) {
