@@ -153,7 +153,7 @@ fn trace_check(event : &RBEvent) -> bool {
 /// Simplified version of spike cleaning 
 ///
 /// Taken over from Jamie's python code
-fn clean_spikes(traces : &mut Vec<Vec<Vec<f32>>>,vcaldone : bool) {
+pub fn clean_spikes(trace : &mut Vec<f32>, vcaldone : bool) {
   //# TODO: make robust (symmetric, doubles, fixed/estimated spike height)
   let mut thresh : f32 = 360.0;
   if vcaldone {
@@ -163,28 +163,24 @@ fn clean_spikes(traces : &mut Vec<Vec<Vec<f32>>>,vcaldone : bool) {
   // remember the structure of the traces here    
   //nevents,nchan,tracelen = gbf.traces.shape
   // we have chan, events, tracelen instead
-  let mut spikefilter0 = Vec::<f32>::new(); 
-  let mut spikefilter1 = Vec::<f32>::new();
-  let mut spikefilter2 = Vec::<f32>::new();
-  let mut spikefilter3 = Vec::<f32>::new();
+  //let mut spikefilter0 = Vec::<f32>::new(); 
+  //let mut spikefilter1 = Vec::<f32>::new();
+  //let mut spikefilter2 = Vec::<f32>::new();
+  //let mut spikefilter3 = Vec::<f32>::new();
   let mut spf_allch    = vec![0usize;1023];
-  for ch in 0..traces.len() {
-    for ev in 0..traces[ch].len() {
-      let tracelen = traces[ch][ev].len();
-      spikefilter0 = (&traces[ch][ev][0..tracelen-3]).to_vec();
-      spikefilter1 = (&traces[ch][ev][1..tracelen-2]).to_vec();
-      spikefilter2 = (&traces[ch][ev][2..tracelen-1]).to_vec();
-      spikefilter3 = (&traces[ch][ev][3..tracelen]).to_vec();
-    }
-    let spf_len = spikefilter0.len();
-    let mut spf_sum = vec![0f32;1024];
-    for k in 0..spf_len {
-      spf_sum[k] += spikefilter1[k] - spikefilter0[k] + spikefilter2[k] - spikefilter3[k];
-    }
-    for k in 0..spf_len {
-      if spf_sum[k] > thresh {
-        spf_allch[k] += 1;
-      }
+  let tracelen = trace.len();
+  let spikefilter0 = (&trace[0..tracelen-3]).to_vec();
+  let spikefilter1 = (&trace[1..tracelen-2]).to_vec();
+  let spikefilter2 = (&trace[2..tracelen-1]).to_vec();
+  let spikefilter3 = (&trace[3..tracelen]).to_vec();
+  let spf_len = spikefilter0.len();
+  let mut spf_sum = vec![0f32;1024];
+  for k in 0..spf_len {
+    spf_sum[k] += spikefilter1[k] - spikefilter0[k] + spikefilter2[k] - spikefilter3[k];
+  }
+  for k in 0..spf_len {
+    if spf_sum[k] > thresh {
+      spf_allch[k] += 1;
     }
   }
   let mut spikes = Vec::<usize>::new();
@@ -194,13 +190,9 @@ fn clean_spikes(traces : &mut Vec<Vec<Vec<f32>>>,vcaldone : bool) {
     }
   }
   for spike in spikes.iter() {
-    for ch in 0..traces.len() {
-      for ev in 0..traces[ch].len() {
-        let d_v : f32 = (traces[ch][ev][spike+3] - traces[ch][ev][*spike])/3.0;
-        traces[ch][ev][spike+1] = traces[ch][ev][*spike] + d_v;
-        traces[ch][ev][spike+2] = traces[ch][ev][*spike] + 2.0*d_v;
-      }
-    }
+    let d_v : f32 = (trace[spike+3] - trace[*spike])/3.0;
+    trace[spike+1] = trace[*spike] + d_v;
+    trace[spike+2] = trace[*spike] + 2.0*d_v;
   }
 }
 
@@ -715,7 +707,11 @@ impl RBCalibrations {
     }
     let do_spike_cleaning = true;
     if do_spike_cleaning {
-      clean_spikes(&mut traces, true);
+      for k_ch in 0..traces.len() {
+        for k_ev in 0..traces[k_ch].len() {
+          clean_spikes(&mut traces[k_ch][k_ev], true);
+        }
+      }
     }
     let nwords = traces[0][0].len();
     for ch in 0..NCHN {

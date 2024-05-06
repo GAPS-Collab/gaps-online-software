@@ -52,7 +52,8 @@ impl Error for SensorError {
 pub enum CalibrationError {
   EmptyInputData,
   CanNotConnectToMyOwnZMQSocket,
-  CalibrationFailed
+  CalibrationFailed,
+  WrongBoardId,
 }
 
 impl fmt::Display for CalibrationError {
