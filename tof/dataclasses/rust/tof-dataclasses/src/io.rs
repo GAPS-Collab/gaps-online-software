@@ -732,16 +732,37 @@ impl Iterator for RBEventMemoryStreamer {
 /// written by TofPacketWriter
 #[derive(Debug)]
 pub struct TofPacketReader {
+  /// Read from this file
   pub filename    : String,
   file_reader     : BufReader<File>,
+  /// Current (byte) position in the file
   cursor          : usize,
-  filter          : PacketType,
+  /// Read only packets of type == PacketType
+  pub filter          : PacketType,
+  /// Number of read packets
   n_packs_read    : usize,
+  /// Number of skipped packets
+  n_packs_skipped : usize,
+  /// Skip the first n packets
+  pub skip_ahead      : usize,
+  /// Stop reading after n packets
+  pub stop_after      : usize,
 }
 
 impl fmt::Display for TofPacketReader {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let repr = format!("<TofPacketReader : file {}, read {} packets, filter {}>", self.filename, self.n_packs_read, self.filter);
+    let mut range_repr = String::from("");
+    if self.skip_ahead > 0 {
+      range_repr += &(format!("({}", self.skip_ahead));
+    } else {
+      range_repr += "(";
+    }
+    if self.stop_after > 0 {
+      range_repr += &(format!("..{})", self.stop_after));
+    } else {
+      range_repr += "..)";
+    }
+    let repr = format!("<TofPacketReader : file {}, read {} packets, filter {}, range {}>", self.filename, self.n_packs_read, self.filter, range_repr);
     write!(f, "{}", repr)
   }
 }
@@ -753,14 +774,18 @@ impl TofPacketReader {
     let file = OpenOptions::new().create(false).append(false).read(true).open(fname_c).expect("Unable to open file {filename}");
     let packet_reader = Self { 
       filename,
-      file_reader  : BufReader::new(file),
-      cursor       : 0,
-      filter       : PacketType::Unknown,
-      n_packs_read : 0,
+      file_reader     : BufReader::new(file),
+      cursor          : 0,
+      filter          : PacketType::Unknown,
+      n_packs_read    : 0,
+      skip_ahead      : 0,
+      stop_after      : 0,
+      n_packs_skipped : 0,
     };
     packet_reader
-  }
- 
+  } 
+
+  #[deprecated(since="0.10.0", note="Use public attribute instead!")]
   pub fn set_filter(&mut self, ptype : PacketType) {
     self.filter = ptype;
   }
@@ -832,6 +857,36 @@ impl TofPacketReader {
             continue; // this is just not the packet we want
           }
           // now at this point, we want the packet!
+          // except we skip ahead or stop earlier
+          if self.skip_ahead > 0 && self.n_packs_skipped < self.skip_ahead {
+            // we don't want it
+            match self.file_reader.seek(SeekFrom::Current(size as i64)) {
+              Err(err) => {
+                error!("Unable to read more data! {err}");
+                return None; 
+              }
+              Ok(_) => {
+                self.n_packs_skipped += 1;
+                self.cursor += size as usize;
+              }
+            }
+            continue; // this is just not the packet we want
+          }
+          if self.stop_after > 0 && self.n_packs_read >= self.stop_after {
+            // we don't want it
+            match self.file_reader.seek(SeekFrom::Current(size as i64)) {
+              Err(err) => {
+                error!("Unable to read more data! {err}");
+                return None; 
+              }
+              Ok(_) => {
+                self.cursor += size as usize;
+              }
+            }
+            continue; // this is just not the packet we want
+
+          }
+
           let mut tp = TofPacket::new();
           tp.packet_type = ptype;
           let mut payload = vec![0u8;size as usize];
