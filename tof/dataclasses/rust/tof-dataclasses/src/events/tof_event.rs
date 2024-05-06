@@ -199,12 +199,24 @@ impl TofEvent {
     //+ self.missing_hits.len() 
   }
 
+  /// Get all waveforms of all RBEvents in this event
   pub fn get_rbwaveforms(&self) -> Vec<RBWaveform> {
     let mut wf = Vec::<RBWaveform>::new();
     for ev in &self.rb_events {
       wf.extend_from_slice(&ev.get_rbwaveforms());
     }
     wf
+  }
+
+  /// Get all hits of all RBEvents in this event
+  pub fn get_hits(&self) -> Vec<TofHit> {
+    let mut hits = Vec::<TofHit>::new();
+    for ev in &self.rb_events {
+      for h in &ev.hits {
+        hits.push(*h);
+      }
+    }
+    hits
   }
 
   pub fn get_summary(&self) -> TofEventSummary {

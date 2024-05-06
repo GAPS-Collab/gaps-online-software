@@ -41,8 +41,15 @@ use crate::events::{
     DataType,
     EventStatus,
 };
-use crate::errors::UserError;
+use crate::errors::{
+    UserError,
+    CalibrationError,
+};
 use crate::io::RBEventMemoryStreamer;
+use crate::calibrations::{
+    RBCalibrations,
+    clean_spikes,
+};
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
@@ -758,12 +765,12 @@ pub struct RBEventHeader {
   // we change this by keeping the byte
   // order the same to accomodate the sine 
   // values
-  pub ch9_amp                : u16,
-  pub ch9_freq               : u16,
-  pub ch9_phase              : u32,
-  //pub crc32                : u32  , 
-  //pub dtap0                : u16  , 
-  //pub drs4_temp            : u16  , 
+  pub ch9_amp              : u16,
+  pub ch9_freq             : u16,
+  pub ch9_phase            : u32,
+  //pub crc32              : u32  , 
+  //pub dtap0              : u16  , 
+  //pub drs4_temp          : u16  , 
   pub fpga_temp            : u16  , 
   pub timestamp32          : u32  ,
   pub timestamp16          : u16  ,
@@ -1122,24 +1129,57 @@ impl FromRandom for RBEventHeader {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct RBWaveform {
-  pub event_id   : u32,
-  pub rb_id      : u8,
-  pub rb_channel : u8,
+  pub event_id    : u32,
+  pub rb_id       : u8,
+  /// FIXME - this is form 0-8, but should it be from 1-9?
+  pub rb_channel  : u8,
   /// DRS4 stop cell
-  pub stop_cell  : u16,
-  pub adc        : Vec<u16>,
+  pub stop_cell   : u16,
+  pub adc         : Vec<u16>,
+  pub paddle_id   : u8,
+  pub voltages    : Vec<f32>,
+  pub nanoseconds : Vec<f32>
 }
 
 impl RBWaveform {
   
   pub fn new() -> Self {
     Self {
-      event_id   : 0,
-      rb_id      : 0,
-      rb_channel : 0,
-      stop_cell  : 0,
-      adc        : Vec::<u16>::new(),
+      event_id    : 0,
+      rb_id       : 0,
+      rb_channel  : 0,
+      stop_cell   : 0,
+      paddle_id   : 0,
+      // FIXME - we should think about this
+      // I guess adc should be an array 
+      // because it needs to be initialized
+      adc         : Vec::<u16>::new(),
+      voltages    : Vec::<f32>::new(),
+      nanoseconds : Vec::<f32>::new()
     }
+  }
+
+  pub fn calibrate(&mut self, cali : &RBCalibrations) -> Result<(), CalibrationError>  {
+    if cali.rb_id != self.rb_id {
+      return Err(CalibrationError::WrongBoardId);
+    }
+    let mut voltages = vec![0.0f32;1024];
+    let mut nanosecs = vec![0.0f32;1024];
+    cali.voltages(self.rb_channel as usize + 1,
+                  self.stop_cell as usize,
+                  &self.adc,
+                  &mut voltages);
+    self.voltages = voltages;
+    cali.nanoseconds(self.rb_channel as usize + 1,
+                     self.stop_cell as usize,
+                     &mut nanosecs);
+    self.nanoseconds = nanosecs;
+    Ok(())
+  }
+
+  /// Apply Jamie's simple spike filter to the calibrated voltages
+  pub fn apply_spike_filter(&mut self) {
+    clean_spikes(&mut self.voltages, true);
   }
 }
 
