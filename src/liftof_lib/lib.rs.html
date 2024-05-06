@@ -1340,6 +1340,9 @@
 <a href="#1338" id="1338">1338</a>
 <a href="#1339" id="1339">1339</a>
 <a href="#1340" id="1340">1340</a>
+<a href="#1341" id="1341">1341</a>
+<a href="#1342" id="1342">1342</a>
+<a href="#1343" id="1343">1343</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
 <span class="kw">pub mod </span>settings;
 <span class="kw">pub mod </span>constants;
@@ -1652,7 +1655,8 @@
 </span><span class="doccomment">/// Helper function to generate a proper tcp string starting
 /// from the ip one.
 </span><span class="kw">pub fn </span>build_tcp_from_ip(ip: String, port: String) -&gt; String {
-  String::from(<span class="string">"tcp://"</span>) + <span class="kw-2">&amp;</span>ip + <span class="string">":" </span>+ <span class="kw-2">&amp;</span>port
+  <span class="comment">//String::from("tcp://") + &amp;ip + ":" + &amp;port
+  </span><span class="macro">format!</span>(<span class="string">"tcp://{}:{}"</span>, ip, port)
 }
 
 <span class="doccomment">/// Broadcast commands over the tof-computer network
@@ -1871,7 +1875,7 @@
                        settings.find_pks_thresh  ,
                        settings.max_peaks      ) {
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">"Unable to find peaks for ch {ch}! Ignoring this channel!"</span>);
+          <span class="macro">error!</span>(<span class="string">"Unable to find peaks for RB{:02} ch {ch}! Ignoring this channel!"</span>, rb.rb_id);
           <span class="macro">error!</span>(<span class="string">"We won't be able to calculate timing information for this channel! Err {err}"</span>);
         },
         <span class="prelude-val">Ok</span>(peaks)  =&gt; {
@@ -2077,7 +2081,9 @@
 
 <span class="doccomment">/// Convert an int value to the board ID string.
 </span><span class="kw">pub fn </span>to_board_id_string(rb_id: u32) -&gt; String {
-  String::from(<span class="string">"RB"</span>) + <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{:02}"</span>, rb_id)
+
+  <span class="comment">//String::from("RB") + &amp;format!("{:02}", rb_id)
+  </span><span class="macro">format!</span>(<span class="string">"RB{:02}"</span>, rb_id)
 }
 
 <span class="comment">/**********************************************************/

@@ -1310,6 +1310,46 @@
 <a href="#1308" id="1308">1308</a>
 <a href="#1309" id="1309">1309</a>
 <a href="#1310" id="1310">1310</a>
+<a href="#1311" id="1311">1311</a>
+<a href="#1312" id="1312">1312</a>
+<a href="#1313" id="1313">1313</a>
+<a href="#1314" id="1314">1314</a>
+<a href="#1315" id="1315">1315</a>
+<a href="#1316" id="1316">1316</a>
+<a href="#1317" id="1317">1317</a>
+<a href="#1318" id="1318">1318</a>
+<a href="#1319" id="1319">1319</a>
+<a href="#1320" id="1320">1320</a>
+<a href="#1321" id="1321">1321</a>
+<a href="#1322" id="1322">1322</a>
+<a href="#1323" id="1323">1323</a>
+<a href="#1324" id="1324">1324</a>
+<a href="#1325" id="1325">1325</a>
+<a href="#1326" id="1326">1326</a>
+<a href="#1327" id="1327">1327</a>
+<a href="#1328" id="1328">1328</a>
+<a href="#1329" id="1329">1329</a>
+<a href="#1330" id="1330">1330</a>
+<a href="#1331" id="1331">1331</a>
+<a href="#1332" id="1332">1332</a>
+<a href="#1333" id="1333">1333</a>
+<a href="#1334" id="1334">1334</a>
+<a href="#1335" id="1335">1335</a>
+<a href="#1336" id="1336">1336</a>
+<a href="#1337" id="1337">1337</a>
+<a href="#1338" id="1338">1338</a>
+<a href="#1339" id="1339">1339</a>
+<a href="#1340" id="1340">1340</a>
+<a href="#1341" id="1341">1341</a>
+<a href="#1342" id="1342">1342</a>
+<a href="#1343" id="1343">1343</a>
+<a href="#1344" id="1344">1344</a>
+<a href="#1345" id="1345">1345</a>
+<a href="#1346" id="1346">1346</a>
+<a href="#1347" id="1347">1347</a>
+<a href="#1348" id="1348">1348</a>
+<a href="#1349" id="1349">1349</a>
+<a href="#1350" id="1350">1350</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Readoutboard binary event formats, former denoted as BLOB (binary large object)
 //! 
 //! The structure is the following
@@ -1353,8 +1393,15 @@
     DataType,
     EventStatus,
 };
-<span class="kw">use </span><span class="kw">crate</span>::errors::UserError;
+<span class="kw">use </span><span class="kw">crate</span>::errors::{
+    UserError,
+    CalibrationError,
+};
 <span class="kw">use </span><span class="kw">crate</span>::io::RBEventMemoryStreamer;
+<span class="kw">use </span><span class="kw">crate</span>::calibrations::{
+    RBCalibrations,
+    clean_spikes,
+};
 
 <span class="macro">cfg_if::cfg_if! </span>{
   <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"random"</span>)]  </span>{
@@ -2070,12 +2117,12 @@
   <span class="comment">// we change this by keeping the byte
   // order the same to accomodate the sine 
   // values
-  </span><span class="kw">pub </span>ch9_amp                : u16,
-  <span class="kw">pub </span>ch9_freq               : u16,
-  <span class="kw">pub </span>ch9_phase              : u32,
-  <span class="comment">//pub crc32                : u32  , 
-  //pub dtap0                : u16  , 
-  //pub drs4_temp            : u16  , 
+  </span><span class="kw">pub </span>ch9_amp              : u16,
+  <span class="kw">pub </span>ch9_freq             : u16,
+  <span class="kw">pub </span>ch9_phase            : u32,
+  <span class="comment">//pub crc32              : u32  , 
+  //pub dtap0              : u16  , 
+  //pub drs4_temp          : u16  , 
   </span><span class="kw">pub </span>fpga_temp            : u16  , 
   <span class="kw">pub </span>timestamp32          : u32  ,
   <span class="kw">pub </span>timestamp16          : u16  ,
@@ -2317,18 +2364,18 @@
     <span class="kw">let </span>sfit = <span class="self">self</span>.get_sine_fit();
     <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;RBEventHeader:"</span>);
     <span class="kw">let </span>sine_field = <span class="macro">format!</span>(<span class="string">"\n    --&gt; online fit AMP {:3} FREQ {:3} PHASE {:3}"</span>, sfit.<span class="number">0</span>, sfit.<span class="number">1</span>, sfit.<span class="number">2</span>);
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  RB ID            "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.rb_id.to_string()); 
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  event id         "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.event_id.to_string());  
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  ch mask          "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.channel_mask.to_string());  
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  has ch9          "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.has_ch9().to_string()); 
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  RB ID            {}"</span>,<span class="self">self</span>.rb_id               )); 
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  event id         {}"</span>,<span class="self">self</span>.event_id            ));  
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  ch mask          {}"</span>,<span class="self">self</span>.channel_mask        ));  
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  has ch9          {}"</span>,<span class="self">self</span>.has_ch9()           )); 
     <span class="comment">//repr += &amp;("\n  DRS4 temp [C]    ".to_owned() + &amp;self.drs4_temp.to_string());  
     </span>repr += <span class="kw-2">&amp;</span>sine_field;
     <span class="comment">//repr += &amp;("\n  FPGA temp [\u{00B0}C]    ".to_owned() + &amp;self.get_fpga_temp().to_string()); 
     </span>repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  FPGA T [\u{00B0}C]    : {:.2}"</span>, <span class="self">self</span>.get_fpga_temp()));
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  timestamp32      "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp32.to_string()); 
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  timestamp16      "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp16.to_string()); 
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n   |-&gt; timestamp48 "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.get_timestamp48().to_string()); 
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  stop cell        "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.stop_cell.to_string()); 
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  timestamp32      {}"</span>, <span class="self">self</span>.timestamp32            )); 
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  timestamp16      {}"</span>, <span class="self">self</span>.timestamp16            )); 
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   |-&gt; timestamp48 {}"</span>, <span class="self">self</span>.get_timestamp48()      )); 
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  stop cell        {}"</span>, <span class="self">self</span>.stop_cell              )); 
     <span class="comment">//repr += &amp;("\n  dtap0            ".to_owned() + &amp;self.dtap0.to_string()); 
     //repr += &amp;("\n  crc32            ".to_owned() + &amp;self.crc32.to_string()); 
     </span><span class="kw">let </span><span class="kw-2">mut </span>perfect = <span class="bool-val">true</span>;
@@ -2434,24 +2481,57 @@
 
 <span class="attr">#[derive(Debug, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>RBWaveform {
-  <span class="kw">pub </span>event_id   : u32,
-  <span class="kw">pub </span>rb_id      : u8,
-  <span class="kw">pub </span>rb_channel : u8,
+  <span class="kw">pub </span>event_id    : u32,
+  <span class="kw">pub </span>rb_id       : u8,
+  <span class="doccomment">/// FIXME - this is form 0-8, but should it be from 1-9?
+  </span><span class="kw">pub </span>rb_channel  : u8,
   <span class="doccomment">/// DRS4 stop cell
-  </span><span class="kw">pub </span>stop_cell  : u16,
-  <span class="kw">pub </span>adc        : Vec&lt;u16&gt;,
+  </span><span class="kw">pub </span>stop_cell   : u16,
+  <span class="kw">pub </span>adc         : Vec&lt;u16&gt;,
+  <span class="kw">pub </span>paddle_id   : u8,
+  <span class="kw">pub </span>voltages    : Vec&lt;f32&gt;,
+  <span class="kw">pub </span>nanoseconds : Vec&lt;f32&gt;
 }
 
 <span class="kw">impl </span>RBWaveform {
   
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
-      event_id   : <span class="number">0</span>,
-      rb_id      : <span class="number">0</span>,
-      rb_channel : <span class="number">0</span>,
-      stop_cell  : <span class="number">0</span>,
-      adc        : Vec::&lt;u16&gt;::new(),
+      event_id    : <span class="number">0</span>,
+      rb_id       : <span class="number">0</span>,
+      rb_channel  : <span class="number">0</span>,
+      stop_cell   : <span class="number">0</span>,
+      paddle_id   : <span class="number">0</span>,
+      <span class="comment">// FIXME - we should think about this
+      // I guess adc should be an array 
+      // because it needs to be initialized
+      </span>adc         : Vec::&lt;u16&gt;::new(),
+      voltages    : Vec::&lt;f32&gt;::new(),
+      nanoseconds : Vec::&lt;f32&gt;::new()
     }
+  }
+
+  <span class="kw">pub fn </span>calibrate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cali : <span class="kw-2">&amp;</span>RBCalibrations) -&gt; <span class="prelude-ty">Result</span>&lt;(), CalibrationError&gt;  {
+    <span class="kw">if </span>cali.rb_id != <span class="self">self</span>.rb_id {
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::WrongBoardId);
+    }
+    <span class="kw">let </span><span class="kw-2">mut </span>voltages = <span class="macro">vec!</span>[<span class="number">0.0f32</span>;<span class="number">1024</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>nanosecs = <span class="macro">vec!</span>[<span class="number">0.0f32</span>;<span class="number">1024</span>];
+    cali.voltages(<span class="self">self</span>.rb_channel <span class="kw">as </span>usize + <span class="number">1</span>,
+                  <span class="self">self</span>.stop_cell <span class="kw">as </span>usize,
+                  <span class="kw-2">&amp;</span><span class="self">self</span>.adc,
+                  <span class="kw-2">&amp;mut </span>voltages);
+    <span class="self">self</span>.voltages = voltages;
+    cali.nanoseconds(<span class="self">self</span>.rb_channel <span class="kw">as </span>usize + <span class="number">1</span>,
+                     <span class="self">self</span>.stop_cell <span class="kw">as </span>usize,
+                     <span class="kw-2">&amp;mut </span>nanosecs);
+    <span class="self">self</span>.nanoseconds = nanosecs;
+    <span class="prelude-val">Ok</span>(())
+  }
+
+  <span class="doccomment">/// Apply Jamie's simple spike filter to the calibrated voltages
+  </span><span class="kw">pub fn </span>apply_spike_filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+    clean_spikes(<span class="kw-2">&amp;mut </span><span class="self">self</span>.voltages, <span class="bool-val">true</span>);
   }
 }
 

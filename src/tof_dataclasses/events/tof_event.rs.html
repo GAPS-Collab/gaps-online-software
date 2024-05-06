@@ -901,6 +901,19 @@
 <a href="#899" id="899">899</a>
 <a href="#900" id="900">900</a>
 <a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Event strucutures for data reconrded byi the tof
 //!
 //! Compressed format containing analysis results of 
@@ -1102,12 +1115,24 @@
     <span class="comment">//+ self.missing_hits.len() 
   </span>}
 
-  <span class="kw">pub fn </span>get_rbwaveforms(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;RBWaveform&gt; {
+  <span class="doccomment">/// Get all waveforms of all RBEvents in this event
+  </span><span class="kw">pub fn </span>get_rbwaveforms(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;RBWaveform&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>wf = Vec::&lt;RBWaveform&gt;::new();
     <span class="kw">for </span>ev <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.rb_events {
       wf.extend_from_slice(<span class="kw-2">&amp;</span>ev.get_rbwaveforms());
     }
     wf
+  }
+
+  <span class="doccomment">/// Get all hits of all RBEvents in this event
+  </span><span class="kw">pub fn </span>get_hits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;TofHit&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>hits = Vec::&lt;TofHit&gt;::new();
+    <span class="kw">for </span>ev <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.rb_events {
+      <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;</span>ev.hits {
+        hits.push(<span class="kw-2">*</span>h);
+      }
+    }
+    hits
   }
 
   <span class="kw">pub fn </span>get_summary(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TofEventSummary {
@@ -1214,8 +1239,9 @@
     event.mt_event  = MasterTriggerEvent::from_random();
     event.header    = TofEventHeader::from_random();
     <span class="kw">let </span><span class="kw-2">mut </span>rng     = rand::thread_rng();
-    <span class="kw">let </span>n_boards    = rng.gen::&lt;u8&gt;() <span class="kw">as </span>usize;
-    <span class="comment">//let n_paddles   = rng.gen::&lt;u8&gt;() as usize;
+    <span class="kw">let </span>n_boards    = rng.gen_range(<span class="number">1</span>..<span class="number">41</span>) <span class="kw">as </span>u8;
+    <span class="comment">//let n_boards    = rng.gen::&lt;u8&gt;() as usize;
+    //let n_paddles   = rng.gen::&lt;u8&gt;() as usize;
     </span><span class="kw">for _ in </span><span class="number">0</span>..n_boards {
       event.rb_events.push(RBEvent::from_random());
     }
@@ -1384,25 +1410,25 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofEventHeader {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;TofEventHeader"</span>); 
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Run   ID          : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.run_id              .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Event ID          : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.event_id            .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Timestamp 32      : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp_32        .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Timestamp 16      : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp_16        .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Beta        : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_beta        .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Beta Unc    : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_beta_unc    .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Charge      : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_charge      .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Charge unc  : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_charge_unc  .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Outer Tof X : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_x .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Outer Tof Y : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_y .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Outer Tof Z : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_z .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Inner Tof X : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_x .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Inner Tof Y : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_y .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Inner Tof Z : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_z .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  NHit  Outer Tof   : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.nhit_outer_tof      .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  NHit  Inner Tof   : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.nhit_inner_tof      .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  TriggerInfo       : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.trigger_info        .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Ctr ETX           : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.ctr_etx             .to_string());
-    repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  NPaddles          : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.n_paddles           .to_string());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Run   ID          : {}"</span>, <span class="self">self</span>.run_id              ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Event ID          : {}"</span>, <span class="self">self</span>.event_id            ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Timestamp 32      : {}"</span>, <span class="self">self</span>.timestamp_32        ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Timestamp 16      : {}"</span>, <span class="self">self</span>.timestamp_16        ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Prim. Beta        : {}"</span>, <span class="self">self</span>.primary_beta        ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Prim. Beta Unc    : {}"</span>, <span class="self">self</span>.primary_beta_unc    ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Prim. Charge      : {}"</span>, <span class="self">self</span>.primary_charge      ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Prim. Charge unc  : {}"</span>, <span class="self">self</span>.primary_charge_unc  ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Prim. Outer Tof X : {}"</span>, <span class="self">self</span>.primary_outer_tof_x ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Prim. Outer Tof Y : {}"</span>, <span class="self">self</span>.primary_outer_tof_y ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Prim. Outer Tof Z : {}"</span>, <span class="self">self</span>.primary_outer_tof_z ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Prim. Inner Tof X : {}"</span>, <span class="self">self</span>.primary_inner_tof_x ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Prim. Inner Tof Y : {}"</span>, <span class="self">self</span>.primary_inner_tof_y ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Prim. Inner Tof Z : {}"</span>, <span class="self">self</span>.primary_inner_tof_z ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  NHit  Outer Tof   : {}"</span>, <span class="self">self</span>.nhit_outer_tof      ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  NHit  Inner Tof   : {}"</span>, <span class="self">self</span>.nhit_inner_tof      ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  TriggerInfo       : {}"</span>, <span class="self">self</span>.trigger_info        ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Ctr ETX           : {}"</span>, <span class="self">self</span>.ctr_etx             ));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  NPaddles          : {}"</span>, <span class="self">self</span>.n_paddles           ));
     repr += <span class="string">"&gt;"</span>;
   <span class="macro">write!</span>(f,<span class="string">"{}"</span>, repr)
   }

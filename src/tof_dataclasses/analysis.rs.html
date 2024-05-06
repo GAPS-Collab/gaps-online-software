@@ -475,8 +475,6 @@
 <a href="#473" id="473">473</a>
 <a href="#474" id="474">474</a>
 <a href="#475" id="475">475</a>
-<a href="#476" id="476">476</a>
-<a href="#477" id="477">477</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implementations of analysis engine
 //! This is based on the original code 
 //! by J.Zweerink
@@ -566,9 +564,7 @@
 /// * impedance : typically this is 
 </span><span class="kw">pub fn </span>integrate(voltages     : <span class="kw-2">&amp;</span>Vec&lt;f32&gt;,
                  nanoseconds  : <span class="kw-2">&amp;</span>Vec&lt;f32&gt;,
-                 <span class="comment">//lower_bound  : f32,
-                 //size         : f32,
-                 </span>lo_bin       : usize,
+                 lo_bin       : usize,
                  upper_bin    : usize,
                  impedance    : f32) -&gt; <span class="prelude-ty">Result</span>&lt;f32, WaveformError&gt;  {
   <span class="comment">//if lower_bound &lt; 0.0 { 

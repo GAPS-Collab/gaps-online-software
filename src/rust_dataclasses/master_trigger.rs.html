@@ -1071,16 +1071,15 @@
 <a href="#1069" id="1069">1069</a>
 <a href="#1070" id="1070">1070</a>
 <a href="#1071" id="1071">1071</a>
-<a href="#1072" id="1072">1072</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>pyo3::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>pyo3::exceptions::PyValueError;
 
 <span class="kw">extern crate </span>pyo3_log;
-<span class="kw">use </span>numpy::PyArray1;
+<span class="comment">//use numpy::PyArray1;
 
-<span class="kw">use </span>comfy_table::modifiers::UTF8_ROUND_CORNERS;
+</span><span class="kw">use </span>comfy_table::modifiers::UTF8_ROUND_CORNERS;
 <span class="kw">use </span>comfy_table::presets::UTF8_FULL;
 <span class="kw">use </span>comfy_table::<span class="kw-2">*</span>;
 
@@ -1483,8 +1482,8 @@
   </span><span class="kw">fn </span>reset_rb_counters(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; PyResult&lt;()&gt; {
     <span class="macro">println!</span>(<span class="string">"{}"</span>, RB_CNTS_RESET);
     <span class="kw">match </span>RB_CNTS_RESET.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, <span class="number">1</span>) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt; {
-        <span class="kw">return </span><span class="prelude-val">Ok</span>(cnt);
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
         <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
@@ -1495,8 +1494,8 @@
   <span class="doccomment">/// Reset all the LTB counters
   </span><span class="kw">fn </span>reset_ltb_counters(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>LT_HIT_CNT_RESET.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, <span class="number">1</span>) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt; {
-        <span class="kw">return </span><span class="prelude-val">Ok</span>(cnt);
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
         <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
@@ -1521,7 +1520,7 @@
     }
 
     <span class="kw">match </span>registers[lt_link <span class="kw">as </span>usize].set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, mask <span class="kw">as </span>u32) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt; {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1539,7 +1538,7 @@
       read_all_rb = <span class="number">1</span>;
     }
     <span class="kw">match </span>RB_READ_ALL_CHANNELS.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, read_all_rb) {
-      <span class="prelude-val">Ok</span>(cnt)  =&gt; {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)  =&gt; {
         <span class="prelude-val">Ok</span>(())
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1561,7 +1560,7 @@
   
   <span class="kw">fn </span>set_total_tof_thresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>TOTAL_TOF_THRESH.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, value) {
-      <span class="prelude-val">Ok</span>(cnt)  =&gt; {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)  =&gt; {
         <span class="prelude-val">Ok</span>(())
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1583,7 +1582,7 @@
   
   <span class="kw">fn </span>set_inner_tof_thresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>INNER_TOF_THRESH.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, value) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt;  {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt;  {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1605,7 +1604,7 @@
 
   <span class="kw">fn </span>set_outer_tof_thresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>OUTER_TOF_THRESH.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, value) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt;  {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt;  {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1627,7 +1626,7 @@
 
   <span class="kw">fn </span>set_cube_side_thresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>CUBE_SIDE_THRESH.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, value) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt;  {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt;  {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1649,7 +1648,7 @@
 
   <span class="kw">fn </span>set_cube_top_thresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>CUBE_TOP_THRESH.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, value) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt;  {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt;  {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1671,7 +1670,7 @@
 
   <span class="kw">fn </span>set_cube_bot_thresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>CUBE_BOT_THRESH.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, value) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt;  {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt;  {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1693,7 +1692,7 @@
 
   <span class="kw">fn </span>set_cube_corner_thresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>CUBE_CORNER_THRESH.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, value) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt;  {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt;  {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1715,7 +1714,7 @@
  
   <span class="kw">fn </span>set_umbrella_thresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>UMBRELLA_THRESH.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, value) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt;  {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt;  {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1737,7 +1736,7 @@
 
   <span class="kw">fn </span>set_umbrella_center_thresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>UMBRELLA_CENTER_THRESH.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, value) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt;  {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt;  {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1759,7 +1758,7 @@
 
   <span class="kw">fn </span>set_cortina_thresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>CORTINA_THRESH.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, value) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt;  {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt;  {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1781,7 +1780,7 @@
 
   <span class="kw">fn </span>set_configurable_trigger(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>CONFIGURABLE_TRIGGER_EN.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, value) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt; {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1803,7 +1802,7 @@
 
   <span class="kw">fn </span>set_any_trigger(<span class="kw-2">&amp;mut </span><span class="self">self</span>, prescale : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>ANY_TRIG_PRESCALE.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, prescale) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt;  {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt;  {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1814,7 +1813,7 @@
 
   <span class="kw">fn </span>set_track_trigger(<span class="kw-2">&amp;mut </span><span class="self">self</span>, prescale : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>TRACK_TRIG_PRESCALE.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, prescale) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt;  {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt;  {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1825,7 +1824,7 @@
   
   <span class="kw">fn </span>set_central_track_trigger(<span class="kw-2">&amp;mut </span><span class="self">self</span>, prescale : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>TRACK_CENTRAL_PRESCALE.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, prescale) {
-      <span class="prelude-val">Ok</span>(cnt) =&gt;  {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt;  {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {
@@ -2025,9 +2024,9 @@
           data = _data;
           <span class="kw">for </span>(i,word) <span class="kw">in </span>data.iter().enumerate() {
             <span class="kw">let </span>desc : <span class="kw-2">&amp;</span>str;
-            <span class="kw">let </span><span class="kw-2">mut </span>desc_str = String::from(<span class="string">""</span>);
-            <span class="kw">let </span><span class="kw-2">mut </span>nhit_words = <span class="number">0</span>;
-            <span class="kw">match </span>i {
+            <span class="kw">let </span>desc_str : String;
+            <span class="comment">//let mut nhit_words = 0;
+            </span><span class="kw">match </span>i {
               <span class="number">0 </span>=&gt; desc = <span class="string">"HEADER"</span>,
               <span class="number">1 </span>=&gt; desc = <span class="string">"EVENTID"</span>,
               <span class="number">2 </span>=&gt; desc = <span class="string">"TIMESTAMP"</span>,
@@ -2037,8 +2036,8 @@
               <span class="number">6 </span>=&gt; desc = <span class="string">"RB MASK 0"</span>,
               <span class="number">7 </span>=&gt; desc = <span class="string">"RB MASK 1"</span>,
               <span class="number">8 </span>=&gt; {
-                nhit_words = nhit_words / <span class="number">2 </span>+ nhit_words % <span class="number">2</span>;
-                desc_str  = <span class="macro">format!</span>(<span class="string">"BOARD MASK ({} ltbs)"</span>, word.count_ones());
+                <span class="comment">//nhit_words = nhit_words / 2 + nhit_words % 2;
+                </span>desc_str  = <span class="macro">format!</span>(<span class="string">"BOARD MASK ({} ltbs)"</span>, word.count_ones());
                 desc  = <span class="kw-2">&amp;</span>desc_str;
               },
               <span class="kw">_ </span>=&gt; desc = <span class="string">"?"
@@ -2055,7 +2054,7 @@
         }
         <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(String::from(<span class="string">"Incorrect header value!"</span>)));
       }
-      <span class="kw">let </span><span class="kw-2">mut </span>foot_pos = (n_daq_words - <span class="number">1</span>) <span class="kw">as </span>usize;
+      <span class="kw">let </span>foot_pos = (n_daq_words - <span class="number">1</span>) <span class="kw">as </span>usize;
       <span class="kw">if </span>data.len() &lt;= foot_pos {
         <span class="kw">if </span>verbose {
           <span class="macro">println!</span>(<span class="string">"[MasterTrigger::get_event] =&gt; Got MTB data, but the format is not correct"</span>);
@@ -2087,7 +2086,6 @@
               }
             }
           }
-          foot_pos = n_daq_words_actual <span class="kw">as </span>usize - <span class="number">1</span>;
           <span class="kw">if </span>verbose {
             <span class="macro">println!</span>(<span class="string">"[MasterTrigger::get_event] =&gt; We read {} additional words!"</span>, n_daq_words_actual - n_daq_words);
           }

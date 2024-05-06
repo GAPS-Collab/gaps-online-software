@@ -1307,7 +1307,6 @@
 <span class="kw">use </span>tof_dataclasses::events::RBEvent;
 <span class="comment">//use tof_dataclasses::serialization::Serialization;
 </span><span class="kw">use </span>tof_dataclasses::monitoring::{
-    Series,
     RBMoniData,
     LTBMoniData,
     PAMoniData,
@@ -1315,6 +1314,7 @@
     LTBMoniDataSeries,
     PAMoniDataSeries,
 };
+<span class="kw">use </span>tof_dataclasses::series::MoniSeries;
 <span class="kw">use </span>tof_dataclasses::io::RBEventMemoryStreamer;
 <span class="kw">use </span>tof_dataclasses::database::ReadoutBoard;
 
@@ -1948,7 +1948,7 @@
        
         <span class="kw">let </span>rate_ds_name   = String::from(<span class="string">"Rate"</span>);
         <span class="kw">let </span>rate_ds_title  = String::from(<span class="string">"RB Rate [Hz]"</span>);
-        <span class="kw">let </span>rate_data      = <span class="self">self</span>.moni_queue.get_var_for_rb(<span class="string">"rate"</span>, <span class="self">self</span>.rb_selector);
+        <span class="kw">let </span>rate_data      = <span class="self">self</span>.moni_queue.get_var_for_board(<span class="string">"rate"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>rate_ts    = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>rate_data {
           <span class="prelude-val">None </span>=&gt; {
@@ -1972,7 +1972,7 @@
         <span class="comment">// ambience
         </span><span class="kw">let </span>mag_tot_ds_name   = String::from(<span class="string">"Magnetic Field"</span>);
         <span class="kw">let </span>mag_tot_ds_title  = String::from(<span class="string">"Tot mag field [Gauss]"</span>);
-        <span class="kw">let </span>mag_tot_data      = <span class="self">self</span>.moni_queue.get_var_for_rb(<span class="string">"mag_tot"</span>, <span class="self">self</span>.rb_selector);
+        <span class="kw">let </span>mag_tot_data      = <span class="self">self</span>.moni_queue.get_var_for_board(<span class="string">"mag_tot"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>mag_tot_ts    = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>mag_tot_data  {
           <span class="prelude-val">None </span>=&gt; {
@@ -1992,7 +1992,7 @@
 
         <span class="kw">let </span>pres_ds_name   = String::from(<span class="string">"Atmospheric pressure"</span>);
         <span class="kw">let </span>pres_ds_title  = String::from(<span class="string">"Atmospheric pressure [hPa]"</span>);
-        <span class="kw">let </span>pres_data      = <span class="self">self</span>.moni_queue.get_var_for_rb(<span class="string">"pressure"</span>, <span class="self">self</span>.rb_selector);
+        <span class="kw">let </span>pres_data      = <span class="self">self</span>.moni_queue.get_var_for_board(<span class="string">"pressure"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>pres_ts    = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>pres_data {
           <span class="prelude-val">None </span>=&gt; {
@@ -2013,7 +2013,7 @@
         
         <span class="kw">let </span>humi_ds_name   = String::from(<span class="string">"Ambient humidity"</span>);
         <span class="kw">let </span>humi_ds_title  = String::from(<span class="string">"Humidity [%]"</span>);
-        <span class="kw">let </span>humi_data      = <span class="self">self</span>.moni_queue.get_var_for_rb(<span class="string">"humidity"</span>, <span class="self">self</span>.rb_selector);
+        <span class="kw">let </span>humi_data      = <span class="self">self</span>.moni_queue.get_var_for_board(<span class="string">"humidity"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>humi_ts    = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>humi_data {
           <span class="prelude-val">None </span>=&gt; {
@@ -2044,7 +2044,7 @@
           frame.render_widget(fpga_tc, col1[<span class="number">3</span>]);
         } <span class="kw">else </span>{
           <span class="comment">// we will get it from the RBMoniData
-          </span><span class="kw">let </span>fpga_data      = <span class="self">self</span>.moni_queue.get_var_for_rb(<span class="string">"tmp_drs"</span>, <span class="self">self</span>.rb_selector);
+          </span><span class="kw">let </span>fpga_data      = <span class="self">self</span>.moni_queue.get_var_for_board(<span class="string">"tmp_drs"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
           <span class="kw">let </span><span class="kw-2">mut </span>fpga_ts    = VecDeque::&lt;(f64, f64)&gt;::new(); 
           <span class="kw">match </span>fpga_data {
             <span class="prelude-val">None </span>=&gt; {
@@ -2065,7 +2065,7 @@
 
         <span class="kw">let </span>tmp_clk_ds_name   = String::from(<span class="string">"CLK Temperature"</span>);
         <span class="kw">let </span>tmp_clk_ds_title  = String::from(<span class="string">"CLK Temp. [\u{00B0}C]"</span>);
-        <span class="kw">let </span>tmp_clk_data      = <span class="self">self</span>.moni_queue.get_var_for_rb(<span class="string">"tmp_clk"</span>, <span class="self">self</span>.rb_selector);
+        <span class="kw">let </span>tmp_clk_data      = <span class="self">self</span>.moni_queue.get_var_for_board(<span class="string">"tmp_clk"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>tmp_clk_ts    = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>tmp_clk_data {
           <span class="prelude-val">None </span>=&gt; {
@@ -2085,7 +2085,7 @@
         
         <span class="kw">let </span>tmp_adc_ds_name   = String::from(<span class="string">"ADC Temperature"</span>);
         <span class="kw">let </span>tmp_adc_ds_title  = String::from(<span class="string">"ADC Temp. [\u{00B0}C]"</span>);
-        <span class="kw">let </span>tmp_adc_data      = <span class="self">self</span>.moni_queue.get_var_for_rb(<span class="string">"tmp_adc"</span>, <span class="self">self</span>.rb_selector);
+        <span class="kw">let </span>tmp_adc_data      = <span class="self">self</span>.moni_queue.get_var_for_board(<span class="string">"tmp_adc"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>tmp_adc_ts    = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>tmp_adc_data {
           <span class="prelude-val">None </span>=&gt; {
@@ -2105,7 +2105,7 @@
         
         <span class="kw">let </span>tmp_zynq_ds_name   = String::from(<span class="string">"ZYNQ Temperature"</span>);
         <span class="kw">let </span>tmp_zynq_ds_title  = String::from(<span class="string">"ZYNQ Temp. [\u{00B0}C]"</span>);
-        <span class="kw">let </span>tmp_zynq_data      = <span class="self">self</span>.moni_queue.get_var_for_rb(<span class="string">"tmp_zynq"</span>, <span class="self">self</span>.rb_selector);
+        <span class="kw">let </span>tmp_zynq_data      = <span class="self">self</span>.moni_queue.get_var_for_board(<span class="string">"tmp_zynq"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>tmp_zynq_ts    = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>tmp_zynq_data {
           <span class="prelude-val">None </span>=&gt; {
@@ -2125,7 +2125,7 @@
         
         <span class="kw">let </span>tmp_bm280_name   = String::from(<span class="string">"BM280 Temperature"</span>);
         <span class="kw">let </span>tmp_bm280_title  = String::from(<span class="string">"BM280 Temp. [\u{00B0}C]"</span>);
-        <span class="kw">let </span>tmp_bm280_data      = <span class="self">self</span>.moni_queue.get_var_for_rb(<span class="string">"tmp_bm280"</span>, <span class="self">self</span>.rb_selector);
+        <span class="kw">let </span>tmp_bm280_data      = <span class="self">self</span>.moni_queue.get_var_for_board(<span class="string">"tmp_bm280"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>tmp_bm280_ts    = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>tmp_bm280_data {
           <span class="prelude-val">None </span>=&gt; {
@@ -2146,7 +2146,7 @@
         <span class="comment">// Currents 
         </span><span class="kw">let </span>drs_c_name   = String::from(<span class="string">"DRS Current"</span>);
         <span class="kw">let </span>drs_c_title  = String::from(<span class="string">"DRS Curr. [mA]"</span>);
-        <span class="kw">let </span>drs_c_data   = <span class="self">self</span>.moni_queue.get_var_for_rb(<span class="string">"drs_dvdd_current"</span>, <span class="self">self</span>.rb_selector);
+        <span class="kw">let </span>drs_c_data   = <span class="self">self</span>.moni_queue.get_var_for_board(<span class="string">"drs_dvdd_current"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>drs_c_ts = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>drs_c_data {
           <span class="prelude-val">None </span>=&gt; {
@@ -2166,7 +2166,7 @@
 
         <span class="kw">let </span>zynq_c_name   = String::from(<span class="string">"Zynq Current"</span>);
         <span class="kw">let </span>zynq_c_title  = String::from(<span class="string">"Zynq Curr. [mA]"</span>);
-        <span class="kw">let </span>zynq_c_data   = <span class="self">self</span>.moni_queue.get_var_for_rb(<span class="string">"zynq_current"</span>, <span class="self">self</span>.rb_selector);
+        <span class="kw">let </span>zynq_c_data   = <span class="self">self</span>.moni_queue.get_var_for_board(<span class="string">"zynq_current"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>zynq_c_ts = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>zynq_c_data {
           <span class="prelude-val">None </span>=&gt; {
@@ -2186,7 +2186,7 @@
         
         <span class="kw">let </span>p3v3_c_name   = String::from(<span class="string">"P3V3 Current"</span>);
         <span class="kw">let </span>p3v3_c_title  = String::from(<span class="string">"P3V3 Curr. [mA]"</span>);
-        <span class="kw">let </span>p3v3_c_data   = <span class="self">self</span>.moni_queue.get_var_for_rb(<span class="string">"p3v3_current"</span>, <span class="self">self</span>.rb_selector);
+        <span class="kw">let </span>p3v3_c_data   = <span class="self">self</span>.moni_queue.get_var_for_board(<span class="string">"p3v3_current"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>p3v3_c_ts = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>p3v3_c_data {
           <span class="prelude-val">None </span>=&gt; {
@@ -2206,7 +2206,7 @@
         
         <span class="kw">let </span>p3v5_c_name   = String::from(<span class="string">"P3V5 Current"</span>);
         <span class="kw">let </span>p3v5_c_title  = String::from(<span class="string">"P3V5 Curr. [mA]"</span>);
-        <span class="kw">let </span>p3v5_c_data   = <span class="self">self</span>.moni_queue.get_var_for_rb(<span class="string">"p3v5_current"</span>, <span class="self">self</span>.rb_selector);
+        <span class="kw">let </span>p3v5_c_data   = <span class="self">self</span>.moni_queue.get_var_for_board(<span class="string">"p3v5_current"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>p3v5_c_ts = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>p3v5_c_data {
           <span class="prelude-val">None </span>=&gt; {
@@ -2280,7 +2280,7 @@
 
         <span class="kw">let </span>tt_name   = String::from(<span class="string">"Trenz Temp"</span>);
         <span class="kw">let </span>tt_title  = String::from(<span class="string">"Trenz Temp [\u{00B0}C]"</span>);
-        <span class="kw">let </span>tt_data   = <span class="self">self</span>.ltb_moni_queue.get_var_for_board(<span class="string">"trenz_temp"</span>, <span class="self">self</span>.ltb_selector);
+        <span class="kw">let </span>tt_data   = <span class="self">self</span>.ltb_moni_queue.get_var_for_board(<span class="string">"trenz_temp"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ltb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>tt_ts = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>tt_data {
           <span class="prelude-val">None </span>=&gt; {
@@ -2300,7 +2300,7 @@
 
         <span class="kw">let </span>lt_name   = String::from(<span class="string">"LTB Temperature"</span>);
         <span class="kw">let </span>lt_title  = String::from(<span class="string">"LTB Temp. [\u{00B0}C]"</span>);
-        <span class="kw">let </span>lt_data      = <span class="self">self</span>.ltb_moni_queue.get_var_for_board(<span class="string">"ltb_temp"</span>, <span class="self">self</span>.ltb_selector);
+        <span class="kw">let </span>lt_data      = <span class="self">self</span>.ltb_moni_queue.get_var_for_board(<span class="string">"ltb_temp"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ltb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>lt_ts    = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>lt_data {
           <span class="prelude-val">None </span>=&gt; {
@@ -2410,7 +2410,7 @@
             <span class="kw">let </span>identifier = <span class="macro">format!</span>(<span class="string">"bias_{}"</span>, k+<span class="number">1</span>);
             <span class="kw">let </span>name   = <span class="macro">format!</span>(<span class="string">"Ch {} Bias Voltage"</span>, k+<span class="number">1</span>);
             <span class="kw">let </span>title  = <span class="macro">format!</span>(<span class="string">"Ch {} Bias [V]"</span>, k+<span class="number">1</span>);
-            <span class="kw">let </span>c_data = <span class="self">self</span>.pa_moni_queue.get_var_for_rb(<span class="kw-2">&amp;</span>identifier, <span class="self">self</span>.rb_selector);
+            <span class="kw">let </span>c_data = <span class="self">self</span>.pa_moni_queue.get_var_for_board(<span class="kw-2">&amp;</span>identifier, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
             <span class="kw">let </span><span class="kw-2">mut </span>ts = VecDeque::&lt;(f64, f64)&gt;::new(); 
             <span class="kw">match </span>c_data {
               <span class="prelude-val">None </span>=&gt; {
@@ -2442,7 +2442,7 @@
             <span class="kw">let </span>identifier = <span class="macro">format!</span>(<span class="string">"temp_{}"</span>, k+<span class="number">1</span>);
             <span class="kw">let </span>name   = <span class="macro">format!</span>(<span class="string">"Ch {} Temperature"</span>, k+<span class="number">1</span>);
             <span class="kw">let </span>title  = <span class="macro">format!</span>(<span class="string">"Ch {} Temp [\u{00B0}C]"</span>, k+<span class="number">1</span>);
-            <span class="kw">let </span>c_data = <span class="self">self</span>.pa_moni_queue.get_var_for_rb(<span class="kw-2">&amp;</span>identifier, <span class="self">self</span>.rb_selector);
+            <span class="kw">let </span>c_data = <span class="self">self</span>.pa_moni_queue.get_var_for_board(<span class="kw-2">&amp;</span>identifier, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
             <span class="kw">let </span><span class="kw-2">mut </span>ts = VecDeque::&lt;(f64, f64)&gt;::new(); 
             <span class="kw">match </span>c_data {
               <span class="prelude-val">None </span>=&gt; {

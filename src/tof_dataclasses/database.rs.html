@@ -1452,7 +1452,6 @@
 <a href="#1450" id="1450">1450</a>
 <a href="#1451" id="1451">1451</a>
 <a href="#1452" id="1452">1452</a>
-<a href="#1453" id="1453">1453</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Database access &amp; entities of the TOF
 //!
 //! A local .sqlite database is shipped with 
@@ -2509,11 +2508,10 @@
     <span class="kw">if </span>newest_file.<span class="number">0</span>.is_empty() {
       <span class="macro">error!</span>(<span class="string">"No matching calibration available for board {}!"</span>, <span class="self">self</span>.rb_id);
     } <span class="kw">else </span>{
-      <span class="kw">let </span>file_to_load = <span class="self">self</span>.calib_file_path.clone() + <span class="string">"/" </span>+ <span class="kw-2">&amp;</span>newest_file.<span class="number">0</span>;
+      <span class="kw">let </span>file_to_load = <span class="macro">format!</span>(<span class="string">"{}/{}"</span>, <span class="self">self</span>.calib_file_path, newest_file.<span class="number">0</span>);
       <span class="macro">println!</span>(<span class="string">"== ==&gt; Loading calibration from file: {}"</span>, file_to_load);
       <span class="self">self</span>.calibration = RBCalibrations::from_file(file_to_load, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
-      <span class="comment">//println!("==&gt; Loaded calibration {}", self.calibration);
-    </span>}
+    }
     <span class="prelude-val">Ok</span>(())
   }
 }

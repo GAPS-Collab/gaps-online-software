@@ -1434,10 +1434,6 @@
 <a href="#1432" id="1432">1432</a>
 <a href="#1433" id="1433">1433</a>
 <a href="#1434" id="1434">1434</a>
-<a href="#1435" id="1435">1435</a>
-<a href="#1436" id="1436">1436</a>
-<a href="#1437" id="1437">1437</a>
-<a href="#1438" id="1438">1438</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Higher level functions, to deal with events/binary reprentation of it, 
 //! configure the drs4, etc.
 
@@ -2354,12 +2350,8 @@
                  </span>.unwrap_or(<span class="number">0</span>);
                                <span class="comment">//.expect("Need to be able to obtain board id!");
   </span><span class="kw">let </span><span class="kw-2">mut </span>bytestream : Vec::&lt;u8&gt;;
-  <span class="kw">let </span>board : String;
-  <span class="kw">if </span>board_id &lt; <span class="number">10 </span>{
-    board = String::from(<span class="string">"RB0"</span>) + <span class="kw-2">&amp;</span>board_id.to_string();
-  } <span class="kw">else </span>{
-    board = String::from(<span class="string">"RB"</span>)  + <span class="kw-2">&amp;</span>board_id.to_string();
-  }
+  <span class="kw">let </span>board = <span class="macro">format!</span>(<span class="string">"RB{:02}"</span>, board_id);
+
   <span class="comment">//let mut response = 
   </span>bytestream = board.as_bytes().to_vec();
   <span class="comment">//bytestream.append(&amp;mut resp.to_bytestream());

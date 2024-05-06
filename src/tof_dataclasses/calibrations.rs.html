@@ -1560,10 +1560,6 @@
 <a href="#1558" id="1558">1558</a>
 <a href="#1559" id="1559">1559</a>
 <a href="#1560" id="1560">1560</a>
-<a href="#1561" id="1561">1561</a>
-<a href="#1562" id="1562">1562</a>
-<a href="#1563" id="1563">1563</a>
-<a href="#1564" id="1564">1564</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The ReadoutBoardCalibration is 
 //! the first stage in a 3 stage 
 //! calibration process for the tof
@@ -1719,7 +1715,7 @@
 </span><span class="doccomment">/// Simplified version of spike cleaning 
 ///
 /// Taken over from Jamie's python code
-</span><span class="kw">fn </span>clean_spikes(traces : <span class="kw-2">&amp;mut </span>Vec&lt;Vec&lt;Vec&lt;f32&gt;&gt;&gt;,vcaldone : bool) {
+</span><span class="kw">pub fn </span>clean_spikes(trace : <span class="kw-2">&amp;mut </span>Vec&lt;f32&gt;, vcaldone : bool) {
   <span class="comment">//# TODO: make robust (symmetric, doubles, fixed/estimated spike height)
   </span><span class="kw">let </span><span class="kw-2">mut </span>thresh : f32 = <span class="number">360.0</span>;
   <span class="kw">if </span>vcaldone {
@@ -1729,28 +1725,24 @@
   <span class="comment">// remember the structure of the traces here    
   //nevents,nchan,tracelen = gbf.traces.shape
   // we have chan, events, tracelen instead
-  </span><span class="kw">let </span><span class="kw-2">mut </span>spikefilter0 = Vec::&lt;f32&gt;::new(); 
-  <span class="kw">let </span><span class="kw-2">mut </span>spikefilter1 = Vec::&lt;f32&gt;::new();
-  <span class="kw">let </span><span class="kw-2">mut </span>spikefilter2 = Vec::&lt;f32&gt;::new();
-  <span class="kw">let </span><span class="kw-2">mut </span>spikefilter3 = Vec::&lt;f32&gt;::new();
-  <span class="kw">let </span><span class="kw-2">mut </span>spf_allch    = <span class="macro">vec!</span>[<span class="number">0usize</span>;<span class="number">1023</span>];
-  <span class="kw">for </span>ch <span class="kw">in </span><span class="number">0</span>..traces.len() {
-    <span class="kw">for </span>ev <span class="kw">in </span><span class="number">0</span>..traces[ch].len() {
-      <span class="kw">let </span>tracelen = traces[ch][ev].len();
-      spikefilter0 = (<span class="kw-2">&amp;</span>traces[ch][ev][<span class="number">0</span>..tracelen-<span class="number">3</span>]).to_vec();
-      spikefilter1 = (<span class="kw-2">&amp;</span>traces[ch][ev][<span class="number">1</span>..tracelen-<span class="number">2</span>]).to_vec();
-      spikefilter2 = (<span class="kw-2">&amp;</span>traces[ch][ev][<span class="number">2</span>..tracelen-<span class="number">1</span>]).to_vec();
-      spikefilter3 = (<span class="kw-2">&amp;</span>traces[ch][ev][<span class="number">3</span>..tracelen]).to_vec();
-    }
-    <span class="kw">let </span>spf_len = spikefilter0.len();
-    <span class="kw">let </span><span class="kw-2">mut </span>spf_sum = <span class="macro">vec!</span>[<span class="number">0f32</span>;<span class="number">1024</span>];
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..spf_len {
-      spf_sum[k] += spikefilter1[k] - spikefilter0[k] + spikefilter2[k] - spikefilter3[k];
-    }
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..spf_len {
-      <span class="kw">if </span>spf_sum[k] &gt; thresh {
-        spf_allch[k] += <span class="number">1</span>;
-      }
+  //let mut spikefilter0 = Vec::&lt;f32&gt;::new(); 
+  //let mut spikefilter1 = Vec::&lt;f32&gt;::new();
+  //let mut spikefilter2 = Vec::&lt;f32&gt;::new();
+  //let mut spikefilter3 = Vec::&lt;f32&gt;::new();
+  </span><span class="kw">let </span><span class="kw-2">mut </span>spf_allch    = <span class="macro">vec!</span>[<span class="number">0usize</span>;<span class="number">1023</span>];
+  <span class="kw">let </span>tracelen = trace.len();
+  <span class="kw">let </span>spikefilter0 = (<span class="kw-2">&amp;</span>trace[<span class="number">0</span>..tracelen-<span class="number">3</span>]).to_vec();
+  <span class="kw">let </span>spikefilter1 = (<span class="kw-2">&amp;</span>trace[<span class="number">1</span>..tracelen-<span class="number">2</span>]).to_vec();
+  <span class="kw">let </span>spikefilter2 = (<span class="kw-2">&amp;</span>trace[<span class="number">2</span>..tracelen-<span class="number">1</span>]).to_vec();
+  <span class="kw">let </span>spikefilter3 = (<span class="kw-2">&amp;</span>trace[<span class="number">3</span>..tracelen]).to_vec();
+  <span class="kw">let </span>spf_len = spikefilter0.len();
+  <span class="kw">let </span><span class="kw-2">mut </span>spf_sum = <span class="macro">vec!</span>[<span class="number">0f32</span>;<span class="number">1024</span>];
+  <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..spf_len {
+    spf_sum[k] += spikefilter1[k] - spikefilter0[k] + spikefilter2[k] - spikefilter3[k];
+  }
+  <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..spf_len {
+    <span class="kw">if </span>spf_sum[k] &gt; thresh {
+      spf_allch[k] += <span class="number">1</span>;
     }
   }
   <span class="kw">let </span><span class="kw-2">mut </span>spikes = Vec::&lt;usize&gt;::new();
@@ -1760,13 +1752,9 @@
     }
   }
   <span class="kw">for </span>spike <span class="kw">in </span>spikes.iter() {
-    <span class="kw">for </span>ch <span class="kw">in </span><span class="number">0</span>..traces.len() {
-      <span class="kw">for </span>ev <span class="kw">in </span><span class="number">0</span>..traces[ch].len() {
-        <span class="kw">let </span>d_v : f32 = (traces[ch][ev][spike+<span class="number">3</span>] - traces[ch][ev][<span class="kw-2">*</span>spike])/<span class="number">3.0</span>;
-        traces[ch][ev][spike+<span class="number">1</span>] = traces[ch][ev][<span class="kw-2">*</span>spike] + d_v;
-        traces[ch][ev][spike+<span class="number">2</span>] = traces[ch][ev][<span class="kw-2">*</span>spike] + <span class="number">2.0</span><span class="kw-2">*</span>d_v;
-      }
-    }
+    <span class="kw">let </span>d_v : f32 = (trace[spike+<span class="number">3</span>] - trace[<span class="kw-2">*</span>spike])/<span class="number">3.0</span>;
+    trace[spike+<span class="number">1</span>] = trace[<span class="kw-2">*</span>spike] + d_v;
+    trace[spike+<span class="number">2</span>] = trace[<span class="kw-2">*</span>spike] + <span class="number">2.0</span><span class="kw-2">*</span>d_v;
   }
 }
 
@@ -2281,7 +2269,11 @@
     }
     <span class="kw">let </span>do_spike_cleaning = <span class="bool-val">true</span>;
     <span class="kw">if </span>do_spike_cleaning {
-      clean_spikes(<span class="kw-2">&amp;mut </span>traces, <span class="bool-val">true</span>);
+      <span class="kw">for </span>k_ch <span class="kw">in </span><span class="number">0</span>..traces.len() {
+        <span class="kw">for </span>k_ev <span class="kw">in </span><span class="number">0</span>..traces[k_ch].len() {
+          clean_spikes(<span class="kw-2">&amp;mut </span>traces[k_ch][k_ev], <span class="bool-val">true</span>);
+        }
+      }
     }
     <span class="kw">let </span>nwords = traces[<span class="number">0</span>][<span class="number">0</span>].len();
     <span class="kw">for </span>ch <span class="kw">in </span><span class="number">0</span>..NCHN {
