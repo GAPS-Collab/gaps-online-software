@@ -914,12 +914,8 @@ pub fn prefix_board_id(input : &mut Vec<u8>) -> Vec<u8> {
                  .unwrap_or(0);
                                //.expect("Need to be able to obtain board id!");
   let mut bytestream : Vec::<u8>;
-  let board : String;
-  if board_id < 10 {
-    board = String::from("RB0") + &board_id.to_string();
-  } else {
-    board = String::from("RB")  + &board_id.to_string();
-  }
+  let board = format!("RB{:02}", board_id);
+
   //let mut response = 
   bytestream = board.as_bytes().to_vec();
   //bytestream.append(&mut resp.to_bytestream());
