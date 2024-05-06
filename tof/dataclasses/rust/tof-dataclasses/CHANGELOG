@@ -3,6 +3,9 @@
 ## v0.10.1
 * changes timestamp for file saving to the same %y%m%d_%h%m% format as 
   bfsw, however, due to rusts increased desire of safety, add UTC.
+* Changes in RBWaveform. Make this the "default" container for waveforms
+  and allow for placeholders for calibrated data, which won't get serialized.
+  Also adds a paddle_id
 
 ## v0.10.0
 * introduces breaking changes to the MasterTriggerEvent. Streamline it 
