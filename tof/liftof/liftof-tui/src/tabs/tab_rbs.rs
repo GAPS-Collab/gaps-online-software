@@ -52,7 +52,6 @@ use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::events::RBEvent;
 //use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::monitoring::{
-    Series,
     RBMoniData,
     LTBMoniData,
     PAMoniData,
@@ -60,6 +59,7 @@ use tof_dataclasses::monitoring::{
     LTBMoniDataSeries,
     PAMoniDataSeries,
 };
+use tof_dataclasses::series::MoniSeries;
 use tof_dataclasses::io::RBEventMemoryStreamer;
 use tof_dataclasses::database::ReadoutBoard;
 
@@ -693,7 +693,7 @@ impl RBTab<'_>  {
        
         let rate_ds_name   = String::from("Rate");
         let rate_ds_title  = String::from("RB Rate [Hz]");
-        let rate_data      = self.moni_queue.get_var_for_rb("rate", self.rb_selector);
+        let rate_data      = self.moni_queue.get_var_for_board("rate", &self.rb_selector);
         let mut rate_ts    = VecDeque::<(f64, f64)>::new(); 
         match rate_data {
           None => {
@@ -717,7 +717,7 @@ impl RBTab<'_>  {
         // ambience
         let mag_tot_ds_name   = String::from("Magnetic Field");
         let mag_tot_ds_title  = String::from("Tot mag field [Gauss]");
-        let mag_tot_data      = self.moni_queue.get_var_for_rb("mag_tot", self.rb_selector);
+        let mag_tot_data      = self.moni_queue.get_var_for_board("mag_tot", &self.rb_selector);
         let mut mag_tot_ts    = VecDeque::<(f64, f64)>::new(); 
         match mag_tot_data  {
           None => {
@@ -737,7 +737,7 @@ impl RBTab<'_>  {
 
         let pres_ds_name   = String::from("Atmospheric pressure");
         let pres_ds_title  = String::from("Atmospheric pressure [hPa]");
-        let pres_data      = self.moni_queue.get_var_for_rb("pressure", self.rb_selector);
+        let pres_data      = self.moni_queue.get_var_for_board("pressure", &self.rb_selector);
         let mut pres_ts    = VecDeque::<(f64, f64)>::new(); 
         match pres_data {
           None => {
@@ -758,7 +758,7 @@ impl RBTab<'_>  {
         
         let humi_ds_name   = String::from("Ambient humidity");
         let humi_ds_title  = String::from("Humidity [%]");
-        let humi_data      = self.moni_queue.get_var_for_rb("humidity", self.rb_selector);
+        let humi_data      = self.moni_queue.get_var_for_board("humidity", &self.rb_selector);
         let mut humi_ts    = VecDeque::<(f64, f64)>::new(); 
         match humi_data {
           None => {
@@ -789,7 +789,7 @@ impl RBTab<'_>  {
           frame.render_widget(fpga_tc, col1[3]);
         } else {
           // we will get it from the RBMoniData
-          let fpga_data      = self.moni_queue.get_var_for_rb("tmp_drs", self.rb_selector);
+          let fpga_data      = self.moni_queue.get_var_for_board("tmp_drs", &self.rb_selector);
           let mut fpga_ts    = VecDeque::<(f64, f64)>::new(); 
           match fpga_data {
             None => {
@@ -810,7 +810,7 @@ impl RBTab<'_>  {
 
         let tmp_clk_ds_name   = String::from("CLK Temperature");
         let tmp_clk_ds_title  = String::from("CLK Temp. [\u{00B0}C]");
-        let tmp_clk_data      = self.moni_queue.get_var_for_rb("tmp_clk", self.rb_selector);
+        let tmp_clk_data      = self.moni_queue.get_var_for_board("tmp_clk", &self.rb_selector);
         let mut tmp_clk_ts    = VecDeque::<(f64, f64)>::new(); 
         match tmp_clk_data {
           None => {
@@ -830,7 +830,7 @@ impl RBTab<'_>  {
         
         let tmp_adc_ds_name   = String::from("ADC Temperature");
         let tmp_adc_ds_title  = String::from("ADC Temp. [\u{00B0}C]");
-        let tmp_adc_data      = self.moni_queue.get_var_for_rb("tmp_adc", self.rb_selector);
+        let tmp_adc_data      = self.moni_queue.get_var_for_board("tmp_adc", &self.rb_selector);
         let mut tmp_adc_ts    = VecDeque::<(f64, f64)>::new(); 
         match tmp_adc_data {
           None => {
@@ -850,7 +850,7 @@ impl RBTab<'_>  {
         
         let tmp_zynq_ds_name   = String::from("ZYNQ Temperature");
         let tmp_zynq_ds_title  = String::from("ZYNQ Temp. [\u{00B0}C]");
-        let tmp_zynq_data      = self.moni_queue.get_var_for_rb("tmp_zynq", self.rb_selector);
+        let tmp_zynq_data      = self.moni_queue.get_var_for_board("tmp_zynq", &self.rb_selector);
         let mut tmp_zynq_ts    = VecDeque::<(f64, f64)>::new(); 
         match tmp_zynq_data {
           None => {
@@ -870,7 +870,7 @@ impl RBTab<'_>  {
         
         let tmp_bm280_name   = String::from("BM280 Temperature");
         let tmp_bm280_title  = String::from("BM280 Temp. [\u{00B0}C]");
-        let tmp_bm280_data      = self.moni_queue.get_var_for_rb("tmp_bm280", self.rb_selector);
+        let tmp_bm280_data      = self.moni_queue.get_var_for_board("tmp_bm280", &self.rb_selector);
         let mut tmp_bm280_ts    = VecDeque::<(f64, f64)>::new(); 
         match tmp_bm280_data {
           None => {
@@ -891,7 +891,7 @@ impl RBTab<'_>  {
         // Currents 
         let drs_c_name   = String::from("DRS Current");
         let drs_c_title  = String::from("DRS Curr. [mA]");
-        let drs_c_data   = self.moni_queue.get_var_for_rb("drs_dvdd_current", self.rb_selector);
+        let drs_c_data   = self.moni_queue.get_var_for_board("drs_dvdd_current", &self.rb_selector);
         let mut drs_c_ts = VecDeque::<(f64, f64)>::new(); 
         match drs_c_data {
           None => {
@@ -911,7 +911,7 @@ impl RBTab<'_>  {
 
         let zynq_c_name   = String::from("Zynq Current");
         let zynq_c_title  = String::from("Zynq Curr. [mA]");
-        let zynq_c_data   = self.moni_queue.get_var_for_rb("zynq_current", self.rb_selector);
+        let zynq_c_data   = self.moni_queue.get_var_for_board("zynq_current", &self.rb_selector);
         let mut zynq_c_ts = VecDeque::<(f64, f64)>::new(); 
         match zynq_c_data {
           None => {
@@ -931,7 +931,7 @@ impl RBTab<'_>  {
         
         let p3v3_c_name   = String::from("P3V3 Current");
         let p3v3_c_title  = String::from("P3V3 Curr. [mA]");
-        let p3v3_c_data   = self.moni_queue.get_var_for_rb("p3v3_current", self.rb_selector);
+        let p3v3_c_data   = self.moni_queue.get_var_for_board("p3v3_current", &self.rb_selector);
         let mut p3v3_c_ts = VecDeque::<(f64, f64)>::new(); 
         match p3v3_c_data {
           None => {
@@ -951,7 +951,7 @@ impl RBTab<'_>  {
         
         let p3v5_c_name   = String::from("P3V5 Current");
         let p3v5_c_title  = String::from("P3V5 Curr. [mA]");
-        let p3v5_c_data   = self.moni_queue.get_var_for_rb("p3v5_current", self.rb_selector);
+        let p3v5_c_data   = self.moni_queue.get_var_for_board("p3v5_current", &self.rb_selector);
         let mut p3v5_c_ts = VecDeque::<(f64, f64)>::new(); 
         match p3v5_c_data {
           None => {
@@ -1025,7 +1025,7 @@ impl RBTab<'_>  {
 
         let tt_name   = String::from("Trenz Temp");
         let tt_title  = String::from("Trenz Temp [\u{00B0}C]");
-        let tt_data   = self.ltb_moni_queue.get_var_for_board("trenz_temp", self.ltb_selector);
+        let tt_data   = self.ltb_moni_queue.get_var_for_board("trenz_temp", &self.ltb_selector);
         let mut tt_ts = VecDeque::<(f64, f64)>::new(); 
         match tt_data {
           None => {
@@ -1045,7 +1045,7 @@ impl RBTab<'_>  {
 
         let lt_name   = String::from("LTB Temperature");
         let lt_title  = String::from("LTB Temp. [\u{00B0}C]");
-        let lt_data      = self.ltb_moni_queue.get_var_for_board("ltb_temp", self.ltb_selector);
+        let lt_data      = self.ltb_moni_queue.get_var_for_board("ltb_temp", &self.ltb_selector);
         let mut lt_ts    = VecDeque::<(f64, f64)>::new(); 
         match lt_data {
           None => {
@@ -1155,7 +1155,7 @@ impl RBTab<'_>  {
             let identifier = format!("bias_{}", k+1);
             let name   = format!("Ch {} Bias Voltage", k+1);
             let title  = format!("Ch {} Bias [V]", k+1);
-            let c_data = self.pa_moni_queue.get_var_for_rb(&identifier, self.rb_selector);
+            let c_data = self.pa_moni_queue.get_var_for_board(&identifier, &self.rb_selector);
             let mut ts = VecDeque::<(f64, f64)>::new(); 
             match c_data {
               None => {
@@ -1187,7 +1187,7 @@ impl RBTab<'_>  {
             let identifier = format!("temp_{}", k+1);
             let name   = format!("Ch {} Temperature", k+1);
             let title  = format!("Ch {} Temp [\u{00B0}C]", k+1);
-            let c_data = self.pa_moni_queue.get_var_for_rb(&identifier, self.rb_selector);
+            let c_data = self.pa_moni_queue.get_var_for_board(&identifier, &self.rb_selector);
             let mut ts = VecDeque::<(f64, f64)>::new(); 
             match c_data {
               None => {
