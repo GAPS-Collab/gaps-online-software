@@ -26,6 +26,7 @@ serde_json        = { workspace = true }
 crossbeam-channel = { workspace = true } 
 zmq               = { workspace = true }
 log               = { workspace = true }
+signal-hook       = { workspace = true }
 # parse command line arguments
 clap              = { workspace = true }
 

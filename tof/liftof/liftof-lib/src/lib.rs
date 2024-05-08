@@ -18,6 +18,16 @@ use constants::{
     PREAMP_MAX_BIAS
 };
 
+use std::thread;
+use std::time::Duration;
+use std::os::raw::c_int;
+use std::sync::{
+    Arc,
+    Mutex,
+};
+use std::process::exit;
+
+
 pub use master_trigger::{
     master_trigger,
     MTBSettings,
@@ -55,11 +65,19 @@ use log::Level;
 #[macro_use] extern crate log;
 extern crate env_logger;
 
+use signal_hook::iterator::Signals;
+use signal_hook::consts::signal::{
+    SIGTERM,
+    SIGINT
+};
 //use ndarray::{array, Array1};
 //use nlopt::{Algorithm, Objective, Optimization, Result};
 
 use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::database::ReadoutBoard;
+use tof_dataclasses::threading::{
+    ThreadControl,
+};
 
 use tof_dataclasses::constants::NWORDS;
 use tof_dataclasses::calibrations::{
@@ -125,6 +143,62 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
           ==> API docs https://gaps-collab.github.io/gaps-online-software/
 
   ";
+
+/// Handle incoming POSIX signals
+pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
+  let one_second = Duration::from_millis(1000);
+
+  let mut end_program = false;
+  let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
+  loop {
+    thread::sleep(1*one_second);
+    match thread_control.lock() {
+      Ok(tc) => {
+        if !tc.thread_cmd_dispatch_active 
+        && !tc.thread_data_sink_active
+        && !tc.thread_event_bldr_active 
+        && !tc.thread_master_trg_active {
+          exit(0);
+        }
+      }
+      Err(err) => {
+        error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+      },
+    }
+
+    // check pending signals and handle
+    // SIGTERM and SIGINT
+    for signal in signals.pending() {
+      match signal as c_int {
+        SIGTERM => {
+          println!("=> {}", String::from("SIGINT received. Maybe Ctrl+C has been pressed!").red().bold());
+          end_program = true;
+        } 
+        SIGINT => {
+          println!("=> {}", String::from("SIGTERM received").red().bold());
+          end_program = true;
+        }
+        _ => {
+          error!("Received signal, but I don't have instructions what to do about it!");
+        }
+      }
+    }
+    if end_program {
+      println!("=> Shutting down threads...");
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          tc.stop_flag = true;
+        },
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        },
+      }
+    }
+
+
+  }
+}
+
 
 /// Make sure that the loglevel is in color, even though not using pretty_env logger
 pub fn color_log(level : &Level) -> ColoredString {
