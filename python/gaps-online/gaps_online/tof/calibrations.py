@@ -1,4 +1,6 @@
 import gaps_tof as gt
+import rpy_tof_dataclasses as rust_api
+
 import pylab as p
 import numpy as np
 import dashi as d
@@ -124,6 +126,35 @@ gt.RBCalibration.plot_dips    = plot_dips
 gt.RBCalibration.plot_incs    = plot_incs
 gt.RBCalibration.plot_tbins   = plot_tbins
 RBCalibration = gt.RBCalibration
+
+## convenience functions
+def load_calibrations_rapi(cali_dir : Path, load_event_data = False):
+    """
+    Load all calibrations stored in a certain directory and
+    return a dictionary rbid -> RBCalibration
+
+    # Arguments:
+
+        * load_event_data : if True, also load the associated events
+                            which went into the calculation of the
+                            calibration constants.
+    """
+    pattern = re.compile('RB(?P<rb_id>[0-9]*)_')
+    calib_files = [k for k in cali_dir.glob("*.tof.gaps")]
+    calibs = dict()
+    for fname in tqdm.tqdm(calib_files, desc="Loading calibration files"):
+        fname = str(fname)
+        try:
+            rb_id = int(pattern.search(fname).groupdict()['rb_id'])
+        except Exception as e:
+            print(f'Failed to get RB ID from file {fname}')   
+            continue
+        cali = rust_api.events.RBCalibration()
+        cali.from_file(fname)
+        calibs[rb_id] = cali
+    
+    return calibs
+
 
 ## convenience functions
 def load_calibrations(cali_dir : Path, load_event_data = False):
