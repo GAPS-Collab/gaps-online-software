@@ -165,19 +165,17 @@
 //};
 </span><span class="kw">use </span>crossbeam_channel::Sender;
 
-<span class="kw">use </span>tof_dataclasses::manifest::ReadoutBoard;
+<span class="kw">use </span>tof_dataclasses::database::ReadoutBoard;
 <span class="kw">use </span>tof_dataclasses::events::RBEvent;
 <span class="kw">use </span>tof_dataclasses::packets::{
     TofPacket,
     PacketType
 };
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
-<span class="comment">//use tof_dataclasses::RBChannelPaddleEndIDMap;
+<span class="kw">use </span>tof_dataclasses::commands::TofResponse;
 
-</span><span class="kw">use </span>liftof_lib::{
-    <span class="comment">//build_tcp_from_ip,
-    //get_rb_ch_pid_map,
-    </span>waveform_analysis,
+<span class="kw">use </span>liftof_lib::{
+    waveform_analysis,
 };
 
 <span class="kw">use </span>liftof_lib::settings::AnalysisEngineSettings;
@@ -193,28 +191,26 @@
 ///
 /// # Arguments:
 ///
-/// * ev_to_builder       :
+/// * ev_to_builder       : This thread will receive RBEvent data from the assigned RB, 
+///                         if desired (see run_analysis_engine) run analysis and extract
+///                         TofHits and then pass the result on to the event builder.
 /// * tp_to_sink          : Channel which should be connect to a (global) data sink.
 ///                         Packets which are of not event type (e.g. header/full binary data)
 ///                         will be forwarded to the sink.
-/// * write_rb_raw        : Should readoutboard raw data be written to disk?
-/// * storage_savepath    :
-/// * events_per_file     :
-/// * rb                  : 
-/// * runid               : Current assigned runid. Will be used in the filenames of saved 
-///                         readoutboard raw data.
-/// * print_packets       : 
-/// * run_analysis_engine :
+/// * rb                  : ReadoutBoard instance, as loaded from the database. This will be used
+///                         for readoutboard id as well as paddle assignment.
+/// * print_packets       : Increase verbosity and print incoming packets from the RB
+/// * run_analysis_engine : Extract TofHits from the waveforms and attach them to RBEvent
 /// * ae_settings         : Settings to configure peakfinding algorithms etc. 
 ///                         These can be configured with an external .toml file
-</span><span class="kw">pub fn </span>readoutboard_communicator(ev_to_builder       : <span class="kw-2">&amp;</span>Sender&lt;RBEvent&gt;,
+/// * ack_sender          : Intercept acknowledgement packets and forward them to elswhere
+</span><span class="kw">pub fn </span>readoutboard_communicator(ev_to_builder       : Sender&lt;RBEvent&gt;,
                                  tp_to_sink          : Sender&lt;TofPacket&gt;,
-                                 rb                  : <span class="kw-2">&amp;</span>ReadoutBoard,
-                                 runid               : usize,
+                                 rb                  : ReadoutBoard,
                                  print_packets       : bool,
                                  run_analysis_engine : bool,
-                                 ae_settings         : AnalysisEngineSettings) {
-  <span class="macro">info!</span>(<span class="string">"Got run id {runid}"</span>);
+                                 ae_settings         : AnalysisEngineSettings,
+                                 ack_sender          : Sender&lt;TofResponse&gt;) {
   <span class="kw">let </span>zmq_ctx = zmq::Context::new();
   <span class="kw">let </span>board_id = rb.rb_id; <span class="comment">//rb.id.unwrap();
   </span><span class="macro">info!</span>(<span class="string">"initializing RB thread for board {}!"</span>, board_id);
@@ -239,13 +235,7 @@
    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to subscribe to topic! {err}"</span>),
    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Subscribed to {:?}!"</span>, topic),
   }
-  <span class="comment">//let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-  //let mut n_events   = 0usize;
-  //let mut n_received = 0usize;
-  //let map_file  = format!("{}/rb{:02}_paddle_map.json", ASSET_DIR, board_id);
-  //let rb_ch_map = get_rb_ch_pid_map(map_file.into(),rb.rb_id);
-  </span><span class="kw">loop </span>{
-
+  <span class="kw">loop </span>{
     <span class="comment">// check if we got new data
     // this is blocking the thread
     </span><span class="kw">match </span>socket.recv_bytes(<span class="number">0</span>) {
@@ -258,7 +248,7 @@
         // board id
         </span><span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>buffer, <span class="kw-2">&amp;mut </span><span class="number">4</span>) { 
           <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">"Unknown packet...{:?}"</span>, err);
+            <span class="macro">error!</span>(<span class="string">"Unknown bytestream...{:?}"</span>, err);
             <span class="kw">continue</span>;  
           },
           <span class="prelude-val">Ok</span>(tp) =&gt; {
@@ -267,6 +257,17 @@
             }
             <span class="comment">//n_received += 1;
             </span><span class="kw">match </span>tp.packet_type {
+              PacketType::TofResponse =&gt; {
+                <span class="kw">match </span>tp.unpack::&lt;TofResponse&gt;() {
+                  <span class="prelude-val">Err</span>(err)   =&gt; <span class="macro">error!</span>(<span class="string">"Unable to send ACK packet! {err}"</span>),
+                  <span class="prelude-val">Ok</span>(tr)     =&gt; {
+                    <span class="kw">match </span>ack_sender.send(tr) {
+                      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to send ACK packet! {err}"</span>),
+                      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+                    }
+                  }
+                }
+              }
               PacketType::RBEvent | PacketType::RBEventMemoryView =&gt; {
                 <span class="kw">let </span><span class="kw-2">mut </span>event = RBEvent::from(<span class="kw-2">&amp;</span>tp);
                 <span class="kw">if </span>event.hits.len() == <span class="number">0 </span>{
@@ -274,7 +275,6 @@
                     <span class="kw">match </span>waveform_analysis(<span class="kw-2">&amp;mut </span>event, 
                                             <span class="kw-2">&amp;</span>rb,
                                             ae_settings) {
-                        
                       <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
                       <span class="prelude-val">Err</span>(err) =&gt; {
                         <span class="macro">error!</span>(<span class="string">"Unable to analyze waveforms for this event! {err}"</span>);

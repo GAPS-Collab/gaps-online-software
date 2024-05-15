@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['pressure_140',['pressure',['../structRBMoniData.html#a417357f8a34942a7eefecb7ba73800ba',1,'RBMoniData']]],
-  ['primary_5fbeta_141',['primary_beta',['../structTofEventSummary.html#aaaf4cf393a61aacf8e5e3e390f2ea474',1,'TofEventSummary']]],
-  ['primary_5fcharge_142',['primary_charge',['../structTofEventSummary.html#a7254ca37addca5afb86310d1fc6e8b09',1,'TofEventSummary']]]
+  ['n_5ftrigger_5fpaddles_142',['n_trigger_paddles',['../structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e',1,'TofEventSummary']]],
+  ['noi_5fdata_143',['noi_data',['../structRBCalibration.html#a71265fb6bc6cd97c69bc54923cc06f0e',1,'RBCalibration']]]
 ];

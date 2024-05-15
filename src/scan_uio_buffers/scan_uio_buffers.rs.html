@@ -202,7 +202,7 @@
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
 
 <span class="kw">use </span>liftof_rb::control::<span class="kw-2">*</span>;
-<span class="kw">use </span>liftof_rb::memory::BlobBuffer;
+<span class="kw">use </span>liftof_rb::memory::RamBuffer;
 <span class="kw">use </span>liftof_rb::memory::RegisterError;
 <span class="kw">use </span>liftof_rb::memory::map_physical_mem_read;
 <span class="attr">#[macro_use] </span><span class="kw">extern crate </span>log;
@@ -282,8 +282,8 @@
 
   
   // get the current cache sizes
-  </span><span class="kw">let </span>buf_a = BlobBuffer::A;
-  <span class="kw">let </span>buf_b = BlobBuffer::B;
+  </span><span class="kw">let </span>buf_a = RamBuffer::A;
+  <span class="kw">let </span>buf_b = RamBuffer::B;
   reset_dma().unwrap();
   thread::sleep(one_milli);
   <span class="kw">let </span>buf_a_start = get_blob_buffer_occ(<span class="kw-2">&amp;</span>buf_a).unwrap();
@@ -336,8 +336,8 @@
   <span class="kw">let </span><span class="kw-2">mut </span>buff_b_max_occ : u32 = <span class="number">0</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>buff_a_occ : u32;
   <span class="kw">let </span><span class="kw-2">mut </span>buff_b_occ : u32;
-  <span class="kw">let </span>buff_a = BlobBuffer::A;
-  <span class="kw">let </span>buff_b = BlobBuffer::B;
+  <span class="kw">let </span>buff_a = RamBuffer::A;
+  <span class="kw">let </span>buff_b = RamBuffer::B;
   <span class="kw">let </span><span class="kw-2">mut </span>n_iter = <span class="number">0</span>;
   <span class="kw">loop </span>{
     n_iter += <span class="number">1</span>;

@@ -896,6 +896,40 @@
 <a href="#894" id="894">894</a>
 <a href="#895" id="895">895</a>
 <a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Commmands which can be issued
 //! to the various components of 
 //! the tof system.
@@ -924,9 +958,18 @@
 
 </span><span class="kw">use </span>std::fmt;
 
-<span class="kw">use </span><span class="kw">crate</span>::serialization::{Serialization, SerializationError, parse_u8, parse_u32};
-<span class="kw">use </span><span class="kw">crate</span>::packets::{TofPacket,
-                     PacketType};
+<span class="kw">use </span><span class="kw">crate</span>::serialization::{
+    Serialization,
+    Packable,
+    SerializationError,
+    parse_u8,
+    parse_u32
+};
+
+<span class="kw">use </span><span class="kw">crate</span>::packets::{
+    TofPacket,
+    PacketType
+};
 
 <span class="macro">cfg_if::cfg_if! </span>{
   <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"random"</span>)]  </span>{
@@ -944,7 +987,9 @@
   </span>CmdPing                    = <span class="number">1u8</span>,
   <span class="doccomment">/// command code for getting the monitoring data from the component
   </span>CmdMoni                    = <span class="number">2u8</span>,
-  <span class="doccomment">/// command code for power management
+  <span class="doccomment">/// Kill myself
+  </span>CmdKill                    = <span class="number">4u8</span>, <span class="comment">// Shi!
+  </span><span class="doccomment">/// command code for power management
   </span>CmdPower                   = <span class="number">10u8</span>,
   <span class="doccomment">/// command code for "Set LTB Thresholds"
   </span>CmdSetThresholds           = <span class="number">21u8</span>,         
@@ -986,8 +1031,14 @@
   <span class="doccomment">/// command code for restarting systemd
   </span>CmdSystemdReboot           = <span class="number">60u8</span>,
   <span class="doccomment">/// command code for putting liftof-cc in listening mode
-  </span>CmdListen                  = <span class="number">70u8
-</span>}
+  </span>CmdListen                  = <span class="number">70u8</span>,
+  <span class="doccomment">/// command code for putting liftof-cc in staging mode
+  </span>CmdStaging                 = <span class="number">71u8</span>,
+  <span class="doccomment">/// lock the cmd dispatcher
+  </span>CmdLock                    = <span class="number">80u8</span>,
+  <span class="doccomment">/// unlock the cmd dispatcher
+  </span>CmdUnlock                  = <span class="number">81u8</span>,
+}
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofCommandCode {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
@@ -1003,6 +1054,7 @@
       <span class="number">0u8  </span>=&gt; TofCommandCode::CmdUnknown,
       <span class="number">1u8  </span>=&gt; TofCommandCode::CmdPing,
       <span class="number">2u8  </span>=&gt; TofCommandCode::CmdMoni,
+      <span class="number">4u8  </span>=&gt; TofCommandCode::CmdKill,
       <span class="number">10u8 </span>=&gt; TofCommandCode::CmdPower,
       <span class="number">21u8 </span>=&gt; TofCommandCode::CmdSetThresholds,
       <span class="number">22u8 </span>=&gt; TofCommandCode::CmdSetMTConfig,
@@ -1020,6 +1072,10 @@
       <span class="number">24u8 </span>=&gt; TofCommandCode::CmdTriggerModeForced,
       <span class="number">25u8 </span>=&gt; TofCommandCode::CmdTriggerModeForcedMTB,
       <span class="number">60u8 </span>=&gt; TofCommandCode::CmdSystemdReboot,
+      <span class="number">70u8 </span>=&gt; TofCommandCode::CmdListen,
+      <span class="number">71u8 </span>=&gt; TofCommandCode::CmdStaging,
+      <span class="number">80u8 </span>=&gt; TofCommandCode::CmdLock,
+      <span class="number">81u8 </span>=&gt; TofCommandCode::CmdUnlock,
       <span class="kw">_    </span>=&gt; TofCommandCode::CmdUnknown
     }
   }
@@ -1048,7 +1104,12 @@
       TofCommandCode::CmdSetRBDataBufSize,
       TofCommandCode::CmdTriggerModeForced,
       TofCommandCode::CmdTriggerModeForcedMTB,
-      TofCommandCode::CmdSystemdReboot
+      TofCommandCode::CmdSystemdReboot,
+      TofCommandCode::CmdListen,
+      TofCommandCode::CmdStaging,
+      TofCommandCode::CmdLock,
+      TofCommandCode::CmdUnlock,
+      TofCommandCode::CmdKill,
     ];
     <span class="kw">let </span><span class="kw-2">mut </span>rng  = rand::thread_rng();
     <span class="kw">let </span>idx = rng.gen_range(<span class="number">0</span>..choices.len());
@@ -1062,10 +1123,11 @@
 // e.g. event id
 </span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u32)]
-</span><span class="kw">pub enum </span>TofCommandResp {
+</span><span class="kw">pub enum </span>TofResponseCode {
   Unknown                            = <span class="number">0u32</span>,
   <span class="doccomment">/// response code for: Command can not be executed on the server side
   </span>RespErrUnexecutable                = <span class="number">500u32</span>,
+  RespErrAccessDenied                = <span class="number">403u32</span>,
   RespErrNotImplemented              = <span class="number">404u32</span>, 
   <span class="doccomment">/// response code for: Something did not work quite right, 
   /// however, the problem has either fixed itself or it is 
@@ -1097,51 +1159,53 @@
   </span>RespErrCmdStuck                    = <span class="number">503u32
 </span>}
 
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofCommandResp {
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofResponseCode {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">"Error: cannot unwrap this TofCommandResp"</span>));
-    <span class="macro">write!</span>(f, <span class="string">"&lt;TofCommandResp: {}&gt;"</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this TofResponseCode"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;TofResponseCode: {}&gt;"</span>, r)
   }
 }
 
-<span class="kw">impl </span>From&lt;u32&gt; <span class="kw">for </span>TofCommandResp {
+<span class="kw">impl </span>From&lt;u32&gt; <span class="kw">for </span>TofResponseCode {
   <span class="kw">fn </span>from(value: u32) -&gt; <span class="self">Self </span>{
     <span class="kw">match </span>value {
-      <span class="number">500u32   </span>=&gt; TofCommandResp::RespErrUnexecutable,
-      <span class="number">404u32   </span>=&gt; TofCommandResp::RespErrNotImplemented,
-      <span class="number">4000u32  </span>=&gt; TofCommandResp::RespErrLevelNoProblem,
-      <span class="number">4010u32  </span>=&gt; TofCommandResp::RespErrLevelMedium,
-      <span class="number">4020u32  </span>=&gt; TofCommandResp::RespErrLevelSevere,
-      <span class="number">4030u32  </span>=&gt; TofCommandResp::RespErrLevelCritical,
-      <span class="number">4040u32  </span>=&gt; TofCommandResp::RespErrLevelMissionCritical,
-      <span class="number">99999u32 </span>=&gt; TofCommandResp::RespErrLevelRunFoolRun,
-      <span class="number">200u32   </span>=&gt; TofCommandResp::RespSuccFingersCrossed,
-      <span class="number">501u32   </span>=&gt; TofCommandResp::RespErrNoRunActive,
-      <span class="number">502u32   </span>=&gt; TofCommandResp::RespErrRunActive,
-      <span class="number">503u32   </span>=&gt; TofCommandResp::RespErrCmdStuck,
-      <span class="kw">_        </span>=&gt; TofCommandResp::Unknown
+      <span class="number">500u32   </span>=&gt; TofResponseCode::RespErrUnexecutable,
+      <span class="number">403u32   </span>=&gt; TofResponseCode::RespErrAccessDenied,
+      <span class="number">404u32   </span>=&gt; TofResponseCode::RespErrNotImplemented,
+      <span class="number">4000u32  </span>=&gt; TofResponseCode::RespErrLevelNoProblem,
+      <span class="number">4010u32  </span>=&gt; TofResponseCode::RespErrLevelMedium,
+      <span class="number">4020u32  </span>=&gt; TofResponseCode::RespErrLevelSevere,
+      <span class="number">4030u32  </span>=&gt; TofResponseCode::RespErrLevelCritical,
+      <span class="number">4040u32  </span>=&gt; TofResponseCode::RespErrLevelMissionCritical,
+      <span class="number">99999u32 </span>=&gt; TofResponseCode::RespErrLevelRunFoolRun,
+      <span class="number">200u32   </span>=&gt; TofResponseCode::RespSuccFingersCrossed,
+      <span class="number">501u32   </span>=&gt; TofResponseCode::RespErrNoRunActive,
+      <span class="number">502u32   </span>=&gt; TofResponseCode::RespErrRunActive,
+      <span class="number">503u32   </span>=&gt; TofResponseCode::RespErrCmdStuck,
+      <span class="kw">_        </span>=&gt; TofResponseCode::Unknown
     }
   }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
-</span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofCommandResp {
+</span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofResponseCode {
   
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>choices = [
-      TofCommandResp::RespErrUnexecutable,
-      TofCommandResp::RespErrNotImplemented,
-      TofCommandResp::RespErrLevelNoProblem,
-      TofCommandResp::RespErrLevelMedium,
-      TofCommandResp::RespErrLevelSevere,
-      TofCommandResp::RespErrLevelCritical,
-      TofCommandResp::RespErrLevelMissionCritical,
-      TofCommandResp::RespErrLevelRunFoolRun,
-      TofCommandResp::RespSuccFingersCrossed,
-      TofCommandResp::RespErrNoRunActive,
-      TofCommandResp::RespErrRunActive,
-      TofCommandResp::RespErrCmdStuck
+      TofResponseCode::RespErrAccessDenied,
+      TofResponseCode::RespErrUnexecutable,
+      TofResponseCode::RespErrNotImplemented,
+      TofResponseCode::RespErrLevelNoProblem,
+      TofResponseCode::RespErrLevelMedium,
+      TofResponseCode::RespErrLevelSevere,
+      TofResponseCode::RespErrLevelCritical,
+      TofResponseCode::RespErrLevelMissionCritical,
+      TofResponseCode::RespErrLevelRunFoolRun,
+      TofResponseCode::RespSuccFingersCrossed,
+      TofResponseCode::RespErrNoRunActive,
+      TofResponseCode::RespErrRunActive,
+      TofResponseCode::RespErrCmdStuck
     ];
     <span class="kw">let </span><span class="kw-2">mut </span>rng  = rand::thread_rng();
     <span class="kw">let </span>idx = rng.gen_range(<span class="number">0</span>..choices.len());
@@ -1352,6 +1416,13 @@
   TriggerModeForcedMTB    (u32),
   SystemdReboot           (u32),
   Listen                  (u32),
+  Lock                    (u32),
+  Unlock                  (u32),
+  Kill                    (u32),
+}
+
+<span class="kw">impl </span>Packable <span class="kw">for </span>TofCommand {
+  <span class="kw">const </span>PACKET_TYPE : PacketType = PacketType::TofCommand;
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofCommand {
@@ -1363,64 +1434,6 @@
 }
 
 <span class="kw">impl </span>TofCommand { 
-  <span class="kw">const </span>HEAD : u16 = <span class="number">0xAAAA</span>;
-  <span class="kw">const </span>TAIL : u16 = <span class="number">0x5555</span>;
-  <span class="comment">///// The size of TofCommand when 
-  ///// in byte representation is 
-  ///// fixed:
-  ///// it is 4 bytes (header/footer)
-  ///// + 1 byte command code
-  ///// + 4 bytes value
-  ///// =&gt; 9 bytes
-  </span><span class="kw">const </span>SIZE : usize = <span class="number">9</span>; 
-
-
-  <span class="doccomment">/// Returns the serialized data stream
-  /// as byte array
-  /// 
-  /// Might be faster thant its sister
-  /// ::to_bytestream(), however is not
-  /// a trait, since the return type 
-  /// depends on the size. 
-  /// FIXME - can we somehow make this 
-  /// a trait? It seems we can not return 
-  /// &amp;[u8] when we have the corresponding
-  /// array allocated in the function
-  </span><span class="kw">pub fn </span>to_bytearray(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [u8;TofCommand::SIZE] {
-
-    <span class="kw">let </span><span class="kw-2">mut </span>bytes = [<span class="number">0u8</span>;TofCommand::SIZE];
-    bytes[<span class="number">0</span>] = <span class="number">0xAA</span>;
-    bytes[<span class="number">1</span>] = <span class="number">0xAA</span>;
-    bytes[<span class="number">2</span>] = TofCommand::to_command_code(<span class="kw-2">&amp;</span><span class="self">self</span>)
-      .expect(<span class="string">"This can't fail, since this is implemented on MYSELF and I am a TofCommand!"</span>) <span class="kw">as </span>u8; 
-    <span class="kw">let </span>value_bytes = <span class="self">self</span>.get_value().to_le_bytes();
-   
-    <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
-      bytes[<span class="number">3</span>+n] = value_bytes[n];
-    }
-    bytes[<span class="number">7</span>] = <span class="number">0x55</span>;
-    bytes[<span class="number">8</span>] = <span class="number">0x55</span>;
-    bytes
-  }
-  
-  <span class="kw">pub fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
-
-    <span class="comment">//let mut stream = Vec::&lt;u8&gt;::with_capacity(TofCommand::SIZE);
-    </span><span class="kw">let </span><span class="kw-2">mut </span>stream : Vec::&lt;u8&gt; = <span class="macro">vec!</span>[<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>];
-    stream[<span class="number">0</span>] = <span class="number">0xAA</span>;
-    stream[<span class="number">1</span>] = <span class="number">0xAA</span>;
-    stream[<span class="number">2</span>] = TofCommand::to_command_code(<span class="kw-2">&amp;</span><span class="self">self</span>)
-      .expect(<span class="string">"This can't fail, since this is implemented on MYSELF and I am a TofCommand!"</span>) <span class="kw">as </span>u8; 
-    <span class="kw">let </span>value_bytes = <span class="self">self</span>.get_value().to_le_bytes();
-   
-    <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
-      stream[<span class="number">3</span>+n] = value_bytes[n];
-    }
-    stream[<span class="number">7</span>] = <span class="number">0x55</span>;
-    stream[<span class="number">8</span>] = <span class="number">0x55</span>;
-    stream
-  }
-
 
   <span class="comment">// this can not fail
   </span><span class="kw">pub fn </span>get_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
@@ -1447,6 +1460,9 @@
       TofCommand::TriggerModeForcedMTB    (data) =&gt; { value = <span class="kw-2">*</span>data;},
       TofCommand::SystemdReboot           (data) =&gt; { value = <span class="kw-2">*</span>data;},
       TofCommand::Listen                  (data) =&gt; { value = <span class="kw-2">*</span>data;}
+      TofCommand::Kill                    (data) =&gt; { value = <span class="kw-2">*</span>data;}
+      TofCommand::Lock                    (data) =&gt; { value = <span class="kw-2">*</span>data;}
+      TofCommand::Unlock                  (data) =&gt; { value = <span class="kw-2">*</span>data;}
     }
     value
   }  
@@ -1475,7 +1491,11 @@
       TofCommandCode::CmdTriggerModeForced       =&gt; TofCommand::TriggerModeForced       (value),
       TofCommandCode::CmdTriggerModeForcedMTB    =&gt; TofCommand::TriggerModeForcedMTB    (value),
       TofCommandCode::CmdSystemdReboot           =&gt; TofCommand::SystemdReboot           (value),
-      TofCommandCode::CmdListen                  =&gt; TofCommand::Listen                  (value)
+      TofCommandCode::CmdListen                  =&gt; TofCommand::Listen                  (value),
+      TofCommandCode::CmdKill                    =&gt; TofCommand::Kill                    (value),
+      TofCommandCode::CmdLock                    =&gt; TofCommand::Lock                    (value),
+      TofCommandCode::CmdUnlock                  =&gt; TofCommand::Unlock                  (value),
+      <span class="kw">_                                          </span>=&gt; TofCommand::Unknown                 (value),
     }
   }
     
@@ -1502,7 +1522,10 @@
       TofCommand::TriggerModeForced       (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdTriggerModeForced),
       TofCommand::TriggerModeForcedMTB    (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdTriggerModeForcedMTB),
       TofCommand::SystemdReboot           (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdSystemdReboot),
-      TofCommand::Listen                  (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdListen)
+      TofCommand::Listen                  (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdListen),
+      TofCommand::Kill                    (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdKill),
+      TofCommand::Lock                    (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdLock),
+      TofCommand::Unlock                  (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdUnlock),
     }
   }
 
@@ -1527,6 +1550,9 @@
     } <span class="comment">// end match
   </span>}
 } <span class="comment">// end impl TofCommand
+
+//impl From&lt;&amp;TofPacket&gt; for TofCommand {
+//  fn from(tp : &amp;TofPacket) -&gt; Self {
 
 </span><span class="kw">impl </span>From&lt;(u8, u32)&gt; <span class="kw">for </span>TofCommand {
   
@@ -1568,7 +1594,10 @@
       TofCommand::TriggerModeForced       (val),
       TofCommand::TriggerModeForcedMTB    (val),
       TofCommand::SystemdReboot           (val),
-      TofCommand::Listen                  (val)
+      TofCommand::Listen                  (val),
+      TofCommand::Kill                    (val),
+      TofCommand::Lock                    (val),
+      TofCommand::Unlock                  (val),
     ];
     <span class="kw">let </span>idx = rng.gen_range(<span class="number">0</span>..choices.len());
     choices[idx]
@@ -1587,38 +1616,63 @@
   ///// + 4 bytes value
   ///// =&gt; 9 bytes
   </span><span class="kw">const </span>SIZE : usize = <span class="number">9</span>; 
+  
+  <span class="comment">///// Returns the serialized data stream
+  ///// as byte array
+  ///// 
+  ///// Might be faster thant its sister
+  ///// ::to_bytestream(), however is not
+  ///// a trait, since the return type 
+  ///// depends on the size. 
+  ///// FIXME - can we somehow make this 
+  ///// a trait? It seems we can not return 
+  ///// &amp;[u8] when we have the corresponding
+  ///// array allocated in the function
+  //pub fn to_bytearray(&amp;self) -&gt; [u8;TofCommand::SIZE] {
+
+  //  let mut bytes = [0u8;TofCommand::SIZE];
+  //  bytes[0] = 0xAA;
+  //  bytes[1] = 0xAA;
+  //  bytes[2] = TofCommand::to_command_code(&amp;self)
+  //    .expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!") as u8; 
+  //  let value_bytes = self.get_value().to_le_bytes();
+  // 
+  //  for n in 0..4 {
+  //    bytes[3+n] = value_bytes[n];
+  //  }
+  //  bytes[7] = 0x55;
+  //  bytes[8] = 0x55;
+  //  bytes
+  //}
+  
+  </span><span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+    <span class="comment">//let mut stream = Vec::&lt;u8&gt;::with_capacity(TofCommand::SIZE);
+    </span><span class="kw">let </span><span class="kw-2">mut </span>stream : Vec::&lt;u8&gt; = <span class="macro">vec!</span>[<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>];
+    stream[<span class="number">0</span>] = <span class="number">0xAA</span>;
+    stream[<span class="number">1</span>] = <span class="number">0xAA</span>;
+    stream[<span class="number">2</span>] = TofCommand::to_command_code(<span class="kw-2">&amp;</span><span class="self">self</span>)
+      .expect(<span class="string">"This can't fail, since this is implemented on MYSELF and I am a TofCommand!"</span>) <span class="kw">as </span>u8; 
+    <span class="kw">let </span>value_bytes = <span class="self">self</span>.get_value().to_le_bytes();
+   
+    <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
+      stream[<span class="number">3</span>+n] = value_bytes[n];
+    }
+    stream[<span class="number">7</span>] = <span class="number">0x55</span>;
+    stream[<span class="number">8</span>] = <span class="number">0x55</span>;
+    stream
+  }
+
 
   <span class="kw">fn </span>from_bytestream(stream    : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;, 
                      pos       : <span class="kw-2">&amp;mut </span>usize) 
     -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt;{
-  
-    <span class="comment">//let mut pos      = start_pos; 
-    </span><span class="kw">let </span><span class="kw-2">mut </span>two_bytes : [u8;<span class="number">2</span>];
-    <span class="kw">let </span>four_bytes    : [u8;<span class="number">4</span>];
-    two_bytes = [stream[<span class="kw-2">*</span>pos],
-                 stream[<span class="kw-2">*</span>pos+<span class="number">1</span>]];
-    <span class="kw-2">*</span>pos += <span class="number">2</span>;
-    <span class="kw">if </span><span class="self">Self</span>::HEAD != u16::from_le_bytes(two_bytes) {
-      <span class="macro">error!</span>(<span class="string">"Packet does not start with HEAD signature"</span>);
-      <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::HeadInvalid {});
-    }
-    <span class="kw">let </span>cc   = stream[<span class="kw-2">*</span>pos];
-    <span class="kw-2">*</span>pos += <span class="number">1</span>;
-    four_bytes = [stream[<span class="kw-2">*</span>pos],
-                  stream[<span class="kw-2">*</span>pos+<span class="number">1</span>],
-                  stream[<span class="kw-2">*</span>pos+<span class="number">2</span>],
-                  stream[<span class="kw-2">*</span>pos+<span class="number">3</span>]];
-    <span class="kw-2">*</span>pos += <span class="number">4</span>;
-    <span class="kw">let </span>value = u32::from_le_bytes(four_bytes);
-    two_bytes = [stream[<span class="kw-2">*</span>pos],
-                 stream[<span class="kw-2">*</span>pos+<span class="number">1</span>]];
+    <span class="self">Self</span>::verify_fixed(stream, pos)<span class="question-mark">?</span>;  
+    <span class="kw">let </span>cc      = parse_u8(stream, pos);
+    <span class="kw">let </span>value   = parse_u32(stream, pos); 
     <span class="kw">let </span>pair    = (cc, value);
     <span class="kw">let </span>command = <span class="self">Self</span>::from(pair);
-    <span class="kw">if </span><span class="self">Self</span>::TAIL != u16::from_le_bytes(two_bytes) {
-      <span class="macro">error!</span>(<span class="string">"Packet does not end with TAIL signature"</span>);
-      <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::TailInvalid {});
-    }
-    <span class="prelude-val">Ok</span>(command)
+    <span class="kw-2">*</span>pos += <span class="number">2</span>; <span class="comment">// for the TAIL
+    </span><span class="prelude-val">Ok</span>(command)
   }
 }
 
@@ -1648,7 +1702,14 @@
   /// command again.
   </span>SerializationIssue(u32),
   ZMQProblem(u32),
+  TimeOut(u32),
+  NotImplemented(u32),
+  AccessDenied(u32),
   Unknown
+}
+
+<span class="kw">impl </span>Packable <span class="kw">for </span>TofResponse {
+  <span class="kw">const </span>PACKET_TYPE : PacketType = PacketType::TofResponse;
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofResponse {
@@ -1671,6 +1732,9 @@
       TofResponse::EventNotReady(val),
       TofResponse::SerializationIssue(val),
       TofResponse::ZMQProblem(val),
+      TofResponse::TimeOut(val),
+      TofResponse::NotImplemented(val),
+      TofResponse::AccessDenied(val),
       TofResponse::Unknown,
     ];
     <span class="kw">let </span>idx = rng.gen_range(<span class="number">0</span>..choices.len());
@@ -1678,11 +1742,13 @@
   }
 }
 
-<span class="kw">impl </span>TofResponse {
-  <span class="kw">const </span>HEAD : u16 = <span class="number">0xAAAA</span>;
-  <span class="kw">const </span>TAIL : u16 = <span class="number">0x5555</span>;
 
-  <span class="kw">pub fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+<span class="kw">impl </span>Serialization <span class="kw">for </span>TofResponse {
+  <span class="kw">const </span>HEAD : u16   = <span class="number">0xAAAA</span>;
+  <span class="kw">const </span>TAIL : u16   = <span class="number">0x5555</span>;
+  <span class="kw">const </span>SIZE : usize = <span class="number">9</span>; <span class="comment">//FIXME
+  
+  </span><span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>bytestream = Vec::&lt;u8&gt;::with_capacity(<span class="number">9</span>);
     bytestream.extend_from_slice(<span class="kw-2">&amp;</span>TofResponse::HEAD.to_le_bytes());
     <span class="kw">let </span>cc = u8::from(<span class="kw-2">*</span><span class="self">self</span>);
@@ -1694,61 +1760,40 @@
       TofResponse::EventNotReady(data)      =&gt; value = <span class="kw-2">*</span>data,
       TofResponse::SerializationIssue(data) =&gt; value = <span class="kw-2">*</span>data,
       TofResponse::ZMQProblem(data)         =&gt; value = <span class="kw-2">*</span>data,
+      TofResponse::TimeOut(data)            =&gt; value = <span class="kw-2">*</span>data,
+      TofResponse::NotImplemented(data)     =&gt; value = <span class="kw-2">*</span>data,
+      TofResponse::AccessDenied(data)       =&gt; value = <span class="kw-2">*</span>data,
       TofResponse::Unknown =&gt; ()
     }
     bytestream.extend_from_slice(<span class="kw-2">&amp;</span>value.to_le_bytes());
     bytestream.extend_from_slice(<span class="kw-2">&amp;</span>TofResponse::TAIL.to_le_bytes());
     bytestream
   }
-}
 
-<span class="kw">impl </span>Serialization <span class="kw">for </span>TofResponse {
-  <span class="kw">const </span>HEAD : u16 = <span class="number">0xAAAA</span>;
-  <span class="kw">const </span>TAIL : u16 = <span class="number">0x5555</span>;
-  <span class="kw">const </span>SIZE : usize = <span class="number">0</span>; <span class="comment">//FIXME
-
-  </span><span class="kw">fn </span>from_bytestream(stream    : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;, 
+  <span class="kw">fn </span>from_bytestream(stream    : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;, 
                      pos       : <span class="kw-2">&amp;mut </span>usize) 
     -&gt; <span class="prelude-ty">Result</span>&lt;TofResponse, SerializationError&gt;{
-  
-    <span class="kw">let </span><span class="kw-2">mut </span>two_bytes : [u8;<span class="number">2</span>];
-    <span class="kw">let </span>four_bytes    : [u8;<span class="number">4</span>];
-    two_bytes = [stream[<span class="kw-2">*</span>pos],
-                 stream[<span class="kw-2">*</span>pos+<span class="number">1</span>]];
-    <span class="kw-2">*</span>pos += <span class="number">2</span>;
-    <span class="kw">if </span>TofResponse::HEAD != u16::from_le_bytes(two_bytes) {
-      <span class="macro">warn!</span>(<span class="string">"Packet does not start with HEAD signature"</span>);
-      <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::HeadInvalid {});
-    }
-   
-    <span class="kw">let </span>cc   = stream[<span class="kw-2">*</span>pos];
-    <span class="kw-2">*</span>pos += <span class="number">1</span>;
-    four_bytes = [stream[<span class="kw-2">*</span>pos],
-                  stream[<span class="kw-2">*</span>pos+<span class="number">1</span>],
-                  stream[<span class="kw-2">*</span>pos+<span class="number">2</span>],
-                  stream[<span class="kw-2">*</span>pos+<span class="number">3</span>]];
-    <span class="kw-2">*</span>pos += <span class="number">4</span>;
-    <span class="kw">let </span>value = u32::from_le_bytes(four_bytes);
-    two_bytes = [stream[<span class="kw-2">*</span>pos],
-                 stream[<span class="kw-2">*</span>pos+<span class="number">1</span>]];
-    <span class="kw">let </span>pair = (cc, value);
+    <span class="self">Self</span>::verify_fixed(stream, pos)<span class="question-mark">?</span>;  
+    <span class="kw">let </span>cc       = parse_u8(stream, pos);
+    <span class="kw">let </span>value    = parse_u32(stream, pos);
+    <span class="kw">let </span>pair     = (cc, value);
     <span class="kw">let </span>response = TofResponse::from(pair);
-    <span class="kw">if </span>TofResponse::TAIL != u16::from_le_bytes(two_bytes) {
-      <span class="macro">warn!</span>(<span class="string">"Packet does not end with TAIL signature"</span>);
-      <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::TailInvalid {});
-    }
-    <span class="prelude-val">Ok</span>(response)
+    <span class="kw-2">*</span>pos += <span class="number">2</span>; <span class="comment">// acccount for TAIL
+    </span><span class="prelude-val">Ok</span>(response)
   }
 }
 
 <span class="kw">impl </span>From&lt;TofResponse&gt; <span class="kw">for </span>u8 {
   <span class="kw">fn </span>from(input : TofResponse) -&gt; u8 {
     <span class="kw">match </span>input {
-      TofResponse::Success(<span class="kw">_</span>)       =&gt; <span class="number">1</span>,
-      TofResponse::GeneralFail(<span class="kw">_</span>)   =&gt; <span class="number">2</span>,
-      TofResponse::EventNotReady(<span class="kw">_</span>) =&gt; <span class="number">3</span>,
+      TofResponse::Success(<span class="kw">_</span>)            =&gt; <span class="number">1</span>,
+      TofResponse::GeneralFail(<span class="kw">_</span>)        =&gt; <span class="number">2</span>,
+      TofResponse::EventNotReady(<span class="kw">_</span>)      =&gt; <span class="number">3</span>,
       TofResponse::SerializationIssue(<span class="kw">_</span>) =&gt; <span class="number">4</span>,
-      TofResponse::ZMQProblem(<span class="kw">_</span>) =&gt; <span class="number">5</span>,
+      TofResponse::ZMQProblem(<span class="kw">_</span>)         =&gt; <span class="number">5</span>,
+      TofResponse::TimeOut(<span class="kw">_</span>)            =&gt; <span class="number">6</span>,
+      TofResponse::NotImplemented(<span class="kw">_</span>)     =&gt; <span class="number">7</span>,
+      TofResponse::AccessDenied(<span class="kw">_</span>)       =&gt; <span class="number">8</span>,
       TofResponse::Unknown =&gt; <span class="number">0
     </span>}
   }
@@ -1758,12 +1803,14 @@
   <span class="kw">fn </span>from(pair : (u8, u32)) -&gt; TofResponse {
     <span class="kw">let </span>(input, value) = pair;
     <span class="kw">match </span>input {
-
       <span class="number">1 </span>=&gt; TofResponse::Success(value),
       <span class="number">2 </span>=&gt; TofResponse::GeneralFail(value),
       <span class="number">3 </span>=&gt; TofResponse::EventNotReady(value),
       <span class="number">4 </span>=&gt; TofResponse::SerializationIssue(value),
       <span class="number">5 </span>=&gt; TofResponse::ZMQProblem(value),
+      <span class="number">6 </span>=&gt; TofResponse::TimeOut(value),
+      <span class="number">7 </span>=&gt; TofResponse::NotImplemented(value),
+      <span class="number">8 </span>=&gt; TofResponse::AccessDenied(value),
       <span class="kw">_ </span>=&gt; TofResponse::Unknown
     }
   }
@@ -1792,4 +1839,25 @@
   <span class="kw">let </span>test = RBCommand::from_bytestream(<span class="kw-2">&amp;</span>cmd.to_bytestream(), <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
   <span class="macro">assert_eq!</span>(cmd, test);
 }
+
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
+#[test]
+</span><span class="kw">fn </span>pack_tofresponse() {
+  <span class="kw">let </span>resp = TofResponse::from_random();
+  <span class="kw">let </span>test : TofResponse = resp.pack().unpack().unwrap();
+  <span class="macro">assert_eq!</span>(resp, test);
+}
+
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
+#[test]
+</span><span class="kw">fn </span>pack_tofcommand() {
+  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+    <span class="kw">let </span>cmd  = TofCommand::from_random();
+    <span class="kw">let </span>test : TofCommand = cmd.pack().unpack().unwrap();
+    <span class="macro">assert_eq!</span>(cmd, test);
+  }
+}
+
+
+
 </code></pre></div></section></main></body></html>

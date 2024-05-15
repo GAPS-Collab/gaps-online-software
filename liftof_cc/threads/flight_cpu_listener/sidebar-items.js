@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["flight_cpu_listener"]};

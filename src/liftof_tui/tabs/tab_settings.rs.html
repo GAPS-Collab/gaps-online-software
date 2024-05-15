@@ -266,7 +266,7 @@
 </span>};
 
 <span class="kw">use </span><span class="kw">crate</span>::colors::{
-    ColorTheme2,
+    ColorTheme,
     ColorSet,
     COLORSETOMILU,
     COLORSETBW,
@@ -281,14 +281,14 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>SettingsTab&lt;<span class="lifetime">'a</span>&gt; {
-  <span class="kw">pub </span>theme      : ColorTheme2,
+  <span class="kw">pub </span>theme      : ColorTheme,
   <span class="kw">pub </span>ctl_state  : ListState,
   <span class="kw">pub </span>ctl_items  : Vec::&lt;ListItem&lt;<span class="lifetime">'a</span>&gt;&gt;,
   <span class="kw">pub </span>ctl_active : bool,
 }
 
 <span class="kw">impl </span>SettingsTab&lt;<span class="lifetime">'_</span>&gt; {
-  <span class="kw">pub fn </span>new(theme : ColorTheme2) -&gt; SettingsTab&lt;<span class="lifetime">'static</span>&gt; {
+  <span class="kw">pub fn </span>new(theme : ColorTheme) -&gt; SettingsTab&lt;<span class="lifetime">'static</span>&gt; {
     <span class="kw">let </span>ct_list_items = <span class="macro">vec!</span>[ListItem::new(Line::from(<span class="string">"Black&amp;White"</span>)),
                              ListItem::new(Line::from(<span class="string">"StarField"</span>)),
                              ListItem::new(Line::from(<span class="string">"Omiliu"</span>)),

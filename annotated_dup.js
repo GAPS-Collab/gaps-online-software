@@ -4,9 +4,6 @@ var annotated_dup =
       [ "TofPacketReader", "classGaps_1_1TofPacketReader.html", "classGaps_1_1TofPacketReader" ],
       [ "FatalException", "classGaps_1_1FatalException.html", null ]
     ] ],
-    [ "GAPS", null, [
-      [ "Waveform", "classGAPS_1_1Waveform.html", "classGAPS_1_1Waveform" ]
-    ] ],
     [ "CPUMoniData", "structCPUMoniData.html", "structCPUMoniData" ],
     [ "FromTofPacket", "structFromTofPacket.html", null ],
     [ "LTBMoniData", "structLTBMoniData.html", "structLTBMoniData" ],
@@ -18,7 +15,6 @@ var annotated_dup =
     [ "RBCalibration", "structRBCalibration.html", "structRBCalibration" ],
     [ "RBEvent", "structRBEvent.html", "structRBEvent" ],
     [ "RBEventHeader", "structRBEventHeader.html", "structRBEventHeader" ],
-    [ "RBEventMemoryView", "structRBEventMemoryView.html", "structRBEventMemoryView" ],
     [ "RBMissingHit", "structRBMissingHit.html", "structRBMissingHit" ],
     [ "RBMoniData", "structRBMoniData.html", "structRBMoniData" ],
     [ "RBWaveform", "structRBWaveform.html", "structRBWaveform" ],

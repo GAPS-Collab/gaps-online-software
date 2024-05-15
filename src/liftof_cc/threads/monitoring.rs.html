@@ -103,7 +103,7 @@
 
 <span class="kw">use </span>tof_control::helper::cpu_type::{
     CPUTempDebug,
-    CPUInfo,
+    CPUInfoDebug,
 };
 
 
@@ -128,8 +128,8 @@
   <span class="kw">let </span><span class="kw-2">mut </span>timer     = Instant::now();
   <span class="kw">let </span>sleep_time    = Duration::from_secs(moni_interval);
   <span class="lifetime">'main</span>: <span class="kw">loop </span>{
-    <span class="kw">let </span>cpu_info  = CPUInfo::new();
-    <span class="kw">let </span>cpu_temp  = CPUTempDebug::new();
+    <span class="kw">let </span>cpu_info    = CPUInfoDebug::new();
+    <span class="kw">let </span>cpu_temp    = CPUTempDebug::new();
     <span class="kw">if </span>timer.elapsed().as_secs() &gt;= moni_interval {
       moni_data.add_temps(<span class="kw-2">&amp;</span>cpu_temp);
       moni_data.add_info(<span class="kw-2">&amp;</span>cpu_info);

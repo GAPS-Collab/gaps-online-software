@@ -294,6 +294,12 @@
 <a href="#292" id="292">292</a>
 <a href="#293" id="293">293</a>
 <a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::time::Instant;
 <span class="kw">use </span>std::collections::VecDeque;
 
@@ -326,9 +332,12 @@
 };
 <span class="kw">use </span>tof_dataclasses::monitoring::CPUMoniData;
 <span class="kw">use </span>tof_dataclasses::errors::SerializationError;
-<span class="kw">use </span>tof_dataclasses::serialization::Serialization;
+<span class="comment">//use tof_dataclasses::serialization::{
+//    Serialization,
+//    Packable
+//};
 
-<span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme2;
+</span><span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme;
 <span class="kw">use </span><span class="kw">crate</span>::widgets::timeseries;
 
 <span class="comment">//pub const LG_LINE_HORIZONTAL : &amp;str = "◉";
@@ -352,23 +361,24 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>CPUTab {
-  <span class="kw">pub </span>theme      : ColorTheme2,
+  <span class="kw">pub </span>theme      : ColorTheme,
   <span class="kw">pub </span>freq_queue  : Vec&lt;VecDeque&lt;(f64,f64)&gt;&gt;,
   <span class="kw">pub </span>temp_queue  : Vec&lt;VecDeque&lt;(f64,f64)&gt;&gt;,
   <span class="kw">pub </span>disk_usage : u8, <span class="comment">// disk usage in per cent
   </span><span class="kw">pub </span>tp_recv    : Receiver&lt;TofPacket&gt;,
   timer          : Instant,
   queue_size     : usize,
+  <span class="kw">pub </span>last_moni  : CPUMoniData,
 }
 
 <span class="kw">impl </span>CPUTab {
 
   <span class="kw">pub fn </span>new(tp_recv : Receiver&lt;TofPacket&gt;,
-             theme : ColorTheme2) -&gt; <span class="self">Self </span>{
+             theme : ColorTheme) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>queue_size    = <span class="number">1000usize</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>freq_queue = Vec::&lt;VecDeque::&lt;(f64,f64)&gt;&gt;::with_capacity(<span class="number">4</span>);
     <span class="kw">let </span><span class="kw-2">mut </span>temp_queue = Vec::&lt;VecDeque::&lt;(f64,f64)&gt;&gt;::with_capacity(<span class="number">4</span>);
-    
+
     <span class="kw">for </span>_core <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
       <span class="kw">let </span>core_queue  = VecDeque::&lt;(f64,f64)&gt;::with_capacity(queue_size);
       freq_queue.push(core_queue);
@@ -387,6 +397,7 @@
       disk_usage : <span class="number">0u8</span>,
       tp_recv    : tp_recv,
       queue_size : <span class="number">1000usize</span>,
+      last_moni  : CPUMoniData::new(),
     }
   }
   
@@ -402,7 +413,9 @@
         <span class="macro">trace!</span>(<span class="string">"Got next packet {}!"</span>, pack);
         <span class="kw">match </span>pack.packet_type {
           PacketType::CPUMoniData =&gt; {
-            moni = CPUMoniData::from_bytestream(<span class="kw-2">&amp;</span>pack.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>)<span class="question-mark">?</span>;
+            <span class="comment">//moni = CPUMoniData::from_bytestream(&amp;pack.payload, &amp;mut 0)?;
+            // new API!
+            </span>moni = pack.unpack()<span class="question-mark">?</span>;
           }
           <span class="kw">_ </span>=&gt; {
             <span class="kw">return </span><span class="prelude-val">Ok</span>(());
@@ -428,6 +441,7 @@
       }
     }
     <span class="self">self</span>.disk_usage = moni.disk_usage;
+    <span class="self">self</span>.last_moni  = moni;
     <span class="prelude-val">Ok</span>(())
   }
 
@@ -476,11 +490,9 @@
           .split(graph_chunks[<span class="number">1</span>]).to_vec();
 
 
-        <span class="kw">let </span>info_view_str = String::from(<span class="string">"foo1"</span>);
-        <span class="comment">//let foo3 = String::from("foo3");
-        //let foo4 = String::from("foo4");
+        <span class="kw">let </span>info_view_str = <span class="macro">format!</span>(<span class="string">"{}"</span>, <span class="self">self</span>.last_moni);
 
-        </span><span class="kw">let </span>info_view = Paragraph::new(info_view_str)
+        <span class="kw">let </span>info_view = Paragraph::new(info_view_str)
         .style(<span class="self">self</span>.theme.style())
         .alignment(Alignment::Left)
         .block(

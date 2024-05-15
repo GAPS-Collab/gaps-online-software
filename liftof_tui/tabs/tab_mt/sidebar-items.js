@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["HIST_LABELS"],"struct":["MTTab"]};
+window.SIDEBAR_ITEMS = {"struct":["MTTab"]};

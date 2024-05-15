@@ -13,12 +13,13 @@
 <a href="#11" id="11">11</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>readoutboard_comm;
 <span class="kw">pub mod </span>event_builder;
-<span class="kw">pub mod </span>flight_comms;
+<span class="kw">pub mod </span>global_data_sink;
 <span class="kw">pub mod </span>monitoring;
-<span class="kw">pub mod </span>flight_cpu_listener;
+<span class="kw">pub mod </span>command_dispatcher;
 
 <span class="kw">pub use </span><span class="self">self</span>::event_builder::event_builder;
 <span class="kw">pub use </span><span class="self">self</span>::readoutboard_comm::readoutboard_communicator;
-<span class="kw">pub use </span><span class="self">self</span>::flight_comms::global_data_sink;
+<span class="kw">pub use </span><span class="self">self</span>::global_data_sink::global_data_sink;
 <span class="kw">pub use </span><span class="self">self</span>::monitoring::monitor_cpu;
-<span class="kw">pub use </span><span class="self">self</span>::flight_cpu_listener::flight_cpu_listener;</code></pre></div></section></main></body></html>
+<span class="kw">pub use </span><span class="self">self</span>::command_dispatcher::command_dispatcher;
+</code></pre></div></section></main></body></html>

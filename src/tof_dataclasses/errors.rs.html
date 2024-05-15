@@ -348,6 +348,8 @@
 <a href="#346" id="346">346</a>
 <a href="#347" id="347">347</a>
 <a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Specific error types
 //!
 //!
@@ -402,7 +404,8 @@
 </span><span class="kw">pub enum </span>CalibrationError {
   EmptyInputData,
   CanNotConnectToMyOwnZMQSocket,
-  CalibrationFailed
+  CalibrationFailed,
+  WrongBoardId,
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>CalibrationError {
@@ -471,6 +474,7 @@
   ValueNotFound,
   EventFragment,
   UnknownPayload,
+  IncorrectPacketType,
   WrongByteSize,
   JsonDecodingError,
   TomlDecodingError,
@@ -516,7 +520,7 @@
 #[repr(u8)]
 </span><span class="kw">pub enum </span>MasterTriggerError {
   Unknown,
-  QueueEmpty,
+  EventQueueEmpty,
   MaskTooLarge,
   BrokenPackage,
   DAQNotAvailable,

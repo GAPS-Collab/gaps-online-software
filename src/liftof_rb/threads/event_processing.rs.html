@@ -309,6 +309,8 @@
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fs;
 <span class="kw">use </span>std::path::PathBuf;
 <span class="kw">use </span>std::sync::{
@@ -409,7 +411,9 @@
   <span class="kw">let </span><span class="kw-2">mut </span>data_type       : DataType   = DataType::Unknown;
   <span class="comment">//let one_milli           = Duration::from_millis(1);
   </span><span class="kw">let </span><span class="kw-2">mut </span>streamer        = RBEventMemoryStreamer::new();
-  streamer.calc_crc32     = calc_crc32;
+  <span class="comment">// FIXME
+  </span>streamer.check_channel_errors = <span class="bool-val">true</span>;
+  streamer.calc_crc32           = calc_crc32;
   <span class="comment">// our cachesize is 50 events. This means each time we 
   // receive data over bs_recv, we have received 50 more 
   // events. This means we might want to wait for 50 MTE

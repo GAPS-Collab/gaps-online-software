@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["analysis","calibrations","commands","constants","errors","events","io","ipbus","manifest","monitoring","packets","run","serialization","threading"],"trait":["FromRandom"],"type":["DsiLtbRBMapping","RBChannelPaddleEndIDMap"]};
+window.SIDEBAR_ITEMS = {"mod":["analysis","calibrations","commands","constants","database","errors","events","io","ipbus","monitoring","packets","run","serialization","series","threading"],"trait":["FromRandom"],"type":["DsiLtbRBMapping","RBChannelPaddleEndIDMap"]};
