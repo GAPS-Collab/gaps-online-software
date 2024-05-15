@@ -557,7 +557,8 @@ fn main() {
       },
       _ => ()
     }
-    println!("=> Calibration complete! Terminating..");
+    println!("=> Calibration complete! Terminating, waiting till file is written..");
+    thread::sleep(2*one_sec);
     println!("=> Terminated. So long and thanks for all the \u{1F41F}");
     exit(0);
   }

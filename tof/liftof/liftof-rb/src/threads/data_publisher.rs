@@ -178,6 +178,13 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
                 Err(err) => error!("Writing file to disk failed! Err {err}"),
                 Ok(()) => ()
               }
+              // local file can be synced, rate should be in general 
+              // low when we are writing to the local file.
+              // Careful with SD card!
+              match f.sync_all() {
+                Err(err) => error!("Unable to sync file to disk! {err}"),
+                Ok(()) => ()
+              }
             }
           }
         }
