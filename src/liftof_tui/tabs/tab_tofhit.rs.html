@@ -365,6 +365,111 @@
 <a href="#363" id="363">363</a>
 <a href="#364" id="364">364</a>
 <a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{
     <span class="comment">//HashMap,
     </span>VecDeque,
@@ -381,8 +486,8 @@
     BorderType,
     Borders,
     Paragraph,
-    <span class="comment">//BarChart,
-    </span>List,
+    BarChart,
+    List,
     ListItem,
     ListState,
 };
@@ -412,10 +517,9 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme;
 <span class="kw">use </span><span class="kw">crate</span>::widgets::{
-    <span class="comment">//clean_data,
-    </span>prep_data,
+    clean_data,
+    prep_data,
     create_labels,
-    histogram,
 };
 
 <span class="attr">#[derive(Debug, Clone)]
@@ -448,7 +552,6 @@
   </span><span class="kw">pub </span>pa_histo        : Hist1D&lt;Uniform&lt;f32&gt;&gt;,
   <span class="comment">// tzero           
   </span><span class="kw">pub </span>t0_histo        : Hist1D&lt;Uniform&lt;f32&gt;&gt;,
-  <span class="kw">pub </span>edep_histo      : Hist1D&lt;Uniform&lt;f32&gt;&gt;,
   <span class="comment">// paddle id
   </span><span class="kw">pub </span>pid_histo       : Hist1D&lt;Uniform&lt;f32&gt;&gt;,
   <span class="kw">pub </span>view            : TofHitView,
@@ -465,11 +568,10 @@
   <span class="kw">pub fn </span>new(th_recv : Receiver&lt;TofHit&gt;, theme : ColorTheme) -&gt; TofHitTab&lt;<span class="lifetime">'static</span>&gt; {
     <span class="kw">let </span>bins_ph    = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">200.0</span>);
     <span class="kw">let </span>bins_pt    = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">400.0</span>);
-    <span class="kw">let </span>bins_pc    = Uniform::new(<span class="number">30</span>, <span class="number">0.0</span>, <span class="number">30.0</span>);
-    <span class="kw">let </span>bins_pa    = Uniform::new(<span class="number">90</span>, <span class="number">0.0</span>, <span class="number">1800.0</span>);
+    <span class="kw">let </span>bins_pc    = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">500.0</span>);
+    <span class="kw">let </span>bins_pa    = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">200.0</span>);
     <span class="kw">let </span>bins_t0    = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">200.0</span>);
     <span class="kw">let </span>bins_pid   = Uniform::new(<span class="number">160</span>,<span class="number">1.0</span>, <span class="number">161.0</span>);
-    <span class="kw">let </span>bins_edep  = Uniform::new(<span class="number">50</span>,<span class="number">0.0</span>,<span class="number">100.0</span>);
     <span class="kw">let </span><span class="kw-2">mut </span>paddle_select_items = Vec::&lt;ListItem&gt;::new();
     <span class="kw">let </span>all_pdl = String::from(<span class="string">"  All paddles"</span>);
     paddle_select_items.push(ListItem::new(Line::from(all_pdl)));
@@ -490,7 +592,6 @@
       pcb_histo       : <span class="macro">ndhistogram!</span>(bins_pc),
       pa_histo        : <span class="macro">ndhistogram!</span>(bins_pa),
       t0_histo        : <span class="macro">ndhistogram!</span>(bins_t0),
-      edep_histo      : <span class="macro">ndhistogram!</span>(bins_edep),
       pid_histo       : <span class="macro">ndhistogram!</span>(bins_pid),
       view            : TofHitView::Pulses,
       paddle_selector : <span class="number">0</span>,
@@ -503,21 +604,19 @@
   }
 
   <span class="kw">pub fn </span>init_histos(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-    <span class="kw">let </span>bins_ph     = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">200.0</span>);
-    <span class="kw">let </span>bins_pt     = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">400.0</span>);
-    <span class="kw">let </span>bins_pc     = Uniform::new(<span class="number">30</span>, <span class="number">0.0</span>, <span class="number">30.0</span>);
-    <span class="kw">let </span>bins_pa     = Uniform::new(<span class="number">90</span>, <span class="number">0.0</span>, <span class="number">1800.0</span>);
-    <span class="kw">let </span>bins_t0     = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">200.0</span>);
-    <span class="kw">let </span>bins_edep   = Uniform::new(<span class="number">50</span>,<span class="number">0.0</span>,<span class="number">100.0</span>);
-    <span class="self">self</span>.pha_histo  = <span class="macro">ndhistogram!</span>(bins_ph.clone());
-    <span class="self">self</span>.pta_histo  = <span class="macro">ndhistogram!</span>(bins_pt.clone());
-    <span class="self">self</span>.pca_histo  = <span class="macro">ndhistogram!</span>(bins_pc.clone());
-    <span class="self">self</span>.phb_histo  = <span class="macro">ndhistogram!</span>(bins_ph);
-    <span class="self">self</span>.ptb_histo  = <span class="macro">ndhistogram!</span>(bins_pt);
-    <span class="self">self</span>.pcb_histo  = <span class="macro">ndhistogram!</span>(bins_pc);
-    <span class="self">self</span>.pa_histo   = <span class="macro">ndhistogram!</span>(bins_pa);
-    <span class="self">self</span>.t0_histo   = <span class="macro">ndhistogram!</span>(bins_t0);
-    <span class="self">self</span>.edep_histo = <span class="macro">ndhistogram!</span>(bins_edep);
+    <span class="kw">let </span>bins_ph    = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">200.0</span>);
+    <span class="kw">let </span>bins_pt    = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">400.0</span>);
+    <span class="kw">let </span>bins_pc    = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">500.0</span>);
+    <span class="kw">let </span>bins_pa    = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">200.0</span>);
+    <span class="kw">let </span>bins_t0    = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">200.0</span>);
+    <span class="self">self</span>.pha_histo = <span class="macro">ndhistogram!</span>(bins_ph.clone());
+    <span class="self">self</span>.pta_histo = <span class="macro">ndhistogram!</span>(bins_pt.clone());
+    <span class="self">self</span>.pca_histo = <span class="macro">ndhistogram!</span>(bins_pc.clone());
+    <span class="self">self</span>.phb_histo = <span class="macro">ndhistogram!</span>(bins_ph);
+    <span class="self">self</span>.ptb_histo = <span class="macro">ndhistogram!</span>(bins_pt);
+    <span class="self">self</span>.pcb_histo = <span class="macro">ndhistogram!</span>(bins_pc);
+    <span class="self">self</span>.pa_histo  = <span class="macro">ndhistogram!</span>(bins_pa);
+    <span class="self">self</span>.t0_histo  = <span class="macro">ndhistogram!</span>(bins_t0);
   }
 
   <span class="kw">pub fn </span>receive_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), SerializationError&gt; {  
@@ -544,9 +643,8 @@
         <span class="self">self</span>.ptb_histo.fill(<span class="kw-2">&amp;</span>hit.get_time_b());
         <span class="self">self</span>.pca_histo.fill(<span class="kw-2">&amp;</span>hit.get_charge_a());
         <span class="self">self</span>.pcb_histo.fill(<span class="kw-2">&amp;</span>hit.get_charge_b());
-        <span class="self">self</span>.t0_histo.fill(<span class="kw-2">&amp;</span>(hit.get_t0()));
-        <span class="self">self</span>.pa_histo.fill(<span class="kw-2">&amp;</span>(hit.get_pos_across()));
-        <span class="self">self</span>.edep_histo.fill(<span class="kw-2">&amp;</span>(hit.get_edep()));
+        <span class="self">self</span>.t0_histo.fill(<span class="kw-2">&amp;</span>(hit.t0 <span class="kw">as </span>f32));
+        <span class="self">self</span>.pa_histo.fill(<span class="kw-2">&amp;</span>(hit.pos_across <span class="kw">as </span>f32));
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
     }
@@ -585,29 +683,107 @@
 
         <span class="comment">// histograms
         </span><span class="kw">let </span>ph_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pha_histo);
-        <span class="kw">let </span>pha_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pha_histo, <span class="kw-2">&amp;</span>ph_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
-        <span class="kw">let </span>pha_chart  = histogram(pha_data, String::from(<span class="string">"Pulse height SideA [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        <span class="kw">let </span>pha_data   = clean_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pha_histo, <span class="kw-2">&amp;</span>ph_labels, <span class="number">20</span>); 
+        <span class="kw">let </span>pha_chart  = BarChart::default()
+          .block(Block::default().title(<span class="string">"Pulse height SideA [mV]"</span>).borders(Borders::ALL))
+          .data(pha_data.as_slice())
+          .bar_width(<span class="number">1</span>)
+          .bar_gap(<span class="number">1</span>)
+          <span class="comment">//.bar_style(Style::default().fg(Color::Blue))
+          </span>.bar_style(<span class="self">self</span>.theme.highlight_fg())
+          .value_style(
+            <span class="self">self</span>.theme.highlight_fg()
+            <span class="comment">//Style::default()
+            //.bg(Color::Blue)
+            </span>.add_modifier(Modifier::BOLD),
+          )
+          .style(<span class="self">self</span>.theme.background());
         frame.render_widget(pha_chart, plots_a[<span class="number">0</span>]);
-        <span class="kw">let </span>phb_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.phb_histo, <span class="kw-2">&amp;</span>ph_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
-        <span class="kw">let </span>phb_chart  = histogram(phb_data, String::from(<span class="string">"Pulse height SideB [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        <span class="kw">let </span>phb_data   = clean_data(<span class="kw-2">&amp;</span><span class="self">self</span>.phb_histo, <span class="kw-2">&amp;</span>ph_labels, <span class="number">20</span>); 
+        <span class="kw">let </span>phb_chart  = BarChart::default()
+          .block(Block::default().title(<span class="string">"Pulse height SideB [mV]"</span>).borders(Borders::ALL))
+          .data(phb_data.as_slice())
+          .bar_width(<span class="number">1</span>)
+          .bar_gap(<span class="number">1</span>)
+          <span class="comment">//.bar_style(Style::default().fg(Color::Blue))
+          </span>.bar_style(<span class="self">self</span>.theme.highlight_fg())
+          .value_style(
+            <span class="self">self</span>.theme.highlight_fg()
+            <span class="comment">//Style::default()
+            //.bg(Color::Blue)
+            </span>.add_modifier(Modifier::BOLD),
+          )
+          .style(<span class="self">self</span>.theme.background());
         frame.render_widget(phb_chart, plots_b[<span class="number">0</span>]);
         
         <span class="kw">let </span>pt_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pta_histo);
-        <span class="kw">let </span>pta_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pta_histo, <span class="kw-2">&amp;</span>pt_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
-        <span class="kw">let </span>pta_chart  = histogram(pta_data, String::from(<span class="string">"Pulse time SideA [a.u.]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        <span class="kw">let </span>pta_data   = clean_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pta_histo, <span class="kw-2">&amp;</span>pt_labels, <span class="number">20</span>); 
+        <span class="kw">let </span>pta_chart  = BarChart::default()
+          .block(Block::default().title(<span class="string">"Pulse time SideA [mV]"</span>).borders(Borders::ALL))
+          .data(pta_data.as_slice())
+          .bar_width(<span class="number">1</span>)
+          .bar_gap(<span class="number">1</span>)
+          <span class="comment">//.bar_style(Style::default().fg(Color::Blue))
+          </span>.bar_style(<span class="self">self</span>.theme.highlight_fg())
+          .value_style(
+            <span class="self">self</span>.theme.highlight_fg()
+            <span class="comment">//Style::default()
+            //.bg(Color::Blue)
+            </span>.add_modifier(Modifier::BOLD),
+          )
+          .style(<span class="self">self</span>.theme.background());
         frame.render_widget(pta_chart, plots_a[<span class="number">1</span>]);
 
-        <span class="kw">let </span>ptb_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.ptb_histo, <span class="kw-2">&amp;</span>pt_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
-        <span class="kw">let </span>ptb_chart  = histogram(ptb_data, String::from(<span class="string">"Pulse time SideB [a.u.]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        <span class="kw">let </span>ptb_data   = clean_data(<span class="kw-2">&amp;</span><span class="self">self</span>.ptb_histo, <span class="kw-2">&amp;</span>pt_labels, <span class="number">20</span>); 
+        <span class="kw">let </span>ptb_chart  = BarChart::default()
+          .block(Block::default().title(<span class="string">"Pulse time SideB (a.u.)"</span>).borders(Borders::ALL))
+          .data(ptb_data.as_slice())
+          .bar_width(<span class="number">1</span>)
+          .bar_gap(<span class="number">1</span>)
+          <span class="comment">//.bar_style(Style::default().fg(Color::Blue))
+          </span>.bar_style(<span class="self">self</span>.theme.highlight_fg())
+          .value_style(
+            <span class="self">self</span>.theme.highlight_fg()
+            <span class="comment">//Style::default()
+            //.bg(Color::Blue)
+            </span>.add_modifier(Modifier::BOLD),
+          )
+          .style(<span class="self">self</span>.theme.background());
         frame.render_widget(ptb_chart, plots_b[<span class="number">1</span>]);
         
         <span class="kw">let </span>pc_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pca_histo);
-        <span class="kw">let </span>pca_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pca_histo, <span class="kw-2">&amp;</span>pc_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
-        <span class="kw">let </span>pca_chart  = histogram(pca_data, String::from(<span class="string">"Pulse charge SideA [mC]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        <span class="kw">let </span>pca_data   = clean_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pca_histo, <span class="kw-2">&amp;</span>pc_labels, <span class="number">20</span>); 
+        <span class="kw">let </span>pca_chart  = BarChart::default()
+          .block(Block::default().title(<span class="string">"Pulse charge SideA [mC]"</span>).borders(Borders::ALL))
+          .data(pca_data.as_slice())
+          .bar_width(<span class="number">1</span>)
+          .bar_gap(<span class="number">1</span>)
+          <span class="comment">//.bar_style(Style::default().fg(Color::Blue))
+          </span>.bar_style(<span class="self">self</span>.theme.highlight_fg())
+          .value_style(
+            <span class="self">self</span>.theme.highlight_fg()
+            <span class="comment">//Style::default()
+            //.bg(Color::Blue)
+            </span>.add_modifier(Modifier::BOLD),
+          )
+          .style(<span class="self">self</span>.theme.background());
         frame.render_widget(pca_chart, plots_a[<span class="number">2</span>]);
 
-        <span class="kw">let </span>pcb_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pcb_histo, <span class="kw-2">&amp;</span>pc_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
-        <span class="kw">let </span>pcb_chart  = histogram(pcb_data, String::from(<span class="string">"Pulse charge SideB [mC]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        <span class="kw">let </span>pcb_data   = clean_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pcb_histo, <span class="kw-2">&amp;</span>pc_labels, <span class="number">20</span>); 
+        <span class="kw">let </span>pcb_chart  = BarChart::default()
+          .block(Block::default().title(<span class="string">"Pulse charge SideB [mC]"</span>).borders(Borders::ALL))
+          .data(pcb_data.as_slice())
+          .bar_width(<span class="number">1</span>)
+          .bar_gap(<span class="number">1</span>)
+          <span class="comment">//.bar_style(Style::default().fg(Color::Blue))
+          </span>.bar_style(<span class="self">self</span>.theme.highlight_fg())
+          .value_style(
+            <span class="self">self</span>.theme.highlight_fg()
+            <span class="comment">//Style::default()
+            //.bg(Color::Blue)
+            </span>.add_modifier(Modifier::BOLD),
+          )
+          .style(<span class="self">self</span>.theme.background());
         frame.render_widget(pcb_chart, plots_b[<span class="number">2</span>]);
         
       },
@@ -640,9 +816,8 @@
         <span class="kw">let </span>chunks = Layout::default()
           .direction(Direction::Vertical)
           .constraints(
-              [Constraint::Percentage(<span class="number">33</span>),
-               Constraint::Percentage(<span class="number">33</span>),
-               Constraint::Percentage(<span class="number">34</span>)].as_ref(),
+              [Constraint::Percentage(<span class="number">50</span>),
+               Constraint::Percentage(<span class="number">50</span>)].as_ref(),
           )
           .split(<span class="kw-2">*</span>main_window);
         <span class="kw">let </span>plots = Layout::default()
@@ -655,25 +830,59 @@
         
         <span class="comment">// histograms
         </span><span class="kw">let </span>t0_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.t0_histo);
-        <span class="kw">let </span>t0_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.t0_histo, <span class="kw-2">&amp;</span>t0_labels, <span class="number">10</span>, <span class="bool-val">false</span>); 
-        <span class="kw">let </span>t0_chart   = histogram(t0_data, String::from(<span class="string">"Reco. T0"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        <span class="kw">let </span>t0_data    = clean_data(<span class="kw-2">&amp;</span><span class="self">self</span>.t0_histo, <span class="kw-2">&amp;</span>t0_labels, <span class="number">40</span>); 
+        <span class="kw">let </span>t0_chart   = BarChart::default()
+          .block(Block::default().title(<span class="string">"Reco. T0"</span>).borders(Borders::ALL))
+          .data(t0_data.as_slice())
+          .bar_width(<span class="number">1</span>)
+          .bar_gap(<span class="number">1</span>)
+          <span class="comment">//.bar_style(Style::default().fg(Color::Blue))
+          </span>.bar_style(<span class="self">self</span>.theme.highlight_fg())
+          .value_style(
+            <span class="self">self</span>.theme.highlight_fg()
+            <span class="comment">//Style::default()
+            //.bg(Color::Blue)
+            </span>.add_modifier(Modifier::BOLD),
+          )
+          .style(<span class="self">self</span>.theme.background());
         frame.render_widget(t0_chart, plots[<span class="number">0</span>]);
 
-        <span class="kw">let </span>edep_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.edep_histo);
-        <span class="kw">let </span>edep_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.edep_histo, <span class="kw-2">&amp;</span>edep_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
-        <span class="kw">let </span>edep_chart   = histogram(edep_data, String::from(<span class="string">"Reco. EDep"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
-        frame.render_widget(edep_chart, plots[<span class="number">1</span>]);
-        
         <span class="comment">// position across paddle
-        </span><span class="kw">let </span>pa_labels = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pa_histo);
-        <span class="kw">let </span>pa_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pa_histo, <span class="kw-2">&amp;</span>pa_labels, <span class="number">20</span>, <span class="bool-val">false</span>); 
-        <span class="kw">let </span>pa_chart  = histogram(pa_data, String::from(<span class="string">"Position accross paddle"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
-        frame.render_widget(pa_chart, chunks[<span class="number">1</span>]);
+        </span><span class="kw">let </span>pa_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pa_histo);
+        <span class="kw">let </span>pa_data   = clean_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pa_histo, <span class="kw-2">&amp;</span>pa_labels, <span class="number">180</span>); 
+        <span class="kw">let </span>pa_chart  = BarChart::default()
+          .block(Block::default().title(<span class="string">"Pulse charge SideA [mC]"</span>).borders(Borders::ALL))
+          .data(pa_data.as_slice())
+          .bar_width(<span class="number">1</span>)
+          .bar_gap(<span class="number">1</span>)
+          <span class="comment">//.bar_style(Style::default().fg(Color::Blue))
+          </span>.bar_style(<span class="self">self</span>.theme.highlight_fg())
+          .value_style(
+            <span class="self">self</span>.theme.highlight_fg()
+            <span class="comment">//Style::default()
+            //.bg(Color::Blue)
+            </span>.add_modifier(Modifier::BOLD),
+          )
+          .style(<span class="self">self</span>.theme.background());
+        frame.render_widget(pa_chart, plots[<span class="number">1</span>]);
         
         <span class="kw">let </span>pid_labels = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pid_histo);
-        <span class="kw">let </span>pid_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pid_histo, <span class="kw-2">&amp;</span>pid_labels, <span class="number">10</span>, <span class="bool-val">true</span>); 
-        <span class="kw">let </span>pid_chart  = histogram(pid_data, String::from(<span class="string">"Paddle ID"</span>), <span class="number">3</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
-        frame.render_widget(pid_chart, chunks[<span class="number">2</span>]);
+        <span class="kw">let </span>pid_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pid_histo, <span class="kw-2">&amp;</span>pid_labels, <span class="number">10</span>); 
+        <span class="kw">let </span>pid_chart  = BarChart::default()
+          .block(Block::default().title(<span class="string">"Paddle ID"</span>).borders(Borders::ALL))
+          .data(pid_data.as_slice())
+          .bar_width(<span class="number">3</span>)
+          .bar_gap(<span class="number">0</span>)
+          <span class="comment">//.bar_style(Style::default().fg(Color::Blue))
+          </span>.bar_style(<span class="self">self</span>.theme.highlight_fg())
+          .value_style(
+            <span class="self">self</span>.theme.highlight_fg()
+            <span class="comment">//Style::default()
+            //.bg(Color::Blue)
+            </span>.add_modifier(Modifier::BOLD),
+          )
+          .style(<span class="self">self</span>.theme.background());
+        frame.render_widget(pid_chart, chunks[<span class="number">1</span>]);
       },
       TofHitView::SelectPaddle =&gt; {
         <span class="kw">let </span>list_chunks = Layout::default()
@@ -728,6 +937,7 @@
         frame.render_stateful_widget(paddle_select_list, list_chunks[<span class="number">0</span>], <span class="kw-2">&amp;mut </span><span class="self">self</span>.pl_state );
       }
     }
+
   }
 }
 </code></pre></div></section></main></body></html>

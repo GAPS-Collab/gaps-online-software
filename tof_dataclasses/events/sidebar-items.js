@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["EventStatus"],"mod":["data_type","master_trigger","rb_event","rb_eventmemoryview","tof_event","tof_hit"]};
+window.SIDEBAR_ITEMS = {"mod":["data_type","master_trigger","rb_event","rb_eventmemoryview","tof_event","tof_hit"]};

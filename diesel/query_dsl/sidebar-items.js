@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["methods"],"trait":["BelongingToDsl","CombineDsl","JoinOnDsl","QueryDsl","RunQueryDsl","SaveChangesDsl","UpdateAndFetchResults"]};

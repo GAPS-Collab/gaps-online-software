@@ -28,7 +28,7 @@
   <td id="projectlogo"><img alt="Logo" src="GAPSLOGO_2023_ico.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">gaps-online-software
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.9</span>
    </div>
    <div id="projectbrief">online software for the TOF system for the GAPS experiment</div>
   </td>
@@ -98,7 +98,9 @@ $(document).ready(function(){initNavTree('structRBCalibration.html',''); initRes
   <tr><td class="entry"><a class="el" href="structRBCalibration.html#ad3b079190ff34f2575d56a8baf40f3c9">from_file</a>(const String &amp;filename, bool discard_events=true)</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structRBCalibration.html#a3a13e042d18ab68914ebe48dd1ea1783">from_txtfile</a>(const String &amp;filename)</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
   <tr bgcolor="#f0f0f0"><td class="entry"><b>HEAD</b> (defined in <a class="el" href="structRBCalibration.html">RBCalibration</a>)</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>nanoseconds</b>(const RBEvent &amp;event) const (defined in <a class="el" href="structRBCalibration.html">RBCalibration</a>)</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
+  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>nanoseconds</b>(const RBEventMemoryView &amp;event) const (defined in <a class="el" href="structRBCalibration.html">RBCalibration</a>)</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
+  <tr bgcolor="#f0f0f0"><td class="entry"><b>nanoseconds</b>(const RBEvent &amp;event) const (defined in <a class="el" href="structRBCalibration.html">RBCalibration</a>)</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
+  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>nanoseconds</b>(const RBEventMemoryView &amp;event, const u8 channel) const (defined in <a class="el" href="structRBCalibration.html">RBCalibration</a>)</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
   <tr bgcolor="#f0f0f0"><td class="entry"><b>nanoseconds</b>(const RBEvent &amp;event, const u8 channel) const (defined in <a class="el" href="structRBCalibration.html">RBCalibration</a>)</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structRBCalibration.html#a71265fb6bc6cd97c69bc54923cc06f0e">noi_data</a></td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="structRBCalibration.html#af877b4807be2918e61d3062ea49526b5">rb_id</a></td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
@@ -113,7 +115,9 @@ $(document).ready(function(){initNavTree('structRBCalibration.html',''); initRes
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>v_incs</b> (defined in <a class="el" href="structRBCalibration.html">RBCalibration</a>)</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
   <tr bgcolor="#f0f0f0"><td class="entry"><b>v_offsets</b> (defined in <a class="el" href="structRBCalibration.html">RBCalibration</a>)</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="structRBCalibration.html#a7b2b7e4fd0b4e106a8ec53d0c019be3a">vcal_data</a></td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="structRBCalibration.html#adfab387bd6bebb965be054e754076452">voltages</a>(const RBEvent &amp;event, bool spike_cleaning=false) const</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="structRBCalibration.html#ac1986aa0fb98cfd5010a7e67af1fe160">voltages</a>(const RBEventMemoryView &amp;event, bool spike_cleaning=false) const</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="structRBCalibration.html#adfab387bd6bebb965be054e754076452">voltages</a>(const RBEvent &amp;event, bool spike_cleaning=false) const</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
+  <tr bgcolor="#f0f0f0"><td class="entry"><b>voltages</b>(const RBEventMemoryView &amp;event, const u8 channel) const (defined in <a class="el" href="structRBCalibration.html">RBCalibration</a>)</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>voltages</b>(const RBEvent &amp;event, const u8 channel) const (defined in <a class="el" href="structRBCalibration.html">RBCalibration</a>)</td><td class="entry"><a class="el" href="structRBCalibration.html">RBCalibration</a></td><td class="entry"></td></tr>
 </table></div><!-- contents -->
 </div><!-- doc-content -->

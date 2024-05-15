@@ -370,7 +370,7 @@
 <span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 #[test]
 </span><span class="kw">fn </span>serialization_runconfig() {
-  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+  <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">100 </span>{
     <span class="kw">let </span>cfg  = RunConfig::from_random();
     <span class="kw">let </span>test = RunConfig::from_bytestream(<span class="kw-2">&amp;</span>cfg.to_bytestream(), <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
     <span class="macro">assert_eq!</span>(cfg, test);

@@ -217,100 +217,6 @@
 <a href="#215" id="215">215</a>
 <a href="#216" id="216">216</a>
 <a href="#217" id="217">217</a>
-<a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
-<a href="#220" id="220">220</a>
-<a href="#221" id="221">221</a>
-<a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
-<a href="#224" id="224">224</a>
-<a href="#225" id="225">225</a>
-<a href="#226" id="226">226</a>
-<a href="#227" id="227">227</a>
-<a href="#228" id="228">228</a>
-<a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
-<a href="#237" id="237">237</a>
-<a href="#238" id="238">238</a>
-<a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
-<a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
-<a href="#244" id="244">244</a>
-<a href="#245" id="245">245</a>
-<a href="#246" id="246">246</a>
-<a href="#247" id="247">247</a>
-<a href="#248" id="248">248</a>
-<a href="#249" id="249">249</a>
-<a href="#250" id="250">250</a>
-<a href="#251" id="251">251</a>
-<a href="#252" id="252">252</a>
-<a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
-<a href="#255" id="255">255</a>
-<a href="#256" id="256">256</a>
-<a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
-<a href="#260" id="260">260</a>
-<a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
-<a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(unused)]
 </span><span class="kw">use </span>sysinfo::{DiskExt, System, SystemExt};
 <span class="kw">use </span>i2cdev::core::<span class="kw-2">*</span>;
@@ -414,15 +320,11 @@
                     sub_board: u8::MAX,
                     lol: u8::MAX,
                     lol_stable: u8::MAX,
-                    <span class="comment">// trig_rate: u16::MAX,
-                    </span>fw_version: <span class="string">"0.0.0"</span>.to_string(),
-                    fw_hash: <span class="string">"XXXXX"</span>.to_string(),
+                    trig_rate: u16::MAX,
+                    fw_version: <span class="string">"0.0.0"</span>.to_string(),
                     uptime: u32::MAX,
-                    <span class="comment">// sd_usage: u8::MAX,
-                    </span>input_mode: <span class="string">"Input Mode Error"</span>.to_string(),
-                    rat_num: u8::MAX,
-                    rat_pos: u8::MAX,
-                    rb_pos: u8::MAX,
+                    sd_usage: u8::MAX,
+                    input_mode: <span class="string">"Input Mode Error"</span>.to_string(),
                 }
             }
         }
@@ -433,16 +335,12 @@
         <span class="kw">let </span>sub_board = <span class="self">Self</span>::read_sub_board()<span class="question-mark">?</span>;
         <span class="kw">let </span>lol = <span class="self">Self</span>::read_lol()<span class="question-mark">?</span>;
         <span class="kw">let </span>lol_stable = <span class="self">Self</span>::read_lol_stable()<span class="question-mark">?</span>;
-        <span class="comment">// let trig_rate = Self::read_trig_rate()?;
-        // Additional Info
+        <span class="kw">let </span>trig_rate = <span class="self">Self</span>::read_trig_rate()<span class="question-mark">?</span>;
+        <span class="comment">// Additional Info
         </span><span class="kw">let </span>fw_version = <span class="self">Self</span>::read_fw_version()<span class="question-mark">?</span>;
-        <span class="kw">let </span>fw_hash = <span class="self">Self</span>::read_fw_hash()<span class="question-mark">?</span>;
         <span class="kw">let </span>uptime = <span class="self">Self</span>::read_uptime();
-        <span class="comment">// let sd_usage = Self::read_sd_usage();
-        </span><span class="kw">let </span>input_mode = <span class="self">Self</span>::read_input_mode()<span class="question-mark">?</span>;
-        <span class="kw">let </span>rat_num = <span class="self">Self</span>::read_rat_num()<span class="question-mark">?</span>;
-        <span class="kw">let </span>rat_pos = <span class="self">Self</span>::read_rat_pos()<span class="question-mark">?</span>;
-        <span class="kw">let </span>rb_pos = <span class="self">Self</span>::read_rb_pos()<span class="question-mark">?</span>;
+        <span class="kw">let </span>sd_usage = <span class="self">Self</span>::read_sd_usage();
+        <span class="kw">let </span>input_mode = <span class="self">Self</span>::read_input_mode()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(
             RBInfoDebug {
@@ -450,15 +348,11 @@
                 sub_board,
                 lol,
                 lol_stable,
-                <span class="comment">// trig_rate,
-                </span>fw_version,
-                fw_hash,
+                trig_rate,
+                fw_version,
                 uptime,
-                <span class="comment">// sd_usage,
-                </span>input_mode,
-                rat_num,
-                rat_pos,
-                rb_pos,
+                sd_usage,
+                input_mode,
             }
         )
     }
@@ -498,12 +392,12 @@
 
         <span class="prelude-val">Ok</span>(lol_stable)
     }
-    <span class="comment">// pub fn read_trig_rate() -&gt; Result&lt;u16, RBInfoError&gt; {
-    //     let trig_rate = read_control_reg(MT_TRIGGER_RATE)? as u16;
+    <span class="kw">pub fn </span>read_trig_rate() -&gt; <span class="prelude-ty">Result</span>&lt;u16, RBInfoError&gt; {
+        <span class="kw">let </span>trig_rate = read_control_reg(MT_TRIGGER_RATE)<span class="question-mark">? </span><span class="kw">as </span>u16;
 
-    //     Ok(trig_rate)
-    // }
-    </span><span class="kw">pub fn </span>read_fw_version() -&gt; <span class="prelude-ty">Result</span>&lt;String, RBInfoError&gt; {
+        <span class="prelude-val">Ok</span>(trig_rate)
+    }
+    <span class="kw">pub fn </span>read_fw_version() -&gt; <span class="prelude-ty">Result</span>&lt;String, RBInfoError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>fw_version_raw = read_control_reg(GLOBAL_VER)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>fw_version = <span class="macro">format!</span>(<span class="string">"{:08X}"</span>, fw_version_raw);
@@ -514,111 +408,29 @@
 
         <span class="prelude-val">Ok</span>(fw_version)
     }
-    <span class="kw">pub fn </span>read_fw_hash() -&gt; <span class="prelude-ty">Result</span>&lt;String, RBInfoError&gt; {
-        <span class="kw">let </span>fw_hash = <span class="macro">format!</span>(<span class="string">"{:02X}"</span>,read_control_reg(GLOBAL_SHA)<span class="question-mark">?</span>);
-
-        <span class="prelude-val">Ok</span>((fw_hash))
-    }
     <span class="kw">pub fn </span>read_uptime() -&gt; u32 {
         <span class="kw">let </span>sys = System::new_all();
         <span class="kw">let </span>uptime = sys.uptime();
 
         <span class="kw">return </span>uptime <span class="kw">as </span>u32
     }
-    <span class="comment">// pub fn read_sd_usage() -&gt; u8 {
-    //     let sys = System::new_all();
+    <span class="kw">pub fn </span>read_sd_usage() -&gt; u8 {
+        <span class="kw">let </span>sys = System::new_all();
 
-    //     let mut available_space = Default::default();
-    //     let mut total_space = Default::default();
-    //     for disk in sys.disks() {
-    //         available_space = disk.available_space();
-    //         total_space = disk.total_space();
-    //     }
+        <span class="kw">let </span><span class="kw-2">mut </span>available_space = Default::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>total_space = Default::default();
+        <span class="kw">for </span>disk <span class="kw">in </span>sys.disks() {
+            available_space = disk.available_space();
+            total_space = disk.total_space();
+        }
 
-    //     let sd_usage: f32 = (1.0 - (available_space as f32 / total_space as f32)) * 100.0;
+        <span class="kw">let </span>sd_usage: f32 = (<span class="number">1.0 </span>- (available_space <span class="kw">as </span>f32 / total_space <span class="kw">as </span>f32)) * <span class="number">100.0</span>;
 
-    //     return sd_usage as u8
-    // }
-    </span><span class="kw">pub fn </span>read_input_mode() -&gt; <span class="prelude-ty">Result</span>&lt;String, RBInfoError&gt; {
+        <span class="kw">return </span>sd_usage <span class="kw">as </span>u8
+    }
+    <span class="kw">pub fn </span>read_input_mode() -&gt; <span class="prelude-ty">Result</span>&lt;String, RBInfoError&gt; {
         <span class="kw">let </span>input_mode = rb_mode::read_input_mode()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>((input_mode))
-    }
-    <span class="kw">pub fn </span>read_rat_num() -&gt; <span class="prelude-ty">Result</span>&lt;u8, RBInfoError&gt; {
-        <span class="kw">let </span>board_id = <span class="self">Self</span>::read_board_id()<span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>rat_num: u8 = Default::default();
-        <span class="kw">match </span>board_id {
-            <span class="number">15 </span>| <span class="number">3 </span>=&gt; rat_num = <span class="number">1</span>,
-            <span class="number">14 </span>| <span class="number">32 </span>=&gt; rat_num = <span class="number">2</span>,
-            <span class="number">29 </span>| <span class="number">31 </span>=&gt; rat_num = <span class="number">3</span>,
-            <span class="number">13 </span>| <span class="number">35 </span>=&gt; rat_num = <span class="number">4</span>,
-            <span class="number">21 </span>| <span class="number">23 </span>=&gt; rat_num = <span class="number">5</span>,
-            <span class="number">24 </span>| <span class="number">27 </span>=&gt; rat_num = <span class="number">6</span>,
-            <span class="number">19 </span>| <span class="number">20 </span>=&gt; rat_num = <span class="number">7</span>,
-            <span class="number">25 </span>| <span class="number">16 </span>=&gt; rat_num = <span class="number">8</span>,
-            <span class="number">30 </span>| <span class="number">8 </span>=&gt; rat_num = <span class="number">9</span>,
-            <span class="number">11 </span>| <span class="number">1 </span>=&gt; rat_num = <span class="number">10</span>,
-            <span class="number">22 </span>| <span class="number">26 </span>=&gt; rat_num = <span class="number">11</span>,
-            <span class="number">40 </span>| <span class="number">39 </span>=&gt; rat_num = <span class="number">12</span>,
-            <span class="number">18 </span>| <span class="number">9 </span>=&gt; rat_num = <span class="number">13</span>,
-            <span class="number">42 </span>| <span class="number">41 </span>=&gt; rat_num = <span class="number">14</span>,
-            <span class="number">4 </span>| <span class="number">2 </span>=&gt; rat_num = <span class="number">15</span>,
-            <span class="number">44 </span>| <span class="number">46 </span>=&gt; rat_num = <span class="number">16</span>,
-            <span class="number">17 </span>| <span class="number">7 </span>=&gt; rat_num = <span class="number">17</span>,
-            <span class="number">34 </span>| <span class="number">33 </span>=&gt; rat_num = <span class="number">18</span>,
-            <span class="number">6 </span>| <span class="number">36 </span>=&gt; rat_num = <span class="number">19</span>,
-            <span class="number">5 </span>| <span class="number">28 </span>=&gt; rat_num = <span class="number">20</span>,
-            <span class="number">48 </span>| <span class="number">47 </span>=&gt; rat_num = <span class="number">21</span>,
-            <span class="number">49 </span>| <span class="number">37 </span>=&gt; rat_num = <span class="number">22</span>,
-            <span class="kw">_ </span>=&gt; rat_num = <span class="number">0</span>,
-        }
-
-        <span class="prelude-val">Ok</span>((rat_num))
-    }
-    <span class="kw">pub fn </span>read_rat_pos() -&gt; <span class="prelude-ty">Result</span>&lt;u8, RBInfoError&gt; {
-        <span class="kw">let </span>rat_num = <span class="self">Self</span>::read_rat_num()<span class="question-mark">?</span>;
-        <span class="comment">/*
-        rat_pos = 0 =&gt; Not Flight RAT
-        rat_pos = 1 =&gt; CBE RAT
-        rat_pos = 2 =&gt; UMB RAT
-        rat_pos = 3 =&gt; COR RAT
-        rat_pos = 4 =&gt; CBE/COR RAT
-        */
-        </span><span class="kw">let </span><span class="kw-2">mut </span>rat_pos: u8 = Default::default();
-        <span class="kw">match </span>rat_num {
-            <span class="number">1 </span>=&gt; rat_pos = <span class="number">2</span>,
-            <span class="number">2 </span>=&gt; rat_pos = <span class="number">2</span>,
-            <span class="number">3 </span>=&gt; rat_pos = <span class="number">2</span>,
-            <span class="number">4 </span>=&gt; rat_pos = <span class="number">2</span>,
-            <span class="number">5 </span>=&gt; rat_pos = <span class="number">2</span>,
-            <span class="number">6 </span>=&gt; rat_pos = <span class="number">2</span>,
-            <span class="number">7 </span>=&gt; rat_pos = <span class="number">4</span>,
-            <span class="number">8 </span>=&gt; rat_pos = <span class="number">1</span>,
-            <span class="number">9 </span>=&gt; rat_pos = <span class="number">4</span>,
-            <span class="number">10 </span>=&gt; rat_pos = <span class="number">4</span>,
-            <span class="number">11 </span>=&gt; rat_pos = <span class="number">4</span>,
-            <span class="number">12 </span>=&gt; rat_pos = <span class="number">1</span>,
-            <span class="number">13 </span>=&gt; rat_pos = <span class="number">4</span>,
-            <span class="number">14 </span>=&gt; rat_pos = <span class="number">4</span>,
-            <span class="number">15 </span>=&gt; rat_pos = <span class="number">4</span>,
-            <span class="number">16 </span>=&gt; rat_pos = <span class="number">1</span>,
-            <span class="number">17 </span>=&gt; rat_pos = <span class="number">4</span>,
-            <span class="number">18 </span>=&gt; rat_pos = <span class="number">3</span>,
-            <span class="number">19 </span>=&gt; rat_pos = <span class="number">1</span>,
-            <span class="number">20 </span>=&gt; rat_pos = <span class="number">3</span>,
-            <span class="kw">_ </span>=&gt; rat_pos = <span class="number">0</span>,
-        }
-
-        <span class="prelude-val">Ok</span>((rat_pos))
-    }
-    <span class="comment">/*
-    rb_pos = 0 =&gt; Not in RAT
-    rb_pos = 1 =&gt; RB1
-    rb_pos = 2 =&gt; RB2
-    */
-    </span><span class="kw">pub fn </span>read_rb_pos() -&gt; <span class="prelude-ty">Result</span>&lt;u8, RBInfoError&gt; {
-        <span class="kw">let </span>rb_pos = <span class="self">Self</span>::read_sub_board()<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>((rb_pos))
     }
 }</code></pre></div></section></main></body></html>

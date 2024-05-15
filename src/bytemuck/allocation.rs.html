@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bytemuck-1.15.0/src/allocation.rs`."><title>allocation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bytemuck" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bytemuck-1.16.0/src/allocation.rs`."><title>allocation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bytemuck" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../bytemuck/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -882,6 +882,35 @@
 <a href="#880" id="880">880</a>
 <a href="#881" id="881">881</a>
 <a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg(feature = <span class="string">"extern_crate_alloc"</span>)]
 
 </span><span class="doccomment">//! Stuff to boost things in the `alloc` crate.
@@ -903,15 +932,18 @@
   vec,
   vec::Vec,
 };
-<span class="kw">use </span>core::ops::{Deref, DerefMut};
+<span class="kw">use </span>core::{
+  mem::ManuallyDrop,
+  ops::{Deref, DerefMut},
+};
 
-<span class="doccomment">/// As [`try_cast_box`](try_cast_box), but unwraps for you.
+<span class="doccomment">/// As [`try_cast_box`], but unwraps for you.
 </span><span class="attr">#[inline]
 </span><span class="kw">pub fn </span>cast_box&lt;A: NoUninit, B: AnyBitPattern&gt;(input: Box&lt;A&gt;) -&gt; Box&lt;B&gt; {
   try_cast_box(input).map_err(|(e, _v)| e).unwrap()
 }
 
-<span class="doccomment">/// Attempts to cast the content type of a [`Box`](alloc::boxed::Box).
+<span class="doccomment">/// Attempts to cast the content type of a [`Box`].
 ///
 /// On failure you get back an error along with the starting `Box`.
 ///
@@ -1022,12 +1054,12 @@
   }
 }
 
-<span class="doccomment">/// As [`try_zeroed_slice_box`](try_zeroed_slice_box), but unwraps for you.
+<span class="doccomment">/// As [`try_zeroed_slice_box`], but unwraps for you.
 </span><span class="kw">pub fn </span>zeroed_slice_box&lt;T: Zeroable&gt;(length: usize) -&gt; Box&lt;[T]&gt; {
   try_zeroed_slice_box(length).unwrap()
 }
 
-<span class="doccomment">/// As [`try_cast_slice_box`](try_cast_slice_box), but unwraps for you.
+<span class="doccomment">/// As [`try_cast_slice_box`], but unwraps for you.
 </span><span class="attr">#[inline]
 </span><span class="kw">pub fn </span>cast_slice_box&lt;A: NoUninit, B: AnyBitPattern&gt;(
   input: Box&lt;[A]&gt;,
@@ -1078,13 +1110,13 @@
   }
 }
 
-<span class="doccomment">/// As [`try_cast_vec`](try_cast_vec), but unwraps for you.
+<span class="doccomment">/// As [`try_cast_vec`], but unwraps for you.
 </span><span class="attr">#[inline]
 </span><span class="kw">pub fn </span>cast_vec&lt;A: NoUninit, B: AnyBitPattern&gt;(input: Vec&lt;A&gt;) -&gt; Vec&lt;B&gt; {
   try_cast_vec(input).map_err(|(e, _v)| e).unwrap()
 }
 
-<span class="doccomment">/// Attempts to cast the content type of a [`Vec`](alloc::vec::Vec).
+<span class="doccomment">/// Attempts to cast the content type of a [`Vec`].
 ///
 /// On failure you get back an error along with the starting `Vec`.
 ///
@@ -1170,7 +1202,7 @@
 </span><span class="kw">pub fn </span>pod_collect_to_vec&lt;A: NoUninit, B: NoUninit + AnyBitPattern&gt;(
   src: <span class="kw-2">&amp;</span>[A],
 ) -&gt; Vec&lt;B&gt; {
-  <span class="kw">let </span>src_size = size_of_val(src);
+  <span class="kw">let </span>src_size = core::mem::size_of_val(src);
   <span class="comment">// Note(Lokathor): dst_count is rounded up so that the dest will always be at
   // least as many bytes as the src.
   </span><span class="kw">let </span>dst_count = src_size / size_of::&lt;B&gt;()
@@ -1183,7 +1215,7 @@
   dst
 }
 
-<span class="doccomment">/// As [`try_cast_rc`](try_cast_rc), but unwraps for you.
+<span class="doccomment">/// As [`try_cast_rc`], but unwraps for you.
 </span><span class="attr">#[inline]
 </span><span class="kw">pub fn </span>cast_rc&lt;A: NoUninit + AnyBitPattern, B: NoUninit + AnyBitPattern&gt;(
   input: Rc&lt;A&gt;,
@@ -1191,7 +1223,7 @@
   try_cast_rc(input).map_err(|(e, _v)| e).unwrap()
 }
 
-<span class="doccomment">/// Attempts to cast the content type of a [`Rc`](alloc::rc::Rc).
+<span class="doccomment">/// Attempts to cast the content type of a [`Rc`].
 ///
 /// On failure you get back an error along with the starting `Rc`.
 ///
@@ -1219,7 +1251,7 @@
   }
 }
 
-<span class="doccomment">/// As [`try_cast_arc`](try_cast_arc), but unwraps for you.
+<span class="doccomment">/// As [`try_cast_arc`], but unwraps for you.
 </span><span class="attr">#[inline]
 #[cfg(target_has_atomic = <span class="string">"ptr"</span>)]
 </span><span class="kw">pub fn </span>cast_arc&lt;A: NoUninit + AnyBitPattern, B: NoUninit + AnyBitPattern&gt;(
@@ -1228,7 +1260,7 @@
   try_cast_arc(input).map_err(|(e, _v)| e).unwrap()
 }
 
-<span class="doccomment">/// Attempts to cast the content type of a [`Arc`](alloc::sync::Arc).
+<span class="doccomment">/// Attempts to cast the content type of a [`Arc`].
 ///
 /// On failure you get back an error along with the starting `Arc`.
 ///
@@ -1260,7 +1292,7 @@
   }
 }
 
-<span class="doccomment">/// As [`try_cast_slice_rc`](try_cast_slice_rc), but unwraps for you.
+<span class="doccomment">/// As [`try_cast_slice_rc`], but unwraps for you.
 </span><span class="attr">#[inline]
 </span><span class="kw">pub fn </span>cast_slice_rc&lt;
   A: NoUninit + AnyBitPattern,
@@ -1322,7 +1354,7 @@
   }
 }
 
-<span class="doccomment">/// As [`try_cast_slice_arc`](try_cast_slice_arc), but unwraps for you.
+<span class="doccomment">/// As [`try_cast_slice_arc`], but unwraps for you.
 </span><span class="attr">#[inline]
 #[cfg(target_has_atomic = <span class="string">"ptr"</span>)]
 </span><span class="kw">pub fn </span>cast_slice_arc&lt;
@@ -1396,7 +1428,7 @@
     </span><span class="self">Self</span>: Sized,
     Inner: Sized,
   {
-    <span class="kw">let </span><span class="kw-2">mut </span>s = core::mem::ManuallyDrop::new(s);
+    <span class="kw">let </span><span class="kw-2">mut </span>s = ManuallyDrop::new(s);
 
     <span class="kw">let </span>length = s.len();
     <span class="kw">let </span>capacity = s.capacity();
@@ -1415,7 +1447,12 @@
   /// type.
   </span><span class="attr">#[inline]
   </span><span class="kw">fn </span>wrap_box(s: Box&lt;Inner&gt;) -&gt; Box&lt;<span class="self">Self</span>&gt; {
-    <span class="macro">assert!</span>(size_of::&lt;<span class="kw-2">*mut </span>Inner&gt;() == size_of::&lt;<span class="kw-2">*mut </span><span class="self">Self</span>&gt;());
+    <span class="comment">// The unsafe contract requires that these two have
+    // identical representations, and thus identical pointer metadata.
+    // Assert that Self and Inner have the same pointer size,
+    // which is the best we can do to assert their metadata is the same type
+    // on stable.
+    </span><span class="macro">assert!</span>(size_of::&lt;<span class="kw-2">*mut </span>Inner&gt;() == size_of::&lt;<span class="kw-2">*mut </span><span class="self">Self</span>&gt;());
 
     <span class="kw">unsafe </span>{
       <span class="comment">// A pointer cast doesn't work here because rustc can't tell that
@@ -1435,11 +1472,15 @@
     }
   }
 
-  <span class="doccomment">/// Convert an [`Rc`](alloc::rc::Rc) to the inner type into an `Rc` to the
-  /// wrapper type.
+  <span class="doccomment">/// Convert an [`Rc`] to the inner type into an `Rc` to the wrapper type.
   </span><span class="attr">#[inline]
   </span><span class="kw">fn </span>wrap_rc(s: Rc&lt;Inner&gt;) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
-    <span class="macro">assert!</span>(size_of::&lt;<span class="kw-2">*mut </span>Inner&gt;() == size_of::&lt;<span class="kw-2">*mut </span><span class="self">Self</span>&gt;());
+    <span class="comment">// The unsafe contract requires that these two have
+    // identical representations, and thus identical pointer metadata.
+    // Assert that Self and Inner have the same pointer size,
+    // which is the best we can do to assert their metadata is the same type
+    // on stable.
+    </span><span class="macro">assert!</span>(size_of::&lt;<span class="kw-2">*mut </span>Inner&gt;() == size_of::&lt;<span class="kw-2">*mut </span><span class="self">Self</span>&gt;());
 
     <span class="kw">unsafe </span>{
       <span class="comment">// A pointer cast doesn't work here because rustc can't tell that
@@ -1457,12 +1498,16 @@
     }
   }
 
-  <span class="doccomment">/// Convert an [`Arc`](alloc::sync::Arc) to the inner type into an `Arc` to
-  /// the wrapper type.
+  <span class="doccomment">/// Convert an [`Arc`] to the inner type into an `Arc` to the wrapper type.
   </span><span class="attr">#[inline]
   #[cfg(target_has_atomic = <span class="string">"ptr"</span>)]
   </span><span class="kw">fn </span>wrap_arc(s: Arc&lt;Inner&gt;) -&gt; Arc&lt;<span class="self">Self</span>&gt; {
-    <span class="macro">assert!</span>(size_of::&lt;<span class="kw-2">*mut </span>Inner&gt;() == size_of::&lt;<span class="kw-2">*mut </span><span class="self">Self</span>&gt;());
+    <span class="comment">// The unsafe contract requires that these two have
+    // identical representations, and thus identical pointer metadata.
+    // Assert that Self and Inner have the same pointer size,
+    // which is the best we can do to assert their metadata is the same type
+    // on stable.
+    </span><span class="macro">assert!</span>(size_of::&lt;<span class="kw-2">*mut </span>Inner&gt;() == size_of::&lt;<span class="kw-2">*mut </span><span class="self">Self</span>&gt;());
 
     <span class="kw">unsafe </span>{
       <span class="comment">// A pointer cast doesn't work here because rustc can't tell that
@@ -1486,7 +1531,7 @@
     </span><span class="self">Self</span>: Sized,
     Inner: Sized,
   {
-    <span class="kw">let </span><span class="kw-2">mut </span>s = core::mem::ManuallyDrop::new(s);
+    <span class="kw">let </span><span class="kw-2">mut </span>s = ManuallyDrop::new(s);
 
     <span class="kw">let </span>length = s.len();
     <span class="kw">let </span>capacity = s.capacity();
@@ -1505,7 +1550,12 @@
   /// type.
   </span><span class="attr">#[inline]
   </span><span class="kw">fn </span>peel_box(s: Box&lt;<span class="self">Self</span>&gt;) -&gt; Box&lt;Inner&gt; {
-    <span class="macro">assert!</span>(size_of::&lt;<span class="kw-2">*mut </span>Inner&gt;() == size_of::&lt;<span class="kw-2">*mut </span><span class="self">Self</span>&gt;());
+    <span class="comment">// The unsafe contract requires that these two have
+    // identical representations, and thus identical pointer metadata.
+    // Assert that Self and Inner have the same pointer size,
+    // which is the best we can do to assert their metadata is the same type
+    // on stable.
+    </span><span class="macro">assert!</span>(size_of::&lt;<span class="kw-2">*mut </span>Inner&gt;() == size_of::&lt;<span class="kw-2">*mut </span><span class="self">Self</span>&gt;());
 
     <span class="kw">unsafe </span>{
       <span class="comment">// A pointer cast doesn't work here because rustc can't tell that
@@ -1525,11 +1575,15 @@
     }
   }
 
-  <span class="doccomment">/// Convert an [`Rc`](alloc::rc::Rc) to the wrapper type into an `Rc` to the
-  /// inner type.
+  <span class="doccomment">/// Convert an [`Rc`] to the wrapper type into an `Rc` to the inner type.
   </span><span class="attr">#[inline]
   </span><span class="kw">fn </span>peel_rc(s: Rc&lt;<span class="self">Self</span>&gt;) -&gt; Rc&lt;Inner&gt; {
-    <span class="macro">assert!</span>(size_of::&lt;<span class="kw-2">*mut </span>Inner&gt;() == size_of::&lt;<span class="kw-2">*mut </span><span class="self">Self</span>&gt;());
+    <span class="comment">// The unsafe contract requires that these two have
+    // identical representations, and thus identical pointer metadata.
+    // Assert that Self and Inner have the same pointer size,
+    // which is the best we can do to assert their metadata is the same type
+    // on stable.
+    </span><span class="macro">assert!</span>(size_of::&lt;<span class="kw-2">*mut </span>Inner&gt;() == size_of::&lt;<span class="kw-2">*mut </span><span class="self">Self</span>&gt;());
 
     <span class="kw">unsafe </span>{
       <span class="comment">// A pointer cast doesn't work here because rustc can't tell that
@@ -1547,12 +1601,16 @@
     }
   }
 
-  <span class="doccomment">/// Convert an [`Arc`](alloc::sync::Arc) to the wrapper type into an `Arc` to
-  /// the inner type.
+  <span class="doccomment">/// Convert an [`Arc`] to the wrapper type into an `Arc` to the inner type.
   </span><span class="attr">#[inline]
   #[cfg(target_has_atomic = <span class="string">"ptr"</span>)]
   </span><span class="kw">fn </span>peel_arc(s: Arc&lt;<span class="self">Self</span>&gt;) -&gt; Arc&lt;Inner&gt; {
-    <span class="macro">assert!</span>(size_of::&lt;<span class="kw-2">*mut </span>Inner&gt;() == size_of::&lt;<span class="kw-2">*mut </span><span class="self">Self</span>&gt;());
+    <span class="comment">// The unsafe contract requires that these two have
+    // identical representations, and thus identical pointer metadata.
+    // Assert that Self and Inner have the same pointer size,
+    // which is the best we can do to assert their metadata is the same type
+    // on stable.
+    </span><span class="macro">assert!</span>(size_of::&lt;<span class="kw-2">*mut </span>Inner&gt;() == size_of::&lt;<span class="kw-2">*mut </span><span class="self">Self</span>&gt;());
 
     <span class="kw">unsafe </span>{
       <span class="comment">// A pointer cast doesn't work here because rustc can't tell that

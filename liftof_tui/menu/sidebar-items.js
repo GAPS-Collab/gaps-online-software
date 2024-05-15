@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["MTMenuItem","MenuItem","PAMoniMenuItem","RBMenuItem","RWMenuItem","SettingsMenuItem","TEMenuItem","THMenuItem","TSMenuItem"],"struct":["MTMenu","MainMenu","PAMoniMenu","RBMenu","RWMenu","SettingsMenu","TEMenu","THMenu","TSMenu"]};
+window.SIDEBAR_ITEMS = {"enum":["MTMenuItem","MenuItem","RBMenuItem","RWMenuItem","SettingsMenuItem","THMenuItem","TSMenuItem"],"struct":["MTMenu","MainMenu","RBMenu","RWMenu","SettingsMenu","THMenu","TSMenu"]};

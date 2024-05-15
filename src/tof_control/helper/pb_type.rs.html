@@ -141,11 +141,7 @@
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
 <a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
-
-<span class="doccomment">/// PB Data Type
+</pre></div><pre class="rust"><code><span class="doccomment">/// PB Data Type
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>PBLevel1 {
     <span class="kw">pub </span>pds_temp: f32,
@@ -158,7 +154,7 @@
 }
 
 <span class="comment">// PB Temperature Sensor
-</span><span class="attr">#[derive(Debug, Serialize, Deserialize)]
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>PBTemp {
     <span class="kw">pub </span>pds_temp: f32,
     <span class="kw">pub </span>pas_temp: f32,
@@ -167,7 +163,7 @@
 }
 
 <span class="comment">// PB VCP (Voltage, Current and Power) Sensor
-</span><span class="attr">#[derive(Debug, Serialize, Deserialize)]
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>PBVcp {
     <span class="kw">pub </span>p3v6_preamp_vcp:    [f32; <span class="number">3</span>],
     <span class="kw">pub </span>n1v6_preamp_vcp:    [f32; <span class="number">3</span>],

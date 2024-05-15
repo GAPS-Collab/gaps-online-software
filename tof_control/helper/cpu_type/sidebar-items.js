@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["CPUInfo","CPUInfoDebug","CPUTemp","CPUTempDebug"]};
+window.SIDEBAR_ITEMS = {"struct":["CPUInfo","CPUTemp","CPUTempDebug"]};
