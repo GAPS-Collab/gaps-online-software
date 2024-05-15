@@ -1092,6 +1092,10 @@ pub struct TofPacketWriter {
   /// number is reached, a new 
   /// file is started.
   pub pkts_per_file   : usize,
+  /// The maximum number of (Mega)bytes
+  /// per file. After this a new file 
+  /// is started
+  pub mbytes_per_file : usize,
   /// add timestamps to filenames
   pub file_type       : FileType,
   pub file_name       : String,
@@ -1100,6 +1104,9 @@ pub struct TofPacketWriter {
   /// internal packet counter, number of 
   /// packets which went through the writer
   n_packets           : usize,
+  /// internal counter for bytes written in 
+  /// this file
+  file_nbytes_wr      : usize,
 }
 
 impl TofPacketWriter {
@@ -1128,7 +1135,7 @@ impl TofPacketWriter {
         file_name = filename;
       }
       FileType::RunFile(runid) => {
-        let filename = format!("{}{}", file_path, get_runfilename(runid, 1, None));
+        let filename = format!("{}{}", file_path, get_runfilename(runid, 0, None));
         let path     = Path::new(&filename); 
         println!("Writing to file {filename}");
         file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
@@ -1145,12 +1152,14 @@ impl TofPacketWriter {
     }
     Self {
       file,
-      file_path       : file_path,
-      pkts_per_file   : 3000,
-      file_type       : file_type,
-      file_id         : 1,
-      n_packets       : 0,
-      file_name       : file_name,
+      file_path        : file_path,
+      pkts_per_file    : 0,
+      mbytes_per_file  : 420,
+      file_nbytes_wr   : 0,    
+      file_type        : file_type,
+      file_id          : 1,
+      n_packets        : 0,
+      file_name        : file_name,
     }
   }
 
@@ -1186,28 +1195,40 @@ impl TofPacketWriter {
   ///
   pub fn add_tof_packet(&mut self, packet : &TofPacket) {
     let buffer = packet.to_bytestream();
+    self.file_nbytes_wr += buffer.len();
     match self.file.write_all(buffer.as_slice()) {
       Err(err) => error!("Writing to file to path {} failed! {}", self.file_path, err),
       Ok(_)    => ()
     }
     self.n_packets += 1;
-    if self.n_packets == self.pkts_per_file {
-      //let filename = self.file_prefix.clone() + "_" + &self.file_id.to_string() + ".tof.gaps";
-      match self.file.sync_all() {
-        Err(err) => {
-          error!("Unable to sync file to disc! {err}");
-        },
-        Ok(_) => ()
+    let mut newfile = false;
+    if self.pkts_per_file != 0 {
+      if self.n_packets == self.pkts_per_file {
+        newfile = true;
+        self.n_packets = 0;
       }
-      self.file = self.get_file();
-      self.n_packets = 0;
-      self.file_id += 1;
-      //let path  = Path::new(&filename);
-      //println!("==> [TOFPACKETWRITER] Will start a new file {}", path.display());
-      //self.file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
-      //self.n_packets = 0;
-      //self.file_id += 1;
+    } else if self.mbytes_per_file != 0 {
+      if self.file_nbytes_wr >= self.mbytes_per_file {
+        newfile = true;
+        self.file_nbytes_wr = 0;
+      }
     }
+    if newfile {
+        //let filename = self.file_prefix.clone() + "_" + &self.file_id.to_string() + ".tof.gaps";
+        match self.file.sync_all() {
+          Err(err) => {
+            error!("Unable to sync file to disc! {err}");
+          },
+          Ok(_) => ()
+        }
+        self.file = self.get_file();
+        self.file_id += 1;
+        //let path  = Path::new(&filename);
+        //println!("==> [TOFPACKETWRITER] Will start a new file {}", path.display());
+        //self.file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+        //self.n_packets = 0;
+        //self.file_id += 1;
+      }
   debug!("TofPacket written!");
   }
 }

@@ -7,7 +7,7 @@
 
 use std::time::{
     Instant,
-    //Duration,
+    Duration,
 };
 
 use std::sync::{
@@ -58,22 +58,24 @@ use liftof_lib::settings::DataPublisherSettings;
 ///
 /// # Arguments
 ///
-/// * flight_address   : The address the flight computer
-///                      (or whomever) wants to listen.
-///                      A 0MQ PUB socket witll be bound 
-///                      to this address.
-/// * write_npack_file : Write this many TofPackets to a 
-///                      single file before starting a 
-///                      new one.
 pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                         write_stream       : bool,
                         runid              : usize,
                         settings           : &DataPublisherSettings,
                         print_moni_packets : bool,
                         thread_control     : Arc<Mutex<ThreadControl>>) {
+  match thread_control.lock() {
+    Ok(mut tc) => {
+      tc.thread_data_sink_active = true; 
+    },
+    Err(err) => {
+      error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+    },
+  }
+  let one_second          = Duration::from_millis(1000);
   let flight_address      = settings.fc_pub_address.clone();
   let write_stream_path   = settings.data_dir.clone(); 
-  let write_npack_file    = settings.packs_per_file;
+  let mbytes_per_file     = settings.mbytes_per_file;
   let mut met_time_secs   = 0f32; // mission elapsed time
 
   let mut evid_check      = Vec::<u32>::new();
@@ -96,18 +98,35 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
     let file_type = FileType::RunFile(runid as u32);
     //println!("==> Writing stream to file with prefix {}", streamfile_name);
     writer = Some(TofPacketWriter::new(write_stream_path.clone(), file_type));
-    writer.as_mut().unwrap().pkts_per_file = write_npack_file;
+    writer.as_mut().unwrap().mbytes_per_file = mbytes_per_file;
   }
   //let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
 
-  let mut n_pack_sent = 0;
-  //let mut last_evid   = 0u32;
+  let mut n_pack_sent       = 0;
+  //let mut last_evid       = 0u32;
   let mut n_pack_write_disk = 0usize;
+  let mut nbytes_file       = 0usize;
   let mut bytes_sec_disk    = 0f64;
 
   // for debugging/profiling
-  let mut timer = Instant::now();
+  let mut timer      = Instant::now();
+  let mut kill_timer = Instant::now();
+
   loop {
+    if kill_timer.elapsed().as_secs_f32() > 0.1 {
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          if tc.stop_flag {
+            tc.thread_data_sink_active = false;
+            break;
+          } 
+          kill_timer = Instant::now();
+        },
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        },
+      }
+    }
     match incoming.recv() {
       Err(err) => trace!("No new packet, err {err}"),
       Ok(pack) => {
@@ -115,7 +134,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         if writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(&pack);
           n_pack_write_disk += 1;
-          bytes_sec_disk += pack.payload.len() as f64;
+          nbytes_file       += pack.payload.len() + 9;
+          bytes_sec_disk    += pack.payload.len() as f64;
         }
         // yeah, this is it. 
         // catch RBCalibration packets here,

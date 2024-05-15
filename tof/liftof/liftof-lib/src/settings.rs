@@ -343,9 +343,10 @@ impl Default for TofEventBuilderSettings {
 pub struct DataPublisherSettings {
   /// location to store data on TOF computer
   pub data_dir                  : String,
-  /// TOFPackets per file. This defines the "length" of 
-  /// a subrun. 
-  pub packs_per_file            : usize,
+  /// The data written on disk gets divided into 
+  /// files of a fixed size. 
+  pub mbytes_per_file           : usize,
+
   /// The address the flight computer should subscribe 
   /// to to get tof packets
   pub fc_pub_address            : String,
@@ -365,7 +366,7 @@ impl DataPublisherSettings {
   pub fn new() -> Self {
     Self {
       data_dir                  : String::from(""),
-      packs_per_file            : 1000,
+      mbytes_per_file           : 420,
       fc_pub_address            : String::from(""),
       send_mtb_event_packets    : false,
       send_rbwaveform_packets   : false,
