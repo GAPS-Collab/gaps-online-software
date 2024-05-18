@@ -410,6 +410,7 @@ fn main() {
     let thread_name     = format!("rb-comms-{}", this_rb.rb_id);
     let settings        = config.analysis_engine_settings.clone();
     let ack_sender      = ack_to_cmd_disp.clone();
+    let tc_rb_comm      = thread_control.clone();
     let _rb_comm_thread = thread::Builder::new()
       .name(thread_name)
       .spawn(move || {
@@ -419,7 +420,8 @@ fn main() {
                                   false,
                                   run_analysis_engine,
                                   settings,
-                                  ack_sender);
+                                  ack_sender,
+                                  tc_rb_comm);
       })
       .expect("Failed to spawn readoutboard-communicator thread!");
   } // end for loop over nboards

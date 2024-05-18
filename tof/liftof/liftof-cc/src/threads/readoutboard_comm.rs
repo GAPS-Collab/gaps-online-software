@@ -5,6 +5,21 @@
 //    Path,
 //    PathBuf,
 //};
+
+use std::sync::{
+    Arc,
+    Mutex,
+};
+use std::time::{
+    Instant,
+    Duration,
+};
+
+use tof_dataclasses::threading::{
+    ThreadControl,
+};
+
+
 use crossbeam_channel::Sender;
 
 use tof_dataclasses::database::ReadoutBoard;
@@ -52,7 +67,8 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                                  print_packets       : bool,
                                  run_analysis_engine : bool,
                                  ae_settings         : AnalysisEngineSettings,
-                                 ack_sender          : Sender<TofResponse>) {
+                                 ack_sender          : Sender<TofResponse>,
+                                 thread_control      : Arc<Mutex<ThreadControl>>) {
   let zmq_ctx = zmq::Context::new();
   let board_id = rb.rb_id; //rb.id.unwrap();
   info!("initializing RB thread for board {}!", board_id);
@@ -77,7 +93,21 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
    Err(err) => error!("Unable to subscribe to topic! {err}"),
    Ok(_)    => info!("Subscribed to {:?}!", topic),
   }
+  let mut tc_timer = Instant::now();
   loop {
+    if tc_timer.elapsed().as_secs() > 1 {
+      match thread_control.lock() {
+        Ok(tc) => {
+          if tc.stop_flag {
+            break;
+          }
+        },
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        },
+      }
+      tc_timer = Instant::now();
+    }
     // check if we got new data
     // this is blocking the thread
     match socket.recv_bytes(0) {
