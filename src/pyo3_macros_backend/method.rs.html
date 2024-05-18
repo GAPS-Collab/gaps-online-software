@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-macros-backend-0.19.2/src/method.rs`."><title>method.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="pyo3_macros_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-macros-backend-0.19.2/src/method.rs`."><title>method.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="pyo3_macros_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../pyo3_macros_backend/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -928,12 +928,12 @@
                 <span class="macro">quote!</span>()
             }
             FnType::FnClass | FnType::FnNewClass =&gt; {
-                <span class="macro">quote! </span>{
+                <span class="macro">quote!</span> {
                     _pyo3::types::PyType::from_type_ptr(py, _slf <span class="kw">as </span><span class="kw-2">*mut </span>_pyo3::ffi::PyTypeObject),
                 }
             }
             FnType::FnModule =&gt; {
-                <span class="macro">quote! </span>{
+                <span class="macro">quote!</span> {
                     py.from_borrowed_ptr::&lt;_pyo3::types::PyModule&gt;(_slf),
                 }
             }
@@ -956,8 +956,8 @@
 <span class="kw">impl </span>ExtractErrorMode {
     <span class="kw">pub fn </span>handle_error(<span class="self">self</span>, py: <span class="kw-2">&amp;</span>syn::Ident, extract: TokenStream) -&gt; TokenStream {
         <span class="kw">match </span><span class="self">self </span>{
-            ExtractErrorMode::Raise =&gt; <span class="macro">quote! </span>{ #extract<span class="question-mark">? </span>},
-            ExtractErrorMode::NotImplemented =&gt; <span class="macro">quote! </span>{
+            ExtractErrorMode::Raise =&gt; <span class="macro">quote!</span> { #extract<span class="question-mark">? </span>},
+            ExtractErrorMode::NotImplemented =&gt; <span class="macro">quote!</span> {
                 <span class="kw">match </span>#extract {
                     ::std::result::Result::Ok(value) =&gt; value,
                     ::std::result::Result::Err(<span class="kw">_</span>) =&gt; { <span class="kw">return </span>_pyo3::callback::convert(#py, #py.NotImplemented()); },
@@ -980,7 +980,7 @@
                 };
                 error_mode.handle_error(
                     <span class="kw-2">&amp;</span>py,
-                    <span class="macro">quote_spanned! </span>{ <span class="kw-2">*</span>span =&gt;
+                    <span class="macro">quote_spanned!</span> { <span class="kw-2">*</span>span =&gt;
                         _pyo3::impl_::extract_argument::#method::&lt;#cls&gt;(
                             #py.from_borrowed_ptr::&lt;_pyo3::PyAny&gt;(#slf),
                             <span class="kw-2">&amp;mut </span>{ _pyo3::impl_::extract_argument::FunctionArgumentHolder::INIT },
@@ -991,7 +991,7 @@
             SelfType::TryFromPyCell(span) =&gt; {
                 error_mode.handle_error(
                     <span class="kw-2">&amp;</span>py,
-                    <span class="macro">quote_spanned! </span>{ <span class="kw-2">*</span>span =&gt;
+                    <span class="macro">quote_spanned!</span> { <span class="kw-2">*</span>span =&gt;
                         #py.from_borrowed_ptr::&lt;_pyo3::PyAny&gt;(#slf).downcast::&lt;_pyo3::PyCell&lt;#cls&gt;&gt;()
                             .map_err(::std::convert::Into::&lt;_pyo3::PyErr&gt;::into)
                             .and_then(
@@ -1052,7 +1052,7 @@
 
 <span class="kw">pub fn </span>get_return_info(output: <span class="kw-2">&amp;</span>syn::ReturnType) -&gt; syn::Type {
     <span class="kw">match </span>output {
-        syn::ReturnType::Default =&gt; syn::Type::Infer(<span class="macro">syn::parse_quote! </span>{<span class="kw">_</span>}),
+        syn::ReturnType::Default =&gt; syn::Type::Infer(<span class="macro">syn::parse_quote!</span> {<span class="kw">_</span>}),
         syn::ReturnType::Type(<span class="kw">_</span>, ty) =&gt; <span class="kw-2">*</span>ty.clone(),
     }
 }
@@ -1238,7 +1238,7 @@
         <span class="kw">let </span>func_name = <span class="kw-2">&amp;</span><span class="self">self</span>.name;
 
         <span class="kw">let </span>rust_call = |args: Vec&lt;TokenStream&gt;| {
-            quotes::map_result_into_ptr(quotes::ok_wrap(<span class="macro">quote! </span>{ function(#self_arg #(#args),<span class="kw-2">*</span>) }))
+            quotes::map_result_into_ptr(quotes::ok_wrap(<span class="macro">quote!</span> { function(#self_arg #(#args),<span class="kw-2">*</span>) }))
         };
 
         <span class="kw">let </span>rust_name = <span class="kw">if let </span><span class="prelude-val">Some</span>(cls) = cls {
@@ -1256,7 +1256,7 @@
                     rust_call(<span class="macro">vec!</span>[])
                 };
 
-                <span class="macro">quote! </span>{
+                <span class="macro">quote!</span> {
                     <span class="kw">unsafe fn </span>#ident&lt;<span class="lifetime">'py</span>&gt;(
                         #py: _pyo3::Python&lt;<span class="lifetime">'py</span>&gt;,
                         _slf: <span class="kw-2">*mut </span>_pyo3::ffi::PyObject,
@@ -1270,7 +1270,7 @@
             CallingConvention::Fastcall =&gt; {
                 <span class="kw">let </span>(arg_convert, args) = impl_arg_params(<span class="self">self</span>, cls, <span class="kw-2">&amp;</span>py, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
                 <span class="kw">let </span>call = rust_call(args);
-                <span class="macro">quote! </span>{
+                <span class="macro">quote!</span> {
                     <span class="kw">unsafe fn </span>#ident&lt;<span class="lifetime">'py</span>&gt;(
                         #py: _pyo3::Python&lt;<span class="lifetime">'py</span>&gt;,
                         _slf: <span class="kw-2">*mut </span>_pyo3::ffi::PyObject,
@@ -1288,7 +1288,7 @@
             CallingConvention::Varargs =&gt; {
                 <span class="kw">let </span>(arg_convert, args) = impl_arg_params(<span class="self">self</span>, cls, <span class="kw-2">&amp;</span>py, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
                 <span class="kw">let </span>call = rust_call(args);
-                <span class="macro">quote! </span>{
+                <span class="macro">quote!</span> {
                     <span class="kw">unsafe fn </span>#ident&lt;<span class="lifetime">'py</span>&gt;(
                         #py: _pyo3::Python&lt;<span class="lifetime">'py</span>&gt;,
                         _slf: <span class="kw-2">*mut </span>_pyo3::ffi::PyObject,
@@ -1305,13 +1305,13 @@
             CallingConvention::TpNew =&gt; {
                 <span class="kw">let </span>(arg_convert, args) = impl_arg_params(<span class="self">self</span>, cls, <span class="kw-2">&amp;</span>py, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
                 <span class="kw">let </span>call = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.tp {
-                    FnType::FnNew =&gt; <span class="macro">quote! </span>{ #rust_name(#(#args),<span class="kw-2">*</span>) },
+                    FnType::FnNew =&gt; <span class="macro">quote!</span> { #rust_name(#(#args),<span class="kw-2">*</span>) },
                     FnType::FnNewClass =&gt; {
-                        <span class="macro">quote! </span>{ #rust_name(_pyo3::types::PyType::from_type_ptr(#py, subtype), #(#args),<span class="kw-2">*</span>) }
+                        <span class="macro">quote!</span> { #rust_name(_pyo3::types::PyType::from_type_ptr(#py, subtype), #(#args),<span class="kw-2">*</span>) }
                     }
                     x =&gt; <span class="macro">panic!</span>(<span class="string">"Only `FnNew` or `FnNewClass` may use the `TpNew` calling convention. Got: {:?}"</span>, x),
                 };
-                <span class="macro">quote! </span>{
+                <span class="macro">quote!</span> {
                     <span class="kw">unsafe fn </span>#ident(
                         #py: _pyo3::Python&lt;<span class="lifetime">'_</span>&gt;,
                         subtype: <span class="kw-2">*mut </span>_pyo3::ffi::PyTypeObject,
@@ -1337,7 +1337,7 @@
     </span><span class="kw">pub fn </span>get_methoddef(<span class="kw-2">&amp;</span><span class="self">self</span>, wrapper: <span class="kw">impl </span>ToTokens, doc: <span class="kw-2">&amp;</span>PythonDoc) -&gt; TokenStream {
         <span class="kw">let </span>python_name = <span class="self">self</span>.null_terminated_python_name();
         <span class="kw">match </span><span class="self">self</span>.convention {
-            CallingConvention::Noargs =&gt; <span class="macro">quote! </span>{
+            CallingConvention::Noargs =&gt; <span class="macro">quote!</span> {
                 _pyo3::impl_::pymethods::PyMethodDef::noargs(
                     #python_name,
                     _pyo3::impl_::pymethods::PyCFunction({
@@ -1357,7 +1357,7 @@
                     #doc,
                 )
             },
-            CallingConvention::Fastcall =&gt; <span class="macro">quote! </span>{
+            CallingConvention::Fastcall =&gt; <span class="macro">quote!</span> {
                 _pyo3::impl_::pymethods::PyMethodDef::fastcall_cfunction_with_keywords(
                     #python_name,
                     _pyo3::impl_::pymethods::PyCFunctionFastWithKeywords({
@@ -1381,7 +1381,7 @@
                     #doc,
                 )
             },
-            CallingConvention::Varargs =&gt; <span class="macro">quote! </span>{
+            CallingConvention::Varargs =&gt; <span class="macro">quote!</span> {
                 _pyo3::impl_::pymethods::PyMethodDef::cfunction_with_keywords(
                     #python_name,
                     _pyo3::impl_::pymethods::PyCFunctionWithKeywords({
@@ -1451,7 +1451,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>deprecated_args = <span class="prelude-val">None</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>ty: <span class="prelude-ty">Option</span>&lt;MethodTypeAttribute&gt; = <span class="prelude-val">None</span>;
 
-    <span class="macro">macro_rules! </span>set_compound_ty {
+    <span class="macro">macro_rules!</span> set_compound_ty {
         (<span class="macro-nonterminal">$new_ty</span>:expr, <span class="macro-nonterminal">$ident</span>:expr) =&gt; {
             ty = <span class="kw">match </span>(ty, <span class="macro-nonterminal">$new_ty</span>) {
                 (<span class="prelude-val">None</span>, new_ty) =&gt; <span class="prelude-val">Some</span>(new_ty),
@@ -1462,7 +1462,7 @@
         };
     }
 
-    <span class="macro">macro_rules! </span>set_ty {
+    <span class="macro">macro_rules!</span> set_ty {
         (<span class="macro-nonterminal">$new_ty</span>:expr, <span class="macro-nonterminal">$ident</span>:expr) =&gt; {
             <span class="macro">ensure_spanned!</span>(
                ty.replace(<span class="macro-nonterminal">$new_ty</span>).is_none(),

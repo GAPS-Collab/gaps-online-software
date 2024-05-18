@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rustls-webpki-0.102.3/src/crl/types.rs`."><title>types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="webpki" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rustls-webpki-0.102.4/src/crl/types.rs`."><title>types.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="webpki" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../webpki/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1240,6 +1240,54 @@
 <a href="#1238" id="1238">1238</a>
 <a href="#1239" id="1239">1239</a>
 <a href="#1240" id="1240">1240</a>
+<a href="#1241" id="1241">1241</a>
+<a href="#1242" id="1242">1242</a>
+<a href="#1243" id="1243">1243</a>
+<a href="#1244" id="1244">1244</a>
+<a href="#1245" id="1245">1245</a>
+<a href="#1246" id="1246">1246</a>
+<a href="#1247" id="1247">1247</a>
+<a href="#1248" id="1248">1248</a>
+<a href="#1249" id="1249">1249</a>
+<a href="#1250" id="1250">1250</a>
+<a href="#1251" id="1251">1251</a>
+<a href="#1252" id="1252">1252</a>
+<a href="#1253" id="1253">1253</a>
+<a href="#1254" id="1254">1254</a>
+<a href="#1255" id="1255">1255</a>
+<a href="#1256" id="1256">1256</a>
+<a href="#1257" id="1257">1257</a>
+<a href="#1258" id="1258">1258</a>
+<a href="#1259" id="1259">1259</a>
+<a href="#1260" id="1260">1260</a>
+<a href="#1261" id="1261">1261</a>
+<a href="#1262" id="1262">1262</a>
+<a href="#1263" id="1263">1263</a>
+<a href="#1264" id="1264">1264</a>
+<a href="#1265" id="1265">1265</a>
+<a href="#1266" id="1266">1266</a>
+<a href="#1267" id="1267">1267</a>
+<a href="#1268" id="1268">1268</a>
+<a href="#1269" id="1269">1269</a>
+<a href="#1270" id="1270">1270</a>
+<a href="#1271" id="1271">1271</a>
+<a href="#1272" id="1272">1272</a>
+<a href="#1273" id="1273">1273</a>
+<a href="#1274" id="1274">1274</a>
+<a href="#1275" id="1275">1275</a>
+<a href="#1276" id="1276">1276</a>
+<a href="#1277" id="1277">1277</a>
+<a href="#1278" id="1278">1278</a>
+<a href="#1279" id="1279">1279</a>
+<a href="#1280" id="1280">1280</a>
+<a href="#1281" id="1281">1281</a>
+<a href="#1282" id="1282">1282</a>
+<a href="#1283" id="1283">1283</a>
+<a href="#1284" id="1284">1284</a>
+<a href="#1285" id="1285">1285</a>
+<a href="#1286" id="1286">1286</a>
+<a href="#1287" id="1287">1287</a>
+<a href="#1288" id="1288">1288</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
 </span><span class="kw">use </span>alloc::collections::BTreeMap;
 <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
@@ -1382,6 +1430,21 @@
         )
         .map_err(crl_signature_err)
     }
+
+    <span class="doccomment">/// Checks the verification time is before the time in the CRL nextUpdate field.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_expiration(<span class="kw-2">&amp;</span><span class="self">self</span>, time: UnixTime) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>next_update = <span class="kw">match </span><span class="self">self </span>{
+            <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
+            </span>CertRevocationList::Owned(crl) =&gt; crl.next_update,
+            CertRevocationList::Borrowed(crl) =&gt; crl.next_update,
+        };
+
+        <span class="kw">if </span>time &gt;= next_update {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::CrlExpired);
+        }
+
+        <span class="prelude-val">Ok</span>(())
+    }
 }
 
 <span class="doccomment">/// Owned representation of a RFC 5280[^1] profile Certificate Revocation List (CRL).
@@ -1399,6 +1462,8 @@
     issuing_distribution_point: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
 
     signed_data: signed_data::OwnedSignedData,
+
+    next_update: UnixTime,
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
@@ -1447,6 +1512,8 @@
 
     <span class="doccomment">/// List of certificates revoked by the issuer in this CRL.
     </span>revoked_certs: untrusted::Input&lt;<span class="lifetime">'a</span>&gt;,
+
+    next_update: UnixTime,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; BorrowedCertRevocationList&lt;<span class="lifetime">'a</span>&gt; {
@@ -1484,6 +1551,7 @@
                 </span>.issuing_distribution_point
                 .map(|idp| idp.as_slice_less_safe().to_vec()),
             revoked_certs,
+            next_update: <span class="self">self</span>.next_update,
         })
     }
 
@@ -1605,7 +1673,7 @@
             //   Conforming CRL issuers MUST include the nextUpdate field in all CRLs.
             // We do not presently enforce the correct choice of UTCTime or GeneralizedTime based on
             // whether the date is post 2050.
-            </span>UnixTime::from_der(tbs_cert_list)<span class="question-mark">?</span>;
+            </span><span class="kw">let </span>next_update = UnixTime::from_der(tbs_cert_list)<span class="question-mark">?</span>;
 
             <span class="comment">// RFC 5280 §5.1.2.6:
             //   When there are no revoked certificates, the revoked certificates list
@@ -1626,6 +1694,7 @@
                 issuer,
                 revoked_certs,
                 issuing_distribution_point: <span class="prelude-val">None</span>,
+                next_update,
             };
 
             <span class="comment">// RFC 5280 §5.1.2.7:
@@ -2141,6 +2210,8 @@
 <span class="attr">#[cfg(feature = <span class="string">"alloc"</span>)]
 #[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::time::Duration;
+
     <span class="kw">use </span>pki_types::CertificateDer;
     <span class="kw">use </span>std::prelude::v1::<span class="kw-2">*</span>;
     <span class="kw">use </span>std::println;
@@ -2469,6 +2540,31 @@
         <span class="comment">// The CRL should be considered authoritative, the issuers match, the CRL has no IDP and the
         // cert has no CRL DPs.
         </span><span class="macro">assert!</span>(crl.authoritative(<span class="kw-2">&amp;</span>path.node()));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_crl_expired() {
+        <span class="kw">let </span>crl = <span class="macro">include_bytes!</span>(<span class="string">"../../tests/crls/crl.valid.der"</span>);
+        <span class="kw">let </span>crl: CertRevocationList = BorrowedCertRevocationList::from_der(<span class="kw-2">&amp;</span>crl[..])
+            .unwrap()
+            .into();
+        <span class="comment">//  Friday, February 2, 2024 8:26:19 PM GMT
+        </span><span class="kw">let </span>time = UnixTime::since_unix_epoch(Duration::from_secs(<span class="number">1_706_905_579</span>));
+
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(crl.check_expiration(time), <span class="prelude-val">Err</span>(Error::CrlExpired)));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_crl_not_expired() {
+        <span class="kw">let </span>crl = <span class="macro">include_bytes!</span>(<span class="string">"../../tests/crls/crl.valid.der"</span>);
+        <span class="kw">let </span>crl: CertRevocationList = BorrowedCertRevocationList::from_der(<span class="kw-2">&amp;</span>crl[..])
+            .unwrap()
+            .into();
+        <span class="comment">// Wednesday, October 19, 2022 8:12:06 PM GMT
+        </span><span class="kw">let </span>expiration_time = <span class="number">1_666_210_326</span>;
+        <span class="kw">let </span>time = UnixTime::since_unix_epoch(Duration::from_secs(expiration_time - <span class="number">1000</span>));
+
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(crl.check_expiration(time), <span class="prelude-val">Ok</span>(())));
     }
 
     <span class="attr">#[test]

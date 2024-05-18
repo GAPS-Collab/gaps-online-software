@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-macros-backend-0.19.2/src/pymethod.rs`."><title>pymethod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="pyo3_macros_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-macros-backend-0.19.2/src/pymethod.rs`."><title>pymethod.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="pyo3_macros_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../pyo3_macros_backend/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1632,8 +1632,8 @@
         FnType::FnClass =&gt; <span class="macro">quote!</span>(Class),
         <span class="kw">_ </span>=&gt; <span class="macro">quote!</span>(Method),
     };
-    <span class="kw">let </span>methoddef = spec.get_methoddef(<span class="macro">quote! </span>{ #cls::#wrapper_ident }, doc);
-    <span class="kw">let </span>method_def = <span class="macro">quote! </span>{
+    <span class="kw">let </span>methoddef = spec.get_methoddef(<span class="macro">quote!</span> { #cls::#wrapper_ident }, doc);
+    <span class="kw">let </span>method_def = <span class="macro">quote!</span> {
         _pyo3::class::PyMethodDefType::#methoddef_type(#methoddef #add_flags)
     };
     <span class="prelude-val">Ok</span>(MethodAndMethodDef {
@@ -1652,7 +1652,7 @@
         || <span class="macro">quote!</span>(::std::option::Option::None),
         |text_signature| <span class="macro">quote!</span>(::std::option::Option::Some(#text_signature)),
     );
-    <span class="kw">let </span>slot_def = <span class="macro">quote! </span>{
+    <span class="kw">let </span>slot_def = <span class="macro">quote!</span> {
         _pyo3::ffi::PyType_Slot {
             slot: _pyo3::ffi::Py_tp_new,
             pfunc: {
@@ -1694,7 +1694,7 @@
 
     <span class="kw">let </span>wrapper_ident = syn::Ident::new(<span class="string">"__pymethod___call____"</span>, Span::call_site());
     <span class="kw">let </span>associated_method = spec.get_wrapper_function(<span class="kw-2">&amp;</span>wrapper_ident, <span class="prelude-val">Some</span>(cls))<span class="question-mark">?</span>;
-    <span class="kw">let </span>slot_def = <span class="macro">quote! </span>{
+    <span class="kw">let </span>slot_def = <span class="macro">quote!</span> {
         _pyo3::ffi::PyType_Slot {
             slot: _pyo3::ffi::Py_tp_call,
             pfunc: {
@@ -1731,7 +1731,7 @@
 
     <span class="kw">let </span>rust_fn_ident = spec.name;
 
-    <span class="kw">let </span>associated_method = <span class="macro">quote! </span>{
+    <span class="kw">let </span>associated_method = <span class="macro">quote!</span> {
         <span class="kw">pub unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>__pymethod_traverse__(
             slf: <span class="kw-2">*mut </span>_pyo3::ffi::PyObject,
             visit: _pyo3::ffi::visitproc,
@@ -1740,7 +1740,7 @@
             _pyo3::impl_::pymethods::_call_traverse::&lt;#cls&gt;(slf, #cls::#rust_fn_ident, visit, arg)
         }
     };
-    <span class="kw">let </span>slot_def = <span class="macro">quote! </span>{
+    <span class="kw">let </span>slot_def = <span class="macro">quote!</span> {
         _pyo3::ffi::PyType_Slot {
             slot: _pyo3::ffi::Py_tp_traverse,
             pfunc: #cls::__pymethod_traverse__ <span class="kw">as </span>_pyo3::ffi::traverseproc <span class="kw">as _
@@ -1771,7 +1771,7 @@
     <span class="kw">let </span>python_name = spec.null_terminated_python_name();
     <span class="kw">let </span>body = quotes::ok_wrap(fncall);
 
-    <span class="kw">let </span>associated_method = <span class="macro">quote! </span>{
+    <span class="kw">let </span>associated_method = <span class="macro">quote!</span> {
         <span class="kw">fn </span>#wrapper_ident(py: _pyo3::Python&lt;<span class="lifetime">'_</span>&gt;) -&gt; _pyo3::PyResult&lt;_pyo3::PyObject&gt; {
             <span class="kw">let </span>function = #cls::#name; <span class="comment">// Shadow the method name to avoid #3017
             </span>#deprecations
@@ -1779,7 +1779,7 @@
         }
     };
 
-    <span class="kw">let </span>method_def = <span class="macro">quote! </span>{
+    <span class="kw">let </span>method_def = <span class="macro">quote!</span> {
         _pyo3::class::PyMethodDefType::ClassAttribute({
             _pyo3::class::PyClassAttributeDef::new(
                 #python_name,
@@ -1876,7 +1876,7 @@
         }
     }
 
-    <span class="kw">let </span>associated_method = <span class="macro">quote! </span>{
+    <span class="kw">let </span>associated_method = <span class="macro">quote!</span> {
         #cfg_attrs
         <span class="kw">unsafe fn </span>#wrapper_ident(
             py: _pyo3::Python&lt;<span class="lifetime">'_</span>&gt;,
@@ -1894,7 +1894,7 @@
         }
     };
 
-    <span class="kw">let </span>method_def = <span class="macro">quote! </span>{
+    <span class="kw">let </span>method_def = <span class="macro">quote!</span> {
         #cfg_attrs
         _pyo3::class::PyMethodDefType::Setter({
             #deprecations
@@ -1959,7 +1959,7 @@
                 <span class="comment">// tuple struct field
                 </span>syn::Index::from(field_index).to_token_stream()
             };
-            quotes::map_result_into_ptr(quotes::ok_wrap(<span class="macro">quote! </span>{
+            quotes::map_result_into_ptr(quotes::ok_wrap(<span class="macro">quote!</span> {
                 ::std::clone::Clone::clone(<span class="kw-2">&amp;</span>(#slf.#field_token))
             }))
         }
@@ -1968,7 +1968,7 @@
             spec, self_type, ..
         } =&gt; {
             <span class="kw">let </span>call = impl_call_getter(cls, spec, self_type)<span class="question-mark">?</span>;
-            <span class="macro">quote! </span>{
+            <span class="macro">quote!</span> {
                 _pyo3::callback::convert(py, #call)
             }
         }
@@ -1998,7 +1998,7 @@
         }
     }
 
-    <span class="kw">let </span>associated_method = <span class="macro">quote! </span>{
+    <span class="kw">let </span>associated_method = <span class="macro">quote!</span> {
         #cfg_attrs
         <span class="kw">unsafe fn </span>#wrapper_ident(
             py: _pyo3::Python&lt;<span class="lifetime">'_</span>&gt;,
@@ -2008,7 +2008,7 @@
         }
     };
 
-    <span class="kw">let </span>method_def = <span class="macro">quote! </span>{
+    <span class="kw">let </span>method_def = <span class="macro">quote!</span> {
         #cfg_attrs
         _pyo3::class::PyMethodDefType::Getter({
             #deprecations
@@ -2088,7 +2088,7 @@
 <span class="kw">const </span>__HASH__: SlotDef = SlotDef::new(<span class="string">"Py_tp_hash"</span>, <span class="string">"hashfunc"</span>)
     .ret_ty(Ty::PyHashT)
     .return_conversion(TokenGenerator(
-        || <span class="macro">quote! </span>{ _pyo3::callback::HashCallbackOutput },
+        || <span class="macro">quote!</span> { _pyo3::callback::HashCallbackOutput },
     ));
 <span class="kw">pub const </span>__RICHCMP__: SlotDef = SlotDef::new(<span class="string">"Py_tp_richcompare"</span>, <span class="string">"richcmpfunc"</span>)
     .extract_error_mode(ExtractErrorMode::NotImplemented)
@@ -2097,12 +2097,12 @@
     .arguments(<span class="kw-2">&amp;</span>[Ty::MaybeNullObject, Ty::MaybeNullObject]);
 <span class="kw">const </span>__ITER__: SlotDef = SlotDef::new(<span class="string">"Py_tp_iter"</span>, <span class="string">"getiterfunc"</span>);
 <span class="kw">const </span>__NEXT__: SlotDef = SlotDef::new(<span class="string">"Py_tp_iternext"</span>, <span class="string">"iternextfunc"</span>).return_conversion(
-    TokenGenerator(|| <span class="macro">quote! </span>{ _pyo3::class::iter::IterNextOutput::&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; }),
+    TokenGenerator(|| <span class="macro">quote!</span> { _pyo3::class::iter::IterNextOutput::&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; }),
 );
 <span class="kw">const </span>__AWAIT__: SlotDef = SlotDef::new(<span class="string">"Py_am_await"</span>, <span class="string">"unaryfunc"</span>);
 <span class="kw">const </span>__AITER__: SlotDef = SlotDef::new(<span class="string">"Py_am_aiter"</span>, <span class="string">"unaryfunc"</span>);
 <span class="kw">const </span>__ANEXT__: SlotDef = SlotDef::new(<span class="string">"Py_am_anext"</span>, <span class="string">"unaryfunc"</span>).return_conversion(
-    TokenGenerator(|| <span class="macro">quote! </span>{ _pyo3::class::pyasync::IterANextOutput::&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; }),
+    TokenGenerator(|| <span class="macro">quote!</span> { _pyo3::class::pyasync::IterANextOutput::&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; }),
 );
 <span class="kw">const </span>__LEN__: SlotDef = SlotDef::new(<span class="string">"Py_mp_length"</span>, <span class="string">"lenfunc"</span>).ret_ty(Ty::PySsizeT);
 <span class="kw">const </span>__CONTAINS__: SlotDef = SlotDef::new(<span class="string">"Py_sq_contains"</span>, <span class="string">"objobjproc"</span>)
@@ -2206,14 +2206,14 @@
 <span class="kw">impl </span>Ty {
     <span class="kw">fn </span>ffi_type(<span class="self">self</span>) -&gt; TokenStream {
         <span class="kw">match </span><span class="self">self </span>{
-            Ty::Object | Ty::MaybeNullObject =&gt; <span class="macro">quote! </span>{ <span class="kw-2">*mut </span>_pyo3::ffi::PyObject },
-            Ty::NonNullObject =&gt; <span class="macro">quote! </span>{ ::std::ptr::NonNull&lt;_pyo3::ffi::PyObject&gt; },
-            Ty::IPowModulo =&gt; <span class="macro">quote! </span>{ _pyo3::impl_::pymethods::IPowModulo },
-            Ty::Int | Ty::CompareOp =&gt; <span class="macro">quote! </span>{ ::std::os::raw::c_int },
-            Ty::PyHashT =&gt; <span class="macro">quote! </span>{ _pyo3::ffi::Py_hash_t },
-            Ty::PySsizeT =&gt; <span class="macro">quote! </span>{ _pyo3::ffi::Py_ssize_t },
-            Ty::Void =&gt; <span class="macro">quote! </span>{ () },
-            Ty::PyBuffer =&gt; <span class="macro">quote! </span>{ <span class="kw-2">*mut </span>_pyo3::ffi::Py_buffer },
+            Ty::Object | Ty::MaybeNullObject =&gt; <span class="macro">quote!</span> { <span class="kw-2">*mut </span>_pyo3::ffi::PyObject },
+            Ty::NonNullObject =&gt; <span class="macro">quote!</span> { ::std::ptr::NonNull&lt;_pyo3::ffi::PyObject&gt; },
+            Ty::IPowModulo =&gt; <span class="macro">quote!</span> { _pyo3::impl_::pymethods::IPowModulo },
+            Ty::Int | Ty::CompareOp =&gt; <span class="macro">quote!</span> { ::std::os::raw::c_int },
+            Ty::PyHashT =&gt; <span class="macro">quote!</span> { _pyo3::ffi::Py_hash_t },
+            Ty::PySsizeT =&gt; <span class="macro">quote!</span> { _pyo3::ffi::Py_ssize_t },
+            Ty::Void =&gt; <span class="macro">quote!</span> { () },
+            Ty::PyBuffer =&gt; <span class="macro">quote!</span> { <span class="kw-2">*mut </span>_pyo3::ffi::Py_buffer },
         }
     }
 
@@ -2230,7 +2230,7 @@
                 extract_error_mode,
                 py,
                 <span class="kw-2">&amp;</span>name_str,
-                <span class="macro">quote! </span>{
+                <span class="macro">quote!</span> {
                     #py.from_borrowed_ptr::&lt;_pyo3::PyAny&gt;(#ident)
                 },
             ),
@@ -2238,7 +2238,7 @@
                 extract_error_mode,
                 py,
                 <span class="kw-2">&amp;</span>name_str,
-                <span class="macro">quote! </span>{
+                <span class="macro">quote!</span> {
                     #py.from_borrowed_ptr::&lt;_pyo3::PyAny&gt;(
                         <span class="kw">if </span>#ident.is_null() {
                             _pyo3::ffi::Py_None()
@@ -2252,7 +2252,7 @@
                 extract_error_mode,
                 py,
                 <span class="kw-2">&amp;</span>name_str,
-                <span class="macro">quote! </span>{
+                <span class="macro">quote!</span> {
                     #py.from_borrowed_ptr::&lt;_pyo3::PyAny&gt;(#ident.as_ptr())
                 },
             ),
@@ -2260,13 +2260,13 @@
                 extract_error_mode,
                 py,
                 <span class="kw-2">&amp;</span>name_str,
-                <span class="macro">quote! </span>{
+                <span class="macro">quote!</span> {
                     #ident.to_borrowed_any(#py)
                 },
             ),
             Ty::CompareOp =&gt; extract_error_mode.handle_error(
                 py,
-                <span class="macro">quote! </span>{
+                <span class="macro">quote!</span> {
                     _pyo3::class::basic::CompareOp::from_raw(#ident)
                         .ok_or_else(|| _pyo3::exceptions::PyValueError::new_err(<span class="string">"invalid comparison operator"</span>))
                 },
@@ -2275,13 +2275,13 @@
                 <span class="kw">let </span>ty = arg.ty;
                 extract_error_mode.handle_error(
                     py,
-                    <span class="macro">quote! </span>{
+                    <span class="macro">quote!</span> {
                             ::std::convert::TryInto::&lt;#ty&gt;::try_into(#ident).map_err(|e| _pyo3::exceptions::PyValueError::new_err(e.to_string()))
                     },
                 )
             }
             <span class="comment">// Just pass other types through unmodified
-            </span>Ty::PyBuffer | Ty::Int | Ty::PyHashT | Ty::Void =&gt; <span class="macro">quote! </span>{ #ident },
+            </span>Ty::PyBuffer | Ty::Int | Ty::PyHashT | Ty::Void =&gt; <span class="macro">quote!</span> { #ident },
         }
     }
 }
@@ -2294,7 +2294,7 @@
 ) -&gt; TokenStream {
     extract_error_mode.handle_error(
         py,
-        <span class="macro">quote! </span>{
+        <span class="macro">quote!</span> {
             _pyo3::impl_::extract_argument::extract_argument(
                 #source,
                 <span class="kw-2">&amp;mut </span>{ _pyo3::impl_::extract_argument::FunctionArgumentHolder::INIT },
@@ -2312,11 +2312,11 @@
 <span class="kw">impl </span>ReturnMode {
     <span class="kw">fn </span>return_call_output(<span class="kw-2">&amp;</span><span class="self">self</span>, py: <span class="kw-2">&amp;</span>syn::Ident, call: TokenStream) -&gt; TokenStream {
         <span class="kw">match </span><span class="self">self </span>{
-            ReturnMode::Conversion(conversion) =&gt; <span class="macro">quote! </span>{
+            ReturnMode::Conversion(conversion) =&gt; <span class="macro">quote!</span> {
                 <span class="kw">let </span>_result: _pyo3::PyResult&lt;#conversion&gt; = #call;
                 _pyo3::callback::convert(#py, _result)
             },
-            ReturnMode::ReturnSelf =&gt; <span class="macro">quote! </span>{
+            ReturnMode::ReturnSelf =&gt; <span class="macro">quote!</span> {
                 <span class="kw">let </span>_result: _pyo3::PyResult&lt;()&gt; = #call;
                 _result<span class="question-mark">?</span>;
                 _pyo3::ffi::Py_XINCREF(_raw_slf);
@@ -2418,7 +2418,7 @@
             return_mode.as_ref(),
         )<span class="question-mark">?</span>;
         <span class="kw">let </span>name = spec.name;
-        <span class="kw">let </span>associated_method = <span class="macro">quote! </span>{
+        <span class="kw">let </span>associated_method = <span class="macro">quote!</span> {
             <span class="kw">unsafe fn </span>#wrapper_ident(
                 #py: _pyo3::Python&lt;<span class="lifetime">'_</span>&gt;,
                 _raw_slf: <span class="kw-2">*mut </span>_pyo3::ffi::PyObject,
@@ -2429,7 +2429,7 @@
                 #body
             }
         };
-        <span class="kw">let </span>slot_def = <span class="macro">quote! </span>{{
+        <span class="kw">let </span>slot_def = <span class="macro">quote!</span> {{
             <span class="kw">unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>trampoline(
                 _slf: <span class="kw-2">*mut </span>_pyo3::ffi::PyObject,
                 #(#arg_idents: #arg_types),*
@@ -2465,7 +2465,7 @@
     <span class="kw">let </span>self_arg = spec.tp.self_arg(<span class="prelude-val">Some</span>(cls), extract_error_mode);
     <span class="kw">let </span>rust_name = spec.name;
     <span class="kw">let </span>args = extract_proto_arguments(py, spec, arguments, extract_error_mode)<span class="question-mark">?</span>;
-    <span class="kw">let </span>call = <span class="macro">quote! </span>{ _pyo3::callback::convert(#py, #cls::#rust_name(#self_arg #(#args),<span class="kw-2">*</span>)) };
+    <span class="kw">let </span>call = <span class="macro">quote!</span> { _pyo3::callback::convert(#py, #cls::#rust_name(#self_arg #(#args),<span class="kw-2">*</span>)) };
     <span class="prelude-val">Ok</span>(<span class="kw">if let </span><span class="prelude-val">Some</span>(return_mode) = return_mode {
         return_mode.return_call_output(py, call)
     } <span class="kw">else </span>{
@@ -2517,7 +2517,7 @@
             .collect();
         <span class="kw">let </span>body = generate_method_body(cls, spec, <span class="kw-2">&amp;</span>py, arguments, <span class="kw-2">*</span>extract_error_mode, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>ret_ty = ret_ty.ffi_type();
-        <span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{
+        <span class="prelude-val">Ok</span>(<span class="macro">quote!</span> {
             <span class="kw">impl </span>_pyo3::impl_::pyclass::#fragment_trait&lt;#cls&gt; <span class="kw">for </span>_pyo3::impl_::pyclass::PyClassImplCollector&lt;#cls&gt; {
 
                 <span class="attr">#[inline]
@@ -2557,7 +2557,7 @@
     SlotFragmentDef::new(<span class="string">"__setitem__"</span>, <span class="kw-2">&amp;</span>[Ty::Object, Ty::NonNullObject]);
 <span class="kw">const </span>__DELITEM__: SlotFragmentDef = SlotFragmentDef::new(<span class="string">"__delitem__"</span>, <span class="kw-2">&amp;</span>[Ty::Object]);
 
-<span class="macro">macro_rules! </span>binary_num_slot_fragment_def {
+<span class="macro">macro_rules!</span> binary_num_slot_fragment_def {
     (<span class="macro-nonterminal">$ident</span>:ident, <span class="macro-nonterminal">$name</span>:literal) =&gt; {
         <span class="kw">const </span><span class="macro-nonterminal">$ident</span>: SlotFragmentDef = SlotFragmentDef::new(<span class="macro-nonterminal">$name</span>, <span class="kw-2">&amp;</span>[Ty::Object])
             .extract_error_mode(ExtractErrorMode::NotImplemented)
@@ -2610,7 +2610,7 @@
 
     <span class="kw">for </span>arg <span class="kw">in </span><span class="kw-2">&amp;</span>spec.signature.arguments {
         <span class="kw">if </span>arg.py {
-            args.push(<span class="macro">quote! </span>{ #py });
+            args.push(<span class="macro">quote!</span> { #py });
         } <span class="kw">else </span>{
             <span class="kw">let </span>ident = syn::Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"arg{}"</span>, non_python_args), Span::call_site());
             <span class="kw">let </span>conversions = proto_args.get(non_python_args)

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/plotters-0.3.5/src/style/colors/colormaps.rs`."><title>colormaps.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="plotters" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/plotters-0.3.5/src/style/colors/colormaps.rs`."><title>colormaps.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="plotters" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../plotters/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -360,7 +360,7 @@
     }
 }
 
-<span class="macro">macro_rules! </span>calculate_new_color_value(
+<span class="macro">macro_rules!</span> calculate_new_color_value(
     (<span class="macro-nonterminal">$relative_difference</span>:expr, <span class="macro-nonterminal">$colors</span>:expr, <span class="macro-nonterminal">$index_upper</span>:expr, <span class="macro-nonterminal">$index_lower</span>:expr, RGBColor) =&gt; {
         RGBColor(
             <span class="comment">// These equations are a very complicated way of writing a simple linear extrapolation with lots of casting between numerical values
@@ -416,7 +416,7 @@
     (relative_difference, index_lower, index_upper)
 }
 
-<span class="macro">macro_rules! </span>implement_color_scale_for_derived_color_map{
+<span class="macro">macro_rules!</span> implement_color_scale_for_derived_color_map{
     ($(<span class="macro-nonterminal">$color_type</span>:ident),+) =&gt; {
         $(
             <span class="kw">impl</span>&lt;FloatType: Float + FromPrimitive + ToPrimitive&gt; ColorMap&lt;<span class="macro-nonterminal">$color_type</span>, FloatType&gt; <span class="kw">for </span>DerivedColorMap&lt;<span class="macro-nonterminal">$color_type</span>&gt; {
@@ -445,14 +445,14 @@
     }
 }
 
-<span class="macro">implement_color_scale_for_derived_color_map! </span>{RGBAColor, RGBColor, HSLColor}
+<span class="macro">implement_color_scale_for_derived_color_map!</span> {RGBAColor, RGBColor, HSLColor}
 
-<span class="macro">macro_rules! </span>count {
+<span class="macro">macro_rules!</span> count {
     () =&gt; (<span class="number">0usize</span>);
     (<span class="macro-nonterminal">$x</span>:tt $(<span class="macro-nonterminal">$xs</span>:tt)* ) =&gt; (<span class="number">1usize </span>+ <span class="macro">count!</span>($(<span class="macro-nonterminal">$xs</span>)<span class="kw-2">*</span>));
 }
 
-<span class="macro">macro_rules! </span>define_colors_from_list_of_values_or_directly{
+<span class="macro">macro_rules!</span> define_colors_from_list_of_values_or_directly{
     (<span class="macro-nonterminal">$color_type</span>:ident, $(($(<span class="macro-nonterminal">$color_value</span>:expr),+)),+) =&gt; {
         [$(<span class="macro-nonterminal">$color_type</span>($(<span class="macro-nonterminal">$color_value</span>),+)),+]
     };
@@ -461,7 +461,7 @@
     };
 }
 
-<span class="macro">macro_rules! </span>implement_linear_interpolation_color_map {
+<span class="macro">macro_rules!</span> implement_linear_interpolation_color_map {
     (<span class="macro-nonterminal">$color_scale_name</span>:ident, <span class="macro-nonterminal">$color_type</span>:ident) =&gt; {
         <span class="kw">impl</span>&lt;FloatType: std::fmt::Debug + Float + FromPrimitive + ToPrimitive&gt;
             ColorMap&lt;<span class="macro-nonterminal">$color_type</span>, FloatType&gt; <span class="kw">for </span><span class="macro-nonterminal">$color_scale_name
@@ -523,7 +523,7 @@
 
 <span class="attr">#[macro_export]
 </span><span class="doccomment">/// Macro to create a new colormap with evenly spaced colors at compile-time.
-</span><span class="macro">macro_rules! </span>define_linear_interpolation_color_map{
+</span><span class="macro">macro_rules!</span> define_linear_interpolation_color_map{
     (<span class="macro-nonterminal">$color_scale_name</span>:ident, <span class="macro-nonterminal">$color_type</span>:ident, <span class="macro-nonterminal">$doc</span>:expr, $(($(<span class="macro-nonterminal">$color_value</span>:expr),+)),<span class="kw-2">*</span>) =&gt; {
         <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>]
         </span><span class="kw">pub struct </span><span class="macro-nonterminal">$color_scale_name </span>{}
@@ -548,7 +548,7 @@
     }
 }
 
-<span class="macro">define_linear_interpolation_color_map! </span>{
+<span class="macro">define_linear_interpolation_color_map!</span> {
     ViridisRGBA,
     RGBAColor,
     <span class="string">"A colormap optimized for visually impaired people (RGBA format).
@@ -564,7 +564,7 @@
     (<span class="number">254</span>, <span class="number">232</span>,  <span class="number">37</span>, <span class="number">1.0</span>)
 }
 
-<span class="macro">define_linear_interpolation_color_map! </span>{
+<span class="macro">define_linear_interpolation_color_map!</span> {
     ViridisRGB,
     RGBColor,
     <span class="string">"A colormap optimized for visually impaired people (RGB Format).
@@ -580,7 +580,7 @@
     (<span class="number">254</span>, <span class="number">232</span>,  <span class="number">37</span>)
 }
 
-<span class="macro">define_linear_interpolation_color_map! </span>{
+<span class="macro">define_linear_interpolation_color_map!</span> {
     BlackWhite,
     RGBColor,
     <span class="string">"Simple chromatic colormap from black to white."</span>,
@@ -588,7 +588,7 @@
     (<span class="number">255</span>, <span class="number">255</span>,   <span class="number">255</span>)
 }
 
-<span class="macro">define_linear_interpolation_color_map! </span>{
+<span class="macro">define_linear_interpolation_color_map!</span> {
     MandelbrotHSL,
     HSLColor,
     <span class="string">"Colormap created to replace the one used in the mandelbrot example."</span>,
@@ -596,7 +596,7 @@
     (<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">0.5</span>)
 }
 
-<span class="macro">define_linear_interpolation_color_map! </span>{
+<span class="macro">define_linear_interpolation_color_map!</span> {
     VulcanoHSL,
     HSLColor,
     <span class="string">"A vulcanic colormap that display red/orange and black colors"</span>,
@@ -605,7 +605,7 @@
 }
 
 <span class="kw">use </span><span class="kw">super</span>::full_palette::<span class="kw-2">*</span>;
-<span class="macro">define_linear_interpolation_color_map! </span>{
+<span class="macro">define_linear_interpolation_color_map!</span> {
     Bone,
     RGBColor,
     <span class="string">"Dark colormap going from black over blue to white."</span>,
@@ -614,7 +614,7 @@
     WHITE
 }
 
-<span class="macro">define_linear_interpolation_color_map! </span>{
+<span class="macro">define_linear_interpolation_color_map!</span> {
     Copper,
     RGBColor,
     <span class="string">"Friendly black to brown colormap."</span>,

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/diesel_derives-2.1.4/src/table.rs`."><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="diesel_derives" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/diesel_derives-2.1.4/src/table.rs`."><title>table.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="diesel_derives" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../diesel_derives/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -840,7 +840,7 @@
              `32-column-tables` feature to enable diesels support for \
              tables with more than 16 columns."
         </span>};
-        <span class="kw">return </span><span class="macro">quote::quote! </span>{
+        <span class="kw">return </span><span class="macro">quote::quote!</span> {
             <span class="macro">compile_error!</span>(#txt);
         };
     }
@@ -867,7 +867,7 @@
         )) =&gt;
         {
             <span class="kw">let </span>id = syn::Ident::new(DEFAULT_PRIMARY_KEY_NAME, proc_macro2::Span::call_site());
-            <span class="macro">parse_quote! </span>{
+            <span class="macro">parse_quote!</span> {
                 #id
             }
         }
@@ -894,20 +894,20 @@
             message += <span class="string">"\t}\n}"</span>;
 
             <span class="kw">let </span>span = input.table_name.span();
-            <span class="kw">return </span><span class="macro">quote::quote_spanned! </span>{span=&gt;
+            <span class="kw">return </span><span class="macro">quote::quote_spanned!</span> {span=&gt;
                 <span class="macro">compile_error!</span>(#message);
             };
         }
         <span class="prelude-val">Some</span>(a) <span class="kw">if </span>a.keys.len() == <span class="number">1 </span>=&gt; {
             <span class="kw">let </span>k = a.keys.first().unwrap();
-            <span class="macro">parse_quote! </span>{
+            <span class="macro">parse_quote!</span> {
                 #k
             }
         }
         <span class="prelude-val">Some</span>(a) =&gt; {
             <span class="kw">let </span>keys = a.keys.iter();
 
-            <span class="macro">parse_quote! </span>{
+            <span class="macro">parse_quote!</span> {
                 (#(#keys,)<span class="kw-2">*</span>)
             }
         }
@@ -920,7 +920,7 @@
     <span class="kw">let </span>sql_name = <span class="kw-2">&amp;</span>input.sql_name;
     <span class="kw">let </span>static_query_fragment_impl_for_table = <span class="kw">if let </span><span class="prelude-val">Some</span>(schema) = input.schema {
         <span class="kw">let </span>schema_name = schema.to_string();
-        <span class="macro">quote::quote! </span>{
+        <span class="macro">quote::quote!</span> {
             <span class="kw">impl </span>diesel::internal::table_macro::StaticQueryFragment <span class="kw">for </span>table {
                 <span class="kw">type </span>Component = diesel::internal::table_macro::InfixNode&lt;
                         diesel::internal::table_macro::Identifier&lt;<span class="lifetime">'static</span>&gt;,
@@ -935,7 +935,7 @@
             }
         }
     } <span class="kw">else </span>{
-        <span class="macro">quote::quote! </span>{
+        <span class="macro">quote::quote!</span> {
             <span class="kw">impl </span>diesel::internal::table_macro::StaticQueryFragment <span class="kw">for </span>table {
                 <span class="kw">type </span>Component = diesel::internal::table_macro::Identifier&lt;<span class="lifetime">'static</span>&gt;;
                 <span class="kw">const </span>STATIC_COMPONENT: <span class="kw-2">&amp;</span><span class="lifetime">'static </span><span class="self">Self</span>::Component = <span class="kw-2">&amp;</span>diesel::internal::table_macro::Identifier(#sql_name);
@@ -953,18 +953,18 @@
                  `{column_name}` column \n\
                  Docs available at: `https://docs.diesel.rs/master/diesel/macro.table.html`\n"
             </span>);
-            <span class="macro">quote::quote_spanned! </span>{ span =&gt;
+            <span class="macro">quote::quote_spanned!</span> { span =&gt;
                 <span class="macro">compile_error!</span>(#message);
             }
         } <span class="kw">else </span>{
-            <span class="macro">quote::quote! </span>{
+            <span class="macro">quote::quote!</span> {
                 <span class="kw">pub use </span><span class="kw">super</span>::columns::#column_name;
             }
         }
     });
 
     <span class="kw">let </span>backend_specific_table_impls = <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">"postgres"</span>) {
-        <span class="prelude-val">Some</span>(<span class="macro">quote::quote! </span>{
+        <span class="prelude-val">Some</span>(<span class="macro">quote::quote!</span> {
             <span class="kw">impl</span>&lt;S&gt; diesel::JoinTo&lt;diesel::query_builder::Only&lt;S&gt;&gt; <span class="kw">for </span>table
             <span class="kw">where
                 </span>diesel::query_builder::Only&lt;S&gt;: diesel::JoinTo&lt;table&gt;,
@@ -996,7 +996,7 @@
 
     <span class="kw">let </span>imports_for_column_module = imports.iter().map(fix_import_for_submodule);
 
-    <span class="macro">quote::quote! </span>{
+    <span class="macro">quote::quote!</span> {
         #(#meta)*
         <span class="attr">#[allow(unused_imports, dead_code, unreachable_pub)]
         </span><span class="kw">pub mod </span>#table_name {
@@ -1329,7 +1329,7 @@
             <span class="kw">let </span>right_col = <span class="kw-2">&amp;</span>right_col.column_name;
 
             <span class="kw">if </span>left_col != right_col {
-                ret.push(<span class="macro">quote::quote! </span>{
+                ret.push(<span class="macro">quote::quote!</span> {
                     <span class="kw">impl </span>diesel::expression::IsContainedInGroupBy&lt;#right_col&gt; <span class="kw">for </span>#left_col {
                         <span class="kw">type </span>Output = diesel::expression::is_contained_in_group_by::#right_to_left;
                     }
@@ -1451,7 +1451,7 @@
 <span class="kw">fn </span>generate_op_impl(op: <span class="kw-2">&amp;</span>str, tpe: <span class="kw-2">&amp;</span>syn::Ident) -&gt; TokenStream {
     <span class="kw">let </span>fn_name = syn::Ident::new(<span class="kw-2">&amp;</span>op.to_lowercase(), tpe.span());
     <span class="kw">let </span>op = syn::Ident::new(op, tpe.span());
-    <span class="macro">quote::quote! </span>{
+    <span class="macro">quote::quote!</span> {
         <span class="kw">impl</span>&lt;Rhs&gt; ::std::ops::#op&lt;Rhs&gt; <span class="kw">for </span>#tpe
         <span class="kw">where
             </span>Rhs: diesel::expression::AsExpression&lt;
@@ -1477,7 +1477,7 @@
     <span class="kw">let </span>sql_type = <span class="kw-2">&amp;</span>column_def.tpe;
 
     <span class="kw">let </span>backend_specific_column_impl = <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">"postgres"</span>) {
-        <span class="prelude-val">Some</span>(<span class="macro">quote::quote! </span>{
+        <span class="prelude-val">Some</span>(<span class="macro">quote::quote!</span> {
             <span class="kw">impl </span>diesel::query_source::AppearsInFromClause&lt;diesel::query_builder::Only&lt;<span class="kw">super</span>::table&gt;&gt;
                 <span class="kw">for </span>#column_name
             {
@@ -1494,7 +1494,7 @@
         <span class="kw">let </span>sub = generate_op_impl(<span class="string">"Sub"</span>, column_name);
         <span class="kw">let </span>div = generate_op_impl(<span class="string">"Div"</span>, column_name);
         <span class="kw">let </span>mul = generate_op_impl(<span class="string">"Mul"</span>, column_name);
-        <span class="prelude-val">Some</span>(<span class="macro">quote::quote! </span>{
+        <span class="prelude-val">Some</span>(<span class="macro">quote::quote!</span> {
             #add
             #sub
             #div
@@ -1503,7 +1503,7 @@
     } <span class="kw">else if </span>is_date_time(<span class="kw-2">&amp;</span>column_def.tpe) || is_network(<span class="kw-2">&amp;</span>column_def.tpe) {
         <span class="kw">let </span>add = generate_op_impl(<span class="string">"Add"</span>, column_name);
         <span class="kw">let </span>sub = generate_op_impl(<span class="string">"Sub"</span>, column_name);
-        <span class="prelude-val">Some</span>(<span class="macro">quote::quote! </span>{
+        <span class="prelude-val">Some</span>(<span class="macro">quote::quote!</span> {
             #add
             #sub
         })
@@ -1512,14 +1512,14 @@
     </span>};
 
     <span class="kw">let </span>max_length = column_def.max_length.as_ref().map(|column_max_length| {
-        <span class="macro">quote::quote! </span>{
+        <span class="macro">quote::quote!</span> {
             <span class="kw">impl </span><span class="self">self</span>::diesel::query_source::SizeRestrictedColumn <span class="kw">for </span>#column_name {
                 <span class="kw">const </span>MAX_LENGTH: usize = #column_max_length;
             }
         }
     });
 
-    <span class="macro">quote::quote_spanned! </span>{span=&gt;
+    <span class="macro">quote::quote_spanned!</span> {span=&gt;
         #(#meta)*
         <span class="attr">#[allow(non_camel_case_types, dead_code)]
         #[derive(Debug, Clone, Copy, diesel::query_builder::QueryId, Default)]

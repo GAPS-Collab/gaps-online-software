@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/freetype-0.7.2/src/freetype.rs`."><title>freetype.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="freetype" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/freetype-0.7.2/src/freetype.rs`."><title>freetype.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="freetype" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../freetype/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -2706,24 +2706,24 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_MemoryRec_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_MemoryRec_&gt;() , <span class="number">32usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_MemoryRec_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_MemoryRec_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_MemoryRec_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_MemoryRec_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_MemoryRec_ ) ) . user <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_MemoryRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( user ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_MemoryRec_ ) ) . alloc <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_MemoryRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( alloc ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_MemoryRec_ ) ) . free <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_MemoryRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( free ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_MemoryRec_ ) ) . realloc <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_MemoryRec_ ) , <span class="string">"::"
@@ -2768,54 +2768,54 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_StreamRec_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_StreamRec_&gt;() , <span class="number">80usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_StreamRec_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_StreamRec_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_StreamRec_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_StreamRec_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_StreamRec_ ) ) . base <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_StreamRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( base ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_StreamRec_ ) ) . size <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_StreamRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( size ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_StreamRec_ ) ) . pos <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_StreamRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( pos ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_StreamRec_ ) ) . descriptor <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_StreamRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( descriptor ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_StreamRec_ ) ) . pathname <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">32usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_StreamRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( pathname ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_StreamRec_ ) ) . read <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">40usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_StreamRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( read ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_StreamRec_ ) ) . close <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">48usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_StreamRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( close ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_StreamRec_ ) ) . memory <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">56usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_StreamRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( memory ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_StreamRec_ ) ) . cursor <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">64usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_StreamRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( cursor ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_StreamRec_ ) ) . limit <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">72usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_StreamRec_ ) , <span class="string">"::"
@@ -2836,14 +2836,14 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_StreamDesc_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_StreamDesc_&gt;() , <span class="number">8usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_StreamDesc_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_StreamDesc_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_StreamDesc_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_StreamDesc_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_StreamDesc_ ) ) . value <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_StreamDesc_ ) , <span class="string">"::"
                 </span>, stringify ! ( value ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_StreamDesc_ ) ) . pointer <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_StreamDesc_ ) , <span class="string">"::"
@@ -2875,14 +2875,14 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Vector_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Vector_&gt;() , <span class="number">16usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_Vector_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Vector_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Vector_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_Vector_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Vector_ ) ) . x <span class="kw">as </span>* <span class="kw">const _ as </span>usize
                 } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Vector_ ) , <span class="string">"::" </span>,
                 stringify ! ( x ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Vector_ ) ) . y <span class="kw">as </span>* <span class="kw">const _ as </span>usize
                 } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Vector_ ) , <span class="string">"::" </span>,
@@ -2904,24 +2904,24 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_BBox_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_BBox_&gt;() , <span class="number">32usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_BBox_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_BBox_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_BBox_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_BBox_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_BBox_ ) ) . xMin <span class="kw">as </span>* <span class="kw">const _ as </span>usize
                 } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_BBox_ ) , <span class="string">"::" </span>,
                 stringify ! ( xMin ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_BBox_ ) ) . yMin <span class="kw">as </span>* <span class="kw">const _ as </span>usize
                 } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_BBox_ ) , <span class="string">"::" </span>,
                 stringify ! ( yMin ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_BBox_ ) ) . xMax <span class="kw">as </span>* <span class="kw">const _ as </span>usize
                 } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_BBox_ ) , <span class="string">"::" </span>,
                 stringify ! ( xMax ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_BBox_ ) ) . yMax <span class="kw">as </span>* <span class="kw">const _ as </span>usize
                 } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_BBox_ ) , <span class="string">"::" </span>,
@@ -2961,44 +2961,44 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Bitmap_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Bitmap_&gt;() , <span class="number">40usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_Bitmap_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Bitmap_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Bitmap_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_Bitmap_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Bitmap_ ) ) . rows <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Bitmap_ ) , <span class="string">"::" </span>,
                 stringify ! ( rows ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Bitmap_ ) ) . width <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">4usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Bitmap_ ) , <span class="string">"::" </span>,
                 stringify ! ( width ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Bitmap_ ) ) . pitch <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Bitmap_ ) , <span class="string">"::" </span>,
                 stringify ! ( pitch ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Bitmap_ ) ) . buffer <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Bitmap_ ) , <span class="string">"::" </span>,
                 stringify ! ( buffer ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Bitmap_ ) ) . num_grays <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Bitmap_ ) , <span class="string">"::" </span>,
                 stringify ! ( num_grays ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Bitmap_ ) ) . pixel_mode <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">26usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Bitmap_ ) , <span class="string">"::" </span>,
                 stringify ! ( pixel_mode ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Bitmap_ ) ) . palette_mode <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">27usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Bitmap_ ) , <span class="string">"::" </span>,
                 stringify ! ( palette_mode ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Bitmap_ ) ) . palette <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">32usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Bitmap_ ) , <span class="string">"::" </span>,
@@ -3022,34 +3022,34 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Outline_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Outline_&gt;() , <span class="number">40usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_Outline_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Outline_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Outline_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_Outline_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Outline_ ) ) . n_contours <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Outline_ ) , <span class="string">"::" </span>,
                 stringify ! ( n_contours ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Outline_ ) ) . n_points <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">2usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Outline_ ) , <span class="string">"::" </span>,
                 stringify ! ( n_points ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Outline_ ) ) . points <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Outline_ ) , <span class="string">"::" </span>,
                 stringify ! ( points ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Outline_ ) ) . tags <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Outline_ ) , <span class="string">"::" </span>,
                 stringify ! ( tags ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Outline_ ) ) . contours <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Outline_ ) , <span class="string">"::" </span>,
                 stringify ! ( contours ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Outline_ ) ) . flags <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">32usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Outline_ ) , <span class="string">"::" </span>,
@@ -3096,34 +3096,34 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Outline_Funcs_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Outline_Funcs_&gt;() , <span class="number">48usize </span>, concat !
                ( <span class="string">"Size of: " </span>, stringify ! ( FT_Outline_Funcs_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Outline_Funcs_&gt;() , <span class="number">8usize </span>, concat
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Outline_Funcs_&gt;() , <span class="number">8usize </span>, concat
                 ! ( <span class="string">"Alignment of " </span>, stringify ! ( FT_Outline_Funcs_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Outline_Funcs_ ) ) . move_to <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Outline_Funcs_ ) ,
                 <span class="string">"::" </span>, stringify ! ( move_to ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Outline_Funcs_ ) ) . line_to <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Outline_Funcs_ ) ,
                 <span class="string">"::" </span>, stringify ! ( line_to ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Outline_Funcs_ ) ) . conic_to <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Outline_Funcs_ ) ,
                 <span class="string">"::" </span>, stringify ! ( conic_to ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Outline_Funcs_ ) ) . cubic_to <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Outline_Funcs_ ) ,
                 <span class="string">"::" </span>, stringify ! ( cubic_to ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Outline_Funcs_ ) ) . shift <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">32usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Outline_Funcs_ ) ,
                 <span class="string">"::" </span>, stringify ! ( shift ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Outline_Funcs_ ) ) . delta <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">40usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Outline_Funcs_ ) ,
@@ -3160,19 +3160,19 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Span_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Span_&gt;() , <span class="number">6usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_Span_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Span_&gt;() , <span class="number">2usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Span_&gt;() , <span class="number">2usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_Span_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Span_ ) ) . x <span class="kw">as </span>* <span class="kw">const _ as </span>usize }
                 , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Span_ ) , <span class="string">"::" </span>,
                 stringify ! ( x ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Span_ ) ) . len <span class="kw">as </span>* <span class="kw">const _ as </span>usize
                 } , <span class="number">2usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Span_ ) , <span class="string">"::" </span>,
                 stringify ! ( len ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Span_ ) ) . coverage <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">4usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Span_ ) , <span class="string">"::" </span>,
@@ -3216,49 +3216,49 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Raster_Params_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Raster_Params_&gt;() , <span class="number">96usize </span>, concat !
                ( <span class="string">"Size of: " </span>, stringify ! ( FT_Raster_Params_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Raster_Params_&gt;() , <span class="number">8usize </span>, concat
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Raster_Params_&gt;() , <span class="number">8usize </span>, concat
                 ! ( <span class="string">"Alignment of " </span>, stringify ! ( FT_Raster_Params_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Params_ ) ) . target <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Params_ ) ,
                 <span class="string">"::" </span>, stringify ! ( target ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Params_ ) ) . source <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Params_ ) ,
                 <span class="string">"::" </span>, stringify ! ( source ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Params_ ) ) . flags <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Params_ ) ,
                 <span class="string">"::" </span>, stringify ! ( flags ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Params_ ) ) . gray_spans <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Params_ ) ,
                 <span class="string">"::" </span>, stringify ! ( gray_spans ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Params_ ) ) . black_spans <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">32usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Params_ ) ,
                 <span class="string">"::" </span>, stringify ! ( black_spans ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Params_ ) ) . bit_test <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">40usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Params_ ) ,
                 <span class="string">"::" </span>, stringify ! ( bit_test ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Params_ ) ) . bit_set <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">48usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Params_ ) ,
                 <span class="string">"::" </span>, stringify ! ( bit_set ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Params_ ) ) . user <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">56usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Params_ ) ,
                 <span class="string">"::" </span>, stringify ! ( user ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Params_ ) ) . clip_box <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">64usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Params_ ) ,
@@ -3306,34 +3306,34 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Raster_Funcs_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Raster_Funcs_&gt;() , <span class="number">48usize </span>, concat !
                ( <span class="string">"Size of: " </span>, stringify ! ( FT_Raster_Funcs_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Raster_Funcs_&gt;() , <span class="number">8usize </span>, concat !
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Raster_Funcs_&gt;() , <span class="number">8usize </span>, concat !
                 ( <span class="string">"Alignment of " </span>, stringify ! ( FT_Raster_Funcs_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Funcs_ ) ) . glyph_format <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Funcs_ ) ,
                 <span class="string">"::" </span>, stringify ! ( glyph_format ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Funcs_ ) ) . raster_new <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Funcs_ ) ,
                 <span class="string">"::" </span>, stringify ! ( raster_new ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Funcs_ ) ) . raster_reset <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Funcs_ ) ,
                 <span class="string">"::" </span>, stringify ! ( raster_reset ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Funcs_ ) ) . raster_set_mode <span class="kw">as
                 </span>* <span class="kw">const _ as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Funcs_ ) ,
                 <span class="string">"::" </span>, stringify ! ( raster_set_mode ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Funcs_ ) ) . raster_render <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">32usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Funcs_ ) ,
                 <span class="string">"::" </span>, stringify ! ( raster_render ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Raster_Funcs_ ) ) . raster_done <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">40usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Raster_Funcs_ ) ,
@@ -3373,14 +3373,14 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_UnitVector_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_UnitVector_&gt;() , <span class="number">4usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_UnitVector_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_UnitVector_&gt;() , <span class="number">2usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_UnitVector_&gt;() , <span class="number">2usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_UnitVector_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_UnitVector_ ) ) . x <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_UnitVector_ ) , <span class="string">"::"
                 </span>, stringify ! ( x ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_UnitVector_ ) ) . y <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">2usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_UnitVector_ ) , <span class="string">"::"
@@ -3402,24 +3402,24 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Matrix_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Matrix_&gt;() , <span class="number">32usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_Matrix_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Matrix_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Matrix_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_Matrix_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Matrix_ ) ) . xx <span class="kw">as </span>* <span class="kw">const _ as </span>usize
                 } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Matrix_ ) , <span class="string">"::" </span>,
                 stringify ! ( xx ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Matrix_ ) ) . xy <span class="kw">as </span>* <span class="kw">const _ as </span>usize
                 } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Matrix_ ) , <span class="string">"::" </span>,
                 stringify ! ( xy ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Matrix_ ) ) . yx <span class="kw">as </span>* <span class="kw">const _ as </span>usize
                 } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Matrix_ ) , <span class="string">"::" </span>,
                 stringify ! ( yx ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Matrix_ ) ) . yy <span class="kw">as </span>* <span class="kw">const _ as </span>usize
                 } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Matrix_ ) , <span class="string">"::" </span>,
@@ -3439,14 +3439,14 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Data_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Data_&gt;() , <span class="number">16usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_Data_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Data_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Data_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_Data_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Data_ ) ) . pointer <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Data_ ) , <span class="string">"::" </span>,
                 stringify ! ( pointer ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Data_ ) ) . length <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Data_ ) , <span class="string">"::" </span>,
@@ -3469,14 +3469,14 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Generic_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Generic_&gt;() , <span class="number">16usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_Generic_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Generic_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Generic_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_Generic_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Generic_ ) ) . data <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Generic_ ) , <span class="string">"::" </span>,
                 stringify ! ( data ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Generic_ ) ) . finalizer <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Generic_ ) , <span class="string">"::" </span>,
@@ -3497,19 +3497,19 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_ListNodeRec_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_ListNodeRec_&gt;() , <span class="number">24usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_ListNodeRec_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_ListNodeRec_&gt;() , <span class="number">8usize </span>, concat !
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_ListNodeRec_&gt;() , <span class="number">8usize </span>, concat !
                 ( <span class="string">"Alignment of " </span>, stringify ! ( FT_ListNodeRec_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_ListNodeRec_ ) ) . prev <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_ListNodeRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( prev ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_ListNodeRec_ ) ) . next <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_ListNodeRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( next ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_ListNodeRec_ ) ) . data <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_ListNodeRec_ ) ,
@@ -3529,14 +3529,14 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_ListRec_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_ListRec_&gt;() , <span class="number">16usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_ListRec_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_ListRec_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_ListRec_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_ListRec_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_ListRec_ ) ) . head <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_ListRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( head ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_ListRec_ ) ) . tail <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_ListRec_ ) , <span class="string">"::" </span>,
@@ -3868,44 +3868,44 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Glyph_Metrics_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Glyph_Metrics_&gt;() , <span class="number">64usize </span>, concat !
                ( <span class="string">"Size of: " </span>, stringify ! ( FT_Glyph_Metrics_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Glyph_Metrics_&gt;() , <span class="number">8usize </span>, concat
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Glyph_Metrics_&gt;() , <span class="number">8usize </span>, concat
                 ! ( <span class="string">"Alignment of " </span>, stringify ! ( FT_Glyph_Metrics_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Glyph_Metrics_ ) ) . width <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Glyph_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( width ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Glyph_Metrics_ ) ) . height <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Glyph_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( height ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Glyph_Metrics_ ) ) . horiBearingX <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Glyph_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( horiBearingX ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Glyph_Metrics_ ) ) . horiBearingY <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Glyph_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( horiBearingY ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Glyph_Metrics_ ) ) . horiAdvance <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">32usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Glyph_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( horiAdvance ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Glyph_Metrics_ ) ) . vertBearingX <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">40usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Glyph_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( vertBearingX ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Glyph_Metrics_ ) ) . vertBearingY <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">48usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Glyph_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( vertBearingY ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Glyph_Metrics_ ) ) . vertAdvance <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">56usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Glyph_Metrics_ ) ,
@@ -3928,29 +3928,29 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Bitmap_Size_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Bitmap_Size_&gt;() , <span class="number">32usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_Bitmap_Size_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Bitmap_Size_&gt;() , <span class="number">8usize </span>, concat !
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Bitmap_Size_&gt;() , <span class="number">8usize </span>, concat !
                 ( <span class="string">"Alignment of " </span>, stringify ! ( FT_Bitmap_Size_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Bitmap_Size_ ) ) . height <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Bitmap_Size_ ) ,
                 <span class="string">"::" </span>, stringify ! ( height ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Bitmap_Size_ ) ) . width <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">2usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Bitmap_Size_ ) ,
                 <span class="string">"::" </span>, stringify ! ( width ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Bitmap_Size_ ) ) . size <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Bitmap_Size_ ) ,
                 <span class="string">"::" </span>, stringify ! ( size ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Bitmap_Size_ ) ) . x_ppem <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Bitmap_Size_ ) ,
                 <span class="string">"::" </span>, stringify ! ( x_ppem ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Bitmap_Size_ ) ) . y_ppem <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Bitmap_Size_ ) ,
@@ -4023,159 +4023,159 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_FaceRec_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_FaceRec_&gt;() , <span class="number">248usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_FaceRec_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_FaceRec_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_FaceRec_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_FaceRec_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . num_faces <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( num_faces ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . face_index <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( face_index ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . face_flags <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( face_flags ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . style_flags <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( style_flags ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . num_glyphs <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">32usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( num_glyphs ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . family_name <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">40usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( family_name ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . style_name <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">48usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( style_name ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . num_fixed_sizes <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">56usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( num_fixed_sizes ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . available_sizes <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">64usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( available_sizes ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . num_charmaps <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">72usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( num_charmaps ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . charmaps <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">80usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( charmaps ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . generic <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">88usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( generic ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . bbox <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">104usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( bbox ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . units_per_EM <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">136usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( units_per_EM ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . ascender <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">138usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( ascender ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . descender <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">140usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( descender ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . height <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">142usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( height ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . max_advance_width <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">144usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( max_advance_width ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . max_advance_height <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">146usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( max_advance_height ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . underline_position <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">148usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( underline_position ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . underline_thickness <span class="kw">as
                 </span>* <span class="kw">const _ as </span>usize } , <span class="number">150usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( underline_thickness ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . glyph <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">152usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( glyph ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . size <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">160usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( size ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . charmap <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">168usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( charmap ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . driver <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">176usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( driver ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . memory <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">184usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( memory ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . stream <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">192usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( stream ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . sizes_list <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">200usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( sizes_list ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . autohint <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">216usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( autohint ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . extensions <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">232usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( extensions ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_FaceRec_ ) ) . internal <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">240usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_FaceRec_ ) , <span class="string">"::" </span>,
@@ -4197,24 +4197,24 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_SizeRec_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_SizeRec_&gt;() , <span class="number">88usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_SizeRec_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_SizeRec_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_SizeRec_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_SizeRec_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_SizeRec_ ) ) . face <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_SizeRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( face ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_SizeRec_ ) ) . generic <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_SizeRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( generic ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_SizeRec_ ) ) . metrics <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_SizeRec_ ) , <span class="string">"::" </span>,
                 stringify ! ( metrics ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_SizeRec_ ) ) . internal <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">80usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_SizeRec_ ) , <span class="string">"::" </span>,
@@ -4254,114 +4254,114 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_GlyphSlotRec_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_GlyphSlotRec_&gt;() , <span class="number">304usize </span>, concat !
                ( <span class="string">"Size of: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_GlyphSlotRec_&gt;() , <span class="number">8usize </span>, concat !
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_GlyphSlotRec_&gt;() , <span class="number">8usize </span>, concat !
                 ( <span class="string">"Alignment of " </span>, stringify ! ( FT_GlyphSlotRec_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . library <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( library ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . face <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( face ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . next <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( next ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . reserved <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( reserved ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . generic <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">32usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( generic ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . metrics <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">48usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( metrics ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . linearHoriAdvance
                 <span class="kw">as </span>* <span class="kw">const _ as </span>usize } , <span class="number">112usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( linearHoriAdvance ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . linearVertAdvance
                 <span class="kw">as </span>* <span class="kw">const _ as </span>usize } , <span class="number">120usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( linearVertAdvance ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . advance <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">128usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( advance ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . format <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">144usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( format ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . bitmap <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">152usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( bitmap ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . bitmap_left <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">192usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( bitmap_left ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . bitmap_top <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">196usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( bitmap_top ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . outline <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">200usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( outline ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . num_subglyphs <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">240usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( num_subglyphs ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . subglyphs <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">248usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( subglyphs ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . control_data <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">256usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( control_data ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . control_len <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">264usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( control_len ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . lsb_delta <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">272usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( lsb_delta ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . rsb_delta <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">280usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( rsb_delta ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . other <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">288usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( other ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_GlyphSlotRec_ ) ) . internal <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">296usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_GlyphSlotRec_ ) ,
@@ -4383,24 +4383,24 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_CharMapRec_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_CharMapRec_&gt;() , <span class="number">16usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_CharMapRec_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_CharMapRec_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_CharMapRec_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_CharMapRec_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_CharMapRec_ ) ) . face <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_CharMapRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( face ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_CharMapRec_ ) ) . encoding <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_CharMapRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( encoding ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_CharMapRec_ ) ) . platform_id <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">12usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_CharMapRec_ ) , <span class="string">"::"
                 </span>, stringify ! ( platform_id ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_CharMapRec_ ) ) . encoding_id <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">14usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_CharMapRec_ ) , <span class="string">"::"
@@ -4469,44 +4469,44 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Size_Metrics_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Size_Metrics_&gt;() , <span class="number">56usize </span>, concat !
                ( <span class="string">"Size of: " </span>, stringify ! ( FT_Size_Metrics_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Size_Metrics_&gt;() , <span class="number">8usize </span>, concat !
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Size_Metrics_&gt;() , <span class="number">8usize </span>, concat !
                 ( <span class="string">"Alignment of " </span>, stringify ! ( FT_Size_Metrics_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Size_Metrics_ ) ) . x_ppem <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Size_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( x_ppem ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Size_Metrics_ ) ) . y_ppem <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">2usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Size_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( y_ppem ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Size_Metrics_ ) ) . x_scale <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Size_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( x_scale ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Size_Metrics_ ) ) . y_scale <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Size_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( y_scale ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Size_Metrics_ ) ) . ascender <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Size_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( ascender ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Size_Metrics_ ) ) . descender <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">32usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Size_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( descender ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Size_Metrics_ ) ) . height <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">40usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Size_Metrics_ ) ,
                 <span class="string">"::" </span>, stringify ! ( height ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Size_Metrics_ ) ) . max_advance <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">48usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Size_Metrics_ ) ,
@@ -4546,14 +4546,14 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Parameter_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Parameter_&gt;() , <span class="number">16usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_Parameter_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Parameter_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Parameter_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_Parameter_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Parameter_ ) ) . tag <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Parameter_ ) , <span class="string">"::"
                 </span>, stringify ! ( tag ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Parameter_ ) ) . data <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Parameter_ ) , <span class="string">"::"
@@ -4579,44 +4579,44 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Open_Args_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Open_Args_&gt;() , <span class="number">64usize </span>, concat ! (
                <span class="string">"Size of: " </span>, stringify ! ( FT_Open_Args_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Open_Args_&gt;() , <span class="number">8usize </span>, concat ! (
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Open_Args_&gt;() , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_Open_Args_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Open_Args_ ) ) . flags <span class="kw">as </span>* <span class="kw">const _ as
                 </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Open_Args_ ) , <span class="string">"::"
                 </span>, stringify ! ( flags ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Open_Args_ ) ) . memory_base <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Open_Args_ ) , <span class="string">"::"
                 </span>, stringify ! ( memory_base ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Open_Args_ ) ) . memory_size <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Open_Args_ ) , <span class="string">"::"
                 </span>, stringify ! ( memory_size ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Open_Args_ ) ) . pathname <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Open_Args_ ) , <span class="string">"::"
                 </span>, stringify ! ( pathname ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Open_Args_ ) ) . stream <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">32usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Open_Args_ ) , <span class="string">"::"
                 </span>, stringify ! ( stream ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Open_Args_ ) ) . driver <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">40usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Open_Args_ ) , <span class="string">"::"
                 </span>, stringify ! ( driver ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Open_Args_ ) ) . num_params <span class="kw">as </span>* <span class="kw">const
                 _ as </span>usize } , <span class="number">48usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Open_Args_ ) , <span class="string">"::"
                 </span>, stringify ! ( num_params ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Open_Args_ ) ) . params <span class="kw">as </span>* <span class="kw">const _
                 as </span>usize } , <span class="number">56usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Open_Args_ ) , <span class="string">"::"
@@ -4682,30 +4682,30 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Size_RequestRec_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Size_RequestRec_&gt;() , <span class="number">32usize </span>, concat
                ! ( <span class="string">"Size of: " </span>, stringify ! ( FT_Size_RequestRec_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Size_RequestRec_&gt;() , <span class="number">8usize </span>,
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Size_RequestRec_&gt;() , <span class="number">8usize </span>,
                 concat ! (
                 <span class="string">"Alignment of " </span>, stringify ! ( FT_Size_RequestRec_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Size_RequestRec_ ) ) . type_ <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Size_RequestRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( type_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Size_RequestRec_ ) ) . width <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Size_RequestRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( width ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Size_RequestRec_ ) ) . height <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Size_RequestRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( height ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Size_RequestRec_ ) ) . horiResolution
                 <span class="kw">as </span>* <span class="kw">const _ as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Size_RequestRec_ ) ,
                 <span class="string">"::" </span>, stringify ! ( horiResolution ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Size_RequestRec_ ) ) . vertResolution
                 <span class="kw">as </span>* <span class="kw">const _ as </span>usize } , <span class="number">28usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Size_RequestRec_ ) ,
@@ -4950,49 +4950,49 @@
 </span><span class="kw">fn </span>bindgen_test_layout_FT_Module_Class_() {
     <span class="macro">assert_eq!</span>(::std::mem::size_of::&lt;FT_Module_Class_&gt;() , <span class="number">72usize </span>, concat !
                ( <span class="string">"Size of: " </span>, stringify ! ( FT_Module_Class_ ) ));
-    <span class="macro">assert_eq! </span>(::std::mem::align_of::&lt;FT_Module_Class_&gt;() , <span class="number">8usize </span>, concat !
+    <span class="macro">assert_eq!</span> (::std::mem::align_of::&lt;FT_Module_Class_&gt;() , <span class="number">8usize </span>, concat !
                 ( <span class="string">"Alignment of " </span>, stringify ! ( FT_Module_Class_ ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Module_Class_ ) ) . module_flags <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">0usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Module_Class_ ) ,
                 <span class="string">"::" </span>, stringify ! ( module_flags ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Module_Class_ ) ) . module_size <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">8usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Module_Class_ ) ,
                 <span class="string">"::" </span>, stringify ! ( module_size ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Module_Class_ ) ) . module_name <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">16usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Module_Class_ ) ,
                 <span class="string">"::" </span>, stringify ! ( module_name ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Module_Class_ ) ) . module_version <span class="kw">as
                 </span>* <span class="kw">const _ as </span>usize } , <span class="number">24usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Module_Class_ ) ,
                 <span class="string">"::" </span>, stringify ! ( module_version ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Module_Class_ ) ) . module_requires <span class="kw">as
                 </span>* <span class="kw">const _ as </span>usize } , <span class="number">32usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Module_Class_ ) ,
                 <span class="string">"::" </span>, stringify ! ( module_requires ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Module_Class_ ) ) . module_interface
                 <span class="kw">as </span>* <span class="kw">const _ as </span>usize } , <span class="number">40usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Module_Class_ ) ,
                 <span class="string">"::" </span>, stringify ! ( module_interface ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Module_Class_ ) ) . module_init <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">48usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Module_Class_ ) ,
                 <span class="string">"::" </span>, stringify ! ( module_init ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Module_Class_ ) ) . module_done <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">56usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Module_Class_ ) ,
                 <span class="string">"::" </span>, stringify ! ( module_done ) ));
-    <span class="macro">assert_eq! </span>(<span class="kw">unsafe </span>{
+    <span class="macro">assert_eq!</span> (<span class="kw">unsafe </span>{
                 &amp; ( * ( <span class="number">0 </span><span class="kw">as </span>* <span class="kw">const </span>FT_Module_Class_ ) ) . get_interface <span class="kw">as </span>*
                 <span class="kw">const _ as </span>usize } , <span class="number">64usize </span>, concat ! (
                 <span class="string">"Alignment of field: " </span>, stringify ! ( FT_Module_Class_ ) ,

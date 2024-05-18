@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-macros-backend-0.19.2/src/pyclass.rs`."><title>pyclass.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="pyo3_macros_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.2 (25ef9e3d8 2024-04-09)" data-channel="1.77.2" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-macros-backend-0.19.2/src/pyclass.rs`."><title>pyclass.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="pyo3_macros_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../pyo3_macros_backend/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1298,7 +1298,7 @@
     }
 
     <span class="kw">fn </span>set_option(<span class="kw-2">&amp;mut </span><span class="self">self</span>, option: PyClassPyO3Option) -&gt; syn::Result&lt;()&gt; {
-        <span class="macro">macro_rules! </span>set_option {
+        <span class="macro">macro_rules!</span> set_option {
             (<span class="macro-nonterminal">$key</span>:ident) =&gt; {
                 {
                     <span class="macro">ensure_spanned!</span>(
@@ -1509,7 +1509,7 @@
     .doc(doc)
     .impl_all()<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{
+    <span class="prelude-val">Ok</span>(<span class="macro">quote!</span> {
         <span class="kw">const _</span>: () = {
             <span class="kw">use </span>#krate <span class="kw">as </span>_pyo3;
 
@@ -1664,9 +1664,9 @@
                 get_class_python_name(cls, args),
                 variant.python_name(),
             );
-            <span class="macro">quote! </span>{ #cls::#variant_name =&gt; #repr, }
+            <span class="macro">quote!</span> { #cls::#variant_name =&gt; #repr, }
         });
-        <span class="kw">let </span><span class="kw-2">mut </span>repr_impl: syn::ImplItemMethod = <span class="macro">syn::parse_quote! </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>repr_impl: syn::ImplItemMethod = <span class="macro">syn::parse_quote!</span> {
             <span class="kw">fn </span>__pyo3__repr__(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
                 <span class="kw">match </span><span class="self">self </span>{
                     #(#variants_repr)*
@@ -1683,9 +1683,9 @@
         <span class="comment">// This implementation allows us to convert &amp;T to #repr_type without implementing `Copy`
         </span><span class="kw">let </span>variants_to_int = variants.iter().map(|variant| {
             <span class="kw">let </span>variant_name = variant.ident;
-            <span class="macro">quote! </span>{ #cls::#variant_name =&gt; #cls::#variant_name <span class="kw">as </span>#repr_type, }
+            <span class="macro">quote!</span> { #cls::#variant_name =&gt; #cls::#variant_name <span class="kw">as </span>#repr_type, }
         });
-        <span class="kw">let </span><span class="kw-2">mut </span>int_impl: syn::ImplItemMethod = <span class="macro">syn::parse_quote! </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>int_impl: syn::ImplItemMethod = <span class="macro">syn::parse_quote!</span> {
             <span class="kw">fn </span>__pyo3__int__(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; #repr_type {
                 <span class="kw">match </span><span class="self">self </span>{
                     #(#variants_to_int)*
@@ -1697,7 +1697,7 @@
     };
 
     <span class="kw">let </span>(default_richcmp, default_richcmp_slot) = {
-        <span class="kw">let </span><span class="kw-2">mut </span>richcmp_impl: syn::ImplItemMethod = <span class="macro">syn::parse_quote! </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>richcmp_impl: syn::ImplItemMethod = <span class="macro">syn::parse_quote!</span> {
             <span class="kw">fn </span>__pyo3__richcmp__(
                 <span class="kw-2">&amp;</span><span class="self">self</span>,
                 py: _pyo3::Python,
@@ -1750,7 +1750,7 @@
     .doc(doc)
     .impl_all()<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{
+    <span class="prelude-val">Ok</span>(<span class="macro">quote!</span> {
         <span class="kw">const _</span>: () = {
             <span class="kw">use </span>#krate <span class="kw">as </span>_pyo3;
 
@@ -1798,7 +1798,7 @@
         attributes: ConstAttributes {
             is_class_attr: <span class="bool-val">true</span>,
             name: <span class="prelude-val">Some</span>(NameAttribute {
-                kw: <span class="macro">syn::parse_quote! </span>{ name },
+                kw: <span class="macro">syn::parse_quote!</span> { name },
                 value: NameLitStr(py_ident.clone()),
             }),
             deprecations: Default::default(),
@@ -1873,12 +1873,12 @@
     <span class="kw">let </span>cls_name = get_class_python_name(cls, attr).to_string();
 
     <span class="kw">let </span>module = <span class="kw">if let </span><span class="prelude-val">Some</span>(ModuleAttribute { value, .. }) = <span class="kw-2">&amp;</span>attr.options.module {
-        <span class="macro">quote! </span>{ ::core::option::Option::Some(#value) }
+        <span class="macro">quote!</span> { ::core::option::Option::Some(#value) }
     } <span class="kw">else </span>{
-        <span class="macro">quote! </span>{ ::core::option::Option::None }
+        <span class="macro">quote!</span> { ::core::option::Option::None }
     };
 
-    <span class="macro">quote! </span>{
+    <span class="macro">quote!</span> {
         <span class="kw">unsafe impl </span>_pyo3::type_object::PyTypeInfo <span class="kw">for </span>#cls {
             <span class="kw">type </span>AsRefTarget = _pyo3::PyCell&lt;<span class="self">Self</span>&gt;;
 
@@ -1953,12 +1953,12 @@
         <span class="kw">let </span>cls = <span class="self">self</span>.cls;
 
         <span class="kw">let </span>frozen = <span class="kw">if </span><span class="self">self</span>.attr.options.frozen.is_some() {
-            <span class="macro">quote! </span>{ _pyo3::pyclass::boolean_struct::True }
+            <span class="macro">quote!</span> { _pyo3::pyclass::boolean_struct::True }
         } <span class="kw">else </span>{
-            <span class="macro">quote! </span>{ _pyo3::pyclass::boolean_struct::False }
+            <span class="macro">quote!</span> { _pyo3::pyclass::boolean_struct::False }
         };
 
-        <span class="macro">quote! </span>{
+        <span class="macro">quote!</span> {
             <span class="kw">impl </span>_pyo3::PyClass <span class="kw">for </span>#cls {
                 <span class="kw">type </span>Frozen = #frozen;
             }
@@ -1967,7 +1967,7 @@
     <span class="kw">fn </span>impl_extractext(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream {
         <span class="kw">let </span>cls = <span class="self">self</span>.cls;
         <span class="kw">if </span><span class="self">self</span>.attr.options.frozen.is_some() {
-            <span class="macro">quote! </span>{
+            <span class="macro">quote!</span> {
                 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'py</span>&gt; _pyo3::impl_::extract_argument::PyFunctionArgument&lt;<span class="lifetime">'a</span>, <span class="lifetime">'py</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span>#cls
                 {
                     <span class="kw">type </span>Holder = ::std::option::Option&lt;_pyo3::PyRef&lt;<span class="lifetime">'py</span>, #cls&gt;&gt;;
@@ -1979,7 +1979,7 @@
                 }
             }
         } <span class="kw">else </span>{
-            <span class="macro">quote! </span>{
+            <span class="macro">quote!</span> {
                 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'py</span>&gt; _pyo3::impl_::extract_argument::PyFunctionArgument&lt;<span class="lifetime">'a</span>, <span class="lifetime">'py</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span>#cls
                 {
                     <span class="kw">type </span>Holder = ::std::option::Option&lt;_pyo3::PyRef&lt;<span class="lifetime">'py</span>, #cls&gt;&gt;;
@@ -2008,7 +2008,7 @@
         <span class="kw">let </span>attr = <span class="self">self</span>.attr;
         <span class="comment">// If #cls is not extended type, we allow Self-&gt;PyObject conversion
         </span><span class="kw">if </span>attr.options.extends.is_none() {
-            <span class="macro">quote! </span>{
+            <span class="macro">quote!</span> {
                 <span class="kw">impl </span>_pyo3::IntoPy&lt;_pyo3::PyObject&gt; <span class="kw">for </span>#cls {
                     <span class="kw">fn </span>into_py(<span class="self">self</span>, py: _pyo3::Python) -&gt; _pyo3::PyObject {
                         _pyo3::IntoPy::into_py(_pyo3::Py::new(py, <span class="self">self</span>).unwrap(), py)
@@ -2016,12 +2016,12 @@
                 }
             }
         } <span class="kw">else </span>{
-            <span class="macro">quote! </span>{}
+            <span class="macro">quote!</span> {}
         }
     }
     <span class="kw">fn </span>impl_pyclassimpl(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream&gt; {
         <span class="kw">let </span>cls = <span class="self">self</span>.cls;
-        <span class="kw">let </span>doc = <span class="self">self</span>.doc.as_ref().map_or(<span class="macro">quote! </span>{<span class="string">"\0"</span>}, |doc| <span class="macro">quote! </span>{#doc});
+        <span class="kw">let </span>doc = <span class="self">self</span>.doc.as_ref().map_or(<span class="macro">quote!</span> {<span class="string">"\0"</span>}, |doc| <span class="macro">quote!</span> {#doc});
         <span class="kw">let </span>deprecated_text_signature = <span class="kw">match </span><span class="self">self
             </span>.attr
             .options
@@ -2041,7 +2041,7 @@
             .extends
             .as_ref()
             .map(|extends_attr| extends_attr.value.clone())
-            .unwrap_or_else(|| <span class="macro">parse_quote! </span>{ _pyo3::PyAny });
+            .unwrap_or_else(|| <span class="macro">parse_quote!</span> { _pyo3::PyAny });
         <span class="kw">let </span>is_subclass = <span class="self">self</span>.attr.options.extends.is_some();
         <span class="kw">let </span>is_mapping: bool = <span class="self">self</span>.attr.options.mapping.is_some();
         <span class="kw">let </span>is_sequence: bool = <span class="self">self</span>.attr.options.sequence.is_some();
@@ -2052,7 +2052,7 @@
         </span>);
 
         <span class="kw">let </span>dict_offset = <span class="kw">if </span><span class="self">self</span>.attr.options.dict.is_some() {
-            <span class="macro">quote! </span>{
+            <span class="macro">quote!</span> {
                 <span class="kw">fn </span>dict_offset() -&gt; ::std::option::Option&lt;_pyo3::ffi::Py_ssize_t&gt; {
                     ::std::option::Option::Some(_pyo3::impl_::pyclass::dict_offset::&lt;<span class="self">Self</span>&gt;())
                 }
@@ -2063,7 +2063,7 @@
 
         <span class="comment">// insert space for weak ref
         </span><span class="kw">let </span>weaklist_offset = <span class="kw">if </span><span class="self">self</span>.attr.options.weakref.is_some() {
-            <span class="macro">quote! </span>{
+            <span class="macro">quote!</span> {
                 <span class="kw">fn </span>weaklist_offset() -&gt; ::std::option::Option&lt;_pyo3::ffi::Py_ssize_t&gt; {
                     ::std::option::Option::Some(_pyo3::impl_::pyclass::weaklist_offset::&lt;<span class="self">Self</span>&gt;())
                 }
@@ -2073,17 +2073,17 @@
         };
 
         <span class="kw">let </span>thread_checker = <span class="kw">if </span><span class="self">self</span>.attr.options.unsendable.is_some() {
-            <span class="macro">quote! </span>{ _pyo3::impl_::pyclass::ThreadCheckerImpl&lt;#cls&gt; }
+            <span class="macro">quote!</span> { _pyo3::impl_::pyclass::ThreadCheckerImpl&lt;#cls&gt; }
         } <span class="kw">else if </span><span class="self">self</span>.attr.options.extends.is_some() {
-            <span class="macro">quote! </span>{
+            <span class="macro">quote!</span> {
                 _pyo3::impl_::pyclass::ThreadCheckerInherited&lt;#cls, &lt;#cls <span class="kw">as </span>_pyo3::impl_::pyclass::PyClassImpl&gt;::BaseType&gt;
             }
         } <span class="kw">else </span>{
-            <span class="macro">quote! </span>{ _pyo3::impl_::pyclass::ThreadCheckerStub&lt;#cls&gt; }
+            <span class="macro">quote!</span> { _pyo3::impl_::pyclass::ThreadCheckerStub&lt;#cls&gt; }
         };
 
         <span class="kw">let </span>(pymethods_items, inventory, inventory_class) = <span class="kw">match </span><span class="self">self</span>.methods_type {
-            PyClassMethodsType::Specialization =&gt; (<span class="macro">quote! </span>{ collector.py_methods() }, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            PyClassMethodsType::Specialization =&gt; (<span class="macro">quote!</span> { collector.py_methods() }, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             PyClassMethodsType::Inventory =&gt; {
                 <span class="comment">// To allow multiple #[pymethods] block, we define inventory types.
                 </span><span class="kw">let </span>inventory_class_name = syn::Ident::new(
@@ -2091,7 +2091,7 @@
                     Span::call_site(),
                 );
                 (
-                    <span class="macro">quote! </span>{
+                    <span class="macro">quote!</span> {
                         ::std::boxed::Box::new(
                             ::std::iter::Iterator::map(
                                 _pyo3::inventory::iter::&lt;&lt;<span class="self">Self </span><span class="kw">as </span>_pyo3::impl_::pyclass::PyClassImpl&gt;::Inventory&gt;(),
@@ -2099,7 +2099,7 @@
                             )
                         )
                     },
-                    <span class="prelude-val">Some</span>(<span class="macro">quote! </span>{ <span class="kw">type </span>Inventory = #inventory_class_name; }),
+                    <span class="prelude-val">Some</span>(<span class="macro">quote!</span> { <span class="kw">type </span>Inventory = #inventory_class_name; }),
                     <span class="prelude-val">Some</span>(define_inventory_class(<span class="kw-2">&amp;</span>inventory_class_name)),
                 )
             }
@@ -2122,11 +2122,11 @@
         <span class="kw">let </span>deprecations = <span class="kw-2">&amp;</span><span class="self">self</span>.attr.deprecations;
 
         <span class="kw">let </span>class_mutability = <span class="kw">if </span><span class="self">self</span>.attr.options.frozen.is_some() {
-            <span class="macro">quote! </span>{
+            <span class="macro">quote!</span> {
                 ImmutableChild
             }
         } <span class="kw">else </span>{
-            <span class="macro">quote! </span>{
+            <span class="macro">quote!</span> {
                 MutableChild
             }
         };
@@ -2134,25 +2134,25 @@
         <span class="kw">let </span>cls = <span class="self">self</span>.cls;
         <span class="kw">let </span>attr = <span class="self">self</span>.attr;
         <span class="kw">let </span>dict = <span class="kw">if </span>attr.options.dict.is_some() {
-            <span class="macro">quote! </span>{ _pyo3::impl_::pyclass::PyClassDictSlot }
+            <span class="macro">quote!</span> { _pyo3::impl_::pyclass::PyClassDictSlot }
         } <span class="kw">else </span>{
-            <span class="macro">quote! </span>{ _pyo3::impl_::pyclass::PyClassDummySlot }
+            <span class="macro">quote!</span> { _pyo3::impl_::pyclass::PyClassDummySlot }
         };
 
         <span class="comment">// insert space for weak ref
         </span><span class="kw">let </span>weakref = <span class="kw">if </span>attr.options.weakref.is_some() {
-            <span class="macro">quote! </span>{ _pyo3::impl_::pyclass::PyClassWeakRefSlot }
+            <span class="macro">quote!</span> { _pyo3::impl_::pyclass::PyClassWeakRefSlot }
         } <span class="kw">else </span>{
-            <span class="macro">quote! </span>{ _pyo3::impl_::pyclass::PyClassDummySlot }
+            <span class="macro">quote!</span> { _pyo3::impl_::pyclass::PyClassDummySlot }
         };
 
         <span class="kw">let </span>base_nativetype = <span class="kw">if </span>attr.options.extends.is_some() {
-            <span class="macro">quote! </span>{ &lt;<span class="self">Self</span>::BaseType <span class="kw">as </span>_pyo3::impl_::pyclass::PyClassBaseType&gt;::BaseNativeType }
+            <span class="macro">quote!</span> { &lt;<span class="self">Self</span>::BaseType <span class="kw">as </span>_pyo3::impl_::pyclass::PyClassBaseType&gt;::BaseNativeType }
         } <span class="kw">else </span>{
-            <span class="macro">quote! </span>{ _pyo3::PyAny }
+            <span class="macro">quote!</span> { _pyo3::PyAny }
         };
 
-        <span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{
+        <span class="prelude-val">Ok</span>(<span class="macro">quote!</span> {
             <span class="kw">impl </span>_pyo3::impl_::pyclass::PyClassImpl <span class="kw">for </span>#cls {
                 <span class="kw">const </span>IS_BASETYPE: bool = #is_basetype;
                 <span class="kw">const </span>IS_SUBCLASS: bool = #is_subclass;
@@ -2214,7 +2214,7 @@
 
         <span class="self">self</span>.attr.options.freelist.as_ref().map_or(<span class="macro">quote!</span>{}, |freelist| {
             <span class="kw">let </span>freelist = <span class="kw-2">&amp;</span>freelist.value;
-            <span class="macro">quote! </span>{
+            <span class="macro">quote!</span> {
                 <span class="kw">impl </span>_pyo3::impl_::pyclass::PyClassWithFreeList <span class="kw">for </span>#cls {
                     <span class="attr">#[inline]
                     </span><span class="kw">fn </span>get_free_list(py: _pyo3::Python&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="kw-2">&amp;mut </span>_pyo3::impl_::freelist::FreeList&lt;<span class="kw-2">*mut </span>_pyo3::ffi::PyObject&gt; {
@@ -2237,13 +2237,13 @@
 
         <span class="kw">if </span><span class="self">self</span>.attr.options.freelist.is_some() {
             <span class="macro">vec!</span>[
-                <span class="macro">quote! </span>{
+                <span class="macro">quote!</span> {
                     _pyo3::ffi::PyType_Slot {
                         slot: _pyo3::ffi::Py_tp_alloc,
                         pfunc: _pyo3::impl_::pyclass::alloc_with_freelist::&lt;#cls&gt; <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>,
                     }
                 },
-                <span class="macro">quote! </span>{
+                <span class="macro">quote!</span> {
                     _pyo3::ffi::PyType_Slot {
                         slot: _pyo3::ffi::Py_tp_free,
                         pfunc: _pyo3::impl_::pyclass::free_with_freelist::&lt;#cls&gt; <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>,
@@ -2257,7 +2257,7 @@
 }
 
 <span class="kw">fn </span>define_inventory_class(inventory_class_name: <span class="kw-2">&amp;</span>syn::Ident) -&gt; TokenStream {
-    <span class="macro">quote! </span>{
+    <span class="macro">quote!</span> {
         <span class="attr">#[doc(hidden)]
         </span><span class="kw">pub struct </span>#inventory_class_name {
             items: _pyo3::impl_::pyclass::PyClassItems,
