@@ -8,6 +8,11 @@
 //!
 //!
 
+use std::sync::{
+    Arc,
+    Mutex,
+};
+
 extern crate zmq;
 
 #[macro_use] extern crate log;
@@ -20,6 +25,9 @@ extern crate liftof_lib;
 use std::thread;
 
 //use tof_dataclasses::threading::ThreadControl;
+use tof_dataclasses::threading::{
+    ThreadControl,
+};
 
 //use tof_dataclasses::commands::RBCommand;
 use liftof_lib::{
@@ -131,6 +139,7 @@ fn main() {
   let verbose             = args.verbose;
   let publish_packets     = args.publish_packets;
   let relay_rbs           = args.relay_rbs;
+  let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
 
   let _worker_thread = thread::Builder::new()
          .name("master_trigger".into())
@@ -139,6 +148,7 @@ fn main() {
                            &mte_send,
                            &tp_send_moni,
                            mtb_settings,
+                           thread_control,
                            verbose);
          })
          .expect("Failed to spawn master_trigger thread!");

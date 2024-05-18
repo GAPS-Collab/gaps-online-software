@@ -95,6 +95,7 @@ use tof_dataclasses::commands::{
 
 use liftof_lib::{
     //readoutboard_commander,
+    signal_handler,
     init_env_logger,
     //color_log,
     LIFTOF_LOGO_SHOW,
@@ -311,7 +312,7 @@ fn main() {
   //let one_minute = time::Duration::from_millis(60000);
 
   // set up signal handline
-  let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
+  //let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
 
   // no cpu monitoring for cmdline calibration tasks
   if cpu_moni_interval > 0 {
@@ -349,6 +350,14 @@ fn main() {
     })
     .expect("Failed to spawn data-sink thread!");
   println!("==> data sink thread started!");
+  let thread_control_sh = thread_control.clone();
+  let _signal_handler_thread = thread::Builder::new()
+    .name("signal_handler".into())
+    .spawn(move || {
+      signal_handler(
+        thread_control_sh) 
+      })
+    .expect("Failed to spawn signal-handler thread!");
 
   println!("==> Starting event builder and master trigger threads...");
   //let db_path_string    = config.db_path.clone();
@@ -371,6 +380,7 @@ fn main() {
   // master trigger
   //let thread_control_mt = thread_control.clone();
   let mtb_moni_sender = tp_to_sink.clone(); 
+  let thread_control_mt = thread_control.clone();
   let _mtb_thread = thread::Builder::new()
     .name("master-trigger".into())
     .spawn(move || {
@@ -378,6 +388,7 @@ fn main() {
                                    &master_ev_send,
                                    &mtb_moni_sender,
                                    mtb_settings,
+                                   thread_control_mt,
                                    // verbosity is currently too much 
                                    // output
                                    verbose);
@@ -480,7 +491,6 @@ fn main() {
     CommandCC::Calibration(ref calibration_cmd) => {
       match calibration_cmd {
         CalibrationCmd::Default(cali_opts) => {
-
           let voltage_level = cali_opts.level;
           let rb_id         = cali_opts.id;
           let extra         = cali_opts.extra;
@@ -497,6 +507,8 @@ fn main() {
           let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
           let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
           cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+          println!("=> Give the RBs a chance to connect and wait a bit..");
+          thread::sleep(10*one_second);
 
           match cmd_sender.send(&payload, 0) {
             Err(err) => {
@@ -518,6 +530,8 @@ fn main() {
           // if that is successful, we need to wait
           match thread_control.lock() {
             Ok(mut tc) => {
+              // deactivate the master trigger thread
+              tc.thread_master_trg_active =false;
               tc.calibration_active = true;
             },
             Err(err) => {
@@ -649,21 +663,21 @@ fn main() {
 
     // check pending signals and handle
     // SIGTERM and SIGINT
-    for signal in signals.pending() {
-      match signal as c_int {
-        SIGTERM => {
-          println!("=> {}", String::from("SIGINT received. Maybe Ctrl+C has been pressed!").red().bold());
-          end_program = true;
-        } 
-        SIGINT => {
-          println!("=> {}", String::from("SIGTERM received").red().bold());
-          end_program = true;
-        }
-        _ => {
-          error!("Received signal, but I don't have instructions what to do about it!");
-        }
-      }
-    }
+    //for signal in signals.pending() {
+    //  match signal as c_int {
+    //    SIGTERM => {
+    //      println!("=> {}", String::from("SIGINT received. Maybe Ctrl+C has been pressed!").red().bold());
+    //      end_program = true;
+    //    } 
+    //    SIGINT => {
+    //      println!("=> {}", String::from("SIGTERM received").red().bold());
+    //      end_program = true;
+    //    }
+    //    _ => {
+    //      error!("Received signal, but I don't have instructions what to do about it!");
+    //    }
+    //  }
+    //}
     if end_program {
       println!("=> Shutting down threads...");
       match thread_control.lock() {

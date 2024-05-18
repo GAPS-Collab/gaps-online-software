@@ -146,23 +146,29 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
 
 /// Handle incoming POSIX signals
 pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
-  let one_second = Duration::from_millis(1000);
+  let sleep_time = Duration::from_millis(100);
 
   let mut end_program = false;
   let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
   loop {
-    thread::sleep(1*one_second);
+    thread::sleep(sleep_time);
     match thread_control.lock() {
-      Ok(tc) => {
+      Ok(mut tc) => {
+        //println!("Tread control {:?}", tc);
         if !tc.thread_cmd_dispatch_active 
         && !tc.thread_data_sink_active
         && !tc.thread_event_bldr_active 
-        && !tc.thread_master_trg_active {
+        && !tc.thread_master_trg_active  {
+          println!(">> So long and thanks for all the \u{1F41F} <<"); 
           exit(0);
+        }
+        if end_program{
+            tc.stop_flag = true;
+            continue;
         }
       }
       Err(err) => {
-        error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        error!("Can't acquire lock for ThreadControl! {err}");
       },
     }
 
@@ -183,19 +189,6 @@ pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
         }
       }
     }
-    if end_program {
-      println!("=> Shutting down threads...");
-      match thread_control.lock() {
-        Ok(mut tc) => {
-          tc.stop_flag = true;
-        },
-        Err(err) => {
-          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-        },
-      }
-    }
-
-
   }
 }
 

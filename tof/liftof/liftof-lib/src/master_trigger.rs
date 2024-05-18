@@ -18,6 +18,10 @@ pub mod registers;
 
 use control::*;
 use registers::*;
+use std::sync::{
+    Arc,
+    Mutex,
+};
 
 use std::time::{
     Duration,
@@ -37,6 +41,9 @@ use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::monitoring::MtbMoniData;
 //use tof_dataclasses::commands::RBCommand;
 use tof_dataclasses::events::MasterTriggerEvent;
+use tof_dataclasses::threading::{
+    ThreadControl,
+};
 use tof_dataclasses::events::master_trigger::TriggerType;
 use tof_dataclasses::errors::{
     //IPBusError,
@@ -239,7 +246,7 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
   // sensors are 12 bit
   let first_word   = 0x00000fff;
   let second_word  = 0x0fff0000;
-  println!("[get_mtbmonidata] => Received data from registers {:?} data", data);
+  //println!("[get_mtbmonidata] => Received data from registers {:?} data", data);
   moni.calibration = ( data[0] & first_word  ) as u16;
   moni.vccpint     = ((data[0] & second_word ) >> 16) as u16;  
   moni.vccpaux     = ( data[1] & first_word  ) as u16;  
@@ -282,11 +289,12 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
 ///
 /// * verbose           : Print "heartbeat" output 
 ///
-pub fn master_trigger(mt_address        : String,
-                      mt_sender         : &Sender<MasterTriggerEvent>,
-                      moni_sender       : &Sender<TofPacket>,
-                      settings          : MTBSettings,
-                      verbose           : bool) {
+pub fn master_trigger(mt_address     : String,
+                      mt_sender      : &Sender<MasterTriggerEvent>,
+                      moni_sender    : &Sender<TofPacket>,
+                      settings       : MTBSettings,
+                      thread_control : Arc<Mutex<ThreadControl>>,
+                      verbose        : bool) {
 
   // missing event analysis - has to go away eventually
   //let mut event_id_test = Vec::<u32>::new();
@@ -481,6 +489,7 @@ pub fn master_trigger(mt_address        : String,
   // certain timeinterval
   let mut mtb_timeout    = Instant::now();
   let mut moni_interval  = Instant::now();
+  let mut tc_timer       = Instant::now();
   let mtb_timeout_sec    = settings.mtb_timeout_sec;
   let mtb_moni_interval  = settings.mtb_moni_interval;
   // verbose, debugging
@@ -501,6 +510,22 @@ pub fn master_trigger(mt_address        : String,
 
 
   loop {
+    // Check thread control and what to do
+    if tc_timer.elapsed().as_secs_f32() > 0.1 {
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          if !tc.thread_master_trg_active {
+            // if the thread is not supposed to be active, 
+            // idle
+            continue;
+          }
+        },
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        },
+      }
+      tc_timer = Instant::now();
+    }
     // This is a recovery mechanism. In case we don't see an event
     // for mtb_timeout_sec, we attempt to reconnect to the MTB
     if mtb_timeout.elapsed().as_secs() > mtb_timeout_sec {
