@@ -26,6 +26,8 @@ pub struct ThreadControl {
   pub thread_event_bldr_active   : bool,
   /// alive indicator for master trigger thread
   pub thread_master_trg_active   : bool,
+  /// Running readoutboard communicator threads - the key is associated rb id
+  pub thread_rbcomm_active       : HashMap<u8, bool>,
   /// The current run id
   pub run_id                     : u32,
   /// The number of boards available
@@ -43,6 +45,7 @@ impl ThreadControl {
       thread_runner_active       : false,
       thread_event_bldr_active   : false,
       thread_master_trg_active   : false,
+      thread_rbcomm_active       : HashMap::<u8,bool>::new(),
       run_id                     : 0,
       n_rbs                      : 0,
     }
