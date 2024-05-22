@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/text/span.rs`."><title>span.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/text/span.rs`."><title>span.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -668,12 +668,7 @@
 <a href="#666" id="666">666</a>
 <a href="#667" id="667">667</a>
 <a href="#668" id="668">668</a>
-<a href="#669" id="669">669</a>
-<a href="#670" id="670">670</a>
-<a href="#671" id="671">671</a>
-<a href="#672" id="672">672</a>
-<a href="#673" id="673">673</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, fmt::Debug};
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, fmt};
 
 <span class="kw">use </span>unicode_segmentation::UnicodeSegmentation;
 <span class="kw">use </span>unicode_width::UnicodeWidthStr;
@@ -1070,9 +1065,9 @@
     }
 }
 
-<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>Span&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">"{}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.content)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Span&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.content, f)
     }
 }
 
@@ -1204,15 +1199,15 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>display_span() {
         <span class="kw">let </span>span = Span::raw(<span class="string">"test content"</span>);
-
         <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{span}"</span>), <span class="string">"test content"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{span:.4}"</span>), <span class="string">"test"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>display_styled_span() {
         <span class="kw">let </span>stylized_span = Span::styled(<span class="string">"stylized test content"</span>, Style::new().green());
-
         <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{stylized_span}"</span>), <span class="string">"stylized test content"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{stylized_span:.8}"</span>), <span class="string">"stylized"</span>);
     }
 
     <span class="attr">#[test]
@@ -1240,7 +1235,6 @@
         <span class="kw">use </span>rstest::rstest;
 
         <span class="kw">use super</span>::<span class="kw-2">*</span>;
-        <span class="kw">use </span><span class="kw">crate</span>::assert_buffer_eq;
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>render() {
@@ -1248,12 +1242,11 @@
             <span class="kw">let </span>span = Span::styled(<span class="string">"test content"</span>, style);
             <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">1</span>));
             span.render(buf.area, <span class="kw-2">&amp;mut </span>buf);
-
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[Line::from(<span class="macro">vec!</span>[
+            <span class="kw">let </span>expected = Buffer::with_lines([Line::from(<span class="macro">vec!</span>[
                 <span class="string">"test content"</span>.green().on_yellow(),
                 <span class="string">"   "</span>.into(),
             ])]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
 
         <span class="attr">#[rstest]
@@ -1273,10 +1266,11 @@
             <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">1</span>));
             span.render(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">1</span>), <span class="kw-2">&amp;mut </span>buf);
 
-            <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[Line::from(<span class="string">"test      "</span>)]);
-            expected.set_style(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">1</span>), (Color::Green, Color::Yellow));
-
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            <span class="kw">let </span>expected = Buffer::with_lines([Line::from(<span class="macro">vec!</span>[
+                <span class="string">"test "</span>.green().on_yellow(),
+                <span class="string">"     "</span>.into(),
+            ])]);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
 
         <span class="doccomment">/// When there is already a style set on the buffer, the style of the span should be
@@ -1288,12 +1282,11 @@
             <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">1</span>));
             buf.set_style(buf.area, Style::new().italic());
             span.render(buf.area, <span class="kw-2">&amp;mut </span>buf);
-
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[Line::from(<span class="macro">vec!</span>[
+            <span class="kw">let </span>expected = Buffer::with_lines([Line::from(<span class="macro">vec!</span>[
                 <span class="string">"test content"</span>.green().on_yellow().italic(),
                 <span class="string">"   "</span>.italic(),
             ])]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
 
         <span class="doccomment">/// When the span contains a multi-width grapheme, the grapheme will ensure that the cells
@@ -1304,12 +1297,11 @@
             <span class="kw">let </span>span = Span::styled(<span class="string">"test 😃 content"</span>, style);
             <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">1</span>));
             span.render(buf.area, <span class="kw-2">&amp;mut </span>buf);
-
             <span class="comment">// The existing code in buffer.set_line() handles multi-width graphemes by clearing the
             // cells of the hidden characters. This test ensures that the existing behavior is
             // preserved.
-            </span><span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"test 😃 content"</span>.green().on_yellow()]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            </span><span class="kw">let </span>expected = Buffer::with_lines([<span class="string">"test 😃 content"</span>.green().on_yellow()]);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
 
         <span class="doccomment">/// When the span contains a multi-width grapheme that does not fit in the area passed to
@@ -1322,11 +1314,9 @@
             <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">6</span>, <span class="number">1</span>));
             span.render(buf.area, <span class="kw-2">&amp;mut </span>buf);
 
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[Line::from(<span class="macro">vec!</span>[
-                <span class="string">"test "</span>.green().on_yellow(),
-                <span class="string">" "</span>.into(),
-            ])]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            <span class="kw">let </span>expected =
+                Buffer::with_lines([Line::from(<span class="macro">vec!</span>[<span class="string">"test "</span>.green().on_yellow(), <span class="string">" "</span>.into()])]);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
 
         <span class="doccomment">/// When the area passed to render overflows the buffer, the content should be truncated
@@ -1338,11 +1328,11 @@
             <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">1</span>));
             span.render(Rect::new(<span class="number">10</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">1</span>), <span class="kw-2">&amp;mut </span>buf);
 
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[Line::from(<span class="macro">vec!</span>[
+            <span class="kw">let </span>expected = Buffer::with_lines([Line::from(<span class="macro">vec!</span>[
                 <span class="string">"          "</span>.into(),
                 <span class="string">"test "</span>.green().on_yellow(),
             ])]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
     }
 }

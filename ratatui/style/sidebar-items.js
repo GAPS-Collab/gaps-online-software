@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["Color"],"mod":["palette"],"struct":["Modifier","Style"],"trait":["Styled","Stylize"]};
+window.SIDEBAR_ITEMS = {"enum":["Color"],"mod":["palette"],"struct":["Modifier","ParseColorError","Style"],"trait":["Styled","Stylize"]};

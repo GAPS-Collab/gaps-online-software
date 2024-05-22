@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/widgets/scrollbar.rs`."><title>scrollbar.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/widgets/scrollbar.rs`."><title>scrollbar.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1050,40 +1050,6 @@
 <a href="#1048" id="1048">1048</a>
 <a href="#1049" id="1049">1049</a>
 <a href="#1050" id="1050">1050</a>
-<a href="#1051" id="1051">1051</a>
-<a href="#1052" id="1052">1052</a>
-<a href="#1053" id="1053">1053</a>
-<a href="#1054" id="1054">1054</a>
-<a href="#1055" id="1055">1055</a>
-<a href="#1056" id="1056">1056</a>
-<a href="#1057" id="1057">1057</a>
-<a href="#1058" id="1058">1058</a>
-<a href="#1059" id="1059">1059</a>
-<a href="#1060" id="1060">1060</a>
-<a href="#1061" id="1061">1061</a>
-<a href="#1062" id="1062">1062</a>
-<a href="#1063" id="1063">1063</a>
-<a href="#1064" id="1064">1064</a>
-<a href="#1065" id="1065">1065</a>
-<a href="#1066" id="1066">1066</a>
-<a href="#1067" id="1067">1067</a>
-<a href="#1068" id="1068">1068</a>
-<a href="#1069" id="1069">1069</a>
-<a href="#1070" id="1070">1070</a>
-<a href="#1071" id="1071">1071</a>
-<a href="#1072" id="1072">1072</a>
-<a href="#1073" id="1073">1073</a>
-<a href="#1074" id="1074">1074</a>
-<a href="#1075" id="1075">1075</a>
-<a href="#1076" id="1076">1076</a>
-<a href="#1077" id="1077">1077</a>
-<a href="#1078" id="1078">1078</a>
-<a href="#1079" id="1079">1079</a>
-<a href="#1080" id="1080">1080</a>
-<a href="#1081" id="1081">1081</a>
-<a href="#1082" id="1082">1082</a>
-<a href="#1083" id="1083">1083</a>
-<a href="#1084" id="1084">1084</a>
 </pre></div><pre class="rust"><code><span class="attr">#![warn(clippy::pedantic)]
 #![allow(
     clippy::cast_possible_truncation,
@@ -1114,6 +1080,11 @@
 /// │  └──────── thumb
 /// └─────────── begin
 /// ```
+///
+/// # Important
+///
+/// You must specify the [`ScrollbarState::content_length`] before rendering the `Scrollbar`, or
+/// else the `Scrollbar` will render blank.
 ///
 /// # Examples
 ///
@@ -1755,113 +1726,107 @@
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"#-"</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="string">"area 2, position_0"</span>)]
-    #[case(<span class="string">"-#"</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="string">"area 2, position_1"</span>)]
+    #[case::area_2_position_0(<span class="string">"#-"</span>, <span class="number">0</span>, <span class="number">2</span>)]
+    #[case::area_2_position_1(<span class="string">"-#"</span>, <span class="number">1</span>, <span class="number">2</span>)]
     </span><span class="kw">fn </span>render_scrollbar_simplest(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
         scrollbar_no_arrows: Scrollbar,
     ) {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, expected.width() <span class="kw">as </span>u16, <span class="number">1</span>));
         <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::new(content_length).position(position);
         scrollbar_no_arrows.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]), <span class="string">"{description}"</span>,);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"#####-----"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
-    #[case(<span class="string">"-#####----"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
-    #[case(<span class="string">"-#####----"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
-    #[case(<span class="string">"--#####---"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
-    #[case(<span class="string">"--#####---"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
-    #[case(<span class="string">"---#####--"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
-    #[case(<span class="string">"---#####--"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
-    #[case(<span class="string">"----#####-"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
-    #[case(<span class="string">"----#####-"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
-    #[case(<span class="string">"-----#####"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
+    #[case::position_0(<span class="string">"#####-----"</span>, <span class="number">0</span>, <span class="number">10</span>)]
+    #[case::position_1(<span class="string">"-#####----"</span>, <span class="number">1</span>, <span class="number">10</span>)]
+    #[case::position_2(<span class="string">"-#####----"</span>, <span class="number">2</span>, <span class="number">10</span>)]
+    #[case::position_3(<span class="string">"--#####---"</span>, <span class="number">3</span>, <span class="number">10</span>)]
+    #[case::position_4(<span class="string">"--#####---"</span>, <span class="number">4</span>, <span class="number">10</span>)]
+    #[case::position_5(<span class="string">"---#####--"</span>, <span class="number">5</span>, <span class="number">10</span>)]
+    #[case::position_6(<span class="string">"---#####--"</span>, <span class="number">6</span>, <span class="number">10</span>)]
+    #[case::position_7(<span class="string">"----#####-"</span>, <span class="number">7</span>, <span class="number">10</span>)]
+    #[case::position_8(<span class="string">"----#####-"</span>, <span class="number">8</span>, <span class="number">10</span>)]
+    #[case::position_9(<span class="string">"-----#####"</span>, <span class="number">9</span>, <span class="number">10</span>)]
     </span><span class="kw">fn </span>render_scrollbar_simple(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
         scrollbar_no_arrows: Scrollbar,
     ) {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, expected.width() <span class="kw">as </span>u16, <span class="number">1</span>));
         <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::new(content_length).position(position);
         scrollbar_no_arrows.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]), <span class="string">"{description}"</span>,);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"          "</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="string">"position_0"</span>)]
+    #[case::position_0(<span class="string">"          "</span>, <span class="number">0</span>, <span class="number">0</span>)]
     </span><span class="kw">fn </span>render_scrollbar_nobar(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
         scrollbar_no_arrows: Scrollbar,
     ) {
         <span class="kw">let </span>size = expected.width();
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size <span class="kw">as </span>u16, <span class="number">1</span>));
         <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::new(content_length).position(position);
         scrollbar_no_arrows.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]), <span class="string">"{description}"</span>,);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"##########"</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="string">"fullbar position 0"</span>)]
-    #[case(<span class="string">"#########-"</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="string">"almost fullbar position 0"</span>)]
-    #[case(<span class="string">"-#########"</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="string">"almost fullbar position 1"</span>)]
+    #[case::fullbar_position_0(<span class="string">"##########"</span>, <span class="number">0</span>, <span class="number">1</span>)]
+    #[case::almost_fullbar_position_0(<span class="string">"#########-"</span>, <span class="number">0</span>, <span class="number">2</span>)]
+    #[case::almost_fullbar_position_1(<span class="string">"-#########"</span>, <span class="number">1</span>, <span class="number">2</span>)]
     </span><span class="kw">fn </span>render_scrollbar_fullbar(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
         scrollbar_no_arrows: Scrollbar,
     ) {
         <span class="kw">let </span>size = expected.width();
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size <span class="kw">as </span>u16, <span class="number">1</span>));
         <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::new(content_length).position(position);
         scrollbar_no_arrows.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]), <span class="string">"{description}"</span>,);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"#########-"</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="string">"position_0"</span>)]
-    #[case(<span class="string">"-#########"</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="string">"position_1"</span>)]
+    #[case::position_0(<span class="string">"#########-"</span>, <span class="number">0</span>, <span class="number">2</span>)]
+    #[case::position_1(<span class="string">"-#########"</span>, <span class="number">1</span>, <span class="number">2</span>)]
     </span><span class="kw">fn </span>render_scrollbar_almost_fullbar(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
         scrollbar_no_arrows: Scrollbar,
     ) {
         <span class="kw">let </span>size = expected.width();
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size <span class="kw">as </span>u16, <span class="number">1</span>));
         <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::new(content_length).position(position);
         scrollbar_no_arrows.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]), <span class="string">"{description}"</span>,);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"█████═════"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
-    #[case(<span class="string">"═█████════"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
-    #[case(<span class="string">"═█████════"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
-    #[case(<span class="string">"══█████═══"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
-    #[case(<span class="string">"══█████═══"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
-    #[case(<span class="string">"═══█████══"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
-    #[case(<span class="string">"═══█████══"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
-    #[case(<span class="string">"════█████═"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
-    #[case(<span class="string">"════█████═"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
-    #[case(<span class="string">"═════█████"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
-    #[case(<span class="string">"═════█████"</span>, <span class="number">100</span>, <span class="number">10</span>, <span class="string">"position_out_of_bounds"</span>)]
+    #[case::position_0(<span class="string">"█████═════"</span>, <span class="number">0</span>, <span class="number">10</span>)]
+    #[case::position_1(<span class="string">"═█████════"</span>, <span class="number">1</span>, <span class="number">10</span>)]
+    #[case::position_2(<span class="string">"═█████════"</span>, <span class="number">2</span>, <span class="number">10</span>)]
+    #[case::position_3(<span class="string">"══█████═══"</span>, <span class="number">3</span>, <span class="number">10</span>)]
+    #[case::position_4(<span class="string">"══█████═══"</span>, <span class="number">4</span>, <span class="number">10</span>)]
+    #[case::position_5(<span class="string">"═══█████══"</span>, <span class="number">5</span>, <span class="number">10</span>)]
+    #[case::position_6(<span class="string">"═══█████══"</span>, <span class="number">6</span>, <span class="number">10</span>)]
+    #[case::position_7(<span class="string">"════█████═"</span>, <span class="number">7</span>, <span class="number">10</span>)]
+    #[case::position_8(<span class="string">"════█████═"</span>, <span class="number">8</span>, <span class="number">10</span>)]
+    #[case::position_9(<span class="string">"═════█████"</span>, <span class="number">9</span>, <span class="number">10</span>)]
+    #[case::position_out_of_bounds(<span class="string">"═════█████"</span>, <span class="number">100</span>, <span class="number">10</span>)]
     </span><span class="kw">fn </span>render_scrollbar_without_symbols(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>assertion_message: <span class="kw-2">&amp;</span>str,
     ) {
         <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size, <span class="number">1</span>));
@@ -1870,30 +1835,25 @@
             .begin_symbol(<span class="prelude-val">None</span>)
             .end_symbol(<span class="prelude-val">None</span>)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[expected]),
-            <span class="string">"{assertion_message}"</span>,
-        );
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"█████     "</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
-    #[case(<span class="string">" █████    "</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
-    #[case(<span class="string">" █████    "</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
-    #[case(<span class="string">"  █████   "</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
-    #[case(<span class="string">"  █████   "</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
-    #[case(<span class="string">"   █████  "</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
-    #[case(<span class="string">"   █████  "</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
-    #[case(<span class="string">"    █████ "</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
-    #[case(<span class="string">"    █████ "</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
-    #[case(<span class="string">"     █████"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
-    #[case(<span class="string">"     █████"</span>, <span class="number">100</span>, <span class="number">10</span>, <span class="string">"position_out_of_bounds"</span>)]
+    #[case::position_0(<span class="string">"█████     "</span>, <span class="number">0</span>, <span class="number">10</span>)]
+    #[case::position_1(<span class="string">" █████    "</span>, <span class="number">1</span>, <span class="number">10</span>)]
+    #[case::position_2(<span class="string">" █████    "</span>, <span class="number">2</span>, <span class="number">10</span>)]
+    #[case::position_3(<span class="string">"  █████   "</span>, <span class="number">3</span>, <span class="number">10</span>)]
+    #[case::position_4(<span class="string">"  █████   "</span>, <span class="number">4</span>, <span class="number">10</span>)]
+    #[case::position_5(<span class="string">"   █████  "</span>, <span class="number">5</span>, <span class="number">10</span>)]
+    #[case::position_6(<span class="string">"   █████  "</span>, <span class="number">6</span>, <span class="number">10</span>)]
+    #[case::position_7(<span class="string">"    █████ "</span>, <span class="number">7</span>, <span class="number">10</span>)]
+    #[case::position_8(<span class="string">"    █████ "</span>, <span class="number">8</span>, <span class="number">10</span>)]
+    #[case::position_9(<span class="string">"     █████"</span>, <span class="number">9</span>, <span class="number">10</span>)]
+    #[case::position_out_of_bounds(<span class="string">"     █████"</span>, <span class="number">100</span>, <span class="number">10</span>)]
     </span><span class="kw">fn </span>render_scrollbar_without_track_symbols(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>assertion_message: <span class="kw-2">&amp;</span>str,
     ) {
         <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size, <span class="number">1</span>));
@@ -1903,30 +1863,25 @@
             .begin_symbol(<span class="prelude-val">None</span>)
             .end_symbol(<span class="prelude-val">None</span>)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[expected]),
-            <span class="string">"{assertion_message}"</span>,
-        );
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"█████-----"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
-    #[case(<span class="string">"-█████----"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
-    #[case(<span class="string">"-█████----"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
-    #[case(<span class="string">"--█████---"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
-    #[case(<span class="string">"--█████---"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
-    #[case(<span class="string">"---█████--"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
-    #[case(<span class="string">"---█████--"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
-    #[case(<span class="string">"----█████-"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
-    #[case(<span class="string">"----█████-"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
-    #[case(<span class="string">"-----█████"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
-    #[case(<span class="string">"-----█████"</span>, <span class="number">100</span>, <span class="number">10</span>, <span class="string">"position_out_of_bounds"</span>)]
+    #[case::position_0(<span class="string">"█████-----"</span>, <span class="number">0</span>, <span class="number">10</span>)]
+    #[case::position_1(<span class="string">"-█████----"</span>, <span class="number">1</span>, <span class="number">10</span>)]
+    #[case::position_2(<span class="string">"-█████----"</span>, <span class="number">2</span>, <span class="number">10</span>)]
+    #[case::position_3(<span class="string">"--█████---"</span>, <span class="number">3</span>, <span class="number">10</span>)]
+    #[case::position_4(<span class="string">"--█████---"</span>, <span class="number">4</span>, <span class="number">10</span>)]
+    #[case::position_5(<span class="string">"---█████--"</span>, <span class="number">5</span>, <span class="number">10</span>)]
+    #[case::position_6(<span class="string">"---█████--"</span>, <span class="number">6</span>, <span class="number">10</span>)]
+    #[case::position_7(<span class="string">"----█████-"</span>, <span class="number">7</span>, <span class="number">10</span>)]
+    #[case::position_8(<span class="string">"----█████-"</span>, <span class="number">8</span>, <span class="number">10</span>)]
+    #[case::position_9(<span class="string">"-----█████"</span>, <span class="number">9</span>, <span class="number">10</span>)]
+    #[case::position_out_of_bounds(<span class="string">"-----█████"</span>, <span class="number">100</span>, <span class="number">10</span>)]
     </span><span class="kw">fn </span>render_scrollbar_without_track_symbols_over_content(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>assertion_message: <span class="kw-2">&amp;</span>str,
     ) {
         <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size, <span class="number">1</span>));
@@ -1939,32 +1894,27 @@
             .begin_symbol(<span class="prelude-val">None</span>)
             .end_symbol(<span class="prelude-val">None</span>)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[expected]),
-            <span class="string">"{assertion_message}"</span>,
-        );
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"&lt;####----&gt;"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
-    #[case(<span class="string">"&lt;#####---&gt;"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
-    #[case(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
-    #[case(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
-    #[case(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
-    #[case(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
-    #[case(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
-    #[case(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
-    #[case(<span class="string">"&lt;---#####&gt;"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
-    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
-    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="string">"position_one_out_of_bounds"</span>)]
-    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">15</span>, <span class="number">10</span>, <span class="string">"position_few_out_of_bounds"</span>)]
-    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">500</span>, <span class="number">10</span>, <span class="string">"position_very_many_out_of_bounds"</span>)]
+    #[case::position_0(<span class="string">"&lt;####----&gt;"</span>, <span class="number">0</span>, <span class="number">10</span>)]
+    #[case::position_1(<span class="string">"&lt;#####---&gt;"</span>, <span class="number">1</span>, <span class="number">10</span>)]
+    #[case::position_2(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">2</span>, <span class="number">10</span>)]
+    #[case::position_3(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">3</span>, <span class="number">10</span>)]
+    #[case::position_4(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">4</span>, <span class="number">10</span>)]
+    #[case::position_5(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">5</span>, <span class="number">10</span>)]
+    #[case::position_6(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">6</span>, <span class="number">10</span>)]
+    #[case::position_7(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">7</span>, <span class="number">10</span>)]
+    #[case::position_8(<span class="string">"&lt;---#####&gt;"</span>, <span class="number">8</span>, <span class="number">10</span>)]
+    #[case::position_9(<span class="string">"&lt;----####&gt;"</span>, <span class="number">9</span>, <span class="number">10</span>)]
+    #[case::position_one_out_of_bounds(<span class="string">"&lt;----####&gt;"</span>, <span class="number">10</span>, <span class="number">10</span>)]
+    #[case::position_few_out_of_bounds(<span class="string">"&lt;----####&gt;"</span>, <span class="number">15</span>, <span class="number">10</span>)]
+    #[case::position_very_many_out_of_bounds(<span class="string">"&lt;----####&gt;"</span>, <span class="number">500</span>, <span class="number">10</span>)]
     </span><span class="kw">fn </span>render_scrollbar_with_symbols(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>assertion_message: <span class="kw-2">&amp;</span>str,
     ) {
         <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size, <span class="number">1</span>));
@@ -1975,30 +1925,25 @@
             .track_symbol(<span class="prelude-val">Some</span>(<span class="string">"-"</span>))
             .thumb_symbol(<span class="string">"#"</span>)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[expected]),
-            <span class="string">"{assertion_message}"</span>,
-        );
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"█████═════"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
-    #[case(<span class="string">"═█████════"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
-    #[case(<span class="string">"═█████════"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
-    #[case(<span class="string">"══█████═══"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
-    #[case(<span class="string">"══█████═══"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
-    #[case(<span class="string">"═══█████══"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
-    #[case(<span class="string">"═══█████══"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
-    #[case(<span class="string">"════█████═"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
-    #[case(<span class="string">"════█████═"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
-    #[case(<span class="string">"═════█████"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
-    #[case(<span class="string">"═════█████"</span>, <span class="number">100</span>, <span class="number">10</span>, <span class="string">"position_out_of_bounds"</span>)]
+    #[case::position_0(<span class="string">"█████═════"</span>, <span class="number">0</span>, <span class="number">10</span>)]
+    #[case::position_1(<span class="string">"═█████════"</span>, <span class="number">1</span>, <span class="number">10</span>)]
+    #[case::position_2(<span class="string">"═█████════"</span>, <span class="number">2</span>, <span class="number">10</span>)]
+    #[case::position_3(<span class="string">"══█████═══"</span>, <span class="number">3</span>, <span class="number">10</span>)]
+    #[case::position_4(<span class="string">"══█████═══"</span>, <span class="number">4</span>, <span class="number">10</span>)]
+    #[case::position_5(<span class="string">"═══█████══"</span>, <span class="number">5</span>, <span class="number">10</span>)]
+    #[case::position_6(<span class="string">"═══█████══"</span>, <span class="number">6</span>, <span class="number">10</span>)]
+    #[case::position_7(<span class="string">"════█████═"</span>, <span class="number">7</span>, <span class="number">10</span>)]
+    #[case::position_8(<span class="string">"════█████═"</span>, <span class="number">8</span>, <span class="number">10</span>)]
+    #[case::position_9(<span class="string">"═════█████"</span>, <span class="number">9</span>, <span class="number">10</span>)]
+    #[case::position_out_of_bounds(<span class="string">"═════█████"</span>, <span class="number">100</span>, <span class="number">10</span>)]
     </span><span class="kw">fn </span>render_scrollbar_horizontal_bottom(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
     ) {
         <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size, <span class="number">2</span>));
@@ -2008,30 +1953,25 @@
             .end_symbol(<span class="prelude-val">None</span>)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
         <span class="kw">let </span>empty_string = <span class="string">" "</span>.repeat(size <span class="kw">as </span>usize);
-        <span class="macro">assert_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="kw-2">&amp;</span>empty_string, expected]),
-            <span class="string">"{description}"</span>,
-        );
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="kw-2">&amp;</span>empty_string, expected]));
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"█████═════"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
-    #[case(<span class="string">"═█████════"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
-    #[case(<span class="string">"═█████════"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
-    #[case(<span class="string">"══█████═══"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
-    #[case(<span class="string">"══█████═══"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
-    #[case(<span class="string">"═══█████══"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
-    #[case(<span class="string">"═══█████══"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
-    #[case(<span class="string">"════█████═"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
-    #[case(<span class="string">"════█████═"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
-    #[case(<span class="string">"═════█████"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
-    #[case(<span class="string">"═════█████"</span>, <span class="number">100</span>, <span class="number">10</span>, <span class="string">"position_out_of_bounds"</span>)]
+    #[case::position_0(<span class="string">"█████═════"</span>, <span class="number">0</span>, <span class="number">10</span>)]
+    #[case::position_1(<span class="string">"═█████════"</span>, <span class="number">1</span>, <span class="number">10</span>)]
+    #[case::position_2(<span class="string">"═█████════"</span>, <span class="number">2</span>, <span class="number">10</span>)]
+    #[case::position_3(<span class="string">"══█████═══"</span>, <span class="number">3</span>, <span class="number">10</span>)]
+    #[case::position_4(<span class="string">"══█████═══"</span>, <span class="number">4</span>, <span class="number">10</span>)]
+    #[case::position_5(<span class="string">"═══█████══"</span>, <span class="number">5</span>, <span class="number">10</span>)]
+    #[case::position_6(<span class="string">"═══█████══"</span>, <span class="number">6</span>, <span class="number">10</span>)]
+    #[case::position_7(<span class="string">"════█████═"</span>, <span class="number">7</span>, <span class="number">10</span>)]
+    #[case::position_8(<span class="string">"════█████═"</span>, <span class="number">8</span>, <span class="number">10</span>)]
+    #[case::position_9(<span class="string">"═════█████"</span>, <span class="number">9</span>, <span class="number">10</span>)]
+    #[case::position_out_of_bounds(<span class="string">"═════█████"</span>, <span class="number">100</span>, <span class="number">10</span>)]
     </span><span class="kw">fn </span>render_scrollbar_horizontal_top(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
     ) {
         <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, size, <span class="number">2</span>));
@@ -2041,30 +1981,25 @@
             .end_symbol(<span class="prelude-val">None</span>)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
         <span class="kw">let </span>empty_string = <span class="string">" "</span>.repeat(size <span class="kw">as </span>usize);
-        <span class="macro">assert_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[expected, <span class="kw-2">&amp;</span>empty_string]),
-            <span class="string">"{description}"</span>,
-        );
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected, <span class="kw-2">&amp;</span>empty_string]));
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"&lt;####----&gt;"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
-    #[case(<span class="string">"&lt;#####---&gt;"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
-    #[case(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
-    #[case(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
-    #[case(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
-    #[case(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
-    #[case(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
-    #[case(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
-    #[case(<span class="string">"&lt;---#####&gt;"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
-    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
-    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="string">"position_one_out_of_bounds"</span>)]
+    #[case::position_0(<span class="string">"&lt;####----&gt;"</span>, <span class="number">0</span>, <span class="number">10</span>)]
+    #[case::position_1(<span class="string">"&lt;#####---&gt;"</span>, <span class="number">1</span>, <span class="number">10</span>)]
+    #[case::position_2(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">2</span>, <span class="number">10</span>)]
+    #[case::position_3(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">3</span>, <span class="number">10</span>)]
+    #[case::position_4(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">4</span>, <span class="number">10</span>)]
+    #[case::position_5(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">5</span>, <span class="number">10</span>)]
+    #[case::position_6(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">6</span>, <span class="number">10</span>)]
+    #[case::position_7(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">7</span>, <span class="number">10</span>)]
+    #[case::position_8(<span class="string">"&lt;---#####&gt;"</span>, <span class="number">8</span>, <span class="number">10</span>)]
+    #[case::position_9(<span class="string">"&lt;----####&gt;"</span>, <span class="number">9</span>, <span class="number">10</span>)]
+    #[case::position_one_out_of_bounds(<span class="string">"&lt;----####&gt;"</span>, <span class="number">10</span>, <span class="number">10</span>)]
     </span><span class="kw">fn </span>render_scrollbar_vertical_left(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
     ) {
         <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, size));
@@ -2076,26 +2011,25 @@
             .thumb_symbol(<span class="string">"#"</span>)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
         <span class="kw">let </span>bar = expected.chars().map(|c| <span class="macro">format!</span>(<span class="string">"{c}    "</span>));
-        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(bar), <span class="string">"{description}"</span>);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(bar));
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"&lt;####----&gt;"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
-    #[case(<span class="string">"&lt;#####---&gt;"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
-    #[case(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
-    #[case(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
-    #[case(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
-    #[case(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
-    #[case(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
-    #[case(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
-    #[case(<span class="string">"&lt;---#####&gt;"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
-    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
-    #[case(<span class="string">"&lt;----####&gt;"</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="string">"position_one_out_of_bounds"</span>)]
+    #[case::position_0(<span class="string">"&lt;####----&gt;"</span>, <span class="number">0</span>, <span class="number">10</span>)]
+    #[case::position_1(<span class="string">"&lt;#####---&gt;"</span>, <span class="number">1</span>, <span class="number">10</span>)]
+    #[case::position_2(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">2</span>, <span class="number">10</span>)]
+    #[case::position_3(<span class="string">"&lt;-####---&gt;"</span>, <span class="number">3</span>, <span class="number">10</span>)]
+    #[case::position_4(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">4</span>, <span class="number">10</span>)]
+    #[case::position_5(<span class="string">"&lt;--####--&gt;"</span>, <span class="number">5</span>, <span class="number">10</span>)]
+    #[case::position_6(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">6</span>, <span class="number">10</span>)]
+    #[case::position_7(<span class="string">"&lt;---####-&gt;"</span>, <span class="number">7</span>, <span class="number">10</span>)]
+    #[case::position_8(<span class="string">"&lt;---#####&gt;"</span>, <span class="number">8</span>, <span class="number">10</span>)]
+    #[case::position_9(<span class="string">"&lt;----####&gt;"</span>, <span class="number">9</span>, <span class="number">10</span>)]
+    #[case::position_one_out_of_bounds(<span class="string">"&lt;----####&gt;"</span>, <span class="number">10</span>, <span class="number">10</span>)]
     </span><span class="kw">fn </span>render_scrollbar_vertical_rightl(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
     ) {
         <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, size));
@@ -2107,26 +2041,25 @@
             .thumb_symbol(<span class="string">"#"</span>)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
         <span class="kw">let </span>bar = expected.chars().map(|c| <span class="macro">format!</span>(<span class="string">"    {c}"</span>));
-        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(bar), <span class="string">"{description}"</span>);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(bar));
     }
 
     <span class="attr">#[rstest]
-    #[case(<span class="string">"##--------"</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="string">"position_0"</span>)]
-    #[case(<span class="string">"-##-------"</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="string">"position_1"</span>)]
-    #[case(<span class="string">"--##------"</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="string">"position_2"</span>)]
-    #[case(<span class="string">"---##-----"</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="string">"position_3"</span>)]
-    #[case(<span class="string">"----#-----"</span>, <span class="number">4</span>, <span class="number">10</span>, <span class="string">"position_4"</span>)]
-    #[case(<span class="string">"-----#----"</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="string">"position_5"</span>)]
-    #[case(<span class="string">"-----##---"</span>, <span class="number">6</span>, <span class="number">10</span>, <span class="string">"position_6"</span>)]
-    #[case(<span class="string">"------##--"</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="string">"position_7"</span>)]
-    #[case(<span class="string">"-------##-"</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="string">"position_8"</span>)]
-    #[case(<span class="string">"--------##"</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="string">"position_9"</span>)]
-    #[case(<span class="string">"--------##"</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="string">"position_one_out_of_bounds"</span>)]
+    #[case::position_0(<span class="string">"##--------"</span>, <span class="number">0</span>, <span class="number">10</span>)]
+    #[case::position_1(<span class="string">"-##-------"</span>, <span class="number">1</span>, <span class="number">10</span>)]
+    #[case::position_2(<span class="string">"--##------"</span>, <span class="number">2</span>, <span class="number">10</span>)]
+    #[case::position_3(<span class="string">"---##-----"</span>, <span class="number">3</span>, <span class="number">10</span>)]
+    #[case::position_4(<span class="string">"----#-----"</span>, <span class="number">4</span>, <span class="number">10</span>)]
+    #[case::position_5(<span class="string">"-----#----"</span>, <span class="number">5</span>, <span class="number">10</span>)]
+    #[case::position_6(<span class="string">"-----##---"</span>, <span class="number">6</span>, <span class="number">10</span>)]
+    #[case::position_7(<span class="string">"------##--"</span>, <span class="number">7</span>, <span class="number">10</span>)]
+    #[case::position_8(<span class="string">"-------##-"</span>, <span class="number">8</span>, <span class="number">10</span>)]
+    #[case::position_9(<span class="string">"--------##"</span>, <span class="number">9</span>, <span class="number">10</span>)]
+    #[case::position_one_out_of_bounds(<span class="string">"--------##"</span>, <span class="number">10</span>, <span class="number">10</span>)]
     </span><span class="kw">fn </span>custom_viewport_length(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
         scrollbar_no_arrows: Scrollbar,
     ) {
         <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
@@ -2135,28 +2068,27 @@
             .position(position)
             .viewport_content_length(<span class="number">2</span>);
         scrollbar_no_arrows.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]), <span class="string">"{description}"</span>);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
     }
 
     <span class="doccomment">/// Fixes &lt;https://github.com/ratatui-org/ratatui/pull/959&gt; which was a bug that would not
     /// render a thumb when the viewport was very small in comparison to the content length.
     </span><span class="attr">#[rstest]
-    #[case(<span class="string">"#----"</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="string">"position_0"</span>)]
-    #[case(<span class="string">"#----"</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="string">"position_10"</span>)]
-    #[case(<span class="string">"-#---"</span>, <span class="number">20</span>, <span class="number">100</span>, <span class="string">"position_20"</span>)]
-    #[case(<span class="string">"-#---"</span>, <span class="number">30</span>, <span class="number">100</span>, <span class="string">"position_30"</span>)]
-    #[case(<span class="string">"--#--"</span>, <span class="number">40</span>, <span class="number">100</span>, <span class="string">"position_40"</span>)]
-    #[case(<span class="string">"--#--"</span>, <span class="number">50</span>, <span class="number">100</span>, <span class="string">"position_50"</span>)]
-    #[case(<span class="string">"---#-"</span>, <span class="number">60</span>, <span class="number">100</span>, <span class="string">"position_60"</span>)]
-    #[case(<span class="string">"---#-"</span>, <span class="number">70</span>, <span class="number">100</span>, <span class="string">"position_70"</span>)]
-    #[case(<span class="string">"----#"</span>, <span class="number">80</span>, <span class="number">100</span>, <span class="string">"position_80"</span>)]
-    #[case(<span class="string">"----#"</span>, <span class="number">90</span>, <span class="number">100</span>, <span class="string">"position_90"</span>)]
-    #[case(<span class="string">"----#"</span>, <span class="number">100</span>, <span class="number">100</span>, <span class="string">"position_one_out_of_bounds"</span>)]
+    #[case::position_0(<span class="string">"#----"</span>, <span class="number">0</span>, <span class="number">100</span>)]
+    #[case::position_10(<span class="string">"#----"</span>, <span class="number">10</span>, <span class="number">100</span>)]
+    #[case::position_20(<span class="string">"-#---"</span>, <span class="number">20</span>, <span class="number">100</span>)]
+    #[case::position_30(<span class="string">"-#---"</span>, <span class="number">30</span>, <span class="number">100</span>)]
+    #[case::position_40(<span class="string">"--#--"</span>, <span class="number">40</span>, <span class="number">100</span>)]
+    #[case::position_50(<span class="string">"--#--"</span>, <span class="number">50</span>, <span class="number">100</span>)]
+    #[case::position_60(<span class="string">"---#-"</span>, <span class="number">60</span>, <span class="number">100</span>)]
+    #[case::position_70(<span class="string">"---#-"</span>, <span class="number">70</span>, <span class="number">100</span>)]
+    #[case::position_80(<span class="string">"----#"</span>, <span class="number">80</span>, <span class="number">100</span>)]
+    #[case::position_90(<span class="string">"----#"</span>, <span class="number">90</span>, <span class="number">100</span>)]
+    #[case::position_one_out_of_bounds(<span class="string">"----#"</span>, <span class="number">100</span>, <span class="number">100</span>)]
     </span><span class="kw">fn </span>thumb_visible_on_very_small_track(
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="attr">#[case] </span>position: usize,
         <span class="attr">#[case] </span>content_length: usize,
-        <span class="attr">#[case] </span>description: <span class="kw-2">&amp;</span>str,
         scrollbar_no_arrows: Scrollbar,
     ) {
         <span class="kw">let </span>size = expected.width() <span class="kw">as </span>u16;
@@ -2165,7 +2097,7 @@
             .position(position)
             .viewport_content_length(<span class="number">2</span>);
         scrollbar_no_arrows.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]), <span class="string">"{description}"</span>);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
     }
 }
 </code></pre></div></section></main></body></html>

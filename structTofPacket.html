@@ -28,7 +28,7 @@
   <td id="projectlogo"><img alt="Logo" src="GAPSLOGO_2023_ico.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">gaps-online-software
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.9</span>
    </div>
    <div id="projectbrief">online software for the TOF system for the GAPS experiment</div>
   </td>
@@ -95,14 +95,14 @@ $(document).ready(function(){initNavTree('structTofPacket.html',''); initResizab
 <div class="title">TofPacket Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p><code>#include &lt;<a class="el" href="tof__packet_8h_source.html">tof_packet.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a59825a0535181026173df4eb8142b751"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofPacket.html#a59825a0535181026173df4eb8142b751">to_string</a> () const</td></tr>
+<tr class="memitem:a59825a0535181026173df4eb8142b751"><td class="memItemLeft" align="right" valign="top"><a id="a59825a0535181026173df4eb8142b751"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofPacket.html#a59825a0535181026173df4eb8142b751">to_string</a> () const</td></tr>
+<tr class="memdesc:a59825a0535181026173df4eb8142b751"><td class="mdescLeft">&#160;</td><td class="mdescRight">Just to be used for debugging - NO SERIALIZATION. <br /></td></tr>
 <tr class="separator:a59825a0535181026173df4eb8142b751"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a348ad4e49dc8667f72d12d02b97653"><td class="memTemplParams" colspan="2">template&lt;HasFromByteStream T&gt; </td></tr>
+<tr class="memitem:a7a348ad4e49dc8667f72d12d02b97653"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a7a348ad4e49dc8667f72d12d02b97653"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structTofPacket.html#a7a348ad4e49dc8667f72d12d02b97653">unpack</a> ()</td></tr>
 <tr class="separator:a7a348ad4e49dc8667f72d12d02b97653"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -138,12 +138,7 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>HEAD</b> 
 static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> = 0x5555</td></tr>
 <tr class="separator:a1b080830a5f4ac27361b6e2dda950b28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The most basic of all packets</p>
-<p>A wrapper packet for an arbitrary bytestream</p>
-<p>It looks like the following</p>
-<p>HEAD : u16 = 0xAAAA TYPE : u8 = PacketType SIZE : u64 PAYLOAD : [u8;6-SIZE] TAIL : u16 = 0x5555 =&gt; The packet has a fixed size of 9 bytes =&gt; The packet has a size of 9 + PAYLOAD.size() </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a7ab592f11c676473ff62dac29e9e9861"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7ab592f11c676473ff62dac29e9e9861">&#9670;&nbsp;</a></span>from_bytestream()</h2>
 
@@ -177,25 +172,7 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> 
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Transcode the bytestream into the respective <a class="el" href="structTofPacket.html">TofPacket</a> </p>
-
-</div>
-</div>
-<a id="a59825a0535181026173df4eb8142b751"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a59825a0535181026173df4eb8142b751">&#9670;&nbsp;</a></span>to_string()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string TofPacket::to_string </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>A representative representation of the <a class="el" href="structTofPacket.html">TofPacket</a> very usefule for debugging </p>
+<p>Transcode from bytestream </p>
 
 </div>
 </div>
@@ -205,7 +182,7 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;HasFromByteStream T&gt; </div>
+template&lt;typename T &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -223,7 +200,8 @@ template&lt;HasFromByteStream T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A generic unpacking method - unpack everything which is stored within the payload This requires that T has a ::from_bytestream method, which is enforced at compile time by the concept HasFromByteStream </p>
+<p>A generic unpacking method - unpack everything which is stored within the payload <br  />
+ </p>
 
 </div>
 </div>

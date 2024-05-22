@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["cpc_type","cpu_type","ltb_type","pb_type","preamp_type","rb_type","switch_type","tcpc_type"]};
+window.SIDEBAR_ITEMS = {"mod":["cpc_type","cpu_type","ltb_type","pb_type","preamp_type","rb_type","tcpc_type"]};

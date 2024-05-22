@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/plotters-backend-0.3.5/src/text.rs`."><title>text.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="plotters_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/plotters-backend-0.3.6/src/text.rs`."><title>text.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="plotters_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../plotters_backend/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -231,20 +231,6 @@
 <a href="#229" id="229">229</a>
 <a href="#230" id="230">230</a>
 <a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
-<a href="#237" id="237">237</a>
-<a href="#238" id="238">238</a>
-<a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
-<a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
-<a href="#244" id="244">244</a>
-<a href="#245" id="245">245</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{BackendColor, BackendCoord};
 <span class="kw">use </span>std::error::Error;
 
@@ -307,9 +293,10 @@
 /// ```
 </span><span class="kw">pub mod </span>text_anchor {
     <span class="doccomment">/// The horizontal position of the anchor point relative to the text.
-    </span><span class="attr">#[derive(Clone, Copy)]
+    </span><span class="attr">#[derive(Clone, Copy, Default)]
     </span><span class="kw">pub enum </span>HPos {
         <span class="doccomment">/// Anchor point is on the left side of the text
+        </span><span class="attr">#[default]
         </span>Left,
         <span class="doccomment">/// Anchor point is on the right side of the text
         </span>Right,
@@ -318,9 +305,10 @@
     }
 
     <span class="doccomment">/// The vertical position of the anchor point relative to the text.
-    </span><span class="attr">#[derive(Clone, Copy)]
+    </span><span class="attr">#[derive(Clone, Copy, Default)]
     </span><span class="kw">pub enum </span>VPos {
         <span class="doccomment">/// Anchor point is on the top of the text
+        </span><span class="attr">#[default]
         </span>Top,
         <span class="doccomment">/// Anchor point is in the vertical center of the text
         </span>Center,
@@ -329,7 +317,7 @@
     }
 
     <span class="doccomment">/// The text anchor position.
-    </span><span class="attr">#[derive(Clone, Copy)]
+    </span><span class="attr">#[derive(Clone, Copy, Default)]
     </span><span class="kw">pub struct </span>Pos {
         <span class="doccomment">/// The horizontal position of the anchor point
         </span><span class="kw">pub </span>h_pos: HPos,
@@ -351,22 +339,6 @@
         /// ```
         </span><span class="kw">pub fn </span>new(h_pos: HPos, v_pos: VPos) -&gt; <span class="self">Self </span>{
             Pos { h_pos, v_pos }
-        }
-
-        <span class="doccomment">/// Create a default text anchor position (top left).
-        ///
-        /// - **returns** The default text anchor position
-        ///
-        /// ```rust
-        /// use plotters_backend::text_anchor::{Pos, HPos, VPos};
-        ///
-        /// let pos = Pos::default();
-        /// ```
-        </span><span class="kw">pub fn </span>default() -&gt; <span class="self">Self </span>{
-            Pos {
-                h_pos: HPos::Left,
-                v_pos: VPos::Top,
-            }
         }
     }
 }
@@ -448,8 +420,8 @@
 /// text drawing, those font information provides instructions about how the text should be
 /// rendered: color, size, slant, anchor, font, etc.
 ///
-/// This trait decouples the detailed implementaiton about the font and the backend code which
-/// wants to perfome some operation on the font.
+/// This trait decouples the detailed implementation about the font and the backend code which
+/// wants to perform some operation on the font.
 ///
 </span><span class="kw">pub trait </span>BackendTextStyle {
     <span class="doccomment">/// The error type of this text style implementation

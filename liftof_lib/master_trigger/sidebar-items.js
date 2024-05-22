@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["get_event","get_mtbmonidata","master_trigger"],"mod":["control","registers"],"struct":["MTBSettings"]};
+window.SIDEBAR_ITEMS = {"fn":["decode_board_mask","decode_hit_mask","get_mtbmonidata","get_mtevent","get_tiu_link_status","master_trigger","read_event_cnt","reset_daq","set_any_trigger","set_central_track_trigger","set_gaps_trigger","set_poisson_trigger","set_rb_int_window","set_trace_suppression","set_track_trigger","unset_all_triggers"],"struct":["MTBSettings"]};

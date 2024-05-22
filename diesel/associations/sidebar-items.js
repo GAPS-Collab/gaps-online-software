@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"derive":["Associations","Identifiable"],"trait":["BelongsTo","GroupedBy","HasTable","Identifiable"]};

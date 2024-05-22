@@ -268,13 +268,6 @@
 <a href="#266" id="266">266</a>
 <a href="#267" id="267">267</a>
 <a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::env;
 <span class="kw">use </span>std::path::Path;
 <span class="kw">use </span>std::fs;
@@ -453,13 +446,6 @@
             <span class="prelude-val">Some</span>(f) =&gt; {
               <span class="kw">match </span>f.write_all(packet.to_bytestream().as_slice()) {
                 <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Writing file to disk failed! Err {err}"</span>),
-                <span class="prelude-val">Ok</span>(()) =&gt; ()
-              }
-              <span class="comment">// local file can be synced, rate should be in general 
-              // low when we are writing to the local file.
-              // Careful with SD card!
-              </span><span class="kw">match </span>f.sync_all() {
-                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to sync file to disk! {err}"</span>),
                 <span class="prelude-val">Ok</span>(()) =&gt; ()
               }
             }

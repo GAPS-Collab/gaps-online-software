@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/plotters-0.3.5/src/style/colors/colormaps.rs`."><title>colormaps.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="plotters" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/plotters-0.3.6/src/style/colors/colormaps.rs`."><title>colormaps.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="plotters" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../plotters/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -311,18 +311,75 @@
 <a href="#309" id="309">309</a>
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::style::{HSLColor, RGBAColor, RGBColor};
-
-<span class="kw">use </span>num_traits::{Float, FromPrimitive, ToPrimitive};
 
 <span class="doccomment">/// Converts scalar values to colors.
 </span><span class="kw">pub trait </span>ColorMap&lt;ColorType: <span class="kw">crate</span>::prelude::Color, FloatType = f32&gt;
 <span class="kw">where
-    </span>FloatType: Float,
+    </span>FloatType: num_traits::Float,
 {
     <span class="doccomment">/// Takes a scalar value 0.0 &lt;= h &lt;= 1.0 and returns the corresponding color.
     /// Typically color-scales are named according to which color-type they return.
-    /// To use upper and lower bounds with ths function see [get_color_normalized](ColorMap::get_color_normalized).
+    /// To use upper and lower bounds with this function see [get_color_normalized](ColorMap::get_color_normalized).
     </span><span class="kw">fn </span>get_color(<span class="kw-2">&amp;</span><span class="self">self</span>, h: FloatType) -&gt; ColorType {
         <span class="self">self</span>.get_color_normalized(h, FloatType::zero(), FloatType::one())
     }
@@ -360,7 +417,9 @@
     }
 }
 
-<span class="macro">macro_rules!</span> calculate_new_color_value(
+<span class="attr">#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules!</span> calculate_new_color_value(
     (<span class="macro-nonterminal">$relative_difference</span>:expr, <span class="macro-nonterminal">$colors</span>:expr, <span class="macro-nonterminal">$index_upper</span>:expr, <span class="macro-nonterminal">$index_lower</span>:expr, RGBColor) =&gt; {
         RGBColor(
             <span class="comment">// These equations are a very complicated way of writing a simple linear extrapolation with lots of casting between numerical values
@@ -394,20 +453,34 @@
     };
 );
 
-<span class="kw">fn </span>calculate_relative_difference_index_lower_upper&lt;
-    FloatType: Float + FromPrimitive + ToPrimitive,
+<span class="comment">// Helper function to calculate the lower and upper index nearest to a provided float value.
+//
+// Used to obtain colors from a colorscale given a value h between 0.0 and 1.0.
+// It also returns the relative difference which can then be used to calculate a linear interpolation between the two nearest colors.
+// ```
+// # use plotters::prelude::*;
+// let r = calculate_relative_difference_index_lower_upper(1.2, 1.0, 3.0, 4);
+// let (relative_difference, lower_index, upper_index) = r;
+//
+// assert_eq!(relative_difference, 0.7000000000000001);
+// assert_eq!(lower_index, 0);
+// assert_eq!(upper_index, 1);
+// ```
+</span><span class="attr">#[doc(hidden)]
+</span><span class="kw">pub fn </span>calculate_relative_difference_index_lower_upper&lt;
+    FloatType: num_traits::Float + num_traits::FromPrimitive + num_traits::ToPrimitive,
 &gt;(
     h: FloatType,
     min: FloatType,
     max: FloatType,
-    n_colors: usize,
+    n_steps: usize,
 ) -&gt; (FloatType, usize, usize) {
     <span class="comment">// Ensure that we do have a value in bounds
     </span><span class="kw">let </span>h = num_traits::clamp(h, min, max);
     <span class="comment">// Next calculate a normalized value between 0.0 and 1.0
     </span><span class="kw">let </span>t = (h - min) / (max - min);
     <span class="kw">let </span>approximate_index =
-        t * (FloatType::from_usize(n_colors).unwrap() - FloatType::one()).max(FloatType::zero());
+        t * (FloatType::from_usize(n_steps).unwrap() - FloatType::one()).max(FloatType::zero());
     <span class="comment">// Calculate which index are the two most nearest of the supplied value
     </span><span class="kw">let </span>index_lower = approximate_index.floor().to_usize().unwrap();
     <span class="kw">let </span>index_upper = approximate_index.ceil().to_usize().unwrap();
@@ -419,7 +492,7 @@
 <span class="macro">macro_rules!</span> implement_color_scale_for_derived_color_map{
     ($(<span class="macro-nonterminal">$color_type</span>:ident),+) =&gt; {
         $(
-            <span class="kw">impl</span>&lt;FloatType: Float + FromPrimitive + ToPrimitive&gt; ColorMap&lt;<span class="macro-nonterminal">$color_type</span>, FloatType&gt; <span class="kw">for </span>DerivedColorMap&lt;<span class="macro-nonterminal">$color_type</span>&gt; {
+            <span class="kw">impl</span>&lt;FloatType: num_traits::Float + num_traits::FromPrimitive + num_traits::ToPrimitive&gt; ColorMap&lt;<span class="macro-nonterminal">$color_type</span>, FloatType&gt; <span class="kw">for </span>DerivedColorMap&lt;<span class="macro-nonterminal">$color_type</span>&gt; {
                 <span class="kw">fn </span>get_color_normalized(<span class="kw-2">&amp;</span><span class="self">self</span>, h: FloatType, min: FloatType, max: FloatType) -&gt; <span class="macro-nonterminal">$color_type </span>{
                     <span class="kw">let </span>(
                         relative_difference,
@@ -432,8 +505,8 @@
                         <span class="self">self</span>.colors.len()
                     );
                     <span class="comment">// Interpolate the final color linearly
-                    </span><span class="macro">calculate_new_color_value!</span>(
-                        relative_difference,
+                    </span><span class="macro-nonterminal">$</span><span class="macro">crate::calculate_new_color_value!</span>(
+                        <span class="macro-nonterminal">relative_difference</span>,
                         <span class="self">self</span>.colors,
                         index_upper,
                         index_lower,
@@ -447,12 +520,31 @@
 
 <span class="macro">implement_color_scale_for_derived_color_map!</span> {RGBAColor, RGBColor, HSLColor}
 
-<span class="macro">macro_rules!</span> count {
+<span class="attr">#[macro_export]
+#[doc(hidden)]
+</span><span class="comment">// Counts the number of arguments which are separated by spaces
+//
+// This macro is used internally to determine the size of an array to hold all new colors.
+// ```
+// # use plotters::count;
+// let counted = count!{Plotting is fun};
+// assert_eq!(counted, 3);
+//
+// let counted2 = count!{0_usize was my favourite 1_f64 last century};
+// assert_eq!(counted2, 7);
+//
+// let new_array = ["Hello"; count!(Plotting is fun)];
+// assert_eq!(new_array, ["Hello"; 3]);
+// ```
+</span><span class="macro">macro_rules!</span> count {
     () =&gt; (<span class="number">0usize</span>);
-    (<span class="macro-nonterminal">$x</span>:tt $(<span class="macro-nonterminal">$xs</span>:tt)* ) =&gt; (<span class="number">1usize </span>+ <span class="macro">count!</span>($(<span class="macro-nonterminal">$xs</span>)<span class="kw-2">*</span>));
+    (<span class="macro-nonterminal">$x</span>:tt $(<span class="macro-nonterminal">$xs</span>:tt)* ) =&gt; (<span class="number">1usize </span>+ <span class="macro-nonterminal">$</span><span class="macro">crate::count!</span>($(<span class="macro-nonterminal">$xs</span>)<span class="kw-2">*</span>));
 }
 
-<span class="macro">macro_rules!</span> define_colors_from_list_of_values_or_directly{
+<span class="attr">#[macro_export]
+#[doc(hidden)]
+</span><span class="doccomment">/// Converts a given color identifier and a sequence of colors to an array of them.
+</span><span class="macro">macro_rules!</span> define_colors_from_list_of_values_or_directly{
     (<span class="macro-nonterminal">$color_type</span>:ident, $(($(<span class="macro-nonterminal">$color_value</span>:expr),+)),+) =&gt; {
         [$(<span class="macro-nonterminal">$color_type</span>($(<span class="macro-nonterminal">$color_value</span>),+)),+]
     };
@@ -461,9 +553,12 @@
     };
 }
 
-<span class="macro">macro_rules!</span> implement_linear_interpolation_color_map {
+<span class="attr">#[macro_export]
+#[doc(hidden)]
+</span><span class="doccomment">/// Implements the [ColorMap] trait on a given color scale.
+</span><span class="macro">macro_rules!</span> implement_linear_interpolation_color_map {
     (<span class="macro-nonterminal">$color_scale_name</span>:ident, <span class="macro-nonterminal">$color_type</span>:ident) =&gt; {
-        <span class="kw">impl</span>&lt;FloatType: std::fmt::Debug + Float + FromPrimitive + ToPrimitive&gt;
+        <span class="kw">impl</span>&lt;FloatType: std::fmt::Debug + num_traits::Float + num_traits::FromPrimitive + num_traits::ToPrimitive&gt;
             ColorMap&lt;<span class="macro-nonterminal">$color_type</span>, FloatType&gt; <span class="kw">for </span><span class="macro-nonterminal">$color_scale_name
         </span>{
             <span class="kw">fn </span>get_color_normalized(
@@ -483,8 +578,8 @@
                     <span class="self">Self</span>::COLORS.len()
                 );
                 <span class="comment">// Interpolate the final color linearly
-                </span><span class="macro">calculate_new_color_value!</span>(
-                    relative_difference,
+                </span><span class="macro-nonterminal">$</span><span class="macro">crate::calculate_new_color_value!</span>(
+                    <span class="macro-nonterminal">relative_difference</span>,
                     <span class="self">Self</span>::COLORS,
                     index_upper,
                     index_lower,
@@ -497,7 +592,7 @@
             <span class="attr">#[doc = <span class="string">"Get color value from `"</span>]
             #[doc = <span class="macro">stringify!</span>(<span class="macro-nonterminal">$color_scale_name</span>)]
             #[doc = <span class="string">"` by supplying a parameter 0.0 &lt;= h &lt;= 1.0"</span>]
-            </span><span class="kw">pub fn </span>get_color&lt;FloatType: std::fmt::Debug + Float + FromPrimitive + ToPrimitive&gt;(
+            </span><span class="kw">pub fn </span>get_color&lt;FloatType: std::fmt::Debug + num_traits::Float + num_traits::FromPrimitive + num_traits::ToPrimitive&gt;(
                 h: FloatType,
             ) -&gt; <span class="macro-nonterminal">$color_type </span>{
                 <span class="kw">let </span>color_scale = <span class="macro-nonterminal">$color_scale_name </span>{};
@@ -508,7 +603,7 @@
             #[doc = <span class="macro">stringify!</span>(<span class="macro-nonterminal">$color_scale_name</span>)]
             #[doc = <span class="string">"` by supplying lower and upper bounds min, max and a parameter h where min &lt;= h &lt;= max"</span>]
             </span><span class="kw">pub fn </span>get_color_normalized&lt;
-                FloatType: std::fmt::Debug + Float + FromPrimitive + ToPrimitive,
+                FloatType: std::fmt::Debug + num_traits::Float + num_traits::FromPrimitive + num_traits::ToPrimitive,
             &gt;(
                 h: FloatType,
                 min: FloatType,
@@ -521,34 +616,57 @@
     };
 }
 
+<span class="attr">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::def_linear_colormap;
+
 <span class="attr">#[macro_export]
-</span><span class="doccomment">/// Macro to create a new colormap with evenly spaced colors at compile-time.
-</span><span class="macro">macro_rules!</span> define_linear_interpolation_color_map{
+#[doc(hidden)]
+</span><span class="doccomment">/// Create a new colormap with evenly spaced colors and interpolates between them automatically.
+///
+/// This macro works by taking a identifier (name) for the colormap, the type of color to specify, a
+/// docstring and a list of colors and constructs an empty struct on which it implements the [ColorMap] trait.
+///
+/// ```
+/// use plotters::prelude::*;
+/// def_linear_colormap! {
+///     BlackWhite,
+///     RGBColor,
+///     "Simple chromatic colormap from black to white.",
+///     (  0,   0,   0),
+///     (255, 255,   255)
+/// }
+///
+/// assert_eq!(BlackWhite::get_color(0.0), RGBColor(0,0,0));
+/// ```
+///
+/// Hint: Some helper macros and functions have been deliberately hidden from end users.
+/// Look for them in the source code if you are interested.
+</span><span class="macro">macro_rules!</span> def_linear_colormap{
     (<span class="macro-nonterminal">$color_scale_name</span>:ident, <span class="macro-nonterminal">$color_type</span>:ident, <span class="macro-nonterminal">$doc</span>:expr, $(($(<span class="macro-nonterminal">$color_value</span>:expr),+)),<span class="kw-2">*</span>) =&gt; {
         <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>]
-        </span><span class="kw">pub struct </span><span class="macro-nonterminal">$color_scale_name </span>{}
+        </span><span class="kw">pub struct </span><span class="macro-nonterminal">$color_scale_name</span>;
 
         <span class="kw">impl </span><span class="macro-nonterminal">$color_scale_name </span>{
             <span class="comment">// const COLORS: [$color_type; $number_colors] = [$($color_type($($color_value),+)),+];
-            // const COLORS: [$color_type; count!($(($($color_value:expr),+))*)] = [$($color_type($($color_value),+)),+];
-            </span><span class="kw">const </span>COLORS: [<span class="macro-nonterminal">$color_type</span>; <span class="macro">count!</span>($(($(<span class="macro-nonterminal">$color_value</span>:expr),+))<span class="kw-2">*</span>)] = <span class="macro">define_colors_from_list_of_values_or_directly!</span>{<span class="macro-nonterminal">$color_type</span>, $(($(<span class="macro-nonterminal">$color_value</span>),+)),<span class="kw-2">*</span>};
+            // const COLORS: [$color_type; $crate::count!($(($($color_value:expr),+))*)] = [$($color_type($($color_value),+)),+];
+            </span><span class="kw">const </span>COLORS: [<span class="macro-nonterminal">$color_type</span>; <span class="macro-nonterminal">$</span><span class="macro">crate::count!</span>($(($(<span class="macro-nonterminal">$color_value</span>:expr),+))<span class="kw-2">*</span>)] = <span class="macro-nonterminal">$</span><span class="macro">crate::define_colors_from_list_of_values_or_directly!</span>{<span class="macro-nonterminal">$color_type</span>, $(($(<span class="macro-nonterminal">$color_value</span>),+)),<span class="kw-2">*</span>};
         }
 
-        <span class="macro">implement_linear_interpolation_color_map!</span>{<span class="macro-nonterminal">$color_scale_name</span>, <span class="macro-nonterminal">$color_type</span>}
+        <span class="macro-nonterminal">$</span><span class="macro">crate::implement_linear_interpolation_color_map!</span>{<span class="macro-nonterminal">$color_scale_name</span>, <span class="macro-nonterminal">$color_type</span>}
     };
     (<span class="macro-nonterminal">$color_scale_name</span>:ident, <span class="macro-nonterminal">$color_type</span>:ident, <span class="macro-nonterminal">$doc</span>:expr, $(<span class="macro-nonterminal">$color_complete</span>:tt),+) =&gt; {
         <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>]
-        </span><span class="kw">pub struct </span><span class="macro-nonterminal">$color_scale_name </span>{}
+        </span><span class="kw">pub struct </span><span class="macro-nonterminal">$color_scale_name</span>;
 
         <span class="kw">impl </span><span class="macro-nonterminal">$color_scale_name </span>{
-            <span class="kw">const </span>COLORS: [<span class="macro-nonterminal">$color_type</span>; <span class="macro">count!</span>($(<span class="macro-nonterminal">$color_complete</span>)<span class="kw-2">*</span>)] = <span class="macro">define_colors_from_list_of_values_or_directly!</span>{$(<span class="macro-nonterminal">$color_complete</span>),+};
+            <span class="kw">const </span>COLORS: [<span class="macro-nonterminal">$color_type</span>; <span class="macro-nonterminal">$</span><span class="macro">crate::count!</span>($(<span class="macro-nonterminal">$color_complete</span>)<span class="kw-2">*</span>)] = <span class="macro-nonterminal">$</span><span class="macro">crate::define_colors_from_list_of_values_or_directly!</span>{$(<span class="macro-nonterminal">$color_complete</span>),+};
         }
 
-        <span class="macro">implement_linear_interpolation_color_map!</span>{<span class="macro-nonterminal">$color_scale_name</span>, <span class="macro-nonterminal">$color_type</span>}
+        <span class="macro-nonterminal">$</span><span class="macro">crate::implement_linear_interpolation_color_map!</span>{<span class="macro-nonterminal">$color_scale_name</span>, <span class="macro-nonterminal">$color_type</span>}
     }
 }
 
-<span class="macro">define_linear_interpolation_color_map!</span> {
+<span class="macro">def_linear_colormap!</span> {
     ViridisRGBA,
     RGBAColor,
     <span class="string">"A colormap optimized for visually impaired people (RGBA format).
@@ -564,7 +682,7 @@
     (<span class="number">254</span>, <span class="number">232</span>,  <span class="number">37</span>, <span class="number">1.0</span>)
 }
 
-<span class="macro">define_linear_interpolation_color_map!</span> {
+<span class="macro">def_linear_colormap!</span> {
     ViridisRGB,
     RGBColor,
     <span class="string">"A colormap optimized for visually impaired people (RGB Format).
@@ -580,7 +698,7 @@
     (<span class="number">254</span>, <span class="number">232</span>,  <span class="number">37</span>)
 }
 
-<span class="macro">define_linear_interpolation_color_map!</span> {
+<span class="macro">def_linear_colormap!</span> {
     BlackWhite,
     RGBColor,
     <span class="string">"Simple chromatic colormap from black to white."</span>,
@@ -588,7 +706,7 @@
     (<span class="number">255</span>, <span class="number">255</span>,   <span class="number">255</span>)
 }
 
-<span class="macro">define_linear_interpolation_color_map!</span> {
+<span class="macro">def_linear_colormap!</span> {
     MandelbrotHSL,
     HSLColor,
     <span class="string">"Colormap created to replace the one used in the mandelbrot example."</span>,
@@ -596,7 +714,7 @@
     (<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">0.5</span>)
 }
 
-<span class="macro">define_linear_interpolation_color_map!</span> {
+<span class="macro">def_linear_colormap!</span> {
     VulcanoHSL,
     HSLColor,
     <span class="string">"A vulcanic colormap that display red/orange and black colors"</span>,
@@ -605,7 +723,7 @@
 }
 
 <span class="kw">use </span><span class="kw">super</span>::full_palette::<span class="kw-2">*</span>;
-<span class="macro">define_linear_interpolation_color_map!</span> {
+<span class="macro">def_linear_colormap!</span> {
     Bone,
     RGBColor,
     <span class="string">"Dark colormap going from black over blue to white."</span>,
@@ -614,7 +732,7 @@
     WHITE
 }
 
-<span class="macro">define_linear_interpolation_color_map!</span> {
+<span class="macro">def_linear_colormap!</span> {
     Copper,
     RGBColor,
     <span class="string">"Friendly black to brown colormap."</span>,

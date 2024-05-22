@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/widgets/list.rs`."><title>list.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/widgets/list.rs`."><title>list.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -2192,77 +2192,6 @@
 <a href="#2190" id="2190">2190</a>
 <a href="#2191" id="2191">2191</a>
 <a href="#2192" id="2192">2192</a>
-<a href="#2193" id="2193">2193</a>
-<a href="#2194" id="2194">2194</a>
-<a href="#2195" id="2195">2195</a>
-<a href="#2196" id="2196">2196</a>
-<a href="#2197" id="2197">2197</a>
-<a href="#2198" id="2198">2198</a>
-<a href="#2199" id="2199">2199</a>
-<a href="#2200" id="2200">2200</a>
-<a href="#2201" id="2201">2201</a>
-<a href="#2202" id="2202">2202</a>
-<a href="#2203" id="2203">2203</a>
-<a href="#2204" id="2204">2204</a>
-<a href="#2205" id="2205">2205</a>
-<a href="#2206" id="2206">2206</a>
-<a href="#2207" id="2207">2207</a>
-<a href="#2208" id="2208">2208</a>
-<a href="#2209" id="2209">2209</a>
-<a href="#2210" id="2210">2210</a>
-<a href="#2211" id="2211">2211</a>
-<a href="#2212" id="2212">2212</a>
-<a href="#2213" id="2213">2213</a>
-<a href="#2214" id="2214">2214</a>
-<a href="#2215" id="2215">2215</a>
-<a href="#2216" id="2216">2216</a>
-<a href="#2217" id="2217">2217</a>
-<a href="#2218" id="2218">2218</a>
-<a href="#2219" id="2219">2219</a>
-<a href="#2220" id="2220">2220</a>
-<a href="#2221" id="2221">2221</a>
-<a href="#2222" id="2222">2222</a>
-<a href="#2223" id="2223">2223</a>
-<a href="#2224" id="2224">2224</a>
-<a href="#2225" id="2225">2225</a>
-<a href="#2226" id="2226">2226</a>
-<a href="#2227" id="2227">2227</a>
-<a href="#2228" id="2228">2228</a>
-<a href="#2229" id="2229">2229</a>
-<a href="#2230" id="2230">2230</a>
-<a href="#2231" id="2231">2231</a>
-<a href="#2232" id="2232">2232</a>
-<a href="#2233" id="2233">2233</a>
-<a href="#2234" id="2234">2234</a>
-<a href="#2235" id="2235">2235</a>
-<a href="#2236" id="2236">2236</a>
-<a href="#2237" id="2237">2237</a>
-<a href="#2238" id="2238">2238</a>
-<a href="#2239" id="2239">2239</a>
-<a href="#2240" id="2240">2240</a>
-<a href="#2241" id="2241">2241</a>
-<a href="#2242" id="2242">2242</a>
-<a href="#2243" id="2243">2243</a>
-<a href="#2244" id="2244">2244</a>
-<a href="#2245" id="2245">2245</a>
-<a href="#2246" id="2246">2246</a>
-<a href="#2247" id="2247">2247</a>
-<a href="#2248" id="2248">2248</a>
-<a href="#2249" id="2249">2249</a>
-<a href="#2250" id="2250">2250</a>
-<a href="#2251" id="2251">2251</a>
-<a href="#2252" id="2252">2252</a>
-<a href="#2253" id="2253">2253</a>
-<a href="#2254" id="2254">2254</a>
-<a href="#2255" id="2255">2255</a>
-<a href="#2256" id="2256">2256</a>
-<a href="#2257" id="2257">2257</a>
-<a href="#2258" id="2258">2258</a>
-<a href="#2259" id="2259">2259</a>
-<a href="#2260" id="2260">2260</a>
-<a href="#2261" id="2261">2261</a>
-<a href="#2262" id="2262">2262</a>
-<a href="#2263" id="2263">2263</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>strum::{Display, EnumString};
 <span class="kw">use </span>unicode_width::UnicodeWidthStr;
 
@@ -2296,7 +2225,7 @@
 /// # use ratatui::{prelude::*, widgets::*};
 /// # fn ui(frame: &amp;mut Frame) {
 /// # let area = Rect::default();
-/// # let items = vec!["Item 1"];
+/// # let items = ["Item 1"];
 /// let list = List::new(items);
 ///
 /// // This should be stored outside of the function in your application state.
@@ -2649,7 +2578,7 @@
 /// # let area = Rect::default();
 /// let items = ["Item 1", "Item 2", "Item 3"];
 /// let list = List::new(items)
-///     .block(Block::default().title("List").borders(Borders::ALL))
+///     .block(Block::bordered().title("List"))
 ///     .style(Style::default().fg(Color::White))
 ///     .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
 ///     .highlight_symbol("&gt;&gt;")
@@ -2670,7 +2599,7 @@
 /// let mut state = ListState::default();
 /// let items = ["Item 1", "Item 2", "Item 3"];
 /// let list = List::new(items)
-///     .block(Block::default().title("List").borders(Borders::ALL))
+///     .block(Block::bordered().title("List"))
 ///     .highlight_style(Style::new().add_modifier(Modifier::REVERSED))
 ///     .highlight_symbol("&gt;&gt;")
 ///     .repeat_highlight_symbol(true);
@@ -2801,8 +2730,8 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let items = vec!["Item 1"];
-    /// let block = Block::default().title("List").borders(Borders::ALL);
+    /// # let items = ["Item 1"];
+    /// let block = Block::bordered().title("List");
     /// let list = List::new(items).block(block);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2825,7 +2754,7 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let items = vec!["Item 1"];
+    /// # let items = ["Item 1"];
     /// let list = List::new(items).style(Style::new().red().italic());
     /// ```
     ///
@@ -2836,7 +2765,7 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let items = vec!["Item 1"];
+    /// # let items = ["Item 1"];
     /// let list = List::new(items).red().italic();
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2855,7 +2784,7 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let items = vec!["Item 1", "Item 2"];
+    /// # let items = ["Item 1", "Item 2"];
     /// let list = List::new(items).highlight_symbol("&gt;&gt;");
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2879,7 +2808,7 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let items = vec!["Item 1", "Item 2"];
+    /// # let items = ["Item 1", "Item 2"];
     /// let list = List::new(items).highlight_style(Style::new().red().italic());
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2921,7 +2850,7 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let items = vec!["Item 1"];
+    /// # let items = ["Item 1"];
     /// let list = List::new(items).highlight_spacing(HighlightSpacing::Always);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2943,7 +2872,7 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let items = vec!["Item 1"];
+    /// # let items = ["Item 1"];
     /// let list = List::new(items).direction(ListDirection::BottomToTop);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2962,7 +2891,7 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let items = vec!["Item 1"];
+    /// # let items = ["Item 1"];
     /// let list = List::new(items).scroll_padding(1);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2992,7 +2921,7 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let items = vec!["Item 1"];
+    /// # let items = ["Item 1"];
     /// let list = List::new(items).start_corner(Corner::BottomRight);
     /// ```
     ///
@@ -3000,7 +2929,7 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let items = vec!["Item 1"];
+    /// # let items = ["Item 1"];
     /// let list = List::new(items).start_corner(Corner::BottomLeft);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -3314,7 +3243,6 @@
     <span class="kw">use </span>rstest::{fixture, rstest};
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use crate</span>::{assert_buffer_eq, widgets::Borders};
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_list_state_selected() {
@@ -3454,11 +3382,6 @@
         <span class="macro">assert_eq!</span>(item.width(), <span class="number">9</span>);
     }
 
-    <span class="doccomment">/// helper method to take a vector of strings and return a vector of list items
-    </span><span class="kw">fn </span>list_items(items: Vec&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; Vec&lt;ListItem&gt; {
-        items.into_iter().map(ListItem::new).collect()
-    }
-
     <span class="doccomment">/// helper method to render a widget to an empty buffer with the default state
     </span><span class="kw">fn </span>render_widget(widget: List&lt;<span class="lifetime">'_</span>&gt;, width: u16, height: u16) -&gt; Buffer {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, width, height));
@@ -3486,64 +3409,67 @@
 
         <span class="comment">// attempt to render into an area of the buffer with 0 width
         </span>Widget::render(list.clone(), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::empty(buffer.area));
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buffer, <span class="kw-2">&amp;</span>Buffer::empty(buffer.area));
 
         <span class="comment">// attempt to render into an area of the buffer with 0 height
         </span>Widget::render(list.clone(), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">0</span>), <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::empty(buffer.area));
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buffer, <span class="kw-2">&amp;</span>Buffer::empty(buffer.area));
 
         <span class="kw">let </span>list = List::new(items)
             .highlight_symbol(<span class="string">"&gt;&gt;"</span>)
-            .block(Block::default().borders(Borders::all()));
+            .block(Block::bordered());
         <span class="comment">// attempt to render into an area of the buffer with zero height after
         // setting the block borders
         </span>Widget::render(list, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">2</span>), <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"┌─────────────┐"</span>,
-                <span class="string">"└─────────────┘"</span>,
-                <span class="string">"               "
-            </span>])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"┌─────────────┐"</span>,
+            <span class="string">"└─────────────┘"</span>,
+            <span class="string">"               "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected,);
     }
 
     <span class="attr">#[allow(clippy::too_many_lines)]
     #[test]
     </span><span class="kw">fn </span>test_list_combinations() {
-        <span class="kw">fn </span>test_case_render(items: <span class="kw-2">&amp;</span>[ListItem], expected_lines: Vec&lt;<span class="kw-2">&amp;</span>str&gt;) {
+        <span class="attr">#[track_caller]
+        </span><span class="kw">fn </span>test_case_render&lt;<span class="lifetime">'line</span>, Lines&gt;(items: <span class="kw-2">&amp;</span>[ListItem], expected: Lines)
+        <span class="kw">where
+            </span>Lines: IntoIterator,
+            Lines::Item: Into&lt;Line&lt;<span class="lifetime">'line</span>&gt;&gt;,
+        {
             <span class="kw">let </span>list = List::new(items.to_owned()).highlight_symbol(<span class="string">"&gt;&gt;"</span>);
             <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">5</span>));
-
             Widget::render(list, buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-            <span class="kw">let </span>expected = Buffer::with_lines(expected_lines);
-            <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+            <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(expected));
         }
-        <span class="kw">fn </span>test_case_render_stateful(
+
+        <span class="attr">#[track_caller]
+        </span><span class="kw">fn </span>test_case_render_stateful&lt;<span class="lifetime">'line</span>, Lines&gt;(
             items: <span class="kw-2">&amp;</span>[ListItem],
             selected: <span class="prelude-ty">Option</span>&lt;usize&gt;,
-            expected_lines: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
-        ) {
+            expected: Lines,
+        ) <span class="kw">where
+            </span>Lines: IntoIterator,
+            Lines::Item: Into&lt;Line&lt;<span class="lifetime">'line</span>&gt;&gt;,
+        {
             <span class="kw">let </span>list = List::new(items.to_owned()).highlight_symbol(<span class="string">"&gt;&gt;"</span>);
             <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default().with_selected(selected);
             <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">5</span>));
-
             StatefulWidget::render(list, buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-
-            <span class="kw">let </span>expected = Buffer::with_lines(expected_lines);
-            <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+            <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(expected));
         }
 
-        <span class="kw">let </span>empty_items: Vec&lt;ListItem&gt; = Vec::new();
-        <span class="kw">let </span>single_item = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>]);
-        <span class="kw">let </span>multiple_items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-        <span class="kw">let </span>multi_line_items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0\nLine 2"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
+        <span class="kw">let </span>empty_items = Vec::new();
+        <span class="kw">let </span>single_item = <span class="macro">vec!</span>[<span class="string">"Item 0"</span>.into()];
+        <span class="kw">let </span>multiple_items = <span class="macro">vec!</span>[<span class="string">"Item 0"</span>.into(), <span class="string">"Item 1"</span>.into(), <span class="string">"Item 2"</span>.into()];
+        <span class="kw">let </span>multi_line_items = <span class="macro">vec!</span>[<span class="string">"Item 0\nLine 2"</span>.into(), <span class="string">"Item 1"</span>.into(), <span class="string">"Item 2"</span>.into()];
 
         <span class="comment">// empty list
         </span>test_case_render(
             <span class="kw-2">&amp;</span>empty_items,
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
@@ -3554,7 +3480,7 @@
         test_case_render_stateful(
             <span class="kw-2">&amp;</span>empty_items,
             <span class="prelude-val">None</span>,
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
@@ -3565,7 +3491,7 @@
         test_case_render_stateful(
             <span class="kw-2">&amp;</span>empty_items,
             <span class="prelude-val">Some</span>(<span class="number">0</span>),
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
@@ -3577,7 +3503,7 @@
         <span class="comment">// single item
         </span>test_case_render(
             <span class="kw-2">&amp;</span>single_item,
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"Item 0    "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
@@ -3588,7 +3514,7 @@
         test_case_render_stateful(
             <span class="kw-2">&amp;</span>single_item,
             <span class="prelude-val">None</span>,
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"Item 0    "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
@@ -3599,7 +3525,7 @@
         test_case_render_stateful(
             <span class="kw-2">&amp;</span>single_item,
             <span class="prelude-val">Some</span>(<span class="number">0</span>),
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"&gt;&gt;Item 0  "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
@@ -3610,7 +3536,7 @@
         test_case_render_stateful(
             <span class="kw-2">&amp;</span>single_item,
             <span class="prelude-val">Some</span>(<span class="number">1</span>),
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"  Item 0  "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
@@ -3622,7 +3548,7 @@
         <span class="comment">// multiple items
         </span>test_case_render(
             <span class="kw-2">&amp;</span>multiple_items,
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"Item 0    "</span>,
                 <span class="string">"Item 1    "</span>,
                 <span class="string">"Item 2    "</span>,
@@ -3633,7 +3559,7 @@
         test_case_render_stateful(
             <span class="kw-2">&amp;</span>multiple_items,
             <span class="prelude-val">None</span>,
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"Item 0    "</span>,
                 <span class="string">"Item 1    "</span>,
                 <span class="string">"Item 2    "</span>,
@@ -3644,7 +3570,7 @@
         test_case_render_stateful(
             <span class="kw-2">&amp;</span>multiple_items,
             <span class="prelude-val">Some</span>(<span class="number">0</span>),
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"&gt;&gt;Item 0  "</span>,
                 <span class="string">"  Item 1  "</span>,
                 <span class="string">"  Item 2  "</span>,
@@ -3655,7 +3581,7 @@
         test_case_render_stateful(
             <span class="kw-2">&amp;</span>multiple_items,
             <span class="prelude-val">Some</span>(<span class="number">1</span>),
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"  Item 0  "</span>,
                 <span class="string">"&gt;&gt;Item 1  "</span>,
                 <span class="string">"  Item 2  "</span>,
@@ -3666,7 +3592,7 @@
         test_case_render_stateful(
             <span class="kw-2">&amp;</span>multiple_items,
             <span class="prelude-val">Some</span>(<span class="number">3</span>),
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"  Item 0  "</span>,
                 <span class="string">"  Item 1  "</span>,
                 <span class="string">"  Item 2  "</span>,
@@ -3678,7 +3604,7 @@
         <span class="comment">// multi line items
         </span>test_case_render(
             <span class="kw-2">&amp;</span>multi_line_items,
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"Item 0    "</span>,
                 <span class="string">"Line 2    "</span>,
                 <span class="string">"Item 1    "</span>,
@@ -3689,7 +3615,7 @@
         test_case_render_stateful(
             <span class="kw-2">&amp;</span>multi_line_items,
             <span class="prelude-val">None</span>,
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"Item 0    "</span>,
                 <span class="string">"Line 2    "</span>,
                 <span class="string">"Item 1    "</span>,
@@ -3700,7 +3626,7 @@
         test_case_render_stateful(
             <span class="kw-2">&amp;</span>multi_line_items,
             <span class="prelude-val">Some</span>(<span class="number">0</span>),
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"&gt;&gt;Item 0  "</span>,
                 <span class="string">"  Line 2  "</span>,
                 <span class="string">"  Item 1  "</span>,
@@ -3711,7 +3637,7 @@
         test_case_render_stateful(
             <span class="kw-2">&amp;</span>multi_line_items,
             <span class="prelude-val">Some</span>(<span class="number">1</span>),
-            <span class="macro">vec!</span>[
+            [
                 <span class="string">"  Item 0  "</span>,
                 <span class="string">"  Line 2  "</span>,
                 <span class="string">"&gt;&gt;Item 1  "</span>,
@@ -3724,25 +3650,23 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_list_items_setter() {
         <span class="kw">let </span>list = List::default().items([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-        <span class="macro">assert_buffer_eq!</span>(
-            render_widget(list, <span class="number">10</span>, <span class="number">5</span>),
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"Item 0    "</span>,
-                <span class="string">"Item 1    "</span>,
-                <span class="string">"Item 2    "</span>,
-                <span class="string">"          "</span>,
-                <span class="string">"          "</span>,
-            ])
-        );
+        <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">5</span>);
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"Item 0    "</span>,
+            <span class="string">"Item 1    "</span>,
+            <span class="string">"Item 2    "</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_list_with_empty_strings() {
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">""</span>, <span class="string">""</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-        <span class="kw">let </span>list = List::new(items).block(Block::default().title(<span class="string">"List"</span>).borders(Borders::ALL));
+        <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">""</span>, <span class="string">""</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>])
+            .block(Block::bordered().title(<span class="string">"List"</span>));
         <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">7</span>);
-
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+        <span class="kw">let </span>expected = Buffer::with_lines([
             <span class="string">"┌List────┐"</span>,
             <span class="string">"│Item 0  │"</span>,
             <span class="string">"│        │"</span>,
@@ -3751,7 +3675,7 @@
             <span class="string">"│Item 2  │"</span>,
             <span class="string">"└────────┘"</span>,
         ]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -3763,11 +3687,9 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_list_block() {
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-        <span class="kw">let </span>list = List::new(items).block(Block::default().title(<span class="string">"List"</span>).borders(Borders::ALL));
+        <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]).block(Block::bordered().title(<span class="string">"List"</span>));
         <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">7</span>);
-
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+        <span class="kw">let </span>expected = Buffer::with_lines([
             <span class="string">"┌List────┐"</span>,
             <span class="string">"│Item 0  │"</span>,
             <span class="string">"│Item 1  │"</span>,
@@ -3776,84 +3698,72 @@
             <span class="string">"│        │"</span>,
             <span class="string">"└────────┘"</span>,
         ]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_list_style() {
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-        <span class="kw">let </span>list = List::new(items).style(Style::default().fg(Color::Red));
-
-        <span class="macro">assert_buffer_eq!</span>(
-            render_widget(list, <span class="number">10</span>, <span class="number">5</span>),
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"Item 0    "</span>.red(),
-                <span class="string">"Item 1    "</span>.red(),
-                <span class="string">"Item 2    "</span>.red(),
-                <span class="string">"          "</span>.red(),
-                <span class="string">"          "</span>.red(),
-            ])
-        );
+        <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]).style(Style::default().fg(Color::Red));
+        <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">5</span>);
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"Item 0    "</span>.red(),
+            <span class="string">"Item 1    "</span>.red(),
+            <span class="string">"Item 2    "</span>.red(),
+            <span class="string">"          "</span>.red(),
+            <span class="string">"          "</span>.red(),
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_list_highlight_symbol_and_style() {
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-        <span class="kw">let </span>list = List::new(items)
+        <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>])
             .highlight_symbol(<span class="string">"&gt;&gt;"</span>)
             .highlight_style(Style::default().fg(Color::Yellow));
         <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
         state.select(<span class="prelude-val">Some</span>(<span class="number">1</span>));
-
-        <span class="macro">assert_buffer_eq!</span>(
-            render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">10</span>, <span class="number">5</span>),
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"  Item 0  "</span>.into(),
-                <span class="string">"&gt;&gt;Item 1  "</span>.yellow(),
-                <span class="string">"  Item 2  "</span>.into(),
-                <span class="string">"          "</span>.into(),
-                <span class="string">"          "</span>.into(),
-            ])
-        );
+        <span class="kw">let </span>buffer = render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">10</span>, <span class="number">5</span>);
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"  Item 0  "</span>.into(),
+            <span class="string">"&gt;&gt;Item 1  "</span>.yellow(),
+            <span class="string">"  Item 2  "</span>.into(),
+            <span class="string">"          "</span>.into(),
+            <span class="string">"          "</span>.into(),
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_list_highlight_spacing_default_whenselected() {
         <span class="comment">// when not selected
         </span>{
-            <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-            <span class="kw">let </span>list = List::new(items).highlight_symbol(<span class="string">"&gt;&gt;"</span>);
+            <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]).highlight_symbol(<span class="string">"&gt;&gt;"</span>);
             <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
-
             <span class="kw">let </span>buffer = render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">10</span>, <span class="number">5</span>);
-
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"Item 0    "</span>,
                 <span class="string">"Item 1    "</span>,
                 <span class="string">"Item 2    "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+            <span class="macro">assert_eq!</span>(buffer, expected);
         }
 
         <span class="comment">// when selected
         </span>{
-            <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-            <span class="kw">let </span>list = List::new(items).highlight_symbol(<span class="string">"&gt;&gt;"</span>);
+            <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]).highlight_symbol(<span class="string">"&gt;&gt;"</span>);
             <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
             state.select(<span class="prelude-val">Some</span>(<span class="number">1</span>));
-
             <span class="kw">let </span>buffer = render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">10</span>, <span class="number">5</span>);
-
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"  Item 0  "</span>,
                 <span class="string">"&gt;&gt;Item 1  "</span>,
                 <span class="string">"  Item 2  "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+            <span class="macro">assert_eq!</span>(buffer, expected);
         }
     }
 
@@ -3861,43 +3771,37 @@
     </span><span class="kw">fn </span>test_list_highlight_spacing_default_always() {
         <span class="comment">// when not selected
         </span>{
-            <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-            <span class="kw">let </span>list = List::new(items)
+            <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>])
                 .highlight_symbol(<span class="string">"&gt;&gt;"</span>)
                 .highlight_spacing(HighlightSpacing::Always);
             <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
-
             <span class="kw">let </span>buffer = render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">10</span>, <span class="number">5</span>);
-
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"  Item 0  "</span>,
                 <span class="string">"  Item 1  "</span>,
                 <span class="string">"  Item 2  "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+            <span class="macro">assert_eq!</span>(buffer, expected);
         }
 
         <span class="comment">// when selected
         </span>{
-            <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-            <span class="kw">let </span>list = List::new(items)
+            <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>])
                 .highlight_symbol(<span class="string">"&gt;&gt;"</span>)
                 .highlight_spacing(HighlightSpacing::Always);
             <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
             state.select(<span class="prelude-val">Some</span>(<span class="number">1</span>));
-
             <span class="kw">let </span>buffer = render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">10</span>, <span class="number">5</span>);
-
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"  Item 0  "</span>,
                 <span class="string">"&gt;&gt;Item 1  "</span>,
                 <span class="string">"  Item 2  "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+            <span class="macro">assert_eq!</span>(buffer, expected);
         }
     }
 
@@ -3905,194 +3809,177 @@
     </span><span class="kw">fn </span>test_list_highlight_spacing_default_never() {
         <span class="comment">// when not selected
         </span>{
-            <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-            <span class="kw">let </span>list = List::new(items)
+            <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>])
                 .highlight_symbol(<span class="string">"&gt;&gt;"</span>)
                 .highlight_spacing(HighlightSpacing::Never);
             <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
-
             <span class="kw">let </span>buffer = render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">10</span>, <span class="number">5</span>);
-
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"Item 0    "</span>,
                 <span class="string">"Item 1    "</span>,
                 <span class="string">"Item 2    "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+            <span class="macro">assert_eq!</span>(buffer, expected);
         }
 
         <span class="comment">// when selected
         </span>{
-            <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-            <span class="kw">let </span>list = List::new(items)
+            <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>])
                 .highlight_symbol(<span class="string">"&gt;&gt;"</span>)
                 .highlight_spacing(HighlightSpacing::Never);
             <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
             state.select(<span class="prelude-val">Some</span>(<span class="number">1</span>));
-
             <span class="kw">let </span>buffer = render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">10</span>, <span class="number">5</span>);
-
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"Item 0    "</span>,
                 <span class="string">"Item 1    "</span>,
                 <span class="string">"Item 2    "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+            <span class="macro">assert_eq!</span>(buffer, expected);
         }
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_list_repeat_highlight_symbol() {
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0\nLine 2"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-        <span class="kw">let </span>list = List::new(items)
+        <span class="kw">let </span>list = List::new([<span class="string">"Item 0\nLine 2"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>])
             .highlight_symbol(<span class="string">"&gt;&gt;"</span>)
             .highlight_style(Style::default().fg(Color::Yellow))
             .repeat_highlight_symbol(<span class="bool-val">true</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
         state.select(<span class="prelude-val">Some</span>(<span class="number">0</span>));
-
-        <span class="macro">assert_buffer_eq!</span>(
-            render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">10</span>, <span class="number">5</span>),
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"&gt;&gt;Item 0  "</span>.yellow(),
-                <span class="string">"&gt;&gt;Line 2  "</span>.yellow(),
-                <span class="string">"  Item 1  "</span>.into(),
-                <span class="string">"  Item 2  "</span>.into(),
-                <span class="string">"          "</span>.into(),
-            ])
-        );
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_list_direction_top_to_bottom() {
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-        <span class="kw">let </span>list = List::new(items).direction(ListDirection::TopToBottom);
-        <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">5</span>);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">"Item 0    "</span>,
-            <span class="string">"Item 1    "</span>,
-            <span class="string">"Item 2    "</span>,
-            <span class="string">"          "</span>,
-            <span class="string">"          "</span>,
+        <span class="kw">let </span>buffer = render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">10</span>, <span class="number">5</span>);
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"&gt;&gt;Item 0  "</span>.yellow(),
+            <span class="string">"&gt;&gt;Line 2  "</span>.yellow(),
+            <span class="string">"  Item 1  "</span>.into(),
+            <span class="string">"  Item 2  "</span>.into(),
+            <span class="string">"          "</span>.into(),
         ]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_list_direction_bottom_to_top() {
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-        <span class="kw">let </span>list = List::new(items).direction(ListDirection::BottomToTop);
-        <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">5</span>);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">"          "</span>,
-            <span class="string">"          "</span>,
-            <span class="string">"Item 2    "</span>,
-            <span class="string">"Item 1    "</span>,
-            <span class="string">"Item 0    "</span>,
-        ]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+    <span class="attr">#[rstest]
+    #[case::top_to_bottom(ListDirection::TopToBottom, [
+        <span class="string">"Item 0    "</span>,
+        <span class="string">"Item 1    "</span>,
+        <span class="string">"Item 2    "</span>,
+        <span class="string">"          "</span>,
+    ]</span>)]
+    <span class="attr">#[case::top_to_bottom(ListDirection::BottomToTop, [
+        <span class="string">"          "</span>,
+        <span class="string">"Item 2    "</span>,
+        <span class="string">"Item 1    "</span>,
+        <span class="string">"Item 0    "</span>,
+    ]</span>)]
+    <span class="kw">fn </span>list_direction&lt;<span class="lifetime">'line</span>, Lines&gt;(<span class="attr">#[case] </span>direction: ListDirection, <span class="attr">#[case] </span>expected: Lines)
+    <span class="kw">where
+        </span>Lines: IntoIterator,
+        Lines::Item: Into&lt;Line&lt;<span class="lifetime">'line</span>&gt;&gt;,
+    {
+        <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]).direction(direction);
+        <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(expected));
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_list_start_corner_top_left() {
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
+    <span class="attr">#[rstest]
+    #[case::topleft(Corner::TopLeft, [
+        <span class="string">"Item 0    "</span>,
+        <span class="string">"Item 1    "</span>,
+        <span class="string">"Item 2    "</span>,
+        <span class="string">"          "</span>,
+    ]</span>)]
+    <span class="attr">#[case::bottomleft(Corner::BottomLeft, [
+        <span class="string">"          "</span>,
+        <span class="string">"Item 2    "</span>,
+        <span class="string">"Item 1    "</span>,
+        <span class="string">"Item 0    "</span>,
+    ]</span>)]
+    <span class="kw">fn </span>start_corner&lt;<span class="lifetime">'line</span>, Lines&gt;(<span class="attr">#[case] </span>corner: Corner, <span class="attr">#[case] </span>expected: Lines)
+    <span class="kw">where
+        </span>Lines: IntoIterator,
+        Lines::Item: Into&lt;Line&lt;<span class="lifetime">'line</span>&gt;&gt;,
+    {
         <span class="attr">#[allow(deprecated)] </span><span class="comment">// For start_corner
-        </span><span class="kw">let </span>list = List::new(items).start_corner(Corner::TopLeft);
-        <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">5</span>);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">"Item 0    "</span>,
-            <span class="string">"Item 1    "</span>,
-            <span class="string">"Item 2    "</span>,
-            <span class="string">"          "</span>,
-            <span class="string">"          "</span>,
-        ]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_list_start_corner_bottom_left() {
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]);
-        <span class="attr">#[allow(deprecated)] </span><span class="comment">// For start_corner
-        </span><span class="kw">let </span>list = List::new(items).start_corner(Corner::BottomLeft);
-        <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">5</span>);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">"          "</span>,
-            <span class="string">"          "</span>,
-            <span class="string">"Item 2    "</span>,
-            <span class="string">"Item 1    "</span>,
-            <span class="string">"Item 0    "</span>,
-        ]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        </span><span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]).start_corner(corner);
+        <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(expected));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_list_truncate_items() {
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>, <span class="string">"Item 3"</span>, <span class="string">"Item 4"</span>]);
-        <span class="kw">let </span>list = List::new(items);
+        <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>, <span class="string">"Item 3"</span>, <span class="string">"Item 4"</span>]);
         <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">3</span>);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Item 0    "</span>, <span class="string">"Item 1    "</span>, <span class="string">"Item 2    "</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"Item 0    "</span>,
+            <span class="string">"Item 1    "</span>,
+            <span class="string">"Item 2    "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_offset_renders_shifted() {
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[
+        <span class="kw">let </span>list = List::new([
             <span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>, <span class="string">"Item 3"</span>, <span class="string">"Item 4"</span>, <span class="string">"Item 5"</span>, <span class="string">"Item 6"</span>,
         ]);
-        <span class="kw">let </span>list = List::new(items);
         <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default().with_offset(<span class="number">3</span>);
         <span class="kw">let </span>buffer = render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">6</span>, <span class="number">3</span>);
 
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Item 3"</span>, <span class="string">"Item 4"</span>, <span class="string">"Item 5"</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="kw">let </span>expected = Buffer::with_lines([<span class="string">"Item 3"</span>, <span class="string">"Item 4"</span>, <span class="string">"Item 5"</span>]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_list_long_lines() {
-        <span class="kw">fn </span>test_case(list: List, selected: <span class="prelude-ty">Option</span>&lt;usize&gt;, expected_lines: Vec&lt;<span class="kw-2">&amp;</span>str&gt;) {
-            <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
-            state.select(selected);
-            <span class="kw">let </span>buffer = render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">15</span>, <span class="number">3</span>);
-            <span class="kw">let </span>expected = Buffer::with_lines(expected_lines);
-            <span class="macro">assert_buffer_eq!</span>(buffer, expected);
-        }
-
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[
+    <span class="attr">#[rstest]
+    #[case(<span class="prelude-val">None</span>, [
+        <span class="string">"Item 0 with a v"</span>,
+        <span class="string">"Item 1         "</span>,
+        <span class="string">"Item 2         "</span>,
+    ]</span>)]
+    <span class="attr">#[case(<span class="prelude-val">Some</span>(<span class="number">0</span>), [
+        <span class="string">"&gt;&gt;Item 0 with a"</span>,
+        <span class="string">"  Item 1       "</span>,
+        <span class="string">"  Item 2       "</span>,
+    ]</span>)]
+    <span class="kw">fn </span>test_list_long_lines&lt;<span class="lifetime">'line</span>, Lines&gt;(<span class="attr">#[case] </span>selected: <span class="prelude-ty">Option</span>&lt;usize&gt;, <span class="attr">#[case] </span>expected: Lines)
+    <span class="kw">where
+        </span>Lines: IntoIterator,
+        Lines::Item: Into&lt;Line&lt;<span class="lifetime">'line</span>&gt;&gt;,
+    {
+        <span class="kw">let </span>items = [
             <span class="string">"Item 0 with a very long line that will be truncated"</span>,
             <span class="string">"Item 1"</span>,
             <span class="string">"Item 2"</span>,
-        ]);
+        ];
         <span class="kw">let </span>list = List::new(items).highlight_symbol(<span class="string">"&gt;&gt;"</span>);
-
-        test_case(
-            list.clone(),
-            <span class="prelude-val">None</span>,
-            <span class="macro">vec!</span>[<span class="string">"Item 0 with a v"</span>, <span class="string">"Item 1         "</span>, <span class="string">"Item 2         "</span>],
-        );
-        test_case(
-            list,
-            <span class="prelude-val">Some</span>(<span class="number">0</span>),
-            <span class="macro">vec!</span>[<span class="string">"&gt;&gt;Item 0 with a"</span>, <span class="string">"  Item 1       "</span>, <span class="string">"  Item 2       "</span>],
-        );
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default().with_selected(selected);
+        <span class="kw">let </span>buffer = render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">15</span>, <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(expected));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_list_selected_item_ensures_selected_item_is_visible_when_offset_is_before_visible_range(
     ) {
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[
+        <span class="kw">let </span>items = [
             <span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>, <span class="string">"Item 3"</span>, <span class="string">"Item 4"</span>, <span class="string">"Item 5"</span>, <span class="string">"Item 6"</span>,
-        ]);
+        ];
         <span class="kw">let </span>list = List::new(items).highlight_symbol(<span class="string">"&gt;&gt;"</span>);
         <span class="comment">// Set the initial visible range to items 3, 4, and 5
         </span><span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default().with_selected(<span class="prelude-val">Some</span>(<span class="number">1</span>)).with_offset(<span class="number">3</span>);
         <span class="kw">let </span>buffer = render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">10</span>, <span class="number">3</span>);
 
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"&gt;&gt;Item 1  "</span>, <span class="string">"  Item 2  "</span>, <span class="string">"  Item 3  "</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"&gt;&gt;Item 1  "</span>,
+            <span class="string">"  Item 2  "</span>,
+            <span class="string">"  Item 3  "</span>,
+        ]);
+
+        <span class="macro">assert_eq!</span>(buffer, expected);
         <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">1</span>));
         <span class="macro">assert_eq!</span>(
             state.offset, <span class="number">1</span>,
@@ -4103,16 +3990,22 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_list_selected_item_ensures_selected_item_is_visible_when_offset_is_after_visible_range()
     {
-        <span class="kw">let </span>items = list_items(<span class="macro">vec!</span>[
+        <span class="kw">let </span>items = [
             <span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>, <span class="string">"Item 3"</span>, <span class="string">"Item 4"</span>, <span class="string">"Item 5"</span>, <span class="string">"Item 6"</span>,
-        ]);
+        ];
         <span class="kw">let </span>list = List::new(items).highlight_symbol(<span class="string">"&gt;&gt;"</span>);
         <span class="comment">// Set the initial visible range to items 3, 4, and 5
         </span><span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default().with_selected(<span class="prelude-val">Some</span>(<span class="number">6</span>)).with_offset(<span class="number">3</span>);
         <span class="kw">let </span>buffer = render_stateful_widget(list, <span class="kw-2">&amp;mut </span>state, <span class="number">10</span>, <span class="number">3</span>);
 
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  Item 4  "</span>, <span class="string">"  Item 5  "</span>, <span class="string">"&gt;&gt;Item 6  "</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"  Item 4  "</span>,
+            <span class="string">"  Item 5  "</span>,
+            <span class="string">"&gt;&gt;Item 6  "</span>,
+        ]);
+
+        <span class="macro">assert_eq!</span>(buffer, expected);
         <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">6</span>));
         <span class="macro">assert_eq!</span>(
             state.offset, <span class="number">4</span>,
@@ -4151,155 +4044,99 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_list_with_alignment() {
-        <span class="kw">let </span>items = [
+        <span class="kw">let </span>list = List::new([
             Line::from(<span class="string">"Left"</span>).alignment(Alignment::Left),
             Line::from(<span class="string">"Center"</span>).alignment(Alignment::Center),
             Line::from(<span class="string">"Right"</span>).alignment(Alignment::Right),
-        ]
-        .into_iter()
-        .map(ListItem::new)
-        .collect::&lt;Vec&lt;ListItem&gt;&gt;();
-        <span class="kw">let </span>list = List::new(items);
-        <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">5</span>);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">"Left      "</span>,
-            <span class="string">"  Center  "</span>,
-            <span class="string">"     Right"</span>,
-            <span class="string">"          "</span>,
-            <span class="string">"          "</span>,
         ]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">4</span>);
+        <span class="kw">let </span>expected = Buffer::with_lines([<span class="string">"Left      "</span>, <span class="string">"  Center  "</span>, <span class="string">"     Right"</span>, <span class="string">""</span>]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_list_alignment_odd_line_odd_area() {
-        <span class="kw">let </span>items = [
+        <span class="kw">let </span>list = List::new([
             Line::from(<span class="string">"Odd"</span>).alignment(Alignment::Left),
             Line::from(<span class="string">"Even"</span>).alignment(Alignment::Center),
             Line::from(<span class="string">"Width"</span>).alignment(Alignment::Right),
-        ]
-        .into_iter()
-        .map(ListItem::new)
-        .collect::&lt;Vec&lt;ListItem&gt;&gt;();
-        <span class="kw">let </span>list = List::new(items);
-        <span class="kw">let </span>buffer = render_widget(list, <span class="number">7</span>, <span class="number">5</span>);
-        <span class="kw">let </span>expected =
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Odd    "</span>, <span class="string">" Even  "</span>, <span class="string">"  Width"</span>, <span class="string">"       "</span>, <span class="string">"       "</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        ]);
+        <span class="kw">let </span>buffer = render_widget(list, <span class="number">7</span>, <span class="number">4</span>);
+        <span class="kw">let </span>expected = Buffer::with_lines([<span class="string">"Odd    "</span>, <span class="string">" Even  "</span>, <span class="string">"  Width"</span>, <span class="string">""</span>]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_list_alignment_even_line_even_area() {
-        <span class="kw">let </span>items = [
+        <span class="kw">let </span>list = List::new([
             Line::from(<span class="string">"Odd"</span>).alignment(Alignment::Left),
             Line::from(<span class="string">"Even"</span>).alignment(Alignment::Center),
             Line::from(<span class="string">"Width"</span>).alignment(Alignment::Right),
-        ]
-        .into_iter()
-        .map(ListItem::new)
-        .collect::&lt;Vec&lt;ListItem&gt;&gt;();
-        <span class="kw">let </span>list = List::new(items);
+        ]);
         <span class="kw">let </span>buffer = render_widget(list, <span class="number">6</span>, <span class="number">4</span>);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Odd   "</span>, <span class="string">" Even "</span>, <span class="string">" Width"</span>, <span class="string">"      "</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="kw">let </span>expected = Buffer::with_lines([<span class="string">"Odd   "</span>, <span class="string">" Even "</span>, <span class="string">" Width"</span>, <span class="string">""</span>]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_list_alignment_odd_line_even_area() {
-        <span class="kw">let </span>items = [
+        <span class="kw">let </span>list = List::new([
             Line::from(<span class="string">"Odd"</span>).alignment(Alignment::Left),
             Line::from(<span class="string">"Even"</span>).alignment(Alignment::Center),
             Line::from(<span class="string">"Width"</span>).alignment(Alignment::Right),
-        ]
-        .into_iter()
-        .map(ListItem::new)
-        .collect::&lt;Vec&lt;ListItem&gt;&gt;();
-        <span class="kw">let </span>list = List::new(items);
+        ]);
         <span class="kw">let </span>buffer = render_widget(list, <span class="number">8</span>, <span class="number">4</span>);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Odd     "</span>, <span class="string">"  Even  "</span>, <span class="string">"   Width"</span>, <span class="string">"        "</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="kw">let </span>expected = Buffer::with_lines([<span class="string">"Odd     "</span>, <span class="string">"  Even  "</span>, <span class="string">"   Width"</span>, <span class="string">""</span>]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_list_alignment_even_line_odd_area() {
-        <span class="kw">let </span>items = [
+        <span class="kw">let </span>list = List::new([
             Line::from(<span class="string">"Odd"</span>).alignment(Alignment::Left),
             Line::from(<span class="string">"Even"</span>).alignment(Alignment::Center),
             Line::from(<span class="string">"Width"</span>).alignment(Alignment::Right),
-        ]
-        .into_iter()
-        .map(ListItem::new)
-        .collect::&lt;Vec&lt;ListItem&gt;&gt;();
-        <span class="kw">let </span>list = List::new(items);
-        <span class="kw">let </span>buffer = render_widget(list, <span class="number">6</span>, <span class="number">5</span>);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Odd   "</span>, <span class="string">" Even "</span>, <span class="string">" Width"</span>, <span class="string">"     "</span>, <span class="string">"     "</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        ]);
+        <span class="kw">let </span>buffer = render_widget(list, <span class="number">6</span>, <span class="number">4</span>);
+        <span class="kw">let </span>expected = Buffer::with_lines([<span class="string">"Odd   "</span>, <span class="string">" Even "</span>, <span class="string">" Width"</span>, <span class="string">""</span>]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_list_alignment_zero_line_width() {
-        <span class="kw">let </span>items = [Line::from(<span class="string">"This line has zero width"</span>).alignment(Alignment::Center)]
-            .into_iter()
-            .map(ListItem::new)
-            .collect::&lt;Vec&lt;ListItem&gt;&gt;();
-        <span class="kw">let </span>list = List::new(items);
-        <span class="kw">let </span>buffer = render_widget(list, <span class="number">0</span>, <span class="number">5</span>);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">""</span>, <span class="string">""</span>, <span class="string">""</span>, <span class="string">""</span>, <span class="string">""</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="kw">let </span>list = List::new([Line::from(<span class="string">"This line has zero width"</span>).alignment(Alignment::Center)]);
+        <span class="kw">let </span>buffer = render_widget(list, <span class="number">0</span>, <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">""</span>; <span class="number">2</span>]));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_list_alignment_zero_area_width() {
-        <span class="kw">let </span>items = [Line::from(<span class="string">"Text"</span>).alignment(Alignment::Left)]
-            .into_iter()
-            .map(ListItem::new)
-            .collect::&lt;Vec&lt;ListItem&gt;&gt;();
-        <span class="kw">let </span>list = List::new(items);
-        <span class="comment">// assert_buffer_eq! doesn't handle zero height buffers so we call this test manually
-        // rather than using render_widget
-        </span><span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>));
+        <span class="kw">let </span>list = List::new([Line::from(<span class="string">"Text"</span>).alignment(Alignment::Left)]);
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>));
         Widget::render(list, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">0</span>), <span class="kw-2">&amp;mut </span>buffer);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"    "</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"    "</span>]));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_list_alignment_line_less_than_width() {
-        <span class="kw">let </span>items = [Line::from(<span class="string">"Small"</span>).alignment(Alignment::Center)];
-        <span class="kw">let </span>list = List::new(items);
-        <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">5</span>);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">"  Small   "</span>,
-            <span class="string">"          "</span>,
-            <span class="string">"          "</span>,
-            <span class="string">"          "</span>,
-            <span class="string">"          "</span>,
-        ]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="kw">let </span>list = List::new([Line::from(<span class="string">"Small"</span>).alignment(Alignment::Center)]);
+        <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">2</span>);
+        <span class="kw">let </span>expected = Buffer::with_lines([<span class="string">"  Small   "</span>, <span class="string">""</span>]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_list_alignment_line_equal_to_width() {
-        <span class="kw">let </span>items = [Line::from(<span class="string">"Exact"</span>).alignment(Alignment::Left)]
-            .into_iter()
-            .map(ListItem::new)
-            .collect::&lt;Vec&lt;ListItem&gt;&gt;();
-        <span class="kw">let </span>list = List::new(items);
-        <span class="kw">let </span>buffer = render_widget(list, <span class="number">5</span>, <span class="number">3</span>);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Exact"</span>, <span class="string">"     "</span>, <span class="string">"     "</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="kw">let </span>list = List::new([Line::from(<span class="string">"Exact"</span>).alignment(Alignment::Left)]);
+        <span class="kw">let </span>buffer = render_widget(list, <span class="number">5</span>, <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"Exact"</span>, <span class="string">""</span>]));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_list_alignment_line_greater_than_width() {
-        <span class="kw">let </span>items = [Line::from(<span class="string">"Large line"</span>).alignment(Alignment::Left)]
-            .into_iter()
-            .map(ListItem::new)
-            .collect::&lt;Vec&lt;ListItem&gt;&gt;();
-        <span class="kw">let </span>list = List::new(items);
-        <span class="kw">let </span>buffer = render_widget(list, <span class="number">5</span>, <span class="number">3</span>);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Large"</span>, <span class="string">"     "</span>, <span class="string">"     "</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="kw">let </span>list = List::new([Line::from(<span class="string">"Large line"</span>).alignment(Alignment::Left)]);
+        <span class="kw">let </span>buffer = render_widget(list, <span class="number">5</span>, <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"Large"</span>, <span class="string">""</span>]));
     }
 
     <span class="attr">#[rstest]
@@ -4308,61 +4145,97 @@
         <span class="number">2</span>, <span class="comment">// Offset
         </span><span class="number">0</span>, <span class="comment">// Padding
         </span><span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="comment">// Selected
-        </span>Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"&gt;&gt; Item 2 "</span>, <span class="string">"   Item 3 "</span>, <span class="string">"   Item 4 "</span>, <span class="string">"   Item 5 "</span>]</span>)
-    )]
+        </span>[
+            <span class="string">"&gt;&gt; Item 2 "</span>,
+            <span class="string">"   Item 3 "</span>,
+            <span class="string">"   Item 4 "</span>,
+            <span class="string">"   Item 5 "</span>,
+        ]
+    </span>)]
     <span class="attr">#[case::one_before(
         <span class="number">4</span>,
         <span class="number">2</span>, <span class="comment">// Offset
         </span><span class="number">1</span>, <span class="comment">// Padding
         </span><span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="comment">// Selected
-        </span>Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"   Item 1 "</span>, <span class="string">"&gt;&gt; Item 2 "</span>, <span class="string">"   Item 3 "</span>, <span class="string">"   Item 4 "</span>]</span>)
-    )]
+        </span>[
+            <span class="string">"   Item 1 "</span>,
+            <span class="string">"&gt;&gt; Item 2 "</span>,
+            <span class="string">"   Item 3 "</span>,
+            <span class="string">"   Item 4 "</span>,
+        ]
+    </span>)]
     <span class="attr">#[case::one_after(
         <span class="number">4</span>,
         <span class="number">1</span>, <span class="comment">// Offset
         </span><span class="number">1</span>, <span class="comment">// Padding
         </span><span class="prelude-val">Some</span>(<span class="number">4</span>), <span class="comment">// Selected
-        </span>Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"   Item 2 "</span>, <span class="string">"   Item 3 "</span>, <span class="string">"&gt;&gt; Item 4 "</span>, <span class="string">"   Item 5 "</span>]</span>)
-    )]
+        </span>[
+            <span class="string">"   Item 2 "</span>,
+            <span class="string">"   Item 3 "</span>,
+            <span class="string">"&gt;&gt; Item 4 "</span>,
+            <span class="string">"   Item 5 "</span>,
+        ]
+    </span>)]
     <span class="attr">#[case::check_padding_overflow(
         <span class="number">4</span>,
         <span class="number">1</span>, <span class="comment">// Offset
         </span><span class="number">2</span>, <span class="comment">// Padding
         </span><span class="prelude-val">Some</span>(<span class="number">4</span>), <span class="comment">// Selected
-        </span>Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"   Item 2 "</span>, <span class="string">"   Item 3 "</span>, <span class="string">"&gt;&gt; Item 4 "</span>, <span class="string">"   Item 5 "</span>]</span>)
-    )]
+        </span>[
+            <span class="string">"   Item 2 "</span>,
+            <span class="string">"   Item 3 "</span>,
+            <span class="string">"&gt;&gt; Item 4 "</span>,
+            <span class="string">"   Item 5 "</span>,
+        ]
+    </span>)]
     <span class="attr">#[case::no_padding_offset_behavior(
         <span class="number">5</span>, <span class="comment">// Render Area Height
         </span><span class="number">2</span>, <span class="comment">// Offset
         </span><span class="number">0</span>, <span class="comment">// Padding
         </span><span class="prelude-val">Some</span>(<span class="number">3</span>), <span class="comment">// Selected
-        </span>Buffer::with_lines(
-            <span class="macro">vec!</span>[<span class="string">"   Item 2 "</span>, <span class="string">"&gt;&gt; Item 3 "</span>, <span class="string">"   Item 4 "</span>, <span class="string">"   Item 5 "</span>, <span class="string">"          "</span>]
-            </span>)
-    )]
+        </span>[
+            <span class="string">"   Item 2 "</span>,
+            <span class="string">"&gt;&gt; Item 3 "</span>,
+            <span class="string">"   Item 4 "</span>,
+            <span class="string">"   Item 5 "</span>,
+            <span class="string">"          "</span>,
+        ]
+    </span>)]
     <span class="attr">#[case::two_before(
         <span class="number">5</span>, <span class="comment">// Render Area Height
         </span><span class="number">2</span>, <span class="comment">// Offset
         </span><span class="number">2</span>, <span class="comment">// Padding
         </span><span class="prelude-val">Some</span>(<span class="number">3</span>), <span class="comment">// Selected
-        </span>Buffer::with_lines(
-            <span class="macro">vec!</span>[<span class="string">"   Item 1 "</span>, <span class="string">"   Item 2 "</span>, <span class="string">"&gt;&gt; Item 3 "</span>, <span class="string">"   Item 4 "</span>, <span class="string">"   Item 5 "</span>]
-            </span>)
-    )]
+        </span>[
+            <span class="string">"   Item 1 "</span>,
+            <span class="string">"   Item 2 "</span>,
+            <span class="string">"&gt;&gt; Item 3 "</span>,
+            <span class="string">"   Item 4 "</span>,
+            <span class="string">"   Item 5 "</span>,
+        ]
+    </span>)]
     <span class="attr">#[case::keep_selected_visible(
         <span class="number">4</span>,
         <span class="number">0</span>, <span class="comment">// Offset
         </span><span class="number">4</span>, <span class="comment">// Padding
         </span><span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="comment">// Selected
-        </span>Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"   Item 0 "</span>, <span class="string">"&gt;&gt; Item 1 "</span>, <span class="string">"   Item 2 "</span>, <span class="string">"   Item 3 "</span>]</span>)
-    )]
-    <span class="kw">fn </span>test_padding(
+        </span>[
+            <span class="string">"   Item 0 "</span>,
+            <span class="string">"&gt;&gt; Item 1 "</span>,
+            <span class="string">"   Item 2 "</span>,
+            <span class="string">"   Item 3 "</span>,
+        ]
+    </span>)]
+    <span class="kw">fn </span>test_padding&lt;<span class="lifetime">'line</span>, Lines&gt;(
         <span class="attr">#[case] </span>render_height: u16,
         <span class="attr">#[case] </span>offset: usize,
         <span class="attr">#[case] </span>padding: usize,
         <span class="attr">#[case] </span>selected: <span class="prelude-ty">Option</span>&lt;usize&gt;,
-        <span class="attr">#[case] </span>expected: Buffer,
-    ) {
+        <span class="attr">#[case] </span>expected: Lines,
+    ) <span class="kw">where
+        </span>Lines: IntoIterator,
+        Lines::Item: Into&lt;Line&lt;<span class="lifetime">'line</span>&gt;&gt;,
+    {
         <span class="kw">let </span>backend = backend::TestBackend::new(<span class="number">10</span>, render_height);
         <span class="kw">let </span><span class="kw-2">mut </span>terminal = Terminal::new(backend).unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
@@ -4370,26 +4243,16 @@
         <span class="kw-2">*</span>state.offset_mut() = offset;
         state.select(selected);
 
-        <span class="kw">let </span>items = <span class="macro">vec!</span>[
-            ListItem::new(<span class="string">"Item 0"</span>),
-            ListItem::new(<span class="string">"Item 1"</span>),
-            ListItem::new(<span class="string">"Item 2"</span>),
-            ListItem::new(<span class="string">"Item 3"</span>),
-            ListItem::new(<span class="string">"Item 4"</span>),
-            ListItem::new(<span class="string">"Item 5"</span>),
-        ];
-        <span class="kw">let </span>list = List::new(items)
+        <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>, <span class="string">"Item 3"</span>, <span class="string">"Item 4"</span>, <span class="string">"Item 5"</span>])
             .scroll_padding(padding)
             .highlight_symbol(<span class="string">"&gt;&gt; "</span>);
-
         terminal
             .draw(|f| {
                 <span class="kw">let </span>size = f.size();
                 f.render_stateful_widget(list, size, <span class="kw-2">&amp;mut </span>state);
             })
             .unwrap();
-
-        terminal.backend().assert_buffer(<span class="kw-2">&amp;</span>expected);
+        terminal.backend().assert_buffer_lines(expected);
     }
 
     <span class="doccomment">/// If there isn't enough room for the selected item and the requested padding the list can jump
@@ -4404,15 +4267,8 @@
         <span class="kw-2">*</span>state.offset_mut() = <span class="number">2</span>;
         state.select(<span class="prelude-val">Some</span>(<span class="number">4</span>));
 
-        <span class="kw">let </span>items = <span class="macro">vec!</span>[
-            ListItem::new(<span class="string">"Item 0"</span>),
-            ListItem::new(<span class="string">"Item 1"</span>),
-            ListItem::new(<span class="string">"Item 2"</span>),
-            ListItem::new(<span class="string">"Item 3"</span>),
-            ListItem::new(<span class="string">"Item 4"</span>),
-            ListItem::new(<span class="string">"Item 5"</span>),
-            ListItem::new(<span class="string">"Item 6"</span>),
-            ListItem::new(<span class="string">"Item 7"</span>),
+        <span class="kw">let </span>items = [
+            <span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>, <span class="string">"Item 3"</span>, <span class="string">"Item 4"</span>, <span class="string">"Item 5"</span>, <span class="string">"Item 6"</span>, <span class="string">"Item 7"</span>,
         ];
         <span class="kw">let </span>list = List::new(items).scroll_padding(<span class="number">3</span>).highlight_symbol(<span class="string">"&gt;&gt; "</span>);
 
@@ -4442,7 +4298,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>terminal = Terminal::new(backend).unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default().with_offset(<span class="number">0</span>).with_selected(<span class="prelude-val">Some</span>(<span class="number">3</span>));
 
-        <span class="kw">let </span>items = <span class="macro">vec!</span>[
+        <span class="kw">let </span>items = [
             ListItem::new(<span class="string">"Item 0"</span>),
             ListItem::new(<span class="string">"Item 1"</span>),
             ListItem::new(<span class="string">"Item 2"</span>),
@@ -4459,11 +4315,13 @@
             })
             .unwrap();
 
-        terminal.backend().assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = [
             <span class="string">"   Item 1 "</span>,
             <span class="string">"   Item 2 "</span>,
             <span class="string">"&gt;&gt; Item 3 "</span>,
-        ]));
+        ];
+        terminal.backend().assert_buffer_lines(expected);
     }
 
     <span class="comment">// Tests to make sure when it's pushing back the first visible index value that it doesnt
@@ -4477,7 +4335,7 @@
         <span class="kw-2">*</span>state.offset_mut() = <span class="number">1</span>;
         state.select(<span class="prelude-val">Some</span>(<span class="number">2</span>));
 
-        <span class="kw">let </span>items = <span class="macro">vec!</span>[
+        <span class="kw">let </span>items = [
             ListItem::new(<span class="string">"Item 0\nTest\nTest"</span>),
             ListItem::new(<span class="string">"Item 1"</span>),
             ListItem::new(<span class="string">"Item 2"</span>),
@@ -4492,12 +4350,12 @@
             })
             .unwrap();
 
-        terminal.backend().assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[
+        terminal.backend().assert_buffer_lines([
             <span class="string">"   Item 1 "</span>,
             <span class="string">"&gt;&gt; Item 2 "</span>,
             <span class="string">"   Item 3 "</span>,
             <span class="string">"          "</span>,
-        ]));
+        ]);
     }
 
     <span class="attr">#[fixture]
@@ -4519,11 +4377,11 @@
         <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str,
         <span class="kw-2">mut </span>single_line_buf: Buffer,
     ) {
-        <span class="kw">let </span>list = List::new(<span class="macro">vec!</span>[item]).highlight_symbol(highlight_symbol);
+        <span class="kw">let </span>list = List::new([item]).highlight_symbol(highlight_symbol);
         <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
         state.select(<span class="prelude-val">Some</span>(<span class="number">0</span>));
         StatefulWidget::render(list, single_line_buf.area, <span class="kw-2">&amp;mut </span>single_line_buf, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(single_line_buf, Buffer::with_lines(<span class="macro">vec!</span>[expected]));
+        <span class="macro">assert_eq!</span>(single_line_buf, Buffer::with_lines([expected]));
     }
 }
 </code></pre></div></section></main></body></html>

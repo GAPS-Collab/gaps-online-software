@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["TransactionDepthChange","TransactionManagerStatus"],"struct":["AnsiTransactionManager","DefaultLoadingMode","InTransactionStatus","ValidTransactionManagerStatus"],"trait":["BoxableConnection","Connection","LoadConnection","SimpleConnection","TransactionManager"]};

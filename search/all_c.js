@@ -1,12 +1,6 @@
 var searchData=
 [
-  ['rate_49',['rate',['../structRBMoniData.html#abb385a6a883190b2b5e4b7b4f755a909',1,'RBMoniData']]],
-  ['rb_5fevents_50',['rb_events',['../structTofEvent.html#a577628b0f2d6beacc40f6bad1adc135a',1,'TofEvent']]],
-  ['rb_5fid_51',['rb_id',['../structRBCalibration.html#af877b4807be2918e61d3062ea49526b5',1,'RBCalibration']]],
-  ['rbcalibration_52',['RBCalibration',['../structRBCalibration.html',1,'']]],
-  ['rbevent_53',['RBEvent',['../structRBEvent.html',1,'']]],
-  ['rbeventheader_54',['RBEventHeader',['../structRBEventHeader.html',1,'']]],
-  ['rbmissinghit_55',['RBMissingHit',['../structRBMissingHit.html',1,'']]],
-  ['rbmonidata_56',['RBMoniData',['../structRBMoniData.html',1,'']]],
-  ['rbwaveform_57',['RBWaveform',['../structRBWaveform.html',1,'']]]
+  ['set_5floglevel_56',['set_loglevel',['../namespaceGaps.html#a212013efcb580c37612821937fa4ff8d',1,'Gaps']]],
+  ['simprimary_57',['SimPrimary',['../structSimPrimary.html',1,'']]],
+  ['size_58',['SIZE',['../structTofEventHeader.html#ac4744665f64968853fbf6c909dc808e6',1,'TofEventHeader::SIZE()'],['../structMasterTriggerEvent.html#ae8de2d59e0cdb02a7ad7b6073011983d',1,'MasterTriggerEvent::SIZE()'],['../structLTBMoniData.html#a63e6fe71fa5cdbac6b69c28ee7676798',1,'LTBMoniData::SIZE()']]]
 ];

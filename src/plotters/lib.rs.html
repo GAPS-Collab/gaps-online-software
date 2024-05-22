@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/plotters-0.3.5/src/lib.rs`."><title>lib.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="plotters" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/plotters-0.3.6/src/lib.rs`."><title>lib.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="plotters" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../plotters/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -919,7 +919,29 @@
 <a href="#917" id="917">917</a>
 <a href="#918" id="918">918</a>
 <a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
 </pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
+#![cfg_attr(doc_cfg, feature(doc_cfg))]
 </span><span class="doccomment">/*!
 
 # Plotters - A Rust drawing library focusing on data plotting for both WASM and native applications 🦀📈🚀
@@ -1073,7 +1095,7 @@ including bitmap, vector graph, piston window, GTK/Cairo and WebAssembly.
     &lt;/a&gt;
     &lt;div class="galleryText"&gt;
         The 1D Gaussian Distribution
-        &lt;a href="https://github.com/plotters-rs/plotters/blob/master/plotters/examples/nomal-dist2.rs"&gt;[code]&lt;/a&gt;
+        &lt;a href="https://github.com/plotters-rs/plotters/blob/master/plotters/examples/normal-dist2.rs"&gt;[code]&lt;/a&gt;
     &lt;/div&gt;
 &lt;/div&gt;
 
@@ -1282,7 +1304,7 @@ The feature `evcxr` should be enabled when including Plotters to Jupyter Noteboo
 The following code shows a minimal example of this.
 
 ```text
-:dep plotters = { version = "^0.3.5", default_features = false, features = ["evcxr", "all_series", "all_elements"] }
+:dep plotters = { version = "^0.3.6", default_features = false, features = ["evcxr", "all_series", "all_elements"] }
 extern crate plotters;
 use plotters::prelude::*;
 
@@ -1717,12 +1739,14 @@ pub fn register_font(
 
 <span class="doccomment">/// Evaluation Context for Rust. See [the evcxr crate](https://crates.io/crates/evcxr) for more information.
 </span><span class="attr">#[cfg(feature = <span class="string">"evcxr"</span>)]
+#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"evcxr"</span>)))]
 </span><span class="kw">pub mod </span>evcxr;
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::drawing::{check_color, create_mocked_drawing_area};
 
 <span class="attr">#[cfg(feature = <span class="string">"palette_ext"</span>)]
+#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"palette_ext"</span>)))]
 </span><span class="kw">pub use </span>palette;
 
 <span class="doccomment">/// The module imports the most commonly used types and modules in Plotters
@@ -1746,6 +1770,7 @@ pub fn register_font(
     </span><span class="kw">pub use </span><span class="kw">crate</span>::coord::combinators::LogRange;
 
     <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"chrono"</span>)))]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::coord::types::{
         IntoMonthly, IntoYearly, RangedDate, RangedDateTime, RangedDuration,
     };
@@ -1757,23 +1782,30 @@ pub fn register_font(
 
     <span class="comment">// Series helpers
     </span><span class="attr">#[cfg(feature = <span class="string">"area_series"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"area_series"</span>)))]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::series::AreaSeries;
     <span class="attr">#[cfg(feature = <span class="string">"histogram"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"histogram"</span>)))]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::series::Histogram;
-    <span class="attr">#[cfg(feature = <span class="string">"line_series"</span>)]
-    </span><span class="kw">pub use </span><span class="kw">crate</span>::series::LineSeries;
     <span class="attr">#[cfg(feature = <span class="string">"point_series"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"point_series"</span>)))]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::series::PointSeries;
     <span class="attr">#[cfg(feature = <span class="string">"surface_series"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"surface_series"</span>)))]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::series::SurfaceSeries;
+    <span class="attr">#[cfg(feature = <span class="string">"line_series"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"line_series"</span>)))]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::series::{DashedLineSeries, DottedLineSeries, LineSeries};
 
     <span class="comment">// Styles
     </span><span class="kw">pub use </span><span class="kw">crate</span>::style::{BLACK, BLUE, CYAN, GREEN, MAGENTA, RED, TRANSPARENT, WHITE, YELLOW};
 
     <span class="attr">#[cfg(feature = <span class="string">"full_palette"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"full_palette"</span>)))]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::style::full_palette;
 
     <span class="attr">#[cfg(feature = <span class="string">"colormaps"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"colormaps"</span>)))]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::style::colors::colormaps::<span class="kw-2">*</span>;
 
     <span class="kw">pub use </span><span class="kw">crate</span>::style::{
@@ -1789,13 +1821,17 @@ pub fn register_font(
     };
 
     <span class="attr">#[cfg(feature = <span class="string">"boxplot"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"boxplot"</span>)))]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::element::Boxplot;
     <span class="attr">#[cfg(feature = <span class="string">"candlestick"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"candlestick"</span>)))]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::element::CandleStick;
     <span class="attr">#[cfg(feature = <span class="string">"errorbar"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"errorbar"</span>)))]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::element::ErrorBar;
 
     <span class="attr">#[cfg(feature = <span class="string">"bitmap_backend"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"bitmap_backend"</span>)))]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::element::BitMapElement;
 
     <span class="comment">// Data
@@ -1803,6 +1839,7 @@ pub fn register_font(
 
     <span class="comment">// TODO: This should be deprecated and completely removed
     </span><span class="attr">#[cfg(feature = <span class="string">"deprecated_items"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"deprecated_items"</span>)))]
     #[allow(deprecated)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::element::Path;
 
@@ -1814,13 +1851,16 @@ pub fn register_font(
         <span class="prelude-ty">Result</span>&lt;T, <span class="kw">crate</span>::drawing::DrawingAreaErrorKind&lt;D::ErrorType&gt;&gt;;
 
     <span class="attr">#[cfg(feature = <span class="string">"evcxr"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"evcxr"</span>)))]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::evcxr::evcxr_figure;
 
     <span class="comment">// Re-export tier 1 backends for backward compatibility
     </span><span class="attr">#[cfg(feature = <span class="string">"bitmap_backend"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"bitmap_backend"</span>)))]
     </span><span class="kw">pub use </span>plotters_bitmap::BitMapBackend;
 
     <span class="attr">#[cfg(feature = <span class="string">"svg_backend"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"svg_backend"</span>)))]
     </span><span class="kw">pub use </span>plotters_svg::SVGBackend;
 }
 
@@ -1828,11 +1868,13 @@ pub fn register_font(
 </span><span class="kw">pub mod </span>backend {
     <span class="kw">pub use </span>plotters_backend::DrawingBackend;
     <span class="attr">#[cfg(feature = <span class="string">"bitmap_backend"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"bitmap_backend"</span>)))]
     </span><span class="kw">pub use </span>plotters_bitmap::{
         bitmap_pixel::{BGRXPixel, PixelFormat, RGBPixel},
         BitMapBackend,
     };
     <span class="attr">#[cfg(feature = <span class="string">"svg_backend"</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"svg_backend"</span>)))]
     </span><span class="kw">pub use </span>plotters_svg::SVGBackend;
 }
 

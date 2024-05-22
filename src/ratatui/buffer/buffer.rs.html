@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/buffer/buffer.rs`."><title>buffer.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/buffer/buffer.rs`."><title>buffer.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -958,10 +958,35 @@
 <a href="#956" id="956">956</a>
 <a href="#957" id="957">957</a>
 <a href="#958" id="958">958</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::{
-    cmp::min,
-    fmt::{Debug, Formatter, <span class="prelude-ty">Result</span>},
-};
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span>unicode_segmentation::UnicodeSegmentation;
 <span class="kw">use </span>unicode_width::UnicodeWidthStr;
@@ -1015,22 +1040,21 @@
 
 <span class="kw">impl </span>Buffer {
     <span class="doccomment">/// Returns a Buffer with all cells set to the default one
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>empty(area: Rect) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>cell = Cell::default();
-        <span class="self">Self</span>::filled(area, <span class="kw-2">&amp;</span>cell)
+        <span class="self">Self</span>::filled(area, <span class="kw-2">&amp;</span>Cell::default())
     }
 
     <span class="doccomment">/// Returns a Buffer with all cells initialized with the attributes of the given Cell
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>filled(area: Rect, cell: <span class="kw-2">&amp;</span>Cell) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>size = area.area() <span class="kw">as </span>usize;
-        <span class="kw">let </span><span class="kw-2">mut </span>content = Vec::with_capacity(size);
-        <span class="kw">for _ in </span><span class="number">0</span>..size {
-            content.push(cell.clone());
-        }
+        <span class="kw">let </span>content = <span class="macro">vec!</span>[cell.clone(); size];
         <span class="self">Self </span>{ area, content }
     }
 
     <span class="doccomment">/// Returns a Buffer containing the given lines
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>with_lines&lt;<span class="lifetime">'a</span>, Iter&gt;(lines: Iter) -&gt; <span class="self">Self
     </span><span class="kw">where
         </span>Iter: IntoIterator,
@@ -1057,12 +1081,14 @@
     }
 
     <span class="doccomment">/// Returns a reference to Cell at the given coordinates
+    </span><span class="attr">#[track_caller]
     </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, x: u16, y: u16) -&gt; <span class="kw-2">&amp;</span>Cell {
         <span class="kw">let </span>i = <span class="self">self</span>.index_of(x, y);
         <span class="kw-2">&amp;</span><span class="self">self</span>.content[i]
     }
 
     <span class="doccomment">/// Returns a mutable reference to Cell at the given coordinates
+    </span><span class="attr">#[track_caller]
     </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u16, y: u16) -&gt; <span class="kw-2">&amp;mut </span>Cell {
         <span class="kw">let </span>i = <span class="self">self</span>.index_of(x, y);
         <span class="kw-2">&amp;mut </span><span class="self">self</span>.content[i]
@@ -1094,6 +1120,7 @@
     /// // starts at (200, 100).
     /// buffer.index_of(0, 0); // Panics
     /// ```
+    </span><span class="attr">#[track_caller]
     </span><span class="kw">pub fn </span>index_of(<span class="kw-2">&amp;</span><span class="self">self</span>, x: u16, y: u16) -&gt; usize {
         <span class="macro">debug_assert!</span>(
             x &gt;= <span class="self">self</span>.area.left()
@@ -1144,65 +1171,56 @@
     }
 
     <span class="doccomment">/// Print a string, starting at the position (x, y)
-    ///
-    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
-    /// your own type that implements [`Into&lt;Style&gt;`]).
     </span><span class="kw">pub fn </span>set_string&lt;T, S&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u16, y: u16, string: T, style: S)
     <span class="kw">where
         </span>T: AsRef&lt;str&gt;,
         S: Into&lt;Style&gt;,
     {
-        <span class="self">self</span>.set_stringn(x, y, string, usize::MAX, style.into());
+        <span class="self">self</span>.set_stringn(x, y, string, usize::MAX, style);
     }
 
     <span class="doccomment">/// Print at most the first n characters of a string if enough space is available
-    /// until the end of the line
+    /// until the end of the line.
     ///
-    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
-    /// your own type that implements [`Into&lt;Style&gt;`]).
+    /// Use [`Buffer::set_string`] when the maximum amount of characters can be printed.
     </span><span class="kw">pub fn </span>set_stringn&lt;T, S&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        x: u16,
+        <span class="kw-2">mut </span>x: u16,
         y: u16,
         string: T,
-        width: usize,
+        max_width: usize,
         style: S,
     ) -&gt; (u16, u16)
     <span class="kw">where
         </span>T: AsRef&lt;str&gt;,
         S: Into&lt;Style&gt;,
     {
+        <span class="kw">let </span>max_width = max_width.try_into().unwrap_or(u16::MAX);
+        <span class="kw">let </span><span class="kw-2">mut </span>remaining_width = <span class="self">self</span>.area.right().saturating_sub(x).min(max_width);
+        <span class="kw">let </span>graphemes = UnicodeSegmentation::graphemes(string.as_ref(), <span class="bool-val">true</span>)
+            .map(|symbol| (symbol, symbol.width() <span class="kw">as </span>u16))
+            .filter(|(_symbol, width)| <span class="kw-2">*</span>width &gt; <span class="number">0</span>)
+            .map_while(|(symbol, width)| {
+                remaining_width = remaining_width.checked_sub(width)<span class="question-mark">?</span>;
+                <span class="prelude-val">Some</span>((symbol, width))
+            });
         <span class="kw">let </span>style = style.into();
-        <span class="kw">let </span><span class="kw-2">mut </span>index = <span class="self">self</span>.index_of(x, y);
-        <span class="kw">let </span><span class="kw-2">mut </span>x_offset = x <span class="kw">as </span>usize;
-        <span class="kw">let </span>graphemes = UnicodeSegmentation::graphemes(string.as_ref(), <span class="bool-val">true</span>);
-        <span class="kw">let </span>max_offset = min(<span class="self">self</span>.area.right() <span class="kw">as </span>usize, width.saturating_add(x <span class="kw">as </span>usize));
-        <span class="kw">for </span>s <span class="kw">in </span>graphemes {
-            <span class="kw">let </span>width = s.width();
-            <span class="kw">if </span>width == <span class="number">0 </span>{
-                <span class="kw">continue</span>;
-            }
-            <span class="comment">// `x_offset + width &gt; max_offset` could be integer overflow on 32-bit machines if we
-            // change dimensions to usize or u32 and someone resizes the terminal to 1x2^32.
-            </span><span class="kw">if </span>width &gt; max_offset.saturating_sub(x_offset) {
-                <span class="kw">break</span>;
-            }
-
-            <span class="self">self</span>.content[index].set_symbol(s);
-            <span class="self">self</span>.content[index].set_style(style);
+        <span class="kw">for </span>(symbol, width) <span class="kw">in </span>graphemes {
+            <span class="self">self</span>.get_mut(x, y).set_symbol(symbol).set_style(style);
+            <span class="kw">let </span>next_symbol = x + width;
+            x += <span class="number">1</span>;
             <span class="comment">// Reset following cells if multi-width (they would be hidden by the grapheme),
-            </span><span class="kw">for </span>i <span class="kw">in </span>index + <span class="number">1</span>..index + width {
-                <span class="self">self</span>.content[i].reset();
+            </span><span class="kw">while </span>x &lt; next_symbol {
+                <span class="self">self</span>.get_mut(x, y).reset();
+                x += <span class="number">1</span>;
             }
-            index += width;
-            x_offset += width;
         }
-        (x_offset <span class="kw">as </span>u16, y)
+        (x, y)
     }
 
     <span class="doccomment">/// Print a line, starting at the position (x, y)
-    </span><span class="kw">pub fn </span>set_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u16, y: u16, line: <span class="kw-2">&amp;</span>Line&lt;<span class="lifetime">'_</span>&gt;, width: u16) -&gt; (u16, u16) {
-        <span class="kw">let </span><span class="kw-2">mut </span>remaining_width = width;
+    </span><span class="kw">pub fn </span>set_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u16, y: u16, line: <span class="kw-2">&amp;</span>Line&lt;<span class="lifetime">'_</span>&gt;, max_width: u16) -&gt; (u16, u16) {
+        <span class="kw">let </span><span class="kw-2">mut </span>remaining_width = max_width;
         <span class="kw">let </span><span class="kw-2">mut </span>x = x;
         <span class="kw">for </span>span <span class="kw">in </span>line {
             <span class="kw">if </span>remaining_width == <span class="number">0 </span>{
@@ -1223,8 +1241,8 @@
     }
 
     <span class="doccomment">/// Print a span, starting at the position (x, y)
-    </span><span class="kw">pub fn </span>set_span(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u16, y: u16, span: <span class="kw-2">&amp;</span>Span&lt;<span class="lifetime">'_</span>&gt;, width: u16) -&gt; (u16, u16) {
-        <span class="self">self</span>.set_stringn(x, y, span.content.as_ref(), width <span class="kw">as </span>usize, span.style)
+    </span><span class="kw">pub fn </span>set_span(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u16, y: u16, span: <span class="kw-2">&amp;</span>Span&lt;<span class="lifetime">'_</span>&gt;, max_width: u16) -&gt; (u16, u16) {
+        <span class="self">self</span>.set_stringn(x, y, <span class="kw-2">&amp;</span>span.content, max_width <span class="kw">as </span>usize, span.style)
     }
 
     <span class="doccomment">/// Set the style of all cells in the given area.
@@ -1263,8 +1281,7 @@
     <span class="doccomment">/// Merge an other buffer into this one
     </span><span class="kw">pub fn </span>merge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) {
         <span class="kw">let </span>area = <span class="self">self</span>.area.union(other.area);
-        <span class="kw">let </span>cell = Cell::default();
-        <span class="self">self</span>.content.resize(area.area() <span class="kw">as </span>usize, cell.clone());
+        <span class="self">self</span>.content.resize(area.area() <span class="kw">as </span>usize, Cell::default());
 
         <span class="comment">// Move original content to the appropriate space
         </span><span class="kw">let </span>size = <span class="self">self</span>.area.area() <span class="kw">as </span>usize;
@@ -1274,7 +1291,7 @@
             </span><span class="kw">let </span>k = ((y - area.y) * area.width + x - area.x) <span class="kw">as </span>usize;
             <span class="kw">if </span>i != k {
                 <span class="self">self</span>.content[k] = <span class="self">self</span>.content[i].clone();
-                <span class="self">self</span>.content[i] = cell.clone();
+                <span class="self">self</span>.content[i] = Cell::default();
             }
         }
 
@@ -1343,7 +1360,7 @@
     }
 }
 
-<span class="kw">impl </span>Debug <span class="kw">for </span>Buffer {
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Buffer {
     <span class="doccomment">/// Writes a debug representation of the buffer to the given formatter.
     ///
     /// The format is like a pretty printed struct, with the following fields:
@@ -1351,11 +1368,14 @@
     /// * `content`: displayed as a list of strings representing the content of the buffer
     /// * `styles`: displayed as a list of: `{ x: 1, y: 2, fg: Color::Red, bg: Color::Blue,
     ///   modifier: Modifier::BOLD }` only showing a value when there is a change in style.
-    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result </span>{
-        f.write_fmt(<span class="macro">format_args!</span>(
-            <span class="string">"Buffer {{\n    area: {:?},\n    content: [\n"</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.area
-        ))<span class="question-mark">?</span>;
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        f.write_fmt(<span class="macro">format_args!</span>(<span class="string">"Buffer {{\n    area: {:?}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.area))<span class="question-mark">?</span>;
+
+        <span class="kw">if </span><span class="self">self</span>.area.is_empty() {
+            <span class="kw">return </span>f.write_str(<span class="string">"\n}"</span>);
+        }
+
+        f.write_str(<span class="string">",\n    content: [\n"</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>last_style = <span class="prelude-val">None</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>styles = <span class="macro">vec!</span>[];
         <span class="kw">for </span>(y, line) <span class="kw">in </span><span class="self">self</span>.content.chunks(<span class="self">self</span>.area.width <span class="kw">as </span>usize).enumerate() {
@@ -1386,12 +1406,13 @@
                     }
                 }
             }
+            f.write_str(<span class="string">"\","</span>)<span class="question-mark">?</span>;
             <span class="kw">if </span>!overwritten.is_empty() {
                 f.write_fmt(<span class="macro">format_args!</span>(
-                    <span class="string">"// hidden by multi-width symbols: {overwritten:?}"
+                    <span class="string">" // hidden by multi-width symbols: {overwritten:?}"
                 </span>))<span class="question-mark">?</span>;
             }
-            f.write_str(<span class="string">"\",\n"</span>)<span class="question-mark">?</span>;
+            f.write_str(<span class="string">"\n"</span>)<span class="question-mark">?</span>;
         }
         f.write_str(<span class="string">"    ],\n    styles: [\n"</span>)<span class="question-mark">?</span>;
         <span class="kw">for </span>s <span class="kw">in </span>styles {
@@ -1419,7 +1440,6 @@
     <span class="kw">use </span>rstest::{fixture, rstest};
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::assert_buffer_eq;
 
     <span class="kw">fn </span>cell(s: <span class="kw-2">&amp;</span>str) -&gt; Cell {
         <span class="kw">let </span><span class="kw-2">mut </span>cell = Cell::default();
@@ -1428,10 +1448,40 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>debug() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">12</span>, <span class="number">2</span>));
-        buf.set_string(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"Hello World!"</span>, Style::default());
-        buf.set_string(
+    </span><span class="kw">fn </span>debug_empty_buffer() {
+        <span class="kw">let </span>buffer = Buffer::empty(Rect::ZERO);
+        <span class="kw">let </span>result = <span class="macro">format!</span>(<span class="string">"{buffer:?}"</span>);
+        <span class="macro">println!</span>(<span class="string">"{result}"</span>);
+        <span class="kw">let </span>expected = <span class="string">"Buffer {\n    area: Rect { x: 0, y: 0, width: 0, height: 0 }\n}"</span>;
+        <span class="macro">assert_eq!</span>(result, expected);
+    }
+
+    <span class="attr">#[cfg(feature = <span class="string">"underline-color"</span>)]
+    #[test]
+    </span><span class="kw">fn </span>debug_grapheme_override() {
+        <span class="kw">let </span>buffer = Buffer::with_lines([<span class="string">"a🦀b"</span>]);
+        <span class="kw">let </span>result = <span class="macro">format!</span>(<span class="string">"{buffer:?}"</span>);
+        <span class="macro">println!</span>(<span class="string">"{result}"</span>);
+        <span class="kw">let </span>expected = <span class="macro">indoc::indoc!</span>(
+            <span class="string">r#"
+            Buffer {
+                area: Rect { x: 0, y: 0, width: 4, height: 1 },
+                content: [
+                    "a🦀b", // hidden by multi-width symbols: [(2, " ")]
+                ],
+                styles: [
+                    x: 0, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+                ]
+            }"#
+        </span>);
+        <span class="macro">assert_eq!</span>(result, expected);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>debug_some_example() {
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">12</span>, <span class="number">2</span>));
+        buffer.set_string(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"Hello World!"</span>, Style::default());
+        buffer.set_string(
             <span class="number">0</span>,
             <span class="number">1</span>,
             <span class="string">"G'day World!"</span>,
@@ -1440,42 +1490,40 @@
                 .bg(Color::Yellow)
                 .add_modifier(Modifier::BOLD),
         );
+        <span class="kw">let </span>result = <span class="macro">format!</span>(<span class="string">"{buffer:?}"</span>);
+        <span class="macro">println!</span>(<span class="string">"{result}"</span>);
         <span class="attr">#[cfg(feature = <span class="string">"underline-color"</span>)]
-        </span><span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">"{buf:?}"</span>),
-            <span class="macro">indoc::indoc!</span>(
-                <span class="string">"
-                Buffer {
-                    area: Rect { x: 0, y: 0, width: 12, height: 2 },
-                    content: [
-                        \"Hello World!\",
-                        \"G'day World!\",
-                    ],
-                    styles: [
-                        x: 0, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
-                        x: 0, y: 1, fg: Green, bg: Yellow, underline: Reset, modifier: BOLD,
-                    ]
-                }"
-            </span>)
-        );
+        </span><span class="kw">let </span>expected = <span class="macro">indoc::indoc!</span>(
+            <span class="string">r#"
+            Buffer {
+                area: Rect { x: 0, y: 0, width: 12, height: 2 },
+                content: [
+                    "Hello World!",
+                    "G'day World!",
+                ],
+                styles: [
+                    x: 0, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+                    x: 0, y: 1, fg: Green, bg: Yellow, underline: Reset, modifier: BOLD,
+                ]
+            }"#
+        </span>);
         <span class="attr">#[cfg(not(feature = <span class="string">"underline-color"</span>))]
-        </span><span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">"{buf:?}"</span>),
-            <span class="macro">indoc::indoc!</span>(
-                <span class="string">"
-                Buffer {
-                    area: Rect { x: 0, y: 0, width: 12, height: 2 },
-                    content: [
-                        \"Hello World!\",
-                        \"G'day World!\",
-                    ],
-                    styles: [
-                        x: 0, y: 0, fg: Reset, bg: Reset, modifier: NONE,
-                        x: 0, y: 1, fg: Green, bg: Yellow, modifier: BOLD,
-                    ]
-                }"
-            </span>)
-        );
+        </span><span class="kw">let </span>expected = <span class="macro">indoc::indoc!</span>(
+            <span class="string">r#"
+            Buffer {
+                area: Rect { x: 0, y: 0, width: 12, height: 2 },
+                content: [
+                    "Hello World!",
+                    "G'day World!",
+                ],
+                styles: [
+                    x: 0, y: 0, fg: Reset, bg: Reset, modifier: NONE,
+                    x: 0, y: 1, fg: Green, bg: Yellow, modifier: BOLD,
+                ]
+            }"#
+        </span>);
+
+        <span class="macro">assert_eq!</span>(result, expected);
     }
 
     <span class="attr">#[test]
@@ -1519,27 +1567,27 @@
 
         <span class="comment">// Zero-width
         </span>buffer.set_stringn(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"aaa"</span>, <span class="number">0</span>, Style::default());
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"     "</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"     "</span>]));
 
         buffer.set_string(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"aaa"</span>, Style::default());
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"aaa  "</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"aaa  "</span>]));
 
         <span class="comment">// Width limit:
         </span>buffer.set_stringn(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"bbbbbbbbbbbbbb"</span>, <span class="number">4</span>, Style::default());
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"bbbb "</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"bbbb "</span>]));
 
         buffer.set_string(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"12345"</span>, Style::default());
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"12345"</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"12345"</span>]));
 
         <span class="comment">// Width truncation:
         </span>buffer.set_string(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"123456"</span>, Style::default());
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"12345"</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"12345"</span>]));
 
         <span class="comment">// multi-line
         </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">2</span>));
         buffer.set_string(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"12345"</span>, Style::default());
         buffer.set_string(<span class="number">0</span>, <span class="number">1</span>, <span class="string">"67890"</span>, Style::default());
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"12345"</span>, <span class="string">"67890"</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"12345"</span>, <span class="string">"67890"</span>]));
     }
 
     <span class="attr">#[test]
@@ -1550,7 +1598,7 @@
         <span class="comment">// multi-width overwrite
         </span>buffer.set_string(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"aaaaa"</span>, Style::default());
         buffer.set_string(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"称号"</span>, Style::default());
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"称号a"</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"称号a"</span>]));
     }
 
     <span class="attr">#[test]
@@ -1561,12 +1609,12 @@
         <span class="comment">// Leading grapheme with zero width
         </span><span class="kw">let </span>s = <span class="string">"\u{1}a"</span>;
         buffer.set_stringn(<span class="number">0</span>, <span class="number">0</span>, s, <span class="number">1</span>, Style::default());
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"a"</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"a"</span>]));
 
         <span class="comment">// Trailing grapheme with zero with
         </span><span class="kw">let </span>s = <span class="string">"a\u{1}"</span>;
         buffer.set_stringn(<span class="number">0</span>, <span class="number">0</span>, s, <span class="number">1</span>, Style::default());
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"a"</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"a"</span>]));
     }
 
     <span class="attr">#[test]
@@ -1574,11 +1622,11 @@
         <span class="kw">let </span>area = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">1</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(area);
         buffer.set_string(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"コン"</span>, Style::default());
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"コン "</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"コン "</span>]));
 
         <span class="comment">// Only 1 space left.
         </span>buffer.set_string(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"コンピ"</span>, Style::default());
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"コン "</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"コン "</span>]));
     }
 
     <span class="attr">#[fixture]
@@ -1603,7 +1651,7 @@
         // set_line
         </span><span class="kw">let </span><span class="kw-2">mut </span>expected_buffer = Buffer::empty(small_one_line_buffer.area);
         expected_buffer.set_string(<span class="number">0</span>, <span class="number">0</span>, expected, Style::default());
-        <span class="macro">assert_buffer_eq!</span>(small_one_line_buffer, expected_buffer);
+        <span class="macro">assert_eq!</span>(small_one_line_buffer, expected_buffer);
     }
 
     <span class="attr">#[rstest]
@@ -1644,28 +1692,39 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>set_style() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"aaaaa"</span>, <span class="string">"bbbbb"</span>, <span class="string">"ccccc"</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::with_lines([<span class="string">"aaaaa"</span>, <span class="string">"bbbbb"</span>, <span class="string">"ccccc"</span>]);
         buffer.set_style(Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">1</span>), Style::new().red());
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"aaaaa"</span>.into(), <span class="string">"bbbbb"</span>.red(), <span class="string">"ccccc"</span>.into(),])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"aaaaa"</span>.into(),
+            <span class="string">"bbbbb"</span>.red(),
+            <span class="string">"ccccc"</span>.into(),
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>set_style_does_not_panic_when_out_of_area() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"aaaaa"</span>, <span class="string">"bbbbb"</span>, <span class="string">"ccccc"</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::with_lines([<span class="string">"aaaaa"</span>, <span class="string">"bbbbb"</span>, <span class="string">"ccccc"</span>]);
         buffer.set_style(Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="number">3</span>), Style::new().red());
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"aaaaa"</span>.into(), <span class="string">"bbbbb"</span>.red(), <span class="string">"ccccc"</span>.red(),])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"aaaaa"</span>.into(),
+            <span class="string">"bbbbb"</span>.red(),
+            <span class="string">"ccccc"</span>.red(),
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>with_lines() {
-        <span class="kw">let </span>buffer =
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"┌────────┐"</span>, <span class="string">"│コンピュ│"</span>, <span class="string">"│ーa 上で│"</span>, <span class="string">"└────────┘"</span>]);
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>buffer = Buffer::with_lines([
+            <span class="string">"┌────────┐"</span>,
+            <span class="string">"│コンピュ│"</span>,
+            <span class="string">"│ーa 上で│"</span>,
+            <span class="string">"└────────┘"</span>,
+        ]);
         <span class="macro">assert_eq!</span>(buffer.area.x, <span class="number">0</span>);
         <span class="macro">assert_eq!</span>(buffer.area.y, <span class="number">0</span>);
         <span class="macro">assert_eq!</span>(buffer.area.width, <span class="number">10</span>);
@@ -1701,14 +1760,14 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>diff_single_width() {
-        <span class="kw">let </span>prev = Buffer::with_lines(<span class="macro">vec!</span>[
+        <span class="kw">let </span>prev = Buffer::with_lines([
             <span class="string">"          "</span>,
             <span class="string">"┌Title─┐  "</span>,
             <span class="string">"│      │  "</span>,
             <span class="string">"│      │  "</span>,
             <span class="string">"└──────┘  "</span>,
         ]);
-        <span class="kw">let </span>next = Buffer::with_lines(<span class="macro">vec!</span>[
+        <span class="kw">let </span>next = Buffer::with_lines([
             <span class="string">"          "</span>,
             <span class="string">"┌TITLE─┐  "</span>,
             <span class="string">"│      │  "</span>,
@@ -1730,11 +1789,11 @@
     <span class="attr">#[test]
     #[rustfmt::skip]
     </span><span class="kw">fn </span>diff_multi_width() {
-        <span class="kw">let </span>prev = Buffer::with_lines(<span class="macro">vec!</span>[
+        <span class="kw">let </span>prev = Buffer::with_lines([
             <span class="string">"┌Title─┐  "</span>,
             <span class="string">"└──────┘  "</span>,
         ]);
-        <span class="kw">let </span>next = Buffer::with_lines(<span class="macro">vec!</span>[
+        <span class="kw">let </span>next = Buffer::with_lines([
             <span class="string">"┌称号──┐  "</span>,
             <span class="string">"└──────┘  "</span>,
         ]);
@@ -1753,8 +1812,8 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>diff_multi_width_offset() {
-        <span class="kw">let </span>prev = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"┌称号──┐"</span>]);
-        <span class="kw">let </span>next = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"┌─称号─┐"</span>]);
+        <span class="kw">let </span>prev = Buffer::with_lines([<span class="string">"┌称号──┐"</span>]);
+        <span class="kw">let </span>next = Buffer::with_lines([<span class="string">"┌─称号─┐"</span>]);
 
         <span class="kw">let </span>diff = prev.diff(<span class="kw-2">&amp;</span>next);
         <span class="macro">assert_eq!</span>(
@@ -1765,8 +1824,8 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>diff_skip() {
-        <span class="kw">let </span>prev = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"123"</span>]);
-        <span class="kw">let </span><span class="kw-2">mut </span>next = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"456"</span>]);
+        <span class="kw">let </span>prev = Buffer::with_lines([<span class="string">"123"</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>next = Buffer::with_lines([<span class="string">"456"</span>]);
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..<span class="number">3 </span>{
             next.content[i].set_skip(<span class="bool-val">true</span>);
         }
@@ -1796,7 +1855,7 @@
             Cell::default().set_symbol(<span class="string">"2"</span>),
         );
         one.merge(<span class="kw-2">&amp;</span>two);
-        <span class="macro">assert_buffer_eq!</span>(one, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"11"</span>, <span class="string">"11"</span>, <span class="string">"22"</span>, <span class="string">"22"</span>]));
+        <span class="macro">assert_eq!</span>(one, Buffer::with_lines([<span class="string">"11"</span>, <span class="string">"11"</span>, <span class="string">"22"</span>, <span class="string">"22"</span>]));
     }
 
     <span class="attr">#[test]
@@ -1820,10 +1879,7 @@
             Cell::default().set_symbol(<span class="string">"2"</span>),
         );
         one.merge(<span class="kw-2">&amp;</span>two);
-        <span class="macro">assert_buffer_eq!</span>(
-            one,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"22  "</span>, <span class="string">"22  "</span>, <span class="string">"  11"</span>, <span class="string">"  11"</span>])
-        );
+        <span class="macro">assert_eq!</span>(one, Buffer::with_lines([<span class="string">"22  "</span>, <span class="string">"22  "</span>, <span class="string">"  11"</span>, <span class="string">"  11"</span>]));
     }
 
     <span class="attr">#[test]
@@ -1847,14 +1903,14 @@
             Cell::default().set_symbol(<span class="string">"2"</span>),
         );
         one.merge(<span class="kw-2">&amp;</span>two);
-        <span class="kw">let </span><span class="kw-2">mut </span>merged = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"222 "</span>, <span class="string">"222 "</span>, <span class="string">"2221"</span>, <span class="string">"2221"</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>merged = Buffer::with_lines([<span class="string">"222 "</span>, <span class="string">"222 "</span>, <span class="string">"2221"</span>, <span class="string">"2221"</span>]);
         merged.area = Rect {
             x: <span class="number">1</span>,
             y: <span class="number">1</span>,
             width: <span class="number">4</span>,
             height: <span class="number">4</span>,
         };
-        <span class="macro">assert_buffer_eq!</span>(one, merged);
+        <span class="macro">assert_eq!</span>(one, merged);
     }
 
     <span class="attr">#[test]
@@ -1913,7 +1969,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">2</span>));
         buf.set_string(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"foo"</span>, Style::new().red());
         buf.set_string(<span class="number">0</span>, <span class="number">1</span>, <span class="string">"bar"</span>, Style::new().blue());
-        <span class="macro">assert_eq!</span>(buf, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"foo"</span>.red(), <span class="string">"bar"</span>.blue()]));
+        <span class="macro">assert_eq!</span>(buf, Buffer::with_lines([<span class="string">"foo"</span>.red(), <span class="string">"bar"</span>.blue()]));
     }
 }
 </code></pre></div></section></main></body></html>

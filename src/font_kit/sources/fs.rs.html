@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/font-kit-0.11.0/src/sources/fs.rs`."><title>fs.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="font_kit" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/font-kit-0.13.2/src/sources/fs.rs`."><title>fs.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="font_kit" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../font_kit/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -208,6 +208,34 @@
 <a href="#206" id="206">206</a>
 <a href="#207" id="207">207</a>
 <a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
 </pre></div><pre class="rust"><code><span class="comment">// font-kit/src/sources/fs.rs
 //
 // Copyright © 2018 The Pathfinder Project Developers.
@@ -222,14 +250,14 @@
 //!
 //! This source uses the WalkDir abstraction from the `walkdir` crate to locate fonts.
 //!
-//! This is the native source on Android.
+//! This is the native source on Android and OpenHarmony.
 
 </span><span class="kw">use </span>std::any::Any;
 <span class="kw">use </span>std::fs::File;
-<span class="kw">use </span>std::path::PathBuf;
+<span class="kw">use </span>std::path::{Path, PathBuf};
 <span class="kw">use </span>walkdir::WalkDir;
 
-<span class="attr">#[cfg(not(any(target_os = <span class="string">"android"</span>, target_family = <span class="string">"windows"</span>)))]
+<span class="attr">#[cfg(not(any(target_os = <span class="string">"android"</span>, target_family = <span class="string">"windows"</span>, target_env = <span class="string">"ohos"</span>)))]
 </span><span class="kw">use </span>dirs_next;
 <span class="attr">#[cfg(target_family = <span class="string">"windows"</span>)]
 </span><span class="kw">use </span>std::ffi::OsString;
@@ -254,43 +282,66 @@
 ///
 /// This source uses the WalkDir abstraction from the `walkdir` crate to locate fonts.
 ///
-/// This is the native source on Android.
+/// This is the native source on Android and OpenHarmony.
 </span><span class="attr">#[allow(missing_debug_implementations)]
 </span><span class="kw">pub struct </span>FsSource {
     mem_source: MemSource,
 }
 
+<span class="kw">impl </span>Default <span class="kw">for </span>FsSource {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
+    }
+}
+
 <span class="kw">impl </span>FsSource {
     <span class="doccomment">/// Opens the default set of directories on this platform and indexes the fonts found within.
     ///
-    /// Do not rely on this function for systems other than Android. It makes a best effort to
-    /// locate fonts in the typical platform directories, but it is too simple to pick up fonts
-    /// that are stored in unusual locations but nevertheless properly installed.
+    /// Do not rely on this function for systems other than Android or OpenHarmony. It makes a best
+    /// effort to locate fonts in the typical platform directories, but it is too simple to pick up
+    /// fonts that are stored in unusual locations but nevertheless properly installed.
     </span><span class="kw">pub fn </span>new() -&gt; FsSource {
         <span class="kw">let </span><span class="kw-2">mut </span>fonts = <span class="macro">vec!</span>[];
         <span class="kw">for </span>font_directory <span class="kw">in </span>default_font_directories() {
-            <span class="kw">for </span>directory_entry <span class="kw">in </span>WalkDir::new(font_directory).into_iter() {
-                <span class="kw">let </span>directory_entry = <span class="kw">match </span>directory_entry {
-                    <span class="prelude-val">Ok</span>(directory_entry) =&gt; directory_entry,
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
-                };
-                <span class="kw">let </span>path = directory_entry.path();
-                <span class="kw">let </span><span class="kw-2">mut </span>file = <span class="kw">match </span>File::open(path) {
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
-                    <span class="prelude-val">Ok</span>(file) =&gt; file,
-                };
-                <span class="kw">match </span>Font::analyze_file(<span class="kw-2">&amp;mut </span>file) {
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
-                    <span class="prelude-val">Ok</span>(FileType::Single) =&gt; fonts.push(Handle::from_path(path.to_owned(), <span class="number">0</span>)),
-                    <span class="prelude-val">Ok</span>(FileType::Collection(font_count)) =&gt; {
-                        <span class="kw">for </span>font_index <span class="kw">in </span><span class="number">0</span>..font_count {
-                            fonts.push(Handle::from_path(path.to_owned(), font_index))
-                        }
+            fonts.extend(<span class="self">Self</span>::discover_fonts(<span class="kw-2">&amp;</span>font_directory));
+        }
+
+        FsSource {
+            mem_source: MemSource::from_fonts(fonts.into_iter()).unwrap(),
+        }
+    }
+
+    <span class="kw">fn </span>discover_fonts(path: <span class="kw-2">&amp;</span>Path) -&gt; Vec&lt;Handle&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>fonts = <span class="macro">vec!</span>[];
+        <span class="kw">for </span>directory_entry <span class="kw">in </span>WalkDir::new(path).into_iter() {
+            <span class="kw">let </span>directory_entry = <span class="kw">match </span>directory_entry {
+                <span class="prelude-val">Ok</span>(directory_entry) =&gt; directory_entry,
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
+            };
+            <span class="kw">let </span>path = directory_entry.path();
+            <span class="kw">let </span><span class="kw-2">mut </span>file = <span class="kw">match </span>File::open(path) {
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
+                <span class="prelude-val">Ok</span>(file) =&gt; file,
+            };
+            <span class="kw">match </span>Font::analyze_file(<span class="kw-2">&amp;mut </span>file) {
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
+                <span class="prelude-val">Ok</span>(FileType::Single) =&gt; fonts.push(Handle::from_path(path.to_owned(), <span class="number">0</span>)),
+                <span class="prelude-val">Ok</span>(FileType::Collection(font_count)) =&gt; {
+                    <span class="kw">for </span>font_index <span class="kw">in </span><span class="number">0</span>..font_count {
+                        fonts.push(Handle::from_path(path.to_owned(), font_index))
                     }
                 }
             }
         }
+        fonts
+    }
 
+    <span class="doccomment">/// Indexes all fonts found in `path`
+    </span><span class="kw">pub fn </span>in_path&lt;P&gt;(path: P) -&gt; FsSource
+    <span class="kw">where
+        </span>P: AsRef&lt;Path&gt;,
+    {
+        <span class="kw">let </span>fonts = <span class="self">Self</span>::discover_fonts(path.as_ref());
         FsSource {
             mem_source: MemSource::from_fonts(fonts.into_iter()).unwrap(),
         }
@@ -364,7 +415,7 @@
     </span>}
 }
 
-<span class="attr">#[cfg(target_os = <span class="string">"android"</span>)]
+<span class="attr">#[cfg(any(target_os = <span class="string">"android"</span>, target_env = <span class="string">"ohos"</span>))]
 </span><span class="kw">fn </span>default_font_directories() -&gt; Vec&lt;PathBuf&gt; {
     <span class="macro">vec!</span>[PathBuf::from(<span class="string">"/system/fonts"</span>)]
 }
@@ -398,7 +449,12 @@
     directories
 }
 
-<span class="attr">#[cfg(not(any(target_os = <span class="string">"android"</span>, target_family = <span class="string">"windows"</span>, target_os = <span class="string">"macos"</span>)))]
+<span class="attr">#[cfg(not(any(
+    target_os = <span class="string">"android"</span>,
+    target_family = <span class="string">"windows"</span>,
+    target_os = <span class="string">"macos"</span>,
+    target_env = <span class="string">"ohos"
+</span>)))]
 </span><span class="kw">fn </span>default_font_directories() -&gt; Vec&lt;PathBuf&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>directories = <span class="macro">vec!</span>[
         PathBuf::from(<span class="string">"/usr/share/fonts"</span>),

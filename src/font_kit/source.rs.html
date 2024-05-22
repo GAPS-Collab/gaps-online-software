@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/font-kit-0.11.0/src/source.rs`."><title>source.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="font_kit" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/font-kit-0.13.2/src/source.rs`."><title>source.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="font_kit" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../font_kit/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -162,6 +162,26 @@
 <a href="#160" id="160">160</a>
 <a href="#161" id="161">161</a>
 <a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
 </pre></div><pre class="rust"><code><span class="comment">// font-kit/src/source.rs
 //
 // Copyright © 2018 The Pathfinder Project Developers.
@@ -191,18 +211,24 @@
 </span><span class="kw">pub use </span><span class="kw">crate</span>::sources::core_text::CoreTextSource <span class="kw">as </span>SystemSource;
 <span class="attr">#[cfg(all(target_family = <span class="string">"windows"</span>, not(feature = <span class="string">"source-fontconfig-default"</span>)))]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::sources::directwrite::DirectWriteSource <span class="kw">as </span>SystemSource;
-<span class="attr">#[cfg(any(
-    not(any(
-        target_os = <span class="string">"android"</span>,
-        target_os = <span class="string">"macos"</span>,
-        target_os = <span class="string">"ios"</span>,
-        target_family = <span class="string">"windows"</span>,
-        target_arch = <span class="string">"wasm32"
-    </span>)),
-    feature = <span class="string">"source-fontconfig-default"
-</span>))]
+<span class="attr">#[cfg(all(
+    any(
+        not(any(
+            target_os = <span class="string">"android"</span>,
+            target_os = <span class="string">"macos"</span>,
+            target_os = <span class="string">"ios"</span>,
+            target_family = <span class="string">"windows"</span>,
+            target_arch = <span class="string">"wasm32"</span>,
+        )),
+        feature = <span class="string">"source-fontconfig-default"
+    </span>),
+    not(target_env = <span class="string">"ohos"</span>)
+))]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::sources::fontconfig::FontconfigSource <span class="kw">as </span>SystemSource;
 <span class="attr">#[cfg(all(target_os = <span class="string">"android"</span>, not(feature = <span class="string">"source-fontconfig-default"</span>)))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::sources::fs::FsSource <span class="kw">as </span>SystemSource;
+
+<span class="attr">#[cfg(target_env = <span class="string">"ohos"</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::sources::fs::FsSource <span class="kw">as </span>SystemSource;
 
 <span class="comment">// FIXME(pcwalton): These could expand to multiple fonts, and they could be language-specific.
@@ -210,8 +236,12 @@
 </span><span class="kw">const </span>DEFAULT_FONT_FAMILY_SERIF: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Times New Roman"</span>;
 <span class="attr">#[cfg(any(target_family = <span class="string">"windows"</span>, target_os = <span class="string">"macos"</span>, target_os = <span class="string">"ios"</span>))]
 </span><span class="kw">const </span>DEFAULT_FONT_FAMILY_SANS_SERIF: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Arial"</span>;
+<span class="attr">#[cfg(target_env = <span class="string">"ohos"</span>)]
+</span><span class="kw">const </span>DEFAULT_FONT_FAMILY_SANS_SERIF: <span class="kw-2">&amp;</span>str = <span class="string">"HarmonyOS Sans"</span>;
 <span class="attr">#[cfg(any(target_family = <span class="string">"windows"</span>, target_os = <span class="string">"macos"</span>, target_os = <span class="string">"ios"</span>))]
 </span><span class="kw">const </span>DEFAULT_FONT_FAMILY_MONOSPACE: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Courier New"</span>;
+<span class="attr">#[cfg(target_env = <span class="string">"ohos"</span>)]
+</span><span class="kw">const </span>DEFAULT_FONT_FAMILY_MONOSPACE: <span class="kw-2">&amp;</span>str = <span class="string">"HarmonyOS Sans"</span>;
 <span class="attr">#[cfg(any(target_family = <span class="string">"windows"</span>, target_os = <span class="string">"macos"</span>, target_os = <span class="string">"ios"</span>))]
 </span><span class="kw">const </span>DEFAULT_FONT_FAMILY_CURSIVE: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Comic Sans MS"</span>;
 <span class="attr">#[cfg(target_family = <span class="string">"windows"</span>)]
@@ -220,15 +250,25 @@
 </span><span class="kw">const </span>DEFAULT_FONT_FAMILY_FANTASY: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Papyrus"</span>;
 
 <span class="attr">#[cfg(not(any(target_family = <span class="string">"windows"</span>, target_os = <span class="string">"macos"</span>, target_os = <span class="string">"ios"</span>)))]
-</span><span class="kw">const </span>DEFAULT_FONT_FAMILY_SERIF: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"serif"</span>;
+</span><span class="kw">const </span>DEFAULT_FONT_FAMILY_SERIF: <span class="kw-2">&amp;</span>str = <span class="string">"serif"</span>;
+<span class="attr">#[cfg(not(any(
+    target_family = <span class="string">"windows"</span>,
+    target_os = <span class="string">"macos"</span>,
+    target_os = <span class="string">"ios"</span>,
+    target_env = <span class="string">"ohos"
+</span>)))]
+</span><span class="kw">const </span>DEFAULT_FONT_FAMILY_SANS_SERIF: <span class="kw-2">&amp;</span>str = <span class="string">"sans-serif"</span>;
+<span class="attr">#[cfg(not(any(
+    target_family = <span class="string">"windows"</span>,
+    target_os = <span class="string">"macos"</span>,
+    target_os = <span class="string">"ios"</span>,
+    target_env = <span class="string">"ohos"
+</span>)))]
+</span><span class="kw">const </span>DEFAULT_FONT_FAMILY_MONOSPACE: <span class="kw-2">&amp;</span>str = <span class="string">"monospace"</span>;
 <span class="attr">#[cfg(not(any(target_family = <span class="string">"windows"</span>, target_os = <span class="string">"macos"</span>, target_os = <span class="string">"ios"</span>)))]
-</span><span class="kw">const </span>DEFAULT_FONT_FAMILY_SANS_SERIF: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"sans-serif"</span>;
+</span><span class="kw">const </span>DEFAULT_FONT_FAMILY_CURSIVE: <span class="kw-2">&amp;</span>str = <span class="string">"cursive"</span>;
 <span class="attr">#[cfg(not(any(target_family = <span class="string">"windows"</span>, target_os = <span class="string">"macos"</span>, target_os = <span class="string">"ios"</span>)))]
-</span><span class="kw">const </span>DEFAULT_FONT_FAMILY_MONOSPACE: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"monospace"</span>;
-<span class="attr">#[cfg(not(any(target_family = <span class="string">"windows"</span>, target_os = <span class="string">"macos"</span>, target_os = <span class="string">"ios"</span>)))]
-</span><span class="kw">const </span>DEFAULT_FONT_FAMILY_CURSIVE: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"cursive"</span>;
-<span class="attr">#[cfg(not(any(target_family = <span class="string">"windows"</span>, target_os = <span class="string">"macos"</span>, target_os = <span class="string">"ios"</span>)))]
-</span><span class="kw">const </span>DEFAULT_FONT_FAMILY_FANTASY: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"fantasy"</span>;
+</span><span class="kw">const </span>DEFAULT_FONT_FAMILY_FANTASY: <span class="kw-2">&amp;</span>str = <span class="string">"fantasy"</span>;
 
 <span class="doccomment">/// A database of installed fonts that can be queried.
 ///

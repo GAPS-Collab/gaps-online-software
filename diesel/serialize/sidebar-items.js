@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["IsNull"],"struct":["Output"],"trait":["ToSql"],"type":["Result"]};

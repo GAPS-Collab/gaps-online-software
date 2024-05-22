@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/widgets/block.rs`."><title>block.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/widgets/block.rs`."><title>block.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1359,172 +1359,6 @@
 <a href="#1357" id="1357">1357</a>
 <a href="#1358" id="1358">1358</a>
 <a href="#1359" id="1359">1359</a>
-<a href="#1360" id="1360">1360</a>
-<a href="#1361" id="1361">1361</a>
-<a href="#1362" id="1362">1362</a>
-<a href="#1363" id="1363">1363</a>
-<a href="#1364" id="1364">1364</a>
-<a href="#1365" id="1365">1365</a>
-<a href="#1366" id="1366">1366</a>
-<a href="#1367" id="1367">1367</a>
-<a href="#1368" id="1368">1368</a>
-<a href="#1369" id="1369">1369</a>
-<a href="#1370" id="1370">1370</a>
-<a href="#1371" id="1371">1371</a>
-<a href="#1372" id="1372">1372</a>
-<a href="#1373" id="1373">1373</a>
-<a href="#1374" id="1374">1374</a>
-<a href="#1375" id="1375">1375</a>
-<a href="#1376" id="1376">1376</a>
-<a href="#1377" id="1377">1377</a>
-<a href="#1378" id="1378">1378</a>
-<a href="#1379" id="1379">1379</a>
-<a href="#1380" id="1380">1380</a>
-<a href="#1381" id="1381">1381</a>
-<a href="#1382" id="1382">1382</a>
-<a href="#1383" id="1383">1383</a>
-<a href="#1384" id="1384">1384</a>
-<a href="#1385" id="1385">1385</a>
-<a href="#1386" id="1386">1386</a>
-<a href="#1387" id="1387">1387</a>
-<a href="#1388" id="1388">1388</a>
-<a href="#1389" id="1389">1389</a>
-<a href="#1390" id="1390">1390</a>
-<a href="#1391" id="1391">1391</a>
-<a href="#1392" id="1392">1392</a>
-<a href="#1393" id="1393">1393</a>
-<a href="#1394" id="1394">1394</a>
-<a href="#1395" id="1395">1395</a>
-<a href="#1396" id="1396">1396</a>
-<a href="#1397" id="1397">1397</a>
-<a href="#1398" id="1398">1398</a>
-<a href="#1399" id="1399">1399</a>
-<a href="#1400" id="1400">1400</a>
-<a href="#1401" id="1401">1401</a>
-<a href="#1402" id="1402">1402</a>
-<a href="#1403" id="1403">1403</a>
-<a href="#1404" id="1404">1404</a>
-<a href="#1405" id="1405">1405</a>
-<a href="#1406" id="1406">1406</a>
-<a href="#1407" id="1407">1407</a>
-<a href="#1408" id="1408">1408</a>
-<a href="#1409" id="1409">1409</a>
-<a href="#1410" id="1410">1410</a>
-<a href="#1411" id="1411">1411</a>
-<a href="#1412" id="1412">1412</a>
-<a href="#1413" id="1413">1413</a>
-<a href="#1414" id="1414">1414</a>
-<a href="#1415" id="1415">1415</a>
-<a href="#1416" id="1416">1416</a>
-<a href="#1417" id="1417">1417</a>
-<a href="#1418" id="1418">1418</a>
-<a href="#1419" id="1419">1419</a>
-<a href="#1420" id="1420">1420</a>
-<a href="#1421" id="1421">1421</a>
-<a href="#1422" id="1422">1422</a>
-<a href="#1423" id="1423">1423</a>
-<a href="#1424" id="1424">1424</a>
-<a href="#1425" id="1425">1425</a>
-<a href="#1426" id="1426">1426</a>
-<a href="#1427" id="1427">1427</a>
-<a href="#1428" id="1428">1428</a>
-<a href="#1429" id="1429">1429</a>
-<a href="#1430" id="1430">1430</a>
-<a href="#1431" id="1431">1431</a>
-<a href="#1432" id="1432">1432</a>
-<a href="#1433" id="1433">1433</a>
-<a href="#1434" id="1434">1434</a>
-<a href="#1435" id="1435">1435</a>
-<a href="#1436" id="1436">1436</a>
-<a href="#1437" id="1437">1437</a>
-<a href="#1438" id="1438">1438</a>
-<a href="#1439" id="1439">1439</a>
-<a href="#1440" id="1440">1440</a>
-<a href="#1441" id="1441">1441</a>
-<a href="#1442" id="1442">1442</a>
-<a href="#1443" id="1443">1443</a>
-<a href="#1444" id="1444">1444</a>
-<a href="#1445" id="1445">1445</a>
-<a href="#1446" id="1446">1446</a>
-<a href="#1447" id="1447">1447</a>
-<a href="#1448" id="1448">1448</a>
-<a href="#1449" id="1449">1449</a>
-<a href="#1450" id="1450">1450</a>
-<a href="#1451" id="1451">1451</a>
-<a href="#1452" id="1452">1452</a>
-<a href="#1453" id="1453">1453</a>
-<a href="#1454" id="1454">1454</a>
-<a href="#1455" id="1455">1455</a>
-<a href="#1456" id="1456">1456</a>
-<a href="#1457" id="1457">1457</a>
-<a href="#1458" id="1458">1458</a>
-<a href="#1459" id="1459">1459</a>
-<a href="#1460" id="1460">1460</a>
-<a href="#1461" id="1461">1461</a>
-<a href="#1462" id="1462">1462</a>
-<a href="#1463" id="1463">1463</a>
-<a href="#1464" id="1464">1464</a>
-<a href="#1465" id="1465">1465</a>
-<a href="#1466" id="1466">1466</a>
-<a href="#1467" id="1467">1467</a>
-<a href="#1468" id="1468">1468</a>
-<a href="#1469" id="1469">1469</a>
-<a href="#1470" id="1470">1470</a>
-<a href="#1471" id="1471">1471</a>
-<a href="#1472" id="1472">1472</a>
-<a href="#1473" id="1473">1473</a>
-<a href="#1474" id="1474">1474</a>
-<a href="#1475" id="1475">1475</a>
-<a href="#1476" id="1476">1476</a>
-<a href="#1477" id="1477">1477</a>
-<a href="#1478" id="1478">1478</a>
-<a href="#1479" id="1479">1479</a>
-<a href="#1480" id="1480">1480</a>
-<a href="#1481" id="1481">1481</a>
-<a href="#1482" id="1482">1482</a>
-<a href="#1483" id="1483">1483</a>
-<a href="#1484" id="1484">1484</a>
-<a href="#1485" id="1485">1485</a>
-<a href="#1486" id="1486">1486</a>
-<a href="#1487" id="1487">1487</a>
-<a href="#1488" id="1488">1488</a>
-<a href="#1489" id="1489">1489</a>
-<a href="#1490" id="1490">1490</a>
-<a href="#1491" id="1491">1491</a>
-<a href="#1492" id="1492">1492</a>
-<a href="#1493" id="1493">1493</a>
-<a href="#1494" id="1494">1494</a>
-<a href="#1495" id="1495">1495</a>
-<a href="#1496" id="1496">1496</a>
-<a href="#1497" id="1497">1497</a>
-<a href="#1498" id="1498">1498</a>
-<a href="#1499" id="1499">1499</a>
-<a href="#1500" id="1500">1500</a>
-<a href="#1501" id="1501">1501</a>
-<a href="#1502" id="1502">1502</a>
-<a href="#1503" id="1503">1503</a>
-<a href="#1504" id="1504">1504</a>
-<a href="#1505" id="1505">1505</a>
-<a href="#1506" id="1506">1506</a>
-<a href="#1507" id="1507">1507</a>
-<a href="#1508" id="1508">1508</a>
-<a href="#1509" id="1509">1509</a>
-<a href="#1510" id="1510">1510</a>
-<a href="#1511" id="1511">1511</a>
-<a href="#1512" id="1512">1512</a>
-<a href="#1513" id="1513">1513</a>
-<a href="#1514" id="1514">1514</a>
-<a href="#1515" id="1515">1515</a>
-<a href="#1516" id="1516">1516</a>
-<a href="#1517" id="1517">1517</a>
-<a href="#1518" id="1518">1518</a>
-<a href="#1519" id="1519">1519</a>
-<a href="#1520" id="1520">1520</a>
-<a href="#1521" id="1521">1521</a>
-<a href="#1522" id="1522">1522</a>
-<a href="#1523" id="1523">1523</a>
-<a href="#1524" id="1524">1524</a>
-<a href="#1525" id="1525">1525</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Elements related to the `Block` base widget.
 //!
 //! This holds everything needed to display and configure a [`Block`].
@@ -1568,12 +1402,12 @@
 /// ```
 /// use ratatui::{prelude::*, widgets::*};
 ///
-/// Block::default()
-///     .title("Block")
+/// Block::new()
+///     .border_type(BorderType::Rounded)
 ///     .borders(Borders::LEFT | Borders::RIGHT)
 ///     .border_style(Style::default().fg(Color::White))
-///     .border_type(BorderType::Rounded)
-///     .style(Style::default().bg(Color::Black));
+///     .style(Style::default().bg(Color::Black))
+///     .title("Block");
 /// ```
 ///
 /// You may also use multiple titles like in the following:
@@ -1583,7 +1417,7 @@
 ///     widgets::{block::*, *},
 /// };
 ///
-/// Block::default()
+/// Block::new()
 ///     .title("Title 1")
 ///     .title(Title::from("Title 2").position(Position::Bottom));
 /// ```
@@ -1700,6 +1534,11 @@
     }
 
     <span class="doccomment">/// Create a new block with [all borders](Borders::ALL) shown
+    ///
+    /// ```
+    /// # use ratatui::widgets::{Block, Borders};
+    /// assert_eq!(Block::bordered(), Block::new().borders(Borders::ALL));
+    /// ```
     </span><span class="kw">pub const fn </span>bordered() -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>block = <span class="self">Self</span>::new();
         block.borders = Borders::ALL;
@@ -1746,7 +1585,7 @@
     ///     widgets::{block::*, *},
     /// };
     ///
-    /// Block::default()
+    /// Block::new()
     ///     .title("Title") // By default in the top left corner
     ///     .title(Title::from("Left").alignment(Alignment::Left)) // also on the left
     ///     .title(Title::from("Right").alignment(Alignment::Right))
@@ -1852,12 +1691,12 @@
     ///     widgets::{block::*, *},
     /// };
     ///
-    /// Block::default()
+    /// Block::new()
+    ///     .title_alignment(Alignment::Center)
     ///     // This title won't be aligned in the center
     ///     .title(Title::from("right").alignment(Alignment::Right))
     ///     .title("foo")
-    ///     .title("bar")
-    ///     .title_alignment(Alignment::Center);
+    ///     .title("bar");
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub const fn </span>title_alignment(<span class="kw-2">mut </span><span class="self">self</span>, alignment: Alignment) -&gt; <span class="self">Self </span>{
@@ -1879,12 +1718,12 @@
     ///     widgets::{block::*, *},
     /// };
     ///
-    /// Block::default()
+    /// Block::new()
+    ///     .title_position(Position::Bottom)
     ///     // This title won't be aligned in the center
     ///     .title(Title::from("top").position(Position::Top))
     ///     .title("foo")
-    ///     .title("bar")
-    ///     .title_position(Position::Bottom);
+    ///     .title("bar");
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub const fn </span>title_position(<span class="kw-2">mut </span><span class="self">self</span>, position: Position) -&gt; <span class="self">Self </span>{
@@ -1904,9 +1743,7 @@
     /// This example shows a `Block` with blue borders.
     /// ```
     /// # use ratatui::{prelude::*, widgets::*};
-    /// Block::default()
-    ///     .borders(Borders::ALL)
-    ///     .border_style(Style::new().blue());
+    /// Block::bordered().border_style(Style::new().blue());
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>border_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
@@ -1936,17 +1773,13 @@
     ///
     /// # Examples
     ///
-    /// Simply show all borders.
-    /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
-    /// Block::default().borders(Borders::ALL);
-    /// ```
-    ///
     /// Display left and right borders.
     /// ```
     /// # use ratatui::{prelude::*, widgets::*};
-    /// Block::default().borders(Borders::LEFT | Borders::RIGHT);
+    /// Block::new().borders(Borders::LEFT | Borders::RIGHT);
     /// ```
+    ///
+    /// To show all borders you can abbreviate this with [`Block::bordered`]
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub const fn </span>borders(<span class="kw-2">mut </span><span class="self">self</span>, flag: Borders) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.borders = flag;
@@ -1964,10 +1797,9 @@
     ///
     /// ```
     /// # use ratatui::{prelude::*, widgets::*};
-    /// Block::default()
-    ///     .title("Block")
-    ///     .borders(Borders::ALL)
-    ///     .border_type(BorderType::Rounded);
+    /// Block::bordered()
+    ///     .border_type(BorderType::Rounded)
+    ///     .title("Block");
     /// // Renders
     /// // ╭Block╮
     /// // │     │
@@ -1987,7 +1819,7 @@
     ///
     /// ```
     /// # use ratatui::{prelude::*, widgets::*};
-    /// Block::default().title("Block").borders(Borders::ALL).border_set(symbols::border::DOUBLE);
+    /// Block::bordered().border_set(symbols::border::DOUBLE).title("Block");
     /// // Renders
     /// // ╔Block╗
     /// // ║     ║
@@ -2006,8 +1838,8 @@
     /// ```
     /// # use ratatui::{prelude::*, widgets::*};
     /// # fn render_nested_block(frame: &amp;mut Frame) {
-    /// let outer_block = Block::default().title("Outer").borders(Borders::ALL);
-    /// let inner_block = Block::default().title("Inner").borders(Borders::ALL);
+    /// let outer_block = Block::bordered().title("Outer");
+    /// let inner_block = Block::bordered().title("Inner");
     ///
     /// let outer_area = frame.size();
     /// let inner_area = outer_block.inner(outer_area);
@@ -2028,14 +1860,14 @@
             inner.x = inner.x.saturating_add(<span class="number">1</span>).min(inner.right());
             inner.width = inner.width.saturating_sub(<span class="number">1</span>);
         }
-        <span class="kw">if </span><span class="self">self</span>.borders.intersects(Borders::TOP) || <span class="self">self</span>.have_title_at_position(Position::Top) {
+        <span class="kw">if </span><span class="self">self</span>.borders.intersects(Borders::TOP) || <span class="self">self</span>.has_title_at_position(Position::Top) {
             inner.y = inner.y.saturating_add(<span class="number">1</span>).min(inner.bottom());
             inner.height = inner.height.saturating_sub(<span class="number">1</span>);
         }
         <span class="kw">if </span><span class="self">self</span>.borders.intersects(Borders::RIGHT) {
             inner.width = inner.width.saturating_sub(<span class="number">1</span>);
         }
-        <span class="kw">if </span><span class="self">self</span>.borders.intersects(Borders::BOTTOM) || <span class="self">self</span>.have_title_at_position(Position::Bottom)
+        <span class="kw">if </span><span class="self">self</span>.borders.intersects(Borders::BOTTOM) || <span class="self">self</span>.has_title_at_position(Position::Bottom)
         {
             inner.height = inner.height.saturating_sub(<span class="number">1</span>);
         }
@@ -2053,7 +1885,7 @@
         inner
     }
 
-    <span class="kw">fn </span>have_title_at_position(<span class="kw-2">&amp;</span><span class="self">self</span>, position: Position) -&gt; bool {
+    <span class="kw">fn </span>has_title_at_position(<span class="kw-2">&amp;</span><span class="self">self</span>, position: Position) -&gt; bool {
         <span class="self">self</span>.titles
             .iter()
             .any(|title| title.position.unwrap_or(<span class="self">self</span>.titles_position) == position)
@@ -2068,9 +1900,7 @@
     /// This renders a `Block` with no padding (the default).
     /// ```
     /// # use ratatui::{prelude::*, widgets::*};
-    /// Block::default()
-    ///     .borders(Borders::ALL)
-    ///     .padding(Padding::zero());
+    /// Block::bordered().padding(Padding::zero());
     /// // Renders
     /// // ┌───────┐
     /// // │content│
@@ -2081,9 +1911,7 @@
     /// Notice the two spaces before and after the content.
     /// ```
     /// # use ratatui::{prelude::*, widgets::*};
-    /// Block::default()
-    ///     .borders(Borders::ALL)
-    ///     .padding(Padding::horizontal(2));
+    /// Block::bordered().padding(Padding::horizontal(2));
     /// // Renders
     /// // ┌───────────┐
     /// // │  content  │
@@ -2393,10 +2221,10 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>rstest::rstest;
     <span class="kw">use </span>strum::ParseError;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::assert_buffer_eq;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>create_with_all_borders() {
@@ -2404,234 +2232,112 @@
         <span class="macro">assert_eq!</span>(block.borders, Borders::all());
     }
 
-    <span class="attr">#[allow(clippy::too_many_lines)]
-    #[test]
-    </span><span class="kw">fn </span>inner_takes_into_account_the_borders() {
-        <span class="comment">// No borders
-        </span><span class="macro">assert_eq!</span>(
-            Block::default().inner(Rect::default()),
-            Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>),
-            <span class="string">"no borders, width=0, height=0"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            Block::default().inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>),
-            <span class="string">"no borders, width=1, height=1"
-        </span>);
+    <span class="attr">#[rstest]
+    #[case::none_0(Borders::NONE, Rect::ZERO, Rect::ZERO)]
+    #[case::none_1(Borders::NONE, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>))]
+    #[case::left_0(Borders::LEFT, Rect::ZERO, Rect::ZERO)]
+    #[case::left_w1(Borders::LEFT, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
+    #[case::left_w2(Borders::LEFT, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), Rect::new(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
+    #[case::left_w3(Borders::LEFT, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), Rect::new(<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>))]
+    #[case::top_0(Borders::TOP, Rect::ZERO, Rect::ZERO)]
+    #[case::top_h1(Borders::TOP, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>))]
+    #[case::top_h2(Borders::TOP, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>))]
+    #[case::top_h3(Borders::TOP, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>), Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>))]
+    #[case::right_0(Borders::RIGHT, Rect::ZERO, Rect::ZERO)]
+    #[case::right_w1(Borders::RIGHT, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
+    #[case::right_w2(Borders::RIGHT, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
+    #[case::right_w3(Borders::RIGHT, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>))]
+    #[case::bottom_0(Borders::BOTTOM, Rect::ZERO, Rect::ZERO)]
+    #[case::bottom_h1(Borders::BOTTOM, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>))]
+    #[case::bottom_h2(Borders::BOTTOM, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>))]
+    #[case::bottom_h3(Borders::BOTTOM, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>))]
+    #[case::all_0(Borders::ALL, Rect::ZERO, Rect::ZERO)]
+    #[case::all_1(Borders::ALL, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), Rect::new(<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::all_2(Borders::ALL, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">2</span>), Rect::new(<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::all_3(Borders::ALL, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">3</span>), Rect::new(<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>))]
+    </span><span class="kw">fn </span>inner_takes_into_account_the_borders(
+        <span class="attr">#[case] </span>borders: Borders,
+        <span class="attr">#[case] </span>area: Rect,
+        <span class="attr">#[case] </span>expected: Rect,
+    ) {
+        <span class="kw">let </span>block = Block::new().borders(borders);
+        <span class="macro">assert_eq!</span>(block.inner(area), expected);
+    }
 
-        <span class="comment">// Left border
-        </span><span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::LEFT)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>),
-            <span class="string">"left, width=0"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::LEFT)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>)),
-            Rect::new(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>),
-            <span class="string">"left, width=1"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::LEFT)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>)),
-            Rect::new(<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>),
-            <span class="string">"left, width=2"
-        </span>);
+    <span class="attr">#[rstest]
+    #[case::left(Alignment::Left)]
+    #[case::center(Alignment::Center)]
+    #[case::right(Alignment::Right)]
+    </span><span class="kw">fn </span>inner_takes_into_account_the_title(<span class="attr">#[case] </span>alignment: Alignment) {
+        <span class="kw">let </span>area = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>);
+        <span class="kw">let </span>expected = Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>);
 
-        <span class="comment">// Top border
-        </span><span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::TOP)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>),
-            <span class="string">"top, height=0"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::TOP)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>),
-            <span class="string">"top, height=1"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::TOP)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>),
-            <span class="string">"top, height=2"
-        </span>);
+        <span class="kw">let </span>block = Block::new().title(Title::from(<span class="string">"Test"</span>).alignment(alignment));
+        <span class="macro">assert_eq!</span>(block.inner(area), expected);
+    }
 
-        <span class="comment">// Right border
-        </span><span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::RIGHT)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>),
-            <span class="string">"right, width=0"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::RIGHT)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>),
-            <span class="string">"right, width=1"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::RIGHT)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>),
-            <span class="string">"right, width=2"
-        </span>);
-
-        <span class="comment">// Bottom border
-        </span><span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::BOTTOM)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>),
-            <span class="string">"bottom, height=0"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::BOTTOM)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>),
-            <span class="string">"bottom, height=1"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::BOTTOM)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>),
-            <span class="string">"bottom, height=2"
-        </span>);
-
-        <span class="comment">// All borders
-        </span><span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::ALL)
-                .inner(Rect::default()),
-            Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>),
-            <span class="string">"all borders, width=0, height=0"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::ALL)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>)),
-            Rect::new(<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>),
-            <span class="string">"all borders, width=1, height=1"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::ALL)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">2</span>)),
-            Rect::new(<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>),
-            <span class="string">"all borders, width=2, height=2"
-        </span>);
-        <span class="macro">assert_eq!</span>(
-            Block::default()
-                .borders(Borders::ALL)
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">3</span>)),
-            Rect::new(<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>),
-            <span class="string">"all borders, width=3, height=3"
-        </span>);
+    <span class="attr">#[rstest]
+    #[case::top_top(Borders::TOP, Position::Top, Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>))]
+    #[case::top_bot(Borders::BOTTOM, Position::Top, Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::bot_top(Borders::TOP, Position::Bottom, Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::top_top(Borders::BOTTOM, Position::Bottom, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
+    </span><span class="kw">fn </span>inner_takes_into_account_border_and_title(
+        <span class="attr">#[case] </span>borders: Borders,
+        <span class="attr">#[case] </span>position: Position,
+        <span class="attr">#[case] </span>expected: Rect,
+    ) {
+        <span class="kw">let </span>area = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>);
+        <span class="kw">let </span>block = Block::new()
+            .borders(borders)
+            .title(Title::from(<span class="string">"Test"</span>).position(position));
+        <span class="macro">assert_eq!</span>(block.inner(area), expected);
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>inner_takes_into_account_the_title() {
-        <span class="macro">assert_eq!</span>(
-            Block::default().title(<span class="string">"Test"</span>).inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>),
-        );
-        <span class="macro">assert_eq!</span>(
-            Block::default()
-                .title(Title::from(<span class="string">"Test"</span>).alignment(Alignment::Center))
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>),
-        );
-        <span class="macro">assert_eq!</span>(
-            Block::default()
-                .title(Title::from(<span class="string">"Test"</span>).alignment(Alignment::Right))
-                .inner(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
-            Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>),
-        );
-    }
+    </span><span class="kw">fn </span>has_title_at_position_takes_into_account_all_positioning_declarations() {
+        <span class="kw">let </span>block = Block::new();
+        <span class="macro">assert!</span>(!block.has_title_at_position(Position::Top));
+        <span class="macro">assert!</span>(!block.has_title_at_position(Position::Bottom));
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>inner_takes_into_account_border_and_title() {
-        <span class="kw">let </span>test_rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>);
+        <span class="kw">let </span>block = Block::new().title(Title::from(<span class="string">"Test"</span>).position(Position::Top));
+        <span class="macro">assert!</span>(block.has_title_at_position(Position::Top));
+        <span class="macro">assert!</span>(!block.has_title_at_position(Position::Bottom));
 
-        <span class="kw">let </span>top_top = Block::default()
-            .title(Title::from(<span class="string">"Test"</span>).position(Position::Top))
-            .borders(Borders::TOP);
-        <span class="macro">assert_eq!</span>(top_top.inner(test_rect), Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>));
+        <span class="kw">let </span>block = Block::new().title(Title::from(<span class="string">"Test"</span>).position(Position::Bottom));
+        <span class="macro">assert!</span>(!block.has_title_at_position(Position::Top));
+        <span class="macro">assert!</span>(block.has_title_at_position(Position::Bottom));
 
-        <span class="kw">let </span>top_bot = Block::default()
-            .title(Title::from(<span class="string">"Test"</span>).position(Position::Top))
-            .borders(Borders::BOTTOM);
-        <span class="macro">assert_eq!</span>(top_bot.inner(test_rect), Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>));
-
-        <span class="kw">let </span>bot_top = Block::default()
-            .title(Title::from(<span class="string">"Test"</span>).position(Position::Bottom))
-            .borders(Borders::TOP);
-        <span class="macro">assert_eq!</span>(bot_top.inner(test_rect), Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>));
-
-        <span class="kw">let </span>bot_bot = Block::default()
-            .title(Title::from(<span class="string">"Test"</span>).position(Position::Bottom))
-            .borders(Borders::BOTTOM);
-        <span class="macro">assert_eq!</span>(bot_bot.inner(test_rect), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>));
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>have_title_at_position_takes_into_account_all_positioning_declarations() {
-        <span class="kw">let </span>block = Block::default();
-        <span class="macro">assert!</span>(!block.have_title_at_position(Position::Top));
-        <span class="macro">assert!</span>(!block.have_title_at_position(Position::Bottom));
-
-        <span class="kw">let </span>block = Block::default().title(Title::from(<span class="string">"Test"</span>).position(Position::Top));
-        <span class="macro">assert!</span>(block.have_title_at_position(Position::Top));
-        <span class="macro">assert!</span>(!block.have_title_at_position(Position::Bottom));
-
-        <span class="kw">let </span>block = Block::default().title(Title::from(<span class="string">"Test"</span>).position(Position::Bottom));
-        <span class="macro">assert!</span>(!block.have_title_at_position(Position::Top));
-        <span class="macro">assert!</span>(block.have_title_at_position(Position::Bottom));
-
-        <span class="kw">let </span>block = Block::default()
+        <span class="kw">let </span>block = Block::new()
             .title(Title::from(<span class="string">"Test"</span>).position(Position::Top))
             .title_position(Position::Bottom);
-        <span class="macro">assert!</span>(block.have_title_at_position(Position::Top));
-        <span class="macro">assert!</span>(!block.have_title_at_position(Position::Bottom));
+        <span class="macro">assert!</span>(block.has_title_at_position(Position::Top));
+        <span class="macro">assert!</span>(!block.has_title_at_position(Position::Bottom));
 
-        <span class="kw">let </span>block = Block::default()
+        <span class="kw">let </span>block = Block::new()
             .title(Title::from(<span class="string">"Test"</span>).position(Position::Bottom))
             .title_position(Position::Top);
-        <span class="macro">assert!</span>(!block.have_title_at_position(Position::Top));
-        <span class="macro">assert!</span>(block.have_title_at_position(Position::Bottom));
+        <span class="macro">assert!</span>(!block.has_title_at_position(Position::Top));
+        <span class="macro">assert!</span>(block.has_title_at_position(Position::Bottom));
 
-        <span class="kw">let </span>block = Block::default()
+        <span class="kw">let </span>block = Block::new()
             .title(Title::from(<span class="string">"Test"</span>).position(Position::Top))
             .title(Title::from(<span class="string">"Test"</span>).position(Position::Bottom));
-        <span class="macro">assert!</span>(block.have_title_at_position(Position::Top));
-        <span class="macro">assert!</span>(block.have_title_at_position(Position::Bottom));
+        <span class="macro">assert!</span>(block.has_title_at_position(Position::Top));
+        <span class="macro">assert!</span>(block.has_title_at_position(Position::Bottom));
 
-        <span class="kw">let </span>block = Block::default()
+        <span class="kw">let </span>block = Block::new()
             .title(Title::from(<span class="string">"Test"</span>).position(Position::Top))
             .title(Title::from(<span class="string">"Test"</span>))
             .title_position(Position::Bottom);
-        <span class="macro">assert!</span>(block.have_title_at_position(Position::Top));
-        <span class="macro">assert!</span>(block.have_title_at_position(Position::Bottom));
+        <span class="macro">assert!</span>(block.has_title_at_position(Position::Top));
+        <span class="macro">assert!</span>(block.has_title_at_position(Position::Bottom));
 
-        <span class="kw">let </span>block = Block::default()
+        <span class="kw">let </span>block = Block::new()
             .title(Title::from(<span class="string">"Test"</span>))
             .title(Title::from(<span class="string">"Test"</span>).position(Position::Bottom))
             .title_position(Position::Top);
-        <span class="macro">assert!</span>(block.have_title_at_position(Position::Top));
-        <span class="macro">assert!</span>(block.have_title_at_position(Position::Bottom));
+        <span class="macro">assert!</span>(block.has_title_at_position(Position::Top));
+        <span class="macro">assert!</span>(block.has_title_at_position(Position::Bottom));
     }
 
     <span class="attr">#[test]
@@ -2661,50 +2367,49 @@
     </span><span class="kw">const fn </span>block_can_be_const() {
         <span class="kw">const </span>_DEFAULT_STYLE: Style = Style::new();
         <span class="kw">const </span>_DEFAULT_PADDING: Padding = Padding::uniform(<span class="number">1</span>);
-        <span class="kw">const </span>_DEFAULT_BLOCK: Block = Block::new()
+        <span class="kw">const </span>_DEFAULT_BLOCK: Block = Block::bordered()
             <span class="comment">// the following methods are no longer const because they use Into&lt;Style&gt;
             // .style(_DEFAULT_STYLE)           // no longer const
             // .border_style(_DEFAULT_STYLE)    // no longer const
             // .title_style(_DEFAULT_STYLE)     // no longer const
             </span>.title_alignment(Alignment::Left)
             .title_position(Position::Top)
-            .borders(Borders::ALL)
             .padding(_DEFAULT_PADDING);
     }
 
-    <span class="doccomment">/// This test ensures that we have some coverage on the [`Style::from()`] implementations
+    <span class="doccomment">/// Ensure Style from/into works the way a user would use it.
     </span><span class="attr">#[test]
-    </span><span class="kw">fn </span>block_style() {
+    </span><span class="kw">fn </span>style_into_works_from_user_view() {
         <span class="comment">// nominal style
-        </span><span class="kw">let </span>block = Block::default().style(Style::new().red());
+        </span><span class="kw">let </span>block = Block::new().style(Style::new().red());
         <span class="macro">assert_eq!</span>(block.style, Style::new().red());
 
         <span class="comment">// auto-convert from Color
-        </span><span class="kw">let </span>block = Block::default().style(Color::Red);
+        </span><span class="kw">let </span>block = Block::new().style(Color::Red);
         <span class="macro">assert_eq!</span>(block.style, Style::new().red());
 
         <span class="comment">// auto-convert from (Color, Color)
-        </span><span class="kw">let </span>block = Block::default().style((Color::Red, Color::Blue));
+        </span><span class="kw">let </span>block = Block::new().style((Color::Red, Color::Blue));
         <span class="macro">assert_eq!</span>(block.style, Style::new().red().on_blue());
 
         <span class="comment">// auto-convert from Modifier
-        </span><span class="kw">let </span>block = Block::default().style(Modifier::BOLD | Modifier::ITALIC);
+        </span><span class="kw">let </span>block = Block::new().style(Modifier::BOLD | Modifier::ITALIC);
         <span class="macro">assert_eq!</span>(block.style, Style::new().bold().italic());
 
         <span class="comment">// auto-convert from (Modifier, Modifier)
-        </span><span class="kw">let </span>block = Block::default().style((Modifier::BOLD | Modifier::ITALIC, Modifier::DIM));
+        </span><span class="kw">let </span>block = Block::new().style((Modifier::BOLD | Modifier::ITALIC, Modifier::DIM));
         <span class="macro">assert_eq!</span>(block.style, Style::new().bold().italic().not_dim());
 
         <span class="comment">// auto-convert from (Color, Modifier)
-        </span><span class="kw">let </span>block = Block::default().style((Color::Red, Modifier::BOLD));
+        </span><span class="kw">let </span>block = Block::new().style((Color::Red, Modifier::BOLD));
         <span class="macro">assert_eq!</span>(block.style, Style::new().red().bold());
 
         <span class="comment">// auto-convert from (Color, Color, Modifier)
-        </span><span class="kw">let </span>block = Block::default().style((Color::Red, Color::Blue, Modifier::BOLD));
+        </span><span class="kw">let </span>block = Block::new().style((Color::Red, Color::Blue, Modifier::BOLD));
         <span class="macro">assert_eq!</span>(block.style, Style::new().red().on_blue().bold());
 
         <span class="comment">// auto-convert from (Color, Color, Modifier, Modifier)
-        </span><span class="kw">let </span>block = Block::default().style((
+        </span><span class="kw">let </span>block = Block::new().style((
             Color::Red,
             Color::Blue,
             Modifier::BOLD | Modifier::ITALIC,
@@ -2718,7 +2423,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>can_be_stylized() {
-        <span class="kw">let </span>block = Block::default().black().on_white().bold().not_dim();
+        <span class="kw">let </span>block = Block::new().black().on_white().bold().not_dim();
         <span class="macro">assert_eq!</span>(
             block.style,
             Style::default()
@@ -2733,7 +2438,7 @@
     </span><span class="kw">fn </span>title() {
         <span class="kw">use </span>Alignment::<span class="kw-2">*</span>;
         <span class="kw">use </span>Position::<span class="kw-2">*</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">11</span>, <span class="number">3</span>));
         Block::bordered()
             .title(Title::from(<span class="string">"A"</span>).position(Top).alignment(Left))
             .title(Title::from(<span class="string">"B"</span>).position(Top).alignment(Center))
@@ -2742,19 +2447,18 @@
             .title(Title::from(<span class="string">"E"</span>).position(Bottom).alignment(Center))
             .title(Title::from(<span class="string">"F"</span>).position(Bottom).alignment(Right))
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"┌A─────B─────C┐"</span>,
-                <span class="string">"│             │"</span>,
-                <span class="string">"└D─────E─────F┘"</span>,
-            ])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"┌A───B───C┐"</span>,
+            <span class="string">"│         │"</span>,
+            <span class="string">"└D───E───F┘"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>title_top_bottom() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">11</span>, <span class="number">3</span>));
         Block::bordered()
             .title_top(Line::raw(<span class="string">"A"</span>).left_aligned())
             .title_top(Line::raw(<span class="string">"B"</span>).centered())
@@ -2763,14 +2467,13 @@
             .title_bottom(Line::raw(<span class="string">"E"</span>).centered())
             .title_bottom(Line::raw(<span class="string">"F"</span>).right_aligned())
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"┌A─────B─────C┐"</span>,
-                <span class="string">"│             │"</span>,
-                <span class="string">"└D─────E─────F┘"</span>,
-            ])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"┌A───B───C┐"</span>,
+            <span class="string">"│         │"</span>,
+            <span class="string">"└D───E───F┘"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2782,11 +2485,11 @@
         ];
         <span class="kw">for </span>(alignment, expected) <span class="kw">in </span>tests {
             <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="number">1</span>));
-            Block::default()
-                .title(<span class="string">"test"</span>)
+            Block::new()
                 .title_alignment(alignment)
+                .title(<span class="string">"test"</span>)
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]));
+            <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
         }
     }
 
@@ -2799,11 +2502,11 @@
         ];
         <span class="kw">for </span>(block_title_alignment, alignment, expected) <span class="kw">in </span>tests {
             <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="number">1</span>));
-            Block::default()
-                .title(Title::from(<span class="string">"test"</span>).alignment(alignment))
+            Block::new()
                 .title_alignment(block_title_alignment)
+                .title(Title::from(<span class="string">"test"</span>).alignment(alignment))
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-            <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[expected]));
+            <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
         }
     }
 
@@ -2811,43 +2514,32 @@
     </span><span class="attr">#[test]
     </span><span class="kw">fn </span>render_right_aligned_empty_title() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
-        Block::default()
-            .title(<span class="string">""</span>)
+        Block::new()
             .title_alignment(Alignment::Right)
+            .title(<span class="string">""</span>)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"               "</span>,
-                <span class="string">"               "</span>,
-                <span class="string">"               "</span>,
-            ])
-        );
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"               "</span>; <span class="number">3</span>]));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>title_position() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">2</span>));
-        Block::default()
-            .title(<span class="string">"test"</span>)
+        Block::new()
             .title_position(Position::Bottom)
+            .title(<span class="string">"test"</span>)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"test"</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"    "</span>, <span class="string">"test"</span>]));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>title_content_style() {
         <span class="kw">for </span>alignment <span class="kw">in </span>[Alignment::Left, Alignment::Center, Alignment::Right] {
             <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>));
-            Block::default()
-                .title(<span class="string">"test"</span>.yellow())
+            Block::new()
                 .title_alignment(alignment)
+                .title(<span class="string">"test"</span>.yellow())
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-            <span class="kw">let </span><span class="kw-2">mut </span>expected_buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"test"</span>]);
-            expected_buffer.set_style(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>), Style::new().yellow());
-
-            <span class="macro">assert_buffer_eq!</span>(buffer, expected_buffer);
+            <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"test"</span>.yellow()]));
         }
     }
 
@@ -2855,16 +2547,12 @@
     </span><span class="kw">fn </span>block_title_style() {
         <span class="kw">for </span>alignment <span class="kw">in </span>[Alignment::Left, Alignment::Center, Alignment::Right] {
             <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>));
-            Block::default()
-                .title(<span class="string">"test"</span>)
-                .title_style(Style::new().yellow())
+            Block::new()
                 .title_alignment(alignment)
+                .title_style(Style::new().yellow())
+                .title(<span class="string">"test"</span>)
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-            <span class="kw">let </span><span class="kw-2">mut </span>expected_buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"test"</span>]);
-            expected_buffer.set_style(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>), Style::new().yellow());
-
-            <span class="macro">assert_buffer_eq!</span>(buffer, expected_buffer);
+            <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"test"</span>.yellow()]));
         }
     }
 
@@ -2872,37 +2560,31 @@
     </span><span class="kw">fn </span>title_style_overrides_block_title_style() {
         <span class="kw">for </span>alignment <span class="kw">in </span>[Alignment::Left, Alignment::Center, Alignment::Right] {
             <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>));
-            Block::default()
-                .title(<span class="string">"test"</span>.yellow())
-                .title_style(Style::new().green().on_red())
+            Block::new()
                 .title_alignment(alignment)
+                .title_style(Style::new().green().on_red())
+                .title(<span class="string">"test"</span>.yellow())
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-            <span class="kw">let </span><span class="kw-2">mut </span>expected_buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"test"</span>]);
-            expected_buffer.set_style(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>), Style::new().yellow().on_red());
-
-            <span class="macro">assert_buffer_eq!</span>(buffer, expected_buffer);
+            <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"test"</span>.yellow().on_red()]));
         }
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>title_border_style() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
-        Block::default()
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
+        Block::bordered()
             .title(<span class="string">"test"</span>)
-            .borders(Borders::ALL)
             .border_style(Style::new().yellow())
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-        <span class="kw">let </span><span class="kw-2">mut </span>expected_buffer = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">"┌test─────────┐"</span>,
-            <span class="string">"│             │"</span>,
-            <span class="string">"└─────────────┘"</span>,
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines([
+            <span class="string">"┌test────┐"</span>,
+            <span class="string">"│        │"</span>,
+            <span class="string">"└────────┘"</span>,
         ]);
-        expected_buffer.set_style(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>), Style::new().yellow());
-        expected_buffer.set_style(Rect::new(<span class="number">1</span>, <span class="number">1</span>, <span class="number">13</span>, <span class="number">1</span>), Style::reset());
-
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected_buffer);
+        expected.set_style(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>), Style::new().yellow());
+        expected.set_style(Rect::new(<span class="number">1</span>, <span class="number">1</span>, <span class="number">8</span>, <span class="number">1</span>), Style::reset());
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2924,111 +2606,98 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_plain_border() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
-        Block::default()
-            .borders(Borders::ALL)
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
+        Block::bordered()
             .border_type(BorderType::Plain)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"┌─────────────┐"</span>,
-                <span class="string">"│             │"</span>,
-                <span class="string">"└─────────────┘"
-            </span>])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"┌────────┐"</span>,
+            <span class="string">"│        │"</span>,
+            <span class="string">"└────────┘"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_rounded_border() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
-        Block::default()
-            .borders(Borders::ALL)
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
+        Block::bordered()
             .border_type(BorderType::Rounded)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"╭─────────────╮"</span>,
-                <span class="string">"│             │"</span>,
-                <span class="string">"╰─────────────╯"
-            </span>])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"╭────────╮"</span>,
+            <span class="string">"│        │"</span>,
+            <span class="string">"╰────────╯"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_double_border() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
-        Block::default()
-            .borders(Borders::ALL)
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
+        Block::bordered()
             .border_type(BorderType::Double)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"╔═════════════╗"</span>,
-                <span class="string">"║             ║"</span>,
-                <span class="string">"╚═════════════╝"
-            </span>])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"╔════════╗"</span>,
+            <span class="string">"║        ║"</span>,
+            <span class="string">"╚════════╝"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_quadrant_inside() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
-        Block::default()
-            .borders(Borders::ALL)
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
+        Block::bordered()
             .border_type(BorderType::QuadrantInside)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"▗▄▄▄▄▄▄▄▄▄▄▄▄▄▖"</span>,
-                <span class="string">"▐             ▌"</span>,
-                <span class="string">"▝▀▀▀▀▀▀▀▀▀▀▀▀▀▘"</span>,
-            ])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"▗▄▄▄▄▄▄▄▄▖"</span>,
+            <span class="string">"▐        ▌"</span>,
+            <span class="string">"▝▀▀▀▀▀▀▀▀▘"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_border_quadrant_outside() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
-        Block::default()
-            .borders(Borders::ALL)
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
+        Block::bordered()
             .border_type(BorderType::QuadrantOutside)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"▛▀▀▀▀▀▀▀▀▀▀▀▀▀▜"</span>,
-                <span class="string">"▌             ▐"</span>,
-                <span class="string">"▙▄▄▄▄▄▄▄▄▄▄▄▄▄▟"</span>,
-            ])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"▛▀▀▀▀▀▀▀▀▜"</span>,
+            <span class="string">"▌        ▐"</span>,
+            <span class="string">"▙▄▄▄▄▄▄▄▄▟"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_solid_border() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
-        Block::default()
-            .borders(Borders::ALL)
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
+        Block::bordered()
             .border_type(BorderType::Thick)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"┏━━━━━━━━━━━━━┓"</span>,
-                <span class="string">"┃             ┃"</span>,
-                <span class="string">"┗━━━━━━━━━━━━━┛"
-            </span>])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"┏━━━━━━━━┓"</span>,
+            <span class="string">"┃        ┃"</span>,
+            <span class="string">"┗━━━━━━━━┛"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_custom_border_set() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
-        Block::default()
-            .borders(Borders::ALL)
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
+        Block::bordered()
             .border_set(border::Set {
                 top_left: <span class="string">"1"</span>,
                 top_right: <span class="string">"2"</span>,
@@ -3040,14 +2709,13 @@
                 horizontal_bottom: <span class="string">"B"</span>,
             })
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"1TTTTTTTTTTTTT2"</span>,
-                <span class="string">"L             R"</span>,
-                <span class="string">"3BBBBBBBBBBBBB4"</span>,
-            ])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"1TTTTTTTT2"</span>,
+            <span class="string">"L        R"</span>,
+            <span class="string">"3BBBBBBBB4"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 }
 </code></pre></div></section></main></body></html>

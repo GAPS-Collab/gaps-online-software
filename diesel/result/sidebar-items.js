@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["ConnectionError","DatabaseErrorKind","Error"],"struct":["UnexpectedEndOfRow","UnexpectedNullError"],"trait":["DatabaseErrorInformation","OptionalExtension"],"type":["ConnectionResult","QueryResult"]};

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/widgets/table/table.rs`."><title>table.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/widgets/table/table.rs`."><title>table.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1757,38 +1757,6 @@
 <a href="#1755" id="1755">1755</a>
 <a href="#1756" id="1756">1756</a>
 <a href="#1757" id="1757">1757</a>
-<a href="#1758" id="1758">1758</a>
-<a href="#1759" id="1759">1759</a>
-<a href="#1760" id="1760">1760</a>
-<a href="#1761" id="1761">1761</a>
-<a href="#1762" id="1762">1762</a>
-<a href="#1763" id="1763">1763</a>
-<a href="#1764" id="1764">1764</a>
-<a href="#1765" id="1765">1765</a>
-<a href="#1766" id="1766">1766</a>
-<a href="#1767" id="1767">1767</a>
-<a href="#1768" id="1768">1768</a>
-<a href="#1769" id="1769">1769</a>
-<a href="#1770" id="1770">1770</a>
-<a href="#1771" id="1771">1771</a>
-<a href="#1772" id="1772">1772</a>
-<a href="#1773" id="1773">1773</a>
-<a href="#1774" id="1774">1774</a>
-<a href="#1775" id="1775">1775</a>
-<a href="#1776" id="1776">1776</a>
-<a href="#1777" id="1777">1777</a>
-<a href="#1778" id="1778">1778</a>
-<a href="#1779" id="1779">1779</a>
-<a href="#1780" id="1780">1780</a>
-<a href="#1781" id="1781">1781</a>
-<a href="#1782" id="1782">1782</a>
-<a href="#1783" id="1783">1783</a>
-<a href="#1784" id="1784">1784</a>
-<a href="#1785" id="1785">1785</a>
-<a href="#1786" id="1786">1786</a>
-<a href="#1787" id="1787">1787</a>
-<a href="#1788" id="1788">1788</a>
-<a href="#1789" id="1789">1789</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>itertools::Itertools;
 
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
@@ -1866,7 +1834,7 @@
 ///     // It has an optional footer, which is simply a Row always visible at the bottom.
 ///     .footer(Row::new(vec!["Updated on Dec 28"]))
 ///     // As any other widget, a Table can be wrapped in a Block.
-///     .block(Block::default().title("Table"))
+///     .block(Block::new().title("Table"))
 ///     // The selected row and its content can also be styled.
 ///     .highlight_style(Style::new().reversed())
 ///     // ...and potentially show a symbol in front of the selection.
@@ -1969,7 +1937,7 @@
 /// ];
 /// let widths = [Constraint::Length(5), Constraint::Length(5), Constraint::Length(10)];
 /// let table = Table::new(rows, widths)
-///     .block(Block::default().title("Table"))
+///     .block(Block::new().title("Table"))
 ///     .highlight_style(Style::new().add_modifier(Modifier::REVERSED))
 ///     .highlight_symbol("&gt;&gt;");
 ///
@@ -2001,7 +1969,7 @@
     <span class="doccomment">/// Style used to render the selected row
     </span>highlight_style: Style,
 
-    <span class="doccomment">/// Symbol in front of the selected rom
+    <span class="doccomment">/// Symbol in front of the selected row
     </span>highlight_symbol: Text&lt;<span class="lifetime">'a</span>&gt;,
 
     <span class="doccomment">/// Decides when to allocate spacing for the row selection
@@ -2209,7 +2177,7 @@
     /// # use ratatui::{prelude::*, widgets::*};
     /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
     /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
-    /// let block = Block::default().title("Table").borders(Borders::ALL);
+    /// let block = Block::bordered().title("Table");
     /// let table = Table::new(rows, widths).block(block);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2633,7 +2601,7 @@
     <span class="kw">use </span>std::vec;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use crate</span>::{layout::Constraint::<span class="kw-2">*</span>, style::Style, text::Line, widgets::Borders};
+    <span class="kw">use crate</span>::{layout::Constraint::<span class="kw-2">*</span>, style::Style, text::Line};
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>new() {
@@ -2721,7 +2689,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>block() {
-        <span class="kw">let </span>block = Block::default().title(<span class="string">"Table"</span>).borders(Borders::ALL);
+        <span class="kw">let </span>block = Block::bordered().title(<span class="string">"Table"</span>);
         <span class="kw">let </span>table = Table::default().block(block.clone());
         <span class="macro">assert_eq!</span>(table.block, <span class="prelude-val">Some</span>(block));
     }
@@ -2792,7 +2760,6 @@
     <span class="attr">#[cfg(test)]
     </span><span class="kw">mod </span>render {
         <span class="kw">use super</span>::<span class="kw-2">*</span>;
-        <span class="kw">use </span><span class="kw">crate</span>::assert_buffer_eq;
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>render_empty_area() {
@@ -2800,7 +2767,7 @@
             <span class="kw">let </span>rows = <span class="macro">vec!</span>[Row::new(<span class="macro">vec!</span>[<span class="string">"Cell1"</span>, <span class="string">"Cell2"</span>])];
             <span class="kw">let </span>table = Table::new(rows, <span class="macro">vec!</span>[Constraint::Length(<span class="number">5</span>); <span class="number">2</span>]);
             Widget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="kw-2">&amp;mut </span>buf);
-            <span class="macro">assert_buffer_eq!</span>(buf, Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>)));
+            <span class="macro">assert_eq!</span>(buf, Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>)));
         }
 
         <span class="attr">#[test]
@@ -2808,7 +2775,7 @@
             <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
             <span class="kw">let </span>table = Table::default();
             Widget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf);
-            <span class="macro">assert_buffer_eq!</span>(buf, Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>)));
+            <span class="macro">assert_eq!</span>(buf, Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>)));
         }
 
         <span class="attr">#[test]
@@ -2818,15 +2785,16 @@
                 Row::new(<span class="macro">vec!</span>[<span class="string">"Cell1"</span>, <span class="string">"Cell2"</span>]),
                 Row::new(<span class="macro">vec!</span>[<span class="string">"Cell3"</span>, <span class="string">"Cell4"</span>]),
             ];
-            <span class="kw">let </span>block = Block::new().borders(Borders::ALL).title(<span class="string">"Block"</span>);
+            <span class="kw">let </span>block = Block::bordered().title(<span class="string">"Block"</span>);
             <span class="kw">let </span>table = Table::new(rows, <span class="macro">vec!</span>[Constraint::Length(<span class="number">5</span>); <span class="number">2</span>]).block(block);
             Widget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf);
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="attr">#[rustfmt::skip]
+            </span><span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"┌Block────────┐"</span>,
                 <span class="string">"│Cell1 Cell2  │"</span>,
                 <span class="string">"└─────────────┘"</span>,
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
 
         <span class="attr">#[test]
@@ -2839,12 +2807,13 @@
             ];
             <span class="kw">let </span>table = Table::new(rows, [Constraint::Length(<span class="number">5</span>); <span class="number">2</span>]).header(header);
             Widget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf);
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="attr">#[rustfmt::skip]
+            </span><span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"Head1 Head2    "</span>,
                 <span class="string">"Cell1 Cell2    "</span>,
                 <span class="string">"Cell3 Cell4    "</span>,
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
 
         <span class="attr">#[test]
@@ -2857,12 +2826,13 @@
             ];
             <span class="kw">let </span>table = Table::new(rows, [Constraint::Length(<span class="number">5</span>); <span class="number">2</span>]).footer(footer);
             Widget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf);
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="attr">#[rustfmt::skip]
+            </span><span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"Cell1 Cell2    "</span>,
                 <span class="string">"Cell3 Cell4    "</span>,
                 <span class="string">"Foot1 Foot2    "</span>,
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
 
         <span class="attr">#[test]
@@ -2875,12 +2845,13 @@
                 .header(header)
                 .footer(footer);
             Widget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf);
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="attr">#[rustfmt::skip]
+            </span><span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"Head1 Head2    "</span>,
                 <span class="string">"Cell1 Cell2    "</span>,
                 <span class="string">"Foot1 Foot2    "</span>,
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
 
         <span class="attr">#[test]
@@ -2893,12 +2864,13 @@
             ];
             <span class="kw">let </span>table = Table::new(rows, [Constraint::Length(<span class="number">5</span>); <span class="number">2</span>]).header(header);
             Widget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf);
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="attr">#[rustfmt::skip]
+            </span><span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"Head1 Head2    "</span>,
                 <span class="string">"               "</span>,
                 <span class="string">"Cell1 Cell2    "</span>,
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
 
         <span class="attr">#[test]
@@ -2908,12 +2880,13 @@
             <span class="kw">let </span>rows = <span class="macro">vec!</span>[Row::new(<span class="macro">vec!</span>[<span class="string">"Cell1"</span>, <span class="string">"Cell2"</span>])];
             <span class="kw">let </span>table = Table::new(rows, [Constraint::Length(<span class="number">5</span>); <span class="number">2</span>]).footer(footer);
             Widget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf);
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="attr">#[rustfmt::skip]
+            </span><span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"Cell1 Cell2    "</span>,
                 <span class="string">"               "</span>,
                 <span class="string">"Foot1 Foot2    "</span>,
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
 
         <span class="attr">#[test]
@@ -2925,30 +2898,27 @@
             ];
             <span class="kw">let </span>table = Table::new(rows, [Constraint::Length(<span class="number">5</span>); <span class="number">2</span>]);
             Widget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf);
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="attr">#[rustfmt::skip]
+            </span><span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"Cell1 Cell2    "</span>,
                 <span class="string">"               "</span>,
                 <span class="string">"Cell3 Cell4    "</span>,
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>render_with_alignment() {
-            <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
             <span class="kw">let </span>rows = <span class="macro">vec!</span>[
                 Row::new(<span class="macro">vec!</span>[Line::from(<span class="string">"Left"</span>).alignment(Alignment::Left)]),
                 Row::new(<span class="macro">vec!</span>[Line::from(<span class="string">"Center"</span>).alignment(Alignment::Center)]),
                 Row::new(<span class="macro">vec!</span>[Line::from(<span class="string">"Right"</span>).alignment(Alignment::Right)]),
             ];
             <span class="kw">let </span>table = Table::new(rows, [Percentage(<span class="number">100</span>)]);
-            Widget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf);
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"Left           "</span>,
-                <span class="string">"    Center     "</span>,
-                <span class="string">"          Right"</span>,
-            ]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            Widget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf);
+            <span class="kw">let </span>expected = Buffer::with_lines([<span class="string">"Left      "</span>, <span class="string">"  Center  "</span>, <span class="string">"     Right"</span>]);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
 
         <span class="attr">#[test]
@@ -2972,19 +2942,18 @@
                 .highlight_symbol(<span class="string">"&gt;&gt;"</span>);
             <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::new().with_selected(<span class="number">0</span>);
             StatefulWidget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf, <span class="kw-2">&amp;mut </span>state);
-            <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"&gt;&gt;Cell1 Cell2  "</span>.red(),
                 <span class="string">"  Cell3 Cell4  "</span>.into(),
                 <span class="string">"               "</span>.into(),
             ]);
-            <span class="macro">assert_buffer_eq!</span>(buf, expected);
+            <span class="macro">assert_eq!</span>(buf, expected);
         }
     }
 
     <span class="comment">// test how constraints interact with table column width allocation
     </span><span class="kw">mod </span>column_widths {
         <span class="kw">use super</span>::<span class="kw-2">*</span>;
-        <span class="kw">use </span><span class="kw">crate</span>::assert_buffer_eq;
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>length_constraint() {
@@ -3178,12 +3147,17 @@
             <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">10</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">5</span>), (<span class="number">5</span>, <span class="number">5</span>)]);
         }
 
-        <span class="kw">fn </span>test_table_with_selection(
+        <span class="attr">#[track_caller]
+        </span><span class="kw">fn </span>test_table_with_selection&lt;<span class="lifetime">'line</span>, Lines&gt;(
             highlight_spacing: HighlightSpacing,
             columns: u16,
             spacing: u16,
             selection: <span class="prelude-ty">Option</span>&lt;usize&gt;,
-        ) -&gt; Buffer {
+            expected: Lines,
+        ) <span class="kw">where
+            </span>Lines: IntoIterator,
+            Lines::Item: Into&lt;Line&lt;<span class="lifetime">'line</span>&gt;&gt;,
+        {
             <span class="kw">let </span>table = Table::default()
                 .rows(<span class="macro">vec!</span>[Row::new(<span class="macro">vec!</span>[<span class="string">"ABCDE"</span>, <span class="string">"12345"</span>])])
                 .highlight_spacing(highlight_spacing)
@@ -3193,26 +3167,24 @@
             <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(area);
             <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::default().with_selected(selection);
             StatefulWidget::render(table, area, <span class="kw-2">&amp;mut </span>buf, <span class="kw-2">&amp;mut </span>state);
-            buf
+            <span class="macro">assert_eq!</span>(buf, Buffer::with_lines(expected));
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>excess_area_highlight_symbol_and_column_spacing_allocation() {
             <span class="comment">// no highlight_symbol rendered ever
-            </span><span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Never,
-                    <span class="number">15</span>,   <span class="comment">// width
-                    </span><span class="number">0</span>,    <span class="comment">// spacing
-                    </span><span class="prelude-val">None</span>, <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            </span>test_table_with_selection(
+                HighlightSpacing::Never,
+                <span class="number">15</span>,   <span class="comment">// width
+                </span><span class="number">0</span>,    <span class="comment">// spacing
+                </span><span class="prelude-val">None</span>, <span class="comment">// selection
+                </span>[
                     <span class="string">"ABCDE  12345   "</span>, <span class="comment">/* default layout is Flex::Start but columns length
                                         * constraints are calculated as `max_area / n_columns`,
                                         * i.e. they are distributed amongst available space */
                     </span><span class="string">"               "</span>, <span class="comment">// row 2
                     </span><span class="string">"               "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
 
             <span class="kw">let </span>table = Table::default()
@@ -3222,88 +3194,76 @@
             <span class="kw">let </span>area = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>);
             <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(area);
             Widget::render(table, area, <span class="kw-2">&amp;mut </span>buf);
-            <span class="macro">assert_buffer_eq!</span>(
-                buf,
-                Buffer::with_lines(<span class="macro">vec!</span>[
-                    <span class="string">"ABCDE12345     "</span>, <span class="comment">/* As reference, this is what happens when you manually
-                                        * specify widths */
-                    </span><span class="string">"               "</span>, <span class="comment">// row 2
-                    </span><span class="string">"               "</span>, <span class="comment">// row 3
-                </span>])
-            );
+            <span class="kw">let </span>expected = Buffer::with_lines([
+                <span class="string">"ABCDE12345     "</span>, <span class="comment">/* As reference, this is what happens when you manually
+                                    * specify widths */
+                </span><span class="string">"               "</span>, <span class="comment">// row 2
+                </span><span class="string">"               "</span>, <span class="comment">// row 3
+            </span>]);
+            <span class="macro">assert_eq!</span>(buf, expected);
 
             <span class="comment">// no highlight_symbol rendered ever
-            </span><span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Never,
-                    <span class="number">15</span>,      <span class="comment">// width
-                    </span><span class="number">0</span>,       <span class="comment">// spacing
-                    </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            </span>test_table_with_selection(
+                HighlightSpacing::Never,
+                <span class="number">15</span>,      <span class="comment">// width
+                </span><span class="number">0</span>,       <span class="comment">// spacing
+                </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
+                </span>[
                     <span class="string">"ABCDE  12345   "</span>, <span class="comment">// row 1
                     </span><span class="string">"               "</span>, <span class="comment">// row 2
                     </span><span class="string">"               "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
 
             <span class="comment">// no highlight_symbol rendered because no selection is made
-            </span><span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::WhenSelected,
-                    <span class="number">15</span>,   <span class="comment">// width
-                    </span><span class="number">0</span>,    <span class="comment">// spacing
-                    </span><span class="prelude-val">None</span>, <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            </span>test_table_with_selection(
+                HighlightSpacing::WhenSelected,
+                <span class="number">15</span>,   <span class="comment">// width
+                </span><span class="number">0</span>,    <span class="comment">// spacing
+                </span><span class="prelude-val">None</span>, <span class="comment">// selection
+                </span>[
                     <span class="string">"ABCDE  12345   "</span>, <span class="comment">// row 1
                     </span><span class="string">"               "</span>, <span class="comment">// row 2
                     </span><span class="string">"               "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
             <span class="comment">// highlight_symbol rendered because selection is made
-            </span><span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::WhenSelected,
-                    <span class="number">15</span>,      <span class="comment">// width
-                    </span><span class="number">0</span>,       <span class="comment">// spacing
-                    </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            </span>test_table_with_selection(
+                HighlightSpacing::WhenSelected,
+                <span class="number">15</span>,      <span class="comment">// width
+                </span><span class="number">0</span>,       <span class="comment">// spacing
+                </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
+                </span>[
                     <span class="string">"&gt;&gt;&gt;ABCDE 12345 "</span>, <span class="comment">// row 1
                     </span><span class="string">"               "</span>, <span class="comment">// row 2
                     </span><span class="string">"               "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
 
             <span class="comment">// highlight_symbol always rendered even no selection is made
-            </span><span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Always,
-                    <span class="number">15</span>,   <span class="comment">// width
-                    </span><span class="number">0</span>,    <span class="comment">// spacing
-                    </span><span class="prelude-val">None</span>, <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            </span>test_table_with_selection(
+                HighlightSpacing::Always,
+                <span class="number">15</span>,   <span class="comment">// width
+                </span><span class="number">0</span>,    <span class="comment">// spacing
+                </span><span class="prelude-val">None</span>, <span class="comment">// selection
+                </span>[
                     <span class="string">"   ABCDE 12345 "</span>, <span class="comment">// row 1
                     </span><span class="string">"               "</span>, <span class="comment">// row 2
                     </span><span class="string">"               "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
 
             <span class="comment">// no highlight_symbol rendered because no selection is made
-            </span><span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Always,
-                    <span class="number">15</span>,      <span class="comment">// width
-                    </span><span class="number">0</span>,       <span class="comment">// spacing
-                    </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            </span>test_table_with_selection(
+                HighlightSpacing::Always,
+                <span class="number">15</span>,      <span class="comment">// width
+                </span><span class="number">0</span>,       <span class="comment">// spacing
+                </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
+                </span>[
                     <span class="string">"&gt;&gt;&gt;ABCDE 12345 "</span>, <span class="comment">// row 1
                     </span><span class="string">"               "</span>, <span class="comment">// row 2
                     </span><span class="string">"               "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
         }
 
@@ -3311,31 +3271,27 @@
         #[test]
         </span><span class="kw">fn </span>insufficient_area_highlight_symbol_and_column_spacing_allocation() {
             <span class="comment">// column spacing is prioritized over every other constraint
-            </span><span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Never,
-                    <span class="number">10</span>,   <span class="comment">// width
-                    </span><span class="number">1</span>,    <span class="comment">// spacing
-                    </span><span class="prelude-val">None</span>, <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            </span>test_table_with_selection(
+                HighlightSpacing::Never,
+                <span class="number">10</span>,   <span class="comment">// width
+                </span><span class="number">1</span>,    <span class="comment">// spacing
+                </span><span class="prelude-val">None</span>, <span class="comment">// selection
+                </span>[
                     <span class="string">"ABCDE 1234"</span>, <span class="comment">// spacing is prioritized and column is cut
                     </span><span class="string">"          "</span>, <span class="comment">// row 2
                     </span><span class="string">"          "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
-            <span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::WhenSelected,
-                    <span class="number">10</span>,   <span class="comment">// width
-                    </span><span class="number">1</span>,    <span class="comment">// spacing
-                    </span><span class="prelude-val">None</span>, <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            test_table_with_selection(
+                HighlightSpacing::WhenSelected,
+                <span class="number">10</span>,   <span class="comment">// width
+                </span><span class="number">1</span>,    <span class="comment">// spacing
+                </span><span class="prelude-val">None</span>, <span class="comment">// selection
+                </span>[
                     <span class="string">"ABCDE 1234"</span>, <span class="comment">// spacing is prioritized and column is cut
                     </span><span class="string">"          "</span>, <span class="comment">// row 2
                     </span><span class="string">"          "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
 
             <span class="comment">// this test checks that space for highlight_symbol space is always allocated.
@@ -3346,59 +3302,51 @@
             // Then in a separate step, column widths are calculated.
             // column spacing is prioritized when column widths are calculated and last column here
             // ends up with just 1 wide
-            </span><span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Always,
-                    <span class="number">10</span>,   <span class="comment">// width
-                    </span><span class="number">1</span>,    <span class="comment">// spacing
-                    </span><span class="prelude-val">None</span>, <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            </span>test_table_with_selection(
+                HighlightSpacing::Always,
+                <span class="number">10</span>,   <span class="comment">// width
+                </span><span class="number">1</span>,    <span class="comment">// spacing
+                </span><span class="prelude-val">None</span>, <span class="comment">// selection
+                </span>[
                     <span class="string">"   ABC 123"</span>, <span class="comment">// highlight_symbol and spacing are prioritized
                     </span><span class="string">"          "</span>, <span class="comment">// row 2
                     </span><span class="string">"          "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
 
             <span class="comment">// the following are specification tests
-            </span><span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Always,
-                    <span class="number">9</span>,    <span class="comment">// width
-                    </span><span class="number">1</span>,    <span class="comment">// spacing
-                    </span><span class="prelude-val">None</span>, <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            </span>test_table_with_selection(
+                HighlightSpacing::Always,
+                <span class="number">9</span>,    <span class="comment">// width
+                </span><span class="number">1</span>,    <span class="comment">// spacing
+                </span><span class="prelude-val">None</span>, <span class="comment">// selection
+                </span>[
                     <span class="string">"   ABC 12"</span>, <span class="comment">// highlight_symbol and spacing are prioritized
                     </span><span class="string">"         "</span>, <span class="comment">// row 2
                     </span><span class="string">"         "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
-            <span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Always,
-                    <span class="number">8</span>,    <span class="comment">// width
-                    </span><span class="number">1</span>,    <span class="comment">// spacing
-                    </span><span class="prelude-val">None</span>, <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            test_table_with_selection(
+                HighlightSpacing::Always,
+                <span class="number">8</span>,    <span class="comment">// width
+                </span><span class="number">1</span>,    <span class="comment">// spacing
+                </span><span class="prelude-val">None</span>, <span class="comment">// selection
+                </span>[
                     <span class="string">"   AB 12"</span>, <span class="comment">// highlight_symbol and spacing are prioritized
                     </span><span class="string">"        "</span>, <span class="comment">// row 2
                     </span><span class="string">"        "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
-            <span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Always,
-                    <span class="number">7</span>,    <span class="comment">// width
-                    </span><span class="number">1</span>,    <span class="comment">// spacing
-                    </span><span class="prelude-val">None</span>, <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            test_table_with_selection(
+                HighlightSpacing::Always,
+                <span class="number">7</span>,    <span class="comment">// width
+                </span><span class="number">1</span>,    <span class="comment">// spacing
+                </span><span class="prelude-val">None</span>, <span class="comment">// selection
+                </span>[
                     <span class="string">"   AB 1"</span>, <span class="comment">// highlight_symbol and spacing are prioritized
                     </span><span class="string">"       "</span>, <span class="comment">// row 2
                     </span><span class="string">"       "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
 
             <span class="kw">let </span>table = Table::default()
@@ -3411,10 +3359,13 @@
             <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(area);
             Widget::render(table, area, <span class="kw-2">&amp;mut </span>buf);
             <span class="comment">// highlight_symbol and spacing are prioritized but columns are evenly distributed
-            </span><span class="macro">assert_buffer_eq!</span>(
-                buf,
-                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"   ABCDE 1"</span>, <span class="string">"          "</span>, <span class="string">"          "</span>,])
-            );
+            </span><span class="attr">#[rustfmt::skip]
+            </span><span class="kw">let </span>expected = Buffer::with_lines([
+                <span class="string">"   ABCDE 1"</span>,
+                <span class="string">"          "</span>,
+                <span class="string">"          "</span>,
+            ]);
+            <span class="macro">assert_eq!</span>(buf, expected);
 
             <span class="kw">let </span>table = Table::default()
                 .rows(<span class="macro">vec!</span>[Row::new(<span class="macro">vec!</span>[<span class="string">"ABCDE"</span>, <span class="string">"12345"</span>])])
@@ -3426,137 +3377,122 @@
             <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(area);
             Widget::render(table, area, <span class="kw-2">&amp;mut </span>buf);
             <span class="comment">// highlight_symbol and spacing are prioritized but columns are evenly distributed
-            </span><span class="macro">assert_buffer_eq!</span>(
-                buf,
-                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"   ABC 123"</span>, <span class="string">"          "</span>, <span class="string">"          "</span>,])
-            );
+            </span><span class="attr">#[rustfmt::skip]
+            </span><span class="kw">let </span>expected = Buffer::with_lines([
+                <span class="string">"   ABC 123"</span>,
+                <span class="string">"          "</span>,
+                <span class="string">"          "</span>,
+            ]);
+            <span class="macro">assert_eq!</span>(buf, expected);
 
-            <span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Never,
-                    <span class="number">10</span>,      <span class="comment">// width
-                    </span><span class="number">1</span>,       <span class="comment">// spacing
-                    </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            test_table_with_selection(
+                HighlightSpacing::Never,
+                <span class="number">10</span>,      <span class="comment">// width
+                </span><span class="number">1</span>,       <span class="comment">// spacing
+                </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
+                </span>[
                     <span class="string">"ABCDE 1234"</span>, <span class="comment">// spacing is prioritized
                     </span><span class="string">"          "</span>,
                     <span class="string">"          "</span>,
-                ])
+                ],
             );
 
-            <span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::WhenSelected,
-                    <span class="number">10</span>,      <span class="comment">// width
-                    </span><span class="number">1</span>,       <span class="comment">// spacing
-                    </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            test_table_with_selection(
+                HighlightSpacing::WhenSelected,
+                <span class="number">10</span>,      <span class="comment">// width
+                </span><span class="number">1</span>,       <span class="comment">// spacing
+                </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
+                </span>[
                     <span class="string">"&gt;&gt;&gt;ABC 123"</span>, <span class="comment">// row 1
                     </span><span class="string">"          "</span>, <span class="comment">// row 2
                     </span><span class="string">"          "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
 
-            <span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Always,
-                    <span class="number">10</span>,      <span class="comment">// width
-                    </span><span class="number">1</span>,       <span class="comment">// spacing
-                    </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            test_table_with_selection(
+                HighlightSpacing::Always,
+                <span class="number">10</span>,      <span class="comment">// width
+                </span><span class="number">1</span>,       <span class="comment">// spacing
+                </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
+                </span>[
                     <span class="string">"&gt;&gt;&gt;ABC 123"</span>, <span class="comment">// highlight column and spacing are prioritized
                     </span><span class="string">"          "</span>, <span class="comment">// row 2
                     </span><span class="string">"          "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>insufficient_area_highlight_symbol_allocation_with_no_column_spacing() {
-            <span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Never,
-                    <span class="number">10</span>,   <span class="comment">// width
-                    </span><span class="number">0</span>,    <span class="comment">// spacing
-                    </span><span class="prelude-val">None</span>, <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            test_table_with_selection(
+                HighlightSpacing::Never,
+                <span class="number">10</span>,   <span class="comment">// width
+                </span><span class="number">0</span>,    <span class="comment">// spacing
+                </span><span class="prelude-val">None</span>, <span class="comment">// selection
+                </span>[
                     <span class="string">"ABCDE12345"</span>, <span class="comment">// row 1
                     </span><span class="string">"          "</span>, <span class="comment">// row 2
                     </span><span class="string">"          "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
-            <span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::WhenSelected,
-                    <span class="number">10</span>,   <span class="comment">// width
-                    </span><span class="number">0</span>,    <span class="comment">// spacing
-                    </span><span class="prelude-val">None</span>, <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            test_table_with_selection(
+                HighlightSpacing::WhenSelected,
+                <span class="number">10</span>,   <span class="comment">// width
+                </span><span class="number">0</span>,    <span class="comment">// spacing
+                </span><span class="prelude-val">None</span>, <span class="comment">// selection
+                </span>[
                     <span class="string">"ABCDE12345"</span>, <span class="comment">// row 1
                     </span><span class="string">"          "</span>, <span class="comment">// row 2
                     </span><span class="string">"          "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
             <span class="comment">// highlight symbol spacing is prioritized over all constraints
             // even if the constraints are fixed length
             // this is because highlight_symbol column is separated _before_ any of the constraint
             // widths are calculated
-            </span><span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Always,
-                    <span class="number">10</span>,   <span class="comment">// width
-                    </span><span class="number">0</span>,    <span class="comment">// spacing
-                    </span><span class="prelude-val">None</span>, <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            </span>test_table_with_selection(
+                HighlightSpacing::Always,
+                <span class="number">10</span>,   <span class="comment">// width
+                </span><span class="number">0</span>,    <span class="comment">// spacing
+                </span><span class="prelude-val">None</span>, <span class="comment">// selection
+                </span>[
                     <span class="string">"   ABCD123"</span>, <span class="comment">// highlight column and spacing are prioritized
                     </span><span class="string">"          "</span>, <span class="comment">// row 2
                     </span><span class="string">"          "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
-            <span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Never,
-                    <span class="number">10</span>,      <span class="comment">// width
-                    </span><span class="number">0</span>,       <span class="comment">// spacing
-                    </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            test_table_with_selection(
+                HighlightSpacing::Never,
+                <span class="number">10</span>,      <span class="comment">// width
+                </span><span class="number">0</span>,       <span class="comment">// spacing
+                </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
+                </span>[
                     <span class="string">"ABCDE12345"</span>, <span class="comment">// row 1
                     </span><span class="string">"          "</span>, <span class="comment">// row 2
                     </span><span class="string">"          "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
-            <span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::WhenSelected,
-                    <span class="number">10</span>,      <span class="comment">// width
-                    </span><span class="number">0</span>,       <span class="comment">// spacing
-                    </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            test_table_with_selection(
+                HighlightSpacing::WhenSelected,
+                <span class="number">10</span>,      <span class="comment">// width
+                </span><span class="number">0</span>,       <span class="comment">// spacing
+                </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
+                </span>[
                     <span class="string">"&gt;&gt;&gt;ABCD123"</span>, <span class="comment">// highlight column and spacing are prioritized
                     </span><span class="string">"          "</span>, <span class="comment">// row 2
                     </span><span class="string">"          "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
-            <span class="macro">assert_buffer_eq!</span>(
-                test_table_with_selection(
-                    HighlightSpacing::Always,
-                    <span class="number">10</span>,      <span class="comment">// width
-                    </span><span class="number">0</span>,       <span class="comment">// spacing
-                    </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
-                </span>),
-                Buffer::with_lines(<span class="macro">vec!</span>[
+            test_table_with_selection(
+                HighlightSpacing::Always,
+                <span class="number">10</span>,      <span class="comment">// width
+                </span><span class="number">0</span>,       <span class="comment">// spacing
+                </span><span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="comment">// selection
+                </span>[
                     <span class="string">"&gt;&gt;&gt;ABCD123"</span>, <span class="comment">// highlight column and spacing are prioritized
                     </span><span class="string">"          "</span>, <span class="comment">// row 2
                     </span><span class="string">"          "</span>, <span class="comment">// row 3
-                </span>])
+                </span>],
             );
         }
     }

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/yeslogic-fontconfig-sys-3.2.0/src/lib.rs`."><title>lib.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fontconfig_sys" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/yeslogic-fontconfig-sys-5.0.0/src/lib.rs`."><title>lib.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="fontconfig_sys" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../fontconfig_sys/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -864,27 +864,17 @@
 <a href="#862" id="862">862</a>
 <a href="#863" id="863">863</a>
 <a href="#864" id="864">864</a>
-<a href="#865" id="865">865</a>
-<a href="#866" id="866">866</a>
-<a href="#867" id="867">867</a>
-<a href="#868" id="868">868</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2013 The Servo Project Developers. See the LICENSE
 // file at the top-level directory of this distribution.
 //
-// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
-// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license
-// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
-// option. This file may not be copied, modified, or distributed
-// except according to those terms.
+// Licensed under the the MIT license. This file may not be
+// copied, modified, or distributed except according to those terms.
 
 </span><span class="attr">#![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-#[macro_use]
-</span><span class="kw">extern crate </span>const_cstr;
-
-<span class="kw">use </span>std::os::raw::{c_char, c_double, c_int, c_uchar, c_uint, c_ushort, c_void};
+</span><span class="kw">use </span>std::os::raw::{c_char, c_double, c_int, c_uchar, c_uint, c_ushort, c_void};
 
 <span class="kw">pub use </span>dlib::ffi_dispatch;
 
@@ -926,6 +916,10 @@
 <span class="kw">pub type </span>FcType = enum__FcType;
 
 <span class="kw">pub mod </span>constants {
+    <span class="kw">use </span>std::ffi::CStr;
+
+    <span class="kw">use </span>cstr::cstr;
+
     <span class="kw">use </span><span class="kw">super</span>::c_int;
 
     <span class="kw">pub const </span>FC_WEIGHT_THIN: c_int = <span class="number">0</span>;
@@ -986,66 +980,64 @@
     <span class="kw">pub const </span>FC_CHARSET_DONE: u32 = u32::MAX;
     <span class="kw">pub const </span>FC_UTF8_MAX_LEN: c_int = <span class="number">6</span>;
 
-    <span class="macro">const_cstr!</span> {
-        <span class="kw">pub </span>FC_FAMILY = <span class="string">"family"</span>;
-        <span class="kw">pub </span>FC_STYLE = <span class="string">"style"</span>;
-        <span class="kw">pub </span>FC_SLANT = <span class="string">"slant"</span>;
-        <span class="kw">pub </span>FC_WEIGHT = <span class="string">"weight"</span>;
-        <span class="kw">pub </span>FC_SIZE = <span class="string">"size"</span>;
-        <span class="kw">pub </span>FC_ASPECT = <span class="string">"aspect"</span>;
-        <span class="kw">pub </span>FC_PIXEL_SIZE = <span class="string">"pixelsize"</span>;
-        <span class="kw">pub </span>FC_SPACING = <span class="string">"spacing"</span>;
-        <span class="kw">pub </span>FC_FOUNDRY = <span class="string">"foundry"</span>;
-        <span class="kw">pub </span>FC_ANTIALIAS = <span class="string">"antialias"</span>;
-        <span class="kw">pub </span>FC_HINTING = <span class="string">"hinting"</span>;
-        <span class="kw">pub </span>FC_HINT_STYLE = <span class="string">"hintstyle"</span>;
-        <span class="kw">pub </span>FC_VERTICAL_LAYOUT = <span class="string">"verticallayout"</span>;
-        <span class="kw">pub </span>FC_AUTOHINT = <span class="string">"autohint"</span>;
-        <span class="kw">pub </span>FC_GLOBAL_ADVANCE = <span class="string">"globaladvance"</span>;
-        <span class="kw">pub </span>FC_WIDTH = <span class="string">"width"</span>;
-        <span class="kw">pub </span>FC_FILE = <span class="string">"file"</span>;
-        <span class="kw">pub </span>FC_INDEX = <span class="string">"index"</span>;
-        <span class="kw">pub </span>FC_FT_FACE = <span class="string">"ftface"</span>;
-        <span class="kw">pub </span>FC_RASTERIZER = <span class="string">"rasterizer"</span>;
-        <span class="kw">pub </span>FC_OUTLINE = <span class="string">"outline"</span>;
-        <span class="kw">pub </span>FC_SCALABLE = <span class="string">"scalable"</span>;
-        <span class="kw">pub </span>FC_COLOR = <span class="string">"color"</span>;
-        <span class="kw">pub </span>FC_VARIABLE = <span class="string">"variable"</span>;
-        <span class="kw">pub </span>FC_SCALE = <span class="string">"scale"</span>;
-        <span class="kw">pub </span>FC_SYMBOL = <span class="string">"symbol"</span>;
-        <span class="kw">pub </span>FC_DPI = <span class="string">"dpi"</span>;
-        <span class="kw">pub </span>FC_RGBA = <span class="string">"rgba"</span>;
-        <span class="kw">pub </span>FC_MINSPACE = <span class="string">"minspace"</span>;
-        <span class="kw">pub </span>FC_SOURCE = <span class="string">"source"</span>;
-        <span class="kw">pub </span>FC_CHARSET = <span class="string">"charset"</span>;
-        <span class="kw">pub </span>FC_LANG = <span class="string">"lang"</span>;
-        <span class="kw">pub </span>FC_FONTVERSION = <span class="string">"fontversion"</span>;
-        <span class="kw">pub </span>FC_FULLNAME = <span class="string">"fullname"</span>;
-        <span class="kw">pub </span>FC_FAMILYLANG = <span class="string">"familylang"</span>;
-        <span class="kw">pub </span>FC_STYLELANG = <span class="string">"stylelang"</span>;
-        <span class="kw">pub </span>FC_FULLNAMELANG = <span class="string">"fullnamelang"</span>;
-        <span class="kw">pub </span>FC_CAPABILITY = <span class="string">"capability"</span>;
-        <span class="kw">pub </span>FC_FONTFORMAT = <span class="string">"fontformat"</span>;
-        <span class="kw">pub </span>FC_EMBOLDEN = <span class="string">"embolden"</span>;
-        <span class="kw">pub </span>FC_EMBEDDED_BITMAP = <span class="string">"embeddedbitmap"</span>;
-        <span class="kw">pub </span>FC_DECORATIVE = <span class="string">"decorative"</span>;
-        <span class="kw">pub </span>FC_LCD_FILTER = <span class="string">"lcdfilter"</span>;
-        <span class="kw">pub </span>FC_FONT_FEATURES = <span class="string">"fontfeatures"</span>;
-        <span class="kw">pub </span>FC_FONT_VARIATIONS = <span class="string">"fontvariations"</span>;
-        <span class="kw">pub </span>FC_NAMELANG = <span class="string">"namelang"</span>;
-        <span class="kw">pub </span>FC_PRGNAME = <span class="string">"prgname"</span>;
-        <span class="kw">pub </span>FC_HASH = <span class="string">"hash"</span>;
-        <span class="kw">pub </span>FC_POSTSCRIPT_NAME = <span class="string">"postscriptname"</span>;
-        <span class="kw">pub </span>FC_FONT_HAS_HINT = <span class="string">"fonthashint"</span>;
-        <span class="kw">pub </span>FC_CACHE_SUFFIX = <span class="string">".cache-"</span>;
-        <span class="kw">pub </span>FC_DIR_CACHE_FILE = <span class="string">"fonts.cache-"</span>;
-        <span class="kw">pub </span>FC_USER_CACHE_FILE = <span class="string">".fonts.cache-"</span>;
-        <span class="kw">pub </span>FC_CHARWIDTH = <span class="string">"charwidth"</span>;
-        <span class="kw">pub </span>FC_CHAR_WIDTH = <span class="string">"charwidth"</span>;
-        <span class="kw">pub </span>FC_CHAR_HEIGHT = <span class="string">"charheight"</span>;
-        <span class="kw">pub </span>FC_MATRIX = <span class="string">"matrix"</span>;
-        <span class="kw">pub </span>FC_ORDER = <span class="string">"order"</span>;
-    }
+    <span class="kw">pub const </span>FC_FAMILY: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"family"</span>);
+    <span class="kw">pub const </span>FC_STYLE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"style"</span>);
+    <span class="kw">pub const </span>FC_SLANT: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"slant"</span>);
+    <span class="kw">pub const </span>FC_WEIGHT: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"weight"</span>);
+    <span class="kw">pub const </span>FC_SIZE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"size"</span>);
+    <span class="kw">pub const </span>FC_ASPECT: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"aspect"</span>);
+    <span class="kw">pub const </span>FC_PIXEL_SIZE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"pixelsize"</span>);
+    <span class="kw">pub const </span>FC_SPACING: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"spacing"</span>);
+    <span class="kw">pub const </span>FC_FOUNDRY: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"foundry"</span>);
+    <span class="kw">pub const </span>FC_ANTIALIAS: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"antialias"</span>);
+    <span class="kw">pub const </span>FC_HINTING: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"hinting"</span>);
+    <span class="kw">pub const </span>FC_HINT_STYLE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"hintstyle"</span>);
+    <span class="kw">pub const </span>FC_VERTICAL_LAYOUT: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"verticallayout"</span>);
+    <span class="kw">pub const </span>FC_AUTOHINT: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"autohint"</span>);
+    <span class="kw">pub const </span>FC_GLOBAL_ADVANCE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"globaladvance"</span>);
+    <span class="kw">pub const </span>FC_WIDTH: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"width"</span>);
+    <span class="kw">pub const </span>FC_FILE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"file"</span>);
+    <span class="kw">pub const </span>FC_INDEX: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"index"</span>);
+    <span class="kw">pub const </span>FC_FT_FACE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"ftface"</span>);
+    <span class="kw">pub const </span>FC_RASTERIZER: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"rasterizer"</span>);
+    <span class="kw">pub const </span>FC_OUTLINE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"outline"</span>);
+    <span class="kw">pub const </span>FC_SCALABLE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"scalable"</span>);
+    <span class="kw">pub const </span>FC_COLOR: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"color"</span>);
+    <span class="kw">pub const </span>FC_VARIABLE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"variable"</span>);
+    <span class="kw">pub const </span>FC_SCALE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"scale"</span>);
+    <span class="kw">pub const </span>FC_SYMBOL: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"symbol"</span>);
+    <span class="kw">pub const </span>FC_DPI: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"dpi"</span>);
+    <span class="kw">pub const </span>FC_RGBA: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"rgba"</span>);
+    <span class="kw">pub const </span>FC_MINSPACE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"minspace"</span>);
+    <span class="kw">pub const </span>FC_SOURCE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"source"</span>);
+    <span class="kw">pub const </span>FC_CHARSET: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"charset"</span>);
+    <span class="kw">pub const </span>FC_LANG: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"lang"</span>);
+    <span class="kw">pub const </span>FC_FONTVERSION: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"fontversion"</span>);
+    <span class="kw">pub const </span>FC_FULLNAME: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"fullname"</span>);
+    <span class="kw">pub const </span>FC_FAMILYLANG: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"familylang"</span>);
+    <span class="kw">pub const </span>FC_STYLELANG: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"stylelang"</span>);
+    <span class="kw">pub const </span>FC_FULLNAMELANG: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"fullnamelang"</span>);
+    <span class="kw">pub const </span>FC_CAPABILITY: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"capability"</span>);
+    <span class="kw">pub const </span>FC_FONTFORMAT: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"fontformat"</span>);
+    <span class="kw">pub const </span>FC_EMBOLDEN: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"embolden"</span>);
+    <span class="kw">pub const </span>FC_EMBEDDED_BITMAP: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"embeddedbitmap"</span>);
+    <span class="kw">pub const </span>FC_DECORATIVE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"decorative"</span>);
+    <span class="kw">pub const </span>FC_LCD_FILTER: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"lcdfilter"</span>);
+    <span class="kw">pub const </span>FC_FONT_FEATURES: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"fontfeatures"</span>);
+    <span class="kw">pub const </span>FC_FONT_VARIATIONS: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"fontvariations"</span>);
+    <span class="kw">pub const </span>FC_NAMELANG: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"namelang"</span>);
+    <span class="kw">pub const </span>FC_PRGNAME: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"prgname"</span>);
+    <span class="kw">pub const </span>FC_HASH: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"hash"</span>);
+    <span class="kw">pub const </span>FC_POSTSCRIPT_NAME: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"postscriptname"</span>);
+    <span class="kw">pub const </span>FC_FONT_HAS_HINT: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"fonthashint"</span>);
+    <span class="kw">pub const </span>FC_CACHE_SUFFIX: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">".cache-"</span>);
+    <span class="kw">pub const </span>FC_DIR_CACHE_FILE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"fonts.cache-"</span>);
+    <span class="kw">pub const </span>FC_USER_CACHE_FILE: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">".fonts.cache-"</span>);
+    <span class="kw">pub const </span>FC_CHARWIDTH: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"charwidth"</span>);
+    <span class="kw">pub const </span>FC_CHAR_WIDTH: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"charwidth"</span>);
+    <span class="kw">pub const </span>FC_CHAR_HEIGHT: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"charheight"</span>);
+    <span class="kw">pub const </span>FC_MATRIX: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"matrix"</span>);
+    <span class="kw">pub const </span>FC_ORDER: <span class="kw-2">&amp;</span>CStr = <span class="macro">cstr!</span>(<span class="string">"order"</span>);
 }
 
 <span class="attr">#[repr(C)]

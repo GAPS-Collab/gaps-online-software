@@ -28,7 +28,7 @@
   <td id="projectlogo"><img alt="Logo" src="GAPSLOGO_2023_ico.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">gaps-online-software
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.9</span>
    </div>
    <div id="projectbrief">online software for the TOF system for the GAPS experiment</div>
   </td>
@@ -100,21 +100,14 @@ $(document).ready(function(){initNavTree('structMasterTriggerEvent.html',''); in
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a455353807880e3474df222b7f42d7268"><td class="memItemLeft" align="right" valign="top">u64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a455353807880e3474df222b7f42d7268">get_timestamp_gps48</a> () const</td></tr>
-<tr class="separator:a455353807880e3474df222b7f42d7268"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39fdaf7835bd4691d17e3dcad9d64cda"><td class="memItemLeft" align="right" valign="top"><a id="a39fdaf7835bd4691d17e3dcad9d64cda"></a>
-u64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a39fdaf7835bd4691d17e3dcad9d64cda">get_timestamp_abs48</a> () const</td></tr>
-<tr class="memdesc:a39fdaf7835bd4691d17e3dcad9d64cda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get absolute timestamp as sent by the GPS. <br /></td></tr>
-<tr class="separator:a39fdaf7835bd4691d17e3dcad9d64cda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4a478fed26dc3ecebbc698a312d30274"><td class="memItemLeft" align="right" valign="top"><a id="a4a478fed26dc3ecebbc698a312d30274"></a>
-Vec&lt; u8 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>get_rb_link_ids</b> () const</td></tr>
-<tr class="separator:a4a478fed26dc3ecebbc698a312d30274"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf8974dcebd34ca3b46078f5ded868ce"><td class="memItemLeft" align="right" valign="top">Vec&lt; std::tuple&lt; u8, u8, u8, LTBThreshold &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#aaf8974dcebd34ca3b46078f5ded868ce">get_trigger_hits</a> () const</td></tr>
-<tr class="separator:aaf8974dcebd34ca3b46078f5ded868ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10e4d924cea6d9cf121290f7effab1e0"><td class="memItemLeft" align="right" valign="top"><a id="a10e4d924cea6d9cf121290f7effab1e0"></a>
-Vec&lt; TriggerType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a10e4d924cea6d9cf121290f7effab1e0">get_trigger_sources</a> () const</td></tr>
-<tr class="memdesc:a10e4d924cea6d9cf121290f7effab1e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the trigger sources from trigger source byte. <br /></td></tr>
-<tr class="separator:a10e4d924cea6d9cf121290f7effab1e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01ceb14924107f2feaf464502ec7bcae"><td class="memItemLeft" align="right" valign="top"><a id="a01ceb14924107f2feaf464502ec7bcae"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_board_mask</b> (u32 mask)</td></tr>
+<tr class="separator:a01ceb14924107f2feaf464502ec7bcae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa878290e6a097045ff133161cbbae7c9"><td class="memItemLeft" align="right" valign="top"><a id="aa878290e6a097045ff133161cbbae7c9"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_hit_mask</b> (usize ltb_index, u32 mask)</td></tr>
+<tr class="separator:aa878290e6a097045ff133161cbbae7c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fb481cacc0a272a464bba031b880669"><td class="memItemLeft" align="right" valign="top">Vec&lt; std::tuple&lt; u8, u8, u8 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a7fb481cacc0a272a464bba031b880669">get_dsi_j_ch</a> ()</td></tr>
+<tr class="separator:a7fb481cacc0a272a464bba031b880669"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aabc131f9d53ef6256b235d953f6c3f3b"><td class="memItemLeft" align="right" valign="top"><a id="aabc131f9d53ef6256b235d953f6c3f3b"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#aabc131f9d53ef6256b235d953f6c3f3b">to_string</a> () const</td></tr>
 <tr class="memdesc:aabc131f9d53ef6256b235d953f6c3f3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">String representation of the struct. <br /></td></tr>
@@ -122,14 +115,17 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:aab5152c48bacdba0d8a32f5d8e85a245"><td class="memItemLeft" align="right" valign="top"><a id="aab5152c48bacdba0d8a32f5d8e85a245"></a>
+static usize&#160;</td><td class="memItemRight" valign="bottom"><b>get_packet_size</b> (const Vec&lt; u8 &gt; &amp;stream, usize pos, usize expected_size)</td></tr>
+<tr class="separator:aab5152c48bacdba0d8a32f5d8e85a245"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92eba169f890dbdf936adba5572e06fe"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structMasterTriggerEvent.html">MasterTriggerEvent</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a92eba169f890dbdf936adba5572e06fe">from_bytestream</a> (const Vec&lt; u8 &gt; &amp;bytestream, u64 &amp;pos)</td></tr>
 <tr class="separator:a92eba169f890dbdf936adba5572e06fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39fe79edbdea9c4394a861ea02853e1d"><td class="memItemLeft" align="right" valign="top"><a id="a39fe79edbdea9c4394a861ea02853e1d"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>decode_hit_mask</b> (u32 mask_number, bool(&amp;hitmask_1)[N_CHN_PER_LTB], bool(&amp;hitmask_2)[N_CHN_PER_LTB])</td></tr>
+<tr class="separator:a39fe79edbdea9c4394a861ea02853e1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a935b83acbec230d81d345178ae91ab1b"><td class="memItemLeft" align="right" valign="top"><a id="a935b83acbec230d81d345178ae91ab1b"></a>
-EventStatus&#160;</td><td class="memItemRight" valign="bottom"><b>event_status</b></td></tr>
-<tr class="separator:a935b83acbec230d81d345178ae91ab1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fc1e8b3d4f1e769b4bce8a58a166c78"><td class="memItemLeft" align="right" valign="top"><a id="a2fc1e8b3d4f1e769b4bce8a58a166c78"></a>
 u32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a2fc1e8b3d4f1e769b4bce8a58a166c78">event_id</a></td></tr>
 <tr class="memdesc:a2fc1e8b3d4f1e769b4bce8a58a166c78"><td class="mdescLeft">&#160;</td><td class="mdescRight">event_id as assigned by the MasterTriggerBoard <br /></td></tr>
@@ -142,30 +138,36 @@ u32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struc
 u32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a30d57d1dc8bd9e7fc55d1af7ad6ebc92">tiu_timestamp</a></td></tr>
 <tr class="memdesc:a30d57d1dc8bd9e7fc55d1af7ad6ebc92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tracker (?) timestamp. <br /></td></tr>
 <tr class="separator:a30d57d1dc8bd9e7fc55d1af7ad6ebc92"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa49962e24c04ede5087ff1876feecd36"><td class="memItemLeft" align="right" valign="top"><a id="aa49962e24c04ede5087ff1876feecd36"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#aa49962e24c04ede5087ff1876feecd36">tiu_gps32</a></td></tr>
-<tr class="memdesc:aa49962e24c04ede5087ff1876feecd36"><td class="mdescLeft">&#160;</td><td class="mdescRight">GAPS GPS clock value (slow) <br /></td></tr>
-<tr class="separator:aa49962e24c04ede5087ff1876feecd36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7def730b945ec5fb1da944dbd95ab25"><td class="memItemLeft" align="right" valign="top"><a id="ab7def730b945ec5fb1da944dbd95ab25"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#ab7def730b945ec5fb1da944dbd95ab25">tiu_gps16</a></td></tr>
-<tr class="memdesc:ab7def730b945ec5fb1da944dbd95ab25"><td class="mdescLeft">&#160;</td><td class="mdescRight">GAPS GPS clock value (fast) <br /></td></tr>
-<tr class="separator:ab7def730b945ec5fb1da944dbd95ab25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa02e973d0cf453f05bf1c9c591a14af8"><td class="memItemLeft" align="right" valign="top"><a id="aa02e973d0cf453f05bf1c9c591a14af8"></a>
+u32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#aa02e973d0cf453f05bf1c9c591a14af8">tiu_gps_32</a></td></tr>
+<tr class="memdesc:aa02e973d0cf453f05bf1c9c591a14af8"><td class="mdescLeft">&#160;</td><td class="mdescRight">GAPS GPS clock value (slow) <br /></td></tr>
+<tr class="separator:aa02e973d0cf453f05bf1c9c591a14af8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a812af2c197e987f663477039dfb349da"><td class="memItemLeft" align="right" valign="top"><a id="a812af2c197e987f663477039dfb349da"></a>
+u32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a812af2c197e987f663477039dfb349da">tiu_gps_16</a></td></tr>
+<tr class="memdesc:a812af2c197e987f663477039dfb349da"><td class="mdescLeft">&#160;</td><td class="mdescRight">GAPS GPS clock value (fast) <br /></td></tr>
+<tr class="separator:a812af2c197e987f663477039dfb349da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3584e8178fab07839e43d3eec831d0bc"><td class="memItemLeft" align="right" valign="top"><a id="a3584e8178fab07839e43d3eec831d0bc"></a>
+u8&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a3584e8178fab07839e43d3eec831d0bc">n_paddles</a></td></tr>
+<tr class="memdesc:a3584e8178fab07839e43d3eec831d0bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">triggered paddles as seen by the MTB <br /></td></tr>
+<tr class="separator:a3584e8178fab07839e43d3eec831d0bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e2850cccfd9056e60da6512216a7aff"><td class="memItemLeft" align="right" valign="top"><a id="a3e2850cccfd9056e60da6512216a7aff"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a3e2850cccfd9056e60da6512216a7aff">board_mask</a> [N_LTBS]</td></tr>
+<tr class="memdesc:a3e2850cccfd9056e60da6512216a7aff"><td class="mdescLeft">&#160;</td><td class="mdescRight">bitmask indicating hit LTBs, identified by DSI/J <br /></td></tr>
+<tr class="separator:a3e2850cccfd9056e60da6512216a7aff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa92539d1bcffb9b8cadf5f909a11d916"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#aa92539d1bcffb9b8cadf5f909a11d916">hits</a> [N_LTBS][N_CHN_PER_LTB]</td></tr>
+<tr class="separator:aa92539d1bcffb9b8cadf5f909a11d916"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab438df14fccd804df45411f51a85719b"><td class="memItemLeft" align="right" valign="top"><a id="ab438df14fccd804df45411f51a85719b"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#ab438df14fccd804df45411f51a85719b">crc</a></td></tr>
-<tr class="memdesc:ab438df14fccd804df45411f51a85719b"><td class="mdescLeft">&#160;</td><td class="mdescRight">triggered paddles as seen by the MTB <br /></td></tr>
+u32&#160;</td><td class="memItemRight" valign="bottom"><b>crc</b></td></tr>
 <tr class="separator:ab438df14fccd804df45411f51a85719b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3edd142130fbdd973d8e63a15166d6df"><td class="memItemLeft" align="right" valign="top"><a id="a3edd142130fbdd973d8e63a15166d6df"></a>
-u16&#160;</td><td class="memItemRight" valign="bottom"><b>trigger_source</b></td></tr>
-<tr class="separator:a3edd142130fbdd973d8e63a15166d6df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc050262f6d08b8b2a2c80ca59a0a849"><td class="memItemLeft" align="right" valign="top"><a id="acc050262f6d08b8b2a2c80ca59a0a849"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><b>dsi_j_mask</b></td></tr>
-<tr class="separator:acc050262f6d08b8b2a2c80ca59a0a849"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1093aa4c8ebdec7e23d60579fd8fd5c0"><td class="memItemLeft" align="right" valign="top"><a id="a1093aa4c8ebdec7e23d60579fd8fd5c0"></a>
-Vec&lt; u16 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>channel_mask</b></td></tr>
-<tr class="separator:a1093aa4c8ebdec7e23d60579fd8fd5c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab05c4f3b5d0f32309e8bb47c09995194"><td class="memItemLeft" align="right" valign="top"><a id="ab05c4f3b5d0f32309e8bb47c09995194"></a>
-u64&#160;</td><td class="memItemRight" valign="bottom"><b>mtb_link_mask</b></td></tr>
-<tr class="separator:ab05c4f3b5d0f32309e8bb47c09995194"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4901de4e4dfafbdc9395d90a0719d3c0"><td class="memItemLeft" align="right" valign="top"><a id="a4901de4e4dfafbdc9395d90a0719d3c0"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>broken</b></td></tr>
+<tr class="separator:a4901de4e4dfafbdc9395d90a0719d3c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a172aa8b6f860a3f364a97b477828789e"><td class="memItemLeft" align="right" valign="top"><a id="a172aa8b6f860a3f364a97b477828789e"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>valid</b></td></tr>
+<tr class="separator:a172aa8b6f860a3f364a97b477828789e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53f023548abd013d74ced49590a488aa"><td class="memItemLeft" align="right" valign="top"><a id="a53f023548abd013d74ced49590a488aa"></a>
+LtbRBMap&#160;</td><td class="memItemRight" valign="bottom"><b>channel_map</b></td></tr>
+<tr class="separator:a53f023548abd013d74ced49590a488aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -181,10 +183,15 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 static const usize&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#ae8de2d59e0cdb02a7ad7b6073011983d">SIZE</a> = 45</td></tr>
 <tr class="memdesc:ae8de2d59e0cdb02a7ad7b6073011983d"><td class="mdescLeft">&#160;</td><td class="mdescRight">the struct has a fixed size of SIZE <br /></td></tr>
 <tr class="separator:ae8de2d59e0cdb02a7ad7b6073011983d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff5e1b47bb33bc397369183e8d46c088"><td class="memItemLeft" align="right" valign="top"><a id="aff5e1b47bb33bc397369183e8d46c088"></a>
+static const usize&#160;</td><td class="memItemRight" valign="bottom"><b>SIZE_LTB20</b> = 113</td></tr>
+<tr class="separator:aff5e1b47bb33bc397369183e8d46c088"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1030345bf4aeefc392d37a33efbf0e0"><td class="memItemLeft" align="right" valign="top"><a id="ab1030345bf4aeefc392d37a33efbf0e0"></a>
+static const usize&#160;</td><td class="memItemRight" valign="bottom"><b>SIZE_LTB25</b> = 113 + 5*4</td></tr>
+<tr class="separator:ab1030345bf4aeefc392d37a33efbf0e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <a class="el" href="structMasterTriggerEvent.html">MasterTriggerEvent</a> represesnts the information provided by the MTB for this one specific event. Most notably, it includes a board mask, which is the DSI/J connections which triggered, and a hit mask. The hit mask gives hit channels per DSI/J, which correspond to hit channels on a LTB.</p>
-<p>FIXME -compatibiltiy. Reading older data, we have 2 scenarios - either 113 bytes of fixed size for 20 LTBs, or 133 bytes for 25 LTBs. We can modify from_bytestream to at least not throw an error when reading older data, but this would currently be a #todo of lower priority </p>
+<div class="textblock"><p>The <a class="el" href="structMasterTriggerEvent.html">MasterTriggerEvent</a> represesnts the information provided by the MTB for this one specific event. Most notably, it includes a board mask, which is the DSI/J connections which triggered, and a hit mask. The hit mask gives hit channels per DSI/J, which correspond to hit channels on a LTB. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a92eba169f890dbdf936adba5572e06fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a92eba169f890dbdf936adba5572e06fe">&#9670;&nbsp;</a></span>from_bytestream()</h2>
@@ -231,44 +238,37 @@ static const usize&#160;</td><td class="memItemRight" valign="bottom"><a class="
 
 </div>
 </div>
-<a id="a455353807880e3474df222b7f42d7268"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a455353807880e3474df222b7f42d7268">&#9670;&nbsp;</a></span>get_timestamp_gps48()</h2>
+<a id="a7fb481cacc0a272a464bba031b880669"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fb481cacc0a272a464bba031b880669">&#9670;&nbsp;</a></span>get_dsi_j_ch()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">u64 MasterTriggerEvent::get_timestamp_gps48 </td>
+          <td class="memname">Vec&lt;std::tuple&lt;u8,u8,u8&gt; &gt; MasterTriggerEvent::get_dsi_j_ch </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The combined GPS 48bit timestamp into a 48bit timestamp </p>
+<p>Get the hits in terms of DSI/J/CH This can then be further used to calculate RB ID/CHANNEL </p>
 
 </div>
 </div>
-<a id="aaf8974dcebd34ca3b46078f5ded868ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaf8974dcebd34ca3b46078f5ded868ce">&#9670;&nbsp;</a></span>get_trigger_hits()</h2>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="aa92539d1bcffb9b8cadf5f909a11d916"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa92539d1bcffb9b8cadf5f909a11d916">&#9670;&nbsp;</a></span>hits</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Vec&lt;std::tuple&lt;u8, u8, u8, LTBThreshold&gt; &gt; MasterTriggerEvent::get_trigger_hits </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td class="memname">bool MasterTriggerEvent::hits[N_LTBS][N_CHN_PER_LTB]</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the combination of triggered DSI/J/CH on the MTB which formed the trigger. This does not include further hits which fall into the integration window. For those, se rb_link_mask</p>
-<p>The returned values follow the TOF convention to start with 1, so that we can use them to look up LTB ids in the db.</p>
-<h1><a class="anchor" id="autotoc_md0"></a>
-Returns</h1>
-<p>Vec&lt;(hit)&gt; where hit is (DSI, J, CH) <br  />
- </p>
+<p>bitmask per LTB to indicate hit channels. Each channel maps to a RBID/RBCH </p>
 
 </div>
 </div>

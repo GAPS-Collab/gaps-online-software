@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["config_temp","to_json"]};
+window.SIDEBAR_ITEMS = {"fn":["config_temp"]};

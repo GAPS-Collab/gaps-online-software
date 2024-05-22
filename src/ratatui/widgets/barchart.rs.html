@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.2/src/widgets/barchart.rs`."><title>barchart.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/widgets/barchart.rs`."><title>barchart.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1333,26 +1333,6 @@
 <a href="#1331" id="1331">1331</a>
 <a href="#1332" id="1332">1332</a>
 <a href="#1333" id="1333">1333</a>
-<a href="#1334" id="1334">1334</a>
-<a href="#1335" id="1335">1335</a>
-<a href="#1336" id="1336">1336</a>
-<a href="#1337" id="1337">1337</a>
-<a href="#1338" id="1338">1338</a>
-<a href="#1339" id="1339">1339</a>
-<a href="#1340" id="1340">1340</a>
-<a href="#1341" id="1341">1341</a>
-<a href="#1342" id="1342">1342</a>
-<a href="#1343" id="1343">1343</a>
-<a href="#1344" id="1344">1344</a>
-<a href="#1345" id="1345">1345</a>
-<a href="#1346" id="1346">1346</a>
-<a href="#1347" id="1347">1347</a>
-<a href="#1348" id="1348">1348</a>
-<a href="#1349" id="1349">1349</a>
-<a href="#1350" id="1350">1350</a>
-<a href="#1351" id="1351">1351</a>
-<a href="#1352" id="1352">1352</a>
-<a href="#1353" id="1353">1353</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, widgets::Block};
 
 <span class="kw">mod </span>bar;
@@ -1400,7 +1380,7 @@
 /// use ratatui::{prelude::*, widgets::*};
 ///
 /// BarChart::default()
-///     .block(Block::default().title("BarChart").borders(Borders::ALL))
+///     .block(Block::bordered().title("BarChart"))
 ///     .bar_width(3)
 ///     .bar_gap(1)
 ///     .group_gap(3)
@@ -1970,151 +1950,140 @@
     <span class="kw">use </span>itertools::iproduct;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use crate</span>::{
-        assert_buffer_eq,
-        widgets::{BorderType, Borders},
-    };
+    <span class="kw">use </span><span class="kw">crate</span>::widgets::BorderType;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>default() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default();
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"          "</span>; <span class="number">3</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"          "</span>; <span class="number">3</span>]));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>data() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default().data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)]);
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"  █            "</span>,
-                <span class="string">"1 2            "</span>,
-                <span class="string">"f b            "</span>,
-            ])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"  █       "</span>,
+            <span class="string">"1 2       "</span>,
+            <span class="string">"f b       "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>block() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">5</span>));
-        <span class="kw">let </span>block = Block::default()
-            .title(<span class="string">"Block"</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">5</span>));
+        <span class="kw">let </span>block = Block::bordered()
             .border_type(BorderType::Double)
-            .borders(Borders::ALL);
+            .title(<span class="string">"Block"</span>);
         <span class="kw">let </span>widget = BarChart::default()
             .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .block(block);
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"╔Block════════╗"</span>,
-                <span class="string">"║  █          ║"</span>,
-                <span class="string">"║1 2          ║"</span>,
-                <span class="string">"║f b          ║"</span>,
-                <span class="string">"╚═════════════╝"</span>,
-            ])
-        );
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"╔Block═══╗"</span>,
+            <span class="string">"║  █     ║"</span>,
+            <span class="string">"║1 2     ║"</span>,
+            <span class="string">"║f b     ║"</span>,
+            <span class="string">"╚════════╝"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>max() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
         <span class="kw">let </span>without_max = BarChart::default().data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>), (<span class="string">"baz"</span>, <span class="number">100</span>)]);
         without_max.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"    █          "</span>,
-                <span class="string">"    █          "</span>,
-                <span class="string">"f b b          "</span>,
-            ])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"    █     "</span>,
+            <span class="string">"    █     "</span>,
+            <span class="string">"f b b     "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
         <span class="kw">let </span>with_max = BarChart::default()
             .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>), (<span class="string">"baz"</span>, <span class="number">100</span>)])
             .max(<span class="number">2</span>);
         with_max.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"  █ █          "</span>,
-                <span class="string">"1 2 █          "</span>,
-                <span class="string">"f b b          "</span>,
-            ])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"  █ █     "</span>,
+            <span class="string">"1 2 █     "</span>,
+            <span class="string">"f b b     "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>bar_style() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
             .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .bar_style(Style::new().red());
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">"  █            "</span>,
-            <span class="string">"1 2            "</span>,
-            <span class="string">"f b            "</span>,
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines([
+            <span class="string">"  █       "</span>,
+            <span class="string">"1 2       "</span>,
+            <span class="string">"f b       "</span>,
         ]);
         <span class="kw">for </span>(x, y) <span class="kw">in </span><span class="macro">iproduct!</span>([<span class="number">0</span>, <span class="number">2</span>], [<span class="number">0</span>, <span class="number">1</span>]) {
             expected.get_mut(x, y).set_fg(Color::Red);
         }
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>bar_width() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
             .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .bar_width(<span class="number">3</span>);
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"    ███        "</span>,
-                <span class="string">"█1█ █2█        "</span>,
-                <span class="string">"foo bar        "</span>,
-            ])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"    ███   "</span>,
+            <span class="string">"█1█ █2█   "</span>,
+            <span class="string">"foo bar   "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>bar_gap() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
             .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .bar_gap(<span class="number">2</span>);
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"   █           "</span>,
-                <span class="string">"1  2           "</span>,
-                <span class="string">"f  b           "</span>,
-            ])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"   █      "</span>,
+            <span class="string">"1  2      "</span>,
+            <span class="string">"f  b      "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>bar_set() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
             .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">0</span>), (<span class="string">"bar"</span>, <span class="number">1</span>), (<span class="string">"baz"</span>, <span class="number">3</span>)])
             .bar_set(symbols::bar::THREE_LEVELS);
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"    █          "</span>,
-                <span class="string">"  ▄ 3          "</span>,
-                <span class="string">"f b b          "</span>,
-            ])
-        );
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"    █     "</span>,
+            <span class="string">"  ▄ 3     "</span>,
+            <span class="string">"f b b     "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2134,67 +2103,68 @@
             ])
             .bar_set(symbols::bar::NINE_LEVELS);
         widget.render(Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">18</span>, <span class="number">2</span>), <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"                  "</span>,
-                <span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8 "</span>,
-                <span class="string">"a b c d e f g h i "</span>,
-            ])
-        );
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"                  "</span>,
+            <span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8 "</span>,
+            <span class="string">"a b c d e f g h i "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>value_style() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
             .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .bar_width(<span class="number">3</span>)
             .value_style(Style::new().red());
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">"    ███        "</span>,
-            <span class="string">"█1█ █2█        "</span>,
-            <span class="string">"foo bar        "</span>,
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines([
+            <span class="string">"    ███   "</span>,
+            <span class="string">"█1█ █2█   "</span>,
+            <span class="string">"foo bar   "</span>,
         ]);
         expected.get_mut(<span class="number">1</span>, <span class="number">1</span>).set_fg(Color::Red);
         expected.get_mut(<span class="number">5</span>, <span class="number">1</span>).set_fg(Color::Red);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>label_style() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
             .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .label_style(Style::new().red());
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">"  █            "</span>,
-            <span class="string">"1 2            "</span>,
-            <span class="string">"f b            "</span>,
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines([
+            <span class="string">"  █       "</span>,
+            <span class="string">"1 2       "</span>,
+            <span class="string">"f b       "</span>,
         ]);
         expected.get_mut(<span class="number">0</span>, <span class="number">2</span>).set_fg(Color::Red);
         expected.get_mut(<span class="number">2</span>, <span class="number">2</span>).set_fg(Color::Red);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>style() {
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
             .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .style(Style::new().red());
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">"  █            "</span>,
-            <span class="string">"1 2            "</span>,
-            <span class="string">"f b            "</span>,
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines([
+            <span class="string">"  █       "</span>,
+            <span class="string">"1 2       "</span>,
+            <span class="string">"f b       "</span>,
         ]);
-        <span class="kw">for </span>(x, y) <span class="kw">in </span><span class="macro">iproduct!</span>(<span class="number">0</span>..<span class="number">15</span>, <span class="number">0</span>..<span class="number">3</span>) {
+        <span class="kw">for </span>(x, y) <span class="kw">in </span><span class="macro">iproduct!</span>(<span class="number">0</span>..<span class="number">10</span>, <span class="number">0</span>..<span class="number">3</span>) {
             expected.get_mut(x, y).set_fg(Color::Red);
         }
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2220,8 +2190,13 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">3</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  █"</span>, <span class="string">"1 2"</span>, <span class="string">"G  "</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"  █"</span>,
+            <span class="string">"1 2"</span>,
+            <span class="string">"G  "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="kw">fn </span>build_test_barchart&lt;<span class="lifetime">'a</span>&gt;() -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
@@ -2247,7 +2222,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">8</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+        <span class="kw">let </span>expected = Buffer::with_lines([
             <span class="string">"2█   "</span>,
             <span class="string">"3██  "</span>,
             <span class="string">"4███ "</span>,
@@ -2257,8 +2232,7 @@
             <span class="string">"5████"</span>,
             <span class="string">"G2   "</span>,
         ]);
-
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2267,7 +2241,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">7</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+        <span class="kw">let </span>expected = Buffer::with_lines([
             <span class="string">"2█   "</span>,
             <span class="string">"3██  "</span>,
             <span class="string">"4███ "</span>,
@@ -2276,8 +2250,7 @@
             <span class="string">"4███ "</span>,
             <span class="string">"5████"</span>,
         ]);
-
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2286,9 +2259,15 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">5</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"2█   "</span>, <span class="string">"3██  "</span>, <span class="string">"4███ "</span>, <span class="string">"G1   "</span>, <span class="string">"3██  "</span>]);
-
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"2█   "</span>,
+            <span class="string">"3██  "</span>,
+            <span class="string">"4███ "</span>,
+            <span class="string">"G1   "</span>,
+            <span class="string">"3██  "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="kw">fn </span>test_horizontal_bars_label_width_greater_than_bar(bar_color: <span class="prelude-ty">Option</span>&lt;Color&gt;) {
@@ -2311,7 +2290,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">2</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"label"</span>, <span class="string">"5████"</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines([<span class="string">"label"</span>, <span class="string">"5████"</span>]);
 
         <span class="comment">// first line has a yellow foreground. first cell contains italic "5"
         </span>expected.get_mut(<span class="number">0</span>, <span class="number">1</span>).modifier.insert(Modifier::ITALIC);
@@ -2336,7 +2315,7 @@
         expected.get_mut(<span class="number">3</span>, <span class="number">0</span>).set_fg(expected_color);
         expected.get_mut(<span class="number">4</span>, <span class="number">0</span>).set_fg(expected_color);
 
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2359,9 +2338,13 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Jan 10█   "</span>, <span class="string">"Feb 20████"</span>, <span class="string">"Mar 5     "</span>]);
-
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"Jan 10█   "</span>,
+            <span class="string">"Feb 20████"</span>,
+            <span class="string">"Mar 5     "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2382,13 +2365,13 @@
         <span class="comment">// G1 should have the bold red style
         // bold: because of BarChart::label_style
         // red: is included with the label itself
-        </span><span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"2████"</span>, <span class="string">"G1   "</span>]);
+        </span><span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines([<span class="string">"2████"</span>, <span class="string">"G1   "</span>]);
         <span class="kw">let </span>cell = expected.get_mut(<span class="number">0</span>, <span class="number">1</span>).set_fg(Color::Red);
         cell.modifier.insert(Modifier::BOLD);
         <span class="kw">let </span>cell = expected.get_mut(<span class="number">1</span>, <span class="number">1</span>).set_fg(Color::Red);
         cell.modifier.insert(Modifier::BOLD);
 
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2405,17 +2388,14 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">13</span>, <span class="number">5</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"    ▂ █     ▂"</span>,
-                <span class="string">"  ▄ █ █   ▄ █"</span>,
-                <span class="string">"▆ 2 3 4 ▆ 2 3"</span>,
-                <span class="string">"a b c c a b c"</span>,
-                <span class="string">"  G1     G2  "</span>,
-            ])
-        );
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"    ▂ █     ▂"</span>,
+            <span class="string">"  ▄ █ █   ▄ █"</span>,
+            <span class="string">"▆ 2 3 4 ▆ 2 3"</span>,
+            <span class="string">"a b c c a b c"</span>,
+            <span class="string">"  G1     G2  "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2428,9 +2408,13 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">3</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  █"</span>, <span class="string">"▆ 5"</span>, <span class="string">"  G"</span>]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"  █"</span>,
+            <span class="string">"▆ 5"</span>,
+            <span class="string">"  G"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2453,15 +2437,14 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">11</span>, <span class="number">5</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+        <span class="kw">let </span>expected = Buffer::with_lines([
             <span class="string">"    ▆▆▆ ███"</span>,
             <span class="string">"    ███ ███"</span>,
             <span class="string">"▃▃▃ ███ ███"</span>,
             <span class="string">"写█ 写█ 写█"</span>,
             <span class="string">"B1  B2  B2 "</span>,
         ]);
-        <span class="macro">assert_buffer_eq!</span>(buffer, expected);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2473,7 +2456,7 @@
             .bar_gap(<span class="number">0</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>)));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>)));
     }
 
     <span class="attr">#[test]
@@ -2498,8 +2481,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">17</span>, <span class="number">1</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8"</span>]));
+        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([<span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8"</span>]));
     }
 
     <span class="attr">#[test]
@@ -2524,15 +2506,12 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">17</span>, <span class="number">3</span>));
         chart.render(Rect::new(<span class="number">0</span>, <span class="number">1</span>, buffer.area.width, <span class="number">2</span>), <span class="kw-2">&amp;mut </span>buffer);
-
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"                 "</span>,
-                <span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8"</span>,
-                <span class="string">"a b c d e f g h i"</span>,
-            ])
-        );
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"                 "</span>,
+            <span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8"</span>,
+            <span class="string">"a b c d e f g h i"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2557,15 +2536,12 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">17</span>, <span class="number">3</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8"</span>,
-                <span class="string">"a b c d e f g h i"</span>,
-                <span class="string">"      Group      "</span>,
-            ])
-        );
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8"</span>,
+            <span class="string">"a b c d e f g h i"</span>,
+            <span class="string">"      Group      "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2590,15 +2566,12 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">26</span>, <span class="number">3</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"   1▁ 2▂ 3▃ 4▄ 5▅ 6▆ 7▇ 8█"</span>,
-                <span class="string">"a  b  c  d  e  f  g  h  i "</span>,
-                <span class="string">"          Group           "</span>,
-            ])
-        );
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"   1▁ 2▂ 3▃ 4▄ 5▅ 6▆ 7▇ 8█"</span>,
+            <span class="string">"a  b  c  d  e  f  g  h  i "</span>,
+            <span class="string">"          Group           "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2623,16 +2596,13 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">17</span>, <span class="number">4</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"          ▂ ▄ ▆ █"</span>,
-                <span class="string">"  ▂ ▄ ▆ 4 5 6 7 8"</span>,
-                <span class="string">"a b c d e f g h i"</span>,
-                <span class="string">"      Group      "</span>,
-            ])
-        );
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"          ▂ ▄ ▆ █"</span>,
+            <span class="string">"  ▂ ▄ ▆ 4 5 6 7 8"</span>,
+            <span class="string">"a b c d e f g h i"</span>,
+            <span class="string">"      Group      "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2655,15 +2625,12 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">17</span>, <span class="number">3</span>));
         chart.render(Rect::new(<span class="number">0</span>, <span class="number">1</span>, buffer.area.width, <span class="number">2</span>), <span class="kw-2">&amp;mut </span>buffer);
-
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"                 "</span>,
-                <span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8"</span>,
-                <span class="string">"      Group      "</span>,
-            ])
-        );
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"                 "</span>,
+            <span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8"</span>,
+            <span class="string">"      Group      "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2674,13 +2641,9 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">59</span>, <span class="number">1</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"        ▁ ▁ ▁ ▁ ▂ ▂ ▂ ▃ ▃ ▃ ▃ ▄ ▄ ▄ ▄ ▅ ▅ ▅ ▆ ▆ ▆ ▆ ▇ ▇ ▇ █"</span>,
-            ])
-        );
+        <span class="kw">let </span>expected =
+            Buffer::with_lines([<span class="string">"        ▁ ▁ ▁ ▁ ▂ ▂ ▂ ▃ ▃ ▃ ▃ ▄ ▄ ▄ ▄ ▅ ▅ ▅ ▆ ▆ ▆ ▆ ▇ ▇ ▇ █"</span>]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
@@ -2692,18 +2655,15 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">7</span>, <span class="number">6</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-
-        <span class="macro">assert_buffer_eq!</span>(
-            buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">"   ██  "</span>,
-                <span class="string">"   ██  "</span>,
-                <span class="string">"▄▄ ██  "</span>,
-                <span class="string">"██ ██  "</span>,
-                <span class="string">"1█ 2█  "</span>,
-                <span class="string">"a  b   "</span>,
-            ])
-        );
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"   ██  "</span>,
+            <span class="string">"   ██  "</span>,
+            <span class="string">"▄▄ ██  "</span>,
+            <span class="string">"██ ██  "</span>,
+            <span class="string">"1█ 2█  "</span>,
+            <span class="string">"a  b   "</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 }
 </code></pre></div></section></main></body></html>

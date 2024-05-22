@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/font-kit-0.11.0/src/loaders/freetype.rs`."><title>freetype.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="font_kit" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/font-kit-0.13.2/src/loaders/freetype.rs`."><title>freetype.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="font_kit" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../font_kit/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1235,6 +1235,16 @@
 <a href="#1233" id="1233">1233</a>
 <a href="#1234" id="1234">1234</a>
 <a href="#1235" id="1235">1235</a>
+<a href="#1236" id="1236">1236</a>
+<a href="#1237" id="1237">1237</a>
+<a href="#1238" id="1238">1238</a>
+<a href="#1239" id="1239">1239</a>
+<a href="#1240" id="1240">1240</a>
+<a href="#1241" id="1241">1241</a>
+<a href="#1242" id="1242">1242</a>
+<a href="#1243" id="1243">1243</a>
+<a href="#1244" id="1244">1244</a>
+<a href="#1245" id="1245">1245</a>
 </pre></div><pre class="rust"><code><span class="comment">// font-kit/src/loaders/freetype.rs
 //
 // Copyright © 2018 The Pathfinder Project Developers.
@@ -1251,17 +1261,17 @@
 //! loader by default.
 
 </span><span class="kw">use </span>byteorder::{BigEndian, ReadBytesExt};
-<span class="kw">use </span>freetype::freetype::{FT_Byte, FT_Done_Face, FT_Error, FT_Face, FT_FACE_FLAG_FIXED_WIDTH};
-<span class="kw">use </span>freetype::freetype::{
-    FT_Fixed, FT_Get_Char_Index, FT_Get_Name_Index, FT_Get_Postscript_Name, FT_Pos,
+<span class="kw">use </span>freetype_sys::{
+    ft_sfnt_os2, FT_Byte, FT_Done_Face, FT_Done_FreeType, FT_Error, FT_Face, FT_Fixed,
+    FT_Get_Char_Index, FT_Get_Name_Index, FT_Get_Postscript_Name, FT_Get_Sfnt_Name,
+    FT_Get_Sfnt_Name_Count, FT_Get_Sfnt_Table, FT_Init_FreeType, FT_Library,
+    FT_Library_SetLcdFilter, FT_Load_Glyph, FT_Long, FT_Matrix, FT_New_Memory_Face, FT_Pos,
+    FT_Reference_Face, FT_Set_Char_Size, FT_Set_Transform, FT_UInt, FT_ULong, FT_Vector,
+    FT_FACE_FLAG_FIXED_WIDTH, FT_LCD_FILTER_DEFAULT, FT_LOAD_DEFAULT, FT_LOAD_MONOCHROME,
+    FT_LOAD_NO_HINTING, FT_LOAD_RENDER, FT_LOAD_TARGET_LCD, FT_LOAD_TARGET_LIGHT,
+    FT_LOAD_TARGET_MONO, FT_LOAD_TARGET_NORMAL, FT_PIXEL_MODE_GRAY, FT_PIXEL_MODE_LCD,
+    FT_PIXEL_MODE_LCD_V, FT_PIXEL_MODE_MONO, FT_STYLE_FLAG_ITALIC, TT_OS2,
 };
-<span class="kw">use </span>freetype::freetype::{FT_Get_Sfnt_Table, FT_Init_FreeType, FT_LcdFilter, FT_Library};
-<span class="kw">use </span>freetype::freetype::{FT_Library_SetLcdFilter, FT_Load_Glyph, FT_LOAD_DEFAULT};
-<span class="kw">use </span>freetype::freetype::{FT_Load_Sfnt_Table, FT_Long, FT_Matrix, FT_New_Memory_Face};
-<span class="kw">use </span>freetype::freetype::{FT_Reference_Face, FT_Set_Char_Size, FT_Set_Transform, FT_Sfnt_Tag};
-<span class="kw">use </span>freetype::freetype::{FT_UInt, FT_ULong, FT_UShort, FT_Vector, FT_STYLE_FLAG_ITALIC};
-<span class="kw">use </span>freetype::freetype::{FT_LOAD_MONOCHROME, FT_LOAD_NO_HINTING, FT_LOAD_RENDER};
-<span class="kw">use </span>freetype::tt_os2::TT_OS2;
 <span class="kw">use </span>log::warn;
 <span class="kw">use </span>pathfinder_geometry::line_segment::LineSegment2F;
 <span class="kw">use </span>pathfinder_geometry::rect::{RectF, RectI};
@@ -1303,21 +1313,6 @@
 <span class="kw">const </span>FT_POINT_TAG_ON_CURVE: c_char = <span class="number">0x01</span>;
 <span class="kw">const </span>FT_POINT_TAG_CUBIC_CONTROL: c_char = <span class="number">0x02</span>;
 
-<span class="kw">const </span>FT_RENDER_MODE_NORMAL: u32 = <span class="number">0</span>;
-<span class="kw">const </span>FT_RENDER_MODE_LIGHT: u32 = <span class="number">1</span>;
-<span class="kw">const </span>FT_RENDER_MODE_MONO: u32 = <span class="number">2</span>;
-<span class="kw">const </span>FT_RENDER_MODE_LCD: u32 = <span class="number">3</span>;
-
-<span class="kw">const </span>FT_LOAD_TARGET_LIGHT: u32 = (FT_RENDER_MODE_LIGHT &amp; <span class="number">15</span>) &lt;&lt; <span class="number">16</span>;
-<span class="kw">const </span>FT_LOAD_TARGET_LCD: u32 = (FT_RENDER_MODE_LCD &amp; <span class="number">15</span>) &lt;&lt; <span class="number">16</span>;
-<span class="kw">const </span>FT_LOAD_TARGET_MONO: u32 = (FT_RENDER_MODE_MONO &amp; <span class="number">15</span>) &lt;&lt; <span class="number">16</span>;
-<span class="kw">const </span>FT_LOAD_TARGET_NORMAL: u32 = (FT_RENDER_MODE_NORMAL &amp; <span class="number">15</span>) &lt;&lt; <span class="number">16</span>;
-
-<span class="kw">const </span>FT_PIXEL_MODE_MONO: u8 = <span class="number">1</span>;
-<span class="kw">const </span>FT_PIXEL_MODE_GRAY: u8 = <span class="number">2</span>;
-<span class="kw">const </span>FT_PIXEL_MODE_LCD: u8 = <span class="number">5</span>;
-<span class="kw">const </span>FT_PIXEL_MODE_LCD_V: u8 = <span class="number">6</span>;
-
 <span class="kw">const </span>OS2_FS_SELECTION_OBLIQUE: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">9</span>;
 
 <span class="comment">// Not in our FreeType bindings, so we define these ourselves.
@@ -1331,14 +1326,27 @@
 </span><span class="kw">const </span>BDF_PROPERTY_TYPE_CARDINAL: BDF_PropertyType = <span class="number">3</span>;
 
 <span class="macro">thread_local!</span> {
-    <span class="kw">static </span>FREETYPE_LIBRARY: FT_Library = {
+    <span class="kw">static </span>FREETYPE_LIBRARY: FtLibrary = {
         <span class="kw">unsafe </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>library = ptr::null_mut();
             <span class="macro">assert_eq!</span>(FT_Init_FreeType(<span class="kw-2">&amp;mut </span>library), <span class="number">0</span>);
-            FT_Library_SetLcdFilter(library, FT_LcdFilter::FT_LCD_FILTER_DEFAULT);
-            library
+            FT_Library_SetLcdFilter(library, FT_LCD_FILTER_DEFAULT);
+            FtLibrary(library)
         }
     };
+}
+
+<span class="attr">#[repr(transparent)]
+</span><span class="kw">struct </span>FtLibrary(FT_Library);
+
+<span class="kw">impl </span>Drop <span class="kw">for </span>FtLibrary {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>library = ptr::null_mut();
+            mem::swap(<span class="kw-2">&amp;mut </span>library, <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>);
+            FT_Done_FreeType(library);
+        }
+    }
 }
 
 <span class="doccomment">/// The handle that the FreeType API natively uses to represent a font.
@@ -1374,7 +1382,7 @@
         FREETYPE_LIBRARY.with(|freetype_library| <span class="kw">unsafe </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>freetype_face = ptr::null_mut();
             <span class="kw">if </span>FT_New_Memory_Face(
-                <span class="kw-2">*</span>freetype_library,
+                freetype_library.<span class="number">0</span>,
                 (<span class="kw-2">*</span>font_data).as_ptr(),
                 font_data.len() <span class="kw">as </span>FT_Long,
                 font_index <span class="kw">as </span>FT_Long,
@@ -1427,7 +1435,7 @@
         <span class="kw">loop </span>{
             font_data.extend(iter::repeat(<span class="number">0</span>).take(CHUNK_SIZE));
             <span class="kw">let </span>freetype_stream = (<span class="kw-2">*</span>freetype_face).stream;
-            <span class="kw">let </span>n_read = ((<span class="kw-2">*</span>freetype_stream).read.unwrap())(
+            <span class="kw">let </span>n_read = ((<span class="kw-2">*</span>freetype_stream).read)(
                 freetype_stream,
                 font_data.len() <span class="kw">as </span>FT_ULong,
                 font_data.as_mut_ptr(),
@@ -1453,7 +1461,7 @@
         FREETYPE_LIBRARY.with(|freetype_library| <span class="kw">unsafe </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>freetype_face = ptr::null_mut();
             <span class="kw">if </span>FT_New_Memory_Face(
-                <span class="kw-2">*</span>freetype_library,
+                freetype_library.<span class="number">0</span>,
                 (<span class="kw-2">*</span>font_data).as_ptr(),
                 font_data.len() <span class="kw">as </span>FT_Long,
                 <span class="number">0</span>,
@@ -1481,7 +1489,7 @@
 
             <span class="kw">let </span><span class="kw-2">mut </span>freetype_face = ptr::null_mut();
             <span class="kw">if </span>FT_New_Memory_Face(
-                <span class="kw-2">*</span>freetype_library,
+                freetype_library.<span class="number">0</span>,
                 (<span class="kw-2">*</span>font_data).as_ptr(),
                 font_data.len() <span class="kw">as </span>FT_Long,
                 <span class="number">0</span>,
@@ -1637,7 +1645,7 @@
                 <span class="kw">unsafe </span>{ FT_Get_Name_Index(<span class="self">self</span>.freetype_face, ffi_name.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>c_char) };
 
             <span class="kw">if </span>code &gt; <span class="number">0 </span>{
-                <span class="kw">return </span><span class="prelude-val">Some</span>(u32::from(code));
+                <span class="kw">return </span><span class="prelude-val">Some</span>(code);
             }
         }
         <span class="prelude-val">None
@@ -1680,16 +1688,17 @@
                 </span>);
             }
 
-            <span class="kw">if </span>FT_Load_Glyph(<span class="self">self</span>.freetype_face, glyph_id, load_flags <span class="kw">as </span>i32) != <span class="number">0 </span>{
+            <span class="kw">if </span>FT_Load_Glyph(<span class="self">self</span>.freetype_face, glyph_id, load_flags) != <span class="number">0 </span>{
                 <span class="kw">return </span><span class="prelude-val">Err</span>(GlyphLoadingError::NoSuchGlyph);
             }
 
             <span class="kw">let </span>outline = <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.freetype_face).glyph).outline;
-            <span class="kw">let </span>contours =
-                slice::from_raw_parts((<span class="kw-2">*</span>outline).contours, (<span class="kw-2">*</span>outline).n_contours <span class="kw">as </span>usize);
-            <span class="kw">let </span>point_positions =
-                slice::from_raw_parts((<span class="kw-2">*</span>outline).points, (<span class="kw-2">*</span>outline).n_points <span class="kw">as </span>usize);
-            <span class="kw">let </span>point_tags = slice::from_raw_parts((<span class="kw-2">*</span>outline).tags, (<span class="kw-2">*</span>outline).n_points <span class="kw">as </span>usize);
+            <span class="kw">if </span>outline.n_contours == <span class="number">0 </span>{
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+            }
+            <span class="kw">let </span>contours = slice::from_raw_parts(outline.contours, outline.n_contours <span class="kw">as </span>usize);
+            <span class="kw">let </span>point_positions = slice::from_raw_parts(outline.points, outline.n_points <span class="kw">as </span>usize);
+            <span class="kw">let </span>point_tags = slice::from_raw_parts(outline.tags, outline.n_points <span class="kw">as </span>usize);
 
             <span class="kw">let </span><span class="kw-2">mut </span>current_point_index = <span class="number">0</span>;
             <span class="kw">for </span><span class="kw-2">&amp;</span>last_point_index_in_contour <span class="kw">in </span>contours {
@@ -1793,7 +1802,7 @@
             }
 
             <span class="kw">if </span>hinting.grid_fitting_size().is_some() {
-                reset_freetype_face_char_size((<span class="kw-2">*</span><span class="self">self</span>).freetype_face)
+                reset_freetype_face_char_size(<span class="self">self</span>.freetype_face)
             }
         }
 
@@ -1828,7 +1837,7 @@
             <span class="kw">if </span>FT_Load_Glyph(
                 <span class="self">self</span>.freetype_face,
                 glyph_id,
-                (FT_LOAD_DEFAULT | FT_LOAD_NO_HINTING) <span class="kw">as </span>i32,
+                FT_LOAD_DEFAULT | FT_LOAD_NO_HINTING,
             ) != <span class="number">0
             </span>{
                 <span class="kw">return </span><span class="prelude-val">Err</span>(GlyphLoadingError::NoSuchGlyph);
@@ -1853,7 +1862,7 @@
             <span class="kw">if </span>FT_Load_Glyph(
                 <span class="self">self</span>.freetype_face,
                 glyph_id,
-                (FT_LOAD_DEFAULT | FT_LOAD_NO_HINTING) <span class="kw">as </span>i32,
+                FT_LOAD_DEFAULT | FT_LOAD_NO_HINTING,
             ) != <span class="number">0
             </span>{
                 <span class="kw">return </span><span class="prelude-val">Err</span>(GlyphLoadingError::NoSuchGlyph);
@@ -1906,7 +1915,7 @@
 
     <span class="doccomment">/// Returns true if and only if the font loader can perform hinting in the requested way.
     ///
-    /// Some APIs support only rasterizing glyphs with hinting, not retriving hinted outlines. If
+    /// Some APIs support only rasterizing glyphs with hinting, not retrieving hinted outlines. If
     /// `for_rasterization` is false, this function returns true if and only if the loader supports
     /// retrieval of hinted *outlines*. If `for_rasterization` is true, this function returns true
     /// if and only if the loader supports *rasterizing* hinted glyphs.
@@ -1984,7 +1993,7 @@
 
     <span class="kw">fn </span>get_os2_table(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>TT_OS2&gt; {
         <span class="kw">unsafe </span>{
-            <span class="kw">let </span>table = FT_Get_Sfnt_Table(<span class="self">self</span>.freetype_face, FT_Sfnt_Tag::FT_SFNT_OS2);
+            <span class="kw">let </span>table = FT_Get_Sfnt_Table(<span class="self">self</span>.freetype_face, ft_sfnt_os2);
             <span class="kw">if </span>table.is_null() {
                 <span class="prelude-val">None
             </span>} <span class="kw">else </span>{
@@ -2067,7 +2076,7 @@
                 hinting_options,
                 rasterization_options,
             );
-            <span class="kw">if </span>FT_Load_Glyph(<span class="self">self</span>.freetype_face, glyph_id, load_flags <span class="kw">as </span>i32) != <span class="number">0 </span>{
+            <span class="kw">if </span>FT_Load_Glyph(<span class="self">self</span>.freetype_face, glyph_id, load_flags) != <span class="number">0 </span>{
                 <span class="kw">return </span><span class="prelude-val">Err</span>(GlyphLoadingError::NoSuchGlyph);
             }
 
@@ -2075,30 +2084,43 @@
             // need to keep this around for bilevel rendering, as the direct API doesn't work with
             // that mode.
             </span><span class="kw">let </span>bitmap = <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.freetype_face).glyph).bitmap;
-            <span class="kw">let </span>bitmap_stride = (<span class="kw-2">*</span>bitmap).pitch <span class="kw">as </span>usize;
-            <span class="kw">let </span>bitmap_width = (<span class="kw-2">*</span>bitmap).width <span class="kw">as </span>i32;
-            <span class="kw">let </span>bitmap_height = (<span class="kw-2">*</span>bitmap).rows <span class="kw">as </span>i32;
+            <span class="kw">let </span>bitmap_stride = bitmap.pitch <span class="kw">as </span>usize;
+            <span class="kw">let </span>bitmap_width = bitmap.width;
+            <span class="kw">let </span>bitmap_height = bitmap.rows;
             <span class="kw">let </span>bitmap_size = Vector2I::new(bitmap_width, bitmap_height);
-            <span class="kw">let </span>bitmap_buffer = (<span class="kw-2">*</span>bitmap).buffer <span class="kw">as </span><span class="kw-2">*const </span>i8 <span class="kw">as </span><span class="kw-2">*const </span>u8;
+            <span class="kw">let </span>bitmap_buffer = bitmap.buffer <span class="kw">as </span><span class="kw-2">*const </span>i8 <span class="kw">as </span><span class="kw-2">*const </span>u8;
             <span class="kw">let </span>bitmap_length = bitmap_stride * bitmap_height <span class="kw">as </span>usize;
-            <span class="kw">let </span>buffer = slice::from_raw_parts(bitmap_buffer, bitmap_length);
-            <span class="kw">let </span>dst_point = Vector2I::new(
-                (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.freetype_face).glyph).bitmap_left,
-                -(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.freetype_face).glyph).bitmap_top,
-            );
+            <span class="kw">if </span>bitmap_buffer.is_null() {
+                <span class="macro">assert_eq!</span>(
+                    bitmap_length, <span class="number">0</span>,
+                    <span class="string">"bitmap length should be 0 when bitmap_buffer is nullptr"
+                </span>);
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>buffer = slice::from_raw_parts(bitmap_buffer, bitmap_length);
+                <span class="kw">let </span>dst_point = Vector2I::new(
+                    (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.freetype_face).glyph).bitmap_left,
+                    -(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.freetype_face).glyph).bitmap_top,
+                );
 
-            <span class="comment">// FIXME(pcwalton): This function should return a Result instead.
-            </span><span class="kw">match </span>(<span class="kw-2">*</span>bitmap).pixel_mode {
-                FT_PIXEL_MODE_GRAY =&gt; {
-                    canvas.blit_from(dst_point, buffer, bitmap_size, bitmap_stride, Format::A8);
+                <span class="comment">// FIXME(pcwalton): This function should return a Result instead.
+                </span><span class="kw">match </span>bitmap.pixel_mode <span class="kw">as </span>u32 {
+                    FT_PIXEL_MODE_GRAY =&gt; {
+                        canvas.blit_from(dst_point, buffer, bitmap_size, bitmap_stride, Format::A8);
+                    }
+                    FT_PIXEL_MODE_LCD | FT_PIXEL_MODE_LCD_V =&gt; {
+                        canvas.blit_from(
+                            dst_point,
+                            buffer,
+                            bitmap_size,
+                            bitmap_stride,
+                            Format::Rgb24,
+                        );
+                    }
+                    FT_PIXEL_MODE_MONO =&gt; {
+                        canvas.blit_from_bitmap_1bpp(dst_point, buffer, bitmap_size, bitmap_stride);
+                    }
+                    <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Unexpected FreeType pixel mode!"</span>),
                 }
-                FT_PIXEL_MODE_LCD | FT_PIXEL_MODE_LCD_V =&gt; {
-                    canvas.blit_from(dst_point, buffer, bitmap_size, bitmap_stride, Format::Rgb24);
-                }
-                FT_PIXEL_MODE_MONO =&gt; {
-                    canvas.blit_from_bitmap_1bpp(dst_point, buffer, bitmap_size, bitmap_stride);
-                }
-                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Unexpected FreeType pixel mode!"</span>),
             }
 
             FT_Set_Transform(<span class="self">self</span>.freetype_face, ptr::null_mut(), ptr::null_mut());
@@ -2111,7 +2133,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         hinting: HintingOptions,
         rasterization: RasterizationOptions,
-    ) -&gt; u32 {
+    ) -&gt; i32 {
         <span class="kw">let </span><span class="kw-2">mut </span>options = <span class="kw">match </span>(hinting, rasterization) {
             (HintingOptions::VerticalSubpixel(<span class="kw">_</span>), <span class="kw">_</span>) | (<span class="kw">_</span>, RasterizationOptions::SubpixelAa) =&gt; {
                 FT_LOAD_TARGET_LCD
@@ -2206,11 +2228,14 @@
 
 <span class="kw">impl </span>Drop <span class="kw">for </span>Font {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="kw">unsafe </span>{
-            <span class="kw">if </span>!<span class="self">self</span>.freetype_face.is_null() {
+        <span class="comment">// The AccessError can be ignored, as it means FREETYPE_LIBRARY has already been
+        // destroyed, and it already destroys all FreeType resources.
+        // https://freetype.org/freetype2/docs/reference/ft2-module_management.html#ft_done_library
+        </span><span class="kw">let _ </span>= FREETYPE_LIBRARY.try_with(|freetype_library| <span class="kw">unsafe </span>{
+            <span class="kw">if </span>!freetype_library.<span class="number">0</span>.is_null() &amp;&amp; !<span class="self">self</span>.freetype_face.is_null() {
                 <span class="macro">assert_eq!</span>(FT_Done_Face(<span class="self">self</span>.freetype_face), <span class="number">0</span>);
             }
-        }
+        });
     }
 }
 
@@ -2387,16 +2412,6 @@
     }
 }
 
-<span class="attr">#[repr(C)]
-</span><span class="kw">struct </span>FT_SfntName {
-    platform_id: FT_UShort,
-    encoding_id: FT_UShort,
-    language_id: FT_UShort,
-    name_id: FT_UShort,
-    string: <span class="kw-2">*mut </span>FT_Byte,
-    string_len: FT_UInt,
-}
-
 <span class="kw">trait </span>F32ToFtFixed {
     <span class="kw">type </span>Output;
     <span class="kw">fn </span>f32_to_ft_fixed_26_6(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Output;
@@ -2453,16 +2468,21 @@
         value: <span class="kw-2">*mut </span>c_void,
         value_len: FT_Long,
     ) -&gt; FT_Long;
-    <span class="kw">fn </span>FT_Get_Sfnt_Name(face: FT_Face, idx: FT_UInt, aname: <span class="kw-2">*mut </span>FT_SfntName) -&gt; FT_Error;
-    <span class="kw">fn </span>FT_Get_Sfnt_Name_Count(face: FT_Face) -&gt; FT_UInt;
+    <span class="kw">fn </span>FT_Load_Sfnt_Table(
+        face: FT_Face,
+        tag: FT_ULong,
+        offset: FT_Long,
+        buffer: <span class="kw-2">*mut </span>FT_Byte,
+        length: <span class="kw-2">*mut </span>FT_ULong,
+    ) -&gt; FT_Error;
 }
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use </span><span class="kw">crate</span>::loaders::freetype::Font;
 
-    <span class="kw">static </span>PCF_FONT_PATH: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"resources/tests/times-roman-pcf/timR12.pcf"</span>;
-    <span class="kw">static </span>PCF_FONT_POSTSCRIPT_NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Times-Roman"</span>;
+    <span class="kw">static </span>PCF_FONT_PATH: <span class="kw-2">&amp;</span>str = <span class="string">"resources/tests/times-roman-pcf/timR12.pcf"</span>;
+    <span class="kw">static </span>PCF_FONT_POSTSCRIPT_NAME: <span class="kw-2">&amp;</span>str = <span class="string">"Times-Roman"</span>;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>get_pcf_postscript_name() {
