@@ -16,7 +16,6 @@ var hierarchy =
     [ "RBCalibration", "structRBCalibration.html", null ],
     [ "RBEvent", "structRBEvent.html", null ],
     [ "RBEventHeader", "structRBEventHeader.html", null ],
-    [ "RBEventMemoryView", "structRBEventMemoryView.html", null ],
     [ "RBMissingHit", "structRBMissingHit.html", null ],
     [ "RBMoniData", "structRBMoniData.html", null ],
     [ "RBWaveform", "structRBWaveform.html", null ],
@@ -26,6 +25,5 @@ var hierarchy =
     [ "TofEventSummary", "structTofEventSummary.html", null ],
     [ "TofHit", "structTofHit.html", null ],
     [ "TofPacket", "structTofPacket.html", null ],
-    [ "Gaps::TofPacketReader", "classGaps_1_1TofPacketReader.html", null ],
-    [ "GAPS::Waveform", "classGAPS_1_1Waveform.html", null ]
+    [ "Gaps::TofPacketReader", "classGaps_1_1TofPacketReader.html", null ]
 ];

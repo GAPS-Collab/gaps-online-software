@@ -381,17 +381,17 @@
 ///  A -&gt; /dev/uio1
 ///  B -&gt; /dev/uio2
 </span><span class="attr">#[derive(Debug, Copy, Clone)]
-</span><span class="kw">pub enum </span>BlobBuffer {
+</span><span class="kw">pub enum </span>RamBuffer {
   A,
   B,
   <span class="comment">//Both
 </span>}
 
-<span class="kw">impl </span>BlobBuffer {
-  <span class="kw">pub fn </span>invert(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BlobBuffer {
+<span class="kw">impl </span>RamBuffer {
+  <span class="kw">pub fn </span>invert(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RamBuffer {
     <span class="kw">match </span><span class="self">self </span>{
-      BlobBuffer::A =&gt; {<span class="kw">return </span>BlobBuffer::B},
-      BlobBuffer::B =&gt; {<span class="kw">return </span>BlobBuffer::A}
+      RamBuffer::A =&gt; {<span class="kw">return </span>RamBuffer::B},
+      RamBuffer::B =&gt; {<span class="kw">return </span>RamBuffer::A}
     }
   }
 }
@@ -511,7 +511,7 @@
 ///  * which : Select data buffer to read 
 ///  * size  : in bytes
 ///
-</span><span class="kw">pub fn </span>read_data_buffer(which : <span class="kw-2">&amp;</span>BlobBuffer, 
+</span><span class="kw">pub fn </span>read_data_buffer(which : <span class="kw-2">&amp;</span>RamBuffer, 
                         size  : usize)
     -&gt; <span class="prelude-ty">Result</span>&lt;Vec::&lt;u8&gt;, RegisterError&gt; 
   <span class="kw">where
@@ -519,8 +519,8 @@
 
   <span class="kw">let </span>addr_space;
   <span class="kw">match </span>which {
-    BlobBuffer::A =&gt; addr_space = UIO1,
-    BlobBuffer::B =&gt; addr_space = UIO2
+    RamBuffer::A =&gt; addr_space = UIO1,
+    RamBuffer::B =&gt; addr_space = UIO2
   }
   <span class="comment">//let blobsize = BlobData::SERIALIZED_SIZE;
   //let vec_size = blobsize*len;
@@ -557,7 +557,7 @@
 ///     * which    : Select data buffer to read 
 ///     * size     : in bytes
 ///     * streamer : an instance of a RBEventMemoryStreamer
-</span><span class="kw">pub fn </span>read_buffer_into_streamer(which    : <span class="kw-2">&amp;</span>BlobBuffer, 
+</span><span class="kw">pub fn </span>read_buffer_into_streamer(which    : <span class="kw-2">&amp;</span>RamBuffer, 
                                  size     : usize,
                                  streamer : <span class="kw-2">&amp;mut </span>RBEventMemoryStreamer)
     -&gt; <span class="prelude-ty">Result</span>&lt;(), RegisterError&gt; 
@@ -566,8 +566,8 @@
 
   <span class="kw">let </span>addr_space;
   <span class="kw">match </span>which {
-    BlobBuffer::A =&gt; addr_space = UIO1,
-    BlobBuffer::B =&gt; addr_space = UIO2
+    RamBuffer::A =&gt; addr_space = UIO1,
+    RamBuffer::B =&gt; addr_space = UIO2
   }
   <span class="kw">let </span>m = <span class="kw">match </span>map_physical_mem_read(addr_space, <span class="number">0x0</span>, size) {
   <span class="comment">//let mut m = match map_physical_mem_write(addr_space, 0x0, size) {

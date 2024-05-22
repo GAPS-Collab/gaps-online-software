@@ -216,6 +216,16 @@
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
 <a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Standalone application to get events from the MTB (master trigger board)
 //!
 //! This will connect to the MTB over Udp and request the event queue, 
@@ -226,7 +236,12 @@
 //!
 //!
 
-</span><span class="kw">extern crate </span>zmq;
+</span><span class="kw">use </span>std::sync::{
+    Arc,
+    Mutex,
+};
+
+<span class="kw">extern crate </span>zmq;
 
 <span class="attr">#[macro_use] </span><span class="kw">extern crate </span>log;
 <span class="kw">extern crate </span>crossbeam_channel;
@@ -238,8 +253,11 @@
 <span class="kw">use </span>std::thread;
 
 <span class="comment">//use tof_dataclasses::threading::ThreadControl;
+</span><span class="kw">use </span>tof_dataclasses::threading::{
+    ThreadControl,
+};
 
-//use tof_dataclasses::commands::RBCommand;
+<span class="comment">//use tof_dataclasses::commands::RBCommand;
 </span><span class="kw">use </span>liftof_lib::{
     init_env_logger,
     LiftofSettings
@@ -349,6 +367,7 @@
   <span class="kw">let </span>verbose             = args.verbose;
   <span class="kw">let </span>publish_packets     = args.publish_packets;
   <span class="kw">let </span>relay_rbs           = args.relay_rbs;
+  <span class="kw">let </span>thread_control = Arc::new(Mutex::new(ThreadControl::new()));
 
   <span class="kw">let </span>_worker_thread = thread::Builder::new()
          .name(<span class="string">"master_trigger"</span>.into())
@@ -357,6 +376,7 @@
                            <span class="kw-2">&amp;</span>mte_send,
                            <span class="kw-2">&amp;</span>tp_send_moni,
                            mtb_settings,
+                           thread_control,
                            verbose);
          })
          .expect(<span class="string">"Failed to spawn master_trigger thread!"</span>);

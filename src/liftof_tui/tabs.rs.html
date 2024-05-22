@@ -28,31 +28,47 @@
 <a href="#26" id="26">26</a>
 <a href="#27" id="27">27</a>
 <a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>tab_mt;
 <span class="kw">pub mod </span>tab_home;
-<span class="kw">pub mod </span>tab_status;
+<span class="kw">pub mod </span>tab_rbs;
 <span class="kw">pub mod </span>tab_settings;
 <span class="kw">pub mod </span>tab_events;
 <span class="kw">pub mod </span>tab_cpu;
 <span class="kw">pub mod </span>tab_rbwaveform;
 <span class="kw">pub mod </span>tab_tofsummary;
 <span class="kw">pub mod </span>tab_tofhit;
+<span class="kw">pub mod </span>tab_telemetry;
 
 <span class="kw">pub use </span><span class="kw">crate</span>::tab_mt::MTTab;
 <span class="kw">pub use </span><span class="kw">crate</span>::tab_settings::SettingsTab;
 <span class="kw">pub use </span><span class="kw">crate</span>::tab_home::HomeTab;
 <span class="kw">pub use </span><span class="kw">crate</span>::tab_events::EventTab;
-<span class="kw">pub use </span><span class="kw">crate</span>::tab_status::{
-        RBTab,
-        RBTabView
+<span class="kw">pub use </span><span class="kw">crate</span>::tab_rbs::{
+    RBTab,
+    RBTabView,
+    RBLTBListFocus,
+};
+<span class="kw">pub use </span><span class="kw">crate</span>::tab_telemetry::{
+    TelemetryTab
 };
 
+
 <span class="kw">pub use </span><span class="kw">crate</span>::tab_rbwaveform::RBWaveformTab;
+<span class="kw">pub use </span><span class="kw">crate</span>::tab_tofsummary::TofSummaryTab;
 
 <span class="kw">pub use </span><span class="kw">crate</span>::tab_tofhit::{
     TofHitTab,
     TofHitView,
 };
+
 <span class="kw">pub use </span><span class="kw">crate</span>::tab_cpu::CPUTab;
 
 

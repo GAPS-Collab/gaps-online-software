@@ -34,6 +34,9 @@
 <a href="#32" id="32">32</a>
 <a href="#33" id="33">33</a>
 <a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Global constants for TOF operations
 //!
 //! ISSUES:
@@ -42,7 +45,10 @@
 //!   now. There is an active issue #18
 //!
 
-/// Speed of light in the scintillator paddles
+/// The TimeStamp format for Human readable timestamps
+</span><span class="kw">pub static </span>HUMAN_TIMESTAMP_FORMAT : <span class="kw-2">&amp;</span>str = <span class="string">"%y%m%d_%H%M%S%Z"</span>; 
+
+<span class="doccomment">/// Speed of light in the scintillator paddles
 /// (divine number from the TOF team)
 /// This value is in cm/ns
 </span><span class="kw">pub const </span>C_LIGHT_PADDLE : f32 = <span class="number">15.4</span>; 

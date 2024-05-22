@@ -1,0 +1,74 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A convenient macro to execute a Python code snippet, with some local variables set."><title>py_run in pyo3 - Rust</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="pyo3" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-4c98445ec4002617.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc macro"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../pyo3/index.html">pyo3</a><span class="version">0.19.2</span></h2></div><div class="sidebar-elems"></div></nav><div class="sidebar-resizer"></div>
+    <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../pyo3/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Macro <a href="index.html">pyo3</a>::<wbr><a class="macro" href="#">py_run</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/pyo3/macros.rs.html#81-94">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><span class="macro">macro_rules!</span> py_run {
+    (<span class="macro-nonterminal">$py</span>:expr, $(<span class="macro-nonterminal">$val</span>:ident)+, <span class="macro-nonterminal">$code</span>:literal) =&gt; { ... };
+    (<span class="macro-nonterminal">$py</span>:expr, $(<span class="macro-nonterminal">$val</span>:ident)+, <span class="macro-nonterminal">$code</span>:expr) =&gt; { ... };
+    (<span class="macro-nonterminal">$py</span>:expr, <span class="kw-2">*</span><span class="macro-nonterminal">$dict</span>:expr, <span class="macro-nonterminal">$code</span>:literal) =&gt; { ... };
+    (<span class="macro-nonterminal">$py</span>:expr, <span class="kw-2">*</span><span class="macro-nonterminal">$dict</span>:expr, <span class="macro-nonterminal">$code</span>:expr) =&gt; { ... };
+}</pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A convenient macro to execute a Python code snippet, with some local variables set.</p>
+<h2 id="panics"><a class="doc-anchor" href="#panics">§</a>Panics</h2>
+<p>This macro internally calls <a href="marker/struct.Python.html#method.run" title="method pyo3::marker::Python::run"><code>Python::run</code></a> and panics
+if it returns <code>Err</code>, after printing the error to stdout.</p>
+<p>If you need to handle failures, please use <a href="marker/struct.Python.html#method.run" title="method pyo3::marker::Python::run"><code>Python::run</code></a> instead.</p>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>pyo3::{prelude::<span class="kw-2">*</span>, py_run, types::PyList};
+
+Python::with_gil(|py| {
+    <span class="kw">let </span>list = PyList::new(py, <span class="kw-2">&amp;</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
+    <span class="macro">py_run!</span>(py, list, <span class="string">"assert list == [1, 2, 3]"</span>);
+});</code></pre></div>
+<p>You can use this macro to test pyfunctions or pyclasses quickly.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>pyo3::{prelude::<span class="kw-2">*</span>, py_run};
+
+<span class="attr">#[pyclass]
+#[derive(Debug)]
+</span><span class="kw">struct </span>Time {
+    hour: u32,
+    minute: u32,
+    second: u32,
+}
+
+<span class="attr">#[pymethods]
+</span><span class="kw">impl </span>Time {
+    <span class="kw">fn </span>repl_japanese(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">"{}時{}分{}秒"</span>, <span class="self">self</span>.hour, <span class="self">self</span>.minute, <span class="self">self</span>.second)
+    }
+    <span class="attr">#[getter]
+    </span><span class="kw">fn </span>hour(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.hour
+    }
+    <span class="kw">fn </span>as_tuple(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (u32, u32, u32) {
+        (<span class="self">self</span>.hour, <span class="self">self</span>.minute, <span class="self">self</span>.second)
+    }
+}
+
+Python::with_gil(|py| {
+    <span class="kw">let </span>time = PyCell::new(py, Time {hour: <span class="number">8</span>, minute: <span class="number">43</span>, second: <span class="number">16</span>}).unwrap();
+    <span class="kw">let </span>time_as_tuple = (<span class="number">8</span>, <span class="number">43</span>, <span class="number">16</span>);
+    <span class="macro">py_run!</span>(py, time time_as_tuple, <span class="string">r#"
+        assert time.hour == 8
+        assert time.repl_japanese() == "8時43分16秒"
+        assert time.as_tuple() == time_as_tuple
+    "#</span>);
+});</code></pre></div>
+<p>If you need to prepare the <code>locals</code> dict by yourself, you can pass it as <code>*locals</code>.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>pyo3::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>pyo3::types::IntoPyDict;
+
+<span class="attr">#[pyclass]
+</span><span class="kw">struct </span>MyClass;
+
+<span class="attr">#[pymethods]
+</span><span class="kw">impl </span>MyClass {
+    <span class="attr">#[new]
+    </span><span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        MyClass {}
+    }
+}
+
+Python::with_gil(|py| {
+    <span class="kw">let </span>locals = [(<span class="string">"C"</span>, py.get_type::&lt;MyClass&gt;())].into_py_dict(py);
+    <span class="macro">pyo3::py_run!</span>(py, <span class="kw-2">*</span>locals, <span class="string">"c = C()"</span>);
+});</code></pre></div>
+</div></details></section></div></main></body></html>

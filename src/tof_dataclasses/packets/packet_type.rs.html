@@ -157,6 +157,14 @@
 <a href="#155" id="155">155</a>
 <a href="#156" id="156">156</a>
 <a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// PacketType identifies the payload in TofPackets
 ///
 /// This needs to be kept in sync with the C++ API
@@ -170,9 +178,13 @@
   }
 }
 
+<span class="attr">#[cfg(feature = <span class="string">"pybindings"</span>)]
+</span><span class="kw">use </span>pyo3::pyclass;
+
 <span class="doccomment">/// Types of serializable data structures used
 /// throughout the tof system
 </span><span class="attr">#[derive(Debug, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass)]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>PacketType {
   Unknown             = <span class="number">0u8</span>, 
@@ -186,7 +198,7 @@
   </span>RBEventHeader       = <span class="number">70u8</span>,    <span class="comment">// needs to go away
   </span>CPUMoniData         = <span class="number">80u8</span>,
   MonitorMtb          = <span class="number">90u8</span>,
-  RBMoni              = <span class="number">100u8</span>,
+  RBMoniData          = <span class="number">100u8</span>,
   PBMoniData          = <span class="number">101u8</span>,
   LTBMoniData         = <span class="number">102u8</span>,
   PAMoniData          = <span class="number">103u8</span>,
@@ -194,6 +206,7 @@
                                // still needs to be processed.
   </span>RBCalibration       = <span class="number">130u8</span>,
   TofCommand          = <span class="number">140u8</span>,
+  TofResponse         = <span class="number">142u8</span>,
   RBCommand           = <span class="number">150u8</span>,
   Ping                = <span class="number">160u8</span>,
   <span class="comment">// use the &gt; 200 values for transmitting
@@ -229,13 +242,14 @@
       <span class="number">70u8  </span>=&gt; PacketType::RBEventHeader,
       <span class="number">80u8  </span>=&gt; PacketType::CPUMoniData,
       <span class="number">90u8  </span>=&gt; PacketType::MonitorMtb,
-      <span class="number">100u8 </span>=&gt; PacketType::RBMoni,
+      <span class="number">100u8 </span>=&gt; PacketType::RBMoniData,
       <span class="number">101u8 </span>=&gt; PacketType::PBMoniData   ,
       <span class="number">102u8 </span>=&gt; PacketType::LTBMoniData  ,
       <span class="number">103u8 </span>=&gt; PacketType::PAMoniData   ,
       <span class="number">120u8 </span>=&gt; PacketType::RBEventMemoryView,
       <span class="number">130u8 </span>=&gt; PacketType::RBCalibration,
       <span class="number">140u8 </span>=&gt; PacketType::TofCommand,
+      <span class="number">142u8 </span>=&gt; PacketType::TofResponse,
       <span class="number">150u8 </span>=&gt; PacketType::RBCommand,
       <span class="number">160u8 </span>=&gt; PacketType::Ping,
       <span class="number">201u8 </span>=&gt; PacketType::ConfigBinary,
@@ -264,8 +278,9 @@
       PacketType::RBEvent,
       PacketType::RBEventMemoryView,
       PacketType::TofCommand,
+      PacketType::TofResponse,
       PacketType::RBCommand,
-      PacketType::RBMoni,
+      PacketType::RBMoniData,
       PacketType::PBMoniData,
       PacketType::LTBMoniData,
       PacketType::PAMoniData,
@@ -297,8 +312,9 @@
   type_codes.push(PacketType::RBEvent <span class="kw">as </span>u8);
   type_codes.push(PacketType::RBEventMemoryView <span class="kw">as </span>u8);
   type_codes.push(PacketType::TofCommand <span class="kw">as </span>u8);
+  type_codes.push(PacketType::TofResponse <span class="kw">as </span>u8);
   type_codes.push(PacketType::RBCommand <span class="kw">as </span>u8);
-  type_codes.push(PacketType::RBMoni <span class="kw">as </span>u8);
+  type_codes.push(PacketType::RBMoniData <span class="kw">as </span>u8);
   type_codes.push(PacketType::PBMoniData <span class="kw">as </span>u8);
   type_codes.push(PacketType::LTBMoniData <span class="kw">as </span>u8);
   type_codes.push(PacketType::PAMoniData <span class="kw">as </span>u8);

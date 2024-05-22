@@ -101,7 +101,11 @@
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
-</pre></div><pre class="rust"><code><span class="doccomment">/// LTB Data Type
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
+
+<span class="doccomment">/// LTB Data Type
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>LTBMoniData {
     <span class="kw">pub </span>temperature: LTBTemp,
@@ -109,14 +113,14 @@
 }
 
 <span class="comment">// LTB Temperature Sensor
-</span><span class="attr">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>LTBTemp {
     <span class="kw">pub </span>trenz_temp: f32,
     <span class="kw">pub </span>board_temp: f32,
 }
 
 <span class="comment">// LTB Threshold Voltages
-</span><span class="attr">#[derive(Debug)]
+</span><span class="attr">#[derive(Debug, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>LTBThreshold {
     <span class="kw">pub </span>thresholds: [f32; <span class="number">3</span>],
 }

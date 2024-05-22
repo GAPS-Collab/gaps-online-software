@@ -9,15 +9,9 @@ var namespaceGaps =
     [ "parse_i32", "namespaceGaps.html#a2fa35da8776bb053ebdb6f9da7ea245e", null ],
     [ "parse_u16", "namespaceGaps.html#a8d5ee03930328391169c3f11a9b06e8e", null ],
     [ "parse_u32", "namespaceGaps.html#ac09d7b4a66f0df27a63af339dd6d7ea8", null ],
-    [ "parse_u32_for_16bit_words", "namespaceGaps.html#af77731e0cae916409314f6a8c44c0622", null ],
-    [ "parse_u48_for_16bit_words", "namespaceGaps.html#a227fc43c4890ccddb69dba88a82c7a5a", null ],
     [ "parse_u64", "namespaceGaps.html#aa913722aa6668823951e07f44b8698d6", null ],
     [ "parse_u8", "namespaceGaps.html#af02b80458f7649651a342344e3b103ee", null ],
     [ "set_loglevel", "namespaceGaps.html#a212013efcb580c37612821937fa4ff8d", null ],
     [ "severity_to_str", "namespaceGaps.html#a63983ede070cd10b4e310de973772319", null ],
-    [ "slice", "namespaceGaps.html#a22fc40b41968b7d4462f0c11ac07b53f", null ],
-    [ "u32_from_be_bytes", "namespaceGaps.html#a2b7380cce1160bf677b6db59f2f73708", null ],
-    [ "u32_from_le_bytes", "namespaceGaps.html#a080f0ddfc1acdfd20d34ee1a05dc94ea", null ],
-    [ "u32_to_le_bytes", "namespaceGaps.html#a408dcd7e14dffcc0e3b239335bbaffb3", null ],
-    [ "u64_from_le_bytes", "namespaceGaps.html#a5951f624ffb61311c0bedde6901f721f", null ]
+    [ "slice", "namespaceGaps.html#a22fc40b41968b7d4462f0c11ac07b53f", null ]
 ];

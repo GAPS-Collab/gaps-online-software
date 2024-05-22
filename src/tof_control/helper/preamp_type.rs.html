@@ -109,7 +109,11 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
-</pre></div><pre class="rust"><code><span class="attr">#[derive(Debug)]
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
+
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>PreampMoniData {
     <span class="comment">// Preamp Temperature Sensors
     </span><span class="kw">pub </span>temperature: PreampTemp,
@@ -117,12 +121,12 @@
     </span><span class="kw">pub </span>read_bias: PreampReadBias,
 }
 
-<span class="attr">#[derive(Debug)]
+<span class="attr">#[derive(Debug, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>PreampTemp {
     <span class="kw">pub </span>preamp_temps: [f32; <span class="number">16</span>],
 }
 
-<span class="attr">#[derive(Debug)]
+<span class="attr">#[derive(Debug, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>PreampReadBias {
     <span class="kw">pub </span>read_biases: [f32; <span class="number">16</span>],
 }

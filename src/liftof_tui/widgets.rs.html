@@ -224,11 +224,99 @@
 <a href="#222" id="222">222</a>
 <a href="#223" id="223">223</a>
 <a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::VecDeque;
 
 <span class="kw">use </span>ratatui::symbols;
+<span class="kw">use </span>ratatui::symbols::line::<span class="kw-2">*</span>;
 <span class="kw">use </span>ratatui::text::Span;
 <span class="kw">use </span>ratatui::style::{
+    Modifier,
     Color,
     Style,
 };
@@ -236,20 +324,38 @@
     Axis,
     Block,
     BorderType,
+    BarChart,
     GraphType,
     Dataset,
     Chart,
+    LineGauge,
     Borders,
 };
 
 <span class="comment">//extern crate ndhistogram;
 </span><span class="kw">use </span>ndhistogram::{
-    ndhistogram,
-    Histogram,
+    <span class="comment">//ndhistogram,
+    </span>Histogram,
     Hist1D,
 };
 <span class="kw">use </span>ndhistogram::axis::{
     Uniform,
+};
+
+<span class="kw">pub const </span>LG_LINE_HORIZONTAL : <span class="kw-2">&amp;</span>str = <span class="string">"░"</span>;
+<span class="kw">pub const </span>LG_LINE: Set = Set {
+        vertical         : THICK_VERTICAL,
+        <span class="comment">//horizontal       : THICK_HORIZONTAL,
+        </span>horizontal       : LG_LINE_HORIZONTAL,
+        top_right        : THICK_TOP_RIGHT,
+        top_left         : THICK_TOP_LEFT,
+        bottom_right     : THICK_BOTTOM_RIGHT,
+        bottom_left      : THICK_BOTTOM_LEFT,
+        vertical_left    : THICK_VERTICAL_LEFT,
+        vertical_right   : THICK_VERTICAL_RIGHT,
+        horizontal_down  : THICK_HORIZONTAL_DOWN,
+        horizontal_up    : THICK_HORIZONTAL_UP,
+        cross            : THICK_CROSS,
 };
 
 <span class="comment">//extern crate num_traits;
@@ -260,37 +366,28 @@
 };
 
 
-<span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">struct </span>HistoDisplay {
-  <span class="kw">pub </span>nbin     : usize,
-  <span class="kw">pub </span>bin_low  : f32,
-  <span class="kw">pub </span>bin_high : f32,
-  <span class="kw">pub </span>histo    : Hist1D&lt;Uniform&lt;f32&gt;&gt;,
-}
+<span class="comment">//#[derive(Debug, Clone)]
+//struct HistoDisplay {
+//  pub nbin     : usize,
+//  pub bin_low  : f32,
+//  pub bin_high : f32,
+//  pub histo    : Hist1D&lt;Uniform&lt;f32&gt;&gt;,
+//}
+//
+//impl HistoDisplay {
+//  pub fn new(nbin : usize, bin_low : f32, bin_high : f32) -&gt; Self {
+//    let bins = Uniform::new(nbin, bin_low, bin_high);  
+//    Self {
+//      nbin     : nbin,
+//      bin_low  : bin_low,
+//      bin_high : bin_high,
+//      histo    : ndhistogram!(bins), 
+//    }
+//  }
+//}
 
-<span class="kw">impl </span>HistoDisplay {
-  <span class="kw">pub fn </span>new(nbin : usize, bin_low : f32, bin_high : f32) -&gt; <span class="self">Self </span>{
-    <span class="kw">let </span>bins = Uniform::new(nbin, bin_low, bin_high);  
-    <span class="self">Self </span>{
-      nbin     : nbin,
-      bin_low  : bin_low,
-      bin_high : bin_high,
-      histo    : <span class="macro">ndhistogram!</span>(bins), 
-    }
-  }
-}
 
-<span class="doccomment">/// Create the labels for a certain histogram
-/// for rendering
-</span><span class="kw">pub fn </span>create_labels(histo : <span class="kw-2">&amp;</span>Hist1D&lt;Uniform&lt;f32&gt;&gt;) -&gt; Vec&lt;String&gt; {
-  <span class="kw">let </span><span class="kw-2">mut </span>labels = Vec::&lt;String&gt;::new();
-  <span class="kw">for </span>bin <span class="kw">in </span>histo.iter() {
-    labels.push(<span class="macro">format!</span>(<span class="string">"{}"</span>,bin.index <span class="kw">as </span>u64));
-  }
-  labels
-}
-
-<span class="doccomment">/// Adapt the bins of the histogram for the 
+</span><span class="doccomment">/// Adapt the bins of the histogram for the 
 /// bar chart which will get rendered.
 /// Always show a minimum number of bins, 
 /// but if the max y-bin is "too far to the left"
@@ -326,32 +423,77 @@
   clean_data
 }
 
+<span class="doccomment">/// Create the labels for a certain histogram
+/// for rendering
+</span><span class="kw">pub fn </span>create_labels(histo : <span class="kw-2">&amp;</span>Hist1D&lt;Uniform&lt;f32&gt;&gt;) -&gt; Vec&lt;String&gt; {
+  <span class="kw">let </span><span class="kw-2">mut </span>labels = Vec::&lt;String&gt;::new();
+  <span class="kw">for </span>bin <span class="kw">in </span>histo.iter() {
+    <span class="kw">match </span>bin.bin.start() {
+      <span class="prelude-val">None </span>=&gt; {
+        labels.push(String::from(<span class="string">"x"</span>));
+      },
+      <span class="prelude-val">Some</span>(value) =&gt; {
+        labels.push(<span class="macro">format!</span>(<span class="string">"{}"</span>, value <span class="kw">as </span>u64));
+      }
+    }
+  }
+  labels
+}
+
 <span class="comment">// FIXME - merge this with clean data
+</span><span class="doccomment">/// Prepare data for histogram widget
+///
+/// # Arguments:
+///
+/// * remove_uf   : Remove underflow bin
 </span><span class="kw">pub fn </span>prep_data&lt;<span class="lifetime">'a</span>&gt;(histo      : <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Hist1D&lt;Uniform&lt;f32&gt;&gt;, 
                      labels     : <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Vec&lt;String&gt;,
-                     spacing    : usize) -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,u64)&gt; {
+                     spacing    : usize,
+                     remove_uf  : bool) -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,u64)&gt; {
   <span class="kw">let </span><span class="kw-2">mut </span>data = Vec::&lt;(<span class="kw-2">&amp;</span>str, u64)&gt;::new();
-  <span class="kw">let </span><span class="kw-2">mut </span>cnt = <span class="number">0usize</span>;
-  <span class="kw">for </span>bin <span class="kw">in </span>histo.iter() {
-    <span class="kw">if </span>cnt % spacing != <span class="number">0 </span>{
-      data.push((<span class="string">""</span>, <span class="kw-2">*</span>bin.value <span class="kw">as </span>u64));
-    } <span class="kw">else </span>{
-      data.push((<span class="kw-2">&amp;</span>labels[cnt], <span class="kw-2">*</span>bin.value <span class="kw">as </span>u64));
+  <span class="kw">for </span>(k,bin) <span class="kw">in </span>histo.iter().enumerate() {
+    <span class="kw">if </span>k == <span class="number">0 </span>&amp;&amp; remove_uf {
+      <span class="kw">continue</span>;
     }
-    cnt += <span class="number">1</span>;
+    <span class="kw">if </span>k == <span class="number">1 </span>&amp;&amp; remove_uf {
+      data.push((<span class="kw-2">&amp;</span>labels[k], <span class="kw-2">*</span>bin.value <span class="kw">as </span>u64));
+      <span class="kw">continue</span>;
+    }
+    <span class="comment">// k+1 to account for underflow bin
+    </span><span class="kw">if </span>k % spacing != <span class="number">0 </span>{
+      data.push((<span class="string">"-"</span>, <span class="kw-2">*</span>bin.value <span class="kw">as </span>u64));
+    } <span class="kw">else </span>{
+      data.push((<span class="kw-2">&amp;</span>labels[k], <span class="kw-2">*</span>bin.value <span class="kw">as </span>u64));
+    }
   }
   data
 }
 
-<span class="kw">pub fn </span>histogram(nbin : usize, bin_low : f32,
-                 bin_high : f32,
-                 data : Vec&lt;f32&gt;) -&gt; Hist1D&lt;Uniform&lt;f32&gt;&gt; {
-  <span class="kw">let </span>bins = Uniform::new(nbin, bin_low, bin_high);
-  <span class="kw">let </span><span class="kw-2">mut </span>histo = <span class="macro">ndhistogram!</span>(bins);
-  <span class="kw">for </span>k <span class="kw">in </span>data {
-    histo.fill(<span class="kw-2">&amp;</span>k);
-  }
-  histo
+<span class="kw">pub fn </span>histogram&lt;<span class="lifetime">'a</span>&gt;(hist_data : Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, u64)&gt;,
+                     title     : String,
+                     bar_width : u16,
+                     bar_gap   : u16,
+                     theme     : <span class="kw-2">&amp;</span>ColorTheme) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
+  <span class="comment">//let bins = Uniform::new(nbin, bin_low, bin_high);
+  //let mut histo = ndhistogram!(bins);
+  //for k in data {
+  //  histo.fill(&amp;k);
+  //}
+  </span><span class="kw">let </span>chart  = BarChart::default()
+    .block(Block::default().title(title).borders(Borders::ALL))
+    .data(hist_data.as_slice())
+    .bar_width(bar_width)
+    .bar_gap(bar_gap)
+    <span class="comment">//.bar_style(Style::default().fg(Color::Blue))
+    </span>.bar_style(theme.style())
+    .value_style(
+      theme.style()
+      <span class="comment">//Style::default()
+      //.bg(Color::Blue)
+      </span>.add_modifier(Modifier::BOLD),
+    )
+    .style(theme.background());
+  chart
 }
 
 <span class="kw">pub fn </span>timeseries&lt;<span class="lifetime">'a</span>&gt;(data        : <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>VecDeque&lt;(f64,f64)&gt;,
@@ -433,7 +575,7 @@
         .borders(Borders::ALL)
         .style(theme.style())
         .title(xlabel )
-        .border_type(BorderType::Double),
+        .border_type(BorderType::Rounded),
     )
     .x_axis(Axis::default()
       .title(Span::styled(<span class="string">"MET [s]"</span>, Style::default().fg(Color::White)))
@@ -448,4 +590,34 @@
     .style(theme.style());
     chart
 }
+
+
+<span class="doccomment">/// A simple line gauge, that is bacically a progress bar
+</span><span class="kw">pub fn </span>gauge(title : String,
+             label : String,
+             ratio : f64,
+             theme : <span class="kw-2">&amp;</span>ColorTheme) -&gt; LineGauge {
+    <span class="kw">let </span>gauge = LineGauge::default()
+      .block(
+        Block::default()
+        .borders(Borders::ALL)
+        .style(theme.style())
+        .title(title)
+        .border_type(BorderType::Rounded)
+      )
+      .gauge_style(
+        Style::default()
+          .fg(theme.hc)
+          .bg(theme.bg1)
+          .add_modifier(Modifier::BOLD)
+      )
+      <span class="comment">//.use_unicode(true)
+      </span>.label(label)
+      <span class="comment">//.line_set(symbols::line::THICK)  // THICK
+      </span>.line_set(LG_LINE)
+      <span class="comment">//.percent(self.disk_usage as u16);
+      </span>.ratio(ratio);
+    gauge
+}
+
 </code></pre></div></section></main></body></html>

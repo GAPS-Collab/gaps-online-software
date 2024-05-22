@@ -475,6 +475,104 @@
 <a href="#473" id="473">473</a>
 <a href="#474" id="474">474</a>
 <a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
+<a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
+<a href="#488" id="488">488</a>
+<a href="#489" id="489">489</a>
+<a href="#490" id="490">490</a>
+<a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
+<a href="#493" id="493">493</a>
+<a href="#494" id="494">494</a>
+<a href="#495" id="495">495</a>
+<a href="#496" id="496">496</a>
+<a href="#497" id="497">497</a>
+<a href="#498" id="498">498</a>
+<a href="#499" id="499">499</a>
+<a href="#500" id="500">500</a>
+<a href="#501" id="501">501</a>
+<a href="#502" id="502">502</a>
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
+<a href="#505" id="505">505</a>
+<a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
+<a href="#509" id="509">509</a>
+<a href="#510" id="510">510</a>
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Packets are a way to send data over the network.
 //!
 //! Data gets serialized to a bytestream and then 
@@ -490,12 +588,13 @@
 //!
 //! The total packet size is thus 13 + SIZE
 
+</span><span class="kw">pub mod </span>packet_type;
+<span class="kw">pub use </span>packet_type::PacketType;
 
-
-</span><span class="comment">// re-imports
-</span><span class="kw">use </span>std::time::Instant;
+<span class="kw">use </span>std::time::Instant;
 <span class="kw">use </span>std::fmt;
-<span class="kw">pub use </span><span class="kw">crate</span>::monitoring::{
+<span class="comment">// re-exports
+</span><span class="kw">pub use </span><span class="kw">crate</span>::monitoring::{
     RBMoniData,
     PBMoniData,
     LTBMoniData,
@@ -506,16 +605,17 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::serialization::{
     Serialization, 
+    Packable,
     parse_u8,
     parse_u16,
     parse_u32
 };
 
-<span class="kw">use </span>std::error::Error;
-<span class="kw">use </span><span class="kw">crate</span>::errors::{
+<span class="comment">//use std::error::Error;
+</span><span class="kw">use </span><span class="kw">crate</span>::errors::{
     SerializationError,
-    PacketError
-};
+    <span class="comment">//PacketError
+</span>};
 
 <span class="kw">use </span><span class="kw">crate</span>::events::{
     RBEventHeader,
@@ -526,12 +626,17 @@
     TofEventSummary,
 };
 
-<span class="kw">use </span><span class="kw">crate</span>::commands::{TofCommand,
-                      RBCommand};
+<span class="kw">use </span><span class="kw">crate</span>::commands::{
+    TofCommand,
+    RBCommand
+};
+
 <span class="kw">use </span><span class="kw">crate</span>::calibrations::RBCalibrations;
 
-<span class="kw">pub mod </span>packet_type;
-<span class="kw">pub use </span>packet_type::PacketType;
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::FromRandom;
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">use </span>rand::Rng;
 
 <span class="doccomment">/// The most basic of all packets
 ///  
@@ -551,9 +656,6 @@
 </span><span class="kw">pub struct </span>TofPacket {
   <span class="kw">pub </span>packet_type        : PacketType,
   <span class="kw">pub </span>payload            : Vec&lt;u8&gt;,
-  <span class="comment">// FUTURE EXTENSION: Be able to send
-  </span><span class="doccomment">/// packets which contain multiple of the same packets
-  </span><span class="kw">pub </span>is_multi_packet    : bool,
   <span class="comment">// fields which won't get serialized
   </span><span class="doccomment">/// mark a packet as not eligible to be written to disk
   </span><span class="kw">pub </span>no_write_to_disk   : bool,
@@ -571,9 +673,8 @@
     <span class="kw">if </span>p_len &lt; <span class="number">4 </span>{
       <span class="macro">write!</span>(f, <span class="string">"&lt;TofPacket: type {:?}, payload size {}&gt;"</span>, <span class="self">self</span>.packet_type, p_len)
     } <span class="kw">else </span>{
-      <span class="macro">write!</span>(f, <span class="string">"&lt;TofPacket: type {:?}, multi {}, payload [ {} {} {} {} .. {} {} {} {}] of size {} &gt;"</span>,
+      <span class="macro">write!</span>(f, <span class="string">"&lt;TofPacket: type {:?}, payload [ {} {} {} {} .. {} {} {} {}] of size {} &gt;"</span>,
              <span class="self">self</span>.packet_type,
-             <span class="self">self</span>.is_multi_packet,
              <span class="self">self</span>.payload[<span class="number">0</span>], <span class="self">self</span>.payload[<span class="number">1</span>], <span class="self">self</span>.payload[<span class="number">2</span>], <span class="self">self</span>.payload[<span class="number">3</span>],
              <span class="self">self</span>.payload[p_len-<span class="number">4</span>], <span class="self">self</span>.payload[p_len-<span class="number">3</span>], <span class="self">self</span>.payload[p_len - <span class="number">2</span>], <span class="self">self</span>.payload[p_len-<span class="number">1</span>], p_len ) 
     }
@@ -592,7 +693,6 @@
   <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
     (<span class="self">self</span>.packet_type == other.packet_type)           &amp;&amp;
     (<span class="self">self</span>.payload == other.payload)                   &amp;&amp;
-    (<span class="self">self</span>.is_multi_packet == other.is_multi_packet)   &amp;&amp;
     (<span class="self">self</span>.no_write_to_disk == other.no_write_to_disk) &amp;&amp;
     (<span class="self">self</span>.no_send_over_nw == other.no_send_over_nw)   &amp;&amp;
     (<span class="self">self</span>.valid == other.valid)
@@ -601,14 +701,11 @@
 
 <span class="kw">impl </span>TofPacket {
 
-  <span class="kw">pub const </span>PRELUDE_SIZE : usize = <span class="number">7</span>; 
- 
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>creation_time = Instant::now();
     <span class="self">Self </span>{
       packet_type      : PacketType::Unknown,
       payload          : Vec::&lt;u8&gt;::new(),
-      is_multi_packet  : <span class="bool-val">false</span>,
       no_write_to_disk : <span class="bool-val">false</span>,
       no_send_over_nw  : <span class="bool-val">false</span>,
       creation_time    : creation_time,
@@ -616,31 +713,128 @@
     }
   }
 
-  <span class="doccomment">/// Unpack possible content
-  </span><span class="kw">pub fn </span>unpack_rbevent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;RBEvent, Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
-    <span class="kw">if </span><span class="self">self</span>.packet_type != PacketType::RBEvent {
-      <span class="macro">error!</span>(<span class="string">"We expeckt packet type {}, but got packet type {} instead!"</span>, PacketType::RBEvent, <span class="self">self</span>.packet_type);
-      <span class="kw">return </span><span class="prelude-val">Err</span>(Box::new(PacketError::WrongPacketType));
-    }
-    <span class="prelude-val">Ok</span>(RBEvent::from_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>)<span class="question-mark">?</span>)
+  <span class="doccomment">/// Generate a bytestream of self for ZMQ, prefixed with 
+  /// BRCT so all RBs will see it
+  </span><span class="kw">pub fn </span>zmq_payload_brdcast(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>payload     = String::from(<span class="string">"BRCT"</span>).into_bytes(); 
+    <span class="kw">let </span><span class="kw-2">mut </span>stream  = <span class="self">self</span>.to_bytestream();
+    payload.append(<span class="kw-2">&amp;mut </span>stream);
+    payload
+  }
+  
+  <span class="doccomment">/// Generate a bytestream of self for ZMQ, prefixed with 
+  /// RBX, to address only a certain board
+  </span><span class="kw">pub fn </span>zmq_payload_rb(<span class="kw-2">&amp;</span><span class="self">self</span>, rb_id : u8) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>payload     = <span class="macro">format!</span>(<span class="string">"RB{:02}"</span>, rb_id).into_bytes(); 
+    <span class="kw">let </span><span class="kw-2">mut </span>stream  = <span class="self">self</span>.to_bytestream();
+    payload.append(<span class="kw-2">&amp;mut </span>stream);
+    payload
   }
 
+  <span class="doccomment">/// Unpack the TofPacket and return its content
+  </span><span class="kw">pub fn </span>unpack&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, SerializationError&gt;
+    <span class="kw">where </span>T: Packable + Serialization {
+    <span class="kw">if </span>T::PACKET_TYPE != <span class="self">self</span>.packet_type {
+      <span class="macro">error!</span>(<span class="string">"This bytestream is not for a {} packet!"</span>, <span class="self">self</span>.packet_type);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::IncorrectPacketType);
+    }
+    <span class="kw">let </span>unpacked : T = T::from_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(unpacked)
+  }
+  
   <span class="kw">pub fn </span>age(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
     <span class="self">self</span>.creation_time.elapsed().as_secs()
   }
- 
-  <span class="kw">pub fn </span>get_n_packets(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
-    <span class="kw">if </span>!<span class="self">self</span>.is_multi_packet {
-      <span class="kw">return </span><span class="number">1</span>; 
-    }
-    <span class="macro">todo!</span>(<span class="string">"Can not deal with multipackets right now!"</span>);
-    <span class="attr">#[allow(unreachable_code)] </span>{
-      <span class="kw">return </span><span class="number">1</span>;
+}
+
+<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
+</span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofPacket {
+
+  <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
+    <span class="comment">// FIXME - this should be an actual, realistic
+    // distribution
+    </span><span class="kw">let </span>choices = [
+      PacketType::TofEvent,
+      PacketType::TofEvent,
+      PacketType::TofEvent,
+      PacketType::TofEvent,
+      PacketType::TofEvent,
+      PacketType::TofEvent,
+      PacketType::TofEvent,
+      PacketType::RBWaveform,
+      PacketType::RBWaveform,
+      PacketType::TofEventSummary,
+      PacketType::TofEventSummary,
+      PacketType::TofEventSummary,
+      PacketType::TofEventSummary,
+      PacketType::TofEventSummary,
+      PacketType::TofEventSummary,
+      PacketType::MasterTrigger,
+      PacketType::MasterTrigger,
+      PacketType::MasterTrigger,
+      PacketType::RBMoniData,
+      PacketType::PBMoniData,
+      PacketType::LTBMoniData,
+      PacketType::PAMoniData,
+      PacketType::CPUMoniData,
+      PacketType::MonitorMtb,
+    ];
+    <span class="kw">let </span><span class="kw-2">mut </span>rng  = rand::thread_rng();
+    <span class="kw">let </span>idx = rng.gen_range(<span class="number">0</span>..choices.len());
+    <span class="kw">let </span>packet_type = choices[idx];
+    <span class="kw">match </span>packet_type {
+      PacketType::TofEvent =&gt; {
+        <span class="kw">let </span>te = TofEvent::from_random();
+        <span class="kw">return </span>te.pack()
+      }
+      PacketType::TofEventSummary =&gt; {
+        <span class="kw">let </span>te = TofEventSummary::from_random();
+        <span class="kw">return </span>te.pack()
+      }
+      PacketType::RBWaveform =&gt; {
+        <span class="kw">let </span>te = RBWaveform::from_random();
+        <span class="kw">return </span>te.pack()
+      }
+      PacketType::MasterTrigger =&gt; {
+        <span class="kw">let </span>te = MasterTriggerEvent::from_random();
+        <span class="kw">return </span>te.pack()
+      }
+      PacketType::RBMoniData =&gt; {
+        <span class="kw">let </span>te = RBMoniData::from_random();
+        <span class="kw">return </span>te.pack()
+      }
+      PacketType::PAMoniData =&gt; {
+        <span class="kw">let </span>te = PAMoniData::from_random();
+        <span class="kw">return </span>te.pack()
+      }
+      PacketType::LTBMoniData =&gt; {
+        <span class="kw">let </span>te = LTBMoniData::from_random();
+        <span class="kw">return </span>te.pack()
+      }
+      PacketType::PBMoniData =&gt; {
+        <span class="kw">let </span>te = PBMoniData::from_random();
+        <span class="kw">return </span>te.pack()
+      }
+      PacketType::CPUMoniData =&gt; {
+        <span class="kw">let </span>te = CPUMoniData::from_random();
+        <span class="kw">return </span>te.pack()
+      }
+      PacketType::MonitorMtb  =&gt; {
+        <span class="kw">let </span>te = MtbMoniData::from_random();
+        <span class="kw">return </span>te.pack()
+      }
+      <span class="kw">_ </span>=&gt; {
+        <span class="kw">let </span>te = TofEvent::from_random();
+        <span class="kw">return </span>te.pack()
+      }
     }
   }
 }
 
-<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>RBWaveform&gt; <span class="kw">for </span>TofPacket {
+
+<span class="doccomment">/// FIXME - all these can go away now, because we have the
+/// Packable trait! Amazing!
+</span><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>RBWaveform&gt; <span class="kw">for </span>TofPacket {
   <span class="kw">fn </span>from(rbwave : <span class="kw-2">&amp;</span>RBWaveform) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span><span class="kw-2">mut </span>tp     = <span class="self">Self</span>::new();
     tp.packet_type = PacketType::RBWaveform;
@@ -743,7 +937,7 @@
 <span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>RBMoniData&gt; <span class="kw">for </span>TofPacket {
   <span class="kw">fn </span>from(moni : <span class="kw-2">&amp;</span>RBMoniData) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span><span class="kw-2">mut </span>tp     = <span class="self">Self</span>::new();
-    tp.packet_type = PacketType::RBMoni;
+    tp.packet_type = PacketType::RBMoniData;
     tp.payload     = moni.to_bytestream();
     tp
   }
@@ -793,7 +987,12 @@
   }
 }
 
-<span class="kw">impl </span>Serialization <span class="kw">for </span>TofPacket {
+<span class="comment">// I would LOOVE to implement the Packable trait here and have 
+// a matroshka doll for TofPackets. I just don't know why that 
+// would be useful. It might be leading to a new approach 
+// for multipackets
+
+</span><span class="kw">impl </span>Serialization <span class="kw">for </span>TofPacket {
   <span class="kw">const </span>HEAD : u16 = <span class="number">0xaaaa</span>;
   <span class="kw">const </span>TAIL : u16 = <span class="number">0x5555</span>;
   <span class="kw">const </span>SIZE : usize = <span class="number">0</span>; <span class="comment">// FIXME - size/prelude_size 
@@ -831,9 +1030,6 @@
   
   <span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) 
     -&gt; Vec&lt;u8&gt; {
-    <span class="kw">if </span><span class="self">self</span>.is_multi_packet {
-      <span class="macro">todo!</span>(<span class="string">"Can not deal with multipackets right now!"</span>);
-    }
     <span class="kw">let </span><span class="kw-2">mut </span>bytestream = Vec::&lt;u8&gt;::with_capacity(<span class="number">6 </span>+ <span class="self">self</span>.payload.len());
     bytestream.extend_from_slice(<span class="kw-2">&amp;</span>TofPacket::HEAD.to_le_bytes());
     <span class="kw">let </span>p_type = <span class="self">self</span>.packet_type <span class="kw">as </span>u8;
@@ -880,7 +1076,7 @@
 <span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 #[test] 
 </span><span class="kw">fn </span>tofpacket_from_mtevent() {
-  <span class="kw">let </span>data = MasterTriggerEvent::new(<span class="number">0</span>,<span class="number">0</span>);
+  <span class="kw">let </span>data = MasterTriggerEvent::new();
   <span class="kw">let </span>pk   = TofPacket::from(<span class="kw-2">&amp;</span>data);
   <span class="kw">let </span>test = TofPacket::from_bytestream(<span class="kw-2">&amp;</span>pk.to_bytestream(),<span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
   <span class="macro">assert_eq!</span>(pk.packet_type, PacketType::MasterTrigger);
@@ -895,7 +1091,7 @@
   <span class="kw">let </span>data = RBMoniData::new();
   <span class="kw">let </span>pk   = TofPacket::from(<span class="kw-2">&amp;</span>data);
   <span class="kw">let </span>test = TofPacket::from_bytestream(<span class="kw-2">&amp;</span>pk.to_bytestream(),<span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
-  <span class="macro">assert_eq!</span>(pk.packet_type, PacketType::RBMoni);
+  <span class="macro">assert_eq!</span>(pk.packet_type, PacketType::RBMoniData);
   <span class="macro">assert_eq!</span>(pk, test);
   <span class="kw">let </span>data_test = RBMoniData::from_bytestream(<span class="kw-2">&amp;</span>pk.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
   <span class="macro">assert_eq!</span>(data, data_test);

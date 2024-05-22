@@ -455,6 +455,26 @@
 <a href="#453" id="453">453</a>
 <a href="#454" id="454">454</a>
 <a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implementations of analysis engine
 //! This is based on the original code 
 //! by J.Zweerink
@@ -544,22 +564,29 @@
 /// * impedance : typically this is 
 </span><span class="kw">pub fn </span>integrate(voltages     : <span class="kw-2">&amp;</span>Vec&lt;f32&gt;,
                  nanoseconds  : <span class="kw-2">&amp;</span>Vec&lt;f32&gt;,
-                 lower_bound  : f32,
-                 size         : f32,
-                 impedance    : f32) -&gt;<span class="prelude-ty">Result</span>&lt;f32, WaveformError&gt;  {
-  <span class="kw">if </span>lower_bound &lt; <span class="number">0.0 </span>{ 
-    <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::NegativeLowerBound);
+                 lo_bin       : usize,
+                 upper_bin    : usize,
+                 impedance    : f32) -&gt; <span class="prelude-ty">Result</span>&lt;f32, WaveformError&gt;  {
+  <span class="comment">//if lower_bound &lt; 0.0 { 
+  //  return Err(WaveformError::NegativeLowerBound);
+  //}
+  //let lo_bin          = time2bin(nanoseconds,lower_bound)?;
+  //let mut size_bin    = time2bin(nanoseconds,lower_bound + size)?;
+  //println!("lower bound {}, lo bin {}, size bin {}", lower_bound, lo_bin, size_bin);
+  //size_bin = size_bin - lo_bin;
+  //if lo_bin + size_bin &gt; voltages.len() {
+  //  warn!("Limiting integration range to waveform size!");
+  //  size_bin = voltages.len() - lo_bin;
+  //}
+  </span><span class="kw">if </span>upper_bin &gt; voltages.len() {
+    <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::OutOfRangeUpperBound);
   }
-  <span class="kw">let </span>lo_bin          = time2bin(nanoseconds,lower_bound)<span class="question-mark">?</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>size_bin    = time2bin(nanoseconds,lower_bound + size)<span class="question-mark">?</span>;
-  size_bin = size_bin - lo_bin;
-  <span class="kw">if </span>lo_bin + size_bin &gt; voltages.len() {
-    <span class="macro">warn!</span>(<span class="string">"Limiting integration range to waveform size!"</span>);
-    size_bin = voltages.len() - lo_bin;
+  <span class="kw">if </span>lo_bin &lt; <span class="number">1 </span>{
+    <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::OutOfRangeLowerBound);
   }
   <span class="kw">let </span><span class="kw-2">mut </span>sum = <span class="number">0f32</span>;
-  <span class="kw">let </span>upper_bin = lo_bin + size_bin;
-  <span class="kw">for </span>n <span class="kw">in </span>lo_bin..upper_bin {
+  <span class="comment">//let upper_bin = lo_bin + size_bin;
+  </span><span class="kw">for </span>n <span class="kw">in </span>lo_bin..upper_bin {
     sum += voltages[n] * (nanoseconds[n] - nanoseconds[n-<span class="number">1</span>]) ;
   }
   sum /= impedance;
@@ -700,6 +727,9 @@
     start_bin = <span class="number">10</span>;
   }
   <span class="kw">let </span>window_bin = time2bin(nanoseconds, start_time + window_size)<span class="question-mark">? </span>- start_bin;
+  <span class="kw">if </span>start_bin + window_bin &gt; voltages.len () {
+    <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::OutOfRangeUpperBound);
+  }
 
   <span class="kw">let </span><span class="kw-2">mut </span>pos = <span class="number">0usize</span>;
   <span class="comment">// find the first bin when voltage
@@ -718,6 +748,9 @@
   </span><span class="kw">let </span><span class="kw-2">mut </span>nbins_peak   = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>begin_peak   = pos;
   <span class="kw">let </span><span class="kw-2">mut </span>end_peak  : usize;
+  <span class="kw">if </span>(pos + window_bin) &gt; voltages.len() {
+    <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::OutOfRangeUpperBound);
+  }
   <span class="kw">for </span>k <span class="kw">in </span>pos..(pos + window_bin) {
     <span class="kw">if </span>voltages[k] &gt;= threshold {
       nbins_peak += <span class="number">1</span>;
@@ -773,6 +806,13 @@
   <span class="prelude-val">Ok</span>(peaks)
 }
 
+<span class="doccomment">/// An approximation to calculate the energy deposition as used by
+/// Philip/Jamie/Jeff
+</span><span class="kw">pub fn </span>calc_edep_simple(peak_voltage : f32) -&gt; f32 {
+  (-<span class="number">1000.0 </span>* peak_voltage) / (<span class="number">21.0 </span>* peak_voltage - <span class="number">35260.0</span>)
+}
+
+
 <span class="doccomment">/// Calculate the interaction time based on the peak timings measured 
 /// at the paddle ends A and B
 ///
@@ -782,7 +822,7 @@
 /// * t_b           : (absolute) timing for the peak measured at B side
 /// * paddle_length : the length of the paddle in cm
 </span><span class="kw">pub fn </span>get_paddle_t0(t_a : f32, t_b : f32, paddle_length : f32) -&gt; f32 {
-  <span class="number">0.5</span><span class="kw-2">*</span>(t_a + t_b - (paddle_length/C_LIGHT_PADDLE))
+  <span class="number">0.5</span><span class="kw-2">*</span>(t_a + t_b - (paddle_length/(<span class="number">10.0</span><span class="kw-2">*</span>C_LIGHT_PADDLE)))
 }
 
 <span class="doccomment">/// Calculate the distance from the A side

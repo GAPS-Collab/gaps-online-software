@@ -151,12 +151,12 @@
 };
 
 <span class="kw">use </span>liftof_lib::LIFTOF_LOGO_SHOW;
-<span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme2;
+<span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme;
 
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>HomeTab {
-  <span class="kw">pub </span>theme      : ColorTheme2,
+  <span class="kw">pub </span>theme      : ColorTheme,
   <span class="kw">pub </span>streamer   : Arc&lt;Mutex&lt;VecDeque&lt;String&gt;&gt;&gt;,
   <span class="kw">pub </span>pack_stat  : Arc&lt;Mutex&lt;HashMap&lt;String, usize&gt;&gt;&gt;,
   <span class="kw">pub </span>stream     : String,
@@ -164,7 +164,7 @@
 }
 
 <span class="kw">impl </span>HomeTab {
-  <span class="kw">pub fn </span>new(theme     : ColorTheme2,
+  <span class="kw">pub fn </span>new(theme     : ColorTheme,
              streamer  : Arc&lt;Mutex&lt;VecDeque&lt;String&gt;&gt;&gt;,
              pack_stat : Arc&lt;Mutex&lt;HashMap&lt;String,usize&gt;&gt;&gt;) -&gt; HomeTab {
     HomeTab {
@@ -202,7 +202,7 @@
         <span class="kw">for </span>k <span class="kw">in </span>_stat.keys() {
           <span class="comment">//stat_string_render += "  -- -- -- -- -- -- -- -- -- --\n";
           </span><span class="kw">if </span>_stat[k] != <span class="number">0 </span>{
-            <span class="kw">let </span>line = <span class="macro">format!</span>(<span class="string">"  {} \t=&gt; [{}]\n"</span>,  _stat[k],k);
+            <span class="kw">let </span>line = <span class="macro">format!</span>(<span class="string">"  {} \t=&gt; \t[{}]\n"</span>,  _stat[k],k);
             stat_string_render += <span class="kw-2">&amp;</span>line;
             sum_pack += _stat[k];
           }

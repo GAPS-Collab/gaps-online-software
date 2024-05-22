@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["clean_data","create_labels","histogram","prep_data","timeseries"]};
+window.SIDEBAR_ITEMS = {"constant":["LG_LINE","LG_LINE_HORIZONTAL"],"fn":["clean_data","create_labels","gauge","histogram","prep_data","timeseries"]};

@@ -639,6 +639,16 @@
 <a href="#637" id="637">637</a>
 <a href="#638" id="638">638</a>
 <a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::time::{
     <span class="comment">//Instant,
     </span>Duration,
@@ -653,7 +663,12 @@
 //use std::path::Path;
 </span><span class="kw">use </span>crossbeam_channel::Sender;
 
-<span class="kw">use </span>tof_dataclasses::commands::{TofCommand, TofCommandCode, TofCommandResp, TofResponse};
+<span class="kw">use </span>tof_dataclasses::commands::{
+    TofCommand,
+    TofCommandCode,
+    TofResponse,
+    TofResponseCode,
+};
 <span class="kw">use </span>tof_dataclasses::errors::CmdError;
 <span class="kw">use </span>tof_dataclasses::packets::{TofPacket,
                                PacketType};
@@ -815,7 +830,7 @@
                   <span class="prelude-val">Ok</span>(cmd)  =&gt; {
                     <span class="comment">// we got a valid tof command, forward it and wait for the 
                     // response
-                    //let tof_resp  = TofResponse::GeneralFail(TofCommandResp::RespErrNotImplemented as u32);
+                    //let tof_resp  = TofResponse::GeneralFail(TofResponseCode::RespErrNotImplemented as u32);
                     //let resp_not_implemented = prefix_board_id(&amp;mut tof_resp.to_bytestream());
                     //let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
                     </span><span class="kw">let </span>return_val: <span class="prelude-ty">Result</span>&lt;TofCommandCode, CmdError&gt;;
@@ -1096,7 +1111,8 @@
                         <span class="macro">warn!</span>(<span class="string">"Not implemented"</span>);
                         return_val = <span class="prelude-val">Err</span>(CmdError::NotImplementedError);
                       },
-                      TofCommand::GetFullWaveforms  (<span class="kw">_</span>) =&gt; {
+                      <span class="comment">// This won't be a thing for RBs
+                      </span>TofCommand::GetFullWaveforms  (<span class="kw">_</span>) =&gt; {
                         <span class="macro">warn!</span>(<span class="string">"Not implemented"</span>);
                         return_val = <span class="prelude-val">Err</span>(CmdError::NotImplementedError);
                       },
@@ -1228,18 +1244,22 @@
                         <span class="macro">warn!</span>(<span class="string">"Not implemented"</span>);
                         return_val = <span class="prelude-val">Err</span>(CmdError::NotImplementedError);
                       }
+                      <span class="kw">_ </span>=&gt; {
+                        <span class="macro">error!</span>(<span class="string">"{} is not implemented!"</span>, cmd);
+                        return_val = <span class="prelude-val">Err</span>(CmdError::NotImplementedError);
+                      }
                     }
                     <span class="comment">// deal with return values
                     </span><span class="kw">match </span>return_val {
                       <span class="prelude-val">Err</span>(cmd_error) =&gt; {
-                        <span class="kw">let </span>r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable <span class="kw">as </span>u32);
+                        <span class="kw">let </span>r = TofResponse::GeneralFail(TofResponseCode::RespErrUnexecutable <span class="kw">as </span>u32);
                         <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
                           <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">"Can not send response!, Err {err}"</span>),
                           <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Responded to {cmd_error}!"</span>)
                         }
                       },
                       <span class="prelude-val">Ok</span>(tof_command)  =&gt; {
-                        <span class="kw">let </span>r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
+                        <span class="kw">let </span>r = TofResponse::Success(TofResponseCode::RespSuccFingersCrossed <span class="kw">as </span>u32);
                         <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
                           <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">"Can not send response!! {err}"</span>),
                           <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Responded to {tof_command}!"</span>)

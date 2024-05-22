@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ControlPersist","Error","ForwardType","KnownHosts","Socket"],"mod":["changelog","process"],"struct":["Child","ChildStderr","ChildStdin","ChildStdout","OwningCommand","Session","SessionBuilder","Stdio"],"trait":["OverSsh"],"type":["Command","RemoteChild"]};
