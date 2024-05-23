@@ -16,7 +16,7 @@ echo -e "   -- PYTHONPATH=$PYTHONPATH"
 echo -e "   -- PATH=${PATH//:/\\n  -- }"
 echo -e "   -- LD_LIBRARY_PATH=${LD_LIBRARY_PATH//:/\\n  -- }"
 echo -e "   -- GapsOnlineSoftware_DIR=${GapsOnlineSoftware_DIR}" 
-echo -e "      (for cmake's find_package(GapsOnlineSoftware) calls)
+echo -e "      (for cmake's find_package(GapsOnlineSoftware) calls)"
 echo -e "  ***************************************************"
 echo -e "   => software repository:"
 echo -e "      - https://github.com/GAPS-Collab/gaps-online-software"
