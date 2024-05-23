@@ -789,6 +789,96 @@ impl TofPacketReader {
   pub fn set_filter(&mut self, ptype : PacketType) {
     self.filter = ptype;
   }
+  
+
+  /// Get an index of the file - count number of packets
+  ///
+  /// Returns the number of all PacketTypes in the file
+  pub fn get_packet_index(&mut self) -> io::Result<HashMap<u8, usize>> {
+    let mut index  = HashMap::<u8, usize>::new();
+    let mut buffer = [0];
+    loop {
+      match self.file_reader.read_exact(&mut buffer) {
+        Err(err) => {
+          error!("Unable to read from file! {err}");
+          //return None;
+          break;
+        }
+        Ok(_) => {
+          self.cursor += 1;
+        }
+      }
+      if buffer[0] != 0xAA {
+        continue;
+      } else {
+        match self.file_reader.read_exact(&mut buffer) {
+          Err(err) => {
+            error!("Unable to read from file! {err}");
+            //return None;
+            break;
+          }
+          Ok(_) => {
+            self.cursor += 1;
+          }
+        }
+
+        if buffer[0] != 0xAA { 
+          continue;
+        } else {
+          // the 3rd byte is the packet type
+          match self.file_reader.read_exact(&mut buffer) {
+             Err(err) => {
+              error!("Unable to read from file! {err}");
+              //return None;
+              break;
+            }
+            Ok(_) => {
+              self.cursor += 1;
+            }
+          }
+          let ptype    = PacketType::from(buffer[0]);
+          // read the the size of the packet
+          let mut buffer_psize = [0,0,0,0];
+          match self.file_reader.read_exact(&mut buffer_psize) {
+            Err(err) => {
+              error!("Unable to read from file! {err}");
+              break;
+            }
+            Ok(_) => {
+              self.cursor += 4;
+            }
+          }
+          let vec_data = buffer_psize.to_vec();
+          let size     = parse_u32(&vec_data, &mut 0);
+          match self.file_reader.seek(SeekFrom::Current(size as i64)) {
+            Err(err) => {
+              error!("Unable to read more data! {err}");
+              break; 
+            }
+            Ok(_) => {
+              self.cursor += size as usize;
+              // and then we add the packet type to the 
+              // hashmap
+              let ptype_key = ptype as u8;
+              if index.contains_key(&ptype_key) {
+                *index.get_mut(&ptype_key).unwrap() += 1;
+              } else {
+                index.insert(ptype_key, 1usize);
+              }
+            }
+          }
+        }
+      } // if no 0xAA found
+    } // end loop
+    self.rewind()?;
+    Ok(index)
+  } // end fn
+
+  pub fn rewind(&mut self) -> io::Result<()> {
+    self.file_reader.rewind()?;
+    self.cursor = 0;
+    Ok(())
+  }
 
   pub fn get_next_packet(&mut self) -> Option<TofPacket> {
     // filter::Unknown corresponds to allowing any
@@ -1030,9 +1120,6 @@ impl Iterator for TofPacketReader {
 
   fn next(&mut self) -> Option<Self::Item> {
     self.get_next_packet()
-    //let packet : TofPacket;
-    //packet = TofPacket::new();
-    //return Some(packet);
   }
 }
     //    match read_n_bytes(self.file_reader.as_mut().unwrap(), 7) { 
