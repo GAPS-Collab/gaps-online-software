@@ -1060,7 +1060,18 @@ impl PyTofHit {
   fn t0(&self) -> f32 {
     self.hit.get_t0()
   }
+ 
+  /// charge of the different paddle ends
+  #[getter]
+  fn charge_a(&self) -> f32 {
+    self.hit.get_charge_a()
+  }
   
+  #[getter]
+  fn charge_b(&self) -> f32 {
+    self.hit.get_charge_b()
+  }
+
   /// Reconstructed particle interaction position
   /// along the long axis of the paddle.
   /// For the other dimensions, there is no information
@@ -1114,6 +1125,12 @@ impl PyRBWaveform {
         return Err(PyValueError::new_err(err.to_string()));
       }
     }
+  }
+
+  /// Paddle ID of this wveform (1-160)
+  #[getter]
+  fn paddle_id(&self) -> u8 {
+    self.wf.paddle_id
   }
 
   #[getter]

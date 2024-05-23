@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use tof_dataclasses::io as io_api;
 
 use pyo3::prelude::*;
@@ -28,8 +30,13 @@ impl PyTofPacketReader {
     pyreader
   }
 
-  //fn set_filter(&self) {
-  //}
+  fn get_packet_index(&mut self) -> PyResult<HashMap<u8, usize>> {
+    Ok(self.reader.get_packet_index()?)
+  }
+
+  fn rewind(&mut self) {
+    let _ = self.reader.rewind();
+  }
 
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.reader)) 
