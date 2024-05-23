@@ -35,18 +35,24 @@ def get_paddle(rb_id, rb_ch):
     rbs = m.RB.object.filter(rb_id=rb_id)
     return rbs.get_channel(rb_ch)
 
-def tof_paddle_manifest():
+def get_tof_paddles(panel_id=None):
     """
     Get all TOF paddles
     """
-    paddles = m.Paddle.objects.all()
-    pids    = [(k.paddle_id, k) for k in paddles]
-    result  = dict()
-    for pid in pids:
-        ends  = m.PaddleEnd.objects.filter(paddle_id = pid[0])
-        assert (len (ends) == 2)
-        panel = m.Panel.objects.filter(panel_id = ends[0].panel_id)
-        ends  = (ends[0], ends[1])
-        result[pid[0]] = {'paddle' : pid[1], 'ends' : ends, 'panel' : panel }
+    if panel_id is None:
+        paddles = [k for k in m.Paddle.objects.all()]
+    else:
+        paddles = [k for k in m.Paddle.objects.filter(panel_id=panel_id)]
+    return paddles
 
-    return result
+def get_cube_paddles():
+    paddles = [k for k in m.Paddle.objects.filter(panel_id__lt=7)]
+    for pid in 57,58,59,60:
+        paddle = m.Paddle.objects.filter(paddle_id=pid)
+        paddles.append(paddle[0])
+    return paddles
+
+def get_umbrella_paddles():
+    paddles = [k for k in m.Paddle.objects.filter(panel_id__gt=6).filter(panel_id__lt=14)]
+    return paddles
+
