@@ -74,6 +74,9 @@ if __name__ == '__main__':
     # baseline histogram
     baselines = dict()
 
+    # paddle occupancy
+    ocu_paddles = []
+
     for f in runfiles:
         event_reader = go.rust_api.io.TofPacketReader(f, filter=go.rust_api.io.PacketType.TofEvent)
         print('-> Creating packet index...')
@@ -97,6 +100,7 @@ if __name__ == '__main__':
                 nwfs_cali += 1
                 uid = wf.rb_id*100 + wf.rb_channel + 1
                 pid = rbch_pid_dict[uid]
+                ocu_paddles.append(pid)
                 if not uid in baselines:
                     baselines [uid] = (pid,[baseline(wf.voltages)])
                 else:
@@ -113,6 +117,15 @@ if __name__ == '__main__':
     print(f'=> Calibrated {nwfs_cali} waveforms!')
     
     # plots
+    fig  = plt.figure(figsize = lo.FIGSIZE_A4_LANDSCAPE)
+    ax   = fig.gca()
+    oc_bins = np.linspace(0.5, 160.5, 160)
+    h    = d.factory.hist1d(ocu_paddles, oc_bins)
+    h.line(filled=True, alpha=0.5, color='b')
+    ax.set_xlabel('paddleID')
+    ax.set_ylabel('occupancy (counts)')
+    fig.savefig(f'{args.plotdir}/paddle_occupancy.png')
+
     for k in tqdm.tqdm(range(1,161), total=160, desc="Plotting charge correlations..."):
         fig_cab = plt.figure(figsize=lo.FIGSIZE_A4_SQUARE)
         ax = fig_cab.gca()
