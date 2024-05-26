@@ -1010,7 +1010,7 @@ impl PyRBEvent {
     }
   }
   
-  pub fn get_waveform<'_py>(&self, py: Python<'_py>, channel : usize) -> PyResult<Bound<'_py, PyArray1<u16>>> {  
+  fn get_waveform<'_py>(&self, py: Python<'_py>, channel : usize) -> PyResult<Bound<'_py, PyArray1<u16>>> {  
     let wf  = self.event.get_channel_by_id(channel).unwrap().clone();
     let arr = PyArray1::<u16>::from_vec_bound(py, wf);
     Ok(arr)
@@ -1027,6 +1027,15 @@ impl PyRBEvent {
     hits
   }
   
+  #[getter]
+  fn header(&self) -> PyRBEventHeader {
+    let mut py_header = PyRBEventHeader::new();
+    //let mut header = self.event.header;
+    py_header.set_header(self.event.header.clone());
+    py_header
+  }
+  
+
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.event)) 
   }
