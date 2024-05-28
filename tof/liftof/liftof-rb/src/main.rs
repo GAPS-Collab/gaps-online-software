@@ -63,13 +63,11 @@ use tof_dataclasses::threading::{
 };
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::commands::{
-    //RBCommand,
     TofOperationMode
 };
 
 use tof_dataclasses::events::DataType;
 use tof_dataclasses::run::RunConfig;
-//use tof_dataclasses::manifest::get_rbs_from_sqlite;
 
 #[cfg(feature="database")]
 use tof_dataclasses::database::{
@@ -85,11 +83,8 @@ use tof_dataclasses::io::{
 use liftof_lib::{
     LIFTOF_LOGO_SHOW,
     DATAPORT,
-    //Command,
-    CommandRB,
     //color_log,
     RunStatistics,
-    CalibrationCmd,
     LiftofSettings,
     init_env_logger,
 };
@@ -106,6 +101,18 @@ use liftof_rb::threads::{
 use liftof_rb::api::*;
 use liftof_rb::control::*;
 
+#[derive(Debug, Clone, Parser, PartialEq)]
+pub enum CommandLineCommand {
+  /// Run a RB Calibration and save the resu8lt locally
+  Calibration,
+  /// Start a data run, see the configuration file for 
+  /// the specific settings
+  Run,
+  /// Run in listening mode - wiat for commands from a 
+  /// central C&C server, e.g. liftof-cc
+  Listen,
+}
+
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {
@@ -115,25 +122,15 @@ struct Args {
   /// only parse the relevant sections.
   #[arg(short, long)]
   config: Option<String>,
-  /// If you want to run locally, use run start
-  /// and set the time of the run with this
-  /// parameter
-  /// The default setting of 0 will run 
-  /// forever
-  #[arg(long, default_value_t = 0)]
-  runtime_secs : u32,
   /// Show progress bars to indicate buffer fill values and number of acquired events
   #[arg(long, default_value_t = false)]
   show_progress: bool,
   /// Print out (even more) debugging information 
   #[arg(long, default_value_t = false)]
   verbose : bool,
-  /// Write the readoutboard binary data ('.robin') to the board itself
-  #[arg(long, default_value_t = false)]
-  to_local_file : bool,
   /// List of possible commands
   #[command(subcommand)]
-  command: CommandRB
+  command: CommandLineCommand
 }
 
 /**********************************************************/
@@ -205,7 +202,6 @@ fn main() {
 
   let verbose                  = args.verbose;
   let show_progress            = args.show_progress;
-  let to_local_file            = args.to_local_file;
   match args.config {
     None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
     Some(cfg_file) => {
@@ -224,14 +220,11 @@ fn main() {
   if config.rb_settings.only_perfect_events {
     error!("Currently we are not supporting the only_perfect_events setting. See issue #57");
   }
-  //let only_perfect_events   = config.rb_settings.only_perfect_events;
   let only_perfect_events   = false;
   let cmd_server_address    = config.cmd_dispatcher_settings.cc_server_address.clone();
-  let mut run_config        = config.rb_settings.get_runconfig();
-  //let db_path               = Path::new(&config.db_path);
+  let run_config            = config.rb_settings.get_runconfig();
   #[cfg(feature="database")]
   let db_path               = config.db_path.clone();
-  run_config.nseconds       = args.runtime_secs;
 
   cfg_if::cfg_if!{
     if #[cfg(feature="database")] {
@@ -324,78 +317,26 @@ fn main() {
   // run, or calibrate
   let args_commands = args.command.clone(); // we need it later 
                                             // again
-
+  let mut output_fname : Option<String> = None;
   match args_commands {
     // Matching calibration command
-    CommandRB::Calibration(_) => {
+    CommandLineCommand::Calibration => {
       calibration   = true;
       end_after_run = true;
     }
-    CommandRB::Listen(_) => {
+    CommandLineCommand::Listen => {
       listen = true;
     },
-    // BEGIN Matching set command
-    CommandRB::Set(set_cmd) => {
-      match set_cmd {
-        liftof_lib::SetCmd::LtbThreshold(lbt_threshold_opts) => {
-          let ltb_id = lbt_threshold_opts.id;
-          let threshold_name = lbt_threshold_opts.name;
-          let threshold_level: u16 = lbt_threshold_opts.level;
-          match send_ltb_threshold_set(ltb_id,
-                                        threshold_name,
-                                        threshold_level) {
-            Ok(_) => {
-              println!("=> send_ltb_threshold successful!");
-            },
-            Err(err) => {
-              error!("Unable to set LTB thresholds! Error {err}!");
-            }
-          }
-        },
-        liftof_lib::SetCmd::PreampBias(preamp_bias_opts) => {
-          let preamp_id = preamp_bias_opts.id;
-          let preamp_bias = preamp_bias_opts.bias;
-          match send_preamp_bias_set(preamp_id, 
-                                      preamp_bias) {
-            Ok(_) => {
-              println!("=> send_preamp_bias successful!");
-            },
-            Err(err) => {
-              error!("Unable to set preamp bias! Error {err}!");
-            }
-          }
-        }
-      }
-      println!("=> Exiting program after values have been set!");
-      exit(0);
-    },
-    CommandRB::Run(run_cmd) => {
-      match run_cmd {
-        liftof_lib::RunCmd::Start(_run_start_opts) => {
-          start_run_now = true;
-          // for the default setting, actually we 
-          // don't stop after a certain time, 
-          // but just when we hit Ctrl+C
-          end_after_run = run_config.nseconds > 0;
-        },
-        liftof_lib::RunCmd::Stop(_run_stop_opts) => {
-          match disable_trigger() {
-            Err(err) => {
-              error!("Unable to stop run! {err}");
-              exit(1);
-            }
-            Ok(_) => {
-              println!("Stopped triggers successfully! Exit!");
-              exit(0);
-            }
-          }
-        }
-      }
+    CommandLineCommand::Run  => {
+      start_run_now = true;
+      // for the default setting, actually we 
+      // don't stop after a certain time, 
+      // but just when we hit Ctrl+C
+      end_after_run = run_config.nseconds > 0;
+      output_fname = Some(get_runfilename(1,1,Some(rb_id)));
     } 
-    //_ => ()
   }
   let run_stat = Arc::new(Mutex::new(RunStatistics::new()));
-  let output_fname : Option<String>;
   if calibration {
     output_fname = Some(get_califilename(rb_id, false));
     println!("===================================================================");
@@ -403,12 +344,6 @@ fn main() {
     println!("=> We are operating on local mode (not listeing). This will save   ");
     println!("=> to {}", output_fname.clone().unwrap());
     println!("===================================================================");
-  } else {
-    if to_local_file {
-      output_fname = Some(get_runfilename(1,1,Some(rb_id)));
-    } else {
-      output_fname = None;
-    }
   }
   
   //***************************************/
@@ -509,56 +444,14 @@ fn main() {
   // Now all threads have been spawned which are needed for 
   // the calbration
   if calibration {
-    // we execute this routine first, then we 
-    // can go into our loop listening for input
-    match args.command {
-      // BEGIN Matching calibration command
-      CommandRB::Calibration(calib_cmd) => {
-        match calib_cmd {
-          CalibrationCmd::Default(_default_opts) => {
-            match rb_calibration(&rc_to_runner_cal, 
-                                 &tp_to_pub_cal,
-                                 ip_address) {
-              Ok(_) => (),
-              Err(err) => {
-                error!("Calibration failed! Error {err}!");
-              }
-            }
-          },
-          CalibrationCmd::Noi(_noi_opts) => {
-            match rb_noi_subcalibration(&rc_to_runner_cal, 
-                        &tp_to_pub_cal) {
-              Ok(_) => (),
-              Err(err) => {
-                error!("Noi data taking failed! Error {err}!");
-              }
-            }
-          },
-          CalibrationCmd::Voltage(voltage_opts) => {
-            let voltage_level = voltage_opts.level;
-            match rb_voltage_subcalibration(&rc_to_runner_cal, 
-                            &tp_to_pub_cal,
-                                            voltage_level) {
-              Ok(_) => (),
-              Err(err) => {
-                error!("Voltage calibration data taking failed! Error {err}!");
-              }
-            }
-          },
-          CalibrationCmd::Timing(timing_opts) => {
-            let voltage_level = timing_opts.level;
-            match rb_timing_subcalibration(&rc_to_runner_cal, 
-                            &tp_to_pub_cal,
-                                            voltage_level) {
-              Ok(_) => (),
-              Err(err) => {
-                error!("Timing calibration data taking failed! Error {err}!");
-              }
-            }
-          }
-        }
-      },
-      _ => ()
+    match rb_calibration(&rc_to_runner_cal, 
+                         &tp_to_pub_cal,
+                         ip_address) {
+      Ok(_) => (),
+      Err(err) => {
+        error!("Calibration failed! Error {err}!");
+        exit(1);
+      }
     }
     println!("=> Calibration complete! Terminating, waiting till file is written..");
     thread::sleep(2*one_sec);

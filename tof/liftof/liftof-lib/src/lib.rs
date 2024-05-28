@@ -846,21 +846,6 @@ pub enum CommandCC {
   Run(RunCmd)
 }
 
-/// Command Enums and stucts
-#[derive(Debug, Clone, Parser, PartialEq)]
-pub enum CommandRB {
-  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
-  #[command(subcommand)]
-  Calibration(CalibrationCmd),
-  /// Remotely set LTB thresholds or preamp bias.
-  #[command(subcommand)]
-  Set(SetCmd),
-  /// Start/stop data taking run.
-  #[command(subcommand)]
-  Run(RunCmd),
-  /// Listen to commands from the central C&C server (liftof-cc).
-  Listen(ListenCmd),
-}
 
 /// TOF SW cmds ====================================================
 #[derive(Debug, Copy, Clone, Args, PartialEq)]
