@@ -4,9 +4,9 @@ version = "0.10.0"
 edition = "2021"
 
 [features]
-random = []
-debug = []
-
+random   = []
+debug    = []
+database = ["tof-dataclasses/database"]
 #[[lib]]
 #name = "liftof-lib"
 #path = "src/lib.rs"
@@ -33,7 +33,7 @@ clap              = { workspace = true }
 
 toml              = "0.8"
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random","database","tofcontrol","smoothed_z_score"], version = "0.10"} 
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["tofcontrol","smoothed_z_score"], version = "0.10"} 
 
 
 colored     = "2.0"

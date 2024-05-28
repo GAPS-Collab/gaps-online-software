@@ -56,7 +56,10 @@ use std::net::IpAddr;
 use std::net::Ipv4Addr;
 use crossbeam_channel::Receiver;
 use zmq;
-use colored::{Colorize, ColoredString};
+use colored::{
+    Colorize,
+    ColoredString
+};
 
 use serde_json::Value;
 
@@ -74,6 +77,7 @@ use signal_hook::consts::signal::{
 //use nlopt::{Algorithm, Objective, Optimization, Result};
 
 use tof_dataclasses::DsiLtbRBMapping;
+#[cfg(feature="database")]
 use tof_dataclasses::database::ReadoutBoard;
 use tof_dataclasses::threading::{
     ThreadControl,
@@ -88,18 +92,19 @@ use tof_dataclasses::packets::{
     TofPacket,
     PacketType,
 };
-use tof_dataclasses::errors::{
-    AnalysisError,
-    SetError
-};
+#[cfg(feature="database")]
+use tof_dataclasses::errors::AnalysisError;
+use tof_dataclasses::errors::SetError;
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::commands::RBCommand;
+#[cfg(feature="database")]
 use tof_dataclasses::events::{
     RBEvent,
     TofHit,
 };
 use tof_dataclasses::events::tof_hit::Peak;
 
+#[cfg(feature="database")]
 use tof_dataclasses::analysis::{
     calculate_pedestal,
     integrate,
@@ -331,6 +336,7 @@ impl fmt::Display for RunStatistics {
 /// FIXME - proper fitting algorithm
 /// This here is bad, because it does not interpolate between 
 /// the bins
+#[cfg(feature="database")]
 fn fit_sine(time: &Vec<f32>, data: &Vec<f32>) -> (f32, f32, f32) {
   let z_cross   = find_zero_crossings(&data);
   let mut y_max = f32::MIN;
@@ -491,6 +497,9 @@ pub fn get_peaks() -> Vec<Peak> {
 ///                 work on
 /// * rb          : ReadoutBoard as loaded from the DB, 
 ///                 with latest calibration attached
+/// * settings    : Parameters to configure the waveform
+///                 analysis & peak finding
+#[cfg(feature="database")]
 pub fn waveform_analysis(event         : &mut RBEvent,
                          rb            : &ReadoutBoard,
                          settings      : AnalysisEngineSettings)
@@ -898,10 +907,7 @@ pub struct SystemdRebootCmd {
   #[arg(required = true)]
   pub id: u8
 }
-/// END TOF SW cmds ================================================
 
-
-/// Set cmds ====================================================
 #[derive(Debug, Clone, Subcommand, PartialEq)]
 pub enum SetCmd {
   /// Set MT configuration (WHAT SHOULD I DO WITH THIS TODO)
@@ -1397,14 +1403,6 @@ impl StopRunOpts {
       id
     }
   }
-}
-/// END Run cmds ==================================================
-
-#[test]
-fn test_display() {
-  let rb = ReadoutBoard::default();
-  println!("Readout board {}", rb);
-  assert_eq!(1,1);
 }
 
 
