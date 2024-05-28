@@ -27,23 +27,6 @@ use crate::api::{
     prefix_local,
 };
 use crate::control::get_board_id;
-// this is just used for the testing case
-fn find_missing_elements(nums: &[u32]) -> Vec<u32> {
-  let mut missing_elements = Vec::new();
-  let mut expected = nums[0];
-
-  for &num in nums {
-      while expected < num {
-          missing_elements.push(expected);
-          expected += 1;
-      }
-
-      if expected == num {
-          expected += 1;
-      }
-  }
-  missing_elements
-}
 
 /// Manage the 0MQ PUB socket and send everything 
 /// which comes in over the wire as a byte 
@@ -66,12 +49,8 @@ fn find_missing_elements(nums: &[u32]) -> Vec<u32> {
 pub fn data_publisher(data           : &Receiver<TofPacket>,
                       address        : String,
                       output_fname   : Option<String> ,
-                      testing        : bool,
                       print_packets  : bool,
                       thread_control : Arc<Mutex<ThreadControl>>) {
-  if testing {
-    warn!("Testing mode!");
-  }
 
   let ctx = zmq::Context::new();
   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
@@ -125,19 +104,13 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
     file_on_disk = OpenOptions::new().append(true).create(true).open(datafile_output_file).ok()
   }
  
-  // these are only required for testing
-  let mut last_10k_evids = Vec::<u32>::new();
-  if testing {
-    last_10k_evids = Vec::<u32>::with_capacity(10000);
-  }
-  let mut n_tested : u32 = 0;
-  let mut n_sent   : u64 = 0;
   let board_id     = get_board_id().unwrap_or(0) as u8;
   if board_id == 0 {
     error!("We could not get the board id!");
   }
   let mut sigint_received = false;
   let mut kill_timer      = Instant::now();
+  let mut n_sent          = 0usize;
   loop {
     // check if we should end this
     if sigint_received && kill_timer.elapsed().as_secs() > 10 {
@@ -189,53 +162,8 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
           }
         }
         
-        if testing {
-          n_tested += 1;
-          match RBEvent::from_bytestream(&packet.payload, &mut 0) {
-            Ok(event) => {
-              last_10k_evids.push(event.header.event_id);
-            },
-            Err(err) => {
-               warn!("Error occured during testing! {err}");
-               warn!("We are seing a payload of {} bytes", packet.payload.len());
-               //warn!("Last few bytes:");
-               //for k in packet.payload.len() - 20..packet.payload.len() {
-               //  warn!("-- {}", packet.payload[k]);
-               //}
-            }
-          }
-          if n_tested == 10000 {
-            println!("Testing batch complete! Will check the last 10000 events!");
-            println!("-- first event id {}",  last_10k_evids[0]);
-            println!("-- last event id {}", last_10k_evids[last_10k_evids.len() - 1]);
-            // this is not efficient, but this is a testing case anyway
-            let mut duplicates = false;
-            for i in 0..last_10k_evids.len() {
-              for j in (i + 1)..last_10k_evids.len() {
-                if last_10k_evids[i] == last_10k_evids[j] {
-                  println!("FAIL : Found eventid {} at positions {} and {}", last_10k_evids[i], i, j);
-                  duplicates = true;
-                }
-              }
-            }
-            if !duplicates {
-              println!("PASS - we did not observe any duplicate entries!");
-            }
-            let missing = find_missing_elements(&last_10k_evids);
-            if missing.is_empty() {
-              println!("PASS - we did not miss any event ids!");
-            } else {
-              println!("FAIL - we missed {} event ids ({}/100)", missing.len(), missing.len() as f32/10000.0);
-              println!("MISSING {:?}", missing);
-            }
-            println!("----");
-            println!("---- last 10k evids {:?}", last_10k_evids);
-            last_10k_evids.clear();
-          }
-        } // end testing
-        //
-        //// prefix the board id, except for our Voltage, Timing and NOI 
-        //// packages. For those, we prefix with LOCAL 
+        // prefix the board id, except for our Voltage, Timing and NOI 
+        // packages. For those, we prefix with LOCAL 
         let tp_payload : Vec<u8>;
         match data_type {
           // FIXME - this makes that data types for 

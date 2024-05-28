@@ -131,10 +131,6 @@ struct Args {
   /// Write the readoutboard binary data ('.robin') to the board itself
   #[arg(long, default_value_t = false)]
   to_local_file : bool,
-  /// Take some events with the poisson trigger and 
-  /// check the event ids for duplicates or missing ids
-  #[arg(long, default_value_t = false)]
-  test_eventids: bool,
   /// List of possible commands
   #[command(subcommand)]
   command: CommandRB
@@ -210,7 +206,6 @@ fn main() {
   let verbose                  = args.verbose;
   let show_progress            = args.show_progress;
   let to_local_file            = args.to_local_file;
-  let test_eventids            = args.test_eventids;
   match args.config {
     None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
     Some(cfg_file) => {
@@ -319,10 +314,6 @@ fn main() {
     }
   }
   
-  if test_eventids {
-    warn!("Testing mode! Only for debugging!");
-  }
-
   // should the program terminate after a run
   // or calibration is done?
   // This affects only run start and calibration
@@ -468,7 +459,6 @@ fn main() {
        data_publisher(&tp_from_client,
                       address,
                       output_fname,
-                      test_eventids,
                       verbose,
                       ctrl_cl) 
      })
