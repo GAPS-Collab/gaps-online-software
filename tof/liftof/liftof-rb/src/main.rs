@@ -71,6 +71,7 @@ use tof_dataclasses::events::DataType;
 use tof_dataclasses::run::RunConfig;
 //use tof_dataclasses::manifest::get_rbs_from_sqlite;
 
+#[cfg(feature="database")]
 use tof_dataclasses::database::{
     ReadoutBoard,
     connect_to_db,
@@ -233,36 +234,42 @@ fn main() {
   let cmd_server_address    = config.cmd_dispatcher_settings.cc_server_address.clone();
   let mut run_config        = config.rb_settings.get_runconfig();
   //let db_path               = Path::new(&config.db_path);
+  #[cfg(feature="database")]
   let db_path               = config.db_path.clone();
   run_config.nseconds       = args.runtime_secs;
 
-  // Query the db for this RBs information
-  let conn = connect_to_db(db_path);
-  let mut rb_expected_link_id = 0u8;
-  match conn {
-    Err(err) => {
-      error!("Unable to connect to database at {}! {}", config.db_path, err);
-      panic!("Without db connection, we are currently unable to perform the RB Id/MTB Link Id check!");
-    }
-    Ok(mut conn) => {
-      match ReadoutBoard::all(&mut conn) {
-        None => {
-          error!("We could connect to the database, however, we were unable to retrieve any RB information!");
-          panic!("Without RB information, we won't be able to perform the RB Id/MTB Link Id check!");
+  cfg_if::cfg_if!{
+    if #[cfg(feature="database")] {
+      // Query the db for this RBs information
+      let conn = connect_to_db(db_path);
+      let mut rb_expected_link_id = 0u8;
+      match conn {
+        Err(err) => {
+          error!("Unable to connect to database at {}! {}", config.db_path, err);
+          panic!("Without db connection, we are currently unable to perform the RB Id/MTB Link Id check!");
         }
-        Some(rbs) => {
-          for rb  in rbs {
-            if rb.rb_id == rb_info.board_id {
-              rb_expected_link_id = rb.mtb_link_id;
-              break;
+        Ok(mut conn) => {
+          match ReadoutBoard::all(&mut conn) {
+            None => {
+              error!("We could connect to the database, however, we were unable to retrieve any RB information!");
+              panic!("Without RB information, we won't be able to perform the RB Id/MTB Link Id check!");
+            }
+            Some(rbs) => {
+              for rb  in rbs {
+                if rb.rb_id == rb_info.board_id {
+                  rb_expected_link_id = rb.mtb_link_id;
+                  break;
+                }
+              }
             }
           }
         }
       }
+      println!("=> We found a MTB Link ID {} for this RB (RB ID {}) in the database!", rb_expected_link_id, rb_info.board_id);
+    } else {
+      warn!("Not build with database feature! Currently unable to perform MTB LINK ID check!!");
     }
   }
-  
-  println!("=> We found a MTB Link ID {} for this RB (RB ID {}) in the database!", rb_expected_link_id, rb_info.board_id);
   // FIXME - instead of passing the run config around,
   // just offer it through a mutex
   //let mut global_run_config = Arc::new(Mutex::new(run_config));
@@ -290,19 +297,25 @@ fn main() {
   println!("-----------------------------------------------");
 
   // check if the board has received the correct link id from the mtb
-  println!("=> Performing LTB LINK ID check!");
-  match get_mtb_link_id() {
-    Err(err) => error!("Unable to obtain MTB link id! {err}"),
-    Ok(link_id) => {
-      if link_id as u8 != rb_expected_link_id {
-        println!("=> We received the correct link id from the MTB!");
-        panic!("Unable to perform RB/Link ID mapping check!");
-      } else {
-        error!("Received unexpected MTB link ID {}!", link_id);
-        error!("Incorrect link ID. This might hint to issues with the MTB mapping!");
-        error!("******************************************************************");
-        panic!("The RB/Link ID mapping is wrong for this board!");
+  cfg_if::cfg_if!{
+    if #[cfg(feature="database")] {
+      println!("=> Performing LTB LINK ID check!");
+      match get_mtb_link_id() {
+        Err(err) => error!("Unable to obtain MTB link id! {err}"),
+        Ok(link_id) => {
+          if link_id as u8 != rb_expected_link_id {
+            println!("=> We received the correct link id from the MTB!");
+            panic!("Unable to perform RB/Link ID mapping check!");
+          } else {
+            error!("Received unexpected MTB link ID {}!", link_id);
+            error!("Incorrect link ID. This might hint to issues with the MTB mapping!");
+            error!("******************************************************************");
+            panic!("The RB/Link ID mapping is wrong for this board!");
+          }
+        }
       }
+    } else {
+      error!("Unable to perorm MTB LINK ID check! Recompile with database feature!");
     }
   }
   

@@ -1,6 +1,6 @@
 [package]
 name = "liftof-rb"
-version = "0.10.0"
+version = "0.10.1"
 edition = "2021"
 description = "Readoutboard data acquisition code for the TOF of the GAPS science experiment"
 
@@ -20,15 +20,12 @@ path = "src/bin/scan_uio_buffers.rs"
 name = "debug-idle"
 path = "src/bin/debug_idle.rs"
 
-
 [[bin]]
 name = "debug-registers"
 path = "src/bin/debug_registers.rs"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-#[net]
-#git-fetch-with-cli = true
+[features]
+database = ["tof-dataclasses/database", "liftof-lib/database"]
 
 [dependencies]
 # addess raw memeory, e.g. /dev/uio0
@@ -38,11 +35,12 @@ crossbeam-channel = { workspace = true }
 log               = { workspace = true } 
 clap              = { workspace = true } 
 serde_json        = { workspace = true } 
+zmq               = { workspace = true }
+cfg-if            = { workspace = true }
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random","database","tofcontrol","smoothed_z_score"], version = "0.10"} 
-liftof-lib  = { path = "../liftof-lib", version="0.10"} 
-tof-control = {path = "../../extern/tof-control", optional = false, version = "0.5", features=[] }
-zmq = "0.10.0"
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["tofcontrol","smoothed_z_score"], version = "0.10"} 
+liftof-lib      = { path = "../liftof-lib", version="0.10"} 
+tof-control     = { path = "../../extern/tof-control", optional = false, version = "0.5", features=[] }
 
 colored = "2.0"
 env_logger = "0.10"
@@ -52,4 +50,3 @@ signal-hook = "0.3"
 
 #[target.armv7-unknown-linux-gnueabi]
 #linker = "/usr/bin/arm-none-eabi-gcc"
-cfg-if = "1.0"
