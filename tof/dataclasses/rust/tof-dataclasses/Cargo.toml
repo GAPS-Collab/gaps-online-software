@@ -50,7 +50,9 @@ rand   = { version = "0.8", optional = true}
 # for the database - in case we want to use postgres, 
 # the feature needs to be added here, however, this would
 # also require libpq to be installed.
-diesel = { version = "2.1", features = ["sqlite","64-column-tables"], optional=true }
+diesel = { version = "2.1", features = ["sqlite", "64-column-tables"], optional=true }
+# this fixes all compiling issues for the musl target with libsqlite
+libsqlite3-sys = { version = "0.28", features = ["bundled"] }
 # Takeru's tof-control
 tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.5", features=[] }
 smoothed_z_score = {version = "0.1", optional = true}
