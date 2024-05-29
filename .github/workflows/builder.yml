@@ -53,12 +53,19 @@ jobs:
     - name: Docs
       run: cd ${{github.workspace}}/build && make doc && make liftof-doc
       
-    - name: Test
+    - name: Test-Dataclasses
       working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       #run: ctest -C ${{env.BUILD_TYPE}}
       run: cd ${{github.workspace}}/tof/dataclasses/rust/tof-dataclasses && cargo test --features="random" && cargo test --features="random" --test=test
+    
+    - name: Test-LiftofLib
+      working-directory: ${{github.workspace}}/build
+      # Execute tests defined by the CMake configuration.
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      #run: ctest -C ${{env.BUILD_TYPE}}
+      run: cd ${{github.workspace}}/tof/liftof/liftof-lib && cargo test --all-features && cargo test 
 
     - name: Create .nojekyll
       run: touch ${{ github.workspace }}/build/doc/html/.nojekyll
