@@ -13,6 +13,8 @@ use std::io::{
     Read,
 };
 use std::fmt;
+use std::collections::HashMap;
+
 
 extern crate toml;
 //use tof_dataclasses::events::master_trigger::TriggerType;
@@ -31,6 +33,48 @@ use tof_dataclasses::serialization::{
     Serialization,
     SerializationError
 };
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub enum PreampBiasSetStrategy {
+  ControlServer,
+  Board
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub struct PreampSettings {
+  /// actually apply the below settings
+  pub set_preamp_voltages    : bool,
+  /// liftof-cc will send commands to set the 
+  /// preamp bias voltages
+  pub set_strategy           : PreampBiasSetStrategy,
+  /// preamp biases (one set of 16 values per RAT
+  pub rat_preamp_biases      : HashMap<u8, [f32;16]>
+}
+
+impl PreampSettings {
+  pub fn new() -> Self {
+    Self {
+      set_preamp_voltages    : true,
+      set_strategy           : PreampBiasSetStrategy::ControlServer,
+      rat_preamp_biases      : HashMap::<u8, [f32;16]>::new(),
+    }
+  }
+}
+
+impl fmt::Display for PreampSettings {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = toml::to_string(self).unwrap_or(
+      String::from("-- DESERIALIZATION ERROR! --"));
+    write!(f, "<PreampBiasSettings :\n{}>", disp)
+  }
+}
+
+impl Default for PreampSettings {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CommandDispatcherSettings {
