@@ -1,5 +1,8 @@
 # LELEWAA series
 
+## v0.10.1
+* adds preamp voltage configuration to config file
+
 ## v0.10.0
 * refactors the MasterTrigger code complex and introduces
   seperate modules for registers and control

@@ -48,23 +48,54 @@ pub struct PreampSettings {
   /// preamp bias voltages
   pub set_strategy           : PreampBiasSetStrategy,
   /// preamp biases (one set of 16 values per RAT
-  pub rat_preamp_biases      : HashMap<u8, [f32;16]>
+  pub rat_preamp_biases      : HashMap<String, [f32;16]>
 }
 
 impl PreampSettings {
   pub fn new() -> Self {
+    //let default_biases = HashMap::<u8, [f32;16]>::new();
+    let default_biases = HashMap::from([
+      (String::from("01"), [58.0;16]),
+      (String::from("02"), [58.0;16]),
+      (String::from("03"), [58.0;16]),
+      (String::from("04"), [58.0;16]),
+      (String::from("05"), [58.0;16]),
+      (String::from("06"), [58.0;16]),
+      (String::from("07"), [58.0;16]),
+      (String::from("08"), [58.0;16]),
+      (String::from("09"), [58.0;16]),
+      (String::from("10"), [58.0;16]),
+      (String::from("11"), [58.0;16]),
+      (String::from("12"), [58.0;16]),
+      (String::from("13"), [58.0;16]),
+      (String::from("14"), [58.0;16]),
+      (String::from("15"), [58.0;16]),
+      (String::from("16"), [58.0;16]),
+      (String::from("17"), [58.0;16]),
+      (String::from("18"), [58.0;16]),
+      (String::from("19"), [58.0;16]),
+      (String::from("20"), [58.0;16])]);
+
     Self {
       set_preamp_voltages    : true,
       set_strategy           : PreampBiasSetStrategy::ControlServer,
-      rat_preamp_biases      : HashMap::<u8, [f32;16]>::new(),
+      rat_preamp_biases      : default_biases,
     }
   }
 }
 
 impl fmt::Display for PreampSettings {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let disp = toml::to_string(self).unwrap_or(
-      String::from("-- DESERIALIZATION ERROR! --"));
+    let disp : String;
+    match toml::to_string(self) {
+      Err(err) => {
+        error!("Deserialization error! {err}");
+        disp = String::from("-- DESERIALIZATION ERROR! --");
+      }
+      Ok(_disp) => {
+        disp = _disp;
+      }
+    }
     write!(f, "<PreampBiasSettings :\n{}>", disp)
   }
 }
@@ -469,6 +500,8 @@ pub struct LiftofSettings {
   pub cmd_dispatcher_settings    : CommandDispatcherSettings,
   /// Settings for the individual RBs
   pub rb_settings                : RBSettings,
+  /// Preamp configuration
+  pub preamp_settings            : PreampSettings,
 }
 
 impl LiftofSettings {
@@ -488,6 +521,7 @@ impl LiftofSettings {
       data_publisher_settings   : DataPublisherSettings::new(),
       cmd_dispatcher_settings   : CommandDispatcherSettings::new(),
       rb_settings               : RBSettings::new(),
+      preamp_settings           : PreampSettings::new(),
     }
   }
 
@@ -570,8 +604,16 @@ impl LiftofSettings {
 
 impl fmt::Display for LiftofSettings {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let disp = toml::to_string(self).unwrap_or(
-      String::from("-- DESERIALIZATION ERROR! --"));
+    let disp : String;
+    match toml::to_string(self) {
+      Err(err) => {
+        println!("Deserialization error! {err}");
+        disp = String::from("-- DESERIALIZATION ERROR! --");
+      }
+      Ok(_disp) => {
+        disp = _disp;
+      }
+    }
     write!(f, "<LiftofSettings :\n{}>", disp)
   }
 }
