@@ -26,6 +26,8 @@ pub struct ThreadControl {
   pub thread_event_bldr_active   : bool,
   /// alive indicator for master trigger thread
   pub thread_master_trg_active   : bool,
+  /// alive indicator for monitoring thread
+  pub thread_monitoring_active   : bool,
   /// Running readoutboard communicator threads - the key is associated rb id
   pub thread_rbcomm_active       : HashMap<u8, bool>,
   /// The current run id
@@ -45,6 +47,7 @@ impl ThreadControl {
       thread_runner_active       : false,
       thread_event_bldr_active   : false,
       thread_master_trg_active   : false,
+      thread_monitoring_active   : false,
       thread_rbcomm_active       : HashMap::<u8,bool>::new(),
       run_id                     : 0,
       n_rbs                      : 0,
@@ -66,6 +69,13 @@ impl fmt::Display for ThreadControl {
     repr        += &(format!("\n  cmd dispatcher : {}", self.thread_cmd_dispatch_active));
     repr        += &(format!("\n  runner         : {}", self.thread_data_sink_active));
     repr        += &(format!("\n  data sink      : {}", self.thread_runner_active));
+    repr        += &(format!("\n  monitoring     : {}", self.thread_monitoring_active));
+    if self.thread_rbcomm_active.len() > 0 {
+      repr        += "\n -- active RB threads";
+      for k in self.thread_rbcomm_active.keys() {
+        repr      += &(format!("\n -- -- {} : {}", k, self.thread_rbcomm_active.get(k).unwrap()));
+      }
+    }
     repr        += &(format!("\n  master trig    : {}>", self.thread_master_trg_active));
     write!(f, "{}", repr)
   }
