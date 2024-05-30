@@ -577,110 +577,6 @@
 <a href="#575" id="575">575</a>
 <a href="#576" id="576">576</a>
 <a href="#577" id="577">577</a>
-<a href="#578" id="578">578</a>
-<a href="#579" id="579">579</a>
-<a href="#580" id="580">580</a>
-<a href="#581" id="581">581</a>
-<a href="#582" id="582">582</a>
-<a href="#583" id="583">583</a>
-<a href="#584" id="584">584</a>
-<a href="#585" id="585">585</a>
-<a href="#586" id="586">586</a>
-<a href="#587" id="587">587</a>
-<a href="#588" id="588">588</a>
-<a href="#589" id="589">589</a>
-<a href="#590" id="590">590</a>
-<a href="#591" id="591">591</a>
-<a href="#592" id="592">592</a>
-<a href="#593" id="593">593</a>
-<a href="#594" id="594">594</a>
-<a href="#595" id="595">595</a>
-<a href="#596" id="596">596</a>
-<a href="#597" id="597">597</a>
-<a href="#598" id="598">598</a>
-<a href="#599" id="599">599</a>
-<a href="#600" id="600">600</a>
-<a href="#601" id="601">601</a>
-<a href="#602" id="602">602</a>
-<a href="#603" id="603">603</a>
-<a href="#604" id="604">604</a>
-<a href="#605" id="605">605</a>
-<a href="#606" id="606">606</a>
-<a href="#607" id="607">607</a>
-<a href="#608" id="608">608</a>
-<a href="#609" id="609">609</a>
-<a href="#610" id="610">610</a>
-<a href="#611" id="611">611</a>
-<a href="#612" id="612">612</a>
-<a href="#613" id="613">613</a>
-<a href="#614" id="614">614</a>
-<a href="#615" id="615">615</a>
-<a href="#616" id="616">616</a>
-<a href="#617" id="617">617</a>
-<a href="#618" id="618">618</a>
-<a href="#619" id="619">619</a>
-<a href="#620" id="620">620</a>
-<a href="#621" id="621">621</a>
-<a href="#622" id="622">622</a>
-<a href="#623" id="623">623</a>
-<a href="#624" id="624">624</a>
-<a href="#625" id="625">625</a>
-<a href="#626" id="626">626</a>
-<a href="#627" id="627">627</a>
-<a href="#628" id="628">628</a>
-<a href="#629" id="629">629</a>
-<a href="#630" id="630">630</a>
-<a href="#631" id="631">631</a>
-<a href="#632" id="632">632</a>
-<a href="#633" id="633">633</a>
-<a href="#634" id="634">634</a>
-<a href="#635" id="635">635</a>
-<a href="#636" id="636">636</a>
-<a href="#637" id="637">637</a>
-<a href="#638" id="638">638</a>
-<a href="#639" id="639">639</a>
-<a href="#640" id="640">640</a>
-<a href="#641" id="641">641</a>
-<a href="#642" id="642">642</a>
-<a href="#643" id="643">643</a>
-<a href="#644" id="644">644</a>
-<a href="#645" id="645">645</a>
-<a href="#646" id="646">646</a>
-<a href="#647" id="647">647</a>
-<a href="#648" id="648">648</a>
-<a href="#649" id="649">649</a>
-<a href="#650" id="650">650</a>
-<a href="#651" id="651">651</a>
-<a href="#652" id="652">652</a>
-<a href="#653" id="653">653</a>
-<a href="#654" id="654">654</a>
-<a href="#655" id="655">655</a>
-<a href="#656" id="656">656</a>
-<a href="#657" id="657">657</a>
-<a href="#658" id="658">658</a>
-<a href="#659" id="659">659</a>
-<a href="#660" id="660">660</a>
-<a href="#661" id="661">661</a>
-<a href="#662" id="662">662</a>
-<a href="#663" id="663">663</a>
-<a href="#664" id="664">664</a>
-<a href="#665" id="665">665</a>
-<a href="#666" id="666">666</a>
-<a href="#667" id="667">667</a>
-<a href="#668" id="668">668</a>
-<a href="#669" id="669">669</a>
-<a href="#670" id="670">670</a>
-<a href="#671" id="671">671</a>
-<a href="#672" id="672">672</a>
-<a href="#673" id="673">673</a>
-<a href="#674" id="674">674</a>
-<a href="#675" id="675">675</a>
-<a href="#676" id="676">676</a>
-<a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-<a href="#679" id="679">679</a>
-<a href="#680" id="680">680</a>
-<a href="#681" id="681">681</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Aggregate settings for the TOF system
 //!
 //! Control the settings for the C&amp;C server
@@ -714,76 +610,6 @@
     </span>Serialization,
     SerializationError
 };
-
-<span class="attr">#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-</span><span class="kw">pub struct </span>CommandDispatcherSettings {
-  <span class="doccomment">/// Log all commands into this file
-  /// Set to "/dev/null" to turn off.
-  /// The mode will be always "append", since we don't 
-  /// expect a lot of logging
-  </span><span class="kw">pub </span>cmd_log_path               : String,
-  <span class="doccomment">/// The address of the liftof-command &amp; control server
-  /// that is the ip address on the RBNetwork which the 
-  /// liftof-cc instance runs on 
-  /// This address will be used as "PUB" for the CommandDispather
-  /// This address has to be within the RB network
-  </span><span class="kw">pub </span>cc_server_address          : String,   
-  <span class="doccomment">/// The address ("tcp://xx.xx.xx.xx:xxxxx") the tof computer should subscribe to 
-  /// to get commands from the flight computer. This address is within the 
-  /// flight network
-  </span><span class="kw">pub </span>fc_sub_address             : String,
-  <span class="doccomment">/// Interval of time that will elapse from a cmd check to the other
-  </span><span class="kw">pub </span>cmd_listener_interval_sec  : u64,
-  <span class="doccomment">/// Safety mechanism - is this is on, the command listener will deny 
-  /// every request. E.g. in staging mode to guarantee no tinkering
-  </span><span class="kw">pub </span>deny_all_requests          : bool
-}
-
-<span class="kw">impl </span>CommandDispatcherSettings {
-  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-    <span class="self">Self </span>{
-      cmd_log_path                   : String::from(<span class="string">"/home/gaps/log"</span>),
-      cc_server_address              : String::from(<span class="string">"tcp://10.0.1.10:42000"</span>),   
-      fc_sub_address                 : String::from(<span class="string">"tcp://192.168.37.200:41662"</span>),
-      cmd_listener_interval_sec      : <span class="number">1</span>,
-      deny_all_requests              : <span class="bool-val">false
-    </span>}
-  }
-}
-
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>CommandDispatcherSettings {
-  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="kw">let </span>disp = toml::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">"-- DESERIALIZATION ERROR! --"</span>));
-    <span class="macro">write!</span>(f, <span class="string">"&lt;CommandDispatcherSettings :\n{}&gt;"</span>, disp)
-  }
-}
-
-<span class="kw">impl </span>Default <span class="kw">for </span>CommandDispatcherSettings {
-  <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-    <span class="self">Self</span>::new()
-  }
-}
-
-<span class="doccomment">/// Readout strategy for RB (onboard) (RAM) memory buffers
-</span><span class="attr">#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
-</span><span class="kw">pub enum </span>RBBufferStrategy {
-  <span class="doccomment">/// Readout and switch the buffers every
-  /// x events
-  </span>NEvents(u16),
-  <span class="doccomment">/// Adapt to the RB rate and readout the buffers
-  /// so that we get switch them every X seconds.
-  /// (Argument is in seconds
-  </span>AdaptToRate(u16),
-}
-
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>RBBufferStrategy {
-  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">"N.A. - Invalid RBBufferStrategy (error)"</span>));
-    <span class="macro">write!</span>(f, <span class="string">"&lt;RBBufferStrategy: {}&gt;"</span>, r)
-  }
-}
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 </span><span class="kw">pub enum </span>BuildStrategy {
@@ -828,17 +654,12 @@
   /// data type, e.g. "VoltageCalibration".
   /// &lt;div class="warning"&gt;This might get deprecated in a future version!&lt;/div&gt;
   </span><span class="kw">pub </span>data_type               : DataType,
-  <span class="doccomment">/// This allows for different strategies on how to readout 
-  /// the RB buffers. The following refers to the NEvent strategy.
-  /// The value when the readout of the RB buffers is triggered.
+  <span class="doccomment">/// The value when the readout of the RB buffers is triggered.
   /// This number is in size of full events, which correspond to 
   /// 18530 bytes. Maximum buffer size is a bit more than 3000 
   /// events. Smaller buffer allows for a more snappy reaction, 
   /// but might require more CPU resources (on the board)
-  /// For RBBufferStrategy::AdaptToRate(k), readout (and switch) the buffers every
-  /// k seconds. The size of the buffer will be determined
-  /// automatically depending on the rate.
-  </span><span class="kw">pub </span>rb_buff_strategy        : RBBufferStrategy,
+  </span><span class="kw">pub </span>rb_buff_size            : u16,
   <span class="doccomment">/// The general moni interval. Whenever this time in seconds has
   /// passed, the RB will send a RBMoniData packet
   </span><span class="kw">pub </span>rb_moni_interval        : f32,
@@ -859,7 +680,7 @@
       trigger_fixed_rate   : <span class="number">0</span>,
       trigger_poisson_rate : <span class="number">0</span>,
       data_type            : DataType::Physics,
-      rb_buff_strategy     : RBBufferStrategy::AdaptToRate(<span class="number">5</span>),
+      rb_buff_size         : <span class="number">50</span>,
       rb_moni_interval     : <span class="number">0.0</span>,
       pb_moni_every_x      : <span class="number">0.0</span>,
       pa_moni_every_x      : <span class="number">0.0</span>,
@@ -876,27 +697,7 @@
     rcfg.trigger_fixed_rate   = <span class="self">self</span>.trigger_fixed_rate;
     rcfg.trigger_poisson_rate = <span class="self">self</span>.trigger_poisson_rate;
     rcfg.data_type            = <span class="self">self</span>.data_type.clone();
-    <span class="kw">let </span>buffer_trip : u16;
-    <span class="kw">match </span><span class="self">self</span>.rb_buff_strategy {
-      RBBufferStrategy::NEvents(buff_size) =&gt; {
-        buffer_trip = buff_size;
-      },
-      RBBufferStrategy::AdaptToRate(<span class="kw">_</span>) =&gt; {
-        <span class="comment">// For now, let's just set the initial value to
-        // 50 FIXME
-        </span>buffer_trip = <span class="number">50</span>;
-        <span class="comment">//match rate = get_trigger_rate() {
-        //  Err(err) {
-        //    error!("Unable to obtain trigger rate!");
-        //    buffer_trip = 50;
-        //  },
-        //  Ok(rate) =&gt; {
-        //    buffer_trip = rate*n_secs as u16;
-        //  }
-        //}
-      </span>}
-    }
-    rcfg.rb_buff_size         = buffer_trip <span class="kw">as </span>u16;
+    rcfg.rb_buff_size         = <span class="self">self</span>.rb_buff_size;
     rcfg
   }
 }
@@ -989,8 +790,6 @@
   <span class="doccomment">/// The timeout parameter for the TofEvent. If not
   /// complete after this time, send it onwards anyway
   </span><span class="kw">pub </span>te_timeout_sec      : u32,
-  <span class="doccomment">/// try to sort the events by id (uses more resources)
-  </span><span class="kw">pub </span>sort_events         : bool,
   <span class="kw">pub </span>build_strategy      : BuildStrategy,
 }
 
@@ -1001,7 +800,6 @@
       n_mte_per_loop      : <span class="number">1</span>,
       n_rbe_per_loop      : <span class="number">40</span>,
       te_timeout_sec      : <span class="number">30</span>,
-      sort_events         : <span class="bool-val">false</span>,
       build_strategy      : BuildStrategy::WaitForNBoards(<span class="number">40</span>),
     }
   }
@@ -1025,36 +823,25 @@
 </span><span class="attr">#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 </span><span class="kw">pub struct </span>DataPublisherSettings {
   <span class="doccomment">/// location to store data on TOF computer
-  </span><span class="kw">pub </span>data_dir                  : String,
-  <span class="doccomment">/// The data written on disk gets divided into 
-  /// files of a fixed size. 
-  </span><span class="kw">pub </span>mbytes_per_file           : usize,
-
+  </span><span class="kw">pub </span>data_dir       : String,
+  <span class="doccomment">/// TOFPackets per file. This defines the "length" of 
+  /// a subrun. 
+  </span><span class="kw">pub </span>packs_per_file : usize,
   <span class="doccomment">/// The address the flight computer should subscribe 
   /// to to get tof packets
-  </span><span class="kw">pub </span>fc_pub_address            : String,
-  <span class="doccomment">/// Send also MastertriggerPackets (this should be 
-  /// turned off in flight - only useful if 
-  /// send_flight_packets is true, otherwise
-  /// MTB events will get sent as part of TofEvents
-  </span><span class="kw">pub </span>send_mtb_event_packets    : bool,
-  <span class="doccomment">/// switch off waveform sending (in case of we 
-  /// are sending flight packets)
-  </span><span class="kw">pub </span>send_rbwaveform_packets   : bool,
-  <span class="kw">pub </span>send_tof_summary_packets  : bool,
-  <span class="kw">pub </span>send_tof_event_packets    : bool
+  </span><span class="kw">pub </span>fc_pub_address : String,
+  <span class="doccomment">/// Send TofSummary + RBWaveforms instead of 
+  /// TofEvents
+  </span><span class="kw">pub </span>send_flight_packets : bool,
 }
 
 <span class="kw">impl </span>DataPublisherSettings {
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
       data_dir                  : String::from(<span class="string">""</span>),
-      mbytes_per_file           : <span class="number">420</span>,
+      packs_per_file            : <span class="number">1000</span>,
       fc_pub_address            : String::from(<span class="string">""</span>),
-      send_mtb_event_packets    : <span class="bool-val">false</span>,
-      send_rbwaveform_packets   : <span class="bool-val">false</span>,
-      send_tof_summary_packets  : <span class="bool-val">true</span>,
-      send_tof_event_packets    : <span class="bool-val">false
+      send_flight_packets       : <span class="bool-val">false
     </span>}
   }
 }
@@ -1076,15 +863,21 @@
 
 <span class="attr">#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 </span><span class="kw">pub struct </span>LiftofSettings {
-  <span class="doccomment">/// read run .toml files from this directory and 
-  /// automotically work through them 1by1
-  </span><span class="kw">pub </span>staging_dir                : String,
   <span class="doccomment">/// default location for RBCalibration files
   </span><span class="kw">pub </span>calibration_dir            : String,
   <span class="doccomment">/// default location for the database
   </span><span class="kw">pub </span>db_path                    : String,
   <span class="doccomment">/// Runtime in seconds
   </span><span class="kw">pub </span>runtime_sec                : u64,
+  <span class="doccomment">/// The address of the liftof-command &amp; control server
+  /// that is the ip address on the RBNetwork which the 
+  /// liftof-cc instance runs on 
+  </span><span class="kw">pub </span>cc_server_address          : String,   
+  <span class="doccomment">/// The address ("tcp://xx.xx.xx.xx:xxxxx") the tof computer should subscribe to 
+  /// to get commands from the flight computer
+  </span><span class="kw">pub </span>fc_sub_address             : String,
+  <span class="doccomment">/// Interval of time that will elapse from a cmd check to the other
+  </span><span class="kw">pub </span>cmd_listener_interval_sec  : u64,
   <span class="doccomment">/// The UDP port to be used to get packets from the 
   /// MTB
   </span><span class="kw">pub </span>mtb_address                : String,
@@ -1104,8 +897,6 @@
   </span><span class="kw">pub </span>analysis_engine_settings   : AnalysisEngineSettings,
   <span class="doccomment">/// Configure data publshing and saving on local disc
   </span><span class="kw">pub </span>data_publisher_settings    : DataPublisherSettings,
-  <span class="doccomment">/// Configure cmmand reception and sending
-  </span><span class="kw">pub </span>cmd_dispatcher_settings    : CommandDispatcherSettings,
   <span class="doccomment">/// Settings for the individual RBs
   </span><span class="kw">pub </span>rb_settings                : RBSettings,
 }
@@ -1113,10 +904,12 @@
 <span class="kw">impl </span>LiftofSettings {
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     LiftofSettings {
-      staging_dir               : String::from(<span class="string">"/home/gaps/liftof-staging"</span>),
       calibration_dir           : String::from(<span class="string">""</span>),
       db_path                   : String::from(<span class="string">"/home/gaps/config/gaps_flight.db"</span>),
       runtime_sec               : <span class="number">0</span>,
+      cc_server_address         : String::from(<span class="string">"tcp://10.0.1.10:42000"</span>),   
+      fc_sub_address            : String::from(<span class="string">""</span>),
+      cmd_listener_interval_sec : <span class="number">1</span>,
       mtb_address               : String::from(<span class="string">"10.0.1.10:50001"</span>),
       cpu_moni_interval_sec     : <span class="number">60</span>,
       rb_ignorelist             : Vec::&lt;u8&gt;::new(),
@@ -1125,7 +918,6 @@
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),
       data_publisher_settings   : DataPublisherSettings::new(),
-      cmd_dispatcher_settings   : CommandDispatcherSettings::new(),
       rb_settings               : RBSettings::new(),
     }
   }

@@ -63,12 +63,6 @@
 <a href="#61" id="61">61</a>
 <a href="#62" id="62">62</a>
 <a href="#63" id="63">63</a>
-<a href="#64" id="64">64</a>
-<a href="#65" id="65">65</a>
-<a href="#66" id="66">66</a>
-<a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-<a href="#69" id="69">69</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Tof dataclasses
 //!     
 //! This crate provides tof related dataclasses for 
@@ -90,8 +84,8 @@
 //! * random - allow random number generated data classes for 
 //!            testing
 //!
-//! * database - access a data base for advanced paddle
-//!              mapping, readoutboard and ltb information etc.
+//! * database - access the SQLite data base for advanced paddle
+//!              mapping
 //!
 
 </span><span class="kw">pub mod </span>events;
@@ -103,17 +97,11 @@
 <span class="kw">pub mod </span>threading;
 <span class="kw">pub mod </span>commands;
 <span class="kw">pub mod </span>monitoring;
-<span class="comment">//pub mod manifest;
-</span><span class="kw">pub mod </span>run;
+<span class="kw">pub mod </span>manifest;
+<span class="kw">pub mod </span>run;
 <span class="kw">pub mod </span>io;
 <span class="kw">pub mod </span>analysis;
 <span class="kw">pub mod </span>ipbus;
-<span class="kw">pub mod </span>series;
-<span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
-</span><span class="kw">extern crate </span>diesel;
-<span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
-</span><span class="kw">pub mod </span>database;
-
 
 <span class="attr">#[macro_use] </span><span class="kw">extern crate </span>log;
 

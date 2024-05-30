@@ -4,6 +4,5 @@ var structRBWaveform =
     [ "adc", "structRBWaveform.html#a4c910f202714b5ac8fe164c9a0fe4f24", null ],
     [ "event_id", "structRBWaveform.html#ac181e3faf63b4e0675e86dad6aa55208", null ],
     [ "rb_channel", "structRBWaveform.html#a67bad83e42b35f710a1c80866cdb39b1", null ],
-    [ "rb_id", "structRBWaveform.html#a40599a4a3dab919b26019dcf9d90d28b", null ],
-    [ "stop_cell", "structRBWaveform.html#ae789129964e8dd970c282e40b73745bc", null ]
+    [ "rb_id", "structRBWaveform.html#a40599a4a3dab919b26019dcf9d90d28b", null ]
 ];

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"derive":["AsChangeset","AsExpression","Associations","DieselNumericOps","FromSqlRow","Identifiable","Insertable","MultiConnection","QueryId","Queryable","QueryableByName","Selectable","SqlType","ValidGrouping"],"macro":["sql_function_proc","table_proc"]};

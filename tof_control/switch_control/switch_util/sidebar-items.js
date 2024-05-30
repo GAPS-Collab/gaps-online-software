@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["convert_oid","print_switch_data","snmp_get_integer","snmp_get_octetstring","snmp_get_octetstring_raw","snmp_get_unsigned32","snmp_getbulk_counter64","snmp_getbulk_integer","snmp_set_integer"]};

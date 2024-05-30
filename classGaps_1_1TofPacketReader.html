@@ -28,7 +28,7 @@
   <td id="projectlogo"><img alt="Logo" src="GAPSLOGO_2023_ico.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">gaps-online-software
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.9</span>
    </div>
    <div id="projectbrief">online software for the TOF system for the GAPS experiment</div>
   </td>
@@ -100,83 +100,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6ff57b5fa3c49c7ed83f3465e169c6c9"><td class="memItemLeft" align="right" valign="top"><a id="a6ff57b5fa3c49c7ed83f3465e169c6c9"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>TofPacketReader</b> (String filename)</td></tr>
 <tr class="separator:a6ff57b5fa3c49c7ed83f3465e169c6c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5848861461ddb746c6e6b74c3b12a3d7"><td class="memItemLeft" align="right" valign="top"><a id="a5848861461ddb746c6e6b74c3b12a3d7"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>TofPacketReader</b> (const <a class="el" href="classGaps_1_1TofPacketReader.html">TofPacketReader</a> &amp;)=delete</td></tr>
-<tr class="separator:a5848861461ddb746c6e6b74c3b12a3d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8a207f64bbe9c6f4abe9327eb04631c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGaps_1_1TofPacketReader.html#ae8a207f64bbe9c6f4abe9327eb04631c">set_filename</a> (String filename)</td></tr>
-<tr class="separator:ae8a207f64bbe9c6f4abe9327eb04631c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a929ceac60fd9cbaddee01ba3050138e4"><td class="memItemLeft" align="right" valign="top"><a id="a929ceac60fd9cbaddee01ba3050138e4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>process_chunk</b> ()</td></tr>
+<tr class="separator:a929ceac60fd9cbaddee01ba3050138e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80c6a32384e55586be13bc2b8e2e7458"><td class="memItemLeft" align="right" valign="top"><a id="a80c6a32384e55586be13bc2b8e2e7458"></a>
-<a class="el" href="structTofPacket.html">TofPacket</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGaps_1_1TofPacketReader.html#a80c6a32384e55586be13bc2b8e2e7458">get_next_packet</a> ()</td></tr>
-<tr class="memdesc:a80c6a32384e55586be13bc2b8e2e7458"><td class="mdescLeft">&#160;</td><td class="mdescRight">Walk over the file and return the next packet. <br /></td></tr>
+<a class="el" href="structTofPacket.html">TofPacket</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_next_packet</b> ()</td></tr>
 <tr class="separator:a80c6a32384e55586be13bc2b8e2e7458"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7460faef779b1af3048212d928e40e7"><td class="memItemLeft" align="right" valign="top"><a id="ad7460faef779b1af3048212d928e40e7"></a>
-String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGaps_1_1TofPacketReader.html#ad7460faef779b1af3048212d928e40e7">get_filename</a> () const</td></tr>
-<tr class="memdesc:ad7460faef779b1af3048212d928e40e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the filename we assigned. <br /></td></tr>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>get_filename</b> () const</td></tr>
 <tr class="separator:ad7460faef779b1af3048212d928e40e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05d05259733a4cacd26045fa0844cd36"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGaps_1_1TofPacketReader.html#a05d05259733a4cacd26045fa0844cd36">is_exhausted</a> () const</td></tr>
-<tr class="separator:a05d05259733a4cacd26045fa0844cd36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d60c227d18a002876b946ea1f6f9ed4"><td class="memItemLeft" align="right" valign="top">usize&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGaps_1_1TofPacketReader.html#a0d60c227d18a002876b946ea1f6f9ed4">n_packets_read</a> () const</td></tr>
-<tr class="separator:a0d60c227d18a002876b946ea1f6f9ed4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Read serialized TofPackets from a file and emit them as packets </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a05d05259733a4cacd26045fa0844cd36"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a05d05259733a4cacd26045fa0844cd36">&#9670;&nbsp;</a></span>is_exhausted()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool Gaps::TofPacketReader::is_exhausted </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>All packets have been read from the file. If they should be read again, the reader has to be created again </p>
-
-</div>
-</div>
-<a id="a0d60c227d18a002876b946ea1f6f9ed4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d60c227d18a002876b946ea1f6f9ed4">&#9670;&nbsp;</a></span>n_packets_read()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">usize Gaps::TofPacketReader::n_packets_read </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The number of files this reader has read from the file </p>
-
-</div>
-</div>
-<a id="ae8a207f64bbe9c6f4abe9327eb04631c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae8a207f64bbe9c6f4abe9327eb04631c">&#9670;&nbsp;</a></span>set_filename()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Gaps::TofPacketReader::set_filename </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>filename</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Set a filename where to read packets from. This is a binary file format, typically ending in ".tof.gaps" </p>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/C++/include/<a class="el" href="io_8hpp_source.html">io.hpp</a></li>
 </ul>
 </div><!-- contents -->

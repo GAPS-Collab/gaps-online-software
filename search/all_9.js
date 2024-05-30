@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['mag_5ftot_29',['mag_tot',['../structRBMoniData.html#aceb4fef6fbabb001a8fff0744f2ae23f',1,'RBMoniData']]],
-  ['mastertriggerevent_30',['MasterTriggerEvent',['../structMasterTriggerEvent.html',1,'']]],
-  ['missing_5fhits_31',['missing_hits',['../structTofEvent.html#aa9745620cfaea3f6655d2c214a51f7e3',1,'TofEvent']]],
-  ['mtbmonidata_32',['MtbMoniData',['../structMtbMoniData.html',1,'']]]
+  ['n_5fpaddles_29',['n_paddles',['../structMasterTriggerEvent.html#a3584e8178fab07839e43d3eec831d0bc',1,'MasterTriggerEvent']]],
+  ['n_5ftrigger_5fpaddles_30',['n_trigger_paddles',['../structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e',1,'TofEventSummary']]],
+  ['noi_5fdata_31',['noi_data',['../structRBCalibration.html#a71265fb6bc6cd97c69bc54923cc06f0e',1,'RBCalibration']]]
 ];
