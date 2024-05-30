@@ -116,7 +116,8 @@ impl PyRBCalibration {
   fn d_v(&self) -> f32 {
     self.cali.d_v
   }
-  
+ 
+
   #[getter]
   fn vcal_data(&self) -> Vec<PyRBEvent> {
     let mut events = Vec::<PyRBEvent>::with_capacity(1000);
@@ -1027,12 +1028,37 @@ impl PyRBEvent {
     hits
   }
   
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<RBEvent>() {
+      Ok(event) => {
+        self.event = event;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+  
   #[getter]
   fn header(&self) -> PyRBEventHeader {
     let mut py_header = PyRBEventHeader::new();
     //let mut header = self.event.header;
     py_header.set_header(self.event.header.clone());
     py_header
+  }
+  
+  #[getter]
+  fn waveforms(&self) -> Vec<PyRBWaveform> {
+    let mut wfs = Vec::<PyRBWaveform>::new();
+    for wf in &self.event.get_rbwaveforms() {
+      let mut pywf = PyRBWaveform::new();
+      pywf.set_wf(wf.clone());
+      wfs.push(pywf);
+    }
+    wfs
   }
   
 
@@ -1071,6 +1097,16 @@ impl PyTofHit {
   }
  
   /// charge of the different paddle ends
+  #[getter]
+  fn peak_a(&self) -> f32 {
+    self.hit.get_peak_a()
+  }
+  
+  #[getter]
+  fn peak_b(&self) -> f32 {
+    self.hit.get_peak_b()
+  }
+  
   #[getter]
   fn charge_a(&self) -> f32 {
     self.hit.get_charge_a()
