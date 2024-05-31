@@ -62,10 +62,10 @@ impl fmt::Display for ThreadControl {
     repr        += &(format!("\n  N RBs     : {}", self.n_rbs));
     repr        += "    -- reported RB calibration activity:";
     repr        += &(format!("\n  RB cali active : {}", self.calibration_active));
-    repr        += &(format!("\n  -- finished    : {:?}", self.finished_calibrations));       
-    repr        += "    -- program status:";
+    repr        += &(format!("\n  -- finished    : \n{:?}", self.finished_calibrations));       
+    repr        += "\n    -- program status:";
     repr        += &(format!("\n  stop flag : {}", self.stop_flag));
-    repr        += "    -- reported thread activity:";
+    repr        += "\n    -- reported thread activity:";
     repr        += &(format!("\n  cmd dispatcher : {}", self.thread_cmd_dispatch_active));
     repr        += &(format!("\n  runner         : {}", self.thread_data_sink_active));
     repr        += &(format!("\n  data sink      : {}", self.thread_runner_active));
