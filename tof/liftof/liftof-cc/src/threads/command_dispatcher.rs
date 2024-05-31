@@ -31,7 +31,6 @@ use tof_dataclasses::threading::ThreadControl;
 use tof_dataclasses::constants::PAD_CMD_32BIT;
 use tof_dataclasses::commands::{
     TofCommand,
-    RBCommand,
     //TofCommandCode,
     TofResponse,
     TofResponseCode
@@ -302,28 +301,6 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                     }
                   }
                 }// end match cmd
-              }
-              // deprecated, should go away, kept here right now
-              // for compatiblity and not sure what it is neeeded for
-              PacketType::RBCommand => {
-                debug!("Received RBCommand!");
-                match RBCommand::from_bytestream(&packet.payload, &mut 0) {
-                  Ok(rb_cmd) => {
-                    let mut payload = format!("RB{:2}", rb_cmd.rb_id).into_bytes();
-                    // We just relay the whole thing, the only use of the excercise
-                    // here was to get the RBID from within the packet and slab it 
-                    // onto its front
-                    //let payload = &rb_topic.into_bytes() + buffer.to_slice();
-                    payload.append(&mut buffer);
-                    match cmd_sender.send(&payload,0) {
-                      Err(err) => error!("Unable to send command {}! Error {err}", rb_cmd),
-                      Ok(_)    => trace!("Sent RBCommand {}", rb_cmd)
-                    }
-                  }
-                  Err(err) => {
-                    error!("Can not construct RBCommand, error {err}");
-                  }
-                }
               },
               _ => {
                 error!("Received garbage package! {}", packet);
