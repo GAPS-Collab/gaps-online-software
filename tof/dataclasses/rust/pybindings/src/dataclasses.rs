@@ -50,7 +50,10 @@ use tof_dataclasses::events::{
     RBWaveform
 };
 
-use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::serialization::{
+    Serialization,
+    Packable
+};
 use tof_dataclasses::commands::{
     TofCommandV2,
     TofCommandCode
@@ -118,6 +121,14 @@ impl PyTofCommand {
   fn to_bytestream(&self) -> Vec<u8> {
     self.command.to_bytestream()
   }
+
+  fn pack(&self) -> PyTofPacket {
+    let packet   = self.command.pack();
+    let mut pytp = PyTofPacket::new();
+    pytp.set_tp(packet);
+    pytp
+  }
+
 
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.command)) 
@@ -778,6 +789,10 @@ impl PyTofPacket {
   #[getter]
   fn packet_type(&self) -> PacketType {
     self.packet.packet_type
+  }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    self.packet.to_bytestream()
   }
 
   fn __repr__(&self) -> PyResult<String> {
