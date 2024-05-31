@@ -39,6 +39,7 @@ pub enum PacketType {
                                // still needs to be processed.
   RBCalibration       = 130u8,
   TofCommand          = 140u8,
+  TofCommandV2        = 141u8,
   TofResponse         = 142u8,
   RBCommand           = 150u8,
   Ping                = 160u8,
@@ -82,6 +83,7 @@ impl From<u8> for PacketType {
       120u8 => PacketType::RBEventMemoryView,
       130u8 => PacketType::RBCalibration,
       140u8 => PacketType::TofCommand,
+      141u8 => PacketType::TofCommandV2,
       142u8 => PacketType::TofResponse,
       150u8 => PacketType::RBCommand,
       160u8 => PacketType::Ping,
@@ -111,6 +113,7 @@ impl FromRandom for PacketType {
       PacketType::RBEvent,
       PacketType::RBEventMemoryView,
       PacketType::TofCommand,
+      PacketType::TofCommandV2,
       PacketType::TofResponse,
       PacketType::RBCommand,
       PacketType::RBMoniData,
@@ -145,6 +148,7 @@ fn test_packet_types() {
   type_codes.push(PacketType::RBEvent as u8);
   type_codes.push(PacketType::RBEventMemoryView as u8);
   type_codes.push(PacketType::TofCommand as u8);
+  type_codes.push(PacketType::TofCommandV2 as u8);
   type_codes.push(PacketType::TofResponse as u8);
   type_codes.push(PacketType::RBCommand as u8);
   type_codes.push(PacketType::RBMoniData as u8);
