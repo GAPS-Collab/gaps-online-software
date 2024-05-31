@@ -53,7 +53,6 @@ use crate::events::{
 
 use crate::commands::{
     TofCommand,
-    RBCommand
 };
 
 use crate::calibrations::RBCalibrations;
@@ -304,14 +303,6 @@ impl From<&TofCommand> for TofPacket {
   }
 }
 
-impl From<&RBCommand> for TofPacket {
-  fn from(cmd : &RBCommand) -> Self {
-    let mut tp = Self::new();
-    tp.packet_type = PacketType::RBCommand;
-    tp.payload = cmd.to_bytestream();
-    tp
-  }
-}
 
 impl From<&RBCalibrations> for TofPacket {
   fn from(calib : &RBCalibrations) -> Self {

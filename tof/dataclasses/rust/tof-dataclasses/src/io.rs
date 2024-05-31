@@ -102,6 +102,14 @@ pub fn get_utc_timestamp() -> String {
   timestamp_str
 }
 
+/// Create date string in YYMMDD format
+pub fn get_utc_date() -> String {
+  let now: DateTime<Utc> = Utc::now();
+  //let timestamp_str = now.format("%Y_%m_%d-%H_%M_%S").to_string();
+  let timestamp_str = now.format("%y%m%d").to_string();
+  timestamp_str
+}
+
 /// A standardized name for calibration files saved by 
 /// the liftof suite
 ///
