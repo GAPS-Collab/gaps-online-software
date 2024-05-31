@@ -138,6 +138,7 @@ fn rpy_tof_dataclasses<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { //: P
   m.add_wrapped(wrap_pymodule!(tof_moni))?;
   m.add_wrapped(wrap_pymodule!(tof_io))?;
   m.add_wrapped(wrap_pymodule!(tof_events))?;
+  m.add_wrapped(wrap_pymodule!(tof_commands))?;
   //m.add_function(wrap_pyfunction!(test_waveform_analysis,m)?)?;
   //m.add_function(wrap_pyfunction!(wrap_calc_edep_simple,m)?)?;
   //m.add_function(wrap_pyfunction!(test_db,m)?)?;
