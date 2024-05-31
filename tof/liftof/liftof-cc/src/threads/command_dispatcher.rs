@@ -101,8 +101,10 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
   loop {
     // check if we get a command from the main 
     // thread
-    match thread_ctrl.lock() {
+    thread::sleep(sleep_time);
+    match thread_ctrl.try_lock() {
       Ok(mut tc) => {
+        //println!("== ==> [cmd_dispatcher] tc locked!");
         if tc.stop_flag {
           info!("Received stop signal. Will stop thread!");
           info!("Will end all Run activity on the RBs and send >>StopRun<< signal to all RBs!");
@@ -140,11 +142,6 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
     // thread
     match cmd_receiver.recv_bytes(zmq::DONTWAIT) {
       Err(_)   => {
-        // no need for error catching, typically it 
-        // just means that nobody sent anythin
-        trace!("No cmd received! Sleeping for {:?}...", sleep_time);
-        // take out the heat and sleep a bit
-        thread::sleep(sleep_time);
         continue;
       }
       Ok(mut buffer) => {
@@ -340,83 +337,3 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
   }
 }
 
-///// Broadcast commands over the tof-computer network
-///// socket via zmq::PUB to the rb network.
-///// Currently, the only participants in the rb network
-///// are the readoutboards.
-/////
-///// After the reception of a TofCommand, this will currently be 
-///// broadcasted to all readout boards.
-/////
-///// ISSUE/FIXME  : Send commands only to specific addresses.
-/////
-///// # Arguments 
-/////
-///// * cmd        : a \[crossbeam\] receiver, to receive 
-/////                TofCommands.
-//pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
-//  debug!(".. started!");
-//  let this_board_ip = IpAddr::V4(Ipv4Addr::new(10, 0, 1, 1));
-//
-//  let address_ip;
-//  match this_board_ip {
-//    IpAddr::V4(ip) => address_ip = ip.to_string().clone(),
-//    IpAddr::V6(_) => panic!("Currently, we do not support IPV6!")
-//  }
-//  let data_address : String = build_tcp_from_ip(address_ip,DATAPORT.to_string());
-//  let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-//  data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
-//  println!("==> 0MQ PUB socket bound to address {data_address}");
-//  loop {
-//    // check if we get a command from the main 
-//    // thread
-//    match cmd.try_recv() {
-//      Err(err) => trace!("Did not receive a new command, error {err}"),
-//      Ok(packet) => {
-//        // now we have several options
-//        match packet.packet_type {
-//          PacketType::TofCommand => {
-//            info!("Received TofCommand! Broadcasting to all TOF entities who are listening!");
-//            let mut payload  = String::from("BRCT").into_bytes();
-//            payload.append(&mut packet.to_bytestream());
-//            match data_socket.send(&payload,0) {
-//              Err(err) => error!("Unable to send command! Error {err}"),
-//              Ok(_)    => info!("BRCT command sent!")
-//            }
-//          },
-//          PacketType::RBCommand => {
-//            debug!("Received RBCommand!");
-//            let mut payload_str  = String::from("RB");
-//            match RBCommand::from_bytestream(&packet.payload, &mut 0) {
-//              Ok(rb_cmd) => {
-//                let to_rb_id = rb_cmd.rb_id;
-//                if rb_cmd.rb_id < 10 {
-//                  payload_str += &String::from("0");
-//                  payload_str += &to_rb_id.to_string();
-//                } else {
-//                  payload_str += &to_rb_id.to_string();
-//                }
-//
-//                let mut payload = payload_str.into_bytes();
-//                payload.append(&mut packet.to_bytestream());
-//                match data_socket.send(&payload,0) {
-//                  Err(err) => error!("Unable to send command {}! Error {err}", rb_cmd),
-//                  Ok(_)    => debug!("Making event request! {}", rb_cmd)
-//                }
-//              }
-//              Err(err) => {
-//                error!("Can not construct RBCommand, error {err}");
-//              }
-//            }
-//          },
-//          _ => {
-//            error!("Received garbage package! {}", packet);
-//          }
-//        }// end match
-//      }
-//    }
-//  }
-//}
-//
-//
-//}

@@ -189,11 +189,6 @@ pub fn cmd_responder(cmd_server_address        : String,
                         error!("Cannot interpret unknown command");
                         return_val = Err(CmdError::UnknownError);
                       },
-                      TofCommand::Listen (_) => {
-                        info!("Received listen command");
-                        error!("Listening inception!");
-                        return_val = Err(CmdError::ListenError);
-                      },
                       TofCommand::Ping (value) => {
                         info!("Received ping command");
                         // MSB third 8 bits are 
@@ -317,48 +312,6 @@ pub fn cmd_responder(cmd_server_address        : String,
                           }
                         }
                       },
-                      TofCommand::Power   (value) => {
-                        info!("Received power command");
-                        // MSB second 8 bits are tof component
-                        let tof_component: TofComponent = TofComponent::from(((value | (MASK_CMD_8BIT << 16)) >> 16) as u8);
-                        // MSB third 8 bits are 
-                        let component_id: u8 = ((value | MASK_CMD_8BIT << 8) >> 8) as u8;
-                        // MSB fourth 8 bits are 
-                        let status: PowerStatusEnum = PowerStatusEnum::from((value | MASK_CMD_8BIT) as u8);
-                        // TODO implement proper routines
-                        match tof_component {
-                          TofComponent::All      => {
-                            return_val = Err(CmdError::PowerError);
-                            warn!("Not implemented for All yet")
-                          }, //power_all(cmd_socket, component_id, status),
-                          TofComponent::MT       => {
-                            return_val = Err(CmdError::PowerError);
-                            warn!("Not implemented for MT yet")
-                          }, //power_mt(cmd_socket, component_id, status),
-                          TofComponent::AllButMT => {
-                            return_val = Err(CmdError::PowerError);
-                            warn!("Not implemented for AllButMT yet")
-                          }, //power_allbutmt(cmd_socket, component_id, status),
-                          TofComponent::LTB      => {
-                            return_val = power_ltb(component_id, status);
-                            match return_val {
-                              Ok(_)  => info!("LTB powered up!"),
-                              Err(_) => error!("Not able to power up LTB!")
-                            };
-                          },
-                          TofComponent::Preamp   => {
-                            return_val = power_preamp(component_id, status);
-                            match return_val {
-                              Ok(_)  => info!("Preamp powered up!"),
-                              Err(_) => error!("Not able to power up Preamp!")
-                            };
-                          },
-                          _                      => {
-                            error!("Power operation not implemented for Unknown!");
-                            return_val = Err(CmdError::PowerError);
-                          }
-                        }
-                      },
                       TofCommand::SetThresholds   (value) =>  {
                         info!("Received set threshold command! Will communicate to LTBs");
                         // MSB first 8 bits are LTB ID
@@ -377,10 +330,6 @@ pub fn cmd_responder(cmd_server_address        : String,
                             return_val = Err(CmdError::ThresholdSetError);
                           }
                         }
-                      },
-                      TofCommand::SetMTConfig  (_) => {
-                        warn!("Not implemented");
-                        return_val = Err(CmdError::NotImplementedError);
                       },
                       TofCommand::SetPreampBias   (value) =>  {
                         info!("Received set preamp bias command! Will communicate to preamps");
@@ -456,93 +405,6 @@ pub fn cmd_responder(cmd_server_address        : String,
                           continue;
                         }
                       },
-                      TofCommand::StartValidationRun  (_) => {
-                        warn!("Not implemented");
-                        return_val = Err(CmdError::NotImplementedError);
-                      },
-                      // This won't be a thing for RBs
-                      TofCommand::GetFullWaveforms  (_) => {
-                        warn!("Not implemented");
-                        return_val = Err(CmdError::NotImplementedError);
-                      },
-                      // Voltage and timing calibration is connected now
-                      TofCommand::NoiCalibration (value) => {
-                        // MSB third 8 bits are RB ID
-                        let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
-                        // MSB fourth 8 bits are extra (not used)
-                        //let extra: u8 = (value | MASK_CMD_8BIT) as u8;
-                        
-                        let my_rb_id = get_board_id().unwrap() as u8;
-                        // if this RB is the one then do stuff
-                        if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
-                          match rb_noi_subcalibration(&run_config_sender, &ev_request_to_cache) {
-                            Ok(_) => {
-                              info!("No input data taking successful!");
-                              return_val = Ok(TofCommandCode::CmdNoiCalibration);
-                            },
-                            Err(err) => {
-                              error!("No input data taking failed! Error {err}!");
-                              return_val = Err(CmdError::CalibrationError);
-                            }
-                          }
-                        } else {
-                          // The packet was not for this RB so bye
-                          continue;
-                        }
-                      },
-                      TofCommand::VoltageCalibration (value) => {
-                        trace!("Got voltage calibration command with {value} value");
-                        // MSB first 16 bits are voltage level
-                        let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
-                        // MSB third 8 bits are RB ID
-                        let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
-                        // MSB fourth 8 bits are extra (not used)
-                        //let extra: u8 = (value | MASK_CMD_8BIT) as u8;
-                        
-                        let my_rb_id = get_board_id().unwrap() as u8;
-                        // if this RB is the one then do stuff
-                        if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
-                          match rb_voltage_subcalibration(&run_config_sender, &ev_request_to_cache, voltage_val) {
-                            Ok(_) => {
-                              info!("Voltage data taking successful!");
-                              return_val = Ok(TofCommandCode::CmdVoltageCalibration);
-                            },
-                            Err(err) => {
-                              error!("Voltage data taking failed! Error {err}!");
-                              return_val = Err(CmdError::CalibrationError);
-                            }
-                          }
-                        } else {
-                          // The packet was not for this RB so bye
-                          continue;
-                        }
-                      },
-                      TofCommand::TimingCalibration  (value) => {
-                        // MSB first 16 bits are voltage level
-                        let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
-                        // MSB third 8 bits are RB ID
-                        let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
-                        // MSB fourth 8 bits are extra (not used)
-                        //let extra: u8 = (value | MASK_CMD_8BIT) as u8;
-                        
-                        let my_rb_id = get_board_id().unwrap() as u8;
-                        // if this RB is the one then do stuff
-                        if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
-                          match rb_timing_subcalibration(&run_config_sender, &ev_request_to_cache, voltage_val) {
-                            Ok(_) => {
-                              info!("Timing data taking successful!");
-                              return_val = Ok(TofCommandCode::CmdTimingCalibration);
-                            },
-                            Err(err) => {
-                              error!("Timing data taking failed! Error {err}!");
-                              return_val = Err(CmdError::CalibrationError);
-                            }
-                          }
-                        } else {
-                          // The packet was not for this RB so bye
-                          continue;
-                        }
-                      },
                       TofCommand::DefaultCalibration  (value) => {
                         // MSB first 16 bits are voltage level
                         //let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
@@ -560,6 +422,7 @@ pub fn cmd_responder(cmd_server_address        : String,
                                                &ev_request_to_cache,
                                                address_for_cali.clone()) {
                             Ok(_) => {
+                              println!("== ==> [cmd-responder] Calibration successful!");
                               info!("Default calibration data taking successful!");
                               return_val = Ok(TofCommandCode::CmdDefaultCalibration);
                             },
@@ -578,10 +441,6 @@ pub fn cmd_responder(cmd_server_address        : String,
                         return_val = Err(CmdError::NotImplementedError);
                       },
                       TofCommand::TriggerModeForced  (_) => {
-                        warn!("Not implemented");
-                        return_val = Err(CmdError::NotImplementedError);
-                      },
-                      TofCommand::TriggerModeForcedMTB   (_) => {
                         warn!("Not implemented");
                         return_val = Err(CmdError::NotImplementedError);
                       },
@@ -617,25 +476,6 @@ pub fn cmd_responder(cmd_server_address        : String,
                     }
                   }
                 }  
-              },
-              PacketType::RBCommand  => {
-                trace!("Received RBCommand!");
-                // just forward the packet now, the cache 
-                // can understand if it is an event request or not
-                match ev_request_to_cache.send(tp) {
-                  Err(err) => {
-                    error!("Can not send event request! Err {err}");
-                  },
-                  Ok(_) => ()
-                }
-                // FIXME - notify this about TofOperation mode.
-                // if the TofOperation mode is StreamAny, 
-                // we won't do this.
-                // It might not needed, since if we are in 
-                // StreamAny mode, we should not be sending 
-                // these requests from the C&C server.
-              
-                // FIXME - do we want to acknowledge this?
               },
               _ => {
                 error!("Can not respond to {}", tp);
