@@ -50,6 +50,11 @@ use tof_dataclasses::events::{
     RBWaveform
 };
 
+use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::commands::{
+    TofCommandV2,
+    TofCommandCode
+};
 use tof_dataclasses::calibrations::RBCalibrations;
 
 use pyo3::prelude::*;
@@ -84,6 +89,40 @@ use pyo3::exceptions::{
 //    Ok(format!("<PyO3Wrapper: {}>", self.moni)) 
 //  }
 //}
+#[pyclass]
+#[pyo3(name="TofCommand")]
+pub struct PyTofCommand {
+  pub command : TofCommandV2
+}
+
+impl PyTofCommand {
+  pub fn set_command(&mut self, cmd : TofCommandV2) {
+    self.command = cmd;
+  }
+}
+
+#[pymethods]
+impl PyTofCommand {
+  #[new]
+  fn new() -> Self {
+    let cmd =  TofCommandV2::new();
+    Self {
+      command : cmd
+    }
+  }
+
+  fn set_command_code(&mut self, command_code : TofCommandCode) {
+    self.command.command_code = command_code;
+  }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    self.command.to_bytestream()
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.command)) 
+  }
+}
 
 #[pyclass]
 #[pyo3(name="RBCalibration")]

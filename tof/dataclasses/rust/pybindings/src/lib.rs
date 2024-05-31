@@ -11,9 +11,9 @@ use crate::analysis::*;
 use crate::dataclasses::*;
 use crate::io::*;
 
-// this is already wrapped in a pyclass
+// these are already wrapped in a pyclass (enum)
 use tof_dataclasses::packets::PacketType;
-
+use tof_dataclasses::commands::TofCommandCode;
 
 //#[pyfunction]
 //#[pyo3(name="test_db")]
@@ -113,6 +113,15 @@ fn tof_events<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyTofEvent>()?;
   m.add_class::<PyRBWaveform>()?;
   m.add_class::<PyRBCalibration>()?;
+  Ok(())
+}
+
+/// Commands for the whole TOF system
+#[pymodule]
+#[pyo3(name = "commands")]
+fn tof_commands<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  m.add_class::<TofCommandCode>()?;
+  m.add_class::<PyTofCommand>()?;
   Ok(())
 }
 
