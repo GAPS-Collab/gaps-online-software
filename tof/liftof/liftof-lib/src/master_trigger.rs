@@ -508,16 +508,18 @@ pub fn master_trigger(mt_address     : String,
   let mut evq_num_events_avg  = 0f64;
   let mut n_iter_loop         = 0u64;
 
-
+  /// indicator if the thread is active (it can 
+  /// sleep during calibrations)
+  let mut is_active = true;
   loop {
     // Check thread control and what to do
-    if tc_timer.elapsed().as_secs_f32() > 0.1 {
-      match thread_control.lock() {
-        Ok(mut tc) => {
+    if tc_timer.elapsed().as_secs_f32() > 1.5 {
+      match thread_control.try_lock() {
+        Ok(tc) => {
           if !tc.thread_master_trg_active {
             // if the thread is not supposed to be active, 
             // idle
-            continue;
+            is_active = false;
           }
         },
         Err(err) => {
@@ -525,6 +527,9 @@ pub fn master_trigger(mt_address     : String,
         },
       }
       tc_timer = Instant::now();
+    }
+    if !is_active {
+      continue;
     }
     // This is a recovery mechanism. In case we don't see an event
     // for mtb_timeout_sec, we attempt to reconnect to the MTB
