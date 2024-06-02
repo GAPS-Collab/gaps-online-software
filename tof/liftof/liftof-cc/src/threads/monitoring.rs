@@ -66,9 +66,10 @@ pub fn monitor_cpu(tp_sender      : Sender<TofPacket>,
     // FIXME - technically we should look for the 
     // stop signal on a shorter timescale.
     // But this saves CPU cycles
-    match thread_control.lock() {
+    match thread_control.try_lock() {
       Err(err) => error!("Unable to lock shared memory! {err}"),
       Ok(tc)   => {
+        //println!("== ==> [monitoring] tc lock ackquired!");
         if tc.stop_flag {
           println!("==> Stopping monitoring thread, stop signal received!");
           break 'main;

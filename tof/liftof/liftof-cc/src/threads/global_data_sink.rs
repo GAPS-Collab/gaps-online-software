@@ -15,6 +15,8 @@ use std::sync::{
     Mutex,
 };
 
+use std::fs::create_dir_all;
+
 
 extern crate crossbeam_channel;
 use crossbeam_channel::Receiver; 
@@ -43,21 +45,30 @@ use tof_dataclasses::serialization::{
 
 use tof_dataclasses::io::{
     TofPacketWriter,
-    FileType
+    FileType,
+    get_utc_date
 };
+
 use tof_dataclasses::events::TofEvent;
 
 
 use liftof_lib::settings::DataPublisherSettings;
 
-/// Manages "outgoing" 0MQ PUB socket
+/// Manages "outgoing" 0MQ PUB socket and writing
+/// data to disk
 ///
-/// Everything should send to here, and 
-/// then it gets passed on over the 
-/// connection to the flight computer
+/// All received packets will be either forwarded
+/// over zmq or saved to disk
 ///
 /// # Arguments
 ///
+/// * incoming           : incoming connection for TofPackets from 
+///                        other threads
+/// * write_stream       : write TofPacket stream to disk
+/// * run_id             : run id which is used in filename generation
+/// * settings           : additional settings
+/// * print_moni_packets : print monitoring packets to the terminal
+/// * thread_control     : start/stop thread, calibration information
 pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                         write_stream       : bool,
                         runid              : usize,
@@ -113,19 +124,20 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut kill_timer = Instant::now();
 
   loop {
-    if kill_timer.elapsed().as_secs_f32() > 0.1 {
-      match thread_control.lock() {
+    if kill_timer.elapsed().as_secs_f32() > 0.11 {
+      match thread_control.try_lock() {
         Ok(mut tc) => {
+          //println!("== ==> [global_data_sink] tc lock acquired!");
           if tc.stop_flag {
             tc.thread_data_sink_active = false;
             break;
           } 
-          kill_timer = Instant::now();
         },
         Err(err) => {
           error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
         },
       }
+      kill_timer = Instant::now();
     }
     match incoming.recv() {
       Err(err) => trace!("No new packet, err {err}"),
@@ -147,7 +159,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         match pack.packet_type {
           PacketType::RBCalibration => {
             let cali_rb_id = pack.payload[2]; 
-            debug!("Received RBCalibration packet for board {}!", cali_rb_id);
+            info!("Received RBCalibration packet for board {}!", cali_rb_id);
             // we notify the other threads that we got this specific packet, 
             // so we know how long we still have to wait
             match thread_control.lock() {
@@ -163,7 +175,14 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
             // See RBCalibration reference
             let file_type  = FileType::CalibrationFile(cali_rb_id);
             //println!("==> Writing stream to file with prefix {}", streamfile_name);
-            let mut cali_writer = TofPacketWriter::new(write_stream_path.clone(), file_type);
+            //let mut cali_writer = TofPacketWriter::new(write_stream_path.clone(), file_type);
+            let today           = get_utc_date();
+            let cali_output_dir = format!("{}/{}", settings.cali_dir.clone(), today);
+            match create_dir_all(cali_output_dir.clone()) {
+              Ok(_)    => info!("Created {} for calibration data!", cali_output_dir),
+              Err(err) => error!("Unable to create {} for calibration data! {}", cali_output_dir, err)
+            }
+            let mut cali_writer = TofPacketWriter::new(cali_output_dir, file_type);
             cali_writer.add_tof_packet(&pack);
             drop(cali_writer);
           }

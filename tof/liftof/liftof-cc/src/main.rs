@@ -40,10 +40,6 @@ use std::path::{
 use std::os::raw::c_int;
 
 use signal_hook::iterator::Signals;
-use signal_hook::consts::signal::{
-    SIGTERM,
-    SIGINT
-};
 
 use clap::{
     arg,
@@ -94,16 +90,19 @@ use tof_dataclasses::commands::{
 };
 
 use liftof_lib::{
-    //readoutboard_commander,
     signal_handler,
     init_env_logger,
     //color_log,
     LIFTOF_LOGO_SHOW,
     master_trigger,
     LiftofSettings,
-    RunCmd,
     CommandCC,
-    CalibrationCmd,
+};
+
+use liftof_lib::constants::{
+    DEFAULT_CALIB_VOLTAGE,
+    DEFAULT_RB_ID,
+    DEFAULT_CALIB_EXTRA
 };
 
 use liftof_cc::threads::{
@@ -114,6 +113,32 @@ use liftof_cc::threads::{
     monitor_cpu,
     readoutboard_communicator
 };
+
+/*************************************/
+
+
+
+/// Command line arguments for calling 
+/// liftof-cc directly from the command line
+#[derive(Debug, Parser, PartialEq)]
+pub enum CommandLineCommand {
+  /// Listen for flight CPU commands.
+  Listen,
+  /// Staging mode - work through all .toml files
+  /// in the staging area
+  Staging,
+  /// Ping a TOF sub-system.
+  Ping,
+  ///// Monitor a TOF sub-system.
+  //Moni(MoniCmd),
+  ///// Restart RB systemd
+  //SystemdReboot(SystemdRebootCmd),
+  /// Power control of TOF sub-systems.
+  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
+  Calibration,
+  /// Start/stop data taking run.
+  Run
+}
 
 /*************************************/
 
@@ -358,6 +383,7 @@ fn main() {
         thread_control_sh) 
       })
     .expect("Failed to spawn signal-handler thread!");
+  println!("==> signal handler thread started!");
 
   println!("==> Starting event builder and master trigger threads...");
   //let db_path_string    = config.db_path.clone();
@@ -402,7 +428,7 @@ fn main() {
     let this_tp_to_sink_clone = tp_to_sink.clone();
     this_rb.calib_file_path   = calib_file_path.clone();
     match this_rb.load_latest_calibration() {
-      Err(err) => error!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
+      Err(err) => panic!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
       Ok(_)    => ()
     }
     println!("==> Starting RB thread for {}", this_rb.rb_id);
@@ -473,7 +499,7 @@ fn main() {
   // when we are done
   let mut dont_stop = false;
   match args.command {
-    CommandCC::Listen(_) => {
+    CommandCC::Listen => {
       dont_stop = true;
       // start command dispatcher thread
       let tc = thread_control.clone();
@@ -490,153 +516,111 @@ fn main() {
         })
       .expect("Failed to spawn cpu-monitoring thread!");
     },
-    CommandCC::Calibration(ref calibration_cmd) => {
-      match calibration_cmd {
-        CalibrationCmd::Default(cali_opts) => {
-          let voltage_level = cali_opts.level;
-          let rb_id         = cali_opts.id;
-          let extra         = cali_opts.extra;
-          println!("=> Received calibration default command! Will init calibration run of all RBs...");
-          let cmd_payload: u32
-            = (voltage_level as u32) << 16 | (rb_id as u32) << 8 | (extra as u32);
-          let default_calib = TofCommand::DefaultCalibration(cmd_payload);
-          let tp = default_calib.pack();
-          let mut payload  = String::from("BRCT").into_bytes();
-          payload.append(&mut tp.to_bytestream());
-          
-          // open 0MQ socket here
-          let ctx = zmq::Context::new();
-          let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-          let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
-          cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
-          println!("=> Give the RBs a chance to connect and wait a bit..");
-          thread::sleep(10*one_second);
+    CommandCC::Calibration => {
+      let voltage_level = DEFAULT_CALIB_VOLTAGE;
+      let rb_id         = DEFAULT_RB_ID;
+      let extra         = DEFAULT_CALIB_EXTRA;
+      println!("=> Received calibration default command! Will init calibration run of all RBs...");
+      let cmd_payload: u32
+        = (voltage_level as u32) << 16 | (rb_id as u32) << 8 | (extra as u32);
+      let default_calib = TofCommand::DefaultCalibration(cmd_payload);
+      let tp = default_calib.pack();
+      let mut payload  = String::from("BRCT").into_bytes();
+      payload.append(&mut tp.to_bytestream());
+      
+      // open 0MQ socket here
+      let ctx = zmq::Context::new();
+      let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+      let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
+      cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+      println!("=> Give the RBs a chance to connect and wait a bit..");
+      thread::sleep(10*one_second);
 
-          match cmd_sender.send(&payload, 0) {
-            Err(err) => {
-              error!("Unable to send command, error{err}");
-              exit(1);
-            },
-            Ok(_) => {
-              println!("=> Calibration  initialized!");
-            }
-          }
-          println!("=> .. now we need to wait until the calibration is finished!");
-          let bar_label  = String::from("Acquiring RB calibration data");
-
-          bar = ProgressBar::new(rb_list.len() as u64); 
-          bar.set_position(0);
-          bar.set_message (bar_label);
-          bar.set_prefix  ("\u{2699}\u{1F4D0}");
-          bar.set_style   (bar_style);
-          // if that is successful, we need to wait
-          match thread_control.lock() {
-            Ok(mut tc) => {
-              // deactivate the master trigger thread
-              tc.thread_master_trg_active =false;
-              tc.calibration_active = true;
-            },
-            Err(err) => {
-              error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-            },
-          }
-          //// now we wait until the calibrations are finished
-          ////let cali_wait_timer     = Instant::now();
-          //let mut cali_received = 0u32;
-          //// progress bar setup
-
-          //loop {
-          //  match thread_control.lock() {
-          //    Ok(tc) => {
-          //      for rbid in &rb_list {
-          //        if tc.finished_calibrations[&rbid.rb_id] {
-          //          cali_received += 1;
-          //        }
-          //      }
-          //    },
-          //    Err(err) => {
-          //      error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-          //    },
-          //  }
-          //  bar.set_position(cali_received);
-          //  thread::sleep(5*one_second);
-          //  if cali_received as usize == rb_list.len() {
-          //    break;
-          //  }
-          //}
-          //bar.finish();
-          //println!("=> All calibrations acquired!");
-          //println!(">> So long and thanks for all the \u{1F41F} <<"); 
-          //exit(0);
-            },
-        _ => {
-          panic!("Non default calibration not supported!");
+      match cmd_sender.send(&payload, 0) {
+        Err(err) => {
+          error!("Unable to send command, error{err}");
+          exit(1);
+        },
+        Ok(_) => {
+          println!("=> Calibration  initialized!");
         }
       }
-    }
-    CommandCC::Staging(_) => {
+      println!("=> .. now we need to wait until the calibration is finished!");
+      let bar_label  = String::from("Acquiring RB calibration data");
+
+      bar = ProgressBar::new(rb_list.len() as u64); 
+      bar.set_position(0);
+      bar.set_message (bar_label);
+      bar.set_prefix  ("\u{2699}\u{1F4D0}");
+      bar.set_style   (bar_style);
+      // if that is successful, we need to wait
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          // deactivate the master trigger thread
+          tc.thread_master_trg_active =false;
+          tc.calibration_active = true;
+        },
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        },
+      }
+    },
+    CommandCC::Staging => {
       error!("Staging sequence not implemented!");
     }
-    CommandCC::Run(run_cmd) => {
-      match run_cmd {
-        RunCmd::Start(_run_start_opts) => {
-          // in this scenario, we want to end
-          // after we are done
-          dont_stop = false;
-          // technically, it is run_typ, rb_id, event number
-          // all to the max means run start for all
-          // We don't need this - just need to make sure it gets broadcasted
-          let cmd_payload: u32 =  PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
-          let cmd          = TofCommand::DataRunStart(cmd_payload);
-          let packet       = cmd.pack();
-          let mut payload  = String::from("BRCT").into_bytes();
-          payload.append(&mut packet.to_bytestream());
-          
-          // open 0MQ socket here
-          let ctx = zmq::Context::new();
-          let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-          let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
-          cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
-          // after we opened the socket, give the RBs a chance to connect
-          println!("=> Give the RBs a chance to connect and wait a bit..");
-          thread::sleep(10*one_second);
+    CommandCC::Run => {
+      // in this scenario, we want to end
+      // after we are done
+      dont_stop = false;
+      // technically, it is run_typ, rb_id, event number
+      // all to the max means run start for all
+      // We don't need this - just need to make sure it gets broadcasted
+      let cmd_payload: u32 =  PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
+      let cmd          = TofCommand::DataRunStart(cmd_payload);
+      let packet       = cmd.pack();
+      let mut payload  = String::from("BRCT").into_bytes();
+      payload.append(&mut packet.to_bytestream());
+      
+      // open 0MQ socket here
+      let ctx = zmq::Context::new();
+      let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+      let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
+      cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+      // after we opened the socket, give the RBs a chance to connect
+      println!("=> Give the RBs a chance to connect and wait a bit..");
+      thread::sleep(10*one_second);
 
-          println!("=> Initializing Run Start!");
-          match cmd_sender.send(&payload, 0) {
-            Err(err) => {
-              error!("Unable to send command, error{err}");
-            },
-            Ok(_) => {
-              debug!("We sent {:?}", payload);
-            }
-          }
-          let run_start_timeout  = Instant::now();
-          // let's wait 20 seconds here
-          let mut n_rb_ack_rcved = 0;
-          while run_start_timeout.elapsed().as_secs() < 20 {
-            //println!("{}", run_start_timeout.elapsed().as_secs());
-            match ack_from_rb.try_recv() {
-              Err(_) => {
-                continue;
-              }
-              Ok(_ack_pack) => {
-                //FIXME - do something with it
-                n_rb_ack_rcved += 1;
-              }
-            }
-            if n_rb_ack_rcved == rb_list.len() {
-              break; 
-            }
-          }
-          println!("Run initialized!");
-          bar = ProgressBar::new_spinner();
-          bar.enable_steady_tick(Duration::from_millis(500));
-          bar.set_message(".. acquiring data ..");
-        }
-        _ => {
-          panic!("Pattern not covered!");
+      println!("=> Initializing Run Start!");
+      match cmd_sender.send(&payload, 0) {
+        Err(err) => {
+          error!("Unable to send command, error{err}");
+        },
+        Ok(_) => {
+          debug!("We sent {:?}", payload);
         }
       }
+      let run_start_timeout  = Instant::now();
+      // let's wait 20 seconds here
+      let mut n_rb_ack_rcved = 0;
+      while run_start_timeout.elapsed().as_secs() < 20 {
+        //println!("{}", run_start_timeout.elapsed().as_secs());
+        match ack_from_rb.try_recv() {
+          Err(_) => {
+            continue;
+          }
+          Ok(_ack_pack) => {
+            //FIXME - do something with it
+            n_rb_ack_rcved += 1;
+          }
+        }
+        if n_rb_ack_rcved == rb_list.len() {
+          break; 
+        }
+      }
+      println!("Run initialized!");
+      bar = ProgressBar::new_spinner();
+      bar.enable_steady_tick(Duration::from_millis(500));
+      bar.set_message(".. acquiring data ..");
     }
     _ => {
       panic!("Unable to execute request for this command!");
@@ -659,7 +643,7 @@ fn main() {
   // received to understand when a calibration 
   // procedure is finished
   let mut cali_received  = 0u64;
-  loop{
+  loop {
     // take out the heat a bit
     thread::sleep(1*one_second);
 
@@ -721,8 +705,11 @@ fn main() {
     // check thread control - this is useful 
     // for everything
 
-    match thread_control.lock() {
+    match thread_control.try_lock() {
       Ok(mut tc) => {
+        if tc.stop_flag {
+          end_program = true;
+        }
         if tc.calibration_active {
           for rbid in &rb_list {
             // the global data sink sets these flags
@@ -750,7 +737,7 @@ fn main() {
         }
       }
       Err(err) => {
-        error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        error!("Can't acquire lock for ThreadControl at this time! Unable to set calibration mode! {err}");
       }
     }
     // in case the runtime seconds are over, we can end the program

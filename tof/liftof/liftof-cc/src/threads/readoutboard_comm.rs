@@ -95,9 +95,10 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
   }
   let mut tc_timer = Instant::now();
   loop {
-    if tc_timer.elapsed().as_secs() > 1 {
-      match thread_control.lock() {
+    if tc_timer.elapsed().as_secs_f32() > 0.9 {
+      match thread_control.try_lock() {
         Ok(tc) => {
+          //println!("== ==> [rbcomm] tc lock acquired!");
           if tc.stop_flag {
             break;
           }
@@ -166,6 +167,9 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
               _ => {
                 // Currently, we will just forward all other packets
                 // directly to the data sink
+                if tp.packet_type == PacketType::RBCalibration {
+                  println!("== ==> [rb_comm] Received RBCalibration!");
+                }
                 match tp_to_sink.send(tp) {
                   Err(err) => error!("Can not send tof packet to data sink! Err {err}"),
                   Ok(_)    => debug!("Packet sent"),
