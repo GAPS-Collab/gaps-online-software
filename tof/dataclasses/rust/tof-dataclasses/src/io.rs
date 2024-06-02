@@ -1303,7 +1303,8 @@ impl TofPacketWriter {
         self.n_packets = 0;
       }
     } else if self.mbytes_per_file != 0 {
-      if self.file_nbytes_wr >= self.mbytes_per_file {
+      // multiply by mebibyte
+      if self.file_nbytes_wr >= self.mbytes_per_file * 1_048_576 {
         newfile = true;
         self.file_nbytes_wr = 0;
       }
