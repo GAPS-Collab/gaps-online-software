@@ -126,8 +126,13 @@ struct Args {
   #[arg(long, default_value_t = false)]
   show_progress: bool,
   /// Print out (even more) debugging information 
-  #[arg(long, default_value_t = false)]
+  #[arg(long, short, default_value_t = false)]
   verbose : bool,
+  /// Explicetly IGNORE the MTB link id check. This is 
+  /// not recommended, but might be useful when there
+  /// is no MTB available for debugging purposes
+  #[arg(long, default_value_t = false)]
+  ignore_mtb_link_id_check : bool,
   /// List of possible commands
   #[command(subcommand)]
   command: CommandLineCommand
@@ -293,12 +298,15 @@ fn main() {
         Ok(link_id) => {
           if link_id as u8 != rb_expected_link_id {
             println!("=> We received the correct link id from the MTB!");
-            panic!("Unable to perform RB/Link ID mapping check!");
           } else {
             error!("Received unexpected MTB link ID {}!", link_id);
             error!("Incorrect link ID. This might hint to issues with the MTB mapping!");
             error!("******************************************************************");
-            panic!("The RB/Link ID mapping is wrong for this board!");
+            if args.ignore_mtb_link_id_check {
+              warn!("The MTB LINK ID check failed, however, we are explicetly instructed to ignore that check, since the --ignore-mte-link-id-check flag is set!");
+            } else {
+              panic!("The RB/Link ID mapping is wrong for this board!");
+            }
           }
         }
       }

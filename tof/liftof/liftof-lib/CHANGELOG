@@ -2,6 +2,9 @@
 
 ## v0.10.1
 * adds preamp voltage configuration to config file
+* signal_handler is now its own thread and moved 
+  here from liftof-cc
+* adds a test for reading/parsing config files
 
 ## v0.10.0
 * refactors the MasterTrigger code complex and introduces
