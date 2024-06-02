@@ -22,13 +22,13 @@ use tof_dataclasses::errors::CmdError;
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
 use tof_dataclasses::run::RunConfig;
-
+use tof_dataclasses::heartbeats::RBPing;
 use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::serialization::Packable;
 
 use liftof_lib::{
     //build_tcp_from_ip,
     TofComponent,
-    PowerStatusEnum,
     LTBThresholdName
 };
 
@@ -36,18 +36,14 @@ use tof_dataclasses::constants::{MASK_CMD_8BIT,
                                   MASK_CMD_16BIT};
 
 use crate::api::{rb_calibration,
-                 rb_noi_subcalibration,
-                 rb_voltage_subcalibration,
-                 rb_timing_subcalibration,
                  send_preamp_bias_set,
                  send_ltb_threshold_set,
-                 power_preamp,
-                 power_ltb,
-                 //get_runconfig,
-                 //prefix_board_id,
-                 //DATAPORT
 };
-use crate::threads::monitoring::{get_ltb_moni, get_pb_moni, get_rb_moni};
+use crate::threads::monitoring::{
+    get_ltb_moni,
+    get_pb_moni,
+    get_rb_moni
+};
 
 use liftof_lib::constants::DEFAULT_RB_ID;
 
@@ -71,17 +67,17 @@ use crate::control::{get_board_id_string,
 ///                               we will run this configuration
 /// * run_config_sender         : A sender to send the dedicated run config to the 
 ///                               runner
-/// * ev_request_to_cache       : When receiveing RBCommands which contain requests,
-///                               forward them to event processing.
+/// * tp_to_pub                 : Send TofPackets to the data pub.
+///                               Some TOF commands might trigger
+///                               additional information to get 
+///                               send.
 /// * address_for_cali          : The local (self) PUB address, so that the rb_calibratoin,
 ///                               can subscribe to it to loop itself the event packets
 /// * thread_control            : Manage thread control signals, e.g. stop
 pub fn cmd_responder(cmd_server_address        : String,
                      run_config                : &RunConfig,
                      run_config_sender         : &Sender<RunConfig>,
-                     //FIXME - this has to go away. There are no 
-                     //event requests any more
-                     ev_request_to_cache       : &Sender<TofPacket>,
+                     tp_to_pub                 : &Sender<TofPacket>,
                      address_for_cali          : String,
                      thread_control            : Arc<Mutex<ThreadControl>>) {
   // create 0MQ sockedts
@@ -189,56 +185,16 @@ pub fn cmd_responder(cmd_server_address        : String,
                         error!("Cannot interpret unknown command");
                         return_val = Err(CmdError::UnknownError);
                       },
-                      TofCommand::Ping (value) => {
+                      TofCommand::Ping (_) => {
                         info!("Received ping command");
-                        // MSB third 8 bits are 
-                        let tof_component: TofComponent = TofComponent::from(((value | MASK_CMD_8BIT << 8) >> 8) as u8);
-                        // MSB fourth 8 bits are 
-                        let id: u8 = (value | MASK_CMD_8BIT) as u8;
-                        // Function that just replies to a ping command send to tofcpu
-                        // get_board_id PANICS!! TODO
-                        let rb_id = get_board_id().unwrap() as u8;
-
-                        if tof_component != TofComponent::MT &&
-                           tof_component != TofComponent::TofCpu &&
-                           tof_component != TofComponent::Unknown &&
-                           rb_id != id {
-                          // The packet was not for this RB so bye
-                          continue;
-                        } else {
-                          match tof_component {
-                            TofComponent::RB => {
-                              info!("Received ping command");
-                              let mut tp = TofPacket::new();
-                              tp.packet_type = PacketType::Ping;
-                              // TODO what do we want here
-                              tp.payload = vec![TofComponent::RB as u8, rb_id];
-
-                              match ev_request_to_cache.send(tp) {
-                                Err(err) => {
-                                  error!("RB ping sending failed! Err {err}");
-                                  return_val = Err(CmdError::PingError);
-                                }
-                                Ok(_)    => {
-                                  info!("RB ping sent!");
-                                  return_val = Ok(TofCommandCode::CmdPing);
-                                }
-                              };
-                            },
-                            TofComponent::PB  => {
-                              return_val = Err(CmdError::PingError);
-                              warn!("Not implemented for PB yet")
-                            },
-                            TofComponent::LTB => {
-                              return_val = Err(CmdError::PingError);
-                              warn!("Not implemented for LTB yet")
-                            },
-                            _                 => {
-                              return_val = Err(CmdError::PingError);
-                              error!("An RB can control just PBs and LTBs.")
-                            }
-                          }
+                        let mut ping = RBPing::new();
+                        ping.rb_id = get_board_id().unwrap_or(0) as u8;
+                        let tp = ping.pack();
+                        match tp_to_pub.send(tp) {
+                          Err(err) => error!("Unable to send ping response! {err}"),
+                          Ok(_) => ()
                         }
+                        return_val   = Ok(TofCommandCode::Ping);
                       },
                       TofCommand::Moni (value) => {
                         // MSB third 8 bits are 
@@ -260,48 +216,46 @@ pub fn cmd_responder(cmd_server_address        : String,
                             TofComponent::RB => {
                               info!("Received RB moni command");
                               let moni = get_rb_moni(id).unwrap();
-                              let tp = TofPacket::from(&moni);
+                              let tp = moni.pack();
 
-                              match ev_request_to_cache.send(tp) {
+                              match tp_to_pub.send(tp) {
                                 Err(err) => {
                                   error!("RB moni sending failed! Err {err}");
                                   return_val = Err(CmdError::MoniError);
                                 }
                                 Ok(_)    => {
                                   info!("RB moni sent");
-                                  return_val = Ok(TofCommandCode::CmdMoni);
+                                  return_val = Ok(TofCommandCode::Moni);
                                 }
                               };
                             },
                             TofComponent::PB  => {
                               info!("Received PB moni command");
                               let moni = get_pb_moni(id).unwrap();
-                              let tp = TofPacket::from(&moni);
-
-                              match ev_request_to_cache.send(tp) {
+                              let tp = moni.pack();
+                              match tp_to_pub.send(tp) {
                                 Err(err) => {
                                   error!("PB moni sending failed! Err {err}");
                                   return_val = Err(CmdError::MoniError);
                                 }
                                 Ok(_)    => {
                                   info!("PB moni sent");
-                                  return_val = Ok(TofCommandCode::CmdMoni);
+                                  return_val = Ok(TofCommandCode::Moni);
                                 }
                               };
                             },
                             TofComponent::LTB => {
                               info!("Received LTB moni command");
                               let moni = get_ltb_moni(id).unwrap();
-                              let tp = TofPacket::from(&moni);
-
-                              match ev_request_to_cache.send(tp) {
+                              let tp = moni.pack();
+                              match tp_to_pub.send(tp) {
                                 Err(err) => {
                                   error!("LTB moni sending failed! Err {err}");
                                   return_val = Err(CmdError::MoniError);
                                 }
                                 Ok(_)    => {
                                   info!("LTB moni sent");
-                                  return_val = Ok(TofCommandCode::CmdMoni);
+                                  return_val = Ok(TofCommandCode::Moni);
                                 }
                               };
                             },
@@ -323,7 +277,7 @@ pub fn cmd_responder(cmd_server_address        : String,
                         match send_ltb_threshold_set(ltb_id, threshold_name, threshold_level) {
                           Ok(_)    => {
                             info!("Threshold sent to LTB!");
-                            return_val = Ok(TofCommandCode::CmdSetThresholds);
+                            return_val = Ok(TofCommandCode::SetLTBThresholds);
                           },
                           Err(err) => {
                             error!("LTB threshold sending failed! Err {err}");
@@ -340,7 +294,7 @@ pub fn cmd_responder(cmd_server_address        : String,
                         match send_preamp_bias_set(preamp_id, preamp_bias) {
                           Ok(_)    => {
                             info!("Bias sent to preamp!");
-                            return_val = Ok(TofCommandCode::CmdSetPreampBias);
+                            return_val = Ok(TofCommandCode::SetPreampBias);
                           },
                           Err(err) => {
                             error!("Preamp bias sending failed! Err {err}");
@@ -362,7 +316,7 @@ pub fn cmd_responder(cmd_server_address        : String,
                           match run_config_sender.send(rc) {
                             Ok(_)    => {
                               info!("Run stopped successfully!");
-                              return_val = Ok(TofCommandCode::CmdDataRunStop);
+                              return_val = Ok(TofCommandCode::DataRunStop);
                             },
                             Err(err) => {
                               error!("Error stopping run! {err}");
@@ -393,7 +347,7 @@ pub fn cmd_responder(cmd_server_address        : String,
                           match run_config_sender.send(rc) {
                             Ok(_)    => {
                               info!("Run started successfully!");
-                              return_val = Ok(TofCommandCode::CmdDataRunStart);
+                              return_val = Ok(TofCommandCode::DataRunStart);
                             },
                             Err(err) => {
                               error!("Error starting run! {err}");
@@ -419,12 +373,12 @@ pub fn cmd_responder(cmd_server_address        : String,
                           // FIXME - time delay? When we start all calibrations at the 
                           // same time, then the nw might get too busy? 
                           match rb_calibration(&run_config_sender,
-                                               &ev_request_to_cache,
+                                               &tp_to_pub,
                                                address_for_cali.clone()) {
                             Ok(_) => {
                               println!("== ==> [cmd-responder] Calibration successful!");
                               info!("Default calibration data taking successful!");
-                              return_val = Ok(TofCommandCode::CmdDefaultCalibration);
+                              return_val = Ok(TofCommandCode::RBCalibration);
                             },
                             Err(err) => {
                               error!("Default calibration data taking failed! Error {err}!");
