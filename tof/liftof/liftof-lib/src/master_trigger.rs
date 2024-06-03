@@ -516,9 +516,11 @@ pub fn master_trigger(mt_address     : String,
     if tc_timer.elapsed().as_secs_f32() > 1.5 {
       match thread_control.try_lock() {
         Ok(tc) => {
-          if !tc.thread_master_trg_active {
+          if tc.thread_master_trg_active {
             // if the thread is not supposed to be active, 
             // idle
+            is_active = true;
+          } else {
             is_active = false;
           }
         },
