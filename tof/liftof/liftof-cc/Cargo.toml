@@ -23,8 +23,8 @@ serde_json        = { workspace = true }
 crossbeam-channel = { workspace = true }  
 log               = { workspace = true }  
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["database","tofcontrol","smoothed_z_score"], version = "0.10"} 
-liftof-lib      = { path = "../liftof-lib" , version="0.10"}
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["database", "tofcontrol","smoothed_z_score"], version = "0.10"} 
+liftof-lib      = { path = "../liftof-lib" , version="0.10", features = ["database"] }
 tof-control     = {path = "../../extern/tof-control", optional = false, version = "0.5", features=[] }
 
 indicatif = "0.17"

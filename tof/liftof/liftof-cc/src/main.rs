@@ -37,9 +37,7 @@ use std::path::{
     //Path,
     PathBuf,
 };
-use std::os::raw::c_int;
 
-use signal_hook::iterator::Signals;
 
 use clap::{
     arg,
@@ -47,7 +45,6 @@ use clap::{
     Parser
 };
 
-use colored::Colorize;
 
 use crossbeam_channel::{
     Sender,
@@ -336,8 +333,6 @@ fn main() {
 
   //let one_minute = time::Duration::from_millis(60000);
 
-  // set up signal handline
-  //let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
 
   // no cpu monitoring for cmdline calibration tasks
   if cpu_moni_interval > 0 {
@@ -647,23 +642,6 @@ fn main() {
     // take out the heat a bit
     thread::sleep(1*one_second);
 
-    // check pending signals and handle
-    // SIGTERM and SIGINT
-    //for signal in signals.pending() {
-    //  match signal as c_int {
-    //    SIGTERM => {
-    //      println!("=> {}", String::from("SIGINT received. Maybe Ctrl+C has been pressed!").red().bold());
-    //      end_program = true;
-    //    } 
-    //    SIGINT => {
-    //      println!("=> {}", String::from("SIGTERM received").red().bold());
-    //      end_program = true;
-    //    }
-    //    _ => {
-    //      error!("Received signal, but I don't have instructions what to do about it!");
-    //    }
-    //  }
-    //}
     if end_program {
       println!("=> Shutting down threads...");
       match thread_control.lock() {
