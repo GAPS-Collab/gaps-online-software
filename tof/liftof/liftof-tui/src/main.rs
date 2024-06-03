@@ -337,8 +337,8 @@ fn packet_sorter(packet_type : &PacketType,
         PacketType::TofEvent           => { 
           *pm.get_mut("TofEvent").unwrap() += 1;
         },
-        PacketType::HeartBeat          => { 
-          *pm.get_mut("HeartBeat").unwrap() += 1;
+        PacketType::HeartBeatDataSink  => { 
+          *pm.get_mut("HeartBeatDataSink").unwrap() += 1;
         },
         PacketType::MasterTrigger      => { 
           *pm.get_mut("MasterTrigger").unwrap() += 1;
@@ -385,8 +385,8 @@ fn packet_sorter(packet_type : &PacketType,
         PacketType::TofEventSummary        => { 
           *pm.get_mut("TofEventSummary").unwrap() += 1;
         },
-        PacketType::Ping               => {
-          *pm.get_mut("PingPacket").unwrap() += 1;
+        PacketType::RBPing               => {
+          *pm.get_mut("RBPing").unwrap() += 1;
         }
         _ => {
           error!("Packet type {packet_type} currently not supported!");
@@ -1019,7 +1019,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   pm.insert(String::from("Unknown"          ) ,0);
   pm.insert(String::from("RBEvent"          ) ,0); 
   pm.insert(String::from("TofEvent"         ) ,0); 
-  pm.insert(String::from("HeartBeat"        ) ,0); 
+  pm.insert(String::from("HeartBeatDataSink") ,0); 
   pm.insert(String::from("MasterTrigger"    ) ,0);
   pm.insert(String::from("RBEventHeader"    ) ,0);
   pm.insert(String::from("CPUMoniData"      ) ,0); 
@@ -1033,7 +1033,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   pm.insert(String::from("TofCommand"       ) ,0); 
   pm.insert(String::from("RBCommand"        ) ,0); 
   pm.insert(String::from("MultiPacket"      ) ,0); 
-  pm.insert(String::from("PingPacket"       ) ,0); 
+  pm.insert(String::from("RBPing"           ) ,0); 
   pm.insert(String::from("RBWaveform"       ) ,0); 
   pm.insert(String::from("TofEventSummary"  ) ,0); 
   
