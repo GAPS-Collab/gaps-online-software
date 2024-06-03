@@ -7,6 +7,7 @@
 //! threads/aspects of the code
 //!
 
+use std::fmt::format;
 use std::fs::File;
 use std::io::{
     Write,
@@ -19,22 +20,30 @@ use std::collections::HashMap;
 extern crate toml;
 //use tof_dataclasses::events::master_trigger::TriggerType;
 use tof_dataclasses::events::DataType;
-use tof_dataclasses::commands::TofOperationMode;
+use tof_dataclasses::packets::TofPacket;
+use tof_dataclasses::commands::{
+  TofOperationMode,
+  TofCommandV2,
+  TofCommandCode,
+};
 use tof_dataclasses::run::RunConfig;
-//#[cfg(feature = "random")]
-//use tof_dataclasses::FromRandom;
+#[cfg(feature="database")]
+use tof_dataclasses::database::RAT;
+#[cfg(feature="database")]
+use tof_dataclasses::config::PreampBiasConfig;
 use crate::master_trigger::MTBSettings;
 
 use tof_dataclasses::serialization::{
-    parse_u8,
-    parse_u16,
-    parse_u32,
-    //parse_bool, 
-    Serialization,
-    SerializationError
+  parse_u8,
+  parse_u16,
+  parse_u32,
+  //parse_bool, 
+  Serialization,
+  SerializationError,
+  Packable
 };
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum PreampBiasSetStrategy {
   ControlServer,
   Board
@@ -81,6 +90,28 @@ impl PreampSettings {
       set_strategy           : PreampBiasSetStrategy::ControlServer,
       rat_preamp_biases      : default_biases,
     }
+  }
+
+  #[cfg(feature="database")]
+  pub fn emit_pb_settings_packets(&self, rats : &HashMap<u8,RAT>) -> Vec<TofPacket> {
+    let mut packets = Vec::<TofPacket>::new();
+    for k in rats.keys() {
+      let rat          = &rats[&k];
+      let rat_key      = format!("RAT{:2}", rat);
+      let mut cmd      = TofCommandV2::new();
+      cmd.command_code = TofCommandCode::SetPreampBias;
+      let mut payload  = PreampBiasConfig::new();
+      payload.rb_id    = rat.rb2_id as u8;
+      if *k as usize >= self.rat_preamp_biases.len() {
+        error!("RAT ID {k} larger than 20!");
+        continue;
+      }
+      payload.biases = self.rat_preamp_biases[&rat_key];
+      cmd.payload = payload.to_bytestream();
+      let tp = cmd.pack();
+      packets.push(tp);
+    }
+    packets
   }
 }
 
