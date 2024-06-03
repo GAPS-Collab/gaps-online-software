@@ -4,6 +4,7 @@
 //! This includes heartbeats for different threads
 
 use std::fmt;
+use colored::Colorize;
 use crate::serialization::{
     Serialization,
     SerializationError,
@@ -11,6 +12,7 @@ use crate::serialization::{
     parse_u8,
     parse_u64
 };
+
 use crate::packets::PacketType;
 
 #[cfg(feature="random")]
@@ -21,7 +23,7 @@ use rand::Rng;
 /// A very general and concise way 
 /// to report RB activity
 #[derive(Debug, Copy, Clone, PartialEq)]
-struct RBPing {
+pub struct RBPing {
   /// RB identifier
   pub rb_id  : u8,
   /// runtime of liftof-rb
@@ -110,6 +112,15 @@ pub struct HeartBeatDataSink {
   pub n_evid_missing     : u64,
   /// event id check - chunksize
   pub n_evid_chunksize   : u64,
+  /// length of incoming buffer for 
+  /// the thread
+  pub incoming_ch_len    : u64,
+  /// check for missing event ids
+  pub evid_missing       : u64,
+  /// probe size for missing event id check
+  pub evid_check_len     : u64,
+  /// number of packets written to disk
+  pub n_pack_write_disk  : u64,
 }
 
 impl HeartBeatDataSink {
@@ -122,7 +133,31 @@ impl HeartBeatDataSink {
       n_bytes_written    : 0,
       n_evid_missing     : 0,
       n_evid_chunksize   : 0,
+      incoming_ch_len    : 0,
+      evid_missing       : 0,
+      evid_check_len     : 0,
+      n_pack_write_disk  : 0,
     }
+  }
+
+  pub fn get_sent_packet_rate(&self) -> f64 {
+    self.n_packets_sent as f64 /  self.met as f64
+  }
+
+  pub fn get_mbytes_to_disk_per_sec(&self) -> f64 {
+    self.n_bytes_written as f64/(1e6 * self.met as f64)
+  }
+
+  pub fn to_string(&self) -> String {
+    let mut repr = String::from("<HearBeatDataSink");
+    repr += &(format!("  {:<75}", ">> == == == == == == DATA SINK HEARTBEAT  == == == == == == <<".bright_cyan().bold()));
+    repr += &(format!("  {:<75} <<", format!(">> ==> Sent {} TofPackets! (packet rate {:.2}/s)", self.n_packets_sent , self.get_sent_packet_rate()).bright_cyan()));
+    repr += &(format!("  {:<75} <<", format!(">> ==> Incoming cb channel len {}", self.incoming_ch_len).bright_cyan()));
+    repr += &(format!("  {:<75} <<", format!(">> ==> Writing events to disk: {} packets written, data write rate {:.2} MB/sec", self.n_pack_write_disk, self.get_mbytes_to_disk_per_sec()).bright_purple()));
+    repr += &(format!("  {:<75} <<", format!(">> ==> Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)", self.evid_missing, self.evid_check_len, 100.0*(self.evid_missing as f64/self.evid_check_len as f64)).bright_purple()));
+    //
+    repr += &(format!("  {:<75}", ">> == == == == == == == == == == == == == == == == == == == <<".bright_cyan().bold()));
+    repr 
   }
 }
 
@@ -140,7 +175,7 @@ impl Serialization for HeartBeatDataSink {
   
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
-  const SIZE : usize = 52; 
+  const SIZE : usize = 84; 
   
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
@@ -153,6 +188,10 @@ impl Serialization for HeartBeatDataSink {
     hb.n_bytes_written    = parse_u64(stream, pos);
     hb.n_evid_missing     = parse_u64(stream, pos);
     hb.n_evid_chunksize   = parse_u64(stream, pos);
+    hb.incoming_ch_len    = parse_u64(stream, pos);
+    hb.evid_missing       = parse_u64(stream, pos);
+    hb.evid_check_len     = parse_u64(stream, pos);
+    hb.n_pack_write_disk  = parse_u64(stream, pos);
     *pos += 2;
     Ok(hb)
   }
@@ -166,6 +205,10 @@ impl Serialization for HeartBeatDataSink {
     bs.extend_from_slice(&self.n_bytes_written.to_le_bytes());
     bs.extend_from_slice(&self.n_evid_missing.to_le_bytes());
     bs.extend_from_slice(&self.n_evid_chunksize.to_le_bytes());
+    bs.extend_from_slice(&self.incoming_ch_len  .to_le_bytes() );
+    bs.extend_from_slice(&self.evid_missing     .to_le_bytes() );
+    bs.extend_from_slice(&self.evid_check_len   .to_le_bytes() );
+    bs.extend_from_slice(&self.n_pack_write_disk.to_le_bytes() );
     bs.extend_from_slice(&Self::TAIL.to_le_bytes());
     bs
   }
@@ -181,16 +224,33 @@ impl FromRandom for HeartBeatDataSink {
     let n_bytes_written    = rng.gen::<u64>();
     let n_evid_missing     = rng.gen::<u64>();
     let n_evid_chunksize   = rng.gen::<u64>();
+    let incoming_ch_len    = rng.gen::<u64>();
+    let evid_missing       = rng.gen::<u64>();
+    let evid_check_len     = rng.gen::<u64>();
+    let n_pack_write_disk  = rng.gen::<u64>();
     Self {
       met,
       n_packets_sent,
       n_packets_incoming,
       n_bytes_written,
       n_evid_missing,
-      n_evid_chunksize
+      n_evid_chunksize,
+      incoming_ch_len,
+      evid_missing,
+      evid_check_len,
+      n_pack_write_disk
     }
   }
 }
+
+impl fmt::Display for HeartBeatDataSink {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let repr = self.to_string();
+    write!(f, "{}", repr)
+  }
+}
+
+
 
 //println!("  {:<75}", ">> == == == == == == DATA SINK HEARTBEAT  == == == == == == <<".bright_cyan().bold());
 //      println!("  {:<75} <<", format!(">> ==> Sent {} TofPackets! (packet rate {:.2}/s)", n_pack_sent ,packet_rate).bright_cyan());
