@@ -7,7 +7,7 @@
 
 use std::time::{
     Instant,
-    Duration,
+    //Duration,
 };
 
 use std::sync::{
@@ -83,7 +83,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
     },
   }
-  let one_second          = Duration::from_millis(1000);
+  //let one_second          = Duration::from_millis(1000);
   let flight_address      = settings.fc_pub_address.clone();
   let write_stream_path   = settings.data_dir.clone(); 
   let mbytes_per_file     = settings.mbytes_per_file;
@@ -116,7 +116,6 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut n_pack_sent       = 0;
   //let mut last_evid       = 0u32;
   let mut n_pack_write_disk = 0usize;
-  let mut nbytes_file       = 0usize;
   let mut bytes_sec_disk    = 0f64;
 
   // for debugging/profiling
@@ -146,7 +145,6 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         if writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(&pack);
           n_pack_write_disk += 1;
-          nbytes_file       += pack.payload.len() + 9;
           bytes_sec_disk    += pack.payload.len() as f64;
         }
         // yeah, this is it. 

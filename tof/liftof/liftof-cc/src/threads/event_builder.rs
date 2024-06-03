@@ -480,7 +480,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               *value += 1;
             }
             None => {
-              error!("Unable to do bookkeeping for RB {}", rb_ev.header.rb_id);
+              warn!("Unable to do bookkeeping for RB {}", rb_ev.header.rb_id);
             }
           }
           //iter_ev = 0;

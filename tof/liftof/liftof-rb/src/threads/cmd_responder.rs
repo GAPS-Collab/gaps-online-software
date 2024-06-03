@@ -14,10 +14,13 @@ use crossbeam_channel::Sender;
 
 use tof_dataclasses::commands::{
     TofCommand,
+    TofCommandV2,
     TofCommandCode,
     TofResponse,
     TofResponseCode,
 };
+use tof_dataclasses::config::PreampBiasConfig;
+
 use tof_dataclasses::errors::CmdError;
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
@@ -36,6 +39,7 @@ use tof_dataclasses::constants::{MASK_CMD_8BIT,
                                   MASK_CMD_16BIT};
 
 use crate::api::{rb_calibration,
+                 set_preamp_biases,
                  send_preamp_bias_set,
                  send_ltb_threshold_set,
 };
@@ -166,6 +170,37 @@ pub fn cmd_responder(cmd_server_address        : String,
           },
           Ok(tp) => {
             match tp.packet_type {
+              PacketType::TofCommandV2 => {
+                let cmd : TofCommandV2;
+                match tp.unpack::<TofCommandV2>() {
+                  Ok(_cmd) => {cmd = _cmd;}
+                  Err(err) => {
+                    error!("Unable to unpack TofCommand! {err}");
+                    continue;
+                  }
+                }
+                match cmd.command_code {
+                  TofCommandCode::SetPreampBias => {
+                    match PreampBiasConfig::from_bytestream(&cmd.payload, &mut 0) {
+                      Ok(pb_cfg) => { 
+                        match set_preamp_biases(&pb_cfg) {
+                          Ok(_)    => info!("Set preamp biases to {}!", pb_cfg),
+                          Err(err) => {
+                            error!("Unable to set preamp biases! {err:?}");
+                            continue;
+                          }
+                        }
+                      },
+                      Err(err) => {
+                        error!("Unable to set preamp biases! {err}");
+                        // FIXME - send response packet
+                        continue;
+                      }
+                    }
+                  }
+                  _ => error!("Not able to execute command for command code {}", cmd.command_code)
+                }
+              }
               PacketType::TofCommand => {
                 // we have to strip off the topic
                 match TofCommand::from_bytestream(&tp.payload, &mut 0) {

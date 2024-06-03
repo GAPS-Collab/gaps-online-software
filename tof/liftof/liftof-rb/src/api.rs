@@ -8,6 +8,7 @@ use tof_dataclasses::serialization::{
     Serialization,
     //parse_u16,
 };
+use tof_dataclasses::config::PreampBiasConfig;
 use tof_dataclasses::io::RBEventMemoryStreamer;
 use std::path::Path;
 use std::time::{
@@ -47,16 +48,29 @@ use tof_control::rb_control::rb_mode::{
 };
 
 // for general control over rb, ltb and pb
-use tof_control::helper::preamp_type::PreampSetBias;
-// for power
-use liftof_lib::{PowerStatusEnum,
-                  LTBThresholdName};
+use tof_control::helper::preamp_type::{
+  PreampSetBias,
+  PreampBiasError
+};
 
-use liftof_lib::constants::{DEFAULT_PREAMP_BIAS,
-                            DEFAULT_PREAMP_ID,
-                            DEFAULT_LTB_ID};
+// for power
+use liftof_lib::{
+    LTBThresholdName
+};
+
+//use liftof_lib::constants::{DEFAULT_PREAMP_BIAS,
+//                            DEFAULT_PREAMP_ID,
+//                            DEFAULT_LTB_ID};
 
 const FIVE_SECONDS: Duration = time::Duration::from_millis(5000);
+
+
+pub fn set_preamp_biases(cfg : &PreampBiasConfig) -> Result<(), PreampBiasError> {
+  //PreampSetBias::set_manual_biases(cfg.biases)?;
+  error!("Not setting actual biases, testing mode!");
+  println!("Set preamp biases for all channels");
+  Ok(())
+}
 
 /// The poisson self trigger mode of the board
 /// triggers automatically, this means we don't 
