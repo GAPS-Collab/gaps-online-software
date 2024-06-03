@@ -349,7 +349,7 @@ impl TofCommandV2 {
 }
 
 impl Packable for TofCommandV2 {
-  const PACKET_TYPE : PacketType = PacketType::TofCommand;
+  const PACKET_TYPE : PacketType = PacketType::TofCommandV2;
 }
 
 impl Serialization for TofCommandV2 {
@@ -434,78 +434,6 @@ impl fmt::Display for TofCommandV2 {
 //  }
 //}
 //
-//impl From<&TofPacket> for RBCommand {
-//  fn from(pk : &TofPacket) -> Self {
-//    let mut cmd = RBCommand::new();
-//    if pk.packet_type == PacketType::RBCommand {
-//      match RBCommand::from_bytestream(&pk.payload, &mut 0) {
-//        Ok(_cmd) => {
-//          cmd = _cmd;
-//        },
-//        Err(err) => {
-//          error!("Can not get RBCommand from TofPacket, error {err}");
-//        }
-//      }
-//    }
-//    cmd
-//  }
-//}
-//impl fmt::Display for RBCommand {
-//  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//    let cc = RBCommand::command_code_to_string(self.command_code);
-//    write!(f, "<RBCommand: {}; RB ID {}; CH MASK {}; PAYLOAD {}>", cc, self.rb_id, self.channel_mask, self.payload)
-//  }
-//}
-//
-//impl Default for RBCommand {
-//  fn default() -> Self {
-//    RBCommand::new()
-//  }
-//}
-//
-//impl Serialization for RBCommand {
-//  
-//  const HEAD : u16 = 0xAAAA;
-//  const TAIL : u16 = 0x5555;
-//  const SIZE : usize = 11; 
-//
-//  fn from_bytestream(stream    : &Vec<u8>, 
-//                     pos       : &mut usize) 
-//    -> Result<Self, SerializationError>{
-//    Self::verify_fixed(stream, pos)?;
-//    let mut command      = RBCommand::new();
-//    command.rb_id        = parse_u8(stream, pos);
-//    command.command_code = parse_u8(stream, pos);
-//    command.channel_mask = parse_u8(stream, pos);
-//    command.payload      = parse_u32(stream, pos);
-//    *pos += 2;
-//    Ok(command)
-//  }
-//
-//  fn to_bytestream(&self) -> Vec<u8> {
-//    let mut stream = Vec::<u8>::with_capacity(9);
-//    stream.extend_from_slice(&RBCommand::HEAD.to_le_bytes());
-//    stream.push(self.rb_id);
-//    stream.push(self.command_code);
-//    stream.push(self.channel_mask);
-//    stream.extend_from_slice(&self.payload.to_le_bytes());
-//    stream.extend_from_slice(&RBCommand::TAIL.to_le_bytes());
-//    stream
-//  }
-//}
-//
-//#[cfg(feature = "random")]
-//impl FromRandom for RBCommand {    
-//  fn from_random() -> Self {
-//    let mut rng = rand::thread_rng();
-//    Self {
-//      rb_id        : rng.gen::<u8>(),
-//      command_code : rng.gen::<u8>(),
-//      channel_mask : rng.gen::<u8>(),
-//      payload      : rng.gen::<u32>(),
-//    }
-//  }
-//}
 
 /// General command class for ALL commands to the 
 /// tof C&C instance and readout boards
@@ -865,7 +793,7 @@ impl Serialization for TofResponse {
   
   fn to_bytestream(&self) -> Vec<u8> {
     let mut bytestream = Vec::<u8>::with_capacity(9);
-    bytestream.extend_from_slice(&TofResponse::HEAD.to_le_bytes());
+    bytestream.extend_from_slice(&Self::HEAD.to_le_bytes());
     let cc = u8::from(*self);
     bytestream.push(cc);
     let mut value : u32 = 0;

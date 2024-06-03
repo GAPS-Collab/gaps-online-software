@@ -26,7 +26,7 @@ pub enum PacketType {
   RBWaveform          = 22u8,
   TofEventSummary     = 23u8,
   //Monitor             = 30u8,    // needs to go away
-  HeartBeat           = 40u8,    // might probably go away
+  HeartBeatDataSink   = 40u8,    
   MasterTrigger       = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
   RBEventHeader       = 70u8,    // needs to go away
   CPUMoniData         = 80u8,
@@ -42,7 +42,9 @@ pub enum PacketType {
   TofCommandV2        = 141u8,
   TofResponse         = 142u8,
   RBCommand           = 150u8,
-  Ping                = 160u8,
+  // > 160 configuration packets
+  RBPing              = 160u8,
+  PreampBiasConfig    = 161u8,
   // use the > 200 values for transmitting
   // various binary files
   ConfigBinary        = 201u8,
@@ -71,7 +73,7 @@ impl From<u8> for PacketType {
       22u8  => PacketType::RBWaveform,
       23u8  => PacketType::TofEventSummary,
       //30u8  => PacketType::Monitor,
-      40u8  => PacketType::HeartBeat,
+      40u8  => PacketType::HeartBeatDataSink,
       60u8  => PacketType::MasterTrigger,
       70u8  => PacketType::RBEventHeader,
       80u8  => PacketType::CPUMoniData,
@@ -86,7 +88,8 @@ impl From<u8> for PacketType {
       141u8 => PacketType::TofCommandV2,
       142u8 => PacketType::TofResponse,
       150u8 => PacketType::RBCommand,
-      160u8 => PacketType::Ping,
+      160u8 => PacketType::RBPing,
+      161u8 => PacketType::PreampBiasConfig,
       201u8 => PacketType::ConfigBinary,
       202u8 => PacketType::LiftofRBBinary,
       203u8 => PacketType::LiftofBinaryService,
@@ -108,7 +111,7 @@ impl FromRandom for PacketType {
       PacketType::TofEventSummary,
       //PacketType::Monitor,
       PacketType::MasterTrigger,
-      PacketType::HeartBeat,
+      PacketType::HeartBeatDataSink,
       PacketType::RBEventHeader,
       PacketType::RBEvent,
       PacketType::RBEventMemoryView,
@@ -116,6 +119,8 @@ impl FromRandom for PacketType {
       PacketType::TofCommandV2,
       PacketType::TofResponse,
       PacketType::RBCommand,
+      PacketType::RBPing,
+      PacketType::PreampBiasConfig,
       PacketType::RBMoniData,
       PacketType::PBMoniData,
       PacketType::LTBMoniData,
@@ -143,7 +148,7 @@ fn test_packet_types() {
   type_codes.push(PacketType::TofEventSummary as u8);
   //type_codes.push(PacketType::Monitor as u8);
   type_codes.push(PacketType::MasterTrigger as u8);
-  type_codes.push(PacketType::HeartBeat as u8);
+  type_codes.push(PacketType::HeartBeatDataSink as u8);
   type_codes.push(PacketType::RBEventHeader as u8);
   type_codes.push(PacketType::RBEvent as u8);
   type_codes.push(PacketType::RBEventMemoryView as u8);
@@ -156,6 +161,8 @@ fn test_packet_types() {
   type_codes.push(PacketType::LTBMoniData as u8);
   type_codes.push(PacketType::PAMoniData as u8);
   type_codes.push(PacketType::CPUMoniData as u8);
+  type_codes.push(PacketType::RBPing as u8);
+  type_codes.push(PacketType::PreampBiasConfig as u8);
   type_codes.push(PacketType::MonitorMtb as u8);
   type_codes.push(PacketType::RBCalibration as u8);
   type_codes.push(PacketType::ConfigBinary as u8);
