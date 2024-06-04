@@ -46,11 +46,13 @@ use tof_dataclasses::serialization::{
 use tof_dataclasses::io::{
     TofPacketWriter,
     FileType,
-    get_utc_date
+    get_utc_timestamp
 };
 
 use tof_dataclasses::events::TofEvent;
 
+#[cfg(features="debug")]
+use tof_dataclasses::heartbeats::HeartBeatDataSink;
 
 use liftof_lib::settings::DataPublisherSettings;
 
@@ -113,6 +115,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   }
   //let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
 
+  #[cfg(features="debug")]
+  let mut heartbeat         = HeartBeatDataSink::new();
   let mut n_pack_sent       = 0;
   //let mut last_evid       = 0u32;
   let mut n_pack_write_disk = 0usize;
@@ -122,6 +126,10 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut timer      = Instant::now();
   let mut kill_timer = Instant::now();
 
+  let mut cali_expected    = 40;
+  let mut cali_dir_created = false;
+  let mut cali_output_dir  = String::from("");
+  let mut cali_completed   = 0;
   loop {
     if kill_timer.elapsed().as_secs_f32() > 0.11 {
       match thread_control.try_lock() {
@@ -144,6 +152,12 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         debug!("Got new tof packet {}", pack.packet_type);
         if writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(&pack);
+          cfg_if::cfg_if!{
+            if #[cfg(features="debug")] {
+              heartbeat.n_pack_write_disk += 1;
+              heartbeat.n_bytes_written += pack.payload.len();   
+            }
+          }
           n_pack_write_disk += 1;
           bytes_sec_disk    += pack.payload.len() as f64;
         }
@@ -164,6 +178,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
               Ok(mut tc) => {
                 // FIXME - unwrap (for bad packets)
                 *tc.finished_calibrations.get_mut(&cali_rb_id).unwrap() = true; 
+                cali_expected = tc.n_rbs;
+                cali_completed += 1;
               },
               Err(err) => {
                 error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -174,13 +190,20 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
             let file_type  = FileType::CalibrationFile(cali_rb_id);
             //println!("==> Writing stream to file with prefix {}", streamfile_name);
             //let mut cali_writer = TofPacketWriter::new(write_stream_path.clone(), file_type);
-            let today           = get_utc_date();
-            let cali_output_dir = format!("{}/{}", settings.cali_dir.clone(), today);
-            match create_dir_all(cali_output_dir.clone()) {
-              Ok(_)    => info!("Created {} for calibration data!", cali_output_dir),
-              Err(err) => error!("Unable to create {} for calibration data! {}", cali_output_dir, err)
+            if !cali_dir_created {
+              let today           = get_utc_timestamp();
+              cali_output_dir = format!("{}/{}", settings.cali_dir.clone(), today);
+              match create_dir_all(cali_output_dir.clone()) {
+                Ok(_)    => info!("Created {} for calibration data!", cali_output_dir),
+                Err(err) => error!("Unable to create {} for calibration data! {}", cali_output_dir, err)
+              }
+              cali_dir_created = true;
             }
-            let mut cali_writer = TofPacketWriter::new(cali_output_dir, file_type);
+            if cali_completed == cali_expected {
+              cali_completed = 0;
+              cali_dir_created = false;
+            }
+            let mut cali_writer = TofPacketWriter::new(cali_output_dir.clone(), file_type);
             cali_writer.add_tof_packet(&pack);
             drop(cali_writer);
           }
