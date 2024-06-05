@@ -31,7 +31,8 @@ use tof_dataclasses::threading::ThreadControl;
 use tof_dataclasses::constants::PAD_CMD_32BIT;
 use tof_dataclasses::commands::{
     TofCommand,
-    //TofCommandCode,
+    TofCommandV2,
+    TofCommandCode,
     TofResponse,
     TofResponseCode
 };
@@ -45,6 +46,12 @@ use tof_dataclasses::serialization::{
 };
 
 use liftof_lib::settings::CommandDispatcherSettings;
+
+use liftof_lib::constants::{
+    DEFAULT_CALIB_VOLTAGE,
+    DEFAULT_RB_ID,
+    DEFAULT_CALIB_EXTRA
+};
 
 /// The command dispatcher listens for incoming commands and either executes
 /// them or passes them on to the intended receiver
@@ -143,7 +150,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
       Err(_)   => {
         continue;
       }
-      Ok(mut buffer) => {
+      Ok(buffer) => {
         // identfiy if we have a GAPS packet
         if buffer[0] == 0xeb && buffer[1] == 0x90 {
           // We have a GAPS packet -> FIXME:
@@ -151,7 +158,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
           // strip away the GAPS header!  
           continue;
         } 
-        match TofPacket::from_bytestream(&buffer, &mut 1) {
+        match TofPacket::from_bytestream(&buffer, &mut 0) {
           Err(err) => {
             error!("Unable to decode bytestream! {:?}", err);
             continue;  
@@ -159,12 +166,13 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
           Ok(packet) => {
             let mut resp = TofResponse::Unknown;
             match packet.packet_type {
-              PacketType::TofCommand => {
-                // Here we have to decide - is that command for us, or for the RBs?
-                let cmd : TofCommand = packet.unpack().unwrap(); // we just checked if
-                                                                 // that is really a
-                                                                 // TofCommand
-                let write_to_file = format!("{}", cmd);
+              PacketType::TofCommandV2 => {
+                let mut cmd = TofCommandV2::new();
+                match packet.unpack::<TofCommandV2>() {
+                  Ok(_cmd) => {cmd = _cmd;},
+                  Err(err) => error!("Unable to decode TofCommand! {err}")
+                }
+                let write_to_file = format!("{}\n", cmd);
                 match log_file.write_all(&write_to_file.into_bytes()) {
                   Err(err) => {
                     error!("Writing to file to path {} failed! {}", filename, err)
@@ -181,7 +189,8 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                 // intercept commands when we are in lockdown
                 if locked {
                   let mut resp = TofResponse::Success(0);
-                  if cmd == TofCommand::Unlock(81) {
+                  //if cmd == TofCommand::Unlock(81) {
+                  if cmd.command_code == TofCommandCode::Unlock {
                     locked = false;
                   } else {
                     resp = TofResponse::AccessDenied(403u32);
@@ -197,11 +206,17 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                   continue;
                 }
 
-                match cmd {
-                  TofCommand::Kill(_value) => {
-                    // FIXME - end all threads, maybe end run?
+                match cmd.command_code {
+                  TofCommandCode::Kill => {
+                    match thread_ctrl.lock() {
+                      Ok(mut tc) => {
+                        //println!("== ==> [cmd_dispatcher] tc locked!");
+                        tc.stop_flag = true;
+                      }
+                      Err(err) => error!("Unable to lock thread-control! {err}")
+                    }
                   }
-                  TofCommand::Lock(_value) => {
+                  TofCommandCode::Lock => {
                     locked = true;
                     let resp = TofResponse::Success(0);
                     let ack_tp = resp.pack();
@@ -212,14 +227,30 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       Ok(_)    => ()
                     }
                   }
-                  TofCommand::DataRunStart (_value) => {
+                  TofCommandCode::DataRunStart => {
+                    println!("== ==> Received DataRunStart!");
                     info!("Received data run start command");
                     // technically, it is run_typ, rb_id, event number
                     // all to the max means run start for all
                     // let payload: u32 =  PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
+                    // make sure the relevant threads are active
+                    match thread_ctrl.lock() {
+                      Ok(mut tc) => {
+                        tc.thread_master_trg_active  = true;
+                        tc.thread_monitoring_active  = true;
+                        tc.thread_event_bldr_active = true;
+                        tc.calibration_active        = false;
+                      },
+                      Err(err) => {
+                        error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+                      },
+                    }
                     // We don't need this - just need to make sure it gets broadcasted
+                    let cmd_payload: u32 =  PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
+                    let cmd          = TofCommand::DataRunStart(cmd_payload);
+                    let packed_cmd   = cmd.pack();
                     let mut payload  = String::from("BRCT").into_bytes();
-                    payload.append(&mut packet.to_bytestream());
+                    payload.append(&mut packed_cmd.to_bytestream());
                     match cmd_sender.send(&payload, 0) {
                       Err(err) => {
                         error!("Unable to send command, error{err}");
@@ -265,30 +296,100 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       }
                     }
                   }
-                  //TofCommand::Ping (_value) => {
-                  //TofCommand::Ping (_value) => {
-                  TofCommand::Ping (_value) => {
-                    //info!("Received ping command");
-                    //// MSB third 8 bits are
-                    //let tof_component: TofComponent = TofComponent::from(((value & (MASK_CMD_8BIT << 8)) >> 8) as u8);
-                    //// MSB fourth 8 bits are 
-                    //let id: u8 = (value & MASK_CMD_8BIT) as u8;
-                    //if tof_component == TofComponent::Unknown {
-                    //  info!("The command is not valid for {}", TofComponent::Unknown);
-                    //  // The packet was not for this RB so bye
-                    //  continue;
-                    //} else {
-                    //  match tof_component {
-                    //    TofComponent::TofCpu => return_val = crate::send_ping_response(resp_socket),
-                    //    TofComponent::RB  |
-                    //    TofComponent::LTB |
-                    //    TofComponent::MT     => return_val = crate::send_ping(resp_socket, outgoing_c,  tof_component, id),
-                    //    _                    => {
-                    //      error!("The ping command is not implemented for this TofComponent!");
-                    //      return_val = Err(CmdError::NotImplementedError);
-                    //    }
-                    //  }
-                    //}
+                  TofCommandCode::Ping => {
+                    info!("Received ping command");
+                    let cmd          = TofCommand::Ping(0x0);
+                    let packed_cmd   = cmd.pack();
+                    let mut payload  = String::from("BRCT").into_bytes();
+                    payload.append(&mut packed_cmd.to_bytestream());
+                    match cmd_sender.send(&payload, 0) {
+                      Err(err) => {
+                        error!("Unable to send command, error{err}");
+                        resp = TofResponse::ZMQProblem(0x0); // response code not assigned, 
+                                                                 // let's just let it be 0 for now
+                        let ack_tp = resp.pack();
+                        match tof_ack_sender.send(ack_tp) {
+                          Err(err) => {
+                            error!("Unable to send ACK packet! {err}");
+                          }
+                          Ok(_)    => ()
+                        }
+                      },
+                      Ok(_)    => {
+                        info!("Ping command sent");
+                        println!("=> TOF CPU responds to ping!");
+                      }
+                    }
+                  }
+                  TofCommandCode::RBCalibration => {
+                    let voltage_level = DEFAULT_CALIB_VOLTAGE;
+                    let rb_id         = DEFAULT_RB_ID;
+                    let extra         = DEFAULT_CALIB_EXTRA;
+                    println!("=> Received calibration default command! Will init calibration run of all RBs...");
+                    let cmd_payload: u32
+                      = (voltage_level as u32) << 16 | (rb_id as u32) << 8 | (extra as u32);
+                    let default_calib = TofCommand::DefaultCalibration(cmd_payload);
+                    let tp = default_calib.pack();
+                    let mut payload  = String::from("BRCT").into_bytes();
+                    payload.append(&mut tp.to_bytestream());
+                    
+                    match cmd_sender.send(&payload, 0) {
+                      Err(err) => {
+                        error!("Unable to send command, error{err}");
+                      },
+                      Ok(_) => {
+                        println!("=> Calibration  initialized!");
+                      }
+                    }
+                    println!("=> .. now we need to wait until the calibration is finished!");
+                    // if that is successful, we need to wait
+                    match thread_ctrl.lock() {
+                      Ok(mut tc) => {
+                        // deactivate the master trigger thread
+                        tc.thread_master_trg_active  = false;
+                        tc.thread_monitoring_active = false;
+                        tc.calibration_active = true;
+                      },
+                      Err(err) => {
+                        error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+                      },
+                    }
+                    // this halts the thread while we are doing calibrations
+                    let mut cali_received = 0u32;
+                    let cali_timeout   = Instant::now();
+                    let cali_sleeptime = Duration::from_secs(30); 
+                    loop {
+                      thread::sleep(cali_sleeptime);
+                      match thread_ctrl.lock() {
+                        Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
+                        Ok(mut tc) => {
+                          if tc.calibration_active {
+                            let mut changed_keys = Vec::<u8>::new();
+                            for rbid in tc.finished_calibrations.keys() {
+                              // the global data sink sets these flags
+                              if tc.finished_calibrations[&rbid] {
+                                cali_received += 1;
+                                changed_keys.push(*rbid);
+                              }
+                            }
+                            for k in changed_keys {
+                              // it got registered, now reset it 
+                              *tc.finished_calibrations.get_mut(&k).unwrap() = false;
+                            }
+                            // FIXME - this or a timer
+                            if cali_received  == tc.n_rbs || cali_timeout.elapsed().as_secs() >= 300 {
+                              // re-enable the threads
+                              tc.thread_master_trg_active = true;
+                              tc.thread_monitoring_active = true;
+                              tc.calibration_active = false;
+                              println!("== ==> Calibration finished!");
+                              info!("Calibration finished!");
+                              break; 
+                            }
+                          }
+                        } // end Ok
+                      } // end match
+                    } // end loop
                   }
                   _ => {
                     error!("Command {} is currently not implemented!", cmd); 

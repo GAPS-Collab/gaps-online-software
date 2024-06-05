@@ -8,6 +8,7 @@ use tof_dataclasses::serialization::{
     Serialization,
     //parse_u16,
 };
+use tof_dataclasses::config::PreampBiasConfig;
 use tof_dataclasses::io::RBEventMemoryStreamer;
 use std::path::Path;
 use std::time::{
@@ -47,16 +48,29 @@ use tof_control::rb_control::rb_mode::{
 };
 
 // for general control over rb, ltb and pb
-use tof_control::helper::preamp_type::PreampSetBias;
-// for power
-use liftof_lib::{PowerStatusEnum,
-                  LTBThresholdName};
+use tof_control::helper::preamp_type::{
+  PreampSetBias,
+  PreampBiasError
+};
 
-use liftof_lib::constants::{DEFAULT_PREAMP_BIAS,
-                            DEFAULT_PREAMP_ID,
-                            DEFAULT_LTB_ID};
+// for power
+use liftof_lib::{
+    LTBThresholdName
+};
+
+//use liftof_lib::constants::{DEFAULT_PREAMP_BIAS,
+//                            DEFAULT_PREAMP_ID,
+//                            DEFAULT_LTB_ID};
 
 const FIVE_SECONDS: Duration = time::Duration::from_millis(5000);
+
+
+pub fn set_preamp_biases(cfg : &PreampBiasConfig) -> Result<(), PreampBiasError> {
+  //PreampSetBias::set_manual_biases(cfg.biases)?;
+  error!("Not setting actual biases, testing mode!");
+  println!("Set preamp biases for all channels");
+  Ok(())
+}
 
 /// The poisson self trigger mode of the board
 /// triggers automatically, this means we don't 
@@ -337,7 +351,7 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
 
   // Do this only with the full calib
   calibration.calibrate()?;
-  println!("Calibration : {}", calibration);
+  println!("== ==> [rb_calibration] Calibration : {}", calibration);
   // now it just needs to be send to 
   // the publisher
   //for k in 0..10 {
@@ -1358,77 +1372,5 @@ pub fn send_ltb_threshold_set(_ltb_id: u8, threshold_name: LTBThresholdName, thr
 }
 
 
-pub fn power_preamp(preamp_id: u8, status: PowerStatusEnum) -> Result<TofCommandCode, CmdError> {
-  //let mut result = Ok(());
-  let result : Result<(),SetError>; 
-  match status {
-    PowerStatusEnum::ON => {
-      if preamp_id == DEFAULT_PREAMP_ID {
-        result = send_preamp_bias_set_all(DEFAULT_PREAMP_BIAS);
-      } else {
-        result = send_preamp_bias_set(DEFAULT_PREAMP_ID, DEFAULT_PREAMP_BIAS);
-      }
-    },
-    PowerStatusEnum::OFF => {
-      if preamp_id == DEFAULT_PREAMP_ID {
-        result = send_preamp_bias_set_all(0);
-      } else {
-        result = send_preamp_bias_set(DEFAULT_PREAMP_ID, 0);
-      }
-    },
-    PowerStatusEnum::Cycle => {
-      // about this command.How long is it right to power cycle stuff??? TODO
-      error!("Not implemented.");
-      return Err(CmdError::PowerError)
-    },
-    _ => {
-      error!("The power status is not specified or outside expected values.");
-      return Err(CmdError::PowerError)
-    }
-  }
-
-  match result {
-    Ok(_) => return Ok(TofCommandCode::CmdPower),
-    Err(_) => {
-      error!("Unable to set preamp bias! Error LTBThresholdError!");
-      return Err(CmdError::PowerError)
-    }
-  };
-}
 
 
-pub fn power_ltb(ltb_id: u8, status: PowerStatusEnum) -> Result<TofCommandCode, CmdError> {
-  let mut result = Ok(());
-  // the differentiation between all and single ltb is done intrinsically by the fact that 1 RB -> 1 LTB
-  match status {
-    PowerStatusEnum::ON => {
-      // TODO add ID check for LTB to if
-      if ltb_id == DEFAULT_LTB_ID {
-        result = send_ltb_all_thresholds_set();
-      }
-    },
-    PowerStatusEnum::OFF => {
-      // TODO add ID check for LTB to if
-      if ltb_id == DEFAULT_LTB_ID {
-        result = send_ltb_all_thresholds_reset();
-      }
-    },
-    PowerStatusEnum::Cycle => {
-      // about this command.How long is it right to power cycle stuff??? TODO
-      error!("Not implemented.");
-      return Err(CmdError::PowerError)
-    },
-    _ => {
-      error!("The power status is not specified or outside expected values.");
-      return Err(CmdError::PowerError)
-    }
-  }
-
-  match result {
-    Ok(_) => return Ok(TofCommandCode::CmdPower),
-    Err(_) => {
-      error!("Unable to set preamp bias! Error LTBThresholdError!");
-      return Err(CmdError::PowerError)
-    }
-  };
-}

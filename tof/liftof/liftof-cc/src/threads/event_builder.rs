@@ -399,19 +399,25 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut n_gathered_fr_cache  = 0usize;
   let mut misaligned_cache_err = 0usize; 
   loop {
-    if check_tc_update.elapsed().as_secs() > 5 {
-      match thread_control.lock() {
+    if check_tc_update.elapsed().as_secs() > 2 {
+      let mut cali_still_active = false;
+      match thread_control.try_lock() {
         Ok(tc) => {
+          //println!("== ==> [evt_builder] tc lock acquired!");
           if tc.calibration_active {
-            thread::sleep(Duration::from_secs(1));
-            continue;
+            cali_still_active = true;
           } else {
-            check_tc_update = Instant::now();
+            cali_still_active = false;  
           }
         },
         Err(err) => {
           error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
         },
+      }
+      check_tc_update = Instant::now();
+      if cali_still_active {
+        thread::sleep(Duration::from_secs(1));
+        continue;
       }
     }
     n_received = 0;
@@ -474,7 +480,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               *value += 1;
             }
             None => {
-              error!("Unable to do bookkeeping for RB {}", rb_ev.header.rb_id);
+              warn!("Unable to do bookkeeping for RB {}", rb_ev.header.rb_id);
             }
           }
           //iter_ev = 0;

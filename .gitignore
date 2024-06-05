@@ -11,6 +11,9 @@ Makefile
 # project files
 .idea/*
 
+# Poetry lock files
+poetry.lock
+
 # Cargo lock files
 Cargo.lock
 tof/dataclasses/rust/tof-dataclasses/Cargo.lock

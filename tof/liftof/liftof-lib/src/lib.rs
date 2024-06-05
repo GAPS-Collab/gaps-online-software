@@ -96,7 +96,6 @@ use tof_dataclasses::packets::{
 use tof_dataclasses::errors::AnalysisError;
 use tof_dataclasses::errors::SetError;
 use tof_dataclasses::serialization::Serialization;
-use tof_dataclasses::commands::RBCommand;
 #[cfg(feature="database")]
 use tof_dataclasses::events::{
     RBEvent,
@@ -151,14 +150,15 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
 
 /// Handle incoming POSIX signals
 pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
-  let sleep_time = Duration::from_millis(100);
+  let sleep_time = Duration::from_millis(300);
 
   let mut end_program = false;
   let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
   loop {
     thread::sleep(sleep_time);
-    match thread_control.lock() {
+    match thread_control.try_lock() {
       Ok(mut tc) => {
+        //println!("== ==> [signal_handler] acquired thread_control lock!");
         //println!("Tread control {:?}", tc);
         if !tc.thread_cmd_dispatch_active 
         && !tc.thread_data_sink_active
@@ -171,6 +171,10 @@ pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
             tc.stop_flag = true;
             continue;
         }
+        if tc.stop_flag {
+          println!("== ==> [signal_handler] Stop flag is set, we are waiting for threads to finish...");
+          println!("{}", tc);
+        }
       }
       Err(err) => {
         error!("Can't acquire lock for ThreadControl! {err}");
@@ -182,11 +186,11 @@ pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
     for signal in signals.pending() {
       match signal as c_int {
         SIGTERM => {
-          println!("=> {}", String::from("SIGINT received. Maybe Ctrl+C has been pressed!").red().bold());
+          println!("=> {}", String::from("SIGTERM received. Maybe Ctrl+C has been pressed!").red().bold());
           end_program = true;
         } 
         SIGINT => {
-          println!("=> {}", String::from("SIGTERM received").red().bold());
+          println!("=> {}", String::from("SIGINT received").red().bold());
           end_program = true;
         }
         _ => {
@@ -387,84 +391,6 @@ pub fn build_tcp_from_ip(ip: String, port: String) -> String {
   format!("tcp://{}:{}", ip, port)
 }
 
-/// Broadcast commands over the tof-computer network
-/// socket via zmq::PUB to the rb network.
-/// Currently, the only participants in the rb network
-/// are the readoutboards.
-///
-/// After the reception of a TofCommand, this will currently be 
-/// broadcasted to all readout boards.
-///
-/// ISSUE/FIXME  : Send commands only to specific addresses.
-///
-/// # Arguments 
-///
-/// * cmd        : a \[crossbeam\] receiver, to receive 
-///                TofCommands.
-pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
-  debug!(".. started!");
-  let ctx = zmq::Context::new();
-  let this_board_ip = IpAddr::V4(Ipv4Addr::new(10, 0, 1, 1));
-
-  let address_ip;
-  match this_board_ip {
-    IpAddr::V4(ip) => address_ip = ip.to_string().clone(),
-    IpAddr::V6(_) => panic!("Currently, we do not support IPV6!")
-  }
-  let data_address : String = build_tcp_from_ip(address_ip,DATAPORT.to_string());
-  let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-  data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
-  println!("==> 0MQ PUB socket bound to address {data_address}");
-  loop {
-    // check if we get a command from the main 
-    // thread
-    match cmd.try_recv() {
-      Err(err) => trace!("Did not receive a new command, error {err}"),
-      Ok(packet) => {
-        // now we have several options
-        match packet.packet_type {
-          PacketType::TofCommand => {
-            info!("Received TofCommand! Broadcasting to all TOF entities who are listening!");
-            let mut payload  = String::from("BRCT").into_bytes();
-            payload.append(&mut packet.to_bytestream());
-            match data_socket.send(&payload,0) {
-              Err(err) => error!("Unable to send command! Error {err}"),
-              Ok(_)    => info!("BRCT command sent!")
-            }
-          },
-          PacketType::RBCommand => {
-            debug!("Received RBCommand!");
-            let mut payload_str  = String::from("RB");
-            match RBCommand::from_bytestream(&packet.payload, &mut 0) {
-              Ok(rb_cmd) => {
-                let to_rb_id = rb_cmd.rb_id;
-                if rb_cmd.rb_id < 10 {
-                  payload_str += &String::from("0");
-                  payload_str += &to_rb_id.to_string();
-                } else {
-                  payload_str += &to_rb_id.to_string();
-                }
-
-                let mut payload = payload_str.into_bytes();
-                payload.append(&mut packet.to_bytestream());
-                match data_socket.send(&payload,0) {
-                  Err(err) => error!("Unable to send command {}! Error {err}", rb_cmd),
-                  Ok(_)    => debug!("Making event request! {}", rb_cmd)
-                }
-              }
-              Err(err) => {
-                error!("Can not construct RBCommand, error {err}");
-              }
-            }
-          },
-          _ => {
-            error!("Received garbage package! {}", packet);
-          }
-        }// end match
-      }
-    }
-  }
-}
 
 //**********************************************
 //
@@ -822,53 +748,25 @@ pub fn to_board_id_string(rb_id: u32) -> String {
 #[derive(Debug, Parser, PartialEq)]
 pub enum CommandCC {
   /// Listen for flight CPU commands.
-  Listen(ListenCmd),
+  Listen,
   /// Staging mode - work through all .toml files
   /// in the staging area
-  Staging(StagingCmd),
+  Staging,
   /// Ping a TOF sub-system.
-  Ping(PingCmd),
+  Ping,
   /// Monitor a TOF sub-system.
   Moni(MoniCmd),
   /// Restart RB systemd
   SystemdReboot(SystemdRebootCmd),
   /// Power control of TOF sub-systems.
-  #[command(subcommand)]
-  Power(PowerCmd),
   /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
-  #[command(subcommand)]
-  Calibration(CalibrationCmd),
-  /// Remotely set LTB thresholds or preamp bias.
-  #[command(subcommand)]
-  Set(SetCmd),
+  Calibration,
   /// Start/stop data taking run.
-  #[command(subcommand)]
-  Run(RunCmd)
+  Run
 }
 
 
-/// TOF SW cmds ====================================================
-#[derive(Debug, Copy, Clone, Args, PartialEq)]
-pub struct ListenCmd { }
 
-#[derive(Debug, Copy, Clone, Args, PartialEq)]
-pub struct StagingCmd { }
-
-#[derive(Debug, Args, PartialEq)]
-pub struct PingCmd {
-  /// Component to target
-  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
-          TofComponent::TofCpu,
-          TofComponent::MT,
-          TofComponent::RB,
-          TofComponent::LTB
-        ]),
-        required = true)]
-  pub component: TofComponent,
-  /// Component ID
-  #[arg(required = true)]
-  pub id: u8
-}
 
 #[derive(Debug, Args, PartialEq)]
 pub struct MoniCmd {
@@ -1011,18 +909,6 @@ impl PreampBiasOpts {
 }
 /// END Set cmds ================================================
 
-/// Calibration cmds ====================================================
-#[derive(Debug, Clone, Subcommand, PartialEq)]
-pub enum CalibrationCmd {
-  /// Default calibration run, meaning 2 voltage calibrations and one timing calibration on all RBs with the default values.
-  Default(DefaultOpts),
-  /// No input data taking run. All RB are targeted are default ones if nothing else is specified.
-  Noi(NoiOpts),
-  /// Voltage data taking run. All RB are targeted and voltage are default ones if nothing else is specified.
-  Voltage(VoltageOpts),
-  /// Timing data taking run. All RB are targeted and voltage are default ones if nothing else is specified.
-  Timing(TimingOpts)
-}
 
 #[derive(Debug, Clone, Args, PartialEq)]
 pub struct DefaultOpts {

@@ -38,6 +38,8 @@ pub mod io;
 pub mod analysis;
 pub mod ipbus;
 pub mod series;
+pub mod heartbeats;
+pub mod config;
 #[cfg(feature="database")]
 extern crate diesel;
 #[cfg(feature="database")]

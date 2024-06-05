@@ -73,6 +73,7 @@ use tof_dataclasses::run::RunConfig;
 use tof_dataclasses::database::{
     ReadoutBoard,
     connect_to_db,
+    RAT
 };
 
 use tof_dataclasses::io::{
@@ -88,6 +89,8 @@ use liftof_lib::{
     LiftofSettings,
     init_env_logger,
 };
+
+use liftof_lib::settings::PreampBiasSetStrategy;
 
 use liftof_rb::threads::{
     runner,
@@ -126,8 +129,13 @@ struct Args {
   #[arg(long, default_value_t = false)]
   show_progress: bool,
   /// Print out (even more) debugging information 
-  #[arg(long, default_value_t = false)]
+  #[arg(long, short, default_value_t = false)]
   verbose : bool,
+  /// Explicetly IGNORE the MTB link id check. This is 
+  /// not recommended, but might be useful when there
+  /// is no MTB available for debugging purposes
+  #[arg(long, default_value_t = false)]
+  ignore_mtb_link_id_check : bool,
   /// List of possible commands
   #[command(subcommand)]
   command: CommandLineCommand
@@ -229,7 +237,7 @@ fn main() {
   cfg_if::cfg_if!{
     if #[cfg(feature="database")] {
       // Query the db for this RBs information
-      let conn = connect_to_db(db_path);
+      let conn = connect_to_db(db_path.clone());
       let mut rb_expected_link_id = 0u8;
       match conn {
         Err(err) => {
@@ -256,6 +264,43 @@ fn main() {
       println!("=> We found a MTB Link ID {} for this RB (RB ID {}) in the database!", rb_expected_link_id, rb_info.board_id);
     } else {
       warn!("Not build with database feature! Currently unable to perform MTB LINK ID check!!");
+    }
+  }
+
+  if pb_connected {
+    // preamp bias settings
+    cfg_if::cfg_if!{
+      if #[cfg(feature="database")] {
+        let preamp_cfg = config.preamp_settings;
+        if preamp_cfg.set_strategy == PreampBiasSetStrategy::Board 
+          && preamp_cfg.set_preamp_voltages {
+          match connect_to_db(db_path) {
+            Err(err) => error!("Unable to connect to db! Can not set preamp biases! {err}"),
+            Ok(mut conn) => {
+              match RAT::where_rb2id(&mut conn, rb_id) {
+                None => error!("Unable to set preamp bias! Not able to get board information from db!"),
+                Some(rat_list) => {
+                  if rat_list.len() != 1 {
+                    error!("Ambigious preamp mapping! {:?}", rat_list);
+                  } else {
+                    let key = format!("RAT{:2}", rat_list[0].rat_id);
+                    match preamp_cfg.rat_preamp_biases.get(&key) {
+                      None => error!("Unable to set biases! Entry for {} not found in the settings!", key),
+                      Some(biases) => {
+                        println!("Will NOT set preamp biases (testing mode), {:?} for RAT {}", biases, key);
+                        //match PreampSetBias::set_manual_biases(cfg.biases) {
+                        //  Err(err) => error!("Unable to set biases! {err}"),
+                        //  Ok(_)    => info!("Preamp biases set! {:?}", biases)
+                        //}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } 
     }
   }
   // FIXME - instead of passing the run config around,
@@ -287,18 +332,21 @@ fn main() {
   // check if the board has received the correct link id from the mtb
   cfg_if::cfg_if!{
     if #[cfg(feature="database")] {
-      println!("=> Performing LTB LINK ID check!");
+      println!("=> Performing MTB LINK ID check!");
       match get_mtb_link_id() {
         Err(err) => error!("Unable to obtain MTB link id! {err}"),
         Ok(link_id) => {
           if link_id as u8 != rb_expected_link_id {
             println!("=> We received the correct link id from the MTB!");
-            panic!("Unable to perform RB/Link ID mapping check!");
           } else {
             error!("Received unexpected MTB link ID {}!", link_id);
             error!("Incorrect link ID. This might hint to issues with the MTB mapping!");
             error!("******************************************************************");
-            panic!("The RB/Link ID mapping is wrong for this board!");
+            if args.ignore_mtb_link_id_check {
+              warn!("The MTB LINK ID check failed, however, we are explicetly instructed to ignore that check, since the --ignore-mte-link-id-check flag is set!");
+            } else {
+              panic!("The RB/Link ID mapping is wrong for this board!");
+            }
           }
         }
       }

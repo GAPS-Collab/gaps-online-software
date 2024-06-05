@@ -7,13 +7,15 @@
 
 use std::time::{
     Instant,
-    Duration,
+    //Duration,
 };
 
 use std::sync::{
     Arc,
     Mutex,
 };
+
+use std::fs::create_dir_all;
 
 
 extern crate crossbeam_channel;
@@ -43,21 +45,32 @@ use tof_dataclasses::serialization::{
 
 use tof_dataclasses::io::{
     TofPacketWriter,
-    FileType
+    FileType,
+    get_utc_timestamp
 };
+
 use tof_dataclasses::events::TofEvent;
 
+#[cfg(features="debug")]
+use tof_dataclasses::heartbeats::HeartBeatDataSink;
 
 use liftof_lib::settings::DataPublisherSettings;
 
-/// Manages "outgoing" 0MQ PUB socket
+/// Manages "outgoing" 0MQ PUB socket and writing
+/// data to disk
 ///
-/// Everything should send to here, and 
-/// then it gets passed on over the 
-/// connection to the flight computer
+/// All received packets will be either forwarded
+/// over zmq or saved to disk
 ///
 /// # Arguments
 ///
+/// * incoming           : incoming connection for TofPackets from 
+///                        other threads
+/// * write_stream       : write TofPacket stream to disk
+/// * run_id             : run id which is used in filename generation
+/// * settings           : additional settings
+/// * print_moni_packets : print monitoring packets to the terminal
+/// * thread_control     : start/stop thread, calibration information
 pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                         write_stream       : bool,
                         runid              : usize,
@@ -72,7 +85,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
     },
   }
-  let one_second          = Duration::from_millis(1000);
+  //let one_second          = Duration::from_millis(1000);
   let flight_address      = settings.fc_pub_address.clone();
   let write_stream_path   = settings.data_dir.clone(); 
   let mbytes_per_file     = settings.mbytes_per_file;
@@ -102,30 +115,36 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   }
   //let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
 
+  #[cfg(features="debug")]
+  let mut heartbeat         = HeartBeatDataSink::new();
   let mut n_pack_sent       = 0;
   //let mut last_evid       = 0u32;
   let mut n_pack_write_disk = 0usize;
-  let mut nbytes_file       = 0usize;
   let mut bytes_sec_disk    = 0f64;
 
   // for debugging/profiling
   let mut timer      = Instant::now();
   let mut kill_timer = Instant::now();
 
+  let mut cali_expected    = 40;
+  let mut cali_dir_created = false;
+  let mut cali_output_dir  = String::from("");
+  let mut cali_completed   = 0;
   loop {
-    if kill_timer.elapsed().as_secs_f32() > 0.1 {
-      match thread_control.lock() {
+    if kill_timer.elapsed().as_secs_f32() > 0.11 {
+      match thread_control.try_lock() {
         Ok(mut tc) => {
+          //println!("== ==> [global_data_sink] tc lock acquired!");
           if tc.stop_flag {
             tc.thread_data_sink_active = false;
             break;
           } 
-          kill_timer = Instant::now();
         },
         Err(err) => {
           error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
         },
       }
+      kill_timer = Instant::now();
     }
     match incoming.recv() {
       Err(err) => trace!("No new packet, err {err}"),
@@ -133,8 +152,13 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         debug!("Got new tof packet {}", pack.packet_type);
         if writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(&pack);
+          cfg_if::cfg_if!{
+            if #[cfg(features="debug")] {
+              heartbeat.n_pack_write_disk += 1;
+              heartbeat.n_bytes_written += pack.payload.len();   
+            }
+          }
           n_pack_write_disk += 1;
-          nbytes_file       += pack.payload.len() + 9;
           bytes_sec_disk    += pack.payload.len() as f64;
         }
         // yeah, this is it. 
@@ -147,13 +171,15 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         match pack.packet_type {
           PacketType::RBCalibration => {
             let cali_rb_id = pack.payload[2]; 
-            debug!("Received RBCalibration packet for board {}!", cali_rb_id);
+            info!("Received RBCalibration packet for board {}!", cali_rb_id);
             // we notify the other threads that we got this specific packet, 
             // so we know how long we still have to wait
             match thread_control.lock() {
               Ok(mut tc) => {
                 // FIXME - unwrap (for bad packets)
                 *tc.finished_calibrations.get_mut(&cali_rb_id).unwrap() = true; 
+                cali_expected = tc.n_rbs;
+                cali_completed += 1;
               },
               Err(err) => {
                 error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -163,7 +189,21 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
             // See RBCalibration reference
             let file_type  = FileType::CalibrationFile(cali_rb_id);
             //println!("==> Writing stream to file with prefix {}", streamfile_name);
-            let mut cali_writer = TofPacketWriter::new(write_stream_path.clone(), file_type);
+            //let mut cali_writer = TofPacketWriter::new(write_stream_path.clone(), file_type);
+            if !cali_dir_created {
+              let today           = get_utc_timestamp();
+              cali_output_dir = format!("{}/{}", settings.cali_dir.clone(), today);
+              match create_dir_all(cali_output_dir.clone()) {
+                Ok(_)    => info!("Created {} for calibration data!", cali_output_dir),
+                Err(err) => error!("Unable to create {} for calibration data! {}", cali_output_dir, err)
+              }
+              cali_dir_created = true;
+            }
+            if cali_completed == cali_expected {
+              cali_completed = 0;
+              cali_dir_created = false;
+            }
+            let mut cali_writer = TofPacketWriter::new(cali_output_dir.clone(), file_type);
             cali_writer.add_tof_packet(&pack);
             drop(cali_writer);
           }

@@ -12,6 +12,7 @@ use std::thread;
 use crossbeam_channel::Sender;
 
 use tof_dataclasses::errors::SensorError;
+use tof_dataclasses::serialization::Packable;
 use tof_dataclasses::monitoring::{
     RBMoniData,
     PAMoniData,
@@ -129,7 +130,7 @@ pub fn monitoring(board_id          : u8,
         println!("{}", moni_dt);
       }
 
-      let tp = TofPacket::from(&moni_dt);
+      let tp = moni_dt.pack();
       match tp_sender.try_send(tp) {
         Err(err) => error!("Issue sending RBMoniData {:?}", err),
         Ok(_)    => trace!("Sent RBMoniData successfully!"),
@@ -145,7 +146,7 @@ pub fn monitoring(board_id          : u8,
         println!("{}", moni);
       }
 
-      let tp = TofPacket::from(&moni);
+      let tp = moni.pack();
       match tp_sender.try_send(tp) {
         Err(err) => error!("Issue sending PAMoniData {:?}", err),
         Ok(_)    => trace!("Sent PAMoniData successfully!"),
@@ -161,7 +162,7 @@ pub fn monitoring(board_id          : u8,
         println!("{}", moni);
       }
 
-      let tp = TofPacket::from(&moni);
+      let tp = moni.pack();
       match tp_sender.try_send(tp) {
         Err(err) => error!("Issue sending PBMoniData {:?}", err),
         Ok(_)    => trace!("Sent PBMoniData successfully!"),
@@ -177,7 +178,7 @@ pub fn monitoring(board_id          : u8,
         println!("{}", moni);
       }
 
-      let tp = TofPacket::from(&moni);
+      let tp = moni.pack();
       match tp_sender.try_send(tp) {
         Err(err) => error!("Issue sending LTBMoniData {:?}", err),
         Ok(_)    => debug!("Sent LTBMoniData successfully!"),

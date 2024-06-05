@@ -18,6 +18,7 @@ use chrono::{
     Utc,
 };
 
+//use rusqlite::Connection;
 use diesel::prelude::*;
 mod schema;
     
@@ -112,7 +113,7 @@ pub fn get_dsi_j_ch_pid_map(paddles : &Vec<Paddle>) -> DsiJChPidMapping {
 /// Again: rb_ch0 does NOT necessarily correspond to the A side!
 /// 
 
-#[derive(Queryable, Selectable, serde::Serialize, serde::Deserialize)]
+#[derive(Debug,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_rat)]
 #[diesel(primary_key(rat_id))]
 pub struct RAT {
@@ -136,6 +137,23 @@ impl RAT {
     }
   }
   
+  /// Get the RAT where rb2id matched the argument
+  pub fn where_rb2id(conn: &mut SqliteConnection, rb2id : u8) -> Option<Vec<RAT>> {
+    let mut result = Vec::<RAT>::new();
+    match RAT::all(conn) {
+      Some(rats) => {
+        for rat in rats {
+          if rat.rb2_id == rb2id as i16 {
+            result.push(rat);
+          }
+        return Some(result);
+        }
+      }
+      None => ()
+    }
+    Some(result)
+  }
+
   pub fn all(conn: &mut SqliteConnection) -> Option<Vec<RAT>> {
     match tof_db_rat.load::<RAT>(conn) {
       Err(err) => {
@@ -507,7 +525,7 @@ impl fmt::Display for MTBChannel {
 //
 // The following models exceed a bit the capabilities
 // of Diesel, or my Diesel skill.
-// These models contain multple ForeignKeys, in all
+// These models contain multiple ForeignKeys, in all
 // cases these link to the paddle table. 
 //
 // For each of LocalTriggerBoard, ReadoutBoard, Panel
@@ -635,7 +653,7 @@ impl fmt::Display for DBLocalTriggerBoard {
   }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct LocalTriggerBoard {
     pub board_id      : u8,    
     pub dsi           : u8,
@@ -699,7 +717,7 @@ impl LocalTriggerBoard {
     // This is not the best and fastest, but since our diesel skills 
     // are a merely 3, we can't do it right now.
     let mut ltbs = Vec::<LocalTriggerBoard>::new();
-    println!("Iterating over {} ltbs in the DB!", db_ltbs.len());
+    //println!("Iterating over {} ltbs in the DB!", db_ltbs.len());
     for dbltb in db_ltbs {
       let mut ltb  = LocalTriggerBoard::new();
       for pdl in paddles.iter() {
@@ -771,7 +789,7 @@ impl fmt::Display for LocalTriggerBoard {
 
 /// A Readoutboard with paddles connected
 /// 
-#[derive(Debug,PartialEq, Clone,Queryable, Selectable)]
+#[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_readoutboard)]
 #[diesel(primary_key(rb_id_id))]
 #[allow(non_snake_case)]
@@ -972,7 +990,7 @@ impl ReadoutBoard {
     // This is not the best and fastest, but since our diesel skills 
     // are a merely 3, we can't do it right now.
     let mut rbs = Vec::<ReadoutBoard>::new();
-    println!("Iterating over {} rbs in the DB!", db_rbs.len());
+    //println!("Iterating over {} rbs in the DB!", db_rbs.len());
     for dbrb in db_rbs {
       let mut rb  = ReadoutBoard::new();
       rb.rb_id        = dbrb.rb_id as u8;        
@@ -1036,10 +1054,13 @@ impl ReadoutBoard {
         }
         if let Some(caps) = re.captures(&filename) {
           if let Some(timestamp_str) = caps.get(0).map(|m| m.as_str()) {
-            println!("{}",timestamp_str);
+            //println!("timestamp_str {}, {}",timestamp_str, HUMAN_TIMESTAMP_FORMAT);
             //let timestamp = NaiveDateTime::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
             //let timestamp = DateTime::<Utc>::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
-            let timestamp = DateTime::parse_from_str(timestamp_str, HUMAN_TIMESTAMP_FORMAT)?;
+            let footzstring = format!("{}+0000", timestamp_str);
+            let timestamp = DateTime::parse_from_str(&footzstring, "%y%m%d_%H%M%S%z")?;
+            //let timestamp = DateTime::parse_from_str(&footzstring, HUMAN_TIMESTAMP_FORMAT)?;
+            //println!("parse successful");
             //let _timestamp = DateTime
             if timestamp > newest_file.1 {
               // FIXME - into might panic?
@@ -1055,7 +1076,7 @@ impl ReadoutBoard {
       error!("No matching calibration available for board {}!", self.rb_id);
     } else {
       let file_to_load = format!("{}/{}", self.calib_file_path, newest_file.0);
-      println!("== ==> Loading calibration from file: {}", file_to_load);
+      info!("Loading calibration from file: {}", file_to_load);
       self.calibration = RBCalibrations::from_file(file_to_load, true)?;
     }
     Ok(())
