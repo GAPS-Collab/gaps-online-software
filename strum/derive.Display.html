@@ -24,13 +24,15 @@ behavior isn’t desired, you should use <code>to_string</code>.</p>
 to the serialization.</p>
 </li>
 <li>
-<p>Enums with named fields support named field interpolation. The value will be interpolated into the output string.
+<p>Enums with fields support string interpolation.
 Note this means the variant will not “round trip” if you then deserialize the string.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[derive(strum_macros::Display)]
 </span><span class="kw">pub enum </span>Color {
     <span class="attr">#[strum(to_string = <span class="string">"saturation is {sat}"</span>)]
     </span>Red { sat: usize },
+    <span class="attr">#[strum(to_string = <span class="string">"hue is {1}, saturation is {0}"</span>)]
+    </span>Blue(usize, usize),
 }</code></pre></div>
 </li>
 </ol>

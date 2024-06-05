@@ -7,7 +7,7 @@
 </code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Add a verbose message to an enum variant.</p>
 <p>Encode strings into the enum itself. The <code>strum_macros::EmumMessage</code> macro implements the <code>strum::EnumMessage</code> trait.
 <code>EnumMessage</code> looks for <code>#[strum(message=&quot;...&quot;)]</code> attributes on your variants.
-You can also provided a <code>detailed_message=&quot;...&quot;</code> attribute to create a seperate more detailed message than the first.</p>
+You can also provided a <code>detailed_message=&quot;...&quot;</code> attribute to create a separate more detailed message than the first.</p>
 <p><code>EnumMessage</code> also exposes the variants doc comments through <code>get_documentation()</code>. This is useful in some scenarios,
 but <code>get_message</code> should generally be preferred. Rust doc comments are intended for developer facing documentation,
 not end user messaging.</p>

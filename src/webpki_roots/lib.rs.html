@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/webpki-roots-0.26.1/src/lib.rs`."><title>lib.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="webpki_roots" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/webpki-roots-0.26.2/src/lib.rs`."><title>lib.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="webpki_roots" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../webpki_roots/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -5584,6 +5584,38 @@
 <a href="#5582" id="5582">5582</a>
 <a href="#5583" id="5583">5583</a>
 <a href="#5584" id="5584">5584</a>
+<a href="#5585" id="5585">5585</a>
+<a href="#5586" id="5586">5586</a>
+<a href="#5587" id="5587">5587</a>
+<a href="#5588" id="5588">5588</a>
+<a href="#5589" id="5589">5589</a>
+<a href="#5590" id="5590">5590</a>
+<a href="#5591" id="5591">5591</a>
+<a href="#5592" id="5592">5592</a>
+<a href="#5593" id="5593">5593</a>
+<a href="#5594" id="5594">5594</a>
+<a href="#5595" id="5595">5595</a>
+<a href="#5596" id="5596">5596</a>
+<a href="#5597" id="5597">5597</a>
+<a href="#5598" id="5598">5598</a>
+<a href="#5599" id="5599">5599</a>
+<a href="#5600" id="5600">5600</a>
+<a href="#5601" id="5601">5601</a>
+<a href="#5602" id="5602">5602</a>
+<a href="#5603" id="5603">5603</a>
+<a href="#5604" id="5604">5604</a>
+<a href="#5605" id="5605">5605</a>
+<a href="#5606" id="5606">5606</a>
+<a href="#5607" id="5607">5607</a>
+<a href="#5608" id="5608">5608</a>
+<a href="#5609" id="5609">5609</a>
+<a href="#5610" id="5610">5610</a>
+<a href="#5611" id="5611">5611</a>
+<a href="#5612" id="5612">5612</a>
+<a href="#5613" id="5613">5613</a>
+<a href="#5614" id="5614">5614</a>
+<a href="#5615" id="5615">5615</a>
+<a href="#5616" id="5616">5616</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A compiled-in copy of the root certificates trusted by Mozilla.
 //!
 //! To use this library with rustls 0.22:
@@ -5596,8 +5628,11 @@
 //!
 //! This library is suitable for use in applications that can always be recompiled and instantly deployed.
 //! For applications that are deployed to end-users and cannot be recompiled, or which need certification
-//! before deployment, consider a library that loads certificates at runtime, like
-//! [rustls-native-certs](https://docs.rs/rustls-native-certs).
+//! before deployment, consider a library that uses the platform native certificate verifier such as
+//! [rustls-platform-verifier]. This has the additional benefit of supporting OS provided CA constraints
+//! and revocation data.
+//!
+//! [rustls-platform-verifier]: https://docs.rs/rustls-platform-verifier
 </span><span class="comment">//
 // This library is automatically generated from the Mozilla
 // IncludedCACertificateReportPEMCSV report via ccadb.org. Don't edit it.
@@ -5919,7 +5954,7 @@
   <span class="comment">/*
    * Issuer: O=Starfield Technologies, Inc. OU=Starfield Class 2 Certification Authority
    * Subject: O=Starfield Technologies, Inc. OU=Starfield Class 2 Certification Authority
-   * Label: "Starfield Class 2 CA"
+   * Label: "Starfield Class 2 Certification Authority"
    * Serial: 0
    * SHA256 Fingerprint: 14:65:fa:20:53:97:b8:76:fa:a6:f0:a9:95:8e:55:90:e4:0f:cc:7f:aa:4f:b7:c2:c8:67:75:21:fb:5f:b6:58
    * -----BEGIN CERTIFICATE-----
@@ -7876,7 +7911,7 @@
   <span class="comment">/*
    * Issuer: O=CERTSIGN SA OU=certSIGN ROOT CA G2
    * Subject: O=CERTSIGN SA OU=certSIGN ROOT CA G2
-   * Label: "certSIGN Root CA G2"
+   * Label: "certSIGN ROOT CA G2"
    * Serial: 313609486401300475190
    * SHA256 Fingerprint: 65:7c:fe:2f:a7:3f:aa:38:46:25:71:f3:32:a2:36:3a:46:fc:e7:02:09:51:71:07:02:cd:fb:b6:ee:da:33:05
    * -----BEGIN CERTIFICATE-----
@@ -9599,6 +9634,35 @@
   </span>},
 
   <span class="comment">/*
+   * Issuer: CN=FIRMAPROFESIONAL CA ROOT-A WEB O=Firmaprofesional SA
+   * Subject: CN=FIRMAPROFESIONAL CA ROOT-A WEB O=Firmaprofesional SA
+   * Label: "FIRMAPROFESIONAL CA ROOT-A WEB"
+   * Serial: 65916896770016886708751106294915943533
+   * SHA256 Fingerprint: be:f2:56:da:f2:6e:9c:69:bd:ec:16:02:35:97:98:f3:ca:f7:18:21:a0:3e:01:82:57:c5:3c:65:61:7f:3d:4a
+   * -----BEGIN CERTIFICATE-----
+   * MIICejCCAgCgAwIBAgIQMZch7a+JQn81QYehZ1ZMbTAKBggqhkjOPQQDAzBuMQsw
+   * CQYDVQQGEwJFUzEcMBoGA1UECgwTRmlybWFwcm9mZXNpb25hbCBTQTEYMBYGA1UE
+   * YQwPVkFURVMtQTYyNjM0MDY4MScwJQYDVQQDDB5GSVJNQVBST0ZFU0lPTkFMIENB
+   * IFJPT1QtQSBXRUIwHhcNMjIwNDA2MDkwMTM2WhcNNDcwMzMxMDkwMTM2WjBuMQsw
+   * CQYDVQQGEwJFUzEcMBoGA1UECgwTRmlybWFwcm9mZXNpb25hbCBTQTEYMBYGA1UE
+   * YQwPVkFURVMtQTYyNjM0MDY4MScwJQYDVQQDDB5GSVJNQVBST0ZFU0lPTkFMIENB
+   * IFJPT1QtQSBXRUIwdjAQBgcqhkjOPQIBBgUrgQQAIgNiAARHU+osEaR3xyrq89Zf
+   * e9MEkVz6iMYiuYMQYneEMy3pA4jU4DP37XcsSmDq5G+tbbT4TIqk5B/K6k84Si6C
+   * cyvHZpsKjECcfIr28jlgst7L7Ljkb+qbXbdTkBgyVcUgt5SjYzBhMA8GA1UdEwEB
+   * /wQFMAMBAf8wHwYDVR0jBBgwFoAUk+FDY1w8ndYn81LsF7Kpryz3dvgwHQYDVR0O
+   * BBYEFJPhQ2NcPJ3WJ/NS7Beyqa8s93b4MA4GA1UdDwEB/wQEAwIBBjAKBggqhkjO
+   * PQQDAwNoADBlAjAdfKR7w4l1M+E7qUW/Runpod3JIha3RxEL2Jq68cgLcFBTApFw
+   * hVmpHqTm6iMxoAACMQD94vizrxa5HnPEluPBMBnYfubDl94cT7iJLzPrSA8Z94dG
+   * XSaQpYXFuXqUPoeovQA=
+   * -----END CERTIFICATE-----
+   */
+  </span>TrustAnchor {
+    subject: Der::from_slice(<span class="string">b"1\x0b0\t\x06\x03U\x04\x06\x13\x02ES1\x1c0\x1a\x06\x03U\x04\n\x0c\x13Firmaprofesional SA1\x180\x16\x06\x03U\x04a\x0c\x0fVATES-A626340681\'0%\x06\x03U\x04\x03\x0c\x1eFIRMAPROFESIONAL CA ROOT-A WEB"</span>),
+    subject_public_key_info: Der::from_slice(<span class="string">b"0\x10\x06\x07*\x86H\xce=\x02\x01\x06\x05+\x81\x04\x00\"\x03b\x00\x04GS\xea,\x11\xa4w\xc7*\xea\xf3\xd6_{\xd3\x04\x91\\\xfa\x88\xc6\"\xb9\x83\x10bw\x843-\xe9\x03\x88\xd4\xe03\xf7\xedw,J`\xea\xe4o\xadm\xb4\xf8L\x8a\xa4\xe4\x1f\xca\xeaO8J.\x82s+\xc7f\x9b\n\x8c@\x9c|\x8a\xf6\xf29`\xb2\xde\xcb\xec\xb8\xe4o\xea\x9b]\xb7S\x90\x182U\xc5 \xb7\x94"</span>),
+    name_constraints: <span class="prelude-val">None
+  </span>},
+
+  <span class="comment">/*
    * Issuer: CN=SecureSign RootCA11 O=Japan Certification Services, Inc.
    * Subject: CN=SecureSign RootCA11 O=Japan Certification Services, Inc.
    * Label: "SecureSign RootCA11"
@@ -9714,7 +9778,7 @@
   <span class="comment">/*
    * Issuer: O=Chunghwa Telecom Co., Ltd. OU=ePKI Root Certification Authority
    * Subject: O=Chunghwa Telecom Co., Ltd. OU=ePKI Root Certification Authority
-   * Label: "Chunghwa Telecom Co., Ltd. - ePKI Root Certification Authority"
+   * Label: "ePKI Root Certification Authority"
    * Serial: 28956088682735189655030529057352760477
    * SHA256 Fingerprint: c0:a6:f4:dc:63:a2:4b:fd:cf:54:ef:2a:6a:08:2a:0a:72:de:35:80:3e:2f:f5:ff:52:7a:e5:d8:72:06:df:d5
    * -----BEGIN CERTIFICATE-----
@@ -9787,7 +9851,7 @@
   <span class="comment">/*
    * Issuer: O=The Go Daddy Group, Inc. OU=Go Daddy Class 2 Certification Authority
    * Subject: O=The Go Daddy Group, Inc. OU=Go Daddy Class 2 Certification Authority
-   * Label: "Go Daddy Class 2 CA"
+   * Label: "Go Daddy Class 2 Certification Authority"
    * Serial: 0
    * SHA256 Fingerprint: c3:84:6b:f2:4b:9e:93:ca:64:27:4c:0e:c6:7c:1e:cc:5e:02:4f:fc:ac:d2:d7:40:19:35:0e:81:fe:54:6a:e4
    * -----BEGIN CERTIFICATE-----
@@ -10632,7 +10696,7 @@
   <span class="comment">/*
    * Issuer: O=FNMT-RCM OU=AC RAIZ FNMT-RCM
    * Subject: O=FNMT-RCM OU=AC RAIZ FNMT-RCM
-   * Label: "FNMT-RCM - SHA256"
+   * Label: "AC RAIZ FNMT-RCM"
    * Serial: 485876308206448804701554682760554759
    * SHA256 Fingerprint: eb:c5:57:0c:29:01:8c:4d:67:b1:aa:12:7b:af:12:f7:03:b4:61:1e:bc:17:b7:da:b5:57:38:94:17:9b:93:fa
    * -----BEGIN CERTIFICATE-----

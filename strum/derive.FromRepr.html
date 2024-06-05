@@ -11,7 +11,7 @@ variants with additional data, the returned variant will use the <code>Default</
 data. The discriminant follows the same rules as <code>rustc</code>. The first discriminant is zero and each
 successive variant has a discriminant of one greater than the previous variant, except where an
 explicit discriminant is specified. The type of the discriminant will match the <code>repr</code> type if
-it is specifed.</p>
+it is specified.</p>
 <p>When the macro is applied using rustc &gt;= 1.46 and when there is no additional data on any of
 the variants, the <code>from_repr</code> function is marked <code>const</code>. rustc &gt;= 1.46 is required
 to allow <code>match</code> statements in <code>const fn</code>. The no additional data requirement is due to the
