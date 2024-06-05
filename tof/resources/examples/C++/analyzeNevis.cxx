@@ -300,7 +300,15 @@ int main(int argc, char *argv[]){
 	    // Now, initialize the ch9 Waveform for this RB. 
 	    wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),
 					    ch9_times.data(), rbid,0);
-	    //printf(" %d", rbid);
+	    /*
+	    double av1=0.0, av2=0.0;
+	    for (int k=0;k<5;k++) {
+	      av1 += ch9_times.data()[8+k];
+	      av2 += ch9_times.data()[998+k];
+	    }
+	    printf("Ch9 %d : %.3f - %.3f %d\n", rbid, av1/5.0, av2/5.0,
+	    rb_event.header.stop_cell); */
+	    //printf(" %d %d", rbid, rb_event.header.stop_cell);
 	    
 	    // Now, deal with all the SiPM data
 	    for(int c=0;c<NCH;c++) {
@@ -311,6 +319,14 @@ int main(int argc, char *argv[]){
 		Vec<f64> ch_times(times[c].begin(), times[c].end());
 		wave[cw] = new GAPS::Waveform(ch_volts.data(),
 					      ch_times.data(), cw,0);
+		/*
+		av1=0; av2=0;
+		for (int k=0;k<5;k++) {
+		  av1 += ch_times.data()[8+k];
+		  av2 += ch_times.data()[998+k];
+		}
+		printf("\tRB %d %ld : %.3f - %.3f\n",rbid,cw,av1/5.0,av2/5.0);
+		*/
 	      }
 	    }
 	  }
@@ -417,69 +433,48 @@ void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
   int status;
   float value;
 
-  // Another kludgy read is getting the Paddle to volume location from
-  // the paddleid_vs_volid.json adn level0_coordinates.json
-  // files. Achim has a way to do this via rust, but I need the map
-  // for development purposes here.
-  // First, read the paddle to volume ID map
-  int tmp_pad, tmp_vol, vol_id[NPAD] = { 0 }; 
-  int tmp_vid;
+  int tmp_pad, tmp_vid, vol_id[NPAD] = { 0 }; 
+  int tmp_o;
   float tmp_x, tmp_y, tmp_z;
   float tmp_dimx, tmp_dimy, tmp_dimz;
-  snprintf(fname, 500, "%s/%s/paddleid_vs_volid.json", srcdir, codedir);
-  fp = fopen(fname, "r");
-  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
-    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9] %d", &tmp_pad, &tmp_vol) != EOF) {
-      vol_id[tmp_pad] = tmp_vol;
-      pad->VolumeID[tmp_pad] = tmp_vol; // Assign the paddle volume ID
-      //printf("%d %d\n", tmp_pad, vol_id[tmp_pad]);
-    }
-  }
-  fclose(fp); // Finished with file
   
-  // Now that we have the vol_id for each paddle, map read in the
-  // vol_id to location map.
+  // For each paddle, read in the location, orientation, dimensions and volumeID
   snprintf(fname, 500, "%s/%s/level0_coordinates.json", srcdir, codedir);
   fp = fopen(fname, "r");
   int ctr=0;
   if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
-    while (fscanf(fp,"%*[^-0-9]%d ", &tmp_vid) != EOF) { // Read VolID
-      // For each paddle, we want to set the X, Y, Z locations. So,
-      // index through the volume IDs to find a match, then set the
-      // appropriate dimensions and locations.
-      if (tmp_vid > 10000) { // Valid Volume ID
-	for (int j=0; j<NPAD; j++) {
-	  if (tmp_vid == pad->VolumeID[j]) { // Found a match, pad = j
-	    status = fscanf(fp,"%*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f ",
-			    &tmp_x, &tmp_y, &tmp_z);
-	    status = fscanf(fp,"%*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f ",
-			    &tmp_dimx, &tmp_dimy, &tmp_dimz);
-	    pad->Location[j][0] = tmp_x;
-	    pad->Location[j][1] = tmp_y;
-	    pad->Location[j][2] = tmp_z;
-	    pad->Dimension[j][0] = tmp_dimx;
-	    pad->Dimension[j][1] = tmp_dimy;
-	    pad->Dimension[j][2] = tmp_dimz;
-	  }
-	}
+    while (fscanf(fp,"%*[^-0-9]%d ", &tmp_pad) != EOF) { // Read paddle ID
+      // For each paddle, we want to set the X, Y, Z locations. 
+      if (tmp_pad > 0 && tmp_pad < 161) { // Valid paddle ID
+	int j = tmp_pad;
+	status = fscanf(fp,"%*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f %*[^-0-9]%d ",
+			&tmp_x, &tmp_y, &tmp_z, &tmp_o);
+	status = fscanf(fp,"%*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f %*[^-0-9]%d ",
+			&tmp_dimx, &tmp_dimy, &tmp_dimz, &tmp_vid);
+	pad->Location[j][0]  = tmp_x;
+	pad->Location[j][1]  = tmp_y;
+	pad->Location[j][2]  = tmp_z;
+	pad->Orientation[j]  = tmp_o;
+	pad->Dimension[j][0] = tmp_dimx;
+	pad->Dimension[j][1] = tmp_dimy;
+	pad->Dimension[j][2] = tmp_dimz;
+	pad->VolumeID[j]     = tmp_vid; 
       }
     }
-  }  
+  }
   fclose(fp); // Finished with file
   
-  int tmp_o;
   float coax, harting;
-  // One last task: Get the paddle orientation from paddle_to_orientation.json
-  snprintf(fname, 500, "%s/%s/paddle_orient_cable.jaz", srcdir, codedir);
+  // One last task: Get cable timings 
+  snprintf(fname, 500, "%s/%s/paddle_cable.json", srcdir, codedir);
   fp = fopen(fname, "r");
   if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
-    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9]%d %*[^-0-9]%f  %*[^-0-9]%f ",
-		  &tmp_pad, &tmp_o, &coax, &harting) != EOF) {
+    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9]%f  %*[^-0-9]%f ",
+		  &tmp_pad, &coax, &harting) != EOF) {
       if (tmp_pad > 0) {
-	pad->Orientation[tmp_pad] = tmp_o;
 	pad->CoaxLen[tmp_pad]     = coax;
 	pad->HardingLen[tmp_pad]  = harting;
-	//printf("%3d %2d %8.3f %8.3f\n", tmp_pad, tmp_o, coax, harting);
+	//printf("%3d %8.3f %8.3f\n", tmp_pad, coax, harting);
       }
     }
   }

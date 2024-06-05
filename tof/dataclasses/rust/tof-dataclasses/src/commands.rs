@@ -349,7 +349,7 @@ impl TofCommandV2 {
 }
 
 impl Packable for TofCommandV2 {
-  const PACKET_TYPE : PacketType = PacketType::TofCommand;
+  const PACKET_TYPE : PacketType = PacketType::TofCommandV2;
 }
 
 impl Serialization for TofCommandV2 {

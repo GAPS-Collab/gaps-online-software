@@ -65,6 +65,19 @@ void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0) {
     RBInData[i]      = false;
     Phi[i]           = -999.0;
   }
+
+  float umb[12] = {0.215, 0.187, 0.172, 0.154, 0.102, 0.000, 1.021, 0.279,
+		   1.064, 0.431, 1.235, 0.390};
+  float top[12] = {0.136, 0.565, 0.001, 0.464, 0.067, 0.504, -0.140, 0.126,
+		   -0.156, 0.090, -0.004, 0.000}; 
+  float bot[12] = {0.828, 0.000, 0.588, 0.706, 0.798, 0.615, 0.605, 1.092,
+		   0.671, 0.000, 0.737};
+  for (int i=0;i<NPAD;i++) {
+    if (i>0&&i<13) Offset[i] = top[i-1];
+    else if (i>12&&i<25) Offset[i] = bot[i-13];
+    else if (i>60&&i<73) Offset[i] = bot[i-61];
+    else Offset[i] = 0.0;
+  }
   
   // Reset everything that is stored by Paddle number (1-160)
   for (int i=0; i<NPAD; i++) {
@@ -328,7 +341,7 @@ void EventGAPS::InitializeHistograms(void) {
   // Paddle Hit times
   for (int b = 0; b < NPAD; b++) {
     sprintf(text, "HitTime[%d]", b);
-    HitTime[b] = new TH1F(text, "", 50, -2, 10);
+    HitTime[b] = new TH1F(text, "", 250, -2, 14);
     HitTime[b]->GetXaxis()->SetTitle("Hit Time (ns)");
     HitTime[b]->GetYaxis()->SetTitle("Counts");
   }
@@ -498,33 +511,45 @@ void EventGAPS::WriteHistograms() {
   //TDirectory *CFDTimeVsQdir = savdir->mkdir("CFDTimeVsQplots");
   //TDirectory *CFDTVsTdir = savdir->mkdir("CFDTvsTplots");
 
+  int PEDS = 0;
+  int PEAK = 0;
+  int QVSP = 0;
+  
   int start = 1; // No Sipm ch = 0 or paddle = 0
   max_sipm = max_paddle*2-1;
   //write all the Trace plots to the root file
-  //Peddir->cd();
-  for (int i = start; i < max_sipm; i++) {
-    pedHist[i]->Write();
-    pedRMSHist[i]->Write();
+  if (PEDS) {
+    //Peddir->cd();
+    for (int i = start; i < max_sipm; i++) {
+      pedHist[i]->Write();
+      pedRMSHist[i]->Write();
+    }
+  }
+
+  if (PEAK) {
+    //Peakdir->cd();
+    for (int i = start; i < max_sipm; i++) Peak[i]->Write();
+    
+    //Chargedir->cd();
+    for (int i = start; i < max_sipm; i++) {
+      Charge[i]->Write();
+      Charge_cut[i]->Write();
+    }
   }
   
-  //Peakdir->cd();
-  for (int i = start; i < max_sipm; i++) Peak[i]->Write();
-  
-  //Chargedir->cd();
-  for (int i = start; i < max_sipm; i++) {
-    Charge[i]->Write();
-    Charge_cut[i]->Write();
-  }
   for (int j = start; j < max_paddle; j++) QEnd2End[j]->Write();
   HitGAPS->Write();
   HitCube->Write();
   HitCortina->Write();
   HitUmbrella->Write();
-  for (int j = start; j < max_paddle; j++) HitPosition[j]->Write();
-  for (int j = start; j < max_paddle; j++) {
-    QvPosition[j]->Write();
-    QvPositionA[j]->Write();
-    QvPositionB[j]->Write();
+
+  if (QVSP) {
+    for (int j = start; j < max_paddle; j++) HitPosition[j]->Write();
+    for (int j = start; j < max_paddle; j++) {
+      QvPosition[j]->Write();
+      QvPositionA[j]->Write();
+      QvPositionB[j]->Write();
+    }
   }
   
   //TDCdir->cd();
@@ -668,17 +693,19 @@ void EventGAPS::AnalyzePhases(float phi[NRB]) {
       // Ensure the shift is in proper range: -Pi/3 < shift < Pi/3
       while (phi_shift < -PI/2.0) phi_shift += 2.0*PI;
       while (phi_shift >  PI/2.0) phi_shift -= 2.0*PI;
-      // Store the timing shift for the ch9 correction
-      TShift[i] = phi_shift/(2.0*PI*0.02);
+      // Store the timing shift for the ch9 correction 
+     TShift[i] = phi_shift/(2.0*PI*0.02);
     } else TShift[i] = -999.0;
   }
 
   if (0) { 
+    printf("%ld - Phase Analysis: %d %6.3f\n", evtno, ref_rb, ref_phi);
     for (int i=0; i<NRB; i++) {
-      printf(" %.3f", TShift[i]);
-      if (i%10 == 9) printf("\n");
+      if (Phi[i]>-998.0) printf("%2d : %6.3f %6.3f\n", i, TShift[i], Phi[i]);
+      //printf(" %.3f (%.3f)", TShift[i], Phi[i]);
+      //if (i%4 == 3) printf("\n");
     }
-    printf("\n");
+    //printf("%d %6.3f\n", ref_rb, ref_phi);
   }
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -730,8 +757,11 @@ void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
       TDC_Cor[chB] = TDC[chB] + TCorrEvent[i] + TCorrFixed[i];
       // Calculate hit time for the paddle
       HitT[i] = (TDC_Cor[chA]+TDC_Cor[chB])/2.0 - Dimension[i][0]/(2.0*sc_speed);
+      HitT[i] -= Offset[i];
+      
       if ( TDC[chA]>5 && TDC[chA]<220 && TDC[chB]>5 && TDC[chB]<220 ) {
-	IsHit[i] = true;
+	if (PedRMS[chA]<2.0 && PedRMS[chB]<2.0) 
+	  IsHit[i] = true;
       }
     }
     
@@ -762,8 +792,8 @@ void EventGAPS::AnalyzeEvent(void) {
   // Find the earliest hit time (and paddle) and demand that it is
   // either in the umbrella or cortina
   //for (int i=61; i<NPAD; i++) {
-  //for (int i=61; i<73; i++) { // UMB-Center
-  for (int i=67; i<68; i++) {
+  for (int i=61; i<73; i++) { // UMB-Center
+  //for (int i=66; i<68; i++) {
     if (IsHit[i] ) {
       if (0) {
 	printf(" %3d %7.3f %7.3f %7.2f -%7.2f (%7.2f) %8.2f %6.2f\n", i,
@@ -788,14 +818,16 @@ void EventGAPS::AnalyzeEvent(void) {
   }
   int ctr=0;
   // Now that we have the hit times and positions, calculate beta
-  for (int i=0; i<61; i++) { // Only calculate beta for cube hits
-  //for (int i=0; i<13; i++) { // Only calculate beta for cube-top hits
+  //for (int i=0; i<61; i++) { // Only calculate beta for cube hits
+  for (int i=0; i<13; i++) { // Only calculate beta for cube-top hits
+  //for (int i=13; i<25; i++) { // Only calculate beta for cube-bot hits
   //for (int i=6; i<8; i++) { // Only calculate beta for middle cube-top hits
-    if (IsHit[i] && (i==6 || i==7 || i==18 || i==19) ) {
+    //if (IsHit[i] && (i==6 || i==7 || i==8 || i==9) ) {
+    if ( IsHit[i] ) {
       float dist_sq = SQR(HitX[i]-HitX[e_pad]) + SQR(HitY[i]-HitY[e_pad]) +
 	SQR(HitZ[i]-HitZ[e_pad]);
       float t_diff = HitT[i] - HitT[EarlyPaddle];
-      if ( 1 && (i==5) && t_diff < 2.29 ) {
+      if ( 0 && (i==5) && t_diff < 2.29 ) {
 	printf("Too Early: %ld -- %d - %5.2f (%6.2f %6.2f)\n",evtno,i,t_diff,
 	       HitT[i], HitT[EarlyPaddle]);
       }
@@ -803,16 +835,17 @@ void EventGAPS::AnalyzeEvent(void) {
       ctr++;
       //if (ctr>1) printf("%ld: Previous beta = %.3f\n", evtno, beta);
       beta = speed/(CSPEED);
-      if (0 && e_pad>60 && e_pad<73) {
-      //if (0 && (e_pad>64 && e_pad<69) ) {
+      //if (0 && e_pad>60 && e_pad<73) {
+      if (0 && (EarlyPaddle>65 && EarlyPaddle<68) ) {
 	printf("Positions: (%d %d) (%.2f %.2f)  (%.2f %.2f)  (%.2f %.2f)\n",
-	       i, e_pad, HitX[i], HitX[e_pad], HitY[i], HitY[e_pad],
-	       HitZ[i], HitZ[e_pad]);
+	       i, EarlyPaddle, HitX[i], HitX[EarlyPaddle], HitY[i],
+	       HitY[EarlyPaddle], HitZ[i], HitZ[EarlyPaddle]);
 	printf("Speeds: (%.2f %.2f): %.2f   %.2f  %.2f\n", HitT[i],
-	HitT[e_pad], t_diff,  speed, beta); 
+	       HitT[EarlyPaddle], t_diff,  speed, beta); 
 	printf(" %3d %7.3f %7.3f %7.2f -%7.2f (%7.2f) (%7.2f %7.2f) %3d\n",
 	       i,TCorrEvent[i],TCorrFixed[i],TDC[Paddle_A[i]],TDC[Paddle_B[i]],
-	       TDC[Paddle_A[i]]+TDC[Paddle_B[i]], HitT[i], HitT[e_pad], e_pad);
+	       TDC[Paddle_A[i]]+TDC[Paddle_B[i]], HitT[i],
+	       HitT[EarlyPaddle], EarlyPaddle);
       }
     }
   }
@@ -912,20 +945,49 @@ void EventGAPS::FillPaddleHistos(void) {
 	// Only record HitTimes[] and beta for events which hit two
 	// center umbrella paddles and two center Cube top paddles
 	// (and within 10cm of center).
-	if ( (EarlyPaddle>66&&EarlyPaddle<68) && ((i>5&&i<8) || (i>17&&i<20)) ) { 
-	  if ( ABS(delta[i])< 10.0 && ABS(delta[EarlyPaddle])<10.0 &&
-	       NHitPaddles < 10 ) {
-	    //printf("%ld: %3d %3d %7.2f %7.2lf\n", evtno, i, EarlyPaddle,
-	    //	   HitT[i], TShift[RB[Paddle_A[i]]]);
-	    HitTime[i]->Fill(HitT[i]);
+	//if ( (EarlyPaddle>65&&EarlyPaddle<68) && ((i>5&&i<8) || (i>17&&i<20))){ 
+	if ( (EarlyPaddle>60&&EarlyPaddle<73) && (i>0&&i<13) ) { 
+	//if ( (EarlyPaddle>60&&EarlyPaddle<73) && (i>12&&i<25) ) { 
+	  if ( ABS(delta[i])< 15.4 && ABS(delta[EarlyPaddle])<15.4 &&
+	       NHitPaddles < 4 ) {
+	    int ind = (EarlyPaddle-61)*12;
+	    //if (EarlyPaddle==66) 
+	    HitTime[i+ind]->Fill(HitT[i]);
+	      //else
+	      //HitTime[i+10]->Fill(HitT[i]);
 	    FirstPaddle->Fill(EarlyPaddle);
+	    
+	    /*
+	    printf("\nEv %ld - %d ( %6.3f %6.3lf %6.3f ) ",
+		   evtno, i,HitT[i],TShift[RB[Paddle_A[i]]],Phi[RB[Paddle_A[i]]]);
+	    printf("- %d ( %6.3f %6.3lf %6.3f )\n",
+		   EarlyPaddle, HitT[EarlyPaddle],
+		   TShift[RB[Paddle_A[EarlyPaddle]]],
+		   Phi[RB[Paddle_A[EarlyPaddle]]]);
+	    printf("%ld TDC     %d %d - %.3f = %.3f : %d - %.3f = %.3f\n",
+		   evtno, i, 
+		   Paddle_A[i], TDC[Paddle_A[i]], TDC_Cor[Paddle_A[i]],
+		   Paddle_B[i], TDC[Paddle_B[i]], TDC_Cor[Paddle_B[i]]);
+	    printf("%ld HIT     %d ( %.3f %.3f %.3f ) : %.3f\n", evtno, i, 
+		   TCorrEvent[i], TCorrFixed[i], Dimension[i][0], HitT[i]);
+	    printf("%ld TDC_ref %d %d - %.3f = %.3f : %d - %.3f = %.3f\n",
+		   evtno, EarlyPaddle, 
+		   Paddle_A[EarlyPaddle], TDC[Paddle_A[EarlyPaddle]],
+		   TDC_Cor[Paddle_A[EarlyPaddle]], Paddle_B[EarlyPaddle],
+		   TDC[Paddle_B[EarlyPaddle]], TDC_Cor[Paddle_B[EarlyPaddle]]);
+	    printf("%ld HIT_ref %d ( %.3f %.3f %.3f ) : %.3f\n",
+		   evtno, EarlyPaddle,
+		   TCorrEvent[EarlyPaddle], TCorrFixed[EarlyPaddle],
+		   Dimension[EarlyPaddle][0], HitT[EarlyPaddle]);
+	    */
+
 	    if (beta>0 && (i==6||i==7)) {
-	      printf("Found Event %ld - %d: %.3f %.2f %.2f %.2f\n", evtno,i,
-		     EarlyTime, beta, TShift[RB[Paddle_A[EarlyPaddle]]],
-		     TShift[RB[Paddle_A[i]]]); 
+	      //printf("Found Event %ld - %d: %.3f %.2f %.2f %.2f\n", evtno,i,
+	      //     EarlyTime, beta, TShift[RB[Paddle_A[EarlyPaddle]]],
+	      //     TShift[RB[Paddle_A[i]]]); 
 	      if (beta > 1.0) {
 		Ch9Bad[i-6]->Fill(TShift[RB[Paddle_A[EarlyPaddle]]],
-				TShift[RB[Paddle_A[i]]]);
+				  TShift[RB[Paddle_A[i]]]);
 		FirstTimeBad->Fill(EarlyTime);
 	      } else { 
 		Ch9Good[i-6]->Fill(TShift[RB[Paddle_A[EarlyPaddle]]],
@@ -935,9 +997,9 @@ void EventGAPS::FillPaddleHistos(void) {
 	    }
 	    if (beta>0 && i==6) BetaDist1->Fill(beta); 
 	    if (beta>0 && i==7) BetaDist2->Fill(beta); 
-	    if (beta>0 && i==18) BetaDist3->Fill(beta); 
-	    if (beta>0 && i==19) BetaDist4->Fill(beta); 
-	    if ( 0 && (i==5||i==6||i==18||i==19) && beta > 1.0 ) {
+	    if (beta>0 && i==8) BetaDist3->Fill(beta); 
+	    if (beta>0 && i==9) BetaDist4->Fill(beta); 
+	    if ( 1 && (i==5||i==6||i==18||i==19) && beta > 1.0 ) {
 	      printf("Fast: %ld %d - %5.2f %6.2f %6.2f\n",evtno,i,beta,
 	       HitT[i], HitT[EarlyPaddle]);
 	    }

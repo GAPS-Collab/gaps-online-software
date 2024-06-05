@@ -92,6 +92,7 @@ private:
   float   Dimension[NPAD][3];        // Dimension of paddle (LxWxH)
   float   TCorrFixed[NPAD];          // Timing correction (cables, pad_len)
   float   TCorrEvent[NPAD];          // Timing correction (ch9)
+  float   Offset[NPAD];              // Offset of this paddle
   int     EarlyPaddle;               // Which paddle is first hit
   float   EarlyTime;                 // Time of earliest hit
   

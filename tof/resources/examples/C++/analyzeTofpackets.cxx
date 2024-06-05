@@ -21,10 +21,9 @@
 #include "legacy.h"
 #include <vector>
 
-const int NRB   = 50; // Technically, it is 49, but we don't use 0
-const int NCH   = 8;
-const int NTOT  = NCH * (NRB-1); // NTOT is the number of SiPMs
-const int NPADS = NTOT/2;        // NPAD: 1 per 2 SiPMs
+#include "include/constants.h"
+
+double FitSine(std::vector<double> volts, std::vector<double> times);
 
 int main(int argc, char *argv[]){
   spdlog::cfg::load_env_levels();
@@ -32,7 +31,7 @@ int main(int argc, char *argv[]){
   cxxopts::Options options("unpack-tofpackets", "Unpack example for .tof.gaps files with TofPackets.");
   options.add_options()
   ("h,help", "Print help")
-  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value(""))
+  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/home/gaps/tof-data/nevis-data/tofdata/calibration/latest/"))
   ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
   ;
@@ -56,6 +55,7 @@ int main(int argc, char *argv[]){
 
   // To read calibration data from individual binary files, when -c is
   // given with the directory of the calibration files
+  bool RB_Calibrated[NRB] = { false };
   if (calname != "") {
     for (int i=1; i<NRB; i++) {
       // First, determine the proper RB filename from its number
@@ -81,32 +81,13 @@ int main(int argc, char *argv[]){
 	    // Should have the one calibration tofpacket stored in "packet".
 	    usize pos = 0;
 	    cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
+            RB_Calibrated[i] = true;
 	  }
 	}
-      } //else {printf("File does not exist: %s\n", f_str.c_str());}
+      }
     }
   }
   
-  // To read calibration data from individual text files, when -c is
-  // given with the directory of the calibration files
-  /*if (calname != "") {
-    // obviously here we have to get all the calibration files, 
-    // but for the sake of the example let's use only one
-    // Ultimatly, they will be stored in the stream.
-    for (int i=1; i<NRB; i++) {
-      std::string f_str;
-      if (i<10) // Little Kludgy, but it works
-	f_str = calname + "/txt-files/rb0" + std::to_string(i) + "_cal.txt";
-      else
-	f_str = calname + "/txt-files/rb" + std::to_string(i) + "_cal.txt";
-      
-      //spdlog::info("Will use calibration file {}", calname);
-      //cali[i] = RBCalibration::from_txtfile(calname);
-      spdlog::info("Will use calibration file {}", f_str);
-      cali[i] = RBCalibration::from_txtfile(f_str);
-    }
-    }*/
-
   // the reader is something for the future, when the 
   // files get bigger so they might not fit into memory
   // at the same time
@@ -155,96 +136,227 @@ int main(int argc, char *argv[]){
         usize pos = 0;
 	// We need a structure to hold the waveforms for an event. We
 	// initialize and delete them with each new event
+	
+#define OLD_CHECK 0
+#if OLD_CHECK
 	GAPS::Waveform *wave[NTOT];
 	GAPS::Waveform *wch9[NRB];
-	float Ped_low   = 10;
-	float Ped_win   = 90;
-	float CThresh   = 5.0;
-	float CFDS_frac = 0.40;
-	float Qwin_low  = 100;
-	float Qwin_size = 100;
-	float Ped[NTOT];
-	float PedRMS[NTOT];
-	float Qint[NTOT];
-	float VPeak[NTOT];
-	float TCFDS[NTOT];
+#endif
+	float Ped_low   = 350;
+	float Ped_win   = 100;
+	float CThresh   = 10.0;
+	float CFDS_frac = 0.25;
+	float Qwin_low  =  10;
+	float Qwin_size = 190;
+	double Ped[NTOT];
+	double PedRMS[NTOT];
+	double Qint[NTOT];
+	double VPeak[NTOT];
+	double TDC[NTOT];
+	double X_POS[NPAD];
+	float  Phi[NRB];
 	bool  IsHit[NTOT] = {false} ;
+	int NPadCube = 0;
+	int NPadUmb  = 0;
+	int NPadCort = 0;
 	
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
 	//printf("Event %ld: RBs -", evt_ctr);
+	//printf("Event %ld\n", evt_ctr);
 	for (auto const &rbid : ev.get_rbids()) {
 	  RBEvent rb_event = ev.get_rbevent(rbid);
 	  // Now that we know the RBID, we can set the starting ch_no
 	  // Eventually we will use a function to map RB_ch to GAPS_ch
 	  usize ch_start = (rbid-1)*NCH; // first RB is #1
+          // Let's also store the channel mask to use later.                   
+          int ch_mask = rb_event.header.channel_mask;
 	  if (verbose) {
 	    std::cout << rb_event << std::endl;
 	  }
 	  Vec<Vec<f32>> volts;
 	  Vec<Vec<f32>> times;
-	  //if ((calname != "") && cali.rb_id == rbid ){
 	  if (calname != "") { // For combined data all boards calibrated
 	    // Vec<f32> is a typedef for std::vector<float32>
-	    volts = cali[rbid].voltages(rb_event, false); //second argument is for spike cleaning
-	    // (C++ implementation causes a segfault sometimes when "true"
+	    volts = cali[rbid].voltages(rb_event, false);
+	    // second argument is for spike cleaning (C++
+	    // implementation causes a segfault sometimes when "true"
 	    times = cali[rbid].nanoseconds(rb_event);
 	    // volts and times are now ch 0-8 with the waveform for this event.
 
 	    // First, store the waveform for channel 9
 	    Vec<f64> ch9_volts(volts[8].begin(), volts[8].end());
 	    Vec<f64> ch9_times(times[8].begin(), times[8].end());
-	    wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),ch9_times.data(),rbid,0);
-	    wch9[rbid]->SetPedBegin(Ped_low);
-	    wch9[rbid]->SetPedRange(Ped_win);
-	    wch9[rbid]->CalcPedestalRange(); 
-	    float ch9RMS = wch9[rbid]->GetPedsigma();
-	    //printf(" %d(%.1f)", rbid, ch9RMS);
-	    // printf(" %d", rbid);
+	    // Calculate the ch9 phase. For now, if we have ch9 data
+            // for this RB, we want to analyze it.
+	    // NEW STUFF FOR ACHIM
+            Phi[rbid] = FitSine(ch9_volts,ch9_times);
+	    // DONE WITH NEW STUFF
+	    //printf(" %d", rbid); fflush(stdout);
 	      
 	    // Now, deal with all the SiPM data
 	    for(int c=0;c<NCH;c++) {
 	      usize cw = c+ch_start; 
+	      unsigned int inEvent = ch_mask & (1 << c);
+              if (inEvent > 0 ) {
+		
+		Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
+		Vec<f64> ch_times(times[c].begin(), times[c].end());
+#if OLD_CHECK
+		wave[cw] = new GAPS::Waveform(ch_volts.data(),ch_times.data() ,cw,0);
+#endif
+	    // NEW STUFF FOR ACHIM
+		// Calculate the ped and pedrms for the channel
+		int ctr=0, i=0;
+		double sum=0.0, sum2=0.0; 
+		while (ch_times[i++]<Ped_low); // Find start of ped window
+		while (ch_times[i]<Ped_low+Ped_win) {
+		  sum +=  ch_volts[i];
+		  sum2 += ch_volts[i]*ch_volts[i];
+		  ctr++;
+		  i++;
+		}
+		double average;
+		if (ctr>0) {
+		  average = sum / (double)ctr;
+		  PedRMS[cw] = sqrt (sum2/(double)ctr - average*average);
+		  Ped[cw] = average;
+		} else {
+		  Ped[cw] = PedRMS[cw] = 0.0;
+		}
 
-	      Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
-	      Vec<f64> ch_times(times[c].begin(), times[c].end());
-	      wave[cw] = new GAPS::Waveform(ch_volts.data(),ch_times.data() ,cw,0);
-	      
-	      // Calculate the pedestal
-	      wave[cw]->SetPedBegin(Ped_low);
-	      wave[cw]->SetPedRange(Ped_win);
-	      wave[cw]->CalcPedestalRange(); 
-	      wave[cw]->SubtractPedestal(); 
-	      Ped[cw] = wave[cw]->GetPedestal();
-	      PedRMS[cw] = wave[cw]->GetPedsigma();
-	      if ( c==0 && (PedRMS[cw] > 15) && (ch9RMS < 190) ) {
-		// RMS_ch1 has ch9 data && RMS_ch9 has normal data        
-		printf(" %ld Row %d: %8.1f %8.1f\n", evt_ctr, rbid, ch9RMS, PedRMS[cw]);
-		//for(int j=0;j<8;j++) printf(" %8.1f",PedRMS[ch_start+j]);
-		//printf("\n");
+		// Subtract Pedestal
+		i=0;
+		while (i<ch_times.size()-1 ) {// Move through trace
+		  ch_volts[i++] -= Ped[cw];  // Subtract Pedestal
+		}
+
+		// Find VPeak 
+		int    vpeak_bin=512;
+		double vpeak_time=250.0, vpeak=0.0;
+		// 512 and 250 are hardwired values to ensure the TDC
+		// values outside of a window from 5-220ns (when no
+		// pulses are in the trace) and don't interfere with
+		// the pedestal window (350-450ns) either
+		i=0;
+		while (ch_times[i++]<Qwin_low); // Find start of pulse window
+		while (ch_times[i]<Qwin_low+Qwin_size) {
+		  sum=0.0;
+		  for (int j=i-1; j<=i+1; j++) sum += ch_volts[j];
+		  if (sum > vpeak) {
+		    vpeak = sum;
+		    if (ch_volts[i]>CThresh) {
+		      vpeak_time = ch_times[i];
+		      vpeak_bin = i;
+		    }
+		  }
+		  i++;
+		}
+		VPeak[cw] = vpeak/3.0;  // Convert sum to average
+
+		// Integrate charge in window from vpeak-20 to vpeak+80
+		double charge=0.0;
+		i=vpeak_bin;
+		while (ch_times[i--] > vpeak_time-20.0); // Find start point
+		while (ch_times[i]<vpeak_time+80) { // Integrate window
+		  charge += ch_volts[i] * (ch_times[i]-ch_times[i-1]);
+		  i++;
+		}
+		Qint[cw]  = charge / 50.0; // 50 Ohm impedance
+		
+		// Find TDC using simple CFD method.
+		sum = 0.0;
+		if (vpeak_bin>0) { // Only do if peak was above threshold
+		  // Determine the threshold for finding the time. Use
+		  // 25% of the average of VPeak and two adjacent bins
+		  int idx = vpeak_bin;
+		  for (int j=idx-1; j<=idx+1; j++) sum += ch_volts[j];
+		  double tmp_thresh = CFDS_frac * (sum / 3.0);
+		  
+		  // Now scan through the waveform around the peak to
+		  // find the bin crossing the calculated
+		  // threshold. Bin idx (vpeak_time) is the peak so it
+		  // is definitely above threshold. So let's walk
+		  // backwards through the trace until we find a bin
+		  // value less than the threshold.
+		  int bin = ch_times.size();
+		  for (i=idx; ch_times[i]>10; i--) {//Stay 10ns into trace
+		    if ( ch_volts[i] < tmp_thresh ) {
+		      bin = i;
+		      i=0;
+		    }
+		  }
+		  
+		  // Finally, interpolate to find exact time where trace
+		  // crossed the CFD threshold
+		  double tdiff = ch_times[bin+1]-ch_times[bin];
+		  double vdiff = ch_volts[bin+1]-ch_volts[bin];
+		  double time = ch_times[bin] +
+		    (tmp_thresh-ch_volts[bin])/vdiff * tdiff;
+		  TDC[cw] = time;
+		} else { // Trace never crosses CThresh
+		  TDC[cw] = -1.0;
+		}
+		
+		// TODO: Need to correct TDC values for measuring time
+		// in buffer rather than time to exit buffer.
+		// WILL GET THIS LATER; SHOULD BE A FEW LINES TO ADD
+		
+		// From the TDC values, calculate the x_pos along paddle
+		if (cw%2 == 1) { // have analyzed both ends of paddle
+		  double tdc_diff  = TDC[cw-1] - TDC[cw];
+		  double x_pos = tdc_diff*154.0/2.0; // + -> toward cw
+		  // ACHIM TODO: Determine paddle number/orientation for
+		  // this cw,cw-1 pair.
+		  //int pad = GET_PADDLE_ID;
+
+		  // Once we know paddle/orientation, uncomment next 4 lines
+		  /*
+		  X_POS[pad] = orient*x_pos;
+		  if(pad<61) NPadCube++;      // Paddle in Cube
+		  else if (i<109) NPadUmb++;  // Paddle in Umbrella       
+		  else if (i<161) NPadCort++; // Paddle in Cortina          
+		  */
+		}
+	    // DONE WITH NEW STUFF
+		printf("new %3ld: %7.3lf %7.3lf %7.3lf %7.3lf %7.3lf %7.3lf\n",
+		       cw, Ped[cw], PedRMS[cw], VPeak[cw], Qint[cw],
+		       TDC[cw], Phi[rbid]);
+
+#if OLD_CHECK
+		// Calculate the pedestal
+		wave[cw]->SetPedBegin(Ped_low);
+		wave[cw]->SetPedRange(Ped_win);
+		wave[cw]->CalcPedestalRange(); 
+		wave[cw]->SubtractPedestal(); 
+		//Ped[cw] = wave[cw]->GetPedestal();
+		//PedRMS[cw] = wave[cw]->GetPedsigma();
+		
+		
+		// Set thresholds and find pulses
+		wave[cw]->SetThreshold(CThresh);
+		wave[cw]->SetCFDSFraction(CFDS_frac);
+		//VPeak[cw] = wave[cw]->GetPeakValue(Qwin_low, Qwin_size);
+		//Qint[cw]  = wave[cw]->Integrate(Qwin_low, Qwin_size);
+		wave[cw]->FindPeaks(Qwin_low, Qwin_size);
+		if ( (wave[cw]->GetNumPeaks() > 0) ) {
+		  wave[cw]->FindTdc(0, GAPS::CFD_SIMPLE);       // Simple CFD
+		  //TDC[cw] = wave[cw]->GetTdcs(0);
+		}
+		printf("old %3ld: %7.3lf %7.3lf %7.3lf %7.3lf %7.3lf\n",
+		       cw, wave[cw]->GetPedestal(),
+		       wave[cw]->GetPedsigma(),
+		       wave[cw]->GetPeakValue(Qwin_low, Qwin_size),
+		       wave[cw]->Integrate(Qwin_low, Qwin_size),
+		       wave[cw]->GetTdcs(0) );
+#endif		
 	      }
-
-
-	      // Set thresholds and find pulses
-	      wave[cw]->SetThreshold(CThresh);
-	      wave[cw]->SetCFDSFraction(CFDS_frac);
-	      VPeak[cw] = wave[cw]->GetPeakValue(Qwin_low, Qwin_size);
-	      Qint[cw]  = wave[cw]->Integrate(Qwin_low, Qwin_size);
-	      wave[cw]->FindPeaks(Qwin_low, Qwin_size);
-	      //if ( (wave[cw]->GetNumPeaks() > 0) && (Qint[cw] > 5.0) ) {
-	      if ( (wave[cw]->GetNumPeaks() > 0) ) {
-		wave[cw]->FindTdc(0, GAPS::CFD_SIMPLE);       // Simple CFD
-		TCFDS[cw] = wave[cw]->GetTdcs(0);
-		printf("EVT %12ld - ch %3ld: %10.5f\n", evt_ctr, cw, TCFDS[cw]);
-	      }		
 	    }
 	  }
 	}
 	//printf("\n");
-	// Now that we have all the waveforms in place, we can analyze
-	// the event. Start by looping over all paddles, and process
-	// any paddles with hits
-	for (int k=0; k<NPADS; k++) {
+
+	for (int k=0; k<NPAD; k++) {
 	  //First, check with the MTB data to see if paddle is hit
 
 	  // Then find the pulse information from each SiPM
@@ -313,4 +425,121 @@ int main(int argc, char *argv[]){
 
   spdlog::info("Finished");
   return EXIT_SUCCESS;
+}
+
+double FitSine(std::vector<double> volts, std::vector<double> times)
+//if you want to get all three fit parameters:                                 
+//std::vector<double> FitSine(std::vector<double> volts, std::vector<double> times, float cm)                                                                 
+{
+  //float ns_off = 0; //cm*0.08; //Harting cable signal propagation is
+  //supposed to be 5.13 ns/m or 0.0513 ns/cm. crude measurement gives
+  //0.08 ns/cm
+  int start_bin = 20;
+  int size_bin = 900; //can probably make this smaller                         
+
+  int data_size = 0;
+  double pi = 3.14159265;
+  double a;
+  double b;
+  //if you want to get all fit params                                          
+  //double c;                                                                  
+  double p[3]; // product of fitting equation                                 
+  double XiYi = 0.0;
+  double XiZi = 0.0;
+  double YiZi = 0.0;
+  double XiXi = 0.0;
+  double YiYi = 0.0;
+  double Xi = 0.0;
+  double Yi = 0.0;
+  double Zi = 0.0;
+  double xi = 0.0;
+  double yi = 0.0;
+  double zi = 0.0;
+
+  for(int i=start_bin; i < start_bin+size_bin; i++) {
+    xi = cos(2*pi*0.02*(times[i]));  //for this fit we know nu=0.02 waves/ns
+    yi = sin(2*pi*0.02*(times[i]));
+    zi = volts[i];
+    XiYi += xi*yi;
+    XiZi += xi*zi;
+    YiZi += yi*zi;
+    XiXi += xi*xi;
+    YiYi += yi*yi;
+    Xi   += xi;
+    Yi   += yi;
+    Zi   += zi;
+    data_size++;
+  }
+
+  double A[3][3];
+  double B[3][3];
+  double X[3][3];
+  double x = 0;
+  double n = 0; //n is the determinant of A                                    
+
+  //the matrix A is XTX where X is the matrix of dimensions
+  // (data_size x 3) <co\ s(2pifreq*time), sin(2pifreq*time),1>
+  A[0][0] = XiXi;
+  A[0][1] = XiYi;
+  A[0][2] = Xi;
+  A[1][0] = XiYi;
+  A[1][1] = YiYi;
+  A[1][2] = Yi;
+  A[2][0] = Xi;
+  A[2][1] = Yi;
+  A[2][2] = data_size;
+
+  n += A[0][0] * A[1][1] * A[2][2];
+  n += A[0][1] * A[1][2] * A[2][0];
+  n += A[0][2] * A[1][0] * A[2][1];
+  n -= A[0][0] * A[1][2] * A[2][1];
+  n -= A[0][1] * A[1][0] * A[2][2];
+  n -= A[0][2] * A[1][1] * A[2][0];
+  x = 1.0/n;
+
+  //find cofactor matrix of A, call this B                                     
+  B[0][0] =  (A[1][1] * A[2][2]) - (A[2][1] * A[1][2]);
+  B[0][1] = ((A[1][0] * A[2][2]) - (A[2][0] * A[1][2])) * (-1);
+  B[0][2] =  (A[1][0] * A[2][1]) - (A[2][0] * A[1][1]);
+  B[1][0] = ((A[0][1] * A[2][2]) - (A[2][1] * A[0][2])) * (-1);
+  B[1][1] =  (A[0][0] * A[2][2]) - (A[2][0] * A[0][2]);
+  B[1][2] = ((A[0][0] * A[2][1]) - (A[2][0] * A[0][1])) * (-1);
+  B[2][0] =  (A[0][1] * A[1][2]) - (A[1][1] * A[0][2]);
+  B[2][1] = ((A[0][0] * A[1][2]) - (A[1][0] * A[0][2])) * (-1);
+  B[2][2] =  (A[0][0] * A[1][1]) - (A[1][0] * A[0][1]);
+
+  //take the transpose of the cofactor matrix and divide by the
+  //determinant to get the inverse matrix X                                    
+  for(int i=0;i<3;i++)
+  {
+    for(int j=0;j<3;j++)
+    {
+      X[i][j] = B[j][i] * x;
+   }
+  }
+
+  //multiply p = zTX by the result                                             
+  p[0] = XiZi;
+  p[1] = YiZi;
+  p[2] = Zi;
+  a = X[0][0] * p[0] + X[1][0] * p[1] + X[2][0] * p[2];
+  b = X[0][1] * p[0] + X[1][1] * p[1] + X[2][1] * p[2];
+  //offset parameter                                                           
+  //c = X[0][2] * p[0] + X[1][2] * p[1] + X[2][2] * p[2];                      
+
+  double phi = atan2(a,b);
+
+
+  return phi;
+
+  //amplitude parameter                                                        
+  //double amp2 = pow(a,2)+pow(b,2);
+  
+  //return all three params                                                    
+  //std::vector<double> v;                                                     
+  //v.push_back(phi);                                                          
+  //v.push_back(amp2);                                                        
+  //v.push_back(c);
+  
+  //return v;                                                                  
 }
