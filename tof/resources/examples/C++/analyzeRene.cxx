@@ -314,7 +314,7 @@ int main(int argc, char *argv[]){
 	//printf("\n");
 
 	// Now that we have the waveforms in place, analyze the event.
-	Event.InitializeVariables(evt_ctr);
+	Event.InitializeVariables(evt_ctr, CThresh, CHmin);
 	Event.InitializeWaveforms(wave, wch9);
 
 	// Calculate and store pedestals/RMSs for each channel
@@ -332,7 +332,8 @@ int main(int argc, char *argv[]){
 	Event.AnalyzePhases(Phi);
 	
 	// Analyze each paddle: position on paddle, hitmask, etc
-	Event.AnalyzePaddles(10.0, CHmin); //Args: Peak and Charge cuts
+	//Event.AnalyzePaddles(10.0, CHmin); //Args: Peak and Charge cuts
+	Event.AnalyzePaddles();
 
 	// Now calculate beta, charge, and inner/outer tof x,y,z, etc.
 	Event.AnalyzeEvent();

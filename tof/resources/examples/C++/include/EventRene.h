@@ -32,7 +32,7 @@ public:
 
   // MEMBER FUNCTIONS
 
-  void    InitializeVariables(unsigned long int evt_ctr);
+  void    InitializeVariables(unsigned long int evt_ctr, float pk_cut, float ch_cut);
   void    InitializeWaveforms(GAPS::Waveform *wave[], GAPS::Waveform *wch9[]);
   void    UnsetWaveforms(void);
   void    SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],
@@ -45,7 +45,8 @@ public:
   void    SetCFDFraction(float CFDS_frac);
   void    AnalyzePulses(float Pulse_low, float Pulse_win);
   void    AnalyzePhases(float phi[NRB]);
-  void    AnalyzePaddles(float pk_cut, float ch_cut);
+  //void    AnalyzePaddles(float pk_cut, float ch_cut);
+  void    AnalyzePaddles(void);
   void    AnalyzeEvent(void);
 
   float   GetTDC(int ch) {return TDC[ch];}
@@ -103,6 +104,8 @@ private:
   float   Phi[NRB];                   // Phase of ch9 data
   float   TShift[NRB];                // Calculated timing shift
   
+  float   Ch_cut;                     // Charge cut value
+  float   Pk_cut;                     // Peak cut value
   float   VPeak[NTOT];                // Pulse peak value
   float   QInt[NTOT];                 // Pulse charge value
   float   TDC[NTOT];                  // TDC value (CFD method)
@@ -119,7 +122,6 @@ private:
   int     NPadCube;
   int     NPadUmbrella;
   int     NPadCortina;
-  
   
   TH1D    *pedHist[NTOT];              // Pedestal histograms
   TH1D    *pedRMSHist[NTOT];           // Pedestal RMS histograms
@@ -147,6 +149,8 @@ private:
   TH1I    *NPaddlesCube;
   TH1I    *NPaddlesUmbrella;
   TH1I    *NPaddlesCortina;
+  TH1I    *NPaddlesOuter;
+  TH1I    *NPaddlesTotal;
   
   // MEMBER FUNCTIONS
   void    Message(const char *s);           // Print out messages as needed

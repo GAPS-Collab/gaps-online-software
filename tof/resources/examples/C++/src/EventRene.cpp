@@ -25,7 +25,7 @@ using namespace std;
 EventGAPS::EventGAPS(void) {
 
   // Initialize any values necessary for a new event
-  InitializeVariables(0);
+  InitializeVariables(0, 0.0, 0.0);
 
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -44,10 +44,15 @@ EventGAPS::~EventGAPS(void) {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0) {
+void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0,
+				    float pk_cut=-999.0, float ch_cut=-999.0) {
   
   evtno    = evt_ctr;
   sc_speed = 154.0;   // in mm/s
+
+  // If passed non-negative values, use the arguments instead of defaults
+  Pk_cut  = (pk_cut > 0 ? pk_cut : 0.0);
+  Ch_cut = (ch_cut > 0 ? ch_cut : 0.0);
   
   // Reset everything that is stored by SiPM channel number
   for (int i=0; i<NTOT; i++) {
@@ -442,6 +447,14 @@ void EventGAPS::InitializeHistograms(void) {
   NPaddlesCortina->GetXaxis()->SetTitle("NPaddes Hit Cortina");
   NPaddlesCortina->GetYaxis()->SetTitle("Counts");
   
+  NPaddlesOuter = new TH1I("NPaddles Hit Outer", "", 12, -1.5, 10.5);
+  NPaddlesOuter->GetXaxis()->SetTitle("NPaddes Hit Outer");
+  NPaddlesOuter->GetYaxis()->SetTitle("Counts");
+  
+  NPaddlesTotal = new TH1I("NPaddles Hit Total", "", 12, -1.5, 10.5);
+  NPaddlesTotal->GetXaxis()->SetTitle("NPaddes Hit Total");
+  NPaddlesTotal->GetYaxis()->SetTitle("Counts");
+  
 }
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -514,9 +527,11 @@ void EventGAPS::WriteHistograms() {
   for (int i = start; i < max_sipm; i++) tdcCFD[i]->Write();
   
   //Hitmaskdir->cd();
+  NPaddlesTotal->Write();
   NPaddlesCube->Write();
   NPaddlesUmbrella->Write();
   NPaddlesCortina->Write();
+  NPaddlesOuter->Write();
   for (int j = start; j < max_paddle; j++) HitMask[j]->Write();
   
   outfile->Close();
@@ -650,26 +665,21 @@ void EventGAPS::AnalyzePhases(float phi[NRB]) {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
+//void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
+void EventGAPS::AnalyzePaddles(void) {
   // Assuming previous calls to AnalyzePedestals and AnalyzePulses,
   // you have access to Pedestals, charges, Peaks, TDCs etc so
   // calculate quantities related to paddles.
 
-  float Vpeak_cut  = 10.0;
-  float Charge_cut =  5.0;
   int ahit, bhit;
   
   int cube=0, upper=0, outer=0;
   
-  // If passed non-negative values, use the arguments instead of defaults
-  if (pk_cut > 0) Vpeak_cut  = pk_cut;
-  if (ch_cut > 0) Charge_cut = ch_cut;
-  
   for (int i=0; i<NPAD; i++) {
     int chA = Paddle_A[i]; // SiPM channel of A end
     int chB = Paddle_B[i]; // SiPM channel of B end
-    ahit = (VPeak[chA] > Vpeak_cut) ? 1 : 0 ;   
-    bhit = (VPeak[chB] > Vpeak_cut) ? 2 : 0 ;   
+    ahit = (VPeak[chA] > Pk_cut) ? 1 : 0 ;   
+    bhit = (VPeak[chB] > Pk_cut) ? 2 : 0 ;   
     Hits[i] = ahit + bhit;
     IsHit[i] = false; // Flag that we don't have Hit info
     
@@ -816,7 +826,7 @@ void EventGAPS::FillChannelHistos(int old=0) {
       pedRMSHist[i]->Fill(PedRMS[i]);
       Peak[i]->Fill(VPeak[i]);
       Charge[i]->Fill(QInt[i]);
-      if (QInt[i]>5.0) Charge_cut[i]->Fill(QInt[i]);
+      if (QInt[i]>Ch_cut) Charge_cut[i]->Fill(QInt[i]);
       
       tdcCFD[i]->Fill(TDC[i]);
     }
@@ -824,6 +834,7 @@ void EventGAPS::FillChannelHistos(int old=0) {
     // This is the default way to store the histograms in the root file
     // This section of code stores histos with channel numbers based on
     // paddles. For paddle N, Histo[N/N+1] = PaddleA/B SiPM
+    printf("Ch_cut = %.2f; Pk_cut = %.2f\n", Ch_cut, Pk_cut);
     for (int i=0; i<NPAD; i++) {
       if (Paddle_A[i] > 0) { 
 	int ch = 2*i;
@@ -837,8 +848,10 @@ void EventGAPS::FillChannelHistos(int old=0) {
 	
 	Charge[ch-1]->Fill(QInt[Paddle_A[i]]);
 	Charge[ch]->Fill(QInt[Paddle_B[i]]);
-	if (QInt[Paddle_A[i]]>5.0) Charge_cut[ch-1]->Fill(QInt[Paddle_A[i]]);
-	if (QInt[Paddle_B[i]]>5.0) Charge_cut[ch]->Fill(QInt[Paddle_B[i]]);
+	if (QInt[Paddle_A[i]]>Ch_cut)
+	  Charge_cut[ch-1]->Fill(QInt[Paddle_A[i]]);
+	if (QInt[Paddle_B[i]]>Ch_cut)
+	  Charge_cut[ch]->Fill(QInt[Paddle_B[i]]);
 	
 	tdcCFD[ch-1]->Fill(TDC[Paddle_A[i]]);
 	tdcCFD[ch]->Fill(TDC[Paddle_B[i]]);
@@ -855,6 +868,7 @@ void EventGAPS::FillPaddleHistos(void) {
   
   for (int i=0; i<NPAD; i++) {
     if (Paddle_A[i] > 0) { // Paddle-channel map exists
+      //if (QInt[Paddle_A[i]]>Ch_cut && QInt[Paddle_B[i]]>Ch_cut)
       QEnd2End[i]->Fill(QInt[Paddle_A[i]], QInt[Paddle_B[i]]);
       HitMask[i]->Fill(Hits[i]);
       if ( TDC[Paddle_A[i]] > 0 && TDC[Paddle_B[i]] > 0 ) {
@@ -873,19 +887,23 @@ void EventGAPS::FillPaddleHistos(void) {
 	if (i<61) HitCube->Fill(HitX[i], HitY[i], HitZ[i]);
 	else if (i<109) HitUmbrella->Fill(HitX[i], HitY[i], HitZ[i]);
 	else if (i<161) HitCortina->Fill(HitX[i], HitY[i], HitZ[i]);
-	float q_ave = (QInt[Paddle_A[i]] + QInt[Paddle_B[i]]) / 2.0;
-	QvPosition[i]->Fill(delta[i], q_ave);
-	if ( ABS(delta[i]) < 50 ) { // hit within middle meter
-	  QvPositionA[i]->Fill(delta[i], QInt[Paddle_A[i]]);
-	  QvPositionB[i]->Fill(delta[i], QInt[Paddle_B[i]]);
+	if (QInt[Paddle_A[i]]>Ch_cut && QInt[Paddle_B[i]]>Ch_cut) {
+	  float q_ave = (QInt[Paddle_A[i]] + QInt[Paddle_B[i]]) / 2.0;
+	  QvPosition[i]->Fill(delta[i], q_ave);
+	  if ( ABS(delta[i]) < 50 ) { // hit within middle meter
+	    QvPositionA[i]->Fill(delta[i], QInt[Paddle_A[i]]);
+	    QvPositionB[i]->Fill(delta[i], QInt[Paddle_B[i]]);
+	  }
 	}
       }
     }
   }
   if (beta > 0) BetaDist->Fill(beta); // Only when beta was calculated
+  NPaddlesTotal->Fill(NPadCube+NPadUmbrella+NPadCortina);
   NPaddlesCube->Fill(NPadCube);
   NPaddlesUmbrella->Fill(NPadUmbrella);
   NPaddlesCortina->Fill(NPadCortina);
+  NPaddlesOuter->Fill(NPadUmbrella+NPadCortina);
 }
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
