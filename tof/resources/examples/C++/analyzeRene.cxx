@@ -274,6 +274,8 @@ int main(int argc, char *argv[]){
 	  // Now that we know the RBID, we can set the starting ch_no
 	  // Eventually we will use a function to map RB_ch to GAPS_ch
 	  usize ch_start = (rbid-1)*NCH; // first RB is #1
+          // Let's also store the channel mask to use later.               
+          int ch_mask = rb_event.header.channel_mask;
 	  if (verbose) {
 	    std::cout << rb_event << std::endl;
           }
@@ -303,11 +305,13 @@ int main(int argc, char *argv[]){
 	    // Now, deal with all the SiPM data
 	    for(int c=0;c<NCH;c++) {
 	      usize cw = c+ch_start; 
-	      
-	      Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
-	      Vec<f64> ch_times(times[c].begin(), times[c].end());
-	      wave[cw] = new GAPS::Waveform(ch_volts.data(),
-					    ch_times.data(), cw,0);
+              unsigned int inEvent = ch_mask & (1 << c);
+              if (inEvent > 0 ) {
+		Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
+		Vec<f64> ch_times(times[c].begin(), times[c].end());
+		wave[cw] = new GAPS::Waveform(ch_volts.data(),
+					      ch_times.data(), cw,0);
+	      }
 	    }
 	  }
 	}

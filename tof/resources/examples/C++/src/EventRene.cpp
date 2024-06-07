@@ -834,7 +834,6 @@ void EventGAPS::FillChannelHistos(int old=0) {
     // This is the default way to store the histograms in the root file
     // This section of code stores histos with channel numbers based on
     // paddles. For paddle N, Histo[N/N+1] = PaddleA/B SiPM
-    printf("Ch_cut = %.2f; Pk_cut = %.2f\n", Ch_cut, Pk_cut);
     for (int i=0; i<NPAD; i++) {
       if (Paddle_A[i] > 0) { 
 	int ch = 2*i;
