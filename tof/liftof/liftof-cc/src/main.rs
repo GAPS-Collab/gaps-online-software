@@ -113,8 +113,6 @@ use liftof_cc::threads::{
 
 /*************************************/
 
-
-
 /// Command line arguments for calling 
 /// liftof-cc directly from the command line
 #[derive(Debug, Parser, PartialEq)]
@@ -586,6 +584,17 @@ fn main() {
       thread::sleep(10*one_second);
 
       println!("=> Initializing Run Start!");
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          // deactivate the master trigger thread
+          tc.thread_master_trg_active = true;
+          tc.calibration_active = false;
+          tc.thread_event_bldr_active = true;
+        },
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        },
+      }
       match cmd_sender.send(&payload, 0) {
         Err(err) => {
           error!("Unable to send command, error{err}");
@@ -691,9 +700,14 @@ fn main() {
         if tc.calibration_active {
           for rbid in &rb_list {
             // the global data sink sets these flags
+            let mut finished_keys = Vec::<u8>::new();
             if tc.finished_calibrations[&rbid.rb_id] {
               cali_received += 1;
               bar.set_position(cali_received);
+              finished_keys.push(rbid.rb_id);
+            }
+            for rbid in &finished_keys {
+              *tc.finished_calibrations.get_mut(&rbid).unwrap() = false; 
             }
           }
           // FIXME - this or a timer

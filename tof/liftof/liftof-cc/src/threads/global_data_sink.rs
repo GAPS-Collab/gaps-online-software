@@ -236,34 +236,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
             _ => ()
           } // end match 
         }
-        //if pack.packet_type == PacketType::TofEvent {
-        //  if event_cache.len() != 100 {
-        //    event_cache.push(pack);
-        //    continue;
-        //  } else {
-        //    if n_pack_sent % 1000 == 0 && n_pack_sent != 0 {
-        //      println!("=> [SINK] Sent {n_pack_sent}, last evid {last_evid} ===");
-        //    }
-        //    // sort the cache
-        //    // FIXME - at this step, we should have checked if the 
-        //    // packets are broken.
-        //    event_cache.sort_by(| a, b|  TofEvent::extract_event_id_from_stream(&a.payload).unwrap().cmp(
-        //                                &TofEvent::extract_event_id_from_stream(&b.payload).unwrap()));
-        //   
-        //    for ev in event_cache.iter() {
-        //      last_evid = TofEvent::extract_event_id_from_stream(&ev.payload).unwrap();
-        //      match data_socket.send(&ev.to_bytestream(),0) {
-        //        Err(err) => error!("Not able to send packet over 0MQ PUB, {err}"),
-        //        Ok(_)    => { 
-        //          trace!("TofPacket sent");
-        //          n_pack_sent += 1;
-        //        }
-        //      }
-        //    }
-        //    event_cache.clear();
-        //  }
-
-        //} else {
+        
         // FIXME - disentangle network and disk I/O?
         if pack.packet_type == PacketType::TofEvent {
           if settings.send_tof_summary_packets ||
@@ -296,6 +269,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 }
                 Ok(_)    => {
                   //trace!("Event Summary for event id {} send!", evid);
+                  cfg_if::cfg_if!{
+                    if #[cfg(features="debug")] {
+                      heartbeat.n_pack_sent += 1;
+                    }
+                  }
                   n_pack_sent += 1;
                 }
               }
@@ -309,6 +287,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                   }
                   Ok(_)    => {
                     //trace!("RB waveform for event id {} send!", evid);
+                    cfg_if::cfg_if!{
+                      if #[cfg(features="debug")] {
+                        heartbeat.n_pack_sent += 1;
+                      }
+                    }
                     n_pack_sent += 1;
                   }
                 }
@@ -322,6 +305,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 }
                 Ok(_)    => {
                   //trace!("RB waveform for event id {} send!", evid);
+                  cfg_if::cfg_if!{
+                    if #[cfg(features="debug")] {
+                      heartbeat.n_pack_sent += 1;
+                    }
+                  }
                   n_pack_sent += 1;
                 }
               }
@@ -332,6 +320,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
               Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
               Ok(_)    => {
                 trace!("TofPacket sent");
+                cfg_if::cfg_if!{
+                  if #[cfg(features="debug")] {
+                    heartbeat.n_pack_sent += 1;
+                  }
+                }
                 n_pack_sent += 1;
               }
             } // end match
@@ -341,6 +334,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
             Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
             Ok(_)    => {
               trace!("TofPacket sent");
+              cfg_if::cfg_if!{
+                if #[cfg(features="debug")] {
+                  heartbeat.n_pack_sent += 1;
+                }
+              }
               n_pack_sent += 1;
             }
           } // end match
