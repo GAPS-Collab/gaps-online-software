@@ -219,8 +219,9 @@ impl RBTab<'_>  {
     let met    = self.timer.elapsed().as_secs_f64();
     let mut ev = RBEvent::new();
     let bins   = Uniform::new(50,-0.5,49.5);
-    
+    //info!("Receive packet!"); 
     if self.rb_changed {
+      info!("RB change detectod!");
       // currently, only one RB at a time is supported
       //self.moni_queue.clear();
       self.event_queue.clear();
@@ -248,8 +249,9 @@ impl RBTab<'_>  {
           }
         }
       }
+      self.rb_changed = false;
+      info!("RB changed!");
     }
-
     if !self.rb_receiver.is_empty() {
       match self.rb_receiver.try_recv() {
         Err(_) => (),
@@ -258,7 +260,6 @@ impl RBTab<'_>  {
         }
       }
     }
-
     if !self.tp_receiver.is_empty() {
       match self.tp_receiver.try_recv() {
         Err(_err) => (),
@@ -392,6 +393,7 @@ impl RBTab<'_>  {
       None => 0,
     };
     self.rbl_state.select(Some(i));
+    //info!("Selecting {}", i);
   }
 
   pub fn previous_rb(&mut self) {
@@ -447,12 +449,12 @@ impl RBTab<'_>  {
   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
     match self.view {
       RBTabView::SelectRB => {
-        let list_chunks = Layout::default()
+        let main_lo = Layout::default()
           .direction(Direction::Horizontal)
           .constraints(
-              [Constraint::Percentage(20),
-               Constraint::Percentage(20),
-               Constraint::Percentage(60)].as_ref(),
+              [Constraint::Percentage(10),
+               //Constraint::Percentage(20),
+               Constraint::Percentage(90)].as_ref(),
           )
           .split(*main_window);
         //let par_rb_title_string = String::from("Select ReadoutBoard (RB)");
@@ -475,15 +477,16 @@ impl RBTab<'_>  {
           .highlight_style(self.theme.highlight().add_modifier(Modifier::BOLD))
           .highlight_symbol(">>")
           .repeat_highlight_symbol(true);
-        let ltbs = Block::default()
-          .borders(Borders::ALL)
-          .style(self.theme.style())
-          .title("Select LocalTriggerBoard (LTB)")
-          .border_type(BorderType::Plain);
-        let ltb_select_list = List::new(self.ltbl_items.clone()).block(ltbs)
-          .highlight_style(self.theme.highlight().add_modifier(Modifier::BOLD))
-          .highlight_symbol(">>")
-          .repeat_highlight_symbol(true);
+        // No ltb selection right now
+        //let ltbs = Block::default()
+        //  .borders(Borders::ALL)
+        //  .style(self.theme.style())
+        //  .title("Select LocalTriggerBoard (LTB)")
+        //  .border_type(BorderType::Plain);
+        //let ltb_select_list = List::new(self.ltbl_items.clone()).block(ltbs)
+        //  .highlight_style(self.theme.highlight().add_modifier(Modifier::BOLD))
+        //  .highlight_symbol(">>")
+        //  .repeat_highlight_symbol(true);
         match self.list_focus {
           RBLTBListFocus::RBList => {
             match self.rbl_state.selected() {
@@ -507,25 +510,49 @@ impl RBTab<'_>  {
               },
             }
           },
-          RBLTBListFocus::LTBList => {
-            match self.ltbl_state.selected() {
-              None    => {
-                let selector =  1;
-                if self.ltb_selector != selector {
-                  self.ltb_selector = selector;
-                } 
-              },
-              Some(_ltbid) => {
-                let selector =  _ltbid as u8 + 1;
-                if self.ltb_selector != selector {
-                  self.ltb_selector = selector;
-                }
-              },
-            }
+          _ => ()
+          // no ltb selection right now
+          //RBLTBListFocus::LTBList => {
+          //  match self.ltbl_state.selected() {
+          //    None    => {
+          //      let selector =  1;
+          //      if self.ltb_selector != selector {
+          //        self.ltb_selector = selector;
+          //      } 
+          //    },
+          //    Some(_ltbid) => {
+          //      let selector =  _ltbid as u8 + 1;
+          //      if self.ltb_selector != selector {
+          //        self.ltb_selector = selector;
+          //      }
+          //    },
+          //  }
+          //}
+        }
+        let mut view_string : String;
+        match self.rbs.get(&self.rb_selector) {
+          Some(_rb) => {
+            view_string = format!("{}", _rb.to_summary_str());
+          }
+          None => {
+            view_string = format!("No information for RB {} in DBor DB not available!", self.rb_selector);
           }
         }
-        frame.render_stateful_widget(rb_select_list,  list_chunks[0], &mut self.rbl_state );
-        frame.render_stateful_widget(ltb_select_list, list_chunks[1], &mut self.ltbl_state );
+        let rb_view = Paragraph::new(view_string)
+          .style(self.theme.style())
+          .alignment(Alignment::Left)
+          //.scroll((5, 10))
+          .block(
+          Block::default()
+            .borders(Borders::ALL)
+            .style(self.theme.style())
+            .title("RB")
+            .border_type(BorderType::Rounded),
+        );
+
+        frame.render_stateful_widget(rb_select_list,  main_lo[0], &mut self.rbl_state );
+        frame.render_widget(rb_view, main_lo[1]);
+        //frame.render_stateful_widget(ltb_select_list, list_chunks[1], &mut self.ltbl_state );
       },
       RBTabView::Waveform => {
         // set up general layout
@@ -700,11 +727,12 @@ impl RBTab<'_>  {
             error!("No rate data available for board {}", self.rb_selector);
           },
           Some(rdata) => {
-            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-              rate_ts.push_back((*time, rdata[k] as f64));
-            }
             if rate_ts.len() == 0 {
               error!("We have 0 length rate data for board {}!", self.rb_selector);
+            } else {
+              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                rate_ts.push_back((*time, rdata[k] as f64));
+              }
             }
           }
         }
@@ -724,8 +752,10 @@ impl RBTab<'_>  {
             error!("No mag_tot data available for board {}", self.rb_selector);
           },
           Some(data) => {
-            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-              mag_tot_ts.push_back((*time, data[k] as f64));
+            if data.len() != 0 {
+              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                mag_tot_ts.push_back((*time, data[k] as f64));
+              }
             }
           }
         }
@@ -744,8 +774,10 @@ impl RBTab<'_>  {
             error!("No atmos pressure data available for board {}", self.rb_selector);
           },
           Some(data) => {
-            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-              pres_ts.push_back((*time, data[k] as f64));
+            if data.len() != 0 {
+              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                pres_ts.push_back((*time, data[k] as f64));
+              }
             }
           }
         }
@@ -765,8 +797,10 @@ impl RBTab<'_>  {
             error!("No humidity data available for board {}", self.rb_selector);
           },
           Some(data) => {
-            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-              humi_ts.push_back((*time, data[k] as f64));
+            if data.len() != 0 {
+              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                humi_ts.push_back((*time, data[k] as f64));
+              }
             }
           }
         }
@@ -796,8 +830,10 @@ impl RBTab<'_>  {
               error!("No DRS4 temperature data available for board {}", self.rb_selector);
             },
             Some(data) => {
-              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-                fpga_ts.push_back((*time, data[k] as f64));
+              if data.len() != 0 {
+                for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                  fpga_ts.push_back((*time, data[k] as f64));
+                }
               }
             }
           }
@@ -817,8 +853,10 @@ impl RBTab<'_>  {
             error!("No CLK temperature data available for board {}", self.rb_selector);
           },
           Some(data) => {
-            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-              tmp_clk_ts.push_back((*time, data[k] as f64));
+            if data.len() != 0 {
+              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                tmp_clk_ts.push_back((*time, data[k] as f64));
+              }
             }
           }
         }
@@ -837,8 +875,10 @@ impl RBTab<'_>  {
             error!("No ADC temperature data available for board {}", self.rb_selector);
           },
           Some(data) => {
-            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-              tmp_adc_ts.push_back((*time, data[k] as f64));
+            if data.len() != 0 {
+              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                tmp_adc_ts.push_back((*time, data[k] as f64));
+              }
             }
           }
         }
@@ -857,8 +897,10 @@ impl RBTab<'_>  {
             error!("No ZYNQ temperature data available for board {}", self.rb_selector);
           },
           Some(data) => {
-            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-              tmp_zynq_ts.push_back((*time, data[k] as f64));
+            if data.len() != 0 {
+              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                tmp_zynq_ts.push_back((*time, data[k] as f64));
+              }
             }
           }
         }
@@ -877,8 +919,10 @@ impl RBTab<'_>  {
             error!("No BM280 temperature data available for board {}", self.rb_selector);
           },
           Some(data) => {
-            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-              tmp_bm280_ts.push_back((*time, data[k] as f64));
+            if data.len() != 0 {
+              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                tmp_bm280_ts.push_back((*time, data[k] as f64));
+              }
             }
           }
         }
@@ -898,8 +942,10 @@ impl RBTab<'_>  {
             error!("No DRS4 current data available for board {}", self.rb_selector);
           },
           Some(data) => {
-            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-              drs_c_ts.push_back((*time, data[k] as f64));
+            if data.len() != 0 {
+              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                drs_c_ts.push_back((*time, data[k] as f64));
+              }
             }
           }
         }
@@ -918,8 +964,10 @@ impl RBTab<'_>  {
             error!("No ZYNQ current data available for board {}", self.rb_selector);
           },
           Some(data) => {
-            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-              zynq_c_ts.push_back((*time, data[k] as f64));
+            if data.len() != 0 {
+              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                zynq_c_ts.push_back((*time, data[k] as f64));
+              }
             }
           }
         }
@@ -938,8 +986,10 @@ impl RBTab<'_>  {
             error!("No P3V3 current data available for board {}", self.rb_selector);
           },
           Some(data) => {
-            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-              p3v3_c_ts.push_back((*time, data[k] as f64));
+            if data.len() != 0 {
+              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                p3v3_c_ts.push_back((*time, data[k] as f64));
+              }
             }
           }
         }
@@ -958,8 +1008,10 @@ impl RBTab<'_>  {
             error!("No P3V5 current data available for board {}", self.rb_selector);
           },
           Some(data) => {
-            for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-              p3v5_c_ts.push_back((*time, data[k] as f64));
+            if data.len() != 0 {
+              for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                p3v5_c_ts.push_back((*time, data[k] as f64));
+              }
             }
           }
         }
@@ -1032,8 +1084,10 @@ impl RBTab<'_>  {
             error!("No trenz temp data available for board {}", self.ltb_selector);
           },
           Some(data) => {
-            for (k, time) in self.met_queue_ltb_moni.get(&self.ltb_selector).unwrap().iter().enumerate() {
-              tt_ts.push_back((*time, data[k] as f64));
+            if data.len() != 0 {
+              for (k, time) in self.met_queue_ltb_moni.get(&self.ltb_selector).unwrap().iter().enumerate() {
+                tt_ts.push_back((*time, data[k] as f64));
+              }
             }
           }
         }
@@ -1052,8 +1106,10 @@ impl RBTab<'_>  {
             error!("No LTB temp data available for board {}", self.ltb_selector);
           },
           Some(data) => {
-            for (k, time) in self.met_queue_ltb_moni.get(&self.ltb_selector).unwrap().iter().enumerate() {
-              lt_ts.push_back((*time, data[k] as f64));
+            if data.len() != 0 {
+              for (k, time) in self.met_queue_ltb_moni.get(&self.ltb_selector).unwrap().iter().enumerate() {
+                lt_ts.push_back((*time, data[k] as f64));
+              }
             }
           }
         }
@@ -1194,8 +1250,10 @@ impl RBTab<'_>  {
                 error!("No {} data available for board {}", identifier, self.rb_selector);
               },
               Some(data) => {
-                for (k, time) in self.met_queue_pa_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
-                  ts.push_back((*time, data[k] as f64));
+                if data.len() != 0 {
+                  for (k, time) in self.met_queue_pa_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
+                    ts.push_back((*time, data[k] as f64));
+                  }
                 }
               }
             }

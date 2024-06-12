@@ -8,11 +8,14 @@ pub mod tab_rbwaveform;
 pub mod tab_tofsummary;
 pub mod tab_tofhit;
 pub mod tab_telemetry;
+pub mod tab_commands;
+pub mod tab_paddles;
 
 pub use crate::tab_mt::MTTab;
 pub use crate::tab_settings::SettingsTab;
 pub use crate::tab_home::HomeTab;
 pub use crate::tab_events::EventTab;
+pub use crate::tab_paddles::PaddleTab;
 pub use crate::tab_rbs::{
     RBTab,
     RBTabView,
@@ -32,5 +35,5 @@ pub use crate::tab_tofhit::{
 };
 
 pub use crate::tab_cpu::CPUTab;
-
+pub use crate::tab_commands::CommandTab;
 

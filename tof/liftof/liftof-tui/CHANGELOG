@@ -1,5 +1,9 @@
 # LELEWAA series
 
+##v0.10.2
+* massive overhaul - show waveforms per each paddle
+* interface change - use arrow keys to navigate
+
 ##v0.10.1
 * support to read directly from the GAPS telemetry 
   stream and parse relevant data to the other tabs.

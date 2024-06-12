@@ -61,10 +61,10 @@ pub enum TofHitView {
 
 #[derive(Debug, Clone)]
 pub struct TofHitTab<'a> {
-  pub theme          : ColorTheme,
-  pub th_recv        : Receiver<TofHit>,
-  pub hit_queue      : VecDeque<TofHit>,
-  pub queue_size     : usize,
+  pub theme           : ColorTheme,
+  pub th_recv         : Receiver<TofHit>,
+  pub hit_queue       : VecDeque<TofHit>,
+  pub queue_size      : usize,
   // pulse height
   pub pha_histo       : Hist1D<Uniform<f32>>,
   // pulse time

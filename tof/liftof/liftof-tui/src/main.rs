@@ -24,7 +24,9 @@ use std::collections::{
 };
 #[macro_use] extern crate log;
 
+// third party widgets
 use tui_logger::TuiLoggerWidget;
+use tui_popup::Popup;
 
 use crossterm::{
     event::{self, Event as CEvent, KeyCode},
@@ -48,7 +50,8 @@ use ratatui::{
     },
     style::{
         Color,
-        Style
+        Style,
+        Stylize
     },
     widgets::{
         Block,
@@ -76,18 +79,28 @@ use tof_dataclasses::serialization::{
 use tof_dataclasses::events::{
     MasterTriggerEvent,
     RBEvent,
+    TofEvent,
     TofHit,
     TofEventSummary,
     //RBWaveform,
 };
-
+use tof_dataclasses::commands::TofResponse;
+use tof_dataclasses::calibrations::RBCalibrations;
 //use liftof_lib::settings::LiftofSettings;
 
 use liftof_tui::menu::{
+    UIMenuItem,
     MenuItem,
     MainMenu,
+    MainMenu2,
+    TriggerMenu,
+    EventMenu,
+    MoniMenu,
+    ActiveMenu,
+    UIMenu,
     RBMenuItem,
     RBMenu,
+    RBMenu2,
     PAMoniMenuItem,
     PAMoniMenu,
     MTMenu,
@@ -122,6 +135,8 @@ use liftof_tui::{
     TofSummaryTab, 
     RBLTBListFocus,
     TelemetryTab,
+    CommandTab,
+    PaddleTab,
 };
 
 extern crate clap;
@@ -255,7 +270,7 @@ struct Args {
   /// On a decent system 1kHz should be ok.
   /// If screen flickering appears, try to change
   /// this parameter. 
-  #[arg(short, long, default_value_t = 1000.0)]
+  #[arg(short, long, default_value_t = 10.0)]
   refresh_rate: f32,
   /// Get the TofData not from the TOF stream, 
   /// but extract it from the telemetry data instead
@@ -564,15 +579,17 @@ fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
 // so that it can be put in an Arc(Mutex), so
 // we can multithread it
 struct TabbedInterface<'a> {
-  pub ui_menu       :  MainMenu,
-  pub rb_menu       :  RBMenu,
-  pub mt_menu       :  MTMenu,
+  pub ui_menu       :  MainMenu2<'a>,
+  pub rb_menu       :  RBMenu2<'a>,
+  pub mt_menu       :  TriggerMenu<'a>,
   pub st_menu       :  SettingsMenu,
   pub th_menu       :  THMenu,
   pub ts_menu       :  TSMenu,
   pub rw_menu       :  RWMenu,
   pub pa_menu       :  PAMoniMenu,
-  pub te_menu       :  TEMenu,
+  pub te_menu       :  EventMenu<'a>,
+  pub mo_menu       :  MoniMenu<'a>,
+  pub active_menu   :  ActiveMenu,
 
   // The tabs
   pub mt_tab        : MTTab,
@@ -582,6 +599,7 @@ struct TabbedInterface<'a> {
   pub settings_tab  : SettingsTab<'a>,
   pub home_tab      : HomeTab,
   pub event_tab     : EventTab,
+  pub cmd_tab       : CommandTab<'a>,
 
   pub th_tab        : TofHitTab<'a>,
   // flight packets
@@ -589,22 +607,29 @@ struct TabbedInterface<'a> {
   pub ts_tab        : TofSummaryTab,
   
   // telemetry 
-  pub te_tab       : TelemetryTab,
+  pub te_tab        : TelemetryTab,
+
+  // paddles 
+  pub pd_tab        : PaddleTab<'a>,
 
   // latest color set
   pub color_set     : ColorSet,
+
+  pub quit_request  : bool,
 } 
 
 impl<'a> TabbedInterface<'a> {
-  pub fn new(ui_menu      : MainMenu,
-             rb_menu      : RBMenu,
-             mt_menu      : MTMenu,
+  pub fn new(ui_menu      : MainMenu2<'a>,
+             rb_menu      : RBMenu2<'a>,
+             mt_menu      : TriggerMenu<'a>,
              st_menu      : SettingsMenu,
              th_menu      : THMenu,
              ts_menu      : TSMenu,
              rw_menu      : RWMenu,
              pa_menu      : PAMoniMenu,
-             te_menu      : TEMenu,
+             te_menu      : EventMenu<'a>,
+             mo_menu      : MoniMenu<'a>,
+             active_menu  : ActiveMenu,
              mt_tab       : MTTab,
              cpu_tab      : CPUTab,
              wf_tab       : RBTab<'a>,
@@ -614,8 +639,11 @@ impl<'a> TabbedInterface<'a> {
              th_tab       : TofHitTab<'a>,
              rbwf_tab     : RBWaveformTab,
              ts_tab       : TofSummaryTab,
-             te_tab       : TelemetryTab) -> Self {
+             te_tab       : TelemetryTab,
+             cmd_tab      : CommandTab<'a>,
+             pd_tab       : PaddleTab<'a>) -> Self {
     Self {
+
       ui_menu     ,
       rb_menu     , 
       mt_menu     , 
@@ -625,6 +653,8 @@ impl<'a> TabbedInterface<'a> {
       rw_menu     ,
       pa_menu     ,
       te_menu     ,
+      mo_menu     ,
+      active_menu ,
       mt_tab      , 
       cpu_tab     , 
       wf_tab      , 
@@ -635,7 +665,10 @@ impl<'a> TabbedInterface<'a> {
       rbwf_tab    ,
       ts_tab      ,
       te_tab      ,
+      cmd_tab     ,
+      pd_tab      , 
       color_set   : COLORSETBW,
+      quit_request: false,
     }
   }
 
@@ -646,6 +679,10 @@ impl<'a> TabbedInterface<'a> {
   pub fn receive_packet(&mut self) {
     match self.mt_tab.receive_packet() {
       Err(err) => error!("Can not receive TofPackets for MTTab! {err}"),
+      Ok(_)    => ()
+    }
+    match self.pd_tab.receive_packet() {
+      Err(err) => error!("Can not receive TofEvent for PaddleTab! {err}"),
       Ok(_)    => ()
     }
     match self.wf_tab.receive_packet() {
@@ -709,8 +746,16 @@ impl<'a> TabbedInterface<'a> {
   }
 
   pub fn render_events(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.ui_menu.render  (&master_lo.rect[0], frame);
+    self.te_menu.render  (&master_lo.rect[0], frame);
     self.event_tab.render(&master_lo.rect[1], frame);
+  }
+
+
+   
+
+  pub fn render_monitoring(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.mo_menu.render(&master_lo.rect[0], frame);
+    self.home_tab.render(&master_lo.rect[1], frame);
   }
 
   pub fn render_cpu(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
@@ -719,32 +764,68 @@ impl<'a> TabbedInterface<'a> {
   }
   
   pub fn render_mt(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.mt_menu.render(&master_lo.rect[0], frame);
+    self.ui_menu.render(&master_lo.rect[0], frame);
     self.mt_tab.render (&master_lo.rect[1], frame);
   }
   
   pub fn render_rbs(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.rb_menu.render(&master_lo.rect[0], frame);
-    self.wf_tab.render (&master_lo.rect[1], frame);
+    match self.active_menu {
+      ActiveMenu::RBMenu => {
+        self.rb_menu.render(&master_lo.rect[0], frame);
+        self.wf_tab.render (&master_lo.rect[1], frame);
+      }
+      _ => {
+        self.ui_menu.render(&master_lo.rect[0], frame);
+        self.wf_tab.render (&master_lo.rect[1], frame);
+      }
+    }
   }
   
+  pub fn render_paddles(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    match self.active_menu {
+      ActiveMenu::Paddles => {
+        self.pd_tab.menu.render(&master_lo.rect[0], frame);
+        self.pd_tab.render (&master_lo.rect[1], frame);
+      }
+      _ => {
+        self.ui_menu.render(&master_lo.rect[0], frame);
+        self.pd_tab.render (&master_lo.rect[1], frame);
+      }
+    }
+  }
+ 
+  pub fn render_commands(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.ui_menu.render(&master_lo.rect[0], frame);
+    self.cmd_tab.render(&master_lo.rect[1], frame);
+  }
+
   pub fn render_settings(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.st_menu.render     (&master_lo.rect[0], frame);
+    self.ui_menu.render     (&master_lo.rect[0], frame);
     self.settings_tab.render(&master_lo.rect[1], frame);
   }
-    
+   
+  pub fn render_quit(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.ui_menu.render(&master_lo.rect[0], frame);
+    if self.quit_request {
+      let popup = Popup::new("Quit liftof-tui?", "Press Y to confirm, any key to abort")
+      //.style(Style::new().white().on_blue());
+      .style(self.home_tab.theme.style());
+      frame.render_widget(&popup, frame.size());
+    }
+  }
+
   pub fn render_tofhittab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
     self.th_menu.render(&master_lo.rect[0], frame);
     self.th_tab.render(&master_lo.rect[1], frame);
   }
 
   pub fn render_tofsummarytab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.ts_menu.render(&master_lo.rect[0], frame);
+    self.te_menu.render(&master_lo.rect[0], frame);
     self.ts_tab.render(&master_lo.rect[1], frame);
   }
   
   pub fn render_rbwaveformtab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.rw_menu.render(&master_lo.rect[0], frame);
+    self.te_menu.render(&master_lo.rect[0], frame);
     self.rbwf_tab.render(&master_lo.rect[1], frame);
   }
 
@@ -754,50 +835,140 @@ impl<'a> TabbedInterface<'a> {
   }
   
   pub fn render_telemetrytab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.te_menu.render(&master_lo.rect[0], frame);
+    //self.ts_menu.render(&master_lo.rect[0], frame);
+    self.ui_menu.render(&master_lo.rect[0], frame);
     self.te_tab.render(&master_lo.rect[1], frame);
   }
 
   pub fn render(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    match self.ui_menu.active_menu_item {
-      MenuItem::Home => {
-        self.render_home(master_lo, frame);
-      },
-      MenuItem::TofEvents => {
-        self.render_events(master_lo, frame);
-      },
-      MenuItem::TOFCpu => { 
-        self.render_cpu(master_lo, frame);
-      },
-      MenuItem::MasterTrigger => {
-        self.render_mt(master_lo, frame);
-      },
-      MenuItem::ReadoutBoards => {
-        if self.wf_tab.view == RBTabView::PAMoniData {
-          self.render_pamonidatatab(master_lo, frame);
-        } else {
-          self.render_rbs(master_lo, frame);
+    match self.active_menu {
+      ActiveMenu::MainMenu => {
+        match self.ui_menu.get_active_menu_item() {
+          UIMenuItem::Home => {
+            self.render_home(master_lo, frame);
+          }
+          UIMenuItem::Events => {
+            self.render_home(master_lo, frame);
+          },
+          UIMenuItem::ReadoutBoards => {
+            self.wf_tab.view = RBTabView::SelectRB;
+            self.render_rbs(master_lo, frame);
+          }
+          UIMenuItem::Trigger => {
+            self.render_mt(master_lo, frame);
+          }
+          UIMenuItem::Monitoring => {
+            self.render_home(master_lo, frame);
+          }
+          UIMenuItem::Telemetry => {
+            self.render_telemetrytab(master_lo, frame);
+          }
+          UIMenuItem::Commands => {
+            self.render_commands(master_lo, frame);
+          }
+          UIMenuItem::Settings => {
+            self.render_settings(master_lo, frame);
+          }
+          UIMenuItem::Paddles => {
+            self.render_paddles(master_lo, frame);
+          }
+          UIMenuItem::Quit => {
+            self.render_quit(master_lo, frame);
+          }
+          _ => ()
         }
-      },
-      MenuItem::Settings => {
-        self.render_settings(master_lo, frame);
-      },
-      MenuItem::TofHits => {
-        self.render_tofhittab(master_lo, frame);
       }
-      MenuItem::RBWaveform => {
-        self.render_rbwaveformtab(master_lo, frame);
+      ActiveMenu::RBMenu => {
+        self.render_rbs(master_lo, frame);
       }
-      MenuItem::TofSummary => {
-        self.render_tofsummarytab(master_lo, frame);
+      ActiveMenu::Paddles => {
+        self.render_paddles(master_lo, frame);
       }
-      MenuItem::Telemetry => {
-        self.render_telemetrytab(master_lo, frame);
+      //ActiveMenu::Trigger => {
+      //  self.render_mt(master_lo, frame);
+      //}
+      ActiveMenu::Events => {
+        match self.te_menu.active_menu_item {
+          UIMenuItem::TofSummary => {
+            self.render_tofsummarytab(master_lo, frame);
+          }
+          UIMenuItem::TofHits => {
+            self.render_tofhittab(master_lo, frame);
+          }
+          UIMenuItem::RBWaveform => {
+            self.render_rbwaveformtab(master_lo, frame);
+          }
+          UIMenuItem::Back => {
+            self.render_events(master_lo, frame);
+          }
+          _ => ()
+        }
       }
-      _ => {
-        self.ui_menu.render(&master_lo.rect[0], frame);
+      ActiveMenu::Monitoring => {
+        match self.mo_menu.active_menu_item {
+          UIMenuItem::Back => {
+            self.render_monitoring(master_lo, frame);
+          }
+          UIMenuItem::PreampBias => {
+          }
+          UIMenuItem::PreampTemp => {
+          }
+          UIMenuItem::LTBThresholds => {
+          }
+          _ => ()
+        }
       }
+      _ => ()
     }
+    //match self.ui_menu.get_active_menu_item() {
+    //  UIMenuItem::ReadoutBoards => {
+    //    self.render_rbs(master_lo, frame);
+    //    return;
+    //  }
+    //  UIMenuItem::Home => {
+    //    self.render_home(master_lo, frame);
+    //  }
+    //  _ => ()
+    //}
+    //match self.ui_menu.active_menu_item {
+    //  MenuItem::Home => {
+    //    self.render_home(master_lo, frame);
+    //  },
+    //  MenuItem::TofEvents => {
+    //    self.render_events(master_lo, frame);
+    //  },
+    //  MenuItem::TOFCpu => { 
+    //    self.render_cpu(master_lo, frame);
+    //  },
+    //  MenuItem::MasterTrigger => {
+    //    self.render_mt(master_lo, frame);
+    //  },
+    //  MenuItem::ReadoutBoards => {
+    //    if self.wf_tab.view == RBTabView::PAMoniData {
+    //      self.render_pamonidatatab(master_lo, frame);
+    //    } else {
+    //      self.render_rbs(master_lo, frame);
+    //    }
+    //  },
+    //  MenuItem::Settings => {
+    //    self.render_settings(master_lo, frame);
+    //  },
+    //  MenuItem::TofHits => {
+    //    self.render_tofhittab(master_lo, frame);
+    //  }
+    //  MenuItem::RBWaveform => {
+    //    self.render_rbwaveformtab(master_lo, frame);
+    //  }
+    //  MenuItem::TofSummary => {
+    //    self.render_tofsummarytab(master_lo, frame);
+    //  }
+    //  MenuItem::Telemetry => {
+    //    self.render_telemetrytab(master_lo, frame);
+    //  }
+    //  _ => {
+    //    self.ui_menu.render(&master_lo.rect[0], frame);
+    //  }
+    //}
   }
 
   /// Perform actions depending on the input.
@@ -806,187 +977,435 @@ impl<'a> TabbedInterface<'a> {
   /// close the app
   pub fn digest_input(&mut self, key_code : KeyCode)
   -> bool {
-    match self.ui_menu.active_menu_item {
-      // if we are in the RBTab, 
-      // route input accordingly
-      MenuItem::Settings   => {
-        match key_code {
-          KeyCode::Char('h') => self.ui_menu.active_menu_item = MenuItem::Home,
-          KeyCode::Char('a') => {
-            self.settings_tab.ctl_active = true;
-            self.settings_tab.ctl_state.select(Some(0));
-          }
-          KeyCode::Up  => {
-            if self.settings_tab.ctl_active {
-              self.settings_tab.previous_ct();
-              match self.settings_tab.get_colorset() {
-                None => info!("Did not get a new colorset!"),
-                Some(cs) => {
-                  self.update_color_theme(cs);
-                }
-              }
-            }
-          },
-          KeyCode::Down => {
-            if self.settings_tab.ctl_active {
-              self.settings_tab.next_ct();
-              match self.settings_tab.get_colorset() {
-                None => info!("Did not get a new colorset!"),
-                Some(cs) => {
-                  self.update_color_theme(cs);
-                }
-              }
-            }
-          },
-          KeyCode::Char('q') => {
-            return true; // we want to quit
-                         // the app
-          },
-          _ => (),
+    if self.quit_request {
+      match key_code {
+        KeyCode::Char('Y') => {
+          return true;
         }
-      },
-      MenuItem::ReadoutBoards => {
-        self.settings_tab.ctl_active = false;
-
-        match key_code {
-          KeyCode::Right => {
-            if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-              self.wf_tab.list_focus = RBLTBListFocus::LTBList;
-            }
-          },
-          KeyCode::Left => {
-            if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-              self.wf_tab.list_focus = RBLTBListFocus::RBList;
-            }
-          },
-          KeyCode::Up  => {
-            if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-              match self.wf_tab.list_focus {
-                RBLTBListFocus::RBList => {
-                  self.wf_tab.previous_rb();
-                },
-                RBLTBListFocus::LTBList => {
-                  self.wf_tab.previous_ltb();    
-                }
+        _ => {
+          self.quit_request = false;
+        }
+      }
+    }
+    match key_code {
+      KeyCode::Char('a') => {
+        if self.ui_menu.get_active_menu_item() == UIMenuItem::Settings {
+          self.settings_tab.ctl_active = true;
+          self.settings_tab.ctl_state.select(Some(0));
+        }
+      }
+      KeyCode::Enter => {
+        //info!("{:?}", self.ui_menu.get_active_menu_item());
+        match self.active_menu {
+          ActiveMenu::Events  => {
+            match self.te_menu.get_active_menu_item() {
+              UIMenuItem::Back => {
+                self.ui_menu.set_active_menu_item(UIMenuItem::Home);
+                self.ui_menu.active_menu_item = MenuItem::Home;
+                self.active_menu = ActiveMenu::MainMenu;
               }
-            }
-          },
-          KeyCode::Down => {
-            if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-              match self.wf_tab.list_focus {
-                RBLTBListFocus::RBList => {
-                  self.wf_tab.next_rb();
-                },
-                RBLTBListFocus::LTBList => {
-                  self.wf_tab.next_ltb();    
-                }
-              }
-            }
-          },
-          KeyCode::Char('h') => {
-            self.ui_menu.active_menu_item = MenuItem::Home;
-            self.rb_menu.active_menu_item = RBMenuItem::Home;
-          },
-          KeyCode::Char('i') => {
-            if self.wf_tab.view == RBTabView::PAMoniData {
-              self.pa_menu.active_menu_item = PAMoniMenuItem::Biases;
-              self.wf_tab.pa_show_biases = true;
-            } else {
-              self.rb_menu.active_menu_item = RBMenuItem::Info;
-              self.wf_tab.view = RBTabView::Info;
-            }
-          },
-          KeyCode::Char('w') => {
-            self.rb_menu.active_menu_item = RBMenuItem::Waveforms;
-            self.wf_tab.view = RBTabView::Waveform;
-          },
-          KeyCode::Char('r') => {
-            self.rb_menu.active_menu_item = RBMenuItem::RBMoniData;
-            self.wf_tab.view = RBTabView::RBMoniData;
-          },
-          KeyCode::Char('p') => {
-            self.rb_menu.active_menu_item = RBMenuItem::PAMoniData;
-            self.wf_tab.view = RBTabView::PAMoniData;
-          },
-          KeyCode::Char('b') => {
-            if self.wf_tab.view == RBTabView::PAMoniData {
-              self.pa_menu.active_menu_item = PAMoniMenuItem::Back;
-              self.wf_tab.view = RBTabView::Info;
-            } else {
-              self.rb_menu.active_menu_item = RBMenuItem::PBMoniData;
-              self.wf_tab.view = RBTabView::PBMoniData;
-            }
-          },
-          KeyCode::Char('l') => {
-            self.rb_menu.active_menu_item = RBMenuItem::LTBMoniData;
-            self.wf_tab.view = RBTabView::LTBMoniData;
-          },
-          KeyCode::Char('s') => {
-            self.rb_menu.active_menu_item = RBMenuItem::SelectRB;
-            self.wf_tab.view = RBTabView::SelectRB;
-          },
-          KeyCode::Char('t') => {
-            if self.wf_tab.view == RBTabView::PAMoniData {
-              self.pa_menu.active_menu_item = PAMoniMenuItem::Temperatures;
-              self.wf_tab.pa_show_biases = false;
+              _ => ()
             }
           }
-          KeyCode::Char('q') => {
-            return true; // we want to quit the app
-          },
+          //ActiveMenu::Trigger => {
+          //  match self.mt_menu.get_active_menu_item() {
+          //    UIMenuItem::Back => {
+          //      self.ui_menu.set_active_menu_item(UIMenuItem::Home);
+          //      self.ui_menu.active_menu_item = MenuItem::Home;
+          //      self.active_menu = ActiveMenu::MainMenu;
+          //    }
+          //    _ => ()
+          //  }
+          //}
+          ActiveMenu::Paddles => {
+            match self.pd_tab.menu.get_active_menu_item() {
+              UIMenuItem::Back => {
+                self.ui_menu.set_active_menu_item(UIMenuItem::Paddles);
+                //self.ui_menu.active_menu_item = MenuItem::Home;
+                self.active_menu = ActiveMenu::MainMenu;
+              }
+              _ => ()
+            }
+          }
+          ActiveMenu::Monitoring => {
+            match self.mo_menu.get_active_menu_item() {
+              UIMenuItem::Back => {
+                self.ui_menu.set_active_menu_item(UIMenuItem::Home);
+                self.ui_menu.active_menu_item = MenuItem::Home;
+                self.active_menu = ActiveMenu::MainMenu;
+              }
+              _ => ()
+            }
+          }
+          ActiveMenu::RBMenu => {
+            match self.rb_menu.get_active_menu_item() {
+              UIMenuItem::Back => {
+                self.ui_menu.set_active_menu_item(UIMenuItem::ReadoutBoards);
+                self.ui_menu.active_menu_item = MenuItem::ReadoutBoards;
+                self.active_menu = ActiveMenu::MainMenu;
+              }
+              _ => ()
+            }
+          }
+          ActiveMenu::MainMenu => {
+            match self.ui_menu.get_active_menu_item() {
+              UIMenuItem::ReadoutBoards => {
+                //self.rb_menu.set_active_menu_item(UIMenuItem::Back);
+                info!("Setting active menu to RBMenu!");
+                self.active_menu = ActiveMenu::RBMenu;
+              }
+              UIMenuItem::Trigger => {
+                self.active_menu = ActiveMenu::Trigger;
+              }
+              UIMenuItem::Events => {
+                self.active_menu = ActiveMenu::Events;
+              }
+              UIMenuItem::Monitoring => {
+                self.active_menu = ActiveMenu::Monitoring;
+              }
+              UIMenuItem::Paddles => {
+                self.active_menu = ActiveMenu::Paddles;
+              }
+              UIMenuItem::Quit => {
+                info!("Feeling a desire of the user to quit this application...");
+                self.quit_request = true;
+              }
+              _ => ()
+            }
+          }
           _ => ()
         }
-      },
-      MenuItem::TofHits => {
-        match key_code {
-          KeyCode::Char('h') => {
-            self.ui_menu.active_menu_item = MenuItem::Home;
-            self.th_menu.active_menu_item = THMenuItem::Home;
-            self.th_tab.view = TofHitView::Pulses;
+      }
+      KeyCode::Right => {
+        match self.active_menu {
+          ActiveMenu::MainMenu => {
+            self.ui_menu.next();
           }
-          KeyCode::Char('i') => {
-            self.th_menu.active_menu_item = THMenuItem::Hits;
-            self.th_tab.view = TofHitView::Hits;
+          ActiveMenu::RBMenu => {
+            self.rb_menu.next();
+            match self.rb_menu.get_active_menu_item() {
+              UIMenuItem::Back => {
+                self.wf_tab.view = RBTabView::SelectRB; 
+              }
+              UIMenuItem::Waveforms => {
+                self.wf_tab.view = RBTabView::Waveform; 
+              }
+              UIMenuItem::RBMoniData => {
+                self.wf_tab.view = RBTabView::RBMoniData;
+              }
+              UIMenuItem::PAMoniData => {
+                self.wf_tab.view = RBTabView::PAMoniData;
+              }
+              UIMenuItem::PBMoniData => {
+                self.wf_tab.view = RBTabView::PBMoniData;
+              }
+              UIMenuItem::LTBMoniData => {
+                self.wf_tab.view = RBTabView::LTBMoniData; 
+              }
+              _ => ()
+            }
           }
-          KeyCode::Char('p') => {
-            self.th_menu.active_menu_item = THMenuItem::Pulses;
-            self.th_tab.view = TofHitView::Pulses;
+          ActiveMenu::Paddles => {
+            self.pd_tab.menu.next();
           }
-          KeyCode::Char('a') => {
-            self.th_menu.active_menu_item = THMenuItem::Paddles;
-            self.th_tab.view = TofHitView::Paddles;
+          //ActiveMenu::Trigger => {
+          //  self.mt_menu.next();
+          //}
+          ActiveMenu::Events => {
+            self.te_menu.next();
           }
-          KeyCode::Char('s') => {
-            self.th_menu.active_menu_item = THMenuItem::SelectPaddle;
-            self.th_tab.view = TofHitView::SelectPaddle;
-          }
-          KeyCode::Char('q') => {
-            return true; // we want to quit the app
+          ActiveMenu::Monitoring => {
+            self.mo_menu.next();
           }
           _ => ()
+        }
+      }
+      KeyCode::Left => {
+        match self.active_menu {
+          ActiveMenu::MainMenu => {
+            self.ui_menu.prev();
+          }
+          ActiveMenu::RBMenu => {
+            self.rb_menu.prev();
+            match self.rb_menu.get_active_menu_item() {
+              UIMenuItem::Back => {
+                self.wf_tab.view = RBTabView::SelectRB; 
+              }
+              UIMenuItem::Waveforms => {
+                self.wf_tab.view = RBTabView::Waveform; 
+              }
+              UIMenuItem::RBMoniData => {
+                self.wf_tab.view = RBTabView::RBMoniData;
+              }
+              UIMenuItem::PAMoniData => {
+                self.wf_tab.view = RBTabView::PAMoniData;
+              }
+              UIMenuItem::PBMoniData => {
+                self.wf_tab.view = RBTabView::PBMoniData;
+              }
+              UIMenuItem::LTBMoniData => {
+                self.wf_tab.view = RBTabView::LTBMoniData; 
+              }
+              _ => ()
+            }
+          }
+          //ActiveMenu::Trigger => {
+          //  self.mt_menu.prev();
+          //}
+          ActiveMenu::Paddles => {
+            self.pd_tab.menu.prev();
+          }
+          ActiveMenu::Events => {
+            self.te_menu.prev();
+          }
+          ActiveMenu::Monitoring => {
+            self.mo_menu.prev();
+          }
+          _ => ()
+        }
+      }
+      KeyCode::Down => {
+        if self.settings_tab.ctl_active {
+          self.settings_tab.next_ct();
+          match self.settings_tab.get_colorset() {
+            None => info!("Did not get a new colorset!"),
+            Some(cs) => {
+              self.update_color_theme(cs);
+            }
+          }
+        }
+        // Paddle lsit
+        if self.active_menu == ActiveMenu::MainMenu && self.ui_menu.get_active_menu_item() == UIMenuItem::Paddles {
+          self.pd_tab.next_pd();
+          //info!("selected rb {}", self.wf_tab.rb_selector);
+        }
+        if self.active_menu == ActiveMenu::Paddles && self.pd_tab.menu.get_active_menu_item() == UIMenuItem::Back {
+          self.pd_tab.next_pd();
+        }
+        // RB list
+        if self.active_menu == ActiveMenu::MainMenu && self.ui_menu.get_active_menu_item() == UIMenuItem::ReadoutBoards {
+          self.wf_tab.next_rb();
+          //info!("selected rb {}", self.wf_tab.rb_selector);
+        }
+        if self.active_menu == ActiveMenu::RBMenu && self.rb_menu.get_active_menu_item() == UIMenuItem::Back {
+          self.wf_tab.next_rb();
+        }
+      }
+      KeyCode::Up => {
+        if self.settings_tab.ctl_active {
+          self.settings_tab.previous_ct();
+          match self.settings_tab.get_colorset() {
+            None => info!("Did not get a new colorset!"),
+            Some(cs) => {
+              self.update_color_theme(cs);
+            }
+          }
+        }
+        // Paddle lsit
+        if self.active_menu == ActiveMenu::MainMenu && self.ui_menu.get_active_menu_item() == UIMenuItem::Paddles {
+          self.pd_tab.prev_pd();
+          //info!("selected rb {}", self.wf_tab.rb_selector);
+        }
+        if self.active_menu == ActiveMenu::Paddles && self.pd_tab.menu.get_active_menu_item() == UIMenuItem::Back {
+          self.pd_tab.prev_pd();
+        }
+        if self.active_menu == ActiveMenu::MainMenu && self.ui_menu.get_active_menu_item() == UIMenuItem::ReadoutBoards {
+          self.wf_tab.previous_rb();
+        }
+        if self.active_menu == ActiveMenu::RBMenu && self.rb_menu.get_active_menu_item() == UIMenuItem::Back {
+          self.wf_tab.previous_rb();
         }
       }
       _ => {
         self.settings_tab.ctl_active = false;
-        match key_code {
-          // it seems we have to carry thos allong for every tab
-          KeyCode::Char('h') => self.ui_menu.active_menu_item = MenuItem::Home,
-          KeyCode::Char('t') => self.ui_menu.active_menu_item = MenuItem::TofEvents,
-          KeyCode::Char('r') => self.ui_menu.active_menu_item = MenuItem::ReadoutBoards,
-          KeyCode::Char('y') => self.ui_menu.active_menu_item = MenuItem::TofSummary,
-          KeyCode::Char('w') => self.ui_menu.active_menu_item = MenuItem::RBWaveform,
-          KeyCode::Char('f') => self.ui_menu.active_menu_item = MenuItem::TofHits,
-          KeyCode::Char('e') => self.ui_menu.active_menu_item = MenuItem::Telemetry,
-          KeyCode::Char('s') => self.ui_menu.active_menu_item = MenuItem::Settings,
-          KeyCode::Char('m') => self.ui_menu.active_menu_item = MenuItem::MasterTrigger,
-          KeyCode::Char('c') => self.ui_menu.active_menu_item = MenuItem::TOFCpu,
-          KeyCode::Char('q') => {
-            return true; // trigger exit
-          },
-          _ => trace!("Some other key pressed!"),
-        }
       }
-    } // end match ui_menu
+    }
+    //match self.ui_menu.active_menu_item {
+    //  // if we are in the RBTab, 
+    //  // route input accordingly
+    //  MenuItem::Settings   => {
+    //    match key_code {
+    //      KeyCode::Char('h') => self.ui_menu.active_menu_item = MenuItem::Home,
+    //      KeyCode::Char('a') => {
+    //        self.settings_tab.ctl_active = true;
+    //        self.settings_tab.ctl_state.select(Some(0));
+    //      }
+    //      KeyCode::Up  => {
+    //        if self.settings_tab.ctl_active {
+    //          self.settings_tab.previous_ct();
+    //          match self.settings_tab.get_colorset() {
+    //            None => info!("Did not get a new colorset!"),
+    //            Some(cs) => {
+    //              self.update_color_theme(cs);
+    //            }
+    //          }
+    //        }
+    //      },
+    //      KeyCode::Down => {
+    //        if self.settings_tab.ctl_active {
+    //          self.settings_tab.next_ct();
+    //          match self.settings_tab.get_colorset() {
+    //            None => info!("Did not get a new colorset!"),
+    //            Some(cs) => {
+    //              self.update_color_theme(cs);
+    //            }
+    //          }
+    //        }
+    //      },
+    //      KeyCode::Char('q') => {
+    //        self.quit_request = true;
+    //        //return true; // we want to quit
+    //                     // the app
+    //      },
+    //      _ => (),
+    //    }
+    //  },
+    //  MenuItem::ReadoutBoards => {
+    //    self.settings_tab.ctl_active = false;
+
+    //    match key_code {
+    //      KeyCode::Right => {
+    //        if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
+    //          self.wf_tab.list_focus = RBLTBListFocus::LTBList;
+    //        }
+    //      },
+    //      KeyCode::Left => {
+    //        if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
+    //          self.wf_tab.list_focus = RBLTBListFocus::RBList;
+    //        }
+    //      },
+    //      KeyCode::Up  => {
+    //        if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
+    //          match self.wf_tab.list_focus {
+    //            RBLTBListFocus::RBList => {
+    //              self.wf_tab.previous_rb();
+    //            },
+    //            RBLTBListFocus::LTBList => {
+    //              self.wf_tab.previous_ltb();    
+    //            }
+    //          }
+    //        }
+    //      },
+    //      KeyCode::Down => {
+    //        if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
+    //          match self.wf_tab.list_focus {
+    //            RBLTBListFocus::RBList => {
+    //              self.wf_tab.next_rb();
+    //            },
+    //            RBLTBListFocus::LTBList => {
+    //              self.wf_tab.next_ltb();    
+    //            }
+    //          }
+    //        }
+    //      },
+    //      KeyCode::Char('h') => {
+    //        self.ui_menu.active_menu_item = MenuItem::Home;
+    //        self.rb_menu.active_menu_item = RBMenuItem::Home;
+    //      },
+    //      KeyCode::Char('i') => {
+    //        if self.wf_tab.view == RBTabView::PAMoniData {
+    //          self.pa_menu.active_menu_item = PAMoniMenuItem::Biases;
+    //          self.wf_tab.pa_show_biases = true;
+    //        } else {
+    //          self.rb_menu.active_menu_item = RBMenuItem::Info;
+    //          self.wf_tab.view = RBTabView::Info;
+    //        }
+    //      },
+    //      KeyCode::Char('w') => {
+    //        self.rb_menu.active_menu_item = RBMenuItem::Waveforms;
+    //        self.wf_tab.view = RBTabView::Waveform;
+    //      },
+    //      KeyCode::Char('r') => {
+    //        self.rb_menu.active_menu_item = RBMenuItem::RBMoniData;
+    //        self.wf_tab.view = RBTabView::RBMoniData;
+    //      },
+    //      KeyCode::Char('p') => {
+    //        self.rb_menu.active_menu_item = RBMenuItem::PAMoniData;
+    //        self.wf_tab.view = RBTabView::PAMoniData;
+    //      },
+    //      KeyCode::Char('b') => {
+    //        if self.wf_tab.view == RBTabView::PAMoniData {
+    //          self.pa_menu.active_menu_item = PAMoniMenuItem::Back;
+    //          self.wf_tab.view = RBTabView::Info;
+    //        } else {
+    //          self.rb_menu.active_menu_item = RBMenuItem::PBMoniData;
+    //          self.wf_tab.view = RBTabView::PBMoniData;
+    //        }
+    //      },
+    //      KeyCode::Char('l') => {
+    //        self.rb_menu.active_menu_item = RBMenuItem::LTBMoniData;
+    //        self.wf_tab.view = RBTabView::LTBMoniData;
+    //      },
+    //      KeyCode::Char('s') => {
+    //        self.rb_menu.active_menu_item = RBMenuItem::SelectRB;
+    //        self.wf_tab.view = RBTabView::SelectRB;
+    //      },
+    //      KeyCode::Char('t') => {
+    //        if self.wf_tab.view == RBTabView::PAMoniData {
+    //          self.pa_menu.active_menu_item = PAMoniMenuItem::Temperatures;
+    //          self.wf_tab.pa_show_biases = false;
+    //        }
+    //      }
+    //      KeyCode::Char('q') => {
+    //        self.quit_request = true;
+    //        //return true; // we want to quit the app
+    //      },
+    //      _ => ()
+    //    }
+    //  },
+    //  MenuItem::TofHits => {
+    //    match key_code {
+    //      KeyCode::Char('h') => {
+    //        self.ui_menu.active_menu_item = MenuItem::Home;
+    //        self.th_menu.active_menu_item = THMenuItem::Home;
+    //        self.th_tab.view = TofHitView::Pulses;
+    //      }
+    //      KeyCode::Char('i') => {
+    //        self.th_menu.active_menu_item = THMenuItem::Hits;
+    //        self.th_tab.view = TofHitView::Hits;
+    //      }
+    //      KeyCode::Char('p') => {
+    //        self.th_menu.active_menu_item = THMenuItem::Pulses;
+    //        self.th_tab.view = TofHitView::Pulses;
+    //      }
+    //      KeyCode::Char('a') => {
+    //        self.th_menu.active_menu_item = THMenuItem::Paddles;
+    //        self.th_tab.view = TofHitView::Paddles;
+    //      }
+    //      KeyCode::Char('s') => {
+    //        self.th_menu.active_menu_item = THMenuItem::SelectPaddle;
+    //        self.th_tab.view = TofHitView::SelectPaddle;
+    //      }
+    //      KeyCode::Char('q') => {
+    //        self.quit_request = true;
+    //        //return true; // we want to quit the app
+    //      }
+    //      _ => ()
+    //    }
+    //  }
+    //  _ => {
+    //    self.settings_tab.ctl_active = false;
+    //    match key_code {
+    //      // it seems we have to carry thos allong for every tab
+    //      KeyCode::Char('h') => self.ui_menu.active_menu_item = MenuItem::Home,
+    //      KeyCode::Char('t') => self.ui_menu.active_menu_item = MenuItem::TofEvents,
+    //      KeyCode::Char('r') => self.ui_menu.active_menu_item = MenuItem::ReadoutBoards,
+    //      KeyCode::Char('y') => self.ui_menu.active_menu_item = MenuItem::TofSummary,
+    //      KeyCode::Char('w') => self.ui_menu.active_menu_item = MenuItem::RBWaveform,
+    //      KeyCode::Char('f') => self.ui_menu.active_menu_item = MenuItem::TofHits,
+    //      KeyCode::Char('e') => self.ui_menu.active_menu_item = MenuItem::Telemetry,
+    //      KeyCode::Char('s') => self.ui_menu.active_menu_item = MenuItem::Settings,
+    //      KeyCode::Char('m') => self.ui_menu.active_menu_item = MenuItem::MasterTrigger,
+    //      KeyCode::Char('c') => self.ui_menu.active_menu_item = MenuItem::TOFCpu,
+    //      KeyCode::Char('q') => {
+    //        self.quit_request = true;
+    //        //return true; // trigger exit
+    //      },
+    //      _ => trace!("Some other key pressed!"),
+    //    }
+    //  }
+    //} // end match ui_menu
+    info!("Returning false");
     false // if we arrive here, we don't
           // want to exit the app
   }
@@ -999,6 +1418,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let home_stream_wd_cnt : Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
   let home_streamer      = home_stream_wd_cnt.clone();
 
+  // calibrations for everybody!
+  let rbcalibrations : Arc<Mutex<HashMap<u8, RBCalibrations>>> = Arc::new(Mutex::new(HashMap::<u8, RBCalibrations>::new()));
   // prepare calibrations
   let mut readoutboards = HashMap::<u8, ReadoutBoard>::new();
   let mut rb_conn = connect_to_db(String::from("gaps_flight2.db")).expect("Will need database access. Make sure gaps_flight2.db is installed!");
@@ -1008,13 +1429,22 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     match rb.load_latest_calibration() {
       Err(err) => error!("Unable to load calibration for {}! {}", rb, err),
       Ok(_) => {
-        readoutboards.insert(rb.rb_id, rb);
+        match rbcalibrations.lock() {
+          Err(err)  => error!("Unable to lock rbcalibrations mutex!"),
+          Ok(mut rbcal) => {
+            rbcal.insert(rb.rb_id as u8, rb.calibration.clone()); 
+          }
+        }
+        readoutboards.insert(rb.rb_id as u8, rb);
       }
     }
   }
   let paddles = Paddle::all(&mut rb_conn).expect("Database corrupt!");
   let dsijch_paddle_map = get_dsi_j_ch_pid_map(&paddles);
-
+  let mut paddle_map = HashMap::<u8, Paddle>::new();
+  for pdl in paddles {
+    paddle_map.insert(pdl.paddle_id as u8, pdl.clone());
+  }
   let mut pm = HashMap::<String, usize>::new();
   pm.insert(String::from("Unknown"          ) ,0);
   pm.insert(String::from("RBEvent"          ) ,0); 
@@ -1057,6 +1487,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (rbe_send, rbe_recv)         : (Sender<RBEvent>, Receiver<RBEvent>)                       = unbounded();
   let (th_send, th_recv)           : (Sender<TofHit>, Receiver<TofHit>)                         = unbounded();
   let (ts_send, ts_recv)           : (Sender<TofEventSummary>, Receiver<TofEventSummary>)       = unbounded();
+  let (tr_send, tr_recv)           : (Sender<TofResponse>, Receiver<TofResponse>)               = unbounded();
+  let (te_send, te_recv)           : (Sender<TofEvent>, Receiver<TofEvent>)                     = unbounded();
 
   // depending on the switch in the 
   // commandline args, we either 
@@ -1165,6 +1597,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                        }
                        if last_tick.elapsed() >= tick_rate {
                          if let Ok(_) = tx.send(Event::Tick) {
+                           //info!("ticker : {}", last_tick.elapsed().as_micros());
                            last_tick = Instant::now();
                          }
                        }
@@ -1179,15 +1612,17 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //let mut color_set_bw    = 
   
   // The menus
-  let ui_menu         = MainMenu::new(color_theme.clone());
-  let rb_menu         = RBMenu::new(color_theme.clone());
-  let mt_menu         = MTMenu::new(color_theme.clone());
+  let ui_menu         = MainMenu2::new(color_theme.clone());
+  let rb_menu         = RBMenu2::new(color_theme.clone());
+  //let mt_menu         = MTMenu::new(color_theme.clone());
+  let mt_menu         = TriggerMenu::new(color_theme.clone());
   let st_menu         = SettingsMenu::new(color_theme.clone());
   let th_menu         = THMenu::new(color_theme.clone());
   let ts_menu         = TSMenu::new(color_theme.clone());
   let rw_menu         = RWMenu::new(color_theme.clone());
   let pa_menu         = PAMoniMenu::new(color_theme.clone());
-  let te_menu         = TEMenu::new(color_theme.clone());
+  let te_menu         = EventMenu::new(color_theme.clone());
+  let mo_menu         = MoniMenu::new(color_theme.clone());
 
   // The tabs
   let mt_tab          = MTTab::new(mt_pack_recv,
@@ -1204,7 +1639,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                    color_theme.clone());
   let settings_tab    = SettingsTab::new(color_theme.clone());
   let home_tab        = HomeTab::new(color_theme.clone(), home_streamer, packet_map_home);
-  let event_tab       = EventTab::new(ev_pack_recv, mte_send, rbe_send, th_send, color_theme);
+  let event_tab       = EventTab::new(ev_pack_recv, mte_send, rbe_send, th_send, te_send, color_theme);
   let hit_tab         = TofHitTab::new(th_recv,color_theme.clone());
   let rbwf_tab        = RBWaveformTab::new(rbwf_pack_recv,
                                            readoutboards,
@@ -1222,6 +1657,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   
   
   }
+  let cmd_tab         = CommandTab::new(tr_recv, color_theme.clone());
+  let pd_tab          = PaddleTab::new(te_recv, paddle_map, rbcalibrations, color_theme.clone());
+  let active_menu     = ActiveMenu::MainMenu;
   let tabs            = TabbedInterface::new(ui_menu,
                                              rb_menu,
                                              mt_menu,
@@ -1231,6 +1669,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                              rw_menu,
                                              pa_menu,
                                              te_menu,
+                                             mo_menu,
+                                             active_menu,
                                              mt_tab,
                                              cpu_tab,
                                              wf_tab,
@@ -1240,7 +1680,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                              hit_tab,
                                              rbwf_tab,
                                              ts_tab,
-                                             te_tab);
+                                             te_tab,
+                                             cmd_tab,
+                                             pd_tab);
 
   let shared_tabs : Arc<Mutex<TabbedInterface>> = Arc::new(Mutex::new(tabs));
   let shared_tabs_c = shared_tabs.clone();
@@ -1262,8 +1704,10 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     match rx.recv() {
       Err(err) => trace!("Err - no update! {err}"),
       Ok(event) => {
+        //info!("next event!");
         match event {
           Event::Input(ev) => {
+            //info!("input");
             match shared_tabs.lock() {
               Err(err) => error!("Unable to get lock on shared tabbed interface! {err}"),
               Ok(mut tabs) => {
@@ -1278,6 +1722,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             }
           }, 
           Event::Tick => {
+            //info!("tick");
             match shared_tabs.lock() {
               Err(err) => error!("Unable to get lock on shared tabbed interface! {err}"),
               Ok(mut tabs) => {

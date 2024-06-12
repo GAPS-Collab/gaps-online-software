@@ -45,6 +45,7 @@ pub struct EventTab {
   pub mte_sender    : Sender<MasterTriggerEvent>,
   pub rbe_sender    : Sender<RBEvent>,
   pub th_sender     : Sender<TofHit>,
+  pub te_sender     : Sender<TofEvent>,
   //pub streamer   : Arc<Mutex<VecDeque<String>>>,
   //pub pack_stat  : Arc<Mutex<HashMap<String, usize>>>,
   //pub stream     : String,
@@ -56,6 +57,7 @@ impl EventTab {
              mte_sender  : Sender<MasterTriggerEvent>,
              rbe_sender  : Sender<RBEvent>,
              th_sender   : Sender<TofHit>,
+             te_sender   : Sender<TofEvent>,
              theme       : ColorTheme) -> Self {
              //streamer  : Arc<Mutex<VecDeque<String>>>,
              //pack_stat : Arc<Mutex<HashMap<String,usize>>>) -> HomeTab<T> {
@@ -64,9 +66,10 @@ impl EventTab {
       tp_receiver,
       event_queue : VecDeque::<TofEvent>::new(),
       queue_size  : 1000,
-      mte_sender  : mte_sender,
-      rbe_sender  : rbe_sender,
-      th_sender   : th_sender,
+      mte_sender,
+      rbe_sender,  
+      th_sender,
+      te_sender
       //streamer, 
       //pack_stat,
       //stream     : String::from(""),
@@ -81,15 +84,19 @@ impl EventTab {
       },
       Ok(pack)    => {
         let ev : TofEvent = pack.unpack()?;
+        match self.te_sender.send(ev.clone()) {
+          Err(err) => error!("Can't send TofEvent! {err}"),
+          Ok(_)    => ()
+        }
         match self.mte_sender.send(ev.mt_event.clone()) {
-          Err(err) => error!("Can send MasterTriggerEvent! {err}"),
+          Err(err) => error!("Can't send MasterTriggerEvent! {err}"),
           Ok(_)    => ()
         }
         for k in ev.rb_events.iter() {
           let rb_ev = k.clone();
           for h in rb_ev.hits.iter() {
             match self.th_sender.send(h.clone()) {
-              Err(err) => error!("Can not send TofHit! {err}"),
+              Err(err) => error!("Can't send TofHit! {err}"),
               Ok(_)    => ()
             }
           }

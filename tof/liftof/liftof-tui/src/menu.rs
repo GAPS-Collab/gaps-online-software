@@ -11,7 +11,18 @@ use crate::colors::{
     ColorTheme
 };
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum ActiveMenu {
+  MainMenu,
+  RBMenu,
+  Paddles,
+  Trigger,
+  Events,
+  Monitoring,
+}
+
+
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum MenuItem {
   Home,
   //Status,
@@ -51,6 +62,548 @@ impl From<MenuItem> for usize {
     }   
   }
 }
+
+
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum UIMenuItem {
+  Unknown,
+  // main menu
+  Home,
+  Back,
+  Events,
+  ReadoutBoards,
+  Paddles,
+  Trigger,
+  Monitoring,
+  Telemetry,
+  Commands,
+  Settings,
+  Quit,
+  // rb menu
+  Waveforms,
+  RBMoniData,
+  PAMoniData,
+  PBMoniData,
+  LTBMoniData,
+  SelectBoard,
+  // event menu
+  TofSummary,
+  TofEvents,
+  TofHits,
+  RBWaveform,
+  // moni menu
+  PreampBias,
+  PreampTemp,
+  LTBThresholds,
+  // paddle menu
+  Signal,
+  RecoVars
+}
+
+impl UIMenuItem {
+
+  pub fn get_title(&self, theme : ColorTheme) -> String {
+    match self {
+      UIMenuItem::Unknown        => String::from("Unknown"       ),
+      UIMenuItem::Home           => String::from("Home"          ),
+      UIMenuItem::Back           => String::from("Back"          ),
+      UIMenuItem::Events         => String::from("Events"        ),
+      UIMenuItem::ReadoutBoards  => String::from("ReadoutBoards" ),
+      UIMenuItem::Trigger        => String::from("Trigger"       ),
+      UIMenuItem::Monitoring     => String::from("Monitoring"    ),
+      UIMenuItem::Telemetry      => String::from("Telemetry"     ),
+      UIMenuItem::Settings       => String::from("Settings"      ),
+      UIMenuItem::Commands       => String::from("Commands"      ),
+      UIMenuItem::Quit           => String::from("Quit"          ),
+      UIMenuItem::Waveforms      => String::from("Waveforms"     ),
+      UIMenuItem::RBMoniData     => String::from("RBMoniData"    ),
+      UIMenuItem::PAMoniData     => String::from("PAMoniData"    ),
+      UIMenuItem::PBMoniData     => String::from("PBMoniData"    ),
+      UIMenuItem::LTBMoniData    => String::from("LTBMoniData"   ),
+      UIMenuItem::SelectBoard    => String::from("SelectBoard"   ),
+      UIMenuItem::TofSummary     => String::from("TofSummary"    ),
+      UIMenuItem::TofEvents      => String::from("TofEvents"     ),
+      UIMenuItem::TofHits        => String::from("TofHits"       ),
+      UIMenuItem::RBWaveform     => String::from("RBWaveform"    ),
+      UIMenuItem::PreampBias     => String::from("Preamp Bias Voltages"   ),
+      UIMenuItem::PreampTemp     => String::from("Preamp Temps"),
+      UIMenuItem::LTBThresholds  => String::from("LTBThresholds"),
+      UIMenuItem::Quit           => String::from("Quit"),
+      UIMenuItem::Paddles        => String::from("Paddles"),
+      UIMenuItem::Signal         => String::from("Wf & Charge"),
+      UIMenuItem::RecoVars       => String::from("Reco Vars"),
+      _ => String::from("Unknown"),
+    } 
+  }
+}
+
+
+pub trait UIMenu<'a> {
+
+  fn get_max_idx() -> usize {
+    Self::get_items().len() - 1
+  }
+
+  fn get_items() -> Vec<UIMenuItem>;
+
+  fn get_active_menu_item(&self) -> UIMenuItem;
+
+  fn set_active_menu_item(&mut self, item : UIMenuItem);
+
+  fn get_active_idx(&self) -> usize;
+
+  fn set_active_idx(&mut self, idx : usize);
+ 
+  fn get_theme(&self) -> ColorTheme;
+
+  fn get_titles(theme : ColorTheme) -> Vec<Line<'a>> {
+    let mut titles = Vec::<Line>::new();
+    for item in Self::get_items().clone() {
+      let ti = item.get_title(theme).clone();
+      let line =  Line::from(vec![Span::styled(ti, theme.style()),]);
+      titles.push(line);
+    }
+    titles
+  }
+
+  fn next(&mut self) {
+    if self.get_active_idx() + 1 > Self::get_max_idx() {
+      self.set_active_menu_item(Self::get_items()[0]);
+      self.set_active_idx(0);
+    } else {
+      self.set_active_menu_item(Self::get_items()[self.get_active_idx() + 1]);
+      self.set_active_idx(self.get_active_idx() + 1);
+    }
+  }
+
+  fn prev(&mut self) {
+    if self.get_active_idx() == 0 {
+      self.set_active_menu_item(Self::get_items()[Self::get_max_idx()]);
+      self.set_active_idx(Self::get_max_idx());
+    } else {
+      self.set_active_menu_item(Self::get_items()[self.get_active_idx() -1]);
+      self.set_active_idx(self.get_active_idx() - 1);
+    }
+  }
+  
+  fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
+    let theme = self.get_theme();
+    let tabs = Tabs::new(Self::get_titles(theme))
+      .select(self.get_active_idx())
+      .block(Block::default().title("Menu").borders(Borders::ALL))
+      .style(self.get_theme().style())
+      .highlight_style(self.get_theme().highlight())
+      .divider(Span::raw("|"));
+    frame.render_widget(tabs, *main_window);
+  }
+}
+
+
+#[derive(Debug, Clone)]
+pub struct MainMenu2<'a> {
+  pub theme        : ColorTheme,
+  pub active_index : usize,
+  pub titles       : Vec<Line<'a>>,
+  pub active_menu_item : MenuItem,
+  pub active_menu_item2 : UIMenuItem,
+}
+
+impl UIMenu<'_> for MainMenu2<'_> {
+  
+  fn get_items() -> Vec<UIMenuItem> {
+    let items = vec![UIMenuItem::Home,
+                     UIMenuItem::Events,
+                     UIMenuItem::ReadoutBoards,
+                     UIMenuItem::Paddles,
+                     UIMenuItem::Trigger,
+                     UIMenuItem::Monitoring,
+                     UIMenuItem::Telemetry,
+                     UIMenuItem::Commands,
+                     UIMenuItem::Settings,
+                     UIMenuItem::Quit];
+    items
+  }
+
+  fn get_theme(&self) -> ColorTheme {
+    self.theme.clone()
+  }
+
+  fn set_active_menu_item(&mut self, item : UIMenuItem) {
+    self.active_menu_item2 = item;
+  }
+
+  fn set_active_idx(&mut self, idx : usize) {
+    self.active_index = idx;
+  }
+
+  fn get_active_idx(&self) -> usize {
+    self.active_index
+  }
+  
+  //fn get_titles(&self) -> Vec<Line> {
+  //  self.titles.clone()
+  //}
+  fn get_active_menu_item(&self) -> UIMenuItem {
+    self.active_menu_item2
+  }
+
+  //fn get_active_menu_item(&self) -> UIMenuItem {
+  //  match self.active_index {
+  //    0 => UIMenuItem::Home,
+  //    1 => UIMenuItem::Events,
+  //    2 => UIMenuItem::ReadoutBoards,
+  //    3 => UIMenuItem::Trigger,
+  //    4 => UIMenuItem::Monitoring,
+  //    5 => UIMenuItem::Telemetry,
+  //    6 => UIMenuItem::Commands,
+  //    7 => UIMenuItem::Quit,
+  //    _ => UIMenuItem::Unknown
+  //  }
+  //}
+}
+
+impl MainMenu2<'_> {
+  pub fn new(theme : ColorTheme) -> Self {
+    //let title_str  =  vec!["Home", "Events",
+    //                       "Readoutboards", 
+    //                       "Trigger", "Monitoring",
+    //                       "Telemetry", "Commands",
+    //                       "Quit"];
+
+    //let titles : Vec<Line> = title_str
+    //            .iter()
+    //            .map(|t| {
+    //               Line::from(vec![
+    //                 Span::styled(*t, theme.style()),
+    //               ])
+    //            })
+    //            .collect();
+    // 
+    let titles = Self::get_titles(theme);
+    let theme_cl = theme.clone();
+    Self {
+      theme : theme_cl,
+      active_index : 0,
+      titles,
+      active_menu_item : MenuItem::Home,
+      active_menu_item2 : UIMenuItem::Home,
+    }
+  }
+}
+
+//======================================
+
+#[derive(Debug, Clone)]
+pub struct RBMenu2<'a>  {
+  pub theme            : ColorTheme,
+  pub active_menu_item : RBMenuItem,
+  pub active_menu_item2 : UIMenuItem,
+  pub active_index     : usize, 
+  pub titles           : Vec<Line<'a>>,
+}
+
+impl UIMenu<'_> for RBMenu2<'_> {
+  
+  fn get_items() -> Vec<UIMenuItem> {
+    let items = vec![UIMenuItem::Back,
+                     UIMenuItem::Waveforms,
+                     UIMenuItem::RBMoniData,
+                     UIMenuItem::PBMoniData,
+                     UIMenuItem::PAMoniData,
+                     UIMenuItem::LTBMoniData,
+                     //UIMenuItem::SelectBoard,
+                     UIMenuItem::Quit];
+    items
+  }
+
+  fn get_theme(&self) -> ColorTheme {
+    self.theme
+  }
+
+  fn set_active_idx(&mut self, idx : usize) {
+    self.active_index = idx;
+  }
+
+  fn get_active_idx(&self) -> usize {
+    self.active_index
+  }
+  
+  fn set_active_menu_item(&mut self, item : UIMenuItem) {
+    self.active_menu_item2 = item;
+  }
+  
+  //fn get_titles(&self) -> Vec<Line> {
+  //  self.titles.clone()
+  //}
+  
+  fn get_active_menu_item(&self) -> UIMenuItem {
+    match self.active_index {
+      0 => UIMenuItem::Back,
+      1 => UIMenuItem::Waveforms,
+      2 => UIMenuItem::RBMoniData,
+      3 => UIMenuItem::PAMoniData,
+      4 => UIMenuItem::PBMoniData,
+      5 => UIMenuItem::LTBMoniData,
+      6 => UIMenuItem::SelectBoard,
+      7 => UIMenuItem::Quit,
+      _ => UIMenuItem::Unknown
+    }
+  }
+}
+
+impl  RBMenu2<'_> {
+
+  pub fn new(theme : ColorTheme) -> Self {
+    let title_str  =  vec!["Back", "Waveforms",
+                           "RBMoniData", 
+                           "PBMoniData", "PAMoniData",
+                           "LTBMoniData",
+                           "SelectBoards [LTB & RB]",
+                           "Quit"];
+
+    let titles : Vec<Line> = title_str
+                .iter()
+                .map(|t| {
+                   Line::from(vec![
+                     Span::styled(*t, theme.style()),
+                   ])
+                })
+                .collect();
+ 
+    let n_titles = titles.len();
+    Self {
+      theme,
+      active_index : 0,
+      titles,
+      active_menu_item : RBMenuItem::Home,
+      active_menu_item2 : UIMenuItem::Home,
+    }
+  }
+}
+
+#[derive(Debug, Clone)]
+pub struct TriggerMenu<'a>  {
+  pub theme            : ColorTheme,
+  pub active_menu_item : UIMenuItem,
+  pub active_index     : usize, 
+  pub titles           : Vec<Line<'a>>,
+}
+
+impl UIMenu<'_> for TriggerMenu<'_> {
+  
+  fn get_items() -> Vec<UIMenuItem> {
+    let items = vec![UIMenuItem::Back,
+                     UIMenuItem::Quit];
+    items
+  }
+
+  fn get_theme(&self) -> ColorTheme {
+    self.theme
+  }
+
+  fn set_active_idx(&mut self, idx : usize) {
+    self.active_index = idx;
+  }
+
+  fn get_active_idx(&self) -> usize {
+    self.active_index
+  }
+  
+  fn set_active_menu_item(&mut self, item : UIMenuItem) {
+    self.active_menu_item = item;
+  }
+  
+  fn get_active_menu_item(&self) -> UIMenuItem {
+    self.active_menu_item
+  }
+}
+
+impl  TriggerMenu<'_> {
+
+  pub fn new(theme : ColorTheme) -> Self {
+    let theme_c = theme.clone();
+    let titles  = Self::get_titles(theme_c);
+    let n_titles = titles.len();
+    Self {
+      theme,
+      active_index : 0,
+      titles,
+      active_menu_item : UIMenuItem::Back,
+    }
+  }
+}
+
+//============================================
+
+#[derive(Debug, Clone)]
+pub struct EventMenu<'a>  {
+  pub theme            : ColorTheme,
+  pub active_menu_item : UIMenuItem,
+  pub active_index     : usize, 
+  pub titles           : Vec<Line<'a>>,
+}
+
+impl UIMenu<'_> for EventMenu<'_> {
+  
+  fn get_items() -> Vec<UIMenuItem> {
+    let items = vec![UIMenuItem::Back,
+                     UIMenuItem::TofSummary,
+                     UIMenuItem::TofHits,
+                     UIMenuItem::RBWaveform,
+                     UIMenuItem::Quit];
+    items
+  }
+
+  fn get_theme(&self) -> ColorTheme {
+    self.theme
+  }
+
+  fn set_active_idx(&mut self, idx : usize) {
+    self.active_index = idx;
+  }
+
+  fn get_active_idx(&self) -> usize {
+    self.active_index
+  }
+  
+  fn set_active_menu_item(&mut self, item : UIMenuItem) {
+    self.active_menu_item = item;
+  }
+  
+  fn get_active_menu_item(&self) -> UIMenuItem {
+    self.active_menu_item
+  }
+}
+
+impl  EventMenu<'_> {
+
+  pub fn new(theme : ColorTheme) -> Self {
+    let theme_c = theme.clone();
+    let titles  = Self::get_titles(theme_c);
+    let n_titles = titles.len();
+    Self {
+      theme,
+      active_index : 0,
+      titles,
+      active_menu_item : UIMenuItem::Back,
+    }
+  }
+}
+
+//============================================
+
+#[derive(Debug, Clone)]
+pub struct PaddleMenu<'a>  {
+  pub theme            : ColorTheme,
+  pub active_menu_item : UIMenuItem,
+  pub active_index     : usize, 
+  pub titles           : Vec<Line<'a>>,
+}
+
+impl UIMenu<'_> for PaddleMenu<'_> {
+  
+  fn get_items() -> Vec<UIMenuItem> {
+    let items = vec![UIMenuItem::Back,
+                     UIMenuItem::Signal,
+                     UIMenuItem::RecoVars,
+                     UIMenuItem::Quit];
+    items
+  }
+
+  fn get_theme(&self) -> ColorTheme {
+    self.theme
+  }
+
+  fn set_active_idx(&mut self, idx : usize) {
+    self.active_index = idx;
+  }
+
+  fn get_active_idx(&self) -> usize {
+    self.active_index
+  }
+  
+  fn set_active_menu_item(&mut self, item : UIMenuItem) {
+    self.active_menu_item = item;
+  }
+  
+  fn get_active_menu_item(&self) -> UIMenuItem {
+    self.active_menu_item
+  }
+}
+
+impl PaddleMenu<'_> {
+
+  pub fn new(theme : ColorTheme) -> Self {
+    let theme_c = theme.clone();
+    let titles  = Self::get_titles(theme_c);
+    let n_titles = titles.len();
+    Self {
+      theme,
+      active_index : 0,
+      titles,
+      active_menu_item : UIMenuItem::Back,
+    }
+  }
+}
+
+//============================================
+
+#[derive(Debug, Clone)]
+pub struct MoniMenu<'a>  {
+  pub theme            : ColorTheme,
+  pub active_menu_item : UIMenuItem,
+  pub active_index     : usize, 
+  pub titles           : Vec<Line<'a>>,
+}
+
+impl UIMenu<'_> for MoniMenu<'_> {
+  
+  fn get_items() -> Vec<UIMenuItem> {
+    let items = vec![UIMenuItem::Back,
+                     UIMenuItem::PreampBias,
+                     UIMenuItem::PreampTemp,
+                     UIMenuItem::LTBThresholds,
+                     UIMenuItem::Quit];
+    items
+  }
+
+  fn get_theme(&self) -> ColorTheme {
+    self.theme
+  }
+
+  fn set_active_idx(&mut self, idx : usize) {
+    self.active_index = idx;
+  }
+
+  fn get_active_idx(&self) -> usize {
+    self.active_index
+  }
+  
+  fn set_active_menu_item(&mut self, item : UIMenuItem) {
+    self.active_menu_item = item;
+  }
+  
+  fn get_active_menu_item(&self) -> UIMenuItem {
+    self.active_menu_item
+  }
+}
+
+impl  MoniMenu<'_> {
+
+  pub fn new(theme : ColorTheme) -> Self {
+    let theme_c = theme.clone();
+    let titles  = Self::get_titles(theme_c);
+    let n_titles = titles.len();
+    Self {
+      theme,
+      active_index : 0,
+      titles,
+      active_menu_item : UIMenuItem::Back,
+    }
+  }
+}
+
+//============================================
 
 #[derive(Debug, Clone)]
 pub struct MainMenu {

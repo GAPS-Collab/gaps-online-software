@@ -1,6 +1,6 @@
 [package]
 name = "liftof-tui"
-version = "0.10.1"
+version = "0.10.2"
 edition = "2021"
 
 [features]
@@ -16,6 +16,7 @@ log        = { worksapce = true }
 clap       = { workspace = true } 
 serde      = { worksapce = true }
 serde_json = { workspace = true } 
+crossbeam-channel = { workspace = true }
 
 chrono     = { version = "0.4", features = ["serde"] }
 
@@ -28,11 +29,12 @@ crossterm  = { version = "0.23", features=["serde"]}
 #eyre = "0.6"
 #sysinfo = "0.27"
 
-crossbeam-channel = { workspace = true }
 
 tof-dataclasses = { workspace = true }
 liftof-lib      = { path = "../liftof-lib" , features = ["random"], version = "0.10"}
 telemetry-dataclasses = { path = "../../../telemetry/dataclasses/rust/telemetry-dataclasses", optional = true }
+
+tui-popup = "0.3"
 
 # this is the "one and only" histogram 
 # crate in my opinion
