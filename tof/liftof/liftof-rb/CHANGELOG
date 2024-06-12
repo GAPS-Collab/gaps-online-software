@@ -1,5 +1,19 @@
 # LELEWAA series
 
+## v0.10.1
+* set preamp bias voltages from config file
+* removes eventid testing from commandline 
+  options
+* removes --to-local-file. It will be set auto
+  matically when taking data or calibrations 
+  locally
+* declutters command interface. All "setting"
+  tasks should be done by other binaries
+  (as in tof-control)
+* database is now a feature (since diesel pulls
+  in sqlite dependency which causes compiler 
+  issues with musl
+
 ## v0.10.0
 * adapt to new ReadoutBoard model in 
   the database
