@@ -124,6 +124,10 @@ use clap::{arg,
   Subcommand
 };
 
+//extern crate ssh2;
+//use ssh2::Session;
+use std::net::TcpStream;
+
 pub const MT_MAX_PACKSIZE   : usize = 512;
 pub const DATAPORT          : u32   = 42000;
 pub const ASSET_DIR         : &str  = "/home/gaps/assets/"; 
@@ -147,6 +151,38 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
           ==> API docs https://gaps-collab.github.io/gaps-online-software/
 
   ";
+
+//pub fn restart_liftof_rb_clients() {
+//  for k in 0..50 {
+//    address = format!("10.0.1.1{k:02}:22");
+//    match TcpStream::connect(&address) {
+//      Err(err) => error!("Unable to connect to {}", address);
+//      Ok(tcp)  => {
+//          // Create a new SSH session
+//        //let mut sess = Session::new().unwrap();
+//        //sess.handshake(&tcp).unwrap();
+//
+//        //// Path to the private key file
+//        //let private_key_path = Path::new("/path/to/private/key");
+//        //sess.userauth_pubkey_file("username", None, private_key_path, None).unwrap();
+//        //assert!(sess.authenticated());
+//        //let mut channel = sess.channel_session().unwrap();
+//        //channel.exec("ls -l").unwrap();
+//        //let mut s = String::new();
+//        //channel.read_to_string(&mut s).unwrap();
+//        //println!("{}", s);
+//        //channel.send_eof().unwrap();
+//        //channel.wait_close().unwrap();
+//        //println!("Exit Status: {}", channel.exit_status().unwrap());
+//      }
+//    }
+//  }
+//}
+
+/// check on liftof-rb clients
+pub fn check_liftof_rb_status() {
+}
+
 
 /// Handle incoming POSIX signals
 pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {

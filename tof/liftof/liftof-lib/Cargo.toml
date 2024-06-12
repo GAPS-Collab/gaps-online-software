@@ -2,6 +2,7 @@
 name = "liftof-lib"
 version = "0.10.1"
 edition = "2021"
+rust-version = "1.78"
 
 [features]
 random   = []
@@ -30,7 +31,7 @@ signal-hook       = { workspace = true }
 # parse command line arguments
 clap              = { workspace = true }
 
-
+#ssh2              = "0.9"
 toml              = "0.8"
 
 tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["tofcontrol","smoothed_z_score"], version = "0.10"} 
