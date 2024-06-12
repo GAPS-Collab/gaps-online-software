@@ -1161,6 +1161,7 @@ impl RBWaveform {
 
   pub fn calibrate(&mut self, cali : &RBCalibrations) -> Result<(), CalibrationError>  {
     if cali.rb_id != self.rb_id {
+      error!("Calibration is for board {}, but wf is for {}", cali.rb_id, self.rb_id);
       return Err(CalibrationError::WrongBoardId);
     }
     let mut voltages = vec![0.0f32;1024];

@@ -146,8 +146,8 @@ impl RAT {
           if rat.rb2_id == rb2id as i16 {
             result.push(rat);
           }
-        return Some(result);
         }
+        return Some(result);
       }
       None => ()
     }
@@ -165,6 +165,7 @@ impl RAT {
       }
     }
   }
+
 }
 
 impl fmt::Display for RAT {
@@ -1024,6 +1025,31 @@ impl ReadoutBoard {
       rbs.push(rb);
     }
     Some(rbs)
+  }
+  
+  // FIXME - better query
+  pub fn where_rbid(conn: &mut SqliteConnection, rb_id : u8) -> Option<ReadoutBoard> {
+    let all = ReadoutBoard::all(conn)?;
+    for rb in all {
+      if rb.rb_id == rb_id {
+        return Some(rb);
+      }
+    }
+    None
+  }
+
+  pub fn to_summary_str(&self) -> String {
+    let mut repr  = String::from("<ReadoutBoard:");
+    repr += &(format!("\n  Board id    : {}",self.rb_id));            
+    repr += &(format!("\n  MTB Link ID : {}",self.mtb_link_id));
+    repr += &(format!("\n  RAT         : {}",self.paddle12.ltb_id));
+    repr += &(format!("\n  DSI/J       : {}/{}",self.dsi,self.j));
+    repr += "\n **Connected paddles**";
+    repr += &(format!("\n  Channel 1/2 : {:02} (panel {:01})", self.paddle12.paddle_id, self.paddle12.panel_id));
+    repr += &(format!("\n  Channel 3/4 : {:02} (panel {:01})", self.paddle34.paddle_id, self.paddle34.panel_id));
+    repr += &(format!("\n  Channel 5/6 : {:02} (panel {:01})", self.paddle56.paddle_id, self.paddle56.panel_id));
+    repr += &(format!("\n  Channel 7/8 : {:02} (panel {:01})", self.paddle78.paddle_id, self.paddle78.panel_id));
+    repr
   }
 
   /// Load the newest calibration from the calibration file path

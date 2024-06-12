@@ -1,0 +1,33 @@
+---
+title: Debugging Dead TOF Channels
+---
+%%{
+  init: {
+    'flowchart': { 'curve': 'monotoneY' },
+    'theme': 'base',
+    'themeVariables': {
+      'primaryColor': '#2B3467',
+      'primaryTextColor': '#FCFFE7',
+      'primaryBorderColor': '#BAD7E9',
+      'lineColor': '#EB455F',
+      'secondaryColor': '#006100',
+      'tertiaryColor': '#BAD7E9'
+    }
+  }
+}%%
+flowchart TB
+  START["You have verified\n by looking at a waveform\n (e.g. with liftof-tui)\n that a signal does not\n show a typical SiPM pulse\n\n Make sure that after debugging\n all cables are connected as\ they are supposed to"]== "RAT OFF!" ==>DBG1["Reseat power connector\n on SiPM side\n Obviously after each\n debugging step turn RAT ON\n verify that the liftof-rb clients\n are running and check again!"]
+  DBG1== "RAT OFF!" ==> DBG2["Swap power cable with\n neighbor paddle, SiPM side"]
+  DBG2-- "Good signal!"--> GOOD0["The SiPM is fine!"]
+  DBG2-- "No pulse!"--> BAD0["Either the HG\n connection or the SiPM\n might be bad!"]
+  subgraph SiPM-Debugging
+  BAD0=="RAT OFF! (to be extra sure\n and also prevent\n damage due to\n static discharge)"==> SDBG1["Swap HG cable with\n neighbor paddle!"] 
+  SDBG1--"Good signal!"-->SDBG2["The HG cable is bad! Report!"]
+  SDBG1--"No pulse!"-->SDBG3["The SiPM might be bad.\n Connect with a scope\n to HG and LG.\n Get help if needed!"]
+  end
+  subgraph Power-Debugging  
+  GOOD0-->NOTE0["At this point\n either the cable or\n the PB channel\n is bad!\n LEAVE the cable swap\n at SiPM side!"]
+  NOTE0=="RAT OFF!"==> PDBG1["Swap PB channel with\n neighbor PB channel on RAT"]
+  PDBG1--"No pulse"--> PDBG2["Bad power cable!\n Report! Possibly it might\n be replaced with spare!"]
+  PDBG1--"Good signal!" --> PDBG3["The PB channel is bad!\n Report! This is a more severe issue!"]
+  end 
