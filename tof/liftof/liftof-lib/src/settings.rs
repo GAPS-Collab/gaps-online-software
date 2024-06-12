@@ -7,7 +7,7 @@
 //! threads/aspects of the code
 //!
 
-use std::fmt::format;
+//use std::fmt::format;
 use std::fs::File;
 use std::io::{
     Write,

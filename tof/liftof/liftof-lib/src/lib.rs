@@ -52,10 +52,10 @@ use std::io::{
     Write,
 };
 use std::collections::HashMap;
-use std::net::IpAddr;
-use std::net::Ipv4Addr;
-use crossbeam_channel::Receiver;
-use zmq;
+//use std::net::IpAddr;
+//use std::net::Ipv4Addr;
+//use crossbeam_channel::Receiver;
+//use zmq;
 use colored::{
     Colorize,
     ColoredString
@@ -88,14 +88,14 @@ use tof_dataclasses::calibrations::{
     //RBCalibrations,
     find_zero_crossings,
 };
-use tof_dataclasses::packets::{
-    TofPacket,
-    PacketType,
-};
+//use tof_dataclasses::packets::{
+//    TofPacket,
+//    PacketType,
+//};
 #[cfg(feature="database")]
 use tof_dataclasses::errors::AnalysisError;
 use tof_dataclasses::errors::SetError;
-use tof_dataclasses::serialization::Serialization;
+//use tof_dataclasses::serialization::Serialization;
 #[cfg(feature="database")]
 use tof_dataclasses::events::{
     RBEvent,
@@ -126,7 +126,7 @@ use clap::{arg,
 
 //extern crate ssh2;
 //use ssh2::Session;
-use std::net::TcpStream;
+//use std::net::TcpStream;
 
 pub const MT_MAX_PACKSIZE   : usize = 512;
 pub const DATAPORT          : u32   = 42000;

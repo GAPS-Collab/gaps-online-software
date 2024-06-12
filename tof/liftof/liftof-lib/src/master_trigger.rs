@@ -508,8 +508,8 @@ pub fn master_trigger(mt_address     : String,
   let mut evq_num_events_avg  = 0f64;
   let mut n_iter_loop         = 0u64;
 
-  /// indicator if the thread is active (it can 
-  /// sleep during calibrations)
+  // indicator if the thread is active (it can 
+  // sleep during calibrations)
   let mut is_active = true;
   loop {
     // Check thread control and what to do
