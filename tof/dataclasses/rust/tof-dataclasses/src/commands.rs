@@ -416,7 +416,7 @@ impl fmt::Display for TofCommandV2 {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     //let cc = RBCommand::command_code_to_string(self.command_code);
     let mut repr = String::from("<TofCommandV2");
-    repr += &(format!("\n  command code : {}>", self.command_code)); 
+    repr += &(format!("\n  cmd code : {}>", self.command_code)); 
     write!(f, "{}", repr)
   }
 }
