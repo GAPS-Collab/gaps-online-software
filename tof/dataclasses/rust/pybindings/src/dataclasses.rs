@@ -959,6 +959,13 @@ impl PyTofEvent {
   }
 
   #[getter]
+  fn mastertriggerevent(&self) ->  PyMasterTriggerEvent {
+    let mut mte = PyMasterTriggerEvent::new();
+    mte.set_event(self.event.mt_event.clone());
+    mte
+  }
+
+  #[getter]
   fn rbevents(&self) -> Vec<PyRBEvent> {
     // use a bit more than typically exepcted number of rbevents
     let mut rbevents = Vec::<PyRBEvent>::with_capacity(5);
@@ -1010,8 +1017,6 @@ impl PyTofEvent {
         return Err(PyIOError::new_err(err_msg));
       }
     }
-
-    
   }
 
   #[pyo3(signature = (filename, start=0, nevents=0))]
