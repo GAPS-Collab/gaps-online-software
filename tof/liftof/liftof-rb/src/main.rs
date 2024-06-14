@@ -69,7 +69,8 @@ use tof_dataclasses::commands::{
 use tof_dataclasses::events::DataType;
 use tof_dataclasses::run::RunConfig;
 
-use tof_control::helper::preamp_type::PreampSetBias;
+#[cfg(feature="database")]
+use tof_control::helper::pa_type::PASetBias;
 
 #[cfg(feature="database")]
 use tof_dataclasses::database::{
@@ -92,6 +93,7 @@ use liftof_lib::{
     init_env_logger,
 };
 
+#[cfg(feature="database")]
 use liftof_lib::settings::PreampBiasSetStrategy;
 
 use liftof_rb::threads::{
@@ -290,7 +292,7 @@ fn main() {
                       None => error!("Unable to set biases! Entry for {} not found in the settings!", key),
                       Some(biases) => {
                         //println!("Will NOT set preamp biases (testing mode), {:?} for RAT {}", biases, key);
-                        match PreampSetBias::set_manual_biases(*biases) {
+                        match PASetBias::set_manual_biases(*biases) {
                           // FIXME - PreampBiasError needs to implement Display
                           Err(_err) => error!("Unable to set biases!"),
                           Ok(_)    => println!("=> Preamp biases set! {:?}", biases)

@@ -28,9 +28,9 @@ use tof_control::helper::pb_type::{
     PBVcp,
 };
 
-use tof_control::helper::preamp_type::{
-    PreampTemp,
-    PreampReadBias,
+use tof_control::helper::pa_type::{
+    PATemp,
+    PAReadBias,
 };
 
 use tof_control::helper::ltb_type::{
@@ -39,7 +39,7 @@ use tof_control::helper::ltb_type::{
 };
 
 use tof_control::helper::rb_type::{
-    RBTempDebug,
+    RBTemp,
     RBMag,
     RBVcp,
     RBPh,
@@ -194,7 +194,7 @@ pub fn get_rb_moni(board_id: u8) -> Result<RBMoniData, SensorError> {
   // get tof-control data
   let mut moni_dt = RBMoniData::new();
   moni_dt.board_id = board_id; 
-  let rb_temp = RBTempDebug::new();
+  let rb_temp = RBTemp::new();
   let rb_mag  = RBMag::new();
   let rb_vcp  = RBVcp::new();
   let rb_ph   = RBPh::new();
@@ -223,8 +223,8 @@ pub fn get_preamp_moni(board_id: u8) -> Result<PAMoniData, SensorError> {
   // FIXME - this won't fail, however, if there
   // is an issue it will silently set all values
   // to f32::MAX
-  let pa_tmp = PreampTemp::new();
-  let pa_bia = PreampReadBias::new();
+  let pa_tmp = PATemp::new();
+  let pa_bia = PAReadBias::new();
   moni.add_temps(&pa_tmp);
   moni.add_biases(&pa_bia);
   Ok(moni)

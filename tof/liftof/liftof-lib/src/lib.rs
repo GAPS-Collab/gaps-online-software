@@ -83,15 +83,10 @@ use tof_dataclasses::threading::{
     ThreadControl,
 };
 
+#[cfg(feature="database")]
 use tof_dataclasses::constants::NWORDS;
-use tof_dataclasses::calibrations::{
-    //RBCalibrations,
-    find_zero_crossings,
-};
-//use tof_dataclasses::packets::{
-//    TofPacket,
-//    PacketType,
-//};
+#[cfg(feature="database")]
+use tof_dataclasses::calibrations::find_zero_crossings;
 #[cfg(feature="database")]
 use tof_dataclasses::errors::AnalysisError;
 use tof_dataclasses::errors::SetError;

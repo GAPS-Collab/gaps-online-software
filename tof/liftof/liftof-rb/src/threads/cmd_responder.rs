@@ -12,6 +12,8 @@ use std::sync::{
 //use std::path::Path;
 use crossbeam_channel::Sender;
 
+use tof_control::helper::pa_type::PASetBias;
+
 use tof_dataclasses::commands::{
     TofCommand,
     TofCommandV2,
@@ -39,8 +41,8 @@ use tof_dataclasses::constants::{MASK_CMD_8BIT,
                                   MASK_CMD_16BIT};
 
 use crate::api::{rb_calibration,
-                 set_preamp_biases,
-                 send_preamp_bias_set,
+                 //set_preamp_biases,
+                 //send_preamp_bias_set,
                  send_ltb_threshold_set,
 };
 use crate::threads::monitoring::{
@@ -183,7 +185,7 @@ pub fn cmd_responder(cmd_server_address        : String,
                   TofCommandCode::SetPreampBias => {
                     match PreampBiasConfig::from_bytestream(&cmd.payload, &mut 0) {
                       Ok(pb_cfg) => { 
-                        match set_preamp_biases(&pb_cfg) {
+                        match PASetBias::set_manual_biases(pb_cfg.biases) {
                           Ok(_)    => info!("Set preamp biases to {}!", pb_cfg),
                           Err(err) => {
                             error!("Unable to set preamp biases! {err:?}");
@@ -320,23 +322,23 @@ pub fn cmd_responder(cmd_server_address        : String,
                           }
                         }
                       },
-                      TofCommand::SetPreampBias   (value) =>  {
-                        info!("Received set preamp bias command! Will communicate to preamps");
-                        // MSB second 8 bits are LTB ID
-                        let preamp_id: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
-                        // MSB third 16 bits are extra (not used)
-                        let preamp_bias: u16 = (value | MASK_CMD_16BIT) as u16;
-                        match send_preamp_bias_set(preamp_id, preamp_bias) {
-                          Ok(_)    => {
-                            info!("Bias sent to preamp!");
-                            return_val = Ok(TofCommandCode::SetPreampBias);
-                          },
-                          Err(err) => {
-                            error!("Preamp bias sending failed! Err {err}");
-                            return_val = Err(CmdError::PreampBiasSetError);
-                          }
-                        }
-                      },
+                      //TofCommand::SetPreampBias   (value) =>  {
+                      //  info!("Received set preamp bias command! Will communicate to preamps");
+                      //  // MSB second 8 bits are LTB ID
+                      //  let preamp_id: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
+                      //  // MSB third 16 bits are extra (not used)
+                      //  let preamp_bias: u16 = (value | MASK_CMD_16BIT) as u16;
+                      //  match send_preamp_bias_set(preamp_id, preamp_bias) {
+                      //    Ok(_)    => {
+                      //      info!("Bias sent to preamp!");
+                      //      return_val = Ok(TofCommandCode::SetPreampBias);
+                      //    },
+                      //    Err(err) => {
+                      //      error!("Preamp bias sending failed! Err {err}");
+                      //      return_val = Err(CmdError::PreampBiasSetError);
+                      //    }
+                      //  }
+                      //},
                       TofCommand::DataRunStop(value)   => {
                         // MSB fourth 8 bits are RB ID
                         let rb_id: u8 = (value | MASK_CMD_8BIT) as u8;

@@ -20,12 +20,14 @@ use std::collections::HashMap;
 extern crate toml;
 //use tof_dataclasses::events::master_trigger::TriggerType;
 use tof_dataclasses::events::DataType;
+#[cfg(feature="database")]
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::commands::{
-  TofOperationMode,
-  TofCommandV2,
-  TofCommandCode,
-};
+use tof_dataclasses::commands::TofOperationMode;
+#[cfg(feature="database")]
+use tof_dataclasses::commands::TofCommandV2;
+#[cfg(feature="database")]
+use tof_dataclasses::commands::TofCommandCode;
+
 use tof_dataclasses::run::RunConfig;
 #[cfg(feature="database")]
 use tof_dataclasses::database::RAT;
@@ -40,8 +42,10 @@ use tof_dataclasses::serialization::{
   //parse_bool, 
   Serialization,
   SerializationError,
-  Packable
 };
+
+#[cfg(feature="database")]
+use tof_dataclasses::serialization::Packable;
 
 #[derive(Debug, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum PreampBiasSetStrategy {

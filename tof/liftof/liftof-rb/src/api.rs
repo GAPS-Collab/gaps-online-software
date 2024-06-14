@@ -8,7 +8,6 @@ use tof_dataclasses::serialization::{
     Serialization,
     //parse_u16,
 };
-use tof_dataclasses::config::PreampBiasConfig;
 use tof_dataclasses::io::RBEventMemoryStreamer;
 use std::path::Path;
 use std::time::{
@@ -28,10 +27,11 @@ use crate::memory::*;
 use tof_dataclasses::events::{RBEvent,
                               DataType};
 use tof_dataclasses::commands::{
-    TofCommand, TofCommandCode, TofOperationMode
+    TofCommand,
+    TofOperationMode,
 };
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::errors::{CmdError, SerializationError};
+use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::run::RunConfig;
 
 // Takeru's tof-control
@@ -48,10 +48,10 @@ use tof_control::rb_control::rb_mode::{
 };
 
 // for general control over rb, ltb and pb
-use tof_control::helper::preamp_type::{
-  PreampSetBias,
-  PreampBiasError
-};
+//use tof_control::helper::pa_type::{
+//  PASetBias,
+//  PABiasError
+//};
 
 // for power
 use liftof_lib::{
@@ -65,12 +65,12 @@ use liftof_lib::{
 const FIVE_SECONDS: Duration = time::Duration::from_millis(5000);
 
 
-pub fn set_preamp_biases(cfg : &PreampBiasConfig) -> Result<(), PreampBiasError> {
-  //PreampSetBias::set_manual_biases(cfg.biases)?;
-  error!("Not setting actual biases, testing mode!");
-  println!("Set preamp biases for all channels");
-  Ok(())
-}
+//pub fn set_preamp_biases(cfg : &PreampBiasConfig) -> Result<(), PABiasError> {
+//  //PreampSetBias::set_manual_biases(cfg.biases)?;
+//  error!("Not setting actual biases, testing mode!");
+//  println!("Set preamp biases for all channels");
+//  Ok(())
+//}
 
 /// The poisson self trigger mode of the board
 /// triggers automatically, this means we don't 
@@ -1314,27 +1314,27 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
 }
 
 
-pub fn send_preamp_bias_set_all(bias_voltage: u16) -> Result<(), SetError> {
-  match PreampSetBias::set_manual_bias(None, bias_voltage as f32) {
-    Ok(_) => (),
-    Err(_) => {
-      error!("Unable to set preamp bias! Error LTBThresholdError!");
-    }
-  };
-  Ok(())
-}
+//pub fn send_preamp_bias_set_all(bias_voltage: u16) -> Result<(), SetError> {
+//  match PreampSetBias::set_manual_bias(None, bias_voltage as f32) {
+//    Ok(_) => (),
+//    Err(_) => {
+//      error!("Unable to set preamp bias! Error LTBThresholdError!");
+//    }
+//  };
+//  Ok(())
+//}
 
 
-pub fn send_preamp_bias_set(preamp_id: u8, bias_voltage: u16) -> Result<(), SetError> {
-  // TODO add check for LTB of interest
-  match PreampSetBias::set_manual_bias(Some(preamp_id), bias_voltage as f32) {
-    Ok(_) => (),
-    Err(_) => {
-      error!("Unable to set preamp bias! Error LTBThresholdError!");
-    }
-  };
-  Ok(())
-}
+//pub fn send_preamp_bias_set(preamp_id: u8, bias_voltage: u16) -> Result<(), SetError> {
+//  // TODO add check for LTB of interest
+//  match PreampSetBias::set_manual_bias(Some(preamp_id), bias_voltage as f32) {
+//    Ok(_) => (),
+//    Err(_) => {
+//      error!("Unable to set preamp bias! Error LTBThresholdError!");
+//    }
+//  };
+//  Ok(())
+//}
 
 
 pub fn send_ltb_all_thresholds_set() -> Result<(), SetError> {
