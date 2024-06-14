@@ -4,15 +4,9 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - main
-    - develop
-    - HAHALUA-0.9
     - LELEWAA-0.10
   pull_request:
     branches: 
-    - main
-    - develop
-    - HAHALUA-0.9
     - LELEWAA-0.10
 
 env:
