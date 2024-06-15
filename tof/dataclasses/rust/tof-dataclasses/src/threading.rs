@@ -34,6 +34,8 @@ pub struct ThreadControl {
   pub run_id                     : u32,
   /// The number of boards available
   pub n_rbs                      : u32,
+  /// Write data to disk
+  pub write_data_to_disk         : bool,
 }
 
 impl ThreadControl {
@@ -51,6 +53,7 @@ impl ThreadControl {
       thread_rbcomm_active       : HashMap::<u8,bool>::new(),
       run_id                     : 0,
       n_rbs                      : 0,
+      write_data_to_disk         : false,
     }
   }
 }
@@ -58,17 +61,18 @@ impl ThreadControl {
 impl fmt::Display for ThreadControl {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<ThreadControl:");
-    repr        += &(format!("\n  Run ID    : {}", self.run_id));
-    repr        += &(format!("\n  N RBs     : {}", self.n_rbs));
-    repr        += "    -- reported RB calibration activity:";
+    repr        += &(format!("\n  Run ID         : {}", self.run_id));
+    repr        += &(format!("\n  N RBs          : {}", self.n_rbs));
+    repr        += &(format!("\n  wr to disk     : {}", self.write_data_to_disk));
+    repr        += "\n    -- reported RB calibration activity:";
     repr        += &(format!("\n  RB cali active : {}", self.calibration_active));
     repr        += &(format!("\n  -- finished    : \n{:?}", self.finished_calibrations));       
     repr        += "\n    -- program status:";
     repr        += &(format!("\n  stop flag : {}", self.stop_flag));
     repr        += "\n    -- reported thread activity:";
     repr        += &(format!("\n  cmd dispatcher : {}", self.thread_cmd_dispatch_active));
-    repr        += &(format!("\n  runner         : {}", self.thread_data_sink_active));
-    repr        += &(format!("\n  data sink      : {}", self.thread_runner_active));
+    repr        += &(format!("\n  runner         : {}", self.thread_runner_active));
+    repr        += &(format!("\n  data sink      : {}", self.thread_data_sink_active));
     repr        += &(format!("\n  monitoring     : {}", self.thread_monitoring_active));
     if self.thread_rbcomm_active.len() > 0 {
       repr        += "\n -- active RB threads";
