@@ -1,6 +1,7 @@
 pub mod master_trigger;
 pub mod settings;
 pub mod constants;
+pub mod thread_control;
 
 use constants::{
     DEFAULT_CALIB_VOLTAGE,
