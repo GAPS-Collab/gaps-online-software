@@ -25,15 +25,16 @@ extern crate liftof_lib;
 use std::thread;
 
 //use tof_dataclasses::threading::ThreadControl;
-use tof_dataclasses::threading::{
-    ThreadControl,
-};
+//use tof_dataclasses::threading::{
+//    ThreadControl,
+//};
 
 //use tof_dataclasses::commands::RBCommand;
 use liftof_lib::{
     init_env_logger,
     LiftofSettings
 };
+use liftof_lib::thread_control::ThreadControl;
 
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::MasterTriggerEvent;
