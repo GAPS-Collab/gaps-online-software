@@ -19,7 +19,8 @@ use tof_dataclasses::packets::{TofPacket,
 use tof_dataclasses::events::{RBEvent,
                               DataType};
 use tof_dataclasses::serialization::Serialization;
-use tof_dataclasses::threading::ThreadControl;
+//use tof_dataclasses::threading::ThreadControl;
+use liftof_lib::thread_control::ThreadControl;
 
 use crate::api::{
     //prefix_board_id,

@@ -15,7 +15,7 @@ use tof_dataclasses::packets::{
 };
 use tof_dataclasses::io::RBEventMemoryStreamer;
 use tof_dataclasses::calibrations::RBCalibrations;
-use tof_dataclasses::threading::ThreadControl;
+//use tof_dataclasses::threading::ThreadControl;
 use tof_dataclasses::events::EventStatus;
 use tof_dataclasses::commands::{
     //RBCommand,
@@ -27,6 +27,7 @@ use liftof_lib::{
     RunStatistics,
     //waveform_analysis,
 };
+use liftof_lib::thread_control::ThreadControl;
 
 ///  Transforms raw bytestream to TofPackets
 ///

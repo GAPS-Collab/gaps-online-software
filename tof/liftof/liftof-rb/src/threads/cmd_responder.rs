@@ -52,8 +52,9 @@ use crate::threads::monitoring::{
 };
 
 use liftof_lib::constants::DEFAULT_RB_ID;
+use liftof_lib::thread_control::ThreadControl;
 
-use tof_dataclasses::threading::ThreadControl;
+//use tof_dataclasses::threading::ThreadControl;
 
 use crate::control::{get_board_id_string,
                      get_board_id};

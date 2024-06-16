@@ -20,7 +20,8 @@ use tof_dataclasses::monitoring::{
     LTBMoniData,
 };
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::threading::ThreadControl;
+//use tof_dataclasses::threading::ThreadControl;
+use liftof_lib::thread_control::ThreadControl;
 
 // Takeru's tof-control code
 use tof_control::helper::pb_type::{

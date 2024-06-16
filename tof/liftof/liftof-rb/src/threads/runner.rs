@@ -22,12 +22,15 @@ use tof_dataclasses::commands::{TofOperationMode};
 use tof_dataclasses::run::RunConfig;
 //use tof_dataclasses::io::RBEventMemoryStreamer;
 //use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::threading::ThreadControl;
+//use tof_dataclasses::threading::ThreadControl;
 
 use liftof_lib::settings::{
     RBSettings,
     RBBufferStrategy
 };
+
+use liftof_lib::thread_control::ThreadControl;
+
 
 /// Shutdown a run within the runner thread
 fn termination_seqeunce(prog_ev       : &ProgressBar,
