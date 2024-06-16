@@ -4,6 +4,8 @@
 use std::collections::HashMap;
 use std::fmt;
 
+use crate::settings::LiftofSettings;
+
 /// Send runtime information 
 /// to threads via shared memory
 /// (Arc(Mutex)
@@ -36,6 +38,7 @@ pub struct ThreadControl {
   pub n_rbs                      : u32,
   /// Write data to disk
   pub write_data_to_disk         : bool,
+  pub liftof_settings            : LiftofSettings,
 }
 
 impl ThreadControl {
@@ -54,6 +57,7 @@ impl ThreadControl {
       run_id                     : 0,
       n_rbs                      : 0,
       write_data_to_disk         : false,
+      liftof_settings            : LiftofSettings::new(),
     }
   }
 }
