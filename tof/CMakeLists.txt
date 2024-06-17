@@ -42,6 +42,7 @@ add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
     dataclasses/C++/src/logging.cxx
 )
 
+set_property(TARGET ${GAPSTOF_LIBRARY_SHARED} PROPERTY CXX_STANDARD 20)
 target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
 target_include_directories(${GAPSTOF_LIBRARY_SHARED}
                             PUBLIC
@@ -65,6 +66,7 @@ if (BUILD_PYBINDINGS)
 
   pybind11_add_module(${pybindings} MODULE dataclasses/C++/pybindings/module.cxx 
                                            dataclasses/C++/pybindings/helpers.cxx)
+  set_property(TARGET ${pybindings} PROPERTY CXX_STANDARD 20)
   target_include_directories(${pybindings}
                             PUBLIC
                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>

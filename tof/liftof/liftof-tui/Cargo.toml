@@ -12,9 +12,9 @@ default    = ["telemetry"]
 cfg-if     = { workspace = true }
 
 zmq        = { workspace = true } 
-log        = { worksapce = true }
+log        = { workspace = true }
 clap       = { workspace = true } 
-serde      = { worksapce = true }
+serde      = { workspace = true }
 serde_json = { workspace = true } 
 crossbeam-channel = { workspace = true }
 
