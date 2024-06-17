@@ -25,10 +25,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="(Re)create tables in the global GAPS database from paddle mapping spreadsheets")
     parser.add_argument('input', metavar='input', type=str,\
                         help='Input XLS spreadsheet')
+    parser.add_argument('--coordinates', type=str,\
+                        help='XLS spreadsheet with paddle coordinates (from Erik)')
     parser.add_argument('--volid-map', default="",\
                         help=".json file with mapping pid->volid")
-    parser.add_argument('--level0-geo', default="",\
-                        help=".json file with mapping volid->l0 geo coord")
+    #parser.add_argument('--level0-geo', default="",\
+    #                    help=".json file with mapping volid->l0 geo coord")
     parser.add_argument('--dry-run', action='store_true', default=False,\
                         help="Don't do anything, just print.")
     parser.add_argument('--create-rat-table',        action='store_true', default=False,\
@@ -58,7 +60,7 @@ if __name__ == '__main__':
         args.create_ltb_table        = True
         args.create_mtbchannel_table = True
     
-    if not args.volid_map or not args.level0_geo:
+    if not args.volid_map:
         args.create_paddle_table = False
         print("Not creating PID table without volid map and level0 geo!")
     
@@ -85,6 +87,7 @@ if __name__ == '__main__':
             if not args.dry_run:
                 rat.save()
         print(f'-- {n_rats} RATs added to the DB!') 
+    
     if args.create_dsi_table:
         try:
             # this NEEDS polars >= 0.20 and the calamine engine, otherwise this spreadsheet
@@ -133,8 +136,9 @@ if __name__ == '__main__':
 
     if args.create_paddle_table:
         print('-- Creating paddle table!')
+        coords     = polars.read_excel(args.coordinates)
         volid_map  = json.load(open(args.volid_map))
-        level0_geo = json.load(open(args.level0_geo))
+        #level0_geo = json.load(open(args.level0_geo))
         sheet      = polars.read_excel(args.input, sheet_name=SPREADSHEET_PADDLE_END)
         rows       = [r for r in sheet.rows()][1:321]
         # how this works is that we have line 0,1 for paddle 1, 2,3 for paddle 2 etc...
@@ -152,8 +156,13 @@ if __name__ == '__main__':
                 assert paddle_end == 'A'
             else:
                 assert paddle_end == 'B'
-            # FIXME - string look up
+            # query spreadsheet by paddle id
+            # starts 
+            pid_q = paddle.paddle_id - 1 #
+
             paddle.volume_id           = int(volid_map[str(r[0])])
+            # FIXME - this is incorrect
+            #paddle.volume_id           = int(coords['VolumeID'][pid_q])
             panel_id                   = r[3]
             if panel_id.startswith('E'):
                 # this are these individual edge paddles
@@ -182,9 +191,11 @@ if __name__ == '__main__':
             paddle.j_ltb               = int(r[11][1])
             paddle.j_rb                = int(r[12][1])
             paddle.mtb_link_id         = int(r[18]) 
-            l0_coord = level0_geo[str(paddle.volume_id)]
-            x,y,z                      = l0_coord['x'], l0_coord['y'], l0_coord['z']
-            length, width, height      = l0_coord['length'], l0_coord['width'], l0_coord['height']
+            #l0_coord = level0_geo[str(paddle.volume_id)]
+            x,y,z                      = coords['X'][pid_q], coords['Y'][pid_q], coords['Z'][pid_q]
+            length, width, height      = coords['Length'][pid_q], coords['Width'][pid_q], coords['Thickness'][pid_q]
+            #x,y,z                      = l0_coord['x'], l0_coord['y'], l0_coord['z']
+            #length, width, height      = l0_coord['length'], l0_coord['width'], l0_coord['height']
             paddle.global_pos_x_l0     = float(x) 
             paddle.global_pos_y_l0     = float(y)
             paddle.global_pos_z_l0     = float(z)
