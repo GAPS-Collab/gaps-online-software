@@ -27,7 +27,7 @@ use crossbeam_channel::{
     Sender
 };
 
-use tof_dataclasses::threading::ThreadControl;
+//use tof_dataclasses::threading::ThreadControl;
 use tof_dataclasses::constants::PAD_CMD_32BIT;
 use tof_dataclasses::commands::{
     TofCommand,
@@ -46,12 +46,16 @@ use tof_dataclasses::serialization::{
 };
 
 use liftof_lib::settings::CommandDispatcherSettings;
+use liftof_lib::thread_control::ThreadControl;
 
 use liftof_lib::constants::{
     DEFAULT_CALIB_VOLTAGE,
     DEFAULT_RB_ID,
     DEFAULT_CALIB_EXTRA
 };
+
+const MAX_CALI_TIME : u64 = 360; // calibration should be done within 6 mins?
+
 
 /// The command dispatcher listens for incoming commands and either executes
 /// them or passes them on to the intended receiver
@@ -99,7 +103,13 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
   filename        += "received-commands.log";
   let path         = Path::new(&filename);
   info!("Writing cmd log to file {filename}");
-  let mut log_file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+  let mut log_file = OpenOptions::new().create(true).append(true).open("received-commands.log").expect("Unable to create file!");
+  match OpenOptions::new().create(true).append(true).open(path) {
+    Ok(_f) => {log_file = _f;},
+    Err(err) => { 
+      error!("Unable to write to path {filename}! {err} Falling back to default file path");
+    }
+  }
 
   let sleep_time   = Duration::from_secs(settings.cmd_listener_interval_sec);
   let mut locked   = settings.deny_all_requests; // do not allow the reception of commands if true
@@ -172,7 +182,8 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                   Ok(_cmd) => {cmd = _cmd;},
                   Err(err) => error!("Unable to decode TofCommand! {err}")
                 }
-                let write_to_file = format!("{}\n", cmd);
+                let now = Instant::now();
+                let write_to_file = format!("{:?}: {}\n",now, cmd);
                 match log_file.write_all(&write_to_file.into_bytes()) {
                   Err(err) => {
                     error!("Writing to file to path {} failed! {}", filename, err)
@@ -238,7 +249,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       Ok(mut tc) => {
                         tc.thread_master_trg_active  = true;
                         tc.thread_monitoring_active  = true;
-                        tc.thread_event_bldr_active = true;
+                        tc.thread_event_bldr_active  = true;
                         tc.calibration_active        = false;
                       },
                       Err(err) => {
@@ -347,7 +358,8 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       Ok(mut tc) => {
                         // deactivate the master trigger thread
                         tc.thread_master_trg_active  = false;
-                        tc.thread_monitoring_active = false;
+                        tc.thread_monitoring_active  = false;
+                        tc.thread_event_bldr_active  = false;
                         tc.calibration_active = true;
                       },
                       Err(err) => {
@@ -370,19 +382,23 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                               if tc.finished_calibrations[&rbid] {
                                 cali_received += 1;
                                 changed_keys.push(*rbid);
+                                println!("==> Received RBCalibration for board {rbid}");
                               }
                             }
                             for k in changed_keys {
                               // it got registered, now reset it 
                               *tc.finished_calibrations.get_mut(&k).unwrap() = false;
                             }
-                            // FIXME - this or a timer
-                            if cali_received  == tc.n_rbs || cali_timeout.elapsed().as_secs() >= 300 {
+                            if cali_received  == tc.n_rbs || cali_timeout.elapsed().as_secs() >= MAX_CALI_TIME {
                               // re-enable the threads
                               tc.thread_master_trg_active = true;
                               tc.thread_monitoring_active = true;
                               tc.calibration_active = false;
-                              println!("== ==> Calibration finished!");
+                              tc.thread_event_bldr_active  = true;
+                              if cali_timeout.elapsed().as_secs() > MAX_CALI_TIME {
+                                error!("Calibration not finished, however, we give up since {} seconds have passed which ssems too long!", MAX_CALI_TIME);
+                              }
+                              println!("== ==> Calibration finished with {} of {} boards!", cali_received, tc.n_rbs);
                               info!("Calibration finished!");
                               break; 
                             }

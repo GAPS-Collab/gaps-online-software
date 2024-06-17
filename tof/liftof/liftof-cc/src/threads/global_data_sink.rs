@@ -7,9 +7,9 @@
 
 use std::time::{
     Instant,
-    //Duration,
+    Duration,
 };
-
+use std::thread::sleep;
 use std::sync::{
     Arc,
     Mutex,
@@ -28,9 +28,9 @@ use tof_dataclasses::packets::{
     PacketType
 };
 
-use tof_dataclasses::threading::{
-    ThreadControl,
-};
+//use tof_dataclasses::threading::{
+//    ThreadControl,
+//};
 
 use tof_dataclasses::monitoring::{
     RBMoniData,
@@ -54,7 +54,8 @@ use tof_dataclasses::events::TofEvent;
 #[cfg(features="debug")]
 use tof_dataclasses::heartbeats::HeartBeatDataSink;
 
-use liftof_lib::settings::DataPublisherSettings;
+//use liftof_lib::settings::DataPublisherSettings;
+use liftof_lib::thread_control::ThreadControl;
 
 /// Manages "outgoing" 0MQ PUB socket and writing
 /// data to disk
@@ -66,29 +67,49 @@ use liftof_lib::settings::DataPublisherSettings;
 ///
 /// * incoming           : incoming connection for TofPackets from 
 ///                        other threads
-/// * write_stream       : write TofPacket stream to disk
-/// * run_id             : run id which is used in filename generation
-/// * settings           : additional settings
+///// * write_stream       : write TofPacket stream to disk
+///// * run_id             : run id which is used in filename generation
+///// * settings           : additional settings
 /// * print_moni_packets : print monitoring packets to the terminal
 /// * thread_control     : start/stop thread, calibration information
 pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
-                        write_stream       : bool,
-                        runid              : usize,
-                        settings           : &DataPublisherSettings,
+                        //write_stream       : bool,
+                        //runid              : usize,
+                        //settings           : &DataPublisherSettings,
                         print_moni_packets : bool,
                         thread_control     : Arc<Mutex<ThreadControl>>) {
+  // when the thread starts, we need to wait a bit
+  // till thread_control becomes usable
+  sleep(Duration::from_secs(10));
+  let mut flight_address    = String::from("");
+  let mut mbytes_per_file   = 420usize;
+  let mut write_stream_path = String::from("");
+  let mut cali_dir          = String::from("");
+  let mut send_tof_summary_packets = false;
+  let mut send_rbwaveform_packets  = false;
+  let mut send_mtb_event_packets   = false;
+  let mut send_tof_event_packets   = false;
   match thread_control.lock() {
     Ok(mut tc) => {
       tc.thread_data_sink_active = true; 
+      flight_address    = tc.liftof_settings.data_publisher_settings.fc_pub_address.clone();
+      mbytes_per_file   = tc.liftof_settings.data_publisher_settings.mbytes_per_file; 
+      write_stream_path = tc.liftof_settings.data_publisher_settings.data_dir.clone();
+      cali_dir = tc.liftof_settings.data_publisher_settings.cali_dir.clone();
+      send_tof_summary_packets = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
+      send_rbwaveform_packets  = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
+      send_mtb_event_packets   = tc.liftof_settings.data_publisher_settings.send_mtb_event_packets;
+      send_tof_event_packets   = tc.liftof_settings.data_publisher_settings.send_tof_event_packets;
     },
     Err(err) => {
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
     },
   }
   //let one_second          = Duration::from_millis(1000);
-  let flight_address      = settings.fc_pub_address.clone();
-  let write_stream_path   = settings.data_dir.clone(); 
-  let mbytes_per_file     = settings.mbytes_per_file;
+  //let flight_address      = settings.fc_pub_address.clone();
+  //let write_stream_path   = settings.data_dir.clone(); 
+  //let mut write_stream_path = String::from("");
+  //let mbytes_per_file     = settings.mbytes_per_file;
   let mut met_time_secs   = 0f32; // mission elapsed time
 
   let mut evid_check      = Vec::<u32>::new();
@@ -98,21 +119,17 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let data_socket = ctx.socket(zmq::PUB).expect("Can not create socket!");
   let unlim : i32 = 1000000;
   data_socket.set_sndhwm(unlim).unwrap();
+  //println!("==> Will bind zmq socket to address {}", flight_address);
   match data_socket.bind(&flight_address) {
+    // FIXEM - this panic is no good! What we want to do instead is
+    // 1) set the flag in thread_control that we are running 
+    // to false, 
+    // 2) enter an eternal loop where we try to restart it
     Err(err) => panic!("Can not bind to address {}! {}", flight_address, err),
     Ok(_)    => ()
   }
   info!("ZMQ PUB Socket for global data sink bound to {flight_address}");
 
-  let mut writer : Option<TofPacketWriter> = None;
-  if write_stream {
-    //let mut streamfile_name = write_stream_path + "/run_";
-    //streamfile_name += &runid.to_string();
-    let file_type = FileType::RunFile(runid as u32);
-    //println!("==> Writing stream to file with prefix {}", streamfile_name);
-    writer = Some(TofPacketWriter::new(write_stream_path.clone(), file_type));
-    writer.as_mut().unwrap().mbytes_per_file = mbytes_per_file;
-  }
   //let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
 
   #[cfg(features="debug")]
@@ -130,7 +147,16 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut cali_dir_created = false;
   let mut cali_output_dir  = String::from("");
   let mut cali_completed   = 0;
+ 
+  // run settings 
+  let mut writer : Option<TofPacketWriter>;
+  let mut write_stream  = false;
+  let mut runid : u32 = 0;
+  let mut new_run_start = false;
   loop {
+    // even though this is called kill timer, check
+    // the settings in general, since they might have
+    // changed due to remote access.
     if kill_timer.elapsed().as_secs_f32() > 0.11 {
       match thread_control.try_lock() {
         Ok(mut tc) => {
@@ -139,12 +165,30 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
             tc.thread_data_sink_active = false;
             break;
           } 
+          if tc.new_run_start_flag {
+            new_run_start         = true;
+            write_stream          = tc.write_data_to_disk;
+            write_stream_path     = tc.liftof_settings.data_publisher_settings.data_dir.clone(); 
+            runid                 = tc.run_id;
+            tc.new_run_start_flag = false;
+          }
         },
         Err(err) => {
           error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
         },
       }
       kill_timer = Instant::now();
+    }
+    if write_stream && new_run_start {
+      //mut streamfile_name = write_stream_path + "/run_";
+      //streamfile_name += &runid.to_string();
+      let file_type = FileType::RunFile(runid as u32);
+      //println!("==> Writing stream to file with prefix {}", streamfile_name);
+      writer = Some(TofPacketWriter::new(write_stream_path.clone(), file_type));
+      writer.as_mut().unwrap().mbytes_per_file = mbytes_per_file as usize;
+      new_run_start = false;
+    } else if !write_stream {
+      writer = None;
     }
     match incoming.recv() {
       Err(err) => trace!("No new packet, err {err}"),
@@ -180,6 +224,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 *tc.finished_calibrations.get_mut(&cali_rb_id).unwrap() = true; 
                 cali_expected = tc.n_rbs;
                 cali_completed += 1;
+                println!("Changed tc {}", tc);
+                info!("{} of {} calibrattions completed!", cali_completed, cali_expected);
               },
               Err(err) => {
                 error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -192,7 +238,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
             //let mut cali_writer = TofPacketWriter::new(write_stream_path.clone(), file_type);
             if !cali_dir_created {
               let today           = get_utc_timestamp();
-              cali_output_dir = format!("{}/{}", settings.cali_dir.clone(), today);
+              cali_output_dir = format!("{}/{}", cali_dir.clone(), today);
               match create_dir_all(cali_output_dir.clone()) {
                 Ok(_)    => info!("Created {} for calibration data!", cali_output_dir),
                 Err(err) => error!("Unable to create {} for calibration data! {}", cali_output_dir, err)
@@ -239,8 +285,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         
         // FIXME - disentangle network and disk I/O?
         if pack.packet_type == PacketType::TofEvent {
-          if settings.send_tof_summary_packets ||
-             settings.send_rbwaveform_packets {
+          if send_tof_summary_packets ||
+             send_rbwaveform_packets {
             // unfortunatly we have to do this unnecessary step
             // I have to think about fast tracking these.
             // maybe sending TofEvents over the channel instead
@@ -256,7 +302,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 ev_to_send = _ev_to_send;
               }
             }
-            if settings.send_tof_summary_packets {
+            if send_tof_summary_packets {
               let te_summary = ev_to_send.get_summary();
               // debug
               if evid_check.len() < 20000 {
@@ -278,7 +324,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 }
               }
             }
-            if settings.send_rbwaveform_packets {
+            if send_rbwaveform_packets {
               for rbwave in ev_to_send.get_rbwaveforms() {
                 let pack = TofPacket::from(&rbwave);
                 match data_socket.send(pack.to_bytestream(),0) {
@@ -297,7 +343,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 }
               }
             }
-            if settings.send_mtb_event_packets {
+            if send_mtb_event_packets {
               let pack = TofPacket::from(&ev_to_send.mt_event);
               match data_socket.send(pack.to_bytestream(),0) {
                 Err(err) => {
@@ -315,7 +361,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
               }
             }
           }
-          if settings.send_tof_event_packets {
+          if send_tof_event_packets {
             match data_socket.send(pack.to_bytestream(),0) {
               Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
               Ok(_)    => {

@@ -15,9 +15,9 @@ use std::time::{
     //Duration,
 };
 
-use tof_dataclasses::threading::{
-    ThreadControl,
-};
+//use tof_dataclasses::threading::{
+//    ThreadControl,
+//};
 
 
 use crossbeam_channel::Sender;
@@ -34,6 +34,7 @@ use tof_dataclasses::commands::TofResponse;
 use liftof_lib::{
     waveform_analysis,
 };
+use liftof_lib::thread_control::ThreadControl;
 
 use liftof_lib::settings::AnalysisEngineSettings;
 

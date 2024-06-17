@@ -45,7 +45,6 @@ use clap::{
     Parser
 };
 
-
 use crossbeam_channel::{
     Sender,
     Receiver,
@@ -64,9 +63,9 @@ use tof_dataclasses::events::{
     RBEvent
 };
 
-use tof_dataclasses::threading::{
-    ThreadControl,
-};
+//use tof_dataclasses::threading::{
+//    ThreadControl,
+//};
 use tof_dataclasses::serialization::{
     Serialization,
     Packable
@@ -95,7 +94,7 @@ use liftof_lib::{
     LiftofSettings,
     CommandCC,
 };
-
+use liftof_lib::thread_control::ThreadControl;
 use liftof_lib::constants::{
     DEFAULT_CALIB_VOLTAGE,
     DEFAULT_RB_ID,
@@ -262,12 +261,16 @@ fn main() {
   nboards = rb_list.len();
   println!("=> Expecting {} readoutboards!", rb_list.len());
   //debug!("--> Following RBs are expected:");
+  // init thread control
   match thread_control.lock() {
     Ok(mut tc) => {
       for rb in &rb_list {
         tc.finished_calibrations.insert(rb.rb_id, false); 
         //debug!("     -{}", rb);
       }
+      tc.n_rbs = rb_list.len() as u32;
+      tc.thread_data_sink_active = true;
+      tc.liftof_settings = config.clone();
     },
     Err(err) => {
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -336,7 +339,7 @@ fn main() {
   if cpu_moni_interval > 0 {
     println!("==> Starting main monitoring thread...");
     let tp_to_sink_c = tp_to_sink.clone();
-    let _thread_control_c = thread_control.clone();
+    let _thread_control_c = Arc::clone(&thread_control);
     // this is anonymus, but we control the thread
     // through the thread control mechanism, so we
     // can still end it.
@@ -355,20 +358,20 @@ fn main() {
   gds_settings.data_dir = write_stream_path;
 
   println!("==> Starting data sink thread!");
-  let thread_control_gds = thread_control.clone();
+  let thread_control_gds = Arc::clone(&thread_control);
   let _data_sink_thread = thread::Builder::new()
     .name("data-sink".into())
     .spawn(move || {
       global_data_sink(&tp_from_threads,
-                       write_stream,
-                       runid,
-                       &gds_settings,
+                       //write_stream,
+                       //runid,
+                       //&gds_settings,
                        false,
                        thread_control_gds);
     })
     .expect("Failed to spawn data-sink thread!");
   println!("==> data sink thread started!");
-  let thread_control_sh = thread_control.clone();
+  let thread_control_sh = Arc::clone(&thread_control);
   let _signal_handler_thread = thread::Builder::new()
     .name("signal_handler".into())
     .spawn(move || {
@@ -381,7 +384,7 @@ fn main() {
   println!("==> Starting event builder and master trigger threads...");
   //let db_path_string    = config.db_path.clone();
   let evb_settings      = config.event_builder_settings.clone();
-  let thread_control_eb = thread_control.clone();
+  let thread_control_eb = Arc::clone(&thread_control);
   let tp_to_sink_c      = tp_to_sink.clone();
   let _evb_thread = thread::Builder::new()
     .name("event-builder".into())
@@ -397,9 +400,8 @@ fn main() {
      })
     .expect("Failed to spawn event-builder thread!");
   // master trigger
-  //let thread_control_mt = thread_control.clone();
   let mtb_moni_sender = tp_to_sink.clone(); 
-  let thread_control_mt = thread_control.clone();
+  let thread_control_mt = Arc::clone(&thread_control);
   let _mtb_thread = thread::Builder::new()
     .name("master-trigger".into())
     .spawn(move || {
@@ -429,7 +431,7 @@ fn main() {
     let thread_name     = format!("rb-comms-{}", this_rb.rb_id);
     let settings        = config.analysis_engine_settings.clone();
     let ack_sender      = ack_to_cmd_disp.clone();
-    let tc_rb_comm      = thread_control.clone();
+    let tc_rb_comm      = Arc::clone(&thread_control);
     let _rb_comm_thread = thread::Builder::new()
       .name(thread_name)
       .spawn(move || {
@@ -491,11 +493,13 @@ fn main() {
   // default  behavriour is to stop
   // when we are done
   let mut dont_stop = false;
+  let mut listen    = false;
   match args.command {
     CommandCC::Listen => {
       dont_stop = true;
+      listen    = true;
       // start command dispatcher thread
-      let tc = thread_control.clone();
+      let tc = Arc::clone(&thread_control);
       let ts = tp_to_sink.clone();
       let _cmd_dispatcher = thread::Builder::new()
         .name("command-dispatcher".into())
@@ -588,8 +592,13 @@ fn main() {
         Ok(mut tc) => {
           // deactivate the master trigger thread
           tc.thread_master_trg_active = true;
-          tc.calibration_active = false;
+          tc.calibration_active       = false;
           tc.thread_event_bldr_active = true;
+          if args.write_stream {
+            tc.write_data_to_disk       = true;
+          }
+          tc.run_id                   = runid as u32;
+          tc.new_run_start_flag       = true;
         },
         Err(err) => {
           error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -697,7 +706,7 @@ fn main() {
         if tc.stop_flag {
           end_program = true;
         }
-        if tc.calibration_active {
+        if tc.calibration_active && !listen {
           for rbid in &rb_list {
             // the global data sink sets these flags
             let mut finished_keys = Vec::<u8>::new();

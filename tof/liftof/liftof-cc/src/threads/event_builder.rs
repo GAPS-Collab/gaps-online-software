@@ -31,13 +31,15 @@ use tof_dataclasses::events::{
 };
 
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::threading::ThreadControl;
+//use tof_dataclasses::threading::ThreadControl;
 
 //use liftof_lib::heartbeat_printer;
 use liftof_lib::settings::{
     TofEventBuilderSettings,
     BuildStrategy,
 };
+use liftof_lib::thread_control::ThreadControl;
+
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 
 use colored::{

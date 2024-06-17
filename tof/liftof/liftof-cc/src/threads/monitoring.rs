@@ -18,12 +18,13 @@ use tof_dataclasses::monitoring::{
     CPUMoniData,
 };
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::threading::ThreadControl;
+//use tof_dataclasses::threading::ThreadControl;
 
 use tof_control::helper::cpu_type::{
     CPUTempDebug,
     CPUInfoDebug,
 };
+use liftof_lib::thread_control::ThreadControl;
 
 
 /// Monitor the main tof computer (sysinfo)
