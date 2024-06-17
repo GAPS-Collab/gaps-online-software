@@ -149,7 +149,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut cali_completed   = 0;
  
   // run settings 
-  let mut writer : Option<TofPacketWriter>;
+  let mut writer : Option<TofPacketWriter> = None;
   let mut write_stream  = false;
   let mut runid : u32 = 0;
   let mut new_run_start = false;
