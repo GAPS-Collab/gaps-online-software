@@ -38,6 +38,10 @@ pub struct ThreadControl {
   pub n_rbs                      : u32,
   /// Write data to disk
   pub write_data_to_disk         : bool,
+  /// indicator that a new 
+  /// run has started
+  /// (data sinks need to know)
+  pub new_run_start_flag         : bool,
   pub liftof_settings            : LiftofSettings,
 }
 
@@ -57,6 +61,7 @@ impl ThreadControl {
       run_id                     : 0,
       n_rbs                      : 0,
       write_data_to_disk         : false,
+      new_run_start_flag         : false,
       liftof_settings            : LiftofSettings::new(),
     }
   }

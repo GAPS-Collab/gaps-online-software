@@ -41,9 +41,9 @@ use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::monitoring::MtbMoniData;
 //use tof_dataclasses::commands::RBCommand;
 use tof_dataclasses::events::MasterTriggerEvent;
-use tof_dataclasses::threading::{
-    ThreadControl,
-};
+//use tof_dataclasses::threading::{
+//    ThreadControl,
+//};
 use tof_dataclasses::events::master_trigger::TriggerType;
 use tof_dataclasses::errors::{
     //IPBusError,
@@ -53,6 +53,8 @@ use tof_dataclasses::ipbus::{
     IPBus,
     //IPBusPacketType,
 };
+
+use crate::thread_control::ThreadControl;
 
 /// The DAQ packet from the MTB has a flexible size, but it will
 /// be at least this number of words long.

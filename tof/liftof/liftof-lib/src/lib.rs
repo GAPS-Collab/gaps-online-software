@@ -80,9 +80,9 @@ use signal_hook::consts::signal::{
 use tof_dataclasses::DsiLtbRBMapping;
 #[cfg(feature="database")]
 use tof_dataclasses::database::ReadoutBoard;
-use tof_dataclasses::threading::{
-    ThreadControl,
-};
+//use tof_dataclasses::threading::{
+//    ThreadControl,
+//};
 
 #[cfg(feature="database")]
 use tof_dataclasses::constants::NWORDS;
@@ -110,6 +110,8 @@ use tof_dataclasses::analysis::{
 };
 
 use tof_dataclasses::RBChannelPaddleEndIDMap;
+
+use crate::thread_control::ThreadControl;
 
 use clap::{arg,
   //value_parser,

@@ -19,7 +19,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 tof-dataclasses = { workspace = true, features = ["polars"] } 
-liftof-lib      = { path = "../liftof-lib", features = ["database"]}
+liftof-lib      = { path = "../liftof-lib", features=["database"]}
 # somehow pyo3 is very picky with the version
 pyo3            = { version = "0.21", features = ["extension-module"] }
 pyo3-log        = "0.10"
