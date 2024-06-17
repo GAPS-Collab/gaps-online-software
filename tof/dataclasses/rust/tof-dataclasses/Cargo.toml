@@ -54,6 +54,6 @@ diesel = { version = "2.1", features = ["sqlite", "64-column-tables"], optional=
 # this fixes all compiling issues for the musl target with libsqlite
 libsqlite3-sys = { version = "0.28", features = ["bundled"] }
 # Takeru's tof-control
-tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.5", features=[] }
+tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.9", features=[] }
 smoothed_z_score = {version = "0.1", optional = true}
 #sqlite = {version = "0.30", optional = true}
