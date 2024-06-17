@@ -289,7 +289,9 @@ fn main() {
                   if rat_list.len() != 1 {
                     error!("Ambigious preamp mapping! {:?}", rat_list);
                   } else {
-                    let key = format!("RAT{:2}", rat_list[0].rat_id);
+                    let key = format!("RAT{:02}", rat_list[0].rat_id);
+                    //println!("{:?}", preamp_cfg.rat_preamp_biases);
+                    //println!("{}", key);
                     match preamp_cfg.rat_preamp_biases.get(&key) {
                       None => error!("Unable to set biases! Entry for {} not found in the settings!", key),
                       Some(biases) => {

@@ -6,6 +6,18 @@ Build and deploy different liftof components
 import subprocess as sub
 import os
 import shutil
+import tqdm
+
+def all_rbs():
+    """
+    Get all avaiable readoutboards
+    """
+    import gaps_online.db as db
+    rbs = db.ReadoutBoard.objects.all()
+    rb_ids = sorted([k.rb_id for k in rbs])
+    #print (rb_ids)
+    #raise
+    return rb_ids
 
 def get_version(binary):
     """
@@ -58,12 +70,28 @@ def deploy(binary, dest_dir='bin'):
     if binary == 'liftof-cc':
         deploy_cmd = f"rsync -avz build/{binary} tofcpu-pl:{dest_dir}/{binary}.{version}"
     if binary == 'liftof-rb':
-        deploy_cmd = f"rsync -avz build/{binary} tofcpu-pl:{dest_dir}/{binary}.{version}"
+        rbids = all_rbs() 
+        rb_targets = [f'tof-rb{k:02}' for k in rbids]
+        for target in tqdm.tqdm(rb_targets, desc='Deploying to rbs'):
+            deploy_cmd = f"rsync -avz build/{binary} tofcpu-pl:{dest_dir}/{binary}.{version}"
+            sub.run([deploy_cmd], shell=True)
+        return
     if binary == 'liftof-tui':
         deploy_cmd = f"rsync -avz build/{binary} gse5-pl:tof-moni/{binary}.{version}"
     sub.run([deploy_cmd], shell=True)
     
-def deploy_aux(binary):
+def deploy_asset(asset):
+    if asset == 'db':
+        rbids = all_rbs() 
+        rb_targets = [f'tof-rb{k:02}' for k in rbids]
+        for target in ['tofcpu-pl']:
+            deploy_cmd = f"rsync -avz ../../gaps-db/gaps_db/gaps_flight.db {target}:config/gaps_flight.db"
+            sub.run([deploy_cmd], shell=True)
+        for target in tqdm.tqdm(rb_targets, desc='Deploying to rbs'):
+            deploy_cmd = f"rsync -avz ../../gaps-db/gaps_db/gaps_flight.db {target}:config/gaps_flight.db"
+            sub.run([deploy_cmd], shell=True)
+
+
     pass
 
 if __name__ == '__main__':
@@ -85,7 +113,8 @@ if __name__ == '__main__':
     deployparser.add_argument("--debug", action="store_true", help="Deploy to debug directory", default=False)
     deployparser.add_argument("--tofcpu-ssh-name", type=str, help="The name of the tof-cpu in .ssh/config", default="tofcpu-pl")
     deployparser.add_argument("binary", type=str, help="Select the binary to build")
-
+    deployassparser = subparsers.add_parser('deploy_asset', help='Deploy liftof components')
+    deployassparser.add_argument("asset", type=str, help="Asset to deply. Choices are 'db'")
     args = parser.parse_args()
     if len(vars(args).keys()) == 0:
         parser.print_help()
@@ -112,5 +141,8 @@ if __name__ == '__main__':
                 deploy(args.binary, dest_dir='bin/debug')
             else:
                 deploy(args.binary)
+    print (args.cmd)
+    if args.cmd == 'deploy_asset':
+        deploy_asset(args.asset)
 #deploy()
 #print (get_version('liftof-cc'))
