@@ -170,7 +170,7 @@ fn test_event_status() {
     let ev_stat    = EventStatus::from_random();
     let ev_stat_u8 = ev_stat.to_u8();
     let u8_ev_stat = EventStatus::from(ev_stat_u8);
-    assert_eq!(u8_ev_stat, u8_ev_stat);
+    assert_eq!(ev_stat, u8_ev_stat);
   }
 }
 
