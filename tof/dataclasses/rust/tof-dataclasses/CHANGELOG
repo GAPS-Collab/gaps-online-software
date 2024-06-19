@@ -1,5 +1,10 @@
 # LELEWAA series
 
+## v0.10.2
+* makes use of f16 for online calculated values
+* adds baseline, baseline_rms to TofHit
+* TofHit and TofEventSummary now support ProtocolVersion
+
 ## v0.10.1
 * changes timestamp for file saving to the same %y%m%d_%h%m% format as 
   bfsw, however, due to rusts increased desire of safety, add UTC.

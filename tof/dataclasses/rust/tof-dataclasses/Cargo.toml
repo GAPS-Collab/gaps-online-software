@@ -1,6 +1,6 @@
 [package]
 name = "tof-dataclasses"
-version = "0.10.1"
+version = "0.10.2"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -30,9 +30,10 @@ criterion = "0.4"
 #tempfile  = "3.10"
 
 [dependencies]
+half              = "2.4.1"
 chrono            = "0.4"
 regex             = "1.5"
-glob               = "0.3"
+glob              = "0.3"
 log               = "0.4"
 serde             = { version = "1.0", features = ["derive"] }
 serde_json        = "1.0"

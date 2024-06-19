@@ -9,6 +9,7 @@
 use std::time::Instant;
 use std::fmt;
 
+
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
     use crate::FromRandom;
@@ -43,6 +44,8 @@ use crate::events::master_trigger::{
     LTBThreshold,
     LTB_CHANNELS
 };
+
+use crate::ProtocolVersion;
 
 // This looks like a TODO
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -550,7 +553,9 @@ impl FromRandom for TofEventHeader {
 /// Smaller packet for in-flight telemetry stream
 #[derive(Debug, Clone, PartialEq)]
 pub struct TofEventSummary {
+  //pub status_version    : u8,
   pub status            : EventStatus,
+  pub version           : ProtocolVersion,
   pub quality           : u8,
   pub trigger_sources   : u16,
   /// the number of triggered paddles coming
@@ -575,6 +580,7 @@ impl TofEventSummary {
   pub fn new() -> Self {
     Self {
       status            : EventStatus::Unknown,
+      version           : ProtocolVersion::Unknown,
       quality           : 0,
       trigger_sources   : 0,
       n_trigger_paddles : 0,
@@ -599,6 +605,8 @@ impl TofEventSummary {
     }
     links
   }
+  
+
 
   /// Get the combination of triggered DSI/J/CH on 
   /// the MTB which formed the trigger. This does 
@@ -727,7 +735,8 @@ impl Serialization for TofEventSummary {
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::new();
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
-    stream.push(self.status.to_u8());
+    let status_version = self.status.to_u8() | self.version.to_u8();
+    stream.push(status_version);
     stream.extend_from_slice(&self.trigger_sources.to_le_bytes());
     stream.extend_from_slice(&self.n_trigger_paddles.to_le_bytes());
     stream.extend_from_slice(&self.event_id.to_le_bytes());
@@ -761,7 +770,11 @@ impl Serialization for TofEventSummary {
       error!("Decoding of HEAD failed! Got {} instead!", head);
       return Err(SerializationError::HeadInvalid);
     }
-    summary.status            = EventStatus::from(parse_u8(stream, pos));
+    let status_version_u8     = parse_u8(stream, pos);
+    let status  = EventStatus::from(status_version_u8 & 0x1f);
+    let version = ProtocolVersion::from(status_version_u8 & 0xe0); 
+    summary.status = status;
+    summary.version = version;
     summary.trigger_sources   = parse_u16(stream, pos);
     summary.n_trigger_paddles = parse_u8(stream, pos);
     summary.event_id          = parse_u32(stream, pos);
@@ -797,7 +810,7 @@ impl Default for TofEventSummary {
 
 impl fmt::Display for TofEventSummary {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let mut repr = String::from("<TofEventSummary");
+    let mut repr = format!("<TofEventSummary (version {})", self.version);
     repr += &(format!("\n  EventStatus      : {}", self.status));
     repr += &(format!("\n  TriggerSources   : {:?}", self.get_trigger_sources()));
     repr += &(format!("\n  NTrigPaddles     : {}", self.n_trigger_paddles));
@@ -834,8 +847,10 @@ impl FromRandom for TofEventSummary {
   fn from_random() -> Self {
     let mut summary = Self::new();
     let mut rng     = rand::thread_rng();
-
-    summary.status            = EventStatus::from_random();
+    let status      = EventStatus::from_random().to_u8();
+    let version     = ProtocolVersion::from_random().to_u8();
+    let status_version = status || version;
+    summary.status_version    = status_version;
     summary.quality           = rng.gen::<u8>();
     summary.trigger_sources   = rng.gen::<u16>();
     summary.n_trigger_paddles = rng.gen::<u8>();
