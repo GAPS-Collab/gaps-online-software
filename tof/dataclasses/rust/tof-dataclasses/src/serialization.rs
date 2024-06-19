@@ -2,6 +2,8 @@
 //!
 //!
 
+use half::f16;
+
 // re-exports
 pub use crate::errors::SerializationError;
 
@@ -169,6 +171,11 @@ pub fn parse_u48_for_16bit_words(bs  : &Vec::<u8>,
   u64::from_le_bytes(raw_bytes_8)
 }
 
+pub fn parse_f16(bs : &Vec::<u8>, pos : &mut usize) -> f16 {
+  let value = f16::from_le_bytes([bs[*pos], bs[*pos+1]]);
+  *pos += 2;
+  value
+}
 
 pub fn parse_f32(bs : &Vec::<u8>, pos : &mut usize) -> f32 {
   let value = f32::from_le_bytes([bs[*pos],   bs[*pos+1],  

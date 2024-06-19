@@ -15,9 +15,8 @@ use std::fmt;
 pub enum ProtocolVersion {
   Unknown  = 0u8,
   V1       = 64u8,
-  V2       = 65u8,
-  V3       = 66u8,
-  V4       = 67u8,
+  V2       = 128u8,
+  V3       = 192u8,
 }
 
 impl fmt::Display for ProtocolVersion {
@@ -38,13 +37,10 @@ impl ProtocolVersion {
         return 64;
       }
       ProtocolVersion::V2 => {
-        return 65;
+        return 128;
       }
       ProtocolVersion::V3 => {
-        return 66;
-      }
-      ProtocolVersion::V4 => {
-        return 67;
+        return 192;
       }
     }
   }
@@ -53,12 +49,11 @@ impl ProtocolVersion {
 impl From<u8> for ProtocolVersion {
   fn from(value: u8) -> Self {
     match value {
-      0u8  => ProtocolVersion::Unknown,
-      64u8 => ProtocolVersion::V1,
-      65u8 => ProtocolVersion::V2,
-      66u8 => ProtocolVersion::V3,
-      67u8 => ProtocolVersion::V4,
-      _    => ProtocolVersion::Unknown
+      0u8   => ProtocolVersion::Unknown,
+      64u8  => ProtocolVersion::V1,
+      128u8 => ProtocolVersion::V2,
+      192u8 => ProtocolVersion::V3,
+      _     => ProtocolVersion::Unknown
     }
   }
 }
@@ -72,7 +67,6 @@ impl FromRandom for ProtocolVersion {
       ProtocolVersion::V1,
       ProtocolVersion::V2,
       ProtocolVersion::V3,
-      ProtocolVersion::V4,
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());

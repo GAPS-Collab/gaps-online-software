@@ -1,10 +1,14 @@
+use half::f16;
+
 use crate::errors::SerializationError;
 use crate::serialization::{
     parse_u8,
     parse_u16,
-    parse_u32,
+    parse_f16,
     Serialization
 };
+use crate::ProtocolVersion;
+
 use std::fmt;
 
 #[cfg(feature="random")]
@@ -104,8 +108,18 @@ pub struct TofHit {
 
   // this might be not needed, 
   // unsure
+  // we repurpsoe these 6 bytes
+  // for baseline, baseline_rms 
+  // and a one byte status
   pub timestamp32   : u32,
   pub timestamp16   : u16,
+  pub reserved      : u8,
+  // only 2 bytes of version
+  // are used
+  pub version       : ProtocolVersion,
+  // for now, but we want to use half instead
+  pub baseline      : f16,
+  pub baseline_rms  : f16,
 
   // fields which won't get 
   // serialized
@@ -137,9 +151,6 @@ impl fmt::Display for TofHit {
     pos_across    {:.2}   
     t0            {:.2}   
   ctr_etx         {}   
-  timestamp32     {}  
-  timestamp16     {}
-  |-> timestamp48 {}
   VALID           {}>", 
             self.paddle_id,
             self.get_time_a(),
@@ -152,9 +163,9 @@ impl fmt::Display for TofHit {
             self.get_pos_across(),
             self.get_t0(),
             self.ctr_etx,
-            self.timestamp32,
-            self.timestamp16,
-            self.get_timestamp48(),
+            //self.timestamp32,
+            //self.timestamp16,
+            //self.get_timestamp48(),
             self.valid,
             )
   }
@@ -187,8 +198,11 @@ impl Serialization for TofHit {
     bytestream.extend_from_slice(&self.pos_across  .to_le_bytes()); 
     bytestream.extend_from_slice(&self.t0          .to_le_bytes()); 
     bytestream.push(self.ctr_etx); 
-    bytestream.extend_from_slice(&self.timestamp32 .to_le_bytes());
-    bytestream.extend_from_slice(&self.timestamp16 .to_le_bytes());
+    //bytestream.extend_from_slice(&self.timestamp32 .to_le_bytes());
+    //bytestream.extend_from_slice(&self.timestamp16 .to_le_bytes());
+    bytestream.push(self.version.to_u8());
+    bytestream.extend_from_slice(&self.baseline.to_le_bytes());
+    bytestream.extend_from_slice(&self.baseline_rms.to_le_bytes());
     bytestream.extend_from_slice(&Self::TAIL       .to_le_bytes()); 
     bytestream
   }
@@ -218,8 +232,13 @@ impl Serialization for TofHit {
     pp.pos_across    = parse_u16(stream, pos);
     pp.t0            = parse_u16(stream, pos);
     pp.ctr_etx       = parse_u8(stream, pos);
-    pp.timestamp32   = parse_u32(stream, pos);
-    pp.timestamp16   = parse_u16(stream, pos);
+    let version      = ProtocolVersion::from(parse_u8(stream, pos));
+    pp.version       = version;
+    pp.baseline      = parse_f16(stream, pos);
+    pp.baseline_rms  = parse_f16(stream, pos);
+
+    //pp.timestamp32   = parse_u32(stream, pos);
+    //pp.timestamp16   = parse_u16(stream, pos);
     *pos += 2; // always have to do this when using verify fixed
     Ok(pp)
   }
@@ -245,6 +264,10 @@ impl TofHit {
          ctr_etx      : 0,
          timestamp32  : 0,
          timestamp16  : 0,
+         version      : ProtocolVersion::Unknown,
+         reserved     : 0,
+         baseline     : f16::from_f32(0.0),
+         baseline_rms : f16::from_f32(0.0),
          // non-serialize fields
          valid        : true,
          ftime_a      : 0.0,
@@ -299,9 +322,9 @@ impl TofHit {
   }
 
 
-  pub fn get_timestamp48(&self) -> u64 {
-    ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
-  }
+  //pub fn get_timestamp48(&self) -> u64 {
+  //  ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
+  //}
   
   pub fn set_edep(&mut self, edep : f32) {
     if edep >= 100.0 {
@@ -446,8 +469,11 @@ impl TofHit {
     pp.pos_across   = rng.gen::<u16>();
     pp.t0           = rng.gen::<u16>();
     pp.ctr_etx      = rng.gen::<u8>();
-    pp.timestamp32  = rng.gen::<u32>();
-    pp.timestamp16  = rng.gen::<u16>();
+    pp.version      = ProtocolVersion::from(rng.gen::<u8>());
+    pp.baseline     = f16::from_f32(rng.gen::<f32>());
+    pp.baseline_rms = f16::from_f32(rng.gen::<f32>());
+    //pp.timestamp32  = rng.gen::<u32>();
+    //pp.timestamp16  = rng.gen::<u16>();
     pp
   }
 }
@@ -455,9 +481,11 @@ impl TofHit {
 #[cfg(feature = "random")]
 #[test]
 fn serialization_tofhit() {
+  for _ in 0..100 {
     let mut pos = 0;
     let data = TofHit::from_random();
     let test = TofHit::from_bytestream(&data.to_bytestream(),&mut pos).unwrap();
     assert_eq!(pos, TofHit::SIZE);
     assert_eq!(data, test);
+  }
 }

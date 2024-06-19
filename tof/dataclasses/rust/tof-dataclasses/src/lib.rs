@@ -40,11 +40,13 @@ pub mod ipbus;
 pub mod series;
 pub mod heartbeats;
 pub mod config;
+pub mod version;
 #[cfg(feature="database")]
 extern crate diesel;
 #[cfg(feature="database")]
 pub mod database;
 
+pub use version::ProtocolVersion;
 
 #[macro_use] extern crate log;
 
