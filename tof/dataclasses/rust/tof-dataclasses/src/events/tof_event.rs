@@ -553,11 +553,20 @@ impl FromRandom for TofEventHeader {
 /// Smaller packet for in-flight telemetry stream
 #[derive(Debug, Clone, PartialEq)]
 pub struct TofEventSummary {
-  //pub status_version    : u8,
   pub status            : EventStatus,
   pub version           : ProtocolVersion,
   pub quality           : u8,
   pub trigger_sources   : u16,
+  // a bunch of calculated variablels, used 
+  // for online interesting event search
+  // these will be only available in ProtocolVersion 1
+  pub n_hits_umb        : u8,
+  pub n_hits_cbe        : u8,
+  pub n_hits_cor        : u8,
+  pub tot_edep_umb      : f32,
+  pub tot_edep_cbe      : f32,
+  pub tot_edep_cor      : f32,
+
   /// the number of triggered paddles coming
   /// from the MTB directly. This might NOT be
   /// the same as the number of hits!
@@ -581,6 +590,12 @@ impl TofEventSummary {
     Self {
       status            : EventStatus::Unknown,
       version           : ProtocolVersion::Unknown,
+      n_hits_umb        : 0,
+      n_hits_cbe        : 0,
+      n_hits_cor        : 0,
+      tot_edep_umb      : 0.0,
+      tot_edep_cbe      : 0.0,
+      tot_edep_cor      : 0.0,
       quality           : 0,
       trigger_sources   : 0,
       n_trigger_paddles : 0,
