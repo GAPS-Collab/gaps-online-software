@@ -120,6 +120,97 @@ fn pack_preampbiasconfig() {
   }
 }
 
+/// Set ltb thresholds
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct LTBThresholdConfig {
+  pub rb_id       : u8,
+  pub thresholds  : [f32;3]
+}
+
+impl LTBThresholdConfig {
+  pub fn ne() -> Self {
+    Self {
+      rb_id       : 0,
+      thresholds  : [0.0;3]
+    }
+  }
+}
+
+impl Default for LTBThresholdConfig {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for LTBThresholdConfig {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<LTBThresholdConfig");
+    repr += &(format!("\n  RB ID      : {}", self.rb_id));
+    repr += "  -- thresholds per channel:";
+    for k in 0..self.thresholds.len() {
+      repr += &(format!("\n    Ch{} : {:.3}", k, self.thresholds[k]));
+    }
+    write!(f, "{}", repr)
+  }
+}
+
+impl Packable for LTBThresholdConfig {
+  const PACKET_TYPE : PacketType = PacketType::LTBThresholdConfig;
+}
+
+impl Serialization for LTBThresholdConfig {
+
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  const SIZE : usize = 13;
+
+  fn from_bytestream(stream     : &Vec<u8>,
+                     pos        : &mut usize)
+    -> Result<Self, SerializationError>{
+      Self::verify_fixed(stream, pos)?;
+      let mut cfg = LTBThresholdConfig::new();
+      cfg.rb_id   = parse_u8(stream, pos);
+      for k in 0..3 {
+        cfg.thresholds[k] = parse_f32(stream, pos);
+      }
+      *pos += 2;
+      Ok(cfg)
+    }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
+    bs.extend_from_slice(&Self::HEAD.to_le_bytes());
+    bs.push(self.rb_id);
+    for k in 0..3 {
+      bs.extend_from_slice(&self.thresholds[k].to_le_bytes());
+    }
+    bs.extend_from_slice(&Self::TAIL.to_le_bytes());
+    bs
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for LTBThresholdConfig {
+  fn from_random() -> Self {
+    let mut cfg   = LTBThresholdConfig::new();
+    let mut rng   = rand::thread_rng();
+    cfg.rb_id     = rng.gen::<u8>();
+    for k in 0..3 {
+      cfg.thresholds[k] = rng.gen::<f32>(0;)
+    }
+    cfg
+  }
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_ltbthresholdconfig {
+  for _ in 0..100 {
+    let cfg   = LTBThresholdConfig::from_random();
+    let test : LTBThresholdConfig = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}
 
 /// Readoutboard configuration for a specific run
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
