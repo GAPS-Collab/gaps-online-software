@@ -862,10 +862,10 @@ impl FromRandom for TofEventSummary {
   fn from_random() -> Self {
     let mut summary = Self::new();
     let mut rng     = rand::thread_rng();
-    let status      = EventStatus::from_random().to_u8();
-    let version     = ProtocolVersion::from_random().to_u8();
-    let status_version = status || version;
-    summary.status_version    = status_version;
+    let status      = EventStatus::from_random();
+    let version     = ProtocolVersion::from_random();
+    summary.status            = status;
+    summary.version           = version;
     summary.quality           = rng.gen::<u8>();
     summary.trigger_sources   = rng.gen::<u16>();
     summary.n_trigger_paddles = rng.gen::<u8>();
