@@ -67,7 +67,7 @@ use tof_dataclasses::commands::{
 };
 
 use tof_dataclasses::events::DataType;
-use tof_dataclasses::run::RunConfig;
+use tof_dataclasses::config::RunConfig;
 
 #[cfg(feature="database")]
 use tof_control::helper::pa_type::PASetBias;

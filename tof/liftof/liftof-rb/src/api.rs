@@ -32,7 +32,7 @@ use tof_dataclasses::commands::{
 };
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::errors::SerializationError;
-use tof_dataclasses::run::RunConfig;
+use tof_dataclasses::config::RunConfig;
 
 // Takeru's tof-control
 use tof_dataclasses::calibrations::RBCalibrations;

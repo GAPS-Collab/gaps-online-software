@@ -26,7 +26,7 @@ use tof_dataclasses::config::PreampBiasConfig;
 use tof_dataclasses::errors::CmdError;
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
-use tof_dataclasses::run::RunConfig;
+use tof_dataclasses::config::RunConfig;
 use tof_dataclasses::heartbeats::RBPing;
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::serialization::Packable;

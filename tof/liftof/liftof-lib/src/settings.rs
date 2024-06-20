@@ -28,7 +28,7 @@ use tof_dataclasses::commands::TofCommandV2;
 #[cfg(feature="database")]
 use tof_dataclasses::commands::TofCommandCode;
 
-use tof_dataclasses::run::RunConfig;
+use tof_dataclasses::config::RunConfig;
 #[cfg(feature="database")]
 use tof_dataclasses::database::RAT;
 #[cfg(feature="database")]
