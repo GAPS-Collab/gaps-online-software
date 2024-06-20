@@ -33,7 +33,6 @@ pub mod threading;
 pub mod commands;
 pub mod monitoring;
 //pub mod manifest;
-pub mod run;
 pub mod io;
 pub mod analysis;
 pub mod ipbus;
