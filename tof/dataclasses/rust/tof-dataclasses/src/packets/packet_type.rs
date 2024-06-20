@@ -47,6 +47,7 @@ pub enum PacketType {
   RBPing              = 160u8,
   PreampBiasConfig    = 161u8,
   RunConfig           = 162u8,
+  LTBThresholdConfig  = 163u8,
   // use the > 200 values for transmitting
   // various binary files
   ConfigBinary        = 201u8,
@@ -93,6 +94,7 @@ impl From<u8> for PacketType {
       160u8 => PacketType::RBPing,
       161u8 => PacketType::PreampBiasConfig,
       162u8 => PacketType::RunConfig,
+      163u8 => PacketType::LTBThresholdConfig,
       201u8 => PacketType::ConfigBinary,
       202u8 => PacketType::LiftofRBBinary,
       203u8 => PacketType::LiftofBinaryService,
@@ -125,6 +127,7 @@ impl FromRandom for PacketType {
       PacketType::RBPing,
       PacketType::PreampBiasConfig,
       PacketType::RunConfig,
+      PacketType::LTBThresholdConfig,
       PacketType::RBMoniData,
       PacketType::PBMoniData,
       PacketType::LTBMoniData,
@@ -168,6 +171,7 @@ fn test_packet_types() {
   type_codes.push(PacketType::RBPing as u8);
   type_codes.push(PacketType::PreampBiasConfig as u8);
   type_codes.push(PacketType::RunConfig as u8);
+  type_codes.push(PacketType::LTBThresholdConfig as u8);
   type_codes.push(PacketType::MonitorMtb as u8);
   type_codes.push(PacketType::RBCalibration as u8);
   type_codes.push(PacketType::ConfigBinary as u8);
