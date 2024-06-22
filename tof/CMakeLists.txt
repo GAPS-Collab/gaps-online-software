@@ -7,8 +7,22 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
 
 ################
 
+option(BUILD_DB "Build C++ bindings to access GAPS DB" OFF) 
+if(BUILD_DB)
+  find_package(SQLite3 REQUIRED)
+  if(SQLite3_FOUND)
+    message(STATUS "-- found SQLite3 libary")
+    message(STATUS "-- -- will use sqlite library ${SQLite3_LIBRARIES}")
+    add_definitions( -DBUILD_DB)
+  else()
+    message(WARNING "Can not find sqlite3 installation! Disabling DB feature")
+    set(BUILD_DB OFF)
+  endif()
+endif()
 # Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
 option(BUILD_ROOTCOMPONENTS "build components of the software which require CERN ROOT" ON)
+
+
 
 if(BUILD_ROOTCOMPONENTS)
 
@@ -40,6 +54,7 @@ add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
     dataclasses/C++/src/monitoring.cxx
     dataclasses/C++/src/legacy.cxx
     dataclasses/C++/src/logging.cxx
+    $<$<BOOL:${BUILD_DB}>:dataclasses/C++/src/database.cxx>
 )
 
 set_property(TARGET ${GAPSTOF_LIBRARY_SHARED} PROPERTY CXX_STANDARD 20)
@@ -47,6 +62,7 @@ target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedanti
 target_include_directories(${GAPSTOF_LIBRARY_SHARED}
                             PUBLIC
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
+                            $<$<BOOL:${BUILD_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
                             $<INSTALL_INTERFACE:include> 
                             #${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
@@ -58,7 +74,7 @@ target_include_directories(${GAPSTOF_LIBRARY_SHARED}
 target_link_libraries(${GAPSTOF_LIBRARY_SHARED}
                       PUBLIC
                          $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
-                         #$<$<BOOL:${USE_GOOGLEPERFTOOLS}>:${GOOGLEPERFTOOLS_LIB}>
+                         $<$<BOOL:${BUILD_DB}>:${SQLite3_LIBRARIES}>
                     )
 
 if (BUILD_PYBINDINGS)
@@ -76,7 +92,8 @@ if (BUILD_PYBINDINGS)
 			                )
   target_link_libraries(${pybindings}
                         PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED})
+                          ${GAPSTOF_LIBRARY_SHARED}
+                          $<$<BOOL:${BUILD_DB}>:${SQLite3_LIBRARIES}>)
 
 endif(BUILD_PYBINDINGS)
 

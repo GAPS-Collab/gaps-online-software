@@ -12,6 +12,10 @@
 #include "packets/monitoring.h"
 #include "events/tof_event_header.hpp"
 
+#ifdef BUILD_DB
+#include "database.h"
+#endif
+
 //#include "legacy.h"
 #include "io.hpp"
 #include "serialization.h"
@@ -81,7 +85,42 @@ PYBIND11_MODULE(gaps_tof, m) {
     //                              + reader.open_file_name + ">";
     //                              }) 
     //;
-    
+    #ifdef BUILD_DB   
+    py::class_<Gaps::TofPaddle>(m, "TofPaddle")
+      .def_readonly("paddle_id"        , &Gaps::TofPaddle::paddle_id      )
+      .def_readonly("volume_id"        , &Gaps::TofPaddle::volume_id         )  
+      .def_readonly("panel_id"         , &Gaps::TofPaddle::panel_id          ) 
+      .def_readonly("mtb_link_id"      , &Gaps::TofPaddle::mtb_link_id       ) 
+      .def_readonly("rb_id"            , &Gaps::TofPaddle::rb_id             ) 
+      .def_readonly("rb_chA"           , &Gaps::TofPaddle::rb_chA            ) 
+      .def_readonly("rb_chB"           , &Gaps::TofPaddle::rb_chB            ) 
+      .def_readonly("ltb_id"           , &Gaps::TofPaddle::ltb_id            )         
+      .def_readonly("ltb_chA"           , &Gaps::TofPaddle::ltb_chA           )         
+      .def_readonly("ltb_chB"           , &Gaps::TofPaddle::ltb_chB           )         
+      .def_readonly("pb_id"             , &Gaps::TofPaddle::pb_id             )         
+      .def_readonly("pb_chA"            , &Gaps::TofPaddle::pb_chA            )         
+      .def_readonly("pb_chB"            , &Gaps::TofPaddle::pb_chB            )         
+      .def_readonly("cable_len"         , &Gaps::TofPaddle::cable_len         )         
+      .def_readonly("dsi"               , &Gaps::TofPaddle::dsi               )         
+      .def_readonly("j_rb"              , &Gaps::TofPaddle::j_rb              )         
+      .def_readonly("j_ltb"             , &Gaps::TofPaddle::j_ltb             )         
+      .def_readonly("height"            , &Gaps::TofPaddle::height            )         
+      .def_readonly("width"             , &Gaps::TofPaddle::width             )         
+      .def_readonly("length"            , &Gaps::TofPaddle::length            )         
+      .def_readonly("global_pos_x_l0"   , &Gaps::TofPaddle::global_pos_x_l0   )         
+      .def_readonly("global_pos_y_l0"   , &Gaps::TofPaddle::global_pos_y_l0   )         
+      .def_readonly("global_pos_z_l0"   , &Gaps::TofPaddle::global_pos_z_l0   )         
+      .def_readonly("global_pos_x_l0_A" , &Gaps::TofPaddle::global_pos_x_l0_A )          
+      .def_readonly("global_pos_y_l0_A" , &Gaps::TofPaddle::global_pos_y_l0_A )          
+      .def_readonly("global_pos_z_l0_A" , &Gaps::TofPaddle::global_pos_z_l0_A )          
+      
+      .def("__repr__", [](const Gaps::TofPaddle &paddle) {
+                          return paddle.to_string();})
+    ;
+    #endif
+
+
+
     py::class_<Gaps::TofPacketReader>(m, "TofPacketReader") 
       .def(py::init<String>(), py::return_value_policy::take_ownership)  
       .def("get_next_tp", &Gaps::TofPacketReader::get_next_packet,
@@ -612,8 +651,9 @@ PYBIND11_MODULE(gaps_tof, m) {
    m.def("get_event_ids_from_raw_stream", &get_event_ids_from_raw_stream);
    m.def("get_bytestream_from_file",      &get_bytestream_from_file);
    m.def("get_rbeventheaders",            &get_rbeventheaders); 
-   
-
+   #ifdef BUILD_DB 
+   m.def("get_paddles",                   &Gaps::get_tofpaddles);
+   #endif
    // Calibration functions
    m.def("spike_cleaning_simple",         &spike_cleaning_simple, 
            "A more simpler spike cleaing routine written by Jamie.");
