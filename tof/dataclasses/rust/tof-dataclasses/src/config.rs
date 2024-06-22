@@ -128,7 +128,7 @@ pub struct LTBThresholdConfig {
 }
 
 impl LTBThresholdConfig {
-  pub fn ne() -> Self {
+  pub fn new() -> Self {
     Self {
       rb_id       : 0,
       thresholds  : [0.0;3]
@@ -196,7 +196,7 @@ impl FromRandom for LTBThresholdConfig {
     let mut rng   = rand::thread_rng();
     cfg.rb_id     = rng.gen::<u8>();
     for k in 0..3 {
-      cfg.thresholds[k] = rng.gen::<f32>(0;)
+      cfg.thresholds[k] = rng.gen::<f32>();
     }
     cfg
   }
@@ -204,7 +204,7 @@ impl FromRandom for LTBThresholdConfig {
 
 #[cfg(feature = "random")]
 #[test]
-fn pack_ltbthresholdconfig {
+fn pack_ltbthresholdconfig() {
   for _ in 0..100 {
     let cfg   = LTBThresholdConfig::from_random();
     let test : LTBThresholdConfig = cfg.pack().unpack().unwrap();
