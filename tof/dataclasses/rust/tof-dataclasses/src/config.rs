@@ -162,7 +162,7 @@ impl Serialization for LTBThresholdConfig {
 
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
-  const SIZE : usize = 13;
+  const SIZE : usize = 17;
 
   fn from_bytestream(stream     : &Vec<u8>,
                      pos        : &mut usize)

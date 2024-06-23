@@ -200,6 +200,7 @@ impl Serialization for TofHit {
     bytestream.push(self.ctr_etx); 
     //bytestream.extend_from_slice(&self.timestamp32 .to_le_bytes());
     //bytestream.extend_from_slice(&self.timestamp16 .to_le_bytes());
+    bytestream.push(self.reserved);
     bytestream.push(self.version.to_u8());
     bytestream.extend_from_slice(&self.baseline.to_le_bytes());
     bytestream.extend_from_slice(&self.baseline_rms.to_le_bytes());
@@ -232,6 +233,7 @@ impl Serialization for TofHit {
     pp.pos_across    = parse_u16(stream, pos);
     pp.t0            = parse_u16(stream, pos);
     pp.ctr_etx       = parse_u8(stream, pos);
+    pp.reserved      = parse_u8(stream, pos);
     let version      = ProtocolVersion::from(parse_u8(stream, pos));
     pp.version       = version;
     pp.baseline      = parse_f16(stream, pos);

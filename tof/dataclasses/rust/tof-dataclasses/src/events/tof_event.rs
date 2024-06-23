@@ -786,8 +786,8 @@ impl Serialization for TofEventSummary {
       return Err(SerializationError::HeadInvalid);
     }
     let status_version_u8     = parse_u8(stream, pos);
-    let status  = EventStatus::from(status_version_u8 & 0x1f);
-    let version = ProtocolVersion::from(status_version_u8 & 0xe0); 
+    let status  = EventStatus::from(status_version_u8 & 0x3f);
+    let version = ProtocolVersion::from(status_version_u8 & 0xc0); 
     summary.status = status;
     summary.version = version;
     summary.trigger_sources   = parse_u16(stream, pos);
