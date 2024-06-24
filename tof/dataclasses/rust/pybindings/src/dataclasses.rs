@@ -59,6 +59,8 @@ use tof_dataclasses::commands::{
     TofCommandCode
 };
 use tof_dataclasses::calibrations::RBCalibrations;
+use tof_dataclasses::config::RunConfig;
+
 
 use pyo3::prelude::*;
 use pyo3::exceptions::{
@@ -91,7 +93,49 @@ use pyo3::exceptions::{
 //  fn __repr__(&self) -> PyResult<String> {
 //    Ok(format!("<PyO3Wrapper: {}>", self.moni)) 
 //  }
-//}
+//
+#[pyclass]
+#[pyo3(name="RunConfig")]
+pub struct PyRunConfig {
+  pub config : RunConfig
+}
+
+impl PyRunConfig {
+  pub fn set_config(&mut self, config : RunConfig) {
+    self.config = config
+  }
+}
+
+#[pymethods]
+impl PyRunConfig {
+  #[new]
+  fn new() -> Self {
+    let config =  RunConfig::new();
+    Self {
+      config
+    }
+  }
+
+  #[getter]
+  fn get_runid(&self) -> PyResult<u32> {
+    Ok(self.config.runid)
+  }
+  
+  #[setter]
+  fn set_runid(&mut self, runid: u32) -> PyResult<()> {
+    self.config.runid = runid;
+    Ok(())
+  }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    self.config.to_bytestream()
+  }
+  
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.config)) 
+  }
+}
+
 #[pyclass]
 #[pyo3(name="TofCommand")]
 pub struct PyTofCommand {
