@@ -19,6 +19,9 @@ use crate::packets::PacketType;
 use crate::events::DataType;
 use crate::commands::TofOperationMode;
 
+use crate::events::TriggerType;
+
+
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
     use crate::FromRandom;
@@ -379,7 +382,101 @@ fn pack_runconfig() {
     assert_eq!(cfg, test_json);
   }
 }
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct TriggerConfig{
+  pub gaps_trigger_use_beta : bool,
+  pub tiu_emulation_mode : bool, 
+  pub prescale : f32,
+  pub trigger_type : TriggerType 
+}
 
+impl TriggerConfig {
+  pub fn new() -> Self { 
+    Self {
+      gaps_trigger_use_beta   : false,
+      tiu_emulation_mode  : false,
+      prescale : 0.0,
+      trigger_type : TriggerType::Unknown
+    }
+  }
+}
+
+impl Default for TriggerConfig {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for TriggerConfig {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TriggerConfig");
+    repr += &(format!("\n  Beta is used by trigger      : {}", self.gaps_trigger_use_beta)); 
+    repr += &(format!("\n  TIU Emulation Mode : {}", self.tiu_emulation_mode));
+    repr += &(format!("\n  Prescale : {:.3}", self.prescale));
+    repr += &(format!("\n  Trigger type : {}", self.trigger_type));
+    write!(f, "{}", repr)
+  }
+}
+
+
+
+
+impl Packable for TriggerConfig {
+  const PACKET_TYPE : PacketType = PacketType::TriggerConfig;
+}
+
+impl Serialization for TriggerConfig {
+  
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  const SIZE : usize = 9; 
+  
+  fn from_bytestream(stream    : &Vec<u8>, 
+                     pos       : &mut usize) 
+    -> Result<Self, SerializationError>{
+    Self::verify_fixed(stream, pos)?;  
+    let mut cfg = TriggerConfig::new();
+      cfg.gaps_trigger_use_beta = parse_bool(stream, pos);
+      cfg.tiu_emulation_mode = parse_bool(stream, pos);
+      cfg.prescale = parse_f32 (stream, pos);
+      cfg.trigger_type = TriggerType::from(parse_u8(stream, pos));
+    
+    *pos += 2;
+    Ok(cfg)
+  }
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
+    bs.extend_from_slice(&Self::HEAD.to_le_bytes());
+    bs.push(self.gaps_trigger_use_beta as u8);
+    bs.push(self.tiu_emulation_mode as u8);
+    bs.push(self.prescale as u8);
+    bs.push(self.trigger_type.to_u8());
+    bs.extend_from_slice(&Self::TAIL.to_le_bytes());
+    bs
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for TriggerConfig {
+  fn from_random() -> Self {
+    let mut cfg  = TriggerConfig::new();
+    let mut rng      = rand::thread_rng();
+    cfg.gaps_trigger_use_beta  = rng.gen::<bool>();
+    cfg.tiu_emulation_mode = rng.gen::<bool>();
+    cfg.prescale = rng.gen::<f32>();
+    cfg.trigger_type = TriggerType::from_random();
+  }
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_triggerconfig() {
+  for _ in 0..100 {
+    let cfg  = TriggerConfig::from_random();
+    let test : TriggerConfig = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}
 
 
 
