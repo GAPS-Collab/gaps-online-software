@@ -28,6 +28,7 @@ pub enum PacketType {
   //Monitor             = 30u8,    // needs to go away
   HeartBeatDataSink   = 40u8,    
   MasterTrigger       = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
+  TriggerConfig       = 61u8,
   RBEventHeader       = 70u8,    // needs to go away
   CPUMoniData         = 80u8,
   MonitorMtb          = 90u8,
@@ -78,6 +79,7 @@ impl From<u8> for PacketType {
       //30u8  => PacketType::Monitor,
       40u8  => PacketType::HeartBeatDataSink,
       60u8  => PacketType::MasterTrigger,
+      61u8  => PacketType::TriggerConfig,
       70u8  => PacketType::RBEventHeader,
       80u8  => PacketType::CPUMoniData,
       90u8  => PacketType::MonitorMtb,
@@ -116,6 +118,7 @@ impl FromRandom for PacketType {
       PacketType::TofEventSummary,
       //PacketType::Monitor,
       PacketType::MasterTrigger,
+      PacketType::TriggerConfig,
       PacketType::HeartBeatDataSink,
       PacketType::RBEventHeader,
       PacketType::RBEvent,
@@ -155,6 +158,7 @@ fn test_packet_types() {
   type_codes.push(PacketType::TofEventSummary as u8);
   //type_codes.push(PacketType::Monitor as u8);
   type_codes.push(PacketType::MasterTrigger as u8);
+  type_codes.push(PacketType::TriggerConfig as u8);
   type_codes.push(PacketType::HeartBeatDataSink as u8);
   type_codes.push(PacketType::RBEventHeader as u8);
   type_codes.push(PacketType::RBEvent as u8);
