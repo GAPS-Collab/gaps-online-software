@@ -141,12 +141,6 @@ impl Default for PreampSettings {
   }
 }
 
-#[derive(Debug, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
-pub enum LTBThresholdSetStrategy {
-  ControlServer,
-  Board
-}
-
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct LTBThresholdSettings {
   /// actually apply the below settings
@@ -157,6 +151,7 @@ pub struct LTBThresholdSettings {
   /// ltb threshold voltages (one set of 3 values per RAT)
   pub rat_ltb_thresholds    : HashMap<String, [f32;3]>
 }
+
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CommandDispatcherSettings {
