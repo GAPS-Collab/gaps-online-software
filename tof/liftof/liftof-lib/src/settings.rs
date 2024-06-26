@@ -141,6 +141,17 @@ impl Default for PreampSettings {
   }
 }
 
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub struct LTBThresholdSettings {
+  /// actually apply the below settings
+  pub set_ltb_thresholds    : bool,
+  /// liftof-cc will send commands to set the 
+  /// ltb thresholds
+  pub set_strategy          : LTBThresholdSetStrategy,
+  /// ltb threshold voltages (one set of 3 values per RAT)
+  pub rat_ltb_thresholds    : HashMap<String, [f32;3]>
+}
+
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CommandDispatcherSettings {
