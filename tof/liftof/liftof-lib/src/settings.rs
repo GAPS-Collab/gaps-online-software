@@ -214,6 +214,28 @@ impl LTBThresholdSettings {
   }
 }
 
+impl fmt::Display for LTBThresholdSettings {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp : String;
+    match toml::to_string(self) {
+      Err(err) => {
+        error!("Deserialization error! {err}");
+        disp = String::from("-- DESERIALIZATION ERROR! --");
+      }
+      Ok(_disp) => {
+        disp = _disp;
+      }
+    }
+    write!(f, "<LTBThresholdSettings :\n{}>", disp)
+  }
+}
+
+impl Default for LTBThresholdSettings {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CommandDispatcherSettings {
   /// Log all commands into this file
@@ -614,6 +636,8 @@ pub struct LiftofSettings {
   pub rb_settings                : RBSettings,
   /// Preamp configuration
   pub preamp_settings            : PreampSettings,
+  /// LTB threshold configuration
+  pub ltb_settings               : LTBThresholdSettings
 }
 
 impl LiftofSettings {
@@ -634,6 +658,7 @@ impl LiftofSettings {
       cmd_dispatcher_settings   : CommandDispatcherSettings::new(),
       rb_settings               : RBSettings::new(),
       preamp_settings           : PreampSettings::new(),
+      ltb_settings              : LTBThresholdSettings::new(),
     }
   }
 
