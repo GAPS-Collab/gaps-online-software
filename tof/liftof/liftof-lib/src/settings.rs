@@ -50,7 +50,7 @@ use tof_dataclasses::serialization::{
 use tof_dataclasses::serialization::Packable;
 
 #[derive(Debug, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
-pub enum PreampBiasSetStrategy {
+pub enum ParameterSetStrategy {
   ControlServer,
   Board
 }
@@ -61,7 +61,7 @@ pub struct PreampSettings {
   pub set_preamp_voltages    : bool,
   /// liftof-cc will send commands to set the 
   /// preamp bias voltages
-  pub set_strategy           : PreampBiasSetStrategy,
+  pub set_strategy           : ParameterSetStrategy,
   /// preamp biases (one set of 16 values per RAT
   pub rat_preamp_biases      : HashMap<String, [f32;16]>
 }
@@ -93,7 +93,7 @@ impl PreampSettings {
 
     Self {
       set_preamp_voltages    : false,
-      set_strategy           : PreampBiasSetStrategy::ControlServer,
+      set_strategy           : ParameterSetStrategy::ControlServer,
       rat_preamp_biases      : default_biases,
     }
   }
@@ -143,19 +143,13 @@ impl Default for PreampSettings {
   }
 }
 
-#[derive(Debug, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
-pub enum LTBThresholdSetStrategy {
-  ControlServer,
-  Board
-}
-
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct LTBThresholdSettings {
   /// actually apply the below settings
   pub set_ltb_thresholds    : bool,
   /// liftof-cc will send commands to set the 
   /// ltb thresholds
-  pub set_strategy          : LTBThresholdSetStrategy,
+  pub set_strategy          : ParameterSetStrategy,
   /// ltb threshold voltages (one set of 3 values per RAT)
   pub rat_ltb_thresholds    : HashMap<String, [f32;3]>
 }
@@ -186,7 +180,7 @@ impl LTBThresholdSettings {
 
       Self {
         set_ltb_thresholds    : false,
-        set_strategy          : LTBThresholdSetStrategy::ControlServer,
+        set_strategy          : ParameterSetStrategy::ControlServer,
         rat_ltb_thresholds    : default_thresholds,
       }
   }
