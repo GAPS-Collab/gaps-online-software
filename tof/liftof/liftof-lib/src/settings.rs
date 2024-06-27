@@ -33,6 +33,8 @@ use tof_dataclasses::config::RunConfig;
 use tof_dataclasses::database::RAT;
 #[cfg(feature="database")]
 use tof_dataclasses::config::PreampBiasConfig;
+#[cfg(feature="database")]
+use tof_dataclasses::config::LTBThresholdConfig;
 use crate::master_trigger::MTBSettings;
 
 use tof_dataclasses::serialization::{
@@ -187,6 +189,28 @@ impl LTBThresholdSettings {
         set_strategy          : LTBThresholdSetStrategy::ControlServer,
         rat_ltb_thresholds    : default_thresholds,
       }
+  }
+
+  #[cfg(feature="database")]
+  pub fn emit_ltb_settings_packets(&self, rats : &HashMap<u8,RAT>) -> Vec<TofPacket> {
+    let mut packets = Vec::<TofPacket>::new();
+    for k in rats.keys() {
+      let rat          = &rats[&k];
+      let rat_key      = format!("RAT{:2}", rat);
+      let mut cmd      = TofCommandV2::new();
+      cmd.command_code = TofCommandCode::SetLTBThresholds;
+      let mut payload  = LTBThresholdConfig::new();
+      payload.rb_id    = rat.rb1_id as u8;
+      if *k as usize >= self.rat_ltb_thresholds.len() {
+        error!("RAT ID {k} larger than 20!");
+        continue;
+      }
+      payload.thresholds = self.rat_ltb_thresholds[&rat_key];
+      cmd.payload = payload.to_bytestream();
+      let tp = cmd.pack();
+      packets.push(tp);
+    }
+    packets
   }
 }
 
