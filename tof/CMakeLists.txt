@@ -54,6 +54,7 @@ add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
     dataclasses/C++/src/monitoring.cxx
     dataclasses/C++/src/legacy.cxx
     dataclasses/C++/src/logging.cxx
+    dataclasses/C++/src/version.cxx
     $<$<BOOL:${BUILD_DB}>:dataclasses/C++/src/database.cxx>
 )
 
