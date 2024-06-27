@@ -158,6 +158,38 @@ pub struct LTBThresholdSettings {
   pub rat_ltb_thresholds    : HashMap<String, [f32;3]>
 }
 
+impl LTBThresholdSettings {
+  pub fn new() -> Self {
+    let default_thresholds = HashMap::from([
+      (String::from("RAT01"), [40.0,32.0,375.0]),
+      (String::from("RAT02"), [40.0,32.0,375.0]),
+      (String::from("RAT03"), [40.0,32.0,375.0]),
+      (String::from("RAT04"), [40.0,32.0,375.0]),
+      (String::from("RAT05"), [40.0,32.0,375.0]),
+      (String::from("RAT06"), [40.0,32.0,375.0]),
+      (String::from("RAT07"), [40.0,32.0,375.0]),
+      (String::from("RAT08"), [40.0,32.0,375.0]),
+      (String::from("RAT09"), [40.0,32.0,375.0]),
+      (String::from("RAT10"), [40.0,32.0,375.0]),
+      (String::from("RAT11"), [40.0,32.0,375.0]),
+      (String::from("RAT12"), [40.0,32.0,375.0]),
+      (String::from("RAT13"), [40.0,32.0,375.0]),
+      (String::from("RAT14"), [40.0,32.0,375.0]),
+      (String::from("RAT15"), [40.0,32.0,375.0]),
+      (String::from("RAT16"), [40.0,32.0,375.0]),
+      (String::from("RAT17"), [40.0,32.0,375.0]),
+      (String::from("RAT18"), [40.0,32.0,375.0]),
+      (String::from("RAT19"), [40.0,32.0,375.0]),
+      (String::from("RAT20"), [40.0,32.0,375.0])]);
+
+      Self {
+        set_ltb_thresholds    : false,
+        set_strategy          : LTBThresholdSetStrategy::ControlServer,
+        rat_ltb_thresholds    : default_thresholds,
+      }
+  }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CommandDispatcherSettings {
   /// Log all commands into this file
