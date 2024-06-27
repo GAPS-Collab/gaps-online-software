@@ -11,6 +11,7 @@
 #include "packets/CommandPacket.h"
 #include "packets/monitoring.h"
 #include "events/tof_event_header.hpp"
+#include "version.h"
 
 #ifdef BUILD_DB
 #include "database.h"
@@ -73,7 +74,7 @@ std::string tof_response_to_str(const TofResponse &cmd) {
 [[deprecated("Currently, the CXX-Python bindings to wrap the C++ API are not recommended for personal use. Consider to use the RUST bindings instead!")]]
 PYBIND11_MODULE(gaps_tof, m) {
     m.doc() = "Gaps-online-software Python wrapper for C++ API. gaps-online-software is a software suite designed to read out (mainly) online data from the TOF subsystem of the GAPS experiment. The code has several APIs, this code here wraps the C++ API. Please find the github repo at https://github.com/GAPS-Collab/gaps-online-software to report bugs/issues.";
-    m.attr("__version__") = "0.10.0";
+    m.attr("__version__") = "0.10.1";
 
     //py::class_<PyTofPacketReader>(m, "PTofPacketReader") 
     //  .def(py::init<String>())  
@@ -140,7 +141,13 @@ PYBIND11_MODULE(gaps_tof, m) {
                           reader.get_filename() + " - read " + std::to_string(reader.n_packets_read()) + " TofPackets>";
                           })
     ;
-  
+ 
+    py::enum_<Gaps::ProtocolVersion>(m, "ProtocolVersion")
+      .value("Unknown" , Gaps::ProtocolVersion::Unknown)
+      .value("V1"      , Gaps::ProtocolVersion::V1)
+      .value("V2"      , Gaps::ProtocolVersion::V2)
+      .value("V3"      , Gaps::ProtocolVersion::V3)
+    ;
     py::enum_<EventStatus>(m, "EventStatus") 
       .value("Unknown"           , EventStatus::Unknown)
       .value("Crc32Wrong"        , EventStatus::Crc32Wrong)
