@@ -28,6 +28,7 @@ use crossbeam_channel::{
 };
 
 //use tof_dataclasses::threading::ThreadControl;
+use tof_dataclasses::config::RunConfig;
 use tof_dataclasses::constants::PAD_CMD_32BIT;
 use tof_dataclasses::commands::{
     TofCommand,
@@ -239,24 +240,34 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                     }
                   }
                   TofCommandCode::DataRunStart => {
+                    let mut run_id : u32 = 0;
                     println!("== ==> Received DataRunStart!");
                     info!("Received data run start command");
                     // technically, it is run_typ, rb_id, event number
                     // all to the max means run start for all
                     // let payload: u32 =  PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
                     // make sure the relevant threads are active
+                    // We don't need this - just need to make sure it gets broadcasted
+                    match RunConfig::from_bytestream(&cmd.payload, &mut 0) {
+                      Err(err) => error!("Unable to unpack run config! {err}"),
+                      Ok(pld) => {
+                        run_id = pld.runid;
+                      }
+                    }
                     match thread_ctrl.lock() {
                       Ok(mut tc) => {
                         tc.thread_master_trg_active  = true;
                         tc.thread_monitoring_active  = true;
                         tc.thread_event_bldr_active  = true;
                         tc.calibration_active        = false;
+                        tc.run_id                    = run_id;
+                        tc.write_data_to_disk        = true;
+                        tc.new_run_start_flag        = true;
                       },
                       Err(err) => {
                         error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
                       },
                     }
-                    // We don't need this - just need to make sure it gets broadcasted
                     let cmd_payload: u32 =  PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
                     let cmd          = TofCommand::DataRunStart(cmd_payload);
                     let packed_cmd   = cmd.pack();

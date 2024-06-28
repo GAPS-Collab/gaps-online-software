@@ -17,7 +17,6 @@ use std::sync::{
 
 use std::fs::create_dir_all;
 
-
 extern crate crossbeam_channel;
 use crossbeam_channel::Receiver; 
 
@@ -67,24 +66,18 @@ use liftof_lib::thread_control::ThreadControl;
 ///
 /// * incoming           : incoming connection for TofPackets from 
 ///                        other threads
-///// * write_stream       : write TofPacket stream to disk
-///// * run_id             : run id which is used in filename generation
-///// * settings           : additional settings
 /// * print_moni_packets : print monitoring packets to the terminal
 /// * thread_control     : start/stop thread, calibration information
 pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
-                        //write_stream       : bool,
-                        //runid              : usize,
-                        //settings           : &DataPublisherSettings,
                         print_moni_packets : bool,
                         thread_control     : Arc<Mutex<ThreadControl>>) {
   // when the thread starts, we need to wait a bit
   // till thread_control becomes usable
   sleep(Duration::from_secs(10));
-  let mut flight_address    = String::from("");
-  let mut mbytes_per_file   = 420usize;
-  let mut write_stream_path = String::from("");
-  let mut cali_dir          = String::from("");
+  let mut flight_address           = String::from("");
+  let mut mbytes_per_file          = 420usize;
+  let mut write_stream_path        = String::from("");
+  let mut cali_dir                 = String::from("");
   let mut send_tof_summary_packets = false;
   let mut send_rbwaveform_packets  = false;
   let mut send_mtb_event_packets   = false;
@@ -170,6 +163,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
             write_stream          = tc.write_data_to_disk;
             write_stream_path     = tc.liftof_settings.data_publisher_settings.data_dir.clone(); 
             runid                 = tc.run_id;
+            write_stream_path     += &(format!("/{}/", runid));
             tc.new_run_start_flag = false;
           }
         },
