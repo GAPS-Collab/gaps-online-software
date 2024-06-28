@@ -15,6 +15,7 @@ use pyo3_polars::{
 
 use pyo3::Python;
 
+use tof_dataclasses::ProtocolVersion;
 use tof_dataclasses::io::TofPacketReader;
 use tof_dataclasses::packets::{
     TofPacket,
@@ -71,6 +72,7 @@ use pyo3::exceptions::{
 
 use tof_dataclasses::config::TriggerConfig;
 use tof_dataclasses::events::TriggerType;
+use tof_dataclasses::events::master_trigger::LTBThreshold;
 //trait<T> Wrapper {
 //  where T : Packable
 //
@@ -941,21 +943,21 @@ impl PyMasterTriggerEvent {
     self.event.get_rb_link_ids()
   }
 
-  ///// Get the combination of triggered DSI/J/CH on 
-  ///// the MTB which formed the trigger. This does 
-  ///// not include further hits which fall into the 
-  ///// integration window. For those, se rb_link_mask
-  /////
-  ///// The returned values follow the TOF convention
-  ///// to start with 1, so that we can use them to 
-  ///// look up LTB ids in the db.
-  /////
-  ///// # Returns
-  /////
-  /////   Vec<(hit)> where hit is (DSI, J, CH) 
-  //pub fn get_trigger_hits(&self) -> Vec<(u8, u8, u8)> {
-  //  self.event.get_trigger_hits()
-  //}
+  /// Get the combination of triggered DSI/J/CH on 
+  /// the MTB which formed the trigger. This does 
+  /// not include further hits which fall into the 
+  /// integration window. For those, se rb_link_mask
+  ///
+  /// The returned values follow the TOF convention
+  /// to start with 1, so that we can use them to 
+  /// look up LTB ids in the db.
+  ///
+  /// # Returns
+  ///
+  ///   Vec<(hit)> where hit is (DSI, J, (CH, CH), LTBThreshold) 
+  pub fn get_trigger_hits(&self) -> PyResult<Vec<(u8, u8, (u8, u8), LTBThreshold)>> {
+    Ok(self.event.get_trigger_hits())
+  }
 
   /// combine the tiu gps 16 and 32bit timestamps 
   /// into a 48bit timestamp
@@ -1091,18 +1093,18 @@ impl PyTofEvent {
     rbevents
   }
   
-  #[getter]
-  fn hits(&self) -> Vec<PyTofHit> {
-    let mut hits = Vec::<PyTofHit>::new();
-    for ev in &self.event.rb_events {
-      for h in &ev.hits {
-        let mut pyhit = PyTofHit::new();
-        pyhit.set_hit(*h);
-        hits.push(pyhit);
-      }
-    }
-    hits
-  }
+  //#[getter]
+  //fn hits(&self) -> Vec<PyTofHit> {
+  //  let mut hits = Vec::<PyTofHit>::new();
+  //  for ev in &self.event.rb_events {
+  //    for h in &ev.hits {
+  //      let mut pyhit = PyTofHit::new();
+  //      pyhit.set_hit(*h);
+  //      hits.push(pyhit);
+  //    }
+  //  }
+  //  hits
+  //}
 
   #[getter]
   fn waveforms(&self) -> Vec<PyRBWaveform> {
@@ -1190,16 +1192,16 @@ impl PyRBEvent {
     Ok(arr)
   }
   
-  #[getter]
-  fn hits(&self) -> Vec<PyTofHit> {
-    let mut hits = Vec::<PyTofHit>::new();
-    for h in &self.event.hits {
-      let mut pyhit = PyTofHit::new();
-      pyhit.set_hit(*h);
-      hits.push(pyhit);
-    }
-    hits
-  }
+  //#[getter]
+  //fn hits(&self) -> Vec<PyTofHit> {
+  //  let mut hits = Vec::<PyTofHit>::new();
+  //  for h in &self.event.hits {
+  //    let mut pyhit = PyTofHit::new();
+  //    pyhit.set_hit(*h);
+  //    hits.push(pyhit);
+  //  }
+  //  hits
+  //}
   
   fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
     let tp = packet.get_tp();
@@ -1268,8 +1270,37 @@ impl PyTofHit {
   fn t0(&self) -> f32 {
     self.hit.get_t0()
   }
- 
-  /// charge of the different paddle ends
+
+  #[getter]
+  fn version(&self) -> ProtocolVersion {
+    self.hit.version
+  }
+
+  #[getter]
+  fn phase(&self) -> f32 {
+    self.hit.phase.to_f32()
+  }
+
+  #[getter]
+  fn baseline_a(&self) -> f32 {
+    self.hit.baseline_a.to_f32()
+  }
+
+  #[getter]
+  fn baseline_a_rms(&self) -> f32 {
+    self.hit.baseline_a_rms.to_f32()
+  }
+  
+  #[getter]
+  fn baseline_b(&self) -> f32 {
+    self.hit.baseline_b.to_f32()
+  }
+
+  #[getter]
+  fn baseline_b_rms(&self) -> f32 {
+    self.hit.baseline_b_rms.to_f32()
+  }
+
   #[getter]
   fn peak_a(&self) -> f32 {
     self.hit.get_peak_a()
@@ -1297,7 +1328,7 @@ impl PyTofHit {
   /// Reconstructed with the waveforms of both paddle ends.
   #[getter]
   fn pos(&self) -> f32 {
-    self.hit.get_pos_across()
+    self.hit.get_pos()
   }
  
   /// The paddle id (1-160) of the hit paddle

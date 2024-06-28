@@ -251,6 +251,7 @@ impl FromRandom for TriggerType {
 /// LTB Thresholds as passed on by the MTB
 /// [See also](https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf)
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(feature = "pybindings", pyclass)]
 #[repr(u8)]
 pub enum LTBThreshold {
   NoHit = 0u8,
