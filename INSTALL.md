@@ -35,3 +35,23 @@ _The rust pybindings are currently a bit experimental, and have to be built sepa
 
 * docs can be built with `make doc`
 
+## Using pybindings with pyo3 on MacOS
+
+Building rust pybindings via pyo3 on MacOS encounters build problems, specifically "errno=21 for architecture x86_64
+clang: error: linker command failed with exit code 1 ", even when not using clang as your default C compiler. 
+
+To avoid this, you must create a file on your home system in the cargo directory called "/usr/bin/.cargo/config". You may need to create the config file if you don't have one already. 
+
+Paste the following into the .cargo/config file: 
+        [target.x86_64-apple-darwin]
+        rustflags = [
+        "-C", "link-arg=-undefined",
+        "-C", "link-arg=dynamic_lookup",
+        ]
+
+        [target.aarch64-apple-darwin]
+        rustflags = [
+        "-C", "link-arg=-undefined",
+        "-C", "link-arg=dynamic_lookup",
+        ]
+Now, your pyo3 pybindings in rust should build. 
