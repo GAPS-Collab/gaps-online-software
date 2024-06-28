@@ -122,6 +122,7 @@ fn tof_events<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 fn tof_commands<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TofCommandCode>()?;
   m.add_class::<PyTofCommand>()?;
+  m.add_class::<PyTriggerConfig>()?;
   Ok(())
 }
 
