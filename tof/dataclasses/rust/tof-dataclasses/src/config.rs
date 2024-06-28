@@ -429,7 +429,7 @@ impl Serialization for TriggerConfig {
   
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
-  const SIZE : usize = 9; 
+  const SIZE : usize = 11; 
   
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
@@ -449,7 +449,7 @@ impl Serialization for TriggerConfig {
     bs.extend_from_slice(&Self::HEAD.to_le_bytes());
     bs.push(self.gaps_trigger_use_beta as u8);
     bs.push(self.tiu_emulation_mode as u8);
-    bs.push(self.prescale as u8);
+    bs.extend_from_slice(&self.prescale.to_le_bytes());
     bs.push(self.trigger_type.to_u8());
     bs.extend_from_slice(&Self::TAIL.to_le_bytes());
     bs
@@ -465,6 +465,7 @@ impl FromRandom for TriggerConfig {
     cfg.tiu_emulation_mode = rng.gen::<bool>();
     cfg.prescale = rng.gen::<f32>();
     cfg.trigger_type = TriggerType::from_random();
+    cfg
   }
 }
 
