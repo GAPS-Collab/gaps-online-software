@@ -1,3 +1,5 @@
+use std::fmt;
+
 use half::f16;
 
 use crate::errors::SerializationError;
@@ -9,34 +11,34 @@ use crate::serialization::{
 };
 use crate::ProtocolVersion;
 
-use std::fmt;
+use crate::constants::C_LIGHT_PADDLE;
 
 #[cfg(feature="random")]
 extern crate rand;
 #[cfg(feature="random")]
 use rand::Rng;
 
-/// We will save the values for the peak heigth, time and charge
-/// as u16. The calculations yield f32 though. We need to convert
-/// them using MIN/MAX and a range
-const MAX_PEAK_HEIGHT      : f32 = 150.0; //mV
-//const MIN_PEAK_HEIGHT      : f32 = 0.0;
-const U16TOF32_PEAK_HEIGHT : f32 = MAX_PEAK_HEIGHT/(u16::MAX as f32);
-const F32TOU16_PEAK_HEIGHT : u16 = ((u16::MAX as f32)/MAX_PEAK_HEIGHT) as u16;
-const MAX_PEAK_CHARGE      : f32 = 100.0; 
-//const MIN_PEAK_CHARGE      : f32 = 0.0;
-const U16TOF32_PEAK_CHARGE : f32 = MAX_PEAK_CHARGE/(u16::MAX as f32);
-const F32TOU16_PEAK_CHARGE : u16 = ((u16::MAX as f32)/MAX_PEAK_CHARGE) as u16;
-const MAX_PEAK_TIME        : f32 = 500.0;
-//const MIN_PEAK_TIME        : f32 = 0.0;
-const U16TOF32_PEAK_TIME   : f32 = MAX_PEAK_TIME/(u16::MAX as f32);
-const F32TOU16_PEAK_TIME   : u16 = ((u16::MAX as f32)/MAX_PEAK_TIME) as u16;
-const U16TOF32_T0          : f32 = MAX_PEAK_TIME/(u16::MAX as f32);
-const F32TOU16_T0          : u16 = ((u16::MAX as f32)/MAX_PEAK_TIME) as u16;
-const U16TOF32_POS_ACROSS  : f32 = 1800.0/(u16::MAX as f32);
-const F32TOU16_POS_ACROSS  : u16 = ((u16::MAX as f32)/1800.0) as u16;
-const U16TOF32_EDEP        : f32 = 180.0/(u16::MAX as f32);
-const F32TOU16_EDEP        : u16 = ((u16::MAX as f32)/100.0) as u16;
+///// We will save the values for the peak heigth, time and charge
+///// as u16. The calculations yield f32 though. We need to convert
+///// them using MIN/MAX and a range
+//const MAX_PEAK_HEIGHT      : f32 = 150.0; //mV
+////const MIN_PEAK_HEIGHT      : f32 = 0.0;
+//const U16TOF32_PEAK_HEIGHT : f32 = MAX_PEAK_HEIGHT/(u16::MAX as f32);
+//const F32TOU16_PEAK_HEIGHT : u16 = ((u16::MAX as f32)/MAX_PEAK_HEIGHT) as u16;
+//const MAX_PEAK_CHARGE      : f32 = 100.0; 
+////const MIN_PEAK_CHARGE      : f32 = 0.0;
+//const U16TOF32_PEAK_CHARGE : f32 = MAX_PEAK_CHARGE/(u16::MAX as f32);
+//const F32TOU16_PEAK_CHARGE : u16 = ((u16::MAX as f32)/MAX_PEAK_CHARGE) as u16;
+//const MAX_PEAK_TIME        : f32 = 500.0;
+////const MIN_PEAK_TIME        : f32 = 0.0;
+//const U16TOF32_PEAK_TIME   : f32 = MAX_PEAK_TIME/(u16::MAX as f32);
+//const F32TOU16_PEAK_TIME   : u16 = ((u16::MAX as f32)/MAX_PEAK_TIME) as u16;
+//const U16TOF32_T0          : f32 = MAX_PEAK_TIME/(u16::MAX as f32);
+//const F32TOU16_T0          : u16 = ((u16::MAX as f32)/MAX_PEAK_TIME) as u16;
+//const U16TOF32_POS_ACROSS  : f32 = 1800.0/(u16::MAX as f32);
+//const F32TOU16_POS_ACROSS  : u16 = ((u16::MAX as f32)/1800.0) as u16;
+//const U16TOF32_EDEP        : f32 = 180.0/(u16::MAX as f32);
+//const F32TOU16_EDEP        : u16 = ((u16::MAX as f32)/100.0) as u16;
 
 /// Waveform peak
 ///
@@ -91,45 +93,46 @@ pub struct TofHit {
   
   /// The ID of the paddle in TOF notation
   /// (1-160)
-  pub paddle_id    : u8,
-  pub time_a       : u16,
-  pub time_b       : u16,
-  pub peak_a       : u16,
-  pub peak_b       : u16,
-  pub charge_a     : u16,
-  pub charge_b     : u16,
-  pub charge_min_i : u16,
+  pub paddle_id      : u8,
+  pub time_a         : f16,
+  pub time_b         : f16,
+  pub peak_a         : f16,
+  pub peak_b         : f16,
+  pub charge_a       : f16,
+  pub charge_b       : f16,
+
+  // deprecated values (prior to V1 version)
+  pub timestamp32    : u32,
+  pub timestamp16    : u16,
+  pub ctr_etx        : u8,
+  pub charge_min_i   : u16,
   /// Reconstructed particle interaction position
   /// across the paddle
-  pub pos_across   : u16,
+  pub pos_across     : u16,
   /// Reconstructed particle interaction time
-  pub t0           : u16,
-  pub ctr_etx      : u8,
-
-  // this might be not needed, 
-  // unsure
-  // we repurpsoe these 6 bytes
-  // for baseline, baseline_rms 
-  // and a one byte status
-  pub timestamp32   : u32,
-  pub timestamp16   : u16,
-  pub reserved      : u8,
+  pub t0             : u16,
+  
+  // new values
+  pub reserved       : u8,
   // only 2 bytes of version
   // are used
-  pub version       : ProtocolVersion,
+  pub version        : ProtocolVersion,
   // for now, but we want to use half instead
-  pub baseline      : f16,
-  pub baseline_rms  : f16,
-
+  pub baseline_a     : f16,
+  pub baseline_a_rms : f16,
+  pub baseline_b     : f16,
+  pub baseline_b_rms : f16,
+  // phase of the sine fit
+  pub phase          : f16,
   // fields which won't get 
   // serialized
-  pub valid        : bool,
+  pub valid          : bool,
   // for debugging purposes
-  pub ftime_a      : f32,
-  pub ftime_b      : f32,
-  pub fpeak_a      : f32,
-  pub fpeak_b      : f32,
-  pub paddle_len   : f32,
+  pub ftime_a        : f32,
+  pub ftime_b        : f32,
+  pub fpeak_a        : f32,
+  pub fpeak_b        : f32,
+  pub paddle_len     : f32,
 }
 
 impl Default for TofHit {
@@ -140,7 +143,7 @@ impl Default for TofHit {
 
 impl fmt::Display for TofHit {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<TofHit:
+    write!(f, "<TofHit (version : {}):
   Paddle ID       {}
   Peak:
     LE Time A/B   {:.2} {:.2}   
@@ -149,9 +152,12 @@ impl fmt::Display for TofHit {
   ** reconstructed interaction
     energy_dep    {:.2}   
     pos_across    {:.2}   
-    t0            {:.2}   
-  ctr_etx         {}   
-  VALID           {}>", 
+    t0            {:.2}  
+  ** V1 variables
+    phase (ch9)   {:.4}
+    baseline A/B  {:.2} {:.2}
+    bl. RMS  A/B  {:.2} {:.2}>",
+            self.version,
             self.paddle_id,
             self.get_time_a(),
             self.get_time_b(),
@@ -160,29 +166,33 @@ impl fmt::Display for TofHit {
             self.get_charge_a(),
             self.get_charge_b(),
             self.get_edep(),
-            self.get_pos_across(),
+            self.get_pos(),
             self.get_t0(),
-            self.ctr_etx,
-            //self.timestamp32,
-            //self.timestamp16,
-            //self.get_timestamp48(),
-            self.valid,
+            self.phase,
+            self.baseline_a,
+            self.baseline_b,
+            self.baseline_a_rms,
+            self.baseline_b_rms,
             )
   }
 }
 
 impl Serialization for TofHit {
   
-  const HEAD          : u16  = 61680; //0xF0F0)
-  const TAIL          : u16  = 3855;
-  const SIZE : usize = 30; // size in bytes with HEAD and TAIL
+  const HEAD          : u16   = 61680; //0xF0F0)
+  const TAIL          : u16   = 3855;
+  const SIZE          : usize = 30; // size in bytes with HEAD and TAIL
 
   /// Serialize the packet
   ///
   /// Not all fields will get serialized, 
   /// only the relevant data for the 
   /// flight computer
-  ///
+  //
+  /// **A note about protocol versions **
+  /// When we serialize (to_bytestream) we will
+  /// always write the latest version.
+  /// Deserialization can also read previous versions
   fn to_bytestream(&self) -> Vec<u8> {
 
     let mut bytestream = Vec::<u8>::with_capacity(Self::SIZE);
@@ -195,15 +205,19 @@ impl Serialization for TofHit {
     bytestream.extend_from_slice(&self.charge_a    .to_le_bytes()); 
     bytestream.extend_from_slice(&self.charge_b    .to_le_bytes()); 
     bytestream.extend_from_slice(&self.charge_min_i.to_le_bytes()); 
-    bytestream.extend_from_slice(&self.pos_across  .to_le_bytes()); 
-    bytestream.extend_from_slice(&self.t0          .to_le_bytes()); 
-    bytestream.push(self.ctr_etx); 
+    //bytestream.extend_from_slice(&self.pos_across  .to_le_bytes()); 
+    //bytestream.extend_from_slice(&self.t0          .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.baseline_a   .to_le_bytes());
+    bytestream.extend_from_slice(&self.baseline_a_rms.to_le_bytes());
+    // instead of ctr_etx and reserved, we now have phase in V1
+    bytestream.extend_from_slice(&self.phase       .to_le_bytes());
+    //bytestream.push(self.ctr_etx); 
     //bytestream.extend_from_slice(&self.timestamp32 .to_le_bytes());
     //bytestream.extend_from_slice(&self.timestamp16 .to_le_bytes());
-    bytestream.push(self.reserved);
+    //bytestream.push(self.reserved);
     bytestream.push(self.version.to_u8());
-    bytestream.extend_from_slice(&self.baseline.to_le_bytes());
-    bytestream.extend_from_slice(&self.baseline_rms.to_le_bytes());
+    bytestream.extend_from_slice(&self.baseline_b.to_le_bytes());
+    bytestream.extend_from_slice(&self.baseline_b_rms.to_le_bytes());
     bytestream.extend_from_slice(&Self::TAIL       .to_le_bytes()); 
     bytestream
   }
@@ -221,23 +235,47 @@ impl Serialization for TofHit {
     Self::verify_fixed(stream, pos)?;
     // since we passed the above test, the packet
     // is valid
-    pp.valid     = true;
-    pp.paddle_id     = parse_u8(stream, pos);
-    pp.time_a        = parse_u16(stream, pos);
-    pp.time_b        = parse_u16(stream, pos);
-    pp.peak_a        = parse_u16(stream, pos);
-    pp.peak_b        = parse_u16(stream, pos);
-    pp.charge_a      = parse_u16(stream, pos);
-    pp.charge_b      = parse_u16(stream, pos);
-    pp.charge_min_i  = parse_u16(stream, pos);
-    pp.pos_across    = parse_u16(stream, pos);
-    pp.t0            = parse_u16(stream, pos);
-    pp.ctr_etx       = parse_u8(stream, pos);
-    pp.reserved      = parse_u8(stream, pos);
+    pp.valid          = true;
+    pp.paddle_id      = parse_u8(stream, pos);
+    pp.time_a         = parse_f16(stream, pos);
+    pp.time_b         = parse_f16(stream, pos);
+    pp.peak_a         = parse_f16(stream, pos);
+    pp.peak_b         = parse_f16(stream, pos);
+    pp.charge_a       = parse_f16(stream, pos);
+    pp.charge_b       = parse_f16(stream, pos);
+    pp.charge_min_i   = parse_u16(stream, pos);
+    pp.baseline_a     = parse_f16(stream, pos);
+    pp.baseline_a_rms = parse_f16(stream, pos);
+    //pp.time_a        = parse_u16(stream, pos);
+    //pp.time_b        = parse_u16(stream, pos);
+    //pp.peak_a        = parse_u16(stream, pos);
+    //pp.peak_b        = parse_u16(stream, pos);
+    //pp.charge_a      = parse_u16(stream, pos);
+    //pp.charge_b      = parse_u16(stream, pos);
+    //pp.charge_min_i  = parse_u16(stream, pos);
+    //pp.pos_across    = parse_u16(stream, pos);
+    //pp.t0            = parse_u16(stream, pos);
+    let mut phase_vec = Vec::<u8>::new();
+    phase_vec.push(parse_u8(stream, pos));
+    phase_vec.push(parse_u8(stream, pos));
+    pp.phase    = parse_f16(&phase_vec, &mut 0);
+    //pp.ctr_etx       = parse_u8(stream, pos);
+    //pp.reserved      = parse_u8(stream, pos);
     let version      = ProtocolVersion::from(parse_u8(stream, pos));
     pp.version       = version;
-    pp.baseline      = parse_f16(stream, pos);
-    pp.baseline_rms  = parse_f16(stream, pos);
+    match pp.version {
+      ProtocolVersion::V1 => {
+        // in this version we do have phase instead of
+        // ctr_etx and reserved
+        //let mut phase_vec = Vec::<u8>::new();
+        //phase_vec.push(pp.ctr_etx);
+        //phase_vec.push(pp.reserved);
+        //pp.phase    = parse_f16(&phase_vec, &mut 0);
+      }
+      _ => ()
+    }
+    pp.baseline_b      = parse_f16(stream, pos);
+    pp.baseline_b_rms  = parse_f16(stream, pos);
 
     //pp.timestamp32   = parse_u32(stream, pos);
     //pp.timestamp16   = parse_u16(stream, pos);
@@ -248,35 +286,37 @@ impl Serialization for TofHit {
 
 impl TofHit {
 
-  // update Feb 2023 - add 4 byte timestamp
-  pub const VERSION       : &'static str = "1.2";
-  
   pub fn new() -> Self {
     Self{
-         paddle_id    : 0,
-         time_a       : 0,
-         time_b       : 0,
-         peak_a       : 0,
-         peak_b       : 0,
-         charge_a     : 0,
-         charge_b     : 0,
-         charge_min_i : 0,
-         pos_across   : 0,
-         t0           : 0,
-         ctr_etx      : 0,
-         timestamp32  : 0,
-         timestamp16  : 0,
-         version      : ProtocolVersion::Unknown,
-         reserved     : 0,
-         baseline     : f16::from_f32(0.0),
-         baseline_rms : f16::from_f32(0.0),
-         // non-serialize fields
-         valid        : true,
-         ftime_a      : 0.0,
-         ftime_b      : 0.0,
-         fpeak_a      : 0.0,
-         fpeak_b      : 0.0,
-         paddle_len   : 0.0,
+      paddle_id      : 0,
+      time_a         : f16::from_f32(0.0),
+      time_b         : f16::from_f32(0.0),
+      peak_a         : f16::from_f32(0.0),
+      peak_b         : f16::from_f32(0.0),
+      charge_a       : f16::from_f32(0.0),
+      charge_b       : f16::from_f32(0.0),
+      charge_min_i   : 0,
+      // deprecated  
+      pos_across     : 0,
+      t0             : 0,
+      ctr_etx        : 0,
+      timestamp32    : 0,
+      timestamp16    : 0,
+      valid          : true,
+      // v1 variables
+      version        : ProtocolVersion::V1,
+      reserved       : 0,
+      baseline_a     : f16::from_f32(0.0),
+      baseline_a_rms : f16::from_f32(0.0),
+      baseline_b     : f16::from_f32(0.0),
+      baseline_b_rms : f16::from_f32(0.0),
+      phase          : f16::from_f32(0.0),
+      // non-serialize fields
+      ftime_a        : 0.0,
+      ftime_b        : 0.0,
+      fpeak_a        : 0.0,
+      fpeak_b        : 0.0,
+      paddle_len     : 0.0,
     }
   }
 
@@ -324,135 +364,224 @@ impl TofHit {
   }
 
 
-  //pub fn get_timestamp48(&self) -> u64 {
-  //  ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
-  //}
+  // rework the whole getter/setter cluster, since 
+  // we switched to f16 instead of our custom 
+  // conversion
   
-  pub fn set_edep(&mut self, edep : f32) {
-    if edep >= 100.0 {
-      self.charge_min_i = u16::MAX;
-    } else {
-      self.charge_min_i = F32TOU16_EDEP*(edep.floor() as u16);
-    }
+  /// Calculate the position across the paddle from
+  /// the two times at the paddle ends
+  ///
+  /// **This will be measured from the A side**
+  pub fn get_pos(&self) -> f32 {
+    (self.time_a.to_f32() - self.get_t0())*C_LIGHT_PADDLE*10.0 // 10 for cm->mm 
+  }
+
+  /// Calculate the interaction time based on the peak timings measured 
+  /// at the paddle ends A and B
+  ///
+  /// That this works, the lenght of the paddle has to 
+  /// be set before.
+  pub fn get_t0(&self) -> f32 {
+    0.5*(self.time_a.to_f32() + self.time_b.to_f32() - (self.paddle_len/(10.0*C_LIGHT_PADDLE)))
   }
 
   pub fn get_edep(&self) -> f32 {
-    self.charge_min_i as f32 * U16TOF32_EDEP
-  }
-  
-  pub fn set_pos_across(&mut self, pa : f32) {
-    if pa >= 1800.0 {
-      self.pos_across = u16::MAX;
-    } else {
-      self.pos_across = F32TOU16_POS_ACROSS*(pa.floor() as u16);
-    }
-  }
-
-  pub fn get_pos_across(&self) -> f32 {
-    self.pos_across as f32 * U16TOF32_POS_ACROSS
-  }
-
-  pub fn set_t0(&mut self, t0 : f32) {
-    if t0 >= MAX_PEAK_TIME {
-      self.t0 = u16::MAX;
-    } else {
-      self.t0 = F32TOU16_T0*(t0.floor() as u16);
-    }
-  }
-
-  pub fn get_t0(&self) -> f32 {
-    self.t0 as f32 * U16TOF32_T0
-  }
-
-  pub fn set_peak_a(&mut self, peak : f32 ) {
-    if peak >= MAX_PEAK_HEIGHT {
-      self.peak_a = u16::MAX;
-    } else {
-      self.peak_a = F32TOU16_PEAK_HEIGHT*(peak.floor() as u16); 
-    }
-  }
-  
-  pub fn get_peak_a(&self) -> f32 {
-    self.peak_a as f32 * U16TOF32_PEAK_HEIGHT
-  }
-
-  pub fn set_peak_b(&mut self, peak : f32 ) {
-    if peak >= MAX_PEAK_HEIGHT {
-      self.peak_b = u16::MAX;
-    } else {
-      self.peak_b = F32TOU16_PEAK_HEIGHT*(peak.floor() as u16); 
-    }
-  }
-  
-  pub fn get_peak_b(&self) -> f32 {
-    self.peak_b as f32 * U16TOF32_PEAK_HEIGHT
-  }
-  
-  pub fn set_peak(&mut self, peak : f32, side : usize ) {
-    assert!(side == 0 || side == 1);
-    if side == 0 {self.set_peak_a(peak);}
-    if side == 1 {self.set_peak_b(peak);}
-  }
-
-  pub fn set_time_a(&mut self, time : f32 ) {
-    if time >= MAX_PEAK_TIME {
-      self.time_a = u16::MAX;
-    } else {
-      self.time_a = F32TOU16_PEAK_TIME*(time.floor() as u16); 
-    }
+    0.0
   }
 
   pub fn get_time_a(&self) -> f32 {
-    self.time_a as f32 * U16TOF32_PEAK_TIME 
+    self.time_a.to_f32()
   }
 
-  pub fn set_time_b(&mut self, time : f32 ) {
-    if time >= MAX_PEAK_TIME {
-      self.time_b = u16::MAX;
-    } else {
-      self.time_b = F32TOU16_PEAK_TIME*(time.floor() as u16); 
-    }
+  pub fn set_time_a(&mut self, t : f32) {
+    self.time_a = f16::from_f32(t);
   }
-  
+
   pub fn get_time_b(&self) -> f32 {
-    self.time_b as f32 * U16TOF32_PEAK_TIME 
-  }
-  
-  pub fn set_time(&mut self, time : f32, side : usize ) {
-    assert!(side == 0 || side == 1);
-    if side == 0 {self.set_time_a(time);}
-    if side == 1 {self.set_time_b(time);}
+    self.time_b.to_f32()
   }
 
-  pub fn set_charge_a(&mut self, charge : f32 ) {
-    if charge >= MAX_PEAK_CHARGE {
-      self.charge_a = u16::MAX;
-    } else {
-      self.charge_a = F32TOU16_PEAK_CHARGE*(charge.floor() as u16); 
-    }
+  pub fn set_time_b(&mut self, t : f32) {
+    self.time_b = f16::from_f32(t)
   }
-  
+
+  pub fn get_peak_a(&self) -> f32 {
+    self.peak_a.to_f32()
+  }
+
+  pub fn set_peak_a(&mut self, p : f32) {
+    self.peak_a = f16::from_f32(p)
+  }
+
+  pub fn get_peak_b(&self) -> f32 {
+    self.peak_b.to_f32()
+  }
+
+  pub fn set_peak_b(&mut self, p : f32) {
+    self.peak_b = f16::from_f32(p)
+  }
+
   pub fn get_charge_a(&self) -> f32 {
-    self.charge_a as f32 * U16TOF32_PEAK_CHARGE
+    self.charge_a.to_f32()
   }
 
-  pub fn set_charge_b(&mut self, charge : f32 ) {
-    if charge >= MAX_PEAK_CHARGE {
-      self.charge_b = u16::MAX;
-    } else {
-      self.charge_b = F32TOU16_PEAK_CHARGE*(charge.floor() as u16); 
-    }
+  pub fn set_charge_a(&mut self, c : f32) {
+    self.charge_a = f16::from_f32(c)
   }
-  
+
   pub fn get_charge_b(&self) -> f32 {
-    self.charge_b as f32 * U16TOF32_PEAK_CHARGE
+    self.charge_b.to_f32()
+  }
+
+  pub fn set_charge_b(&mut self, c : f32) {
+    self.charge_b = f16::from_f32(c)
+  }
+
+  pub fn get_bl_a(&self) -> f32 {
+    self.baseline_a.to_f32()
   }
   
-  pub fn set_charge(&mut self, charge : f32, side : usize ) {
-    assert!(side == 0 || side == 1);
-    if side == 0 {self.set_charge_a(charge);}
-    if side == 1 {self.set_charge_b(charge);}
+  pub fn get_bl_b(&self) -> f32 {
+    self.baseline_b.to_f32()
   }
+  
+  pub fn get_bl_a_rms(&self) -> f32 {
+    self.baseline_a_rms.to_f32()
+  }
+  
+  pub fn get_bl_b_rms(&self) -> f32 {
+    self.baseline_b_rms.to_f32()
+  }
+
+  ////pub fn get_timestamp48(&self) -> u64 {
+  ////  ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
+  ////}
+  //
+  //pub fn set_edep(&mut self, edep : f32) {
+  //  if edep >= 100.0 {
+  //    self.charge_min_i = u16::MAX;
+  //  } else {
+  //    self.charge_min_i = F32TOU16_EDEP*(edep.floor() as u16);
+  //  }
+  //}
+
+  //pub fn get_edep(&self) -> f32 {
+  //  self.charge_min_i as f32 * U16TOF32_EDEP
+  //}
+  //
+  //pub fn set_pos_across(&mut self, pa : f32) {
+  //  if pa >= 1800.0 {
+  //    self.pos_across = u16::MAX;
+  //  } else {
+  //    self.pos_across = F32TOU16_POS_ACROSS*(pa.floor() as u16);
+  //  }
+  //}
+
+  //pub fn get_pos_across(&self) -> f32 {
+  //  self.pos_across as f32 * U16TOF32_POS_ACROSS
+  //}
+
+  //pub fn set_t0(&mut self, t0 : f32) {
+  //  if t0 >= MAX_PEAK_TIME {
+  //    self.t0 = u16::MAX;
+  //  } else {
+  //    self.t0 = F32TOU16_T0*(t0.floor() as u16);
+  //  }
+  //}
+
+  //pub fn get_t0(&self) -> f32 {
+  //  self.t0 as f32 * U16TOF32_T0
+  //}
+
+  //pub fn set_peak_a(&mut self, peak : f32 ) {
+  //  if peak >= MAX_PEAK_HEIGHT {
+  //    self.peak_a = u16::MAX;
+  //  } else {
+  //    self.peak_a = F32TOU16_PEAK_HEIGHT*(peak.floor() as u16); 
+  //  }
+  //}
+  //
+  //pub fn get_peak_a(&self) -> f32 {
+  //  self.peak_a as f32 * U16TOF32_PEAK_HEIGHT
+  //}
+
+  //pub fn set_peak_b(&mut self, peak : f32 ) {
+  //  if peak >= MAX_PEAK_HEIGHT {
+  //    self.peak_b = u16::MAX;
+  //  } else {
+  //    self.peak_b = F32TOU16_PEAK_HEIGHT*(peak.floor() as u16); 
+  //  }
+  //}
+  //
+  //pub fn get_peak_b(&self) -> f32 {
+  //  self.peak_b as f32 * U16TOF32_PEAK_HEIGHT
+  //}
+  //
+  //pub fn set_peak(&mut self, peak : f32, side : usize ) {
+  //  assert!(side == 0 || side == 1);
+  //  if side == 0 {self.set_peak_a(peak);}
+  //  if side == 1 {self.set_peak_b(peak);}
+  //}
+
+  //pub fn set_time_a(&mut self, time : f32 ) {
+  //  if time >= MAX_PEAK_TIME {
+  //    self.time_a = u16::MAX;
+  //  } else {
+  //    self.time_a = F32TOU16_PEAK_TIME*(time.floor() as u16); 
+  //  }
+  //}
+
+  //pub fn get_time_a(&self) -> f32 {
+  //  self.time_a as f32 * U16TOF32_PEAK_TIME 
+  //}
+
+  //pub fn set_time_b(&mut self, time : f32 ) {
+  //  if time >= MAX_PEAK_TIME {
+  //    self.time_b = u16::MAX;
+  //  } else {
+  //    self.time_b = F32TOU16_PEAK_TIME*(time.floor() as u16); 
+  //  }
+  //}
+  //
+  //pub fn get_time_b(&self) -> f32 {
+  //  self.time_b as f32 * U16TOF32_PEAK_TIME 
+  //}
+  //
+  //pub fn set_time(&mut self, time : f32, side : usize ) {
+  //  assert!(side == 0 || side == 1);
+  //  if side == 0 {self.set_time_a(time);}
+  //  if side == 1 {self.set_time_b(time);}
+  //}
+
+  //pub fn set_charge_a(&mut self, charge : f32 ) {
+  //  if charge >= MAX_PEAK_CHARGE {
+  //    self.charge_a = u16::MAX;
+  //  } else {
+  //    self.charge_a = F32TOU16_PEAK_CHARGE*(charge.floor() as u16); 
+  //  }
+  //}
+  //
+  //pub fn get_charge_a(&self) -> f32 {
+  //  self.charge_a as f32 * U16TOF32_PEAK_CHARGE
+  //}
+
+  //pub fn set_charge_b(&mut self, charge : f32 ) {
+  //  if charge >= MAX_PEAK_CHARGE {
+  //    self.charge_b = u16::MAX;
+  //  } else {
+  //    self.charge_b = F32TOU16_PEAK_CHARGE*(charge.floor() as u16); 
+  //  }
+  //}
+  //
+  //pub fn get_charge_b(&self) -> f32 {
+  //  self.charge_b as f32 * U16TOF32_PEAK_CHARGE
+  //}
+  //
+  //pub fn set_charge(&mut self, charge : f32, side : usize ) {
+  //  assert!(side == 0 || side == 1);
+  //  if side == 0 {self.set_charge_a(charge);}
+  //  if side == 1 {self.set_charge_b(charge);}
+  //}
 
 
   #[cfg(feature="random")]
@@ -460,20 +589,23 @@ impl TofHit {
     let mut pp  = TofHit::new();
     let mut rng = rand::thread_rng();
 
-    pp.paddle_id    = rng.gen::<u8> ();
-    pp.time_a       = rng.gen::<u16>();
-    pp.time_b       = rng.gen::<u16>();
-    pp.peak_a       = rng.gen::<u16>();
-    pp.peak_b       = rng.gen::<u16>();
-    pp.charge_a     = rng.gen::<u16>();
-    pp.charge_b     = rng.gen::<u16>();
-    pp.charge_min_i = rng.gen::<u16>();
-    pp.pos_across   = rng.gen::<u16>();
-    pp.t0           = rng.gen::<u16>();
-    pp.ctr_etx      = rng.gen::<u8>();
-    pp.version      = ProtocolVersion::from(rng.gen::<u8>());
-    pp.baseline     = f16::from_f32(rng.gen::<f32>());
-    pp.baseline_rms = f16::from_f32(rng.gen::<f32>());
+    pp.paddle_id      = rng.gen::<u8> ();
+    pp.time_a         = f16::from_f32(rng.gen::<f32>());
+    pp.time_b         = f16::from_f32(rng.gen::<f32>());
+    pp.peak_a         = f16::from_f32(rng.gen::<f32>());
+    pp.peak_b         = f16::from_f32(rng.gen::<f32>());
+    pp.charge_a       = f16::from_f32(rng.gen::<f32>());
+    pp.charge_b       = f16::from_f32(rng.gen::<f32>());
+    //pp.charge_min_i = rng.gen::<>();
+    //pp.pos_across   = rng.gen::<>();
+    //pp.t0           = rng.gen::<>();
+    //pp.ctr_etx      = rng.gen::<u8>();
+    pp.version        = ProtocolVersion::from(rng.gen::<u8>());
+    pp.baseline_a     = f16::from_f32(rng.gen::<f32>());
+    pp.baseline_a_rms = f16::from_f32(rng.gen::<f32>());
+    pp.baseline_b     = f16::from_f32(rng.gen::<f32>());
+    pp.baseline_b_rms = f16::from_f32(rng.gen::<f32>());
+    pp.phase          = f16::from_f32(rng.gen::<f32>());
     //pp.timestamp32  = rng.gen::<u32>();
     //pp.timestamp16  = rng.gen::<u16>();
     pp

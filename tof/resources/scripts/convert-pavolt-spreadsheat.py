@@ -11,24 +11,33 @@ def get_pbch_for_pid(pid, ch='A'):
     if ch == 'B':
         return (rat, paddle.pb_chB)
     else:
-        raise ValueError("Channel has to be either 'A' or 'B'")
+        raise ValueError(f"Channel has to be either 'A' or 'B', but it is {ch}")
 
-volts = pl.read_excel('voltages_umb.xlsx')
-rats = dict()
-for k in range(1,21):
-    rats[f'RAT{k:02}'] = [58.0]*16
-#print (rats)
-for  row in volts.rows():
-    pid = row[1]
-    pa_volt = row[3]
-    if pid is not None:
-        last_pid = pid
-    if pid is None:
-        pid = last_pid
-    rat, pb_ch = get_pbch_for_pid(pid, row[2])
-    key = f'RAT{k:02}'
-    rats[key][pb_ch - 1] = pa_volt 
+if __name__ == '__main__':
+    
+    import sys
 
-for k in rats:
-    print (f'{k}={rats[k]}')
-
+    volts = pl.read_excel(sys.argv[1])
+    rats = dict()
+    for k in range(1,21):
+        rats[f'RAT{k:02}'] = [58.0]*16
+    #print (rats)
+    
+    for  row in volts.rows():
+        pid     = row[1]
+        pa_volt = row[4]
+        if pid is not None:
+            last_pid = pid
+        if pid is None:
+            pid = last_pid
+        try:
+            rat, pb_ch = get_pbch_for_pid(pid, row[2])
+        except Exception as e:
+            print (e)
+            continue
+        key = f'RAT{rat:02}'
+        rats[key][pb_ch - 1] = pa_volt 
+    
+    for k in rats:
+        print (f'{k}={rats[k]}')
+    
