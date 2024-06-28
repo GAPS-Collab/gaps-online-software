@@ -1,4 +1,6 @@
 //! MasterTriggerEvent
+#[cfg(feature = "pybindings")]
+use pyo3::pyclass;
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
@@ -110,6 +112,7 @@ pub const LTB_CHANNELS : [u16;8] = [
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
+#[cfg_attr(feature = "pybindings", pyclass)]
 pub enum TriggerType {
   Unknown      = 0u8,
   /// -> 1-10 "pysics" triggers

@@ -69,6 +69,8 @@ use pyo3::exceptions::{
     PyIOError,
 };
 
+use tof_dataclasses::config::TriggerConfig;
+use tof_dataclasses::events::TriggerType;
 //trait<T> Wrapper {
 //  where T : Packable
 //
@@ -133,6 +135,74 @@ impl PyRunConfig {
   
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.config)) 
+  }
+}
+
+#[pyclass]
+#[pyo3(name="TriggerConfig")]
+pub struct PyTriggerConfig {
+  pub config : TriggerConfig
+}
+
+impl PyTriggerConfig {
+  pub fn set_config(&mut self, cfg : TriggerConfig) {
+    self.config = cfg;
+  }
+}
+
+#[pymethods]
+impl PyTriggerConfig {
+  #[new]
+  fn new() -> Self {
+    let cfg =  TriggerConfig::new();
+    Self {
+      config : cfg
+    }
+  }
+  //prescale
+  #[getter] 
+  fn get_prescale(&self) -> PyResult<f32> {
+    Ok(self.config.prescale)
+  }
+  
+  #[setter]
+  fn set_prescale(&mut self, prescale: f32) -> PyResult<()> {
+    self.config.prescale = prescale;
+    Ok(())
+  }
+  //trigger use beta?
+  #[getter] 
+  fn get_gaps_trigger_use_beta(&self) -> PyResult<bool> {
+    Ok(self.config.gaps_trigger_use_beta)
+  }
+
+  #[setter]
+  fn set_gaps_trigger_use_beta(&mut self, gaps_trigger_use_beta: bool) -> PyResult<()> {
+    self.config.gaps_trigger_use_beta = gaps_trigger_use_beta;
+    Ok(())
+  }
+
+  //tiu emulation mode?
+  #[getter] 
+  fn get_tiu_emulation_mode(&self) -> PyResult<bool> {
+    Ok(self.config.tiu_emulation_mode)
+  }
+
+  #[setter]
+  fn set_tiu_emulation_mode(&mut self, tiu_emulation_mode: bool) -> PyResult<()> {
+    self.config.tiu_emulation_mode = tiu_emulation_mode;
+    Ok(())
+  }
+//trigger type
+  #[getter] 
+  fn get_trigger_type(&self) -> PyResult<TriggerType> {
+    Ok(self.config.trigger_type)
+  }
+
+  #[setter]
+  fn set_trigger_type(&mut self, trigger_type: TriggerType) -> PyResult<()> {
+    self.config.trigger_type = trigger_type;
+    Ok(())
   }
 }
 
@@ -904,7 +974,7 @@ impl PyMasterTriggerEvent {
 
   ///// Get the trigger sources from trigger source byte
   ///// FIXME! (Does not return anything)
-  //pub fn get_trigger_sources(&self) -> Vec<TriggerType> {
+  //pub fn get_trigger_sources(&self) -> Vec<x> {
   //
   //}
 }
