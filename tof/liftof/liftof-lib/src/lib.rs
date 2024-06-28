@@ -28,6 +28,8 @@ use std::sync::{
 };
 use std::process::exit;
 
+#[cfg(feature="database")]
+use half::f16;
 
 pub use master_trigger::{
     master_trigger,
@@ -105,8 +107,8 @@ use tof_dataclasses::analysis::{
     integrate,
     cfd_simple,
     find_peaks,
-    get_paddle_t0,
-    pos_across
+    //get_paddle_t0,
+    //pos_across
 };
 
 use tof_dataclasses::RBChannelPaddleEndIDMap;
@@ -481,6 +483,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   let mut times       : Vec<f32>= vec![0.0; NWORDS];
 
   // Step 0 : If desired, fit sine
+  let mut fit_result = (0.0f32, 0.0f32, 0.0f32);
   if fit_sinus {
     if !active_channels.contains(&8) {
       error!("RB {} does not have ch9 data!", rb.rb_id);
@@ -500,7 +503,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     rb.calibration.nanoseconds(9,
                                event.header.stop_cell as usize,
                                &mut times);
-    let fit_result = fit_sine(&times, &voltages);
+    fit_result = fit_sine(&times, &voltages);
     //println!("FIT RESULT = {:?}", fit_result);
     event.header.set_sine_fit(fit_result);
   }
@@ -616,36 +619,27 @@ pub fn waveform_analysis(event         : &mut RBEvent,
       //println!("Calucalated tdc {}, charge {}, max {} for ch {}!", tdc, charge, max_volts, ch); 
       //if rb.channel_to_paddle_end_id[*raw_ch as usize] > 2000 {
       if k == 0 {
-        hit.ftime_b      = tdc;
-        hit.fpeak_b      = max_volts;
-        hit.set_time_b(tdc);
-        hit.set_charge_b(charge);
-        hit.set_peak_b(max_volts);
-      } else {
-        hit.ftime_a = tdc;
-        hit.fpeak_b = max_volts;
+        hit.ftime_a      = tdc;
+        hit.fpeak_a      = max_volts;
         hit.set_time_a(tdc);
         hit.set_charge_a(charge);
         hit.set_peak_a(max_volts);
+        hit.baseline_a     = f16::from_f32(ped);
+        hit.baseline_a_rms = f16::from_f32(ped_err);
+      } else {
+        hit.ftime_b = tdc;
+        hit.fpeak_b = max_volts;
+        hit.set_time_b(tdc);
+        hit.set_charge_b(charge);
+        hit.set_peak_b(max_volts);
+        hit.baseline_b     = f16::from_f32(ped);
+        hit.baseline_b_rms = f16::from_f32(ped_err);
         // this is the seoond iteration,
         // we are done!
+        hit.phase = f16::from_f32(fit_result.2);
         paddles.insert(pid, hit);
       }
     }
-  }
-  //println!("Paddles {:?}", paddles);
-  for (_, hit) in paddles.iter_mut() {
-    // unwrap should not fail by construction
-    let t0 = get_paddle_t0(hit.ftime_a, hit.ftime_b, rb.get_paddle_length(hit.paddle_id).unwrap_or(1.0));
-    //println!("Cot t0 :{}", t0);
-    //println!("Hit : {}", hit);
-    //println!("Hit.ftime_a {}", hit.ftime_a);
-    let pa = pos_across(hit.ftime_a, t0);
-    //println!("pa : {}", pa);
-    hit.set_t0(t0);
-    hit.set_pos_across(pa);
-    hit.set_edep((hit.fpeak_a + hit.fpeak_b) / 2.0);
-    //println!("caluclated {} {} for {}",t0, pa, hit);
   }
   let result = paddles.into_values().collect();
   event.hits = result;
