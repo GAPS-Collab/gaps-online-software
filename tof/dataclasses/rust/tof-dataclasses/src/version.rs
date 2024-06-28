@@ -6,12 +6,16 @@ use rand::Rng;
 
 use std::fmt;
 
+#[cfg(feature = "pybindings")]
+use pyo3::pyclass;
+
 /// Use the fisrt 3 bits (most significant) in 
 /// the event status field for conveyilng versio
 /// information
 /// This means all numbers have to be > 64
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
+#[cfg_attr(feature = "pybindings", pyclass)]
 pub enum ProtocolVersion {
   Unknown  = 0u8,
   V1       = 64u8,
