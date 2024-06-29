@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "gaps-online"
+version = "0.8.0"
+description = ""
+authors = ["Achim Stoessl <achim.stoessl@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+charmingbeauty = "^0.1.1"
+tornado = "^6.3.3"
+pygobject = "^3.46.0"
+jupyter = "^1.0.0"
+pydashi = "^0.1.2"
+scipy = "^1.11.3"
+tqdm = "^4.66.1"
+fpdf2 = "^2.7.6"
+h5py = "^3.10.0"
+hermes-py = "^0.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
