@@ -28,7 +28,10 @@ use crossbeam_channel::{
 };
 
 //use tof_dataclasses::threading::ThreadControl;
-use tof_dataclasses::config::RunConfig;
+use tof_dataclasses::config::{
+    RunConfig,
+    TriggerConfig
+};
 use tof_dataclasses::constants::PAD_CMD_32BIT;
 use tof_dataclasses::commands::{
     TofCommand,
@@ -422,16 +425,18 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                     match thread_ctrl.lock() {
                       Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
                       Ok(mut tc) => {
-                        let config=TriggerConfig::from_bystream(packet.payload, &mut 0);
-                        tc.liftof_settings.mtb_settings.trigger_prescale=config.prescale;
-                        tc.liftof_settings.mtb_settings.trigger_type=config.trigger_type;
-                        tc.liftof_settings.mtb_settings.gaps_trigger_use_beta=config.gaps_trigger_use_beta;
-                        tc.liftof_settings.mtb_setttings.tiu_emulation_mode=config.tiu_emulation_mode;
-                      }
-                            }
+                        match TriggerConfig::from_bytestream(&packet.payload, &mut 0) {
+                          Err(err) => error!("Unable to decode TriggerConfig!"),
+                          Ok(config) => {
+                            tc.liftof_settings.mtb_settings.trigger_prescale=config.prescale;
+                            tc.liftof_settings.mtb_settings.trigger_type=config.trigger_type;
+                            tc.liftof_settings.mtb_settings.gaps_trigger_use_beta=config.gaps_trigger_use_beta;
+                            tc.liftof_settings.mtb_settings.tiu_emulation_mode=config.tiu_emulation_mode;
                           }
-                  
-
+                        }
+                      }
+                    }
+                  }
                   _ => {
                     error!("Command {} is currently not implemented!", cmd); 
                     let ack_tp = resp.pack();
