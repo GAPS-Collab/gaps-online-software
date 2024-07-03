@@ -43,7 +43,6 @@ pub struct ThreadControl {
   /// (data sinks need to know)
   pub new_run_start_flag         : bool,
   pub liftof_settings            : LiftofSettings,
-  pub analysis_engine_settings   : AnalysisEngineSettings,
 }
 
 impl ThreadControl {
