@@ -65,7 +65,9 @@ pub enum TofCommandCode {
   /// command code for "Set LTB Thresholds"
   SetLTBThresholds           = 21u8,         
   /// command code for "Configure MTB"
-  SetMTConfig             = 22u8,        
+  SetMTConfig             = 22u8,     
+  /// command code for AnalysisEngineConfig
+  SetAnalysisEngineConfig = 27u8,   
   /// command code for "Set preamp bias"
   SetPreampBias           = 28u8,         
   /// command code for "Stop Data taking"
