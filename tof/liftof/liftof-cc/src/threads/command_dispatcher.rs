@@ -437,6 +437,30 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       }
                     }
                   }
+                TofCommandCode::SetAnalysisEngineConfig => {
+                  match thread_ctrl.lock() {
+                    Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
+                    Ok(mut tc) => {
+                      match AnalysisEngineConfig::from_bytestream(bytestream: &packet.payload, pos: &mut 0) {
+                        Err(err: SerializationError) => error!("Unalbe to decode AnalysisEngineConfig!"),
+                        Ok(config: AnalysisEngineConfig) => {
+                        tc.analysis_engine_settings.integration_start=config.integration_start;
+                        tc.analysis_engine_settings.integration_window=config.integration_window;
+                        tc.analysis_engine_settings.pedestal_thresh=config.pedestal_thresh;
+                        tc.analysis_engine_settings.pedestal_begin_bin=config.pedestal_begin_bin;
+                        tc.analysis_engine_settings.pedestal_win_bins=config.pedestal_win_bins;
+                        tc.analysis_engine_settings.use_zscore=config.use_zscore;
+                        tc.analysis_engine_settings.find_pks_t_start=config.find_pks_t_start;
+                        tc.analysis_engine_settings.find_pks_t_window=config.find_pks_t_window;
+                        tc.analysis_engine_settings.min_peak_size=config.min_peak_size;
+                        tc.analysis_engine_settings.max_oeaks=config.max_peaks;
+                        tc.analysis_engine_settings.find_pks_thresh=config.find_pks_thresh;
+                        tc.analysis_engine_settings.cfd_fraction=config.cfd_fraction;
+                      }
+                    }  
+                  }
+                }
+              }
                   _ => {
                     error!("Command {} is currently not implemented!", cmd); 
                     let ack_tp = resp.pack();

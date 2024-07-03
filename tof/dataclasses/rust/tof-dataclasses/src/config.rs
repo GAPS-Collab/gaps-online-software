@@ -12,7 +12,8 @@ use crate::serialization::{
   parse_u8,
   parse_u16,
   parse_u32,
-  parse_f32
+  parse_f32,
+  parse_usize
 };
 
 use crate::packets::PacketType;
@@ -384,10 +385,10 @@ fn pack_runconfig() {
 }
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct TriggerConfig{
-  pub gaps_trigger_use_beta : bool,
-  pub tiu_emulation_mode : bool, 
-  pub prescale : f32,
-  pub trigger_type : TriggerType 
+  pub gaps_trigger_use_beta : bool, //1
+  pub tiu_emulation_mode : bool, //1
+  pub prescale : f32, //4
+  pub trigger_type : TriggerType //1 
 }
 
 impl TriggerConfig {
@@ -479,5 +480,147 @@ fn pack_triggerconfig() {
   }
 }
 
+///Analysis Engine Config
+/// Settings to change the configuration of the analysis engine 
+/// (pulse extraction)
 
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct AnalysisEngineConfig{
+  pub integration_start : f32, //4
+  pub integration_window : f32, //4
+  pub pedestal_thresh : f32, //4
+  pub pedestal_begin_bin : usize, //8
+  pub pedestal_win_bins : usize, //8
+  pub use_zscore : bool, //1
+  pub find_pks_t_start : f32, //4
+  pub find_pks_t_window : f32, //4
+  pub min_peak_size : usize, //8
+  pub find_pks_thresh : f32, //4
+  pub max_peaks : usize, //8
+  pub cfd_fraction : f32 //4
+}
 
+impl AnalysisEngineConfig {
+  pub fn new() -> Self {
+    Self {
+      integration_start         : 270.0,
+      integration_window        : 70.0, 
+      pedestal_thresh           : 10.0,
+      pedestal_begin_bin        : 10,
+      pedestal_win_bins         : 50,
+      use_zscore                : false,
+      find_pks_t_start          : 270.0,
+      find_pks_t_window         : 70.0,
+      min_peak_size             : 3,
+      find_pks_thresh           : 10.0,
+      max_peaks                 : 5, //max peak size?? ask
+      cfd_fraction              : 0.2
+    }
+  }
+}
+
+impl Default for AnalysisEngineConfig {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for AnalysisEngineConfig {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr: String = String::from("<AnalysisEngineConfig");
+    repr += &(format!("\n Integration start         : {:.1}", self.integration_start));
+    repr += &(format!("\n Integration window        : {:.1}", self.integration_window));
+    repr += &(format!("\n Pedestal threshold        : {:.1}", self.pedestal_thresh));
+    repr += &(format!("\n Pedestal start bin        : {}", self.pedestal_begin_bin));
+    repr += &(format!("\n Pedestal window num. bins : {}", self.pedestal_win_bins));
+    repr += &(format!("\n Use zscore?               : {}", self.use_zscore));
+    repr += &(format!("\n Peakfinder start time     : {:.1}", self.find_pks_t_start));
+    repr += &(format!("\n Peakfinder window         : {:.1}", self.find_pks_t_window));
+    repr += &(format!("\n Peakfinder threshold      : {:.1}", self.find_pks_thresh));
+    repr += &(format!("\n Min. peak size            : {}", self.min_peak_size));
+    repr += &(format!("\n Max num. peaks            : {}", self.max_peaks));
+    repr += &(format!("\n CFD fraction              : {:.2}", self.cfd_fraction));
+    write!(f, "{}", repr)
+  }
+}
+
+impl Packable for AnalysisEngineConfig {
+  const PACKET_TYPE : PacketType = PacketType::AnalysisEngineConfig;
+}
+
+impl Serialization for AnalysisEngineConfig {
+  
+  const HEAD : u16 = 0xAAAA; //2
+  const TAIL : u16 = 0x5555; //2
+  const SIZE : usize = 65; //61+2+2 = 65
+  
+  fn from_bytestream(stream    : &Vec<u8>, 
+                     pos       : &mut usize) 
+    -> Result<Self, SerializationError>{
+    Self::verify_fixed(stream, pos)?;  
+    let mut cfg: AnalysisEngineConfig = AnalysisEngineConfig::new();
+      cfg.integration_start = parse_f32(stream, pos);
+      cfg.integration_window = parse_f32(stream, pos);
+      cfg.pedestal_thresh = parse_f32(stream, pos);
+      cfg.pedestal_begin_bin = parse_usize(stream, pos);
+      cfg.pedestal_win_bins = parse_usize(stream, pos);
+      cfg.use_zscore = parse_bool(stream, pos);
+      cfg.find_pks_t_start = parse_f32(stream, pos);
+      cfg.find_pks_t_window = parse_f32(stream, pos);
+      cfg.find_pks_thresh = parse_f32(stream, pos);
+      cfg.min_peak_size = parse_usize(stream, pos);
+      cfg.max_peaks = parse_usize(stream, pos);
+      cfg.cfd_fraction = parse_f32(stream, pos);
+    *pos += 2;
+    Ok(cfg)
+  }
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
+    bs.extend_from_slice(&Self::HEAD.to_le_bytes());
+    bs.extend_from_slice(&self.integration_start.to_le_bytes());
+    bs.extend_from_slice(&self.integration_window.to_le_bytes());
+    bs.extend_from_slice(&self.pedestal_thresh.to_le_bytes());
+    bs.extend_from_slice(&self.pedestal_begin_bin.to_le_bytes());
+    bs.extend_from_slice(&self.pedestal_win_bins.to_le_bytes());
+    bs.push(self.use_zscore as u8);
+    bs.extend_from_slice(&self.find_pks_t_start.to_le_bytes());
+    bs.extend_from_slice(&self.find_pks_t_window.to_le_bytes());
+    bs.extend_from_slice(&self.find_pks_thresh.to_le_bytes());
+    bs.extend_from_slice(&self.min_peak_size.to_le_bytes());
+    bs.extend_from_slice(&self.max_peaks.to_le_bytes());
+    bs.extend_from_slice(&self.cfd_fraction.to_le_bytes());
+    bs.extend_from_slice(&Self::TAIL.to_le_bytes());
+    bs
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for AnalysisEngineConfig {
+  fn from_random() -> Self {
+    let mut cfg  = AnalysisEngineConfig::new();
+    let mut rng      = rand::thread_rng();
+    cfg.integration_start = rng.gen::<f32>();
+    cfg.integration_window = rng.gen::<f32>();
+    cfg.pedestal_thresh = rng.gen::<f32>();
+    cfg.pedestal_begin_bin = rng.gen::<usize>();
+    cfg.pedestal_win_bins = rng.gen::<usize>();
+    cfg.use_zscore = rng.gen::<bool>();
+    cfg.find_pks_t_start = rng.gen::<f32>();
+    cfg.find_pks_t_window = rng.gen::<f32>();
+    cfg.find_pks_thresh = rng.gen::<f32>();
+    cfg.min_peak_size = rng.gen::<usize>();
+    cfg.max_peaks = rng.gen::<usize>();
+    cfg.cfd_fraction = rng.gen::<f32>();
+    cfg
+  }
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_analysisengineconfig() {
+  for _ in 0..100 {
+    let cfg  = AnalysisEngineConfig::from_random();
+    let test : AnalysisEngineConfig = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}

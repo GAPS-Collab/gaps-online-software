@@ -60,7 +60,7 @@ use tof_dataclasses::commands::{
     TofCommandCode
 };
 use tof_dataclasses::calibrations::RBCalibrations;
-use tof_dataclasses::config::RunConfig;
+use tof_dataclasses::config::{AnalysisEngineConfig, RunConfig};
 
 
 use pyo3::prelude::*;
@@ -177,7 +177,6 @@ impl PyTriggerConfig {
   fn get_gaps_trigger_use_beta(&self) -> PyResult<bool> {
     Ok(self.config.gaps_trigger_use_beta)
   }
-
   #[setter]
   fn set_gaps_trigger_use_beta(&mut self, gaps_trigger_use_beta: bool) -> PyResult<()> {
     self.config.gaps_trigger_use_beta = gaps_trigger_use_beta;
@@ -204,6 +203,164 @@ impl PyTriggerConfig {
   #[setter]
   fn set_trigger_type(&mut self, trigger_type: TriggerType) -> PyResult<()> {
     self.config.trigger_type = trigger_type;
+    Ok(())
+  }
+}
+
+#[pyclass]
+#[pyo3(name="AnalysisEngineConfig")]
+pub struct PyAnalysisEngineConfig{
+  pub config : AnalysisEngineConfig
+}
+
+impl PyAnalysisEngineConfig {
+  pub fn set_config(&mut self, cfg : AnalysisEngineConfig) {
+    self.config = cfg;
+  }
+}
+
+#[pymethods]
+impl PyAnalysisEngineConfig {
+  #[new]
+  fn new() -> Self {
+    let cfg: AnalysisEngineConfig = AnalysisEngineConfig::new();
+    Self {
+      config : cfg
+    }
+  }
+  // beginning with f32s
+  // integration start
+  #[getter]
+  fn get_integration_start(&self) -> PyResult<f32> {
+    Ok(self.config.integration_start)
+  }
+
+  #[setter]
+  fn set_integration_start(&mut self, integration_start: f32) -> PyResult<()> {
+    self.config.integration_start = integration_start;
+    Ok(())
+  }
+  // integration window
+  #[getter]
+  fn get_integration_window(&self) -> PyResult<f32> {
+    Ok(self.config.integration_window)
+  }
+
+  #[setter]
+  fn set_integration_window(&mut self, integration_window: f32) -> PyResult<()> {
+    self.config.integration_window = integration_window;
+    Ok(())
+  } 
+  // pedestal threshold
+  #[getter]
+  fn get_pedestal_thresh(&self) -> PyResult<f32> {
+    Ok(self.config.pedestal_thresh)
+  }
+
+  #[setter]
+  fn set_pedestal_thresh(&mut self, pedestal_thresh: f32) -> PyResult<()> {
+    self.config.pedestal_thresh = pedestal_thresh;
+    Ok(())
+  }
+  //Peakfinder time start
+  #[getter]
+  fn get_find_pks_t_start(&self) -> PyResult<f32> {
+    Ok(self.config.find_pks_t_start)
+  }
+
+  #[setter]
+  fn set_find_pks_t_start(&mut self, find_pks_t_start: f32) -> PyResult<()> {
+    self.config.find_pks_t_start = find_pks_t_start;
+    Ok(())
+  }
+  //Peakfinder time window
+  #[getter]
+  fn get_find_pks_t_window(&self) -> PyResult<f32> {
+    Ok(self.config.find_pks_t_window)
+  }
+
+  #[setter]
+  fn set_find_pks_t_window(&mut self, find_pks_t_window: f32) -> PyResult<()> {
+    self.config.find_pks_t_window = find_pks_t_window;
+    Ok(())
+  }
+  //Peakfinder threshold
+  #[getter]
+  fn get_find_pks_thresh(&self) -> PyResult<f32> {
+    Ok(self.config.find_pks_thresh)
+  }
+
+  #[setter]
+  fn set_find_pks_thresh(&mut self, find_pks_thresh: f32) -> PyResult<()> {
+    self.config.find_pks_thresh = find_pks_thresh;
+    Ok(())
+  }
+  // CFD fraction
+  #[getter]
+  fn get_cfd_fraction(&self) -> PyResult<f32> {
+    Ok(self.config.cfd_fraction)
+  }
+
+  #[setter]
+  fn set_cfd_fraction(&mut self, cfd_fraction: f32) -> PyResult<()> {
+    self.config.cfd_fraction = cfd_fraction;
+    Ok(())
+  }
+  //moving on to the bool
+  // use zscore?
+  #[getter] 
+  fn get_use_zscore(&self) -> PyResult<bool> {
+    Ok(self.config.use_zscore)
+  }
+
+  #[setter]
+  fn set_use_zscore(&mut self, use_zscore: bool) -> PyResult<()> {
+    self.config.use_zscore = use_zscore;
+    Ok(())
+  }
+  //finally, usize
+  // pedestal start bin
+  #[getter] 
+  fn get_pedestal_begin_bin(&self) -> PyResult<usize> {
+    Ok(self.config.pedestal_begin_bin)
+  }
+
+  #[setter]
+  fn set_pedestal_begin_bin(&mut self, pedestal_begin_bin: usize) -> PyResult<()> {
+    self.config.pedestal_begin_bin = pedestal_begin_bin;
+    Ok(())
+  }
+  // pedestal bin window
+  #[getter] 
+  fn get_pedestal_win_bins(&self) -> PyResult<usize> {
+    Ok(self.config.pedestal_win_bins)
+  }
+
+  #[setter]
+  fn set_pedestal_win_bins(&mut self, pedestal_win_bins: usize) -> PyResult<()> {
+    self.config.pedestal_win_bins = pedestal_win_bins;
+    Ok(())
+  }
+  // min peak size
+  #[getter] 
+  fn get_min_oeak_size(&self) -> PyResult<usize> {
+    Ok(self.config.min_peak_size)
+  }
+
+  #[setter]
+  fn set_min_peak_size(&mut self, min_peak_size: usize) -> PyResult<()> {
+    self.config.min_peak_size = min_peak_size;
+    Ok(())
+  }
+  // max peaks
+  #[getter] 
+  fn get_max_peaks(&self) -> PyResult<usize> {
+    Ok(self.config.max_peaks)
+  }
+
+  #[setter]
+  fn set_max_peaks(&mut self, max_peaks: usize) -> PyResult<()> {
+    self.config.max_peaks = max_peaks;
     Ok(())
   }
 }

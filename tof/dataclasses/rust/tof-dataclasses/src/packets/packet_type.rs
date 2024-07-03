@@ -29,6 +29,7 @@ pub enum PacketType {
   HeartBeatDataSink   = 40u8,    
   MasterTrigger       = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
   TriggerConfig       = 61u8,
+  AnalysisEngineConfig = 69u8,
   RBEventHeader       = 70u8,    // needs to go away
   CPUMoniData         = 80u8,
   MonitorMtb          = 90u8,

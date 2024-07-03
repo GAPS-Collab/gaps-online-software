@@ -133,6 +133,12 @@ pub fn parse_u64(bs : &Vec::<u8>, pos : &mut usize) -> u64 {
   value
 }
 
+pub fn parse_usize(bs: &Vec::<u8>, pos: &mut usize) -> usize {
+  let value: usize = usize::from_le_bytes([bs[*pos],bs[*pos + 1], bs[*pos + 2], bs[*pos + 3], 
+    bs[*pos + 4], bs[*pos + 5], bs[*pos + 6], bs[*pos + 7],]);
+  *pos += std::mem::size_of::<usize>();
+  value
+} 
 /// Get an u32 from a bytestream 
 ///
 /// This assumes an underlying representation of 
