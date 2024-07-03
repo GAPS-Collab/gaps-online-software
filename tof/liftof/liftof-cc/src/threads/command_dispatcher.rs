@@ -31,7 +31,7 @@ use crossbeam_channel::{
 use tof_dataclasses::config::{
     RunConfig,
     TriggerConfig,
-    AnalysisEngineConfig;
+    AnalysisEngineConfig
 };
 use tof_dataclasses::constants::PAD_CMD_32BIT;
 use tof_dataclasses::commands::{
@@ -444,8 +444,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
                       Ok(mut tc) => {
                         match AnalysisEngineConfig::from_bytestream(&packet.payload, &mut 0) {
-                          Err(err: SerializationError) => error!("Unable to decode AnalysisEngineConfig!"),
-                          Ok(config : AnalysisEngineConfig) => {
+                          Ok(config: AnalysisEngineConfig) => {
                           tc.liftof_settings.analysis_engine_settings.integration_start=config.integration_start;
                           tc.liftof_settings.analysis_engine_settings.integration_window=config.integration_window;
                           tc.liftof_settings.analysis_engine_settings.pedestal_thresh=config.pedestal_thresh;
@@ -458,7 +457,6 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                           tc.liftof_settings.analysis_engine_settings.max_oeaks=config.max_peaks;
                           tc.liftof_settings.analysis_engine_settings.find_pks_thresh=config.find_pks_thresh;
                           tc.liftof_settings.analysis_engine_settings.cfd_fraction=config.cfd_fraction;
-                        }
                       }  
                     }
                   }
