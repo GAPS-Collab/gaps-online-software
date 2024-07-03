@@ -30,7 +30,8 @@ use crossbeam_channel::{
 //use tof_dataclasses::threading::ThreadControl;
 use tof_dataclasses::config::{
     RunConfig,
-    TriggerConfig
+    TriggerConfig,
+    AnalysisEngineConfig;
 };
 use tof_dataclasses::constants::PAD_CMD_32BIT;
 use tof_dataclasses::commands::{
@@ -426,7 +427,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                     match thread_ctrl.lock() {
                       Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
                       Ok(mut tc) => {
-                        match TriggerConfig::from_bytestream(&packet.payload, pos &mut 0) {
+                        match TriggerConfig::from_bytestream(&packet.payload, &mut 0) {
                           Err(err) => error!("Unable to decode TriggerConfig!"),
                           Ok(config) => {
                             tc.liftof_settings.mtb_settings.trigger_prescale=config.prescale;
@@ -442,7 +443,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                     match thread_ctrl.lock() {
                       Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
                       Ok(mut tc) => {
-                        match AnalysisEngineConfig::from_bytestream(&packet.payload, pos) {
+                        match AnalysisEngineConfig::from_bytestream(&packet.payload, &mut 0) {
                           Err(err: SerializationError) => error!("Unable to decode AnalysisEngineConfig!"),
                           Ok(config : AnalysisEngineConfig) => {
                           tc.liftof_settings.analysis_engine_settings.integration_start=config.integration_start;
