@@ -455,7 +455,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                           tc.liftof_settings.analysis_engine_settings.find_pks_t_start=config.find_pks_t_start;
                           tc.liftof_settings.analysis_engine_settings.find_pks_t_window=config.find_pks_t_window;
                           tc.liftof_settings.analysis_engine_settings.min_peak_size=config.min_peak_size;
-                          tc.liftof_settings.analysis_engine_settings.max_oeaks=config.max_peaks;
+                          tc.liftof_settings.analysis_engine_settings.max_peaks=config.max_peaks;
                           tc.liftof_settings.analysis_engine_settings.find_pks_thresh=config.find_pks_thresh;
                           tc.liftof_settings.analysis_engine_settings.cfd_fraction=config.cfd_fraction;
                           }  
