@@ -444,7 +444,8 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
                       Ok(mut tc) => {
                         match AnalysisEngineConfig::from_bytestream(&packet.payload, &mut 0) {
-                          Ok(config: AnalysisEngineConfig) => {
+                          Err(err) => error!("Serialization Error! Cannot get analysis engine config from bytestream"),
+                          Ok(config) => {
                           tc.liftof_settings.analysis_engine_settings.integration_start=config.integration_start;
                           tc.liftof_settings.analysis_engine_settings.integration_window=config.integration_window;
                           tc.liftof_settings.analysis_engine_settings.pedestal_thresh=config.pedestal_thresh;
