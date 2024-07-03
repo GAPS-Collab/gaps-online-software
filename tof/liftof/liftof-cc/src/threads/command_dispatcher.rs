@@ -425,7 +425,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                     match thread_ctrl.lock() {
                       Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
                       Ok(mut tc) => {
-                        match TriggerConfig::from_bytestream(&packet.payload, &mut 0) {
+                        match TriggerConfig::from_bytestream(&packet.payload, pos &mut 0) {
                           Err(err) => error!("Unable to decode TriggerConfig!"),
                           Ok(config) => {
                             tc.liftof_settings.mtb_settings.trigger_prescale=config.prescale;
@@ -441,9 +441,9 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                     match thread_ctrl.lock() {
                       Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
                       Ok(mut tc) => {
-                        match AnalysisEngineConfig::from_bytestream(bytestream: &packet.payload, pos: &mut 0) {
+                        match AnalysisEngineConfig::from_bytestream(&packet.payload, pos) {
                           Err(err: SerializationError) => error!("Unalbe to decode AnalysisEngineConfig!"),
-                          Ok(config: AnalysisEngineConfig) => {
+                          Ok(config : AnalysisEngineConfig) => {
                           tc.liftof_settings.analysis_engine_settings.integration_start=config.integration_start;
                           tc.liftof_settings.analysis_engine_settings.integration_window=config.integration_window;
                           tc.liftof_settings.analysis_engine_settings.pedestal_thresh=config.pedestal_thresh;
