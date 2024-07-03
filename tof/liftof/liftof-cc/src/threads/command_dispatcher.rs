@@ -46,7 +46,8 @@ use tof_dataclasses::packets::{
 };
 use tof_dataclasses::serialization::{
     Serialization,
-    Packable
+    Packable,
+    SerializationError
 };
 
 use liftof_lib::settings::CommandDispatcherSettings;
@@ -442,7 +443,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
                       Ok(mut tc) => {
                         match AnalysisEngineConfig::from_bytestream(&packet.payload, pos) {
-                          Err(err: SerializationError) => error!("Unalbe to decode AnalysisEngineConfig!"),
+                          Err(err: SerializationError) => error!("Unable to decode AnalysisEngineConfig!"),
                           Ok(config : AnalysisEngineConfig) => {
                           tc.liftof_settings.analysis_engine_settings.integration_start=config.integration_start;
                           tc.liftof_settings.analysis_engine_settings.integration_window=config.integration_window;
