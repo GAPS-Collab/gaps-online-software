@@ -1,7 +1,7 @@
 [package]
 name        = "liftof-cc" # the name of the package
 version     = "0.10.2"    # the current version, obeying semver
-authors     = ["J.A. Stoessl <stoessl@hawaii.edu>", "Paolo Lazzaroni <paolo.lazzaroni@unibg.it>", "Jeff Zweerink <zweering@astro.ucla.edu>"]
+authors     = ["J.A. Stoessl <stoessl@hawaii.edu>"]
 description = "A programm for the GAPS science instrument. Read out the time-of-flight detectors and process their data."
 
 [[bin]]
@@ -15,9 +15,9 @@ path = "src/bin/liftof_mt.rs"
 
 [features]
 debug = []
+fof-control = ["tof-control"]
 
 [dependencies]
-
 
 clap              = { workspace = true }  
 zmq               = { workspace = true }  
@@ -26,24 +26,20 @@ serde_json        = { workspace = true }
 crossbeam-channel = { workspace = true }  
 log               = { workspace = true }  
 cfg-if            = { workspace = true }
+signal-hook       = { workspace = true }
 
 tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["database", "tofcontrol","smoothed_z_score"], version = "0.10"} 
 liftof-lib      = { path = "../liftof-lib" , version="0.10", features = ["database"] }
-tof-control     = {path = "../../extern/tof-control", optional = false, version = "0.9", features=[] }
+tof-control     = {path = "../../extern/tof-control", optional = true, version = "0.9", features=[] }
 
 indicatif = "0.17"
 # tof-control depends on comfy-table as well
 comfy-table = { version = "7.1", default-features = false }
 
-
 toml       = "0.8"
 
-
-# catch SIGTERM, SIGINT
-# (systemd integration)
-signal-hook = "0.3"
-
-colored = "2.0"
+openssh    = "0.10"
+colored    = "2.0"
 env_logger = "0.10"
 
 #[workspace.metadata.cross.target.x86_64-unknown-linux-musl]

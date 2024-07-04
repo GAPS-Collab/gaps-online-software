@@ -12,7 +12,6 @@ extern crate tof_dataclasses;
 extern crate crossbeam_channel;
 extern crate colored;
 extern crate signal_hook;
-
 extern crate liftof_lib;
 extern crate liftof_cc;
 
@@ -106,9 +105,10 @@ use liftof_cc::threads::{
     //flight_cpu_listener,
     command_dispatcher,
     global_data_sink,
-    monitor_cpu,
     readoutboard_communicator
 };
+#[cfg(features="tof-control")]
+use liftof_cc::threads::monitor_cpu;
 
 /*************************************/
 
@@ -343,6 +343,7 @@ fn main() {
     // this is anonymus, but we control the thread
     // through the thread control mechanism, so we
     // can still end it.
+    #[cfg(features="tof-control")]
     let _cpu_moni_thread = thread::Builder::new()
         .name("cpu-monitoring".into())
         .spawn(move || {
