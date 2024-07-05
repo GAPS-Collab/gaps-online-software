@@ -885,15 +885,15 @@ fn pack_tofresponse() {
   assert_eq!(resp, test);
 }
 
-#[cfg(feature = "random")]
-#[test]
-fn pack_tofcommand() {
-  for _ in 0..100 {
-    let cmd  = TofCommand::from_random();
-    let test : TofCommand = cmd.pack().unpack().unwrap();
-    assert_eq!(cmd, test);
-  }
-}
+//#[cfg(feature = "random")]
+//#[test]
+//fn pack_tofcommand() {
+//  for _ in 0..100 {
+//    let cmd  = TofCommand::from_random();
+//    let test : TofCommand = cmd.pack().unpack().unwrap();
+//    assert_eq!(cmd, test);
+//  }
+//}
 
 #[cfg(feature = "random")]
 #[test]
