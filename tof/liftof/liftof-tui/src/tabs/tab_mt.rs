@@ -2,7 +2,10 @@
 //! 
 //! Show current data from the master trigger
 
-use std::collections::VecDeque;
+use std::collections::{
+    VecDeque,
+    HashMap
+};
 
 use std::time::{
     Instant
@@ -87,6 +90,7 @@ pub struct MTTab {
   pub theme          : ColorTheme,
 
   pub mapping        : DsiJChPidMapping,
+  pub mtlink_rb_map  : HashMap<u8,u8>,
   pub problem_hits   : Vec<(u8, u8, (u8, u8), LTBThreshold)>,
   timer              : Instant,
 }
@@ -96,6 +100,7 @@ impl MTTab {
   pub fn new(tp_receiver  : Receiver<TofPacket>,
              mte_receiver : Receiver<MasterTriggerEvent>,
              mapping      : DsiJChPidMapping,
+             mtlink_rb_map: HashMap<u8,u8>,
              theme        : ColorTheme) -> MTTab {
     let bins          = Uniform::new(50, 0.0, 50.0);
     let mtb_link_bins = Uniform::new(50, 0.0, 50.0);
@@ -119,6 +124,7 @@ impl MTTab {
       panel_histo    : ndhistogram!(panel_bins),
       theme          : theme,
       mapping        : mapping,
+      mtlink_rb_map  : mtlink_rb_map,
       problem_hits   : Vec::<(u8, u8, (u8, u8), LTBThreshold)>::new(),
       timer          : Instant::now(),
     }
@@ -212,7 +218,9 @@ impl MTTab {
       }
       self.nch_histo.fill(&(hits.len() as f32));
       for k in rb_links {
-        self.mtb_link_histo.fill(&(k as f32));
+        // FIXME unwrap
+        let linked_rbid = self.mtlink_rb_map.get(&k).unwrap();
+        self.mtb_link_histo.fill(&(*linked_rbid as f32));
       }
       self.n_events += 1;
       self.event_queue.push_back(mte.clone());
@@ -442,7 +450,8 @@ impl MTTab {
     // histograms
     let ml_labels  = create_labels(&self.mtb_link_histo);
     let mlh_data   = prep_data(&self.mtb_link_histo, &ml_labels, 10, true); 
-    let mlh_chart  = histogram(mlh_data, String::from("MTB Link ID (NOT RBID(!))"), 3, 0, &self.theme);
+    // this actually now is the RB ID!
+    let mlh_chart  = histogram(mlh_data, String::from("RB ID"), 3, 0, &self.theme);
     frame.render_widget(mlh_chart, bottom_row);   
     
     let tp_labels  = create_labels(&self.panel_histo);

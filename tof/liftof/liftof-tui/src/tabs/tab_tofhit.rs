@@ -178,7 +178,7 @@ impl TofHitTab<'_> {
         self.pca_histo.fill(&hit.get_charge_a());
         self.pcb_histo.fill(&hit.get_charge_b());
         self.t0_histo.fill(&(hit.get_t0()));
-        self.pa_histo.fill(&(hit.get_pos_across()));
+        self.pa_histo.fill(&(hit.get_pos()));
         self.edep_histo.fill(&(hit.get_edep()));
         return Ok(());
       }

@@ -67,6 +67,7 @@ pub struct CommandTab<'a> {
   pub cmdl_items         : Vec::<ListItem<'a>>,
   pub cmdl_active        : bool,
   pub cmdl_selector      : usize,
+  pub active_cmd         : TofCommandV2,
 }
 
 impl CommandTab<'_> {
@@ -95,7 +96,37 @@ impl CommandTab<'_> {
       cmdl_items    : cmd_select_items,
       cmdl_active   : false,
       cmdl_selector : 0,
+      active_cmd    : TofCommandV2::new(),
     }
+  }
+  
+  pub fn next_cmd(&mut self) {
+    let i = match self.cmdl_state.selected() {
+      Some(i) => {
+        if i >= self.cmdl_items.len() - 1 {
+          self.cmdl_items.len() - 1
+        } else {
+          i + 1
+        }
+      }
+      None => 0,
+    };
+    self.cmdl_state.select(Some(i));
+    //info!("Selecting {}", i);
+  }
+
+  pub fn prev_cmd(&mut self) {
+    let i = match self.cmdl_state.selected() {
+      Some(i) => {
+        if i == 0 {
+          0 
+        } else {
+          i - 1
+        }
+      }
+      None => 0,
+    };
+    self.cmdl_state.select(Some(i));
   }
   
   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {

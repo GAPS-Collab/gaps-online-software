@@ -68,6 +68,7 @@ use tof_dataclasses::packets::{
 use tof_dataclasses::database::{
     connect_to_db,
     get_dsi_j_ch_pid_map,
+    get_linkid_rbid_map,
     ReadoutBoard,
     Paddle,
 };
@@ -750,9 +751,6 @@ impl<'a> TabbedInterface<'a> {
     self.event_tab.render(&master_lo.rect[1], frame);
   }
 
-
-   
-
   pub fn render_monitoring(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
     self.mo_menu.render(&master_lo.rect[0], frame);
     self.home_tab.render(&master_lo.rect[1], frame);
@@ -1066,6 +1064,9 @@ impl<'a> TabbedInterface<'a> {
               UIMenuItem::Paddles => {
                 self.active_menu = ActiveMenu::Paddles;
               }
+              UIMenuItem::Commands => {
+                //self.active_menu = ActiveMenu::Paddles;
+              }
               UIMenuItem::Quit => {
                 info!("Feeling a desire of the user to quit this application...");
                 self.quit_request = true;
@@ -1190,6 +1191,9 @@ impl<'a> TabbedInterface<'a> {
         if self.active_menu == ActiveMenu::RBMenu && self.rb_menu.get_active_menu_item() == UIMenuItem::Back {
           self.wf_tab.next_rb();
         }
+        if self.active_menu == ActiveMenu::MainMenu && self.ui_menu.get_active_menu_item() == UIMenuItem::Commands {
+          self.cmd_tab.next_cmd();
+        }
       }
       KeyCode::Up => {
         if self.settings_tab.ctl_active {
@@ -1214,6 +1218,9 @@ impl<'a> TabbedInterface<'a> {
         }
         if self.active_menu == ActiveMenu::RBMenu && self.rb_menu.get_active_menu_item() == UIMenuItem::Back {
           self.wf_tab.previous_rb();
+        }
+        if self.active_menu == ActiveMenu::MainMenu && self.ui_menu.get_active_menu_item() == UIMenuItem::Commands {
+          self.cmd_tab.prev_cmd();
         }
       }
       _ => {
@@ -1424,6 +1431,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let mut readoutboards = HashMap::<u8, ReadoutBoard>::new();
   let mut rb_conn = connect_to_db(String::from("gaps_flight2.db")).expect("Will need database access. Make sure gaps_flight2.db is installed!");
   let rbs     = ReadoutBoard::all(&mut rb_conn).expect("Will need database access. Make sure gaps_flight2.db is installed!");
+  let mtlink_rb_map = get_linkid_rbid_map(&rbs);
   for mut rb in rbs {
     rb.calib_file_path = String::from("calibrations");
     match rb.load_latest_calibration() {
@@ -1628,6 +1636,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let mt_tab          = MTTab::new(mt_pack_recv,
                                    mte_recv,
                                    dsijch_paddle_map,
+                                   mtlink_rb_map,
                                    color_theme.clone());
  
   let cpu_tab         = CPUTab::new(cp_pack_recv,
