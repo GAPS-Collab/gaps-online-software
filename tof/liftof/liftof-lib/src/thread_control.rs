@@ -42,6 +42,8 @@ pub struct ThreadControl {
   /// run has started
   /// (data sinks need to know)
   pub new_run_start_flag         : bool,
+  /// initiate a MTB DAQ reset (if the queue is behind)
+  pub reset_mtb_daq              : bool,
   pub liftof_settings            : LiftofSettings,
 }
 
@@ -62,6 +64,7 @@ impl ThreadControl {
       n_rbs                      : 0,
       write_data_to_disk         : false,
       new_run_start_flag         : false,
+      reset_mtb_daq              : false,
       liftof_settings            : LiftofSettings::new(),
     }
   }
