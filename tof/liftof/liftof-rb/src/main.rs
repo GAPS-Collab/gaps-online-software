@@ -96,7 +96,7 @@ use liftof_lib::{
 use liftof_lib::thread_control::ThreadControl;
 
 #[cfg(feature="database")]
-use liftof_lib::settings::PreampBiasSetStrategy;
+use liftof_lib::settings::ParameterSetStrategy;
 
 use liftof_rb::threads::{
     runner,
@@ -278,7 +278,7 @@ fn main() {
     cfg_if::cfg_if!{
       if #[cfg(feature="database")] {
         let preamp_cfg = config.preamp_settings;
-        if preamp_cfg.set_strategy == PreampBiasSetStrategy::Board 
+        if preamp_cfg.set_strategy == ParameterSetStrategy::Board 
           && preamp_cfg.set_preamp_voltages {
           match connect_to_db(db_path) {
             Err(err) => error!("Unable to connect to db! Can not set preamp biases! {err}"),
