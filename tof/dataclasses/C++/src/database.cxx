@@ -1,7 +1,7 @@
+#ifdef BUILD_CXXDB
 #include <format>
 #include <iostream>
 #include "database.h"
-
 
 using namespace sqlite_orm;
 //using namespace Gaps;
@@ -79,4 +79,4 @@ std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& tp) {
   os << tp.to_string();
   return os;
 }
-
+#endif

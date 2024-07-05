@@ -24,7 +24,14 @@ namespace Gaps {
   /// get an unsigned short from a vector of bytes, advancing pos by 2
   u16 parse_u16(const Vec<u8> &bytestream,
                 usize &pos);
-  
+ 
+  /// get a f16 ("half float") from a vector of bytes, advancing pos by 2
+  ///
+  /// NOTE - this will actually convert the result to the more common
+  /// f32 directly
+  f32 parse_f16(const Vec<u8> &bytestream,
+                usize &pos);
+
   /// get an unsigned 32bit int from a vector of bytes, advancing pos by 4
   u32 parse_u32(const Vec<u8> &bytestream,
                 usize &pos);

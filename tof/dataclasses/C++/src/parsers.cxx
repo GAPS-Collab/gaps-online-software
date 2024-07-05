@@ -30,6 +30,96 @@ u16 Gaps::parse_u16(const Vec<u8> &bytestream,
 
 /***********************************************/
 
+u32 leading_zeros(u16 x) {
+  u32 c = 0;
+  u16 msb = 1 << 15;
+  for (u8 k=0;k<16;k++) {
+    if ((x & msb) == 0) {
+      c += 1;
+    } else {
+      return c;
+    }
+    if (k < 15) {
+      x <<= 1;
+    }
+  }
+}
+
+//lil' helpa
+f32 u32tof32(u32 val) {
+  f32 result;
+  Vec<u8> bytes = Vec<u8>();
+  bytes[3] = (val >> 24) & 0xFF;
+  bytes[2] = (val >> 16) & 0xFF;
+  bytes[1] = (val >> 8)  & 0xFF;
+  bytes[0] =  val & 0xFF;
+  std::memcpy(&result, bytes.data(), sizeof(f32));
+}
+
+/***********************************************/
+
+
+f32 Gaps::parse_f16(const Vec<u8> &bytestream,
+                    usize &pos) {
+  u16 bits = Gaps::parse_u16(bytestream, pos);
+  //  // Check for signed zero
+  //  // TODO: Replace mem::transmute with from_bits() once from_bits is const-stabilized
+  f32 result;
+  Vec<u8> bytes = Gaps::slice(bytestream,pos,pos+2); 
+  // Copy the bytes into a float variable using type punning
+  if ((bits & 0x7FFF) == 0) {
+    u32 bits_u32 = (u32)bits << 16;
+    return u32tof32(bits_u32);
+    return result;
+  }
+
+  u32 half_sign = (u32)(bits & 0x8000);
+  u32 half_exp  = (u32)(bits & 0x7C00);
+  u32 half_man  = (u32)(bits & 0x03FF);
+  //  // Check for an infinity or NaN when all exponent bits set
+  if (half_exp == 0x7C00) {
+    // Check for signed infinity if mantissa is zero
+    if (half_man == 0) {
+      u32 bits_u32 = half_sign << 16 | 0x7f800000;
+      return u32tof32(bits_u32);
+        //return unsafe { mem::transmute::<u32, f32>((half_sign << 16) | 0x7F80_0000u32) };
+    } else {
+        // NaN, keep current mantissa but also set most significiant mantissa bit
+        //return unsafe {
+        //    mem::transmute::<u32, f32>((half_sign << 16) | 0x7FC0_0000u32 | (half_man << 13))
+        //};
+      u32 bits_u32 = (half_sign << 16) | 0x7fc00000 | (half_man << 13);
+      return u32tof32(bits_u32);
+    }
+  }
+
+  //  // Calculate single-precision components with adjusted exponent
+  u32 sign = half_sign << 16;
+  //  // Unbias exponent
+  i32 unbiased_exp = ((i32)half_exp >> 10) - 15;
+
+  // Check for subnormals, which will be normalized by adjusting exponent
+  if (half_exp == 0) {
+    // Calculate how much to adjust the exponent by
+    //let e = leading_zeros_u16(half_man as u16) - 6;
+    u16 e = leading_zeros((u16)half_man) - 6;
+    //// Rebias and adjust exponent
+    u16 exp = (127 - 15 - e) << 23;
+    u16 man = (half_man << (14 + e)) & (u32)0x7FFFFF;
+    //return unsafe { mem::transmute::<u32, f32>(sign | exp | man) };
+  }
+
+  // Rebias exponent for a normalized normal
+  u32 exp = (u32)(unbiased_exp + 127) << 23;
+  u32 man = (half_man & 0x03FF) << 13;
+  //  unsafe { mem::transmute::<u32, f32>(sign | exp | man) }
+  u32 bits_u32 = sign | exp | man;
+  return u32tof32(bits_u32);
+  //return result;
+}
+
+/***********************************************/
+
 u32 Gaps::parse_u32(const Vec<u8> &bytestream,
                     u64 &pos) {
   u32 value = (u32)(

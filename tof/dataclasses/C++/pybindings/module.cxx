@@ -13,7 +13,7 @@
 #include "events/tof_event_header.hpp"
 #include "version.h"
 
-#ifdef BUILD_DB
+#ifdef BUILD_CXXDB
 #include "database.h"
 #endif
 
@@ -86,7 +86,7 @@ PYBIND11_MODULE(gaps_tof, m) {
     //                              + reader.open_file_name + ">";
     //                              }) 
     //;
-    #ifdef BUILD_DB   
+    #ifdef BUILD_CXXDB   
     py::class_<Gaps::TofPaddle>(m, "TofPaddle")
       .def_readonly("paddle_id"        , &Gaps::TofPaddle::paddle_id      )
       .def_readonly("volume_id"        , &Gaps::TofPaddle::volume_id         )  
@@ -658,7 +658,7 @@ PYBIND11_MODULE(gaps_tof, m) {
    m.def("get_event_ids_from_raw_stream", &get_event_ids_from_raw_stream);
    m.def("get_bytestream_from_file",      &get_bytestream_from_file);
    m.def("get_rbeventheaders",            &get_rbeventheaders); 
-   #ifdef BUILD_DB 
+   #ifdef BUILD_CXXDB 
    m.def("get_paddles",                   &Gaps::get_tofpaddles);
    #endif
    // Calibration functions

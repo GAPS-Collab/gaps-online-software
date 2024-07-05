@@ -24,6 +24,7 @@
 #include "packets/tof_packet.h"
 #include "events/tof_event_header.hpp"
 #include "calibration.h"
+#include "version.h"
 
 class RBCalibration;
 
@@ -471,7 +472,17 @@ struct TofHit  {
   static const u16 TAIL = 0xF0F;
 
   u8   paddle_id;
+  // deprecated
   bool broken;
+
+
+  // new variables for V1
+  Gaps::ProtocolVersion version;
+  f32 baseline_a;
+  f32 baseline_a_rms;
+  f32 baseline_b;
+  f32 baseline_b_rms;
+  f32 phase;
 
   u32 timestamp32;
   u16 timestamp16;
@@ -501,6 +512,7 @@ struct TofHit  {
     // the user should use the getters
     // to get the values converted 
     // back to f32
+    // deprecated, but kept for compatibility
     u16 time_a;
     u16 time_b;
     u16 peak_a;
@@ -510,6 +522,14 @@ struct TofHit  {
     u16 charge_min_i;
     u16 x_pos;
     u16 t_average;
+    
+    f32 time_a_f32;
+    f32 time_b_f32;
+    f32 peak_a_f32;
+    f32 peak_b_f32;
+    f32 charge_a_f32;
+    f32 charge_b_f32;
+
     // don't serialize
 };
 
