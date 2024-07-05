@@ -17,6 +17,9 @@ tqdm = "^4.66.1"
 fpdf2 = "^2.7.6"
 h5py = "^3.10.0"
 hermes-py = "^0.2.0"
+xlsx2csv = "^0.8.2"
+polars = "^0.20.31"
+django = "^5.0.6"
 
 
 [build-system]
