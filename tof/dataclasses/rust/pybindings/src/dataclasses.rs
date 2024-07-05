@@ -1250,18 +1250,18 @@ impl PyTofEvent {
     rbevents
   }
   
-  //#[getter]
-  //fn hits(&self) -> Vec<PyTofHit> {
-  //  let mut hits = Vec::<PyTofHit>::new();
-  //  for ev in &self.event.rb_events {
-  //    for h in &ev.hits {
-  //      let mut pyhit = PyTofHit::new();
-  //      pyhit.set_hit(*h);
-  //      hits.push(pyhit);
-  //    }
-  //  }
-  //  hits
-  //}
+  #[getter]
+  fn hits(&self) -> Vec<PyTofHit> {
+    let mut hits = Vec::<PyTofHit>::new();
+    for ev in &self.event.rb_events {
+      for h in &ev.hits {
+        let mut pyhit = PyTofHit::new();
+        pyhit.set_hit(*h);
+        hits.push(pyhit);
+      }
+    }
+    hits
+  }
 
   #[getter]
   fn waveforms(&self) -> Vec<PyRBWaveform> {

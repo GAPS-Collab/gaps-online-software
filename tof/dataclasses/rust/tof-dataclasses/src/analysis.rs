@@ -216,8 +216,6 @@ pub fn cfd_simple(voltages    : &Vec<f32>,
 /// Find peaks in a given time window (in ns) by 
 /// comparing the waveform voltages with the 
 /// given threshold. 
-/// Minimum peak width is currently hardcoded to 
-/// be 3 bins in time.
 ///
 /// #Arguments:
 /// * start_time     : begin to look for peaks after 
