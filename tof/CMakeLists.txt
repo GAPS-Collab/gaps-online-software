@@ -7,25 +7,21 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
 
 ################
 
-option(BUILD_DB "Build C++ bindings to access GAPS DB" OFF) 
-if(BUILD_DB)
+option(BUILD_CXXDB "Build C++ bindings to access GAPS DB" OFF) 
+if(BUILD_CXXDB)
   find_package(SQLite3 REQUIRED)
   if(SQLite3_FOUND)
     message(STATUS "-- found SQLite3 libary")
     message(STATUS "-- -- will use sqlite library ${SQLite3_LIBRARIES}")
-    add_definitions( -DBUILD_DB)
+    add_definitions( -DBUILD_CXXDB)
   else()
     message(WARNING "Can not find sqlite3 installation! Disabling DB feature")
-    set(BUILD_DB OFF)
+    set(BUILD_CXXDB OFF)
   endif()
 endif()
 # Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
-option(BUILD_ROOTCOMPONENTS "build components of the software which require CERN ROOT" ON)
-
-
-
+option(BUILD_ROOTCOMPONENTS "build components of the software which require CERN ROOT" OFF)
 if(BUILD_ROOTCOMPONENTS)
-
   list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 #  find_package(ROOT 6.26.00)
   find_package(ROOT 6.30.00)
@@ -41,46 +37,47 @@ if(BUILD_ROOTCOMPONENTS)
   endif(ROOT_FOUND)
 endif(BUILD_ROOTCOMPONENTS)
 
-set(GAPSTOF_LIBRARY_SHARED GapsTof CACHE INTERNAL "GapsTof shared library" FORCE)
 
-add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
-    dataclasses/C++/src/tof_packet.cxx
-    dataclasses/C++/src/tof_event_header.cxx
-    dataclasses/C++/src/calibration.cxx
-    dataclasses/C++/src/serialization.cxx
-    dataclasses/C++/src/parsers.cxx
-    dataclasses/C++/src/events.cxx
-    dataclasses/C++/src/io.cxx
-    dataclasses/C++/src/monitoring.cxx
-    dataclasses/C++/src/legacy.cxx
-    dataclasses/C++/src/logging.cxx
-    dataclasses/C++/src/version.cxx
-    $<$<BOOL:${BUILD_DB}>:dataclasses/C++/src/database.cxx>
-)
-
-set_property(TARGET ${GAPSTOF_LIBRARY_SHARED} PROPERTY CXX_STANDARD 20)
-target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
-target_include_directories(${GAPSTOF_LIBRARY_SHARED}
-                            PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
-                            $<$<BOOL:${BUILD_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
-                            $<INSTALL_INTERFACE:include> 
-                            #${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
-                            #${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+option(BUILD_CXXBINDINGS "build C++ language bindings for the rust project tof-dataclasses to provide an API to interface with downstream C++ written analysis" OFF)
+if(BUILD_CXXBINDINGS)
+  set(GAPSTOF_LIBRARY_SHARED GapsTof CACHE INTERNAL "GapsTof shared library" FORCE)
+  add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
+      dataclasses/C++/src/tof_packet.cxx
+      dataclasses/C++/src/tof_event_header.cxx
+      dataclasses/C++/src/calibration.cxx
+      dataclasses/C++/src/serialization.cxx
+      dataclasses/C++/src/parsers.cxx
+      dataclasses/C++/src/events.cxx
+      dataclasses/C++/src/io.cxx
+      dataclasses/C++/src/monitoring.cxx
+      dataclasses/C++/src/legacy.cxx
+      dataclasses/C++/src/logging.cxx
+      dataclasses/C++/src/version.cxx
+      $<$<BOOL:${BUILD_CXXDB}>:dataclasses/C++/src/database.cxx>
+  )
+  
+  set_property(TARGET ${GAPSTOF_LIBRARY_SHARED} PROPERTY CXX_STANDARD 20)
+  target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
+  target_include_directories(${GAPSTOF_LIBRARY_SHARED}
+                              PUBLIC
+                              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
+                              $<$<BOOL:${BUILD_CXXDB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
+                              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
+                              $<INSTALL_INTERFACE:include> 
+                              #${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                              #${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
                               $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
-                              #  ${Boost_INCLUDE_DIR}
-                          )
-
-target_link_libraries(${GAPSTOF_LIBRARY_SHARED}
-                      PUBLIC
-                         $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
-                         $<$<BOOL:${BUILD_DB}>:${SQLite3_LIBRARIES}>
-                    )
-
-if (BUILD_PYBINDINGS)
+                            )
+  
+  target_link_libraries(${GAPSTOF_LIBRARY_SHARED}
+                        PUBLIC
+                           $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
+                           $<$<BOOL:${BUILD_CXXDB}>:${SQLite3_LIBRARIES}>
+                      )
+endif()
+if (BUILD_CXXPYBINDINGS)
+  if (BUILD_CXXBINDINGS)  
   set(pybindings "gaps_tof")
-
   pybind11_add_module(${pybindings} MODULE dataclasses/C++/pybindings/module.cxx 
                                            dataclasses/C++/pybindings/helpers.cxx)
   set_property(TARGET ${pybindings} PROPERTY CXX_STANDARD 20)
@@ -90,13 +87,16 @@ if (BUILD_PYBINDINGS)
                               $<INSTALL_INTERFACE:include> 
                               #${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
             			      ${Python_INCLUDE_DIRS}
-			                )
+    		                )
   target_link_libraries(${pybindings}
                         PRIVATE
                           ${GAPSTOF_LIBRARY_SHARED}
-                          $<$<BOOL:${BUILD_DB}>:${SQLite3_LIBRARIES}>)
-
-endif(BUILD_PYBINDINGS)
+                          $<$<BOOL:${BUILD_CXXDB}>:${SQLite3_LIBRARIES}>)
+  else()
+    message(WARNING "Unable to build pybindings for C++ library without building the actual library! Make sure to set BUILD_CXXBINDINGS=ON if you want to build the pybind11 pybindings interface for the C++ bindings of tof-dataclasses!")
+    set(BUILD_CXXPYBINDINGS OFF)
+  endif()
+endif(BUILD_CXXPYBINDINGS)
 
 ########################################
 # LIFTOF - GAPS TOF flight software
@@ -125,6 +125,7 @@ if (BUILD_LIFTOF)
   
   # Define the command to build your Rust project
   set(RUST_BUILD_COMMAND cargo build --release --all-features)
+  set(RUST_BUILD_COMMAND_NO_FEATURES cargo build --release)
   add_custom_target(
     liftof-doc
       COMMAND cargo doc 
@@ -136,18 +137,22 @@ if (BUILD_LIFTOF)
       COMMAND ${RUST_BUILD_COMMAND} 
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python 
   )
+if (UNIX AND NOT APPLE)
   add_custom_target(
     liftof-cc
       ALL
       COMMAND ${RUST_BUILD_COMMAND}
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-cc
   )
-  add_custom_target(
-    liftof-mt
-      ALL
-      COMMAND cargo build --release --bin=liftof-mt
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-cc
-  )
+  else()
+    add_custom_target(
+      liftof-cc
+        ALL
+        COMMAND ${RUST_BUILD_COMMAND_NO_FEATURES}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-cc
+    )
+  endif()
+  
   add_custom_target(
     liftof-tui
       ALL
@@ -157,9 +162,6 @@ if (BUILD_LIFTOF)
   
   # installation directives for liftof components
   install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-cc
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-  )
-  install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-mt
       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   )
   install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-tui
@@ -173,7 +175,7 @@ endif(BUILD_LIFTOF)
 
 if(BUILD_RUSTPYBIDINGS)
   # Define the command to build your Rust project
-  message(STATUS "building Rust \\U+1F980 pybindings wiut pyO3...")
+  message(STATUS "building Rust \\U1F980 pybindings wiut pyO3...")
   set(RUST_BUILD_COMMAND cargo build --release --all-features)
   add_custom_target(
     tof-pydataclasses-rust
@@ -220,19 +222,21 @@ install(FILES ${python_example_scripts}
     PERMISSIONS OWNER_EXECUTE
 )
 
-# install the library in the lib directory
-install(TARGETS ${GAPSTOF_LIBRARY_SHARED}
-    EXPORT GAPSTargets         
-    LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR}
-    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
-    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
-)
-
-install(EXPORT GAPSTargets
-    FILE GapsOnlineSoftware.cmake
-    NAMESPACE GapsOnlineSoftware::
-    DESTINATION ${CMAKE_INSTALL_PREFIX}
-)
+if (BUILD_CXXBINDINGS)
+  # install the library in the lib directory
+  install(TARGETS ${GAPSTOF_LIBRARY_SHARED}
+      EXPORT GAPSTargets         
+      LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR}
+      #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
+      #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
+  )
+  
+  install(EXPORT GAPSTargets
+      FILE GapsOnlineSoftware.cmake
+      NAMESPACE GapsOnlineSoftware::
+      DESTINATION ${CMAKE_INSTALL_PREFIX}
+  )
+endif()
 
 # not sure about this
 include(CMakePackageConfigHelpers)

@@ -1,6 +1,7 @@
 pub mod readoutboard_comm;
 pub mod event_builder;
 pub mod global_data_sink;
+#[cfg(features="tof-control")]
 pub mod monitoring;
 pub mod command_dispatcher;
 

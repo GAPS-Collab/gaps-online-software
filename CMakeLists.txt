@@ -12,6 +12,9 @@ project(GAPS_ONLINE_SOFTWARE VERSION 0.10 LANGUAGES C CXX)
 
 message(STATUS "Running cmake for ${CMAKE_PROJECT_NAME} softwere version ${GAPS_ONLINE_SOFTWARE_VERSION}")
 message(STATUS "-- Current release LELEWAA (Whale shark)")
+message(STATUS "-- Building software for ${CMAKE_SYSTEM_NAME}")
+if (UNIX AND NOT APPLE)
+endif()
 message(STATUS "Using build directory: ${PROJECT_BINARY_DIR}")
 set(CMAKE_WARN_DEPRECATED ON)
 
@@ -46,7 +49,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 #endif()
 
 # -- pybindings with pybind11
-option(BUILD_PYBINDINGS "build C++ pybindings with pybind11" OFF)
+option(BUILD_CXXPYBINDINGS "build C++ pybindings with pybind11" OFF)
 option(BUILD_RUSTPYBIDINGS "build Rust \\U+1F980 pybindings wiut pyO3 (better)" OFF)
 
 if (BUILD_PYBINDINGS)
@@ -123,7 +126,11 @@ if(DOXYGEN_FOUND)
 endif()
 
 if (BUILD_LIFTOF)
-  add_dependencies(doc liftof-doc)
+  if (DOXYGEN_FOUND)
+    add_dependencies(doc liftof-doc)
+  else()
+    add_dependencies(liftof-cc liftof-doc)
+  endif()
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tof/liftof/target/doc/ DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/RustAPI/)
 endif()
 

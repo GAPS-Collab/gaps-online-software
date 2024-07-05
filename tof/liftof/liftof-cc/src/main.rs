@@ -338,11 +338,12 @@ fn main() {
   // no cpu monitoring for cmdline calibration tasks
   if cpu_moni_interval > 0 {
     println!("==> Starting main monitoring thread...");
-    let tp_to_sink_c = tp_to_sink.clone();
     let _thread_control_c = Arc::clone(&thread_control);
     // this is anonymus, but we control the thread
     // through the thread control mechanism, so we
     // can still end it.
+    #[cfg(features="tof-control")]
+    let tp_to_sink_c = tp_to_sink.clone();
     #[cfg(features="tof-control")]
     let _cpu_moni_thread = thread::Builder::new()
         .name("cpu-monitoring".into())
