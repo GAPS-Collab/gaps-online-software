@@ -43,13 +43,13 @@ def build_for_muslx86_64(binary, njobs=24):
     shutil.move(f'../target/x86_64-unknown-linux-musl/release/{binary}', '../build/')
     os.chdir('..')
 
-def build_for_arm32_64(binary, njobs=24):
+def build_for_arm32(binary, njobs=24):
     """
     Readoutboards have ARM32 architecture
     """
     os.chdir(f'{binary}')
     sub.run(["cargo clean"], shell=True)
-    build_cmd = f'CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build -j {njobs} --bin {binary} --target=armv7-unknown-linux-musleabi --all-features --release' 
+    build_cmd = f'CARGO_TARGET_ARMV7_UNKNOWN_LINUX_MUSLEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build -j {njobs} --bin {binary} --target=armv7-unknown-linux-musleabi --all-features --release' 
     result = sub.run([build_cmd], shell=True)
     shutil.move(f'../target/armv7-unknown-linux-musleabi/release/{binary}', '../build/')
     os.chdir('..')
@@ -129,7 +129,7 @@ if __name__ == '__main__':
             print ('not deleting build directory...{e}')
         os.makedirs('build', exist_ok=True)
         if args.binary == 'liftof-rb':
-            build_for_arm32_64(args.binary)
+            build_for_arm32(args.binary)
 #bui    ld_for_muslx86_64('liftof-cc')
         else:
             #if args.no_musl:
