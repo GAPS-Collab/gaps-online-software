@@ -1,0 +1,1 @@
+searchState.loadedDescShard("plotters_svg", 0, "The Plotters SVG backend.\nThe SVG image drawing backend\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\nCreate a new SVG drawing backend\nCreate a new SVG drawing backend and store the document …")

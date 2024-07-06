@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["TriggerType"],"struct":["MTBInfo","MasterTriggerEvent"]};
+window.SIDEBAR_ITEMS = {"constant":["LTB_CH0","LTB_CH1","LTB_CH2","LTB_CH3","LTB_CH4","LTB_CH5","LTB_CH6","LTB_CH7","LTB_CHANNELS"],"enum":["LTBThreshold","TriggerType"],"struct":["MTBInfo","MasterTriggerEvent"]};

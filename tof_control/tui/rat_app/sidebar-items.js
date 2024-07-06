@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["App","LTBData","PBData","PreampData","RBData","TabsState"]};
+window.SIDEBAR_ITEMS = {"struct":["App","LTBData","PAData","PBData","RBData","TabsState"]};

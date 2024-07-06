@@ -1,0 +1,1 @@
+searchState.loadedDescShard("encoding_index_tests", 0, "Macros and utilities for testing indices.\nMakes a common test suite for multi-byte range indices.\nMakes a common test suite for multi-byte indices.\nMakes a common test suite for single-byte indices.")

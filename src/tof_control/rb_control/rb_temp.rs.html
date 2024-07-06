@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/extern/tof-control/src/rb_control/rb_temp.rs`."><title>rb_temp.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_control" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
-            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../tof_control/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/extern/tof-control/src/rb_control/rb_temp.rs`."><title>rb_temp.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_control" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../tof_control/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -123,134 +121,12 @@
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
 <a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-</pre></div><pre class="rust"><code><span class="attr">#![allow(unused)]
-</span><span class="kw">use </span><span class="kw">crate</span>::constant::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::memory::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::helper::rb_type::{RBTemp, RBTempDebug, RBTempError};
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::constant::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::memory::read_control_reg;
+<span class="kw">use </span><span class="kw">crate</span>::helper::rb_type::{RBTemp, RBError};
 <span class="kw">use </span><span class="kw">crate</span>::device::{bme280, lis3mdltr, pca9548a, tmp112};
 
 <span class="kw">impl </span>RBTemp {
-    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="kw">match </span><span class="self">Self</span>::read_temp() {
-            <span class="prelude-val">Ok</span>(rb_temp) =&gt; {
-                rb_temp
-            }
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                <span class="self">Self </span>{
-                    zynq_temp: f32::MAX,
-                    drs_temp: f32::MAX,
-                    clk_temp: f32::MAX,
-                    adc_temp: f32::MAX,
-                }
-            }
-        }
-        
-    }
-    <span class="kw">pub fn </span>read_temp() -&gt; <span class="prelude-ty">Result</span>&lt;RBTemp, RBTempError&gt; {
-        <span class="kw">let </span>zynq_temp_adc = read_control_reg(RB_TEMP)<span class="question-mark">?</span>;
-        <span class="kw">let </span>zynq_temp = (((zynq_temp_adc &amp; <span class="number">4095</span>) <span class="kw">as </span>f32 * <span class="number">503.975</span>) / <span class="number">4096.0</span>) - <span class="number">273.15</span>;
-
-        <span class="kw">let </span>i2c_mux_1 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
-        <span class="kw">let </span>i2c_mux_2 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
-
-        i2c_mux_1.select(RB_DRS_TMP112_CHANNEL)<span class="question-mark">?</span>;
-        <span class="kw">let </span>drs_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_DRS_TMP112_ADDRESS);
-        drs_tmp112.config()<span class="question-mark">?</span>;
-        <span class="kw">let </span>drs_temp = drs_tmp112.read()<span class="question-mark">?</span>;
-
-        i2c_mux_2.select(RB_CLK_TMP112_CHANNEL)<span class="question-mark">?</span>;
-        <span class="kw">let </span>clk_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_CLK_TMP112_ADDRESS);
-        clk_tmp112.config()<span class="question-mark">?</span>;
-        <span class="kw">let </span>clk_temp = clk_tmp112.read()<span class="question-mark">?</span>;
-
-        i2c_mux_2.select(RB_ADC_TMP112_CHANNEL)<span class="question-mark">?</span>;
-        <span class="kw">let </span>adc_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_ADC_TMP112_ADDRESS);
-        adc_tmp112.config()<span class="question-mark">?</span>;
-        <span class="kw">let </span>adc_temp = adc_tmp112.read()<span class="question-mark">?</span>;
-
-        i2c_mux_1.reset()<span class="question-mark">?</span>;
-        i2c_mux_2.reset()<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(
-            RBTemp {
-                zynq_temp,
-                drs_temp,
-                clk_temp,
-                adc_temp,
-            }
-        )
-    }
-    <span class="kw">pub fn </span>read_drs_temp() -&gt; <span class="prelude-ty">Result</span>&lt;f32, RBTempError&gt; {
-        <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
-        i2c_mux.select(RB_DRS_TMP112_CHANNEL)<span class="question-mark">?</span>;
-        <span class="kw">let </span>drs_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_DRS_TMP112_ADDRESS);
-        <span class="comment">// drs_tmp112.config()?;
-        </span><span class="kw">let </span>drs_temp = drs_tmp112.read()<span class="question-mark">?</span>;
-
-        i2c_mux.reset()<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(drs_temp)
-    }
-}
-
-<span class="kw">pub fn </span>config_temp() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBTempError&gt; {
-    <span class="kw">let </span>i2c_mux_1 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
-    <span class="kw">let </span>i2c_mux_2 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
-
-    i2c_mux_1.select(RB_DRS_TMP112_CHANNEL)<span class="question-mark">?</span>;
-    <span class="kw">let </span>drs_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_DRS_TMP112_ADDRESS);
-    drs_tmp112.config()<span class="question-mark">?</span>;
-
-    i2c_mux_2.select(RB_CLK_TMP112_CHANNEL)<span class="question-mark">?</span>;
-    <span class="kw">let </span>clk_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_CLK_TMP112_ADDRESS);
-    clk_tmp112.config()<span class="question-mark">?</span>;
-
-    i2c_mux_2.select(RB_ADC_TMP112_CHANNEL)<span class="question-mark">?</span>;
-    <span class="kw">let </span>adc_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_ADC_TMP112_ADDRESS);
-    adc_tmp112.config()<span class="question-mark">?</span>;
-
-    i2c_mux_1.reset()<span class="question-mark">?</span>;
-    i2c_mux_2.reset()<span class="question-mark">?</span>;
-
-    <span class="prelude-val">Ok</span>(())
-}
-
-<span class="kw">impl </span>RBTempDebug {
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="kw">match </span><span class="self">Self</span>::read_temp() {
             <span class="prelude-val">Ok</span>(rb_temp) =&gt; {
@@ -269,7 +145,7 @@
         }
         
     }
-    <span class="kw">pub fn </span>read_temp() -&gt; <span class="prelude-ty">Result</span>&lt;RBTempDebug, RBTempError&gt; {
+    <span class="kw">pub fn </span>read_temp() -&gt; <span class="prelude-ty">Result</span>&lt;RBTemp, RBError&gt; {
         <span class="kw">let </span>zynq_temp_adc = read_control_reg(RB_TEMP)<span class="question-mark">?</span>;
         <span class="kw">let </span>zynq_temp = (((zynq_temp_adc &amp; <span class="number">4095</span>) <span class="kw">as </span>f32 * <span class="number">503.975</span>) / <span class="number">4096.0</span>) - <span class="number">273.15</span>;
 
@@ -305,7 +181,7 @@
         i2c_mux_2.reset()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(
-            RBTempDebug {
+            RBTemp {
                 zynq_temp,
                 drs_temp,
                 clk_temp,
@@ -315,4 +191,56 @@
             }
         )
     }
+    <span class="kw">pub fn </span>read_drs_temp() -&gt; <span class="prelude-ty">Result</span>&lt;f32, RBError&gt; {
+        <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+        i2c_mux.select(RB_DRS_TMP112_CHANNEL)<span class="question-mark">?</span>;
+        <span class="kw">let </span>drs_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_DRS_TMP112_ADDRESS);
+        drs_tmp112.config()<span class="question-mark">?</span>;
+        <span class="kw">let </span>drs_temp = drs_tmp112.read()<span class="question-mark">?</span>;
+
+        i2c_mux.reset()<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(drs_temp)
+    }
+}
+
+<span class="kw">pub fn </span>config_temp() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
+    <span class="kw">let </span>i2c_mux_1 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+    <span class="kw">let </span>i2c_mux_2 = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
+
+    i2c_mux_1.select(RB_DRS_TMP112_CHANNEL)<span class="question-mark">?</span>;
+    <span class="kw">let </span>drs_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_DRS_TMP112_ADDRESS);
+    drs_tmp112.config()<span class="question-mark">?</span>;
+
+    i2c_mux_2.select(RB_CLK_TMP112_CHANNEL)<span class="question-mark">?</span>;
+    <span class="kw">let </span>clk_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_CLK_TMP112_ADDRESS);
+    clk_tmp112.config()<span class="question-mark">?</span>;
+
+    i2c_mux_2.select(RB_ADC_TMP112_CHANNEL)<span class="question-mark">?</span>;
+    <span class="kw">let </span>adc_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_ADC_TMP112_ADDRESS);
+    adc_tmp112.config()<span class="question-mark">?</span>;
+
+    i2c_mux_1.reset()<span class="question-mark">?</span>;
+    i2c_mux_2.reset()<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(())
+}
+
+<span class="kw">pub fn </span>read_drs_temp_raw() -&gt; <span class="prelude-ty">Result</span>&lt;u16, RBError&gt; {
+    <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_1);
+    i2c_mux.select(RB_DRS_TMP112_CHANNEL)<span class="question-mark">?</span>;
+    <span class="kw">let </span>drs_tmp112 = tmp112::TMP112::new(I2C_BUS, RB_DRS_TMP112_ADDRESS);
+    drs_tmp112.config()<span class="question-mark">?</span>;
+    <span class="kw">let </span>drs_temp_raw = drs_tmp112.read_raw()<span class="question-mark">?</span>;
+
+    i2c_mux.reset()<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(drs_temp_raw)
+}
+
+<span class="kw">pub fn </span>to_json() -&gt; <span class="prelude-ty">Result</span>&lt;String, RBError&gt; {
+    <span class="kw">let </span>rb_temp = RBTemp::new();
+    <span class="kw">let </span>rb_temp_json = serde_json::to_string(<span class="kw-2">&amp;</span>rb_temp)<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(rb_temp_json)
 }</code></pre></div></section></main></body></html>

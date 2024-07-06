@@ -28,7 +28,7 @@
   <td id="projectlogo"><img alt="Logo" src="GAPSLOGO_2023_ico.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">gaps-online-software
-   &#160;<span id="projectnumber">0.9</span>
+   &#160;<span id="projectnumber">0.10</span>
    </div>
    <div id="projectbrief">online software for the TOF system for the GAPS experiment</div>
   </td>
@@ -88,6 +88,7 @@ $(document).ready(function(){initNavTree('namespaceGaps.html',''); initResizable
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">Gaps Namespace Reference</div>  </div>
@@ -99,6 +100,8 @@ $(document).ready(function(){initNavTree('namespaceGaps.html',''); initResizable
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGaps_1_1TofPaddle.html">TofPaddle</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGaps_1_1TofPacketReader.html">TofPacketReader</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGaps_1_1FatalException.html">FatalException</a></td></tr>
@@ -111,8 +114,21 @@ Typedefs</h2></td></tr>
 typedef spdlog::level::level_enum&#160;</td><td class="memItemRight" valign="bottom"><b>LOGLEVEL</b></td></tr>
 <tr class="separator:a7e7d9bb141f5f926934e44b33429a44c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:af99376041829a6c93b2b635455d73910"><td class="memItemLeft" align="right" valign="top"><a id="af99376041829a6c93b2b635455d73910"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><b>ProtocolVersion</b> : u8 { <b>Unknown</b> = PROTOCOLVERSION_UNKNOWN
+, <b>V1</b> = PROTOCOLVERSION_V1
+, <b>V2</b> = PROTOCOLVERSION_V2
+, <b>V3</b> = PROTOCOLVERSION_V3
+ }</td></tr>
+<tr class="separator:af99376041829a6c93b2b635455d73910"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ae5fbd2163c2d1c5c8eee7b686e9f3378"><td class="memItemLeft" align="right" valign="top"><a id="ae5fbd2163c2d1c5c8eee7b686e9f3378"></a>
+std::map&lt; u8, <a class="el" href="structGaps_1_1TofPaddle.html">TofPaddle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#ae5fbd2163c2d1c5c8eee7b686e9f3378">get_tofpaddles</a> (std::string dbname)</td></tr>
+<tr class="memdesc:ae5fbd2163c2d1c5c8eee7b686e9f3378"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a paddle from the database. <br /></td></tr>
+<tr class="separator:ae5fbd2163c2d1c5c8eee7b686e9f3378"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63983ede070cd10b4e310de973772319"><td class="memItemLeft" align="right" valign="top"><a id="a63983ede070cd10b4e310de973772319"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>severity_to_str</b> (const LOGLEVEL &amp;severity)</td></tr>
 <tr class="separator:a63983ede070cd10b4e310de973772319"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -122,7 +138,8 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>severity_to_st
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a22fc40b41968b7d4462f0c11ac07b53f"><td class="memTemplItemLeft" align="right" valign="top">Vec&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>slice</b> (const Vec&lt; T &gt; &amp;vec, usize start, usize end)</td></tr>
 <tr class="separator:a22fc40b41968b7d4462f0c11ac07b53f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13cb72078c0645adb57076cc5697b9a1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#a13cb72078c0645adb57076cc5697b9a1">parse_bool</a> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
+<tr class="memitem:a13cb72078c0645adb57076cc5697b9a1"><td class="memItemLeft" align="right" valign="top"><a id="a13cb72078c0645adb57076cc5697b9a1"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>parse_bool</b> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
 <tr class="separator:a13cb72078c0645adb57076cc5697b9a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af02b80458f7649651a342344e3b103ee"><td class="memItemLeft" align="right" valign="top"><a id="af02b80458f7649651a342344e3b103ee"></a>
 u8&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#af02b80458f7649651a342344e3b103ee">parse_u8</a> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
@@ -132,6 +149,8 @@ u8&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namesp
 u16&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#a8d5ee03930328391169c3f11a9b06e8e">parse_u16</a> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
 <tr class="memdesc:a8d5ee03930328391169c3f11a9b06e8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">get an unsigned short from a vector of bytes, advancing pos by 2 <br /></td></tr>
 <tr class="separator:a8d5ee03930328391169c3f11a9b06e8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbed3ea3f57b77872fd060984c65e4be"><td class="memItemLeft" align="right" valign="top">f32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#adbed3ea3f57b77872fd060984c65e4be">parse_f16</a> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
+<tr class="separator:adbed3ea3f57b77872fd060984c65e4be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac09d7b4a66f0df27a63af339dd6d7ea8"><td class="memItemLeft" align="right" valign="top"><a id="ac09d7b4a66f0df27a63af339dd6d7ea8"></a>
 u32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#ac09d7b4a66f0df27a63af339dd6d7ea8">parse_u32</a> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
 <tr class="memdesc:ac09d7b4a66f0df27a63af339dd6d7ea8"><td class="mdescLeft">&#160;</td><td class="mdescRight">get an unsigned 32bit int from a vector of bytes, advancing pos by 4 <br /></td></tr>
@@ -152,37 +171,19 @@ f32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="names
 f64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#a75bc2048681872469a0e8164a07eb145">parse_f64</a> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
 <tr class="memdesc:a75bc2048681872469a0e8164a07eb145"><td class="mdescLeft">&#160;</td><td class="mdescRight">get a signed long float (64) from a vector of bytes, advancing pos by 8 <br /></td></tr>
 <tr class="separator:a75bc2048681872469a0e8164a07eb145"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a080f0ddfc1acdfd20d34ee1a05dc94ea"><td class="memItemLeft" align="right" valign="top"><a id="a080f0ddfc1acdfd20d34ee1a05dc94ea"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><b>u32_from_le_bytes</b> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
-<tr class="separator:a080f0ddfc1acdfd20d34ee1a05dc94ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5951f624ffb61311c0bedde6901f721f"><td class="memItemLeft" align="right" valign="top"><a id="a5951f624ffb61311c0bedde6901f721f"></a>
-u64&#160;</td><td class="memItemRight" valign="bottom"><b>u64_from_le_bytes</b> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
-<tr class="separator:a5951f624ffb61311c0bedde6901f721f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b7380cce1160bf677b6db59f2f73708"><td class="memItemLeft" align="right" valign="top"><a id="a2b7380cce1160bf677b6db59f2f73708"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><b>u32_from_be_bytes</b> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
-<tr class="separator:a2b7380cce1160bf677b6db59f2f73708"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af77731e0cae916409314f6a8c44c0622"><td class="memItemLeft" align="right" valign="top"><a id="af77731e0cae916409314f6a8c44c0622"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><b>parse_u32_for_16bit_words</b> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
-<tr class="separator:af77731e0cae916409314f6a8c44c0622"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a227fc43c4890ccddb69dba88a82c7a5a"><td class="memItemLeft" align="right" valign="top"><a id="a227fc43c4890ccddb69dba88a82c7a5a"></a>
-u64&#160;</td><td class="memItemRight" valign="bottom"><b>parse_u48_for_16bit_words</b> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
-<tr class="separator:a227fc43c4890ccddb69dba88a82c7a5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a408dcd7e14dffcc0e3b239335bbaffb3"><td class="memItemLeft" align="right" valign="top"><a id="a408dcd7e14dffcc0e3b239335bbaffb3"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>u32_to_le_bytes</b> (const u32 value, Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
-<tr class="separator:a408dcd7e14dffcc0e3b239335bbaffb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>&zwj;** </p>
 <p>&zwj;** </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a13cb72078c0645adb57076cc5697b9a1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a13cb72078c0645adb57076cc5697b9a1">&#9670;&nbsp;</a></span>parse_bool()</h2>
+<a id="adbed3ea3f57b77872fd060984c65e4be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbed3ea3f57b77872fd060984c65e4be">&#9670;&nbsp;</a></span>parse_f16()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool Gaps::parse_bool </td>
+          <td class="memname">f32 Gaps::parse_f16 </td>
           <td>(</td>
           <td class="paramtype">const Vec&lt; u8 &gt; &amp;&#160;</td>
           <td class="paramname"><em>bytestream</em>, </td>
@@ -200,11 +201,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>u32_to_le_bytes</b> (
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get an u32 from a vector of bytes.</p>
-<p>The byteorder is compatible with the rust from_le_bytes, where</p>
-<p>let value = u32::from_le_bytes([0x78, 0x56, 0x34, 0x12]); assert_eq!(value, 0x12345678);</p>
-<p>@params:</p>
-<p>@pos : this gets advanced by 4 bytes </p>
+<p>get a f16 ("half float") from a vector of bytes, advancing pos by 2</p>
+<p>NOTE - this will actually convert the result to the more common f32 directly </p>
 
 </div>
 </div>

@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/lib.rs`."><title>lib.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
-            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../liftof_lib/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../liftof_lib/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1307,52 +1305,10 @@
 <a href="#1305" id="1305">1305</a>
 <a href="#1306" id="1306">1306</a>
 <a href="#1307" id="1307">1307</a>
-<a href="#1308" id="1308">1308</a>
-<a href="#1309" id="1309">1309</a>
-<a href="#1310" id="1310">1310</a>
-<a href="#1311" id="1311">1311</a>
-<a href="#1312" id="1312">1312</a>
-<a href="#1313" id="1313">1313</a>
-<a href="#1314" id="1314">1314</a>
-<a href="#1315" id="1315">1315</a>
-<a href="#1316" id="1316">1316</a>
-<a href="#1317" id="1317">1317</a>
-<a href="#1318" id="1318">1318</a>
-<a href="#1319" id="1319">1319</a>
-<a href="#1320" id="1320">1320</a>
-<a href="#1321" id="1321">1321</a>
-<a href="#1322" id="1322">1322</a>
-<a href="#1323" id="1323">1323</a>
-<a href="#1324" id="1324">1324</a>
-<a href="#1325" id="1325">1325</a>
-<a href="#1326" id="1326">1326</a>
-<a href="#1327" id="1327">1327</a>
-<a href="#1328" id="1328">1328</a>
-<a href="#1329" id="1329">1329</a>
-<a href="#1330" id="1330">1330</a>
-<a href="#1331" id="1331">1331</a>
-<a href="#1332" id="1332">1332</a>
-<a href="#1333" id="1333">1333</a>
-<a href="#1334" id="1334">1334</a>
-<a href="#1335" id="1335">1335</a>
-<a href="#1336" id="1336">1336</a>
-<a href="#1337" id="1337">1337</a>
-<a href="#1338" id="1338">1338</a>
-<a href="#1339" id="1339">1339</a>
-<a href="#1340" id="1340">1340</a>
-<a href="#1341" id="1341">1341</a>
-<a href="#1342" id="1342">1342</a>
-<a href="#1343" id="1343">1343</a>
-<a href="#1344" id="1344">1344</a>
-<a href="#1345" id="1345">1345</a>
-<a href="#1346" id="1346">1346</a>
-<a href="#1347" id="1347">1347</a>
-<a href="#1348" id="1348">1348</a>
-<a href="#1349" id="1349">1349</a>
-<a href="#1350" id="1350">1350</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
 <span class="kw">pub mod </span>settings;
 <span class="kw">pub mod </span>constants;
+<span class="kw">pub mod </span>thread_control;
 
 <span class="kw">use </span>constants::{
     DEFAULT_CALIB_VOLTAGE,
@@ -1370,10 +1326,21 @@
     PREAMP_MAX_BIAS
 };
 
+<span class="kw">use </span>std::thread;
+<span class="kw">use </span>std::time::Duration;
+<span class="kw">use </span>std::os::raw::c_int;
+<span class="kw">use </span>std::sync::{
+    Arc,
+    Mutex,
+};
+<span class="kw">use </span>std::process::exit;
+
+<span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="kw">use </span>half::f16;
+
 <span class="kw">pub use </span>master_trigger::{
-    <span class="comment">//connect_to_mtb,
-    </span>master_trigger,
-    MTBSettings
+    master_trigger,
+    MTBSettings,
 };
 
 <span class="kw">pub use </span>settings::{
@@ -1395,11 +1362,14 @@
     Write,
 };
 <span class="kw">use </span>std::collections::HashMap;
-<span class="kw">use </span>std::net::IpAddr;
-<span class="kw">use </span>std::net::Ipv4Addr;
-<span class="kw">use </span>crossbeam_channel::Receiver;
-<span class="kw">use </span>zmq;
-<span class="kw">use </span>colored::{Colorize, ColoredString};
+<span class="comment">//use std::net::IpAddr;
+//use std::net::Ipv4Addr;
+//use crossbeam_channel::Receiver;
+//use zmq;
+</span><span class="kw">use </span>colored::{
+    Colorize,
+    ColoredString
+};
 
 <span class="kw">use </span>serde_json::Value;
 
@@ -1408,46 +1378,49 @@
 <span class="attr">#[macro_use] </span><span class="kw">extern crate </span>log;
 <span class="kw">extern crate </span>env_logger;
 
+<span class="kw">use </span>signal_hook::iterator::Signals;
+<span class="kw">use </span>signal_hook::consts::signal::{
+    SIGTERM,
+    SIGINT
+};
 <span class="comment">//use ndarray::{array, Array1};
 //use nlopt::{Algorithm, Objective, Optimization, Result};
 
-//use tof_dataclasses::manifest as mf;
 </span><span class="kw">use </span>tof_dataclasses::DsiLtbRBMapping;
-<span class="kw">use </span>tof_dataclasses::manifest::{
-    ReadoutBoard,
-};
+<span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="kw">use </span>tof_dataclasses::database::ReadoutBoard;
+<span class="comment">//use tof_dataclasses::threading::{
+//    ThreadControl,
+//};
 
-<span class="kw">use </span>tof_dataclasses::constants::NWORDS;
-<span class="kw">use </span>tof_dataclasses::calibrations::{
-    <span class="comment">//RBCalibrations,
-    </span>find_zero_crossings,
-};
-<span class="kw">use </span>tof_dataclasses::packets::{
-    TofPacket,
-    PacketType,
-};
-<span class="kw">use </span>tof_dataclasses::errors::{
-    AnalysisError,
-    SetError
-};
-<span class="kw">use </span>tof_dataclasses::serialization::Serialization;
-<span class="kw">use </span>tof_dataclasses::commands::RBCommand;
-<span class="kw">use </span>tof_dataclasses::events::{
+</span><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="kw">use </span>tof_dataclasses::constants::NWORDS;
+<span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="kw">use </span>tof_dataclasses::calibrations::find_zero_crossings;
+<span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="kw">use </span>tof_dataclasses::errors::AnalysisError;
+<span class="kw">use </span>tof_dataclasses::errors::SetError;
+<span class="comment">//use tof_dataclasses::serialization::Serialization;
+</span><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="kw">use </span>tof_dataclasses::events::{
     RBEvent,
     TofHit,
 };
 <span class="kw">use </span>tof_dataclasses::events::tof_hit::Peak;
 
-<span class="kw">use </span>tof_dataclasses::analysis::{
+<span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="kw">use </span>tof_dataclasses::analysis::{
     calculate_pedestal,
     integrate,
     cfd_simple,
     find_peaks,
-    get_paddle_t0,
-    pos_across
-};
+    <span class="comment">//get_paddle_t0,
+    //pos_across
+</span>};
 
 <span class="kw">use </span>tof_dataclasses::RBChannelPaddleEndIDMap;
+
+<span class="kw">use </span><span class="kw">crate</span>::thread_control::ThreadControl;
 
 <span class="kw">use </span>clap::{arg,
   <span class="comment">//value_parser,
@@ -1458,7 +1431,11 @@
   Subcommand
 };
 
-<span class="kw">pub const </span>MT_MAX_PACKSIZE   : usize = <span class="number">512</span>;
+<span class="comment">//extern crate ssh2;
+//use ssh2::Session;
+//use std::net::TcpStream;
+
+</span><span class="kw">pub const </span>MT_MAX_PACKSIZE   : usize = <span class="number">512</span>;
 <span class="kw">pub const </span>DATAPORT          : u32   = <span class="number">42000</span>;
 <span class="kw">pub const </span>ASSET_DIR         : <span class="kw-2">&amp;</span>str  = <span class="string">"/home/gaps/assets/"</span>; 
 <span class="kw">pub const </span>LIFTOF_LOGO_SHOW  : <span class="kw-2">&amp;</span>str  = <span class="string">"
@@ -1474,13 +1451,99 @@
       \\::/  /        /:/  /     \\:\\__\\          \\:\\__\\      \\::/  /       \\:\\__\\    
        \\/__/         \\/__/       \\/__/           \\/__/       \\/__/         \\/__/    
 
-          (LIFTOF - liftof is for tof, Version 0.9 'HAHALUA', Dec 2023)
+          (LIFTOF - liftof is for tof, Version 0.10 'LELEWAA', Mar 2024)
 
           * Documentation
-          ==&gt; GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/HAHALUA-0.9
+          ==&gt; GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/LELEWAA-0.10
           ==&gt; API docs https://gaps-collab.github.io/gaps-online-software/
 
   "</span>;
+
+<span class="comment">//pub fn restart_liftof_rb_clients() {
+//  for k in 0..50 {
+//    address = format!("10.0.1.1{k:02}:22");
+//    match TcpStream::connect(&amp;address) {
+//      Err(err) =&gt; error!("Unable to connect to {}", address);
+//      Ok(tcp)  =&gt; {
+//          // Create a new SSH session
+//        //let mut sess = Session::new().unwrap();
+//        //sess.handshake(&amp;tcp).unwrap();
+//
+//        //// Path to the private key file
+//        //let private_key_path = Path::new("/path/to/private/key");
+//        //sess.userauth_pubkey_file("username", None, private_key_path, None).unwrap();
+//        //assert!(sess.authenticated());
+//        //let mut channel = sess.channel_session().unwrap();
+//        //channel.exec("ls -l").unwrap();
+//        //let mut s = String::new();
+//        //channel.read_to_string(&amp;mut s).unwrap();
+//        //println!("{}", s);
+//        //channel.send_eof().unwrap();
+//        //channel.wait_close().unwrap();
+//        //println!("Exit Status: {}", channel.exit_status().unwrap());
+//      }
+//    }
+//  }
+//}
+
+</span><span class="doccomment">/// check on liftof-rb clients
+</span><span class="kw">pub fn </span>check_liftof_rb_status() {
+}
+
+
+<span class="doccomment">/// Handle incoming POSIX signals
+</span><span class="kw">pub fn </span>signal_handler(thread_control     : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;) {
+  <span class="kw">let </span>sleep_time = Duration::from_millis(<span class="number">300</span>);
+
+  <span class="kw">let </span><span class="kw-2">mut </span>end_program = <span class="bool-val">false</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>signals = Signals::new(<span class="kw-2">&amp;</span>[SIGTERM, SIGINT]).expect(<span class="string">"Unknown signals"</span>);
+  <span class="kw">loop </span>{
+    thread::sleep(sleep_time);
+    <span class="kw">match </span>thread_control.try_lock() {
+      <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
+        <span class="comment">//println!("== ==&gt; [signal_handler] acquired thread_control lock!");
+        //println!("Tread control {:?}", tc);
+        </span><span class="kw">if </span>!tc.thread_cmd_dispatch_active 
+        &amp;&amp; !tc.thread_data_sink_active
+        &amp;&amp; !tc.thread_event_bldr_active 
+        &amp;&amp; !tc.thread_master_trg_active  {
+          <span class="macro">println!</span>(<span class="string">"&gt;&gt; So long and thanks for all the \u{1F41F} &lt;&lt;"</span>); 
+          exit(<span class="number">0</span>);
+        }
+        <span class="kw">if </span>end_program{
+            tc.stop_flag = <span class="bool-val">true</span>;
+            <span class="kw">continue</span>;
+        }
+        <span class="kw">if </span>tc.stop_flag {
+          <span class="macro">println!</span>(<span class="string">"== ==&gt; [signal_handler] Stop flag is set, we are waiting for threads to finish..."</span>);
+          <span class="macro">println!</span>(<span class="string">"{}"</span>, tc);
+        }
+      }
+      <span class="prelude-val">Err</span>(err) =&gt; {
+        <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! {err}"</span>);
+      },
+    }
+
+    <span class="comment">// check pending signals and handle
+    // SIGTERM and SIGINT
+    </span><span class="kw">for </span>signal <span class="kw">in </span>signals.pending() {
+      <span class="kw">match </span>signal <span class="kw">as </span>c_int {
+        SIGTERM =&gt; {
+          <span class="macro">println!</span>(<span class="string">"=&gt; {}"</span>, String::from(<span class="string">"SIGTERM received. Maybe Ctrl+C has been pressed!"</span>).red().bold());
+          end_program = <span class="bool-val">true</span>;
+        } 
+        SIGINT =&gt; {
+          <span class="macro">println!</span>(<span class="string">"=&gt; {}"</span>, String::from(<span class="string">"SIGINT received"</span>).red().bold());
+          end_program = <span class="bool-val">true</span>;
+        }
+        <span class="kw">_ </span>=&gt; {
+          <span class="macro">error!</span>(<span class="string">"Received signal, but I don't have instructions what to do about it!"</span>);
+        }
+      }
+    }
+  }
+}
+
 
 <span class="doccomment">/// Make sure that the loglevel is in color, even though not using pretty_env logger
 </span><span class="kw">pub fn </span>color_log(level : <span class="kw-2">&amp;</span>Level) -&gt; ColoredString {
@@ -1620,6 +1683,7 @@
 </span><span class="doccomment">/// FIXME - proper fitting algorithm
 /// This here is bad, because it does not interpolate between 
 /// the bins
+</span><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">fn </span>fit_sine(time: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;, data: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;) -&gt; (f32, f32, f32) {
   <span class="kw">let </span>z_cross   = find_zero_crossings(<span class="kw-2">&amp;</span>data);
   <span class="kw">let </span><span class="kw-2">mut </span>y_max = f32::MIN;
@@ -1666,87 +1730,10 @@
 </span><span class="doccomment">/// Helper function to generate a proper tcp string starting
 /// from the ip one.
 </span><span class="kw">pub fn </span>build_tcp_from_ip(ip: String, port: String) -&gt; String {
-  String::from(<span class="string">"tcp://"</span>) + <span class="kw-2">&amp;</span>ip + <span class="string">":" </span>+ <span class="kw-2">&amp;</span>port
+  <span class="comment">//String::from("tcp://") + &amp;ip + ":" + &amp;port
+  </span><span class="macro">format!</span>(<span class="string">"tcp://{}:{}"</span>, ip, port)
 }
 
-<span class="doccomment">/// Broadcast commands over the tof-computer network
-/// socket via zmq::PUB to the rb network.
-/// Currently, the only participants in the rb network
-/// are the readoutboards.
-///
-/// After the reception of a TofCommand, this will currently be 
-/// broadcasted to all readout boards.
-///
-/// ISSUE/FIXME  : Send commands only to specific addresses.
-///
-/// # Arguments 
-///
-/// * cmd        : a \[crossbeam\] receiver, to receive 
-///                TofCommands.
-</span><span class="kw">pub fn </span>readoutboard_commander(cmd : <span class="kw-2">&amp;</span>Receiver&lt;TofPacket&gt;){
-  <span class="macro">debug!</span>(<span class="string">".. started!"</span>);
-  <span class="kw">let </span>ctx = zmq::Context::new();
-  <span class="kw">let </span>this_board_ip = IpAddr::V4(Ipv4Addr::new(<span class="number">10</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>));
-
-  <span class="kw">let </span>address_ip;
-  <span class="kw">match </span>this_board_ip {
-    IpAddr::V4(ip) =&gt; address_ip = ip.to_string().clone(),
-    IpAddr::V6(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">"Currently, we do not support IPV6!"</span>)
-  }
-  <span class="kw">let </span>data_address : String = build_tcp_from_ip(address_ip,DATAPORT.to_string());
-  <span class="kw">let </span>data_socket = ctx.socket(zmq::PUB).expect(<span class="string">"Unable to create 0MQ PUB socket!"</span>);
-  data_socket.bind(<span class="kw-2">&amp;</span>data_address).expect(<span class="string">"Unable to bind to data (PUB) socket {data_adress}"</span>);
-  <span class="macro">println!</span>(<span class="string">"==&gt; 0MQ PUB socket bound to address {data_address}"</span>);
-  <span class="kw">loop </span>{
-    <span class="comment">// check if we get a command from the main 
-    // thread
-    </span><span class="kw">match </span>cmd.try_recv() {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">trace!</span>(<span class="string">"Did not receive a new command, error {err}"</span>),
-      <span class="prelude-val">Ok</span>(packet) =&gt; {
-        <span class="comment">// now we have several options
-        </span><span class="kw">match </span>packet.packet_type {
-          PacketType::TofCommand =&gt; {
-            <span class="macro">info!</span>(<span class="string">"Received TofCommand! Broadcasting to all TOF entities who are listening!"</span>);
-            <span class="kw">let </span><span class="kw-2">mut </span>payload  = String::from(<span class="string">"BRCT"</span>).into_bytes();
-            payload.append(<span class="kw-2">&amp;mut </span>packet.to_bytestream());
-            <span class="kw">match </span>data_socket.send(<span class="kw-2">&amp;</span>payload,<span class="number">0</span>) {
-              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to send command! Error {err}"</span>),
-              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"BRCT command sent!"</span>)
-            }
-          },
-          PacketType::RBCommand =&gt; {
-            <span class="macro">debug!</span>(<span class="string">"Received RBCommand!"</span>);
-            <span class="kw">let </span><span class="kw-2">mut </span>payload_str  = String::from(<span class="string">"RB"</span>);
-            <span class="kw">match </span>RBCommand::from_bytestream(<span class="kw-2">&amp;</span>packet.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
-              <span class="prelude-val">Ok</span>(rb_cmd) =&gt; {
-                <span class="kw">let </span>to_rb_id = rb_cmd.rb_id;
-                <span class="kw">if </span>rb_cmd.rb_id &lt; <span class="number">10 </span>{
-                  payload_str += <span class="kw-2">&amp;</span>String::from(<span class="string">"0"</span>);
-                  payload_str += <span class="kw-2">&amp;</span>to_rb_id.to_string();
-                } <span class="kw">else </span>{
-                  payload_str += <span class="kw-2">&amp;</span>to_rb_id.to_string();
-                }
-
-                <span class="kw">let </span><span class="kw-2">mut </span>payload = payload_str.into_bytes();
-                payload.append(<span class="kw-2">&amp;mut </span>packet.to_bytestream());
-                <span class="kw">match </span>data_socket.send(<span class="kw-2">&amp;</span>payload,<span class="number">0</span>) {
-                  <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to send command {}! Error {err}"</span>, rb_cmd),
-                  <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">debug!</span>(<span class="string">"Making event request! {}"</span>, rb_cmd)
-                }
-              }
-              <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="macro">error!</span>(<span class="string">"Can not construct RBCommand, error {err}"</span>);
-              }
-            }
-          },
-          <span class="kw">_ </span>=&gt; {
-            <span class="macro">error!</span>(<span class="string">"Received garbage package! {}"</span>, packet);
-          }
-        }<span class="comment">// end match
-      </span>}
-    }
-  }
-}
 
 <span class="comment">//**********************************************
 //
@@ -1779,6 +1766,9 @@
 ///                 work on
 /// * rb          : ReadoutBoard as loaded from the DB, 
 ///                 with latest calibration attached
+/// * settings    : Parameters to configure the waveform
+///                 analysis &amp; peak finding
+</span><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">pub fn </span>waveform_analysis(event         : <span class="kw-2">&amp;mut </span>RBEvent,
                          rb            : <span class="kw-2">&amp;</span>ReadoutBoard,
                          settings      : AnalysisEngineSettings)
@@ -1792,17 +1782,18 @@
   // ch -&gt; pid
   // pid -&gt; (ch, ch) (for the two paddle ends)
   //let mut pid_vs_chs = HashMap::&lt;u8, (PaddleEndIdentifier,[u8;2])&gt;::new();
-  </span><span class="kw">let </span>channels       = event.header.get_channels();
+  </span><span class="kw">let </span>active_channels = event.header.get_channels();
   <span class="comment">// will become a parameter
-  </span><span class="kw">let </span>fit_sinus      = <span class="bool-val">true</span>;
+  </span><span class="kw">let </span>fit_sinus       = <span class="bool-val">true</span>;
   <span class="comment">// allocate memory for the calbration results
-  </span><span class="kw">let </span><span class="kw-2">mut </span>voltages : Vec&lt;f32&gt;= <span class="macro">vec!</span>[<span class="number">0.0</span>; NWORDS];
-  <span class="kw">let </span><span class="kw-2">mut </span>times    : Vec&lt;f32&gt;= <span class="macro">vec!</span>[<span class="number">0.0</span>; NWORDS];
+  </span><span class="kw">let </span><span class="kw-2">mut </span>voltages    : Vec&lt;f32&gt;= <span class="macro">vec!</span>[<span class="number">0.0</span>; NWORDS];
+  <span class="kw">let </span><span class="kw-2">mut </span>times       : Vec&lt;f32&gt;= <span class="macro">vec!</span>[<span class="number">0.0</span>; NWORDS];
 
   <span class="comment">// Step 0 : If desired, fit sine
-  </span><span class="kw">if </span>fit_sinus {
-    <span class="kw">if </span>!channels.contains(<span class="kw-2">&amp;</span><span class="number">8</span>) {
-      <span class="macro">error!</span>(<span class="string">"This RB does not have ch9 data!"</span>);
+  </span><span class="kw">let </span><span class="kw-2">mut </span>fit_result = (<span class="number">0.0f32</span>, <span class="number">0.0f32</span>, <span class="number">0.0f32</span>);
+  <span class="kw">if </span>fit_sinus {
+    <span class="kw">if </span>!active_channels.contains(<span class="kw-2">&amp;</span><span class="number">8</span>) {
+      <span class="macro">error!</span>(<span class="string">"RB {} does not have ch9 data!"</span>, rb.rb_id);
     }
     rb.calibration.voltages(<span class="number">9</span>,
                             event.header.stop_cell <span class="kw">as </span>usize,
@@ -1819,85 +1810,103 @@
     </span>rb.calibration.nanoseconds(<span class="number">9</span>,
                                event.header.stop_cell <span class="kw">as </span>usize,
                                <span class="kw-2">&amp;mut </span>times);
-    <span class="kw">let </span>fit_result = fit_sine(<span class="kw-2">&amp;</span>times, <span class="kw-2">&amp;</span>voltages);
+    fit_result = fit_sine(<span class="kw-2">&amp;</span>times, <span class="kw-2">&amp;</span>voltages);
     <span class="comment">//println!("FIT RESULT = {:?}", fit_result);
     </span>event.header.set_sine_fit(fit_result);
   }
 
-  <span class="comment">//// Step 1: Prepare the data. Currently, we 
-  //// only support one peak per channel
+  <span class="comment">// structure to store final result
+  // extend with Vec&lt;TofHit&gt; in case
+  // we want to have multiple hits
   </span><span class="kw">let </span><span class="kw-2">mut </span>paddles    = HashMap::&lt;u8, TofHit&gt;::new();
-  <span class="kw">for </span>raw_ch <span class="kw">in </span>channels.iter() {
-    <span class="kw">if </span><span class="kw-2">*</span>raw_ch == <span class="number">8 </span>{
-      <span class="kw">continue</span>; <span class="comment">// ignore ch9 for now (no hits) 
-    </span>}
-    <span class="kw">let </span>pend = rb.channel_to_paddle_end_id[<span class="kw-2">*</span>raw_ch <span class="kw">as </span>usize];
-    <span class="comment">// check which side it is
-    </span><span class="kw">let </span>pid : u8;
-    <span class="kw">if </span>pend &gt; <span class="number">2000 </span>{
-      pid = (pend - <span class="number">2000</span>) <span class="kw">as </span>u8;
-    } <span class="kw">else </span>{
-      pid = (pend - <span class="number">1000</span>) <span class="kw">as </span>u8;
-    }
-    <span class="kw">if </span>!paddles.contains_key(<span class="kw-2">&amp;</span>pid) {
-      <span class="kw">let </span><span class="kw-2">mut </span>hit = TofHit::new();
-      hit.paddle_id = pid;
-      paddles.insert(pid, hit);
-    }
-  }
-
-  <span class="comment">// Step 2. Walk over the paddles and fill the 
-  // values
-  </span><span class="kw">let </span><span class="kw-2">mut </span>pids = Vec::&lt;u8&gt;::new();
-  <span class="kw">for </span>k <span class="kw">in </span>paddles.keys() {
-    pids.push(<span class="kw-2">*</span>k);
-  }
-  <span class="kw">for </span>pid <span class="kw">in </span>pids {
-    <span class="kw">let </span><span class="kw-2">mut </span>hit : TofHit;
-    <span class="kw">match </span>paddles.get_mut(<span class="kw-2">&amp;</span>pid) {
-      <span class="prelude-val">None </span>=&gt; {
-        <span class="macro">error!</span>(<span class="string">"The hit is not there, even after we put it in the map!"</span>);
-        <span class="macro">error!</span>(<span class="string">"I am chugging along, but something is amiss here!"</span>);
+  <span class="comment">//println!("RBID {}, Paddles {:?}", rb.rb_id ,rb.get_paddle_ids());
+  </span><span class="kw">for </span>pid <span class="kw">in </span>rb.get_paddle_ids() {
+    <span class="comment">// cant' fail by constructon of pid
+    </span><span class="kw">let </span>ch_a = rb.get_pid_rbchA(pid).unwrap() <span class="kw">as </span>usize;
+    <span class="kw">let </span>ch_b = rb.get_pid_rbchB(pid).unwrap() <span class="kw">as </span>usize;
+    <span class="kw">let </span><span class="kw-2">mut </span>hit = TofHit::new();
+    hit.paddle_id = pid;
+    <span class="comment">//println!("{ch_a}, {ch_b}, active_channels {:?}", active_channels);
+    </span><span class="kw">for </span>(k, ch) <span class="kw">in </span>[ch_a, ch_b].iter().enumerate() {
+      <span class="comment">// Step 1: Calibration
+      //println!("Ch {}, event {}", ch, event);
+      //println!("---------------------------");
+      //println!("pid {}, active channels : {:?}, ch {}",pid, active_channels, ch);
+      </span><span class="kw">if </span>!active_channels.contains(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span>ch <span class="kw">as </span>u8 -<span class="number">1</span>)) {
+        <span class="macro">trace!</span>(<span class="string">"Skipping channel {} because it is not marked to be readout in the event header channel mask!"</span>, ch);
         <span class="kw">continue</span>;
-      },
-      <span class="prelude-val">Some</span>(hit) =&gt; {
-        <span class="kw">for </span>raw_ch <span class="kw">in </span>rb.paddle_id_to_channel.get(<span class="kw-2">&amp;</span>pid).unwrap() {
-          <span class="kw">if </span>channels.contains(<span class="kw-2">&amp;</span>raw_ch) {
-            <span class="comment">// Step 1: Calibration
-            </span>rb.calibration.voltages(<span class="kw-2">*</span>raw_ch <span class="kw">as </span>usize+ <span class="number">1</span>,
-                                    event.header.stop_cell <span class="kw">as </span>usize,
-                                    <span class="kw-2">&amp;</span>event.adc[<span class="kw-2">*</span>raw_ch <span class="kw">as </span>usize],
-                                    <span class="kw-2">&amp;mut </span>voltages);
-            <span class="comment">//FIXME - spike cleaning!
-            //match RBCalibrations::spike_cleaning(&amp;mut ch_voltages,
-            //                                     event.header.stop_cell) {
-            //  Err(err) =&gt; {
-            //    error!("Spike cleaning failed! {err}");
-            //  }
-            //  Ok(_)    =&gt; ()
-            //}
-            </span>rb.calibration.nanoseconds(<span class="kw-2">*</span>raw_ch <span class="kw">as </span>usize + <span class="number">1</span>,
-                                       event.header.stop_cell <span class="kw">as </span>usize,
-                                       <span class="kw-2">&amp;mut </span>times);
-            <span class="comment">// Step 2: Pedestal subtraction
-            </span><span class="kw">let </span>(ped, ped_err) = calculate_pedestal(<span class="kw-2">&amp;</span>voltages,
-                                                    settings.pedestal_thresh,
-                                                    settings.pedestal_begin_bin,
-                                                    settings.pedestal_win_bins);
-            <span class="macro">trace!</span>(<span class="string">"Calculated pedestal of {} +- {}"</span>, ped, ped_err);
-            <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..voltages.len() {
-              voltages[n] -= ped;
+      }
+      <span class="comment">//println!("Will do waveform analysis for ch {}", ch);
+      </span>rb.calibration.voltages(<span class="kw-2">*</span>ch,
+                              event.header.stop_cell <span class="kw">as </span>usize,
+                              <span class="kw-2">&amp;</span>event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize -<span class="number">1</span>],
+                              <span class="kw-2">&amp;mut </span>voltages);
+      <span class="comment">//FIXME - spike cleaning!
+      //match RBCalibrations::spike_cleaning(&amp;mut ch_voltages,
+      //                                     event.header.stop_cell) {
+      //  Err(err) =&gt; {
+      //    error!("Spike cleaning failed! {err}");
+      //  }
+      //  Ok(_)    =&gt; ()
+      //}
+      </span>rb.calibration.nanoseconds(<span class="kw-2">*</span>ch,
+                                 event.header.stop_cell <span class="kw">as </span>usize,
+                                 <span class="kw-2">&amp;mut </span>times);
+      <span class="comment">// Step 2: Pedestal subtraction
+      </span><span class="kw">let </span>(ped, ped_err) = calculate_pedestal(<span class="kw-2">&amp;</span>voltages,
+                                              settings.pedestal_thresh,
+                                              settings.pedestal_begin_bin,
+                                              settings.pedestal_win_bins);
+      <span class="macro">trace!</span>(<span class="string">"Calculated pedestal of {} +- {}"</span>, ped, ped_err);
+      <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..voltages.len() {
+        voltages[n] -= ped;
+      }
+      <span class="kw">let </span><span class="kw-2">mut </span>charge : f32 = <span class="number">0.0</span>;
+      <span class="comment">//let peaks : Vec::&lt;(usize, usize)&gt;;
+      </span><span class="kw">let </span><span class="kw-2">mut </span>cfd_times = Vec::&lt;f32&gt;::new();
+      <span class="kw">let </span><span class="kw-2">mut </span>max_volts = <span class="number">0.0f32</span>;
+      <span class="comment">// Step 4 : Find peaks
+      // FIXME - what do we do for multiple peaks?
+      // Currently we basically throw them away
+      </span><span class="kw">match </span>find_peaks(<span class="kw-2">&amp;</span>voltages ,
+                       <span class="kw-2">&amp;</span>times    ,
+                       settings.find_pks_t_start , 
+                       settings.find_pks_t_window,
+                       settings.min_peak_size    ,
+                       settings.find_pks_thresh  ,
+                       settings.max_peaks      ) {
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"Unable to find peaks for RB{:02} ch {ch}! Ignoring this channel!"</span>, rb.rb_id);
+          <span class="macro">error!</span>(<span class="string">"We won't be able to calculate timing information for this channel! Err {err}"</span>);
+        },
+        <span class="prelude-val">Ok</span>(peaks)  =&gt; {
+          <span class="comment">//peaks = pks;
+          // Step 5 : Find tdcs
+          //println!("Found {} peaks for ch {}! {:?}", peaks.len(), raw_ch, peaks);
+          </span><span class="kw">for </span>pk <span class="kw">in </span>peaks.iter() {
+            <span class="kw">match </span>cfd_simple(<span class="kw-2">&amp;</span>voltages,
+                             <span class="kw-2">&amp;</span>times,
+                             settings.cfd_fraction,
+                             pk.<span class="number">0</span>, pk.<span class="number">1</span>) {
+              <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="macro">debug!</span>(<span class="string">"Unable to calculate cfd for peak {} {}! {}"</span>, pk.<span class="number">0</span>, pk.<span class="number">1</span>, err);
+              }
+              <span class="prelude-val">Ok</span>(cfd) =&gt; {
+                cfd_times.push(cfd);
+              }
             }
-            <span class="kw">let </span><span class="kw-2">mut </span>charge : f32 = <span class="number">0.0</span>;
+            <span class="comment">// just do the first peak for now
+            </span><span class="kw">let </span>pk_height = voltages[pk.<span class="number">0</span>..pk.<span class="number">1</span>].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
+            max_volts = <span class="kw-2">*</span>pk_height; 
             <span class="comment">//debug!("Check impedance value! Just using 50 [Ohm]");
             // Step 3 : charge integration
             // FIXME - make impedance a settings parameter
-            // This does not make sense. Why don't we integrate 
-            // the peak?
             </span><span class="kw">match </span>integrate(<span class="kw-2">&amp;</span>voltages,
                             <span class="kw-2">&amp;</span>times,
-                            settings.integration_start,
-                            settings.integration_window,
+                            <span class="comment">//settings.integration_start,
+                            //settings.integration_window,
+                            </span>pk.<span class="number">0</span>, 
+                            pk.<span class="number">1</span>,
                             <span class="number">50.0</span>) {
               <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="macro">error!</span>(<span class="string">"Integration failed! Err {err}"</span>);
@@ -1906,82 +1915,43 @@
                 charge = chrg;
               }
             }
-            <span class="comment">//let peaks : Vec::&lt;(usize, usize)&gt;;
-            </span><span class="kw">let </span><span class="kw-2">mut </span>cfd_times = Vec::&lt;f32&gt;::new();
-            <span class="kw">let </span><span class="kw-2">mut </span>max_volts = <span class="number">0.0f32</span>;
-            <span class="comment">// Step 4 : Find peaks
-            // FIXME - what do we do for multiple peaks?
-            // Currently we basically throw them away
-            </span><span class="kw">match </span>find_peaks(<span class="kw-2">&amp;</span>voltages ,
-                             <span class="kw-2">&amp;</span>times    ,
-                             settings.find_pks_t_start , 
-                             settings.find_pks_t_window,
-                             settings.min_peak_size    ,
-                             settings.find_pks_thresh  ,
-                             settings.max_peaks      ) {
-              <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="macro">error!</span>(<span class="string">"Unable to find peaks for ch {raw_ch}! Ignoring this channel!"</span>);
-                <span class="macro">error!</span>(<span class="string">"We won't be able to calculate timing information for this channel! Err {err}"</span>);
-              },
-              <span class="prelude-val">Ok</span>(peaks)  =&gt; {
-                <span class="comment">//peaks = pks;
-                // Step 5 : Find tdcs
-                </span><span class="macro">println!</span>(<span class="string">"Found {} peaks!"</span>, peaks.len());
-                <span class="kw">for </span>pk <span class="kw">in </span>peaks.iter() {
-                  <span class="kw">match </span>cfd_simple(<span class="kw-2">&amp;</span>voltages,
-                                   <span class="kw-2">&amp;</span>times,
-                                   settings.cfd_fraction,
-                                   pk.<span class="number">0</span>, pk.<span class="number">1</span>) {
-                    <span class="prelude-val">Err</span>(err) =&gt; {
-                      <span class="macro">debug!</span>(<span class="string">"Unable to calculate cfd for peak {} {}! {}"</span>, pk.<span class="number">0</span>, pk.<span class="number">1</span>, err);
-                    }
-                    <span class="prelude-val">Ok</span>(cfd) =&gt; {
-                      cfd_times.push(cfd);
-                    }
-                  }
-                  <span class="comment">// just do the first peak for now
-                  </span><span class="kw">let </span>pk_height = voltages[pk.<span class="number">0</span>..pk.<span class="number">1</span>].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
-                  max_volts = <span class="kw-2">*</span>pk_height; 
-                  <span class="kw">break</span>;
-                }
-              }<span class="comment">// end OK
-            </span>} <span class="comment">// end match find_peaks 
-            </span><span class="kw">let </span><span class="kw-2">mut </span>tdc : f32 = <span class="number">0.0</span>; 
-            <span class="kw">if </span>cfd_times.len() &gt; <span class="number">0 </span>{
-              tdc = cfd_times[<span class="number">0</span>];
-            }
-            <span class="macro">println!</span>(<span class="string">"Calucalated tdc {}, charge {}, max {}"</span>, tdc, charge, max_volts); 
-            <span class="kw">if </span>rb.channel_to_paddle_end_id[<span class="kw-2">*</span>raw_ch <span class="kw">as </span>usize] &gt; <span class="number">2000 </span>{
-              hit.ftime_b      = tdc;
-              hit.set_time_b(tdc);
-              hit.set_charge_b(charge);
-              hit.set_peak_b(max_volts);
-              
-            } <span class="kw">else </span>{
-              hit.ftime_a = tdc;
-              hit.set_time_a(tdc);
-              hit.set_charge_a(charge);
-              hit.set_peak_a(max_volts);
-            }
-            <span class="macro">println!</span>(<span class="string">"{}"</span>, hit);
-          } <span class="kw">else </span>{
-            <span class="macro">error!</span>(<span class="string">"Only one end of a paddle has a channel record! Ch {}, Pid {}"</span>, raw_ch, pid);
+            <span class="kw">break</span>;
           }
-        }
+        }<span class="comment">// end OK
+      </span>} <span class="comment">// end match find_peaks 
+      </span><span class="kw">let </span><span class="kw-2">mut </span>tdc : f32 = <span class="number">0.0</span>; 
+      <span class="kw">if </span>cfd_times.len() &gt; <span class="number">0 </span>{
+        tdc = cfd_times[<span class="number">0</span>];
+      }
+      <span class="comment">//println!("Calucalated tdc {}, charge {}, max {} for ch {}!", tdc, charge, max_volts, ch); 
+      //if rb.channel_to_paddle_end_id[*raw_ch as usize] &gt; 2000 {
+      </span><span class="kw">if </span>k == <span class="number">0 </span>{
+        hit.ftime_a      = tdc;
+        hit.fpeak_a      = max_volts;
+        hit.set_time_a(tdc);
+        hit.set_charge_a(charge);
+        hit.set_peak_a(max_volts);
+        hit.baseline_a     = f16::from_f32(ped);
+        hit.baseline_a_rms = f16::from_f32(ped_err);
+      } <span class="kw">else </span>{
+        hit.ftime_b = tdc;
+        hit.fpeak_b = max_volts;
+        hit.set_time_b(tdc);
+        hit.set_charge_b(charge);
+        hit.set_peak_b(max_volts);
+        hit.baseline_b     = f16::from_f32(ped);
+        hit.baseline_b_rms = f16::from_f32(ped_err);
+        <span class="comment">// this is the seoond iteration,
+        // we are done!
+        </span>hit.phase = f16::from_f32(fit_result.<span class="number">2</span>);
+        paddles.insert(pid, hit);
       }
     }
   }
-  <span class="macro">println!</span>(<span class="string">"{:?}"</span>, paddles);
-  <span class="kw">for </span>(<span class="kw">_</span>, hit) <span class="kw">in </span>paddles.iter_mut() {
-    <span class="kw">let </span>t0 = get_paddle_t0(hit.ftime_a, hit.ftime_b, rb.get_paddle_length(hit.paddle_id));
-    <span class="kw">let </span>pa = pos_across(hit.ftime_a, t0);
-    hit.set_t0(t0);
-    hit.set_pos_across(pa);
-    <span class="macro">println!</span>(<span class="string">"caluclated {} {} for {}"</span>,t0, pa, hit);
-  }
   <span class="kw">let </span>result = paddles.into_values().collect();
   event.hits = result;
-  <span class="prelude-val">Ok</span>(())
+  <span class="comment">//print ("EVENT {}", event);
+  </span><span class="prelude-val">Ok</span>(())
 }
 
 <span class="comment">//**********************************************
@@ -2103,70 +2073,35 @@
 
 <span class="doccomment">/// Convert an int value to the board ID string.
 </span><span class="kw">pub fn </span>to_board_id_string(rb_id: u32) -&gt; String {
-  String::from(<span class="string">"RB"</span>) + <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{:02}"</span>, rb_id)
+
+  <span class="comment">//String::from("RB") + &amp;format!("{:02}", rb_id)
+  </span><span class="macro">format!</span>(<span class="string">"RB{:02}"</span>, rb_id)
 }
 
 <span class="comment">/**********************************************************/
 </span><span class="doccomment">/// Command Enums and stucts
 </span><span class="attr">#[derive(Debug, Parser, PartialEq)]
-</span><span class="kw">pub enum </span>Command {
+</span><span class="kw">pub enum </span>CommandCC {
   <span class="doccomment">/// Listen for flight CPU commands.
-  </span>Listen(ListenCmd),
+  </span>Listen,
+  <span class="doccomment">/// Staging mode - work through all .toml files
+  /// in the staging area
+  </span>Staging,
   <span class="doccomment">/// Ping a TOF sub-system.
-  </span>Ping(PingCmd),
+  </span>Ping,
   <span class="doccomment">/// Monitor a TOF sub-system.
   </span>Moni(MoniCmd),
   <span class="doccomment">/// Restart RB systemd
   </span>SystemdReboot(SystemdRebootCmd),
   <span class="doccomment">/// Power control of TOF sub-systems.
-  </span><span class="attr">#[command(subcommand)]
-  </span>Power(PowerCmd),
-  <span class="doccomment">/// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
-  </span><span class="attr">#[command(subcommand)]
-  </span>Calibration(CalibrationCmd),
-  <span class="doccomment">/// Remotely set LTB thresholds or preamp bias.
-  </span><span class="attr">#[command(subcommand)]
-  </span>Set(SetCmd),
+  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
+  </span>Calibration,
   <span class="doccomment">/// Start/stop data taking run.
-  </span><span class="attr">#[command(subcommand)]
-  </span>Run(RunCmd)
+  </span>Run
 }
 
-<span class="doccomment">/// Command Enums and stucts
-</span><span class="attr">#[derive(Debug, Clone, Parser, PartialEq)]
-</span><span class="kw">pub enum </span>CommandRB {
-  <span class="doccomment">/// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
-  </span><span class="attr">#[command(subcommand)]
-  </span>Calibration(CalibrationCmd),
-  <span class="doccomment">/// Remotely set LTB thresholds or preamp bias.
-  </span><span class="attr">#[command(subcommand)]
-  </span>Set(SetCmd),
-  <span class="doccomment">/// Start/stop data taking run.
-  </span><span class="attr">#[command(subcommand)]
-  </span>Run(RunCmd),
-  <span class="doccomment">/// Listen to commands from the central C&amp;C server (liftof-cc).
-  </span>Listen(ListenCmd),
-}
 
-<span class="doccomment">/// TOF SW cmds ====================================================
-</span><span class="attr">#[derive(Debug, Copy, Clone, Args, PartialEq)]
-</span><span class="kw">pub struct </span>ListenCmd { }
 
-<span class="attr">#[derive(Debug, Args, PartialEq)]
-</span><span class="kw">pub struct </span>PingCmd {
-  <span class="doccomment">/// Component to target
-  </span><span class="attr">#[arg(value_parser = clap::builder::PossibleValuesParser::new([
-          TofComponent::TofCpu,
-          TofComponent::MT,
-          TofComponent::RB,
-          TofComponent::LTB
-        ]</span>),
-        required = <span class="bool-val">true</span>)]
-  <span class="kw">pub </span>component: TofComponent,
-  <span class="doccomment">/// Component ID
-  </span><span class="attr">#[arg(required = <span class="bool-val">true</span>)]
-  </span><span class="kw">pub </span>id: u8
-}
 
 <span class="attr">#[derive(Debug, Args, PartialEq)]
 </span><span class="kw">pub struct </span>MoniCmd {
@@ -2190,11 +2125,8 @@
   </span><span class="attr">#[arg(required = <span class="bool-val">true</span>)]
   </span><span class="kw">pub </span>id: u8
 }
-<span class="doccomment">/// END TOF SW cmds ================================================
 
-
-/// Set cmds ====================================================
-</span><span class="attr">#[derive(Debug, Clone, Subcommand, PartialEq)]
+<span class="attr">#[derive(Debug, Clone, Subcommand, PartialEq)]
 </span><span class="kw">pub enum </span>SetCmd {
   <span class="doccomment">/// Set MT configuration (WHAT SHOULD I DO WITH THIS TODO)
   </span><span class="comment">//MTConfig(MTConfigOpts),
@@ -2312,20 +2244,8 @@
 }
 <span class="doccomment">/// END Set cmds ================================================
 
-/// Calibration cmds ====================================================
-</span><span class="attr">#[derive(Debug, Clone, Subcommand, PartialEq)]
-</span><span class="kw">pub enum </span>CalibrationCmd {
-  <span class="doccomment">/// Default calibration run, meaning 2 voltage calibrations and one timing calibration on all RBs with the default values.
-  </span>Default(DefaultOpts),
-  <span class="doccomment">/// No input data taking run. All RB are targeted are default ones if nothing else is specified.
-  </span>Noi(NoiOpts),
-  <span class="doccomment">/// Voltage data taking run. All RB are targeted and voltage are default ones if nothing else is specified.
-  </span>Voltage(VoltageOpts),
-  <span class="doccomment">/// Timing data taking run. All RB are targeted and voltage are default ones if nothing else is specified.
-  </span>Timing(TimingOpts)
-}
 
-<span class="attr">#[derive(Debug, Clone, Args, PartialEq)]
+</span><span class="attr">#[derive(Debug, Clone, Args, PartialEq)]
 </span><span class="kw">pub struct </span>DefaultOpts {
   <span class="doccomment">/// Voltage level to be set in default calibration run.
   </span><span class="attr">#[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
@@ -2689,14 +2609,6 @@
       id
     }
   }
-}
-<span class="doccomment">/// END Run cmds ==================================================
-
-</span><span class="attr">#[test]
-</span><span class="kw">fn </span>test_display() {
-  <span class="kw">let </span>rb = ReadoutBoard::default();
-  <span class="macro">println!</span>(<span class="string">"Readout board {}"</span>, rb);
-  <span class="macro">assert_eq!</span>(<span class="number">1</span>,<span class="number">1</span>);
 }
 
 

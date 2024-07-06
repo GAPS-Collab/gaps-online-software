@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/calibrations.rs`."><title>calibrations.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
-            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/calibrations.rs`."><title>calibrations.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1552,6 +1550,14 @@
 <a href="#1550" id="1550">1550</a>
 <a href="#1551" id="1551">1551</a>
 <a href="#1552" id="1552">1552</a>
+<a href="#1553" id="1553">1553</a>
+<a href="#1554" id="1554">1554</a>
+<a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
+<a href="#1560" id="1560">1560</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The ReadoutBoardCalibration is 
 //! the first stage in a 3 stage 
 //! calibration process for the tof
@@ -1563,6 +1569,7 @@
 //! per board and is an automated 
 //! process.
 //!
+
 </span><span class="kw">use </span>std::fs::File;
 <span class="kw">use </span>std::io::{<span class="self">self</span>, BufRead, BufReader};
 <span class="kw">use </span>std::path::Path;
@@ -1580,6 +1587,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::errors::{WaveformError,
                     CalibrationError};
 <span class="kw">use </span><span class="kw">crate</span>::serialization::{Serialization,
+                           Packable,
                            parse_bool,
                            parse_u8,
                            parse_u16,
@@ -1589,8 +1597,11 @@
 <span class="kw">use </span><span class="kw">crate</span>::events::RBEvent;
 <span class="kw">use </span><span class="kw">crate</span>::events::rb_event::unpack_traces_f32;
 
-<span class="kw">use </span><span class="kw">crate</span>::packets::{PacketType,
-                     TofPacket};
+<span class="kw">use </span><span class="kw">crate</span>::packets::{
+    PacketType,
+    TofPacket
+};
+
 <span class="kw">use </span><span class="kw">crate</span>::io::{
     read_file,
     TofPacketReader,
@@ -1702,7 +1713,7 @@
 </span><span class="doccomment">/// Simplified version of spike cleaning 
 ///
 /// Taken over from Jamie's python code
-</span><span class="kw">fn </span>clean_spikes(traces : <span class="kw-2">&amp;mut </span>Vec&lt;Vec&lt;Vec&lt;f32&gt;&gt;&gt;,vcaldone : bool) {
+</span><span class="kw">pub fn </span>clean_spikes(trace : <span class="kw-2">&amp;mut </span>Vec&lt;f32&gt;, vcaldone : bool) {
   <span class="comment">//# TODO: make robust (symmetric, doubles, fixed/estimated spike height)
   </span><span class="kw">let </span><span class="kw-2">mut </span>thresh : f32 = <span class="number">360.0</span>;
   <span class="kw">if </span>vcaldone {
@@ -1712,28 +1723,24 @@
   <span class="comment">// remember the structure of the traces here    
   //nevents,nchan,tracelen = gbf.traces.shape
   // we have chan, events, tracelen instead
-  </span><span class="kw">let </span><span class="kw-2">mut </span>spikefilter0 = Vec::&lt;f32&gt;::new(); 
-  <span class="kw">let </span><span class="kw-2">mut </span>spikefilter1 = Vec::&lt;f32&gt;::new();
-  <span class="kw">let </span><span class="kw-2">mut </span>spikefilter2 = Vec::&lt;f32&gt;::new();
-  <span class="kw">let </span><span class="kw-2">mut </span>spikefilter3 = Vec::&lt;f32&gt;::new();
-  <span class="kw">let </span><span class="kw-2">mut </span>spf_allch    = <span class="macro">vec!</span>[<span class="number">0usize</span>;<span class="number">1023</span>];
-  <span class="kw">for </span>ch <span class="kw">in </span><span class="number">0</span>..traces.len() {
-    <span class="kw">for </span>ev <span class="kw">in </span><span class="number">0</span>..traces[ch].len() {
-      <span class="kw">let </span>tracelen = traces[ch][ev].len();
-      spikefilter0 = (<span class="kw-2">&amp;</span>traces[ch][ev][<span class="number">0</span>..tracelen-<span class="number">3</span>]).to_vec();
-      spikefilter1 = (<span class="kw-2">&amp;</span>traces[ch][ev][<span class="number">1</span>..tracelen-<span class="number">2</span>]).to_vec();
-      spikefilter2 = (<span class="kw-2">&amp;</span>traces[ch][ev][<span class="number">2</span>..tracelen-<span class="number">1</span>]).to_vec();
-      spikefilter3 = (<span class="kw-2">&amp;</span>traces[ch][ev][<span class="number">3</span>..tracelen]).to_vec();
-    }
-    <span class="kw">let </span>spf_len = spikefilter0.len();
-    <span class="kw">let </span><span class="kw-2">mut </span>spf_sum = <span class="macro">vec!</span>[<span class="number">0f32</span>;<span class="number">1024</span>];
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..spf_len {
-      spf_sum[k] += spikefilter1[k] - spikefilter0[k] + spikefilter2[k] - spikefilter3[k];
-    }
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..spf_len {
-      <span class="kw">if </span>spf_sum[k] &gt; thresh {
-        spf_allch[k] += <span class="number">1</span>;
-      }
+  //let mut spikefilter0 = Vec::&lt;f32&gt;::new(); 
+  //let mut spikefilter1 = Vec::&lt;f32&gt;::new();
+  //let mut spikefilter2 = Vec::&lt;f32&gt;::new();
+  //let mut spikefilter3 = Vec::&lt;f32&gt;::new();
+  </span><span class="kw">let </span><span class="kw-2">mut </span>spf_allch    = <span class="macro">vec!</span>[<span class="number">0usize</span>;<span class="number">1023</span>];
+  <span class="kw">let </span>tracelen = trace.len();
+  <span class="kw">let </span>spikefilter0 = (<span class="kw-2">&amp;</span>trace[<span class="number">0</span>..tracelen-<span class="number">3</span>]).to_vec();
+  <span class="kw">let </span>spikefilter1 = (<span class="kw-2">&amp;</span>trace[<span class="number">1</span>..tracelen-<span class="number">2</span>]).to_vec();
+  <span class="kw">let </span>spikefilter2 = (<span class="kw-2">&amp;</span>trace[<span class="number">2</span>..tracelen-<span class="number">1</span>]).to_vec();
+  <span class="kw">let </span>spikefilter3 = (<span class="kw-2">&amp;</span>trace[<span class="number">3</span>..tracelen]).to_vec();
+  <span class="kw">let </span>spf_len = spikefilter0.len();
+  <span class="kw">let </span><span class="kw-2">mut </span>spf_sum = <span class="macro">vec!</span>[<span class="number">0f32</span>;<span class="number">1024</span>];
+  <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..spf_len {
+    spf_sum[k] += spikefilter1[k] - spikefilter0[k] + spikefilter2[k] - spikefilter3[k];
+  }
+  <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..spf_len {
+    <span class="kw">if </span>spf_sum[k] &gt; thresh {
+      spf_allch[k] += <span class="number">1</span>;
     }
   }
   <span class="kw">let </span><span class="kw-2">mut </span>spikes = Vec::&lt;usize&gt;::new();
@@ -1743,13 +1750,9 @@
     }
   }
   <span class="kw">for </span>spike <span class="kw">in </span>spikes.iter() {
-    <span class="kw">for </span>ch <span class="kw">in </span><span class="number">0</span>..traces.len() {
-      <span class="kw">for </span>ev <span class="kw">in </span><span class="number">0</span>..traces[ch].len() {
-        <span class="kw">let </span>d_v : f32 = (traces[ch][ev][spike+<span class="number">3</span>] - traces[ch][ev][<span class="kw-2">*</span>spike])/<span class="number">3.0</span>;
-        traces[ch][ev][spike+<span class="number">1</span>] = traces[ch][ev][<span class="kw-2">*</span>spike] + d_v;
-        traces[ch][ev][spike+<span class="number">2</span>] = traces[ch][ev][<span class="kw-2">*</span>spike] + <span class="number">2.0</span><span class="kw-2">*</span>d_v;
-      }
-    }
+    <span class="kw">let </span>d_v : f32 = (trace[spike+<span class="number">3</span>] - trace[<span class="kw-2">*</span>spike])/<span class="number">3.0</span>;
+    trace[spike+<span class="number">1</span>] = trace[<span class="kw-2">*</span>spike] + d_v;
+    trace[spike+<span class="number">2</span>] = trace[<span class="kw-2">*</span>spike] + <span class="number">2.0</span><span class="kw-2">*</span>d_v;
   }
 }
 
@@ -2264,7 +2267,11 @@
     }
     <span class="kw">let </span>do_spike_cleaning = <span class="bool-val">true</span>;
     <span class="kw">if </span>do_spike_cleaning {
-      clean_spikes(<span class="kw-2">&amp;mut </span>traces, <span class="bool-val">true</span>);
+      <span class="kw">for </span>k_ch <span class="kw">in </span><span class="number">0</span>..traces.len() {
+        <span class="kw">for </span>k_ev <span class="kw">in </span><span class="number">0</span>..traces[k_ch].len() {
+          clean_spikes(<span class="kw-2">&amp;mut </span>traces[k_ch][k_ev], <span class="bool-val">true</span>);
+        }
+      }
     }
     <span class="kw">let </span>nwords = traces[<span class="number">0</span>][<span class="number">0</span>].len();
     <span class="kw">for </span>ch <span class="kw">in </span><span class="number">0</span>..NCHN {
@@ -2592,6 +2599,9 @@
 
   <span class="doccomment">/// Apply the voltage calibration to a single channel 
   /// FIXME - mixing of naming conventions for the channels
+  ///
+  /// FIXME - make it return Result&lt;(), CalibrationError&gt;
+  ///
   /// # Arguments
   ///
   /// * channel   : Channel id 1-9
@@ -2610,7 +2620,7 @@
       <span class="kw">return</span>;
     }
     <span class="kw">if </span>adc.len() != waveform.len() {
-      <span class="macro">error!</span>(<span class="string">"Input len {} and output len {} don't match!"</span>, adc.len(), waveform.len());
+      <span class="macro">error!</span>(<span class="string">"Ch{} has {} adc values, however we are expecting {}!"</span>, channel,  adc.len(), waveform.len());
       <span class="kw">return</span>;
     }
 
@@ -2804,6 +2814,10 @@
   }
 }
 
+<span class="kw">impl </span>Packable <span class="kw">for </span>RBCalibrations {
+  <span class="kw">const </span>PACKET_TYPE : PacketType = PacketType::RBCalibration;
+}
+
 <span class="kw">impl </span>Serialization <span class="kw">for </span>RBCalibrations {
   <span class="kw">const </span>SIZE            : usize = NCHN<span class="kw-2">*</span>NWORDS<span class="kw-2">*</span><span class="number">4</span><span class="kw-2">*</span><span class="number">8 </span>+ <span class="number">4 </span>+ <span class="number">1 </span>+ <span class="number">1</span>; 
   <span class="kw">const </span>HEAD            : u16   = <span class="number">0xAAAA</span>; <span class="comment">// 43690 
@@ -2835,7 +2849,7 @@
     <span class="kw">if </span>rb_cal.serialize_event_data {
       <span class="kw">let </span>broken_event = RBEvent::new();
       <span class="kw">let </span>n_noi  = parse_u16(bytestream, pos);
-      <span class="macro">info!</span>(<span class="string">"Found {n_noi} no input data events!"</span>);
+      <span class="macro">debug!</span>(<span class="string">"Found {n_noi} no input data events!"</span>);
       <span class="kw">for _ in </span><span class="number">0</span>..n_noi {
         <span class="kw">match </span>RBEvent::from_bytestream(bytestream, pos) {
           <span class="prelude-val">Ok</span>(ev) =&gt; {
@@ -2848,7 +2862,7 @@
         <span class="comment">// FIXME - broken event won't advance the pos marker
       </span>}
       <span class="kw">let </span>n_vcal = parse_u16(bytestream, pos); 
-      <span class="macro">info!</span>(<span class="string">"Found {n_vcal} VCal data events!"</span>);
+      <span class="macro">debug!</span>(<span class="string">"Found {n_vcal} VCal data events!"</span>);
       <span class="kw">for _ in </span><span class="number">0</span>..n_vcal {
         <span class="kw">match </span>RBEvent::from_bytestream(bytestream, pos) {
           <span class="prelude-val">Err</span>(err) =&gt; {
@@ -2860,7 +2874,7 @@
         }
       }
       <span class="kw">let </span>n_tcal = parse_u16(bytestream, pos); 
-      <span class="macro">info!</span>(<span class="string">"Found {n_tcal} TCal data events!"</span>);
+      <span class="macro">debug!</span>(<span class="string">"Found {n_tcal} TCal data events!"</span>);
       <span class="kw">for _ in </span><span class="number">0</span>..n_tcal {
         rb_cal.tcal_data.push(RBEvent::from_bytestream(bytestream, pos).unwrap_or(broken_event.clone()));
       }
@@ -3048,7 +3062,7 @@
 #[test]
 </span><span class="kw">fn </span>serialization_rbcalibration_noeventpayload() {
   <span class="kw">let </span><span class="kw-2">mut </span>calis = Vec::&lt;RBCalibrations&gt;::new();
-  <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..<span class="number">100 </span>{
+  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
     <span class="kw">let </span>cali = RBCalibrations::from_random();
     <span class="kw">if </span>cali.serialize_event_data {
       <span class="kw">continue</span>;
@@ -3064,7 +3078,7 @@
 #[test]
 </span><span class="kw">fn </span>serialization_rbcalibration_witheventpayload() {
   <span class="kw">let </span><span class="kw-2">mut </span>calis = Vec::&lt;RBCalibrations&gt;::new();
-  <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..<span class="number">100 </span>{
+  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
     <span class="kw">let </span>cali = RBCalibrations::from_random();
     <span class="kw">if </span>!cali.serialize_event_data {
       <span class="kw">continue</span>;

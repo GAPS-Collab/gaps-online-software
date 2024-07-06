@@ -1,0 +1,1 @@
+searchState.loadedDescShard("unindent", 0, "github crates-io docs-rs")

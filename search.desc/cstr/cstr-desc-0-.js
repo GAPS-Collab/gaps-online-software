@@ -1,0 +1,1 @@
+searchState.loadedDescShard("cstr", 0, "<strong>This crate has been deprecated. Rust 1.77.0 stabilized </strong>…")

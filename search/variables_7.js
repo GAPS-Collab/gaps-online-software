@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['rate_143',['rate',['../structRBMoniData.html#abb385a6a883190b2b5e4b7b4f755a909',1,'RBMoniData']]],
-  ['rb_5fevents_144',['rb_events',['../structTofEvent.html#a577628b0f2d6beacc40f6bad1adc135a',1,'TofEvent']]],
-  ['rb_5fid_145',['rb_id',['../structRBCalibration.html#af877b4807be2918e61d3062ea49526b5',1,'RBCalibration']]]
+  ['n_5ftrigger_5fpaddles_150',['n_trigger_paddles',['../structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e',1,'TofEventSummary']]],
+  ['noi_5fdata_151',['noi_data',['../structRBCalibration.html#a71265fb6bc6cd97c69bc54923cc06f0e',1,'RBCalibration']]]
 ];

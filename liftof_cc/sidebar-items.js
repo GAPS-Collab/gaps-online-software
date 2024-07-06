@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["prefix_tof_cpu","send_default_calibration","send_ltb_threshold_set","send_moni","send_moni_response","send_noi_calibration","send_ping","send_ping_response","send_power","send_power_id","send_power_preamp","send_power_response","send_preamp_bias_set","send_run_start","send_run_stop","send_systemd_reboot","send_timing_calibration","send_voltage_calibration"],"mod":["constants","threads"]};
+window.SIDEBAR_ITEMS = {"fn":["prefix_tof_cpu"],"mod":["constants","threads"]};

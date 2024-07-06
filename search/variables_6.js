@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['pressure_140',['pressure',['../structRBMoniData.html#a417357f8a34942a7eefecb7ba73800ba',1,'RBMoniData']]],
-  ['primary_5fbeta_141',['primary_beta',['../structTofEventSummary.html#aaaf4cf393a61aacf8e5e3e390f2ea474',1,'TofEventSummary']]],
-  ['primary_5fcharge_142',['primary_charge',['../structTofEventSummary.html#a7254ca37addca5afb86310d1fc6e8b09',1,'TofEventSummary']]]
+  ['mag_5ftot_148',['mag_tot',['../structRBMoniData.html#aceb4fef6fbabb001a8fff0744f2ae23f',1,'RBMoniData']]],
+  ['missing_5fhits_149',['missing_hits',['../structTofEvent.html#aa9745620cfaea3f6655d2c214a51f7e3',1,'TofEvent']]]
 ];

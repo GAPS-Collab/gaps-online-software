@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/castaway-0.2.2/src/utils.rs`."><title>utils.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="castaway" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
-            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../castaway/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/castaway-0.2.3/src/utils.rs`."><title>utils.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="castaway" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../castaway/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -92,10 +90,27 @@
 <a href="#90" id="90">90</a>
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Low-level utility functions.
 
 </span><span class="kw">use </span>core::{
     any::{type_name, TypeId},
+    marker::PhantomData,
     mem, ptr,
 };
 
@@ -121,30 +136,31 @@
 /// `Struct&lt;'b&gt;`, even if either `'a` or `'b` outlives the other.
 </span><span class="attr">#[inline(always)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>type_eq_non_static&lt;T: <span class="question-mark">?</span>Sized, U: <span class="question-mark">?</span>Sized&gt;() -&gt; bool {
-    <span class="comment">// Inline has a weird, but desirable result on this function. It can't be
-    // fully inlined everywhere since it creates a function pointer of itself.
-    // But in practice when used here, the act of taking the address will be
-    // inlined, thus avoiding a function call when comparing two types.
-    </span><span class="attr">#[inline]
-    </span><span class="kw">fn </span>type_id_of&lt;T: <span class="question-mark">?</span>Sized&gt;() -&gt; usize {
-        type_id_of::&lt;T&gt; <span class="kw">as </span>usize
+    non_static_type_id::&lt;T&gt;() == non_static_type_id::&lt;U&gt;()
+}
+
+<span class="doccomment">/// Produces type IDs that are compatible with `TypeId::of::&lt;T&gt;`, but without
+/// `T: 'static` bound.
+</span><span class="kw">fn </span>non_static_type_id&lt;T: <span class="question-mark">?</span>Sized&gt;() -&gt; TypeId {
+    <span class="kw">trait </span>NonStaticAny {
+        <span class="kw">fn </span>get_type_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TypeId
+        <span class="kw">where
+            </span><span class="self">Self</span>: <span class="lifetime">'static</span>;
     }
 
-    <span class="comment">// What we're doing here is comparing two function pointers of the same
-    // generic function to see if they are identical. If they are not
-    // identical then `T` and `U` are not the same type.
-    //
-    // If they are equal, then they _might_ be the same type, unless an
-    // optimization step reduced two different functions to the same
-    // implementation due to having the same body. To avoid this we are using
-    // a function which references itself. This is something that LLVM cannot
-    // merge, since each monomorphized function has a reference to a different
-    // global alias.
-    </span>type_id_of::&lt;T&gt;() == type_id_of::&lt;U&gt;()
-        <span class="comment">// This is used as a sanity check more than anything. Our previous calls
-        // should not have any false positives, but if they did then the odds of
-        // them having the same type name as well is extremely unlikely.
-        </span>&amp;&amp; type_name::&lt;T&gt;() == type_name::&lt;U&gt;()
+    <span class="kw">impl</span>&lt;T: <span class="question-mark">?</span>Sized&gt; NonStaticAny <span class="kw">for </span>PhantomData&lt;T&gt; {
+        <span class="kw">fn </span>get_type_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TypeId
+        <span class="kw">where
+            </span><span class="self">Self</span>: <span class="lifetime">'static</span>,
+        {
+            TypeId::of::&lt;T&gt;()
+        }
+    }
+
+    <span class="kw">let </span>phantom_data = PhantomData::&lt;T&gt;;
+    NonStaticAny::get_type_id(<span class="kw">unsafe </span>{
+        mem::transmute::&lt;<span class="kw-2">&amp;</span><span class="kw">dyn </span>NonStaticAny, <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>NonStaticAny + <span class="lifetime">'static</span>)&gt;(<span class="kw-2">&amp;</span>phantom_data)
+    })
 }
 
 <span class="doccomment">/// Reinterprets the bits of a value of one type as another type.
@@ -156,15 +172,29 @@
 /// size and layout and that it is safe to do this conversion. Which it probably
 /// isn't, unless `T` and `U` are identical.
 ///
+/// # Panics
+///
+/// This function panics if `T` and `U` have different sizes.
+///
 /// # Safety
 ///
 /// It is up to the caller to uphold the following invariants:
 ///
-/// - `T` must have the same size as `U`
 /// - `T` must have the same alignment as `U`
 /// - `T` must be safe to transmute into `U`
 </span><span class="attr">#[inline(always)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>transmute_unchecked&lt;T, U&gt;(value: T) -&gt; U {
+    <span class="comment">// Assert is necessary to avoid miscompilation caused by a bug in LLVM.
+    // Without it `castaway::cast!(123_u8, (u8, u8))` returns `Ok(...)` on
+    // release build profile. `assert` shouldn't be replaced by `assert_eq`
+    // because with `assert_eq` Rust 1.70 and 1.71 will still miscompile it.
+    //
+    // See https://github.com/rust-lang/rust/issues/127286 for details.
+    </span><span class="macro">assert!</span>(
+        mem::size_of::&lt;T&gt;() == mem::size_of::&lt;U&gt;(),
+        <span class="string">"cannot transmute_unchecked if Dst and Src have different size"
+    </span>);
+
     <span class="kw">let </span>dest = ptr::read(<span class="kw-2">&amp;</span>value <span class="kw">as </span><span class="kw-2">*const </span>T <span class="kw">as </span><span class="kw-2">*const </span>U);
     mem::forget(value);
     dest

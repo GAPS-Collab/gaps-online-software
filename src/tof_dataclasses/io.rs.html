@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/io.rs`."><title>io.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
-            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/io.rs`."><title>io.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1352,6 +1350,243 @@
 <a href="#1350" id="1350">1350</a>
 <a href="#1351" id="1351">1351</a>
 <a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a>
+<a href="#1356" id="1356">1356</a>
+<a href="#1357" id="1357">1357</a>
+<a href="#1358" id="1358">1358</a>
+<a href="#1359" id="1359">1359</a>
+<a href="#1360" id="1360">1360</a>
+<a href="#1361" id="1361">1361</a>
+<a href="#1362" id="1362">1362</a>
+<a href="#1363" id="1363">1363</a>
+<a href="#1364" id="1364">1364</a>
+<a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
+<a href="#1372" id="1372">1372</a>
+<a href="#1373" id="1373">1373</a>
+<a href="#1374" id="1374">1374</a>
+<a href="#1375" id="1375">1375</a>
+<a href="#1376" id="1376">1376</a>
+<a href="#1377" id="1377">1377</a>
+<a href="#1378" id="1378">1378</a>
+<a href="#1379" id="1379">1379</a>
+<a href="#1380" id="1380">1380</a>
+<a href="#1381" id="1381">1381</a>
+<a href="#1382" id="1382">1382</a>
+<a href="#1383" id="1383">1383</a>
+<a href="#1384" id="1384">1384</a>
+<a href="#1385" id="1385">1385</a>
+<a href="#1386" id="1386">1386</a>
+<a href="#1387" id="1387">1387</a>
+<a href="#1388" id="1388">1388</a>
+<a href="#1389" id="1389">1389</a>
+<a href="#1390" id="1390">1390</a>
+<a href="#1391" id="1391">1391</a>
+<a href="#1392" id="1392">1392</a>
+<a href="#1393" id="1393">1393</a>
+<a href="#1394" id="1394">1394</a>
+<a href="#1395" id="1395">1395</a>
+<a href="#1396" id="1396">1396</a>
+<a href="#1397" id="1397">1397</a>
+<a href="#1398" id="1398">1398</a>
+<a href="#1399" id="1399">1399</a>
+<a href="#1400" id="1400">1400</a>
+<a href="#1401" id="1401">1401</a>
+<a href="#1402" id="1402">1402</a>
+<a href="#1403" id="1403">1403</a>
+<a href="#1404" id="1404">1404</a>
+<a href="#1405" id="1405">1405</a>
+<a href="#1406" id="1406">1406</a>
+<a href="#1407" id="1407">1407</a>
+<a href="#1408" id="1408">1408</a>
+<a href="#1409" id="1409">1409</a>
+<a href="#1410" id="1410">1410</a>
+<a href="#1411" id="1411">1411</a>
+<a href="#1412" id="1412">1412</a>
+<a href="#1413" id="1413">1413</a>
+<a href="#1414" id="1414">1414</a>
+<a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
+<a href="#1417" id="1417">1417</a>
+<a href="#1418" id="1418">1418</a>
+<a href="#1419" id="1419">1419</a>
+<a href="#1420" id="1420">1420</a>
+<a href="#1421" id="1421">1421</a>
+<a href="#1422" id="1422">1422</a>
+<a href="#1423" id="1423">1423</a>
+<a href="#1424" id="1424">1424</a>
+<a href="#1425" id="1425">1425</a>
+<a href="#1426" id="1426">1426</a>
+<a href="#1427" id="1427">1427</a>
+<a href="#1428" id="1428">1428</a>
+<a href="#1429" id="1429">1429</a>
+<a href="#1430" id="1430">1430</a>
+<a href="#1431" id="1431">1431</a>
+<a href="#1432" id="1432">1432</a>
+<a href="#1433" id="1433">1433</a>
+<a href="#1434" id="1434">1434</a>
+<a href="#1435" id="1435">1435</a>
+<a href="#1436" id="1436">1436</a>
+<a href="#1437" id="1437">1437</a>
+<a href="#1438" id="1438">1438</a>
+<a href="#1439" id="1439">1439</a>
+<a href="#1440" id="1440">1440</a>
+<a href="#1441" id="1441">1441</a>
+<a href="#1442" id="1442">1442</a>
+<a href="#1443" id="1443">1443</a>
+<a href="#1444" id="1444">1444</a>
+<a href="#1445" id="1445">1445</a>
+<a href="#1446" id="1446">1446</a>
+<a href="#1447" id="1447">1447</a>
+<a href="#1448" id="1448">1448</a>
+<a href="#1449" id="1449">1449</a>
+<a href="#1450" id="1450">1450</a>
+<a href="#1451" id="1451">1451</a>
+<a href="#1452" id="1452">1452</a>
+<a href="#1453" id="1453">1453</a>
+<a href="#1454" id="1454">1454</a>
+<a href="#1455" id="1455">1455</a>
+<a href="#1456" id="1456">1456</a>
+<a href="#1457" id="1457">1457</a>
+<a href="#1458" id="1458">1458</a>
+<a href="#1459" id="1459">1459</a>
+<a href="#1460" id="1460">1460</a>
+<a href="#1461" id="1461">1461</a>
+<a href="#1462" id="1462">1462</a>
+<a href="#1463" id="1463">1463</a>
+<a href="#1464" id="1464">1464</a>
+<a href="#1465" id="1465">1465</a>
+<a href="#1466" id="1466">1466</a>
+<a href="#1467" id="1467">1467</a>
+<a href="#1468" id="1468">1468</a>
+<a href="#1469" id="1469">1469</a>
+<a href="#1470" id="1470">1470</a>
+<a href="#1471" id="1471">1471</a>
+<a href="#1472" id="1472">1472</a>
+<a href="#1473" id="1473">1473</a>
+<a href="#1474" id="1474">1474</a>
+<a href="#1475" id="1475">1475</a>
+<a href="#1476" id="1476">1476</a>
+<a href="#1477" id="1477">1477</a>
+<a href="#1478" id="1478">1478</a>
+<a href="#1479" id="1479">1479</a>
+<a href="#1480" id="1480">1480</a>
+<a href="#1481" id="1481">1481</a>
+<a href="#1482" id="1482">1482</a>
+<a href="#1483" id="1483">1483</a>
+<a href="#1484" id="1484">1484</a>
+<a href="#1485" id="1485">1485</a>
+<a href="#1486" id="1486">1486</a>
+<a href="#1487" id="1487">1487</a>
+<a href="#1488" id="1488">1488</a>
+<a href="#1489" id="1489">1489</a>
+<a href="#1490" id="1490">1490</a>
+<a href="#1491" id="1491">1491</a>
+<a href="#1492" id="1492">1492</a>
+<a href="#1493" id="1493">1493</a>
+<a href="#1494" id="1494">1494</a>
+<a href="#1495" id="1495">1495</a>
+<a href="#1496" id="1496">1496</a>
+<a href="#1497" id="1497">1497</a>
+<a href="#1498" id="1498">1498</a>
+<a href="#1499" id="1499">1499</a>
+<a href="#1500" id="1500">1500</a>
+<a href="#1501" id="1501">1501</a>
+<a href="#1502" id="1502">1502</a>
+<a href="#1503" id="1503">1503</a>
+<a href="#1504" id="1504">1504</a>
+<a href="#1505" id="1505">1505</a>
+<a href="#1506" id="1506">1506</a>
+<a href="#1507" id="1507">1507</a>
+<a href="#1508" id="1508">1508</a>
+<a href="#1509" id="1509">1509</a>
+<a href="#1510" id="1510">1510</a>
+<a href="#1511" id="1511">1511</a>
+<a href="#1512" id="1512">1512</a>
+<a href="#1513" id="1513">1513</a>
+<a href="#1514" id="1514">1514</a>
+<a href="#1515" id="1515">1515</a>
+<a href="#1516" id="1516">1516</a>
+<a href="#1517" id="1517">1517</a>
+<a href="#1518" id="1518">1518</a>
+<a href="#1519" id="1519">1519</a>
+<a href="#1520" id="1520">1520</a>
+<a href="#1521" id="1521">1521</a>
+<a href="#1522" id="1522">1522</a>
+<a href="#1523" id="1523">1523</a>
+<a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a>
+<a href="#1534" id="1534">1534</a>
+<a href="#1535" id="1535">1535</a>
+<a href="#1536" id="1536">1536</a>
+<a href="#1537" id="1537">1537</a>
+<a href="#1538" id="1538">1538</a>
+<a href="#1539" id="1539">1539</a>
+<a href="#1540" id="1540">1540</a>
+<a href="#1541" id="1541">1541</a>
+<a href="#1542" id="1542">1542</a>
+<a href="#1543" id="1543">1543</a>
+<a href="#1544" id="1544">1544</a>
+<a href="#1545" id="1545">1545</a>
+<a href="#1546" id="1546">1546</a>
+<a href="#1547" id="1547">1547</a>
+<a href="#1548" id="1548">1548</a>
+<a href="#1549" id="1549">1549</a>
+<a href="#1550" id="1550">1550</a>
+<a href="#1551" id="1551">1551</a>
+<a href="#1552" id="1552">1552</a>
+<a href="#1553" id="1553">1553</a>
+<a href="#1554" id="1554">1554</a>
+<a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
+<a href="#1560" id="1560">1560</a>
+<a href="#1561" id="1561">1561</a>
+<a href="#1562" id="1562">1562</a>
+<a href="#1563" id="1563">1563</a>
+<a href="#1564" id="1564">1564</a>
+<a href="#1565" id="1565">1565</a>
+<a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
+<a href="#1577" id="1577">1577</a>
+<a href="#1578" id="1578">1578</a>
+<a href="#1579" id="1579">1579</a>
+<a href="#1580" id="1580">1580</a>
+<a href="#1581" id="1581">1581</a>
+<a href="#1582" id="1582">1582</a>
+<a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
+<a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
+<a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Dataio - readino/writing of different types
 //! of TOF data products.
 //!
@@ -1383,6 +1618,8 @@
       check   : <span class="number">0</span>,
       residue : <span class="number">0</span>,
     };
+
+<span class="kw">use </span>std::fmt;
 
 <span class="kw">extern crate </span>crc;
 <span class="kw">use </span>crc::Crc;
@@ -1422,11 +1659,15 @@
     TofPacket,
     PacketType,
 };
-<span class="kw">use </span><span class="kw">crate</span>::constants::NWORDS;
+<span class="kw">use </span><span class="kw">crate</span>::constants::{
+    NWORDS,
+    HUMAN_TIMESTAMP_FORMAT
+};
 <span class="kw">use </span><span class="kw">crate</span>::serialization::{
     Serialization,
-    SerializationError,
-    u8_to_u16_14bit,
+    <span class="comment">//SerializationError,
+    </span>u8_to_u16_14bit,
+    u8_to_u16_err_check,
     search_for_u16,
     parse_u8,
     parse_u16,
@@ -1445,8 +1686,16 @@
 <span class="doccomment">/// Get a human readable timestamp
 </span><span class="kw">pub fn </span>get_utc_timestamp() -&gt; String {
   <span class="kw">let </span>now: DateTime&lt;Utc&gt; = Utc::now();
-  <span class="comment">// Format the timestamp as "YYYY_MM_DD_HH_MM"
-  </span><span class="kw">let </span>timestamp_str = now.format(<span class="string">"%Y_%m_%d-%H_%M_%S"</span>).to_string();
+  <span class="comment">//let timestamp_str = now.format("%Y_%m_%d-%H_%M_%S").to_string();
+  </span><span class="kw">let </span>timestamp_str = now.format(HUMAN_TIMESTAMP_FORMAT).to_string();
+  timestamp_str
+}
+
+<span class="doccomment">/// Create date string in YYMMDD format
+</span><span class="kw">pub fn </span>get_utc_date() -&gt; String {
+  <span class="kw">let </span>now: DateTime&lt;Utc&gt; = Utc::now();
+  <span class="comment">//let timestamp_str = now.format("%Y_%m_%d-%H_%M_%S").to_string();
+  </span><span class="kw">let </span>timestamp_str = now.format(<span class="string">"%y%m%d"</span>).to_string();
   timestamp_str
 }
 
@@ -1493,25 +1742,6 @@
   fname
 }
 
-<span class="comment">//FIXME : this needs to become a trait
-</span><span class="kw">fn </span>read_n_bytes(file: <span class="kw-2">&amp;mut </span>BufReader&lt;File&gt;, n: usize) -&gt; io::Result&lt;Vec&lt;u8&gt;&gt; {
-  <span class="kw">let </span><span class="kw-2">mut </span>buffer = <span class="macro">vec!</span>[<span class="number">0u8</span>; n];
-  <span class="kw">match </span>file.read_exact(<span class="kw-2">&amp;mut </span>buffer) {
-    <span class="prelude-val">Err</span>(<span class="kw-2">ref </span>err) <span class="kw">if </span>err.kind() == io::ErrorKind::UnexpectedEof =&gt; {
-      <span class="comment">// Reached the end of the file
-      </span>buffer = Vec::&lt;u8&gt;::new();
-      file.read_to_end(<span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
-      <span class="kw">return </span><span class="prelude-val">Ok</span>(buffer);
-    },
-    <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">"Can not read {n} bytes from file! Error {err}"</span>);
-      <span class="kw">return </span><span class="prelude-val">Err</span>(err);
-    },
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
-  }
-  <span class="prelude-val">Ok</span>(buffer)
-}
-
 <span class="doccomment">/// Read an entire file into memory
 ///
 /// Represents the contents of a file 
@@ -1543,62 +1773,67 @@
 </span><span class="kw">pub struct </span>RBEventMemoryStreamer {
   <span class="doccomment">/// Raw stream read out from the RB buffers.
   </span><span class="kw">pub </span>stream         : Vec&lt;u8&gt;,
+  <span class="doccomment">/// Error checking mode - check error bits for 
+  /// channels/cells
+  </span><span class="kw">pub </span>check_channel_errors : bool,
+
   <span class="doccomment">/// Current position in the stream
-  </span>pos            : usize,
+  </span>pos                      : usize,
   <span class="doccomment">/// The current posion marker points to a header 
   /// signature in the stream.
-  </span>pos_at_head    : bool,
+  </span>pos_at_head              : bool,
   <span class="doccomment">/// An optional crossbeam::channel Sender, which 
   /// will allow to send TofPackets
-  </span><span class="kw">pub </span>tp_sender      : <span class="prelude-ty">Option</span>&lt;Sender&lt;TofPacket&gt;&gt;,
+  </span><span class="kw">pub </span>tp_sender            : <span class="prelude-ty">Option</span>&lt;Sender&lt;TofPacket&gt;&gt;,
   <span class="doccomment">/// number of extracted events from stream
   /// this manages how we are draining the stream
-  </span>n_events_ext            : usize,
-  <span class="kw">pub </span>is_depleted         : bool,
+  </span>n_events_ext             : usize,
+  <span class="kw">pub </span>is_depleted          : bool,
   <span class="doccomment">/// Calculate the crc32 checksum for the channels 
   /// everytime next() is called
-  </span><span class="kw">pub </span>calc_crc32          : bool,
+  </span><span class="kw">pub </span>calc_crc32           : bool,
   <span class="doccomment">/// placeholder for checksum calculator
-  </span>crc32_sum               : Crc::&lt;u32&gt;,
-  <span class="kw">pub </span>request_mode        : bool,
-  <span class="kw">pub </span>request_cache       : VecDeque&lt;(u32,u8)&gt;,
+  </span>crc32_sum                : Crc::&lt;u32&gt;,
+  <span class="kw">pub </span>request_mode         : bool,
+  <span class="kw">pub </span>request_cache        : VecDeque&lt;(u32,u8)&gt;,
   <span class="doccomment">/// an index for the events in the stream
   /// this links eventid and start position
   /// in the stream together
-  </span><span class="kw">pub </span>event_map           : HashMap&lt;u32,(usize,usize)&gt;,
-  <span class="kw">pub </span>first_evid          : u32,
-  <span class="kw">pub </span>last_evid           : u32,
-  <span class="kw">pub </span>last_event_complete : bool,
-  <span class="kw">pub </span>last_event_pos      : usize,
+  </span><span class="kw">pub </span>event_map            : HashMap&lt;u32,(usize,usize)&gt;,
+  <span class="kw">pub </span>first_evid           : u32,
+  <span class="kw">pub </span>last_evid            : u32,
+  <span class="kw">pub </span>last_event_complete  : bool,
+  <span class="kw">pub </span>last_event_pos       : usize,
   <span class="doccomment">/// When in request mode, number of events the last event in the stream is behind the
   /// first request
-  </span><span class="kw">pub </span>is_behind_by        : usize,
+  </span><span class="kw">pub </span>is_behind_by         : usize,
   <span class="doccomment">/// When in request mode, number of events the last event in the stream is ahead the
   /// last request
-  </span><span class="kw">pub </span>is_ahead_by         : usize,
+  </span><span class="kw">pub </span>is_ahead_by          : usize,
 }
 
 <span class="kw">impl </span>RBEventMemoryStreamer {
 
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
-      stream              : Vec::&lt;u8&gt;::new(),
-      pos                 : <span class="number">0</span>,
-      pos_at_head         : <span class="bool-val">false</span>,
-      tp_sender           : <span class="prelude-val">None</span>,
-      n_events_ext        : <span class="number">0</span>,
-      is_depleted         : <span class="bool-val">false</span>,
-      calc_crc32          : <span class="bool-val">false</span>,
-      crc32_sum           : Crc::&lt;u32&gt;::new(<span class="kw-2">&amp;</span>ALGO),
-      request_mode        : <span class="bool-val">false</span>,
-      request_cache       : VecDeque::&lt;(u32,u8)&gt;::new(),
-      event_map           : HashMap::&lt;u32,(usize,usize)&gt;::new(),
-      first_evid          : <span class="number">0</span>,
-      last_evid           : <span class="number">0</span>,
-      last_event_complete : <span class="bool-val">false</span>,
-      last_event_pos      : <span class="number">0</span>,
-      is_behind_by        : <span class="number">0</span>,
-      is_ahead_by         : <span class="number">0</span>,
+      stream               : Vec::&lt;u8&gt;::new(),
+      check_channel_errors : <span class="bool-val">false</span>,
+      pos                  : <span class="number">0</span>,
+      pos_at_head          : <span class="bool-val">false</span>,
+      tp_sender            : <span class="prelude-val">None</span>,
+      n_events_ext         : <span class="number">0</span>,
+      is_depleted          : <span class="bool-val">false</span>,
+      calc_crc32           : <span class="bool-val">false</span>,
+      crc32_sum            : Crc::&lt;u32&gt;::new(<span class="kw-2">&amp;</span>ALGO),
+      request_mode         : <span class="bool-val">false</span>,
+      request_cache        : VecDeque::&lt;(u32,u8)&gt;::new(),
+      event_map            : HashMap::&lt;u32,(usize,usize)&gt;::new(),
+      first_evid           : <span class="number">0</span>,
+      last_evid            : <span class="number">0</span>,
+      last_event_complete  : <span class="bool-val">false</span>,
+      last_event_pos       : <span class="number">0</span>,
+      is_behind_by         : <span class="number">0</span>,
+      is_ahead_by          : <span class="number">0</span>,
     }
   }
  
@@ -1793,12 +2028,19 @@
       -&gt; <span class="prelude-ty">Option</span>&lt;RBEvent&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>header       = RBEventHeader::new();
     <span class="kw">let </span><span class="kw-2">mut </span>event        = RBEvent::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>event_status : EventStatus;
+    <span class="kw">let </span><span class="kw-2">mut </span>event_status = EventStatus::Unknown;
     <span class="comment">//let begin_pos = self.pos;
-    </span><span class="kw">if </span><span class="self">self</span>.calc_crc32 {
+    </span><span class="kw">if </span><span class="self">self</span>.calc_crc32 &amp;&amp; <span class="self">self</span>.check_channel_errors {
       event_status = EventStatus::Perfect;
-    } <span class="kw">else </span>{
-      event_status = EventStatus::Unknown;
+    }
+    <span class="kw">if </span>!<span class="self">self</span>.calc_crc32 &amp;&amp; !<span class="self">self</span>.check_channel_errors {
+      event_status = EventStatus::GoodNoCRCOrErrBitCheck;
+    }
+    <span class="kw">if </span>!<span class="self">self</span>.calc_crc32 &amp;&amp; <span class="self">self</span>.check_channel_errors {
+      event_status = EventStatus::GoodNoCRCCheck;
+    }
+    <span class="kw">if </span><span class="self">self</span>.calc_crc32 &amp;&amp; !<span class="self">self</span>.check_channel_errors {
+      event_status = EventStatus::GoodNoErrBitCheck;
     }
     <span class="comment">// start parsing
     //let first_pos = self.pos;
@@ -1910,11 +2152,33 @@
           <span class="kw">for _ in </span><span class="number">0</span>..nwords {
             <span class="kw">let </span>this_field = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
             dig.update(<span class="kw-2">&amp;</span>this_field.to_le_bytes());
+            <span class="kw">if </span><span class="self">self</span>.check_channel_errors {
+              <span class="kw">if </span>((<span class="number">0x8000 </span>&amp; this_field) &gt;&gt; <span class="number">15</span>) == <span class="number">0x1 </span>{
+                <span class="macro">error!</span>(<span class="string">"Ch error bit set for ch {}!"</span>, ch);
+                event_status = EventStatus::ChnSyncErrors;
+              }
+              <span class="kw">if </span>((<span class="number">0x4000 </span>&amp; this_field) &gt;&gt; <span class="number">14</span>) == <span class="number">0x1 </span>{
+                <span class="macro">error!</span>(<span class="string">"Cell error bit set for ch {}!"</span>, ch);
+                event_status = EventStatus::CellSyncErrors;
+              }
+            }
             this_ch_adc.push(<span class="number">0x3fff </span>&amp; this_field)
           }
           event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = this_ch_adc;
         } <span class="kw">else </span>{
-          event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = u8_to_u16_14bit(<span class="kw-2">&amp;</span><span class="self">self</span>.stream[<span class="self">self</span>.pos..<span class="self">self</span>.pos + <span class="number">2</span><span class="kw-2">*</span>nwords]);
+          <span class="kw">if </span><span class="self">self</span>.check_channel_errors {
+            <span class="kw">let </span>adc_w_errs = u8_to_u16_err_check(<span class="kw-2">&amp;</span><span class="self">self</span>.stream[<span class="self">self</span>.pos..<span class="self">self</span>.pos + <span class="number">2</span><span class="kw-2">*</span>nwords]);
+            <span class="kw">if </span>adc_w_errs.<span class="number">1 </span>{
+              <span class="macro">error!</span>(<span class="string">"Ch error bit set for ch {}!"</span>, ch);
+              event_status = EventStatus::ChnSyncErrors;
+            } <span class="kw">else if </span>adc_w_errs.<span class="number">2 </span>{
+              <span class="macro">error!</span>(<span class="string">"Cell error bit set for ch {}!"</span>, ch);
+              event_status = EventStatus::CellSyncErrors;
+            }
+            event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = adc_w_errs.<span class="number">0</span>;
+          } <span class="kw">else </span>{
+            event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = u8_to_u16_14bit(<span class="kw-2">&amp;</span><span class="self">self</span>.stream[<span class="self">self</span>.pos..<span class="self">self</span>.pos + <span class="number">2</span><span class="kw-2">*</span>nwords]);
+          }
           <span class="self">self</span>.pos += <span class="number">2</span><span class="kw-2">*</span>nwords;
         } 
         <span class="comment">//let data = &amp;self.stream[self.pos..self.pos+2*nwords];
@@ -2046,113 +2310,330 @@
 /// written by TofPacketWriter
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>TofPacketReader {
+  <span class="doccomment">/// Read from this file
+  </span><span class="kw">pub </span>filename    : String,
+  file_reader     : BufReader&lt;File&gt;,
+  <span class="doccomment">/// Current (byte) position in the file
+  </span>cursor          : usize,
+  <span class="doccomment">/// Read only packets of type == PacketType
+  </span><span class="kw">pub </span>filter          : PacketType,
+  <span class="doccomment">/// Number of read packets
+  </span>n_packs_read    : usize,
+  <span class="doccomment">/// Number of skipped packets
+  </span>n_packs_skipped : usize,
+  <span class="doccomment">/// Skip the first n packets
+  </span><span class="kw">pub </span>skip_ahead      : usize,
+  <span class="doccomment">/// Stop reading after n packets
+  </span><span class="kw">pub </span>stop_after      : usize,
+}
 
-  <span class="kw">pub </span>filename    : String,
-  file_reader     : <span class="prelude-ty">Option</span>&lt;BufReader&lt;File&gt;&gt;,
-  cursor          : usize
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofPacketReader {
+  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">let </span><span class="kw-2">mut </span>range_repr = String::from(<span class="string">""</span>);
+    <span class="kw">if </span><span class="self">self</span>.skip_ahead &gt; <span class="number">0 </span>{
+      range_repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"({}"</span>, <span class="self">self</span>.skip_ahead));
+    } <span class="kw">else </span>{
+      range_repr += <span class="string">"("</span>;
+    }
+    <span class="kw">if </span><span class="self">self</span>.stop_after &gt; <span class="number">0 </span>{
+      range_repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"..{})"</span>, <span class="self">self</span>.stop_after));
+    } <span class="kw">else </span>{
+      range_repr += <span class="string">"..)"</span>;
+    }
+    <span class="kw">let </span>repr = <span class="macro">format!</span>(<span class="string">"&lt;TofPacketReader : file {}, read {} packets, filter {}, range {}&gt;"</span>, <span class="self">self</span>.filename, <span class="self">self</span>.n_packs_read, <span class="self">self</span>.filter, range_repr);
+    <span class="macro">write!</span>(f, <span class="string">"{}"</span>, repr)
+  }
 }
 
 <span class="kw">impl </span>TofPacketReader {
 
   <span class="kw">pub fn </span>new(filename : String) -&gt; TofPacketReader {
-    <span class="kw">let </span>filename_c = filename.clone();
-    <span class="kw">let </span><span class="kw-2">mut </span>packet_reader = TofPacketReader { 
-      filename       : filename,
-      file_reader    : <span class="prelude-val">None</span>,
-      cursor : <span class="number">0</span>,
+    <span class="kw">let </span>fname_c = filename.clone();
+    <span class="kw">let </span>file = OpenOptions::new().create(<span class="bool-val">false</span>).append(<span class="bool-val">false</span>).read(<span class="bool-val">true</span>).open(fname_c).expect(<span class="string">"Unable to open file {filename}"</span>);
+    <span class="kw">let </span>packet_reader = <span class="self">Self </span>{ 
+      filename,
+      file_reader     : BufReader::new(file),
+      cursor          : <span class="number">0</span>,
+      filter          : PacketType::Unknown,
+      n_packs_read    : <span class="number">0</span>,
+      skip_ahead      : <span class="number">0</span>,
+      stop_after      : <span class="number">0</span>,
+      n_packs_skipped : <span class="number">0</span>,
     };
-    packet_reader.open(filename_c);
     packet_reader
-  }
- 
-  <span class="kw">pub fn </span>get_next_packet_size(<span class="kw-2">&amp;</span><span class="self">self</span>, stream : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;) -&gt; u32 {
-    <span class="comment">// cursor needs at HEAD position and then we have to 
-    // add one byte for the packet type
-    </span><span class="kw">let </span><span class="kw-2">mut </span>pos    = <span class="self">self</span>.cursor + <span class="number">2</span>;
-    <span class="kw">let </span>ptype_int  = parse_u8(stream, <span class="kw-2">&amp;mut </span>pos);
-    <span class="kw">let </span>next_psize = parse_u32(stream, <span class="kw-2">&amp;mut </span>pos);
-    <span class="kw">let </span>ptype      = ptype_int <span class="kw">as </span>u8;
-    <span class="macro">debug!</span>(<span class="string">"We anticpate a TofPacket of type {:?} and size {} (bytes)"</span>,ptype, next_psize);
-    next_psize
+  } 
+
+  <span class="attr">#[deprecated(since=<span class="string">"0.10.0"</span>, note=<span class="string">"Use public attribute instead!"</span>)]
+  </span><span class="kw">pub fn </span>set_filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ptype : PacketType) {
+    <span class="self">self</span>.filter = ptype;
   }
 
-  <span class="kw">pub fn </span>open(<span class="kw-2">&amp;mut </span><span class="self">self</span>, filename : String) {
-    <span class="kw">if </span><span class="self">self</span>.filename != <span class="string">"" </span>{
-      <span class="macro">warn!</span>(<span class="string">"Overiding previously set filename {}"</span>, <span class="self">self</span>.filename);
-    }
-    <span class="kw">let </span>self_filename = filename.clone();
-    <span class="self">self</span>.filename     = self_filename;
-    <span class="kw">if </span>filename != <span class="string">"" </span>{
-      <span class="kw">let </span>path = Path::new(<span class="kw-2">&amp;</span>filename); 
-      <span class="macro">info!</span>(<span class="string">"Reading from {}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.filename);
-      <span class="kw">let </span>file = OpenOptions::new().create(<span class="bool-val">false</span>).append(<span class="bool-val">false</span>).read(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
-      <span class="self">self</span>.file_reader    = <span class="prelude-val">Some</span>(BufReader::new(file));
-      <span class="self">self</span>.init();
-    }
-  }
-
-  <span class="kw">fn </span>init(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-    <span class="kw">match </span><span class="self">self</span>.search_start() {
-      <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">"Can not find any header signature (typically 0xAAAA) in file! Err {err}"</span>);
-        <span class="macro">panic!</span>(<span class="string">"This is most likely a useless endeavour! Hence, I panic!"</span>);
-      }
-      <span class="prelude-val">Ok</span>(start_pos) =&gt; {
-        <span class="self">self</span>.cursor = start_pos;
-      }
-    }
-  }
-
-  <span class="kw">fn </span>search_start(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;usize, SerializationError&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>pos       = <span class="number">0u64</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>start_pos = <span class="number">0usize</span>; 
-    <span class="comment">//let mut stream  = Vec::&lt;u8&gt;::new();
-    </span><span class="kw">let </span>max_bytes   = <span class="self">self</span>.get_file_nbytes();
-    <span class="macro">info!</span>(<span class="string">"Using file with {max_bytes} bytes!"</span>);
-    <span class="kw">let </span>chunk       = <span class="number">10usize</span>;
-    <span class="kw">while </span>pos &lt; max_bytes {
-      <span class="kw">match </span>read_n_bytes(<span class="self">self</span>.file_reader.as_mut().unwrap(), chunk) {
+  <span class="doccomment">/// Get an index of the file - count number of packets
+  ///
+  /// Returns the number of all PacketTypes in the file
+  </span><span class="kw">pub fn </span>get_packet_index(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;HashMap&lt;u8, usize&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>index  = HashMap::&lt;u8, usize&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0</span>];
+    <span class="kw">loop </span>{
+      <span class="kw">match </span><span class="self">self</span>.file_reader.read_exact(<span class="kw-2">&amp;mut </span>buffer) {
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">"Can not read from file, error {err}"</span>);
-          <span class="macro">error!</span>(<span class="string">"Most likely, the file/stream is too short!"</span>);
-          <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::StreamTooShort);
+          <span class="macro">debug!</span>(<span class="string">"Unable to read from file! {err}"</span>);
+          <span class="comment">//return None;
+          </span><span class="kw">break</span>;
         }
-        <span class="prelude-val">Ok</span>(stream) =&gt; {
-          <span class="macro">debug!</span>(<span class="string">"Got stream {:?}"</span>, stream);
-          <span class="kw">match </span>search_for_u16(TofPacket::HEAD, <span class="kw-2">&amp;</span>stream, <span class="number">0</span>) {
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-              pos += chunk <span class="kw">as </span>u64;
-              <span class="kw">continue</span>;
-            }
-            <span class="prelude-val">Ok</span>(result) =&gt; {
-              start_pos = result + pos <span class="kw">as </span>usize;           
-              <span class="comment">// make sure the current chunk is accounted 
-              // for before the break
-              </span>pos += chunk <span class="kw">as </span>u64;
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+          <span class="self">self</span>.cursor += <span class="number">1</span>;
+        }
+      }
+      <span class="kw">if </span>buffer[<span class="number">0</span>] != <span class="number">0xAA </span>{
+        <span class="kw">continue</span>;
+      } <span class="kw">else </span>{
+        <span class="kw">match </span><span class="self">self</span>.file_reader.read_exact(<span class="kw-2">&amp;mut </span>buffer) {
+          <span class="prelude-val">Err</span>(err) =&gt; {
+            <span class="macro">debug!</span>(<span class="string">"Unable to read from file! {err}"</span>);
+            <span class="comment">//return None;
+            </span><span class="kw">break</span>;
+          }
+          <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+            <span class="self">self</span>.cursor += <span class="number">1</span>;
+          }
+        }
+
+        <span class="kw">if </span>buffer[<span class="number">0</span>] != <span class="number">0xAA </span>{ 
+          <span class="kw">continue</span>;
+        } <span class="kw">else </span>{
+          <span class="comment">// the 3rd byte is the packet type
+          </span><span class="kw">match </span><span class="self">self</span>.file_reader.read_exact(<span class="kw-2">&amp;mut </span>buffer) {
+             <span class="prelude-val">Err</span>(err) =&gt; {
+              <span class="macro">debug!</span>(<span class="string">"Unable to read from file! {err}"</span>);
               <span class="kw">break</span>;
             }
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+              <span class="self">self</span>.cursor += <span class="number">1</span>;
+            }
           }
-        } <span class="comment">// end Ok
-      </span>} <span class="comment">// end match 
-    </span>} <span class="comment">// end while
-    </span><span class="kw">let </span><span class="kw-2">mut </span>rewind : i64 = pos.try_into().unwrap();
-    rewind = -<span class="number">1</span><span class="kw-2">*</span>rewind + start_pos <span class="kw">as </span>i64;
-    <span class="macro">debug!</span>(<span class="string">"Rewinding {rewind} bytes"</span>);
-    <span class="kw">match </span><span class="self">self</span>.file_reader.as_mut().unwrap().seek(SeekFrom::Current(rewind)) {
-      <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">"Can not rewind file buffer! Error {err}"</span>);
+          <span class="kw">let </span>ptype    = PacketType::from(buffer[<span class="number">0</span>]);
+          <span class="comment">// read the the size of the packet
+          </span><span class="kw">let </span><span class="kw-2">mut </span>buffer_psize = [<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>];
+          <span class="kw">match </span><span class="self">self</span>.file_reader.read_exact(<span class="kw-2">&amp;mut </span>buffer_psize) {
+            <span class="prelude-val">Err</span>(err) =&gt; {
+              <span class="macro">error!</span>(<span class="string">"Unable to read from file! {err}"</span>);
+              <span class="kw">break</span>;
+            }
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+              <span class="self">self</span>.cursor += <span class="number">4</span>;
+            }
+          }
+          <span class="kw">let </span>vec_data = buffer_psize.to_vec();
+          <span class="kw">let </span>size     = parse_u32(<span class="kw-2">&amp;</span>vec_data, <span class="kw-2">&amp;mut </span><span class="number">0</span>);
+          <span class="kw">match </span><span class="self">self</span>.file_reader.seek(SeekFrom::Current(size <span class="kw">as </span>i64)) {
+            <span class="prelude-val">Err</span>(err) =&gt; {
+              <span class="macro">debug!</span>(<span class="string">"Unable to read more data! {err}"</span>);
+              <span class="kw">break</span>; 
+            }
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+              <span class="self">self</span>.cursor += size <span class="kw">as </span>usize;
+              <span class="comment">// and then we add the packet type to the 
+              // hashmap
+              </span><span class="kw">let </span>ptype_key = ptype <span class="kw">as </span>u8;
+              <span class="kw">if </span>index.contains_key(<span class="kw-2">&amp;</span>ptype_key) {
+                <span class="kw-2">*</span>index.get_mut(<span class="kw-2">&amp;</span>ptype_key).unwrap() += <span class="number">1</span>;
+              } <span class="kw">else </span>{
+                index.insert(ptype_key, <span class="number">1usize</span>);
+              }
+            }
+          }
+        }
+      } <span class="comment">// if no 0xAA found
+    </span>} <span class="comment">// end loop
+    </span><span class="self">self</span>.rewind()<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(index)
+  } <span class="comment">// end fn
+
+  </span><span class="kw">pub fn </span>rewind(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
+    <span class="self">self</span>.file_reader.rewind()<span class="question-mark">?</span>;
+    <span class="self">self</span>.cursor = <span class="number">0</span>;
+    <span class="prelude-val">Ok</span>(())
+  }
+
+  <span class="doccomment">/// Return the next tofpacket in the stream
+  ///
+  /// Will return none if the file has been exhausted.
+  /// Use ::rewind to start reading from the beginning
+  /// again.
+  </span><span class="kw">pub fn </span>get_next_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;TofPacket&gt; {
+    <span class="comment">// filter::Unknown corresponds to allowing any
+
+    </span><span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0</span>];
+    <span class="kw">loop </span>{
+      <span class="kw">match </span><span class="self">self</span>.file_reader.read_exact(<span class="kw-2">&amp;mut </span>buffer) {
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">debug!</span>(<span class="string">"Unable to read from file! {err}"</span>);
+          <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+          <span class="self">self</span>.cursor += <span class="number">1</span>;
+        }
       }
-      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
-    }
-    <span class="prelude-val">Ok</span>(start_pos)
-  }
-  
-  <span class="kw">fn </span>get_file_nbytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
-    <span class="kw">let </span>metadata  = <span class="self">self</span>.file_reader.as_ref().unwrap().get_ref().metadata().unwrap();
-    <span class="kw">let </span>file_size = metadata.len();
-    file_size
-  }
-}
+      <span class="kw">if </span>buffer[<span class="number">0</span>] != <span class="number">0xAA </span>{
+        <span class="kw">continue</span>;
+      } <span class="kw">else </span>{
+        <span class="kw">match </span><span class="self">self</span>.file_reader.read_exact(<span class="kw-2">&amp;mut </span>buffer) {
+          <span class="prelude-val">Err</span>(err) =&gt; {
+            <span class="macro">debug!</span>(<span class="string">"Unable to read from file! {err}"</span>);
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+          }
+          <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+            <span class="self">self</span>.cursor += <span class="number">1</span>;
+          }
+        }
+
+        <span class="kw">if </span>buffer[<span class="number">0</span>] != <span class="number">0xAA </span>{ 
+          <span class="kw">continue</span>;
+        } <span class="kw">else </span>{
+          <span class="comment">// the 3rd byte is the packet type
+          </span><span class="kw">match </span><span class="self">self</span>.file_reader.read_exact(<span class="kw-2">&amp;mut </span>buffer) {
+             <span class="prelude-val">Err</span>(err) =&gt; {
+              <span class="macro">debug!</span>(<span class="string">"Unable to read from file! {err}"</span>);
+              <span class="kw">return </span><span class="prelude-val">None</span>;
+            }
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+              <span class="self">self</span>.cursor += <span class="number">1</span>;
+            }
+          }
+          <span class="kw">let </span>ptype    = PacketType::from(buffer[<span class="number">0</span>]);
+          <span class="comment">// read the the size of the packet
+          </span><span class="kw">let </span><span class="kw-2">mut </span>buffer_psize = [<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>];
+          <span class="kw">match </span><span class="self">self</span>.file_reader.read_exact(<span class="kw-2">&amp;mut </span>buffer_psize) {
+            <span class="prelude-val">Err</span>(err) =&gt; {
+              <span class="macro">debug!</span>(<span class="string">"Unable to read from file! {err}"</span>);
+              <span class="kw">return </span><span class="prelude-val">None</span>;
+            }
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+              <span class="self">self</span>.cursor += <span class="number">4</span>;
+            }
+          }
+          <span class="kw">let </span>vec_data = buffer_psize.to_vec();
+          <span class="kw">let </span>size     = parse_u32(<span class="kw-2">&amp;</span>vec_data, <span class="kw-2">&amp;mut </span><span class="number">0</span>);
+          <span class="kw">if </span>ptype != <span class="self">self</span>.filter &amp;&amp; <span class="self">self</span>.filter != PacketType::Unknown {
+            <span class="kw">match </span><span class="self">self</span>.file_reader.seek(SeekFrom::Current(size <span class="kw">as </span>i64)) {
+              <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="macro">debug!</span>(<span class="string">"Unable to read more data! {err}"</span>);
+                <span class="kw">return </span><span class="prelude-val">None</span>; 
+              }
+              <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+                <span class="self">self</span>.cursor += size <span class="kw">as </span>usize;
+              }
+            }
+            <span class="kw">continue</span>; <span class="comment">// this is just not the packet we want
+          </span>}
+          <span class="comment">// now at this point, we want the packet!
+          // except we skip ahead or stop earlier
+          </span><span class="kw">if </span><span class="self">self</span>.skip_ahead &gt; <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.n_packs_skipped &lt; <span class="self">self</span>.skip_ahead {
+            <span class="comment">// we don't want it
+            </span><span class="kw">match </span><span class="self">self</span>.file_reader.seek(SeekFrom::Current(size <span class="kw">as </span>i64)) {
+              <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="macro">debug!</span>(<span class="string">"Unable to read more data! {err}"</span>);
+                <span class="kw">return </span><span class="prelude-val">None</span>; 
+              }
+              <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+                <span class="self">self</span>.n_packs_skipped += <span class="number">1</span>;
+                <span class="self">self</span>.cursor += size <span class="kw">as </span>usize;
+              }
+            }
+            <span class="kw">continue</span>; <span class="comment">// this is just not the packet we want
+          </span>}
+          <span class="kw">if </span><span class="self">self</span>.stop_after &gt; <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.n_packs_read &gt;= <span class="self">self</span>.stop_after {
+            <span class="comment">// we don't want it
+            </span><span class="kw">match </span><span class="self">self</span>.file_reader.seek(SeekFrom::Current(size <span class="kw">as </span>i64)) {
+              <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="macro">debug!</span>(<span class="string">"Unable to read more data! {err}"</span>);
+                <span class="kw">return </span><span class="prelude-val">None</span>; 
+              }
+              <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+                <span class="self">self</span>.cursor += size <span class="kw">as </span>usize;
+              }
+            }
+            <span class="kw">continue</span>; <span class="comment">// this is just not the packet we want
+
+          </span>}
+
+          <span class="kw">let </span><span class="kw-2">mut </span>tp = TofPacket::new();
+          tp.packet_type = ptype;
+          <span class="kw">let </span><span class="kw-2">mut </span>payload = <span class="macro">vec!</span>[<span class="number">0u8</span>;size <span class="kw">as </span>usize];
+
+          <span class="kw">match </span><span class="self">self</span>.file_reader.read_exact(<span class="kw-2">&amp;mut </span>payload) {
+            <span class="prelude-val">Err</span>(err) =&gt; {
+              <span class="macro">debug!</span>(<span class="string">"Unable to read from file! {err}"</span>);
+              <span class="kw">return </span><span class="prelude-val">None</span>;
+            }
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+              <span class="self">self</span>.cursor += size <span class="kw">as </span>usize;
+            }
+          }
+          tp.payload = payload;
+          <span class="comment">// we don't filter, so we like this packet
+          </span><span class="kw">let </span><span class="kw-2">mut </span>tail = <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="number">2</span>];
+          <span class="kw">match </span><span class="self">self</span>.file_reader.read_exact(<span class="kw-2">&amp;mut </span>tail) {
+            <span class="prelude-val">Err</span>(err) =&gt; {
+              <span class="macro">debug!</span>(<span class="string">"Unable to read from file! {err}"</span>);
+              <span class="kw">return </span><span class="prelude-val">None</span>;
+            }
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+              <span class="self">self</span>.cursor += <span class="number">2</span>;
+            }
+          }
+          <span class="kw">let </span>tail = parse_u16(<span class="kw-2">&amp;</span>tail,<span class="kw-2">&amp;mut </span><span class="number">0</span>);
+          <span class="kw">if </span>tail != TofPacket::TAIL {
+            <span class="macro">debug!</span>(<span class="string">"TofPacket TAIL signature wrong!"</span>);
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+          }
+          <span class="self">self</span>.n_packs_read += <span class="number">1</span>;
+          <span class="kw">return </span><span class="prelude-val">Some</span>(tp);
+        }
+      } <span class="comment">// if no 0xAA found
+    </span>} <span class="comment">// end loop
+  </span>} <span class="comment">// end fn
+
+  //pub fn get_next_packet_size(&amp;self, stream : &amp;Vec&lt;u8&gt;) -&gt; u32 {
+  //  // cursor needs at HEAD position and then we have to 
+  //  // add one byte for the packet type
+  //  let mut pos    = self.cursor + 2;
+  //  let ptype_int  = parse_u8(stream, &amp;mut pos);
+  //  let next_psize = parse_u32(stream, &amp;mut pos);
+  //  let ptype      = ptype_int as u8;
+  //  debug!("We anticpate a TofPacket of type {:?} and size {} (bytes)",ptype, next_psize);
+  //  next_psize
+  //}
+
+  //pub fn open(&amp;mut self, filename : String) {
+  //  if self.filename != "" {
+  //    warn!("Overiding previously set filename {}", self.filename);
+  //  }
+  //  let self_filename = filename.clone();
+  //  self.filename     = self_filename;
+  //  if filename != "" {
+  //    let path = Path::new(&amp;filename); 
+  //    info!("Reading from {}", &amp;self.filename);
+  //    let file = OpenOptions::new().create(false).append(false).read(true).open(path).expect("Unable to open file {filename}");
+  //    self.file_reader    = Some(BufReader::new(file));
+  //    self.init();
+  //  }
+  //}
+
+  //fn init(&amp;mut self) {
+  //  match self.search_start() {
+  //    Err(err) =&gt; {
+  //      error!("Can not find any header signature (typically 0xAAAA) in file! Err {err}");
+  //      panic!("This is most likely a useless endeavour! Hence, I panic!");
+  //    }
+  //    Ok(start_pos) =&gt; {
+  //      self.cursor = start_pos;
+  //    }
+  //  }
+  //}
+
+</span>}
 
 <span class="kw">impl </span>Default <span class="kw">for </span>TofPacketReader {
   <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
@@ -2162,50 +2643,10 @@
 
 <span class="kw">impl </span>Iterator <span class="kw">for </span>TofPacketReader {
   <span class="kw">type </span>Item = TofPacket;
-  <span class="comment">//type Item = io::Result&lt;TofPacket&gt;;
-
-  </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
-    <span class="kw">let </span>packet : TofPacket;
-    <span class="kw">match </span>read_n_bytes(<span class="self">self</span>.file_reader.as_mut().unwrap(), <span class="number">7</span>) { 
-    <span class="comment">//match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &amp;mut line) {
-      </span><span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">"Error reading from file {} error: {}"</span>, <span class="self">self</span>.filename, err);
-      },
-      <span class="prelude-val">Ok</span>(chunk) =&gt; {
-        <span class="kw">if </span>chunk.len() &lt; <span class="number">7 </span>{
-          <span class="macro">error!</span>(<span class="string">"The stream is too short!"</span>);
-          <span class="kw">return </span><span class="prelude-val">None</span>;
-        }
-        <span class="kw">else </span>{
-          <span class="macro">trace!</span>(<span class="string">"Read {} bytes"</span>, chunk.len());
-          <span class="kw">let </span>expected_payload_size = <span class="self">self</span>.get_next_packet_size(<span class="kw-2">&amp;</span>chunk) <span class="kw">as </span>usize; 
-          <span class="kw">match </span>read_n_bytes(<span class="self">self</span>.file_reader.as_mut().unwrap(), expected_payload_size + <span class="number">2</span>) {
-            <span class="prelude-val">Err</span>(err) =&gt; {
-              <span class="macro">error!</span>(<span class="string">"Unable to read {} requested bytes to decode tof packet! Err {err}"</span>, expected_payload_size - <span class="number">7 </span>);
-              <span class="kw">return </span><span class="prelude-val">None</span>;
-            },
-            <span class="prelude-val">Ok</span>(data) =&gt; {
-              <span class="kw">let </span><span class="kw-2">mut </span>stream = Vec::&lt;u8&gt;::with_capacity(expected_payload_size + <span class="number">9</span>);
-              stream.extend_from_slice(<span class="kw-2">&amp;</span>chunk);
-              stream.extend_from_slice(<span class="kw-2">&amp;</span>data);
-              <span class="comment">//println!("{:?}", stream);
-              </span><span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>stream, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
-                <span class="prelude-val">Ok</span>(pack) =&gt; {
-                  packet = pack;
-                  <span class="kw">return </span><span class="prelude-val">Some</span>(packet);
-                }
-                <span class="prelude-val">Err</span>(err) =&gt; { 
-                  <span class="macro">error!</span>(<span class="string">"Error getting packet from file {err}"</span>);
-                  <span class="kw">return </span><span class="prelude-val">None</span>;
-                }
-              }
-            }
-          }
-        }
-      }, <span class="comment">// end outer OK
-    </span>}
-  <span class="prelude-val">None
-  </span>}
+  
+  <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+    <span class="self">self</span>.get_next_packet()
+  }
 }
 
 <span class="doccomment">/// Write TofPackets to disk.
@@ -2223,13 +2664,21 @@
   /// number is reached, a new 
   /// file is started.
   </span><span class="kw">pub </span>pkts_per_file   : usize,
+  <span class="doccomment">/// The maximum number of (Mega)bytes
+  /// per file. After this a new file 
+  /// is started
+  </span><span class="kw">pub </span>mbytes_per_file : usize,
   <span class="doccomment">/// add timestamps to filenames
   </span><span class="kw">pub </span>file_type       : FileType,
+  <span class="kw">pub </span>file_name       : String,
 
   file_id             : usize,
   <span class="doccomment">/// internal packet counter, number of 
   /// packets which went through the writer
   </span>n_packets           : usize,
+  <span class="doccomment">/// internal counter for bytes written in 
+  /// this file
+  </span>file_nbytes_wr      : usize,
 }
 
 <span class="kw">impl </span>TofPacketWriter {
@@ -2245,6 +2694,7 @@
   </span><span class="kw">pub fn </span>new(<span class="kw-2">mut </span>file_path : String, file_type : FileType) -&gt; <span class="self">Self </span>{
     <span class="comment">//let filename = file_prefix.clone() + "_0.tof.gaps";
     </span><span class="kw">let </span>file : File;
+    <span class="kw">let </span>file_name : String;
     <span class="kw">if </span>!file_path.ends_with(<span class="string">"/"</span>) {
       file_path += <span class="string">"/"</span>;
     }
@@ -2254,27 +2704,34 @@
         <span class="kw">let </span>path     = Path::new(<span class="kw-2">&amp;</span>filename); 
         <span class="macro">info!</span>(<span class="string">"Writing to file {filename}"</span>);
         file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
+        file_name = filename;
       }
       FileType::RunFile(runid) =&gt; {
-        <span class="kw">let </span>filename = file_path.clone() + <span class="kw-2">&amp;</span>get_runfilename(runid,<span class="number">1</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>filename = <span class="macro">format!</span>(<span class="string">"{}{}"</span>, file_path, get_runfilename(runid, <span class="number">0</span>, <span class="prelude-val">None</span>));
         <span class="kw">let </span>path     = Path::new(<span class="kw-2">&amp;</span>filename); 
-        <span class="macro">info!</span>(<span class="string">"Writing to file {filename}"</span>);
+        <span class="macro">println!</span>(<span class="string">"Writing to file {filename}"</span>);
         file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
+        file_name = filename;
       }
       FileType::CalibrationFile(rbid) =&gt; {
-        <span class="kw">let </span>filename = file_path.clone() + <span class="kw-2">&amp;</span>get_califilename(rbid,<span class="bool-val">false</span>);
-        <span class="kw">let </span>path     = Path::new(<span class="kw-2">&amp;</span>filename); 
+        <span class="kw">let </span>filename = <span class="macro">format!</span>(<span class="string">"{}{}"</span>, file_path, get_califilename(rbid, <span class="bool-val">false</span>));
+        <span class="comment">//let filename = file_path.clone() + &amp;get_califilename(rbid,false);
+        </span><span class="kw">let </span>path     = Path::new(<span class="kw-2">&amp;</span>filename); 
         <span class="macro">info!</span>(<span class="string">"Writing to file {filename}"</span>);
         file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
+        file_name = filename;
       }
     }
     <span class="self">Self </span>{
       file,
-      file_path       : file_path,
-      pkts_per_file   : <span class="number">3000</span>,
-      file_type       : file_type,
-      file_id         : <span class="number">1</span>,
-      n_packets       : <span class="number">0</span>,
+      file_path        : file_path,
+      pkts_per_file    : <span class="number">0</span>,
+      mbytes_per_file  : <span class="number">420</span>,
+      file_nbytes_wr   : <span class="number">0</span>,    
+      file_type        : file_type,
+      file_id          : <span class="number">1</span>,
+      n_packets        : <span class="number">0</span>,
+      file_name        : file_name,
     }
   }
 
@@ -2288,13 +2745,15 @@
         file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
       }
       FileType::RunFile(runid) =&gt; {
-        <span class="kw">let </span>filename = <span class="self">self</span>.file_path.clone() + <span class="kw-2">&amp;</span>get_runfilename(runid,<span class="self">self</span>.file_id <span class="kw">as </span>u64, <span class="prelude-val">None</span>);
-        <span class="kw">let </span>path     = Path::new(<span class="kw-2">&amp;</span>filename); 
+        <span class="kw">let </span>filename = <span class="macro">format!</span>(<span class="string">"{}{}"</span>, <span class="self">self</span>.file_path, get_runfilename(runid, <span class="self">self</span>.file_id <span class="kw">as </span>u64, <span class="prelude-val">None</span>));
+        <span class="comment">//let filename = self.file_path.clone() + &amp;get_runfilename(runid,self.file_id as u64, None);
+        </span><span class="kw">let </span>path     = Path::new(<span class="kw-2">&amp;</span>filename); 
         <span class="macro">info!</span>(<span class="string">"Writing to file {filename}"</span>);
         file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
       }
       FileType::CalibrationFile(rbid) =&gt; {
-        <span class="kw">let </span>filename = <span class="self">self</span>.file_path.clone() + <span class="kw-2">&amp;</span>get_califilename(rbid,<span class="bool-val">false</span>);
+        <span class="comment">//let filename = self.file_path.clone() + &amp;get_califilename(rbid,false);
+        </span><span class="kw">let </span>filename = <span class="macro">format!</span>(<span class="string">"{}{}"</span>, <span class="self">self</span>.file_path, get_califilename(rbid, <span class="bool-val">false</span>));
         <span class="kw">let </span>path     = Path::new(<span class="kw-2">&amp;</span>filename); 
         <span class="macro">info!</span>(<span class="string">"Writing to file {filename}"</span>);
         file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
@@ -2308,28 +2767,41 @@
   ///
   </span><span class="kw">pub fn </span>add_tof_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>, packet : <span class="kw-2">&amp;</span>TofPacket) {
     <span class="kw">let </span>buffer = packet.to_bytestream();
+    <span class="self">self</span>.file_nbytes_wr += buffer.len();
     <span class="kw">match </span><span class="self">self</span>.file.write_all(buffer.as_slice()) {
       <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Writing to file to path {} failed! {}"</span>, <span class="self">self</span>.file_path, err),
       <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
     }
     <span class="self">self</span>.n_packets += <span class="number">1</span>;
-    <span class="kw">if </span><span class="self">self</span>.n_packets == <span class="self">self</span>.pkts_per_file {
-      <span class="comment">//let filename = self.file_prefix.clone() + "_" + &amp;self.file_id.to_string() + ".tof.gaps";
-      </span><span class="kw">match </span><span class="self">self</span>.file.sync_all() {
-        <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">"Unable to sync file to disc! {err}"</span>);
-        },
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
+    <span class="kw">let </span><span class="kw-2">mut </span>newfile = <span class="bool-val">false</span>;
+    <span class="kw">if </span><span class="self">self</span>.pkts_per_file != <span class="number">0 </span>{
+      <span class="kw">if </span><span class="self">self</span>.n_packets == <span class="self">self</span>.pkts_per_file {
+        newfile = <span class="bool-val">true</span>;
+        <span class="self">self</span>.n_packets = <span class="number">0</span>;
       }
-      <span class="self">self</span>.file = <span class="self">self</span>.get_file();
-      <span class="self">self</span>.n_packets = <span class="number">0</span>;
-      <span class="self">self</span>.file_id += <span class="number">1</span>;
-      <span class="comment">//let path  = Path::new(&amp;filename);
-      //println!("==&gt; [TOFPACKETWRITER] Will start a new file {}", path.display());
-      //self.file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
-      //self.n_packets = 0;
-      //self.file_id += 1;
-    </span>}
+    } <span class="kw">else if </span><span class="self">self</span>.mbytes_per_file != <span class="number">0 </span>{
+      <span class="comment">// multiply by mebibyte
+      </span><span class="kw">if </span><span class="self">self</span>.file_nbytes_wr &gt;= <span class="self">self</span>.mbytes_per_file * <span class="number">1_048_576 </span>{
+        newfile = <span class="bool-val">true</span>;
+        <span class="self">self</span>.file_nbytes_wr = <span class="number">0</span>;
+      }
+    }
+    <span class="kw">if </span>newfile {
+        <span class="comment">//let filename = self.file_prefix.clone() + "_" + &amp;self.file_id.to_string() + ".tof.gaps";
+        </span><span class="kw">match </span><span class="self">self</span>.file.sync_all() {
+          <span class="prelude-val">Err</span>(err) =&gt; {
+            <span class="macro">error!</span>(<span class="string">"Unable to sync file to disc! {err}"</span>);
+          },
+          <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
+        }
+        <span class="self">self</span>.file = <span class="self">self</span>.get_file();
+        <span class="self">self</span>.file_id += <span class="number">1</span>;
+        <span class="comment">//let path  = Path::new(&amp;filename);
+        //println!("==&gt; [TOFPACKETWRITER] Will start a new file {}", path.display());
+        //self.file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+        //self.n_packets = 0;
+        //self.file_id += 1;
+      </span>}
   <span class="macro">debug!</span>(<span class="string">"TofPacket written!"</span>);
   }
 }

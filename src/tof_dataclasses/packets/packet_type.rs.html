@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/packets/packet_type.rs`."><title>packet_type.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
-            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/packets/packet_type.rs`."><title>packet_type.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -157,6 +155,39 @@
 <a href="#155" id="155">155</a>
 <a href="#156" id="156">156</a>
 <a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// PacketType identifies the payload in TofPackets
 ///
 /// This needs to be kept in sync with the C++ API
@@ -170,9 +201,13 @@
   }
 }
 
+<span class="attr">#[cfg(feature = <span class="string">"pybindings"</span>)]
+</span><span class="kw">use </span>pyo3::pyclass;
+
 <span class="doccomment">/// Types of serializable data structures used
 /// throughout the tof system
 </span><span class="attr">#[derive(Debug, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass)]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>PacketType {
   Unknown             = <span class="number">0u8</span>, 
@@ -181,12 +216,14 @@
   RBWaveform          = <span class="number">22u8</span>,
   TofEventSummary     = <span class="number">23u8</span>,
   <span class="comment">//Monitor             = 30u8,    // needs to go away
-  </span>HeartBeat           = <span class="number">40u8</span>,    <span class="comment">// might probably go away
-  </span>MasterTrigger       = <span class="number">60u8</span>,    <span class="comment">// needs to be renamed to either MasterTriggerEvent or MTEvent
-  </span>RBEventHeader       = <span class="number">70u8</span>,    <span class="comment">// needs to go away
+  </span>HeartBeatDataSink   = <span class="number">40u8</span>,    
+  MasterTrigger       = <span class="number">60u8</span>,    <span class="comment">// needs to be renamed to either MasterTriggerEvent or MTEvent
+  </span>TriggerConfig       = <span class="number">61u8</span>,
+  AnalysisEngineConfig = <span class="number">69u8</span>,
+  RBEventHeader       = <span class="number">70u8</span>,    <span class="comment">// needs to go away
   </span>CPUMoniData         = <span class="number">80u8</span>,
   MonitorMtb          = <span class="number">90u8</span>,
-  RBMoni              = <span class="number">100u8</span>,
+  RBMoniData          = <span class="number">100u8</span>,
   PBMoniData          = <span class="number">101u8</span>,
   LTBMoniData         = <span class="number">102u8</span>,
   PAMoniData          = <span class="number">103u8</span>,
@@ -194,8 +231,15 @@
                                // still needs to be processed.
   </span>RBCalibration       = <span class="number">130u8</span>,
   TofCommand          = <span class="number">140u8</span>,
-  RBCommand           = <span class="number">150u8</span>,
-  Ping                = <span class="number">160u8</span>,
+  TofCommandV2        = <span class="number">141u8</span>,
+  TofResponse         = <span class="number">142u8</span>,
+  <span class="comment">// needs to go away
+  </span>RBCommand           = <span class="number">150u8</span>,
+  <span class="comment">// &gt; 160 configuration packets
+  </span>RBPing              = <span class="number">160u8</span>,
+  PreampBiasConfig    = <span class="number">161u8</span>,
+  RunConfig           = <span class="number">162u8</span>,
+  LTBThresholdConfig  = <span class="number">163u8</span>,
   <span class="comment">// use the &gt; 200 values for transmitting
   // various binary files
   </span>ConfigBinary        = <span class="number">201u8</span>,
@@ -224,20 +268,26 @@
       <span class="number">22u8  </span>=&gt; PacketType::RBWaveform,
       <span class="number">23u8  </span>=&gt; PacketType::TofEventSummary,
       <span class="comment">//30u8  =&gt; PacketType::Monitor,
-      </span><span class="number">40u8  </span>=&gt; PacketType::HeartBeat,
+      </span><span class="number">40u8  </span>=&gt; PacketType::HeartBeatDataSink,
       <span class="number">60u8  </span>=&gt; PacketType::MasterTrigger,
+      <span class="number">61u8 </span>=&gt; PacketType::TriggerConfig,
       <span class="number">70u8  </span>=&gt; PacketType::RBEventHeader,
       <span class="number">80u8  </span>=&gt; PacketType::CPUMoniData,
       <span class="number">90u8  </span>=&gt; PacketType::MonitorMtb,
-      <span class="number">100u8 </span>=&gt; PacketType::RBMoni,
+      <span class="number">100u8 </span>=&gt; PacketType::RBMoniData,
       <span class="number">101u8 </span>=&gt; PacketType::PBMoniData   ,
       <span class="number">102u8 </span>=&gt; PacketType::LTBMoniData  ,
       <span class="number">103u8 </span>=&gt; PacketType::PAMoniData   ,
       <span class="number">120u8 </span>=&gt; PacketType::RBEventMemoryView,
       <span class="number">130u8 </span>=&gt; PacketType::RBCalibration,
       <span class="number">140u8 </span>=&gt; PacketType::TofCommand,
+      <span class="number">141u8 </span>=&gt; PacketType::TofCommandV2,
+      <span class="number">142u8 </span>=&gt; PacketType::TofResponse,
       <span class="number">150u8 </span>=&gt; PacketType::RBCommand,
-      <span class="number">160u8 </span>=&gt; PacketType::Ping,
+      <span class="number">160u8 </span>=&gt; PacketType::RBPing,
+      <span class="number">161u8 </span>=&gt; PacketType::PreampBiasConfig,
+      <span class="number">162u8 </span>=&gt; PacketType::RunConfig,
+      <span class="number">163u8 </span>=&gt; PacketType::LTBThresholdConfig,
       <span class="number">201u8 </span>=&gt; PacketType::ConfigBinary,
       <span class="number">202u8 </span>=&gt; PacketType::LiftofRBBinary,
       <span class="number">203u8 </span>=&gt; PacketType::LiftofBinaryService,
@@ -259,13 +309,20 @@
       PacketType::TofEventSummary,
       <span class="comment">//PacketType::Monitor,
       </span>PacketType::MasterTrigger,
-      PacketType::HeartBeat,
+      PacketType::TriggerConfig, 
+      PacketType::HeartBeatDataSink,
       PacketType::RBEventHeader,
       PacketType::RBEvent,
       PacketType::RBEventMemoryView,
       PacketType::TofCommand,
+      PacketType::TofCommandV2,
+      PacketType::TofResponse,
       PacketType::RBCommand,
-      PacketType::RBMoni,
+      PacketType::RBPing,
+      PacketType::PreampBiasConfig,
+      PacketType::RunConfig,
+      PacketType::LTBThresholdConfig,
+      PacketType::RBMoniData,
       PacketType::PBMoniData,
       PacketType::LTBMoniData,
       PacketType::PAMoniData,
@@ -291,18 +348,25 @@
   type_codes.push(PacketType::RBWaveform <span class="kw">as </span>u8);
   type_codes.push(PacketType::TofEventSummary <span class="kw">as </span>u8);
   <span class="comment">//type_codes.push(PacketType::Monitor as u8);
-  </span>type_codes.push(PacketType::MasterTrigger <span class="kw">as </span>u8);
-  type_codes.push(PacketType::HeartBeat <span class="kw">as </span>u8);
+  </span>type_codes.push(PacketType::TriggerConfig <span class="kw">as </span>u8);
+  type_codes.push(PacketType::MasterTrigger <span class="kw">as </span>u8);
+  type_codes.push(PacketType::HeartBeatDataSink <span class="kw">as </span>u8);
   type_codes.push(PacketType::RBEventHeader <span class="kw">as </span>u8);
   type_codes.push(PacketType::RBEvent <span class="kw">as </span>u8);
   type_codes.push(PacketType::RBEventMemoryView <span class="kw">as </span>u8);
   type_codes.push(PacketType::TofCommand <span class="kw">as </span>u8);
+  type_codes.push(PacketType::TofCommandV2 <span class="kw">as </span>u8);
+  type_codes.push(PacketType::TofResponse <span class="kw">as </span>u8);
   type_codes.push(PacketType::RBCommand <span class="kw">as </span>u8);
-  type_codes.push(PacketType::RBMoni <span class="kw">as </span>u8);
+  type_codes.push(PacketType::RBMoniData <span class="kw">as </span>u8);
   type_codes.push(PacketType::PBMoniData <span class="kw">as </span>u8);
   type_codes.push(PacketType::LTBMoniData <span class="kw">as </span>u8);
   type_codes.push(PacketType::PAMoniData <span class="kw">as </span>u8);
   type_codes.push(PacketType::CPUMoniData <span class="kw">as </span>u8);
+  type_codes.push(PacketType::RBPing <span class="kw">as </span>u8);
+  type_codes.push(PacketType::PreampBiasConfig <span class="kw">as </span>u8);
+  type_codes.push(PacketType::RunConfig <span class="kw">as </span>u8);
+  type_codes.push(PacketType::LTBThresholdConfig <span class="kw">as </span>u8);
   type_codes.push(PacketType::MonitorMtb <span class="kw">as </span>u8);
   type_codes.push(PacketType::RBCalibration <span class="kw">as </span>u8);
   type_codes.push(PacketType::ConfigBinary <span class="kw">as </span>u8);

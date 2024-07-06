@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ArrowDataType","IntegerType","IntervalUnit","PhysicalType","TimeUnit","UnionMode"],"fn":["get_extension"],"struct":["ArrowSchema","Field"],"type":["ArrowSchemaRef","IdxArr","Metadata","SchemaRef"]};

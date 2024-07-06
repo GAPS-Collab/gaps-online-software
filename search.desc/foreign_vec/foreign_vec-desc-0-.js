@@ -1,0 +1,1 @@
+searchState.loadedDescShard("foreign_vec", 0, "This library offers <code>ForeignVec</code>, a zero-cost abstraction to …\nA continuous memory region that may be allocated …\nReturns the argument unchanged.\nTakes ownership of an allocated memory region.\nReturns a <code>Some</code> mutable reference of <code>Vec&lt;T&gt;</code> iff this was …\nCalls <code>U::from(self)</code>.")

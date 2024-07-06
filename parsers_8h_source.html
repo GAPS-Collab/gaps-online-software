@@ -28,7 +28,7 @@
   <td id="projectlogo"><img alt="Logo" src="GAPSLOGO_2023_ico.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">gaps-online-software
-   &#160;<span id="projectnumber">0.9</span>
+   &#160;<span id="projectnumber">0.10</span>
    </div>
    <div id="projectbrief">online software for the TOF system for the GAPS experiment</div>
   </td>
@@ -96,80 +96,52 @@ $(document).ready(function(){initNavTree('parsers_8h_source.html',''); initResiz
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceGaps.html">Gaps</a> {</div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;Vec&lt;T&gt; slice(<span class="keyword">const</span> Vec&lt;T&gt;&amp; vec, usize start, usize end) {</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  <span class="keywordflow">if</span> (start &gt;= vec.size()) {</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <span class="keywordflow">return</span> Vec&lt;T&gt;();  <span class="comment">// Return an empty vector if start is out of range</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  }</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  end = std::min(end, vec.size());  <span class="comment">// Clamp the end index to the vector size</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <span class="keywordflow">return</span> Vec&lt;T&gt;(vec.begin() + start, vec.begin() + end);</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;}</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="namespaceGaps.html#a13cb72078c0645adb57076cc5697b9a1">   35</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="namespaceGaps.html#a13cb72078c0645adb57076cc5697b9a1">parse_bool</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                usize &amp;pos);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="namespaceGaps.html#af02b80458f7649651a342344e3b103ee">   39</a></span>&#160;u8 <a class="code" href="namespaceGaps.html#af02b80458f7649651a342344e3b103ee">parse_u8</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;            usize &amp;pos);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="namespaceGaps.html#a8d5ee03930328391169c3f11a9b06e8e">   43</a></span>&#160;u16 <a class="code" href="namespaceGaps.html#a8d5ee03930328391169c3f11a9b06e8e">parse_u16</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;              usize &amp;pos);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="namespaceGaps.html#ac09d7b4a66f0df27a63af339dd6d7ea8">   47</a></span>&#160;u32 <a class="code" href="namespaceGaps.html#ac09d7b4a66f0df27a63af339dd6d7ea8">parse_u32</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;              usize &amp;pos);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="namespaceGaps.html#aa913722aa6668823951e07f44b8698d6">   51</a></span>&#160;u64 <a class="code" href="namespaceGaps.html#aa913722aa6668823951e07f44b8698d6">parse_u64</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;              usize &amp;pos);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="namespaceGaps.html#a2fa35da8776bb053ebdb6f9da7ea245e">   55</a></span>&#160;i32 <a class="code" href="namespaceGaps.html#a2fa35da8776bb053ebdb6f9da7ea245e">parse_i32</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;              usize &amp;pos);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="namespaceGaps.html#aa324d073f3fec42714ed7f1dfa9528ce">   59</a></span>&#160;f32 <a class="code" href="namespaceGaps.html#aa324d073f3fec42714ed7f1dfa9528ce">parse_f32</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;              usize &amp;pos);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="namespaceGaps.html#a75bc2048681872469a0e8164a07eb145">   63</a></span>&#160;f64 <a class="code" href="namespaceGaps.html#a75bc2048681872469a0e8164a07eb145">parse_f64</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;              usize &amp;pos);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;[[deprecated(<span class="stringliteral">&quot;Use parse_u32 instead!&quot;</span>)]]</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;u32 u32_from_le_bytes(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;                      usize &amp;pos);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;[[deprecated(<span class="stringliteral">&quot;Use parse_u64 instead!&quot;</span>)]]</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;u64 u64_from_le_bytes(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;                      usize &amp;pos);</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;[[deprecated(<span class="stringliteral">&quot;Use parse_u32 instead!&quot;</span>)]]</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;u32 u32_from_be_bytes(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                      usize &amp;pos);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;[[deprecated(<span class="stringliteral">&quot;The byteorder of this is confusing and it will go away!&quot;</span>)]]</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;u32 parse_u32_for_16bit_words(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;                              usize &amp;pos);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;[[deprecated(<span class="stringliteral">&quot;The byteorder of this is confusing and it will go away!&quot;</span>)]]</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;u64 parse_u48_for_16bit_words(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;                              usize &amp;pos);</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;[[deprecated(<span class="stringliteral">&quot;This wil go away!&quot;</span>)]]</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="keywordtype">void</span> u32_to_le_bytes(<span class="keyword">const</span> u32 value, </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;                     Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;                     usize &amp;pos);</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;}</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="anamespaceGaps_html"><div class="ttname"><a href="namespaceGaps.html">Gaps</a></div><div class="ttdoc">‍**</div><div class="ttdef"><b>Definition:</b> io.hpp:101</div></div>
-<div class="ttc" id="anamespaceGaps_html_a13cb72078c0645adb57076cc5697b9a1"><div class="ttname"><a href="namespaceGaps.html#a13cb72078c0645adb57076cc5697b9a1">Gaps::parse_bool</a></div><div class="ttdeci">bool parse_bool(const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</div></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  Vec&lt;T&gt; slice(<span class="keyword">const</span> Vec&lt;T&gt;&amp; vec, usize start, usize end) {</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    <span class="keywordflow">if</span> (start &gt;= vec.size()) {</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;      <span class="keywordflow">return</span> Vec&lt;T&gt;();  <span class="comment">// Return an empty vector if start is out of range</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    }</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    end = std::min(end, vec.size());  <span class="comment">// Clamp the end index to the vector size</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <span class="keywordflow">return</span> Vec&lt;T&gt;(vec.begin() + start, vec.begin() + end);</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  }</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keywordtype">bool</span> parse_bool(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;                  usize &amp;pos);</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  </div>
+<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="namespaceGaps.html#af02b80458f7649651a342344e3b103ee">   21</a></span>&#160;  u8 <a class="code" href="namespaceGaps.html#af02b80458f7649651a342344e3b103ee">parse_u8</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;              usize &amp;pos);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  </div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="namespaceGaps.html#a8d5ee03930328391169c3f11a9b06e8e">   25</a></span>&#160;  u16 <a class="code" href="namespaceGaps.html#a8d5ee03930328391169c3f11a9b06e8e">parse_u16</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;                usize &amp;pos);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="namespaceGaps.html#adbed3ea3f57b77872fd060984c65e4be">   32</a></span>&#160;  f32 <a class="code" href="namespaceGaps.html#adbed3ea3f57b77872fd060984c65e4be">parse_f16</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;                usize &amp;pos);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="namespaceGaps.html#ac09d7b4a66f0df27a63af339dd6d7ea8">   36</a></span>&#160;  u32 <a class="code" href="namespaceGaps.html#ac09d7b4a66f0df27a63af339dd6d7ea8">parse_u32</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;                usize &amp;pos);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  </div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="namespaceGaps.html#aa913722aa6668823951e07f44b8698d6">   40</a></span>&#160;  u64 <a class="code" href="namespaceGaps.html#aa913722aa6668823951e07f44b8698d6">parse_u64</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;                usize &amp;pos);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  </div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="namespaceGaps.html#a2fa35da8776bb053ebdb6f9da7ea245e">   44</a></span>&#160;  i32 <a class="code" href="namespaceGaps.html#a2fa35da8776bb053ebdb6f9da7ea245e">parse_i32</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;                usize &amp;pos);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  </div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="namespaceGaps.html#aa324d073f3fec42714ed7f1dfa9528ce">   48</a></span>&#160;  f32 <a class="code" href="namespaceGaps.html#aa324d073f3fec42714ed7f1dfa9528ce">parse_f32</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;                usize &amp;pos);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  </div>
+<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="namespaceGaps.html#a75bc2048681872469a0e8164a07eb145">   52</a></span>&#160;  f64 <a class="code" href="namespaceGaps.html#a75bc2048681872469a0e8164a07eb145">parse_f64</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;                usize &amp;pos);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;}</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="anamespaceGaps_html"><div class="ttname"><a href="namespaceGaps.html">Gaps</a></div><div class="ttdoc">‍**</div><div class="ttdef"><b>Definition:</b> database.h:9</div></div>
 <div class="ttc" id="anamespaceGaps_html_a2fa35da8776bb053ebdb6f9da7ea245e"><div class="ttname"><a href="namespaceGaps.html#a2fa35da8776bb053ebdb6f9da7ea245e">Gaps::parse_i32</a></div><div class="ttdeci">i32 parse_i32(const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</div><div class="ttdoc">get a signed 32bit int from a vector of bytes, advancing pos by 4</div></div>
 <div class="ttc" id="anamespaceGaps_html_a75bc2048681872469a0e8164a07eb145"><div class="ttname"><a href="namespaceGaps.html#a75bc2048681872469a0e8164a07eb145">Gaps::parse_f64</a></div><div class="ttdeci">f64 parse_f64(const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</div><div class="ttdoc">get a signed long float (64) from a vector of bytes, advancing pos by 8</div></div>
 <div class="ttc" id="anamespaceGaps_html_a8d5ee03930328391169c3f11a9b06e8e"><div class="ttname"><a href="namespaceGaps.html#a8d5ee03930328391169c3f11a9b06e8e">Gaps::parse_u16</a></div><div class="ttdeci">u16 parse_u16(const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</div><div class="ttdoc">get an unsigned short from a vector of bytes, advancing pos by 2</div></div>
 <div class="ttc" id="anamespaceGaps_html_aa324d073f3fec42714ed7f1dfa9528ce"><div class="ttname"><a href="namespaceGaps.html#aa324d073f3fec42714ed7f1dfa9528ce">Gaps::parse_f32</a></div><div class="ttdeci">f32 parse_f32(const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</div><div class="ttdoc">get a signed float32 from a vector of bytes, advancning pos by 4</div></div>
 <div class="ttc" id="anamespaceGaps_html_aa913722aa6668823951e07f44b8698d6"><div class="ttname"><a href="namespaceGaps.html#aa913722aa6668823951e07f44b8698d6">Gaps::parse_u64</a></div><div class="ttdeci">u64 parse_u64(const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</div><div class="ttdoc">get an unsigned long64 from a vector of bytes, advancing pos by 8</div></div>
 <div class="ttc" id="anamespaceGaps_html_ac09d7b4a66f0df27a63af339dd6d7ea8"><div class="ttname"><a href="namespaceGaps.html#ac09d7b4a66f0df27a63af339dd6d7ea8">Gaps::parse_u32</a></div><div class="ttdeci">u32 parse_u32(const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</div><div class="ttdoc">get an unsigned 32bit int from a vector of bytes, advancing pos by 4</div></div>
+<div class="ttc" id="anamespaceGaps_html_adbed3ea3f57b77872fd060984c65e4be"><div class="ttname"><a href="namespaceGaps.html#adbed3ea3f57b77872fd060984c65e4be">Gaps::parse_f16</a></div><div class="ttdeci">f32 parse_f16(const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</div></div>
 <div class="ttc" id="anamespaceGaps_html_af02b80458f7649651a342344e3b103ee"><div class="ttname"><a href="namespaceGaps.html#af02b80458f7649651a342344e3b103ee">Gaps::parse_u8</a></div><div class="ttdeci">u8 parse_u8(const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</div><div class="ttdoc">get an unsigned char from a vector of bytes, advancing pos by 1</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

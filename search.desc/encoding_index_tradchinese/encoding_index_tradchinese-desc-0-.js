@@ -1,0 +1,1 @@
+searchState.loadedDescShard("encoding_index_tradchinese", 0, "Traditional Chinese index tables for rust-encoding.\nBig5 and HKSCS.\nReturns the index pointer for code point <code>code</code> in this …\nReturns the index code point for pointer <code>code</code> in this …")

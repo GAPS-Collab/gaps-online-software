@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"trait":["BoolExpressionMethods","EscapeExpressionMethods","ExpressionMethods","NullableExpressionMethods","PreferredBoolSqlType","SqliteExpressionMethods","TextExpressionMethods"]};

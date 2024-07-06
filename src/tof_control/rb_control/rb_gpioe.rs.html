@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/extern/tof-control/src/rb_control/rb_gpioe.rs`."><title>rb_gpioe.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_control" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
-            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../tof_control/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/extern/tof-control/src/rb_control/rb_gpioe.rs`."><title>rb_gpioe.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_control" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../tof_control/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -677,13 +675,11 @@
 <a href="#675" id="675">675</a>
 <a href="#676" id="676">676</a>
 <a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-</pre></div><pre class="rust"><code><span class="attr">#![allow(unused)]
-</span><span class="kw">use </span>std::thread;
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::thread;
 <span class="kw">use </span>std::time::Duration;
 
 <span class="kw">use </span><span class="kw">crate</span>::constant::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::helper::rb_type::RBGPIOeError;
+<span class="kw">use </span><span class="kw">crate</span>::helper::rb_type::RBError;
 <span class="kw">use </span><span class="kw">crate</span>::device::cy8c9560a::CY8C9560A;
 <span class="kw">use </span><span class="kw">crate</span>::device::{cy8c9560a, pca9548a};
 
@@ -748,7 +744,7 @@ GP7: 0x3F
 
 */
 
-</span><span class="kw">pub fn </span>initialize_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+</span><span class="kw">pub fn </span>initialize_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -817,7 +813,7 @@ GP7: 0x3F
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub fn </span>reset_si5345b_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+<span class="kw">pub fn </span>reset_si5345b_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -836,7 +832,7 @@ GP7: 0x3F
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub fn </span>enable_si5345b_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+<span class="kw">pub fn </span>enable_si5345b_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -850,7 +846,7 @@ GP7: 0x3F
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub fn </span>enable_ad5675_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+<span class="kw">pub fn </span>enable_ad5675_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -866,7 +862,7 @@ GP7: 0x3F
 
 <span class="comment">// GP7[7]: TCA_CLK_SC_EN
 // GP7[6]: TCA_CLK_OUT_EN
-</span><span class="kw">pub fn </span>enable_nb3v9312c_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt;  {
+</span><span class="kw">pub fn </span>enable_nb3v9312c_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt;  {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -879,7 +875,7 @@ GP7: 0x3F
 
     <span class="prelude-val">Ok</span>(())
 }
-<span class="kw">pub fn </span>disable_nb3v9312c_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt;  {
+<span class="kw">pub fn </span>disable_nb3v9312c_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt;  {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -907,7 +903,7 @@ GP7: 0x3F
           2: RFC -&gt; RF2 (SMA Input)
 
 */
-</span><span class="kw">pub fn </span>rf_input_select_gpioe(mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+</span><span class="kw">pub fn </span>rf_input_select_gpioe(mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -927,7 +923,7 @@ GP7: 0x3F
 
 <span class="comment">// GP7[5] = EN
 // GP7[4] = VCTL
-</span><span class="kw">fn </span>drs_ch1_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+</span><span class="kw">fn </span>drs_ch1_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>port_status = gpioe.read_port_status(<span class="number">7</span>)<span class="question-mark">?</span>;
 
     <span class="kw">match </span>mode {
@@ -941,7 +937,7 @@ GP7: 0x3F
         }
         <span class="number">2 </span>=&gt; {
             <span class="kw">let </span>value = (port_status &amp; !<span class="number">0x30</span>) | <span class="number">0x00</span>;
-            gpioe.set_output_port(<span class="number">7</span>, value)<span class="question-mark">?</span>;;
+            gpioe.set_output_port(<span class="number">7</span>, value)<span class="question-mark">?</span>;
         }
         <span class="kw">_ </span>=&gt; {
             gpioe.set_output_port(<span class="number">7</span>, port_status)<span class="question-mark">?</span>;
@@ -953,7 +949,7 @@ GP7: 0x3F
 
 <span class="comment">// GP7[3] = EN
 // GP7[2] = VCTL
-</span><span class="kw">fn </span>drs_ch2_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+</span><span class="kw">fn </span>drs_ch2_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>port_status = gpioe.read_port_status(<span class="number">7</span>)<span class="question-mark">?</span>;
 
     <span class="kw">match </span>mode {
@@ -979,7 +975,7 @@ GP7: 0x3F
 
 <span class="comment">// GP7[1] = EN
 // GP7[0] = VCTL
-</span><span class="kw">fn </span>drs_ch3_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+</span><span class="kw">fn </span>drs_ch3_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>port_status = gpioe.read_port_status(<span class="number">7</span>)<span class="question-mark">?</span>;
 
     <span class="kw">match </span>mode {
@@ -1005,7 +1001,7 @@ GP7: 0x3F
 
 <span class="comment">// GP2[1] = EN
 // GP2[0] = VCTL
-</span><span class="kw">fn </span>drs_ch4_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+</span><span class="kw">fn </span>drs_ch4_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>port_status = gpioe.read_port_status(<span class="number">2</span>)<span class="question-mark">?</span>;
 
     <span class="kw">match </span>mode {
@@ -1031,7 +1027,7 @@ GP7: 0x3F
 
 <span class="comment">// GP5[1] = VCTL
 // GP5[0] = EN
-</span><span class="kw">fn </span>drs_ch5_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+</span><span class="kw">fn </span>drs_ch5_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>port_status = gpioe.read_port_status(<span class="number">5</span>)<span class="question-mark">?</span>;
 
     <span class="kw">match </span>mode {
@@ -1057,7 +1053,7 @@ GP7: 0x3F
 
 <span class="comment">// GP5[5] = EN
 // GP5[4] = VCTL
-</span><span class="kw">fn </span>drs_ch6_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+</span><span class="kw">fn </span>drs_ch6_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>port_status = gpioe.read_port_status(<span class="number">5</span>)<span class="question-mark">?</span>;
 
     <span class="kw">match </span>mode {
@@ -1083,7 +1079,7 @@ GP7: 0x3F
 
 <span class="comment">// GP4[7] = VCTL
 // GP4[6] = EN
-</span><span class="kw">fn </span>drs_ch7_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+</span><span class="kw">fn </span>drs_ch7_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>port_status = gpioe.read_port_status(<span class="number">4</span>)<span class="question-mark">?</span>;
 
     <span class="kw">match </span>mode {
@@ -1109,7 +1105,7 @@ GP7: 0x3F
 
 <span class="comment">// GP4[5] = VCTL
 // GP4[4] = EN
-</span><span class="kw">fn </span>drs_ch8_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+</span><span class="kw">fn </span>drs_ch8_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>port_status = gpioe.read_port_status(<span class="number">4</span>)<span class="question-mark">?</span>;
 
     <span class="kw">match </span>mode {
@@ -1135,7 +1131,7 @@ GP7: 0x3F
 
 <span class="comment">// GP4[3] = VCTL
 // GP4[2] = EN
-</span><span class="kw">fn </span>drs_ch9_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+</span><span class="kw">fn </span>drs_ch9_input_select(gpioe: CY8C9560A, mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>port_status = gpioe.read_port_status(<span class="number">4</span>)<span class="question-mark">?</span>;
 
     <span class="kw">match </span>mode {
@@ -1160,7 +1156,7 @@ GP7: 0x3F
 }
 
 
-<span class="kw">pub fn </span>device_info_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(u8, u8, Vec&lt;u8&gt;), RBGPIOeError&gt; {
+<span class="kw">pub fn </span>device_info_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(u8, u8, Vec&lt;u8&gt;), RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -1178,7 +1174,7 @@ GP7: 0x3F
     ))
 }
 
-<span class="kw">pub fn </span>read_port_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, RBGPIOeError&gt; {
+<span class="kw">pub fn </span>read_port_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -1190,10 +1186,10 @@ GP7: 0x3F
 
     i2c_mux.reset()<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>((gp))
+    <span class="prelude-val">Ok</span>(gp)
 }
 
-<span class="kw">pub fn </span>set_rf_switch_gpioe(mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+<span class="kw">pub fn </span>set_rf_switch_gpioe(mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -1215,7 +1211,7 @@ GP7: 0x3F
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub fn </span>enable_tcal_clock_gpioe(mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+<span class="kw">pub fn </span>enable_tcal_clock_gpioe(mode: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -1229,7 +1225,7 @@ GP7: 0x3F
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub fn </span>disable_tcal_clock_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+<span class="kw">pub fn </span>disable_tcal_clock_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -1241,7 +1237,7 @@ GP7: 0x3F
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub fn </span>dac_reset_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+<span class="kw">pub fn </span>dac_reset_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -1255,12 +1251,12 @@ GP7: 0x3F
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub fn </span>program_eeprom_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+<span class="kw">pub fn </span>program_eeprom_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
-    <span class="kw">let </span><span class="kw-2">mut </span>enable_register = cy8c9560a.read_enable_register()<span class="question-mark">?</span>;
+    <span class="kw">let </span>enable_register = cy8c9560a.read_enable_register()<span class="question-mark">?</span>;
     <span class="kw">if </span>(enable_register &amp; <span class="number">0x02</span>) != <span class="number">0x02 </span>{
         cy8c9560a.enable_eeprom()<span class="question-mark">?</span>;
     }
@@ -1272,12 +1268,12 @@ GP7: 0x3F
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub fn </span>reset_eeprom_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+<span class="kw">pub fn </span>reset_eeprom_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>cy8c9560a = cy8c9560a::CY8C9560A::new(I2C_BUS, RB_CY8C9560A_ADDRESS);
-    <span class="kw">let </span><span class="kw-2">mut </span>enable_register = cy8c9560a.read_enable_register()<span class="question-mark">?</span>;
+    <span class="kw">let </span>enable_register = cy8c9560a.read_enable_register()<span class="question-mark">?</span>;
     <span class="kw">if </span>(enable_register &amp; <span class="number">0x02</span>) != <span class="number">0x02 </span>{
         cy8c9560a.enable_eeprom()<span class="question-mark">?</span>;
     }
@@ -1289,7 +1285,7 @@ GP7: 0x3F
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub fn </span>reset_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBGPIOeError&gt; {
+<span class="kw">pub fn </span>reset_gpioe() -&gt; <span class="prelude-ty">Result</span>&lt;(), RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 
@@ -1301,7 +1297,7 @@ GP7: 0x3F
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub fn </span>read_rf_input_port(ch: u8) -&gt; <span class="prelude-ty">Result</span>&lt;u8, RBGPIOeError&gt; {
+<span class="kw">pub fn </span>read_rf_input_port(ch: u8) -&gt; <span class="prelude-ty">Result</span>&lt;u8, RBError&gt; {
     <span class="kw">let </span>i2c_mux = pca9548a::PCA9548A::new(I2C_BUS, RB_PCA9548A_ADDRESS_2);
     i2c_mux.select(RB_CY8C9560A_CHANNEL)<span class="question-mark">?</span>;
 

@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['n_5fpaddles_137',['n_paddles',['../structMasterTriggerEvent.html#a3584e8178fab07839e43d3eec831d0bc',1,'MasterTriggerEvent']]],
-  ['n_5ftrigger_5fpaddles_138',['n_trigger_paddles',['../structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e',1,'TofEventSummary']]],
-  ['noi_5fdata_139',['noi_data',['../structRBCalibration.html#a71265fb6bc6cd97c69bc54923cc06f0e',1,'RBCalibration']]]
+  ['ltb_5fid_147',['ltb_id',['../structGaps_1_1TofPaddle.html#ab59fbe63cc69a3113cb5488c0b6d84d7',1,'Gaps::TofPaddle']]]
 ];

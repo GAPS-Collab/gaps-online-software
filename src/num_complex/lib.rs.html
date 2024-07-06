@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/num-complex-0.2.4/src/lib.rs`."><title>lib.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="num_complex" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0 (9b00956e5 2024-04-29)" data-channel="1.78.0" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
-            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../num_complex/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/num-complex-0.4.6/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="num_complex" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../num_complex/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2663,6 +2661,294 @@
 <a href="#2661" id="2661">2661</a>
 <a href="#2662" id="2662">2662</a>
 <a href="#2663" id="2663">2663</a>
+<a href="#2664" id="2664">2664</a>
+<a href="#2665" id="2665">2665</a>
+<a href="#2666" id="2666">2666</a>
+<a href="#2667" id="2667">2667</a>
+<a href="#2668" id="2668">2668</a>
+<a href="#2669" id="2669">2669</a>
+<a href="#2670" id="2670">2670</a>
+<a href="#2671" id="2671">2671</a>
+<a href="#2672" id="2672">2672</a>
+<a href="#2673" id="2673">2673</a>
+<a href="#2674" id="2674">2674</a>
+<a href="#2675" id="2675">2675</a>
+<a href="#2676" id="2676">2676</a>
+<a href="#2677" id="2677">2677</a>
+<a href="#2678" id="2678">2678</a>
+<a href="#2679" id="2679">2679</a>
+<a href="#2680" id="2680">2680</a>
+<a href="#2681" id="2681">2681</a>
+<a href="#2682" id="2682">2682</a>
+<a href="#2683" id="2683">2683</a>
+<a href="#2684" id="2684">2684</a>
+<a href="#2685" id="2685">2685</a>
+<a href="#2686" id="2686">2686</a>
+<a href="#2687" id="2687">2687</a>
+<a href="#2688" id="2688">2688</a>
+<a href="#2689" id="2689">2689</a>
+<a href="#2690" id="2690">2690</a>
+<a href="#2691" id="2691">2691</a>
+<a href="#2692" id="2692">2692</a>
+<a href="#2693" id="2693">2693</a>
+<a href="#2694" id="2694">2694</a>
+<a href="#2695" id="2695">2695</a>
+<a href="#2696" id="2696">2696</a>
+<a href="#2697" id="2697">2697</a>
+<a href="#2698" id="2698">2698</a>
+<a href="#2699" id="2699">2699</a>
+<a href="#2700" id="2700">2700</a>
+<a href="#2701" id="2701">2701</a>
+<a href="#2702" id="2702">2702</a>
+<a href="#2703" id="2703">2703</a>
+<a href="#2704" id="2704">2704</a>
+<a href="#2705" id="2705">2705</a>
+<a href="#2706" id="2706">2706</a>
+<a href="#2707" id="2707">2707</a>
+<a href="#2708" id="2708">2708</a>
+<a href="#2709" id="2709">2709</a>
+<a href="#2710" id="2710">2710</a>
+<a href="#2711" id="2711">2711</a>
+<a href="#2712" id="2712">2712</a>
+<a href="#2713" id="2713">2713</a>
+<a href="#2714" id="2714">2714</a>
+<a href="#2715" id="2715">2715</a>
+<a href="#2716" id="2716">2716</a>
+<a href="#2717" id="2717">2717</a>
+<a href="#2718" id="2718">2718</a>
+<a href="#2719" id="2719">2719</a>
+<a href="#2720" id="2720">2720</a>
+<a href="#2721" id="2721">2721</a>
+<a href="#2722" id="2722">2722</a>
+<a href="#2723" id="2723">2723</a>
+<a href="#2724" id="2724">2724</a>
+<a href="#2725" id="2725">2725</a>
+<a href="#2726" id="2726">2726</a>
+<a href="#2727" id="2727">2727</a>
+<a href="#2728" id="2728">2728</a>
+<a href="#2729" id="2729">2729</a>
+<a href="#2730" id="2730">2730</a>
+<a href="#2731" id="2731">2731</a>
+<a href="#2732" id="2732">2732</a>
+<a href="#2733" id="2733">2733</a>
+<a href="#2734" id="2734">2734</a>
+<a href="#2735" id="2735">2735</a>
+<a href="#2736" id="2736">2736</a>
+<a href="#2737" id="2737">2737</a>
+<a href="#2738" id="2738">2738</a>
+<a href="#2739" id="2739">2739</a>
+<a href="#2740" id="2740">2740</a>
+<a href="#2741" id="2741">2741</a>
+<a href="#2742" id="2742">2742</a>
+<a href="#2743" id="2743">2743</a>
+<a href="#2744" id="2744">2744</a>
+<a href="#2745" id="2745">2745</a>
+<a href="#2746" id="2746">2746</a>
+<a href="#2747" id="2747">2747</a>
+<a href="#2748" id="2748">2748</a>
+<a href="#2749" id="2749">2749</a>
+<a href="#2750" id="2750">2750</a>
+<a href="#2751" id="2751">2751</a>
+<a href="#2752" id="2752">2752</a>
+<a href="#2753" id="2753">2753</a>
+<a href="#2754" id="2754">2754</a>
+<a href="#2755" id="2755">2755</a>
+<a href="#2756" id="2756">2756</a>
+<a href="#2757" id="2757">2757</a>
+<a href="#2758" id="2758">2758</a>
+<a href="#2759" id="2759">2759</a>
+<a href="#2760" id="2760">2760</a>
+<a href="#2761" id="2761">2761</a>
+<a href="#2762" id="2762">2762</a>
+<a href="#2763" id="2763">2763</a>
+<a href="#2764" id="2764">2764</a>
+<a href="#2765" id="2765">2765</a>
+<a href="#2766" id="2766">2766</a>
+<a href="#2767" id="2767">2767</a>
+<a href="#2768" id="2768">2768</a>
+<a href="#2769" id="2769">2769</a>
+<a href="#2770" id="2770">2770</a>
+<a href="#2771" id="2771">2771</a>
+<a href="#2772" id="2772">2772</a>
+<a href="#2773" id="2773">2773</a>
+<a href="#2774" id="2774">2774</a>
+<a href="#2775" id="2775">2775</a>
+<a href="#2776" id="2776">2776</a>
+<a href="#2777" id="2777">2777</a>
+<a href="#2778" id="2778">2778</a>
+<a href="#2779" id="2779">2779</a>
+<a href="#2780" id="2780">2780</a>
+<a href="#2781" id="2781">2781</a>
+<a href="#2782" id="2782">2782</a>
+<a href="#2783" id="2783">2783</a>
+<a href="#2784" id="2784">2784</a>
+<a href="#2785" id="2785">2785</a>
+<a href="#2786" id="2786">2786</a>
+<a href="#2787" id="2787">2787</a>
+<a href="#2788" id="2788">2788</a>
+<a href="#2789" id="2789">2789</a>
+<a href="#2790" id="2790">2790</a>
+<a href="#2791" id="2791">2791</a>
+<a href="#2792" id="2792">2792</a>
+<a href="#2793" id="2793">2793</a>
+<a href="#2794" id="2794">2794</a>
+<a href="#2795" id="2795">2795</a>
+<a href="#2796" id="2796">2796</a>
+<a href="#2797" id="2797">2797</a>
+<a href="#2798" id="2798">2798</a>
+<a href="#2799" id="2799">2799</a>
+<a href="#2800" id="2800">2800</a>
+<a href="#2801" id="2801">2801</a>
+<a href="#2802" id="2802">2802</a>
+<a href="#2803" id="2803">2803</a>
+<a href="#2804" id="2804">2804</a>
+<a href="#2805" id="2805">2805</a>
+<a href="#2806" id="2806">2806</a>
+<a href="#2807" id="2807">2807</a>
+<a href="#2808" id="2808">2808</a>
+<a href="#2809" id="2809">2809</a>
+<a href="#2810" id="2810">2810</a>
+<a href="#2811" id="2811">2811</a>
+<a href="#2812" id="2812">2812</a>
+<a href="#2813" id="2813">2813</a>
+<a href="#2814" id="2814">2814</a>
+<a href="#2815" id="2815">2815</a>
+<a href="#2816" id="2816">2816</a>
+<a href="#2817" id="2817">2817</a>
+<a href="#2818" id="2818">2818</a>
+<a href="#2819" id="2819">2819</a>
+<a href="#2820" id="2820">2820</a>
+<a href="#2821" id="2821">2821</a>
+<a href="#2822" id="2822">2822</a>
+<a href="#2823" id="2823">2823</a>
+<a href="#2824" id="2824">2824</a>
+<a href="#2825" id="2825">2825</a>
+<a href="#2826" id="2826">2826</a>
+<a href="#2827" id="2827">2827</a>
+<a href="#2828" id="2828">2828</a>
+<a href="#2829" id="2829">2829</a>
+<a href="#2830" id="2830">2830</a>
+<a href="#2831" id="2831">2831</a>
+<a href="#2832" id="2832">2832</a>
+<a href="#2833" id="2833">2833</a>
+<a href="#2834" id="2834">2834</a>
+<a href="#2835" id="2835">2835</a>
+<a href="#2836" id="2836">2836</a>
+<a href="#2837" id="2837">2837</a>
+<a href="#2838" id="2838">2838</a>
+<a href="#2839" id="2839">2839</a>
+<a href="#2840" id="2840">2840</a>
+<a href="#2841" id="2841">2841</a>
+<a href="#2842" id="2842">2842</a>
+<a href="#2843" id="2843">2843</a>
+<a href="#2844" id="2844">2844</a>
+<a href="#2845" id="2845">2845</a>
+<a href="#2846" id="2846">2846</a>
+<a href="#2847" id="2847">2847</a>
+<a href="#2848" id="2848">2848</a>
+<a href="#2849" id="2849">2849</a>
+<a href="#2850" id="2850">2850</a>
+<a href="#2851" id="2851">2851</a>
+<a href="#2852" id="2852">2852</a>
+<a href="#2853" id="2853">2853</a>
+<a href="#2854" id="2854">2854</a>
+<a href="#2855" id="2855">2855</a>
+<a href="#2856" id="2856">2856</a>
+<a href="#2857" id="2857">2857</a>
+<a href="#2858" id="2858">2858</a>
+<a href="#2859" id="2859">2859</a>
+<a href="#2860" id="2860">2860</a>
+<a href="#2861" id="2861">2861</a>
+<a href="#2862" id="2862">2862</a>
+<a href="#2863" id="2863">2863</a>
+<a href="#2864" id="2864">2864</a>
+<a href="#2865" id="2865">2865</a>
+<a href="#2866" id="2866">2866</a>
+<a href="#2867" id="2867">2867</a>
+<a href="#2868" id="2868">2868</a>
+<a href="#2869" id="2869">2869</a>
+<a href="#2870" id="2870">2870</a>
+<a href="#2871" id="2871">2871</a>
+<a href="#2872" id="2872">2872</a>
+<a href="#2873" id="2873">2873</a>
+<a href="#2874" id="2874">2874</a>
+<a href="#2875" id="2875">2875</a>
+<a href="#2876" id="2876">2876</a>
+<a href="#2877" id="2877">2877</a>
+<a href="#2878" id="2878">2878</a>
+<a href="#2879" id="2879">2879</a>
+<a href="#2880" id="2880">2880</a>
+<a href="#2881" id="2881">2881</a>
+<a href="#2882" id="2882">2882</a>
+<a href="#2883" id="2883">2883</a>
+<a href="#2884" id="2884">2884</a>
+<a href="#2885" id="2885">2885</a>
+<a href="#2886" id="2886">2886</a>
+<a href="#2887" id="2887">2887</a>
+<a href="#2888" id="2888">2888</a>
+<a href="#2889" id="2889">2889</a>
+<a href="#2890" id="2890">2890</a>
+<a href="#2891" id="2891">2891</a>
+<a href="#2892" id="2892">2892</a>
+<a href="#2893" id="2893">2893</a>
+<a href="#2894" id="2894">2894</a>
+<a href="#2895" id="2895">2895</a>
+<a href="#2896" id="2896">2896</a>
+<a href="#2897" id="2897">2897</a>
+<a href="#2898" id="2898">2898</a>
+<a href="#2899" id="2899">2899</a>
+<a href="#2900" id="2900">2900</a>
+<a href="#2901" id="2901">2901</a>
+<a href="#2902" id="2902">2902</a>
+<a href="#2903" id="2903">2903</a>
+<a href="#2904" id="2904">2904</a>
+<a href="#2905" id="2905">2905</a>
+<a href="#2906" id="2906">2906</a>
+<a href="#2907" id="2907">2907</a>
+<a href="#2908" id="2908">2908</a>
+<a href="#2909" id="2909">2909</a>
+<a href="#2910" id="2910">2910</a>
+<a href="#2911" id="2911">2911</a>
+<a href="#2912" id="2912">2912</a>
+<a href="#2913" id="2913">2913</a>
+<a href="#2914" id="2914">2914</a>
+<a href="#2915" id="2915">2915</a>
+<a href="#2916" id="2916">2916</a>
+<a href="#2917" id="2917">2917</a>
+<a href="#2918" id="2918">2918</a>
+<a href="#2919" id="2919">2919</a>
+<a href="#2920" id="2920">2920</a>
+<a href="#2921" id="2921">2921</a>
+<a href="#2922" id="2922">2922</a>
+<a href="#2923" id="2923">2923</a>
+<a href="#2924" id="2924">2924</a>
+<a href="#2925" id="2925">2925</a>
+<a href="#2926" id="2926">2926</a>
+<a href="#2927" id="2927">2927</a>
+<a href="#2928" id="2928">2928</a>
+<a href="#2929" id="2929">2929</a>
+<a href="#2930" id="2930">2930</a>
+<a href="#2931" id="2931">2931</a>
+<a href="#2932" id="2932">2932</a>
+<a href="#2933" id="2933">2933</a>
+<a href="#2934" id="2934">2934</a>
+<a href="#2935" id="2935">2935</a>
+<a href="#2936" id="2936">2936</a>
+<a href="#2937" id="2937">2937</a>
+<a href="#2938" id="2938">2938</a>
+<a href="#2939" id="2939">2939</a>
+<a href="#2940" id="2940">2940</a>
+<a href="#2941" id="2941">2941</a>
+<a href="#2942" id="2942">2942</a>
+<a href="#2943" id="2943">2943</a>
+<a href="#2944" id="2944">2944</a>
+<a href="#2945" id="2945">2945</a>
+<a href="#2946" id="2946">2946</a>
+<a href="#2947" id="2947">2947</a>
+<a href="#2948" id="2948">2948</a>
+<a href="#2949" id="2949">2949</a>
+<a href="#2950" id="2950">2950</a>
+<a href="#2951" id="2951">2951</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2013 The Rust Project Developers. See the COPYRIGHT
 // file at the top-level directory of this distribution and at
 // http://rust-lang.org/COPYRIGHT.
@@ -2677,22 +2963,14 @@
 //!
 //! ## Compatibility
 //!
-//! The `num-complex` crate is tested for rustc 1.15 and greater.
+//! The `num-complex` crate is tested for rustc 1.60 and greater.
 
-</span><span class="attr">#![doc(html_root_url = <span class="string">"https://docs.rs/num-complex/0.2"</span>)]
+</span><span class="attr">#![doc(html_root_url = <span class="string">"https://docs.rs/num-complex/0.4"</span>)]
 #![no_std]
 
 #[cfg(any(test, feature = <span class="string">"std"</span>))]
 #[cfg_attr(test, macro_use)]
 </span><span class="kw">extern crate </span>std;
-
-<span class="kw">extern crate </span>num_traits <span class="kw">as </span>traits;
-
-<span class="attr">#[cfg(feature = <span class="string">"serde"</span>)]
-</span><span class="kw">extern crate </span>serde;
-
-<span class="attr">#[cfg(feature = <span class="string">"rand"</span>)]
-</span><span class="kw">extern crate </span>rand;
 
 <span class="kw">use </span>core::fmt;
 <span class="attr">#[cfg(test)]
@@ -2703,19 +2981,24 @@
 <span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
 </span><span class="kw">use </span>std::error::Error;
 
-<span class="kw">use </span>traits::{Inv, MulAdd, Num, One, Pow, Signed, Zero};
+<span class="kw">use </span>num_traits::{ConstOne, ConstZero, Inv, MulAdd, Num, One, Pow, Signed, Zero};
 
-<span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
-</span><span class="kw">use </span>traits::float::Float;
-<span class="kw">use </span>traits::float::FloatCore;
+<span class="kw">use </span>num_traits::float::FloatCore;
+<span class="attr">#[cfg(any(feature = <span class="string">"std"</span>, feature = <span class="string">"libm"</span>))]
+</span><span class="kw">use </span>num_traits::float::{Float, FloatConst};
 
 <span class="kw">mod </span>cast;
 <span class="kw">mod </span>pow;
 
+<span class="attr">#[cfg(any(feature = <span class="string">"std"</span>, feature = <span class="string">"libm"</span>))]
+</span><span class="kw">mod </span>complex_float;
+<span class="attr">#[cfg(any(feature = <span class="string">"std"</span>, feature = <span class="string">"libm"</span>))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::complex_float::ComplexFloat;
+
 <span class="attr">#[cfg(feature = <span class="string">"rand"</span>)]
 </span><span class="kw">mod </span>crand;
 <span class="attr">#[cfg(feature = <span class="string">"rand"</span>)]
-</span><span class="kw">pub use </span>crand::ComplexDistribution;
+</span><span class="kw">pub use </span><span class="kw">crate</span>::crand::ComplexDistribution;
 
 <span class="comment">// FIXME #1284: handle complex NaN &amp; infinity etc. This
 // probably doesn't map to C's _Complex correctly.
@@ -2747,6 +3030,12 @@
 /// ```
 </span><span class="attr">#[derive(PartialEq, Eq, Copy, Clone, Hash, Debug, Default)]
 #[repr(C)]
+#[cfg_attr(
+    feature = <span class="string">"rkyv"</span>,
+    derive(rkyv::Archive, rkyv::Serialize, rkyv::Deserialize)
+)]
+#[cfg_attr(feature = <span class="string">"rkyv"</span>, archive(<span class="kw">as </span>= <span class="string">"Complex&lt;T::Archived&gt;"</span>))]
+#[cfg_attr(feature = <span class="string">"bytecheck"</span>, derive(bytecheck::CheckBytes))]
 </span><span class="kw">pub struct </span>Complex&lt;T&gt; {
     <span class="doccomment">/// Real portion of the complex number
     </span><span class="kw">pub </span>re: T,
@@ -2754,27 +3043,52 @@
     </span><span class="kw">pub </span>im: T,
 }
 
-<span class="kw">pub type </span>Complex32 = Complex&lt;f32&gt;;
-<span class="kw">pub type </span>Complex64 = Complex&lt;f64&gt;;
+<span class="doccomment">/// Alias for a [`Complex&lt;f32&gt;`]
+</span><span class="kw">pub type </span>Complex32 = Complex&lt;f32&gt;;
+
+<span class="doccomment">/// Create a new [`Complex&lt;f32&gt;`] with arguments that can convert [`Into&lt;f32&gt;`].
+///
+/// ```
+/// use num_complex::{c32, Complex32};
+/// assert_eq!(c32(1u8, 2), Complex32::new(1.0, 2.0));
+/// ```
+///
+/// Note: ambiguous integer literals in Rust will [default] to `i32`, which does **not** implement
+/// `Into&lt;f32&gt;`, so a call like `c32(1, 2)` will result in a type error. The example above uses a
+/// suffixed `1u8` to set its type, and then the `2` can be inferred as the same type.
+///
+/// [default]: https://doc.rust-lang.org/reference/expressions/literal-expr.html#integer-literal-expressions
+</span><span class="attr">#[inline]
+</span><span class="kw">pub fn </span>c32&lt;T: Into&lt;f32&gt;&gt;(re: T, im: T) -&gt; Complex32 {
+    Complex::new(re.into(), im.into())
+}
+
+<span class="doccomment">/// Alias for a [`Complex&lt;f64&gt;`]
+</span><span class="kw">pub type </span>Complex64 = Complex&lt;f64&gt;;
+
+<span class="doccomment">/// Create a new [`Complex&lt;f64&gt;`] with arguments that can convert [`Into&lt;f64&gt;`].
+///
+/// ```
+/// use num_complex::{c64, Complex64};
+/// assert_eq!(c64(1, 2), Complex64::new(1.0, 2.0));
+/// ```
+</span><span class="attr">#[inline]
+</span><span class="kw">pub fn </span>c64&lt;T: Into&lt;f64&gt;&gt;(re: T, im: T) -&gt; Complex64 {
+    Complex::new(re.into(), im.into())
+}
 
 <span class="kw">impl</span>&lt;T&gt; Complex&lt;T&gt; {
-    <span class="attr">#[cfg(has_const_fn)]
-    </span><span class="doccomment">/// Create a new Complex
+    <span class="doccomment">/// Create a new `Complex`
     </span><span class="attr">#[inline]
     </span><span class="kw">pub const fn </span>new(re: T, im: T) -&gt; <span class="self">Self </span>{
-        Complex { re: re, im: im }
-    }
-
-    <span class="attr">#[cfg(not(has_const_fn))]
-    </span><span class="doccomment">/// Create a new Complex
-    </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>new(re: T, im: T) -&gt; <span class="self">Self </span>{
-        Complex { re: re, im: im }
+        Complex { re, im }
     }
 }
 
 <span class="kw">impl</span>&lt;T: Clone + Num&gt; Complex&lt;T&gt; {
-    <span class="doccomment">/// Returns imaginary unit
+    <span class="doccomment">/// Returns the imaginary unit.
+    ///
+    /// See also [`Complex::I`].
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>i() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::new(T::zero(), T::one())
@@ -2840,36 +3154,60 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
-</span><span class="kw">impl</span>&lt;T: Clone + Float&gt; Complex&lt;T&gt; {
+<span class="attr">#[cfg(any(feature = <span class="string">"std"</span>, feature = <span class="string">"libm"</span>))]
+</span><span class="kw">impl</span>&lt;T: Float&gt; Complex&lt;T&gt; {
+    <span class="doccomment">/// Create a new Complex with a given phase: `exp(i * phase)`.
+    /// See [cis (mathematics)](https://en.wikipedia.org/wiki/Cis_(mathematics)).
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>cis(phase: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(phase.cos(), phase.sin())
+    }
+
     <span class="doccomment">/// Calculate |self|
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>norm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; T {
+    </span><span class="kw">pub fn </span>norm(<span class="self">self</span>) -&gt; T {
         <span class="self">self</span>.re.hypot(<span class="self">self</span>.im)
     }
     <span class="doccomment">/// Calculate the principal Arg of self.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>arg(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; T {
+    </span><span class="kw">pub fn </span>arg(<span class="self">self</span>) -&gt; T {
         <span class="self">self</span>.im.atan2(<span class="self">self</span>.re)
     }
     <span class="doccomment">/// Convert to polar form (r, theta), such that
     /// `self = r * exp(i * theta)`
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>to_polar(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (T, T) {
+    </span><span class="kw">pub fn </span>to_polar(<span class="self">self</span>) -&gt; (T, T) {
         (<span class="self">self</span>.norm(), <span class="self">self</span>.arg())
     }
     <span class="doccomment">/// Convert a polar representation into a complex number.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>from_polar(r: <span class="kw-2">&amp;</span>T, theta: <span class="kw-2">&amp;</span>T) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(<span class="kw-2">*</span>r * theta.cos(), <span class="kw-2">*</span>r * theta.sin())
+    </span><span class="kw">pub fn </span>from_polar(r: T, theta: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(r * theta.cos(), r * theta.sin())
     }
 
     <span class="doccomment">/// Computes `e^(self)`, where `e` is the base of the natural logarithm.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>exp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        <span class="comment">// formula: e^(a + bi) = e^a (cos(b) + i*sin(b))
-        // = from_polar(e^a, b)
-        </span><span class="self">Self</span>::from_polar(<span class="kw-2">&amp;</span><span class="self">self</span>.re.exp(), <span class="kw-2">&amp;</span><span class="self">self</span>.im)
+    </span><span class="kw">pub fn </span>exp(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="comment">// formula: e^(a + bi) = e^a (cos(b) + i*sin(b)) = from_polar(e^a, b)
+
+        </span><span class="kw">let </span>Complex { re, <span class="kw-2">mut </span>im } = <span class="self">self</span>;
+        <span class="comment">// Treat the corner cases +∞, -∞, and NaN
+        </span><span class="kw">if </span>re.is_infinite() {
+            <span class="kw">if </span>re &lt; T::zero() {
+                <span class="kw">if </span>!im.is_finite() {
+                    <span class="kw">return </span><span class="self">Self</span>::new(T::zero(), T::zero());
+                }
+            } <span class="kw">else if </span>im == T::zero() || !im.is_finite() {
+                <span class="kw">if </span>im.is_infinite() {
+                    im = T::nan();
+                }
+                <span class="kw">return </span><span class="self">Self</span>::new(re, im);
+            }
+        } <span class="kw">else if </span>re.is_nan() &amp;&amp; im == T::zero() {
+            <span class="kw">return </span><span class="self">self</span>;
+        }
+
+        <span class="self">Self</span>::from_polar(re.exp(), im)
     }
 
     <span class="doccomment">/// Computes the principal value of natural logarithm of `self`.
@@ -2880,7 +3218,7 @@
     ///
     /// The branch satisfies `-π ≤ arg(ln(z)) ≤ π`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>ln(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>ln(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: ln(z) = ln|z| + i*arg(z)
         </span><span class="kw">let </span>(r, theta) = <span class="self">self</span>.to_polar();
         <span class="self">Self</span>::new(r.ln(), theta)
@@ -2894,7 +3232,7 @@
     ///
     /// The branch satisfies `-π/2 ≤ arg(sqrt(z)) ≤ π/2`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>sqrt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>sqrt(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="kw">if </span><span class="self">self</span>.im.is_zero() {
             <span class="kw">if </span><span class="self">self</span>.re.is_sign_positive() {
                 <span class="comment">// simple positive real √r, and copy `im` for its sign
@@ -2926,7 +3264,7 @@
             </span><span class="kw">let </span>one = T::one();
             <span class="kw">let </span>two = one + one;
             <span class="kw">let </span>(r, theta) = <span class="self">self</span>.to_polar();
-            <span class="self">Self</span>::from_polar(<span class="kw-2">&amp;</span>(r.sqrt()), <span class="kw-2">&amp;</span>(theta / two))
+            <span class="self">Self</span>::from_polar(r.sqrt(), theta / two)
         }
     }
 
@@ -2942,7 +3280,7 @@
     /// negative real numbers. For example, the real cube root of `-8` is `-2`,
     /// but the principal complex cube root of `-8` is `1 + i√3`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>cbrt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>cbrt(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="kw">if </span><span class="self">self</span>.im.is_zero() {
             <span class="kw">if </span><span class="self">self</span>.re.is_sign_positive() {
                 <span class="comment">// simple positive real ∛r, and copy `im` for its sign
@@ -2979,22 +3317,25 @@
             </span><span class="kw">let </span>one = T::one();
             <span class="kw">let </span>three = one + one + one;
             <span class="kw">let </span>(r, theta) = <span class="self">self</span>.to_polar();
-            <span class="self">Self</span>::from_polar(<span class="kw-2">&amp;</span>(r.cbrt()), <span class="kw-2">&amp;</span>(theta / three))
+            <span class="self">Self</span>::from_polar(r.cbrt(), theta / three)
         }
     }
 
     <span class="doccomment">/// Raises `self` to a floating point power.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>powf(<span class="kw-2">&amp;</span><span class="self">self</span>, exp: T) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>powf(<span class="self">self</span>, exp: T) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>exp.is_zero() {
+            <span class="kw">return </span><span class="self">Self</span>::one();
+        }
         <span class="comment">// formula: x^y = (ρ e^(i θ))^y = ρ^y e^(i θ y)
         // = from_polar(ρ^y, θ y)
         </span><span class="kw">let </span>(r, theta) = <span class="self">self</span>.to_polar();
-        <span class="self">Self</span>::from_polar(<span class="kw-2">&amp;</span>r.powf(exp), <span class="kw-2">&amp;</span>(theta * exp))
+        <span class="self">Self</span>::from_polar(r.powf(exp), theta * exp)
     }
 
     <span class="doccomment">/// Returns the logarithm of `self` with respect to an arbitrary base.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>log(<span class="kw-2">&amp;</span><span class="self">self</span>, base: T) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>log(<span class="self">self</span>, base: T) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: log_y(x) = log_y(ρ e^(i θ))
         // = log_y(ρ) + log_y(e^(i θ)) = log_y(ρ) + ln(e^(i θ)) / ln(y)
         // = log_y(ρ) + i θ / ln(y)
@@ -3004,36 +3345,25 @@
 
     <span class="doccomment">/// Raises `self` to a complex power.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>powc(<span class="kw-2">&amp;</span><span class="self">self</span>, exp: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
-        <span class="comment">// formula: x^y = (a + i b)^(c + i d)
-        // = (ρ e^(i θ))^c (ρ e^(i θ))^(i d)
-        //    where ρ=|x| and θ=arg(x)
-        // = ρ^c e^(−d θ) e^(i c θ) ρ^(i d)
-        // = p^c e^(−d θ) (cos(c θ)
-        //   + i sin(c θ)) (cos(d ln(ρ)) + i sin(d ln(ρ)))
-        // = p^c e^(−d θ) (
-        //   cos(c θ) cos(d ln(ρ)) − sin(c θ) sin(d ln(ρ))
-        //   + i(cos(c θ) sin(d ln(ρ)) + sin(c θ) cos(d ln(ρ))))
-        // = p^c e^(−d θ) (cos(c θ + d ln(ρ)) + i sin(c θ + d ln(ρ)))
-        // = from_polar(p^c e^(−d θ), c θ + d ln(ρ))
-        </span><span class="kw">let </span>(r, theta) = <span class="self">self</span>.to_polar();
-        <span class="self">Self</span>::from_polar(
-            <span class="kw-2">&amp;</span>(r.powf(exp.re) * (-exp.im * theta).exp()),
-            <span class="kw-2">&amp;</span>(exp.re * theta + exp.im * r.ln()),
-        )
+    </span><span class="kw">pub fn </span>powc(<span class="self">self</span>, exp: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>exp.is_zero() {
+            <span class="kw">return </span><span class="self">Self</span>::one();
+        }
+        <span class="comment">// formula: x^y = exp(y * ln(x))
+        </span>(exp * <span class="self">self</span>.ln()).exp()
     }
 
     <span class="doccomment">/// Raises a floating point number to the complex power `self`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>expf(<span class="kw-2">&amp;</span><span class="self">self</span>, base: T) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>expf(<span class="self">self</span>, base: T) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: x^(a+bi) = x^a x^bi = x^a e^(b ln(x) i)
         // = from_polar(x^a, b ln(x))
-        </span><span class="self">Self</span>::from_polar(<span class="kw-2">&amp;</span>base.powf(<span class="self">self</span>.re), <span class="kw-2">&amp;</span>(<span class="self">self</span>.im * base.ln()))
+        </span><span class="self">Self</span>::from_polar(base.powf(<span class="self">self</span>.re), <span class="self">self</span>.im * base.ln())
     }
 
     <span class="doccomment">/// Computes the sine of `self`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>sin(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>sin(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: sin(a + bi) = sin(a)cosh(b) + i*cos(a)sinh(b)
         </span><span class="self">Self</span>::new(
             <span class="self">self</span>.re.sin() * <span class="self">self</span>.im.cosh(),
@@ -3043,7 +3373,7 @@
 
     <span class="doccomment">/// Computes the cosine of `self`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>cos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>cos(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: cos(a + bi) = cos(a)cosh(b) - i*sin(a)sinh(b)
         </span><span class="self">Self</span>::new(
             <span class="self">self</span>.re.cos() * <span class="self">self</span>.im.cosh(),
@@ -3053,7 +3383,7 @@
 
     <span class="doccomment">/// Computes the tangent of `self`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>tan(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>tan(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: tan(a + bi) = (sin(2a) + i*sinh(2b))/(cos(2a) + cosh(2b))
         </span><span class="kw">let </span>(two_re, two_im) = (<span class="self">self</span>.re + <span class="self">self</span>.re, <span class="self">self</span>.im + <span class="self">self</span>.im);
         <span class="self">Self</span>::new(two_re.sin(), two_im.sinh()).unscale(two_re.cos() + two_im.cosh())
@@ -3068,7 +3398,7 @@
     ///
     /// The branch satisfies `-π/2 ≤ Re(asin(z)) ≤ π/2`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>asin(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>asin(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: arcsin(z) = -i ln(sqrt(1-z^2) + iz)
         </span><span class="kw">let </span>i = <span class="self">Self</span>::i();
         -i * ((<span class="self">Self</span>::one() - <span class="self">self </span>* <span class="self">self</span>).sqrt() + i * <span class="self">self</span>).ln()
@@ -3083,7 +3413,7 @@
     ///
     /// The branch satisfies `0 ≤ Re(acos(z)) ≤ π`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>acos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>acos(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: arccos(z) = -i ln(i sqrt(1-z^2) + z)
         </span><span class="kw">let </span>i = <span class="self">Self</span>::i();
         -i * (i * (<span class="self">Self</span>::one() - <span class="self">self </span>* <span class="self">self</span>).sqrt() + <span class="self">self</span>).ln()
@@ -3098,14 +3428,14 @@
     ///
     /// The branch satisfies `-π/2 ≤ Re(atan(z)) ≤ π/2`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>atan(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>atan(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: arctan(z) = (ln(1+iz) - ln(1-iz))/(2i)
         </span><span class="kw">let </span>i = <span class="self">Self</span>::i();
         <span class="kw">let </span>one = <span class="self">Self</span>::one();
         <span class="kw">let </span>two = one + one;
-        <span class="kw">if </span><span class="kw-2">*</span><span class="self">self </span>== i {
+        <span class="kw">if </span><span class="self">self </span>== i {
             <span class="kw">return </span><span class="self">Self</span>::new(T::zero(), T::infinity());
-        } <span class="kw">else if </span><span class="kw-2">*</span><span class="self">self </span>== -i {
+        } <span class="kw">else if </span><span class="self">self </span>== -i {
             <span class="kw">return </span><span class="self">Self</span>::new(T::zero(), -T::infinity());
         }
         ((one + i * <span class="self">self</span>).ln() - (one - i * <span class="self">self</span>).ln()) / (two * i)
@@ -3113,7 +3443,7 @@
 
     <span class="doccomment">/// Computes the hyperbolic sine of `self`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>sinh(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>sinh(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: sinh(a + bi) = sinh(a)cos(b) + i*cosh(a)sin(b)
         </span><span class="self">Self</span>::new(
             <span class="self">self</span>.re.sinh() * <span class="self">self</span>.im.cos(),
@@ -3123,7 +3453,7 @@
 
     <span class="doccomment">/// Computes the hyperbolic cosine of `self`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>cosh(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>cosh(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: cosh(a + bi) = cosh(a)cos(b) + i*sinh(a)sin(b)
         </span><span class="self">Self</span>::new(
             <span class="self">self</span>.re.cosh() * <span class="self">self</span>.im.cos(),
@@ -3133,7 +3463,7 @@
 
     <span class="doccomment">/// Computes the hyperbolic tangent of `self`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>tanh(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>tanh(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: tanh(a + bi) = (sinh(2a) + i*sin(2b))/(cosh(2a) + cos(2b))
         </span><span class="kw">let </span>(two_re, two_im) = (<span class="self">self</span>.re + <span class="self">self</span>.re, <span class="self">self</span>.im + <span class="self">self</span>.im);
         <span class="self">Self</span>::new(two_re.sinh(), two_im.sin()).unscale(two_re.cosh() + two_im.cos())
@@ -3148,7 +3478,7 @@
     ///
     /// The branch satisfies `-π/2 ≤ Im(asinh(z)) ≤ π/2`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>asinh(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>asinh(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: arcsinh(z) = ln(z + sqrt(1+z^2))
         </span><span class="kw">let </span>one = <span class="self">Self</span>::one();
         (<span class="self">self </span>+ (one + <span class="self">self </span>* <span class="self">self</span>).sqrt()).ln()
@@ -3162,7 +3492,7 @@
     ///
     /// The branch satisfies `-π ≤ Im(acosh(z)) ≤ π` and `0 ≤ Re(acosh(z)) &lt; ∞`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>acosh(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>acosh(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: arccosh(z) = 2 ln(sqrt((z+1)/2) + sqrt((z-1)/2))
         </span><span class="kw">let </span>one = <span class="self">Self</span>::one();
         <span class="kw">let </span>two = one + one;
@@ -3178,13 +3508,13 @@
     ///
     /// The branch satisfies `-π/2 ≤ Im(atanh(z)) ≤ π/2`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>atanh(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>atanh(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// formula: arctanh(z) = (ln(1+z) - ln(1-z))/2
         </span><span class="kw">let </span>one = <span class="self">Self</span>::one();
         <span class="kw">let </span>two = one + one;
-        <span class="kw">if </span><span class="kw-2">*</span><span class="self">self </span>== one {
+        <span class="kw">if </span><span class="self">self </span>== one {
             <span class="kw">return </span><span class="self">Self</span>::new(T::infinity(), T::zero());
-        } <span class="kw">else if </span><span class="kw-2">*</span><span class="self">self </span>== -one {
+        } <span class="kw">else if </span><span class="self">self </span>== -one {
             <span class="kw">return </span><span class="self">Self</span>::new(-T::infinity(), T::zero());
         }
         ((one + <span class="self">self</span>).ln() - (one - <span class="self">self</span>).ln()) / two
@@ -3213,7 +3543,7 @@
     /// assert!((inv - expected).norm() &lt; 1e-315);
     /// ```
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>finv(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Complex&lt;T&gt; {
+    </span><span class="kw">pub fn </span>finv(<span class="self">self</span>) -&gt; Complex&lt;T&gt; {
         <span class="kw">let </span>norm = <span class="self">self</span>.norm();
         <span class="self">self</span>.conj() / norm / norm
     }
@@ -3242,12 +3572,35 @@
     /// assert!((quotient - expected).norm() &lt; 1e-315);
     /// ```
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>fdiv(<span class="kw-2">&amp;</span><span class="self">self</span>, other: Complex&lt;T&gt;) -&gt; Complex&lt;T&gt; {
+    </span><span class="kw">pub fn </span>fdiv(<span class="self">self</span>, other: Complex&lt;T&gt;) -&gt; Complex&lt;T&gt; {
         <span class="self">self </span>* other.finv()
     }
 }
 
-<span class="kw">impl</span>&lt;T: Clone + FloatCore&gt; Complex&lt;T&gt; {
+<span class="attr">#[cfg(any(feature = <span class="string">"std"</span>, feature = <span class="string">"libm"</span>))]
+</span><span class="kw">impl</span>&lt;T: Float + FloatConst&gt; Complex&lt;T&gt; {
+    <span class="doccomment">/// Computes `2^(self)`.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>exp2(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="comment">// formula: 2^(a + bi) = 2^a (cos(b*log2) + i*sin(b*log2))
+        // = from_polar(2^a, b*log2)
+        </span><span class="self">Self</span>::from_polar(<span class="self">self</span>.re.exp2(), <span class="self">self</span>.im * T::LN_2())
+    }
+
+    <span class="doccomment">/// Computes the principal value of log base 2 of `self`.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>log2(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::ln(<span class="self">self</span>) / T::LN_2()
+    }
+
+    <span class="doccomment">/// Computes the principal value of log base 10 of `self`.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>log10(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::ln(<span class="self">self</span>) / T::LN_10()
+    }
+}
+
+<span class="kw">impl</span>&lt;T: FloatCore&gt; Complex&lt;T&gt; {
     <span class="doccomment">/// Checks if the given complex number is NaN
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>is_nan(<span class="self">self</span>) -&gt; bool {
@@ -3272,6 +3625,18 @@
         <span class="self">self</span>.re.is_normal() &amp;&amp; <span class="self">self</span>.im.is_normal()
     }
 }
+
+<span class="comment">// Safety: `Complex&lt;T&gt;` is `repr(C)` and contains only instances of `T`, so we
+// can guarantee it contains no *added* padding. Thus, if `T: Zeroable`,
+// `Complex&lt;T&gt;` is also `Zeroable`
+</span><span class="attr">#[cfg(feature = <span class="string">"bytemuck"</span>)]
+</span><span class="kw">unsafe impl</span>&lt;T: bytemuck::Zeroable&gt; bytemuck::Zeroable <span class="kw">for </span>Complex&lt;T&gt; {}
+
+<span class="comment">// Safety: `Complex&lt;T&gt;` is `repr(C)` and contains only instances of `T`, so we
+// can guarantee it contains no *added* padding. Thus, if `T: Pod`,
+// `Complex&lt;T&gt;` is also `Pod`
+</span><span class="attr">#[cfg(feature = <span class="string">"bytemuck"</span>)]
+</span><span class="kw">unsafe impl</span>&lt;T: bytemuck::Pod&gt; bytemuck::Pod <span class="kw">for </span>Complex&lt;T&gt; {}
 
 <span class="kw">impl</span>&lt;T: Clone + Num&gt; From&lt;T&gt; <span class="kw">for </span>Complex&lt;T&gt; {
     <span class="attr">#[inline]
@@ -3334,7 +3699,7 @@
     };
 }
 
-<span class="comment">/* arithmetic */
+<span class="comment">// arithmetic
 </span><span class="macro">forward_all_binop!</span>(<span class="kw">impl </span>Add, add);
 
 <span class="comment">// (a + i b) + (c + i d) == (a + c) + i (b + d)
@@ -3412,18 +3777,21 @@
 
 <span class="macro">forward_all_binop!</span>(<span class="kw">impl </span>Rem, rem);
 
-<span class="comment">// Attempts to identify the gaussian integer whose product with `modulus`
-// is closest to `self`.
-</span><span class="kw">impl</span>&lt;T: Clone + Num&gt; Rem&lt;Complex&lt;T&gt;&gt; <span class="kw">for </span>Complex&lt;T&gt; {
+<span class="kw">impl</span>&lt;T: Clone + Num&gt; Complex&lt;T&gt; {
+    <span class="doccomment">/// Find the gaussian integer corresponding to the true ratio rounded towards zero.
+    </span><span class="kw">fn </span>div_trunc(<span class="kw-2">&amp;</span><span class="self">self</span>, divisor: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>Complex { re, im } = <span class="self">self </span>/ divisor;
+        Complex::new(re.clone() - re % T::one(), im.clone() - im % T::one())
+    }
+}
+
+<span class="kw">impl</span>&lt;T: Clone + Num&gt; Rem&lt;Complex&lt;T&gt;&gt; <span class="kw">for </span>Complex&lt;T&gt; {
     <span class="kw">type </span>Output = <span class="self">Self</span>;
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>rem(<span class="self">self</span>, modulus: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
-        <span class="kw">let </span>Complex { re, im } = <span class="self">self</span>.clone() / modulus.clone();
-        <span class="comment">// This is the gaussian integer corresponding to the true ratio
-        // rounded towards zero.
-        </span><span class="kw">let </span>(re0, im0) = (re.clone() - re % T::one(), im.clone() - im % T::one());
-        <span class="self">self </span>- modulus * <span class="self">Self</span>::Output::new(re0, im0)
+        <span class="kw">let </span>gaussian = <span class="self">self</span>.div_trunc(<span class="kw-2">&amp;</span>modulus);
+        <span class="self">self </span>- modulus * gaussian
     }
 }
 
@@ -3432,9 +3800,9 @@
 </span><span class="kw">mod </span>opassign {
     <span class="kw">use </span>core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 
-    <span class="kw">use </span>traits::{MulAddAssign, NumAssign};
+    <span class="kw">use </span>num_traits::{MulAddAssign, NumAssign};
 
-    <span class="kw">use </span>Complex;
+    <span class="kw">use </span><span class="kw">crate</span>::Complex;
 
     <span class="kw">impl</span>&lt;T: Clone + NumAssign&gt; AddAssign <span class="kw">for </span>Complex&lt;T&gt; {
         <span class="kw">fn </span>add_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
@@ -3450,9 +3818,16 @@
         }
     }
 
-    <span class="kw">impl</span>&lt;T: Clone + NumAssign&gt; MulAssign <span class="kw">for </span>Complex&lt;T&gt; {
+    <span class="comment">// (a + i b) * (c + i d) == (a*c - b*d) + i (a*d + b*c)
+    </span><span class="kw">impl</span>&lt;T: Clone + NumAssign&gt; MulAssign <span class="kw">for </span>Complex&lt;T&gt; {
         <span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
-            <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.clone() * other;
+            <span class="kw">let </span>a = <span class="self">self</span>.re.clone();
+
+            <span class="self">self</span>.re <span class="kw-2">*</span>= other.re.clone();
+            <span class="self">self</span>.re -= <span class="self">self</span>.im.clone() * other.im.clone();
+
+            <span class="self">self</span>.im <span class="kw-2">*</span>= other.re;
+            <span class="self">self</span>.im += a * other.im;
         }
     }
 
@@ -3478,15 +3853,27 @@
         }
     }
 
-    <span class="kw">impl</span>&lt;T: Clone + NumAssign&gt; DivAssign <span class="kw">for </span>Complex&lt;T&gt; {
+    <span class="comment">// (a + i b) / (c + i d) == [(a + i b) * (c - i d)] / (c*c + d*d)
+    //   == [(a*c + b*d) / (c*c + d*d)] + i [(b*c - a*d) / (c*c + d*d)]
+    </span><span class="kw">impl</span>&lt;T: Clone + NumAssign&gt; DivAssign <span class="kw">for </span>Complex&lt;T&gt; {
         <span class="kw">fn </span>div_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
-            <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.clone() / other;
+            <span class="kw">let </span>a = <span class="self">self</span>.re.clone();
+            <span class="kw">let </span>norm_sqr = other.norm_sqr();
+
+            <span class="self">self</span>.re <span class="kw-2">*</span>= other.re.clone();
+            <span class="self">self</span>.re += <span class="self">self</span>.im.clone() * other.im.clone();
+            <span class="self">self</span>.re /= norm_sqr.clone();
+
+            <span class="self">self</span>.im <span class="kw-2">*</span>= other.re;
+            <span class="self">self</span>.im -= a * other.im;
+            <span class="self">self</span>.im /= norm_sqr;
         }
     }
 
     <span class="kw">impl</span>&lt;T: Clone + NumAssign&gt; RemAssign <span class="kw">for </span>Complex&lt;T&gt; {
-        <span class="kw">fn </span>rem_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="self">Self</span>) {
-            <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.clone() % other;
+        <span class="kw">fn </span>rem_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, modulus: <span class="self">Self</span>) {
+            <span class="kw">let </span>gaussian = <span class="self">self</span>.div_trunc(<span class="kw-2">&amp;</span>modulus);
+            <span class="kw-2">*</span><span class="self">self </span>-= modulus * gaussian;
         }
     }
 
@@ -3518,7 +3905,8 @@
 
     <span class="kw">impl</span>&lt;T: Clone + NumAssign&gt; RemAssign&lt;T&gt; <span class="kw">for </span>Complex&lt;T&gt; {
         <span class="kw">fn </span>rem_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: T) {
-            <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.clone() % other;
+            <span class="self">self</span>.re %= other.clone();
+            <span class="self">self</span>.im %= other;
         }
     }
 
@@ -3543,19 +3931,7 @@
     <span class="macro">forward_op_assign!</span>(<span class="kw">impl </span>SubAssign, sub_assign);
     <span class="macro">forward_op_assign!</span>(<span class="kw">impl </span>MulAssign, mul_assign);
     <span class="macro">forward_op_assign!</span>(<span class="kw">impl </span>DivAssign, div_assign);
-
-    <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T: Clone + NumAssign&gt; RemAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Complex&lt;T&gt;&gt; <span class="kw">for </span>Complex&lt;T&gt; {
-        <span class="attr">#[inline]
-        </span><span class="kw">fn </span>rem_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) {
-            <span class="self">self</span>.rem_assign(other.clone())
-        }
-    }
-    <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T: Clone + NumAssign&gt; RemAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>T&gt; <span class="kw">for </span>Complex&lt;T&gt; {
-        <span class="attr">#[inline]
-        </span><span class="kw">fn </span>rem_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>T) {
-            <span class="self">self</span>.rem_assign(other.clone())
-        }
-    }
+    <span class="macro">forward_op_assign!</span>(<span class="kw">impl </span>RemAssign, rem_assign);
 }
 
 <span class="kw">impl</span>&lt;T: Clone + Num + Neg&lt;Output = T&gt;&gt; Neg <span class="kw">for </span>Complex&lt;T&gt; {
@@ -3581,7 +3957,7 @@
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>inv(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Output {
-        (<span class="kw-2">&amp;</span><span class="self">self</span>).inv()
+        Complex::inv(<span class="kw-2">&amp;</span><span class="self">self</span>)
     }
 }
 
@@ -3590,7 +3966,7 @@
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>inv(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Output {
-        <span class="self">self</span>.inv()
+        Complex::inv(<span class="self">self</span>)
     }
 }
 
@@ -3751,13 +4127,19 @@
     }
 }
 
-<span class="attr">#[cfg(not(has_i128))]
-</span><span class="macro">real_arithmetic!</span>(usize, u8, u16, u32, u64, isize, i8, i16, i32, i64, f32, f64);
-<span class="attr">#[cfg(has_i128)]
-</span><span class="macro">real_arithmetic!</span>(usize, u8, u16, u32, u64, u128, isize, i8, i16, i32, i64, i128, f32, f64);
+<span class="macro">real_arithmetic!</span>(usize, u8, u16, u32, u64, u128, isize, i8, i16, i32, i64, i128, f32, f64);
 
-<span class="comment">/* constants */
-</span><span class="kw">impl</span>&lt;T: Clone + Num&gt; Zero <span class="kw">for </span>Complex&lt;T&gt; {
+<span class="comment">// constants
+</span><span class="kw">impl</span>&lt;T: ConstZero&gt; Complex&lt;T&gt; {
+    <span class="doccomment">/// A constant `Complex` 0.
+    </span><span class="kw">pub const </span>ZERO: <span class="self">Self </span>= <span class="self">Self</span>::new(T::ZERO, T::ZERO);
+}
+
+<span class="kw">impl</span>&lt;T: Clone + Num + ConstZero&gt; ConstZero <span class="kw">for </span>Complex&lt;T&gt; {
+    <span class="kw">const </span>ZERO: <span class="self">Self </span>= <span class="self">Self</span>::ZERO;
+}
+
+<span class="kw">impl</span>&lt;T: Clone + Num&gt; Zero <span class="kw">for </span>Complex&lt;T&gt; {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>zero() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::new(Zero::zero(), Zero::zero())
@@ -3773,6 +4155,18 @@
         <span class="self">self</span>.re.set_zero();
         <span class="self">self</span>.im.set_zero();
     }
+}
+
+<span class="kw">impl</span>&lt;T: ConstOne + ConstZero&gt; Complex&lt;T&gt; {
+    <span class="doccomment">/// A constant `Complex` 1.
+    </span><span class="kw">pub const </span>ONE: <span class="self">Self </span>= <span class="self">Self</span>::new(T::ONE, T::ZERO);
+
+    <span class="doccomment">/// A constant `Complex` _i_, the imaginary unit.
+    </span><span class="kw">pub const </span>I: <span class="self">Self </span>= <span class="self">Self</span>::new(T::ZERO, T::ONE);
+}
+
+<span class="kw">impl</span>&lt;T: Clone + Num + ConstOne + ConstZero&gt; ConstOne <span class="kw">for </span>Complex&lt;T&gt; {
+    <span class="kw">const </span>ONE: <span class="self">Self </span>= <span class="self">Self</span>::ONE;
 }
 
 <span class="kw">impl</span>&lt;T: Clone + Num&gt; One <span class="kw">for </span>Complex&lt;T&gt; {
@@ -3825,11 +4219,11 @@
         };
 
         <span class="kw">fn </span>fmt_re_im(
-            f: <span class="kw-2">&amp;mut </span>fmt::Formatter,
+            f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;,
             re_neg: bool,
             im_neg: bool,
-            real: fmt::Arguments,
-            imag: fmt::Arguments,
+            real: fmt::Arguments&lt;<span class="lifetime">'_</span>&gt;,
+            imag: fmt::Arguments&lt;<span class="lifetime">'_</span>&gt;,
         ) -&gt; fmt::Result {
             <span class="kw">let </span>prefix = <span class="kw">if </span>f.alternate() { <span class="macro-nonterminal">$prefix </span>} <span class="kw">else </span>{ <span class="string">"" </span>};
             <span class="kw">let </span>sign = <span class="kw">if </span>re_neg {
@@ -3867,7 +4261,7 @@
 
         <span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
         </span><span class="comment">// Currently, we can only apply width using an intermediate `String` (and thus `std`)
-        </span><span class="kw">fn </span>fmt_complex(f: <span class="kw-2">&amp;mut </span>fmt::Formatter, complex: fmt::Arguments) -&gt; fmt::Result {
+        </span><span class="kw">fn </span>fmt_complex(f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;, complex: fmt::Arguments&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
             <span class="kw">use </span>std::string::ToString;
             <span class="kw">if let </span><span class="prelude-val">Some</span>(width) = f.width() {
                 <span class="macro">write!</span>(f, <span class="string">"{0: &gt;1$}"</span>, complex.to_string(), width)
@@ -3877,18 +4271,18 @@
         }
 
         <span class="attr">#[cfg(not(feature = <span class="string">"std"</span>))]
-        </span><span class="kw">fn </span>fmt_complex(f: <span class="kw-2">&amp;mut </span>fmt::Formatter, complex: fmt::Arguments) -&gt; fmt::Result {
+        </span><span class="kw">fn </span>fmt_complex(f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;, complex: fmt::Arguments&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
             <span class="macro">write!</span>(f, <span class="string">"{}"</span>, complex)
         }
     }};
 }
 
-<span class="comment">/* string conversions */
+<span class="comment">// string conversions
 </span><span class="kw">impl</span>&lt;T&gt; fmt::Display <span class="kw">for </span>Complex&lt;T&gt;
 <span class="kw">where
     </span>T: fmt::Display + Num + PartialOrd + Clone,
 {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write_complex!</span>(f, <span class="string">""</span>, <span class="string">""</span>, <span class="self">self</span>.re, <span class="self">self</span>.im, T)
     }
 }
@@ -3897,7 +4291,7 @@
 <span class="kw">where
     </span>T: fmt::LowerExp + Num + PartialOrd + Clone,
 {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write_complex!</span>(f, <span class="string">"e"</span>, <span class="string">""</span>, <span class="self">self</span>.re, <span class="self">self</span>.im, T)
     }
 }
@@ -3906,7 +4300,7 @@
 <span class="kw">where
     </span>T: fmt::UpperExp + Num + PartialOrd + Clone,
 {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write_complex!</span>(f, <span class="string">"E"</span>, <span class="string">""</span>, <span class="self">self</span>.re, <span class="self">self</span>.im, T)
     }
 }
@@ -3915,7 +4309,7 @@
 <span class="kw">where
     </span>T: fmt::LowerHex + Num + PartialOrd + Clone,
 {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write_complex!</span>(f, <span class="string">"x"</span>, <span class="string">"0x"</span>, <span class="self">self</span>.re, <span class="self">self</span>.im, T)
     }
 }
@@ -3924,7 +4318,7 @@
 <span class="kw">where
     </span>T: fmt::UpperHex + Num + PartialOrd + Clone,
 {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write_complex!</span>(f, <span class="string">"X"</span>, <span class="string">"0x"</span>, <span class="self">self</span>.re, <span class="self">self</span>.im, T)
     }
 }
@@ -3933,7 +4327,7 @@
 <span class="kw">where
     </span>T: fmt::Octal + Num + PartialOrd + Clone,
 {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write_complex!</span>(f, <span class="string">"o"</span>, <span class="string">"0o"</span>, <span class="self">self</span>.re, <span class="self">self</span>.im, T)
     }
 }
@@ -3942,36 +4336,16 @@
 <span class="kw">where
     </span>T: fmt::Binary + Num + PartialOrd + Clone,
 {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write_complex!</span>(f, <span class="string">"b"</span>, <span class="string">"0b"</span>, <span class="self">self</span>.re, <span class="self">self</span>.im, T)
     }
 }
 
-<span class="attr">#[allow(deprecated)] </span><span class="comment">// `trim_left_matches` and `trim_right_matches` since 1.33
-</span><span class="kw">fn </span>from_str_generic&lt;T, E, F&gt;(s: <span class="kw-2">&amp;</span>str, from: F) -&gt; <span class="prelude-ty">Result</span>&lt;Complex&lt;T&gt;, ParseComplexError&lt;E&gt;&gt;
+<span class="kw">fn </span>from_str_generic&lt;T, E, F&gt;(s: <span class="kw-2">&amp;</span>str, from: F) -&gt; <span class="prelude-ty">Result</span>&lt;Complex&lt;T&gt;, ParseComplexError&lt;E&gt;&gt;
 <span class="kw">where
     </span>F: Fn(<span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;T, E&gt;,
     T: Clone + Num,
 {
-    <span class="attr">#[cfg(not(feature = <span class="string">"std"</span>))]
-    #[inline]
-    </span><span class="kw">fn </span>is_whitespace(c: char) -&gt; bool {
-        <span class="kw">match </span>c {
-            <span class="string">' ' </span>| <span class="string">'\x09'</span>...<span class="string">'\x0d' </span>=&gt; <span class="bool-val">true</span>,
-            <span class="kw">_ if </span>c &gt; <span class="string">'\x7f' </span>=&gt; <span class="kw">match </span>c {
-                <span class="string">'\u{0085}' </span>| <span class="string">'\u{00a0}' </span>| <span class="string">'\u{1680}' </span>=&gt; <span class="bool-val">true</span>,
-                <span class="string">'\u{2000}'</span>...<span class="string">'\u{200a}' </span>=&gt; <span class="bool-val">true</span>,
-                <span class="string">'\u{2028}' </span>| <span class="string">'\u{2029}' </span>| <span class="string">'\u{202f}' </span>| <span class="string">'\u{205f}' </span>=&gt; <span class="bool-val">true</span>,
-                <span class="string">'\u{3000}' </span>=&gt; <span class="bool-val">true</span>,
-                <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
-            },
-            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
-        }
-    }
-
-    <span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
-    </span><span class="kw">let </span>is_whitespace = char::is_whitespace;
-
     <span class="kw">let </span>imag = <span class="kw">match </span>s.rfind(<span class="string">'j'</span>) {
         <span class="prelude-val">None </span>=&gt; <span class="string">'i'</span>,
         <span class="kw">_ </span>=&gt; <span class="string">'j'</span>,
@@ -3988,12 +4362,12 @@
         <span class="comment">// ignore '+'/'-' if part of an exponent
         </span><span class="kw">if </span>(c == <span class="string">b'+' </span>|| c == <span class="string">b'-'</span>) &amp;&amp; !(p == <span class="string">b'e' </span>|| p == <span class="string">b'E'</span>) {
             <span class="comment">// trim whitespace around the separator
-            </span>a = <span class="kw-2">&amp;</span>s[..i + <span class="number">1</span>].trim_right_matches(is_whitespace);
-            b = <span class="kw-2">&amp;</span>s[i + <span class="number">2</span>..].trim_left_matches(is_whitespace);
+            </span>a = s[..=i].trim_end_matches(char::is_whitespace);
+            b = s[i + <span class="number">2</span>..].trim_start_matches(char::is_whitespace);
             neg_b = c == <span class="string">b'-'</span>;
 
             <span class="kw">if </span>b.is_empty() || (neg_b &amp;&amp; b.starts_with(<span class="string">'-'</span>)) {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(ParseComplexError::new());
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ParseComplexError::expr_error());
             }
             <span class="kw">break</span>;
         }
@@ -4002,10 +4376,7 @@
     <span class="comment">// split off real and imaginary parts
     </span><span class="kw">if </span>b.is_empty() {
         <span class="comment">// input was either pure real or pure imaginary
-        </span>b = <span class="kw">match </span>a.ends_with(imag) {
-            <span class="bool-val">false </span>=&gt; <span class="string">"0i"</span>,
-            <span class="bool-val">true </span>=&gt; <span class="string">"0"</span>,
-        };
+        </span>b = <span class="kw">if </span>a.ends_with(imag) { <span class="string">"0" </span>} <span class="kw">else </span>{ <span class="string">"0i" </span>};
     }
 
     <span class="kw">let </span>re;
@@ -4023,11 +4394,11 @@
         im = b;
         neg_im = neg_b;
     } <span class="kw">else </span>{
-        <span class="kw">return </span><span class="prelude-val">Err</span>(ParseComplexError::new());
+        <span class="kw">return </span><span class="prelude-val">Err</span>(ParseComplexError::expr_error());
     }
 
     <span class="comment">// parse re
-    </span><span class="kw">let </span>re = <span class="macro">try!</span>(from(re).map_err(ParseComplexError::from_error));
+    </span><span class="kw">let </span>re = from(re).map_err(ParseComplexError::from_error)<span class="question-mark">?</span>;
     <span class="kw">let </span>re = <span class="kw">if </span>neg_re { T::zero() - re } <span class="kw">else </span>{ re };
 
     <span class="comment">// pop imaginary unit off
@@ -4040,7 +4411,7 @@
     }
 
     <span class="comment">// parse im
-    </span><span class="kw">let </span>im = <span class="macro">try!</span>(from(im).map_err(ParseComplexError::from_error));
+    </span><span class="kw">let </span>im = from(im).map_err(ParseComplexError::from_error)<span class="question-mark">?</span>;
     <span class="kw">let </span>im = <span class="kw">if </span>neg_im { T::zero() - im } <span class="kw">else </span>{ im };
 
     <span class="prelude-val">Ok</span>(Complex::new(re, im))
@@ -4062,7 +4433,25 @@
     <span class="kw">type </span>FromStrRadixErr = ParseComplexError&lt;T::FromStrRadixErr&gt;;
 
     <span class="doccomment">/// Parses `a +/- bi`; `ai +/- b`; `a`; or `bi` where `a` and `b` are of type `T`
+    ///
+    /// `radix` must be &lt;= 18; larger radix would include *i* and *j* as digits,
+    /// which cannot be supported.
+    ///
+    /// The conversion returns an error if 18 &lt;= radix &lt;= 36; it panics if radix &gt; 36.
+    ///
+    /// The elements of `T` are parsed using `Num::from_str_radix` too, and errors
+    /// (or panics) from that are reflected here as well.
     </span><span class="kw">fn </span>from_str_radix(s: <span class="kw-2">&amp;</span>str, radix: u32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::FromStrRadixErr&gt; {
+        <span class="macro">assert!</span>(
+            radix &lt;= <span class="number">36</span>,
+            <span class="string">"from_str_radix: radix is too high (maximum 36)"
+        </span>);
+
+        <span class="comment">// larger radix would include 'i' and 'j' as digits, which cannot be supported
+        </span><span class="kw">if </span>radix &gt; <span class="number">18 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ParseComplexError::unsupported_radix());
+        }
+
         from_str_generic(s, |x| -&gt; <span class="prelude-ty">Result</span>&lt;T, T::FromStrRadixErr&gt; {
             T::from_str_radix(x, radix)
         })
@@ -4121,13 +4510,13 @@
 <span class="attr">#[cfg(feature = <span class="string">"serde"</span>)]
 </span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>, T&gt; serde::Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>Complex&lt;T&gt;
 <span class="kw">where
-    </span>T: serde::Deserialize&lt;<span class="lifetime">'de</span>&gt; + Num + Clone,
+    </span>T: serde::Deserialize&lt;<span class="lifetime">'de</span>&gt;,
 {
     <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
     <span class="kw">where
         </span>D: serde::Deserializer&lt;<span class="lifetime">'de</span>&gt;,
     {
-        <span class="kw">let </span>(re, im) = <span class="macro">try!</span>(serde::Deserialize::deserialize(deserializer));
+        <span class="kw">let </span>(re, im) = serde::Deserialize::deserialize(deserializer)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>::new(re, im))
     }
 }
@@ -4141,12 +4530,19 @@
 </span><span class="kw">enum </span>ComplexErrorKind&lt;E&gt; {
     ParseError(E),
     ExprError,
+    UnsupportedRadix,
 }
 
 <span class="kw">impl</span>&lt;E&gt; ParseComplexError&lt;E&gt; {
-    <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>expr_error() -&gt; <span class="self">Self </span>{
         ParseComplexError {
             kind: ComplexErrorKind::ExprError,
+        }
+    }
+
+    <span class="kw">fn </span>unsupported_radix() -&gt; <span class="self">Self </span>{
+        ParseComplexError {
+            kind: ComplexErrorKind::UnsupportedRadix,
         }
     }
 
@@ -4159,19 +4555,22 @@
 
 <span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
 </span><span class="kw">impl</span>&lt;E: Error&gt; Error <span class="kw">for </span>ParseComplexError&lt;E&gt; {
-    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+    <span class="attr">#[allow(deprecated)]
+    </span><span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self</span>.kind {
             ComplexErrorKind::ParseError(<span class="kw-2">ref </span>e) =&gt; e.description(),
             ComplexErrorKind::ExprError =&gt; <span class="string">"invalid or unsupported complex expression"</span>,
+            ComplexErrorKind::UnsupportedRadix =&gt; <span class="string">"unsupported radix for conversion"</span>,
         }
     }
 }
 
 <span class="kw">impl</span>&lt;E: fmt::Display&gt; fmt::Display <span class="kw">for </span>ParseComplexError&lt;E&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self</span>.kind {
             ComplexErrorKind::ParseError(<span class="kw-2">ref </span>e) =&gt; e.fmt(f),
             ComplexErrorKind::ExprError =&gt; <span class="string">"invalid or unsupported complex expression"</span>.fmt(f),
+            ComplexErrorKind::UnsupportedRadix =&gt; <span class="string">"unsupported radix for conversion"</span>.fmt(f),
         }
     }
 }
@@ -4186,25 +4585,43 @@
 }
 
 <span class="attr">#[cfg(test)]
-</span><span class="kw">mod </span>test {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>test {
     <span class="attr">#![allow(non_upper_case_globals)]
 
     </span><span class="kw">use super</span>::{Complex, Complex64};
+    <span class="kw">use super</span>::{ComplexErrorKind, ParseComplexError};
     <span class="kw">use </span>core::f64;
     <span class="kw">use </span>core::str::FromStr;
 
     <span class="kw">use </span>std::string::{String, ToString};
 
-    <span class="kw">use </span>traits::{Num, One, Zero};
+    <span class="kw">use </span>num_traits::{Num, One, Zero};
 
-    <span class="kw">pub const </span>_0_0i: Complex64 = Complex { re: <span class="number">0.0</span>, im: <span class="number">0.0 </span>};
-    <span class="kw">pub const </span>_1_0i: Complex64 = Complex { re: <span class="number">1.0</span>, im: <span class="number">0.0 </span>};
-    <span class="kw">pub const </span>_1_1i: Complex64 = Complex { re: <span class="number">1.0</span>, im: <span class="number">1.0 </span>};
-    <span class="kw">pub const </span>_0_1i: Complex64 = Complex { re: <span class="number">0.0</span>, im: <span class="number">1.0 </span>};
-    <span class="kw">pub const </span>_neg1_1i: Complex64 = Complex { re: -<span class="number">1.0</span>, im: <span class="number">1.0 </span>};
-    <span class="kw">pub const </span>_05_05i: Complex64 = Complex { re: <span class="number">0.5</span>, im: <span class="number">0.5 </span>};
+    <span class="kw">pub const </span>_0_0i: Complex64 = Complex::new(<span class="number">0.0</span>, <span class="number">0.0</span>);
+    <span class="kw">pub const </span>_1_0i: Complex64 = Complex::new(<span class="number">1.0</span>, <span class="number">0.0</span>);
+    <span class="kw">pub const </span>_1_1i: Complex64 = Complex::new(<span class="number">1.0</span>, <span class="number">1.0</span>);
+    <span class="kw">pub const </span>_0_1i: Complex64 = Complex::new(<span class="number">0.0</span>, <span class="number">1.0</span>);
+    <span class="kw">pub const </span>_neg1_1i: Complex64 = Complex::new(-<span class="number">1.0</span>, <span class="number">1.0</span>);
+    <span class="kw">pub const </span>_05_05i: Complex64 = Complex::new(<span class="number">0.5</span>, <span class="number">0.5</span>);
     <span class="kw">pub const </span>all_consts: [Complex64; <span class="number">5</span>] = [_0_0i, _1_0i, _1_1i, _neg1_1i, _05_05i];
-    <span class="kw">pub const </span>_4_2i: Complex64 = Complex { re: <span class="number">4.0</span>, im: <span class="number">2.0 </span>};
+    <span class="kw">pub const </span>_4_2i: Complex64 = Complex::new(<span class="number">4.0</span>, <span class="number">2.0</span>);
+    <span class="kw">pub const </span>_1_infi: Complex64 = Complex::new(<span class="number">1.0</span>, f64::INFINITY);
+    <span class="kw">pub const </span>_neg1_infi: Complex64 = Complex::new(-<span class="number">1.0</span>, f64::INFINITY);
+    <span class="kw">pub const </span>_1_nani: Complex64 = Complex::new(<span class="number">1.0</span>, f64::NAN);
+    <span class="kw">pub const </span>_neg1_nani: Complex64 = Complex::new(-<span class="number">1.0</span>, f64::NAN);
+    <span class="kw">pub const </span>_inf_0i: Complex64 = Complex::new(f64::INFINITY, <span class="number">0.0</span>);
+    <span class="kw">pub const </span>_neginf_1i: Complex64 = Complex::new(f64::NEG_INFINITY, <span class="number">1.0</span>);
+    <span class="kw">pub const </span>_neginf_neg1i: Complex64 = Complex::new(f64::NEG_INFINITY, -<span class="number">1.0</span>);
+    <span class="kw">pub const </span>_inf_1i: Complex64 = Complex::new(f64::INFINITY, <span class="number">1.0</span>);
+    <span class="kw">pub const </span>_inf_neg1i: Complex64 = Complex::new(f64::INFINITY, -<span class="number">1.0</span>);
+    <span class="kw">pub const </span>_neginf_infi: Complex64 = Complex::new(f64::NEG_INFINITY, f64::INFINITY);
+    <span class="kw">pub const </span>_inf_infi: Complex64 = Complex::new(f64::INFINITY, f64::INFINITY);
+    <span class="kw">pub const </span>_neginf_nani: Complex64 = Complex::new(f64::NEG_INFINITY, f64::NAN);
+    <span class="kw">pub const </span>_inf_nani: Complex64 = Complex::new(f64::INFINITY, f64::NAN);
+    <span class="kw">pub const </span>_nan_0i: Complex64 = Complex::new(f64::NAN, <span class="number">0.0</span>);
+    <span class="kw">pub const </span>_nan_1i: Complex64 = Complex::new(f64::NAN, <span class="number">1.0</span>);
+    <span class="kw">pub const </span>_nan_neg1i: Complex64 = Complex::new(f64::NAN, -<span class="number">1.0</span>);
+    <span class="kw">pub const </span>_nan_nani: Complex64 = Complex::new(f64::NAN, f64::NAN);
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_consts() {
@@ -4260,6 +4677,7 @@
     }
 
     <span class="attr">#[test]
+    #[allow(clippy::float_cmp)]
     </span><span class="kw">fn </span>test_l1_norm() {
         <span class="macro">assert_eq!</span>(_0_0i.l1_norm(), <span class="number">0.0</span>);
         <span class="macro">assert_eq!</span>(_1_0i.l1_norm(), <span class="number">1.0</span>);
@@ -4289,14 +4707,27 @@
         }
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
-    </span><span class="kw">mod </span>float {
+    <span class="attr">#[cfg(any(feature = <span class="string">"std"</span>, feature = <span class="string">"libm"</span>))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>float {
+
+        <span class="kw">use </span>core::f64::INFINITY;
+
         <span class="kw">use super</span>::<span class="kw-2">*</span>;
-        <span class="kw">use </span>traits::{Float, Pow};
+        <span class="kw">use </span>num_traits::{Float, Pow};
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_cis() {
+            <span class="macro">assert!</span>(close(Complex::cis(<span class="number">0.0 </span>* f64::consts::PI), _1_0i));
+            <span class="macro">assert!</span>(close(Complex::cis(<span class="number">0.5 </span>* f64::consts::PI), _0_1i));
+            <span class="macro">assert!</span>(close(Complex::cis(<span class="number">1.0 </span>* f64::consts::PI), -_1_0i));
+            <span class="macro">assert!</span>(close(Complex::cis(<span class="number">1.5 </span>* f64::consts::PI), -_0_1i));
+            <span class="macro">assert!</span>(close(Complex::cis(<span class="number">2.0 </span>* f64::consts::PI), _1_0i));
+        }
 
         <span class="attr">#[test]
         #[cfg_attr(target_arch = <span class="string">"x86"</span>, ignore)]
         </span><span class="comment">// FIXME #7158: (maybe?) currently failing on x86.
+        </span><span class="attr">#[allow(clippy::float_cmp)]
         </span><span class="kw">fn </span>test_norm() {
             <span class="kw">fn </span>test(c: Complex64, ns: f64) {
                 <span class="macro">assert_eq!</span>(c.norm_sqr(), ns);
@@ -4324,14 +4755,14 @@
         </span><span class="kw">fn </span>test_polar_conv() {
             <span class="kw">fn </span>test(c: Complex64) {
                 <span class="kw">let </span>(r, theta) = c.to_polar();
-                <span class="macro">assert!</span>((c - Complex::from_polar(<span class="kw-2">&amp;</span>r, <span class="kw-2">&amp;</span>theta)).norm() &lt; <span class="number">1e-6</span>);
+                <span class="macro">assert!</span>((c - Complex::from_polar(r, theta)).norm() &lt; <span class="number">1e-6</span>);
             }
             <span class="kw">for </span><span class="kw-2">&amp;</span>c <span class="kw">in </span>all_consts.iter() {
                 test(c);
             }
         }
 
-        <span class="kw">fn </span>close(a: Complex64, b: Complex64) -&gt; bool {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>close(a: Complex64, b: Complex64) -&gt; bool {
             close_to_tol(a, b, <span class="number">1e-10</span>)
         }
 
@@ -4342,6 +4773,61 @@
                 <span class="macro">println!</span>(<span class="string">"{:?} != {:?}"</span>, a, b);
             }
             close
+        }
+
+        <span class="comment">// Version that also works if re or im are +inf, -inf, or nan
+        </span><span class="kw">fn </span>close_naninf(a: Complex64, b: Complex64) -&gt; bool {
+            close_naninf_to_tol(a, b, <span class="number">1.0e-10</span>)
+        }
+
+        <span class="kw">fn </span>close_naninf_to_tol(a: Complex64, b: Complex64, tol: f64) -&gt; bool {
+            <span class="kw">let </span><span class="kw-2">mut </span>close = <span class="bool-val">true</span>;
+
+            <span class="comment">// Compare the real parts
+            </span><span class="kw">if </span>a.re.is_finite() {
+                <span class="kw">if </span>b.re.is_finite() {
+                    close = (a.re == b.re) || (a.re - b.re).abs() &lt; tol;
+                } <span class="kw">else </span>{
+                    close = <span class="bool-val">false</span>;
+                }
+            } <span class="kw">else if </span>(a.re.is_nan() &amp;&amp; !b.re.is_nan())
+                || (a.re.is_infinite()
+                    &amp;&amp; a.re.is_sign_positive()
+                    &amp;&amp; !(b.re.is_infinite() &amp;&amp; b.re.is_sign_positive()))
+                || (a.re.is_infinite()
+                    &amp;&amp; a.re.is_sign_negative()
+                    &amp;&amp; !(b.re.is_infinite() &amp;&amp; b.re.is_sign_negative()))
+            {
+                close = <span class="bool-val">false</span>;
+            }
+
+            <span class="comment">// Compare the imaginary parts
+            </span><span class="kw">if </span>a.im.is_finite() {
+                <span class="kw">if </span>b.im.is_finite() {
+                    close &amp;= (a.im == b.im) || (a.im - b.im).abs() &lt; tol;
+                } <span class="kw">else </span>{
+                    close = <span class="bool-val">false</span>;
+                }
+            } <span class="kw">else if </span>(a.im.is_nan() &amp;&amp; !b.im.is_nan())
+                || (a.im.is_infinite()
+                    &amp;&amp; a.im.is_sign_positive()
+                    &amp;&amp; !(b.im.is_infinite() &amp;&amp; b.im.is_sign_positive()))
+                || (a.im.is_infinite()
+                    &amp;&amp; a.im.is_sign_negative()
+                    &amp;&amp; !(b.im.is_infinite() &amp;&amp; b.im.is_sign_negative()))
+            {
+                close = <span class="bool-val">false</span>;
+            }
+
+            <span class="kw">if </span>close == <span class="bool-val">false </span>{
+                <span class="macro">println!</span>(<span class="string">"{:?} != {:?}"</span>, a, b);
+            }
+            close
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_exp2() {
+            <span class="macro">assert!</span>(close(_0_0i.exp2(), _1_0i));
         }
 
         <span class="attr">#[test]
@@ -4363,6 +4849,31 @@
                     (c + _0_1i.scale(f64::consts::PI * <span class="number">2.0</span>)).exp()
                 ));
             }
+
+            <span class="comment">// The test values below were taken from https://en.cppreference.com/w/cpp/numeric/complex/exp
+            </span><span class="macro">assert!</span>(close_naninf(_1_infi.exp(), _nan_nani));
+            <span class="macro">assert!</span>(close_naninf(_neg1_infi.exp(), _nan_nani));
+            <span class="macro">assert!</span>(close_naninf(_1_nani.exp(), _nan_nani));
+            <span class="macro">assert!</span>(close_naninf(_neg1_nani.exp(), _nan_nani));
+            <span class="macro">assert!</span>(close_naninf(_inf_0i.exp(), _inf_0i));
+            <span class="macro">assert!</span>(close_naninf(_neginf_1i.exp(), <span class="number">0.0 </span>* Complex::cis(<span class="number">1.0</span>)));
+            <span class="macro">assert!</span>(close_naninf(_neginf_neg1i.exp(), <span class="number">0.0 </span>* Complex::cis(-<span class="number">1.0</span>)));
+            <span class="macro">assert!</span>(close_naninf(
+                _inf_1i.exp(),
+                f64::INFINITY * Complex::cis(<span class="number">1.0</span>)
+            ));
+            <span class="macro">assert!</span>(close_naninf(
+                _inf_neg1i.exp(),
+                f64::INFINITY * Complex::cis(-<span class="number">1.0</span>)
+            ));
+            <span class="macro">assert!</span>(close_naninf(_neginf_infi.exp(), _0_0i)); <span class="comment">// Note: ±0±0i: signs of zeros are unspecified
+            </span><span class="macro">assert!</span>(close_naninf(_inf_infi.exp(), _inf_nani)); <span class="comment">// Note: ±∞+NaN*i: sign of the real part is unspecified
+            </span><span class="macro">assert!</span>(close_naninf(_neginf_nani.exp(), _0_0i)); <span class="comment">// Note: ±0±0i: signs of zeros are unspecified
+            </span><span class="macro">assert!</span>(close_naninf(_inf_nani.exp(), _inf_nani)); <span class="comment">// Note: ±∞+NaN*i: sign of the real part is unspecified
+            </span><span class="macro">assert!</span>(close_naninf(_nan_0i.exp(), _nan_0i));
+            <span class="macro">assert!</span>(close_naninf(_nan_1i.exp(), _nan_nani));
+            <span class="macro">assert!</span>(close_naninf(_nan_neg1i.exp(), _nan_nani));
+            <span class="macro">assert!</span>(close_naninf(_nan_nani.exp(), _nan_nani));
         }
 
         <span class="attr">#[test]
@@ -4394,6 +4905,19 @@
                 Complex::new(<span class="number">1.65826</span>, -<span class="number">0.33502</span>),
                 <span class="number">1e-5
             </span>));
+            <span class="kw">let </span>z = Complex::new(<span class="number">0.0</span>, <span class="number">0.0</span>);
+            <span class="macro">assert!</span>(close(z.powc(b), z));
+            <span class="macro">assert!</span>(z.powc(Complex64::new(<span class="number">0.</span>, INFINITY)).is_nan());
+            <span class="macro">assert!</span>(z.powc(Complex64::new(<span class="number">10.</span>, INFINITY)).is_nan());
+            <span class="macro">assert!</span>(z.powc(Complex64::new(INFINITY, INFINITY)).is_nan());
+            <span class="macro">assert!</span>(close(z.powc(Complex64::new(INFINITY, <span class="number">0.</span>)), z));
+            <span class="macro">assert!</span>(z.powc(Complex64::new(-<span class="number">1.</span>, <span class="number">0.</span>)).re.is_infinite());
+            <span class="macro">assert!</span>(z.powc(Complex64::new(-<span class="number">1.</span>, <span class="number">0.</span>)).im.is_nan());
+
+            <span class="kw">for </span>c <span class="kw">in </span>all_consts.iter() {
+                <span class="macro">assert_eq!</span>(c.powc(_0_0i), _1_0i);
+            }
+            <span class="macro">assert_eq!</span>(_nan_nani.powc(_0_0i), _1_0i);
         }
 
         <span class="attr">#[test]
@@ -4403,6 +4927,11 @@
             <span class="macro">assert!</span>(close_to_tol(c.powf(<span class="number">3.5</span>), expected, <span class="number">1e-5</span>));
             <span class="macro">assert!</span>(close_to_tol(Pow::pow(c, <span class="number">3.5_f64</span>), expected, <span class="number">1e-5</span>));
             <span class="macro">assert!</span>(close_to_tol(Pow::pow(c, <span class="number">3.5_f32</span>), expected, <span class="number">1e-5</span>));
+
+            <span class="kw">for </span>c <span class="kw">in </span>all_consts.iter() {
+                <span class="macro">assert_eq!</span>(c.powf(<span class="number">0.0</span>), _1_0i);
+            }
+            <span class="macro">assert_eq!</span>(_nan_nani.powf(<span class="number">0.0</span>), _1_0i);
         }
 
         <span class="attr">#[test]
@@ -4410,6 +4939,16 @@
             <span class="kw">let </span>c = Complex::new(<span class="number">2.0</span>, -<span class="number">1.0</span>);
             <span class="kw">let </span>r = c.log(<span class="number">10.0</span>);
             <span class="macro">assert!</span>(close_to_tol(r, Complex::new(<span class="number">0.349485</span>, -<span class="number">0.20135958</span>), <span class="number">1e-5</span>));
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_log2() {
+            <span class="macro">assert!</span>(close(_1_0i.log2(), _0_0i));
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_log10() {
+            <span class="macro">assert!</span>(close(_1_0i.log10(), _0_0i));
         }
 
         <span class="attr">#[test]
@@ -4467,12 +5006,12 @@
                 </span><span class="kw">let </span>n2 = n * n;
                 <span class="macro">assert!</span>(close(
                     Complex64::new(<span class="number">0.0</span>, n2).sqrt(),
-                    Complex64::from_polar(<span class="kw-2">&amp;</span>n, <span class="kw-2">&amp;</span>(f64::consts::FRAC_PI_4))
+                    Complex64::from_polar(n, f64::consts::FRAC_PI_4)
                 ));
                 <span class="comment">// √(0 - n²i) = n e^(-iπ/4)
                 </span><span class="macro">assert!</span>(close(
                     Complex64::new(<span class="number">0.0</span>, -n2).sqrt(),
-                    Complex64::from_polar(<span class="kw-2">&amp;</span>n, <span class="kw-2">&amp;</span>(-f64::consts::FRAC_PI_4))
+                    Complex64::from_polar(n, -f64::consts::FRAC_PI_4)
                 ));
             }
         }
@@ -4487,7 +5026,7 @@
             ));
             <span class="macro">assert!</span>(close(
                 Complex::new(-<span class="number">1.0</span>, -<span class="number">0.0</span>).cbrt(),
-                Complex::new(<span class="number">0.5</span>, -<span class="number">0.75</span>.sqrt())
+                Complex::new(<span class="number">0.5</span>, -(<span class="number">0.75</span>.sqrt()))
             ));
             <span class="macro">assert!</span>(close(_0_1i.cbrt(), Complex::new(<span class="number">0.75</span>.sqrt(), <span class="number">0.5</span>)));
             <span class="macro">assert!</span>(close(_0_1i.conj().cbrt(), Complex::new(<span class="number">0.75</span>.sqrt(), -<span class="number">0.5</span>)));
@@ -4516,12 +5055,12 @@
                 <span class="comment">// ∛(-n³ + 0i) = n e^(iπ/3)
                 </span><span class="macro">assert!</span>(close(
                     Complex64::new(-n3, <span class="number">0.0</span>).cbrt(),
-                    Complex64::from_polar(<span class="kw-2">&amp;</span>n, <span class="kw-2">&amp;</span>(f64::consts::FRAC_PI_3))
+                    Complex64::from_polar(n, f64::consts::FRAC_PI_3)
                 ));
                 <span class="comment">// ∛(-n³ - 0i) = n e^(-iπ/3)
                 </span><span class="macro">assert!</span>(close(
                     Complex64::new(-n3, -<span class="number">0.0</span>).cbrt(),
-                    Complex64::from_polar(<span class="kw-2">&amp;</span>n, <span class="kw-2">&amp;</span>(-f64::consts::FRAC_PI_3))
+                    Complex64::from_polar(n, -f64::consts::FRAC_PI_3)
                 ));
             }
         }
@@ -4533,12 +5072,12 @@
                 </span><span class="kw">let </span>n3 = n * n * n;
                 <span class="macro">assert!</span>(close(
                     Complex64::new(<span class="number">0.0</span>, n3).cbrt(),
-                    Complex64::from_polar(<span class="kw-2">&amp;</span>n, <span class="kw-2">&amp;</span>(f64::consts::FRAC_PI_6))
+                    Complex64::from_polar(n, f64::consts::FRAC_PI_6)
                 ));
                 <span class="comment">// ∛(0 - n³i) = n e^(-iπ/6)
                 </span><span class="macro">assert!</span>(close(
                     Complex64::new(<span class="number">0.0</span>, -n3).cbrt(),
-                    Complex64::from_polar(<span class="kw-2">&amp;</span>n, <span class="kw-2">&amp;</span>(-f64::consts::FRAC_PI_6))
+                    Complex64::from_polar(n, -f64::consts::FRAC_PI_6)
                 ));
             }
         }
@@ -4759,6 +5298,14 @@
         }
 
         <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_exp2_log() {
+            <span class="kw">for </span><span class="kw-2">&amp;</span>c <span class="kw">in </span>all_consts.iter() {
+                <span class="comment">// 2^log2(z) = z
+                </span><span class="macro">assert!</span>(close(c.log2().exp2(), c));
+            }
+        }
+
+        <span class="attr">#[test]
         </span><span class="kw">fn </span>test_trig_to_hyperbolic() {
             <span class="kw">for </span><span class="kw-2">&amp;</span>c <span class="kw">in </span>all_consts.iter() {
                 <span class="comment">// sin(iz) = i sinh(z)
@@ -4907,7 +5454,7 @@
 
     <span class="kw">mod </span>complex_arithmetic {
         <span class="kw">use super</span>::{_05_05i, _0_0i, _0_1i, _1_0i, _1_1i, _4_2i, _neg1_1i, all_consts};
-        <span class="kw">use </span>traits::{MulAdd, MulAddAssign, Zero};
+        <span class="kw">use </span>num_traits::{MulAdd, MulAddAssign, Zero};
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>test_add() {
@@ -4949,7 +5496,7 @@
         }
 
         <span class="attr">#[test]
-        #[cfg(feature = <span class="string">"std"</span>)]
+        #[cfg(any(feature = <span class="string">"std"</span>, feature = <span class="string">"libm"</span>))]
         </span><span class="kw">fn </span>test_mul_add_float() {
             <span class="macro">assert_eq!</span>(_05_05i.mul_add(_05_05i, _0_0i), _05_05i * _05_05i + _0_0i);
             <span class="macro">assert_eq!</span>(_05_05i * _05_05i + _0_0i, _05_05i.mul_add(_05_05i, _0_0i));
@@ -5126,9 +5673,9 @@
         <span class="kw">let </span>a = Complex::new(<span class="number">0i32</span>, <span class="number">0i32</span>);
         <span class="kw">let </span>b = Complex::new(<span class="number">1i32</span>, <span class="number">0i32</span>);
         <span class="kw">let </span>c = Complex::new(<span class="number">0i32</span>, <span class="number">1i32</span>);
-        <span class="macro">assert!</span>(::hash(<span class="kw-2">&amp;</span>a) != ::hash(<span class="kw-2">&amp;</span>b));
-        <span class="macro">assert!</span>(::hash(<span class="kw-2">&amp;</span>b) != ::hash(<span class="kw-2">&amp;</span>c));
-        <span class="macro">assert!</span>(::hash(<span class="kw-2">&amp;</span>c) != ::hash(<span class="kw-2">&amp;</span>a));
+        <span class="macro">assert!</span>(<span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>a) != <span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>b));
+        <span class="macro">assert!</span>(<span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>b) != <span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>c));
+        <span class="macro">assert!</span>(<span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>c) != <span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>a));
     }
 
     <span class="attr">#[test]
@@ -5252,6 +5799,33 @@
         test(Complex::new(<span class="number">15.0</span>, <span class="number">32.0</span>), <span class="string">"1111+100000i"</span>, <span class="number">2</span>);
         test(Complex::new(-<span class="number">15.0</span>, -<span class="number">32.0</span>), <span class="string">"-F-20i"</span>, <span class="number">16</span>);
         test(Complex::new(-<span class="number">15.0</span>, -<span class="number">32.0</span>), <span class="string">"-1111-100000i"</span>, <span class="number">2</span>);
+
+        <span class="kw">fn </span>test_error(s: <span class="kw-2">&amp;</span>str, radix: u32) -&gt; ParseComplexError&lt;&lt;f64 <span class="kw">as </span>Num&gt;::FromStrRadixErr&gt; {
+            <span class="kw">let </span>res = Complex64::from_str_radix(s, radix);
+
+            res.expect_err(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"Expected failure on input {:?}"</span>, s))
+        }
+
+        <span class="kw">let </span>err = test_error(<span class="string">"1ii"</span>, <span class="number">19</span>);
+        <span class="kw">if let </span>ComplexErrorKind::UnsupportedRadix = err.kind {
+            <span class="comment">/* pass */
+        </span>} <span class="kw">else </span>{
+            <span class="macro">panic!</span>(<span class="string">"Expected failure on invalid radix, got {:?}"</span>, err);
+        }
+
+        <span class="kw">let </span>err = test_error(<span class="string">"1 + 0"</span>, <span class="number">16</span>);
+        <span class="kw">if let </span>ComplexErrorKind::ExprError = err.kind {
+            <span class="comment">/* pass */
+        </span>} <span class="kw">else </span>{
+            <span class="macro">panic!</span>(<span class="string">"Expected failure on expr error, got {:?}"</span>, err);
+        }
+    }
+
+    <span class="attr">#[test]
+    #[should_panic(expected = <span class="string">"radix is too high"</span>)]
+    </span><span class="kw">fn </span>test_from_str_radix_fail() {
+        <span class="comment">// ensure we preserve the underlying panic on radix &gt; 36
+        </span><span class="kw">let </span>_complex = Complex64::from_str_radix(<span class="string">"1"</span>, <span class="number">37</span>);
     }
 
     <span class="attr">#[test]
@@ -5296,7 +5870,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>c = Complex::new(<span class="number">1.23</span>, <span class="number">4.56</span>);
         <span class="macro">assert!</span>(!c.is_zero());
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>c + <span class="kw-2">&amp;</span>zero, c);
+        <span class="macro">assert_eq!</span>(c + zero, c);
 
         c.set_zero();
         <span class="macro">assert!</span>(c.is_zero());
@@ -5309,14 +5883,14 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>c = Complex::new(<span class="number">1.23</span>, <span class="number">4.56</span>);
         <span class="macro">assert!</span>(!c.is_one());
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>c * <span class="kw-2">&amp;</span>one, c);
+        <span class="macro">assert_eq!</span>(c * one, c);
 
         c.set_one();
         <span class="macro">assert!</span>(c.is_one());
     }
 
-    <span class="attr">#[cfg(has_const_fn)]
-    #[test]
+    <span class="attr">#[test]
+    #[allow(clippy::float_cmp)]
     </span><span class="kw">fn </span>test_const() {
         <span class="kw">const </span>R: f64 = <span class="number">12.3</span>;
         <span class="kw">const </span>I: f64 = -<span class="number">4.5</span>;

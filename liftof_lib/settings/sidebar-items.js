@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["BuildStrategy"],"struct":["AnalysisEngineSettings","DataPublisherSettings","LiftofRBConfig","LiftofSettings","RBSettings","TofEventBuilderSettings"]};
+window.SIDEBAR_ITEMS = {"enum":["BuildStrategy","ParameterSetStrategy","RBBufferStrategy"],"struct":["AnalysisEngineSettings","CommandDispatcherSettings","DataPublisherSettings","LTBThresholdSettings","LiftofRBConfig","LiftofSettings","PreampSettings","RBSettings","TofEventBuilderSettings"]};

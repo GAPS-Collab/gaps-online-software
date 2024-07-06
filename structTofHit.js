@@ -11,10 +11,16 @@ var structTofHit =
     [ "get_timestamp48", "structTofHit.html#ad1260551e11471967105e43ee71319e0", null ],
     [ "get_x_pos", "structTofHit.html#ac8bde89ef95032ea10e9591a59db35cf", null ],
     [ "to_string", "structTofHit.html#afa2cbd718256a9ba9f611c8189cf695f", null ],
+    [ "baseline_a", "structTofHit.html#ae8b8043d59cdffc6ad0ade105614384a", null ],
+    [ "baseline_a_rms", "structTofHit.html#ae597714f49fc0c980ad0896965820d69", null ],
+    [ "baseline_b", "structTofHit.html#a770905e5108175a885f88cc712001d08", null ],
+    [ "baseline_b_rms", "structTofHit.html#aa562d778f3120c15cdc3ea5ad6157029", null ],
     [ "broken", "structTofHit.html#a52dff42b6f445d2f0e511c80600facd4", null ],
     [ "ctr_etx", "structTofHit.html#a8cc01c56ab908c4ae8c3b01d93082df0", null ],
     [ "paddle_id", "structTofHit.html#ae2a4b070762f1702099b8e651d883c4c", null ],
+    [ "phase", "structTofHit.html#a7ccf0363860f0f789b24bb9fc8371d39", null ],
     [ "tail", "structTofHit.html#a828331e30508d4e22bf6740516d9be95", null ],
     [ "timestamp16", "structTofHit.html#ae1c3755571cbebd921aa90b83aee7f1e", null ],
-    [ "timestamp32", "structTofHit.html#a1317449d74bd518abc7c6ed8536c819f", null ]
+    [ "timestamp32", "structTofHit.html#a1317449d74bd518abc7c6ed8536c819f", null ],
+    [ "version", "structTofHit.html#a2e85ffa58c630e4f6c2328568e635aea", null ]
 ];

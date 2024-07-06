@@ -1,0 +1,1 @@
+searchState.loadedDescShard("pyo3_macros", 0, "This crate declares only the proc macro attributes, as a …\nA proc macro used to expose Rust functions to Python.\nA proc macro used to expose methods to Python.\nA proc macro used to implement Python modules.")

@@ -1,0 +1,1 @@
+searchState.loadedDescShard("encoding_index_korean", 0, "Korean index tables for rust-encoding.\nKS X 1001 plus Unified Hangul Code.\nReturns the index pointer for code point <code>code</code> in this …\nReturns the index code point for pointer <code>code</code> in this …")
