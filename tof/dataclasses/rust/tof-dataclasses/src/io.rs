@@ -153,25 +153,6 @@ pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>) -> String {
   fname
 }
 
-////FIXME : this needs to become a trait
-//fn read_n_bytes(file: &mut BufReader<File>, n: usize) -> io::Result<Vec<u8>> {
-//  let mut buffer = vec![0u8; n];
-//  match file.read_exact(&mut buffer) {
-//    Err(ref err) if err.kind() == io::ErrorKind::UnexpectedEof => {
-//      // Reached the end of the file
-//      buffer = Vec::<u8>::new();
-//      file.read_to_end(&mut buffer)?;
-//      return Ok(buffer);
-//    },
-//    Err(err) => {
-//      error!("Can not read {n} bytes from file! Error {err}");
-//      return Err(err);
-//    },
-//    Ok(_) => ()
-//  }
-//  Ok(buffer)
-//}
-
 /// Read an entire file into memory
 ///
 /// Represents the contents of a file 
@@ -797,7 +778,6 @@ impl TofPacketReader {
   pub fn set_filter(&mut self, ptype : PacketType) {
     self.filter = ptype;
   }
-  
 
   /// Get an index of the file - count number of packets
   ///
@@ -808,7 +788,7 @@ impl TofPacketReader {
     loop {
       match self.file_reader.read_exact(&mut buffer) {
         Err(err) => {
-          error!("Unable to read from file! {err}");
+          debug!("Unable to read from file! {err}");
           //return None;
           break;
         }
@@ -821,7 +801,7 @@ impl TofPacketReader {
       } else {
         match self.file_reader.read_exact(&mut buffer) {
           Err(err) => {
-            error!("Unable to read from file! {err}");
+            debug!("Unable to read from file! {err}");
             //return None;
             break;
           }
@@ -836,8 +816,7 @@ impl TofPacketReader {
           // the 3rd byte is the packet type
           match self.file_reader.read_exact(&mut buffer) {
              Err(err) => {
-              error!("Unable to read from file! {err}");
-              //return None;
+              debug!("Unable to read from file! {err}");
               break;
             }
             Ok(_) => {
@@ -860,7 +839,7 @@ impl TofPacketReader {
           let size     = parse_u32(&vec_data, &mut 0);
           match self.file_reader.seek(SeekFrom::Current(size as i64)) {
             Err(err) => {
-              error!("Unable to read more data! {err}");
+              debug!("Unable to read more data! {err}");
               break; 
             }
             Ok(_) => {
@@ -888,6 +867,11 @@ impl TofPacketReader {
     Ok(())
   }
 
+  /// Return the next tofpacket in the stream
+  ///
+  /// Will return none if the file has been exhausted.
+  /// Use ::rewind to start reading from the beginning
+  /// again.
   pub fn get_next_packet(&mut self) -> Option<TofPacket> {
     // filter::Unknown corresponds to allowing any
 
@@ -895,7 +879,7 @@ impl TofPacketReader {
     loop {
       match self.file_reader.read_exact(&mut buffer) {
         Err(err) => {
-          error!("Unable to read from file! {err}");
+          debug!("Unable to read from file! {err}");
           return None;
         }
         Ok(_) => {
@@ -907,7 +891,7 @@ impl TofPacketReader {
       } else {
         match self.file_reader.read_exact(&mut buffer) {
           Err(err) => {
-            error!("Unable to read from file! {err}");
+            debug!("Unable to read from file! {err}");
             return None;
           }
           Ok(_) => {
@@ -921,7 +905,7 @@ impl TofPacketReader {
           // the 3rd byte is the packet type
           match self.file_reader.read_exact(&mut buffer) {
              Err(err) => {
-              error!("Unable to read from file! {err}");
+              debug!("Unable to read from file! {err}");
               return None;
             }
             Ok(_) => {
@@ -933,7 +917,7 @@ impl TofPacketReader {
           let mut buffer_psize = [0,0,0,0];
           match self.file_reader.read_exact(&mut buffer_psize) {
             Err(err) => {
-              error!("Unable to read from file! {err}");
+              debug!("Unable to read from file! {err}");
               return None;
             }
             Ok(_) => {
@@ -945,7 +929,7 @@ impl TofPacketReader {
           if ptype != self.filter && self.filter != PacketType::Unknown {
             match self.file_reader.seek(SeekFrom::Current(size as i64)) {
               Err(err) => {
-                error!("Unable to read more data! {err}");
+                debug!("Unable to read more data! {err}");
                 return None; 
               }
               Ok(_) => {
@@ -960,7 +944,7 @@ impl TofPacketReader {
             // we don't want it
             match self.file_reader.seek(SeekFrom::Current(size as i64)) {
               Err(err) => {
-                error!("Unable to read more data! {err}");
+                debug!("Unable to read more data! {err}");
                 return None; 
               }
               Ok(_) => {
@@ -974,7 +958,7 @@ impl TofPacketReader {
             // we don't want it
             match self.file_reader.seek(SeekFrom::Current(size as i64)) {
               Err(err) => {
-                error!("Unable to read more data! {err}");
+                debug!("Unable to read more data! {err}");
                 return None; 
               }
               Ok(_) => {
@@ -991,7 +975,7 @@ impl TofPacketReader {
 
           match self.file_reader.read_exact(&mut payload) {
             Err(err) => {
-              error!("Unable to read from file! {err}");
+              debug!("Unable to read from file! {err}");
               return None;
             }
             Ok(_) => {
@@ -1003,7 +987,7 @@ impl TofPacketReader {
           let mut tail = vec![0u8; 2];
           match self.file_reader.read_exact(&mut tail) {
             Err(err) => {
-              error!("Unable to read from file! {err}");
+              debug!("Unable to read from file! {err}");
               return None;
             }
             Ok(_) => {
@@ -1012,7 +996,7 @@ impl TofPacketReader {
           }
           let tail = parse_u16(&tail,&mut 0);
           if tail != TofPacket::TAIL {
-            error!("TofPacket TAIL signature wrong!");
+            debug!("TofPacket TAIL signature wrong!");
             return None;
           }
           self.n_packs_read += 1;
@@ -1060,60 +1044,6 @@ impl TofPacketReader {
   //  }
   //}
 
-  //fn search_start(&mut self) -> Result<usize, SerializationError> {
-  //  let mut pos       = 0u64;
-  //  let mut start_pos = 0usize; 
-  //  //let mut stream  = Vec::<u8>::new();
-  //  let max_bytes   = self.get_file_nbytes();
-  //  info!("Using file with {max_bytes} bytes!");
-  //  let chunk       = 10usize;
-  //  while pos < max_bytes {
-  //    match read_n_bytes(self.file_reader.as_mut().unwrap(), chunk) {
-  //      Err(err) => {
-  //        error!("Can not read from file, error {err}");
-  //        error!("Most likely, the file/stream is too short!");
-  //        return Err(SerializationError::StreamTooShort);
-  //      }
-  //      Ok(stream) => {
-  //        debug!("Got stream {:?}", stream);
-  //        match search_for_u16(TofPacket::HEAD, &stream, 0) {
-  //          Err(_) => {
-  //            pos += chunk as u64;
-  //            continue;
-  //          }
-  //          Ok(result) => {
-  //            start_pos = result + pos as usize;           
-  //            // make sure the current chunk is accounted 
-  //            // for before the break
-  //            pos += chunk as u64;
-  //            break;
-  //          }
-  //        }
-  //      } // end Ok
-  //    } // end match 
-  //  } // end while
-  //  let mut rewind : i64 = pos.try_into().unwrap();
-  //  rewind = -1*rewind + start_pos as i64;
-  //  debug!("Rewinding {rewind} bytes");
-  //  match self.file_reader.as_mut().unwrap().seek(SeekFrom::Current(rewind)) {
-  //    Err(err) => {
-  //      error!("Can not rewind file buffer! Error {err}");
-  //    }
-  //    Ok(_) => ()
-  //  }
-  //  Ok(start_pos)
-  //}
-  //
-  //fn get_file_nbytes(&self) -> u64 {
-  //  let metadata  = self.file_reader.as_ref().unwrap().get_ref().metadata().unwrap();
-  //  let file_size = metadata.len();
-  //  file_size
-  //}
-  //
-  //pub fn get_filename(&self) -> String {
-  //  self.filename.clone()
-  //}
-
 }
 
 impl Default for TofPacketReader {
@@ -1124,53 +1054,11 @@ impl Default for TofPacketReader {
 
 impl Iterator for TofPacketReader {
   type Item = TofPacket;
-  //type Item = io::Result<TofPacket>;
-
+  
   fn next(&mut self) -> Option<Self::Item> {
     self.get_next_packet()
   }
 }
-    //    match read_n_bytes(self.file_reader.as_mut().unwrap(), 7) { 
-//    //match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
-//      Err(err) => {
-//        error!("Error reading from file {} error: {}", self.filename, err);
-//      },
-//      Ok(chunk) => {
-//        if chunk.len() < 7 {
-//          error!("The stream is too short!");
-//          return None;
-//        }
-//        else {
-//          trace!("Read {} bytes", chunk.len());
-//          let expected_payload_size = self.get_next_packet_size(&chunk) as usize; 
-//          match read_n_bytes(self.file_reader.as_mut().unwrap(), expected_payload_size + 2) {
-//            Err(err) => {
-//              error!("Unable to read {} requested bytes to decode tof packet! Err {err}", expected_payload_size - 7 );
-//              return None;
-//            },
-//            Ok(data) => {
-//              let mut stream = Vec::<u8>::with_capacity(expected_payload_size + 9);
-//              stream.extend_from_slice(&chunk);
-//              stream.extend_from_slice(&data);
-//              //println!("{:?}", stream);
-//              match TofPacket::from_bytestream(&stream, &mut 0) {
-//                Ok(pack) => {
-//                  packet = pack;
-//                  return Some(packet);
-//                }
-//                Err(err) => { 
-//                  error!("Error getting packet from file {err}");
-//                  return None;
-//                }
-//              }
-//            }
-//          }
-//        }
-//      }, // end outer OK
-//    }
-//  None
-//  }
-//}
 
 /// Write TofPackets to disk.
 ///

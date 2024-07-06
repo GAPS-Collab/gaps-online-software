@@ -1289,7 +1289,7 @@ impl Serialization for RBCalibrations {
     if rb_cal.serialize_event_data {
       let broken_event = RBEvent::new();
       let n_noi  = parse_u16(bytestream, pos);
-      info!("Found {n_noi} no input data events!");
+      debug!("Found {n_noi} no input data events!");
       for _ in 0..n_noi {
         match RBEvent::from_bytestream(bytestream, pos) {
           Ok(ev) => {
@@ -1302,7 +1302,7 @@ impl Serialization for RBCalibrations {
         // FIXME - broken event won't advance the pos marker
       }
       let n_vcal = parse_u16(bytestream, pos); 
-      info!("Found {n_vcal} VCal data events!");
+      debug!("Found {n_vcal} VCal data events!");
       for _ in 0..n_vcal {
         match RBEvent::from_bytestream(bytestream, pos) {
           Err(err) => {
@@ -1314,7 +1314,7 @@ impl Serialization for RBCalibrations {
         }
       }
       let n_tcal = parse_u16(bytestream, pos); 
-      info!("Found {n_tcal} TCal data events!");
+      debug!("Found {n_tcal} TCal data events!");
       for _ in 0..n_tcal {
         rb_cal.tcal_data.push(RBEvent::from_bytestream(bytestream, pos).unwrap_or(broken_event.clone()));
       }
