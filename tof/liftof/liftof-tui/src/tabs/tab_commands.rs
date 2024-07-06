@@ -16,14 +16,14 @@
 //! -----------------------------------------
 //! | Logs                                  |
 
-use chrono::Utc;
+//use chrono::Utc;
 
 use ratatui::prelude::*;
 use ratatui::widgets::{
     Block,
     BorderType,
     Borders,
-    Paragraph,
+    //Paragraph,
     //BarChart,
     List,
     ListItem,
@@ -40,20 +40,19 @@ use ratatui::widgets::{
 //    Terminal,
 //};
 
-use std::collections::VecDeque;
+//use std::collections::VecDeque;
 use crossbeam_channel::{
-    unbounded,
-    Sender,
+    //unbounded,
+    //Sender,
     Receiver
 };
 
-use tof_dataclasses::packets::{TofPacket, PacketType};
+//use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::commands::{
     TofCommandV2,
     TofCommandCode,
     TofResponse
 };
-use tof_dataclasses::events::RBEventMemoryView;
 
 use crate::colors::ColorTheme;
 

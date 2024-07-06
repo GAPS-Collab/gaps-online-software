@@ -9,10 +9,11 @@ use std::sync::{
 
 use crossbeam_channel::{
     Receiver,
-    Sender,
+    //Sender,
 };
 
 use ratatui::prelude::*;
+use ratatui::symbols::Marker;
 
 use ratatui::terminal::Frame;
 use ratatui::layout::Rect;
@@ -25,7 +26,11 @@ use ratatui::widgets::{
     ListItem,
     ListState,
     canvas,
-    canvas::{Canvas, Circle, Rectangle, Points},
+    canvas::{
+        Canvas,
+        //Circle,
+        //Rectangle,
+        Points},
 };
 
 use ndhistogram::{
@@ -39,13 +44,13 @@ use ndhistogram::axis::{
 
 //use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::errors::SerializationError;
-use tof_dataclasses::packets::TofPacket;
+//use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::{
-    RBEvent,
+    //RBEvent,
     TofEvent,
-    TofHit,
-    TofEventHeader,
-    MasterTriggerEvent,
+    //TofHit,
+    //TofEventHeader,
+    //MasterTriggerEvent,
     RBWaveform,
 };
 use tof_dataclasses::calibrations::RBCalibrations;
@@ -393,7 +398,7 @@ impl PaddleTab<'_> {
                 wf_data_a.push_back((wf.nanoseconds[k] as f64, wf.voltages[k] as f64));
               }
             }
-            self.last_wf_ch_a = wf_data_a.clone();;
+            self.last_wf_ch_a = wf_data_a.clone();
           }
         }
         match self.wf_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().pop_front() {

@@ -21,20 +21,17 @@ crossbeam-channel = { workspace = true }
 chrono     = { version = "0.4", features = ["serde"] }
 
 # tui stuff
+# FIXME - ratatui is now at 0.27, but there are issues with 
+# tui-logger. Check back again in the future.
 tui-logger = { version = "0.11" } 
-ratatui    = { version = "0.26", features = ["all-widgets"]}
+ratatui    = { version = "=0.26.3", features = ["all-widgets"]}
+tui-popup  = "=0.3.2"
 crossterm  = { version = "0.23", features=["serde"]}
-
-#tokio = { version = "1", features = ["full"] }
-#eyre = "0.6"
-#sysinfo = "0.27"
 
 
 tof-dataclasses = { workspace = true }
 liftof-lib      = { path = "../liftof-lib" , features = ["random"], version = "0.10"}
 telemetry-dataclasses = { path = "../../../telemetry/dataclasses/rust/telemetry-dataclasses", optional = true }
-
-tui-popup = "0.3"
 
 # this is the "one and only" histogram 
 # crate in my opinion
@@ -42,4 +39,3 @@ ndhistogram = "0.9.0"
 
 #num-traits = "0.2"
 
-#[target.armv7-unknown-linux-gnueabi]
