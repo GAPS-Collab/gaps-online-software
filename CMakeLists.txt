@@ -52,7 +52,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 option(BUILD_CXXPYBINDINGS "build C++ pybindings with pybind11" OFF)
 option(BUILD_RUSTPYBIDINGS "build Rust \\U+1F980 pybindings wiut pyO3 (better)" OFF)
 
-if (BUILD_PYBINDINGS)
+if (BUILD_CXXPYBINDINGS)
 message(STATUS "Checking for pyoind11....")
 # populates Python_INCLUDE_DIRS
 find_package (Python 3.10 COMPONENTS Interpreter Development)
@@ -63,7 +63,7 @@ find_package(pybind11 )
   else()
     message(STATUS "-- found pybind11, building pybindings.")
   endif()
-endif(BUILD_PYBINDINGS)
+endif(BUILD_CXXPYBINDINGS)
 
 
 ## do a release build by default
