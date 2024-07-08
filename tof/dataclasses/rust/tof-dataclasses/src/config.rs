@@ -4,6 +4,9 @@
 
 use std::fmt;
 
+#[cfg(feature = "pybindings")]
+use pyo3::pyclass;
+
 use crate::serialization::{
   Serialization,
   SerializationError,
@@ -45,8 +48,8 @@ pub enum BuildStrategy {
   /// mapping
   AdaptiveThorough,
   /// like adaptive, but add usize to the expected number of boards
-  AdaptiveGreedy(usize),
-  WaitForNBoards(usize)
+  AdaptiveGreedy,
+  WaitForNBoards
 }
 
 impl fmt::Display for BuildStrategy {
@@ -72,10 +75,10 @@ impl BuildStrategy {
       BuildStrategy::AdaptiveThorough => {
         return 102;
       }
-      BuildStrategy::AdaptiveGreedy(_) => {
+      BuildStrategy::AdaptiveGreedy => {
         return 1;
       }
-      BuildStrategy::WaitForNBoards(_) => {
+      BuildStrategy::WaitForNBoards => {
         return 2;
       }
     }
@@ -88,8 +91,8 @@ impl From<u8> for BuildStrategy {
       100 => BuildStrategy::Smart,
       101 => BuildStrategy::Adaptive,
       102 => BuildStrategy::AdaptiveThorough,
-      1   => BuildStrategy::AdaptiveGreedy(3),
-      2   => BuildStrategy::WaitForNBoards(40),
+      1   => BuildStrategy::AdaptiveGreedy,
+      2   => BuildStrategy::WaitForNBoards,
       _   => BuildStrategy::Unknown
     }
   }
@@ -103,8 +106,8 @@ impl FromRandom for BuildStrategy {
       BuildStrategy::Smart,
       BuildStrategy::Adaptive,
       BuildStrategy::AdaptiveThorough,
-      BuildStrategy::AdaptiveGreedy(3),
-      BuildStrategy::WaitForNBoards(40),
+      BuildStrategy::AdaptiveGreedy,
+      BuildStrategy::WaitForNBoards,
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
@@ -727,7 +730,7 @@ impl TOFEventBuilderConfig {
       n_rbe_per_loop      : 40,
       te_timeout_sec      : 30,
       sort_events         : false,
-      build_strategy      : BuildStrategy::WaitForNBoards(40)
+      build_strategy      : BuildStrategy::Adaptive
     }
   }
 }
