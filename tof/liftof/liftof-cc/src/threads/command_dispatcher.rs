@@ -29,9 +29,7 @@ use crossbeam_channel::{
 
 //use tof_dataclasses::threading::ThreadControl;
 use tof_dataclasses::config::{
-    RunConfig,
-    TriggerConfig,
-    AnalysisEngineConfig
+    AnalysisEngineConfig, RunConfig, TOFEventBuilderConfig, TriggerConfig
 };
 use tof_dataclasses::constants::PAD_CMD_32BIT;
 use tof_dataclasses::commands::{
@@ -463,6 +461,25 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       }
                     }
                   }
+                  TofCommandCode::SetTOFEventBuilderConfig => {
+                    match thread_ctrl.lock() {
+                      Err(err) => error!("Unable to acquire lock for thread contorl! {err}"),
+                      Ok(mut tc) => {
+                        match TOFEventBuilderConfig::from_bytestream(&packet.payload, &mut 0) {
+                          Err(err)=> error!("Serialization error! Cannot get TOF event builder config from bytestream"),
+                          Ok(config) => {
+                            tc.liftof_settings.event_builder_settings.cachesize=config.cachesize;
+                            tc.liftof_settings.event_builder_settings.n_mte_per_loop=config.n_mte_per_loop;
+                            tc.liftof_settings.event_builder_settings.n_rbe_per_loop=config.n_rbe_per_loop;
+                            tc.liftof_settings.event_builder_settings.te_timeout_sec=config.te_timeout_sec;
+                            tc.liftof_settings.event_builder_settings.sort_events=config.sort_events;
+                            tc.liftof_settings.event_builder_settings.build_strategy=config.build_strategy;
+                          }
+                        }
+                      }
+                    }
+                  }
+
                   _ => {
                     error!("Command {} is currently not implemented!", cmd); 
                     let ack_tp = resp.pack();
