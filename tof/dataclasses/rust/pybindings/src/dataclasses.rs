@@ -15,6 +15,7 @@ use pyo3_polars::{
 
 use pyo3::Python;
 
+
 use tof_dataclasses::ProtocolVersion;
 use tof_dataclasses::io::TofPacketReader;
 use tof_dataclasses::packets::{
@@ -60,7 +61,7 @@ use tof_dataclasses::commands::{
     TofCommandCode
 };
 use tof_dataclasses::calibrations::RBCalibrations;
-use tof_dataclasses::config::{AnalysisEngineConfig, RunConfig};
+use tof_dataclasses::config::{AnalysisEngineConfig, RunConfig, TOFEventBuilderConfig, BuildStrategy};
 
 
 use pyo3::prelude::*;
@@ -203,6 +204,89 @@ impl PyTriggerConfig {
   #[setter]
   fn set_trigger_type(&mut self, trigger_type: TriggerType) -> PyResult<()> {
     self.config.trigger_type = trigger_type;
+    Ok(())
+  }
+}
+#[pyclass]
+#[pyo3(name="TOFEventBuilderConfig")]
+
+pub struct PyTOFEventBuilderConfig{
+  pub config : TOFEventBuilderConfig
+}
+
+impl PyTOFEventBuilderConfig {
+  pub fn set_config(&mut self, cfd : TOFEventBuilderConfig) {
+    self.config = cfg;
+  }
+}
+#[pymethods]
+impl PyTOFEventBuilderConfig{
+  #[new]
+  fn new() -> Self {
+    let cfg: TOFEventBuilderConfig = TOFEventBuilderConfig::new();
+    Self {
+      config : cfg
+    }
+  }
+  // Cache size
+  #[getter]
+  fn get_cachesize(&self) -> PyResult<usize> {
+    Ok(self.config.cachesize)
+  }
+  #[setter]
+  fn set_cachesize(&mut self, cachesize: usize) -> PyResult<()> {
+    self.config.cachesize = cachesize;
+    Ok(())
+  }
+  // Num. MTB events per loop
+  #[getter]
+  fn get_n_mte_per_loop(&self) -> PyResult<usize> {
+    Ok(self.config.n_mte_per_loop)
+  }
+  #[setter]
+  fn set_n_mte_per_loop(&mut self, n_mte_per_loop: usize) -> PyResult<()> {
+    self.config.n_mte_per_loop = n_mte_per_loop;
+    Ok(())
+  }
+  // Num. RB events per loop
+  #[getter]
+  fn get_n_rbe_per_loop(&self) -> PyResult<usize> {
+    Ok(self.config.n_rbe_per_loop)
+  }
+  #[setter]
+  fn set_n_rbe_per_loop(&mut self, n_rbe_per_loop: usize) -> PyResult<()> {
+    self.config.n_rbe_per_loop = n_rbe_per_loop;
+    Ok(())
+  }  
+  // TOF Event timescale window
+  #[getter]
+  fn get_te_timeout_sec(&self) -> PyResult<u32> {
+    Ok(self.config.te_timeout_sec)
+  }
+  #[setter]
+  fn set_te_timeout_sec(&mut self, te_timeout_sec: u32) -> PyResult<()> {
+    self.config.te_timeout_sec = te_timeout_sec;
+    Ok(())
+  }
+  // Sort events
+  #[getter]
+  fn get_sort_events(&self) -> PyResult<bool> {
+    Ok(self.config.sort_events)
+  }
+  #[setter]
+  fn set_sort_events(&mut self, sort_events: u32) -> PyResult<()> {
+    self.config.sort_events = sort_events;
+    Ok(())
+  }
+  // build strategy
+  #[getter] 
+  fn get_build_strategy(&self) -> PyResult<BuildStrategy> {
+    Ok(self.config.build_strategy)
+  }
+
+  #[setter]
+  fn set_build_strategy(&mut self, build_strategy: BuildStrategy) -> PyResult<()> {
+    self.config.build_strategy = build_strategy;
     Ok(())
   }
 }
