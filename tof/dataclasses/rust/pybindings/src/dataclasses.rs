@@ -215,7 +215,7 @@ pub struct PyTOFEventBuilderConfig{
 }
 
 impl PyTOFEventBuilderConfig {
-  pub fn set_config(&mut self, cfd : TOFEventBuilderConfig) {
+  pub fn set_config(&mut self, cfg : TOFEventBuilderConfig) {
     self.config = cfg;
   }
 }
@@ -274,7 +274,7 @@ impl PyTOFEventBuilderConfig{
     Ok(self.config.sort_events)
   }
   #[setter]
-  fn set_sort_events(&mut self, sort_events: u32) -> PyResult<()> {
+  fn set_sort_events(&mut self, sort_events: bool) -> PyResult<()> {
     self.config.sort_events = sort_events;
     Ok(())
   }
