@@ -107,7 +107,7 @@ use liftof_cc::threads::{
     global_data_sink,
     readoutboard_communicator
 };
-#[cfg(features="tof-control")]
+#[cfg(features="tof-ctrl")]
 use liftof_cc::threads::monitor_cpu;
 
 /*************************************/
@@ -342,9 +342,9 @@ fn main() {
     // this is anonymus, but we control the thread
     // through the thread control mechanism, so we
     // can still end it.
-    #[cfg(features="tof-control")]
+    #[cfg(features="tof-ctrl")]
     let tp_to_sink_c = tp_to_sink.clone();
-    #[cfg(features="tof-control")]
+    #[cfg(features="tof-ctrl")]
     let _cpu_moni_thread = thread::Builder::new()
         .name("cpu-monitoring".into())
         .spawn(move || {

@@ -41,7 +41,7 @@ use liftof_lib::thread_control::ThreadControl;
 ///                    externally
 /// * verbose        - print monitoring information 
 ///                    to the terminal
-#[cfg(features="tof-control")]
+#[cfg(features="tof-ctrl")]
 pub fn monitor_cpu(tp_sender      : Sender<TofPacket>,
                    moni_interval  : u64,
                    thread_control : Arc<Mutex<ThreadControl>>,

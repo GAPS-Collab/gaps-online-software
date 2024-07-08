@@ -8,7 +8,7 @@ extern crate zmq;
 extern crate openssh;
 extern crate comfy_table;
 extern crate tof_dataclasses;
-#[cfg(features="tof-control")]
+#[cfg(features="tof-ctrl")]
 extern crate tof_control;
 extern crate liftof_lib;
 
