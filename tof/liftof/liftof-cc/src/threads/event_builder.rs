@@ -36,8 +36,9 @@ use tof_dataclasses::packets::TofPacket;
 //use liftof_lib::heartbeat_printer;
 use liftof_lib::settings::{
     TofEventBuilderSettings,
-    BuildStrategy,
+    //BuildStrategy,
 };
+use tof_dataclasses::config::BuildStrategy;
 use liftof_lib::thread_control::ThreadControl;
 
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
@@ -361,13 +362,15 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   // debug the number of rb events we have seen 
   // in production mode, these features should go away
   // FIXEM - add debug flags to features
-  let mut seen_rbevents = HashMap::<u8, usize>::new();
+  let mut seen_rbevents      = HashMap::<u8, usize>::new();
+  let mut too_early_rbevents = HashMap::<u8, usize>::new(); 
   // 10, 12, 37,38, 43, 45 don't exist
   for k in 1..47 {
     if k == 10 || k ==12 || k == 37 || k == 38 || k == 43 || k == 45 {
       continue;
     } else {
       seen_rbevents.insert(k as u8, 0);
+      too_early_rbevents.insert(k as u8, 0);
     }
   }
   // event caches for assembled events
@@ -400,16 +403,22 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut check_tc_update      = Instant::now();
   let mut n_gathered_fr_cache  = 0usize;
   let mut misaligned_cache_err = 0usize; 
+  let mut daq_reset_cooldown   = Instant::now();
+  let mut reset_daq_flag       = false;
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
       let mut cali_still_active = false;
       match thread_control.try_lock() {
-        Ok(tc) => {
+        Ok(mut tc) => {
           //println!("== ==> [evt_builder] tc lock acquired!");
           if tc.calibration_active {
             cali_still_active = true;
           } else {
             cali_still_active = false;  
+          }
+          if daq_reset_cooldown.elapsed().as_secs_f32() > 120.0 && reset_daq_flag {
+            warn!("Resetttign MTB DAQ queue!");
+            tc.reset_mtb_daq = true;
           }
         },
         Err(err) => {
@@ -493,6 +502,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             //attempts += 1;
             n_rbe_discarded_tot += 1;
             n_rbe_from_past += 1;
+            *too_early_rbevents.get_mut(&rb_ev.header.rb_id).unwrap() += 1;
             continue;
           }
           match event_cache.get_mut(&last_rb_evid) {
@@ -547,7 +557,9 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         settings.n_rbe_per_loop = 40;
       }
     }
-    if let BuildStrategy::AdaptiveGreedy(greediness) = settings.build_strategy {
+    if let BuildStrategy::AdaptiveGreedy = settings.build_strategy {
+      // FIXME - make this part of settings
+      let greediness : usize = 3;
       settings.n_rbe_per_loop = av_rb_ev.ceil() as usize + greediness;
       if settings.n_rbe_per_loop == 0 {
         // failsafe
@@ -631,7 +643,10 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         println!("  {:<70} <<", format!(">> ==> RBEvents discarded (orphaned, too late?) {} ({:4.2}%)",n_rbe_orphan, rbe_orphaned_frac).bright_purple());
       }
       println!("RBEvents received overview (rate/RB [Hz]):");
-
+      //if rbe_fpast_frac > 0.1 {
+      //  warn!("We will reset the MTB DAQ since the MT events seem to lag behind");
+      //  reset_daq_flag = true;
+      //}
       //let mut key_value_pairs: Vec<_> = seen_rbevents.iter().collect();
       //key_value_pairs.sort_by(|a, b| a.0.cmp(b.0));
       //for (key, value) in key_value_pairs {
@@ -728,6 +743,90 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       //column.set_cell_alignment(CellAlignment::Right);
       println!("{table}");
       println!("  {}",">> == == == == ==  END HEARTBEAT! == == == == == <<".bright_purple().bold());
+      let mut table = Table::new();
+      table
+        .load_preset(UTF8_FULL)
+        .apply_modifier(UTF8_ROUND_CORNERS)
+        .apply_modifier(UTF8_SOLID_INNER_BORDERS)
+        .set_content_arrangement(ContentArrangement::Dynamic)
+        .set_width(80)
+        //.set_header(vec!["Readoutboard Rates:"])
+        .add_row(vec![
+            Cell::new(&(format!("RB01 {:.1} Hz", too_early_rbevents[&1]))),
+            Cell::new(&(format!("RB02 {:.1} Hz", too_early_rbevents[&2]))),
+            Cell::new(&(format!("RB03 {:.1} Hz", too_early_rbevents[&3]))),
+            Cell::new(&(format!("RB04 {:.1} Hz", too_early_rbevents[&4]))),
+            Cell::new(&(format!("RB05 {:.1} Hz", too_early_rbevents[&5]))),
+            //Cell::new("Center aligned").set_alitoo_early_rbeventsgnment(CellAlignment::Center),
+        ])
+        .add_row(vec![
+            Cell::new(&(format!("RB06 {:.1} Hz", too_early_rbevents[&6]))),
+            Cell::new(&(format!("RB07 {:.1} Hz", too_early_rbevents[&7]))),
+            Cell::new(&(format!("RB08 {:.1} Hz", too_early_rbevents[&8]))),
+            Cell::new(&(format!("RB09 {:.1} Hz", too_early_rbevents[&9]))),
+            Cell::new(&(format!("RB10 {}", "N.A."))),
+        ])
+        .add_row(vec![
+            Cell::new(&(format!("RB11 {:.1} Hz", too_early_rbevents[&11]))),
+            Cell::new(&(format!("RB12 {}", "N.A."))),
+            Cell::new(&(format!("RB13 {:.1} Hz", too_early_rbevents[&13]))),
+            Cell::new(&(format!("RB14 {:.1} Hz", too_early_rbevents[&14]))),
+            Cell::new(&(format!("RB15 {:.1} Hz", too_early_rbevents[&15]))),
+        ])
+        .add_row(vec![
+            Cell::new(&(format!("RB16 {:.1} Hz", too_early_rbevents[&16]))),
+            Cell::new(&(format!("RB17 {:.1} Hz", too_early_rbevents[&17]))),
+            Cell::new(&(format!("RB18 {:.1} Hz", too_early_rbevents[&18]))),
+            Cell::new(&(format!("RB19 {:.1} Hz", too_early_rbevents[&19]))),
+            Cell::new(&(format!("RB20 {:.1} Hz", too_early_rbevents[&20]))),
+        ])
+        .add_row(vec![
+            Cell::new(&(format!("RB21 {:.1} Hz", too_early_rbevents[&21]))),
+            Cell::new(&(format!("RB22 {:.1} Hz", too_early_rbevents[&22]))),
+            Cell::new(&(format!("RB23 {:.1} Hz", too_early_rbevents[&23]))),
+            Cell::new(&(format!("RB24 {:.1} Hz", too_early_rbevents[&24]))),
+            Cell::new(&(format!("RB25 {:.1} Hz", too_early_rbevents[&25]))),
+        ])
+        .add_row(vec![
+            Cell::new(&(format!("RB26 {:.1} Hz", too_early_rbevents[&26]))),
+            Cell::new(&(format!("RB27 {:.1} Hz", too_early_rbevents[&27]))),
+            Cell::new(&(format!("RB28 {:.1} Hz", too_early_rbevents[&28]))),
+            Cell::new(&(format!("RB29 {:.1} Hz", too_early_rbevents[&29]))),
+            Cell::new(&(format!("RB30 {:.1} Hz", too_early_rbevents[&30]))),
+        ])
+        .add_row(vec![
+            Cell::new(&(format!("RB31 {:.1} Hz", too_early_rbevents[&31]))),
+            Cell::new(&(format!("RB32 {:.1} Hz", too_early_rbevents[&32]))),
+            Cell::new(&(format!("RB33 {:.1} Hz", too_early_rbevents[&33]))),
+            Cell::new(&(format!("RB34 {:.1} Hz", too_early_rbevents[&34]))),
+            Cell::new(&(format!("RB35 {:.1} Hz", too_early_rbevents[&35]))),
+        ])
+        .add_row(vec![
+            Cell::new(&(format!("RB36 {:.1}", too_early_rbevents[&36]))),
+            Cell::new(&(format!("RB37 {}", "N.A."))),
+            Cell::new(&(format!("RB38 {}", "N.A."))),
+            Cell::new(&(format!("RB39 {:.1}", too_early_rbevents[&39]))),
+            Cell::new(&(format!("RB40 {:.1}", too_early_rbevents[&40]))),
+        ])
+        .add_row(vec![
+            Cell::new(&(format!("RB41 {:.1}", too_early_rbevents[&41]))),
+            Cell::new(&(format!("RB43 {:.1}", too_early_rbevents[&42]))),
+            Cell::new(&(format!("RB42 {}", "N.A."))),
+            Cell::new(&(format!("RB44 {:.1}", too_early_rbevents[&44]))),
+            Cell::new(&(format!("RB45 {}", "N.A."))),
+        ])
+        .add_row(vec![
+            Cell::new(&(format!("RB46 {:.1} Hz", too_early_rbevents[&46]))),
+            Cell::new(&(format!("{}", "N.A."))),
+            Cell::new(&(format!("{}", "N.A."))),
+            Cell::new(&(format!("{}", "N.A."))),
+            Cell::new(&(format!("{}", "N.A."))),
+        ]);
+
+      // Set the default alignment for the third column to right
+      //let column = table.column_mut(2).expect("Our table has three columns");
+      //column.set_cell_alignment(CellAlignment::Right);
+      println!("{table}");
       //println!("[EVTBLDR] ==> Last RB evid {last_rb_evid}");
       debug_timer = Instant::now(); 
     }
@@ -772,8 +871,10 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             // we are earlier than our time out, maybe the 
             // event is already complete
             match settings.build_strategy {
-              BuildStrategy::WaitForNBoards(wait_nrb) => {
+              BuildStrategy::WaitForNBoards => {
                 // we will always wait for the expected number of boards, 
+                // FIXME - make this a member of settings
+                let wait_nrb : usize = 40;
                 // except the event times out
                 if ev.rb_events.len() == wait_nrb {
                   ready_to_send = true;
@@ -782,7 +883,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               },
               BuildStrategy::Adaptive 
               | BuildStrategy::AdaptiveThorough
-              | BuildStrategy::AdaptiveGreedy(_)
+              | BuildStrategy::AdaptiveGreedy
               | BuildStrategy::Smart 
               | BuildStrategy::Unknown => {
                 if ev.is_complete() {
