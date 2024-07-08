@@ -31,6 +31,7 @@ pub enum PacketType {
   TriggerConfig       = 61u8,
   AnalysisEngineConfig = 69u8,
   RBEventHeader       = 70u8,    // needs to go away
+  TOFEventBuilderConfig = 71u8,
   CPUMoniData         = 80u8,
   MonitorMtb          = 90u8,
   RBMoniData          = 100u8,
