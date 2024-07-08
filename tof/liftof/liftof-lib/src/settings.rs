@@ -16,7 +16,7 @@ use std::io::{
 use std::fmt;
 use std::collections::HashMap;
 
-use tof_dataclassess::config::BuildStrategy;
+use tof_dataclasses::config::BuildStrategy;
 
 
 extern crate toml;
@@ -506,7 +506,7 @@ impl TofEventBuilderSettings {
       n_rbe_per_loop      : 40,
       te_timeout_sec      : 30,
       sort_events         : false,
-      build_strategy      : BuildStrategy::WaitForNBoards(40),
+      build_strategy      : BuildStrategy::Adaptive,
     }
   }
 }
