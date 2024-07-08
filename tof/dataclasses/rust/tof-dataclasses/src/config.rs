@@ -23,11 +23,91 @@ use crate::commands::TofOperationMode;
 use crate::events::TriggerType;
 
 
+
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
     use crate::FromRandom;
     extern crate rand;
     use rand::Rng;
+  }
+}
+
+/// Build Strategy
+/// 
+#[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub enum BuildStrategy {
+  Unknown,
+  Smart,
+  /// adjust the number of boards based on nrbes/mtb
+  Adaptive,
+  /// Same as adaptive, but check if the rb events follow the 
+  /// mapping
+  AdaptiveThorough,
+  /// like adaptive, but add usize to the expected number of boards
+  AdaptiveGreedy(usize),
+  WaitForNBoards(usize)
+}
+
+impl fmt::Display for BuildStrategy {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("N.A. - Invalid BuildStrategy (error)"));
+    write!(f, "<BuildStrategy: {}>", r)
+  }
+}
+
+impl BuildStrategy {
+  pub fn to_u8(&self) -> u8 {
+    match self {
+      BuildStrategy::Unknown => {
+        return 0;
+      }
+      BuildStrategy::Smart => {
+        return 100;
+      }
+      BuildStrategy::Adaptive => {
+        return 101;
+      }
+      BuildStrategy::AdaptiveThorough => {
+        return 102;
+      }
+      BuildStrategy::AdaptiveGreedy(_) => {
+        return 1;
+      }
+      BuildStrategy::WaitForNBoards(_) => {
+        return 2;
+      }
+    }
+  }
+}
+impl From<u8> for BuildStrategy {
+  fn from(value: u8) -> Self {
+    match value {
+      0   => BuildStrategy::Unknown,
+      100 => BuildStrategy::Smart,
+      101 => BuildStrategy::Adaptive,
+      102 => BuildStrategy::AdaptiveThorough,
+      1   => BuildStrategy::AdaptiveGreedy(3),
+      2   => BuildStrategy::WaitForNBoards(40),
+      _   => BuildStrategy::Unknown
+    }
+  }
+}
+#[cfg(feature = "random")]
+impl FromRandom for BuildStrategy {
+  
+  fn from_random() -> Self {
+    let choices = [
+      BuildStrategy::Unknown,
+      BuildStrategy::Smart,
+      BuildStrategy::Adaptive,
+      BuildStrategy::AdaptiveThorough,
+      BuildStrategy::AdaptiveGreedy(3),
+      BuildStrategy::WaitForNBoards(40),
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
   }
 }
 
@@ -368,6 +448,7 @@ impl FromRandom for RunConfig {
   }
 }
 
+/// Configuring the trigger during flight
 #[cfg(feature = "random")]
 #[test]
 fn pack_runconfig() {
@@ -624,3 +705,101 @@ fn pack_analysisengineconfig() {
     assert_eq!(cfg, test);
   }
 }
+
+/// TOF Event Builder Settings
+/// Configuring the TOF event builder during flight
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct TOFEventBuilderConfig{
+  pub cachesize : usize, 
+  pub n_mte_per_loop : usize, //8
+  pub n_rbe_per_loop : usize, //8
+  pub te_timeout_sec : u32, //4
+  pub sort_events : bool, //1
+  pub build_strategy : BuildStrategy, //1
+}
+
+impl TOFEventBuilderConfig {
+  pub fn new() -> Self { 
+    Self {
+      cachesize           : 100000,
+      n_mte_per_loop      : 1,
+      n_rbe_per_loop      : 40,
+      te_timeout_sec      : 30,
+      sort_events         : false,
+      build_strategy      : BuildStrategy::WaitForNBoards(40)
+    }
+  }
+}
+
+impl Default for TOFEventBuilderConfig {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for TOFEventBuilderConfig {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TOFEventBuilderConfig");
+    repr += &(format!("\n Cache size                              : {}", self.cachesize)); 
+    repr += &(format!("\n Num. master trigger events per loop     : {}", self.n_mte_per_loop));
+    repr += &(format!("\n Num. readout board events per loop      : {}", self.n_rbe_per_loop));
+    repr += &(format!("\n TOF Event timeout window [sec]          : {:.3}", self.te_timeout_sec));
+    repr += &(format!("\n Sort events by ID (high resource load!) : {}", self.sort_events));
+    repr += &(format!("\n Build strategy                          : {}", self.build_strategy));
+    write!(f, "{}", repr)
+  }
+}
+
+impl Packable for TOFEventBuilderConfig {
+  const PACKET_TYPE : PacketType = PacketType::TOFEventBuilderConfig;
+}
+
+impl Serialization for TOFEventBuilderConfig {
+  
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  const SIZE : usize = 26; 
+  
+  fn from_bytestream(stream    : &Vec<u8>, 
+                     pos       : &mut usize) 
+    -> Result<Self, SerializationError>{
+    Self::verify_fixed(stream, pos)?;  
+    let mut cfg = TOFEventBuilderConfig::new();
+      cfg.cachesize = parse_usize(stream, pos);
+      cfg.n_mte_per_loop = parse_usize(stream, pos);
+      cfg.n_rbe_per_loop = parse_usize(stream, pos);
+      cfg.te_timeout_sec = parse_u32(stream, pos);
+      cfg.sort_events = parse_bool(stream, pos);
+      cfg.build_strategy = BuildStrategy::from(parse_u8(stream, pos));
+    *pos += 2;
+    Ok(cfg)
+  }
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
+    bs.extend_from_slice(&Self::HEAD.to_le_bytes());
+    bs.extend_from_slice(&self.cachesize.to_le_bytes());
+    bs.extend_from_slice(&self.n_mte_per_loop.to_le_bytes());
+    bs.extend_from_slice(&self.n_rbe_per_loop.to_le_bytes());
+    bs.extend_from_slice(&self.te_timeout_sec.to_le_bytes());
+    bs.push(self.sort_events as u8);
+    bs.push(self.build_strategy.to_u8());
+    bs.extend_from_slice(&Self::TAIL.to_le_bytes());
+    bs
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for TOFEventBuilderConfig {
+  fn from_random() -> Self {
+    let mut cfg  = TOFEventBuilderConfig::new();
+    let mut rng      = rand::thread_rng();
+    cfg.cachesize  = rng.gen::<usize>();
+    cfg.n_mte_per_loop= rng.gen::<usize>();
+    cfg.n_rbe_per_loop = rng.gen::<usize>();
+    cfg.te_timeout_sec = rng.gen::<u32>();
+    cfg.sort_events = rng.gen::<bool>();
+    cfg.build_strategy = BuildStrategy::from_random();
+    cfg
+  }
+}
+
