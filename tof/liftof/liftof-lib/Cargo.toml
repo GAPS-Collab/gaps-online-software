@@ -5,20 +5,11 @@ edition = "2021"
 rust-version = "1.78"
 
 [features]
-random   = []
-debug    = []
-database = ["tof-dataclasses/database"]
-#[[lib]]
-#name = "liftof-lib"
-#path = "src/lib.rs"
+random     = []
+debug      = []
+database   = ["tof-dataclasses/database"]
+tofcontrol = ["tof-dataclasses/tofcontrol"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-#ndarray = "0.15"
-#nlopt = "0.7"
-
-#nalgebra = "0.32"
-#nalgebra-linalg = "0.32"
 
 [dependencies]
 
@@ -35,7 +26,7 @@ half              = "2.4"
 #ssh2              = "0.9"
 toml              = "0.8"
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["tofcontrol","smoothed_z_score"], version = "0.10"} 
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["smoothed_z_score"], version = "0.10"} 
 
 
 colored     = "2.0"
