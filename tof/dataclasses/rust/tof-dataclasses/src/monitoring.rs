@@ -21,14 +21,14 @@ cfg_if::cfg_if! {
   }
 }
 
-// Takeru's tof-control code
-#[cfg(feature = "tof-control")]
+// Takeru's tofcontrol code
+#[cfg(feature = "tofcontrol")]
 use tof_control::helper::cpu_type::{
     CPUTempDebug,
     CPUInfoDebug,
 };
 
-#[cfg(feature = "tof-control")]
+#[cfg(feature = "tofcontrol")]
 use tof_control::helper::rb_type::{
     RBTemp,
     RBMag,
@@ -37,19 +37,19 @@ use tof_control::helper::rb_type::{
 };
 
 
-#[cfg(feature = "tof-control")]
+#[cfg(feature = "tofcontrol")]
 use tof_control::helper::ltb_type::{
     LTBTemp,
     LTBThreshold,
 };
 
-#[cfg(feature = "tof-control")]
+#[cfg(feature = "tofcontrol")]
 use tof_control::helper::pa_type::{
     PATemp,
     PAReadBias,
 };
 
-#[cfg(feature = "tof-control")]
+#[cfg(feature = "tofcontrol")]
 use tof_control::helper::pb_type::{
     PBTemp,
     PBVcp,
@@ -126,7 +126,7 @@ impl PBMoniData {
     }
   }
   
-  #[cfg(feature = "tof-control")]
+  #[cfg(feature = "tofcontrol")]
   pub fn add_temps(&mut self, pbtmp : &PBTemp) {
     self.pds_temp = pbtmp.pds_temp; 
     self.pas_temp = pbtmp.pas_temp; 
@@ -134,7 +134,7 @@ impl PBMoniData {
     self.shv_temp = pbtmp.shv_temp; 
   }
   
-  #[cfg(feature = "tof-control")]
+  #[cfg(feature = "tofcontrol")]
   pub fn add_vcp(&mut self, pbvcp : &PBVcp) {
     self.p3v6_preamp_vcp = pbvcp.p3v6_pa_vcp; 
     self.n1v6_preamp_vcp = pbvcp.n1v6_pa_vcp;  
@@ -381,12 +381,12 @@ impl PAMoniData {
     }
   }
 
-  #[cfg(feature = "tof-control")]
+  #[cfg(feature = "tofcontrol")]
   pub fn add_temps(&mut self, pt : &PATemp ) {
     self.temps = pt.pa_temps;
   }
 
-  #[cfg(feature = "tof-control")]
+  #[cfg(feature = "tofcontrol")]
   pub fn add_biases(&mut self, pb : &PAReadBias) {
     self.biases = pb.read_biases;
   }
@@ -613,13 +613,13 @@ impl LTBMoniData {
     }
   }
 
-  #[cfg(feature = "tof-control")]
+  #[cfg(feature = "tofcontrol")]
   pub fn add_temps(&mut self, lt : &LTBTemp) {
     self.trenz_temp = lt.trenz_temp;
     self.ltb_temp   = lt.board_temp;
   }
 
-  #[cfg(feature = "tof-control")]
+  #[cfg(feature = "tofcontrol")]
   pub fn add_thresh(&mut self, lt : &LTBThreshold) {
     self.thresh = [lt.thresh_0, lt.thresh_1, lt.thresh_2];
   }
@@ -785,7 +785,7 @@ pub struct RBMoniData {
 
 impl RBMoniData {
 
-  #[cfg(feature = "tof-control")]
+  #[cfg(feature = "tofcontrol")]
   pub fn add_rbtemp(&mut self, rb_temp : &RBTemp) {
     self.tmp_drs         = rb_temp.drs_temp      ; 
     self.tmp_clk         = rb_temp.clk_temp      ; 
@@ -795,7 +795,7 @@ impl RBMoniData {
     self.tmp_bm280       = rb_temp.bme280_temp   ; 
   }
 
-  #[cfg(feature = "tof-control")] 
+  #[cfg(feature = "tofcontrol")] 
   pub fn add_rbmag(&mut self, rb_mag   : &RBMag) {
     self.mag_x   = rb_mag.mag_xyz[0];
     self.mag_y   = rb_mag.mag_xyz[1];
@@ -807,7 +807,7 @@ impl RBMoniData {
   }
 
 
-  #[cfg(feature = "tof-control")]
+  #[cfg(feature = "tofcontrol")]
   pub fn add_rbvcp(&mut self, rb_vcp   : &RBVcp) {
     self.drs_dvdd_voltage = rb_vcp.drs_dvdd_vcp[0] ;
     self.drs_dvdd_current = rb_vcp.drs_dvdd_vcp[1] ;
@@ -835,7 +835,7 @@ impl RBMoniData {
     self.n1v5_power       = rb_vcp.n1v5_vcp[2]      ;
   }
   
-  #[cfg(feature = "tof-control")] 
+  #[cfg(feature = "tofcontrol")] 
   pub fn add_rbph(&mut self, rb_ph   : &RBPh) {
     self.pressure = rb_ph.pressure;
     self.humidity = rb_ph.humidity;
@@ -1237,7 +1237,7 @@ impl CPUMoniData {
     vec![self.cpu0_temp, self.cpu1_temp, self.cpu_temp, self.mb_temp]
   }
 
-  #[cfg(feature = "tof-control")]
+  #[cfg(feature = "tofcontrol")]
   pub fn add_temps(&mut self, cpu_temps : &CPUTempDebug) {
     self.cpu_temp   = cpu_temps.cpu_temp;
     self.cpu0_temp  = cpu_temps.cpu0_temp;
@@ -1245,7 +1245,7 @@ impl CPUMoniData {
     self.mb_temp    = cpu_temps.mb_temp;
   }
 
-  #[cfg(feature = "tof-control")]
+  #[cfg(feature = "tofcontrol")]
   pub fn add_info(&mut self, cpu_info : &CPUInfoDebug) {
     self.uptime = cpu_info.uptime;
     self.disk_usage = cpu_info.disk_usage;
