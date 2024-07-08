@@ -55,31 +55,33 @@ cfg_if::cfg_if! {
 #[cfg_attr(feature = "pybindings", pyclass)]
 #[repr(u8)]
 pub enum TofCommandCode {
-  Unknown                 = 0u8,
+  Unknown                  = 0u8,
   /// en empty command just to check if stuff is online
-  Ping                    = 1u8,
+  Ping                     = 1u8,
   /// command code for getting the monitoring data from the component
-  Moni                    = 2u8,
+  Moni                     = 2u8,
   /// Kill myself
-  Kill                    = 4u8, // Shi!
+  Kill                     = 4u8, // Shi!
   /// command code for "Set LTB Thresholds"
-  SetLTBThresholds           = 21u8,         
+  SetLTBThresholds         = 21u8,         
   /// command code for "Configure MTB"
-  SetMTConfig             = 22u8,     
+  SetMTConfig              = 22u8,     
   /// command code for AnalysisEngineConfig
-  SetAnalysisEngineConfig = 27u8,   
+  SetAnalysisEngineConfig  = 27u8,   
   /// command code for "Set preamp bias"
-  SetPreampBias           = 28u8,         
+  SetPreampBias            = 28u8,         
+  /// Change the settings of the event builder
+  SetTOFEventBuilderConfig = 29u8,
   /// command code for "Stop Data taking"
-  DataRunStop             = 30u8,  
+  DataRunStop              = 30u8,  
   /// command code for "Start Data taking"
-  DataRunStart            = 31u8,    
+  DataRunStart             = 31u8,    
   /// command code for "Start validation run"
-  StartValidationRun      = 32u8,         
+  StartValidationRun       = 32u8,         
   /// command code for "Get all waveforms"
-  GetFullWaveforms        = 41u8,
+  GetFullWaveforms         = 41u8,
   /// command code for "Run full calibration"
-  RBCalibration           = 53u8, 
+  RBCalibration            = 53u8, 
 
   /// command code for "Send the whole event cache over the wire"
   UnspoolEventCache       = 44u8,
@@ -119,6 +121,7 @@ impl From<u8> for TofCommandCode {
       21u8 => TofCommandCode::SetLTBThresholds,
       22u8 => TofCommandCode::SetMTConfig,
       28u8 => TofCommandCode::SetPreampBias,
+      29u8 => TofCommandCode::SetTOFEventBuilderConfig,
       30u8 => TofCommandCode::DataRunStop,
       31u8 => TofCommandCode::DataRunStart,
       32u8 => TofCommandCode::StartValidationRun,
@@ -145,6 +148,7 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::Moni,
       TofCommandCode::SetLTBThresholds,
       TofCommandCode::SetMTConfig,
+      TofCommandCode::SetTOFEventBuilderConfig,
       TofCommandCode::SetPreampBias,
       TofCommandCode::DataRunStop,
       TofCommandCode::DataRunStart,
