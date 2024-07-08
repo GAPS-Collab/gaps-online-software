@@ -1713,14 +1713,14 @@
   }
 }
 
-<span class="comment">// Takeru's tof-control code
-</span><span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+<span class="comment">// Takeru's tofcontrol code
+</span><span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
 </span><span class="kw">use </span>tof_control::helper::cpu_type::{
     CPUTempDebug,
     CPUInfoDebug,
 };
 
-<span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
 </span><span class="kw">use </span>tof_control::helper::rb_type::{
     RBTemp,
     RBMag,
@@ -1729,19 +1729,19 @@
 };
 
 
-<span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
 </span><span class="kw">use </span>tof_control::helper::ltb_type::{
     LTBTemp,
     LTBThreshold,
 };
 
-<span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
 </span><span class="kw">use </span>tof_control::helper::pa_type::{
     PATemp,
     PAReadBias,
 };
 
-<span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
 </span><span class="kw">use </span>tof_control::helper::pb_type::{
     PBTemp,
     PBVcp,
@@ -1818,7 +1818,7 @@
     }
   }
   
-  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
   </span><span class="kw">pub fn </span>add_temps(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pbtmp : <span class="kw-2">&amp;</span>PBTemp) {
     <span class="self">self</span>.pds_temp = pbtmp.pds_temp; 
     <span class="self">self</span>.pas_temp = pbtmp.pas_temp; 
@@ -1826,7 +1826,7 @@
     <span class="self">self</span>.shv_temp = pbtmp.shv_temp; 
   }
   
-  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
   </span><span class="kw">pub fn </span>add_vcp(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pbvcp : <span class="kw-2">&amp;</span>PBVcp) {
     <span class="self">self</span>.p3v6_preamp_vcp = pbvcp.p3v6_pa_vcp; 
     <span class="self">self</span>.n1v6_preamp_vcp = pbvcp.n1v6_pa_vcp;  
@@ -2073,12 +2073,12 @@
     </span>}
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
   </span><span class="kw">pub fn </span>add_temps(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pt : <span class="kw-2">&amp;</span>PATemp ) {
     <span class="self">self</span>.temps = pt.pa_temps;
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
   </span><span class="kw">pub fn </span>add_biases(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pb : <span class="kw-2">&amp;</span>PAReadBias) {
     <span class="self">self</span>.biases = pb.read_biases;
   }
@@ -2305,13 +2305,13 @@
     }
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
   </span><span class="kw">pub fn </span>add_temps(<span class="kw-2">&amp;mut </span><span class="self">self</span>, lt : <span class="kw-2">&amp;</span>LTBTemp) {
     <span class="self">self</span>.trenz_temp = lt.trenz_temp;
     <span class="self">self</span>.ltb_temp   = lt.board_temp;
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
   </span><span class="kw">pub fn </span>add_thresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, lt : <span class="kw-2">&amp;</span>LTBThreshold) {
     <span class="self">self</span>.thresh = [lt.thresh_0, lt.thresh_1, lt.thresh_2];
   }
@@ -2477,7 +2477,7 @@
 
 <span class="kw">impl </span>RBMoniData {
 
-  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
   </span><span class="kw">pub fn </span>add_rbtemp(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rb_temp : <span class="kw-2">&amp;</span>RBTemp) {
     <span class="self">self</span>.tmp_drs         = rb_temp.drs_temp      ; 
     <span class="self">self</span>.tmp_clk         = rb_temp.clk_temp      ; 
@@ -2487,7 +2487,7 @@
     <span class="self">self</span>.tmp_bm280       = rb_temp.bme280_temp   ; 
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)] 
+  <span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)] 
   </span><span class="kw">pub fn </span>add_rbmag(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rb_mag   : <span class="kw-2">&amp;</span>RBMag) {
     <span class="self">self</span>.mag_x   = rb_mag.mag_xyz[<span class="number">0</span>];
     <span class="self">self</span>.mag_y   = rb_mag.mag_xyz[<span class="number">1</span>];
@@ -2499,7 +2499,7 @@
   }
 
 
-  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
   </span><span class="kw">pub fn </span>add_rbvcp(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rb_vcp   : <span class="kw-2">&amp;</span>RBVcp) {
     <span class="self">self</span>.drs_dvdd_voltage = rb_vcp.drs_dvdd_vcp[<span class="number">0</span>] ;
     <span class="self">self</span>.drs_dvdd_current = rb_vcp.drs_dvdd_vcp[<span class="number">1</span>] ;
@@ -2527,7 +2527,7 @@
     <span class="self">self</span>.n1v5_power       = rb_vcp.n1v5_vcp[<span class="number">2</span>]      ;
   }
   
-  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)] 
+  <span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)] 
   </span><span class="kw">pub fn </span>add_rbph(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rb_ph   : <span class="kw-2">&amp;</span>RBPh) {
     <span class="self">self</span>.pressure = rb_ph.pressure;
     <span class="self">self</span>.humidity = rb_ph.humidity;
@@ -2929,7 +2929,7 @@
     <span class="macro">vec!</span>[<span class="self">self</span>.cpu0_temp, <span class="self">self</span>.cpu1_temp, <span class="self">self</span>.cpu_temp, <span class="self">self</span>.mb_temp]
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
   </span><span class="kw">pub fn </span>add_temps(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cpu_temps : <span class="kw-2">&amp;</span>CPUTempDebug) {
     <span class="self">self</span>.cpu_temp   = cpu_temps.cpu_temp;
     <span class="self">self</span>.cpu0_temp  = cpu_temps.cpu0_temp;
@@ -2937,7 +2937,7 @@
     <span class="self">self</span>.mb_temp    = cpu_temps.mb_temp;
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tofcontrol"</span>)]
   </span><span class="kw">pub fn </span>add_info(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cpu_info : <span class="kw-2">&amp;</span>CPUInfoDebug) {
     <span class="self">self</span>.uptime = cpu_info.uptime;
     <span class="self">self</span>.disk_usage = cpu_info.disk_usage;
