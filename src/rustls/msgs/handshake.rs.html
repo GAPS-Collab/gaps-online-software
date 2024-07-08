@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rustls-0.23.10/src/msgs/handshake.rs`."><title>handshake.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../rustls/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rustls-0.23.11/src/msgs/handshake.rs`."><title>handshake.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../rustls/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -3137,6 +3137,7 @@
 <a href="#3137" id="3137">3137</a>
 <a href="#3138" id="3138">3138</a>
 <a href="#3139" id="3139">3139</a>
+<a href="#3140" id="3140">3140</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>alloc::collections::BTreeSet;
 <span class="attr">#[cfg(feature = <span class="string">"logging"</span>)]
 </span><span class="kw">use </span>alloc::string::String;
@@ -3198,7 +3199,7 @@
             <span class="self">self</span>.<span class="number">0</span>.encode(bytes);
         }
 
-        <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+        <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
             <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="macro-nonterminal">$inner::read</span>(r)<span class="question-mark">?</span>))
         }
     }
@@ -3226,7 +3227,7 @@
         bytes.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>bytes = <span class="kw">match </span>r.take(<span class="number">32</span>) {
             <span class="prelude-val">Some</span>(bytes) =&gt; bytes,
             <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::MissingData(<span class="string">"Random"</span>)),
@@ -3287,7 +3288,7 @@
         bytes.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.data[..<span class="self">self</span>.len]);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>len = u8::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">if </span>len &gt; <span class="number">32 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::TrailingData(<span class="string">"SessionID"</span>));
@@ -3335,7 +3336,7 @@
         <span class="self">self</span>.payload.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(typ: ExtensionType, r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>read(typ: ExtensionType, r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>payload = Payload::read(r).into_owned();
         <span class="self">Self </span>{ typ, payload }
     }
@@ -3365,7 +3366,7 @@
         <span class="self">Self</span>::HostName(hostname)
     }
 
-    <span class="kw">fn </span>read_hostname(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read_hostname(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">use </span>pki_types::ServerName;
         <span class="kw">let </span>raw = PayloadU16::read(r)<span class="question-mark">?</span>;
 
@@ -3406,7 +3407,7 @@
         <span class="self">self</span>.payload.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ServerNameType::read(r)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>payload = <span class="kw">match </span>typ {
@@ -3512,7 +3513,7 @@
         <span class="self">self</span>.payload.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>group = NamedGroup::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>payload = PayloadU16::read(r)<span class="question-mark">?</span>;
 
@@ -3542,7 +3543,7 @@
         <span class="self">self</span>.obfuscated_ticket_age.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             identity: PayloadU16::read(r)<span class="question-mark">?</span>,
             obfuscated_ticket_age: u32::read(r)<span class="question-mark">?</span>,
@@ -3582,7 +3583,7 @@
         <span class="self">self</span>.binders.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             identities: Vec::read(r)<span class="question-mark">?</span>,
             binders: Vec::read(r)<span class="question-mark">?</span>,
@@ -3610,7 +3611,7 @@
         <span class="self">self</span>.extensions.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             responder_ids: Vec::read(r)<span class="question-mark">?</span>,
             extensions: PayloadU16::read(r)<span class="question-mark">?</span>,
@@ -3635,7 +3636,7 @@
         }
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = CertificateStatusType::read(r)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>typ {
@@ -3763,7 +3764,7 @@
         }
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
@@ -3912,7 +3913,7 @@
         }
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
@@ -3973,7 +3974,7 @@
         <span class="self">self</span>.payload_encode(bytes, Encoding::Standard)
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="self">Self </span>{
             client_version: ProtocolVersion::read(r)<span class="question-mark">?</span>,
             random: Random::read(r)<span class="question-mark">?</span>,
@@ -4293,7 +4294,7 @@
         }
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
@@ -4330,7 +4331,7 @@
         <span class="self">self</span>.payload_encode(bytes, Encoding::Standard)
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>session_id = SessionId::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>cipher_suite = CipherSuite::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>compression = Compression::read(r)<span class="question-mark">?</span>;
@@ -4456,7 +4457,7 @@
     }
 
     <span class="comment">// minus version and random, which have already been read.
-    </span><span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    </span><span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>session_id = SessionId::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>suite = CipherSuite::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>compression = Compression::read(r)<span class="question-mark">?</span>;
@@ -4586,6 +4587,7 @@
 <span class="kw">impl </span>TlsListElement <span class="kw">for </span>CertificateDer&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U24 {
         max: CERTIFICATE_MAX_SIZE_LIMIT,
+        error: InvalidMessage::CertificatePayloadTooLarge,
     };
 }
 
@@ -4722,6 +4724,7 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; TlsListElement <span class="kw">for </span>CertificateEntry&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U24 {
         max: CERTIFICATE_MAX_SIZE_LIMIT,
+        error: InvalidMessage::CertificatePayloadTooLarge,
     };
 }
 
@@ -4864,7 +4867,7 @@
         <span class="self">self</span>.named_group.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>ct = ECCurveType::read(r)<span class="question-mark">?</span>;
         <span class="kw">if </span>ct != ECCurveType::NamedCurve {
             <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::UnsupportedCurveType);
@@ -4911,7 +4914,7 @@
 
 <span class="attr">#[cfg(feature = <span class="string">"tls12"</span>)]
 </span><span class="kw">impl </span>KxDecode&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>ClientKeyExchangeParams {
-    <span class="kw">fn </span>decode(r: <span class="kw-2">&amp;mut </span>Reader, algo: KeyExchangeAlgorithm) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>decode(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;, algo: KeyExchangeAlgorithm) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">use </span>KeyExchangeAlgorithm::<span class="kw-2">*</span>;
         <span class="prelude-val">Ok</span>(<span class="kw">match </span>algo {
             ECDHE =&gt; <span class="self">Self</span>::Ecdh(ClientEcdhParams::read(r)<span class="question-mark">?</span>),
@@ -4930,7 +4933,7 @@
         <span class="self">self</span>.public.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>pb = PayloadU8::read(r)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ public: pb })
     }
@@ -4946,7 +4949,7 @@
         <span class="self">self</span>.public.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             public: PayloadU16::read(r)<span class="question-mark">?</span>,
         })
@@ -4978,7 +4981,7 @@
         <span class="self">self</span>.public.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>cp = EcParameters::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>pb = PayloadU8::read(r)<span class="question-mark">?</span>;
 
@@ -5025,7 +5028,7 @@
         <span class="self">self</span>.dh_Ys.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             dh_p: PayloadU16::read(r)<span class="question-mark">?</span>,
             dh_g: PayloadU16::read(r)<span class="question-mark">?</span>,
@@ -5076,7 +5079,7 @@
 
 <span class="attr">#[cfg(feature = <span class="string">"tls12"</span>)]
 </span><span class="kw">impl </span>KxDecode&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>ServerKeyExchangeParams {
-    <span class="kw">fn </span>decode(r: <span class="kw-2">&amp;mut </span>Reader, algo: KeyExchangeAlgorithm) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>decode(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;, algo: KeyExchangeAlgorithm) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">use </span>KeyExchangeAlgorithm::<span class="kw-2">*</span>;
         <span class="prelude-val">Ok</span>(<span class="kw">match </span>algo {
             ECDHE =&gt; <span class="self">Self</span>::Ecdh(ServerEcdhParams::read(r)<span class="question-mark">?</span>),
@@ -5118,7 +5121,7 @@
         }
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="comment">// read as Unknown, fully parse when we know the
         // KeyExchangeAlgorithm
         </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::Unknown(Payload::read(r).into_owned()))
@@ -5262,7 +5265,7 @@
         <span class="self">self</span>.canames.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>certtypes = Vec::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>sigschemes = Vec::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>canames = Vec::read(r)<span class="question-mark">?</span>;
@@ -5312,7 +5315,7 @@
         }
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
@@ -5356,7 +5359,7 @@
         <span class="self">self</span>.extensions.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>context = PayloadU8::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>extensions = Vec::read(r)<span class="question-mark">?</span>;
 
@@ -5424,7 +5427,7 @@
         <span class="self">self</span>.ticket.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>lifetime = u32::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>ticket = PayloadU16::read(r)<span class="question-mark">?</span>;
 
@@ -5462,7 +5465,7 @@
         }
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
@@ -5533,7 +5536,7 @@
         <span class="self">self</span>.exts.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>lifetime = u32::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>age_add = u32::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>nonce = PayloadU8::read(r)<span class="question-mark">?</span>;
@@ -5628,7 +5631,7 @@
         </span>}
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_borrowed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CompressedCertificatePayload {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_borrowed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CompressedCertificatePayload&lt;<span class="lifetime">'_</span>&gt; {
         CompressedCertificatePayload {
             alg: <span class="self">self</span>.alg,
             uncompressed_len: <span class="self">self</span>.uncompressed_len,
@@ -5835,13 +5838,6 @@
             .map(|<span class="kw">_</span>| <span class="self">Self </span>{ typ, payload })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build_key_update_notify() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            typ: HandshakeType::KeyUpdate,
-            payload: HandshakePayload::KeyUpdate(KeyUpdateRequest::UpdateNotRequested),
-        }
-    }
-
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>encoding_for_binder_signing(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="self">self</span>.get_encoding();
 
@@ -5872,7 +5868,13 @@
         }
         .encode(bytes);
 
-        <span class="kw">let </span>nested = LengthPrefixedBuffer::new(ListLength::U24 { max: usize::MAX }, bytes);
+        <span class="kw">let </span>nested = LengthPrefixedBuffer::new(
+            ListLength::U24 {
+                max: usize::MAX,
+                error: InvalidMessage::MessageTooLarge,
+            },
+            bytes,
+        );
 
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.payload {
             <span class="comment">// for Server Hello and HelloRetryRequest payloads we need to encode the payload
@@ -5915,7 +5917,7 @@
         <span class="self">self</span>.aead_id.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             kdf_id: HpkeKdf::read(r)<span class="question-mark">?</span>,
             aead_id: HpkeAead::read(r)<span class="question-mark">?</span>,
@@ -5944,7 +5946,7 @@
             .encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             config_id: u8::read(r)<span class="question-mark">?</span>,
             kem_id: HpkeKem::read(r)<span class="question-mark">?</span>,
@@ -5994,7 +5996,7 @@
         <span class="self">self</span>.extensions.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             key_config: HpkeKeyConfig::read(r)<span class="question-mark">?</span>,
             maximum_name_length: u8::read(r)<span class="question-mark">?</span>,
@@ -6041,7 +6043,7 @@
         }
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>version = EchVersion::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>length = u16::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>contents = r.sub(length <span class="kw">as </span>usize)<span class="question-mark">?</span>;
@@ -6083,7 +6085,7 @@
         }
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
         <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
@@ -6130,7 +6132,7 @@
         }
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="kw">match </span>EchClientHelloType::read(r)<span class="question-mark">? </span>{
             EchClientHelloType::ClientHelloOuter =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Outer(EncryptedClientHelloOuter::read(r)<span class="question-mark">?</span>))
@@ -6167,7 +6169,7 @@
         <span class="self">self</span>.payload.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             cipher_suite: HpkeSymmetricCipherSuite::read(r)<span class="question-mark">?</span>,
             config_id: u8::read(r)<span class="question-mark">?</span>,
@@ -6191,7 +6193,7 @@
         <span class="self">self</span>.retry_configs.encode(bytes);
     }
 
-    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             retry_configs: Vec::&lt;EchConfigPayload&gt;::read(r)<span class="question-mark">?</span>,
         })

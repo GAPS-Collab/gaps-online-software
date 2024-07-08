@@ -188,6 +188,7 @@
 <a href="#188" id="188">188</a>
 <a href="#189" id="189">189</a>
 <a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// PacketType identifies the payload in TofPackets
 ///
 /// This needs to be kept in sync with the C++ API
@@ -221,7 +222,8 @@
   </span>TriggerConfig       = <span class="number">61u8</span>,
   AnalysisEngineConfig = <span class="number">69u8</span>,
   RBEventHeader       = <span class="number">70u8</span>,    <span class="comment">// needs to go away
-  </span>CPUMoniData         = <span class="number">80u8</span>,
+  </span>TOFEventBuilderConfig = <span class="number">71u8</span>,
+  CPUMoniData         = <span class="number">80u8</span>,
   MonitorMtb          = <span class="number">90u8</span>,
   RBMoniData          = <span class="number">100u8</span>,
   PBMoniData          = <span class="number">101u8</span>,

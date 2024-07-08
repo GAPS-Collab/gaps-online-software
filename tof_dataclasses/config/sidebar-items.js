@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["AnalysisEngineConfig","LTBThresholdConfig","PreampBiasConfig","RunConfig","TriggerConfig"]};
+window.SIDEBAR_ITEMS = {"enum":["BuildStrategy"],"struct":["AnalysisEngineConfig","LTBThresholdConfig","PreampBiasConfig","RunConfig","TOFEventBuilderConfig","TriggerConfig"]};

@@ -860,6 +860,107 @@
 <a href="#860" id="860">860</a>
 <a href="#861" id="861">861</a>
 <a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::thread;
 <span class="kw">use </span>std::time::{
     Instant,
@@ -898,8 +999,9 @@
 //use liftof_lib::heartbeat_printer;
 </span><span class="kw">use </span>liftof_lib::settings::{
     TofEventBuilderSettings,
-    BuildStrategy,
-};
+    <span class="comment">//BuildStrategy,
+</span>};
+<span class="kw">use </span>tof_dataclasses::config::BuildStrategy;
 <span class="kw">use </span>liftof_lib::thread_control::ThreadControl;
 
 <span class="kw">use </span><span class="kw">crate</span>::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
@@ -1223,13 +1325,15 @@
   // debug the number of rb events we have seen 
   // in production mode, these features should go away
   // FIXEM - add debug flags to features
-  </span><span class="kw">let </span><span class="kw-2">mut </span>seen_rbevents = HashMap::&lt;u8, usize&gt;::new();
+  </span><span class="kw">let </span><span class="kw-2">mut </span>seen_rbevents      = HashMap::&lt;u8, usize&gt;::new();
+  <span class="kw">let </span><span class="kw-2">mut </span>too_early_rbevents = HashMap::&lt;u8, usize&gt;::new(); 
   <span class="comment">// 10, 12, 37,38, 43, 45 don't exist
   </span><span class="kw">for </span>k <span class="kw">in </span><span class="number">1</span>..<span class="number">47 </span>{
     <span class="kw">if </span>k == <span class="number">10 </span>|| k ==<span class="number">12 </span>|| k == <span class="number">37 </span>|| k == <span class="number">38 </span>|| k == <span class="number">43 </span>|| k == <span class="number">45 </span>{
       <span class="kw">continue</span>;
     } <span class="kw">else </span>{
       seen_rbevents.insert(k <span class="kw">as </span>u8, <span class="number">0</span>);
+      too_early_rbevents.insert(k <span class="kw">as </span>u8, <span class="number">0</span>);
     }
   }
   <span class="comment">// event caches for assembled events
@@ -1262,16 +1366,22 @@
   </span><span class="kw">let </span><span class="kw-2">mut </span>check_tc_update      = Instant::now();
   <span class="kw">let </span><span class="kw-2">mut </span>n_gathered_fr_cache  = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>misaligned_cache_err = <span class="number">0usize</span>; 
+  <span class="kw">let </span><span class="kw-2">mut </span>daq_reset_cooldown   = Instant::now();
+  <span class="kw">let </span><span class="kw-2">mut </span>reset_daq_flag       = <span class="bool-val">false</span>;
   <span class="kw">loop </span>{
     <span class="kw">if </span>check_tc_update.elapsed().as_secs() &gt; <span class="number">2 </span>{
       <span class="kw">let </span><span class="kw-2">mut </span>cali_still_active = <span class="bool-val">false</span>;
       <span class="kw">match </span>thread_control.try_lock() {
-        <span class="prelude-val">Ok</span>(tc) =&gt; {
+        <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
           <span class="comment">//println!("== ==&gt; [evt_builder] tc lock acquired!");
           </span><span class="kw">if </span>tc.calibration_active {
             cali_still_active = <span class="bool-val">true</span>;
           } <span class="kw">else </span>{
             cali_still_active = <span class="bool-val">false</span>;  
+          }
+          <span class="kw">if </span>daq_reset_cooldown.elapsed().as_secs_f32() &gt; <span class="number">120.0 </span>&amp;&amp; reset_daq_flag {
+            <span class="macro">warn!</span>(<span class="string">"Resetttign MTB DAQ queue!"</span>);
+            tc.reset_mtb_daq = <span class="bool-val">true</span>;
           }
         },
         <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1355,6 +1465,7 @@
             <span class="comment">//attempts += 1;
             </span>n_rbe_discarded_tot += <span class="number">1</span>;
             n_rbe_from_past += <span class="number">1</span>;
+            <span class="kw-2">*</span>too_early_rbevents.get_mut(<span class="kw-2">&amp;</span>rb_ev.header.rb_id).unwrap() += <span class="number">1</span>;
             <span class="kw">continue</span>;
           }
           <span class="kw">match </span>event_cache.get_mut(<span class="kw-2">&amp;</span>last_rb_evid) {
@@ -1409,7 +1520,9 @@
         </span>settings.n_rbe_per_loop = <span class="number">40</span>;
       }
     }
-    <span class="kw">if let </span>BuildStrategy::AdaptiveGreedy(greediness) = settings.build_strategy {
+    <span class="kw">if let </span>BuildStrategy::AdaptiveGreedy = settings.build_strategy {
+      <span class="comment">// FIXME - make this part of settings
+      </span><span class="kw">let </span>greediness : usize = <span class="number">3</span>;
       settings.n_rbe_per_loop = av_rb_ev.ceil() <span class="kw">as </span>usize + greediness;
       <span class="kw">if </span>settings.n_rbe_per_loop == <span class="number">0 </span>{
         <span class="comment">// failsafe
@@ -1493,8 +1606,11 @@
         <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; RBEvents discarded (orphaned, too late?) {} ({:4.2}%)"</span>,n_rbe_orphan, rbe_orphaned_frac).bright_purple());
       }
       <span class="macro">println!</span>(<span class="string">"RBEvents received overview (rate/RB [Hz]):"</span>);
-
-      <span class="comment">//let mut key_value_pairs: Vec&lt;_&gt; = seen_rbevents.iter().collect();
+      <span class="comment">//if rbe_fpast_frac &gt; 0.1 {
+      //  warn!("We will reset the MTB DAQ since the MT events seem to lag behind");
+      //  reset_daq_flag = true;
+      //}
+      //let mut key_value_pairs: Vec&lt;_&gt; = seen_rbevents.iter().collect();
       //key_value_pairs.sort_by(|a, b| a.0.cmp(b.0));
       //for (key, value) in key_value_pairs {
       //    if key &lt; &amp;10 {
@@ -1590,6 +1706,90 @@
       //column.set_cell_alignment(CellAlignment::Right);
       </span><span class="macro">println!</span>(<span class="string">"{table}"</span>);
       <span class="macro">println!</span>(<span class="string">"  {}"</span>,<span class="string">"&gt;&gt; == == == == ==  END HEARTBEAT! == == == == == &lt;&lt;"</span>.bright_purple().bold());
+      <span class="kw">let </span><span class="kw-2">mut </span>table = Table::new();
+      table
+        .load_preset(UTF8_FULL)
+        .apply_modifier(UTF8_ROUND_CORNERS)
+        .apply_modifier(UTF8_SOLID_INNER_BORDERS)
+        .set_content_arrangement(ContentArrangement::Dynamic)
+        .set_width(<span class="number">80</span>)
+        <span class="comment">//.set_header(vec!["Readoutboard Rates:"])
+        </span>.add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB01 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">1</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB02 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">2</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB03 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">3</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB04 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">4</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB05 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">5</span>]))),
+            <span class="comment">//Cell::new("Center aligned").set_alitoo_early_rbeventsgnment(CellAlignment::Center),
+        </span>])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB06 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">6</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB07 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">7</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB08 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">8</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB09 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">9</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB10 {}"</span>, <span class="string">"N.A."</span>))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB11 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">11</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB12 {}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB13 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">13</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB14 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">14</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB15 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">15</span>]))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB16 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">16</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB17 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">17</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB18 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">18</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB19 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">19</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB20 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">20</span>]))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB21 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">21</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB22 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">22</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB23 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">23</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB24 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">24</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB25 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">25</span>]))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB26 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">26</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB27 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">27</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB28 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">28</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB29 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">29</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB30 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">30</span>]))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB31 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">31</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB32 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">32</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB33 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">33</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB34 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">34</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB35 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">35</span>]))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB36 {:.1}"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">36</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB37 {}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB38 {}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB39 {:.1}"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">39</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB40 {:.1}"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">40</span>]))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB41 {:.1}"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">41</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB43 {:.1}"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">42</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB42 {}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB44 {:.1}"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">44</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB45 {}"</span>, <span class="string">"N.A."</span>))),
+        ])
+        .add_row(<span class="macro">vec!</span>[
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"RB46 {:.1} Hz"</span>, too_early_rbevents[<span class="kw-2">&amp;</span><span class="number">46</span>]))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, <span class="string">"N.A."</span>))),
+            Cell::new(<span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, <span class="string">"N.A."</span>))),
+        ]);
+
+      <span class="comment">// Set the default alignment for the third column to right
+      //let column = table.column_mut(2).expect("Our table has three columns");
+      //column.set_cell_alignment(CellAlignment::Right);
+      </span><span class="macro">println!</span>(<span class="string">"{table}"</span>);
       <span class="comment">//println!("[EVTBLDR] ==&gt; Last RB evid {last_rb_evid}");
       </span>debug_timer = Instant::now(); 
     }
@@ -1634,9 +1834,11 @@
             <span class="comment">// we are earlier than our time out, maybe the 
             // event is already complete
             </span><span class="kw">match </span>settings.build_strategy {
-              BuildStrategy::WaitForNBoards(wait_nrb) =&gt; {
+              BuildStrategy::WaitForNBoards =&gt; {
                 <span class="comment">// we will always wait for the expected number of boards, 
-                // except the event times out
+                // FIXME - make this a member of settings
+                </span><span class="kw">let </span>wait_nrb : usize = <span class="number">40</span>;
+                <span class="comment">// except the event times out
                 </span><span class="kw">if </span>ev.rb_events.len() == wait_nrb {
                   ready_to_send = <span class="bool-val">true</span>;
                   <span class="comment">//n_gathered_fr_cache += 1;
@@ -1644,7 +1846,7 @@
               </span>},
               BuildStrategy::Adaptive 
               | BuildStrategy::AdaptiveThorough
-              | BuildStrategy::AdaptiveGreedy(<span class="kw">_</span>)
+              | BuildStrategy::AdaptiveGreedy
               | BuildStrategy::Smart 
               | BuildStrategy::Unknown =&gt; {
                 <span class="kw">if </span>ev.is_complete() {

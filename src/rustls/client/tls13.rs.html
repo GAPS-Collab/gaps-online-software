@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rustls-0.23.10/src/client/tls13.rs`."><title>tls13.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../rustls/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rustls-0.23.11/src/client/tls13.rs`."><title>tls13.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../rustls/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1609,6 +1609,14 @@
 <a href="#1609" id="1609">1609</a>
 <a href="#1610" id="1610">1610</a>
 <a href="#1611" id="1611">1611</a>
+<a href="#1612" id="1612">1612</a>
+<a href="#1613" id="1613">1613</a>
+<a href="#1614" id="1614">1614</a>
+<a href="#1615" id="1615">1615</a>
+<a href="#1616" id="1616">1616</a>
+<a href="#1617" id="1617">1617</a>
+<a href="#1618" id="1618">1618</a>
+<a href="#1619" id="1619">1619</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>alloc::boxed::Box;
 <span class="kw">use </span>alloc::sync::Arc;
 <span class="kw">use </span>alloc::vec;
@@ -1623,7 +1631,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::client::common::{ClientAuthDetails, ClientHelloDetails, ServerCertDetails};
 <span class="kw">use </span><span class="kw">crate</span>::client::ech::{<span class="self">self</span>, EchState, EchStatus};
 <span class="kw">use </span><span class="kw">crate</span>::client::{hs, ClientConfig, ClientSessionStore};
-<span class="kw">use </span><span class="kw">crate</span>::common_state::{CommonState, HandshakeKind, Protocol, Side, State};
+<span class="kw">use </span><span class="kw">crate</span>::common_state::{CommonState, HandshakeKind, KxState, Protocol, Side, State};
 <span class="kw">use </span><span class="kw">crate</span>::conn::ConnectionRandoms;
 <span class="kw">use </span><span class="kw">crate</span>::crypto::ActiveKeyExchange;
 <span class="kw">use </span><span class="kw">crate</span>::enums::{
@@ -1673,7 +1681,7 @@
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>handle_server_hello(
     config: Arc&lt;ClientConfig&gt;,
-    cx: <span class="kw-2">&amp;mut </span>ClientContext,
+    cx: <span class="kw-2">&amp;mut </span>ClientContext&lt;<span class="lifetime">'_</span>&gt;,
     server_hello: <span class="kw-2">&amp;</span>ServerHelloPayload,
     <span class="kw-2">mut </span>resuming_session: <span class="prelude-ty">Option</span>&lt;persist::Tls13ClientSessionValue&gt;,
     server_name: ServerName&lt;<span class="lifetime">'static</span>&gt;,
@@ -1684,7 +1692,7 @@
     <span class="kw-2">mut </span>hello: ClientHelloDetails,
     our_key_share: Box&lt;<span class="kw">dyn </span>ActiveKeyExchange&gt;,
     <span class="kw-2">mut </span>sent_tls13_fake_ccs: bool,
-    server_hello_msg: <span class="kw-2">&amp;</span>Message,
+    server_hello_msg: <span class="kw-2">&amp;</span>Message&lt;<span class="lifetime">'_</span>&gt;,
     ech_state: <span class="prelude-ty">Option</span>&lt;EchState&gt;,
 ) -&gt; hs::NextStateOrError&lt;<span class="lifetime">'static</span>&gt; {
     validate_server_hello(cx.common, server_hello)<span class="question-mark">?</span>;
@@ -1758,6 +1766,7 @@
         KeySchedulePreHandshake::new(suite)
     };
 
+    cx.common.kx_state.complete();
     <span class="kw">let </span>shared_secret = our_key_share.complete(<span class="kw-2">&amp;</span>their_key_share.payload.<span class="number">0</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let </span><span class="kw-2">mut </span>key_schedule = key_schedule_pre_handshake.into_handshake(shared_secret);
@@ -1839,6 +1848,7 @@
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>initial_key_share(
     config: <span class="kw-2">&amp;</span>ClientConfig,
     server_name: <span class="kw-2">&amp;</span>ServerName&lt;<span class="lifetime">'_</span>&gt;,
+    kx_state: <span class="kw-2">&amp;mut </span>KxState,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Box&lt;<span class="kw">dyn </span>ActiveKeyExchange&gt;, Error&gt; {
     <span class="kw">let </span>group = config
         .resumption
@@ -1855,6 +1865,7 @@
                 .expect(<span class="string">"No kx groups configured"</span>)
         });
 
+    <span class="kw-2">*</span>kx_state = KxState::Start(group);
     group.start()
 }
 
@@ -1863,7 +1874,7 @@
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>fill_in_psk_binder(
     resuming: <span class="kw-2">&amp;</span>persist::Tls13ClientSessionValue,
     transcript: <span class="kw-2">&amp;</span>HandshakeHashBuffer,
-    hmp: <span class="kw-2">&amp;mut </span>HandshakeMessagePayload,
+    hmp: <span class="kw-2">&amp;mut </span>HandshakeMessagePayload&lt;<span class="lifetime">'_</span>&gt;,
 ) -&gt; KeyScheduleEarly {
     <span class="comment">// We need to know the hash function of the suite we're trying to resume into.
     </span><span class="kw">let </span>suite = resuming.suite();
@@ -3163,6 +3174,11 @@
         }
 
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
+    }
+
+    <span class="kw">fn </span>send_key_update_request(<span class="kw-2">&amp;mut </span><span class="self">self</span>, common: <span class="kw-2">&amp;mut </span>CommonState) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="self">self</span>.key_schedule
+            .request_key_update_and_update_encrypter(common)
     }
 
     <span class="kw">fn </span>export_keying_material(

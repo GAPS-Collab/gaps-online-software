@@ -885,17 +885,6 @@
 <a href="#885" id="885">885</a>
 <a href="#886" id="886">886</a>
 <a href="#887" id="887">887</a>
-<a href="#888" id="888">888</a>
-<a href="#889" id="889">889</a>
-<a href="#890" id="890">890</a>
-<a href="#891" id="891">891</a>
-<a href="#892" id="892">892</a>
-<a href="#893" id="893">893</a>
-<a href="#894" id="894">894</a>
-<a href="#895" id="895">895</a>
-<a href="#896" id="896">896</a>
-<a href="#897" id="897">897</a>
-<a href="#898" id="898">898</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Aggregate settings for the TOF system
 //!
 //! Control the settings for the C&amp;C server
@@ -913,6 +902,8 @@
 };
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::collections::HashMap;
+
+<span class="kw">use </span>tof_dataclasses::config::BuildStrategy;
 
 
 <span class="kw">extern crate </span>toml;
@@ -1198,19 +1189,6 @@
   }
 }
 
-<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-</span><span class="kw">pub enum </span>BuildStrategy {
-  Unknown,
-  Smart,
-  <span class="doccomment">/// adjust the number of boards based on nrbes/mtb
-  </span>Adaptive,
-  <span class="doccomment">/// Same as adaptive, but check if the rb events follow the 
-  /// mapping
-  </span>AdaptiveThorough,
-  <span class="doccomment">/// like adaptive, but add usize to the expected number of boards
-  </span>AdaptiveGreedy(usize),
-  WaitForNBoards(usize)
-}
 
 <span class="doccomment">/// Settings for the specific clients on the RBs (liftof-rb)
 </span><span class="attr">#[derive(Debug, Copy, Clone, serde::Serialize, serde::Deserialize)]
@@ -1415,7 +1393,7 @@
       n_rbe_per_loop      : <span class="number">40</span>,
       te_timeout_sec      : <span class="number">30</span>,
       sort_events         : <span class="bool-val">false</span>,
-      build_strategy      : BuildStrategy::WaitForNBoards(<span class="number">40</span>),
+      build_strategy      : BuildStrategy::Adaptive,
     }
   }
 }

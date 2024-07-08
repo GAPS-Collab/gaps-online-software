@@ -906,6 +906,10 @@
 <a href="#906" id="906">906</a>
 <a href="#907" id="907">907</a>
 <a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Commmands which can be issued
 //! to the various components of 
 //! the tof system.
@@ -963,31 +967,33 @@
 #[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass)]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>TofCommandCode {
-  Unknown                 = <span class="number">0u8</span>,
+  Unknown                  = <span class="number">0u8</span>,
   <span class="doccomment">/// en empty command just to check if stuff is online
-  </span>Ping                    = <span class="number">1u8</span>,
+  </span>Ping                     = <span class="number">1u8</span>,
   <span class="doccomment">/// command code for getting the monitoring data from the component
-  </span>Moni                    = <span class="number">2u8</span>,
+  </span>Moni                     = <span class="number">2u8</span>,
   <span class="doccomment">/// Kill myself
-  </span>Kill                    = <span class="number">4u8</span>, <span class="comment">// Shi!
+  </span>Kill                     = <span class="number">4u8</span>, <span class="comment">// Shi!
   </span><span class="doccomment">/// command code for "Set LTB Thresholds"
-  </span>SetLTBThresholds           = <span class="number">21u8</span>,         
+  </span>SetLTBThresholds         = <span class="number">21u8</span>,         
   <span class="doccomment">/// command code for "Configure MTB"
-  </span>SetMTConfig             = <span class="number">22u8</span>,     
+  </span>SetMTConfig              = <span class="number">22u8</span>,     
   <span class="doccomment">/// command code for AnalysisEngineConfig
-  </span>SetAnalysisEngineConfig = <span class="number">27u8</span>,   
+  </span>SetAnalysisEngineConfig  = <span class="number">27u8</span>,   
   <span class="doccomment">/// command code for "Set preamp bias"
-  </span>SetPreampBias           = <span class="number">28u8</span>,         
+  </span>SetPreampBias            = <span class="number">28u8</span>,         
+  <span class="doccomment">/// Change the settings of the event builder
+  </span>SetTOFEventBuilderConfig = <span class="number">29u8</span>,
   <span class="doccomment">/// command code for "Stop Data taking"
-  </span>DataRunStop             = <span class="number">30u8</span>,  
+  </span>DataRunStop              = <span class="number">30u8</span>,  
   <span class="doccomment">/// command code for "Start Data taking"
-  </span>DataRunStart            = <span class="number">31u8</span>,    
+  </span>DataRunStart             = <span class="number">31u8</span>,    
   <span class="doccomment">/// command code for "Start validation run"
-  </span>StartValidationRun      = <span class="number">32u8</span>,         
+  </span>StartValidationRun       = <span class="number">32u8</span>,         
   <span class="doccomment">/// command code for "Get all waveforms"
-  </span>GetFullWaveforms        = <span class="number">41u8</span>,
+  </span>GetFullWaveforms         = <span class="number">41u8</span>,
   <span class="doccomment">/// command code for "Run full calibration"
-  </span>RBCalibration           = <span class="number">53u8</span>, 
+  </span>RBCalibration            = <span class="number">53u8</span>, 
 
   <span class="doccomment">/// command code for "Send the whole event cache over the wire"
   </span>UnspoolEventCache       = <span class="number">44u8</span>,
@@ -1027,6 +1033,7 @@
       <span class="number">21u8 </span>=&gt; TofCommandCode::SetLTBThresholds,
       <span class="number">22u8 </span>=&gt; TofCommandCode::SetMTConfig,
       <span class="number">28u8 </span>=&gt; TofCommandCode::SetPreampBias,
+      <span class="number">29u8 </span>=&gt; TofCommandCode::SetTOFEventBuilderConfig,
       <span class="number">30u8 </span>=&gt; TofCommandCode::DataRunStop,
       <span class="number">31u8 </span>=&gt; TofCommandCode::DataRunStart,
       <span class="number">32u8 </span>=&gt; TofCommandCode::StartValidationRun,
@@ -1053,6 +1060,7 @@
       TofCommandCode::Moni,
       TofCommandCode::SetLTBThresholds,
       TofCommandCode::SetMTConfig,
+      TofCommandCode::SetTOFEventBuilderConfig,
       TofCommandCode::SetPreampBias,
       TofCommandCode::DataRunStop,
       TofCommandCode::DataRunStart,
