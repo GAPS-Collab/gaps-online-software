@@ -25,6 +25,7 @@ use crate::serialization::{
     parse_u16,
     parse_u32,
     parse_u64,
+    parse_f32,
     search_for_u16
 };
 use crate::packets::PacketType;
@@ -224,10 +225,10 @@ impl TofEvent {
 
   pub fn get_summary(&self) -> TofEventSummary {
     let mut summary = TofEventSummary::new();
-    let mut stati = Vec::<u8>::new();
-    for k in &self.rb_events {
-      stati.push(k.status.to_u8());
-    }
+    //let mut stati = Vec::<u8>::new();
+    //for k in &self.rb_events {
+    //  stati.push(k.status.to_u8());
+    //}
     //summary.status          = self.header.status;
     //summary.quality         = self.header.quality;
     //summary.status            = self.header.event_status;
@@ -755,6 +756,15 @@ impl Serialization for TofEventSummary {
     stream.extend_from_slice(&self.trigger_sources.to_le_bytes());
     stream.extend_from_slice(&self.n_trigger_paddles.to_le_bytes());
     stream.extend_from_slice(&self.event_id.to_le_bytes());
+    // depending on the version, we send the fc event packet
+    if self.version == ProtocolVersion::V1 {
+      stream.extend_from_slice(&self.n_hits_umb  .to_le_bytes()); 
+      stream.extend_from_slice(&self.n_hits_cbe  .to_le_bytes()); 
+      stream.extend_from_slice(&self.n_hits_cor  .to_le_bytes()); 
+      stream.extend_from_slice(&self.tot_edep_umb.to_le_bytes()); 
+      stream.extend_from_slice(&self.tot_edep_cbe.to_le_bytes()); 
+      stream.extend_from_slice(&self.tot_edep_cor.to_le_bytes()); 
+    }
     stream.extend_from_slice(&self.quality.to_le_bytes());
     stream.extend_from_slice(&self.timestamp32.to_le_bytes());
     stream.extend_from_slice(&self.timestamp16.to_le_bytes());
@@ -786,13 +796,21 @@ impl Serialization for TofEventSummary {
       return Err(SerializationError::HeadInvalid);
     }
     let status_version_u8     = parse_u8(stream, pos);
-    let status  = EventStatus::from(status_version_u8 & 0x3f);
-    let version = ProtocolVersion::from(status_version_u8 & 0xc0); 
-    summary.status = status;
-    summary.version = version;
+    let status                = EventStatus::from(status_version_u8 & 0x3f);
+    let version               = ProtocolVersion::from(status_version_u8 & 0xc0); 
+    summary.status            = status;
+    summary.version           = version;
     summary.trigger_sources   = parse_u16(stream, pos);
     summary.n_trigger_paddles = parse_u8(stream, pos);
     summary.event_id          = parse_u32(stream, pos);
+    if summary.version == ProtocolVersion::V1 {
+      summary.n_hits_umb      = parse_u8(stream, pos); 
+      summary.n_hits_cbe      = parse_u8(stream, pos); 
+      summary.n_hits_cor      = parse_u8(stream, pos); 
+      summary.tot_edep_umb    = parse_f32(stream, pos); 
+      summary.tot_edep_cbe    = parse_f32(stream, pos); 
+      summary.tot_edep_cor    = parse_f32(stream, pos); 
+    }
     summary.quality           = parse_u8(stream, pos);
     summary.timestamp32       = parse_u32(stream, pos);
     summary.timestamp16       = parse_u16(stream, pos);
@@ -860,13 +878,22 @@ impl fmt::Display for TofEventSummary {
 impl FromRandom for TofEventSummary {
 
   fn from_random() -> Self {
-    let mut summary = Self::new();
-    let mut rng     = rand::thread_rng();
-    let status      = EventStatus::from_random();
-    let version     = ProtocolVersion::from_random();
+    let mut summary           = Self::new();
+    let mut rng               = rand::thread_rng();
+    let status                = EventStatus::from_random();
+    let version               = ProtocolVersion::from_random();
+    if version == ProtocolVersion::V1 {
+      summary.n_hits_umb        = rng.gen::<u8>();
+      summary.n_hits_cbe        = rng.gen::<u8>();
+      summary.n_hits_cor        = rng.gen::<u8>();
+      summary.tot_edep_umb      = rng.gen::<f32>();
+      summary.tot_edep_cbe      = rng.gen::<f32>();
+      summary.tot_edep_cor      = rng.gen::<f32>();
+      summary.quality           = rng.gen::<u8>();
+    }
     summary.status            = status;
     summary.version           = version;
-    summary.quality           = rng.gen::<u8>();
+    // variable packet for the FC
     summary.trigger_sources   = rng.gen::<u16>();
     summary.n_trigger_paddles = rng.gen::<u8>();
     summary.event_id          = rng.gen::<u32>();
@@ -884,7 +911,6 @@ impl FromRandom for TofEventSummary {
     for _ in 0..nhits {
       summary.hits.push(TofHit::from_random());
     }
-    //hits : Vec<TofHit>,
     summary
   }
 }

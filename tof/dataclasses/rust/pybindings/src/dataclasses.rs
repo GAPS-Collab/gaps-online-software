@@ -45,6 +45,7 @@ use tof_dataclasses::series::{
 
 use tof_dataclasses::events::{
     TofEvent,
+    TofEventSummary,
     TofHit,
     MasterTriggerEvent,
     RBEvent,
@@ -1291,6 +1292,32 @@ impl PyRBEventHeader {
     self.header.get_channels()
   }
 
+}
+
+#[pyclass]
+#[pyo3(name="TofEventSummary")]
+pub struct PyTofEventSummary {
+  event : TofEventSummary,
+}
+
+impl PyTofEventSummary {
+  pub fn set_event(&mut self, event : TofEventSummary) {
+    self.event = event;
+  }
+}
+
+#[pymethods]
+impl PyTofEventSummary {
+  #[new]
+  fn new() -> Self {
+    Self {
+      event : TofEventSummary::new(),
+    }
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.event)) 
+  }
 }
 
 #[pyclass]
