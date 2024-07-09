@@ -236,7 +236,12 @@ impl TofEvent {
     summary.trigger_sources   = self.mt_event.trigger_source;
     summary.n_trigger_paddles = self.mt_event.get_trigger_hits().len() as u8;
     summary.event_id          = self.header.event_id;
+    // FIXME we set the protocol version here, but that should propably 
+    // go elsewhere
+    summary.version               = ProtocolVersion::V1;
+    //let status                = self.header.status;
     let mt_timestamp          = self.mt_event.get_timestamp_abs48();
+    
     summary.timestamp32       = (mt_timestamp & 0x0000ffff ) as u32;
     summary.timestamp16       = ((mt_timestamp & 0x00ff0000 ) >> 16) as u16;
     summary.primary_beta      = self.header.primary_beta; 
@@ -248,6 +253,28 @@ impl TofEvent {
     for ev in &self.rb_events {
       for hit in &ev.hits {
         summary.hits.push(hit.clone());
+      }
+    }
+    if summary.version == ProtocolVersion::V1 {
+      summary.n_hits_umb = 0;
+      summary.n_hits_cbe = 0;
+      summary.n_hits_cor = 0;
+      summary.tot_edep_umb = 0.0;
+      summary.tot_edep_cbe = 0.0;
+      summary.tot_edep_cor = 0.0;
+      for h in &summary.hits {
+        if h.paddle_id <= 60 {
+          summary.n_hits_cbe += 1;
+          summary.tot_edep_cbe += h.get_edep();
+        }
+        else if h.paddle_id <= 108 && h.paddle_id > 60 {
+          summary.n_hits_umb += 1;
+          summary.tot_edep_umb += h.get_edep();
+        }
+        else {
+          summary.n_hits_cor += 1;
+          summary.tot_edep_cor += h.get_edep();
+        }
       }
     }
     summary

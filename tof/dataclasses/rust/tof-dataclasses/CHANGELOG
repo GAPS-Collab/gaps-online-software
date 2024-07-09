@@ -1,5 +1,11 @@
 # LELEWAA series
 
+## v0.10.3
+* flight computer variables following Philip's request.
+  n_hit_cbe/umb/cor, tot_edep_cbe/umb/cor.
+  as part of TofEventSummary in case of ProtocolVersion::V1
+* ProtocolVersion, with 4 possible states. Unknown, V1,V2,V3
+
 ## v0.10.2
 * makes use of f16 for online calculated values
 * adds baseline, baseline_rms to TofHit
