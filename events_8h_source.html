@@ -482,50 +482,59 @@ $(document).ready(function(){initNavTree('events_8h_source.html',''); initResiza
 <div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
 <div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
 <div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160; </div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;  u8          status            ; </div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;  u8          quality           ; </div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;  u16         trigger_sources   ; </div>
-<div class="line"><a name="l00581"></a><span class="lineno"><a class="line" href="structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e">  581</a></span>&#160;  u8          <a class="code" href="structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e">n_trigger_paddles</a> ; </div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;  u32         event_id          ; </div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;  u32         timestamp32       ; </div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;  u16         timestamp16       ; </div>
-<div class="line"><a name="l00586"></a><span class="lineno"><a class="line" href="structTofEventSummary.html#aaaf4cf393a61aacf8e5e3e390f2ea474">  586</a></span>&#160;  u16         <a class="code" href="structTofEventSummary.html#aaaf4cf393a61aacf8e5e3e390f2ea474">primary_beta</a>      ; </div>
-<div class="line"><a name="l00588"></a><span class="lineno"><a class="line" href="structTofEventSummary.html#a7254ca37addca5afb86310d1fc6e8b09">  588</a></span>&#160;  u16         <a class="code" href="structTofEventSummary.html#a7254ca37addca5afb86310d1fc6e8b09">primary_charge</a>    ; </div>
-<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;  u32         dsi_j_mask        ;</div>
-<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;  Vec&lt;u16&gt;    channel_mask      ;</div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;  u64         mtb_link_mask     ;</div>
-<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;  Vec&lt;TofHit&gt; hits              ;</div>
-<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;  </div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofEventSummary.html">TofEventSummary</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream, </div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;                                         u64 &amp;pos);</div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;  <span class="comment">// combined timestamp</span></div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;  u64  get_timestamp48()    <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160; </div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;  Vec&lt;u8&gt; get_rb_link_ids() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;  </div>
-<div class="line"><a name="l00613"></a><span class="lineno"><a class="line" href="structTofEventSummary.html#a5146269be1e6dbabaa70574d55823188">  613</a></span>&#160;  Vec&lt;std::tuple&lt;u8, u8, u8, LTBThreshold&gt;&gt; <a class="code" href="structTofEventSummary.html#a5146269be1e6dbabaa70574d55823188">get_trigger_hits</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160; </div>
-<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160; </div>
-<div class="line"><a name="l00617"></a><span class="lineno"><a class="line" href="structTofEventSummary.html#a046c1b6d75a38be53a7a8c9715fe9b76">  617</a></span>&#160;  Vec&lt;TriggerType&gt; <a class="code" href="structTofEventSummary.html#a046c1b6d75a38be53a7a8c9715fe9b76">get_trigger_sources</a>() <span class="keyword">const</span>; </div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;  </div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;  std::string to_string() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;};</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160; </div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofHit.html">TofHit</a>&amp; pad);</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;  Gaps::ProtocolVersion version ;</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;  u8          status            ; </div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;  u8          quality           ; </div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;  u16         trigger_sources   ; </div>
+<div class="line"><a name="l00582"></a><span class="lineno"><a class="line" href="structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e">  582</a></span>&#160;  u8          <a class="code" href="structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e">n_trigger_paddles</a> ; </div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;  u32         event_id          ; </div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;  <span class="comment">// flight computer event variable packet</span></div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;  u8          n_hits_umb        ;</div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;  u8          n_hits_cbe        ;</div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;  u8          n_hits_cor        ;</div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;  f32         tot_edep_umb      ;</div>
+<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;  f32         tot_edep_cbe      ;</div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;  f32         tot_edep_cor      ;</div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160; </div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;  u32         timestamp32       ; </div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;  u16         timestamp16       ; </div>
+<div class="line"><a name="l00595"></a><span class="lineno"><a class="line" href="structTofEventSummary.html#aaaf4cf393a61aacf8e5e3e390f2ea474">  595</a></span>&#160;  u16         <a class="code" href="structTofEventSummary.html#aaaf4cf393a61aacf8e5e3e390f2ea474">primary_beta</a>      ; </div>
+<div class="line"><a name="l00597"></a><span class="lineno"><a class="line" href="structTofEventSummary.html#a7254ca37addca5afb86310d1fc6e8b09">  597</a></span>&#160;  u16         <a class="code" href="structTofEventSummary.html#a7254ca37addca5afb86310d1fc6e8b09">primary_charge</a>    ; </div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;  u32         dsi_j_mask        ;</div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;  Vec&lt;u16&gt;    channel_mask      ;</div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;  u64         mtb_link_mask     ;</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;  Vec&lt;TofHit&gt; hits              ;</div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;  </div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofEventSummary.html">TofEventSummary</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream, </div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;                                         u64 &amp;pos);</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;  <span class="comment">// combined timestamp</span></div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;  u64  get_timestamp48()    <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160; </div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;  Vec&lt;u8&gt; get_rb_link_ids() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;  </div>
+<div class="line"><a name="l00622"></a><span class="lineno"><a class="line" href="structTofEventSummary.html#a5146269be1e6dbabaa70574d55823188">  622</a></span>&#160;  Vec&lt;std::tuple&lt;u8, u8, u8, LTBThreshold&gt;&gt; <a class="code" href="structTofEventSummary.html#a5146269be1e6dbabaa70574d55823188">get_trigger_hits</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160; </div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a>&amp; mt);</div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160; </div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofEvent.html">TofEvent</a>&amp; et);</div>
-<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160; </div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structRBEvent.html">RBEvent</a>&amp; re);</div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160; </div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structRBEventHeader.html">RBEventHeader</a>&amp; rh);</div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160; </div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structRBWaveform.html">RBWaveform</a>&amp; rh);</div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160; </div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofEventSummary.html">TofEventSummary</a>&amp; tes);</div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160; </div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;<span class="preprocessor">#endif </span></div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160; </div>
+<div class="line"><a name="l00626"></a><span class="lineno"><a class="line" href="structTofEventSummary.html#a046c1b6d75a38be53a7a8c9715fe9b76">  626</a></span>&#160;  Vec&lt;TriggerType&gt; <a class="code" href="structTofEventSummary.html#a046c1b6d75a38be53a7a8c9715fe9b76">get_trigger_sources</a>() <span class="keyword">const</span>; </div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;  </div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;  std::string to_string() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;};</div>
+<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160; </div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofHit.html">TofHit</a>&amp; pad);</div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160; </div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a>&amp; mt);</div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160; </div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofEvent.html">TofEvent</a>&amp; et);</div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160; </div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structRBEvent.html">RBEvent</a>&amp; re);</div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160; </div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structRBEventHeader.html">RBEventHeader</a>&amp; rh);</div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160; </div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structRBWaveform.html">RBWaveform</a>&amp; rh);</div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160; </div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofEventSummary.html">TofEventSummary</a>&amp; tes);</div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160; </div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;<span class="preprocessor">#endif </span></div>
 <div class="ttc" id="anamespaceGaps_html"><div class="ttname"><a href="namespaceGaps.html">Gaps</a></div><div class="ttdoc">‍**</div><div class="ttdef"><b>Definition:</b> database.h:9</div></div>
 <div class="ttc" id="astructMasterTriggerEvent_html"><div class="ttname"><a href="structMasterTriggerEvent.html">MasterTriggerEvent</a></div><div class="ttdef"><b>Definition:</b> events.h:302</div></div>
 <div class="ttc" id="astructMasterTriggerEvent_html_a10e4d924cea6d9cf121290f7effab1e0"><div class="ttname"><a href="structMasterTriggerEvent.html#a10e4d924cea6d9cf121290f7effab1e0">MasterTriggerEvent::get_trigger_sources</a></div><div class="ttdeci">Vec&lt; TriggerType &gt; get_trigger_sources() const</div><div class="ttdoc">Get the trigger sources from trigger source byte.</div></div>
@@ -555,9 +564,9 @@ $(document).ready(function(){initNavTree('events_8h_source.html',''); initResiza
 <div class="ttc" id="astructTofEventSummary_html"><div class="ttname"><a href="structTofEventSummary.html">TofEventSummary</a></div><div class="ttdef"><b>Definition:</b> events.h:571</div></div>
 <div class="ttc" id="astructTofEventSummary_html_a046c1b6d75a38be53a7a8c9715fe9b76"><div class="ttname"><a href="structTofEventSummary.html#a046c1b6d75a38be53a7a8c9715fe9b76">TofEventSummary::get_trigger_sources</a></div><div class="ttdeci">Vec&lt; TriggerType &gt; get_trigger_sources() const</div><div class="ttdoc">Get the trigger sources from trigger source byte.</div></div>
 <div class="ttc" id="astructTofEventSummary_html_a5146269be1e6dbabaa70574d55823188"><div class="ttname"><a href="structTofEventSummary.html#a5146269be1e6dbabaa70574d55823188">TofEventSummary::get_trigger_hits</a></div><div class="ttdeci">Vec&lt; std::tuple&lt; u8, u8, u8, LTBThreshold &gt; &gt; get_trigger_hits() const</div></div>
-<div class="ttc" id="astructTofEventSummary_html_a7254ca37addca5afb86310d1fc6e8b09"><div class="ttname"><a href="structTofEventSummary.html#a7254ca37addca5afb86310d1fc6e8b09">TofEventSummary::primary_charge</a></div><div class="ttdeci">u16 primary_charge</div><div class="ttdoc">reconstructed primary charge</div><div class="ttdef"><b>Definition:</b> events.h:588</div></div>
-<div class="ttc" id="astructTofEventSummary_html_aa3587b9819d57488a264b78e0fdb630e"><div class="ttname"><a href="structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e">TofEventSummary::n_trigger_paddles</a></div><div class="ttdeci">u8 n_trigger_paddles</div><div class="ttdef"><b>Definition:</b> events.h:581</div></div>
-<div class="ttc" id="astructTofEventSummary_html_aaaf4cf393a61aacf8e5e3e390f2ea474"><div class="ttname"><a href="structTofEventSummary.html#aaaf4cf393a61aacf8e5e3e390f2ea474">TofEventSummary::primary_beta</a></div><div class="ttdeci">u16 primary_beta</div><div class="ttdoc">reconstructed primary beta</div><div class="ttdef"><b>Definition:</b> events.h:586</div></div>
+<div class="ttc" id="astructTofEventSummary_html_a7254ca37addca5afb86310d1fc6e8b09"><div class="ttname"><a href="structTofEventSummary.html#a7254ca37addca5afb86310d1fc6e8b09">TofEventSummary::primary_charge</a></div><div class="ttdeci">u16 primary_charge</div><div class="ttdoc">reconstructed primary charge</div><div class="ttdef"><b>Definition:</b> events.h:597</div></div>
+<div class="ttc" id="astructTofEventSummary_html_aa3587b9819d57488a264b78e0fdb630e"><div class="ttname"><a href="structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e">TofEventSummary::n_trigger_paddles</a></div><div class="ttdeci">u8 n_trigger_paddles</div><div class="ttdef"><b>Definition:</b> events.h:582</div></div>
+<div class="ttc" id="astructTofEventSummary_html_aaaf4cf393a61aacf8e5e3e390f2ea474"><div class="ttname"><a href="structTofEventSummary.html#aaaf4cf393a61aacf8e5e3e390f2ea474">TofEventSummary::primary_beta</a></div><div class="ttdeci">u16 primary_beta</div><div class="ttdoc">reconstructed primary beta</div><div class="ttdef"><b>Definition:</b> events.h:595</div></div>
 <div class="ttc" id="astructTofEvent_html"><div class="ttname"><a href="structTofEvent.html">TofEvent</a></div><div class="ttdef"><b>Definition:</b> events.h:388</div></div>
 <div class="ttc" id="astructTofEvent_html_a42760fc8fa3384f7ff5676875dea6e77"><div class="ttname"><a href="structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77">TofEvent::from_tofpacket</a></div><div class="ttdeci">static TofEvent from_tofpacket(const TofPacket &amp;packet)</div></div>
 <div class="ttc" id="astructTofEvent_html_a577628b0f2d6beacc40f6bad1adc135a"><div class="ttname"><a href="structTofEvent.html#a577628b0f2d6beacc40f6bad1adc135a">TofEvent::rb_events</a></div><div class="ttdeci">Vec&lt; RBEvent &gt; rb_events</div><div class="ttdef"><b>Definition:</b> events.h:399</div></div>

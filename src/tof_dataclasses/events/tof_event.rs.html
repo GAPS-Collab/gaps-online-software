@@ -942,6 +942,59 @@
 <a href="#942" id="942">942</a>
 <a href="#943" id="943">943</a>
 <a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Event strucutures for data reconrded byi the tof
 //!
 //! Compressed format containing analysis results of 
@@ -969,6 +1022,7 @@
     parse_u16,
     parse_u32,
     parse_u64,
+    parse_f32,
     search_for_u16
 };
 <span class="kw">use </span><span class="kw">crate</span>::packets::PacketType;
@@ -1168,18 +1222,23 @@
 
   <span class="kw">pub fn </span>get_summary(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TofEventSummary {
     <span class="kw">let </span><span class="kw-2">mut </span>summary = TofEventSummary::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>stati = Vec::&lt;u8&gt;::new();
-    <span class="kw">for </span>k <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.rb_events {
-      stati.push(k.status.to_u8());
-    }
-    <span class="comment">//summary.status          = self.header.status;
+    <span class="comment">//let mut stati = Vec::&lt;u8&gt;::new();
+    //for k in &amp;self.rb_events {
+    //  stati.push(k.status.to_u8());
+    //}
+    //summary.status          = self.header.status;
     //summary.quality         = self.header.quality;
     //summary.status            = self.header.event_status;
     // FIXME - this is not trigger paddles, but trigger hits!
     </span>summary.trigger_sources   = <span class="self">self</span>.mt_event.trigger_source;
     summary.n_trigger_paddles = <span class="self">self</span>.mt_event.get_trigger_hits().len() <span class="kw">as </span>u8;
     summary.event_id          = <span class="self">self</span>.header.event_id;
-    <span class="kw">let </span>mt_timestamp          = <span class="self">self</span>.mt_event.get_timestamp_abs48();
+    <span class="comment">// FIXME we set the protocol version here, but that should propably 
+    // go elsewhere
+    </span>summary.version               = ProtocolVersion::V1;
+    <span class="comment">//let status                = self.header.status;
+    </span><span class="kw">let </span>mt_timestamp          = <span class="self">self</span>.mt_event.get_timestamp_abs48();
+    
     summary.timestamp32       = (mt_timestamp &amp; <span class="number">0x0000ffff </span>) <span class="kw">as </span>u32;
     summary.timestamp16       = ((mt_timestamp &amp; <span class="number">0x00ff0000 </span>) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;
     summary.primary_beta      = <span class="self">self</span>.header.primary_beta; 
@@ -1191,6 +1250,28 @@
     <span class="kw">for </span>ev <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.rb_events {
       <span class="kw">for </span>hit <span class="kw">in </span><span class="kw-2">&amp;</span>ev.hits {
         summary.hits.push(hit.clone());
+      }
+    }
+    <span class="kw">if </span>summary.version == ProtocolVersion::V1 {
+      summary.n_hits_umb = <span class="number">0</span>;
+      summary.n_hits_cbe = <span class="number">0</span>;
+      summary.n_hits_cor = <span class="number">0</span>;
+      summary.tot_edep_umb = <span class="number">0.0</span>;
+      summary.tot_edep_cbe = <span class="number">0.0</span>;
+      summary.tot_edep_cor = <span class="number">0.0</span>;
+      <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;</span>summary.hits {
+        <span class="kw">if </span>h.paddle_id &lt;= <span class="number">60 </span>{
+          summary.n_hits_cbe += <span class="number">1</span>;
+          summary.tot_edep_cbe += h.get_edep();
+        }
+        <span class="kw">else if </span>h.paddle_id &lt;= <span class="number">108 </span>&amp;&amp; h.paddle_id &gt; <span class="number">60 </span>{
+          summary.n_hits_umb += <span class="number">1</span>;
+          summary.tot_edep_umb += h.get_edep();
+        }
+        <span class="kw">else </span>{
+          summary.n_hits_cor += <span class="number">1</span>;
+          summary.tot_edep_cor += h.get_edep();
+        }
       }
     }
     summary
@@ -1699,6 +1780,15 @@
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.trigger_sources.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_trigger_paddles.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.event_id.to_le_bytes());
+    <span class="comment">// depending on the version, we send the fc event packet
+    </span><span class="kw">if </span><span class="self">self</span>.version == ProtocolVersion::V1 {
+      stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_hits_umb  .to_le_bytes()); 
+      stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_hits_cbe  .to_le_bytes()); 
+      stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_hits_cor  .to_le_bytes()); 
+      stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tot_edep_umb.to_le_bytes()); 
+      stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tot_edep_cbe.to_le_bytes()); 
+      stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tot_edep_cor.to_le_bytes()); 
+    }
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.quality.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.timestamp32.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.timestamp16.to_le_bytes());
@@ -1730,13 +1820,21 @@
       <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::HeadInvalid);
     }
     <span class="kw">let </span>status_version_u8     = parse_u8(stream, pos);
-    <span class="kw">let </span>status  = EventStatus::from(status_version_u8 &amp; <span class="number">0x3f</span>);
-    <span class="kw">let </span>version = ProtocolVersion::from(status_version_u8 &amp; <span class="number">0xc0</span>); 
-    summary.status = status;
-    summary.version = version;
+    <span class="kw">let </span>status                = EventStatus::from(status_version_u8 &amp; <span class="number">0x3f</span>);
+    <span class="kw">let </span>version               = ProtocolVersion::from(status_version_u8 &amp; <span class="number">0xc0</span>); 
+    summary.status            = status;
+    summary.version           = version;
     summary.trigger_sources   = parse_u16(stream, pos);
     summary.n_trigger_paddles = parse_u8(stream, pos);
     summary.event_id          = parse_u32(stream, pos);
+    <span class="kw">if </span>summary.version == ProtocolVersion::V1 {
+      summary.n_hits_umb      = parse_u8(stream, pos); 
+      summary.n_hits_cbe      = parse_u8(stream, pos); 
+      summary.n_hits_cor      = parse_u8(stream, pos); 
+      summary.tot_edep_umb    = parse_f32(stream, pos); 
+      summary.tot_edep_cbe    = parse_f32(stream, pos); 
+      summary.tot_edep_cor    = parse_f32(stream, pos); 
+    }
     summary.quality           = parse_u8(stream, pos);
     summary.timestamp32       = parse_u32(stream, pos);
     summary.timestamp16       = parse_u16(stream, pos);
@@ -1804,14 +1902,23 @@
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofEventSummary {
 
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
-    <span class="kw">let </span><span class="kw-2">mut </span>summary = <span class="self">Self</span>::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>rng     = rand::thread_rng();
-    <span class="kw">let </span>status      = EventStatus::from_random();
-    <span class="kw">let </span>version     = ProtocolVersion::from_random();
+    <span class="kw">let </span><span class="kw-2">mut </span>summary           = <span class="self">Self</span>::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>rng               = rand::thread_rng();
+    <span class="kw">let </span>status                = EventStatus::from_random();
+    <span class="kw">let </span>version               = ProtocolVersion::from_random();
+    <span class="kw">if </span>version == ProtocolVersion::V1 {
+      summary.n_hits_umb        = rng.gen::&lt;u8&gt;();
+      summary.n_hits_cbe        = rng.gen::&lt;u8&gt;();
+      summary.n_hits_cor        = rng.gen::&lt;u8&gt;();
+      summary.tot_edep_umb      = rng.gen::&lt;f32&gt;();
+      summary.tot_edep_cbe      = rng.gen::&lt;f32&gt;();
+      summary.tot_edep_cor      = rng.gen::&lt;f32&gt;();
+      summary.quality           = rng.gen::&lt;u8&gt;();
+    }
     summary.status            = status;
     summary.version           = version;
-    summary.quality           = rng.gen::&lt;u8&gt;();
-    summary.trigger_sources   = rng.gen::&lt;u16&gt;();
+    <span class="comment">// variable packet for the FC
+    </span>summary.trigger_sources   = rng.gen::&lt;u16&gt;();
     summary.n_trigger_paddles = rng.gen::&lt;u8&gt;();
     summary.event_id          = rng.gen::&lt;u32&gt;();
     summary.timestamp32       = rng.gen::&lt;u32&gt;();
@@ -1828,8 +1935,7 @@
     <span class="kw">for _ in </span><span class="number">0</span>..nhits {
       summary.hits.push(TofHit::from_random());
     }
-    <span class="comment">//hits : Vec&lt;TofHit&gt;,
-    </span>summary
+    summary
   }
 }
 

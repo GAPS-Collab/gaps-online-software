@@ -10,6 +10,9 @@ var structTofEventSummary =
     [ "event_id", "structTofEventSummary.html#ada60deeba02f19c32df6e1e74f5edafe", null ],
     [ "hits", "structTofEventSummary.html#aed5fe8e77ffd1ae550efbc0b8c4ef117", null ],
     [ "mtb_link_mask", "structTofEventSummary.html#ae562daf7d3b9f9e35c1d0d9e6263902e", null ],
+    [ "n_hits_cbe", "structTofEventSummary.html#ae8a9e3823514109ec75a62237ef3f5e9", null ],
+    [ "n_hits_cor", "structTofEventSummary.html#a6c08239903d1eed7c8374464f2e7b43d", null ],
+    [ "n_hits_umb", "structTofEventSummary.html#a3532f213fbd1851120694511fe7f3a73", null ],
     [ "n_trigger_paddles", "structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e", null ],
     [ "primary_beta", "structTofEventSummary.html#aaaf4cf393a61aacf8e5e3e390f2ea474", null ],
     [ "primary_charge", "structTofEventSummary.html#a7254ca37addca5afb86310d1fc6e8b09", null ],
@@ -17,5 +20,9 @@ var structTofEventSummary =
     [ "status", "structTofEventSummary.html#a52d43bca39a8645fe991218a045af8fa", null ],
     [ "timestamp16", "structTofEventSummary.html#ad55fcbc96aa27e9dee781472f7c16f3c", null ],
     [ "timestamp32", "structTofEventSummary.html#a971aaceb9e22a5a3011015f1ae0dcd33", null ],
-    [ "trigger_sources", "structTofEventSummary.html#ac9fa5dbd0d751fd8bfbc60be22bcfd35", null ]
+    [ "tot_edep_cbe", "structTofEventSummary.html#a006d5f0754a9bce2a6e52f1189b2dcd9", null ],
+    [ "tot_edep_cor", "structTofEventSummary.html#aa18ec9edc67b83a83703055a24f554b0", null ],
+    [ "tot_edep_umb", "structTofEventSummary.html#a634cd10f1fa4e83f57bc94bb72af69c1", null ],
+    [ "trigger_sources", "structTofEventSummary.html#ac9fa5dbd0d751fd8bfbc60be22bcfd35", null ],
+    [ "version", "structTofEventSummary.html#a8e9d86a725e44c2fa3f6ca31767a0e4a", null ]
 ];
