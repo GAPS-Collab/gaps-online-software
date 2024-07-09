@@ -13,7 +13,6 @@
 
 #include "spdlog/cfg/env.h"
 
-
 /// masks to decode LTB hit masks
 const u16 LTB_CH0 = 0x3   ;
 const u16 LTB_CH1 = 0xc   ;
@@ -1186,10 +1185,20 @@ TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream,
     log_error("Decoding of HEAD failed! Got " << head << "instead!");
     //return Err(SerializationError::HeadInvalid);
   }
-  tes.status            = Gaps::parse_u8(stream, pos);
+  u8 status_version_u8  = Gaps::parse_u8(stream, pos);
+  tes.status            = status_version_u8 & 0x3f;
+  tes.version           = (Gaps::ProtocolVersion)(status_version_u8 & 0xc0);
   tes.trigger_sources   = Gaps::parse_u16(stream, pos);
   tes.n_trigger_paddles = Gaps::parse_u8(stream, pos);
   tes.event_id          = Gaps::parse_u32(stream, pos);
+  if (tes.version == Gaps::ProtocolVersion::V1) {
+    tes.n_hits_umb      = Gaps::parse_u8(stream, pos);
+    tes.n_hits_cbe      = Gaps::parse_u8(stream, pos);
+    tes.n_hits_cor      = Gaps::parse_u8(stream, pos);
+    tes.tot_edep_umb    = Gaps::parse_f32(stream, pos);
+    tes.tot_edep_cbe    = Gaps::parse_f32(stream, pos);
+    tes.tot_edep_cor    = Gaps::parse_f32(stream, pos);
+  } 
   tes.quality           = Gaps::parse_u8(stream, pos);
   tes.timestamp32       = Gaps::parse_u32(stream, pos);
   tes.timestamp16       = Gaps::parse_u16(stream, pos);

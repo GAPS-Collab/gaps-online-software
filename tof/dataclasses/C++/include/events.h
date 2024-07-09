@@ -572,6 +572,7 @@ struct TofEventSummary {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
 
+  Gaps::ProtocolVersion version ;
   u8          status            ; 
   u8          quality           ; 
   u16         trigger_sources   ; 
@@ -580,6 +581,14 @@ struct TofEventSummary {
   /// the same as the number of hits!
   u8          n_trigger_paddles ; 
   u32         event_id          ; 
+  // flight computer event variable packet
+  u8          n_hits_umb        ;
+  u8          n_hits_cbe        ;
+  u8          n_hits_cor        ;
+  f32         tot_edep_umb      ;
+  f32         tot_edep_cbe      ;
+  f32         tot_edep_cor      ;
+
   u32         timestamp32       ; 
   u16         timestamp16       ; 
   /// reconstructed primary beta
