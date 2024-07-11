@@ -714,12 +714,14 @@ fn pack_analysisengineconfig() {
 /// Configuring the TOF event builder during flight
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct TOFEventBuilderConfig{
-  pub cachesize : usize, 
+  pub cachesize : usize, //8
   pub n_mte_per_loop : usize, //8
   pub n_rbe_per_loop : usize, //8
   pub te_timeout_sec : u32, //4
-  pub sort_events : bool, //1
+  pub sort_events    : bool, //1
   pub build_strategy : BuildStrategy, //1
+  pub wait_nrb       : u8, //1
+  pub greediness     : u8, //1
 }
 
 impl TOFEventBuilderConfig {
@@ -730,7 +732,9 @@ impl TOFEventBuilderConfig {
       n_rbe_per_loop      : 40,
       te_timeout_sec      : 30,
       sort_events         : false,
-      build_strategy      : BuildStrategy::Adaptive
+      build_strategy      : BuildStrategy::Adaptive,
+      wait_nrb            : 40, 
+      greediness          : 3,  
     }
   }
 }
@@ -750,6 +754,13 @@ impl fmt::Display for TOFEventBuilderConfig {
     repr += &(format!("\n TOF Event timeout window [sec]          : {:.3}", self.te_timeout_sec));
     repr += &(format!("\n Sort events by ID (high resource load!) : {}", self.sort_events));
     repr += &(format!("\n Build strategy                          : {}", self.build_strategy));
+    
+    if self.build_strategy == BuildStrategy::AdaptiveGreedy {
+      repr += &(format!("\n Additional RBs considered (greediness)  : {}", self.greediness));
+    }
+    else if self.build_strategy == BuildStrategy::WaitForNBoards {
+      repr += &(format!("\n Waiting for {} boards", self.wait_nrb))
+    }
     write!(f, "{}", repr)
   }
 }
@@ -762,11 +773,11 @@ impl Serialization for TOFEventBuilderConfig {
   
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
-  const SIZE : usize = 26; 
+  const SIZE : usize = 36; 
   
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
-    -> Result<Self, SerializationError>{
+    -> Result<Self, SerializationError> {
     Self::verify_fixed(stream, pos)?;  
     let mut cfg = TOFEventBuilderConfig::new();
       cfg.cachesize = parse_usize(stream, pos);
@@ -775,9 +786,25 @@ impl Serialization for TOFEventBuilderConfig {
       cfg.te_timeout_sec = parse_u32(stream, pos);
       cfg.sort_events = parse_bool(stream, pos);
       cfg.build_strategy = BuildStrategy::from(parse_u8(stream, pos));
+      match cfg.build_strategy {
+        BuildStrategy::AdaptiveGreedy => {
+            cfg.greediness = parse_u8(stream, pos);
+            cfg.wait_nrb = 0;
+        },
+        BuildStrategy::WaitForNBoards => {
+            cfg.wait_nrb = parse_u8(stream, pos);
+            cfg.greediness = 0;
+        },
+        _ => {
+            // For any other BuildStrategy variant, set default or empty values
+            cfg.greediness = 0; // Default to 0 for greediness
+            cfg.wait_nrb = 0;   // Default to 0 for wait_nrb
+      }
+    }  
     *pos += 2;
     Ok(cfg)
   }
+ 
   fn to_bytestream(&self) -> Vec<u8> {
     let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
     bs.extend_from_slice(&Self::HEAD.to_le_bytes());
@@ -787,6 +814,18 @@ impl Serialization for TOFEventBuilderConfig {
     bs.extend_from_slice(&self.te_timeout_sec.to_le_bytes());
     bs.push(self.sort_events as u8);
     bs.push(self.build_strategy.to_u8());
+    match self.build_strategy {
+      BuildStrategy::AdaptiveGreedy => {
+          bs.push(self.greediness as u8);
+          bs.push(0);
+      },
+      BuildStrategy::WaitForNBoards => {
+          bs.push(self.wait_nrb as u8);
+          bs.push(0);
+      },
+      _ => {bs.push(0);
+            bs.push(0);} 
+    }
     bs.extend_from_slice(&Self::TAIL.to_le_bytes());
     bs
   }
@@ -803,7 +842,35 @@ impl FromRandom for TOFEventBuilderConfig {
     cfg.te_timeout_sec = rng.gen::<u32>();
     cfg.sort_events = rng.gen::<bool>();
     cfg.build_strategy = BuildStrategy::from_random();
+    match cfg.build_strategy {
+      BuildStrategy::AdaptiveGreedy => {
+        cfg.greediness = rng.gen::<u8>();
+        cfg.wait_nrb = 0;
+      },
+      BuildStrategy::WaitForNBoards => { 
+        cfg.wait_nrb = rng.gen::<u8>();
+        cfg.greediness = 0;
+      },
+      _ => {
+        cfg.greediness = 0;
+        cfg.wait_nrb =  0;
+      },
+    };
+    // cfg.greediness = rng.gen::<u8>();
+    // cfg.wait_nrb = rng.gen::<u8>(); <-- works, but in packing test, doesn't match and causes panic
+    // current iteration aims to fix that but has {} errors :((
     cfg
+  }
+}
+
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_tofeventbuilderconfig() {
+  for _ in 0..100 {
+    let cfg  = TOFEventBuilderConfig::from_random();
+    let test : TOFEventBuilderConfig = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
   }
 }
 
