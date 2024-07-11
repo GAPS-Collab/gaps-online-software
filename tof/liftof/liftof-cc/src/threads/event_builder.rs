@@ -558,9 +558,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       }
     }
     if let BuildStrategy::AdaptiveGreedy = settings.build_strategy {
-      // FIXME - make this part of settings
-      let greediness : usize = 3;
-      settings.n_rbe_per_loop = av_rb_ev.ceil() as usize + greediness;
+      settings.n_rbe_per_loop = av_rb_ev.ceil() as usize + settings.greediness;
       if settings.n_rbe_per_loop == 0 {
         // failsafe
         settings.n_rbe_per_loop = 40;
@@ -876,7 +874,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                 // FIXME - make this a member of settings
                 let wait_nrb : usize = 40;
                 // except the event times out
-                if ev.rb_events.len() == wait_nrb {
+                if ev.rb_events.len() == settings.wait_nrb {
                   ready_to_send = true;
                   //n_gathered_fr_cache += 1;
                 } // else ready_to_send is still false 
