@@ -504,6 +504,8 @@
 <a href="#504" id="504">504</a>
 <a href="#505" id="505">505</a>
 <a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Command receiving, processing and sending
 //! We need to fullfill the following requirements
 //! 1) Receive a command from the flight computer/elsewhere
@@ -980,6 +982,8 @@
                             tc.liftof_settings.event_builder_settings.te_timeout_sec=config.te_timeout_sec;
                             tc.liftof_settings.event_builder_settings.sort_events=config.sort_events;
                             tc.liftof_settings.event_builder_settings.build_strategy=config.build_strategy;
+                            tc.liftof_settings.event_builder_settings.greediness =config.greediness;
+                            tc.liftof_settings.event_builder_settings.wait_nrb = config.wait_nrb;
                           }
                         }
                       }
