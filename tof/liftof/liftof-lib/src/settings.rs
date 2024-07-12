@@ -496,6 +496,8 @@ pub struct TofEventBuilderSettings {
   /// try to sort the events by id (uses more resources)
   pub sort_events         : bool,
   pub build_strategy      : BuildStrategy,
+  pub greediness          : u8,
+  pub wait_nrb            : u8,
 }
 
 impl TofEventBuilderSettings {
@@ -507,6 +509,8 @@ impl TofEventBuilderSettings {
       te_timeout_sec      : 30,
       sort_events         : false,
       build_strategy      : BuildStrategy::Adaptive,
+      greediness          : 3,
+      wait_nrb            : 40,
     }
   }
 }
