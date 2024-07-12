@@ -229,6 +229,26 @@ impl PyTOFEventBuilderConfig{
       config : cfg
     }
   }
+  // greediness
+  #[getter]
+  fn get_greediness(&self) -> PyResult<u8> {
+    Ok(self.config.greediness)
+  }
+  #[setter]
+  fn set_greediness(&mut self, greediness: u8) -> PyResult<()> {
+    self.config.greediness = greediness;
+    Ok(())
+  }
+  // wait for num. RB
+  #[getter]
+  fn get_wait_nrb(&self) -> PyResult<u8> {
+    Ok(self.config.wait_nrb)
+  }
+  #[setter]
+  fn set_wait_nrb(&mut self, wait_nrb: u8) -> PyResult<()> {
+    self.config.wait_nrb = wait_nrb;
+    Ok(())
+  }
   // Cache size
   #[getter]
   fn get_cachesize(&self) -> PyResult<usize> {

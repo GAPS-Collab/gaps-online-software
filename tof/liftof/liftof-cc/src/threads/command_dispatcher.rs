@@ -474,6 +474,8 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                             tc.liftof_settings.event_builder_settings.te_timeout_sec=config.te_timeout_sec;
                             tc.liftof_settings.event_builder_settings.sort_events=config.sort_events;
                             tc.liftof_settings.event_builder_settings.build_strategy=config.build_strategy;
+                            tc.liftof_settings.event_builder_settings.greediness =config.greediness;
+                            tc.liftof_settings.event_builder_settings.wait_nrb = config.wait_nrb;
                           }
                         }
                       }
