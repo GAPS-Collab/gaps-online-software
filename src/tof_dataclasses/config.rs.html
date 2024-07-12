@@ -807,6 +807,73 @@
 <a href="#807" id="807">807</a>
 <a href="#808" id="808">808</a>
 <a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Payloads for commands that configure an entity of 
 //! the TOF system.
 //!
@@ -1523,12 +1590,14 @@
 /// Configuring the TOF event builder during flight
 </span><span class="attr">#[derive(Copy, Clone, Debug, PartialEq)]
 </span><span class="kw">pub struct </span>TOFEventBuilderConfig{
-  <span class="kw">pub </span>cachesize : usize, 
-  <span class="kw">pub </span>n_mte_per_loop : usize, <span class="comment">//8
+  <span class="kw">pub </span>cachesize : usize, <span class="comment">//8
+  </span><span class="kw">pub </span>n_mte_per_loop : usize, <span class="comment">//8
   </span><span class="kw">pub </span>n_rbe_per_loop : usize, <span class="comment">//8
   </span><span class="kw">pub </span>te_timeout_sec : u32, <span class="comment">//4
-  </span><span class="kw">pub </span>sort_events : bool, <span class="comment">//1
+  </span><span class="kw">pub </span>sort_events    : bool, <span class="comment">//1
   </span><span class="kw">pub </span>build_strategy : BuildStrategy, <span class="comment">//1
+  </span><span class="kw">pub </span>wait_nrb       : u8, <span class="comment">//1
+  </span><span class="kw">pub </span>greediness     : u8, <span class="comment">//1
 </span>}
 
 <span class="kw">impl </span>TOFEventBuilderConfig {
@@ -1539,7 +1608,9 @@
       n_rbe_per_loop      : <span class="number">40</span>,
       te_timeout_sec      : <span class="number">30</span>,
       sort_events         : <span class="bool-val">false</span>,
-      build_strategy      : BuildStrategy::Adaptive
+      build_strategy      : BuildStrategy::Adaptive,
+      wait_nrb            : <span class="number">40</span>, 
+      greediness          : <span class="number">3</span>,  
     }
   }
 }
@@ -1559,6 +1630,13 @@
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n TOF Event timeout window [sec]          : {:.3}"</span>, <span class="self">self</span>.te_timeout_sec));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Sort events by ID (high resource load!) : {}"</span>, <span class="self">self</span>.sort_events));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Build strategy                          : {}"</span>, <span class="self">self</span>.build_strategy));
+    
+    <span class="kw">if </span><span class="self">self</span>.build_strategy == BuildStrategy::AdaptiveGreedy {
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Additional RBs considered (greediness)  : {}"</span>, <span class="self">self</span>.greediness));
+    }
+    <span class="kw">else if </span><span class="self">self</span>.build_strategy == BuildStrategy::WaitForNBoards {
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Waiting for {} boards"</span>, <span class="self">self</span>.wait_nrb))
+    }
     <span class="macro">write!</span>(f, <span class="string">"{}"</span>, repr)
   }
 }
@@ -1571,11 +1649,11 @@
   
   <span class="kw">const </span>HEAD : u16 = <span class="number">0xAAAA</span>;
   <span class="kw">const </span>TAIL : u16 = <span class="number">0x5555</span>;
-  <span class="kw">const </span>SIZE : usize = <span class="number">26</span>; 
+  <span class="kw">const </span>SIZE : usize = <span class="number">36</span>; 
   
   <span class="kw">fn </span>from_bytestream(stream    : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;, 
                      pos       : <span class="kw-2">&amp;mut </span>usize) 
-    -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt;{
+    -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt; {
     <span class="self">Self</span>::verify_fixed(stream, pos)<span class="question-mark">?</span>;  
     <span class="kw">let </span><span class="kw-2">mut </span>cfg = TOFEventBuilderConfig::new();
       cfg.cachesize = parse_usize(stream, pos);
@@ -1584,9 +1662,25 @@
       cfg.te_timeout_sec = parse_u32(stream, pos);
       cfg.sort_events = parse_bool(stream, pos);
       cfg.build_strategy = BuildStrategy::from(parse_u8(stream, pos));
+      <span class="kw">match </span>cfg.build_strategy {
+        BuildStrategy::AdaptiveGreedy =&gt; {
+            cfg.greediness = parse_u8(stream, pos);
+            cfg.wait_nrb = <span class="number">0</span>;
+        },
+        BuildStrategy::WaitForNBoards =&gt; {
+            cfg.wait_nrb = parse_u8(stream, pos);
+            cfg.greediness = <span class="number">0</span>;
+        },
+        <span class="kw">_ </span>=&gt; {
+            <span class="comment">// For any other BuildStrategy variant, set default or empty values
+            </span>cfg.greediness = <span class="number">0</span>; <span class="comment">// Default to 0 for greediness
+            </span>cfg.wait_nrb = <span class="number">0</span>;   <span class="comment">// Default to 0 for wait_nrb
+      </span>}
+    }  
     <span class="kw-2">*</span>pos += <span class="number">2</span>;
     <span class="prelude-val">Ok</span>(cfg)
   }
+ 
   <span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>bs = Vec::&lt;u8&gt;::with_capacity(<span class="self">Self</span>::SIZE);
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::HEAD.to_le_bytes());
@@ -1596,6 +1690,18 @@
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.te_timeout_sec.to_le_bytes());
     bs.push(<span class="self">self</span>.sort_events <span class="kw">as </span>u8);
     bs.push(<span class="self">self</span>.build_strategy.to_u8());
+    <span class="kw">match </span><span class="self">self</span>.build_strategy {
+      BuildStrategy::AdaptiveGreedy =&gt; {
+          bs.push(<span class="self">self</span>.greediness <span class="kw">as </span>u8);
+          bs.push(<span class="number">0</span>);
+      },
+      BuildStrategy::WaitForNBoards =&gt; {
+          bs.push(<span class="self">self</span>.wait_nrb <span class="kw">as </span>u8);
+          bs.push(<span class="number">0</span>);
+      },
+      <span class="kw">_ </span>=&gt; {bs.push(<span class="number">0</span>);
+            bs.push(<span class="number">0</span>);} 
+    }
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::TAIL.to_le_bytes());
     bs
   }
@@ -1612,7 +1718,35 @@
     cfg.te_timeout_sec = rng.gen::&lt;u32&gt;();
     cfg.sort_events = rng.gen::&lt;bool&gt;();
     cfg.build_strategy = BuildStrategy::from_random();
-    cfg
+    <span class="kw">match </span>cfg.build_strategy {
+      BuildStrategy::AdaptiveGreedy =&gt; {
+        cfg.greediness = rng.gen::&lt;u8&gt;();
+        cfg.wait_nrb = <span class="number">0</span>;
+      },
+      BuildStrategy::WaitForNBoards =&gt; { 
+        cfg.wait_nrb = rng.gen::&lt;u8&gt;();
+        cfg.greediness = <span class="number">0</span>;
+      },
+      <span class="kw">_ </span>=&gt; {
+        cfg.greediness = <span class="number">0</span>;
+        cfg.wait_nrb =  <span class="number">0</span>;
+      },
+    };
+    <span class="comment">// cfg.greediness = rng.gen::&lt;u8&gt;();
+    // cfg.wait_nrb = rng.gen::&lt;u8&gt;(); &lt;-- works, but in packing test, doesn't match and causes panic
+    // current iteration aims to fix that but has {} errors :((
+    </span>cfg
+  }
+}
+
+
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
+#[test]
+</span><span class="kw">fn </span>pack_tofeventbuilderconfig() {
+  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+    <span class="kw">let </span>cfg  = TOFEventBuilderConfig::from_random();
+    <span class="kw">let </span>test : TOFEventBuilderConfig = cfg.pack().unpack().unwrap();
+    <span class="macro">assert_eq!</span>(cfg, test);
   }
 }
 

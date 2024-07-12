@@ -885,6 +885,10 @@
 <a href="#885" id="885">885</a>
 <a href="#886" id="886">886</a>
 <a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Aggregate settings for the TOF system
 //!
 //! Control the settings for the C&amp;C server
@@ -1383,6 +1387,8 @@
   <span class="doccomment">/// try to sort the events by id (uses more resources)
   </span><span class="kw">pub </span>sort_events         : bool,
   <span class="kw">pub </span>build_strategy      : BuildStrategy,
+  <span class="kw">pub </span>greediness          : u8,
+  <span class="kw">pub </span>wait_nrb            : u8,
 }
 
 <span class="kw">impl </span>TofEventBuilderSettings {
@@ -1394,6 +1400,8 @@
       te_timeout_sec      : <span class="number">30</span>,
       sort_events         : <span class="bool-val">false</span>,
       build_strategy      : BuildStrategy::Adaptive,
+      greediness          : <span class="number">3</span>,
+      wait_nrb            : <span class="number">40</span>,
     }
   }
 }

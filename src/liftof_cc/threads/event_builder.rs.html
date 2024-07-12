@@ -959,8 +959,6 @@
 <a href="#959" id="959">959</a>
 <a href="#960" id="960">960</a>
 <a href="#961" id="961">961</a>
-<a href="#962" id="962">962</a>
-<a href="#963" id="963">963</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::thread;
 <span class="kw">use </span>std::time::{
     Instant,
@@ -1521,9 +1519,7 @@
       }
     }
     <span class="kw">if let </span>BuildStrategy::AdaptiveGreedy = settings.build_strategy {
-      <span class="comment">// FIXME - make this part of settings
-      </span><span class="kw">let </span>greediness : usize = <span class="number">3</span>;
-      settings.n_rbe_per_loop = av_rb_ev.ceil() <span class="kw">as </span>usize + greediness;
+      settings.n_rbe_per_loop = av_rb_ev.ceil() <span class="kw">as </span>usize + settings.greediness <span class="kw">as </span>usize;
       <span class="kw">if </span>settings.n_rbe_per_loop == <span class="number">0 </span>{
         <span class="comment">// failsafe
         </span>settings.n_rbe_per_loop = <span class="number">40</span>;
@@ -1839,7 +1835,7 @@
                 // FIXME - make this a member of settings
                 </span><span class="kw">let </span>wait_nrb : usize = <span class="number">40</span>;
                 <span class="comment">// except the event times out
-                </span><span class="kw">if </span>ev.rb_events.len() == wait_nrb {
+                </span><span class="kw">if </span>ev.rb_events.len() <span class="kw">as </span>u8 == settings.wait_nrb {
                   ready_to_send = <span class="bool-val">true</span>;
                   <span class="comment">//n_gathered_fr_cache += 1;
                 </span>} <span class="comment">// else ready_to_send is still false 
