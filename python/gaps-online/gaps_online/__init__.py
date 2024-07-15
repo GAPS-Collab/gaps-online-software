@@ -23,4 +23,10 @@ try:
 except ImportError as e:
     print(f"Can't load RUST API! {e}")
 
+try:
+    import rust_telemetry as telemetry
+except ImportError as e:
+    print(f"Can't load RUST TELEMETRY API {e}")
+
+
 __version__ = "0.10"

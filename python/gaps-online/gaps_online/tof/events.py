@@ -1,5 +1,5 @@
 import gaps_tof as gt
-import pylab as p
+import matplotlib.pyplot as p
 import numpy as np
 try:
     import charmingbeauty as cb

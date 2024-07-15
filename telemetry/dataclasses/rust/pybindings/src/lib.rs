@@ -2,10 +2,15 @@ use pyo3::prelude::*;
 //use pyo3::exceptions::PyValueError;
 
 extern crate pyo3_log;
-//use numpy::PyArray1;
+//extern crate rpy-tof-dataclasses;
 
 use telemetry_dataclasses::packets as tel_api;
 use telemetry_dataclasses::io as tel_io_api;
+extern crate rpy_tof_dataclasses;
+use rpy_tof_dataclasses::dataclasses::{
+    PyTofHit,
+    PyTofEventSummary,
+};
 
 // FIXME - this needs to go to liftof-python
 // or maybe we want to revive the dataclasses pybindings
@@ -54,7 +59,7 @@ impl PyGapsEvent {
   #[getter]
   fn tof(&self) -> PyTofEventSummary {
     let mut tof =  PyTofEventSummary::new();
-    tof.set_tes(self.event.tof.clone());
+    tof.set_event(self.event.tof.clone());
     tof
   }
 
@@ -182,133 +187,6 @@ impl PyTrackerEvent {
   }
 }
 
-#[pyclass]
-#[pyo3(name="TofHit")]
-struct PyTofHit {
-  th : tof_api::TofHit,
-}
-
-
-impl PyTofHit {
-  fn set_hit(&mut self, th : tof_api::TofHit) {
-    self.th = th;
-  }
-}
-
-#[pymethods]
-impl PyTofHit {
-  #[new]
-  fn new() -> Self {
-    Self {
-      th : tof_api::TofHit::new(),
-    }
-  }
-
-  fn get_time_a(&self) -> f32 {
-    self.th.get_time_a()
-  }
-  
-  fn get_time_b(&self) -> f32 {
-    self.th.get_time_b()
-  }
-  
-  fn get_peak_a(&self) -> f32 {
-    self.th.get_peak_a()
-  }
-  
-  fn get_peak_b(&self) -> f32 {
-    self.th.get_peak_b()
-  }
-  
-  fn get_charge_a(&self) -> f32 {
-    self.th.get_charge_a()
-  }
-  
-  fn get_charge_b(&self) -> f32 {
-    self.th.get_charge_b()
-  }
-
-  fn get_edep(&self) -> f32 {
-    self.th.get_edep()
-  }
-
-  fn get_pos_across(&self) -> f32 {
-    self.th.get_pos_across()
-  }
-
-  fn get_t0(&self) -> f32 {
-    self.th.get_t0()
-  }
-
-  #[getter]
-  fn paddle_id(&self) -> u8 {
-    self.th.paddle_id
-  }
-  
-  fn __repr__(&self) -> PyResult<String> {
-    Ok(format!("<PyO3Wrapper: {}>", self.th))
-  }
-}
-
-#[pyclass]
-#[pyo3(name="TofEventSummary")]
-struct PyTofEventSummary {
-  tes : tof_api::TofEventSummary,
-}
-
-impl PyTofEventSummary {
-  pub fn set_tes(&mut self, tes : tof_api::TofEventSummary) {
-    self.tes = tes;
-  }
-}
-   // pub status: u8,
-   // pub quality: u8,
-   // pub trigger_setting: u8,
-   // pub n_trigger_paddles: u8,
-   // pub event_id: u32,
-   // pub timestamp32: u32,
-   // pub timestamp16: u16,
-   // pub primary_beta: u16,
-   // pub primary_charge: u16,
-   // pub hits: Vec<TofHit>,
-
-#[pymethods]
-impl PyTofEventSummary {
-  #[new]
-  fn new() -> Self {
-    Self {
-      tes : tof_api::TofEventSummary::new()
-    }
-  }
-
-  #[getter]
-  fn event_id(&self) -> u32 {
-    self.tes.event_id
-  }
-
-  #[getter]
-  fn n_trigger_paddles(&self) -> u8 {
-    self.tes.n_trigger_paddles
-  }
-
-  fn get_timestamp48(&self) -> u64 {
-    self.tes.get_timestamp48()
-  }
-
-  fn get_hits(&self) -> Vec<PyTofHit> {
-    let mut hits = Vec::<PyTofHit>::new();
-    for h in &self.tes.hits {
-      let mut py_hit = PyTofHit::new();
-      py_hit.set_hit(*h);
-      hits.push(py_hit);
-    }
-    hits
-  }
-
-  fn __repr__(&self) -> PyResult<String> {
-    Ok(format!("<PyO3Wrapper: {}>", self.tes))
-  }
-}
 
 /// Python API to rust version of tof-dataclasses.
 ///

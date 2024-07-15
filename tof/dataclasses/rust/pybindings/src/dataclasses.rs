@@ -1329,7 +1329,7 @@ impl PyTofEventSummary {
 #[pymethods]
 impl PyTofEventSummary {
   #[new]
-  fn new() -> Self {
+  pub fn new() -> Self {
     Self {
       event : TofEventSummary::new(),
     }
