@@ -1029,6 +1029,72 @@ impl PyRBMoniSeries {
     }
   }
 }
+#[pyclass]
+#[pyo3(name="HeartbeatDataSink")]
+
+pub struct PyHeartbeatDataSink{
+  pub config : HeartbeatDataSink
+}
+
+impl PyHeartbeatDataSink {
+  pub fn set_config(&mut self, cfg : HeartbeatDataSink) {
+    self.config = cfg;
+  }
+}
+#[pymethods]
+impl PyHeartbeatDataSink{
+  #[new]
+  fn new() -> Self {
+    let cfg: HeartbeatDataSink = HeartbeatDataSink::new();
+    Self {
+      config : cfg
+    }
+  }
+  //mission elapsed time
+  #[getter]
+  fn get_met(&self) -> PyResult<u64> {
+    Ok(self.config.met)
+  }
+  // num. packets sent
+  #[getter]
+  fn get_n_packets_sent(&self) -> PyResult<u64> {
+    Ok(self.config.n_packets_sent)
+  }
+  // num. packets incoming
+  #[getter]
+  fn get_n_packets_incoming(&self) -> PyResult<u64> {
+    Ok(self.config.n_packets_incominb)
+  }
+  // num. bytes written
+  #[getter]
+  fn get_n_bytes_written(&self) -> PyResult<u64> {
+    Ok(self.config.n_bytes_written)
+  }
+  // num. missing their event id
+  #[getter]
+  fn get_n_evid_chunksize(&self) -> PyResult<u64> {
+    Ok(self.config.n_evid_chunksize)
+  }
+  // len incomming buffer for the thread
+  #[getter]
+  fn get_incoming_ch_len(&self) -> PyResult<u64> {
+    Ok(self.config.incoming_ch_len)
+  }
+  // num. missing event id
+  #[getter]
+  fn get_evid_missing(&self) -> PyResult<u64> {
+    Ok(self.config.evid_missing)
+  }
+  // probe size for missing evid check
+  #[getter]
+  fn get_evid_check_len(&self) -> PyResult<u64> {
+    Ok(self.config.evid_check_len)
+  }
+  // num. packets written to disk
+  #[getter]
+  fn get_n_pack_write_disk(&self) -> PyResult<u64> {
+    Ok(self.config.n_pack_write_disk)
+  }
 
 #[pyclass]
 #[pyo3(name="MtbMoniSeries")]
