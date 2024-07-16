@@ -282,7 +282,6 @@
 <a href="#282" id="282">282</a>
 <a href="#283" id="283">283</a>
 <a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Heartbeats - regularly (or on demand) sent 
 //! software monitoring data
 //!
@@ -440,8 +439,7 @@
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Incoming cb channel len {}"</span>, <span class="self">self</span>.incoming_ch_len).bright_cyan()));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Writing events to disk: {} packets written, data write rate {:.2} MB/sec"</span>, <span class="self">self</span>.n_pack_write_disk, <span class="self">self</span>.get_mbytes_to_disk_per_sec()).bright_purple()));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)"</span>, <span class="self">self</span>.evid_missing, <span class="self">self</span>.evid_check_len, <span class="number">100.0</span><span class="kw-2">*</span>(<span class="self">self</span>.evid_missing <span class="kw">as </span>f64/<span class="self">self</span>.evid_check_len <span class="kw">as </span>f64)).bright_purple()));
-    <span class="comment">//
-    </span>repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  {:&lt;75}"</span>, <span class="string">"&gt;&gt; == == == == == == == == == == == == == == == == == == == &lt;&lt;"</span>.bright_cyan().bold()));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  {:&lt;75}"</span>, <span class="string">"&gt;&gt; == == == == == == == == == == == == == == == == == == == &lt;&lt;"</span>.bright_cyan().bold()));
     repr 
   }
 }
