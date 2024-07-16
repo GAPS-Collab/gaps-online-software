@@ -1238,6 +1238,19 @@ impl PyTofPacket {
     self.packet.to_bytestream()
   }
 
+  fn from_bytestream(&mut self, stream : Vec<u8>, mut pos : usize) -> PyResult<()>{
+    match TofPacket::from_bytestream(&stream, &mut pos) {
+      Ok(tp) => {
+        self.packet = tp;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to TofPacket from bytestream! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.packet)) 
   }
