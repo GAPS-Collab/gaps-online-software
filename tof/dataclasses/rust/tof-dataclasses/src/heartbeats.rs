@@ -155,7 +155,6 @@ impl HeartBeatDataSink {
     repr += &(format!("  {:<75} <<", format!(">> ==> Incoming cb channel len {}", self.incoming_ch_len).bright_cyan()));
     repr += &(format!("  {:<75} <<", format!(">> ==> Writing events to disk: {} packets written, data write rate {:.2} MB/sec", self.n_pack_write_disk, self.get_mbytes_to_disk_per_sec()).bright_purple()));
     repr += &(format!("  {:<75} <<", format!(">> ==> Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)", self.evid_missing, self.evid_check_len, 100.0*(self.evid_missing as f64/self.evid_check_len as f64)).bright_purple()));
-    //
     repr += &(format!("  {:<75}", ">> == == == == == == == == == == == == == == == == == == == <<".bright_cyan().bold()));
     repr 
   }
