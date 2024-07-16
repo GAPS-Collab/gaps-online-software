@@ -113,6 +113,7 @@ fn tof_events<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyTofEvent>()?;
   m.add_class::<PyRBWaveform>()?;
   m.add_class::<PyRBCalibration>()?;
+  m.add_class::<PyTofEventSummary>()?;
   Ok(())
 }
 
