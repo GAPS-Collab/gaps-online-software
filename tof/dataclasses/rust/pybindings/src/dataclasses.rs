@@ -1417,6 +1417,12 @@ impl PyTofEventSummary {
     }
   }
 
+  #[getter]
+  fn event_id(&self) -> u32 {
+    self.event.event_id
+  }
+
+
   /// RB Link IDS (not RB ids) which fall into the 
   /// trigger window
   #[getter]
