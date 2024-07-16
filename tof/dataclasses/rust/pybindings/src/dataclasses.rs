@@ -1029,72 +1029,71 @@ impl PyRBMoniSeries {
     }
   }
 }
-#[pyclass]
-#[pyo3(name="HeartbeatDataSink")]
-
-pub struct PyHeartbeatDataSink{
-  pub config : HeartbeatDataSink
-}
-
-impl PyHeartbeatDataSink {
-  pub fn set_config(&mut self, cfg : HeartbeatDataSink) {
-    self.config = cfg;
-  }
-}
-#[pymethods]
-impl PyHeartbeatDataSink{
-  #[new]
-  fn new() -> Self {
-    let cfg: HeartbeatDataSink = HeartbeatDataSink::new();
-    Self {
-      config : cfg
-    }
-  }
-  //mission elapsed time
-  #[getter]
-  fn get_met(&self) -> PyResult<u64> {
-    Ok(self.config.met)
-  }
-  // num. packets sent
-  #[getter]
-  fn get_n_packets_sent(&self) -> PyResult<u64> {
-    Ok(self.config.n_packets_sent)
-  }
-  // num. packets incoming
-  #[getter]
-  fn get_n_packets_incoming(&self) -> PyResult<u64> {
-    Ok(self.config.n_packets_incominb)
-  }
-  // num. bytes written
-  #[getter]
-  fn get_n_bytes_written(&self) -> PyResult<u64> {
-    Ok(self.config.n_bytes_written)
-  }
-  // num. missing their event id
-  #[getter]
-  fn get_n_evid_chunksize(&self) -> PyResult<u64> {
-    Ok(self.config.n_evid_chunksize)
-  }
-  // len incomming buffer for the thread
-  #[getter]
-  fn get_incoming_ch_len(&self) -> PyResult<u64> {
-    Ok(self.config.incoming_ch_len)
-  }
-  // num. missing event id
-  #[getter]
-  fn get_evid_missing(&self) -> PyResult<u64> {
-    Ok(self.config.evid_missing)
-  }
-  // probe size for missing evid check
-  #[getter]
-  fn get_evid_check_len(&self) -> PyResult<u64> {
-    Ok(self.config.evid_check_len)
-  }
-  // num. packets written to disk
-  #[getter]
-  fn get_n_pack_write_disk(&self) -> PyResult<u64> {
-    Ok(self.config.n_pack_write_disk)
-  }
+//#[pyclass]
+//#[pyo3(name="HeartbeatDataSink")]
+//pub struct PyHeartbeatDataSink{
+//  pub config : HeartbeatDataSink
+//}
+//
+//impl PyHeartbeatDataSink {
+//  pub fn set_config(&mut self, cfg : HeartbeatDataSink) {
+//    self.config = cfg;
+//  }
+//}
+//#[pymethods]
+//impl PyHeartbeatDataSink{
+//  #[new]
+//  fn new() -> Self {
+//    let cfg: HeartbeatDataSink = HeartbeatDataSink::new();
+//    Self {
+//      config : cfg
+//    }
+//  }
+//  //mission elapsed time
+//  #[getter]
+//  fn get_met(&self) -> PyResult<u64> {
+//    Ok(self.config.met)
+//  }
+//  // num. packets sent
+//  #[getter]
+//  fn get_n_packets_sent(&self) -> PyResult<u64> {
+//    Ok(self.config.n_packets_sent)
+//  }
+//  // num. packets incoming
+//  #[getter]
+//  fn get_n_packets_incoming(&self) -> PyResult<u64> {
+//    Ok(self.config.n_packets_incominb)
+//  }
+//  // num. bytes written
+//  #[getter]
+//  fn get_n_bytes_written(&self) -> PyResult<u64> {
+//    Ok(self.config.n_bytes_written)
+//  }
+//  // num. missing their event id
+//  #[getter]
+//  fn get_n_evid_chunksize(&self) -> PyResult<u64> {
+//    Ok(self.config.n_evid_chunksize)
+//  }
+//  // len incomming buffer for the thread
+//  #[getter]
+//  fn get_incoming_ch_len(&self) -> PyResult<u64> {
+//    Ok(self.config.incoming_ch_len)
+//  }
+//  // num. missing event id
+//  #[getter]
+//  fn get_evid_missing(&self) -> PyResult<u64> {
+//    Ok(self.config.evid_missing)
+//  }
+//  // probe size for missing evid check
+//  #[getter]
+//  fn get_evid_check_len(&self) -> PyResult<u64> {
+//    Ok(self.config.evid_check_len)
+//  }
+//  // num. packets written to disk
+//  #[getter]
+//  fn get_n_pack_write_disk(&self) -> PyResult<u64> {
+//    Ok(self.config.n_pack_write_disk)
+//  }
 
 #[pyclass]
 #[pyo3(name="MtbMoniSeries")]
@@ -1267,7 +1266,8 @@ impl PyMasterTriggerEvent {
   }
 
   /// Get the RB link IDs according to the mask
-  pub fn get_rb_link_ids(&self) -> Vec<u8> {
+  #[getter]
+  pub fn rb_link_ids(&self) -> Vec<u8> {
     self.event.get_rb_link_ids()
   }
 
@@ -1283,18 +1283,21 @@ impl PyMasterTriggerEvent {
   /// # Returns
   ///
   ///   Vec<(hit)> where hit is (DSI, J, (CH, CH), LTBThreshold) 
-  pub fn get_trigger_hits(&self) -> PyResult<Vec<(u8, u8, (u8, u8), LTBThreshold)>> {
+  #[getter]
+  pub fn trigger_hits(&self) -> PyResult<Vec<(u8, u8, (u8, u8), LTBThreshold)>> {
     Ok(self.event.get_trigger_hits())
   }
 
   /// combine the tiu gps 16 and 32bit timestamps 
   /// into a 48bit timestamp
-  pub fn get_timestamp_gps48(&self) -> u64 {
+  #[getter]
+  pub fn timestamp_gps48(&self) -> u64 {
     self.event.get_timestamp_gps48()
   }
 
   /// Get absolute timestamp as sent by the GPS
-  pub fn get_timestamp_abs48(&self) -> u64 {
+  #[getter]
+  pub fn timestamp_abs48(&self) -> u64 {
     self.event.get_timestamp_abs48()
   }
   
@@ -1398,6 +1401,71 @@ impl PyTofEventSummary {
   pub fn new() -> Self {
     Self {
       event : TofEventSummary::new(),
+    }
+  }
+
+  /// RB Link IDS (not RB ids) which fall into the 
+  /// trigger window
+  #[getter]
+  fn rb_link_ids(&self) -> Vec<u8> {
+    self.event.get_rb_link_ids()
+  }
+
+  /// Hits which formed a trigger
+  #[getter]
+  fn trigger_hits(&self) -> Vec<(u8, u8, u8, LTBThreshold)> {
+    self.event.get_trigger_hits()
+  }
+  
+  ///
+  #[getter]
+  pub fn trigger_sources(&self) -> Vec<TriggerType> {
+    self.event.get_trigger_sources()
+  } 
+
+  #[getter]
+  pub fn hits(&self) -> Vec<PyTofHit> {
+    let mut hits = Vec::<PyTofHit>::new();
+    for h in &self.event.hits {
+      let mut pyhit = PyTofHit::new();
+      pyhit.set_hit(h.clone());
+      hits.push(pyhit);
+    }
+    hits
+  }
+
+  #[getter]
+  fn beta(&self) -> f32 {
+    self.event.get_beta()
+  }
+
+  #[getter]
+  fn timestamp16(&self) -> u16 {
+    self.event.timestamp16
+  }
+  
+  #[getter]
+  fn timestamp32(&self) -> u32 {
+    self.event.timestamp32
+  }
+  
+  #[getter]
+  fn timestamp48(&self) -> u64 {
+    self.event.get_timestamp48()
+  }
+  
+  
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<TofEventSummary>() {
+      Ok(event) => {
+        self.event = event;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
     }
   }
 

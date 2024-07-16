@@ -126,7 +126,7 @@ fn tof_commands<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyTriggerConfig>()?;
   m.add_class::<PyAnalysisEngineConfig>()?;
   m.add_class::<PyTOFEventBuilderConfig>()?;
-  m.add_class::<PyHeartbeatDataSink>()?;
+  //m.add_class::<PyHeartbeatDataSink>()?;
   Ok(())
 }
 
