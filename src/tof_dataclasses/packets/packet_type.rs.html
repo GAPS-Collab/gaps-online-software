@@ -189,6 +189,8 @@
 <a href="#189" id="189">189</a>
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// PacketType identifies the payload in TofPackets
 ///
 /// This needs to be kept in sync with the C++ API
@@ -220,6 +222,7 @@
   </span>HeartBeatDataSink   = <span class="number">40u8</span>,    
   MasterTrigger       = <span class="number">60u8</span>,    <span class="comment">// needs to be renamed to either MasterTriggerEvent or MTEvent
   </span>TriggerConfig       = <span class="number">61u8</span>,
+  MTBHeartbeat        = <span class="number">62u8</span>, 
   AnalysisEngineConfig = <span class="number">69u8</span>,
   RBEventHeader       = <span class="number">70u8</span>,    <span class="comment">// needs to go away
   </span>TOFEventBuilderConfig = <span class="number">71u8</span>,
@@ -242,6 +245,7 @@
   PreampBiasConfig    = <span class="number">161u8</span>,
   RunConfig           = <span class="number">162u8</span>,
   LTBThresholdConfig  = <span class="number">163u8</span>,
+
   <span class="comment">// use the &gt; 200 values for transmitting
   // various binary files
   </span>ConfigBinary        = <span class="number">201u8</span>,

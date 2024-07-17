@@ -419,6 +419,24 @@
 <a href="#419" id="419">419</a>
 <a href="#420" id="420">420</a>
 <a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Communication with the flight computer
 //!
 //! Using two dedicated 0MQ wires - one for 
@@ -803,6 +821,7 @@
               n_pack_sent += <span class="number">1</span>;
             }
           } <span class="comment">// end match
+          
         </span>}
       } <span class="comment">// end if pk == event packet
     </span>} <span class="comment">// end incoming.recv
@@ -817,11 +836,28 @@
         //println!("len of evid_id_test {}", evid_id_test_len);
         </span><span class="kw">for _ in </span><span class="number">0</span>..evid_check_len {
           <span class="kw">if </span>!evid_check.contains(<span class="kw-2">&amp;</span>evid) {
-            evid_missing += <span class="number">1</span>;
+            <span class="macro">cfg_if::cfg_if!</span>{
+              <span class="kw">if </span><span class="attr">#[cfg(features=<span class="string">"debug"</span>)] </span>{
+                heartbeat.n_evid_missing += <span class="number">1</span>;
+                heartbeat.n_evid_chunksize = evid_check_len;
+              }
+            }
           }
           evid += <span class="number">1</span>;
         }
       }
+      <span class="macro">cfg_if::cfg_if!</span>{
+        <span class="kw">if </span><span class="attr">#[cfg(features=<span class="string">"debug"</span>)] </span>{
+          heartbeat.incoming_ch_len = incoming.len();
+          heartbeat.met += timer.elapsed().as_secs_u64();
+          <span class="kw">match </span>data_socket.send(heartbeat.to_bytestream(),<span class="number">0</span>) {
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Not able to send heartbeat over 0MQ PUB! {err}"</span>),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+              <span class="macro">trace!</span>(<span class="string">"TofPacket sent"</span>);
+            }
+          } <span class="comment">// end match
+        </span>}
+      } 
       evid_check.clear();
       <span class="comment">////println!("DEBUG 2");
       //event_id_test.clear();

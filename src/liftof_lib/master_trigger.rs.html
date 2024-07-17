@@ -801,7 +801,7 @@
 </span>};
 
 <span class="kw">use </span><span class="kw">crate</span>::thread_control::ThreadControl;
-
+<span class="kw">use </span>tof_dataclasses::heartbeats::MTBHeartbeat;
 <span class="doccomment">/// The DAQ packet from the MTB has a flexible size, but it will
 /// be at least this number of words long.
 </span><span class="kw">const </span>MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = <span class="number">11</span>; 
@@ -1039,7 +1039,7 @@
 ///
 </span><span class="kw">pub fn </span>master_trigger(mt_address     : String,
                       mt_sender      : <span class="kw-2">&amp;</span>Sender&lt;MasterTriggerEvent&gt;,
-                      moni_sender    : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
+                      moni_sender    : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;, 
                       settings       : MTBSettings,
                       thread_control : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;,
                       verbose        : bool) {
