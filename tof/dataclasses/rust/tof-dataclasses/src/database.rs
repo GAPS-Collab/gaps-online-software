@@ -85,7 +85,31 @@ pub fn get_dsi_j_ch_pid_map(paddles : &Vec<Paddle>) -> DsiJChPidMapping {
   return mapping;
 }
 
+/// A representation of a run 
+#[derive(Debug,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
+#[diesel(table_name = schema::tof_db_run)]
+#[diesel(primary_key(run_id))]
+pub struct Run {
+  pub run_id                    : i32,
+  pub runtime_secs              : i32,
+  pub calib_before              : bool,
+  pub shifter                   : i16,
+  pub run_type                  : i16,
+  pub run_path                  : String,
+}
 
+impl Run {
+  pub fn new() -> Self {
+    Self {
+      run_id        : 0, 
+      runtime_secs  : 0, 
+      calib_before  : true, 
+      shifter       : 0, 
+      run_type      : 0, 
+      run_path      : String::from(""), 
+    }
+  }
+}
 
 /// Representation of a local trigger board.
 /// 
@@ -112,7 +136,6 @@ pub fn get_dsi_j_ch_pid_map(paddles : &Vec<Paddle>) -> DsiJChPidMapping {
 /// the paddle/RB tables need to be consulted.
 /// Again: rb_ch0 does NOT necessarily correspond to the A side!
 /// 
-
 #[derive(Debug,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_rat)]
 #[diesel(primary_key(rat_id))]
