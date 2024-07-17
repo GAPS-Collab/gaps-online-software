@@ -1148,6 +1148,10 @@ impl PyMTBHeartbeat {
   fn get_trate(&self) -> PyResult<u64> {
     Ok(self.config.trate)
   }
+  #[getter]
+  fn get_lost_trate(&self) -> PyResult<u64> {
+    Ok(self.config.lost_trate)
+  }
 }
 
 #[pyclass]

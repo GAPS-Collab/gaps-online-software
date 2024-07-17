@@ -291,6 +291,7 @@ pub struct MTBHeartbeat {
   pub n_ev_unsent          : u64,
   pub n_ev_missed         : u64,
   pub trate               : u64,
+  pub lost_trate          : u64,
   }
 
   impl MTBHeartbeat {
@@ -303,6 +304,7 @@ pub struct MTBHeartbeat {
         n_ev_unsent         : 0,
         n_ev_missed         : 0,
         trate               : 0,
+        lost_trate          : 0,
       }
     }
     pub fn get_sent_packet_rate(&self) -> f64 {
@@ -316,36 +318,19 @@ pub struct MTBHeartbeat {
       repr += &(format!("   {:<75} <<", format!(">> ==> Last MTB EVQ size                {}", self.evq_num_events_last).bright_blue()));
       repr += &(format!("   {:<75} <<", format!(">> ==> Avg. MTB EVQ size (per 30s )     {:.2}", self.evq_num_events_avg).bright_blue()));
       repr += &(format!("   {:<75} <<", format!(">> ==> -- trigger rate, recorded  (Hz)  {:.2}", self.n_events as f64/self.total_elapsed as f64).bright_blue()));
+      repr += &(format!("   {:<75}", format!(">> ==> -- trigger rate, from reg. (Hz)  {}", self.trate).bright_blue()));
+      repr += &(format!("   {:<75}", format!(">> ==> -- lost trg rate, from reg. (Hz)   {}", self.lost_trate)).bright_blue());
+      if self.n_ev_unsent > 0 {
+        repr += &(format!(" {}{}", format!("{}>> ==> ",self.n_ev_unsent).yellow().bold(), " sent errors  <<")).yellow().bold();
+      }
+      if self.n_ev_missed > 0 {
+        repr += &(format!("  {}{}", format!("{}>> ==> ",self.n_events).yellow().bold(), " missed events   <<")).yellow().bold();
+      }
+      repr += &(format!("  {:<75}", format!(">> == == == == == == ==  END HEARTBEAT = ==  == == == == ==").bright_blue().bold()));
       repr
-    //   match TRIGGER_RATE.get(&mut bus) {
-    //     Ok(trate) => {
-    //       repr += &(format!("  {:<75}", ">> ==> -- trigger rate, from reg. (Hz)  {}", self.trate.bright_blue()));
-    //     }
-    //     Err(err) => {
-    //       error!("Unable to query {}! {err}", TRIGGER_RATE);
-    //       repr += &(format!("  {:<60}", ">> ==> -- trigger rate, from reg. (Hz)   N/A").bright_blue());
-    //     }
-    //   }
-    //   match LOST_TRIGGER_RATE.get(&mut bus) {
-    //     Ok(trate) => {
-    //       repr += &(format!("  {:<75}", ">> ==> -- lost trg rate, from reg. (Hz)   {}", self.trate).bright_blue());
-    //     }
-    //     Err(err) => {
-    //       error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
-    //       repr += &(format!("  {:<75}", ">> ==> -- lost trigger rate, from reg. (Hz)   N/A").bright_blue());
-    //     }
-    //   }
-    //   if n_ev_unsent > 0 {
-    //     repr += &(format!("  {}{}{}", ">> ==> ".yellow().bold(),self.n_ev_unsent, " sent errors                       <<".yellow().bold()));
-    //   }
-    //   if n_ev_missed > 0 {
-    //     repr += &(format!("  {}{}{}", ">> ==> ".yellow().bold(),self.n_events, " missed events                       <<".yellow().bold()));
-    //   }
-    //   repr += &(format!("  {:<75}", ">> == == == == == == ==  END HEARTBEAT = ==  == == == == ==".bright_blue().bold()))
-    
-    // }
     }
   }
+  
 
   impl Default for MTBHeartbeat {
     fn default () -> Self {
@@ -359,7 +344,7 @@ pub struct MTBHeartbeat {
   impl Serialization for MTBHeartbeat {
     const HEAD : u16 = 0xAAAA;
     const TAIL : u16 = 0x5555;
-    const SIZE : usize = 60;
+    const SIZE : usize = 68;
 
     fn from_bytestream(stream    :&Vec<u8>,
                        pos       :&mut usize)
@@ -373,6 +358,7 @@ pub struct MTBHeartbeat {
       hb.n_ev_unsent         = parse_u64(stream, pos);
       hb.n_ev_missed         = parse_u64(stream, pos);
       hb.trate                  = parse_u64(stream, pos);
+      hb.lost_trate             = parse_u64(stream, pos);
       *pos += 2;
       Ok(hb)
     }
@@ -387,6 +373,7 @@ pub struct MTBHeartbeat {
       bs.extend_from_slice(&self.n_ev_unsent.to_le_bytes());
       bs.extend_from_slice(&self.n_ev_missed.to_le_bytes());
       bs.extend_from_slice(&self.trate.to_le_bytes());
+      bs.extend_from_slice(&self.lost_trate.to_le_bytes());
       bs.extend_from_slice(&Self::TAIL.to_le_bytes());
       bs
     }
@@ -403,6 +390,7 @@ pub struct MTBHeartbeat {
     let n_ev_unsent      = rng.gen::<u64>();
     let n_ev_missed      = rng.gen::<u64>();
     let trate               = rng.gen::<u64>();
+    let lost_trate          = rng.gen::<u64>();
     Self {
       total_elapsed,       
         n_events,            
@@ -411,6 +399,7 @@ pub struct MTBHeartbeat {
         n_ev_unsent,
         n_ev_missed,
         trate,
+        lost_trate,
       }
     }
   }
