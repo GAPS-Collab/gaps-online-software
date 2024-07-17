@@ -16,7 +16,10 @@ namespace Gaps {
     V2      = PROTOCOLVERSION_V2,
     V3      = PROTOCOLVERSION_V3
   }; 
+
+  std::string pversion_to_string(ProtocolVersion version);
 }
+
 
 std::ostream& operator<<(std::ostream& os, const Gaps::ProtocolVersion& version);
 
