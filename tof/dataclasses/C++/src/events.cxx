@@ -1007,7 +1007,8 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
    hit.charge_a_f32  = Gaps::parse_f16(bytestream, pos); 
    hit.charge_b_f32  = Gaps::parse_f16(bytestream, pos); 
    hit.charge_min_i  = Gaps::parse_u16(bytestream, pos); 
-   //hit.baseline         = Gaps::parse_u16(bytestream, pos); 
+   //hit.baseline         = Gaps::parse_u16(bytestream, pos);
+   hit.x_pos         = Gaps::parse_u16(bytestream, pos); 
    hit.t_average     = Gaps::parse_u16(bytestream, pos); 
    hit.ctr_etx       = bytestream[pos]; pos+=1;
    hit.timestamp32   = Gaps::parse_u32(bytestream, pos);

@@ -48,12 +48,13 @@ u32 leading_zeros(u16 x) {
 //lil' helpa
 f32 u32tof32(u32 val) {
   f32 result;
-  Vec<u8> bytes = Vec<u8>();
+  Vec<u8> bytes = Vec<u8>(4);
   bytes[3] = (val >> 24) & 0xFF;
   bytes[2] = (val >> 16) & 0xFF;
   bytes[1] = (val >> 8)  & 0xFF;
   bytes[0] =  val & 0xFF;
   std::memcpy(&result, bytes.data(), sizeof(f32));
+  return result;
 }
 
 /***********************************************/
