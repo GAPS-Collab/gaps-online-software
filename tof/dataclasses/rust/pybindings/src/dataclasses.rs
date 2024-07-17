@@ -1337,6 +1337,11 @@ impl PyMasterTriggerEvent {
     }
   }
 
+  #[getter]
+  fn event_id(&self) -> u32 {
+    self.event.event_id
+  }
+
   /// Get the RB link IDs according to the mask
   #[getter]
   pub fn rb_link_ids(&self) -> Vec<u8> {
@@ -1572,6 +1577,11 @@ impl PyTofEvent {
     Self {
       event : TofEvent::new(),
     }
+  }
+
+  #[getter]
+  fn event_id(&self) -> u32 {
+    self.event.header.event_id
   }
 
   #[getter]
