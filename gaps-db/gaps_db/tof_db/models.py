@@ -16,7 +16,9 @@ class RAT(models.Model):
     """
     rat_id                    = models.PositiveSmallIntegerField(unique=True, primary_key=True)
     pb_id                     = models.PositiveSmallIntegerField()
+    # rb1 will control the LTB
     rb1_id                    = models.PositiveSmallIntegerField()
+    # rb2 will control the Preamps/PB
     rb2_id                    = models.PositiveSmallIntegerField()
     ltb_id                    = models.PositiveSmallIntegerField()
     ltb_harting_cable_length  = models.PositiveSmallIntegerField(help_text="Length of the Harting cable in feet")
@@ -535,8 +537,11 @@ class LocalTriggerBoard(models.Model):
                   self.paddle7.panel, self.paddle8.panel]
         return list(set(panels))
 
-    def __str__(self) -> str:
-        return self.__repr__()
+    def get_paddle_for_channel(self):
+        """
+        Get the paddle for the combined channel
+        """
+        pass
 
     def __repr__(self) -> str:
         if not self.connected():
@@ -551,15 +556,18 @@ class LocalTriggerBoard(models.Model):
             _repr += f'\n    ->      {self.cable_len}'
             _repr +=  '\n  -- -- -- -- -- -- -- -- -- -- -- -- -- --'
             _repr +=  '\n  LTB Ch -> RB Id, RB chn, Pdl ID, Pan ID:' 
-            _repr += f'\n  {self.paddle1.ltb_chA:02},{self.paddle1.ltb_chB:02}  -> {self.paddle1.rb_id:02}   |   {self.paddle1.rb_chA},{self.paddle1.rb_chB} |  {self.paddle1.paddle_id:03}  | {self.paddle1.panel_id:02}' 
-            _repr += f'\n  {self.paddle2.ltb_chA:02},{self.paddle2.ltb_chB:02}  -> {self.paddle2.rb_id:02}   |   {self.paddle2.rb_chA},{self.paddle2.rb_chB} |  {self.paddle2.paddle_id:03}  | {self.paddle2.panel_id:02}' 
-            _repr += f'\n  {self.paddle3.ltb_chA:02},{self.paddle3.ltb_chB:02}  -> {self.paddle3.rb_id:02}   |   {self.paddle3.rb_chA},{self.paddle3.rb_chB} |  {self.paddle3.paddle_id:03}  | {self.paddle3.panel_id:02}' 
-            _repr += f'\n  {self.paddle4.ltb_chA:02},{self.paddle4.ltb_chB:02}  -> {self.paddle4.rb_id:02}   |   {self.paddle4.rb_chA},{self.paddle4.rb_chB} |  {self.paddle4.paddle_id:03}  | {self.paddle4.panel_id:02}' 
-            _repr += f'\n  {self.paddle5.ltb_chA:02},{self.paddle5.ltb_chB:02}  -> {self.paddle5.rb_id:02}   |   {self.paddle5.rb_chA},{self.paddle5.rb_chB} |  {self.paddle5.paddle_id:03}  | {self.paddle5.panel_id:02}' 
-            _repr += f'\n  {self.paddle6.ltb_chA:02},{self.paddle6.ltb_chB:02}  -> {self.paddle6.rb_id:02}   |   {self.paddle6.rb_chA},{self.paddle6.rb_chB} |  {self.paddle6.paddle_id:03}  | {self.paddle6.panel_id:02}' 
-            _repr += f'\n  {self.paddle7.ltb_chA:02},{self.paddle7.ltb_chB:02}  -> {self.paddle7.rb_id:02}   |   {self.paddle7.rb_chA},{self.paddle7.rb_chB} |  {self.paddle7.paddle_id:03}  | {self.paddle7.panel_id:02}' 
-            _repr += f'\n  {self.paddle8.ltb_chA:02},{self.paddle8.ltb_chB:02}  -> {self.paddle8.rb_id:02}   |   {self.paddle8.rb_chA},{self.paddle8.rb_chB} |  {self.paddle8.paddle_id:03}  | {self.paddle8.panel_id:02}>' 
+            _repr += f'\n  1: {self.paddle1.ltb_chA:02},{self.paddle1.ltb_chB:02}  -> {self.paddle1.rb_id:02}   |   {self.paddle1.rb_chA},{self.paddle1.rb_chB} |  {self.paddle1.paddle_id:03}  | {self.paddle1.panel_id:02}' 
+            _repr += f'\n  2: {self.paddle2.ltb_chA:02},{self.paddle2.ltb_chB:02}  -> {self.paddle2.rb_id:02}   |   {self.paddle2.rb_chA},{self.paddle2.rb_chB} |  {self.paddle2.paddle_id:03}  | {self.paddle2.panel_id:02}' 
+            _repr += f'\n  3: {self.paddle3.ltb_chA:02},{self.paddle3.ltb_chB:02}  -> {self.paddle3.rb_id:02}   |   {self.paddle3.rb_chA},{self.paddle3.rb_chB} |  {self.paddle3.paddle_id:03}  | {self.paddle3.panel_id:02}' 
+            _repr += f'\n  4: {self.paddle4.ltb_chA:02},{self.paddle4.ltb_chB:02}  -> {self.paddle4.rb_id:02}   |   {self.paddle4.rb_chA},{self.paddle4.rb_chB} |  {self.paddle4.paddle_id:03}  | {self.paddle4.panel_id:02}' 
+            _repr += f'\n  5: {self.paddle5.ltb_chA:02},{self.paddle5.ltb_chB:02}  -> {self.paddle5.rb_id:02}   |   {self.paddle5.rb_chA},{self.paddle5.rb_chB} |  {self.paddle5.paddle_id:03}  | {self.paddle5.panel_id:02}' 
+            _repr += f'\n  6: {self.paddle6.ltb_chA:02},{self.paddle6.ltb_chB:02}  -> {self.paddle6.rb_id:02}   |   {self.paddle6.rb_chA},{self.paddle6.rb_chB} |  {self.paddle6.paddle_id:03}  | {self.paddle6.panel_id:02}' 
+            _repr += f'\n  7: {self.paddle7.ltb_chA:02},{self.paddle7.ltb_chB:02}  -> {self.paddle7.rb_id:02}   |   {self.paddle7.rb_chA},{self.paddle7.rb_chB} |  {self.paddle7.paddle_id:03}  | {self.paddle7.panel_id:02}' 
+            _repr += f'\n  8: {self.paddle8.ltb_chA:02},{self.paddle8.ltb_chB:02}  -> {self.paddle8.rb_id:02}   |   {self.paddle8.rb_chA},{self.paddle8.rb_chB} |  {self.paddle8.paddle_id:03}  | {self.paddle8.panel_id:02}>' 
         return _repr
+    
+    def __str__(self) -> str:
+        return self.__repr__()
 
 ##########################################################################
 
@@ -757,7 +765,22 @@ class Run(models.Model):
     Meta information which defines a data run
     """
 
-    run_id         = models.PositiveBigIntegerField(primary_key=True)
+    run_id         = models.PositiveBigIntegerField(primary_key=True,
+                                                    help_text="Uniquely assigned run id by the TOF CPU")
+    # default is a 24 hour run
+    runtime_secs   = models.PositiveBigIntegerField(null=True, default=86400,
+                                                    help_text="Duration of the run in seconds")
+    # do a calibration before run
+    calib_before   = models.BooleanField(null=True, default=True,
+                                         help_text="Run calibration right before run start")
+    shifter        = models.SmallIntegerField(null=True, default=0,
+                                              help_text="Shifter ID")
+    run_type       = models.SmallIntegerField(null=True, default=0,
+                                              help_text="Type of run, like PHYSICS or DEBUG")
+    run_path       = models.CharField(max_length=1024,
+                                      null=True,
+                                      default="",
+                                      help_text="Data location on TOF computer")
     #shifter        =
     #                 help_text="Name of the responsible person for data taking"
     #comment        = 
