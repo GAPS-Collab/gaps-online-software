@@ -382,7 +382,7 @@ pub struct MTBHeartbeat {
   #[cfg(feature = "random")]
   impl FromRandom for MTBHeartbeat {
     fn from_random() -> Self {
-    let mut_rng             = rand::thread_rng();
+    let mut rng             = rand::thread_rng();
     let total_elapsed       = rng.gen::<u64>();
     let n_events            = rng.gen::<u64>();
     let evq_num_events_last = rng.gen::<u64>();
