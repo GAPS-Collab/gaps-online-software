@@ -39,6 +39,11 @@ struct MasterTriggerEvent;
 struct TofHit;
 
 /*********************************************************/
+
+/// Speed of light in the paddle in cm/ns
+static const f32 C_LIGHT_PADDLE = 15.4; 
+
+/*********************************************************/
   
 static const u8 EVENTSTATUS_UNKNOWN           =   0;
 static const u8 EVENTSTATUS_CRC32WRONG        =  10;
@@ -475,7 +480,6 @@ struct TofHit  {
   // deprecated
   bool broken;
 
-
   // new variables for V1
   Gaps::ProtocolVersion version;
   f32 baseline_a;
@@ -486,6 +490,8 @@ struct TofHit  {
 
   u32 timestamp32;
   u16 timestamp16;
+  // don't serialize
+  f32 paddle_len;  
 
   u8 ctr_etx;
   u16 tail = 0xF0F; 
@@ -499,7 +505,12 @@ struct TofHit  {
   f32 get_charge_min_i() const;
   f32 get_x_pos()        const;
   f32 get_t_avg()        const;
+  f32 get_t0()           const;
   f64 get_timestamp48()  const;
+
+  /// The paddle length will not be in the packet,
+  /// but has to be added after the fact
+  void set_paddle_len(f32 paddle_len);
 
   static TofHit from_bytestream(const Vec<u8> &bytestream, 
                                        u64 &pos);
@@ -529,8 +540,6 @@ struct TofHit  {
     f32 peak_b_f32;
     f32 charge_a_f32;
     f32 charge_b_f32;
-
-    // don't serialize
 };
 
 /************************
