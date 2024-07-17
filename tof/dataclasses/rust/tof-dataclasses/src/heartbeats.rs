@@ -282,3 +282,152 @@ fn pack_heartbeatdatasink() {
   }
 }
 
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct MTBHeartbeat {
+  pub total_elapsed       : u64, //aka met (mission elapsed time)
+  pub n_events            : u64,
+  pub evq_num_events_last : u64,
+  pub evq_num_events_avg  : u64,
+  pub n_ev_unsent          : u64,
+  pub n_ev_missed         : u64,
+  pub trate               : u64,
+  }
+
+  impl MTBHeartbeat {
+    pub fn new() -> Self {
+      Self {
+        total_elapsed       : 0,
+        n_events            : 0,
+        evq_num_events_last : 0,
+        evq_num_events_avg  : 0,
+        n_ev_unsent         : 0,
+        n_ev_missed         : 0,
+        trate               : 0,
+      }
+    }
+    pub fn get_sent_packet_rate(&self) -> f64 {
+      self.n_events as f64 / self.total_elapsed as f64
+    }
+    pub fn to_string(&self) -> String {
+      let mut repr = String::from("<MTBHeartbeats");
+      repr += &(format!("   {:<75}", ">> == == == == == == MTB HEARTBEAT == == == == == == <<".bright_cyan().bold()));
+      repr += &(format!("   {:<75} <<", format!(">> ==> MET (Mission Elapsed Time) (sec) {:.1}",self.total_elapsed).bright_blue()));
+      repr += &(format!("   {:<75} <<", format!(">> ==> Recorded Events                  {}", self.n_events).bright_blue()));
+      repr += &(format!("   {:<75} <<", format!(">> ==> Last MTB EVQ size                {}", self.evq_num_events_last).bright_blue()));
+      repr += &(format!("   {:<75} <<", format!(">> ==> Avg. MTB EVQ size (per 30s )     {:.2}", self.evq_num_events_avg).bright_blue()));
+      repr += &(format!("   {:<75} <<", format!(">> ==> -- trigger rate, recorded  (Hz)  {:.2}", self.n_events as f64/self.total_elapsed as f64).bright_blue()));
+      repr
+    //   match TRIGGER_RATE.get(&mut bus) {
+    //     Ok(trate) => {
+    //       repr += &(format!("  {:<75}", ">> ==> -- trigger rate, from reg. (Hz)  {}", self.trate.bright_blue()));
+    //     }
+    //     Err(err) => {
+    //       error!("Unable to query {}! {err}", TRIGGER_RATE);
+    //       repr += &(format!("  {:<60}", ">> ==> -- trigger rate, from reg. (Hz)   N/A").bright_blue());
+    //     }
+    //   }
+    //   match LOST_TRIGGER_RATE.get(&mut bus) {
+    //     Ok(trate) => {
+    //       repr += &(format!("  {:<75}", ">> ==> -- lost trg rate, from reg. (Hz)   {}", self.trate).bright_blue());
+    //     }
+    //     Err(err) => {
+    //       error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
+    //       repr += &(format!("  {:<75}", ">> ==> -- lost trigger rate, from reg. (Hz)   N/A").bright_blue());
+    //     }
+    //   }
+    //   if n_ev_unsent > 0 {
+    //     repr += &(format!("  {}{}{}", ">> ==> ".yellow().bold(),self.n_ev_unsent, " sent errors                       <<".yellow().bold()));
+    //   }
+    //   if n_ev_missed > 0 {
+    //     repr += &(format!("  {}{}{}", ">> ==> ".yellow().bold(),self.n_events, " missed events                       <<".yellow().bold()));
+    //   }
+    //   repr += &(format!("  {:<75}", ">> == == == == == == ==  END HEARTBEAT = ==  == == == == ==".bright_blue().bold()))
+    
+    // }
+    }
+  }
+
+  impl Default for MTBHeartbeat {
+    fn default () -> Self {
+      Self::new()
+    }
+  }
+  impl Packable for MTBHeartbeat {
+    const PACKET_TYPE : PacketType = PacketType::MTBHeartbeat;
+  }
+
+  impl Serialization for MTBHeartbeat {
+    const HEAD : u16 = 0xAAAA;
+    const TAIL : u16 = 0x5555;
+    const SIZE : usize = 60;
+
+    fn from_bytestream(stream    :&Vec<u8>,
+                       pos       :&mut usize)
+    -> Result<Self, SerializationError>{
+      Self::verify_fixed(stream, pos)?;
+      let mut hb = MTBHeartbeat::new();
+      hb.total_elapsed          = parse_u64(stream, pos);
+      hb.n_events               = parse_u64(stream, pos);
+      hb.evq_num_events_last    = parse_u64(stream, pos);
+      hb.evq_num_events_avg     = parse_u64(stream, pos);
+      hb.n_ev_unsent         = parse_u64(stream, pos);
+      hb.n_ev_missed         = parse_u64(stream, pos);
+      hb.trate                  = parse_u64(stream, pos);
+      *pos += 2;
+      Ok(hb)
+    }
+
+    fn to_bytestream(&self) -> Vec<u8> {
+      let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
+      bs.extend_from_slice(&Self::HEAD.to_le_bytes());
+      bs.extend_from_slice(&self.total_elapsed.to_le_bytes());
+      bs.extend_from_slice(&self.n_events.to_le_bytes());
+      bs.extend_from_slice(&self.evq_num_events_last.to_le_bytes());
+      bs.extend_from_slice(&self.evq_num_events_avg.to_le_bytes());
+      bs.extend_from_slice(&self.n_ev_unsent.to_le_bytes());
+      bs.extend_from_slice(&self.n_ev_missed.to_le_bytes());
+      bs.extend_from_slice(&self.trate.to_le_bytes());
+      bs.extend_from_slice(&Self::TAIL.to_le_bytes());
+      bs
+    }
+  }
+
+  #[cfg(feature = "random")]
+  impl FromRandom for MTBHeartbeat {
+    fn from_random() -> Self {
+    let mut_rng             = rand::thread_rng();
+    let total_elapsed       = rng.gen::<u64>();
+    let n_events            = rng.gen::<u64>();
+    let evq_num_events_last = rng.gen::<u64>();
+    let evq_num_events_avg  = rng.gen::<u64>();
+    let n_ev_unsent      = rng.gen::<u64>();
+    let n_ev_missed      = rng.gen::<u64>();
+    let trate               = rng.gen::<u64>();
+    Self {
+      total_elapsed,       
+        n_events,            
+        evq_num_events_last,
+        evq_num_events_avg,
+        n_ev_unsent,
+        n_ev_missed,
+        trate,
+      }
+    }
+  }
+
+  impl fmt::Display for MTBHeartbeat {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+      let repr = self.to_string();
+      write!(f, "{}", repr)
+    }
+  } 
+
+#[cfg(feature="random")]
+#[test]
+fn pack_mtbheartbeat() {
+  for _ in 0..100 {
+    let hb = MTBHeartbeat::from_random();
+    let test : MTBHeartbeat = hb.pack().unpack().unwrap();
+    assert_eq!(hb, test);
+  }
+} 

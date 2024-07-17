@@ -29,6 +29,7 @@ pub enum PacketType {
   HeartBeatDataSink   = 40u8,    
   MasterTrigger       = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
   TriggerConfig       = 61u8,
+  MTBHeartbeat        = 62u8, 
   AnalysisEngineConfig = 69u8,
   RBEventHeader       = 70u8,    // needs to go away
   TOFEventBuilderConfig = 71u8,
@@ -51,6 +52,7 @@ pub enum PacketType {
   PreampBiasConfig    = 161u8,
   RunConfig           = 162u8,
   LTBThresholdConfig  = 163u8,
+
   // use the > 200 values for transmitting
   // various binary files
   ConfigBinary        = 201u8,
