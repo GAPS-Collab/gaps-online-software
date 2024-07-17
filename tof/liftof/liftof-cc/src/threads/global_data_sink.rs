@@ -382,6 +382,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
               n_pack_sent += 1;
             }
           } // end match
+          
         }
       } // end if pk == event packet
     } // end incoming.recv
@@ -396,11 +397,28 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         //println!("len of evid_id_test {}", evid_id_test_len);
         for _ in 0..evid_check_len {
           if !evid_check.contains(&evid) {
-            evid_missing += 1;
+            cfg_if::cfg_if!{
+              if #[cfg(features="debug")] {
+                heartbeat.n_evid_missing += 1;
+                heartbeat.n_evid_chunksize = evid_check_len;
+              }
+            }
           }
           evid += 1;
         }
       }
+      cfg_if::cfg_if!{
+        if #[cfg(features="debug")] {
+          heartbeat.incoming_ch_len = incoming.len();
+          heartbeat.met += timer.elapsed().as_secs_u64();
+          match data_socket.send(heartbeat.to_bytestream(),0) {
+            Err(err) => error!("Not able to send heartbeat over 0MQ PUB! {err}"),
+            Ok(_)    => {
+              trace!("TofPacket sent");
+            }
+          } // end match
+        }
+      } 
       evid_check.clear();
       ////println!("DEBUG 2");
       //event_id_test.clear();
