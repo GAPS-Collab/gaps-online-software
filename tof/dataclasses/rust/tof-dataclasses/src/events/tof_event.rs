@@ -238,12 +238,12 @@ impl TofEvent {
     summary.event_id          = self.header.event_id;
     // FIXME we set the protocol version here, but that should propably 
     // go elsewhere
-    summary.version               = ProtocolVersion::V1;
+    summary.version           = ProtocolVersion::V1;
     //let status                = self.header.status;
     let mt_timestamp          = self.mt_event.get_timestamp_abs48();
     
-    summary.timestamp32       = (mt_timestamp & 0x0000ffff ) as u32;
-    summary.timestamp16       = ((mt_timestamp & 0x00ff0000 ) >> 16) as u16;
+    summary.timestamp32       = (mt_timestamp & 0x00000000ffffffff ) as u32;
+    summary.timestamp16       = ((mt_timestamp & 0x0000ffff00000000 ) >> 16) as u16;
     summary.primary_beta      = self.header.primary_beta; 
     summary.primary_charge    = self.header.primary_charge; 
     summary.dsi_j_mask        = self.mt_event.dsi_j_mask;
@@ -252,34 +252,26 @@ impl TofEvent {
     summary.hits              = Vec::<TofHit>::new();
     for ev in &self.rb_events {
       for hit in &ev.hits {
-        summary.hits.push(hit.clone());
-      }
-    }
-    if summary.version == ProtocolVersion::V1 {
-      summary.n_hits_umb = 0;
-      summary.n_hits_cbe = 0;
-      summary.n_hits_cor = 0;
-      summary.tot_edep_umb = 0.0;
-      summary.tot_edep_cbe = 0.0;
-      summary.tot_edep_cor = 0.0;
-      for h in &summary.hits {
-        if h.paddle_id <= 60 {
-          summary.n_hits_cbe += 1;
-          summary.tot_edep_cbe += h.get_edep();
+        let h = hit.clone();
+        if summary.version == ProtocolVersion::V1 {
+          if h.paddle_id <= 60 {
+            summary.n_hits_cbe += 1;
+            summary.tot_edep_cbe += h.get_edep();
+          }
+          else if h.paddle_id <= 108 && h.paddle_id > 60 {
+            summary.n_hits_umb += 1;
+            summary.tot_edep_umb += h.get_edep();
+          }
+          else {
+            summary.n_hits_cor += 1;
+            summary.tot_edep_cor += h.get_edep();
+          }
         }
-        else if h.paddle_id <= 108 && h.paddle_id > 60 {
-          summary.n_hits_umb += 1;
-          summary.tot_edep_umb += h.get_edep();
-        }
-        else {
-          summary.n_hits_cor += 1;
-          summary.tot_edep_cor += h.get_edep();
-        }
+        summary.hits.push(h);
       }
     }
     summary
   }
-
 }
 
 impl Packable for TofEvent {
@@ -855,7 +847,7 @@ impl Serialization for TofEventSummary {
     }
     let tail = parse_u16(stream, pos);
     if tail != Self::TAIL {
-      error!("Decoding of TAIL failed! Got {} instead!", tail);
+      error!("Decoding of TAIL failed for version {}! Got {} instead!", version, tail);
       return Err(SerializationError::TailInvalid);
     }
     Ok(summary)
@@ -934,7 +926,7 @@ impl FromRandom for TofEventSummary {
       summary.channel_mask.push(rng.gen::<u16>());
     }
     summary.mtb_link_mask     = rng.gen::<u64>();
-    let nhits                 = rng.gen::<u8>();
+    let nhits             = rng.gen::<u8>();
     for _ in 0..nhits {
       summary.hits.push(TofHit::from_random());
     }
@@ -955,6 +947,16 @@ fn packable_tofeventsummary() {
     assert_eq!(data, test);
   }
 }  
+
+#[test]
+fn emit_tofeventsummary() {
+  for _ in 0..100 {
+    let data = TofEvent::from_random();
+    let summary = data.get_summary();
+    let test : TofEventSummary = summary.pack().unpack().unwrap();
+    assert_eq!(summary, test);
+  }
+}
 
 #[test]
 #[cfg(feature = "random")]
