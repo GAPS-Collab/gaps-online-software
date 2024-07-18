@@ -1,4 +1,5 @@
 #include <cstring>
+#include <iostream>
 #include "parsers.h"
 
 bool Gaps::parse_bool(const Vec<u8> &bytestream,
@@ -43,17 +44,23 @@ u32 leading_zeros(u16 x) {
       x <<= 1;
     }
   }
+  return c;
 }
 
 //lil' helpa
 f32 u32tof32(u32 val) {
   f32 result;
   Vec<u8> bytes = Vec<u8>();
+  bytes.push_back(0);
+  bytes.push_back(0);
+  bytes.push_back(0);
+  bytes.push_back(0);
   bytes[3] = (val >> 24) & 0xFF;
   bytes[2] = (val >> 16) & 0xFF;
   bytes[1] = (val >> 8)  & 0xFF;
   bytes[0] =  val & 0xFF;
   std::memcpy(&result, bytes.data(), sizeof(f32));
+  return result;
 }
 
 /***********************************************/
@@ -65,7 +72,7 @@ f32 Gaps::parse_f16(const Vec<u8> &bytestream,
   //  // Check for signed zero
   //  // TODO: Replace mem::transmute with from_bits() once from_bits is const-stabilized
   f32 result;
-  Vec<u8> bytes = Gaps::slice(bytestream,pos,pos+2); 
+  //Vec<u8> bytes = Gaps::slice(bytestream,pos,pos+2); 
   // Copy the bytes into a float variable using type punning
   if ((bits & 0x7FFF) == 0) {
     u32 bits_u32 = (u32)bits << 16;
@@ -104,8 +111,10 @@ f32 Gaps::parse_f16(const Vec<u8> &bytestream,
     //let e = leading_zeros_u16(half_man as u16) - 6;
     u16 e = leading_zeros((u16)half_man) - 6;
     //// Rebias and adjust exponent
-    u16 exp = (127 - 15 - e) << 23;
-    u16 man = (half_man << (14 + e)) & (u32)0x7FFFFF;
+    u32 exp = (127 - 15 - e) << 23;
+    u32 man = (half_man << (14 + e)) & (u32)0x7FFFFF;
+    u32 bits_u32 = sign | exp | man;
+    return u32tof32(bits_u32);
     //return unsafe { mem::transmute::<u32, f32>(sign | exp | man) };
   }
 
@@ -115,7 +124,6 @@ f32 Gaps::parse_f16(const Vec<u8> &bytestream,
   //  unsafe { mem::transmute::<u32, f32>(sign | exp | man) }
   u32 bits_u32 = sign | exp | man;
   return u32tof32(bits_u32);
-  //return result;
 }
 
 /***********************************************/

@@ -1,7 +1,7 @@
 import gaps_tof as gt
 import rpy_tof_dataclasses as rust_api
 
-import pylab as p
+import matplotlib.pyplot as p
 import numpy as np
 import dashi as d
 import re

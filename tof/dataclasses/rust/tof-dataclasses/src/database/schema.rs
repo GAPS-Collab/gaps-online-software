@@ -106,6 +106,17 @@ diesel::table! {
 }
 
 diesel::table! {
+    tof_db_run (run_id) {
+        run_id       -> BigInt,
+        runtime_secs -> Nullable<BigInt>,
+        calib_before -> Nullable<Bool>,
+        shifter      -> Nullable<SmallInt>,
+        run_type     -> Nullable<SmallInt>,
+        run_path     -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
     tof_db_localtriggerboard (board_id) {
         board_id -> SmallInt,
         dsi -> Nullable<SmallInt>,
@@ -224,11 +235,6 @@ diesel::table! {
     }
 }
 
-diesel::table! {
-    tof_db_run (run_id) {
-        run_id -> BigInt,
-    }
-}
 
 diesel::joinable!(auth_group_permissions -> auth_group (group_id));
 diesel::joinable!(auth_group_permissions -> auth_permission (permission_id));
@@ -252,11 +258,11 @@ diesel::allow_tables_to_appear_in_same_query!(
     django_migrations,
     django_session,
     tof_db_dsicard,
+    tof_db_run,
     tof_db_localtriggerboard,
     tof_db_mtbchannel,
     tof_db_paddle,
     tof_db_panel,
     tof_db_rat,
     tof_db_readoutboard,
-    tof_db_run,
 );

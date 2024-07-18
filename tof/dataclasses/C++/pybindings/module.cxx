@@ -594,6 +594,10 @@ PYBIND11_MODULE(gaps_tof, m) {
                "MSB part of the timestamp (slow)")
         .def_readonly("timestamp32",   &TofHit::timestamp32,
                "LSB part of the timestamp (fast)")
+        .def_readonly("paddle_len",    &TofHit::paddle_len,
+               "Complete timestamp (48 bits)")
+        .def("set_paddle_len",         &TofHit::set_paddle_len,
+               "Set the length of the paddle from an external source")
         .def_property_readonly("timestamp48",   &TofHit::get_timestamp48,
                "Complete timestamp (48 bits)")
         .def("__repr__",          [](const TofHit &th) {

@@ -330,7 +330,7 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
   log_debug("Start decoding at pos " << pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != RBEvent::HEAD)  {
-    //log_error("[RBEvent::from_bytestream] Header signature invalid!");  
+    log_error("[RBEvent::from_bytestream] Header signature invalid!");  
     event.status = EventStatus::IncompleteReadout;
     return event;
   }
@@ -361,10 +361,11 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
   }
   // Decode the hits
   for (u8 k=0;k<nhits;k++) {
+    //std::cout << "next hit" << std::endl;
     auto hit = TofHit::from_bytestream(stream, pos);
     event.hits.push_back(hit);
   }
-
+  //std::cout << "hits finished!" << std::endl;
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != RBEvent::TAIL) {
     log_error("After parsing the event, we found an invalid tail signature " << tail);
@@ -595,7 +596,9 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   u32 n_rbevents    = get_n_rbevents(mask);
   u32 n_missing     = get_n_rbmissinghits(mask);
   log_debug("Expecting " << n_rbevents << " RBEvents, " << n_missing << " RBMissingHits");
+  //std::cout << "Expecting " << n_rbevents << " RBEvents, " << n_missing << " RBMissingHits" << std::endl;
   for (u32 k=0; k< n_rbevents; k++) {
+    //std::cout << "rb event " << k << std::endl;
     RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
     event.rb_events.push_back(rb_event);
     if (rb_event.status == EventStatus::IncompleteReadout) {
@@ -895,6 +898,12 @@ std::string TofEvent::to_string() const {
 
 /*************************************/
 
+void TofHit::set_paddle_len(f32 paddle_len) {
+  paddle_len = paddle_len;
+}
+
+/*************************************/
+
 f32 TofHit::get_time_a() const {
  if (version == Gaps::ProtocolVersion::Unknown) {
    f32 prec = 0.004;
@@ -956,8 +965,16 @@ f32 TofHit::get_charge_min_i() const {
 
 f32 TofHit::get_x_pos() const {
   // FIXME - check if it is really in the middle
-  f32 prec = 0.005; //cm
-  return prec*x_pos - 163.8;
+  if (version == Gaps::ProtocolVersion::Unknown) {
+    f32 prec = 0.005; //cm
+    return prec*x_pos - 163.8;
+  } else {
+    return (time_a_f32 - get_t0())*C_LIGHT_PADDLE*10.0; // 10 for cm->mm 
+  }
+}
+
+f32 TofHit::get_t0() const {
+  return 0.5*(time_a_f32 + time_b_f32 - (paddle_len/(10.0*C_LIGHT_PADDLE)));
 }
 
 f32 TofHit::get_t_avg() const {
@@ -981,7 +998,11 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
    return hit;
  }
  // UPDATE - get version byte first!
- u64 ver_pos       = pos + 23; // version byte is at position 23
+ u64 ver_pos       = pos + 22; // version byte is at position 23
+ if (bytestream.size() <= ver_pos) {
+   //std::cout << "stream too short! " << ver_pos << " " << bytestream.size() << std::endl;
+   return hit;
+ }
  u8  version       = Gaps::parse_u8(bytestream, ver_pos) & 0xc0;
  hit.version       = (Gaps::ProtocolVersion) version;
  hit.paddle_id     = bytestream[pos]; pos+=1;
@@ -1007,11 +1028,17 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
    hit.charge_a_f32  = Gaps::parse_f16(bytestream, pos); 
    hit.charge_b_f32  = Gaps::parse_f16(bytestream, pos); 
    hit.charge_min_i  = Gaps::parse_u16(bytestream, pos); 
+   hit.baseline_a    = Gaps::parse_f16(bytestream, pos);
+   hit.baseline_a_rms = Gaps::parse_f16(bytestream, pos);
+   hit.phase         = Gaps::parse_f16(bytestream, pos);
+   pos += 1; // skip version
+   hit.baseline_b    = Gaps::parse_f16(bytestream, pos);
+   hit.baseline_b_rms = Gaps::parse_f16(bytestream, pos);
    //hit.baseline         = Gaps::parse_u16(bytestream, pos); 
-   hit.t_average     = Gaps::parse_u16(bytestream, pos); 
-   hit.ctr_etx       = bytestream[pos]; pos+=1;
-   hit.timestamp32   = Gaps::parse_u32(bytestream, pos);
-   hit.timestamp16   = Gaps::parse_u16(bytestream, pos);
+   //hit.t_average     = Gaps::parse_u16(bytestream, pos); 
+   //hit.ctr_etx       = bytestream[pos]; pos+=1;
+   //hit.timestamp32   = Gaps::parse_u32(bytestream, pos);
+   //hit.timestamp16   = Gaps::parse_u16(bytestream, pos);
  }
  
 
@@ -1024,28 +1051,40 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
 }
 
 std::string TofHit::to_string() const {
-  std::string repr = "<TofHit";
+  std::string vstr = Gaps::pversion_to_string(version);
+  std::string repr = std::format("<TofHit ({})", vstr);
   //repr += std::format("\n -- format test {:.2f}", get_time_a() );
   repr += "\n  paddle ID         : "     + std::to_string(paddle_id         );
-  repr += "\n  timestamp32       : "     + std::to_string(timestamp32       );
-  repr += "\n  timestamp16       : "     + std::to_string(timestamp16       );
-  repr += "\n   |-> timestamp48  : "     + std::to_string(get_timestamp48() ); 
+  repr += "\n  paddle len        : "     + std::to_string(paddle_len         );
+  if (version == Gaps::ProtocolVersion::Unknown) {
+    repr += "\n  timestamp32       : "     + std::to_string(timestamp32       );
+    repr += "\n  timestamp16       : "     + std::to_string(timestamp16       );
+    repr += "\n   |-> timestamp48  : "     + std::to_string(get_timestamp48() ); 
+  }
   repr += "\n  _________";
   repr += "\n  ##  Peak:";
-  repr += std::format("\n  >> time   A | B  : {} {}", get_time_a(), get_time_b());
+  repr += std::format("\n  >> time       A | B  : {} {}", get_time_a(), get_time_b());
   //repr += "\n  >>  time   A | B  : "     + std::to_string(get_time_a()      )
   //     +  " " + std::to_string(get_time_b());
-  repr += std::format("\n  >>  height A | B  : {} {}",get_peak_a(), get_peak_b());
-  repr += std::format("\n  >>  charge A | B  : {} {}",get_charge_a(), get_charge_b());
+  repr += std::format("\n  >> height     A | B  : {} {}",get_peak_a(), get_peak_b());
+  repr += std::format("\n  >> charge     A | B  : {} {}",get_charge_a(), get_charge_b());
+  repr += std::format("\n  >> baseline   A | B  : {} {}",baseline_a, baseline_b);
+  repr += std::format("\n  >> base. rms  A | B  : {} {}",baseline_a_rms, baseline_b_rms);
   //repr += "\n  >>  height A | B  : "     + std::to_string(get_peak_a()      )
   //     +  " " + std::to_string(get_time_a());
   //repr += "\n  >>  charge A | B  : "     + std::to_string(get_charge_a()    )
   //     +  " " + std::to_string(get_time_b());
-  repr += "\n  >>  charge min_I  : "     + std::to_string(get_charge_min_i());
-  repr += "\n  >>  in pad. pos   : "     + std::to_string(get_x_pos()       );
-  repr += "\n  >>  t_avg         : "     + std::to_string(get_t_avg()       );
-  repr += "\n  cntr ETX          : "     + std::to_string(ctr_etx           );
-  repr += "\n  broken (?depr)    : "     + std::to_string(broken            );
+  if ( version == Gaps::ProtocolVersion::Unknown) {
+    repr += "\n  >>  charge min_I  : "     + std::to_string(get_charge_min_i());
+    repr += "\n  cntr ETX          : "     + std::to_string(ctr_etx           );
+    repr += "\n  broken (?depr)    : "     + std::to_string(broken            );
+  }
+  repr += "\n  >> in pad. pos   : "     + std::to_string(get_x_pos()       );
+  if (version == Gaps::ProtocolVersion::Unknown) {
+    repr += "\n  >> t_avg         : "     + std::to_string(get_t_avg()       );
+  } else {
+    repr += "\n  >> t0            : "     + std::to_string(get_t0()       );
+  }
   repr += ">";
   return repr;
 }

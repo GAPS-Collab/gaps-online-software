@@ -480,13 +480,24 @@ impl MasterTriggerEvent {
   /// Get absolute timestamp as sent by the GPS
   pub fn get_timestamp_abs48(&self) -> u64 {
     let gps = self.get_timestamp_gps48();
-    let mut timestamp = self.timestamp;
-    if timestamp < self.tiu_timestamp {
+    let mut timestamp = self.timestamp as u64;
+    if timestamp < self.tiu_timestamp as u64 {
       // it has wrapped
-      timestamp += u32::MAX;
+      timestamp += u32::MAX as u64;
     }
-    let ts  = 1_000_000_000 * gps + (timestamp - self.tiu_timestamp) as u64;
-    return ts;
+    let gps_mult = match 1_000_000_000u64.checked_mul(gps) {
+      Some(result) => result,
+      None => {
+          // Handle overflow case here
+          // Example: log an error, return a default value, etc.
+          0 // Example fallback value
+      }
+    };
+  
+    let ts = gps_mult + (timestamp - self.tiu_timestamp as u64);
+    //ts
+    // change for debugging with Field
+    self.timestamp as u64
   }
 
   /// Get the trigger sources from trigger source byte

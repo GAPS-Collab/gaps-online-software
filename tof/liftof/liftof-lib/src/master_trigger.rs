@@ -55,7 +55,7 @@ use tof_dataclasses::ipbus::{
 };
 
 use crate::thread_control::ThreadControl;
-
+use tof_dataclasses::heartbeats::MTBHeartbeat;
 /// The DAQ packet from the MTB has a flexible size, but it will
 /// be at least this number of words long.
 const MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = 11; 
@@ -293,7 +293,7 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
 ///
 pub fn master_trigger(mt_address     : String,
                       mt_sender      : &Sender<MasterTriggerEvent>,
-                      moni_sender    : &Sender<TofPacket>,
+                      moni_sender    : &Sender<TofPacket>, 
                       settings       : MTBSettings,
                       thread_control : Arc<Mutex<ThreadControl>>,
                       verbose        : bool) {

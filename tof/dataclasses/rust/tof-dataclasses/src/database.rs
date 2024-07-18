@@ -32,7 +32,6 @@ use crate::DsiLtbRBMapping;
 // FIXME - probably we should make this nicer
 pub type DsiJChPidMapping = DsiLtbRBMapping; 
 
-
 /// Universal function to connect to the database
 pub fn connect_to_db(database_url : String) -> Result<diesel::SqliteConnection, ConnectionError>  {
     //let database_url = "database.sqlite3";
@@ -85,7 +84,69 @@ pub fn get_dsi_j_ch_pid_map(paddles : &Vec<Paddle>) -> DsiJChPidMapping {
   return mapping;
 }
 
+/// A representation of a run 
+#[derive(Debug, Clone, Queryable,Insertable, Selectable, serde::Serialize, serde::Deserialize)]
+#[diesel(table_name = schema::tof_db_run)]
+#[diesel(primary_key(run_id))]
+pub struct Run {
+  pub run_id                    : i64,
+  pub runtime_secs              : Option<i64>,
+  pub calib_before              : Option<bool>,
+  pub shifter                   : Option<i16>,
+  pub run_type                  : Option<i16>,
+  pub run_path                  : Option<String>,
+}
 
+impl Run {
+  pub fn new() -> Self {
+    Self {
+      run_id        : 0, 
+      runtime_secs  : Some(0), 
+      calib_before  : Some(true), 
+      shifter       : Some(0), 
+      run_type      : Some(0), 
+      run_path      : Some(String::from("")), 
+    }
+  }
+
+  pub fn get_last_run(conn: &mut SqliteConnection) -> Option<u32> {
+    use schema::tof_db_run::dsl::*;
+    match tof_db_run.load::<Run>(conn) {
+      Err(err) => {
+        error!("Unable to load DSICards from db! {err}");
+        return None;
+      }
+      Ok(runs) => {
+        //return Some(runs);
+      }
+    }
+    let results = tof_db_run
+      //.filter(published.eq(true))
+      .limit(1)
+      //.select(Run::as_select())
+      .load::<Run>(conn)
+      .expect("Error loading posts");
+    None
+  }
+}
+
+impl fmt::Display for Run {
+      //runtime_secs  : Some(0), 
+      //calib_before  : Some(true), 
+      //shifter       : Some(0), 
+      //run_type      : Some(0), 
+      //run_path      : Some(String::from("")), 
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<Run");
+    repr += &(format!("\n  RunID         : {}", self.run_id));                   
+    repr += &(format!("\n  - auto cali   : {}", self.calib_before.unwrap_or(false)));
+    repr += &(format!("\n  runtime [sec] : {}", self.runtime_secs.unwrap_or(-1)));
+    repr += &(format!("\n  shifter       : {}", self.shifter.unwrap_or(-1)));
+    repr += &(format!("\n  run_type      : {}", self.run_type.unwrap_or(-1)));
+    repr += &(format!("\n  run_path      : {}", self.run_path.clone().unwrap_or(String::from(""))));
+    write!(f, "{}", repr)
+  }
+}
 
 /// Representation of a local trigger board.
 /// 
@@ -112,7 +173,6 @@ pub fn get_dsi_j_ch_pid_map(paddles : &Vec<Paddle>) -> DsiJChPidMapping {
 /// the paddle/RB tables need to be consulted.
 /// Again: rb_ch0 does NOT necessarily correspond to the A side!
 /// 
-
 #[derive(Debug,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_rat)]
 #[diesel(primary_key(rat_id))]
@@ -128,12 +188,12 @@ pub struct RAT {
 impl RAT {
   pub fn new() -> Self {
     Self {
-        rat_id                    : 0, 
-        pb_id                     : 0, 
-        rb1_id                    : 0, 
-        rb2_id                    : 0, 
-        ltb_id                    : 0, 
-        ltb_harting_cable_length  : 0, 
+      rat_id                    : 0, 
+      pb_id                     : 0, 
+      rb1_id                    : 0, 
+      rb2_id                    : 0, 
+      ltb_id                    : 0, 
+      ltb_harting_cable_length  : 0, 
     }
   }
   

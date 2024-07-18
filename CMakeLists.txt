@@ -51,6 +51,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 # -- pybindings with pybind11
 option(BUILD_CXXPYBINDINGS "build C++ pybindings with pybind11" OFF)
 option(BUILD_RUSTPYBIDINGS "build Rust \\U+1F980 pybindings wiut pyO3 (better)" OFF)
+option(BUILD_RUSTTELEMETRY "builds Rust telemetry library and pybindings" OFF)
 
 if (BUILD_CXXPYBINDINGS)
 message(STATUS "Checking for pyoind11....")
@@ -76,7 +77,6 @@ endif(NOT CMAKE_BUILD_TYPE)
 ## in case of Release build, we set the NDEBUG preprocessor directive
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
 
-
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install/gaps-online-sw-v${GAPS_ONLINE_SOFTWARE_VERSION}" CACHE PATH "default install path" FORCE)
 endif()
@@ -89,6 +89,9 @@ set(INSTALL_BINARY_DIR   "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH      "installa
 set(INSTALL_PYTHON_DIR   "${CMAKE_INSTALL_PREFIX}/python" CACHE PATH   "installation directory for python code" FORCE)
 
 add_subdirectory(tof)
+if (BUILD_RUSTTELEMETRY)
+  add_subdirectory(telemetry)
+endif()
 
 # Make relative paths absolute (needed later on)
 foreach(p LIBRARY BINARY INCLUDE PYTHON EXAMPLES)

@@ -23,6 +23,9 @@ use tof_dataclasses::packets::{
     PacketType
 };
 
+use tof_dataclasses::heartbeats::HeartBeatDataSink;
+use tof_dataclasses::heartbeats::MTBHeartbeat;
+
 use tof_dataclasses::monitoring::{
     MoniData,
     MoniSeries,
@@ -228,6 +231,26 @@ impl PyTOFEventBuilderConfig{
     Self {
       config : cfg
     }
+  }
+  // greediness
+  #[getter]
+  fn get_greediness(&self) -> PyResult<u8> {
+    Ok(self.config.greediness)
+  }
+  #[setter]
+  fn set_greediness(&mut self, greediness: u8) -> PyResult<()> {
+    self.config.greediness = greediness;
+    Ok(())
+  }
+  // wait for num. RB
+  #[getter]
+  fn get_wait_nrb(&self) -> PyResult<u8> {
+    Ok(self.config.wait_nrb)
+  }
+  #[setter]
+  fn set_wait_nrb(&mut self, wait_nrb: u8) -> PyResult<()> {
+    self.config.wait_nrb = wait_nrb;
+    Ok(())
   }
   // Cache size
   #[getter]
@@ -1009,6 +1032,127 @@ impl PyRBMoniSeries {
     }
   }
 }
+#[pyclass]
+#[pyo3(name="HeartbeatDataSink")]
+
+pub struct PyHeartBeatDataSink{
+  pub config : HeartBeatDataSink
+}
+
+impl PyHeartBeatDataSink {
+  pub fn set_config(&mut self, cfg : HeartBeatDataSink) {
+    self.config = cfg;
+  }
+}
+#[pymethods]
+impl PyHeartBeatDataSink{
+  #[new]
+  fn new() -> Self {
+    let cfg: HeartBeatDataSink = HeartBeatDataSink::new();
+    Self {
+      config : cfg
+    }
+  }
+  //mission elapsed time
+  #[getter]
+  fn get_met(&self) -> PyResult<u64> {
+    Ok(self.config.met)
+  }
+  // num. packets sent
+  #[getter]
+  fn get_n_packets_sent(&self) -> PyResult<u64> {
+    Ok(self.config.n_packets_sent)
+  }
+  // num. packets incoming
+  #[getter]
+  fn get_n_packets_incoming(&self) -> PyResult<u64> {
+    Ok(self.config.n_packets_incoming)
+  }
+  // num. bytes written
+  #[getter]
+  fn get_n_bytes_written(&self) -> PyResult<u64> {
+    Ok(self.config.n_bytes_written)
+  }
+  // num. missing their event id
+  #[getter]
+  fn get_n_evid_chunksize(&self) -> PyResult<u64> {
+    Ok(self.config.n_evid_chunksize)
+  }
+  // len incomming buffer for the thread
+  #[getter]
+  fn get_incoming_ch_len(&self) -> PyResult<u64> {
+    Ok(self.config.incoming_ch_len)
+  }
+  // num. missing event id
+  #[getter]
+  fn get_evid_missing(&self) -> PyResult<u64> {
+    Ok(self.config.evid_missing)
+  }
+  // probe size for missing evid check
+  #[getter]
+  fn get_evid_check_len(&self) -> PyResult<u64> {
+    Ok(self.config.evid_check_len)
+  }
+  // num. packets written to disk
+  #[getter]
+  fn get_n_pack_write_disk(&self) -> PyResult<u64> {
+    Ok(self.config.n_pack_write_disk)
+  }
+}
+
+#[pyclass]
+#[pyo3(name="MTBHeartbeat")]
+pub struct PyMTBHeartbeat{
+  pub config : MTBHeartbeat
+}
+
+impl PyMTBHeartbeat {
+  pub fn set_config(&mut self, cfg : MTBHeartbeat) {
+    self.config = cfg;
+  }
+}
+#[pymethods]
+impl PyMTBHeartbeat {
+  #[new]
+  fn new () -> Self {
+    let cfg: MTBHeartbeat = MTBHeartbeat::new();
+    Self {
+      config : cfg
+    }
+  }
+  #[getter]
+  fn get_total_elapsed(&self) -> PyResult<u64> {
+    Ok(self.config.total_elapsed)
+  }
+  #[getter]
+  fn get_n_events(&self) -> PyResult<u64> {
+    Ok(self.config.n_events)
+  }
+  #[getter]
+  fn get_evq_num_events_last(&self) -> PyResult<u64> {
+    Ok(self.config.evq_num_events_last)
+  }
+  #[getter]
+  fn get_evq_num_events_avg(&self) -> PyResult<u64> {
+    Ok(self.config.evq_num_events_avg)
+  }
+  #[getter]
+  fn get_n_ev_unsent(&self) -> PyResult<u64> {
+    Ok(self.config.n_ev_unsent)
+  }
+  #[getter]
+  fn get_n_ev_missed(&self) -> PyResult<u64> {
+    Ok(self.config.n_ev_missed)
+  }
+  #[getter]
+  fn get_trate(&self) -> PyResult<u64> {
+    Ok(self.config.trate)
+  }
+  #[getter]
+  fn get_lost_trate(&self) -> PyResult<u64> {
+    Ok(self.config.lost_trate)
+  }
+}
 
 #[pyclass]
 #[pyo3(name="MtbMoniSeries")]
@@ -1153,6 +1297,19 @@ impl PyTofPacket {
     self.packet.to_bytestream()
   }
 
+  fn from_bytestream(&mut self, stream : Vec<u8>, mut pos : usize) -> PyResult<()>{
+    match TofPacket::from_bytestream(&stream, &mut pos) {
+      Ok(tp) => {
+        self.packet = tp;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to TofPacket from bytestream! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.packet)) 
   }
@@ -1180,8 +1337,14 @@ impl PyMasterTriggerEvent {
     }
   }
 
+  #[getter]
+  fn event_id(&self) -> u32 {
+    self.event.event_id
+  }
+
   /// Get the RB link IDs according to the mask
-  pub fn get_rb_link_ids(&self) -> Vec<u8> {
+  #[getter]
+  pub fn rb_link_ids(&self) -> Vec<u8> {
     self.event.get_rb_link_ids()
   }
 
@@ -1197,18 +1360,21 @@ impl PyMasterTriggerEvent {
   /// # Returns
   ///
   ///   Vec<(hit)> where hit is (DSI, J, (CH, CH), LTBThreshold) 
-  pub fn get_trigger_hits(&self) -> PyResult<Vec<(u8, u8, (u8, u8), LTBThreshold)>> {
+  #[getter]
+  pub fn trigger_hits(&self) -> PyResult<Vec<(u8, u8, (u8, u8), LTBThreshold)>> {
     Ok(self.event.get_trigger_hits())
   }
 
   /// combine the tiu gps 16 and 32bit timestamps 
   /// into a 48bit timestamp
-  pub fn get_timestamp_gps48(&self) -> u64 {
+  #[getter]
+  pub fn timestamp_gps48(&self) -> u64 {
     self.event.get_timestamp_gps48()
   }
 
   /// Get absolute timestamp as sent by the GPS
-  pub fn get_timestamp_abs48(&self) -> u64 {
+  #[getter]
+  pub fn timestamp_abs48(&self) -> u64 {
     self.event.get_timestamp_abs48()
   }
   
@@ -1309,9 +1475,80 @@ impl PyTofEventSummary {
 #[pymethods]
 impl PyTofEventSummary {
   #[new]
-  fn new() -> Self {
+  pub fn new() -> Self {
     Self {
       event : TofEventSummary::new(),
+    }
+  }
+
+  #[getter]
+  fn event_id(&self) -> u32 {
+    self.event.event_id
+  }
+
+
+  /// RB Link IDS (not RB ids) which fall into the 
+  /// trigger window
+  #[getter]
+  fn rb_link_ids(&self) -> Vec<u8> {
+    self.event.get_rb_link_ids()
+  }
+
+  /// Hits which formed a trigger
+  #[getter]
+  fn trigger_hits(&self) -> Vec<(u8, u8, u8, LTBThreshold)> {
+    self.event.get_trigger_hits()
+  }
+  
+  ///
+  #[getter]
+  pub fn trigger_sources(&self) -> Vec<TriggerType> {
+    self.event.get_trigger_sources()
+  } 
+
+  #[getter]
+  pub fn hits(&self) -> Vec<PyTofHit> {
+    let mut hits = Vec::<PyTofHit>::new();
+    for h in &self.event.hits {
+      let mut pyhit = PyTofHit::new();
+      pyhit.set_hit(h.clone());
+      hits.push(pyhit);
+    }
+    hits
+  }
+
+  #[getter]
+  fn beta(&self) -> f32 {
+    self.event.get_beta()
+  }
+
+  #[getter]
+  fn timestamp16(&self) -> u16 {
+    self.event.timestamp16
+  }
+  
+  #[getter]
+  fn timestamp32(&self) -> u32 {
+    self.event.timestamp32
+  }
+  
+  #[getter]
+  fn timestamp48(&self) -> u64 {
+    self.event.get_timestamp48()
+  }
+  
+  
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<TofEventSummary>() {
+      Ok(event) => {
+        self.event = event;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
     }
   }
 
@@ -1340,6 +1577,11 @@ impl PyTofEvent {
     Self {
       event : TofEvent::new(),
     }
+  }
+
+  #[getter]
+  fn event_id(&self) -> u32 {
+    self.event.header.event_id
   }
 
   #[getter]
