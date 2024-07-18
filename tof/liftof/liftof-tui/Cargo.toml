@@ -23,7 +23,7 @@ chrono     = { version = "0.4", features = ["serde"] }
 # tui stuff
 # FIXME - ratatui is now at 0.27, but there are issues with 
 # tui-logger. Check back again in the future.
-tui-logger = { version = "0.11" } 
+tui-logger = { version = "=0.11.0" } 
 ratatui    = { version = "=0.26.3", features = ["all-widgets"]}
 tui-popup  = "=0.3.2"
 crossterm  = { version = "0.23", features=["serde"]}
