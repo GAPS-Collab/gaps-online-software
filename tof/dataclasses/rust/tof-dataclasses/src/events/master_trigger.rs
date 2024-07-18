@@ -495,7 +495,9 @@ impl MasterTriggerEvent {
     };
   
     let ts = gps_mult + (timestamp - self.tiu_timestamp as u64);
-    ts
+    //ts
+    // change for debugging with Field
+    self.timestamp as u64
   }
 
   /// Get the trigger sources from trigger source byte
