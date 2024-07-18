@@ -191,6 +191,7 @@
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
 <a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// PacketType identifies the payload in TofPackets
 ///
 /// This needs to be kept in sync with the C++ API
@@ -223,6 +224,7 @@
   MasterTrigger       = <span class="number">60u8</span>,    <span class="comment">// needs to be renamed to either MasterTriggerEvent or MTEvent
   </span>TriggerConfig       = <span class="number">61u8</span>,
   MTBHeartbeat        = <span class="number">62u8</span>, 
+  EVTBLDRHeartbeat   = <span class="number">63u8</span>,
   AnalysisEngineConfig = <span class="number">69u8</span>,
   RBEventHeader       = <span class="number">70u8</span>,    <span class="comment">// needs to go away
   </span>TOFEventBuilderConfig = <span class="number">71u8</span>,

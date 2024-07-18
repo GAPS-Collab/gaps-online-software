@@ -56,7 +56,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "CommandPacket_8h_source.html",
-"structRBMoniData.html#a81f0ce3873ad1bdea1b121d385509843"
+"structRBMoniData.html#a81b779cde246d92ce8587578dc611a7e"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tui-logger-0.11.1/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tui_logger" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../tui_logger/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tui-logger-0.11.0/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tui_logger" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../tui_logger/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1523,8 +1523,14 @@
 <a href="#1523" id="1523">1523</a>
 <a href="#1524" id="1524">1524</a>
 <a href="#1525" id="1525">1525</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! # Logger with smart widget for the `tui` and `ratatui` crate
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+</pre></div><pre class="rust"><code><span class="comment">// Generate README by gawk 'substr($0,1,3) == "//!"{print(substr($0,4))}' src/lib.rs
+
+</span><span class="doccomment">//! # Logger with smart widget for the `tui` and `ratatui` crate
 //!
+//! ![Build Status](https://travis-ci.org/gin66/tui-logger.svg?branch=master)
 //! [![dependency status](https://deps.rs/repo/github/gin66/tui-logger/status.svg?service=github&amp;nocache=0_9_1)](https://deps.rs/repo/github/gin66/tui-logger)
 //! ![Build examples](https://github.com/gin66/tui-logger/workflows/Build%20examples/badge.svg?service=github)
 //!
@@ -2653,14 +2659,14 @@
             }
             <span class="prelude-val">None </span>=&gt; area,
         };
-        <span class="kw">let </span>indent = <span class="number">9</span>;
-        <span class="kw">if </span>list_area.width &lt; indent + <span class="number">4 </span>|| list_area.height &lt; <span class="number">1 </span>{
+        <span class="kw">if </span>list_area.width &lt; <span class="number">8 </span>|| list_area.height &lt; <span class="number">1 </span>{
             <span class="kw">return</span>;
         }
 
         <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state.lock();
         <span class="kw">let </span>la_height = list_area.height <span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>lines: Vec&lt;(<span class="prelude-ty">Option</span>&lt;Style&gt;, u16, String)&gt; = <span class="macro">vec!</span>[];
+        <span class="kw">let </span>indent = <span class="number">9</span>;
         {
             state.opt_timestamp_next_page = <span class="prelude-val">None</span>;
             <span class="kw">let </span>opt_timestamp_bottom = state.opt_timestamp_bottom;
@@ -2718,11 +2724,11 @@
         <span class="comment">// lines is a vector with bottom line at index 0
         // wrapped_lines will be a vector with top line first
         </span><span class="kw">let </span><span class="kw-2">mut </span>wrapped_lines = CircularBuffer::new(la_height);
-        <span class="kw">let </span>rem_width = la_width - indent <span class="kw">as </span>usize;
         <span class="kw">while let </span><span class="prelude-val">Some</span>((style, left, line)) = lines.pop() {
             <span class="kw">if </span>line.chars().count() &gt; la_width {
                 wrapped_lines.push((style, left, line.chars().take(la_width).collect()));
                 <span class="kw">let </span><span class="kw-2">mut </span>remain: String = line.chars().skip(la_width).collect();
+                <span class="kw">let </span>rem_width = la_width - indent <span class="kw">as </span>usize;
                 <span class="kw">while </span>remain.chars().count() &gt; rem_width {
                     <span class="kw">let </span>remove: String = remain.chars().take(rem_width).collect();
                     wrapped_lines.push((style, indent, remove));

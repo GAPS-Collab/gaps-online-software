@@ -20,6 +20,7 @@ var namespaceGaps =
     [ "parse_u32", "namespaceGaps.html#ac09d7b4a66f0df27a63af339dd6d7ea8", null ],
     [ "parse_u64", "namespaceGaps.html#aa913722aa6668823951e07f44b8698d6", null ],
     [ "parse_u8", "namespaceGaps.html#af02b80458f7649651a342344e3b103ee", null ],
+    [ "pversion_to_string", "namespaceGaps.html#a0b7fccda874dd2f4275f12622fb6b3f1", null ],
     [ "set_loglevel", "namespaceGaps.html#a212013efcb580c37612821937fa4ff8d", null ],
     [ "severity_to_str", "namespaceGaps.html#a63983ede070cd10b4e310de973772319", null ],
     [ "slice", "namespaceGaps.html#a22fc40b41968b7d4462f0c11ac07b53f", null ]

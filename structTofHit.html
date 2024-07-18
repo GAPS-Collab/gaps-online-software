@@ -125,9 +125,14 @@ f32&#160;</td><td class="memItemRight" valign="bottom"><b>get_x_pos</b> () const
 <tr class="memitem:add0ce258627ee513e9d1450832e967d1"><td class="memItemLeft" align="right" valign="top"><a id="add0ce258627ee513e9d1450832e967d1"></a>
 f32&#160;</td><td class="memItemRight" valign="bottom"><b>get_t_avg</b> () const</td></tr>
 <tr class="separator:add0ce258627ee513e9d1450832e967d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa65986678facbcf8c4d773d9783fe214"><td class="memItemLeft" align="right" valign="top"><a id="aa65986678facbcf8c4d773d9783fe214"></a>
+f32&#160;</td><td class="memItemRight" valign="bottom"><b>get_t0</b> () const</td></tr>
+<tr class="separator:aa65986678facbcf8c4d773d9783fe214"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1260551e11471967105e43ee71319e0"><td class="memItemLeft" align="right" valign="top"><a id="ad1260551e11471967105e43ee71319e0"></a>
 f64&#160;</td><td class="memItemRight" valign="bottom"><b>get_timestamp48</b> () const</td></tr>
 <tr class="separator:ad1260551e11471967105e43ee71319e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea570005131df3d3077d25512df181e2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofHit.html#aea570005131df3d3077d25512df181e2">set_paddle_len</a> (f32 paddle_len)</td></tr>
+<tr class="separator:aea570005131df3d3077d25512df181e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa2cbd718256a9ba9f611c8189cf695f"><td class="memItemLeft" align="right" valign="top"><a id="afa2cbd718256a9ba9f611c8189cf695f"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>to_string</b> () const</td></tr>
 <tr class="separator:afa2cbd718256a9ba9f611c8189cf695f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -170,6 +175,9 @@ u32&#160;</td><td class="memItemRight" valign="bottom"><b>timestamp32</b></td></
 <tr class="memitem:ae1c3755571cbebd921aa90b83aee7f1e"><td class="memItemLeft" align="right" valign="top"><a id="ae1c3755571cbebd921aa90b83aee7f1e"></a>
 u16&#160;</td><td class="memItemRight" valign="bottom"><b>timestamp16</b></td></tr>
 <tr class="separator:ae1c3755571cbebd921aa90b83aee7f1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9754214cd8cba72b6e9b252cebf97ff"><td class="memItemLeft" align="right" valign="top"><a id="aa9754214cd8cba72b6e9b252cebf97ff"></a>
+f32&#160;</td><td class="memItemRight" valign="bottom"><b>paddle_len</b></td></tr>
+<tr class="separator:aa9754214cd8cba72b6e9b252cebf97ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8cc01c56ab908c4ae8c3b01d93082df0"><td class="memItemLeft" align="right" valign="top"><a id="a8cc01c56ab908c4ae8c3b01d93082df0"></a>
 u8&#160;</td><td class="memItemRight" valign="bottom"><b>ctr_etx</b></td></tr>
 <tr class="separator:a8cc01c56ab908c4ae8c3b01d93082df0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -186,6 +194,26 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>HEAD</b> 
 static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> = 0xF0F</td></tr>
 <tr class="separator:a4f4220dc1af486f65c71712329eaed4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="aea570005131df3d3077d25512df181e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea570005131df3d3077d25512df181e2">&#9670;&nbsp;</a></span>set_paddle_len()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TofHit::set_paddle_len </td>
+          <td>(</td>
+          <td class="paramtype">f32&#160;</td>
+          <td class="paramname"><em>paddle_len</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The paddle length will not be in the packet, but has to be added after the fact </p>
+
+</div>
+</div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
 <li>/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/C++/include/<a class="el" href="events_8h_source.html">events.h</a></li>
 </ul>

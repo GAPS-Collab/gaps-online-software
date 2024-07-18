@@ -38,11 +38,12 @@ var NAVTREEINDEX0 =
 "logging_8hpp_source.html":[3,0,0,0,0,0,8],
 "monitoring_8h_source.html":[3,0,0,0,0,0,1,1],
 "namespaceGaps.html":[1,0,0],
+"namespaceGaps.html#a0b7fccda874dd2f4275f12622fb6b3f1":[1,0,0,15],
 "namespaceGaps.html#a13cb72078c0645adb57076cc5697b9a1":[1,0,0,6],
-"namespaceGaps.html#a212013efcb580c37612821937fa4ff8d":[1,0,0,15],
-"namespaceGaps.html#a22fc40b41968b7d4462f0c11ac07b53f":[1,0,0,17],
+"namespaceGaps.html#a212013efcb580c37612821937fa4ff8d":[1,0,0,16],
+"namespaceGaps.html#a22fc40b41968b7d4462f0c11ac07b53f":[1,0,0,18],
 "namespaceGaps.html#a2fa35da8776bb053ebdb6f9da7ea245e":[1,0,0,10],
-"namespaceGaps.html#a63983ede070cd10b4e310de973772319":[1,0,0,16],
+"namespaceGaps.html#a63983ede070cd10b4e310de973772319":[1,0,0,17],
 "namespaceGaps.html#a75bc2048681872469a0e8164a07eb145":[1,0,0,9],
 "namespaceGaps.html#a7e7d9bb141f5f926934e44b33429a44c":[1,0,0,3],
 "namespaceGaps.html#a8d5ee03930328391169c3f11a9b06e8e":[1,0,0,11],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "structRBMoniData.html#a5ddb6335b38810b40fe95a4364937af4":[2,0,13,21],
 "structRBMoniData.html#a5f9d7cfa9aa1c162d31b7af6dcc411e9":[2,0,13,19],
 "structRBMoniData.html#a6da3dcf006a0f5058cdb29851a492ea7":[2,0,13,23],
-"structRBMoniData.html#a7666c370c2c03b25caee815de70c76ba":[2,0,13,39],
-"structRBMoniData.html#a81b779cde246d92ce8587578dc611a7e":[2,0,13,35]
+"structRBMoniData.html#a7666c370c2c03b25caee815de70c76ba":[2,0,13,39]
 };

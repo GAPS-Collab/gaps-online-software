@@ -1497,6 +1497,66 @@
 <a href="#1497" id="1497">1497</a>
 <a href="#1498" id="1498">1498</a>
 <a href="#1499" id="1499">1499</a>
+<a href="#1500" id="1500">1500</a>
+<a href="#1501" id="1501">1501</a>
+<a href="#1502" id="1502">1502</a>
+<a href="#1503" id="1503">1503</a>
+<a href="#1504" id="1504">1504</a>
+<a href="#1505" id="1505">1505</a>
+<a href="#1506" id="1506">1506</a>
+<a href="#1507" id="1507">1507</a>
+<a href="#1508" id="1508">1508</a>
+<a href="#1509" id="1509">1509</a>
+<a href="#1510" id="1510">1510</a>
+<a href="#1511" id="1511">1511</a>
+<a href="#1512" id="1512">1512</a>
+<a href="#1513" id="1513">1513</a>
+<a href="#1514" id="1514">1514</a>
+<a href="#1515" id="1515">1515</a>
+<a href="#1516" id="1516">1516</a>
+<a href="#1517" id="1517">1517</a>
+<a href="#1518" id="1518">1518</a>
+<a href="#1519" id="1519">1519</a>
+<a href="#1520" id="1520">1520</a>
+<a href="#1521" id="1521">1521</a>
+<a href="#1522" id="1522">1522</a>
+<a href="#1523" id="1523">1523</a>
+<a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a>
+<a href="#1534" id="1534">1534</a>
+<a href="#1535" id="1535">1535</a>
+<a href="#1536" id="1536">1536</a>
+<a href="#1537" id="1537">1537</a>
+<a href="#1538" id="1538">1538</a>
+<a href="#1539" id="1539">1539</a>
+<a href="#1540" id="1540">1540</a>
+<a href="#1541" id="1541">1541</a>
+<a href="#1542" id="1542">1542</a>
+<a href="#1543" id="1543">1543</a>
+<a href="#1544" id="1544">1544</a>
+<a href="#1545" id="1545">1545</a>
+<a href="#1546" id="1546">1546</a>
+<a href="#1547" id="1547">1547</a>
+<a href="#1548" id="1548">1548</a>
+<a href="#1549" id="1549">1549</a>
+<a href="#1550" id="1550">1550</a>
+<a href="#1551" id="1551">1551</a>
+<a href="#1552" id="1552">1552</a>
+<a href="#1553" id="1553">1553</a>
+<a href="#1554" id="1554">1554</a>
+<a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Database access &amp; entities of the TOF
 //!
 //! A local .sqlite database is shipped with 
@@ -1530,7 +1590,6 @@
 
 <span class="comment">// FIXME - probably we should make this nicer
 </span><span class="kw">pub type </span>DsiJChPidMapping = DsiLtbRBMapping; 
-
 
 <span class="doccomment">/// Universal function to connect to the database
 </span><span class="kw">pub fn </span>connect_to_db(database_url : String) -&gt; <span class="prelude-ty">Result</span>&lt;diesel::SqliteConnection, ConnectionError&gt;  {
@@ -1584,7 +1643,69 @@
   <span class="kw">return </span>mapping;
 }
 
+<span class="doccomment">/// A representation of a run 
+</span><span class="attr">#[derive(Debug, Clone, Queryable,Insertable, Selectable, serde::Serialize, serde::Deserialize)]
+#[diesel(table_name = schema::tof_db_run)]
+#[diesel(primary_key(run_id))]
+</span><span class="kw">pub struct </span>Run {
+  <span class="kw">pub </span>run_id                    : i64,
+  <span class="kw">pub </span>runtime_secs              : <span class="prelude-ty">Option</span>&lt;i64&gt;,
+  <span class="kw">pub </span>calib_before              : <span class="prelude-ty">Option</span>&lt;bool&gt;,
+  <span class="kw">pub </span>shifter                   : <span class="prelude-ty">Option</span>&lt;i16&gt;,
+  <span class="kw">pub </span>run_type                  : <span class="prelude-ty">Option</span>&lt;i16&gt;,
+  <span class="kw">pub </span>run_path                  : <span class="prelude-ty">Option</span>&lt;String&gt;,
+}
 
+<span class="kw">impl </span>Run {
+  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+    <span class="self">Self </span>{
+      run_id        : <span class="number">0</span>, 
+      runtime_secs  : <span class="prelude-val">Some</span>(<span class="number">0</span>), 
+      calib_before  : <span class="prelude-val">Some</span>(<span class="bool-val">true</span>), 
+      shifter       : <span class="prelude-val">Some</span>(<span class="number">0</span>), 
+      run_type      : <span class="prelude-val">Some</span>(<span class="number">0</span>), 
+      run_path      : <span class="prelude-val">Some</span>(String::from(<span class="string">""</span>)), 
+    }
+  }
+
+  <span class="kw">pub fn </span>get_last_run(conn: <span class="kw-2">&amp;mut </span>SqliteConnection) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+    <span class="kw">use </span>schema::tof_db_run::dsl::<span class="kw-2">*</span>;
+    <span class="kw">match </span>tof_db_run.load::&lt;Run&gt;(conn) {
+      <span class="prelude-val">Err</span>(err) =&gt; {
+        <span class="macro">error!</span>(<span class="string">"Unable to load DSICards from db! {err}"</span>);
+        <span class="kw">return </span><span class="prelude-val">None</span>;
+      }
+      <span class="prelude-val">Ok</span>(runs) =&gt; {
+        <span class="comment">//return Some(runs);
+      </span>}
+    }
+    <span class="kw">let </span>results = tof_db_run
+      <span class="comment">//.filter(published.eq(true))
+      </span>.limit(<span class="number">1</span>)
+      <span class="comment">//.select(Run::as_select())
+      </span>.load::&lt;Run&gt;(conn)
+      .expect(<span class="string">"Error loading posts"</span>);
+    <span class="prelude-val">None
+  </span>}
+}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Run {
+      <span class="comment">//runtime_secs  : Some(0), 
+      //calib_before  : Some(true), 
+      //shifter       : Some(0), 
+      //run_type      : Some(0), 
+      //run_path      : Some(String::from("")), 
+  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;Run"</span>);
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  RunID         : {}"</span>, <span class="self">self</span>.run_id));                   
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  - auto cali   : {}"</span>, <span class="self">self</span>.calib_before.unwrap_or(<span class="bool-val">false</span>)));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  runtime [sec] : {}"</span>, <span class="self">self</span>.runtime_secs.unwrap_or(-<span class="number">1</span>)));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  shifter       : {}"</span>, <span class="self">self</span>.shifter.unwrap_or(-<span class="number">1</span>)));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  run_type      : {}"</span>, <span class="self">self</span>.run_type.unwrap_or(-<span class="number">1</span>)));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  run_path      : {}"</span>, <span class="self">self</span>.run_path.clone().unwrap_or(String::from(<span class="string">""</span>))));
+    <span class="macro">write!</span>(f, <span class="string">"{}"</span>, repr)
+  }
+}
 
 <span class="doccomment">/// Representation of a local trigger board.
 /// 
@@ -1611,7 +1732,6 @@
 /// the paddle/RB tables need to be consulted.
 /// Again: rb_ch0 does NOT necessarily correspond to the A side!
 /// 
-
 </span><span class="attr">#[derive(Debug,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_rat)]
 #[diesel(primary_key(rat_id))]
@@ -1627,12 +1747,12 @@
 <span class="kw">impl </span>RAT {
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
-        rat_id                    : <span class="number">0</span>, 
-        pb_id                     : <span class="number">0</span>, 
-        rb1_id                    : <span class="number">0</span>, 
-        rb2_id                    : <span class="number">0</span>, 
-        ltb_id                    : <span class="number">0</span>, 
-        ltb_harting_cable_length  : <span class="number">0</span>, 
+      rat_id                    : <span class="number">0</span>, 
+      pb_id                     : <span class="number">0</span>, 
+      rb1_id                    : <span class="number">0</span>, 
+      rb2_id                    : <span class="number">0</span>, 
+      ltb_id                    : <span class="number">0</span>, 
+      ltb_harting_cable_length  : <span class="number">0</span>, 
     }
   }
   

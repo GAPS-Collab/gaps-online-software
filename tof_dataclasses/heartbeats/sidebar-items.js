@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["HeartBeatDataSink","MTBHeartbeat","RBPing"]};
+window.SIDEBAR_ITEMS = {"struct":["EVTBLDRHeartbeat","HeartBeatDataSink","MTBHeartbeat","RBPing"]};

@@ -260,6 +260,12 @@
 <a href="#260" id="260">260</a>
 <a href="#261" id="261">261</a>
 <a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
 </pre></div><pre class="rust"><code><span class="comment">// @generated automatically by Diesel CLI.
 
 </span><span class="macro">diesel::table!</span> {
@@ -364,6 +370,17 @@
         j3_rat_id -&gt; Nullable&lt;SmallInt&gt;,
         j4_rat_id -&gt; Nullable&lt;SmallInt&gt;,
         j5_rat_id -&gt; Nullable&lt;SmallInt&gt;,
+    }
+}
+
+<span class="macro">diesel::table!</span> {
+    tof_db_run (run_id) {
+        run_id       -&gt; BigInt,
+        runtime_secs -&gt; Nullable&lt;BigInt&gt;,
+        calib_before -&gt; Nullable&lt;Bool&gt;,
+        shifter      -&gt; Nullable&lt;SmallInt&gt;,
+        run_type     -&gt; Nullable&lt;SmallInt&gt;,
+        run_path     -&gt; Nullable&lt;Text&gt;,
     }
 }
 
@@ -486,11 +503,6 @@
     }
 }
 
-<span class="macro">diesel::table!</span> {
-    tof_db_run (run_id) {
-        run_id -&gt; BigInt,
-    }
-}
 
 <span class="macro">diesel::joinable!</span>(auth_group_permissions -&gt; auth_group (group_id));
 <span class="macro">diesel::joinable!</span>(auth_group_permissions -&gt; auth_permission (permission_id));
@@ -514,12 +526,12 @@
     django_migrations,
     django_session,
     tof_db_dsicard,
+    tof_db_run,
     tof_db_localtriggerboard,
     tof_db_mtbchannel,
     tof_db_paddle,
     tof_db_panel,
     tof_db_rat,
     tof_db_readoutboard,
-    tof_db_run,
 );
 </code></pre></div></section></main></body></html>

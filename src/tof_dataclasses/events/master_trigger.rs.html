@@ -736,6 +736,17 @@
 <a href="#736" id="736">736</a>
 <a href="#737" id="737">737</a>
 <a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerEvent
 </span><span class="attr">#[cfg(feature = <span class="string">"pybindings"</span>)]
 </span><span class="kw">use </span>pyo3::pyclass;
@@ -1218,13 +1229,24 @@
   <span class="doccomment">/// Get absolute timestamp as sent by the GPS
   </span><span class="kw">pub fn </span>get_timestamp_abs48(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
     <span class="kw">let </span>gps = <span class="self">self</span>.get_timestamp_gps48();
-    <span class="kw">let </span><span class="kw-2">mut </span>timestamp = <span class="self">self</span>.timestamp;
-    <span class="kw">if </span>timestamp &lt; <span class="self">self</span>.tiu_timestamp {
+    <span class="kw">let </span><span class="kw-2">mut </span>timestamp = <span class="self">self</span>.timestamp <span class="kw">as </span>u64;
+    <span class="kw">if </span>timestamp &lt; <span class="self">self</span>.tiu_timestamp <span class="kw">as </span>u64 {
       <span class="comment">// it has wrapped
-      </span>timestamp += u32::MAX;
+      </span>timestamp += u32::MAX <span class="kw">as </span>u64;
     }
-    <span class="kw">let </span>ts  = <span class="number">1_000_000_000 </span>* gps + (timestamp - <span class="self">self</span>.tiu_timestamp) <span class="kw">as </span>u64;
-    <span class="kw">return </span>ts;
+    <span class="kw">let </span>gps_mult = <span class="kw">match </span><span class="number">1_000_000_000u64</span>.checked_mul(gps) {
+      <span class="prelude-val">Some</span>(result) =&gt; result,
+      <span class="prelude-val">None </span>=&gt; {
+          <span class="comment">// Handle overflow case here
+          // Example: log an error, return a default value, etc.
+          </span><span class="number">0 </span><span class="comment">// Example fallback value
+      </span>}
+    };
+  
+    <span class="kw">let </span>ts = gps_mult + (timestamp - <span class="self">self</span>.tiu_timestamp <span class="kw">as </span>u64);
+    <span class="comment">//ts
+    // change for debugging with Field
+    </span><span class="self">self</span>.timestamp <span class="kw">as </span>u64
   }
 
   <span class="doccomment">/// Get the trigger sources from trigger source byte
