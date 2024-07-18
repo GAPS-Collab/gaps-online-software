@@ -235,11 +235,6 @@ diesel::table! {
     }
 }
 
-//diesel::table! {
-//    tof_db_run (run_id) {
-//        run_id -> BigInt,
-//    }
-//}
 
 diesel::joinable!(auth_group_permissions -> auth_group (group_id));
 diesel::joinable!(auth_group_permissions -> auth_permission (permission_id));
