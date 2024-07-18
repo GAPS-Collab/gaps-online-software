@@ -42,7 +42,10 @@ pub fn get_gaps_events(filename : String) -> Vec<GapsEvent> {
         }
       }
       Ok(header) => {
-        println!("{}", header);
+        println!("HEADER {}", header);
+        //for k in pos - 10 .. pos + 10 {
+        //  println!("{}",stream[k]);
+        //}
         if header.ptype == 80 {
           match TrackerPacket::from_bytestream(&stream, &mut pos) {
             Err(err) => {
@@ -65,8 +68,9 @@ pub fn get_gaps_events(filename : String) -> Vec<GapsEvent> {
             Ok(mut me) => {
               me.header  = header;
               let mut g_event = GapsEvent::new();
-              println!("Event ID  : {}", me.event_id);
-              println!("Tof bytes : {:?}", me.tof_data);
+              //println!("Event ID  : {}", me.event_id);
+              //println!("Tof bytes : {:?}", me.tof_data);
+              //println!("len tof bytes : {}", me.tof_data.len());
               match TofPacket::from_bytestream(&me.tof_data, &mut 0) {
                 Err(err) => {
                   println!("Can't unpack TofPacket! {err}");
