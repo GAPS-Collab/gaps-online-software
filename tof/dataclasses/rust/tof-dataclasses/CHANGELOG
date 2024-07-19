@@ -1,5 +1,9 @@
 # LELEWAA series
 
+## v0.10.4
+* change MtbMoniData to iunclude last busy time, etc instead of 
+  empty fields
+
 ## v0.10.3
 * flight computer variables following Philip's request.
   n_hit_cbe/umb/cor, tot_edep_cbe/umb/cor.
