@@ -184,6 +184,29 @@ pub const TIU_EMULATION_MODE : MTBRegister<'static> = MTBRegister {
   pulse : false
 };
 
+/// Check if the TIU BUSY is stuck
+/// TIU_BUSY_STUCK 	0xf 	0x3c 	1 	r 		1 means the TIU has been stuck high for a long time
+pub const TIU_BUSY_STUCK : MTBRegister<'static> = MTBRegister {
+  addr  : 0xf,
+  mask  : 0x2,
+  descr : "Tiu busy stuck high",
+  rmw   : false,
+  ro    : true,
+  pulse : false
+};
+
+/// Set/unset the BUSY_INGORE 
+/// TIU_BUSY_IGNORE 	0xf 	0x3c 	2 	rw 	0x0 	1 means the the MTB should ignore the TIU busy flag (e.g. because it is stuck)
+pub const TIU_BUSY_IGNORE : MTBRegister<'static> = MTBRegister {
+  addr  : 0xf,
+  mask  : 0x4,
+  descr : "Ignore the tiu busy signal",
+  rmw   : true,
+  ro    : false,
+  pulse : false,
+};
+
+
 /// The global event id
 /// EVENT_CNT   0xd     0x34    \[31:0\]  r       Event Counter
 pub const EVENT_CNT : MTBRegister<'static> = MTBRegister {
@@ -270,7 +293,6 @@ pub const EVQ_DATA : MTBRegister<'static> = MTBRegister {
   ro    : true,
   pulse : false
 };
-
 
 /// DAQ data queue SIZE. This stores twice the number of 
 /// times the EVQ_DATA register has to be read out to 
@@ -1795,6 +1817,17 @@ pub const TRACK_CENTRAL_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
   pulse : false,
 };
 
+/// Choose between the 2 different TIU links
+/// 1 for J11, 0 for J3
+/// 0xe     0x38    1   rw  0x0     1 to use J11; 0 to use J3
+pub const TIU_USE_AUX_LINK : MTBRegister<'static> = MTBRegister {
+  addr  : 0xe,
+  mask  : 0x00000010,
+  descr : "Choose betweent the 2 tiu links",
+  rmw   : true,
+  ro    : false,
+  pulse : false,
+};
 
 
 
@@ -1816,7 +1849,6 @@ pub const TRACK_CENTRAL_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
 //TRACK_TRIG_IS_GLOBAL  0xb     0x2c    1   rw  0x0     1 makes the TRACK trigger read all paddles.
 //TRACK_CENTRAL_IS_GLOBAL   0xb     0x2c    2   rw  0x0     1 makes the TRACK central read all paddles.
 //TRACK_CENTRAL_IS_GLOBAL   0xb     0x2c    2   rw  0x0     1 makes the TRACK central read all paddles.
-//TIU_USE_AUX_LINK  0xe     0x38    1   rw  0x0     1 to use J11; 0 to use J3
 //TIU_EMU_BUSY_CNT  0xe     0x38    [31:14]     rw  0xC350  Number of 10 ns clock cyles that the emulator will remain busy
 //TIU_BAD   0xf     0x3c    0   r       1 means that the tiu link is not working
 //LT_INPUT_STRETCH  0xf     0x3c    [7:4]   rw  0xF     Number of clock cycles to stretch the LT inputs by
