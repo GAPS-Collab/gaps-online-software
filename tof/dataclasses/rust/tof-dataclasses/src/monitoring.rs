@@ -1396,7 +1396,9 @@ pub struct MtbMoniData {
   /// tiu_status[3] = bsy_stuck
   /// tiu_status[4] = ignore_bsy
   pub tiu_status   : u8,
-  pub reserved     : u8,
+  /// Prescale factor in per cent
+  /// (might not be accurate)
+  pub prescale_pc  : u8,
   pub daq_queue_len: u16,
   //pub vccpaux      : u16, 
   //pub vccoddr      : u16, 
@@ -1414,7 +1416,7 @@ impl MtbMoniData {
     Self {
       tiu_busy_len  : u32::MAX,
       tiu_status    : u8::MAX,
-      reserved      : u8::MAX,
+      prescale_pc   : u8::MAX,
       daq_queue_len : u16::MAX,
       temp          : u16::MAX,
       vccint        : u16::MAX,
@@ -1470,6 +1472,8 @@ impl fmt::Display for MtbMoniData {
   MTB  EVT RATE  [Hz] {}
   LOST EVT RATE  [Hz] {}
   TIU BUSY CNT  [CLK] {}
+  DAQ QUEUE LEN       {}
+  PRESCALE        [%] {}
   --- TIU STATUS ---
     EMU MODE          {}
     USE AUX LINK      {}
@@ -1484,6 +1488,8 @@ impl fmt::Display for MtbMoniData {
            self.rate,
            self.lost_rate,
            self.tiu_busy_len,
+           self.daq_queue_len,
+           self.prescale_pc,
            self.get_tiu_emulation_mode(),
            self.get_tiu_use_aux_link(),
            self.get_tiu_bad(),
@@ -1512,7 +1518,7 @@ impl Serialization for MtbMoniData {
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.extend_from_slice(&self.tiu_busy_len.to_le_bytes());
     stream.extend_from_slice(&self.tiu_status .to_le_bytes());
-    stream.extend_from_slice(&self.reserved   .to_le_bytes());
+    stream.extend_from_slice(&self.prescale_pc.to_le_bytes());
     stream.extend_from_slice(&self.daq_queue_len.to_le_bytes());
     stream.extend_from_slice(&self.temp       .to_le_bytes());
     stream.extend_from_slice(&self.vccint     .to_le_bytes()); 
@@ -1530,7 +1536,7 @@ impl Serialization for MtbMoniData {
     Self::verify_fixed(stream, pos)?;
     moni_data.tiu_busy_len  = parse_u32(&stream, pos);
     moni_data.tiu_status    = parse_u8(&stream, pos);
-    moni_data.reserved      = parse_u8(&stream, pos);
+    moni_data.prescale_pc   = parse_u8(&stream, pos);
     moni_data.daq_queue_len = parse_u16(&stream, pos);
     moni_data.temp          = parse_u16(&stream, pos);
     moni_data.vccint        = parse_u16(&stream, pos);
@@ -1588,7 +1594,7 @@ impl FromRandom for MtbMoniData {
     let mut rng       = rand::thread_rng();
     moni.tiu_busy_len = rng.gen::<u32>();
     moni.tiu_status   = rng.gen::<u8>();
-    moni.reserved     = rng.gen::<u8>();
+    moni.prescale_pc  = rng.gen::<u8>();
     moni.daq_queue_len= rng.gen::<u16>();
     moni.temp         = rng.gen::<u16>();
     moni.vccint       = rng.gen::<u16>();
