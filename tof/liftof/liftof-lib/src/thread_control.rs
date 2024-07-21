@@ -32,6 +32,8 @@ pub struct ThreadControl {
   pub thread_monitoring_active   : bool,
   /// Running readoutboard communicator threads - the key is associated rb id
   pub thread_rbcomm_active       : HashMap<u8, bool>,
+  /// Manage CTRL+C (or CMD+C/Mac) input
+  pub thread_signal_hdlr_active  : bool,
   /// The current run id
   pub run_id                     : u32,
   /// The number of boards available
@@ -60,6 +62,8 @@ impl ThreadControl {
       thread_master_trg_active   : false,
       thread_monitoring_active   : false,
       thread_rbcomm_active       : HashMap::<u8,bool>::new(),
+      // in principle this should always be active
+      thread_signal_hdlr_active  : true,
       run_id                     : 0,
       n_rbs                      : 0,
       write_data_to_disk         : false,
