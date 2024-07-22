@@ -184,6 +184,19 @@ pub const TIU_EMULATION_MODE : MTBRegister<'static> = MTBRegister {
   pulse : false
 };
 
+/// The length of the tiu busy signal 
+// TIU_BUSY_LENGTH 	0x11f 	0x47c 	[31:0] 	r 		Length in 10ns cycles of the last TIU busy flag
+pub const TIU_BUSY_LENGTH : MTBRegister<'static> = MTBRegister {
+  addr  : 0x11f,
+  mask  : 0xffffffff,
+  descr : "The length of the tiu busy signal in clock cycles [10ns/cycle]",
+  rmw   : false,
+  ro    : true,
+  pulse : false
+};
+
+
+
 /// Check if the TIU BUSY is stuck
 /// TIU_BUSY_STUCK 	0xf 	0x3c 	1 	r 		1 means the TIU has been stuck high for a long time
 pub const TIU_BUSY_STUCK : MTBRegister<'static> = MTBRegister {
