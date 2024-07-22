@@ -245,7 +245,7 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
   if data.len() < 4 {
     return Err(MasterTriggerError::BrokenPackage);
   }
-  let tiu_link_good  = tiu_link_is_good(bus)?;
+  let tiu_link_bad   = !(tiu_link_is_good(bus)?);
   let tiu_busy_len   = TIU_BUSY_LENGTH.get(bus)?;
   let tiu_aux_link   = TIU_USE_AUX_LINK.get(bus)? as u8;
   let tiu_emu_mode   = TIU_EMULATION_MODE.get(bus)? as u8;
@@ -253,11 +253,13 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
   let tiu_busy_stuck = TIU_BUSY_STUCK.get(bus)? as u8;
   let tiu_busy_ign   = TIU_BUSY_IGNORE.get(bus)? as u8;
   let mut tiu_status = 0u8;
+  println! ("tiu status {}", tiu_status);
   tiu_status         = tiu_status | (tiu_emu_mode);
   tiu_status         = tiu_status | (tiu_aux_link << 1);
-  tiu_status         = tiu_status | (!(tiu_link_good as u8) << 2);
+  tiu_status         = tiu_status | ((tiu_link_bad as u8) << 2);
   tiu_status         = tiu_status | (tiu_busy_stuck << 3);
   tiu_status         = tiu_status | (tiu_busy_ign << 4);
+  println! ("tiu status {}", tiu_status);
   let daq_queue_len  = EVQ_NUM_EVENTS.get(bus)? as u16;
   moni.tiu_status    = tiu_status;
   moni.tiu_busy_len  = tiu_busy_len;
@@ -490,6 +492,8 @@ pub fn master_trigger(mt_address     : String,
       error!("Trigger conditions unknown!");
     }
   }
+
+  //TIU_BUSY_IGNORE.set(&mut bus, 1);
 
   // reset the DAQ event queue before start
   match reset_daq(&mut bus) {//, &mt_address) {
