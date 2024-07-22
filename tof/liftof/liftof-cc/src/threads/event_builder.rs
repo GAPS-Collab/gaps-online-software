@@ -134,6 +134,10 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       let mut cali_still_active = false;
       match thread_control.try_lock() {
         Ok(mut tc) => {
+          if !tc.thread_event_bldr_active {
+            // end myself
+            break;
+          }
           //println!("== ==> [evt_builder] tc lock acquired!");
           if tc.calibration_active {
             cali_still_active = true;
