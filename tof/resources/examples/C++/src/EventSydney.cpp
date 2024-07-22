@@ -432,7 +432,7 @@ void EventGAPS::InitializeHistograms(void) {
   }
   
   //rao  number of paddles hit Cube, Umbrella, Cortina
-  NPaddlesCube = new TH1I("NPaddles Hit Cube", "", 12, -1.5, 10.5);
+  NPaddlesCube = new TH1I("NPaddles Hit Cube", "", 152, -1.5, 150.5);
   NPaddlesCube->GetXaxis()->SetTitle("NPaddes Hit Cube");
   NPaddlesCube->GetYaxis()->SetTitle("Counts");
   
@@ -693,7 +693,8 @@ void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
       TCorrEvent[i] = TShift[rbnum];
       // Correct TDC from each end of the paddle. 
       TDC_Cor[chA] = TDC[chA] + TCorrEvent[i] + TCorrFixed[i];
-      TDC_Cor[chB] = TDC[chB] + TCorrEvent[i] + TCorrFixed[i];
+      
+TDC_Cor[chB] = TDC[chB] + TCorrEvent[i] + TCorrFixed[i];
       // Calculate hit time for the paddle
       HitT[i] = (TDC_Cor[chA]+TDC_Cor[chB])/2.0 - Dimension[i][0]/(2.0*sc_speed);
       if ( TDC[chA]>5 && TDC[chA]<220 && TDC[chB]>5 && TDC[chB]<220 ) {
@@ -814,7 +815,7 @@ void EventGAPS::FillChannelHistos(int old=0) {
   // RBs. Histo channel = SiPM Channel = (RB-1)*NCH+rbch  
   
 
-/*
+
 	
   if (old) {
     for (int i=0; i<NTOT; i++) {
@@ -852,7 +853,14 @@ void EventGAPS::FillChannelHistos(int old=0) {
     }
   }
 
-*/
+
+
+
+//calculate tdc times for all umbrella 12PP paddles to one particular cube top paddle: start with paddle 6
+//
+
+	//int cubePadd = 6;
+
   //Manually pick out events where conditions are met and calculate tdc times
         //let's isolate paddles in the umbrella top and cube top: paddle 66 and paddle 6
         //66 (+1X location) : RB-ch 15-01, 15-02. 295cm Coax. 20ft Harting. cw = (15-1)*8 + 0,1 = 112, 113 (A,B). 180cm paddle
@@ -860,90 +868,291 @@ void EventGAPS::FillChannelHistos(int old=0) {
 
 	//67 (-1X location) : RB-ch 14-01, 14-02. 295cm Coax. 20ft Harting. cw = (14-1)*8 + 0,1 = 104, 105 (A,B). 180cm paddle
         //7  (-1X location) : RB-ch 46-07, 46-08. 375cm Coax. 10ft Harting. cw = (46-1)*8 + 6,7 = 366, 367 (A,B). 180cm paddle
-	
+/*	
         int umbrA = 112;
         int umbrB = 113;
         int cubeA = 120;
         int cubeB = 121;
 
-        int goodped = 0;
-        int goodtime = 0;
+        int u66ped = 0;
+        int u66t = 0;
+	int u67ped = 0;
+        int u67t = 0;
+
+	int c6ped = 0;
+        int c6t = 0;
+        int c7ped = 0;
+        int c7t = 0;
 
 	int umbrA2 = 104;
         int umbrB2 = 105;
         int cubeA2 = 366;
         int cubeB2 = 367;
 
-        int goodped2 = 0;
-        int goodtime2 = 0;
+	int paddcount = 0;
 
         for (int i=0; i<NTOT; i++) {
-          if ( i == umbrA || i == umbrB || i == cubeA || i == cubeB ){
+	  if (i<160){
+	  if (IsHit[i]) paddcount++;
+	  }
+	  NPaddlesCube->Fill(paddcount);
+	  
+          if ( i == umbrA || i == umbrB ){
                 pedHist[i]->Fill(Pedestal[i]);
                 pedRMSHist[i]->Fill(PedRMS[i]);
-                if (PedRMS[i] < 2.0) goodped++;
+                if (PedRMS[i] < 2.0) u66ped++;
                 Peak[i]->Fill(VPeak[i]);
                 Charge[i]->Fill(QInt[i]);
                 if (QInt[i]>5.0) Charge_cut[i]->Fill(QInt[i]);
 
                 tdcCFD[i]->Fill(TDC[i]);
-                if (TDC[i] < 430 && TDC[i] > 80) goodtime++;
+                if (TDC[i] < 220 && TDC[i] > 5) u66t++;
 
           }
-	  if ( i == umbrA2 || i == umbrB2 || i == cubeA2 || i == cubeB2 ){
-                pedHist[i]->Fill(Pedestal[i]);
+
+	    if ( i == cubeA || i == cubeB ){
+		pedHist[i]->Fill(Pedestal[i]);
                 pedRMSHist[i]->Fill(PedRMS[i]);
-                if (PedRMS[i] < 2.0) goodped2++;
+                if (PedRMS[i] < 2.0) c6ped++;
                 Peak[i]->Fill(VPeak[i]);
                 Charge[i]->Fill(QInt[i]);
                 if (QInt[i]>5.0) Charge_cut[i]->Fill(QInt[i]);
 
                 tdcCFD[i]->Fill(TDC[i]);
-                if (TDC[i] < 430 && TDC[i] > 80) goodtime2++;
+                if (TDC[i] < 220 && TDC[i] > 5) c6t++;
+	  }
 
+	  if ( i == umbrA2 || i == umbrB2 ){
+                pedHist[i]->Fill(Pedestal[i]);
+                pedRMSHist[i]->Fill(PedRMS[i]);
+                if (PedRMS[i] < 2.0) u67ped++;
+                Peak[i]->Fill(VPeak[i]);
+                Charge[i]->Fill(QInt[i]);
+                if (QInt[i]>5.0) Charge_cut[i]->Fill(QInt[i]);
+
+                tdcCFD[i]->Fill(TDC[i]);
+                if (TDC[i] < 220 && TDC[i] > 5) u67t++;
+	  }
+
+	  if ( i == cubeA2 || i == cubeB2 ){
+		pedHist[i]->Fill(Pedestal[i]);
+                pedRMSHist[i]->Fill(PedRMS[i]);
+                if (PedRMS[i] < 2.0) c7ped++;
+                Peak[i]->Fill(VPeak[i]);
+                Charge[i]->Fill(QInt[i]);
+                if (QInt[i]>5.0) Charge_cut[i]->Fill(QInt[i]);
+
+                tdcCFD[i]->Fill(TDC[i]);
+                if (TDC[i] < 220 && TDC[i] > 5) c7t++;
           }
         }
 
-        if (goodped == 4 && goodtime == 4){
+	NPaddlesCube->Fill(paddcount);
+
+       //   for (int j=0; j<6; j++){
+       //     QEnd2End[40+j*10]->Fill(QInt[Paddle_A[18+j]],QInt[Paddle_B[18+j]]);
+       //     QEnd2End[41+j*10]->Fill(QInt[Paddle_A[18+j]+1],QInt[Paddle_B[18+j]+1]);
+       //     QEnd2End[42+j*10]->Fill(QInt[Paddle_A[18+j]-1],QInt[Paddle_B[18+j]-1]);
+            //QEnd2End[43+j*10]->Fill(QInt[Paddle_A[18+j]+1],QInt[Paddle_B[18+j]]);
+            //QEnd2End[44+j*10]->Fill(QInt[Paddle_A[18+j]-1],QInt[Paddle_B[18+j]]);
+       //   }
+
+	//umbrella 66
+	
+	if (paddcount < 3){
+        if (u66t == 2){
         float tuA = TDC[umbrA];
         float tuB = TDC[umbrB];
+	float tu = (tuA+tuB)/2 + TShift[15] + 6.096*4.46 - 2.95*4.15 - (180/(2*15.4));
+	HitTime[66]->Fill(tu);
+
+	if (c6t == 2){
         float tcA = TDC[cubeA];
         float tcB = TDC[cubeB];
 
-        float tu = (tuA+tuB)/2 + TShift[15] + 6.096*4.46 - 2.95*4.15 - (180/(2*15.4));
         float tc = (tcA+tcB)/2 + TShift[16] + 3.048*4.46 - 3.75*4.15 - (180/(2*15.4));
 
         float phidiff = Phi[16] - Phi[15];
         float rawtdiff = (tcA+tcB)/2 - (tuA+tuB)/2;
         float adjtdiff = tc-tu;
 
-        HitTime[66]->Fill(tu);
-        HitTime[6]->Fill(tc);
-        tDiff[1]->Fill(rawtdiff);
-        Ch9Shift[160]->Fill(phidiff);
-        tDiff[2]->Fill(adjtdiff);
-	if (tuA-tuB > -1.0 && tuA-tuB < 1.0 && tcA-tcB > -1.0 && tcA-tcB < 1.0){
-	  tDiff[3]->Fill(rawtdiff);
-	  tDiff[4]->Fill(adjtdiff);
-	if (adjtdiff > 0 && adjtdiff < 8) tDiff[5]->Fill(adjtdiff);
-	std::ofstream myfile;
-        myfile.open ("/home/gaps/sydney/evt_list.csv", std::ios::app);
-        myfile << evtno;
-        myfile << "," << adjtdiff << "," << "6" << std::endl;
-        myfile.close();
+            if (u66ped+c6ped == 4){
+              HitTime[6]->Fill(tc);
+              tDiff[1]->Fill(rawtdiff);
+              Ch9Shift[160]->Fill(phidiff);
+              tDiff[2]->Fill(adjtdiff);
+	      if (tuA-tuB > -2.0 && tuA-tuB < 2.0 && tcA-tcB > -2.0 && tcA-tcB < 2.0){
+	        tDiff[3]->Fill(rawtdiff);
+	        tDiff[4]->Fill(adjtdiff);
+	        if (adjtdiff > 0 && adjtdiff < 8) tDiff[5]->Fill(adjtdiff);
+		QEnd2End[1]->Fill(QInt[umbrA], adjtdiff);
+        	QEnd2End[2]->Fill(QInt[umbrB], adjtdiff);
+        	QEnd2End[3]->Fill(QInt[umbrA]+QInt[umbrB], adjtdiff);
+        	QEnd2End[4]->Fill(QInt[cubeA], adjtdiff);
+        	QEnd2End[5]->Fill(QInt[cubeB], adjtdiff);
+        	QEnd2End[6]->Fill(QInt[cubeA]+QInt[cubeB], adjtdiff);
+		std::ofstream myfile;
+        	myfile.open ("/home/gaps/sydney/evt_list_goodped.csv", std::ios::app);
+        	myfile << evtno;
+        	myfile << "," << "66" << "," << "6" << "," << tuA << "," << tuB << "," << tu << "," << TShift[15] << "," <<  tcA << "," << tcB << "," << tc << "," << TShift[16] << "," << adjtdiff <<  std::endl;
+        	myfile.close();
 
-
-	QEnd2End[1]->Fill(QInt[umbrA], adjtdiff);
-	QEnd2End[2]->Fill(QInt[umbrB], adjtdiff);
-	QEnd2End[3]->Fill(QInt[umbrA]+QInt[umbrB], adjtdiff);
-	QEnd2End[4]->Fill(QInt[cubeA], adjtdiff);
-	QEnd2End[5]->Fill(QInt[cubeB], adjtdiff);
-	QEnd2End[6]->Fill(QInt[cubeA]+QInt[cubeB], adjtdiff);
-
+	      }
+	    }
 	}
-	}
 
-	if (goodped2 == 4 && goodtime2 == 4){
+	if (c7t == 2){
+        float tcA = TDC[cubeA2];
+        float tcB = TDC[cubeB2];
+
+        float tc = (tcA+tcB)/2 + TShift[46] + 3.048*4.46 - 3.75*4.15 - (180/(2*15.4));
+
+        float phidiff = Phi[46] - Phi[15];
+        float rawtdiff = (tcA+tcB)/2 - (tuA+tuB)/2;
+        float adjtdiff = tc-tu;
+
+            if (u66ped+c7ped == 4){
+
+              HitTime[7]->Fill(tc);
+              tDiff[6]->Fill(rawtdiff);
+              Ch9Shift[159]->Fill(phidiff);
+              tDiff[7]->Fill(adjtdiff);
+              if (tuA-tuB > -2.0 && tuA-tuB < 2.0 && tcA-tcB > -2.0 && tcA-tcB < 2.0){
+                tDiff[8]->Fill(rawtdiff);
+                tDiff[9]->Fill(adjtdiff);
+                if (adjtdiff > 0 && adjtdiff < 8) tDiff[10]->Fill(adjtdiff);
+                QEnd2End[11]->Fill(QInt[umbrA], adjtdiff);
+                QEnd2End[12]->Fill(QInt[umbrB], adjtdiff);
+                QEnd2End[13]->Fill(QInt[umbrA]+QInt[umbrB], adjtdiff);
+                QEnd2End[14]->Fill(QInt[cubeA2], adjtdiff);
+                QEnd2End[15]->Fill(QInt[cubeB2], adjtdiff);
+                QEnd2End[16]->Fill(QInt[cubeA2]+QInt[cubeB2], adjtdiff);
+                std::ofstream myfile;
+                myfile.open ("/home/gaps/sydney/evt_list_goodped.csv", std::ios::app);
+                myfile << evtno;
+                myfile << "," << "66" << "," << "7" << "," << tuA << "," << tuB << "," << tu << "," << TShift[15] << "," <<  tcA << "," << tcB << "," << tc << "," << TShift[46] << "," << adjtdiff << std::endl;
+                myfile.close();
+
+              }
+            }
+        }
+	 */   /*
+	    else{
+	      HitTime[76]->Fill(tu);
+              HitTime[16]->Fill(tc);
+              tDiff[21]->Fill(rawtdiff);
+              Ch9Shift[150]->Fill(phidiff);
+              tDiff[22]->Fill(adjtdiff);
+              if (tuA-tuB > -1.0 && tuA-tuB < 1.0 && tcA-tcB > -1.0 && tcA-tcB < 1.0){
+                tDiff[23]->Fill(rawtdiff);
+                tDiff[24]->Fill(adjtdiff);
+                if (adjtdiff > 0 && adjtdiff < 8) tDiff[25]->Fill(adjtdiff);
+		QEnd2End[21]->Fill(QInt[umbrA], adjtdiff);
+        	QEnd2End[22]->Fill(QInt[umbrB], adjtdiff);
+        	QEnd2End[23]->Fill(QInt[umbrA]+QInt[umbrB], adjtdiff);
+        	QEnd2End[24]->Fill(QInt[cubeA], adjtdiff);
+        	QEnd2End[25]->Fill(QInt[cubeB], adjtdiff);
+        	QEnd2End[26]->Fill(QInt[cubeA]+QInt[cubeB], adjtdiff);
+		std::ofstream myfile;
+                myfile.open ("/home/gaps/sydney/evt_list_badped.csv", std::ios::app);
+                myfile << evtno;
+                myfile << "," << adjtdiff << "," << "6" << std::endl;
+                myfile.close();
+              }
+	    }
+	    */
+	  }
+/*	else{
+          if (IsHit[6] && IsHit[66]){
+            std::ofstream myfile;
+            myfile.open ("/home/gaps/sydney/hit_but_badtime.csv", std::ios::app);
+            myfile << evtno;
+            myfile << "," << "6" << "," << TDC[umbrA] << "," << TDC[umbrB] << "," << TDC[cubeA] << "," << TDC[cubeB] << std::endl;
+            myfile.close();
+          }
+        }
+*/
+/*	if (u67t == 2){
+        float tuA = TDC[umbrA2];
+        float tuB = TDC[umbrB2];
+        float tu = (tuA+tuB)/2 + TShift[14] + 6.096*4.46 - 2.95*4.15 - (180/(2*15.4));
+        HitTime[67]->Fill(tu);
+
+        if (c6t == 2){
+        float tcA = TDC[cubeA];
+        float tcB = TDC[cubeB];
+
+        float tc = (tcA+tcB)/2 + TShift[16] + 3.048*4.46 - 3.75*4.15 - (180/(2*15.4));
+
+        float phidiff = Phi[16] - Phi[14];
+        float rawtdiff = (tcA+tcB)/2 - (tuA+tuB)/2;
+        float adjtdiff = tc-tu;
+
+            if (u67ped+c6ped == 4){
+              HitTime[6]->Fill(tc);
+              tDiff[11]->Fill(rawtdiff);
+              Ch9Shift[158]->Fill(phidiff);
+              tDiff[12]->Fill(adjtdiff);
+              if (tuA-tuB > -2.0 && tuA-tuB < 2.0 && tcA-tcB > -2.0 && tcA-tcB < 2.0){
+                tDiff[13]->Fill(rawtdiff);
+                tDiff[14]->Fill(adjtdiff);
+		QEnd2End[21]->Fill(QInt[umbrA2], adjtdiff);
+                QEnd2End[22]->Fill(QInt[umbrB2], adjtdiff);
+                QEnd2End[23]->Fill(QInt[umbrA2]+QInt[umbrB2], adjtdiff);
+                QEnd2End[24]->Fill(QInt[cubeA], adjtdiff);
+                QEnd2End[25]->Fill(QInt[cubeB], adjtdiff);
+                QEnd2End[26]->Fill(QInt[cubeA]+QInt[cubeB], adjtdiff);
+                if (adjtdiff > 0 && adjtdiff < 8) tDiff[15]->Fill(adjtdiff);
+		std::ofstream myfile;
+                myfile.open ("/home/gaps/sydney/evt_list_goodped.csv", std::ios::app);
+                myfile << evtno;
+                myfile << "," << "67" << "," << "6" << "," << tuA << "," << tuB << "," << tu << "," << TShift[14] << "," <<  tcA << "," << tcB << "," << tc << "," << TShift[16] << "," << adjtdiff <<  std::endl;
+                myfile.close();
+
+              }
+            }
+        }
+
+        if (c7t == 2){
+        float tcA = TDC[cubeA2];
+        float tcB = TDC[cubeB2];
+
+        float tc = (tcA+tcB)/2 + TShift[46] + 3.048*4.46 - 3.75*4.15 - (180/(2*15.4));
+
+        float phidiff = Phi[46] - Phi[14];
+        float rawtdiff = (tcA+tcB)/2 - (tuA+tuB)/2;
+        float adjtdiff = tc-tu;
+
+	if (u66ped+c7ped == 4){
+
+              HitTime[7]->Fill(tc);
+              tDiff[16]->Fill(rawtdiff);
+              Ch9Shift[157]->Fill(phidiff);
+              tDiff[17]->Fill(adjtdiff);
+              if (tuA-tuB > -2.0 && tuA-tuB < 2.0 && tcA-tcB > -2.0 && tcA-tcB < 2.0){
+                tDiff[18]->Fill(rawtdiff);
+                tDiff[19]->Fill(adjtdiff);
+                if (adjtdiff > 0 && adjtdiff < 8) tDiff[20]->Fill(adjtdiff);
+                QEnd2End[31]->Fill(QInt[umbrA2], adjtdiff);
+                QEnd2End[32]->Fill(QInt[umbrB2], adjtdiff);
+                QEnd2End[33]->Fill(QInt[umbrA2]+QInt[umbrB2], adjtdiff);
+                QEnd2End[34]->Fill(QInt[cubeA2], adjtdiff);
+                QEnd2End[35]->Fill(QInt[cubeB2], adjtdiff);
+                QEnd2End[36]->Fill(QInt[cubeA2]+QInt[cubeB2], adjtdiff);
+                std::ofstream myfile;
+                myfile.open ("/home/gaps/sydney/evt_list_goodped.csv", std::ios::app);
+                myfile << evtno;
+                myfile << "," << "67" << "," << "7" << "," << tuA << "," << tuB << "," << tu << "," << TShift[14] << "," <<  tcA << "," << tcB << "," << tc << "," << TShift[46] << "," << adjtdiff << std::endl;
+                myfile.close();
+
+              }
+            }
+        }
+    }
+    }
+*/
+/*
+	if (goodtime2 == 4){
         float tuA = TDC[umbrA2];
         float tuB = TDC[umbrB2];
         float tcA = TDC[cubeA2];
@@ -956,31 +1165,69 @@ void EventGAPS::FillChannelHistos(int old=0) {
         float rawtdiff = (tcA+tcB)/2 - (tuA+tuB)/2;
         float adjtdiff = tc-tu;
 
-        HitTime[67]->Fill(tu);
-        HitTime[7]->Fill(tc);
-        tDiff[11]->Fill(rawtdiff);
-        Ch9Shift[158]->Fill(phidiff);
-        tDiff[12]->Fill(adjtdiff);
-        if (tuA-tuB > -1.0 && tuA-tuB < 1.0 && tcA-tcB > -1.0 && tcA-tcB < 1.0){
-          tDiff[13]->Fill(rawtdiff);
-          tDiff[14]->Fill(adjtdiff);
-        if (adjtdiff > 0 && adjtdiff < 8) tDiff[15]->Fill(adjtdiff);
-	std::ofstream myfile;
-        myfile.open ("/home/gaps/sydney/evt_list.csv", std::ios::app);
-        myfile << evtno;
-        myfile << "," << adjtdiff << "," << "7" << std::endl;
-        myfile.close();
+	//std::ofstream myfile;
+        //myfile.open ("/home/gaps/sydney/jeff_compare.csv", std::ios::app);
+        //myfile << evtno;
+        //myfile << "," << "7" << "," << TDC[umbrA2] << "," << TDC[umbrB2] << "," << TDC[cubeA2] << "," << TDC[cubeB2] << "," << TShift[46] << "," << TShift[14] << "," << adjtdiff <<  std::endl;
+        //myfile.close();
 
-	QEnd2End[11]->Fill(QInt[umbrA], adjtdiff);
-        QEnd2End[12]->Fill(QInt[umbrB], adjtdiff);
-        QEnd2End[13]->Fill(QInt[umbrA]+QInt[umbrB], adjtdiff);
-        QEnd2End[14]->Fill(QInt[cubeA], adjtdiff);
-        QEnd2End[15]->Fill(QInt[cubeB], adjtdiff);
-        QEnd2End[16]->Fill(QInt[cubeA]+QInt[cubeB], adjtdiff);
-
-        }
-        }
-}
+            if (goodped2 == 4){
+              HitTime[67]->Fill(tu);
+              HitTime[7]->Fill(tc);
+              tDiff[11]->Fill(rawtdiff);
+              Ch9Shift[158]->Fill(phidiff);
+              tDiff[12]->Fill(adjtdiff);
+              if (tuA-tuB > -1.0 && tuA-tuB < 1.0 && tcA-tcB > -1.0 && tcA-tcB < 1.0){
+                tDiff[13]->Fill(rawtdiff);
+                tDiff[14]->Fill(adjtdiff);
+                if (adjtdiff > 0 && adjtdiff < 8) tDiff[15]->Fill(adjtdiff);
+		QEnd2End[11]->Fill(QInt[umbrA2], adjtdiff);
+        	QEnd2End[12]->Fill(QInt[umbrB2], adjtdiff);
+        	QEnd2End[13]->Fill(QInt[umbrA2]+QInt[umbrB2], adjtdiff);
+        	QEnd2End[14]->Fill(QInt[cubeA2], adjtdiff);
+        	QEnd2End[15]->Fill(QInt[cubeB2], adjtdiff);
+        	QEnd2End[16]->Fill(QInt[cubeA2]+QInt[cubeB2], adjtdiff);
+		std::ofstream myfile;
+                myfile.open ("/home/gaps/sydney/evt_list_goodped.csv", std::ios::app);
+                myfile << evtno;
+                myfile << "," << adjtdiff << "," << "7" << std::endl;
+                myfile.close();
+              }
+            }
+	    else{
+	      HitTime[77]->Fill(tu);
+              HitTime[17]->Fill(tc);
+              tDiff[31]->Fill(rawtdiff);
+              Ch9Shift[148]->Fill(phidiff);
+              tDiff[32]->Fill(adjtdiff);
+              if (tuA-tuB > -1.0 && tuA-tuB < 1.0 && tcA-tcB > -1.0 && tcA-tcB < 1.0){
+                tDiff[33]->Fill(rawtdiff);
+                tDiff[34]->Fill(adjtdiff);
+                if (adjtdiff > 0 && adjtdiff < 8) tDiff[35]->Fill(adjtdiff);
+                QEnd2End[31]->Fill(QInt[umbrA2], adjtdiff);
+                QEnd2End[32]->Fill(QInt[umbrB2], adjtdiff);
+                QEnd2End[33]->Fill(QInt[umbrA2]+QInt[umbrB2], adjtdiff);
+                QEnd2End[34]->Fill(QInt[cubeA2], adjtdiff);
+                QEnd2End[35]->Fill(QInt[cubeB2], adjtdiff);
+                QEnd2End[36]->Fill(QInt[cubeA2]+QInt[cubeB2], adjtdiff);
+		std::ofstream myfile;
+                myfile.open ("/home/gaps/sydney/evt_list_badped.csv", std::ios::app);
+                myfile << evtno;
+                myfile << "," << adjtdiff << "," << "7" << std::endl;
+                myfile.close();
+	      }
+	    }
+	  }
+	else{
+	  if (IsHit[7] && IsHit[67]){
+	    std::ofstream myfile;
+            myfile.open ("/home/gaps/sydney/hit_but_badtime.csv", std::ios::app);
+            myfile << evtno;
+            myfile << "," << "7" << "," << TDC[umbrA2] << "," << TDC[umbrB2] << "," << TDC[cubeA2] << "," << TDC[cubeB2] << std::endl;
+            myfile.close();
+	  }
+	}
+}*/
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
@@ -992,10 +1239,10 @@ void EventGAPS::FillPaddleHistos(void) {
     if (Paddle_A[i] > 0) { // Paddle-channel map exists
       QEnd2End[i]->Fill(QInt[Paddle_A[i]], QInt[Paddle_B[i]]);
       HitMask[i]->Fill(Hits[i]);
-      if ( TDC[Paddle_A[i]] > 0 && TDC[Paddle_B[i]] > 0 ) {
-	tDiff[i]->Fill(TDC[Paddle_A[i]] - TDC[Paddle_B[i]]);
-	Ch9Shift[i]->Fill(TShift[i]);
-      }
+      //if ( TDC[Paddle_A[i]] > 0 && TDC[Paddle_B[i]] > 0 ) {
+	//tDiff[i]->Fill(TDC[Paddle_A[i]] - TDC[Paddle_B[i]]);
+	//Ch9Shift[i]->Fill(TShift[i]);
+      //}
       if (IsHit[i]) { // Both ends of paddle hit
 	//if (EarlyPaddle>60) { // Demand a UMB or COR paddle hit
 	if (EarlyPaddle>60 && EarlyPaddle<109) { // Demand a UMB paddle hit
@@ -1004,8 +1251,35 @@ void EventGAPS::FillPaddleHistos(void) {
 	  FirstTime->Fill(EarlyTime);
 	}
 	HitPosition[i]->Fill(delta[i]);
-	HitGAPS->Fill(HitX[i], HitY[i], HitZ[i]);
+	//HitGAPS->Fill(HitX[i], HitY[i], HitZ[i]);
 	if (i<61) HitCube->Fill(HitX[i], HitY[i], HitZ[i]);
+	else if (i<73){
+	  if ((TDC[Paddle_A[i]] - TDC[Paddle_B[i]] < 2.0) && (TDC[Paddle_A[i]] - TDC[Paddle_B[i]] > -2.0)){
+	  HitGAPS->Fill(HitX[i], HitY[i], HitZ[i]);
+	  if (NPadCube+NPadUmbrella+NPadCortina == 2){
+	    std::ofstream myfile;
+            myfile.open ("run170_2HITS.csv", std::ios::app);
+            myfile << evtno;
+            myfile << "," << i << "," << IsHit[6] << "," << IsHit[7] << "," << IsHit[8] << "," << IsHit[9] << "," << IsHit[5] << std::endl;
+            myfile.close();
+	    if (IsHit[6] && (TDC[Paddle_A[6]] - TDC[Paddle_B[6]] < 2.0) && (TDC[Paddle_A[6]] - TDC[Paddle_B[6]] > -2.0)){
+	      tDiff[i-60]->Fill(HitT[6]-HitT[i]);
+            }
+	    if (IsHit[7] && (TDC[Paddle_A[7]] - TDC[Paddle_B[7]] < 2.0) && (TDC[Paddle_A[7]] - TDC[Paddle_B[7]] > -2.0)){
+              tDiff[i-61+20]->Fill(HitT[7]-HitT[i]);
+            }
+	    if (IsHit[8] && (TDC[Paddle_A[8]] - TDC[Paddle_B[8]] < 2.0) && (TDC[Paddle_A[8]] - TDC[Paddle_B[8]] > -2.0)){
+              tDiff[i-61+40]->Fill(HitT[8]-HitT[i]);
+            }
+	    if (IsHit[9] && (TDC[Paddle_A[9]] - TDC[Paddle_B[9]] < 2.0) && (TDC[Paddle_A[9]] - TDC[Paddle_B[9]] > -2.0)){
+              tDiff[i-1]->Fill(HitT[9]-HitT[i]);
+            }
+	    if (IsHit[5] && (TDC[Paddle_A[5]] - TDC[Paddle_B[5]] < 2.0) && (TDC[Paddle_A[5]] - TDC[Paddle_B[5]] > -2.0)){
+              tDiff[i+19]->Fill(HitT[5]-HitT[i]);
+            }
+	  }
+	}
+	}
 	else if (i<109) HitUmbrella->Fill(HitX[i], HitY[i], HitZ[i]);
 	else if (i<161) HitCortina->Fill(HitX[i], HitY[i], HitZ[i]);
 	float q_ave = (QInt[Paddle_A[i]] + QInt[Paddle_B[i]]) / 2.0;

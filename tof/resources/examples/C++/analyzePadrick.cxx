@@ -19,498 +19,13 @@
 #include "calibration.h"
 
 #include "legacy.h"
+//#include "analysis.h"
 #include <vector>
 
-#include "./include/constants.h"
-#include "./include/EventPadrick.h"
-
-void   GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm);
-double FitSine(std::vector<double> volts, std::vector<double> times);
-
-int main(int argc, char *argv[]){
-  spdlog::cfg::load_env_levels();
-    
-  cxxopts::Options options("unpack-tofpackets", "Unpack example for .tof.gaps files with TofPackets.");
-  options.add_options()
-  ("h,help", "Print help")
-  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/mnt/tof-nas/nevis-data/tofdata/calibration/latest/"))
-  ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
-  ("f,files", "List of Files", cxxopts::value<bool>()->default_value("false"))
-  ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
-  ;
-  options.parse_positional({"file"});
-  auto result = options.parse(argc, argv);
-  if (result.count("help")) {
-    std::cout << options.help() << std::endl;
-    exit(EXIT_SUCCESS);
-  }
-  if (!result.count("file")) {
-    spdlog::error("No input file given!");
-    std::cout << options.help() << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  auto fname   = result["file"].as<std::string>();
-  bool files   = result["files"].as<bool>();
-  bool verbose = result["verbose"].as<bool>();
-
-  FILE *fp;
-  char tmpline[500];
-  std::string fnames[1000];
-  int j=0;
-  if (files) {
-    fp = fopen(fname.c_str(), "r");
-    while (fscanf(fp, "%s", tmpline) != EOF) fnames[j++] = tmpline;
-    fclose(fp);
-  } else {
-    fnames[j++] = fname;
-  }
-
-  // Print out the filenames as a sanity check
-  //std::cout << fnames[0] << std::endl;
-  //for(int k=1;k<j;k++) std::cout << fnames[k] << std::endl;
-  //return (0);
-  
-  // -> Gaps relevant code starts here
-  auto calname = result["calibration"].as<std::string>();
-  RBCalibration cali[NRB]; // "cali" stores values for one RB
-
-  // To read calibration data from individual binary files, when -c is
-  // given with the directory of the calibration files
-  bool RB_Calibrated[NRB] = { false };
-  if (calname != "") {
-    for (int i=1; i<NRB; i++) {
-      // First, determine the proper RB filename from its number
-      std::string f_str;
-      if (i<10) // Little Kludgy, but it works
-	f_str = calname + "rb_0" + std::to_string(i) + ".cali.tof.gaps";
-      else
-	f_str = calname + "rb_" + std::to_string(i) + ".cali.tof.gaps";
-      //spdlog::info("Extracting RB data from file {}", f_str);
-      
-      // Read the packets from the file
-      //if ( std::filesystem::exists(f_str) ) {
-      //printf("%s file exists\n", f_str.c_str() );
-      //}
-      // Before proceeding, check that the file exists. 
-      struct stat buffer; 
-      if ( stat(f_str.c_str(), &buffer) != -1 ) {
-	auto packet = get_tofpackets(f_str);
-	spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
-	// Loop over the packets (should only be 1) and read into storage
-	for (auto const &p : packet) {
-	  //int ctr=0;
-	  if (p.packet_type == PacketType::RBCalibration) {
-	    // Should have the one calibration tofpacket stored in "packet".
-	    usize pos = 0;
-	    //if (++ctr == 4)  // 4th packet is the one we want
-	    cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
-	    RB_Calibrated[i] = true;
-	  }
-	}
-      } 
-    }
-  }
-  
-  // To read calibration data from individual text files, when -c is
-  // given with the directory of the calibration files
-  /*if (calname != "") {
-    // obviously here we have to get all the calibration files, 
-    // but for the sake of the example let's use only one
-    // Ultimatly, they will be stored in the stream.
-    for (int i=1; i<NRB; i++) {
-      std::string f_str;
-      if (i<10) // Little Kludgy, but it works
-	f_str = calname + "/txt-files/rb0" + std::to_string(i) + "_cal.txt";
-      else
-	f_str = calname + "/txt-files/rb" + std::to_string(i) + "_cal.txt";
-      
-      //spdlog::info("Will use calibration file {}", calname);
-      //cali[i] = RBCalibration::from_txtfile(calname);
-      spdlog::info("Will use calibration file {}", f_str);
-      cali[i] = RBCalibration::from_txtfile(f_str);
-    }
-    }*/
-
-  // Some useful variables (some initialized to default values)
-  // but overwritten from file (if it exists)
-  float Ped_low   = 10;
-  float Ped_win   = 90;
-  float CThresh   = 5.0;
-  float CFDS_frac = 0.10;
-  float Qwin_low  = 100;
-  float Qwin_size = 100;
-  float CHmin     = 4.0;
-
-  // Some useful analysis quantities
-  float Ped[NTOT];
-  float PedRMS[NTOT];
-  float Qint[NTOT];
-  float VPeak[NTOT];
-  float TCFDS[NTOT];
-  bool  IsHit[NTOT] = {false} ;
-
-  char label[50], line[500];
-  int status;
-  float value;
-  // One last task before reading the data file processing events
-  // -- read in some analysis parameters.
-  // Doing this in a kludgy way since we will not use later.
-  fp = fopen("paramNEVIS.txt", "r");
-  while (fscanf(fp, "%s %f", label, &value) != EOF) {
-    if (strcmp(label,"ped_lo") ==0 )     Ped_low = value; 
-    if (strcmp(label,"ped_win") ==0 )    Ped_win = value;
-    if (strcmp(label,"pulse_lo") ==0 )   Qwin_low = value;
-    if (strcmp(label,"pulse_win") ==0 )  Qwin_size = value;
-    if (strcmp(label,"charge_min") ==0 ) CHmin = value;
-    if (strcmp(label,"thresh") ==0 )     CThresh = value;
-    if (strcmp(label,"cfd_frac") ==0 )   CFDS_frac = value;
-    status = fscanf(fp,"%[^\n]",line); // Scan the rest of the line
-  }
-  fclose(fp); 
-
-  // Now, we want to store information about the SiPM channels and
-  // paddle relationships for analysis purpose. Read all that info
-  // into the relevant structures.
-  struct PaddleInfo PadInfo;
-  struct SiPMInfo   SipmInfo;
-  GetPaddleInfo(&PadInfo, &SipmInfo);
-      
-  // Instantiate our class that holds analysis results and set some
-  // initial values
-  auto Event = EventGAPS();
-  //Event.SetPaddleMap(paddle_map, vol_id, paddle_vid, paddle_location);
-  Event.SetPaddleMap(&PadInfo, &SipmInfo);
-  Event.SetThreshold(CThresh);
-  Event.SetCFDFraction(CFDS_frac);
-  Event.InitializeHistograms();
-  //return (0);
-  
-  // the reader is something for the future, when the 
-  // files get bigger so they might not fit into memory
-  // at the same time
-  //auto reader = Gaps::TofPacketReader(fname); 
-  // for now, we have to load the whole file in memory
-
-  u32 n_rbcalib = 0;
-  u32 n_rbmoni  = 0;
-  u32 n_mte     = 0;
-  u32 n_tcmoni  = 0;
-  u32 n_mtbmoni = 0;
-  u32 n_unknown = 0;
-  u32 n_tofevents = 0;
-
-  for (int k=0; k<j; k++) { 
-    auto packets = get_tofpackets(fnames[k]);
-    spdlog::info("We loaded {} packets from {}", packets.size(), fnames[k]);
-
-  for (auto const &p : packets) {
-    // print it
-    //std::cout << p << std::endl;
-    // there will be a more generic way to unpack TofPackets in the future
-    // for now we have to use the packet_type field
-    switch (p.packet_type) {
-      case PacketType::RBCalibration : {
-	// if you have the packet payload, the second argument 
-	// (position in stream) will always be 0
-	//
-	// pos keeps track of the current position in bytestream, 
-	// thus passed by reference so we need an rvalue
-	//
-	// the usize is a typedef from tof_typedefs.h and used
-	// to make the rust and C++ code look more similar, so that 
-	// is easier to compare them.
-	usize pos = 0;
-	auto cali = RBCalibration::from_bytestream(p.payload, pos);
-	if (verbose) {
-	  std::cout << cali << std::endl;
-	}
-	n_rbcalib++;
-      break;
-    }
-      // this only works for the data I combined
-      // recently, NOT for the "stream" kind of data
-      // THe format will change as well soon.
-      case PacketType::TofEvent : {
-
-        usize pos = 0;
-	// We need a structure to hold the waveforms for an event. We
-	// initialize and delete them with each new event
-	GAPS::Waveform *wave[NTOT];
-	GAPS::Waveform *wch9[NRB];
-	for (int i=0;i<NTOT;i++) wave[i] = NULL;
-	for (int i=0;i<NRB;i++)  wch9[i] = NULL;
-	float Phi[NRB] = { -999.0 };
-	
-        auto ev = TofEvent::from_bytestream(p.payload, pos);
-	unsigned long int evt_ctr = ev.mt_event.event_id;
-	//printf("Event %ld: RBs -", evt_ctr);
-	//printf("%ld.", evt_ctr);
-	/*for (int k=0;k<NRB;k++) {
-	  if (k%9==0) printf("\n");
-	  int n = ev.rb_events[k].header.rb_id;
-	  printf(" %3d(%3d)", n, ev.rb_events[k].header.channel_mask);
-	}*/
-	//Vec<std::tuple<u8,u8,u8>> ltbmap = ev.mt_event.get_dsi_j_ch();
-	//std::cout << get<0>(ltbmap[1]) << get<1>(ltbmap[2])
-	//	  << get<2>(ltbmap[1]) << std::endl;
-	//for (auto const& ltbmapi : ltbmap) {
-	//std::cout << std::get<1>(ltbmapi) <<" "<< std::get<2>(ltbmapi)<<" ";
-	  //for (auto k = std::begin(ltbmap); k != std::end(ltbmap); ++k) {
-	  //  std::cout << std::get<1>(*k) << " "<< std::get<2>(*k)<< " ";
-	//}
-	//printf(" %3d(%3d)", k, ev.mt_event.board_mask[k]);
-	
-	for (auto const &rbid : ev.get_rbids()) {
-	  RBEvent rb_event = ev.get_rbevent(rbid);
-	  // Now that we know the RBID, we can set the starting ch_no
-	  // Eventually we will use a function to map RB_ch to GAPS_ch
-	  usize ch_start = (rbid-1)*NCH; // first RB is #1
-	  if (verbose) {
-	    std::cout << rb_event << std::endl;
-          }
-	  Vec<Vec<f32>> volts;
-	  Vec<Vec<f32>> times;
-	  //if ((calname != "") && cali.rb_id == rbid ){
-	  //if (calname != "") { // For combined data all boards calibrated
-	  if (RB_Calibrated[rbid]) { // Have cali data for this RBID
-	    // Vec<f32> is a typedef for std::vector<float32>
-	    volts = cali[rbid].voltages(rb_event, false); //second argument is for spike cleaning
-	    // (C++ implementation causes a segfault sometimes when "true"
-	    times = cali[rbid].nanoseconds(rb_event);
-	    // volts and times are now ch 0-8 with the waveform for this event.
-
-	    // First, store the waveform for channel 9
-	    Vec<f64> ch9_volts(volts[8].begin(), volts[8].end());
-	    Vec<f64> ch9_times(times[8].begin(), times[8].end());
-	    // Before making waveforms, lets calculate the ch9
-	    // phase. For now, if we have ch9 data for this RB, we
-	    // want to analyze it.
-	    Phi[rbid] = FitSine(ch9_volts,ch9_times);
-	    // Now, initialize the ch9 Waveform for this RB. 
-	    wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),
-					    ch9_times.data(), rbid,0);
-	    //printf(" %d", rbid);
-	    
-	    // Now, deal with all the SiPM data
-	    for(int c=0;c<NCH;c++) {
-	      usize cw = c+ch_start; 
-	      
-	      Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
-	      Vec<f64> ch_times(times[c].begin(), times[c].end());
-	      wave[cw] = new GAPS::Waveform(ch_volts.data(),
-					    ch_times.data(), cw,0);
-	    }
-	  }
-	}
-	//printf("\n");
-
-	// Now that we have the waveforms in place, analyze the event.
-	Event.InitializeVariables(evt_ctr);
-	Event.InitializeWaveforms(wave, wch9);
-
-	// Calculate and store pedestals/RMSs for each channel
-	Event.AnalyzePedestals(Ped_low, Ped_win);
-
-	// Analyze the pulses in each channel
-	Event.SetThreshold(CThresh);
-	Event.SetCFDFraction(CFDS_frac);
-	Event.AnalyzePulses(Qwin_low, Qwin_size);
-	for (int i=0;i<NTOT;i++) {
-	  float tdc = Event.GetTDC(i);
-	  //if (tdc > 5) printf("%ld: %d -> %.2f\n", evt_ctr, i, tdc);
-	}
-	// Now that we have TDC values available, process the ch9 phases
-	Event.AnalyzePhases(Phi);
-	
-	// Analyze each paddle: position on paddle, hitmask, etc
-	Event.AnalyzePaddles(10.0, CHmin); //Args: Peak and Charge cuts
-
-	// Now calculate beta, charge, and inner/outer tof x,y,z, etc.
-	Event.AnalyzeEvent();
-	//std::cout << "here: "<< NTOT << "  " << std::endl;
-	//std::cout << "here: "<< Event.evtno << "  " << std::endl;
-	std::cout << "Event id: "<< evt_ctr << "  " << std::endl;
-	// Now fill out histograms
-	Event.FillChannelHistos(0);
-
-
-	
-
-	Event.FillPaddleHistos();
-
-	Event.UnsetWaveforms();
-	for (int i=0;i<NTOT;i++) {delete wave[i]; wave[i] = NULL;}
-	for (int i=0;i<NRB;i++)  {delete wch9[i]; wch9[i] = NULL;}
-	
-	n_tofevents++;
-        break;
-      }
-      case PacketType::RBMoni : {
-        usize pos = 0;
-        auto moni = RBMoniData::from_bytestream(p.payload, pos);
-        if (verbose) {
-          std::cout << moni << std::endl;
-        }
-        n_rbmoni++;
-        break;
-      }
-      case PacketType::MasterTrigger : {
-        usize pos = 0;
-        auto mte = MasterTriggerEvent::from_bytestream(p.payload, pos);
-        if (verbose) {
-          std::cout << mte << std::endl;
-        }
-        n_mte++;
-        break;
-      }
-      case PacketType::MTBMoni : {
-        usize pos = 0;
-        auto mtbmoni = MtbMoniData::from_bytestream(p.payload, pos);
-        if (verbose) {
-          std::cout << mtbmoni << std::endl;
-        }
-        n_mtbmoni++;
-        break;
-      }
-      default : {
-        if (verbose) {
-          std::cout << "-- nothing to do for " << p.packet_type << " --" << std::endl;
-        }
-        n_unknown++;
-        break;
-      }
-    }
-  }
-  }
-  // Write histograms after analyzing all the files
-  Event.WriteHistograms();
-  
-  std::cout << "-- -- packets summary:" << std::endl;
-  
-  std::cout << "-- -- RBCalibration     : " << n_rbcalib << "\t (packets) " <<  std::endl;
-  std::cout << "-- -- RBMoniData        : " << n_rbmoni  << "\t (packets) " <<  std::endl;
-  std::cout << "-- -- MasterTriggerEvent: " << n_mte     << "\t (packets) " <<  std::endl;
-  std::cout << "-- -- TofEvent          : " << n_tofevents  << "\t (packets) " <<  std::endl;
-  std::cout << "-- -- TofCmpMoniData    : " << n_tcmoni  << "\t (packets) " <<  std::endl;
-  std::cout << "-- -- MtbMoniData       : " << n_mtbmoni << "\t (packets) " <<  std::endl;
-  std::cout << "-- -- undecoded         : " << n_unknown << "\t (packets) " <<  std::endl;
-
-  spdlog::info("Finished");
-  return EXIT_SUCCESS;
-}
-
-void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
-  // Eventually we will call the db to get all this info. For now, I
-  // will simple read the relevant files to get the info.
-
-  FILE *fp;
-  char label[50], line[500];
-  char srcdir[200] = "/home/gaps/software/gaps-online-software/";
-  char codedir[200] = "src/gaps-db/resources/master-spreadsheet/";
-  char fname[501];
-  int status;
-  float value;
-
-  // Another kludgy read is getting the Paddle to volume location from
-  // the paddleid_vs_volid.json adn level0_coordinates.json
-  // files. Achim has a way to do this via rust, but I need the map
-  // for development purposes here.
-  // First, read the paddle to volume ID map
-  int tmp_pad, tmp_vol, vol_id[NPAD] = { 0 }; 
-  int tmp_vid;
-  float tmp_x, tmp_y, tmp_z;
-  float tmp_dimx, tmp_dimy, tmp_dimz;
-  snprintf(fname, 500, "%s/%s/paddleid_vs_volid.json", srcdir, codedir);
-  fp = fopen(fname, "r");
-  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
-    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9] %d", &tmp_pad, &tmp_vol) != EOF) {
-      vol_id[tmp_pad] = tmp_vol;
-      pad->VolumeID[tmp_pad] = tmp_vol; // Assign the paddle volume ID
-      //printf("%d %d\n", tmp_pad, vol_id[tmp_pad]);
-    }
-  }
-  fclose(fp); // Finished with file
-  
-  // Now that we have the vol_id for each paddle, map read in the
-  // vol_id to location map.
-  snprintf(fname, 500, "%s/%s/level0_coordinates.json", srcdir, codedir);
-  fp = fopen(fname, "r");
-  int ctr=0;
-  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
-    while (fscanf(fp,"%*[^-0-9]%d ", &tmp_vid) != EOF) { // Read VolID
-      // For each paddle, we want to set the X, Y, Z locations. So,
-      // index through the volume IDs to find a match, then set the
-      // appropriate dimensions and locations.
-      if (tmp_vid > 10000) { // Valid Volume ID
-	for (int j=0; j<NPAD; j++) {
-	  if (tmp_vid == pad->VolumeID[j]) { // Found a match, pad = j
-	    status = fscanf(fp,"%*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f ",
-			    &tmp_x, &tmp_y, &tmp_z);
-	    status = fscanf(fp,"%*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f ",
-			    &tmp_dimx, &tmp_dimy, &tmp_dimz);
-	    pad->Location[j][0] = tmp_x;
-	    pad->Location[j][1] = tmp_y;
-	    pad->Location[j][2] = tmp_z;
-	    pad->Dimension[j][0] = tmp_dimx;
-	    pad->Dimension[j][1] = tmp_dimy;
-	    pad->Dimension[j][2] = tmp_dimz;
-	  }
-	}
-      }
-    }
-  }  
-  fclose(fp); // Finished with file
-  
-  int tmp_o;
-  float coax, harting;
-  // One last task: Get the paddle orientation from paddle_to_orientation.json
-  snprintf(fname, 500, "%s/%s/paddle_orient_cable.jaz", srcdir, codedir);
-  fp = fopen(fname, "r");
-  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
-    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9]%d %*[^-0-9]%f  %*[^-0-9]%f ",
-		  &tmp_pad, &tmp_o, &coax, &harting) != EOF) {
-      if (tmp_pad > 0) {
-	pad->Orientation[tmp_pad] = tmp_o;
-	pad->CoaxLen[tmp_pad]     = coax;
-	pad->HardingLen[tmp_pad]  = harting;
-	//printf("%3d %2d %8.3f %8.3f\n", tmp_pad, tmp_o, coax, harting);
-      }
-    }
-  }
-
-  // Kludgy read to get the RB-ch to paddle map from the
-  // rbch-vs-paddle.json file. Achim has a way to do this via rust,
-  // but I need the map for development purposes here.
-  int paddle_map[NRB][NCH] = { 0 }; // Stored value will be paddle ID;
-  int rb_num, rb_ch, ch_num, pad_id;
-  snprintf(fname, 500, "%s/%s/rbch-vs-paddle.json", srcdir, codedir);
-  fp = fopen(fname, "r");
-  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
-    while (fscanf(fp, "%*[^-0-9]%d  %[^\n]", &rb_num, line) != EOF) { 
-      if (rb_num>0 && rb_num<50) {
-	for(int i=0;i<NCH;i++) {
-	  status = fscanf(fp, "%*[^-0-9]%d  %*[^-0-9]%d ", &rb_ch, &pad_id);
-	  // Store the SiPM Channel for each Paddle end
-	  int paddle = pad_id % 1000;
-	  int ch_num = (rb_num-1)*NCH + (rb_ch)-1; // Map the value to NTOT
-	  sipm->RB[ch_num] = rb_num;
-	  sipm->RB_ch[ch_num] = rb_ch;
-	  sipm->PaddleID[ch_num] = paddle;
-	  if (pad_id > 2000) { // We have a paddle ID for B
-	    pad->SiPM_B[paddle] = ch_num;
-	    sipm->PaddleEnd[ch_num] = 1;
-	    //printf("B -> %d %d %d %d %d\n", i,j,ch_num, paddle,paddle_map[i][j]);
-	  } else if (pad_id > 1000) { //We have a paddle ID for A
-	    pad->SiPM_A[paddle] = ch_num; 
-	    sipm->PaddleEnd[ch_num] = 0;
-	  }
-	}
-	status = fscanf(fp, "%s", line); // read in the closing "}" for RB
-      }
-    }
-  }
-  fclose(fp); // Finished with file
-}
+const int NRB   = 50; // Technically, it is 49, but we don't use 0
+const int NCH   = 9;
+const int NTOT  = (NCH) * NRB; // NTOT is the number of channels
+const int NPADS = NTOT/2;        // NPAD: 1 per 2 SiPMs
 
 double FitSine(std::vector<double> volts, std::vector<double> times)
 //if you want to get all three fit parameters:
@@ -519,7 +34,7 @@ double FitSine(std::vector<double> volts, std::vector<double> times)
   //float ns_off = 0; //cm*0.08; //Harting cable signal propagation is supposed to be 5.13 ns/m or 0.0513 ns/cm. crude measurement gives  0.08 ns/cm
   int start_bin = 20;
   int size_bin = 900; //can probably make this smaller
-  
+
   int data_size = 0;
   double pi = 3.14159265;
   double a;
@@ -629,4 +144,475 @@ double FitSine(std::vector<double> volts, std::vector<double> times)
   //v.push_back(c);
 
   //return v;
+}
+
+///mnt/tof-nas/nevis-data/tofdata/calibration/latest/
+int main(int argc, char *argv[]){
+  spdlog::cfg::load_env_levels();
+    
+  cxxopts::Options options("unpack-tofpackets", "Unpack example for .tof.gaps files with TofPackets.");
+  options.add_options()
+  ("h,help", "Print help")
+  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/mnt/tof-data/ucla-test-stand/ucla-test-stand-MAY/calib/"))
+  ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
+  ("f,files", "List of Files", cxxopts::value<bool>()->default_value("false"))
+  ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
+  ;
+  options.parse_positional({"file"});
+  auto result = options.parse(argc, argv);
+  if (result.count("help")) {
+    std::cout << options.help() << std::endl;
+    exit(EXIT_SUCCESS);
+  }
+  if (!result.count("file")) {
+    spdlog::error("No input file given!");
+    std::cout << options.help() << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  auto fname   = result["file"].as<std::string>();
+  bool files   = result["files"].as<bool>();
+  bool verbose = result["verbose"].as<bool>();
+
+  FILE *fp;
+  char tmpline[500];
+  std::string fnames[1000];
+  int j=0;
+  if (files) {
+    fp = fopen(fname.c_str(), "r");
+    if (fp != NULL) {
+      while (fscanf(fp, "%s", tmpline) != EOF) fnames[j++] = tmpline;
+      fclose(fp);
+    } else {
+      printf("Unable to open file %s\n", fname.c_str());
+    }
+  } else {
+    fnames[j++] = fname;
+  }
+
+  // -> Gaps relevant code starts here
+ 
+  auto calname = result["calibration"].as<std::string>();
+  RBCalibration cali[NRB]; // "cali" stores values for one RB
+
+  // To read calibration data from individual binary files, when -c is
+  // given with the directory of the calibration files
+  if (calname != "") {
+    for (int i=1; i<NRB; i++) {
+      // First, determine the proper RB filename from its number
+      std::string f_str;
+      if (i<10) // Little Kludgy, but it works
+	f_str = calname + "rb_0" + std::to_string(i) + ".cali.tof.gaps";
+      else
+	f_str = calname + "rb_" + std::to_string(i) + ".cali.tof.gaps";
+      //spdlog::info("Extracting RB data from file {}", f_str);
+      
+      // Read the packets from the file
+      //if ( std::filesystem::exists(f_str) ) {
+      //printf("%s file exists\n", f_str.c_str() );
+      //}
+      // Before proceeding, check that the file exists. 
+      struct stat buffer; 
+      if ( stat(f_str.c_str(), &buffer) != -1 ) {
+	auto packet = get_tofpackets(f_str);
+	spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
+	// Loop over the packets (should only be 1) and read into storage
+	for (auto const &p : packet) {
+	  if (p.packet_type == PacketType::RBCalibration) {
+	    // Should have the one calibration tofpacket stored in "packet".
+	    usize pos = 0;
+	    cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
+	  }
+	}
+      } //else {printf("File does not exist: %s\n", f_str.c_str());}
+    }
+  }
+  
+  // To read calibration data from individual text files, when -c is
+  // given with the directory of the calibration files
+  /*if (calname != "") {
+    // obviously here we have to get all the calibration files, 
+    // but for the sake of the example let's use only one
+    // Ultimatly, they will be stored in the stream.
+    for (int i=1; i<NRB; i++) {
+      std::string f_str;
+      if (i<10) // Little Kludgy, but it works
+	f_str = calname + "/txt-files/rb0" + std::to_string(i) + "_cal.txt";
+      else
+	f_str = calname + "/txt-files/rb" + std::to_string(i) + "_cal.txt";
+      
+      //spdlog::info("Will use calibration file {}", calname);
+      //cali[i] = RBCalibration::from_txtfile(calname);
+      spdlog::info("Will use calibration file {}", f_str);
+      cali[i] = RBCalibration::from_txtfile(f_str);
+    }
+    }*/
+
+  // the reader is something for the future, when the 
+  // files get bigger so they might not fit into memory
+  // at the same time
+  //auto reader = Gaps::TofPacketReader(fname); 
+  // for now, we have to load the whole file in memory
+  //auto packets = get_tofpackets(fname);
+  //spdlog::info("We loaded {} packets from {}", packets.size(), fname);
+
+  u32 n_rbcalib = 0;
+  u32 n_rbmoni  = 0;
+  u32 n_mte     = 0;
+  u32 n_tcmoni  = 0;
+  u32 n_mtbmoni = 0;
+  u32 n_unknown = 0;
+  u32 n_tofevents = 0;
+  u32 highrms = 0;
+
+  for (int k=0; k<j; k++) {
+    auto packets = get_tofpackets(fnames[k]);
+    spdlog::info("We loaded {} packets from {}", packets.size(), fnames[k]);
+
+  for (auto const &p : packets) {
+    // print it
+    //std::cout << p.packet_type << std::endl;
+    // there will be a more generic way to unpack TofPackets in the future
+    // for now we have to use the packet_type field
+    switch (p.packet_type) {
+      case PacketType::RBCalibration : {
+	// if you have the packet payload, the second argument 
+	// (position in stream) will always be 0
+	//
+	// pos keeps track of the current position in bytestream, 
+	// thus passed by reference so we need an rvalue
+	//
+	// the usize is a typedef from tof_typedefs.h and used
+	// to make the rust and C++ code look more similar, so that 
+	// is easier to compare them.
+	usize pos = 0;
+	auto cali = RBCalibration::from_bytestream(p.payload, pos);
+	if (verbose) {
+	  std::cout << cali << std::endl;
+	}
+	n_rbcalib++;
+      break;
+    }
+      // this only works for the data I combined
+      // recently, NOT for the "stream" kind of data
+      // THe format will change as well soon.
+      case PacketType::TofEvent : {
+
+        usize pos = 0;
+	// We need a structure to hold the waveforms for an event. We
+	// initialize and delete them with each new event
+	GAPS::Waveform *wave[NTOT];
+	GAPS::Waveform *wch9[NRB];
+	float Ped_low   = 10;
+	float Ped_win   = 70;
+	float CThresh   = 10.0;
+	float CFDS_frac = 0.25;
+	float Qwin_low  = 75;
+	float Qwin_size = 200;
+	float Ped[NTOT];
+	float PedRMS[NTOT];
+	float Qint[NTOT];
+	float VPeak[NTOT];
+	float TCFDS[NTOT];
+	bool  IsHit[NTOT] = {false};
+	float phi[NRB];
+	//use if you want all 3 fitting parameters
+	//float amp[NRB];
+	//float offs[NRB];
+	float H_len[NRB];
+	float shift[NRB];
+
+	//in flight we should probably have array H_len[NRB] and read from database, for now i am manually setting the relavent channels
+	//H_len[47] = 300; //Harting cable length in cm at UCLA
+	//H_len[48] = 500;
+	//H_len[37] = 305;
+	
+        auto ev = TofEvent::from_bytestream(p.payload, pos);
+	unsigned long int evt_ctr = ev.mt_event.event_id;
+	//printf("Event %ld: RBs -", evt_ctr);
+	for (auto const &rbid : ev.get_rbids()) {
+	  RBEvent rb_event = ev.get_rbevent(rbid);
+	  // Now that we know the RBID, we can set the starting ch_no
+	  // Eventually we will use a function to map RB_ch to GAPS_ch
+	  usize ch_start = (rbid-1)*NCH; // first RB is #1
+	  //usize rb_index = rbid-1;       // seems like RB1 should be at position 0, etc...
+	  if (verbose) {
+	    std::cout << rb_event << std::endl;
+          }
+	  Vec<Vec<f32>> volts;
+	  Vec<Vec<f32>> times;
+	  //if ((calname != "") && cali.rb_id == rbid ){
+	  if (calname != "") { // For combined data all boards calibrated
+	    // Vec<f32> is a typedef for std::vector<float32>
+	    volts = cali[rbid].voltages(rb_event, false); //second argument is for spike cleaning
+	    // (C++ implementation causes a segfault sometimes when "true"
+	    times = cali[rbid].nanoseconds(rb_event);
+	    // volts and times are now ch 0-8 with the waveform for this event.
+
+	    // First, store the waveform for channel 9
+	    Vec<f64> ch9_volts(volts[8].begin(), volts[8].end());
+	    Vec<f64> ch9_times(times[8].begin(), times[8].end());
+	    wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),ch9_times.data(),rbid,0);
+	    wch9[rbid]->SetPedBegin(Ped_low);
+	    wch9[rbid]->SetPedRange(Ped_win);
+	    wch9[rbid]->CalcPedestalRange(); 
+	    float ch9RMS = wch9[rbid]->GetPedsigma();
+	    //printf(" %d(%.1f)", rbid, ch9RMS);
+	    // printf(" %d", rbid);
+	      
+	    // Now, deal with all the SiPM data
+	    for(int c=0;c<NCH-1;c++) {
+	      usize cw = c+ch_start; 
+
+	      Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
+	      Vec<f64> ch_times(times[c].begin(), times[c].end());
+	      wave[cw] = new GAPS::Waveform(ch_volts.data(),ch_times.data() ,cw,0);
+	      
+	      // Calculate the pedestal
+	      wave[cw]->SetPedBegin(Ped_low);
+	      wave[cw]->SetPedRange(Ped_win);
+	      wave[cw]->CalcPedestalRange(); 
+	      wave[cw]->SubtractPedestal(); 
+	      Ped[cw] = wave[cw]->GetPedestal();
+	      PedRMS[cw] = wave[cw]->GetPedsigma();
+
+	      //if ( c==0 && (PedRMS[cw] > 15) && (ch9RMS < 190) ) {
+		// RMS_ch1 has ch9 data && RMS_ch9 has normal data        
+		//printf(" %ld Row %d: %8.1f %8.1f\n", evt_ctr, rbid, ch9RMS, PedRMS[cw]);
+		//for(int j=0;j<8;j++) printf(" %8.1f",PedRMS[ch_start+j]);
+		//printf("\n");
+	      //}
+	      //std::cout << "One" << std::endl;	      
+	      //pedRMS cut at 1.0, probably only needs to be at 2.0 but doesn't make much difference
+	      if (PedRMS[cw] > 1.0) {
+		//documenting hi PedRMS in std::out and txt file
+		highrms++;
+		std::ofstream fileP;
+                fileP.open ("HiRMS_feb_pb_RBS.csv", std::ios::app);
+                fileP << evt_ctr << "," << cw << std::endl;
+                fileP.close();
+
+		continue;
+	      }
+	      //std::cout << "Two" << std::endl;
+	      // Set thresholds and find pulses
+	      wave[cw]->SetThreshold(CThresh);
+	      wave[cw]->SetCFDSFraction(CFDS_frac);
+	      VPeak[cw] = wave[cw]->GetPeakValue(Qwin_low, Qwin_size);
+	      Qint[cw]  = wave[cw]->Integrate(Qwin_low, Qwin_size);
+	      wave[cw]->FindPeaks(Qwin_low, Qwin_size);
+	      //if ( (wave[cw]->GetNumPeaks() > 0) && (Qint[cw] > 5.0) ) {
+	      if ( (wave[cw]->GetNumPeaks() > 0) ) {
+		//printf("%i\n",cw);
+		IsHit[cw] = true;
+		wave[cw]->FindTdc(0, GAPS::CFD_SIMPLE);       // Simple CFD
+		TCFDS[cw] = wave[cw]->GetTdcs(0);
+		//printf("%ld hit\n",cw);
+
+		//phi[rbid] = FitSine(ch9_volts,ch9_times);
+		
+		phi[rbid] = FitSine(ch9_volts,ch9_times);
+		
+		// for all three fit params
+		//std::vector<double> v = FitSine(ch9_volts,ch9_times,H_len);
+                //phi[rbid] = v[0];
+		//amp[rbid] = v[1];
+		//offs[rbid] = v[2]; 
+
+		//printf("EVT %12ld - ch %3ld: %10.5f\n", evt_ctr, cw, TCFDS[cw]);
+	      }	//end "if channel is hit" loop	
+	    }  //end channel loop (8)
+
+	    //inside this loop, need to define first board as board A and compare all other phase shifts to board A
+	    //THIS IS NOT WORKING CODE, THIS IS AN OUTLINE OF WHAT THE CODE SHOULD DO! 
+	    //I was doing this in python and with only 2 boards before
+	    
+	    /* if (firstRB)
+	     * {
+	     *   float phiA = phi[rbid];
+	     * } 
+	     * float phi_shift=phiA-phi[rbid];                     //units of rad
+	     * if(phi_shift < -pi/3){
+             *   float shiftRB = (phi_shift+2*pi)/(2*pi*0.02); //ns
+             * }
+	     * else if(phi_shift-H_shift > pi/3){
+             *   float shiftRB = (phi_shift-2*pi)/(2*pi*0.02); //ns
+             * }
+	     * else{
+             *   float shiftRB = (phi_shift)/(2*pi*0.02);      //ns
+             * }
+	     *
+	     * shift[rbid] = shiftRB;
+	     */ 
+	  }   //end rb loop
+	}
+	//printf("\n");
+	// Now that we have all the waveforms in place, we can analyze
+	// the event. Start by looping over all paddles, and process
+	// any paddles with hits
+	for (int k=0; k<NPADS; k++) {
+	  //First, check with the MTB data to see if paddle is hit
+
+	  // Then find the pulse information from each SiPM
+	  int ch0 = k*2, ch1 = k*2+1;
+	  /*
+	  Paddle[k].time_a = wave[ch0].FindTdc(1,CFD_SIMPLE);
+	  Paddle[k].time_b = wave[ch1].FindTdc(1,CFD_SIMPLE);
+	  Paddle[k].peak_a = wave[ch0].GetPeakValue(100, 200);
+	  Paddle[k].peak_b = wave[ch1].GetPeakValue(100, 200);
+	  Paddle[k].charge_a = wave[ch0].Integrate(100, 200);
+	  Paddle[k].charge_b = wave[ch1].Integrate(100, 200);
+	  // Also hit position, min_i, and t_avg
+	  */
+	}
+	// Now calculate beta, charge, and inner/outer tof x,y,z
+
+
+	//SNF jan 2023, calculate timing for UCLA test stand setup
+	//run 16 /mnt/tof-nas/ucla-test-stand-JAN/16/ configuration:
+	//trigger = 'or' of U1A and U1B
+	//U1A signal split and sent to RB47 ch0 and RB48 ch0
+	//U1B signal split and sent to RB37 ch0 and RB37 ch1
+	
+	// start with just looking at U1B signal: ch0 is 324 in wave vector, ch1 is 325
+        
+        //std::cout << "Three" << std::endl;
+	//std::cout << "HIT 432, 433, 434, 435, 436, 437: "<<"," << IsHit[432] << "," << IsHit[433] << "," << IsHit[434] << "," << IsHit[435]  <<"," << IsHit[436] << "," << IsHit[437] << "," << std::endl;
+	if (IsHit[432] && IsHit[433] && IsHit[434] && IsHit[435]) {
+	
+	/*  if (TCFDS[324] < 90.0 || TCFDS[325] < 90.0) {
+	    std::ofstream file2;
+            file2.open ("RB37_tdc0_feb.csv", std::ios::app);
+            file2 << evt_ctr;
+            file2 << "," << TCFDS[324] << "," << TCFDS[325] << std::endl;
+            file2.close();
+          }
+	  else { */
+            std::ofstream myfile;
+            myfile.open ("sig131.csv", std::ios::app);
+            myfile << evt_ctr;
+            //myfile << "," << TCFDS[432] << "," << TCFDS[433] << "," << phi[49] << "," << TCFDS[326] << "," << TCFDS[327] << "," << phi[37] << std::endl;
+	    myfile << "," << TCFDS[432] << "," << TCFDS[433] << "," << TCFDS[434] << "," << TCFDS[435] << std::endl;
+            myfile.close();
+	    //std::cout << "Four" << std::endl;
+	  //}
+		  
+	}
+        
+						
+        // now look at U1A signal: RB47 ch0 is 414 in wave vector, RB48 ch0 is 423
+  
+        if (IsHit[414] && IsHit[423]) {
+
+       /* if (TCFDS[414] < 90.0 || TCFDS[423] < 90.0) {
+            std::ofstream file3;
+            file3.open ("RB4748_tdc0_feb.csv", std::ios::app);
+            file3 << evt_ctr;
+            file3 << "," << TCFDS[414] << "," << TCFDS[423] << std::endl;
+            file3.close();
+          }
+
+          else {
+*/
+            std::ofstream myfile4;
+            myfile4.open ("RB4748_pb_RBS.csv", std::ios::app);
+            myfile4 << evt_ctr;
+            //myfile4 << "," << TCFDS[414] << "," << TCFDS[423] << "," << phi[47] << "," << phi[48] << "," << amp[47] << "," << amp[48] << "," << offs[47] << "," << offs[48] << std::endl;
+            myfile4 << "," << TCFDS[414] << "," << TCFDS[423] << "," << phi[47] << "," << phi[48] << std::endl;
+	    myfile4.close();
+  //        }
+                  
+        }
+
+	
+/*
+	std::ofstream myfile;
+        myfile.open ("PEDs.csv", std::ios::app);
+	myfile << evt_ctr;
+	for (int i; i++; i<NTOT){
+          myfile << Ped[i] << ",";
+        }
+	myfile << std::endl;
+	myfile.close();
+
+	std::ofstream myfile2;
+        myfile2.open ("PEDRMS.csv", std::ios::app);
+        myfile2 << evt_ctr;
+        for (int i; i++; i<NTOT){
+          myfile2 << PedRMS[i] << ",";
+        }
+        myfile2 << std::endl;
+	myfile2.close();
+
+	std::ofstream myfile3;
+        myfile3.open ("Vpeaks.csv", std::ios::app);
+        myfile3 << evt_ctr;
+        for (int i; i++; i<NTOT){
+          myfile3 << VPeak[i] << ",";
+        }
+        myfile3 << std::endl;
+	myfile3.close();
+*/
+	n_tofevents++;
+	//printf("%i\n",n_tofevents);
+        break;
+      }
+      case PacketType::RBMoni : {
+        usize pos = 0;
+        auto moni = RBMoniData::from_bytestream(p.payload, pos);
+        if (verbose) {
+          std::cout << moni << std::endl;
+        }
+        n_rbmoni++;
+        break;
+      }
+      case PacketType::MasterTrigger : {
+        usize pos = 0;
+        auto mte = MasterTriggerEvent::from_bytestream(p.payload, pos);
+        if (verbose) {
+          std::cout << mte << std::endl;
+        }
+        n_mte++;
+        break;
+      }
+      case PacketType::CPUMoniData : {
+        usize pos = 0;
+        auto tcmoni = CPUMoniData::from_bytestream(p.payload, pos);
+        if (verbose) {
+          std::cout << tcmoni << std::endl;
+	}
+        n_tcmoni++;
+	break;
+      }
+      case PacketType::MTBMoni : {
+        usize pos = 0;
+        auto mtbmoni = MtbMoniData::from_bytestream(p.payload, pos);
+        if (verbose) {
+          std::cout << mtbmoni << std::endl;
+        }
+        n_mtbmoni++;
+        break;
+      }
+      default : {
+        if (verbose) {
+          std::cout << "-- nothing to do for " << p.packet_type << " --" << std::endl;
+        }
+        n_unknown++;
+        break;
+      }
+    }
+  }
+  } 
+  std::cout << "-- -- packets summary:" << std::endl;
+  
+  std::cout << "-- -- RBCalibration     : " << n_rbcalib << "\t (packets) " <<  std::endl;
+  std::cout << "-- -- RBMoniData        : " << n_rbmoni  << "\t (packets) " <<  std::endl;
+  std::cout << "-- -- MasterTriggerEvent: " << n_mte     << "\t (packets) " <<  std::endl;
+  std::cout << "-- -- TofEvent          : " << n_tofevents  << "\t (packets) " <<  std::endl;
+  std::cout << "-- -- TofCmpMoniData    : " << n_tcmoni  << "\t (packets) " <<  std::endl;
+  std::cout << "-- -- MtbMoniData       : " << n_mtbmoni << "\t (packets) " <<  std::endl;
+  std::cout << "-- -- undecoded         : " << n_unknown << "\t (packets) " <<  std::endl;
+  std::cout << "-- -- High RMS         : " << highrms << "\t (RB events) " <<  std::endl;
+
+  spdlog::info("Finished");
+  return EXIT_SUCCESS;
 }

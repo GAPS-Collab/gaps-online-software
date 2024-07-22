@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
   cxxopts::Options options("unpack-tofpackets", "Unpack example for .tof.gaps files with TofPackets.");
   options.add_options()
   ("h,help", "Print help")
-  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/home/gaps/tof-data/nevis-data/tofdata/calibration/latest/"))
+  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/home/gaps/csbf-data/calib/latest/"))
   ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
   ;
@@ -54,34 +54,54 @@ int main(int argc, char *argv[]){
   RBCalibration cali[NRB]; // "cali" stores values for one RB
 
   // To read calibration data from individual binary files, when -c is
-  // given with the directory of the calibration files
+  // given with the directory of the calibration files. Since the
+  // calibration files for each RB change with each calibration run,
+  // this code reads the list of calibration files in the directory,
+  // determines the RB number and copies the string into the relevant
+  // array position. For RBs with no calibration file, the length of
+  // the entry will be 0. We then read the calibrations for all RBs
+  // with files.
   bool RB_Calibrated[NRB] = { false };
+  std::string cnames[NRB];
   if (calname != "") {
+    char pname[500], line[500];
+    snprintf(pname,450, "ls %s/RB*.cali.tof.gaps", calname.c_str());
+    FILE *fp = popen(pname, "r");
+    while (fscanf(fp,"%s", line) != EOF) {
+      std::string c_name(line);          // Calib file found
+      int position = c_name.find("RB");  // Find "RB" in the name
+      std::string rbstr = c_name.substr(position+2, 2); // Extract RB num
+      int rbnum = atoi(rbstr.data());    // Convert to integer
+      //printf("%s %d %s\n", rbstr.c_str(), rbnum, line);
+      cnames[rbnum] = c_name;            // Copy to proper place in array
+    }
+    pclose(fp);
+    // Print out the calibration filenames as a sanity check
+    //for (int i=0; i<NRB; i++) {
+    //printf("%d: %lu %s\n", i, cnames[i].size(), cnames[i].c_str());
+    //}
+
     for (int i=1; i<NRB; i++) {
-      // First, determine the proper RB filename from its number
-      std::string f_str;
-      if (i<10) // Little Kludgy, but it works
-	f_str = calname + "rb_0" + std::to_string(i) + ".cali.tof.gaps";
-      else
-	f_str = calname + "rb_" + std::to_string(i) + ".cali.tof.gaps";
-      //spdlog::info("Extracting RB data from file {}", f_str);
-      
-      // Read the packets from the file
-      //if ( std::filesystem::exists(f_str) ) {
-      //printf("%s file exists\n", f_str.c_str() );
-      //}
-      // Before proceeding, check that the file exists. 
-      struct stat buffer; 
-      if ( stat(f_str.c_str(), &buffer) != -1 ) {
-	auto packet = get_tofpackets(f_str);
-	spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
-	// Loop over the packets (should only be 1) and read into storage
-	for (auto const &p : packet) {
-	  if (p.packet_type == PacketType::RBCalibration) {
-	    // Should have the one calibration tofpacket stored in "packet".
-	    usize pos = 0;
-	    cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
-            RB_Calibrated[i] = true;
+      if (cnames[i].size() > 4) { // RB has a calibration file
+	std::string f_str = cnames[i];
+	
+	// Read the packets from the file
+	//if ( std::filesystem::exists(f_str) ) {
+	//printf("%s file exists\n", f_str.c_str() );
+	//}
+	// Before proceeding, check that the file exists. 
+	struct stat buffer; 
+	if ( stat(f_str.c_str(), &buffer) != -1 ) {
+	  auto packet = get_tofpackets(f_str);
+	  spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
+	  // Loop over the packets (should only be 1) and read into storage
+	  for (auto const &p : packet) {
+	    if (p.packet_type == PacketType::RBCalibration) {
+	      // Should have the one calibration tofpacket stored in "packet".
+	      usize pos = 0;
+	      cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
+	      RB_Calibrated[i] = true;
+	    }
 	  }
 	}
       }
