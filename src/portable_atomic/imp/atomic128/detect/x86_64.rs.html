@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/portable-atomic-1.6.0/src/imp/atomic128/detect/x86_64.rs`."><title>x86_64.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../../portable_atomic/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/portable-atomic-1.7.0/src/imp/atomic128/detect/x86_64.rs`."><title>x86_64.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../../portable_atomic/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -114,11 +114,28 @@
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
 </pre></div><pre class="rust"><code><span class="comment">// SPDX-License-Identifier: Apache-2.0 OR MIT
 
 // Adapted from https://github.com/rust-lang/stdarch.
 
-</span><span class="attr">#![cfg_attr(any(not(target_feature = <span class="string">"sse"</span>), portable_atomic_sanitize_thread), allow(dead_code))]
+</span><span class="attr">#![cfg_attr(portable_atomic_sanitize_thread, allow(dead_code))]
 
 </span><span class="comment">// Miri doesn't support inline assembly used in __cpuid: https://github.com/rust-lang/miri/issues/932
 // SGX doesn't support CPUID: https://github.com/rust-lang/stdarch/blob/a0c30f3e3c75adcd6ee7efc94014ebcead61c507/crates/core_arch/src/x86/cpuid.rs#L102-L105
@@ -129,7 +146,7 @@
 
 <span class="attr">#[cfg(not(portable_atomic_no_asm))]
 </span><span class="kw">use </span>core::arch::asm;
-<span class="kw">use </span>core::arch::x86_64::{CpuidResult, _xgetbv};
+<span class="kw">use </span>core::arch::x86_64::CpuidResult;
 
 <span class="comment">// Workaround for https://github.com/rust-lang/rust/issues/101346
 // It is not clear if our use cases are affected, but we implement this just in case.
@@ -138,17 +155,19 @@
 // - https://www.felixcloutier.com/x86/cpuid
 // - https://en.wikipedia.org/wiki/CPUID
 // - https://github.com/rust-lang/stdarch/blob/a0c30f3e3c75adcd6ee7efc94014ebcead61c507/crates/core_arch/src/x86/cpuid.rs
-</span><span class="kw">unsafe fn </span>__cpuid(leaf: u32) -&gt; CpuidResult {
+</span><span class="attr">#[cfg(not(target_env = <span class="string">"sgx"</span>))]
+</span><span class="kw">fn </span>__cpuid(leaf: u32) -&gt; CpuidResult {
     <span class="kw">let </span>eax;
     <span class="kw">let </span><span class="kw-2">mut </span>ebx;
     <span class="kw">let </span>ecx;
     <span class="kw">let </span>edx;
-    <span class="comment">// SAFETY: the caller must guarantee that CPU supports `cpuid`.
+    <span class="comment">// SAFETY: Calling `__cpuid`` is safe on all x86_64 CPUs except for SGX,
+    // which doesn't support `cpuid`.
+    // https://github.com/rust-lang/stdarch/blob/a0c30f3e3c75adcd6ee7efc94014ebcead61c507/crates/core_arch/src/x86/cpuid.rs#L102-L109
     </span><span class="kw">unsafe </span>{
         <span class="macro">asm!</span>(
-            <span class="comment">// rbx is reserved by LLVM
-            </span><span class="string">"mov {ebx_tmp:r}, rbx"</span>,
-            <span class="string">"cpuid"</span>,
+            <span class="string">"mov {ebx_tmp:r}, rbx"</span>, <span class="comment">// save rbx which is reserved by LLVM
+            </span><span class="string">"cpuid"</span>,
             <span class="string">"xchg {ebx_tmp:r}, rbx"</span>, <span class="comment">// restore rbx
             </span>ebx_tmp = out(reg) ebx,
             inout(<span class="string">"eax"</span>) leaf =&gt; eax,
@@ -161,34 +180,40 @@
 }
 
 <span class="comment">// https://en.wikipedia.org/wiki/CPUID
-</span><span class="kw">const </span>VENDOR_ID_INTEL: [u8; <span class="number">12</span>] = <span class="kw-2">*</span><span class="string">b"GenuineIntel"</span>;
-<span class="kw">const </span>VENDOR_ID_AMD: [u8; <span class="number">12</span>] = <span class="kw-2">*</span><span class="string">b"AuthenticAMD"</span>;
-
-<span class="kw">unsafe fn </span>_vendor_id() -&gt; [u8; <span class="number">12</span>] {
+</span><span class="kw">const </span>_VENDOR_ID_INTEL: [u8; <span class="number">12</span>] = <span class="kw-2">*</span><span class="string">b"GenuineIntel"</span>; <span class="comment">// Intel
+</span><span class="kw">const </span>_VENDOR_ID_INTEL2: [u8; <span class="number">12</span>] = <span class="kw-2">*</span><span class="string">b"GenuineIotel"</span>; <span class="comment">// Intel https://github.com/InstLatx64/InstLatx64/commit/8fdd319884c67d2c6ec1ca0c595b42c1c4b8d803
+</span><span class="kw">const </span>_VENDOR_ID_AMD: [u8; <span class="number">12</span>] = <span class="kw-2">*</span><span class="string">b"AuthenticAMD"</span>; <span class="comment">// AMD
+</span><span class="kw">const </span>_VENDOR_ID_ZHAOXIN: [u8; <span class="number">12</span>] = <span class="kw-2">*</span><span class="string">b"  Shanghai  "</span>; <span class="comment">// Zhaoxin
+</span><span class="kw">fn </span>_vendor_id() -&gt; [u8; <span class="number">12</span>] {
     <span class="comment">// https://github.com/rust-lang/stdarch/blob/a0c30f3e3c75adcd6ee7efc94014ebcead61c507/crates/std_detect/src/detect/os/x86.rs#L40-L59
-    // SAFETY: the caller must guarantee that CPU supports `cpuid`.
-    </span><span class="kw">let </span>CpuidResult { ebx, ecx, edx, .. } = <span class="kw">unsafe </span>{ __cpuid(<span class="number">0</span>) };
+    </span><span class="kw">let </span>CpuidResult { ebx, ecx, edx, .. } = __cpuid(<span class="number">0</span>);
     <span class="kw">let </span>vendor_id: [[u8; <span class="number">4</span>]; <span class="number">3</span>] = [ebx.to_ne_bytes(), edx.to_ne_bytes(), ecx.to_ne_bytes()];
     <span class="comment">// SAFETY: transmute is safe because `[u8; 12]` and `[[u8; 4]; 3]` has the same layout.
     </span><span class="kw">unsafe </span>{ core::mem::transmute(vendor_id) }
 }
+<span class="kw">fn </span>_vendor_has_vmovdqa_atomic(vendor_id: [u8; <span class="number">12</span>]) -&gt; bool {
+    <span class="comment">// VMOVDQA is atomic on Intel, AMD, and Zhaoxin CPUs with AVX.
+    // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104688 for details.
+    </span>vendor_id == _VENDOR_ID_INTEL
+        || vendor_id == _VENDOR_ID_INTEL2
+        || vendor_id == _VENDOR_ID_AMD
+        || vendor_id == _VENDOR_ID_ZHAOXIN
+}
 
 <span class="attr">#[cold]
 </span><span class="kw">fn </span>_detect(info: <span class="kw-2">&amp;mut </span>CpuInfo) {
-    <span class="comment">// SAFETY: Calling `_vendor_id`` is safe because the CPU has `cpuid` support.
-    </span><span class="kw">let </span>vendor_id = <span class="kw">unsafe </span>{ _vendor_id() };
-
-    <span class="comment">// SAFETY: Calling `__cpuid`` is safe because the CPU has `cpuid` support.
-    </span><span class="kw">let </span>proc_info_ecx = <span class="kw">unsafe </span>{ __cpuid(<span class="number">0x0000_0001_u32</span>).ecx };
+    <span class="kw">let </span>proc_info_ecx = __cpuid(<span class="number">0x0000_0001_u32</span>).ecx;
 
     <span class="comment">// https://github.com/rust-lang/stdarch/blob/a0c30f3e3c75adcd6ee7efc94014ebcead61c507/crates/std_detect/src/detect/os/x86.rs#L111
     </span><span class="kw">if </span>test(proc_info_ecx, <span class="number">13</span>) {
         info.set(CpuInfo::HAS_CMPXCHG16B);
     }
 
-    <span class="comment">// VMOVDQA is atomic on Intel and AMD CPUs with AVX.
-    // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104688 for details.
-    </span><span class="kw">if </span>vendor_id == VENDOR_ID_INTEL || vendor_id == VENDOR_ID_AMD {
+    <span class="comment">// We only use VMOVDQA when SSE is enabled. See atomic_load_vmovdqa() in atomic128/x86_64.rs for more.
+    </span><span class="attr">#[cfg(target_feature = <span class="string">"sse"</span>)]
+    </span>{
+        <span class="kw">use </span>core::arch::x86_64::_xgetbv;
+
         <span class="comment">// https://github.com/rust-lang/stdarch/blob/a0c30f3e3c75adcd6ee7efc94014ebcead61c507/crates/std_detect/src/detect/os/x86.rs#L131-L224
         </span><span class="kw">let </span>cpu_xsave = test(proc_info_ecx, <span class="number">26</span>);
         <span class="kw">if </span>cpu_xsave {
@@ -199,7 +224,10 @@
                 </span><span class="kw">let </span>xcr0 = <span class="kw">unsafe </span>{ _xgetbv(<span class="number">0</span>) };
                 <span class="kw">let </span>os_avx_support = xcr0 &amp; <span class="number">6 </span>== <span class="number">6</span>;
                 <span class="kw">if </span>os_avx_support &amp;&amp; test(proc_info_ecx, <span class="number">28</span>) {
-                    info.set(CpuInfo::HAS_VMOVDQA_ATOMIC);
+                    <span class="kw">let </span>vendor_id = _vendor_id();
+                    <span class="kw">if </span>_vendor_has_vmovdqa_atomic(vendor_id) {
+                        info.set(CpuInfo::HAS_VMOVDQA_ATOMIC);
+                    }
                 }
             }
         }
@@ -215,15 +243,21 @@
 )]
 #[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="attr">#[cfg(not(portable_atomic_test_outline_atomics_detect_false))]
-    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>std::io::{<span class="self">self</span>, Write};
 
-    <span class="attr">#[cfg(not(portable_atomic_test_outline_atomics_detect_false))]
-    #[test]
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="attr">#[test]
+    #[cfg_attr(portable_atomic_test_outline_atomics_detect_false, ignore)]
     </span><span class="kw">fn </span>test_cpuid() {
         <span class="macro">assert_eq!</span>(<span class="macro">std::is_x86_feature_detected!</span>(<span class="string">"cmpxchg16b"</span>), detect().has_cmpxchg16b());
-        <span class="kw">let </span>vendor_id = <span class="kw">unsafe </span>{ _vendor_id() };
-        <span class="kw">if </span>vendor_id == VENDOR_ID_INTEL || vendor_id == VENDOR_ID_AMD {
+        <span class="kw">let </span>vendor_id = _vendor_id();
+        {
+            <span class="kw">let </span>stdout = io::stderr();
+            <span class="kw">let </span><span class="kw-2">mut </span>stdout = stdout.lock();
+            <span class="kw">let _ </span>= <span class="macro">writeln!</span>(stdout, <span class="string">"\n  vendor_id: {}"</span>, std::str::from_utf8(<span class="kw-2">&amp;</span>vendor_id).unwrap());
+        }
+        <span class="kw">if </span>_vendor_has_vmovdqa_atomic(vendor_id) {
             <span class="macro">assert_eq!</span>(<span class="macro">std::is_x86_feature_detected!</span>(<span class="string">"avx"</span>), detect().has_vmovdqa_atomic());
         } <span class="kw">else </span>{
             <span class="macro">assert!</span>(!detect().has_vmovdqa_atomic());

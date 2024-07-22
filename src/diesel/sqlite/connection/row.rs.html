@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/diesel-2.2.1/src/sqlite/connection/row.rs`."><title>row.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="diesel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../diesel/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/diesel-2.2.2/src/sqlite/connection/row.rs`."><title>row.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="diesel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../diesel/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -323,6 +323,89 @@
 <a href="#323" id="323">323</a>
 <a href="#324" id="324">324</a>
 <a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cell::{Ref, RefCell};
 <span class="kw">use </span>std::rc::Rc;
 <span class="kw">use </span>std::sync::Arc;
@@ -525,127 +608,210 @@
     }
 }
 
-<span class="attr">#[test]
-</span><span class="kw">fn </span>fun_with_row_iters() {
-    <span class="macro">crate::table!</span> {
-        <span class="attr">#[allow(unused_parens)]
-        </span>users(id) {
-            id -&gt; Integer,
-            name -&gt; Text,
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>fun_with_row_iters() {
+        <span class="macro">crate::table!</span> {
+            <span class="attr">#[allow(unused_parens)]
+            </span>users(id) {
+                id -&gt; Integer,
+                name -&gt; Text,
+            }
         }
-    }
 
-    <span class="kw">use </span><span class="kw">crate</span>::connection::LoadConnection;
-    <span class="kw">use </span><span class="kw">crate</span>::deserialize::{FromSql, FromSqlRow};
-    <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::row::{Field, Row};
-    <span class="kw">use </span><span class="kw">crate</span>::sql_types;
+        <span class="kw">use </span><span class="kw">crate</span>::connection::LoadConnection;
+        <span class="kw">use </span><span class="kw">crate</span>::deserialize::{FromSql, FromSqlRow};
+        <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
+        <span class="kw">use </span><span class="kw">crate</span>::row::{Field, Row};
+        <span class="kw">use </span><span class="kw">crate</span>::sql_types;
 
-    <span class="kw">let </span>conn = <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::test_helpers::connection();
+        <span class="kw">let </span>conn = <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::test_helpers::connection();
 
-    <span class="kw">crate</span>::sql_query(<span class="string">"CREATE TABLE users(id INTEGER PRIMARY KEY, name TEXT NOT NULL);"</span>)
-        .execute(conn)
-        .unwrap();
+        <span class="kw">crate</span>::sql_query(<span class="string">"CREATE TABLE users(id INTEGER PRIMARY KEY, name TEXT NOT NULL);"</span>)
+            .execute(conn)
+            .unwrap();
 
-    <span class="kw">crate</span>::insert_into(users::table)
-        .values(<span class="macro">vec!</span>[
-            (users::id.eq(<span class="number">1</span>), users::name.eq(<span class="string">"Sean"</span>)),
-            (users::id.eq(<span class="number">2</span>), users::name.eq(<span class="string">"Tess"</span>)),
-        ])
-        .execute(conn)
-        .unwrap();
+        <span class="kw">crate</span>::insert_into(users::table)
+            .values(<span class="macro">vec!</span>[
+                (users::id.eq(<span class="number">1</span>), users::name.eq(<span class="string">"Sean"</span>)),
+                (users::id.eq(<span class="number">2</span>), users::name.eq(<span class="string">"Tess"</span>)),
+            ])
+            .execute(conn)
+            .unwrap();
 
-    <span class="kw">let </span>query = users::table.select((users::id, users::name));
+        <span class="kw">let </span>query = users::table.select((users::id, users::name));
 
-    <span class="kw">let </span>expected = <span class="macro">vec!</span>[(<span class="number">1</span>, String::from(<span class="string">"Sean"</span>)), (<span class="number">2</span>, String::from(<span class="string">"Tess"</span>))];
+        <span class="kw">let </span>expected = <span class="macro">vec!</span>[(<span class="number">1</span>, String::from(<span class="string">"Sean"</span>)), (<span class="number">2</span>, String::from(<span class="string">"Tess"</span>))];
 
-    <span class="kw">let </span>row_iter = conn.load(query).unwrap();
-    <span class="kw">for </span>(row, expected) <span class="kw">in </span>row_iter.zip(<span class="kw-2">&amp;</span>expected) {
-        <span class="kw">let </span>row = row.unwrap();
+        <span class="kw">let </span>row_iter = conn.load(query).unwrap();
+        <span class="kw">for </span>(row, expected) <span class="kw">in </span>row_iter.zip(<span class="kw-2">&amp;</span>expected) {
+            <span class="kw">let </span>row = row.unwrap();
 
-        <span class="kw">let </span>deserialized = &lt;(i32, String) <span class="kw">as </span>FromSqlRow&lt;
-            (sql_types::Integer, sql_types::Text),
-            <span class="kw">_</span>,
-        &gt;&gt;::build_from_row(<span class="kw-2">&amp;</span>row)
-        .unwrap();
-
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>deserialized, expected);
-    }
-
-    {
-        <span class="kw">let </span>collected_rows = conn.load(query).unwrap().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
-
-        <span class="kw">for </span>(row, expected) <span class="kw">in </span>collected_rows.iter().zip(<span class="kw-2">&amp;</span>expected) {
-            <span class="kw">let </span>deserialized = row
-                .as_ref()
-                .map(|row| {
-                    &lt;(i32, String) <span class="kw">as </span>FromSqlRow&lt;
-                            (sql_types::Integer, sql_types::Text),
-                        <span class="kw">_</span>,
-                        &gt;&gt;::build_from_row(row).unwrap()
-                })
-                .unwrap();
+            <span class="kw">let </span>deserialized = &lt;(i32, String) <span class="kw">as </span>FromSqlRow&lt;
+                (sql_types::Integer, sql_types::Text),
+                <span class="kw">_</span>,
+            &gt;&gt;::build_from_row(<span class="kw-2">&amp;</span>row)
+            .unwrap();
 
             <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>deserialized, expected);
         }
+
+        {
+            <span class="kw">let </span>collected_rows = conn.load(query).unwrap().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+
+            <span class="kw">for </span>(row, expected) <span class="kw">in </span>collected_rows.iter().zip(<span class="kw-2">&amp;</span>expected) {
+                <span class="kw">let </span>deserialized = row
+                    .as_ref()
+                    .map(|row| {
+                        &lt;(i32, String) <span class="kw">as </span>FromSqlRow&lt;
+                            (sql_types::Integer, sql_types::Text),
+                        <span class="kw">_</span>,
+                        &gt;&gt;::build_from_row(row).unwrap()
+                    })
+                    .unwrap();
+
+                <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>deserialized, expected);
+            }
+        }
+
+        <span class="kw">let </span><span class="kw-2">mut </span>row_iter = conn.load(query).unwrap();
+
+        <span class="kw">let </span>first_row = row_iter.next().unwrap().unwrap();
+        <span class="kw">let </span>first_fields = (first_row.get(<span class="number">0</span>).unwrap(), first_row.get(<span class="number">1</span>).unwrap());
+        <span class="kw">let </span>first_values = (first_fields.<span class="number">0</span>.value(), first_fields.<span class="number">1</span>.value());
+
+        <span class="macro">assert!</span>(row_iter.next().unwrap().is_err());
+        std::mem::drop(first_values);
+        <span class="macro">assert!</span>(row_iter.next().unwrap().is_err());
+        std::mem::drop(first_fields);
+
+        <span class="kw">let </span>second_row = row_iter.next().unwrap().unwrap();
+        <span class="kw">let </span>second_fields = (second_row.get(<span class="number">0</span>).unwrap(), second_row.get(<span class="number">1</span>).unwrap());
+        <span class="kw">let </span>second_values = (second_fields.<span class="number">0</span>.value(), second_fields.<span class="number">1</span>.value());
+
+        <span class="macro">assert!</span>(row_iter.next().unwrap().is_err());
+        std::mem::drop(second_values);
+        <span class="macro">assert!</span>(row_iter.next().unwrap().is_err());
+        std::mem::drop(second_fields);
+
+        <span class="macro">assert!</span>(row_iter.next().is_none());
+
+        <span class="kw">let </span>first_fields = (first_row.get(<span class="number">0</span>).unwrap(), first_row.get(<span class="number">1</span>).unwrap());
+        <span class="kw">let </span>second_fields = (second_row.get(<span class="number">0</span>).unwrap(), second_row.get(<span class="number">1</span>).unwrap());
+
+        <span class="kw">let </span>first_values = (first_fields.<span class="number">0</span>.value(), first_fields.<span class="number">1</span>.value());
+        <span class="kw">let </span>second_values = (second_fields.<span class="number">0</span>.value(), second_fields.<span class="number">1</span>.value());
+
+        <span class="macro">assert_eq!</span>(
+            &lt;i32 <span class="kw">as </span>FromSql&lt;sql_types::Integer, Sqlite&gt;&gt;::from_nullable_sql(first_values.<span class="number">0</span>)
+                .unwrap(),
+            expected[<span class="number">0</span>].<span class="number">0
+        </span>);
+        <span class="macro">assert_eq!</span>(
+            &lt;String <span class="kw">as </span>FromSql&lt;sql_types::Text, Sqlite&gt;&gt;::from_nullable_sql(first_values.<span class="number">1</span>)
+                .unwrap(),
+            expected[<span class="number">0</span>].<span class="number">1
+        </span>);
+
+        <span class="macro">assert_eq!</span>(
+            &lt;i32 <span class="kw">as </span>FromSql&lt;sql_types::Integer, Sqlite&gt;&gt;::from_nullable_sql(second_values.<span class="number">0</span>)
+                .unwrap(),
+            expected[<span class="number">1</span>].<span class="number">0
+        </span>);
+        <span class="macro">assert_eq!</span>(
+            &lt;String <span class="kw">as </span>FromSql&lt;sql_types::Text, Sqlite&gt;&gt;::from_nullable_sql(second_values.<span class="number">1</span>)
+                .unwrap(),
+            expected[<span class="number">1</span>].<span class="number">1
+        </span>);
+
+        <span class="kw">let </span>first_fields = (first_row.get(<span class="number">0</span>).unwrap(), first_row.get(<span class="number">1</span>).unwrap());
+        <span class="kw">let </span>first_values = (first_fields.<span class="number">0</span>.value(), first_fields.<span class="number">1</span>.value());
+
+        <span class="macro">assert_eq!</span>(
+            &lt;i32 <span class="kw">as </span>FromSql&lt;sql_types::Integer, Sqlite&gt;&gt;::from_nullable_sql(first_values.<span class="number">0</span>)
+                .unwrap(),
+            expected[<span class="number">0</span>].<span class="number">0
+        </span>);
+        <span class="macro">assert_eq!</span>(
+            &lt;String <span class="kw">as </span>FromSql&lt;sql_types::Text, Sqlite&gt;&gt;::from_nullable_sql(first_values.<span class="number">1</span>)
+                .unwrap(),
+            expected[<span class="number">0</span>].<span class="number">1
+        </span>);
     }
 
-    <span class="kw">let </span><span class="kw-2">mut </span>row_iter = conn.load(query).unwrap();
+    <span class="attr">#[cfg(feature = <span class="string">"returning_clauses_for_sqlite_3_35"</span>)]
+    </span><span class="macro">crate::define_sql_function!</span> {<span class="kw">fn </span>sleep(a: diesel::sql_types::Integer) -&gt; diesel::sql_types::Integer}
 
-    <span class="kw">let </span>first_row = row_iter.next().unwrap().unwrap();
-    <span class="kw">let </span>first_fields = (first_row.get(<span class="number">0</span>).unwrap(), first_row.get(<span class="number">1</span>).unwrap());
-    <span class="kw">let </span>first_values = (first_fields.<span class="number">0</span>.value(), first_fields.<span class="number">1</span>.value());
+    <span class="attr">#[test]
+    #[cfg(feature = <span class="string">"returning_clauses_for_sqlite_3_35"</span>)]
+    </span><span class="kw">fn </span>parallel_iter_with_error() {
+        <span class="kw">use </span><span class="kw">crate</span>::connection::Connection;
+        <span class="kw">use </span><span class="kw">crate</span>::connection::LoadConnection;
+        <span class="kw">use </span><span class="kw">crate</span>::connection::SimpleConnection;
+        <span class="kw">use </span><span class="kw">crate</span>::expression_methods::ExpressionMethods;
+        <span class="kw">use </span><span class="kw">crate</span>::SqliteConnection;
+        <span class="kw">use </span>std::sync::{Arc, Barrier};
+        <span class="kw">use </span>std::time::Duration;
 
-    <span class="macro">assert!</span>(row_iter.next().unwrap().is_err());
-    std::mem::drop(first_values);
-    <span class="macro">assert!</span>(row_iter.next().unwrap().is_err());
-    std::mem::drop(first_fields);
+        <span class="kw">let </span>temp_dir = tempfile::tempdir().unwrap();
+        <span class="kw">let </span>db_path = <span class="macro">format!</span>(<span class="string">"{}/test.db"</span>, temp_dir.path().display());
+        <span class="kw">let </span><span class="kw-2">mut </span>conn1 = SqliteConnection::establish(<span class="kw-2">&amp;</span>db_path).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>conn2 = SqliteConnection::establish(<span class="kw-2">&amp;</span>db_path).unwrap();
 
-    <span class="kw">let </span>second_row = row_iter.next().unwrap().unwrap();
-    <span class="kw">let </span>second_fields = (second_row.get(<span class="number">0</span>).unwrap(), second_row.get(<span class="number">1</span>).unwrap());
-    <span class="kw">let </span>second_values = (second_fields.<span class="number">0</span>.value(), second_fields.<span class="number">1</span>.value());
+        <span class="macro">crate::table!</span> {
+            users {
+                id -&gt; Integer,
+                name -&gt; Text,
+            }
+        }
 
-    <span class="macro">assert!</span>(row_iter.next().unwrap().is_err());
-    std::mem::drop(second_values);
-    <span class="macro">assert!</span>(row_iter.next().unwrap().is_err());
-    std::mem::drop(second_fields);
+        conn1
+            .batch_execute(<span class="string">"CREATE TABLE users(id INTEGER NOT NULL PRIMARY KEY, name TEXT)"</span>)
+            .unwrap();
 
-    <span class="macro">assert!</span>(row_iter.next().is_none());
+        <span class="kw">let </span>barrier = Arc::new(Barrier::new(<span class="number">2</span>));
+        <span class="kw">let </span>barrier2 = barrier.clone();
 
-    <span class="kw">let </span>first_fields = (first_row.get(<span class="number">0</span>).unwrap(), first_row.get(<span class="number">1</span>).unwrap());
-    <span class="kw">let </span>second_fields = (second_row.get(<span class="number">0</span>).unwrap(), second_row.get(<span class="number">1</span>).unwrap());
+        <span class="comment">// we unblock the main thread from the sleep function
+        </span>sleep_utils::register_impl(<span class="kw-2">&amp;mut </span>conn2, <span class="kw">move </span>|a: i32| {
+            barrier.wait();
+            std::thread::sleep(Duration::from_secs(a <span class="kw">as </span>u64));
+            a
+        })
+        .unwrap();
 
-    <span class="kw">let </span>first_values = (first_fields.<span class="number">0</span>.value(), first_fields.<span class="number">1</span>.value());
-    <span class="kw">let </span>second_values = (second_fields.<span class="number">0</span>.value(), second_fields.<span class="number">1</span>.value());
+        <span class="comment">// spawn a background thread that locks the database file
+        </span><span class="kw">let </span>handle = std::thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">use </span><span class="kw">crate</span>::query_dsl::RunQueryDsl;
 
-    <span class="macro">assert_eq!</span>(
-        &lt;i32 <span class="kw">as </span>FromSql&lt;sql_types::Integer, Sqlite&gt;&gt;::from_nullable_sql(first_values.<span class="number">0</span>).unwrap(),
-        expected[<span class="number">0</span>].<span class="number">0
-    </span>);
-    <span class="macro">assert_eq!</span>(
-        &lt;String <span class="kw">as </span>FromSql&lt;sql_types::Text, Sqlite&gt;&gt;::from_nullable_sql(first_values.<span class="number">1</span>).unwrap(),
-        expected[<span class="number">0</span>].<span class="number">1
-    </span>);
+            conn2
+                .immediate_transaction(|conn| diesel::select(sleep(<span class="number">1</span>)).execute(conn))
+                .unwrap();
+        });
+        barrier2.wait();
 
-    <span class="macro">assert_eq!</span>(
-        &lt;i32 <span class="kw">as </span>FromSql&lt;sql_types::Integer, Sqlite&gt;&gt;::from_nullable_sql(second_values.<span class="number">0</span>).unwrap(),
-        expected[<span class="number">1</span>].<span class="number">0
-    </span>);
-    <span class="macro">assert_eq!</span>(
-        &lt;String <span class="kw">as </span>FromSql&lt;sql_types::Text, Sqlite&gt;&gt;::from_nullable_sql(second_values.<span class="number">1</span>).unwrap(),
-        expected[<span class="number">1</span>].<span class="number">1
-    </span>);
+        <span class="comment">// execute some action that also requires a lock
+        </span><span class="kw">let </span><span class="kw-2">mut </span>iter = conn1
+            .load(
+                diesel::insert_into(users::table)
+                    .values((users::id.eq(<span class="number">1</span>), users::name.eq(<span class="string">"John"</span>)))
+                    .returning(users::id),
+            )
+            .unwrap();
 
-    <span class="kw">let </span>first_fields = (first_row.get(<span class="number">0</span>).unwrap(), first_row.get(<span class="number">1</span>).unwrap());
-    <span class="kw">let </span>first_values = (first_fields.<span class="number">0</span>.value(), first_fields.<span class="number">1</span>.value());
+        <span class="comment">// get the first iterator result, that should return the lock error
+        </span><span class="kw">let </span>n = iter.next().unwrap();
+        <span class="macro">assert!</span>(n.is_err());
 
-    <span class="macro">assert_eq!</span>(
-        &lt;i32 <span class="kw">as </span>FromSql&lt;sql_types::Integer, Sqlite&gt;&gt;::from_nullable_sql(first_values.<span class="number">0</span>).unwrap(),
-        expected[<span class="number">0</span>].<span class="number">0
-    </span>);
-    <span class="macro">assert_eq!</span>(
-        &lt;String <span class="kw">as </span>FromSql&lt;sql_types::Text, Sqlite&gt;&gt;::from_nullable_sql(first_values.<span class="number">1</span>).unwrap(),
-        expected[<span class="number">0</span>].<span class="number">1
-    </span>);
+        <span class="comment">// check that the iterator is now empty
+        </span><span class="kw">let </span>n = iter.next();
+        <span class="macro">assert!</span>(n.is_none());
+
+        <span class="comment">// join the background thread
+        </span>handle.join().unwrap();
+    }
 }
 </code></pre></div></section></main></body></html>
