@@ -79,21 +79,21 @@ fn tof_moni<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 
 
 /// I/O features to read TofPackets from disk
-///
-/// # Example 
-/// ```
-/// import gaps_online.rust_api as api
-/// # read 100 TofEvents from the file
-/// reader = api.io.TofPacketReader("/path/to/your/file", filter=api.io.PacketType.TofEvent, nevents=100)
-/// for pack in reader:
-///    ev = api.events.TofEvent()
-///    ev.from_tofpacket(ev)
-///    for h in ev.hits:
-///        print (h.t0)
-///        print (h)
-///
-///
-/// ```
+// /
+// # Example 
+// ```
+// use gaps_online::rust_api as api;
+// # read 100 TofEvents from the file
+// reader = api.io.TofPacketReader("/path/to/your/file", filter=api.io.PacketType.TofEvent, nevents=100)
+// for pack in reader:
+//    ev = api.events.TofEvent()
+//    ev.from_tofpacket(ev)
+//    for h in ev.hits:
+//        print (h.t0)
+//        print (h)
+//
+//
+// ```
 #[pymodule]
 #[pyo3(name = "io")]
 fn tof_io<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
@@ -128,6 +128,7 @@ fn tof_commands<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyTOFEventBuilderConfig>()?;
   m.add_class::<PyHeartBeatDataSink>()?;
   m.add_class::<PyMTBHeartbeat>()?;
+  m.add_class::<PyEVTBLDRHeartbeat>()?;
   Ok(())
 }
 
