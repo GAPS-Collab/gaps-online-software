@@ -25,6 +25,7 @@ use tof_dataclasses::packets::{
 
 use tof_dataclasses::heartbeats::HeartBeatDataSink;
 use tof_dataclasses::heartbeats::MTBHeartbeat;
+use tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
 
 use tof_dataclasses::monitoring::{
     MoniData,
@@ -1032,6 +1033,7 @@ impl PyRBMoniSeries {
     }
   }
 }
+
 #[pyclass]
 #[pyo3(name="HeartbeatDataSink")]
 
@@ -1153,6 +1155,84 @@ impl PyMTBHeartbeat {
     Ok(self.config.lost_trate)
   }
 }
+#[pyclass]
+#[pyo3(name="EVTBLDRHeartbeat")]
+pub struct PyEVTBLDRHeartbeat {
+  pub config : EVTBLDRHeartbeat 
+}
+impl PyEVTBLDRHeartbeat {
+  pub fn set_config(&mut self, cfg : EVTBLDRHeartbeat) {
+    self.config = cfg;
+  }
+}
+#[pymethods]
+impl PyEVTBLDRHeartbeat {
+  #[new]
+  fn new () -> Self {
+    let cfg: EVTBLDRHeartbeat = EVTBLDRHeartbeat::new();
+    Self {
+      config : cfg
+    }
+  }
+  #[getter]
+  fn get_met_seconds(&self) -> PyResult<usize> {
+    Ok(self.config.met_seconds)
+  }
+  #[getter]
+  fn get_n_mte_received_tot(&self) -> PyResult<usize> {
+    Ok(self.config.n_mte_received_tot)
+  }
+  #[getter]
+  fn get_n_rbe_received_tot(&self) -> PyResult<usize> {
+    Ok(self.config.n_rbe_received_tot )
+  }
+  #[getter]
+  fn get_n_rbe_per_te(&self) -> PyResult<usize> {
+    Ok(self.config.n_rbe_per_te)
+  }
+  #[getter]
+  fn get_n_rbe_discarded_tot(&self) -> PyResult<usize> {
+    Ok(self.config.n_rbe_discarded_tot)
+  }
+  #[getter]
+  fn get_n_mte_skipped(&self) -> PyResult<usize> {
+    Ok(self.config.n_mte_skipped)
+  }
+  #[getter]
+  fn get_n_timed_out(&self) -> PyResult<usize> {
+    Ok(self.config.n_timed_out)
+  }
+  #[getter]
+  fn get_n_sent(&self) -> PyResult<usize> {
+    Ok(self.config.n_sent)
+  }
+  #[getter]
+  fn get_delta_mte_rbe(&self) -> PyResult<usize> {
+    Ok(self.config.delta_mte_rbe)
+  }
+  #[getter]
+  fn get_event_cache_size(&self) -> PyResult<usize> {
+    Ok(self.config.event_cache_size)
+  }
+  #[getter]
+  fn get_rbe_wo_mte(&self) -> PyResult<usize> {
+    Ok(self.config.rbe_wo_mte)
+  }
+  #[getter]
+  fn get_mte_receiver_cbc_len(&self) -> PyResult<usize> {
+    Ok(self.config.mte_receiver_cbc_len)
+  }
+  #[getter]
+  fn get_rbe_receiver_cbc_len(&self) -> PyResult<usize> {
+    Ok(self.config.rbe_receiver_cbc_len)
+  }
+  #[getter]
+  fn get_tp_sender_cbc_len(&self) -> PyResult<usize> {
+    Ok(self.config.tp_sender_cbc_len)
+  }
+}
+
+
 
 #[pyclass]
 #[pyo3(name="MtbMoniSeries")]
@@ -1940,7 +2020,7 @@ impl PyRBWaveform {
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.wf)) 
   }
-}
+} 
 
 
 
