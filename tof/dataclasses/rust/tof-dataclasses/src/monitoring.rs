@@ -1444,7 +1444,7 @@ impl MtbMoniData {
   }
 
   pub fn get_tiu_ignore_busy(&self) -> bool {
-    self.tiu_status & 0x16 > 0
+    self.tiu_status & 0x10 > 0
   }
 
 
