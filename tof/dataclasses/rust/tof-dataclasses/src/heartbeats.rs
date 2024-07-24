@@ -441,6 +441,9 @@ pub struct EVTBLDRHeartbeat {
   pub mte_receiver_cbc_len  : usize,
   pub rbe_receiver_cbc_len  : usize,
   pub tp_sender_cbc_len     : usize,
+  pub n_rbe_from_past       : usize,
+  pub n_rbe_orphan          : usize,
+  pub n_ev_wo_evid          : usize,
   // pub seen_rbevents         : HashMap<u8, usize>,
 }
 impl EVTBLDRHeartbeat {
@@ -470,6 +473,9 @@ impl EVTBLDRHeartbeat {
       mte_receiver_cbc_len : 0,
       rbe_receiver_cbc_len : 0,
       tp_sender_cbc_len    : 0,
+      n_ev_wo_evid         : 0,
+      n_rbe_orphan         : 0,
+      n_rbe_from_past      : 0,
       // seen_rbevents        : seen_rbevents, 
     }
  }
@@ -512,6 +518,7 @@ pub fn get_nrbe_discarded_frac(&self) -> f64 {
   repr += &(format!("   {:<75} <<", format!("==> Size of event ID cache   \t{}", self.event_id_cache_size).bright_purple()));
   repr += &(format!("   {:<75} <<", format!("==> {} Events timed out", self.n_timed_out).bright_purple()));
   repr += &(format!("   {:<75} <<", format!("==> Percent events timed out {}%", self.get_timed_out_frac()*(100 as f64)).bright_purple()));
+  repr += &(format!("   {:<75} <<", format!("==> Percent events w/out event ID: {}%", (((self.n_ev_wo_evid / self.n_sent) as f64)*(100 as f64))).bright_purple()));
   repr += &(format!("   {:<75}", " >> \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} <<"));
   repr += &(format!("   {:<75} <<", format!("==> Received MTEvents \t\t{}", self.n_mte_received_tot).bright_purple()));
   repr += &(format!("   {:<75} <<", format!("==> Skipped MTEvents \t\t{}", self.n_mte_skipped).bright_purple()));
@@ -523,6 +530,8 @@ pub fn get_nrbe_discarded_frac(&self) -> f64 {
   repr += &(format!("   {:<75}", " >> \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} <<"));
   repr += &(format!("   {:<75} <<", format!("==> Avg. ratio RBEvent/ToFEvent {:4.2}", self.n_rbe_per_te).bright_purple()));
   repr += &(format!("   {:<75} <<", format!("==> Getting MTE from cache for RBEvent failed {} times :(", self.rbe_wo_mte).bright_purple()));
+  repr += &(format!("   {:<75} <<", format!("==> {} RBEvents with evid from past", self.n_rbe_from_past).bright_purple()));
+  repr += &(format!("   {:<75} <<", format!("==> {} Orphan RBEvents", self.n_rbe_orphan).bright_purple()));
   repr += &(format!("   {:<75}", " >> \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} <<"));
   repr += &(format!("   {:<75} <<", format!("==> Ch. len MTE Receiver   \t{}", self.mte_receiver_cbc_len).bright_purple()));
   repr += &(format!("   {:<75} <<", format!("==> Ch. len RBE Reveiver   \t{}", self.rbe_receiver_cbc_len).bright_purple()));
@@ -544,7 +553,7 @@ impl Packable for EVTBLDRHeartbeat {
 impl Serialization for EVTBLDRHeartbeat {
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
-  const SIZE : usize = 124; //
+  const SIZE : usize = 148; //
 
   fn from_bytestream(stream : &Vec<u8>, 
                        pos        : &mut usize)
@@ -566,6 +575,9 @@ impl Serialization for EVTBLDRHeartbeat {
         hb.mte_receiver_cbc_len = parse_usize(stream,pos);
         hb.rbe_receiver_cbc_len = parse_usize(stream,pos);
         hb.tp_sender_cbc_len    = parse_usize(stream,pos);
+        hb.n_ev_wo_evid         = parse_usize(stream,pos);
+        hb.n_rbe_from_past      = parse_usize(stream,pos);
+        hb.n_rbe_orphan         = parse_usize(stream,pos);
         // hb.seen_rbevents        = HashMap::from(parse_u8(stream, pos));
         *pos += 2;
         Ok(hb)
@@ -588,6 +600,9 @@ impl Serialization for EVTBLDRHeartbeat {
           bs.extend_from_slice(&self.mte_receiver_cbc_len.to_le_bytes());
           bs.extend_from_slice(&self.rbe_receiver_cbc_len.to_le_bytes());
           bs.extend_from_slice(&self.tp_sender_cbc_len.to_le_bytes());
+          bs.extend_from_slice(&self.n_ev_wo_evid.to_le_bytes());
+          bs.extend_from_slice(&self.n_rbe_from_past.to_le_bytes());
+          bs.extend_from_slice(&self.n_rbe_orphan.to_le_bytes());
           // bs.push(self.seen_rbevents.to_u8());
           bs.extend_from_slice(&Self::TAIL.to_le_bytes());
           bs
@@ -612,6 +627,9 @@ impl Serialization for EVTBLDRHeartbeat {
       let mte_receiver_cbc_len = rng.gen::<usize>();
       let rbe_receiver_cbc_len = rng.gen::<usize>();
       let tp_sender_cbc_len = rng.gen::<usize>();
+      let n_ev_wo_evid = rng.gen::<usize>();
+      let n_rbe_from_past = rng.gen::<usize>();
+      let n_rbe_orphan = rng.gen::<usize>();
       Self {
         met_seconds,
         n_rbe_received_tot,
@@ -628,6 +646,9 @@ impl Serialization for EVTBLDRHeartbeat {
         rbe_receiver_cbc_len,
         tp_sender_cbc_len,
         n_mte_received_tot,
+        n_ev_wo_evid,
+        n_rbe_from_past,
+        n_rbe_orphan,
       }
     }
   } 

@@ -125,8 +125,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
 
   //let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
 
-  #[cfg(features="debug")]
-  let mut heartbeat         = HeartBeatDataSink::new();
+  
   let mut n_pack_sent       = 0;
   //let mut last_evid       = 0u32;
   let mut n_pack_write_disk = 0usize;
@@ -411,7 +410,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         if #[cfg(features="debug")] {
           heartbeat.incoming_ch_len = incoming.len();
           heartbeat.met += timer.elapsed().as_secs_u64();
-          match data_socket.send(heartbeat.to_bytestream(),0) {
+          match data_socket.send(heartbeat.pack().to_bytestream(),0) {
             Err(err) => error!("Not able to send heartbeat over 0MQ PUB! {err}"),
             Ok(_)    => {
               trace!("TofPacket sent");
