@@ -128,6 +128,11 @@ private:
   TH1D    *Charge_cut[NTOT];           // Charge (cut) histograms
   TH1D    *tdcCFD[NTOT];                  // TDC histograms
 
+  TH2D    *CorrHist;            //High hit histogram
+  TH1D    *HighHitEvPaddle;            //High hit histogram
+  TH1D    *HighHitEvRB;            //High hit histogram
+  TH1D    *HighHitEvP;            //High hit histogram
+
   TH2D    *QEnd2End[NPAD];             // End 2 End charge 
   TH1I    *HitMask[NPAD];              // Hit mask of paddle
   TH1D    *tDiff[NPAD];                // tdc diff of paddle ends

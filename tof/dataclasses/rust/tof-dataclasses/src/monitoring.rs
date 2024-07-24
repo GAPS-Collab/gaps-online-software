@@ -1384,39 +1384,69 @@ impl FromRandom for CPUMoniData {
 
 ///////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////
-
 /// Monitoring the MTB
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct MtbMoniData {
-  pub calibration : u16, 
-  pub vccpint     : u16, 
-  pub vccpaux     : u16, 
-  pub vccoddr     : u16, 
-  pub temp        : u16, 
-  pub vccint      : u16, 
-  pub vccaux      : u16, 
-  pub vccbram     : u16, 
-  pub rate        : u16, 
-  pub lost_rate   : u16, 
+  //pub calibration  : u16, 
+  //pub vccpint      : u16, 
+  pub tiu_busy_len : u32,
+  /// tiu_status[0] = emu_mode
+  /// tiu_status[1] = use_aux_link
+  /// tiu_status[2] = tiu_bad
+  /// tiu_status[3] = bsy_stuck
+  /// tiu_status[4] = ignore_bsy
+  pub tiu_status   : u8,
+  /// Prescale factor in per cent
+  /// (might not be accurate)
+  pub prescale_pc  : u8,
+  pub daq_queue_len: u16,
+  //pub vccpaux      : u16, 
+  //pub vccoddr      : u16, 
+  pub temp         : u16, 
+  pub vccint       : u16, 
+  pub vccaux       : u16, 
+  pub vccbram      : u16, 
+  pub rate         : u16, 
+  pub lost_rate    : u16, 
 }
 
 impl MtbMoniData {
   
   pub fn new() -> Self {
     Self {
-      calibration  : u16::MAX,
-      vccpint      : u16::MAX,
-      vccpaux      : u16::MAX,
-      vccoddr      : u16::MAX,
-      temp         : u16::MAX,
-      vccint       : u16::MAX,
-      vccaux       : u16::MAX,
-      vccbram      : u16::MAX,
-      rate         : u16::MAX,
-      lost_rate    : u16::MAX
+      tiu_busy_len  : u32::MAX,
+      tiu_status    : u8::MAX,
+      prescale_pc   : u8::MAX,
+      daq_queue_len : u16::MAX,
+      temp          : u16::MAX,
+      vccint        : u16::MAX,
+      vccaux        : u16::MAX,
+      vccbram       : u16::MAX,
+      rate          : u16::MAX,
+      lost_rate     : u16::MAX
     }
   }
+
+  pub fn get_tiu_emulation_mode(&self) -> bool {
+    self.tiu_status & 0x1 > 0
+  }
+  
+  pub fn get_tiu_use_aux_link(&self) -> bool {
+    self.tiu_status & 0x2 > 0
+  }
+
+  pub fn get_tiu_bad(&self) -> bool { 
+    self.tiu_status & 0x4 > 0
+  }
+
+  pub fn get_tiu_busy_stuck(&self) -> bool {
+    self.tiu_status & 0x8 > 0
+  }
+
+  pub fn get_tiu_ignore_busy(&self) -> bool {
+    self.tiu_status & 0x10 > 0
+  }
+
 
   /// Convert ADC temp from adc values to Celsius
   pub fn get_fpga_temp(&self) -> f32 {
@@ -1441,20 +1471,30 @@ impl fmt::Display for MtbMoniData {
     write!(f, "<MtbMoniData:
   MTB  EVT RATE  [Hz] {}
   LOST EVT RATE  [Hz] {}
-  CALIBRATION  [ADC?] {}
-  VCCPINT         [V] {:.3}
-  VCCPAUX         [V] {:.3}
-  VCCODDR         [V] {:.3}
+  TIU BUSY CNT  [CLK] {}
+  DAQ QUEUE LEN       {}
+  PRESCALE        [%] {}
+  --- TIU STATUS ---
+    EMU MODE          {}
+    USE AUX LINK      {}
+    TIU BAD           {}
+    BUSY STUCK        {}
+    IGNROE BUSY       {}
+  --- --- --- --- --
   FPGA TEMP      [\u{00B0}C] {:.2}
   VCCINT          [V] {:.3}
   VCCAUX          [V] {:.3}
   VCCBRAM         [V] {:.3}>",
            self.rate,
            self.lost_rate,
-           self.calibration,
-           MtbMoniData::adc_vcc_conversion(self.vccpint   ),
-           MtbMoniData::adc_vcc_conversion(self.vccpaux   ),
-           MtbMoniData::adc_vcc_conversion(self.vccoddr   ),
+           self.tiu_busy_len,
+           self.daq_queue_len,
+           self.prescale_pc,
+           self.get_tiu_emulation_mode(),
+           self.get_tiu_use_aux_link(),
+           self.get_tiu_bad(),
+           self.get_tiu_busy_stuck(),
+           self.get_tiu_ignore_busy(),
            self.get_fpga_temp(),
            MtbMoniData::adc_vcc_conversion(self.vccint    ),
            MtbMoniData::adc_vcc_conversion(self.vccaux    ),
@@ -1476,10 +1516,10 @@ impl Serialization for MtbMoniData {
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
-    stream.extend_from_slice(&self.calibration.to_le_bytes());
-    stream.extend_from_slice(&self.vccpint    .to_le_bytes());
-    stream.extend_from_slice(&self.vccpaux    .to_le_bytes());
-    stream.extend_from_slice(&self.vccoddr    .to_le_bytes());
+    stream.extend_from_slice(&self.tiu_busy_len.to_le_bytes());
+    stream.extend_from_slice(&self.tiu_status .to_le_bytes());
+    stream.extend_from_slice(&self.prescale_pc.to_le_bytes());
+    stream.extend_from_slice(&self.daq_queue_len.to_le_bytes());
     stream.extend_from_slice(&self.temp       .to_le_bytes());
     stream.extend_from_slice(&self.vccint     .to_le_bytes()); 
     stream.extend_from_slice(&self.vccaux     .to_le_bytes()); 
@@ -1494,16 +1534,16 @@ impl Serialization for MtbMoniData {
     -> Result<Self, SerializationError> {
     let mut moni_data      = Self::new();
     Self::verify_fixed(stream, pos)?;
-    moni_data.calibration  = parse_u16(&stream, pos);
-    moni_data.vccpint      = parse_u16(&stream, pos);
-    moni_data.vccpaux      = parse_u16(&stream, pos);
-    moni_data.vccoddr      = parse_u16(&stream, pos);
-    moni_data.temp         = parse_u16(&stream, pos);
-    moni_data.vccint       = parse_u16(&stream, pos);
-    moni_data.vccaux       = parse_u16(&stream, pos);
-    moni_data.vccbram      = parse_u16(&stream, pos);
-    moni_data.rate         = parse_u16(&stream, pos);
-    moni_data.lost_rate    = parse_u16(&stream, pos);
+    moni_data.tiu_busy_len  = parse_u32(&stream, pos);
+    moni_data.tiu_status    = parse_u8(&stream, pos);
+    moni_data.prescale_pc   = parse_u8(&stream, pos);
+    moni_data.daq_queue_len = parse_u16(&stream, pos);
+    moni_data.temp          = parse_u16(&stream, pos);
+    moni_data.vccint        = parse_u16(&stream, pos);
+    moni_data.vccaux        = parse_u16(&stream, pos);
+    moni_data.vccbram       = parse_u16(&stream, pos);
+    moni_data.rate          = parse_u16(&stream, pos);
+    moni_data.lost_rate     = parse_u16(&stream, pos);
     *pos += 2; // since we deserialized the tail earlier and 
               // didn't account for it
     Ok(moni_data)
@@ -1519,10 +1559,9 @@ impl MoniData for MtbMoniData {
   fn get(&self, varname : &str) -> Option<f32> {
     match varname {
       "board_id"     => Some(0.0f32),
-      "calibration"  => Some(self.calibration as f32), 
-      "vccpint"      => Some(Self::adc_vcc_conversion(self.vccpint)), 
-      "vccpaux"      => Some(Self::adc_vcc_conversion(self.vccpaux)), 
-      "vccoddr"      => Some(Self::adc_vcc_conversion(self.vccoddr)), 
+      "tiu_busy_len" => Some(self.tiu_busy_len as f32), 
+      "tiu_status"   => Some(self.tiu_status as f32), 
+      "daq_queue_len"  => Some(self.daq_queue_len as f32), 
       "temp"         => Some(self.get_fpga_temp()), 
       "vccint"       => Some(Self::adc_vcc_conversion(self.vccint)), 
       "vccaux"       => Some(Self::adc_vcc_conversion(self.vccaux)), 
@@ -1535,11 +1574,10 @@ impl MoniData for MtbMoniData {
   
   fn keys() -> Vec<&'static str> {
     vec![
-      "board_id"   ,  
-      "calibration", 
-      "vccpint"    , 
-      "vccpaux"    , 
-      "vccoddr"    , 
+      "board_id"      ,  
+      "tiu_busy_len"  , 
+      "tiu_status"    , 
+      "daq_queue_len" , 
       "temp"       , 
       "vccint"     , 
       "vccaux"     , 
@@ -1554,10 +1592,10 @@ impl FromRandom for MtbMoniData {
   fn from_random() -> Self {
     let mut moni      = Self::new();
     let mut rng       = rand::thread_rng();
-    moni.calibration  = rng.gen::<u16>();
-    moni.vccpint      = rng.gen::<u16>();
-    moni.vccpaux      = rng.gen::<u16>();
-    moni.vccoddr      = rng.gen::<u16>();
+    moni.tiu_busy_len = rng.gen::<u32>();
+    moni.tiu_status   = rng.gen::<u8>();
+    moni.prescale_pc  = rng.gen::<u8>();
+    moni.daq_queue_len= rng.gen::<u16>();
     moni.temp         = rng.gen::<u16>();
     moni.vccint       = rng.gen::<u16>();
     moni.vccaux       = rng.gen::<u16>();

@@ -410,6 +410,17 @@ pub fn force_trigger(bus : &mut IPBus)
   Ok(())
 }
 
+pub fn use_tiu_aux_link(bus :&mut IPBus, use_it : bool) 
+  -> Result<(), Box<dyn Error>> {
+  if use_it {
+    TIU_USE_AUX_LINK.set(bus, 1)?;
+  } else {
+    TIU_USE_AUX_LINK.set(bus, 0)?;
+  }
+  Ok(())
+}
+
+
 pub fn set_fire_bits(bus : &mut IPBus, channel : u8)
   -> Result<(), Box<dyn Error>> {
   if channel < 25 {

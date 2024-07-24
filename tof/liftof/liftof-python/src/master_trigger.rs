@@ -90,6 +90,10 @@ impl PyMasterTrigger {
   }
 
   /// Check if the TIU emulation mode is on
+  ///
+  /// # Arguments:
+  ///
+  /// * bus : IPBus 
   fn get_tiu_emulation_mode(&mut self) -> PyResult<u32> {
     match TIU_EMULATION_MODE.get(&mut self.ipbus) {
       Ok(mode) => {
@@ -752,6 +756,17 @@ impl PyMasterTrigger {
   fn set_central_track_trigger(&mut self, prescale : u32) -> PyResult<()> {
     match TRACK_CENTRAL_PRESCALE.set(&mut self.ipbus, prescale) {
       Ok(_) =>  {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  fn use_tiu_aux_link(&mut self, use_it : bool) -> PyResult<()> {
+    match mt_api::control::use_tiu_aux_link(&mut self.ipbus, use_it) {
+      Ok(_) => {
         return Ok(());
       }
       Err(err) => {

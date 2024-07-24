@@ -145,6 +145,7 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
        \\/__/         \\/__/       \\/__/           \\/__/       \\/__/         \\/__/    
 
           (LIFTOF - liftof is for tof, Version 0.10 'LELEWAA', Mar 2024)
+          >> with support from the Hawaiian islands \u{1f30a}\u{1f308}\u{1f965}\u{1f334}
 
           * Documentation
           ==> GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/LELEWAA-0.10
@@ -184,6 +185,32 @@ pub fn check_liftof_rb_status() {
 }
 
 
+/// Routine to end the liftof-cc program, finish up with current run 
+/// and clean up
+///
+/// FIXME - maybe this should go to liftof-cc
+pub fn end_liftof_cc(thread_control     : Arc<Mutex<ThreadControl>>) {
+  match thread_control.try_lock() {
+    Ok(mut tc) => {
+      //println!("== ==> [signal_handler] acquired thread_control lock!");
+      //println!("Tread control {:?}", tc);
+      if !tc.thread_cmd_dispatch_active 
+      && !tc.thread_data_sink_active
+      && !tc.thread_event_bldr_active 
+      && !tc.thread_master_trg_active  {
+        println!(">> So long and thanks for all the \u{1F41F} <<"); 
+        exit(0);
+      }
+      tc.stop_flag = true;
+      println!("== ==> [signal_handler] Stop flag is set, we are waiting for threads to finish...");
+      //println!("{}", tc);
+    }
+    Err(err) => {
+      error!("Can't acquire lock for ThreadControl! {err}");
+    }
+  }
+}
+
 /// Handle incoming POSIX signals
 pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
   let sleep_time = Duration::from_millis(300);
@@ -194,6 +221,11 @@ pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
     thread::sleep(sleep_time);
     match thread_control.try_lock() {
       Ok(mut tc) => {
+        if !tc.thread_signal_hdlr_active {
+          //end myself
+          info!("Shutting down siganl handler thread!");
+          break;
+        }
         //println!("== ==> [signal_handler] acquired thread_control lock!");
         //println!("Tread control {:?}", tc);
         if !tc.thread_cmd_dispatch_active 

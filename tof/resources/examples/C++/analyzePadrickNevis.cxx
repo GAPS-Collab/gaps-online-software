@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "./include/constants.h"
-#include "./include/EventGAPS.h"
+#include "./include/EventPadrick.h"
 
 void   GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm);
 double FitSine(std::vector<double> volts, std::vector<double> times);
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
   cxxopts::Options options("unpack-tofpackets", "Unpack example for .tof.gaps files with TofPackets.");
   options.add_options()
   ("h,help", "Print help")
-  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/home/gaps/nevis-data/tofdata/calibration/latest/"))
+  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/mnt/tof-nas/nevis-data/tofdata/calibration/latest/"))
   ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
   ("f,files", "List of Files", cxxopts::value<bool>()->default_value("false"))
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
@@ -53,26 +53,21 @@ int main(int argc, char *argv[]){
   bool files   = result["files"].as<bool>();
   bool verbose = result["verbose"].as<bool>();
 
-  // If called with the -f option, read in the list of files to analyze
   FILE *fp;
   char tmpline[500];
   std::string fnames[1000];
-  int nfiles=0;
+  int j=0;
   if (files) {
     fp = fopen(fname.c_str(), "r");
-    if (fp != NULL) {
-      while (fscanf(fp, "%s", tmpline) != EOF) fnames[nfiles++] = tmpline;
-      fclose(fp);
-    } else {
-      printf("Unable to open file %s\n", fname.c_str());
-    }
+    while (fscanf(fp, "%s", tmpline) != EOF) fnames[j++] = tmpline;
+    fclose(fp);
   } else {
-    fnames[nfiles++] = fname;
+    fnames[j++] = fname;
   }
 
   // Print out the filenames as a sanity check
   //std::cout << fnames[0] << std::endl;
-  //for(int k=1;k<nfiles;k++) std::cout << fnames[k] << std::endl;
+  //for(int k=1;k<j;k++) std::cout << fnames[k] << std::endl;
   //return (0);
   
   // -> Gaps relevant code starts here
@@ -80,59 +75,61 @@ int main(int argc, char *argv[]){
   RBCalibration cali[NRB]; // "cali" stores values for one RB
 
   // To read calibration data from individual binary files, when -c is
-  // given with the directory of the calibration files. Since the
-  // calibration files for each RB change with each calibration run,
-  // this code reads the list of calibration files in the directory,
-  // determines the RB number and copies the string into the relevant
-  // array position. For RBs with no calibration file, the length of
-  // the entry will be 0. We then read the calibrations for all RBs
-  // with files.
+  // given with the directory of the calibration files
   bool RB_Calibrated[NRB] = { false };
-  std::string cnames[NRB];
   if (calname != "") {
-    char pname[500], line[500];
-    snprintf(pname,450, "ls %s/RB*.cali.tof.gaps", calname.c_str());
-    FILE *fp = popen(pname, "r");
-    while (fscanf(fp,"%s", line) != EOF) {
-      std::string c_name(line);          // Calib file found
-      int position = c_name.find("RB");  // Find "RB" in the name
-      std::string rbstr = c_name.substr(position+2, 2); // Extract RB num
-      int rbnum = atoi(rbstr.data());    // Convert to integer
-      //printf("%s %d %s\n", rbstr.c_str(), rbnum, line);
-      cnames[rbnum] = c_name;            // Copy to proper place in array
-    }
-    pclose(fp);
-    // Print out the calibration filenames as a sanity check
-    //for (int i=0; i<NRB; i++) {
-    //printf("%d: %lu %s\n", i, cnames[i].size(), cnames[i].c_str());
-    //}
-
     for (int i=1; i<NRB; i++) {
-      if (cnames[i].size() > 4) { // RB has a calibration file
-	std::string f_str = cnames[i];
-	
-	// Read the packets from the file
-	//if ( std::filesystem::exists(f_str) ) {
-	//printf("%s file exists\n", f_str.c_str() );
-	//}
-	// Before proceeding, check that the file exists. 
-	struct stat buffer; 
-	if ( stat(f_str.c_str(), &buffer) != -1 ) {
-	  auto packet = get_tofpackets(f_str);
-	  spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
-	  // Loop over the packets (should only be 1) and read into storage
-	  for (auto const &p : packet) {
-	    if (p.packet_type == PacketType::RBCalibration) {
-	      // Should have the one calibration tofpacket stored in "packet".
-	      usize pos = 0;
-	      cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
-	      RB_Calibrated[i] = true;
-	    }
+      // First, determine the proper RB filename from its number
+      std::string f_str;
+      if (i<10) // Little Kludgy, but it works
+	f_str = calname + "rb_0" + std::to_string(i) + ".cali.tof.gaps";
+      else
+	f_str = calname + "rb_" + std::to_string(i) + ".cali.tof.gaps";
+      //spdlog::info("Extracting RB data from file {}", f_str);
+      
+      // Read the packets from the file
+      //if ( std::filesystem::exists(f_str) ) {
+      //printf("%s file exists\n", f_str.c_str() );
+      //}
+      // Before proceeding, check that the file exists. 
+      struct stat buffer; 
+      if ( stat(f_str.c_str(), &buffer) != -1 ) {
+	auto packet = get_tofpackets(f_str);
+	spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
+	// Loop over the packets (should only be 1) and read into storage
+	for (auto const &p : packet) {
+	  //int ctr=0;
+	  if (p.packet_type == PacketType::RBCalibration) {
+	    // Should have the one calibration tofpacket stored in "packet".
+	    usize pos = 0;
+	    //if (++ctr == 4)  // 4th packet is the one we want
+	    cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
+	    RB_Calibrated[i] = true;
 	  }
 	}
-      }
+      } 
     }
   }
+  
+  // To read calibration data from individual text files, when -c is
+  // given with the directory of the calibration files
+  /*if (calname != "") {
+    // obviously here we have to get all the calibration files, 
+    // but for the sake of the example let's use only one
+    // Ultimatly, they will be stored in the stream.
+    for (int i=1; i<NRB; i++) {
+      std::string f_str;
+      if (i<10) // Little Kludgy, but it works
+	f_str = calname + "/txt-files/rb0" + std::to_string(i) + "_cal.txt";
+      else
+	f_str = calname + "/txt-files/rb" + std::to_string(i) + "_cal.txt";
+      
+      //spdlog::info("Will use calibration file {}", calname);
+      //cali[i] = RBCalibration::from_txtfile(calname);
+      spdlog::info("Will use calibration file {}", f_str);
+      cali[i] = RBCalibration::from_txtfile(f_str);
+    }
+    }*/
 
   // Some useful variables (some initialized to default values)
   // but overwritten from file (if it exists)
@@ -159,22 +156,18 @@ int main(int argc, char *argv[]){
   // -- read in some analysis parameters.
   // Doing this in a kludgy way since we will not use later.
   fp = fopen("paramNEVIS.txt", "r");
-  if (fp != NULL) { // Actually opened file
-    while (fscanf(fp, "%s %f", label, &value) != EOF) {
-      if (strcmp(label,"ped_lo") ==0 )     Ped_low = value; 
-      if (strcmp(label,"ped_win") ==0 )    Ped_win = value;
-      if (strcmp(label,"pulse_lo") ==0 )   Qwin_low = value;
-      if (strcmp(label,"pulse_win") ==0 )  Qwin_size = value;
-      if (strcmp(label,"charge_min") ==0 ) CHmin = value;
-      if (strcmp(label,"thresh") ==0 )     CThresh = value;
-      if (strcmp(label,"cfd_frac") ==0 )   CFDS_frac = value;
-      status = fscanf(fp,"%[^\n]",line); // Scan the rest of the line
-    }
-    fclose(fp); 
-  } else
-    printf("Using default Nevis parameters.\n");
-  
-  
+  while (fscanf(fp, "%s %f", label, &value) != EOF) {
+    if (strcmp(label,"ped_lo") ==0 )     Ped_low = value; 
+    if (strcmp(label,"ped_win") ==0 )    Ped_win = value;
+    if (strcmp(label,"pulse_lo") ==0 )   Qwin_low = value;
+    if (strcmp(label,"pulse_win") ==0 )  Qwin_size = value;
+    if (strcmp(label,"charge_min") ==0 ) CHmin = value;
+    if (strcmp(label,"thresh") ==0 )     CThresh = value;
+    if (strcmp(label,"cfd_frac") ==0 )   CFDS_frac = value;
+    status = fscanf(fp,"%[^\n]",line); // Scan the rest of the line
+  }
+  fclose(fp); 
+
   // Now, we want to store information about the SiPM channels and
   // paddle relationships for analysis purpose. Read all that info
   // into the relevant structures.
@@ -206,7 +199,7 @@ int main(int argc, char *argv[]){
   u32 n_unknown = 0;
   u32 n_tofevents = 0;
 
-  for (int k=0; k<nfiles; k++) { 
+  for (int k=0; k<j; k++) { 
     auto packets = get_tofpackets(fnames[k]);
     spdlog::info("We loaded {} packets from {}", packets.size(), fnames[k]);
 
@@ -246,8 +239,7 @@ int main(int argc, char *argv[]){
 	GAPS::Waveform *wch9[NRB];
 	for (int i=0;i<NTOT;i++) wave[i] = NULL;
 	for (int i=0;i<NRB;i++)  wch9[i] = NULL;
-	float Phi[NRB];
-	for (int i=0;i<NRB;i++) Phi[i] = -999.0;
+	float Phi[NRB] = { -999.0 };
 	
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
@@ -273,8 +265,6 @@ int main(int argc, char *argv[]){
 	  // Now that we know the RBID, we can set the starting ch_no
 	  // Eventually we will use a function to map RB_ch to GAPS_ch
 	  usize ch_start = (rbid-1)*NCH; // first RB is #1
-	  // Let's also store the channel mask to use later. 
- 	  int ch_mask = rb_event.header.channel_mask;
 	  if (verbose) {
 	    std::cout << rb_event << std::endl;
           }
@@ -299,34 +289,16 @@ int main(int argc, char *argv[]){
 	    // Now, initialize the ch9 Waveform for this RB. 
 	    wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),
 					    ch9_times.data(), rbid,0);
-	    /*
-	    double av1=0.0, av2=0.0;
-	    for (int k=0;k<5;k++) {
-	      av1 += ch9_times.data()[8+k];
-	      av2 += ch9_times.data()[998+k];
-	    }
-	    printf("Ch9 %d : %.3f - %.3f %d\n", rbid, av1/5.0, av2/5.0,
-	    rb_event.header.stop_cell); */
-	    //printf(" %d %d", rbid, rb_event.header.stop_cell);
+	    //printf(" %d", rbid);
 	    
 	    // Now, deal with all the SiPM data
 	    for(int c=0;c<NCH;c++) {
 	      usize cw = c+ch_start; 
-	      unsigned int inEvent = ch_mask & (1 << c);
- 	      if (inEvent > 0 ) {
-		Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
-		Vec<f64> ch_times(times[c].begin(), times[c].end());
-		wave[cw] = new GAPS::Waveform(ch_volts.data(),
-					      ch_times.data(), cw,0);
-		/*
-		av1=0; av2=0;
-		for (int k=0;k<5;k++) {
-		  av1 += ch_times.data()[8+k];
-		  av2 += ch_times.data()[998+k];
-		}
-		printf("\tRB %d %ld : %.3f - %.3f\n",rbid,cw,av1/5.0,av2/5.0);
-		*/
-	      }
+	      
+	      Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
+	      Vec<f64> ch_times(times[c].begin(), times[c].end());
+	      wave[cw] = new GAPS::Waveform(ch_volts.data(),
+					    ch_times.data(), cw,0);
 	    }
 	  }
 	}
@@ -343,7 +315,10 @@ int main(int argc, char *argv[]){
 	Event.SetThreshold(CThresh);
 	Event.SetCFDFraction(CFDS_frac);
 	Event.AnalyzePulses(Qwin_low, Qwin_size);
-
+	for (int i=0;i<NTOT;i++) {
+	  float tdc = Event.GetTDC(i);
+	  //if (tdc > 5) printf("%ld: %d -> %.2f\n", evt_ctr, i, tdc);
+	}
 	// Now that we have TDC values available, process the ch9 phases
 	Event.AnalyzePhases(Phi);
 	
@@ -352,16 +327,20 @@ int main(int argc, char *argv[]){
 
 	// Now calculate beta, charge, and inner/outer tof x,y,z, etc.
 	Event.AnalyzeEvent();
-	
+	//std::cout << "here: "<< NTOT << "  " << std::endl;
+	//std::cout << "here: "<< Event.evtno << "  " << std::endl;
+	std::cout << "Event id: "<< evt_ctr << "  " << std::endl;
 	// Now fill out histograms
 	Event.FillChannelHistos(0);
+
+
+	
+
 	Event.FillPaddleHistos();
 
 	Event.UnsetWaveforms();
-	for (int i=0;i<NTOT;i++) 
-	  if ( wave[i] != NULL ) { delete wave[i]; wave[i] = NULL; }
-	for (int i=0;i<NRB;i++)  
-	  if ( wch9[i] != NULL ) { delete wch9[i]; wch9[i] = NULL; }
+	for (int i=0;i<NTOT;i++) {delete wave[i]; wave[i] = NULL;}
+	for (int i=0;i<NRB;i++)  {delete wch9[i]; wch9[i] = NULL;}
 	
 	n_tofevents++;
         break;
@@ -432,48 +411,69 @@ void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
   int status;
   float value;
 
-  int tmp_pad, tmp_vid, vol_id[NPAD] = { 0 }; 
-  int tmp_o;
+  // Another kludgy read is getting the Paddle to volume location from
+  // the paddleid_vs_volid.json adn level0_coordinates.json
+  // files. Achim has a way to do this via rust, but I need the map
+  // for development purposes here.
+  // First, read the paddle to volume ID map
+  int tmp_pad, tmp_vol, vol_id[NPAD] = { 0 }; 
+  int tmp_vid;
   float tmp_x, tmp_y, tmp_z;
   float tmp_dimx, tmp_dimy, tmp_dimz;
-  
-  // For each paddle, read in the location, orientation, dimensions and volumeID
-  snprintf(fname, 500, "%s/%s/level0_coordinates.json", srcdir, codedir);
+  snprintf(fname, 500, "%s/%s/paddleid_vs_volid.json", srcdir, codedir);
   fp = fopen(fname, "r");
-  int ctr=0;
   if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
-    while (fscanf(fp,"%*[^-0-9]%d ", &tmp_pad) != EOF) { // Read paddle ID
-      // For each paddle, we want to set the X, Y, Z locations. 
-      if (tmp_pad > 0 && tmp_pad < 161) { // Valid paddle ID
-	int j = tmp_pad;
-	status = fscanf(fp,"%*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f %*[^-0-9]%d ",
-			&tmp_x, &tmp_y, &tmp_z, &tmp_o);
-	status = fscanf(fp,"%*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f %*[^-0-9]%d ",
-			&tmp_dimx, &tmp_dimy, &tmp_dimz, &tmp_vid);
-	pad->Location[j][0]  = tmp_x;
-	pad->Location[j][1]  = tmp_y;
-	pad->Location[j][2]  = tmp_z;
-	pad->Orientation[j]  = tmp_o;
-	pad->Dimension[j][0] = tmp_dimx;
-	pad->Dimension[j][1] = tmp_dimy;
-	pad->Dimension[j][2] = tmp_dimz;
-	pad->VolumeID[j]     = tmp_vid; 
-      }
+    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9] %d", &tmp_pad, &tmp_vol) != EOF) {
+      vol_id[tmp_pad] = tmp_vol;
+      pad->VolumeID[tmp_pad] = tmp_vol; // Assign the paddle volume ID
+      //printf("%d %d\n", tmp_pad, vol_id[tmp_pad]);
     }
   }
   fclose(fp); // Finished with file
   
+  // Now that we have the vol_id for each paddle, map read in the
+  // vol_id to location map.
+  snprintf(fname, 500, "%s/%s/level0_coordinates.json", srcdir, codedir);
+  fp = fopen(fname, "r");
+  int ctr=0;
+  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
+    while (fscanf(fp,"%*[^-0-9]%d ", &tmp_vid) != EOF) { // Read VolID
+      // For each paddle, we want to set the X, Y, Z locations. So,
+      // index through the volume IDs to find a match, then set the
+      // appropriate dimensions and locations.
+      if (tmp_vid > 10000) { // Valid Volume ID
+	for (int j=0; j<NPAD; j++) {
+	  if (tmp_vid == pad->VolumeID[j]) { // Found a match, pad = j
+	    status = fscanf(fp,"%*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f ",
+			    &tmp_x, &tmp_y, &tmp_z);
+	    status = fscanf(fp,"%*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f ",
+			    &tmp_dimx, &tmp_dimy, &tmp_dimz);
+	    pad->Location[j][0] = tmp_x;
+	    pad->Location[j][1] = tmp_y;
+	    pad->Location[j][2] = tmp_z;
+	    pad->Dimension[j][0] = tmp_dimx;
+	    pad->Dimension[j][1] = tmp_dimy;
+	    pad->Dimension[j][2] = tmp_dimz;
+	  }
+	}
+      }
+    }
+  }  
+  fclose(fp); // Finished with file
+  
+  int tmp_o;
   float coax, harting;
-  // One last task: Get cable timings 
-  snprintf(fname, 500, "%s/%s/paddle_cable.json", srcdir, codedir);
+  // One last task: Get the paddle orientation from paddle_to_orientation.json
+  snprintf(fname, 500, "%s/%s/paddle_orient_cable.jaz", srcdir, codedir);
   fp = fopen(fname, "r");
   if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
-    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9]%f  %*[^-0-9]%f ",
-		  &tmp_pad, &coax, &harting) != EOF) {
+    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9]%d %*[^-0-9]%f  %*[^-0-9]%f ",
+		  &tmp_pad, &tmp_o, &coax, &harting) != EOF) {
       if (tmp_pad > 0) {
+	pad->Orientation[tmp_pad] = tmp_o;
 	pad->CoaxLen[tmp_pad]     = coax;
 	pad->HardingLen[tmp_pad]  = harting;
-	//printf("%3d %8.3f %8.3f\n", tmp_pad, coax, harting);
+	//printf("%3d %2d %8.3f %8.3f\n", tmp_pad, tmp_o, coax, harting);
       }
     }
   }

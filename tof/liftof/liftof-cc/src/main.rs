@@ -26,17 +26,23 @@ use std::time::{
 };
 //use std::collections::HashMap;
 //use std::io::Write;
-use std::process::exit;
+use std::process::{
+    Command,
+    Child,
+    exit
+};
+
 use std::{
     fs,
     thread,
     time
 };
+
+
 use std::path::{
     //Path,
     PathBuf,
 };
-
 
 use clap::{
     arg,
@@ -75,6 +81,7 @@ use tof_dataclasses::database::{
     connect_to_db,
     get_linkid_rbid_map,
     ReadoutBoard,
+    Run,
 };
 
 use tof_dataclasses::constants::PAD_CMD_32BIT;
@@ -100,6 +107,8 @@ use liftof_lib::constants::{
     DEFAULT_CALIB_EXTRA
 };
 
+
+use liftof_cc::prepare_run;
 use liftof_cc::threads::{
     event_builder,
     //flight_cpu_listener,
@@ -140,12 +149,17 @@ pub enum CommandLineCommand {
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 #[command(propagate_version = true)]
 struct LiftofCCArgs {
-  /// Write the entire TofPacket Stream to a file
-  #[arg(short, long, default_value_t = false)]
-  write_stream: bool,
+  /// Explicetly suppress writing to disk (e.g. for debugging)
+  #[arg(long, default_value_t = false)]
+  no_write_to_disk: bool,
   /// Define a run id for later identification
-  #[arg(short, long, default_value_t=0)]
-  run_id      : usize,
+  /// If this is not given, we will check the 
+  /// data path and assign the next folowing 
+  /// id which has not been used as new run id
+  /// If this argument is given, it *overrides* 
+  /// this behaviour.
+  #[arg(short, long)]
+  run_id      : Option<u32>,
   /// More detailed output for debugging
   #[arg(short, long, default_value_t = false)]
   verbose     : bool,
@@ -187,7 +201,9 @@ fn main() {
   println!(" >> for the GAPS experiment \u{1F496}");
   println!(" >> This is the Command&Control server");
   println!(" >> It connects to the MasterTriggerBoard and the ReadoutBoards");
+  println!("-----------------------------------------------\n\n");
 
+  //panic!("auf der titanic!");
   // settings 
   //let foo = LiftofSettings::new();
   //foo.to_toml(String::from("foo-settings.toml"));
@@ -201,6 +217,15 @@ fn main() {
   //trace!("trace");
   // global thread control
   let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
+  // there seems to be now way to create handles without thread
+  let mut evtbldr_handle   : thread::JoinHandle<_> = thread::spawn(||{});
+  let mut data_sink_handle : thread::JoinHandle<_> = thread::spawn(||{});
+  let mut ckpumoni_handle  : thread::JoinHandle<_> = thread::spawn(||{});
+  let mut mtb_handle       : thread::JoinHandle<_> = thread::spawn(||{});
+  let mut cmd_handle       : thread::JoinHandle<_> = thread::spawn(||{});
+  let mut sig_handle       : thread::JoinHandle<_> = thread::spawn(||{});
+  let mut rb_handles       = Vec::<thread::JoinHandle<_>>::new();
+
   let one_second = time::Duration::from_millis(1000);
 
   // deal with command line arguments
@@ -224,26 +249,18 @@ fn main() {
     } // end Some
   } // end match
   
-  //println!("=> Using the following config as parsed from the config file:\n{}", config);
-
   let mtb_address           = config.mtb_address.clone();
   info!("Will connect to the master trigger board at {}!", mtb_address);
  
   // FIXME
   let runid                 = args.run_id;
-  let write_stream          = args.write_stream;
-  if write_stream && runid == 0 {
-    panic!("Writing data to disk requires a run id != 0! Please specify runid through the --run_id parameter!");
-  }
+  let write_stream          = !args.no_write_to_disk;
   // clone the strings, so we can save the config later
   let mut write_stream_path = config.data_publisher_settings.data_dir.clone();
   let calib_file_path       = config.calibration_dir.clone();
   let runtime_nseconds      = config.runtime_sec;
-  //let write_npack_file      = config.packs_per_file;
   let db_path               = config.db_path.clone();
   let cpu_moni_interval     = config.cpu_moni_interval_sec;
-  //let flight_address        = config.fc_pub_address.clone();
-  //let flight_sub_address    = config.fc_sub_address.clone();
   let cmd_dispatch_settings = config.cmd_dispatcher_settings.clone();
   let mtb_settings          = config.mtb_settings.clone();
   let mut gds_settings      = config.data_publisher_settings.clone();
@@ -255,11 +272,11 @@ fn main() {
   let rb_ignorelist         = config.rb_ignorelist.clone();
   for k in 0..rb_ignorelist.len() {
     let bad_rb = rb_ignorelist[k];
-    println!("=> We will INGORE RB {:02}, since it is being marked as IGNORE in the config file!", bad_rb);
+    //println!("=> We will INGORE RB {:02}, since it is being marked as IGNORE in the config file!", bad_rb);
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
   nboards = rb_list.len();
-  println!("=> Expecting {} readoutboards!", rb_list.len());
+  println!("=> Will use {} readoutboards! Ignoring {:?} sicne they are mareked as 'ignore' in the config file!", rb_list.len(), rb_ignorelist );
   //debug!("--> Following RBs are expected:");
   // init thread control
   match thread_control.lock() {
@@ -276,26 +293,77 @@ fn main() {
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
     },
   }
+  //let mut handles = Vec::<std::thread::JoinHandle<_>>::new();
+  println!("=> Restarting liftof-rb clients on all RBs!");
+  let mut children = Vec::<(u8,Child)>::new();
   for rb in &rb_list {
-    debug!("     -{}", rb);
-    if verbose {
-      //println!("{}", rb);
+    // also populate the rb thread nandles
+    rb_handles.push(thread::spawn(||{}));
+    
+    let rb_address = format!("tof-rb{:02}", rb.rb_id);
+    match Command::new("ssh")
+      .args([&rb_address, "sudo", "systemctl", "restart", "liftof"])
+      .spawn() {
+      Err(err) => {
+        error!("Unable to spawn ssh process to restart liftoof-rb on RB {}! {}", rb.rb_id, err);
+      }
+      Ok(child) => {
+        children.push((rb.rb_id,child));
+      }
     }
   }
-  let mtb_link_id_map = get_linkid_rbid_map(&rb_list);
+  let mut issues = Vec::<u8>::new();
+  for rb_child in &mut children {
+    match rb_child.1.wait() {
+      Err(err) => {
+        error!("Child process failed with stderr {:?}! {}", rb_child.1.stderr, err);
+      }
+      Ok(status) => {
+        if status.success() {
+          info!("Restarted liftof-rb on {} successfully!", rb_child.0);
+          //println!("=> Restarted liftof-rb on {} successfully \u{1F389}!", rb_child.0)
+        } else {
+          error!("Restart of liftof-rb on {} failed with exit code {:?}!", rb_child.0, status.code());
+          issues.push(rb_child.0);
+        }
+      }
+    }
+  }
+  if issues.len() == 0 {
+    println!("=> Restarted liftof-rb on all RBs successfully \u{1F389}!");
+    info!("=> Restarted liftof-rb on all RBs successfully!");
+  }
   
+  let mtb_link_id_map = get_linkid_rbid_map(&rb_list);
   // A global kill timer
   let program_start = Instant::now();
 
   // Prepare outputfiles
+  let mut new_run_id : u32;
+  match prepare_run(write_stream_path.clone()) {
+    None => {
+      error!("Unable to assign new run id, falling back to 0!");
+      new_run_id = 0;
+    }
+    Some(_rid) => {
+      new_run_id = _rid;
+      info!("Will use new run id {}!", new_run_id);
+    }
+  }
+  if let Some(rid) = runid {
+    println!("=> Overriding expected run id by '-r' option!"); 
+    new_run_id = rid;
+  }
+  println!("=> Will use run id {}!", new_run_id);
+
   let mut stream_files_path = PathBuf::from(write_stream_path);
   if write_stream {
-    stream_files_path.push(runid.to_string().as_str());
+    stream_files_path.push(new_run_id.to_string().as_str());
     // Create directory if it does not exist
     // Check if the directory exists
     if let Ok(metadata) = fs::metadata(&stream_files_path) {
       if metadata.is_dir() {
-        println!("=> Directory {} for run number {} already consists and may contain files!", stream_files_path.display(), runid);
+        println!("=> Directory {} for run number {} already consists and may contain files!", stream_files_path.display(), new_run_id);
         // FILXME - in flight, we can not have interactivity.
         // But the whole system with the run ids might change 
       } 
@@ -307,7 +375,7 @@ fn main() {
     }
     // Write the settings to the directory where 
     // we want to save the run to
-    let settings_fname = format!("{}/run{}.toml",stream_files_path.display(), runid); 
+    let settings_fname = format!("{}/run{}.toml",stream_files_path.display(), new_run_id); 
     println!("=> Writing data to {}!", stream_files_path.display());
     println!("=> Writing settings to {}!", settings_fname);
     config.to_toml(settings_fname);
@@ -336,8 +404,9 @@ fn main() {
 
 
   // no cpu monitoring for cmdline calibration tasks
+  #[cfg(features="tof-ctrl")]
   if cpu_moni_interval > 0 {
-    println!("==> Starting main monitoring thread...");
+    debug!("Starting main monitoring thread...");
     let _thread_control_c = Arc::clone(&thread_control);
     // this is anonymus, but we control the thread
     // through the thread control mechanism, so we
@@ -345,7 +414,7 @@ fn main() {
     #[cfg(features="tof-ctrl")]
     let tp_to_sink_c = tp_to_sink.clone();
     #[cfg(features="tof-ctrl")]
-    let _cpu_moni_thread = thread::Builder::new()
+    cpu_moni_handle = thread::Builder::new()
         .name("cpu-monitoring".into())
         .spawn(move || {
           monitor_cpu(
@@ -359,42 +428,39 @@ fn main() {
   write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
   gds_settings.data_dir = write_stream_path;
 
-  println!("==> Starting data sink thread!");
+  debug!("Starting data sink thread!");
   let thread_control_gds = Arc::clone(&thread_control);
-  let _data_sink_thread = thread::Builder::new()
+  data_sink_handle = thread::Builder::new()
     .name("data-sink".into())
     .spawn(move || {
       global_data_sink(&tp_from_threads,
-                       //write_stream,
-                       //runid,
-                       //&gds_settings,
                        false,
                        thread_control_gds);
     })
     .expect("Failed to spawn data-sink thread!");
-  println!("==> data sink thread started!");
+  debug!("Data sink thread started!");
   let thread_control_sh = Arc::clone(&thread_control);
-  let _signal_handler_thread = thread::Builder::new()
+  sig_handle = thread::Builder::new()
     .name("signal_handler".into())
     .spawn(move || {
       signal_handler(
         thread_control_sh) 
       })
     .expect("Failed to spawn signal-handler thread!");
-  println!("==> signal handler thread started!");
+  debug!("Signal handler thread started!");
 
-  println!("==> Starting event builder and master trigger threads...");
+  debug!("Starting event builder and master trigger threads...");
   //let db_path_string    = config.db_path.clone();
   let evb_settings      = config.event_builder_settings.clone();
   let thread_control_eb = Arc::clone(&thread_control);
   let tp_to_sink_c      = tp_to_sink.clone();
-  let _evb_thread = thread::Builder::new()
+  evtbldr_handle = thread::Builder::new()
     .name("event-builder".into())
     .spawn(move || {
                     event_builder(&master_ev_rec,
                                   &ev_from_rb,
                                   &tp_to_sink_c,
-                                  runid as u32,
+                                  new_run_id as u32,
                                   //db_path_string,
                                   mtb_link_id_map,
                                   evb_settings,
@@ -404,7 +470,7 @@ fn main() {
   // master trigger
   let mtb_moni_sender = tp_to_sink.clone(); 
   let thread_control_mt = Arc::clone(&thread_control);
-  let _mtb_thread = thread::Builder::new()
+  mtb_handle = thread::Builder::new()
     .name("master-trigger".into())
     .spawn(move || {
                     master_trigger(mtb_address, 
@@ -419,7 +485,7 @@ fn main() {
   .expect("Failed to spawn master-trigger thread!");
   
   thread::sleep(one_second);
-  println!("==> Will now start rb threads..");
+  //println!("==> Will now start rb threads..");
   for n in 0..nboards {
     let mut this_rb           = rb_list[n].clone();
     let this_tp_to_sink_clone = tp_to_sink.clone();
@@ -428,13 +494,13 @@ fn main() {
       Err(err) => panic!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
       Ok(_)    => ()
     }
-    println!("==> Starting RB thread for {}", this_rb.rb_id);
+    debug!("Starting RB thread for {}", this_rb.rb_id);
     let ev_to_builder_c = ev_to_builder.clone();
     let thread_name     = format!("rb-comms-{}", this_rb.rb_id);
     let settings        = config.analysis_engine_settings.clone();
     let ack_sender      = ack_to_cmd_disp.clone();
     let tc_rb_comm      = Arc::clone(&thread_control);
-    let _rb_comm_thread = thread::Builder::new()
+    let rb_comm_thread = thread::Builder::new()
       .name(thread_name)
       .spawn(move || {
         readoutboard_communicator(ev_to_builder_c,
@@ -447,9 +513,10 @@ fn main() {
                                   tc_rb_comm);
       })
       .expect("Failed to spawn readoutboard-communicator thread!");
+    rb_handles.push(rb_comm_thread);
   } // end for loop over nboards
-  println!("==> All RB threads started!");
-  println!("==> All threads initialized!");
+  //println!("=> All RB threads started!");
+  println!("=> All threads initialized!");
   
   // Now we are ready. Let's decide what to do!
   //pb.set_style(
@@ -496,6 +563,8 @@ fn main() {
   // when we are done
   let mut dont_stop = false;
   let mut listen    = false;
+  
+  let mut command_socket : Option<zmq::Socket> = None;
   match args.command {
     CommandCC::Listen => {
       dont_stop = true;
@@ -503,7 +572,7 @@ fn main() {
       // start command dispatcher thread
       let tc = Arc::clone(&thread_control);
       let ts = tp_to_sink.clone();
-      let _cmd_dispatcher = thread::Builder::new()
+      cmd_handle = thread::Builder::new()
         .name("command-dispatcher".into())
         .spawn(move || {
           command_dispatcher(
@@ -588,7 +657,6 @@ fn main() {
       // after we opened the socket, give the RBs a chance to connect
       println!("=> Give the RBs a chance to connect and wait a bit..");
       thread::sleep(10*one_second);
-
       println!("=> Initializing Run Start!");
       match thread_control.lock() {
         Ok(mut tc) => {
@@ -596,10 +664,10 @@ fn main() {
           tc.thread_master_trg_active = true;
           tc.calibration_active       = false;
           tc.thread_event_bldr_active = true;
-          if args.write_stream {
+          if write_stream {
             tc.write_data_to_disk       = true;
           }
-          tc.run_id                   = runid as u32;
+          tc.run_id                   = new_run_id as u32;
           tc.new_run_start_flag       = true;
         },
         Err(err) => {
@@ -634,8 +702,10 @@ fn main() {
       }
       println!("Run initialized!");
       bar = ProgressBar::new_spinner();
-      bar.enable_steady_tick(Duration::from_millis(500));
+      bar.enable_steady_tick(Duration::from_secs(1));
       bar.set_message(".. acquiring data ..");
+      // move the socket out of here for further use
+      command_socket = Some(cmd_sender);
     }
     _ => {
       panic!("Unable to execute request for this command!");
@@ -663,7 +733,95 @@ fn main() {
     thread::sleep(1*one_second);
 
     if end_program {
-      println!("=> Shutting down threads...");
+      println!("=> Ending program!");
+      println!("=> Sending run termination command to the RBs");
+      let cmd          = TofCommand::DataRunStop(DEFAULT_RB_ID as u32);
+      let packet       = cmd.pack();
+      let mut payload  = String::from("BRCT").into_bytes();
+      payload.append(&mut packet.to_bytestream());
+      
+      match command_socket {
+        None => {
+          warn!("=> No command socket available! Can not shut down RBs..!");
+          // open 0MQ socket here
+          let ctx = zmq::Context::new();
+          let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+          let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
+          cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+          // after we opened the socket, give the RBs a chance to connect
+          println!("=> Give the RBs a chance to connect and wait a bit..");
+          thread::sleep(10*one_second);
+          match cmd_sender.send(&payload, 0) {
+            Err(err) => {
+              error!("Unable to send command! {err}");
+            },
+            Ok(_) => {
+              debug!("We sent {:?}", payload);
+            }
+          }
+        }
+        Some(_sock) => {
+          match _sock.send(&payload, 0) {
+            Err(err) => {
+              error!("Unable to send command! {err}");
+            },
+            Ok(_) => {
+              debug!("We sent {:?}", payload);
+            }
+          }
+        }
+      }
+      println!("=> Give the RBs a chance to connect and wait a bit..");
+      thread::sleep(10*one_second);
+
+      println!("=> Shutting down signal hanlder...");
+      // event builder first, to avoid a lot of error messages
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          tc.thread_signal_hdlr_active = false;
+        }
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        }
+      }
+      let _ = sig_handle.join();
+      //thread::sleep(2*one_second);
+    
+      // end RB threads
+      println!("=> Shutting down rb threads...");
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          for rb in &rb_list {
+            if tc.thread_rbcomm_active.contains_key(&rb.rb_id) {
+              *tc.thread_rbcomm_active.get_mut(&rb.rb_id).unwrap() = false;
+            }
+          }
+        }
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        }
+      }
+
+      for k in rb_handles {
+        let _ = k.join();
+      }
+
+      // event builder first, to avoid a lot of error messages
+      println!("=> Shutting down event builder...");
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          tc.thread_event_bldr_active = false;
+          println!("tc {}", tc);
+        }
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        }
+      } 
+      println!("=> Waiting for event builder thread to finish up...");
+      println!("=> evt builder thread is finsihed: {}", evtbldr_handle.is_finished());
+      let _ = evtbldr_handle.join();
+      println!("=> .. done!");
+
       match thread_control.lock() {
         Ok(mut tc) => {
           tc.stop_flag = true;

@@ -1,5 +1,9 @@
 # LELEWAA series
 
+# v0.10.3
+* automatically restart liftof-rb clients at run start
+* local run db on the tof flight computer
+
 # v0.10.2
 * WIP: systemd integration
 * refactored commandeering interface

@@ -438,11 +438,15 @@ impl IPBus {
       }
       IPBusPacketType::Read |
       IPBusPacketType::ReadNonIncrement => {
-        for i in 0..size as usize {
-          data.push(  ((self.buffer[8 + i * 4]  as u32) << 24) 
-                    | ((self.buffer[9 + i * 4]  as u32) << 16) 
-                    | ((self.buffer[10 + i * 4] as u32) << 8)  
-                    |   self.buffer[11 + i * 4]  as u32)
+        if (((size as usize) * 4) + 11) < MT_MAX_PACKSIZE { 
+          for i in 0..size as usize {
+            data.push(  ((self.buffer[8 + i * 4]  as u32) << 24) 
+                      | ((self.buffer[9 + i * 4]  as u32) << 16) 
+                      | ((self.buffer[10 + i * 4] as u32) << 8)  
+                      |   self.buffer[11 + i * 4]  as u32)
+          }
+        } else {
+          error!("Size {} larger than bufffer len {}", size, data.len());
         }
       },
       IPBusPacketType::Write => {

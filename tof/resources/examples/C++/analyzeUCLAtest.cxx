@@ -155,6 +155,7 @@ int main(int argc, char *argv[]){
   ("h,help", "Print help")
   ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value(""))
   ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
+  ("f,files", "List of Files", cxxopts::value<bool>()->default_value("false"))
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
   ;
   options.parse_positional({"file"});
@@ -169,7 +170,25 @@ int main(int argc, char *argv[]){
     exit(EXIT_FAILURE);
   }
   auto fname   = result["file"].as<std::string>();
+  bool files   = result["files"].as<bool>();
   bool verbose = result["verbose"].as<bool>();
+
+  FILE *fp;
+  char tmpline[500];
+  std::string fnames[1000];
+  int j=0;
+  if (files) {
+    fp = fopen(fname.c_str(), "r");
+    if (fp != NULL) {
+      while (fscanf(fp, "%s", tmpline) != EOF) fnames[j++] = tmpline;
+      fclose(fp);
+    } else {
+      printf("Unable to open file %s\n", fname.c_str());
+    }
+  } else {
+    fnames[j++] = fname;
+  }
+
   // -> Gaps relevant code starts here
  
   auto calname = result["calibration"].as<std::string>();
@@ -233,8 +252,8 @@ int main(int argc, char *argv[]){
   // at the same time
   //auto reader = Gaps::TofPacketReader(fname); 
   // for now, we have to load the whole file in memory
-  auto packets = get_tofpackets(fname);
-  spdlog::info("We loaded {} packets from {}", packets.size(), fname);
+  //auto packets = get_tofpackets(fname);
+  //spdlog::info("We loaded {} packets from {}", packets.size(), fname);
 
   u32 n_rbcalib = 0;
   u32 n_rbmoni  = 0;
@@ -244,6 +263,10 @@ int main(int argc, char *argv[]){
   u32 n_unknown = 0;
   u32 n_tofevents = 0;
   u32 highrms = 0;
+
+  for (int k=0; k<j; k++) {
+    auto packets = get_tofpackets(fnames[k]);
+    spdlog::info("We loaded {} packets from {}", packets.size(), fnames[k]);
 
   for (auto const &p : packets) {
     // print it
@@ -281,8 +304,8 @@ int main(int argc, char *argv[]){
 	GAPS::Waveform *wch9[NRB];
 	float Ped_low   = 10;
 	float Ped_win   = 70;
-	float CThresh   = 5.0;
-	float CFDS_frac = 0.4;
+	float CThresh   = 10.0;
+	float CFDS_frac = 0.25;
 	float Qwin_low  = 75;
 	float Qwin_size = 200;
 	float Ped[NTOT];
@@ -299,9 +322,9 @@ int main(int argc, char *argv[]){
 	float shift[NRB];
 
 	//in flight we should probably have array H_len[NRB] and read from database, for now i am manually setting the relavent channels
-	H_len[47] = 300; //Harting cable length in cm at UCLA
-	H_len[48] = 500;
-	H_len[37] = 305;
+	//H_len[47] = 300; //Harting cable length in cm at UCLA
+	//H_len[48] = 500;
+	//H_len[37] = 305;
 	
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
@@ -453,7 +476,7 @@ int main(int argc, char *argv[]){
 	// start with just looking at U1B signal: ch0 is 324 in wave vector, ch1 is 325
         
         
-	if (IsHit[324] && IsHit[325]) {
+	if (IsHit[432] && IsHit[433] && IsHit[436] && IsHit[437]) {
 
 	/*  if (TCFDS[324] < 90.0 || TCFDS[325] < 90.0) {
 
@@ -466,9 +489,9 @@ int main(int argc, char *argv[]){
 
 	  else { */
             std::ofstream myfile;
-            myfile.open ("RB37.csv", std::ios::app);
+            myfile.open ("RB49.csv", std::ios::app);
             myfile << evt_ctr;
-            myfile << "," << TCFDS[324] << "," << TCFDS[325] << std::endl;
+            myfile << "," << TCFDS[432] << "," << TCFDS[433] << "," << TCFDS[436] << "," << TCFDS[437] << std::endl;
             myfile.close();
 	  }
 		  
@@ -577,7 +600,7 @@ int main(int argc, char *argv[]){
       }
     }
   }
-  
+  } 
   std::cout << "-- -- packets summary:" << std::endl;
   
   std::cout << "-- -- RBCalibration     : " << n_rbcalib << "\t (packets) " <<  std::endl;

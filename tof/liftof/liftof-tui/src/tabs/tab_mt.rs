@@ -168,6 +168,10 @@ impl MTTab {
             if self.rate_queue.len() > self.queue_size {
               self.rate_queue.pop_front();
             }
+            self.lost_r_queue.push_back((met, moni.lost_rate as f64));
+            if self.lost_r_queue.len() > self.queue_size {
+              self.rate_queue.pop_front();
+            }
             self.fpgatmp_queue.push_back((met, moni.get_fpga_temp() as f64));
             if self.fpgatmp_queue.len() > self.queue_size {
               self.fpgatmp_queue.pop_front();
@@ -219,7 +223,7 @@ impl MTTab {
       self.nch_histo.fill(&(hits.len() as f32));
       for k in rb_links {
         // FIXME unwrap
-        let linked_rbid = self.mtlink_rb_map.get(&k).unwrap();
+        let linked_rbid = self.mtlink_rb_map.get(&k).unwrap_or(&0);
         self.mtb_link_histo.fill(&(*linked_rbid as f32));
       }
       self.n_events += 1;

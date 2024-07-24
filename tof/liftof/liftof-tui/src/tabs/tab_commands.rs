@@ -54,13 +54,17 @@ use tof_dataclasses::commands::{
     TofResponse
 };
 
+use tof_dataclasses::serialization::{
+    Serialization,
+    Packable
+};
+
 use crate::colors::ColorTheme;
 
-#[derive(Debug, Clone)]
 pub struct CommandTab<'a> {
-
-  pub resp_rc     : Receiver<TofResponse>,
-  pub theme       : ColorTheme,
+  pub resp_rc            : Receiver<TofResponse>,
+  pub theme              : ColorTheme,
+  pub cmd_sender         : zmq::Socket,
   // list for the command selector
   pub cmdl_state         : ListState,
   pub cmdl_items         : Vec::<ListItem<'a>>,
@@ -71,9 +75,9 @@ pub struct CommandTab<'a> {
 
 impl CommandTab<'_> {
 
-  pub fn new<'a>(resp_rc : Receiver<TofResponse>,
-                 theme   : ColorTheme) -> CommandTab<'a> {
-    
+  pub fn new<'a>(resp_rc      : Receiver<TofResponse>,
+                 cmd_pub_addr : String,
+                 theme        : ColorTheme) -> CommandTab<'a> {  
     let mut ping_cmd = TofCommandV2::new();
     ping_cmd.command_code = TofCommandCode::Ping;
     let mut start_cmd = TofCommandV2::new();
@@ -88,9 +92,15 @@ impl CommandTab<'_> {
       let this_item = format!("{:?}", k.command_code);
       cmd_select_items.push(ListItem::new(Line::from(this_item)));
     } 
+    let ctx = zmq::Context::new();
+    let cmd_sender = ctx.socket(zmq::PUB).expect("Can not create 0MQ PUB socket!"); 
+    cmd_sender.bind(&cmd_pub_addr).expect("Unable to bind to (PUB) socket!");
+    //thread::sleep(10*one_second);
+
     CommandTab {
       theme   ,
       resp_rc ,
+      cmd_sender,
       cmdl_state    : ListState::default(),
       cmdl_items    : cmd_select_items,
       cmdl_active   : false,
@@ -127,7 +137,27 @@ impl CommandTab<'_> {
     };
     self.cmdl_state.select(Some(i));
   }
-  
+ 
+  /// send the selected dommand
+  pub fn send_command(&self) {
+    info!("Sending TOF cmd {}", self.active_cmd);
+    match self.active_cmd.command_code {
+      TofCommandCode::DataRunStop => {
+        let payload = self.active_cmd.pack().to_bytestream();
+        match self.cmd_sender.send(&payload, 0) {
+          Err(err) => {
+            error!("Unable to send command! {err}");
+          },
+          Ok(_) => {
+            println!("=> Calibration  initialized!");
+          }
+        }  
+
+      }     
+      _ => ()
+    }
+  }
+
   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
 
     let main_lo = Layout::default()

@@ -8,6 +8,7 @@
 
 use std::path::Path;
 use std::thread;
+use std::fs;
 use std::sync::{
     Arc,
     Mutex,
@@ -46,7 +47,7 @@ use tof_dataclasses::packets::{
 use tof_dataclasses::serialization::{
     Serialization,
     Packable,
-    SerializationError
+    //SerializationError
 };
 
 use liftof_lib::settings::CommandDispatcherSettings;
@@ -57,6 +58,8 @@ use liftof_lib::constants::{
     DEFAULT_RB_ID,
     DEFAULT_CALIB_EXTRA
 };
+
+use crate::prepare_run;
 
 const MAX_CALI_TIME : u64 = 360; // calibration should be done within 6 mins?
 
@@ -257,6 +260,41 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                         run_id = pld.runid;
                       }
                     }
+                    // if we don't get a specific run id here, we are 
+                    // using our own
+                    let mut write_stream_path = String::from("");
+                    match thread_ctrl.lock() {
+                      Ok(tc) => {
+                        write_stream_path = tc.liftof_settings.data_publisher_settings.data_dir.clone();
+                      }
+                      Err(err) => {
+                        error!("Unable to lock thread control! {err}");
+                      }
+                    }
+                    if run_id == 0 {
+                      match prepare_run(write_stream_path.clone()) {
+                        None => {
+                          error!("Unable to assign new run id, falling back to 999!");
+                        }
+                        Some(_rid) => {
+                          run_id = _rid;
+                          info!("Will use new run id {}!", run_id);
+                        }
+                      }
+                    }
+                    write_stream_path += run_id.to_string().as_str();
+                    if let Ok(metadata) = fs::metadata(&write_stream_path) {
+                      if metadata.is_dir() {
+                        warn!("Directory {} for run number {} already consists and may contain files!", write_stream_path, run_id);
+                        // FILXME - in flight, we can not have interactivity.
+                        // But the whole system with the run ids might change 
+                      } 
+                    } else {
+                      match fs::create_dir(&write_stream_path) {
+                        Ok(())   => info!("=> Created {} to save stream data", write_stream_path),
+                        Err(err) => error!("Failed to create directory: {}! {}", write_stream_path, err),
+                      }
+                    }
                     match thread_ctrl.lock() {
                       Ok(mut tc) => {
                         tc.thread_master_trg_active  = true;
@@ -264,6 +302,8 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                         tc.thread_event_bldr_active  = true;
                         tc.calibration_active        = false;
                         tc.run_id                    = run_id;
+                        // always write data to disk for remote 
+                        // operations
                         tc.write_data_to_disk        = true;
                         tc.new_run_start_flag        = true;
                       },
@@ -426,7 +466,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
                       Ok(mut tc) => {
                         match TriggerConfig::from_bytestream(&packet.payload, &mut 0) {
-                          Err(err) => error!("Unable to decode TriggerConfig!"),
+                          Err(err) => error!("Unable to decode TriggerConfig! {err}"),
                           Ok(config) => {
                             tc.liftof_settings.mtb_settings.trigger_prescale=config.prescale;
                             tc.liftof_settings.mtb_settings.trigger_type=config.trigger_type;
@@ -442,7 +482,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
                       Ok(mut tc) => {
                         match AnalysisEngineConfig::from_bytestream(&packet.payload, &mut 0) {
-                          Err(err) => error!("Serialization Error! Cannot get analysis engine config from bytestream"),
+                          Err(err) => error!("Serialization Error! Cannot get analysis engine config from bytestream! {err}"),
                           Ok(config) => {
                           tc.liftof_settings.analysis_engine_settings.integration_start=config.integration_start;
                           tc.liftof_settings.analysis_engine_settings.integration_window=config.integration_window;
@@ -466,7 +506,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       Err(err) => error!("Unable to acquire lock for thread contorl! {err}"),
                       Ok(mut tc) => {
                         match TOFEventBuilderConfig::from_bytestream(&packet.payload, &mut 0) {
-                          Err(err)=> error!("Serialization error! Cannot get TOF event builder config from bytestream"),
+                          Err(err)=> error!("Serialization error! Cannot get TOF event builder config from bytestream! {err}"),
                           Ok(config) => {
                             tc.liftof_settings.event_builder_settings.cachesize=config.cachesize;
                             tc.liftof_settings.event_builder_settings.n_mte_per_loop=config.n_mte_per_loop;
