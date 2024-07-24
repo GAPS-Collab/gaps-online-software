@@ -291,7 +291,7 @@ pub struct MTBHeartbeat {
   pub n_events            : u64,
   pub evq_num_events_last : u64,
   pub evq_num_events_avg  : u64,
-  pub n_ev_unsent          : u64,
+  pub n_ev_unsent         : u64,
   pub n_ev_missed         : u64,
   pub trate               : u64,
   pub lost_trate          : u64,

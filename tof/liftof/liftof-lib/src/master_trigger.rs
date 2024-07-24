@@ -56,6 +56,7 @@ use tof_dataclasses::ipbus::{
 
 use crate::thread_control::ThreadControl;
 use tof_dataclasses::heartbeats::MTBHeartbeat;
+use tof_dataclasses::serialization::Packable;
 /// The DAQ packet from the MTB has a flexible size, but it will
 /// be at least this number of words long.
 const MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = 11; 
@@ -489,6 +490,7 @@ pub fn master_trigger(mt_address     : String,
   // timers - when to reconnect if no 
   // events have been received in a 
   // certain timeinterval
+  let mut heartbeat          = MTBHeartbeat::new();
   let mut mtb_timeout    = Instant::now();
   let mut moni_interval  = Instant::now();
   let mut tc_timer       = Instant::now();
@@ -661,7 +663,7 @@ pub fn master_trigger(mt_address     : String,
         if _ev.event_id > last_event_id + 1 {
           if last_event_id != 0 {
             error!("We skipped {} events!", _ev.event_id - last_event_id); 
-            n_ev_missed += (_ev.event_id - last_event_id) as u64;
+            heartbeat.n_ev_missed += (_ev.event_id - last_event_id) as u64;
             //event_id_test.push(_ev.event_id);
           }
         }
@@ -669,11 +671,11 @@ pub fn master_trigger(mt_address     : String,
         // we got an even successfully, so reset the 
         // connection timeout
         mtb_timeout = Instant::now();
-        n_events += 1;
+        heartbeat.n_events += 1;
         match mt_sender.send(_ev) {
           Err(err) => {
             error!("Can not send MasterTriggerEvent over channel! {err}");
-            n_ev_unsent += 1;
+            heartbeat.n_ev_unsent += 1;
           },
           Ok(_) => ()
         }
@@ -700,13 +702,13 @@ pub fn master_trigger(mt_address     : String,
             error!("Unable to query {}! {err}", EVQ_NUM_EVENTS);
           }
           Ok(num_ev) => {
-            evq_num_events_last = num_ev;
+            heartbeat.evq_num_events_last = num_ev as u64;
             evq_num_events += num_ev as u64;
             n_iter_loop    += 1;
-            evq_num_events_avg = evq_num_events as f64/n_iter_loop as f64;
+            heartbeat.evq_num_events_avg = evq_num_events as u64/n_iter_loop as u64;
           }
         }
-        total_elapsed += verbose_timer_elapsed;
+        heartbeat.total_elapsed += verbose_timer_elapsed as u64;
         println!("  {:<60} <<", ">> == == == == == == ==  MT HEARTBEAT == ==  == == == == ==".bright_blue().bold());
         println!("  {:<60} <<", format!(">> ==> MET (Mission Elapsed Time) (sec) {:.1}",total_elapsed).bright_blue());
         println!("  {:<60} <<", format!(">> ==> Recorded Events                  {}", n_events).bright_blue());
@@ -716,6 +718,7 @@ pub fn master_trigger(mt_address     : String,
         match TRIGGER_RATE.get(&mut bus) {
           Ok(trate) => {
             println!("  {:<60} <<", format!(">> ==> -- trigger rate, from reg. (Hz)  {}", trate).bright_blue());
+            heartbeat.trate = trate as u64;
           }
           Err(err) => {
             error!("Unable to query {}! {err}", TRIGGER_RATE);
@@ -723,9 +726,11 @@ pub fn master_trigger(mt_address     : String,
           }
         }
         match LOST_TRIGGER_RATE.get(&mut bus) {
-          Ok(trate) => {
-            println!("  {:<60} <<", format!(">> ==> -- lost trg rate, from reg. (Hz)   {}", trate).bright_blue());
+          Ok(lost_trate) => {
+            println!("  {:<60} <<", format!(">> ==> -- lost trg rate, from reg. (Hz)   {}", lost_trate).bright_blue());
+            heartbeat.lost_trate = lost_trate as u64;
           }
+        
           Err(err) => {
             error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
             println!("  {:<60} <<", String::from(">> ==> -- lost trigger rate, from reg. (Hz)   N/A").bright_blue());
@@ -740,7 +745,17 @@ pub fn master_trigger(mt_address     : String,
         println!("  {:<60} <<", ">> == == == == == == ==  END HEARTBEAT = ==  == == == == ==".bright_blue().bold());
         verbose_timer = Instant::now();
       }
+
+    }
+    if verbose_timer.elapsed().as_secs() > 120 {
+      let pack = heartbeat.pack();
+      match moni_sender.send(pack) {
+        Err(err) => {
+          error!("Can not send MTB Heartbeat over channel! {err}");
+        },
+        Ok(_) => ()
+      }
     }
   }
-}
+} 
 
