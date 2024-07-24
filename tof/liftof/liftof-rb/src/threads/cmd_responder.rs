@@ -343,11 +343,12 @@ pub fn cmd_responder(cmd_server_address        : String,
                       TofCommand::DataRunStop(value)   => {
                         // MSB fourth 8 bits are RB ID
                         let rb_id: u8 = (value | MASK_CMD_8BIT) as u8;
+                        println!("=> Received command to end run for board ids {rb_id}!");
 
                         let my_rb_id = get_board_id().unwrap() as u8;
                         // if this RB is the one then do stuff
                         if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
-                          println!("Received command to end run!");
+                          println!("=> Received command to end run!");
                           // default is not active for run config
 
                           let rc = RunConfig::new();

@@ -356,6 +356,12 @@ fn packet_sorter(packet_type : &PacketType,
         PacketType::HeartBeatDataSink  => { 
           *pm.get_mut("HeartBeatDataSink").unwrap() += 1;
         },
+        PacketType::MTBHeartbeat => {
+          *pm.get_mut("MTBHeartbeat").unwrap() += 1;
+        }
+        PacketType::EVTBLDRHeartbeat => { 
+          *pm.get_mut("EVTBLDRHeartbeat").unwrap() += 1;
+        }
         PacketType::MasterTrigger      => { 
           *pm.get_mut("MasterTrigger").unwrap() += 1;
         },
@@ -379,6 +385,9 @@ fn packet_sorter(packet_type : &PacketType,
         },
         PacketType::TofCommand         => { 
           *pm.get_mut("TofCommand").unwrap() += 1;
+        },
+        PacketType::TofResponse        => {
+          *pm.get_mut("TofResponse").unwrap() += 1;
         },
         PacketType::RBCommand          => { 
           *pm.get_mut("RBCommand").unwrap() += 1;
@@ -738,6 +747,8 @@ impl<'a> TabbedInterface<'a> {
     self.rbwf_tab    .theme.update(&cs);
     self.ts_tab      .theme.update(&cs);
     self.te_tab      .theme.update(&cs);
+    self.cmd_tab     .theme.update(&cs);
+    self.pd_tab      .theme.update(&cs);
     self.color_set = cs;
   }
   
@@ -985,15 +996,20 @@ impl<'a> TabbedInterface<'a> {
         }
       }
     }
+    if self.settings_tab.colortheme_popup {
+      self.settings_tab.colortheme_popup = false;
+    }
+
     match key_code {
       KeyCode::Char('a') => {
         if self.ui_menu.get_active_menu_item() == UIMenuItem::Settings {
           self.settings_tab.ctl_active = true;
-          self.settings_tab.ctl_state.select(Some(0));
+          //self.settings_tab.ctl_state.select(Some(0));
         }
       }
       KeyCode::Enter => {
         //info!("{:?}", self.ui_menu.get_active_menu_item());
+        self.settings_tab.ctl_active = false;
         match self.active_menu {
           ActiveMenu::Events  => {
             match self.te_menu.get_active_menu_item() {
@@ -1065,7 +1081,12 @@ impl<'a> TabbedInterface<'a> {
                 self.active_menu = ActiveMenu::Paddles;
               }
               UIMenuItem::Commands => {
+                self.cmd_tab.send_command(); 
                 //self.active_menu = ActiveMenu::Paddles;
+              }
+              UIMenuItem::Settings => {
+                self.settings_tab.ctl_active       = true;
+                self.settings_tab.colortheme_popup = true;
               }
               UIMenuItem::Quit => {
                 info!("Feeling a desire of the user to quit this application...");
@@ -1078,6 +1099,7 @@ impl<'a> TabbedInterface<'a> {
         }
       }
       KeyCode::Right => {
+        self.settings_tab.ctl_active = false;
         match self.active_menu {
           ActiveMenu::MainMenu => {
             self.ui_menu.next();
@@ -1122,6 +1144,7 @@ impl<'a> TabbedInterface<'a> {
         }
       }
       KeyCode::Left => {
+        self.settings_tab.ctl_active = false;
         match self.active_menu {
           ActiveMenu::MainMenu => {
             self.ui_menu.prev();
@@ -1227,191 +1250,6 @@ impl<'a> TabbedInterface<'a> {
         self.settings_tab.ctl_active = false;
       }
     }
-    //match self.ui_menu.active_menu_item {
-    //  // if we are in the RBTab, 
-    //  // route input accordingly
-    //  MenuItem::Settings   => {
-    //    match key_code {
-    //      KeyCode::Char('h') => self.ui_menu.active_menu_item = MenuItem::Home,
-    //      KeyCode::Char('a') => {
-    //        self.settings_tab.ctl_active = true;
-    //        self.settings_tab.ctl_state.select(Some(0));
-    //      }
-    //      KeyCode::Up  => {
-    //        if self.settings_tab.ctl_active {
-    //          self.settings_tab.previous_ct();
-    //          match self.settings_tab.get_colorset() {
-    //            None => info!("Did not get a new colorset!"),
-    //            Some(cs) => {
-    //              self.update_color_theme(cs);
-    //            }
-    //          }
-    //        }
-    //      },
-    //      KeyCode::Down => {
-    //        if self.settings_tab.ctl_active {
-    //          self.settings_tab.next_ct();
-    //          match self.settings_tab.get_colorset() {
-    //            None => info!("Did not get a new colorset!"),
-    //            Some(cs) => {
-    //              self.update_color_theme(cs);
-    //            }
-    //          }
-    //        }
-    //      },
-    //      KeyCode::Char('q') => {
-    //        self.quit_request = true;
-    //        //return true; // we want to quit
-    //                     // the app
-    //      },
-    //      _ => (),
-    //    }
-    //  },
-    //  MenuItem::ReadoutBoards => {
-    //    self.settings_tab.ctl_active = false;
-
-    //    match key_code {
-    //      KeyCode::Right => {
-    //        if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-    //          self.wf_tab.list_focus = RBLTBListFocus::LTBList;
-    //        }
-    //      },
-    //      KeyCode::Left => {
-    //        if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-    //          self.wf_tab.list_focus = RBLTBListFocus::RBList;
-    //        }
-    //      },
-    //      KeyCode::Up  => {
-    //        if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-    //          match self.wf_tab.list_focus {
-    //            RBLTBListFocus::RBList => {
-    //              self.wf_tab.previous_rb();
-    //            },
-    //            RBLTBListFocus::LTBList => {
-    //              self.wf_tab.previous_ltb();    
-    //            }
-    //          }
-    //        }
-    //      },
-    //      KeyCode::Down => {
-    //        if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-    //          match self.wf_tab.list_focus {
-    //            RBLTBListFocus::RBList => {
-    //              self.wf_tab.next_rb();
-    //            },
-    //            RBLTBListFocus::LTBList => {
-    //              self.wf_tab.next_ltb();    
-    //            }
-    //          }
-    //        }
-    //      },
-    //      KeyCode::Char('h') => {
-    //        self.ui_menu.active_menu_item = MenuItem::Home;
-    //        self.rb_menu.active_menu_item = RBMenuItem::Home;
-    //      },
-    //      KeyCode::Char('i') => {
-    //        if self.wf_tab.view == RBTabView::PAMoniData {
-    //          self.pa_menu.active_menu_item = PAMoniMenuItem::Biases;
-    //          self.wf_tab.pa_show_biases = true;
-    //        } else {
-    //          self.rb_menu.active_menu_item = RBMenuItem::Info;
-    //          self.wf_tab.view = RBTabView::Info;
-    //        }
-    //      },
-    //      KeyCode::Char('w') => {
-    //        self.rb_menu.active_menu_item = RBMenuItem::Waveforms;
-    //        self.wf_tab.view = RBTabView::Waveform;
-    //      },
-    //      KeyCode::Char('r') => {
-    //        self.rb_menu.active_menu_item = RBMenuItem::RBMoniData;
-    //        self.wf_tab.view = RBTabView::RBMoniData;
-    //      },
-    //      KeyCode::Char('p') => {
-    //        self.rb_menu.active_menu_item = RBMenuItem::PAMoniData;
-    //        self.wf_tab.view = RBTabView::PAMoniData;
-    //      },
-    //      KeyCode::Char('b') => {
-    //        if self.wf_tab.view == RBTabView::PAMoniData {
-    //          self.pa_menu.active_menu_item = PAMoniMenuItem::Back;
-    //          self.wf_tab.view = RBTabView::Info;
-    //        } else {
-    //          self.rb_menu.active_menu_item = RBMenuItem::PBMoniData;
-    //          self.wf_tab.view = RBTabView::PBMoniData;
-    //        }
-    //      },
-    //      KeyCode::Char('l') => {
-    //        self.rb_menu.active_menu_item = RBMenuItem::LTBMoniData;
-    //        self.wf_tab.view = RBTabView::LTBMoniData;
-    //      },
-    //      KeyCode::Char('s') => {
-    //        self.rb_menu.active_menu_item = RBMenuItem::SelectRB;
-    //        self.wf_tab.view = RBTabView::SelectRB;
-    //      },
-    //      KeyCode::Char('t') => {
-    //        if self.wf_tab.view == RBTabView::PAMoniData {
-    //          self.pa_menu.active_menu_item = PAMoniMenuItem::Temperatures;
-    //          self.wf_tab.pa_show_biases = false;
-    //        }
-    //      }
-    //      KeyCode::Char('q') => {
-    //        self.quit_request = true;
-    //        //return true; // we want to quit the app
-    //      },
-    //      _ => ()
-    //    }
-    //  },
-    //  MenuItem::TofHits => {
-    //    match key_code {
-    //      KeyCode::Char('h') => {
-    //        self.ui_menu.active_menu_item = MenuItem::Home;
-    //        self.th_menu.active_menu_item = THMenuItem::Home;
-    //        self.th_tab.view = TofHitView::Pulses;
-    //      }
-    //      KeyCode::Char('i') => {
-    //        self.th_menu.active_menu_item = THMenuItem::Hits;
-    //        self.th_tab.view = TofHitView::Hits;
-    //      }
-    //      KeyCode::Char('p') => {
-    //        self.th_menu.active_menu_item = THMenuItem::Pulses;
-    //        self.th_tab.view = TofHitView::Pulses;
-    //      }
-    //      KeyCode::Char('a') => {
-    //        self.th_menu.active_menu_item = THMenuItem::Paddles;
-    //        self.th_tab.view = TofHitView::Paddles;
-    //      }
-    //      KeyCode::Char('s') => {
-    //        self.th_menu.active_menu_item = THMenuItem::SelectPaddle;
-    //        self.th_tab.view = TofHitView::SelectPaddle;
-    //      }
-    //      KeyCode::Char('q') => {
-    //        self.quit_request = true;
-    //        //return true; // we want to quit the app
-    //      }
-    //      _ => ()
-    //    }
-    //  }
-    //  _ => {
-    //    self.settings_tab.ctl_active = false;
-    //    match key_code {
-    //      // it seems we have to carry thos allong for every tab
-    //      KeyCode::Char('h') => self.ui_menu.active_menu_item = MenuItem::Home,
-    //      KeyCode::Char('t') => self.ui_menu.active_menu_item = MenuItem::TofEvents,
-    //      KeyCode::Char('r') => self.ui_menu.active_menu_item = MenuItem::ReadoutBoards,
-    //      KeyCode::Char('y') => self.ui_menu.active_menu_item = MenuItem::TofSummary,
-    //      KeyCode::Char('w') => self.ui_menu.active_menu_item = MenuItem::RBWaveform,
-    //      KeyCode::Char('f') => self.ui_menu.active_menu_item = MenuItem::TofHits,
-    //      KeyCode::Char('e') => self.ui_menu.active_menu_item = MenuItem::Telemetry,
-    //      KeyCode::Char('s') => self.ui_menu.active_menu_item = MenuItem::Settings,
-    //      KeyCode::Char('m') => self.ui_menu.active_menu_item = MenuItem::MasterTrigger,
-    //      KeyCode::Char('c') => self.ui_menu.active_menu_item = MenuItem::TOFCpu,
-    //      KeyCode::Char('q') => {
-    //        self.quit_request = true;
-    //        //return true; // trigger exit
-    //      },
-    //      _ => trace!("Some other key pressed!"),
-    //    }
-    //  }
-    //} // end match ui_menu
     info!("Returning false");
     false // if we arrive here, we don't
           // want to exit the app
@@ -1458,6 +1296,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   pm.insert(String::from("RBEvent"          ) ,0); 
   pm.insert(String::from("TofEvent"         ) ,0); 
   pm.insert(String::from("HeartBeatDataSink") ,0); 
+  pm.insert(String::from("MTBHeartbeat"     ) ,0); 
+  pm.insert(String::from("EVTBLDRHeartbeat" ) ,0); 
   pm.insert(String::from("MasterTrigger"    ) ,0);
   pm.insert(String::from("RBEventHeader"    ) ,0);
   pm.insert(String::from("CPUMoniData"      ) ,0); 
@@ -1469,6 +1309,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   pm.insert(String::from("RBEventMemoryView") ,0); 
   pm.insert(String::from("RBCalibration"    ) ,0); 
   pm.insert(String::from("TofCommand"       ) ,0); 
+  pm.insert(String::from("TofResponse"      ) ,0); 
   pm.insert(String::from("RBCommand"        ) ,0); 
   pm.insert(String::from("MultiPacket"      ) ,0); 
   pm.insert(String::from("RBPing"           ) ,0); 
@@ -1666,7 +1507,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   
   
   }
-  let cmd_tab         = CommandTab::new(tr_recv, color_theme.clone());
+  let cmd_sender_addr = String::from("tcp://192.168.37.5:42000");
+  let cmd_tab         = CommandTab::new(tr_recv, cmd_sender_addr, color_theme.clone());
   let pd_tab          = PaddleTab::new(te_recv, paddle_map, rbcalibrations, color_theme.clone());
   let active_menu     = ActiveMenu::MainMenu;
   let tabs            = TabbedInterface::new(ui_menu,

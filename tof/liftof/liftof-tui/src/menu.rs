@@ -21,7 +21,6 @@ pub enum ActiveMenu {
   Monitoring,
 }
 
-
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum MenuItem {
   Home,

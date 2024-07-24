@@ -760,6 +760,17 @@ impl PyMasterTrigger {
     }
   }
 
+  fn use_tiu_aux_link(&mut self, use_it : bool) -> PyResult<()> {
+    match mt_api::control::use_tiu_aux_link(&mut self.ipbus, use_it) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   fn stop_all_triggers(&mut self) -> PyResult<()> {
     match mt_api::control::unset_all_triggers(&mut self.ipbus) {
       Ok(_) => {
