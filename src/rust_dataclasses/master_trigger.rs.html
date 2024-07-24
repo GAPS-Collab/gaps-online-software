@@ -1069,6 +1069,21 @@
 <a href="#1069" id="1069">1069</a>
 <a href="#1070" id="1070">1070</a>
 <a href="#1071" id="1071">1071</a>
+<a href="#1072" id="1072">1072</a>
+<a href="#1073" id="1073">1073</a>
+<a href="#1074" id="1074">1074</a>
+<a href="#1075" id="1075">1075</a>
+<a href="#1076" id="1076">1076</a>
+<a href="#1077" id="1077">1077</a>
+<a href="#1078" id="1078">1078</a>
+<a href="#1079" id="1079">1079</a>
+<a href="#1080" id="1080">1080</a>
+<a href="#1081" id="1081">1081</a>
+<a href="#1082" id="1082">1082</a>
+<a href="#1083" id="1083">1083</a>
+<a href="#1084" id="1084">1084</a>
+<a href="#1085" id="1085">1085</a>
+<a href="#1086" id="1086">1086</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>pyo3::prelude::<span class="kw-2">*</span>;
@@ -1161,6 +1176,10 @@
   }
 
   <span class="doccomment">/// Check if the TIU emulation mode is on
+  ///
+  /// # Arguments:
+  ///
+  /// * bus : IPBus 
   </span><span class="kw">fn </span>get_tiu_emulation_mode(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; PyResult&lt;u32&gt; {
     <span class="kw">match </span>TIU_EMULATION_MODE.get(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus) {
       <span class="prelude-val">Ok</span>(mode) =&gt; {
@@ -1823,6 +1842,17 @@
   <span class="kw">fn </span>set_central_track_trigger(<span class="kw-2">&amp;mut </span><span class="self">self</span>, prescale : u32) -&gt; PyResult&lt;()&gt; {
     <span class="kw">match </span>TRACK_CENTRAL_PRESCALE.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, prescale) {
       <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt;  {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+      }
+      <span class="prelude-val">Err</span>(err) =&gt; {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  <span class="kw">fn </span>use_tiu_aux_link(<span class="kw-2">&amp;mut </span><span class="self">self</span>, use_it : bool) -&gt; PyResult&lt;()&gt; {
+    <span class="kw">match </span>mt_api::control::use_tiu_aux_link(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, use_it) {
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
       <span class="prelude-val">Err</span>(err) =&gt; {

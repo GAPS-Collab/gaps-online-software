@@ -233,6 +233,18 @@
 <a href="#233" id="233">233</a>
 <a href="#234" id="234">234</a>
 <a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>ratatui::prelude::<span class="kw-2">*</span>;
 
 <span class="comment">//use ratatui::symbols;
@@ -263,6 +275,8 @@
 //    Tabs,
 </span>};
 
+<span class="kw">use </span>tui_popup::Popup;
+
 <span class="kw">use </span><span class="kw">crate</span>::colors::{
     ColorTheme,
     ColorSet,
@@ -274,12 +288,14 @@
     COLORSETMATRIX,
     COLORSETSTARFIELD,
     COLORSETGAPS,
+    COLORSETPRINCESSPEACH
 };
 
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>SettingsTab&lt;<span class="lifetime">'a</span>&gt; {
   <span class="kw">pub </span>theme      : ColorTheme,
+  <span class="kw">pub </span>colortheme_popup : bool,
   <span class="kw">pub </span>ctl_state  : ListState,
   <span class="kw">pub </span>ctl_items  : Vec::&lt;ListItem&lt;<span class="lifetime">'a</span>&gt;&gt;,
   <span class="kw">pub </span>ctl_active : bool,
@@ -295,9 +311,11 @@
                              ListItem::new(Line::from(<span class="string">"Dune"</span>)),
                              ListItem::new(Line::from(<span class="string">"LowerDecks"</span>)),
                              ListItem::new(Line::from(<span class="string">"Matrix"</span>)),
-                             ];
+                             ListItem::new(Line::from(<span class="string">"PrincessPeach"</span>)),
+    ];
     SettingsTab {
       theme,
+      colortheme_popup : <span class="bool-val">false</span>,
       ctl_state  : ListState::default(),
       ctl_items  : ct_list_items,
       ctl_active : <span class="bool-val">false</span>,
@@ -348,6 +366,7 @@
           <span class="number">5 </span>=&gt; <span class="prelude-val">Some</span>(COLORSETDUNE),
           <span class="number">6 </span>=&gt; <span class="prelude-val">Some</span>(COLORSETLD),
           <span class="number">7 </span>=&gt; <span class="prelude-val">Some</span>(COLORSETMATRIX),
+          <span class="number">8 </span>=&gt; <span class="prelude-val">Some</span>(COLORSETPRINCESSPEACH),
           <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
       }
@@ -464,6 +483,11 @@
     frame.render_widget(side_view, main_cols0[<span class="number">0</span>]);
     frame.render_widget(refresh_view, sub_rows0[<span class="number">1</span>]);
     frame.render_stateful_widget(color_theme_list, sub_rows0[<span class="number">0</span>], <span class="kw-2">&amp;mut </span><span class="self">self</span>.ctl_state );
+    <span class="kw">if </span><span class="self">self</span>.colortheme_popup {
+      <span class="kw">let </span>popup = Popup::new(<span class="string">"New color theme selected!"</span>, <span class="string">"Any key to continue!"</span>)
+      .style(<span class="self">self</span>.theme.style());
+      frame.render_widget(<span class="kw-2">&amp;</span>popup, frame.size());
+    }
   }
 }
 

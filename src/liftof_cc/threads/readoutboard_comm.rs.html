@@ -189,6 +189,8 @@
 <a href="#189" id="189">189</a>
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Routines for RB commiunication and data reception 
 
 </span><span class="comment">//use std::time::{SystemTime, UNIX_EPOCH};
@@ -292,7 +294,8 @@
         <span class="prelude-val">Ok</span>(tc) =&gt; {
           <span class="comment">//println!("== ==&gt; [rbcomm] tc lock acquired!");
           </span><span class="kw">if </span>tc.stop_flag {
-            <span class="kw">break</span>;
+            <span class="comment">//println!("= =&gt; [rbcomm] initiate ending thread for RB {}!", board_id);
+            </span><span class="kw">break</span>;
           }
         },
         <span class="prelude-val">Err</span>(err) =&gt; {
@@ -360,7 +363,7 @@
                 <span class="comment">// Currently, we will just forward all other packets
                 // directly to the data sink
                 </span><span class="kw">if </span>tp.packet_type == PacketType::RBCalibration {
-                  <span class="macro">println!</span>(<span class="string">"== ==&gt; [rb_comm] Received RBCalibration!"</span>);
+                  <span class="macro">println!</span>(<span class="string">"= =&gt; [rb_comm] Received RBCalibration!"</span>);
                 }
                 <span class="kw">match </span>tp_to_sink.send(tp) {
                   <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not send tof packet to data sink! Err {err}"</span>),
@@ -378,6 +381,7 @@
     //  println!("[RBCOM] =&gt; Received {n_received} packets!");
     //}
   </span>} <span class="comment">// end loop
-</span>} <span class="comment">// end fun
+  </span><span class="macro">println!</span>(<span class="string">"= =&gt; [rbcomm] thread for RB {} finished! (not recoverable)"</span>, board_id);
+} <span class="comment">// end fun
 
 </span></code></pre></div></section></main></body></html>

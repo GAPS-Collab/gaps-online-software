@@ -479,6 +479,7 @@
 <a href="#479" id="479">479</a>
 <a href="#480" id="480">480</a>
 <a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::time::{
     <span class="comment">//Instant,
     </span>Duration,
@@ -824,11 +825,12 @@
                       </span>TofCommand::DataRunStop(value)   =&gt; {
                         <span class="comment">// MSB fourth 8 bits are RB ID
                         </span><span class="kw">let </span>rb_id: u8 = (value | MASK_CMD_8BIT) <span class="kw">as </span>u8;
+                        <span class="macro">println!</span>(<span class="string">"=&gt; Received command to end run for board ids {rb_id}!"</span>);
 
                         <span class="kw">let </span>my_rb_id = get_board_id().unwrap() <span class="kw">as </span>u8;
                         <span class="comment">// if this RB is the one then do stuff
                         </span><span class="kw">if </span>rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
-                          <span class="macro">println!</span>(<span class="string">"Received command to end run!"</span>);
+                          <span class="macro">println!</span>(<span class="string">"=&gt; Received command to end run!"</span>);
                           <span class="comment">// default is not active for run config
 
                           </span><span class="kw">let </span>rc = RunConfig::new();

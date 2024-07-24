@@ -744,6 +744,38 @@
 <a href="#744" id="744">744</a>
 <a href="#745" id="745">745</a>
 <a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard communications
 //!
 //! The MTB (MasterTriggerBoard) is currently
@@ -802,6 +834,7 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::thread_control::ThreadControl;
 <span class="kw">use </span>tof_dataclasses::heartbeats::MTBHeartbeat;
+<span class="kw">use </span>tof_dataclasses::serialization::Packable;
 <span class="doccomment">/// The DAQ packet from the MTB has a flexible size, but it will
 /// be at least this number of words long.
 </span><span class="kw">const </span>MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = <span class="number">11</span>; 
@@ -991,15 +1024,30 @@
   <span class="kw">if </span>data.len() &lt; <span class="number">4 </span>{
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::BrokenPackage);
   }
+  <span class="kw">let </span>tiu_link_bad   = !(tiu_link_is_good(bus)<span class="question-mark">?</span>);
+  <span class="kw">let </span>tiu_busy_len   = TIU_BUSY_LENGTH.get(bus)<span class="question-mark">?</span>;
+  <span class="kw">let </span>tiu_aux_link   = TIU_USE_AUX_LINK.get(bus)<span class="question-mark">? </span><span class="kw">as </span>u8;
+  <span class="kw">let </span>tiu_emu_mode   = TIU_EMULATION_MODE.get(bus)<span class="question-mark">? </span><span class="kw">as </span>u8;
+  <span class="comment">//let tiu_bad        = TIU_BAD.get(bus)? as u8;
+  </span><span class="kw">let </span>tiu_busy_stuck = TIU_BUSY_STUCK.get(bus)<span class="question-mark">? </span><span class="kw">as </span>u8;
+  <span class="kw">let </span>tiu_busy_ign   = TIU_BUSY_IGNORE.get(bus)<span class="question-mark">? </span><span class="kw">as </span>u8;
+  <span class="kw">let </span><span class="kw-2">mut </span>tiu_status = <span class="number">0u8</span>;
+  <span class="macro">println!</span> (<span class="string">"tiu status {}"</span>, tiu_status);
+  tiu_status         = tiu_status | (tiu_emu_mode);
+  tiu_status         = tiu_status | (tiu_aux_link &lt;&lt; <span class="number">1</span>);
+  tiu_status         = tiu_status | ((tiu_link_bad <span class="kw">as </span>u8) &lt;&lt; <span class="number">2</span>);
+  tiu_status         = tiu_status | (tiu_busy_stuck &lt;&lt; <span class="number">3</span>);
+  tiu_status         = tiu_status | (tiu_busy_ign &lt;&lt; <span class="number">4</span>);
+  <span class="macro">println!</span> (<span class="string">"tiu status {}"</span>, tiu_status);
+  <span class="kw">let </span>daq_queue_len  = EVQ_NUM_EVENTS.get(bus)<span class="question-mark">? </span><span class="kw">as </span>u16;
+  moni.tiu_status    = tiu_status;
+  moni.tiu_busy_len  = tiu_busy_len;
+  moni.daq_queue_len = daq_queue_len;
   <span class="comment">// sensors are 12 bit
   </span><span class="kw">let </span>first_word   = <span class="number">0x00000fff</span>;
   <span class="kw">let </span>second_word  = <span class="number">0x0fff0000</span>;
   <span class="comment">//println!("[get_mtbmonidata] =&gt; Received data from registers {:?} data", data);
-  </span>moni.calibration = ( data[<span class="number">0</span>] &amp; first_word  ) <span class="kw">as </span>u16;
-  moni.vccpint     = ((data[<span class="number">0</span>] &amp; second_word ) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;  
-  moni.vccpaux     = ( data[<span class="number">1</span>] &amp; first_word  ) <span class="kw">as </span>u16;  
-  moni.vccoddr     = ((data[<span class="number">1</span>] &amp; second_word ) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;  
-  moni.temp        = ( data[<span class="number">2</span>] &amp; first_word  ) <span class="kw">as </span>u16;  
+  </span>moni.temp        = ( data[<span class="number">2</span>] &amp; first_word  ) <span class="kw">as </span>u16;  
   moni.vccint      = ((data[<span class="number">2</span>] &amp; second_word ) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;  
   moni.vccaux      = ( data[<span class="number">3</span>] &amp; first_word  ) <span class="kw">as </span>u16;  
   moni.vccbram     = ((data[<span class="number">3</span>] &amp; second_word ) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;  
@@ -1224,7 +1272,9 @@
     }
   }
 
-  <span class="comment">// reset the DAQ event queue before start
+  <span class="comment">//TIU_BUSY_IGNORE.set(&amp;mut bus, 1);
+
+  // reset the DAQ event queue before start
   </span><span class="kw">match </span>reset_daq(<span class="kw-2">&amp;mut </span>bus) {<span class="comment">//, &amp;mt_address) {
     </span><span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not reset DAQ! {err}"</span>),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
@@ -1235,7 +1285,8 @@
   // timers - when to reconnect if no 
   // events have been received in a 
   // certain timeinterval
-  </span><span class="kw">let </span><span class="kw-2">mut </span>mtb_timeout    = Instant::now();
+  </span><span class="kw">let </span><span class="kw-2">mut </span>heartbeat          = MTBHeartbeat::new();
+  <span class="kw">let </span><span class="kw-2">mut </span>mtb_timeout    = Instant::now();
   <span class="kw">let </span><span class="kw-2">mut </span>moni_interval  = Instant::now();
   <span class="kw">let </span><span class="kw-2">mut </span>tc_timer       = Instant::now();
   <span class="kw">let </span>mtb_timeout_sec    = settings.mtb_timeout_sec;
@@ -1407,7 +1458,7 @@
         <span class="kw">if </span>_ev.event_id &gt; last_event_id + <span class="number">1 </span>{
           <span class="kw">if </span>last_event_id != <span class="number">0 </span>{
             <span class="macro">error!</span>(<span class="string">"We skipped {} events!"</span>, _ev.event_id - last_event_id); 
-            n_ev_missed += (_ev.event_id - last_event_id) <span class="kw">as </span>u64;
+            heartbeat.n_ev_missed += (_ev.event_id - last_event_id) <span class="kw">as </span>u64;
             <span class="comment">//event_id_test.push(_ev.event_id);
           </span>}
         }
@@ -1415,11 +1466,11 @@
         <span class="comment">// we got an even successfully, so reset the 
         // connection timeout
         </span>mtb_timeout = Instant::now();
-        n_events += <span class="number">1</span>;
+        heartbeat.n_events += <span class="number">1</span>;
         <span class="kw">match </span>mt_sender.send(_ev) {
           <span class="prelude-val">Err</span>(err) =&gt; {
             <span class="macro">error!</span>(<span class="string">"Can not send MasterTriggerEvent over channel! {err}"</span>);
-            n_ev_unsent += <span class="number">1</span>;
+            heartbeat.n_ev_unsent += <span class="number">1</span>;
           },
           <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
         }
@@ -1446,13 +1497,13 @@
             <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, EVQ_NUM_EVENTS);
           }
           <span class="prelude-val">Ok</span>(num_ev) =&gt; {
-            evq_num_events_last = num_ev;
+            heartbeat.evq_num_events_last = num_ev <span class="kw">as </span>u64;
             evq_num_events += num_ev <span class="kw">as </span>u64;
             n_iter_loop    += <span class="number">1</span>;
-            evq_num_events_avg = evq_num_events <span class="kw">as </span>f64/n_iter_loop <span class="kw">as </span>f64;
+            heartbeat.evq_num_events_avg = evq_num_events <span class="kw">as </span>u64/n_iter_loop <span class="kw">as </span>u64;
           }
         }
-        total_elapsed += verbose_timer_elapsed;
+        heartbeat.total_elapsed += verbose_timer_elapsed <span class="kw">as </span>u64;
         <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="string">"&gt;&gt; == == == == == == ==  MT HEARTBEAT == ==  == == == == =="</span>.bright_blue().bold());
         <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; MET (Mission Elapsed Time) (sec) {:.1}"</span>,total_elapsed).bright_blue());
         <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Recorded Events                  {}"</span>, n_events).bright_blue());
@@ -1462,6 +1513,7 @@
         <span class="kw">match </span>TRIGGER_RATE.get(<span class="kw-2">&amp;mut </span>bus) {
           <span class="prelude-val">Ok</span>(trate) =&gt; {
             <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, from reg. (Hz)  {}"</span>, trate).bright_blue());
+            heartbeat.trate = trate <span class="kw">as </span>u64;
           }
           <span class="prelude-val">Err</span>(err) =&gt; {
             <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, TRIGGER_RATE);
@@ -1469,9 +1521,11 @@
           }
         }
         <span class="kw">match </span>LOST_TRIGGER_RATE.get(<span class="kw-2">&amp;mut </span>bus) {
-          <span class="prelude-val">Ok</span>(trate) =&gt; {
-            <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- lost trg rate, from reg. (Hz)   {}"</span>, trate).bright_blue());
+          <span class="prelude-val">Ok</span>(lost_trate) =&gt; {
+            <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- lost trg rate, from reg. (Hz)   {}"</span>, lost_trate).bright_blue());
+            heartbeat.lost_trate = lost_trate <span class="kw">as </span>u64;
           }
+        
           <span class="prelude-val">Err</span>(err) =&gt; {
             <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, LOST_TRIGGER_RATE);
             <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, String::from(<span class="string">"&gt;&gt; ==&gt; -- lost trigger rate, from reg. (Hz)   N/A"</span>).bright_blue());
@@ -1486,8 +1540,18 @@
         <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="string">"&gt;&gt; == == == == == == ==  END HEARTBEAT = ==  == == == == =="</span>.bright_blue().bold());
         verbose_timer = Instant::now();
       }
+
+    }
+    <span class="kw">if </span>verbose_timer.elapsed().as_secs() &gt; <span class="number">120 </span>{
+      <span class="kw">let </span>pack = heartbeat.pack();
+      <span class="kw">match </span>moni_sender.send(pack) {
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"Can not send MTB Heartbeat over channel! {err}"</span>);
+        },
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
+      }
     }
   }
-}
+} 
 
 </code></pre></div></section></main></body></html>

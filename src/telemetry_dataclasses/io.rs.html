@@ -105,6 +105,10 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::path::Path;
 <span class="kw">use </span>tof_dataclasses::io::read_file;
 <span class="kw">use </span>tof_dataclasses::serialization::{
@@ -149,8 +153,11 @@
         }
       }
       <span class="prelude-val">Ok</span>(header) =&gt; {
-        <span class="macro">println!</span>(<span class="string">"{}"</span>, header);
-        <span class="kw">if </span>header.ptype == <span class="number">80 </span>{
+        <span class="macro">println!</span>(<span class="string">"HEADER {}"</span>, header);
+        <span class="comment">//for k in pos - 10 .. pos + 10 {
+        //  println!("{}",stream[k]);
+        //}
+        </span><span class="kw">if </span>header.ptype == <span class="number">80 </span>{
           <span class="kw">match </span>TrackerPacket::from_bytestream(<span class="kw-2">&amp;</span>stream, <span class="kw-2">&amp;mut </span>pos) {
             <span class="prelude-val">Err</span>(err) =&gt; {
               <span class="comment">//for k in pos - 5 .. pos + 5 {
@@ -172,9 +179,10 @@
             <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>me) =&gt; {
               me.header  = header;
               <span class="kw">let </span><span class="kw-2">mut </span>g_event = GapsEvent::new();
-              <span class="macro">println!</span>(<span class="string">"Event ID  : {}"</span>, me.event_id);
-              <span class="macro">println!</span>(<span class="string">"Tof bytes : {:?}"</span>, me.tof_data);
-              <span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>me.tof_data, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
+              <span class="comment">//println!("Event ID  : {}", me.event_id);
+              //println!("Tof bytes : {:?}", me.tof_data);
+              //println!("len tof bytes : {}", me.tof_data.len());
+              </span><span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>me.tof_data, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
                 <span class="prelude-val">Err</span>(err) =&gt; {
                   <span class="macro">println!</span>(<span class="string">"Can't unpack TofPacket! {err}"</span>);
                 }

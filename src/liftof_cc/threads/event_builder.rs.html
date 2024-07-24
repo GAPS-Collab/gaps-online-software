@@ -683,6 +683,39 @@
 <a href="#683" id="683">683</a>
 <a href="#684" id="684">684</a>
 <a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::thread;
 <span class="kw">use </span>std::time::{
     Instant,
@@ -715,6 +748,8 @@
     RBEvent
 };
 
+<span class="kw">use </span>tof_dataclasses::serialization::Packable;
+
 <span class="kw">use </span>tof_dataclasses::packets::TofPacket;
 <span class="comment">//use tof_dataclasses::threading::ThreadControl;
 
@@ -732,6 +767,8 @@
     Colorize,
     ColoredString
 };
+
+<span class="kw">use </span>tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
 <span class="doccomment">/// Events ... assemble! 
 ///
 /// The event_builder collects all available event information,
@@ -782,8 +819,10 @@
       too_early_rbevents.insert(k <span class="kw">as </span>u8, <span class="number">0</span>);
     }
   }
+
   <span class="comment">// event caches for assembled events
-  </span><span class="kw">let </span><span class="kw-2">mut </span>event_cache          = HashMap::&lt;u32, TofEvent&gt;::new();
+  </span><span class="kw">let </span><span class="kw-2">mut </span>heartbeat            = EVTBLDRHeartbeat::new();
+  <span class="kw">let </span><span class="kw-2">mut </span>event_cache          = HashMap::&lt;u32, TofEvent&gt;::new();
   <span class="kw">let </span><span class="kw-2">mut </span>event_id_cache       = VecDeque::&lt;u32&gt;::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
   <span class="comment">//let mut idx_to_remove = Vec::&lt;usize&gt;::with_capacity(20);
   //let mut event_id_cache_a    = VecDeque:
@@ -802,23 +841,32 @@
   <span class="kw">let </span><span class="kw-2">mut </span>n_timed_out          = <span class="number">0usize</span>; 
   <span class="comment">// debug
   </span><span class="kw">let </span><span class="kw-2">mut </span>last_rb_evid         = <span class="number">0u32</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_rbs_per_ev         = <span class="number">0usize</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_per_te         = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>rb_ev_wo_mte         = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_from_past      = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_orphan         = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>debug_timer          = Instant::now();
-  <span class="kw">let </span><span class="kw-2">mut </span>met_total_sec        = <span class="number">0f64</span>;  
+  <span class="kw">let </span><span class="kw-2">mut </span>met_seconds          = <span class="number">0f64</span>;  
   <span class="comment">//let mut n_receiving_errors  = 0;
   </span><span class="kw">let </span><span class="kw-2">mut </span>check_tc_update      = Instant::now();
   <span class="kw">let </span><span class="kw-2">mut </span>n_gathered_fr_cache  = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>misaligned_cache_err = <span class="number">0usize</span>; 
   <span class="kw">let </span><span class="kw-2">mut </span>daq_reset_cooldown   = Instant::now();
   <span class="kw">let </span><span class="kw-2">mut </span>reset_daq_flag       = <span class="bool-val">false</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>retire               = <span class="bool-val">false</span>;
   <span class="kw">loop </span>{
     <span class="kw">if </span>check_tc_update.elapsed().as_secs() &gt; <span class="number">2 </span>{
-      <span class="kw">let </span><span class="kw-2">mut </span>cali_still_active = <span class="bool-val">false</span>;
+      <span class="comment">//println!("= =&gt; [evt_builder] checkling tc..");
+
+      </span><span class="kw">let </span><span class="kw-2">mut </span>cali_still_active = <span class="bool-val">false</span>;
       <span class="kw">match </span>thread_control.try_lock() {
         <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
+          <span class="comment">//println!("= =&gt; [evt_builder] {}", tc);
+          </span><span class="kw">if </span>(!tc.thread_event_bldr_active) || tc.stop_flag {
+            <span class="comment">// end myself
+            </span><span class="macro">println!</span>(<span class="string">"= =&gt; [evt_builder] shutting down..."</span>);
+            retire = <span class="bool-val">true</span>;
+          }
           <span class="comment">//println!("== ==&gt; [evt_builder] tc lock acquired!");
           </span><span class="kw">if </span>tc.calibration_active {
             cali_still_active = <span class="bool-val">true</span>;
@@ -839,6 +887,10 @@
         thread::sleep(Duration::from_secs(<span class="number">1</span>));
         <span class="kw">continue</span>;
       }
+    }
+    <span class="kw">if </span>retire {
+      thread::sleep(Duration::from_secs(<span class="number">2</span>));
+      <span class="kw">break</span>;
     }
     n_received = <span class="number">0</span>;
     <span class="kw">while </span>n_received &lt; settings.n_mte_per_loop {
@@ -893,7 +945,7 @@
           // I hope it won't be a problem. Otherwise we have
           // to add another cache.
           //println!("==&gt; Len evt cache {}", event_cache.len());
-          </span>n_rbe_received_tot += <span class="number">1</span>;
+          </span>heartbeat.n_rbe_received_tot += <span class="number">1</span>;
           n_received += <span class="number">1</span>;
           <span class="kw">match </span>seen_rbevents.get_mut(<span class="kw-2">&amp;</span>rb_ev.header.rb_id) {
             <span class="prelude-val">Some</span>(value) =&gt; {
@@ -909,8 +961,8 @@
             n_received -= <span class="number">1</span>;
             <span class="macro">debug!</span>(<span class="string">"The received RBEvent {} is from the ancient past! Currently, we don't have a way to deal with that and this event will be DISCARDED! The RBEvent queue will be re-synchronized..."</span>, last_rb_evid);
             <span class="comment">//attempts += 1;
-            </span>n_rbe_discarded_tot += <span class="number">1</span>;
-            n_rbe_from_past += <span class="number">1</span>;
+            </span>heartbeat.n_rbe_discarded_tot += <span class="number">1</span>;
+            heartbeat.n_rbe_from_past += <span class="number">1</span>;
             <span class="kw-2">*</span>too_early_rbevents.get_mut(<span class="kw-2">&amp;</span>rb_ev.header.rb_id).unwrap() += <span class="number">1</span>;
             <span class="kw">continue</span>;
           }
@@ -920,9 +972,9 @@
               //println!("Surprisingly we don't have that!");
               // insert a new TofEvent
               //let new_ev = TofEvent::new();
-              </span>rb_ev_wo_mte += <span class="number">1</span>;
-              n_rbe_discarded_tot += <span class="number">1</span>;
-              n_rbe_orphan += <span class="number">1</span>;
+              </span>heartbeat.rbe_wo_mte += <span class="number">1</span>;
+              heartbeat.n_rbe_discarded_tot += <span class="number">1</span>;
+              heartbeat.n_rbe_orphan += <span class="number">1</span>;
               <span class="comment">//error!("No MTEvent for RBEvent. rb event id {}, first mte {}, last mte {}", last_rb_evid, first_evid, last_cache_evid);
               </span><span class="kw">continue </span><span class="lifetime">'main</span>;
             },
@@ -952,7 +1004,7 @@
         }
       }
     }
-    <span class="kw">let </span>av_rb_ev = n_rbs_per_ev <span class="kw">as </span>f64 / n_sent <span class="kw">as </span>f64;
+    <span class="kw">let </span>av_rb_ev = n_rbe_per_te <span class="kw">as </span>f64 / n_sent <span class="kw">as </span>f64;
     <span class="kw">if </span>settings.build_strategy == BuildStrategy::Adaptive || 
       settings.build_strategy == BuildStrategy::AdaptiveThorough {
       settings.n_rbe_per_loop = av_rb_ev.ceil() <span class="kw">as </span>usize;
@@ -978,10 +1030,10 @@
     </span><span class="kw">if </span>debug_timer_elapsed &gt; <span class="number">35.0  </span>{
       <span class="comment">// missing event id check
       </span><span class="kw">let </span><span class="kw-2">mut </span>evid_check = event_id_cache[<span class="number">0</span>];
-      <span class="kw">let </span><span class="kw-2">mut </span>missing = <span class="number">0usize</span>;
+      <span class="kw">let </span><span class="kw-2">mut </span>n_ev_wo_evid = <span class="number">0usize</span>;
       <span class="kw">for _ in </span><span class="number">0</span>..event_id_cache.len() {
         <span class="kw">if </span>!event_id_cache.contains(<span class="kw-2">&amp;</span>evid_check) {
-          missing += <span class="number">1</span>;
+          n_ev_wo_evid += <span class="number">1</span>;
         }
         evid_check += <span class="number">1</span>;
       }
@@ -1014,7 +1066,7 @@
       //hbs.push(line);
       //let end   = String::from("== == == == == == == == == == == == == == == == == == == ==");
       //hbs.push(end);
-      </span>met_total_sec += debug_timer_elapsed;
+      </span>heartbeat.met_seconds += debug_timer_elapsed <span class="kw">as </span>usize;
       <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="string">"&gt;&gt; == == == == == == ==  EVTBLDR HEARTBEAT == ==  == == == == =="</span>.bright_purple().bold());
     <span class="comment">//if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
       </span><span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Received MTEvents {}"</span>, n_mte_received_tot).bright_purple());
@@ -1024,17 +1076,17 @@
       </span><span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Delta Last MTE evid - Last RB evid  {}"</span>, last_evid - last_rb_evid).bright_purple());
       <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Size of event cache    {}"</span>, event_cache.len()).bright_purple());
       <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Size of event ID cache {}"</span>, event_id_cache.len()).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Gathered events from cache, last iter {}"</span>, n_gathered_fr_cache).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Misaligned cache errs  {}"</span>, misaligned_cache_err).bright_purple());
+      <span class="comment">// println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Gathered events from cache, last iter {}", n_gathered_fr_cache).bright_purple());
+      </span><span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Misaligned cache errs  {}"</span>, misaligned_cache_err).bright_purple());
       <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!"</span>).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Sent {} events! rate   {:4.2} Hz"</span>, n_sent, n_sent <span class="kw">as </span>f64/met_total_sec).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Sent {} events! rate   {:4.2} Hz"</span>, n_sent, n_sent <span class="kw">as </span>f64/met_seconds).bright_purple());
       <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Failed in sending {} events!"</span>, n_sent_ch_err).bright_purple());
       <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Chn len MTE receiver   {}"</span>,m_trig_ev.len() ).bright_purple());
       <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Chn len RBE receiver   {}"</span>,ev_from_rb.len()).bright_purple());
       <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Chn len TP  sender     {}"</span>,data_sink.len()).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Event id check: {:4.2}% of events missing in the event ID cache"</span>, missing <span class="kw">as </span>f64 / event_cache.len() <span class="kw">as </span>f64).bright_purple());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Event id check: {:4.2}% of events missing in the event ID cache"</span>, n_ev_wo_evid <span class="kw">as </span>f64 / event_cache.len() <span class="kw">as </span>f64).bright_purple());
       <span class="kw">if </span>n_sent &gt; <span class="number">0 </span>{
-        <span class="kw">let </span>av_rb_ev = n_rbs_per_ev <span class="kw">as </span>f64 / n_sent <span class="kw">as </span>f64;
+        <span class="kw">let </span>av_rb_ev = n_rbe_per_te <span class="kw">as </span>f64 / n_sent <span class="kw">as </span>f64;
         <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Average number of RBEvents/TofEvent {:4.2}"</span>, av_rb_ev).bright_purple());
         <span class="kw">let </span>to_frac = <span class="number">100.0 </span>* n_timed_out <span class="kw">as </span>f64 / n_sent <span class="kw">as </span>f64;
         <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Fraction of timed out events {:4.2}%"</span>, to_frac).bright_purple());
@@ -1063,7 +1115,7 @@
       //      continue;
       </span><span class="kw">let </span><span class="kw-2">mut </span>counters = HashMap::&lt;u8,f64&gt;::new();
       <span class="kw">for </span>k <span class="kw">in </span>seen_rbevents.keys() {
-        counters.insert(<span class="kw-2">*</span>k, seen_rbevents[<span class="kw-2">&amp;</span>k] <span class="kw">as </span>f64/met_total_sec <span class="kw">as </span>f64);
+        counters.insert(<span class="kw-2">*</span>k, seen_rbevents[<span class="kw-2">&amp;</span>k] <span class="kw">as </span>f64/met_seconds <span class="kw">as </span>f64);
       }
       <span class="kw">let </span><span class="kw-2">mut </span>table = Table::new();
       table
@@ -1333,7 +1385,7 @@
             // we should have an eye on performance though
             //idx_to_remove.push(idx);
             </span><span class="kw">let </span>ev_to_send = event_cache.remove(<span class="kw-2">&amp;</span>evid).unwrap();
-            n_rbs_per_ev  += ev_to_send.rb_events.len(); 
+            n_rbe_per_te  += ev_to_send.rb_events.len(); 
             <span class="comment">// can we avoid unpacking and repacking?
             </span><span class="kw">let </span>pack       = TofPacket::from(<span class="kw-2">&amp;</span>ev_to_send);
             <span class="kw">match </span>data_sink.send(pack) {
@@ -1342,7 +1394,7 @@
                 n_sent_ch_err += <span class="number">1</span>; 
               }
               <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-                <span class="macro">debug!</span>(<span class="string">"Event with id {} send!"</span>, evid);
+                <span class="macro">debug!</span>(<span class="string">"Event with id {} sent!"</span>, evid);
                 n_sent += <span class="number">1</span>;
               }
             }
@@ -1351,7 +1403,20 @@
           }
         }
       }
-    } <span class="comment">// end loop over event_id_cache
+    } 
+    heartbeat.mte_receiver_cbc_len = m_trig_ev.len();
+    heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
+    heartbeat.tp_sender_cbc_len = data_sink.len();
+    <span class="kw">let </span>pack = heartbeat.pack();
+    <span class="kw">match </span>data_sink.send(pack) {
+      <span class="prelude-val">Err</span>(err) =&gt; {
+        <span class="macro">error!</span>(<span class="string">"EVTBLDR Heartbeat sending failed! Err {}"</span>, err);
+      }
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+        <span class="macro">debug!</span>(<span class="string">"Heartbeat sent &lt;3 &lt;3 &lt;3"</span>);
+      }
+    }
+    <span class="comment">// end loop over event_id_cache
     // this is related to the above way to deal with the
     // event_id_cache. But it might be too slow.
     //let mut to_remove : usize;
@@ -1367,5 +1432,6 @@
     </span><span class="macro">debug!</span>(<span class="string">"Debug timer! EVT SENDING {:?}"</span>, debug_timer.elapsed());
   } <span class="comment">// end loop
 </span>}
+
 
 </code></pre></div></section></main></body></html>

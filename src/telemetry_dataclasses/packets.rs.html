@@ -546,8 +546,6 @@
 <a href="#546" id="546">546</a>
 <a href="#547" id="547">547</a>
 <a href="#548" id="548">548</a>
-<a href="#549" id="549">549</a>
-<a href="#550" id="550">550</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Basic telemetry packets
 //!
 
@@ -702,6 +700,7 @@
       raw_data       : Vec::&lt;u8&gt;::new(),
       flags0         : <span class="number">0</span>,
       flags1         : <span class="number">1</span>,
+    
     }
   }
 
@@ -712,15 +711,11 @@
     <span class="kw">let </span>_version      = parse_u8(stream, pos);
     <span class="comment">//println!("_version {}", _version);
     </span>me.flags0         = parse_u8(stream, pos);
-    <span class="comment">//println!("flags0 {}", me.flags0);
-    </span>me.flags1         = parse_u8(stream, pos);
-    <span class="comment">//println!("flags1 {}", me.flags1);
-    //let a = parse_u8(stream, pos);
-    //let b = parse_u8(stream, pos);
-    //let c = parse_u8(stream, pos);
-    //let d = parse_u8(stream, pos);
-    //println!("a,b,c,d {} {} {} {}", a,b,c,d);
-    </span>me.event_id       = parse_u32(stream, pos);
+    <span class="comment">// skip a bunch of Alex newly implemented things
+    // FIXME
+    </span><span class="kw-2">*</span>pos += <span class="number">8</span>;
+
+    me.event_id       = parse_u32(stream, pos);
     <span class="comment">//println!("EVENT ID {}", me.event_id);
     </span><span class="kw">let </span>_tof_delim    = parse_u8(stream, pos);
     <span class="comment">//println!("TOF delim : {}", _tof_delim);
@@ -734,6 +729,7 @@
       me.tof_data.push(parse_u8(stream, pos));
     }
     <span class="kw">let </span>trk_delim    = parse_u8(stream, pos);
+
     <span class="comment">//println!("TRK delim {}", trk_delim);
     </span><span class="kw">if </span>trk_delim != <span class="number">0xbb </span>{
       <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::HeadInvalid);

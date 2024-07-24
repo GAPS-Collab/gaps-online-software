@@ -97,6 +97,14 @@
 <a href="#97" id="97">97</a>
 <a href="#98" id="98">98</a>
 <a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Thread control structures
 //! FIXME - this should go to liftof-lib
 
@@ -131,6 +139,8 @@
   </span><span class="kw">pub </span>thread_monitoring_active   : bool,
   <span class="doccomment">/// Running readoutboard communicator threads - the key is associated rb id
   </span><span class="kw">pub </span>thread_rbcomm_active       : HashMap&lt;u8, bool&gt;,
+  <span class="doccomment">/// Manage CTRL+C (or CMD+C/Mac) input
+  </span><span class="kw">pub </span>thread_signal_hdlr_active  : bool,
   <span class="doccomment">/// The current run id
   </span><span class="kw">pub </span>run_id                     : u32,
   <span class="doccomment">/// The number of boards available
@@ -159,6 +169,8 @@
       thread_master_trg_active   : <span class="bool-val">false</span>,
       thread_monitoring_active   : <span class="bool-val">false</span>,
       thread_rbcomm_active       : HashMap::&lt;u8,bool&gt;::new(),
+      <span class="comment">// in principle this should always be active
+      </span>thread_signal_hdlr_active  : <span class="bool-val">true</span>,
       run_id                     : <span class="number">0</span>,
       n_rbs                      : <span class="number">0</span>,
       write_data_to_disk         : <span class="bool-val">false</span>,
@@ -177,7 +189,9 @@
     repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  wr to disk     : {}"</span>, <span class="self">self</span>.write_data_to_disk));
     repr        += <span class="string">"\n    -- reported RB calibration activity:"</span>;
     repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  RB cali active : {}"</span>, <span class="self">self</span>.calibration_active));
-    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  -- finished    : \n{:?}"</span>, <span class="self">self</span>.finished_calibrations));       
+    <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.finished_calibrations.keys() {
+      repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  -- finished  {}  : {}"</span>, k, <span class="self">self</span>.finished_calibrations.get(k).unwrap()));       
+    }
     repr        += <span class="string">"\n    -- program status:"</span>;
     repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  stop flag : {}"</span>, <span class="self">self</span>.stop_flag));
     repr        += <span class="string">"\n    -- reported thread activity:"</span>;
@@ -185,6 +199,8 @@
     repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  runner         : {}"</span>, <span class="self">self</span>.thread_runner_active));
     repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  data sink      : {}"</span>, <span class="self">self</span>.thread_data_sink_active));
     repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  monitoring     : {}"</span>, <span class="self">self</span>.thread_monitoring_active));
+    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  evt builder    : {}"</span>, <span class="self">self</span>.thread_event_bldr_active));
+    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  master_trigger : {}"</span>, <span class="self">self</span>.thread_master_trg_active));
     <span class="kw">if </span><span class="self">self</span>.thread_rbcomm_active.len() &gt; <span class="number">0 </span>{
       repr        += <span class="string">"\n -- active RB threads"</span>;
       <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.thread_rbcomm_active.keys() {

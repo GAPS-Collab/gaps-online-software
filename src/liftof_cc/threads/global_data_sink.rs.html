@@ -437,6 +437,15 @@
 <a href="#437" id="437">437</a>
 <a href="#438" id="438">438</a>
 <a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Communication with the flight computer
 //!
 //! Using two dedicated 0MQ wires - one for 
@@ -564,9 +573,8 @@
 
   <span class="comment">//let mut event_cache = Vec::&lt;TofPacket&gt;::with_capacity(100); 
 
-  </span><span class="attr">#[cfg(features=<span class="string">"debug"</span>)]
-  </span><span class="kw">let </span><span class="kw-2">mut </span>heartbeat         = HeartBeatDataSink::new();
-  <span class="kw">let </span><span class="kw-2">mut </span>n_pack_sent       = <span class="number">0</span>;
+  
+  </span><span class="kw">let </span><span class="kw-2">mut </span>n_pack_sent       = <span class="number">0</span>;
   <span class="comment">//let mut last_evid       = 0u32;
   </span><span class="kw">let </span><span class="kw-2">mut </span>n_pack_write_disk = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>bytes_sec_disk    = <span class="number">0f64</span>;
@@ -585,7 +593,16 @@
   <span class="kw">let </span><span class="kw-2">mut </span>write_stream  = <span class="bool-val">false</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>runid : u32 = <span class="number">0</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>new_run_start = <span class="bool-val">false</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>retire   = <span class="bool-val">false</span>;
   <span class="kw">loop </span>{
+    <span class="kw">if </span>retire {
+      <span class="comment">// take a long nap to give other threads 
+      // a chance to finish first
+      </span><span class="macro">warn!</span>(<span class="string">"Will end data sink thread in 25 seconds!"</span>);
+      <span class="macro">println!</span>(<span class="string">"= =&gt;Will end data sink thread in 25 seconds!"</span>);
+      sleep(Duration::from_secs(<span class="number">25</span>));
+      <span class="kw">break</span>;
+    }
     <span class="comment">// even though this is called kill timer, check
     // the settings in general, since they might have
     // changed due to remote access.
@@ -595,7 +612,8 @@
           <span class="comment">//println!("== ==&gt; [global_data_sink] tc lock acquired!");
           </span><span class="kw">if </span>tc.stop_flag {
             tc.thread_data_sink_active = <span class="bool-val">false</span>;
-            <span class="kw">break</span>;
+            <span class="comment">// we want to make sure that data sink ends the latest
+            </span>retire = <span class="bool-val">true</span>;
           } 
           <span class="kw">if </span>tc.new_run_start_flag {
             new_run_start         = <span class="bool-val">true</span>;
@@ -657,8 +675,8 @@
                 </span><span class="kw-2">*</span>tc.finished_calibrations.get_mut(<span class="kw-2">&amp;</span>cali_rb_id).unwrap() = <span class="bool-val">true</span>; 
                 cali_expected = tc.n_rbs;
                 cali_completed += <span class="number">1</span>;
-                <span class="macro">println!</span>(<span class="string">"Changed tc {}"</span>, tc);
-                <span class="macro">info!</span>(<span class="string">"{} of {} calibrattions completed!"</span>, cali_completed, cali_expected);
+                <span class="comment">//println!("Changed tc {}", tc);
+                </span><span class="macro">info!</span>(<span class="string">"{} of {} calibrattions completed!"</span>, cali_completed, cali_expected);
               },
               <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}"</span>);
@@ -850,7 +868,7 @@
         <span class="kw">if </span><span class="attr">#[cfg(features=<span class="string">"debug"</span>)] </span>{
           heartbeat.incoming_ch_len = incoming.len();
           heartbeat.met += timer.elapsed().as_secs_u64();
-          <span class="kw">match </span>data_socket.send(heartbeat.to_bytestream(),<span class="number">0</span>) {
+          <span class="kw">match </span>data_socket.send(heartbeat.pack().to_bytestream(),<span class="number">0</span>) {
             <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Not able to send heartbeat over 0MQ PUB! {err}"</span>),
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
               <span class="macro">trace!</span>(<span class="string">"TofPacket sent"</span>);

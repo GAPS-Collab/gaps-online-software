@@ -1,1 +1,0 @@
-searchState.loadedDescShard("shell_escape", 0, "Escape characters that may have special meaning in a shell.\nEscape characters that may have special meaning in a shell.\nUnix-specific escaping.\nWindows-specific escaping.\nEscape characters that may have special meaning in a …\nEscape for the windows cmd.exe shell.")

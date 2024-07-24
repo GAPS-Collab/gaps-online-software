@@ -472,6 +472,10 @@
 <a href="#472" id="472">472</a>
 <a href="#473" id="473">473</a>
 <a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Master Trigger tab
 //! 
 //! Show current data from the master trigger
@@ -642,6 +646,10 @@
             <span class="kw">if </span><span class="self">self</span>.rate_queue.len() &gt; <span class="self">self</span>.queue_size {
               <span class="self">self</span>.rate_queue.pop_front();
             }
+            <span class="self">self</span>.lost_r_queue.push_back((met, moni.lost_rate <span class="kw">as </span>f64));
+            <span class="kw">if </span><span class="self">self</span>.lost_r_queue.len() &gt; <span class="self">self</span>.queue_size {
+              <span class="self">self</span>.rate_queue.pop_front();
+            }
             <span class="self">self</span>.fpgatmp_queue.push_back((met, moni.get_fpga_temp() <span class="kw">as </span>f64));
             <span class="kw">if </span><span class="self">self</span>.fpgatmp_queue.len() &gt; <span class="self">self</span>.queue_size {
               <span class="self">self</span>.fpgatmp_queue.pop_front();
@@ -693,7 +701,7 @@
       <span class="self">self</span>.nch_histo.fill(<span class="kw-2">&amp;</span>(hits.len() <span class="kw">as </span>f32));
       <span class="kw">for </span>k <span class="kw">in </span>rb_links {
         <span class="comment">// FIXME unwrap
-        </span><span class="kw">let </span>linked_rbid = <span class="self">self</span>.mtlink_rb_map.get(<span class="kw-2">&amp;</span>k).unwrap();
+        </span><span class="kw">let </span>linked_rbid = <span class="self">self</span>.mtlink_rb_map.get(<span class="kw-2">&amp;</span>k).unwrap_or(<span class="kw-2">&amp;</span><span class="number">0</span>);
         <span class="self">self</span>.mtb_link_histo.fill(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span>linked_rbid <span class="kw">as </span>f32));
       }
       <span class="self">self</span>.n_events += <span class="number">1</span>;

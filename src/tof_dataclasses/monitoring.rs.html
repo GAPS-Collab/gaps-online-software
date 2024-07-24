@@ -1690,6 +1690,44 @@
 <a href="#1690" id="1690">1690</a>
 <a href="#1691" id="1691">1691</a>
 <a href="#1692" id="1692">1692</a>
+<a href="#1693" id="1693">1693</a>
+<a href="#1694" id="1694">1694</a>
+<a href="#1695" id="1695">1695</a>
+<a href="#1696" id="1696">1696</a>
+<a href="#1697" id="1697">1697</a>
+<a href="#1698" id="1698">1698</a>
+<a href="#1699" id="1699">1699</a>
+<a href="#1700" id="1700">1700</a>
+<a href="#1701" id="1701">1701</a>
+<a href="#1702" id="1702">1702</a>
+<a href="#1703" id="1703">1703</a>
+<a href="#1704" id="1704">1704</a>
+<a href="#1705" id="1705">1705</a>
+<a href="#1706" id="1706">1706</a>
+<a href="#1707" id="1707">1707</a>
+<a href="#1708" id="1708">1708</a>
+<a href="#1709" id="1709">1709</a>
+<a href="#1710" id="1710">1710</a>
+<a href="#1711" id="1711">1711</a>
+<a href="#1712" id="1712">1712</a>
+<a href="#1713" id="1713">1713</a>
+<a href="#1714" id="1714">1714</a>
+<a href="#1715" id="1715">1715</a>
+<a href="#1716" id="1716">1716</a>
+<a href="#1717" id="1717">1717</a>
+<a href="#1718" id="1718">1718</a>
+<a href="#1719" id="1719">1719</a>
+<a href="#1720" id="1720">1720</a>
+<a href="#1721" id="1721">1721</a>
+<a href="#1722" id="1722">1722</a>
+<a href="#1723" id="1723">1723</a>
+<a href="#1724" id="1724">1724</a>
+<a href="#1725" id="1725">1725</a>
+<a href="#1726" id="1726">1726</a>
+<a href="#1727" id="1727">1727</a>
+<a href="#1728" id="1728">1728</a>
+<a href="#1729" id="1729">1729</a>
+<a href="#1730" id="1730">1730</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Tof housekeeping/monitoring
 //!
 //! Contains structs to hold monitoring
@@ -3076,39 +3114,69 @@
 
 <span class="comment">///////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////
-
 </span><span class="doccomment">/// Monitoring the MTB
 </span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>MtbMoniData {
-  <span class="kw">pub </span>calibration : u16, 
-  <span class="kw">pub </span>vccpint     : u16, 
-  <span class="kw">pub </span>vccpaux     : u16, 
-  <span class="kw">pub </span>vccoddr     : u16, 
-  <span class="kw">pub </span>temp        : u16, 
-  <span class="kw">pub </span>vccint      : u16, 
-  <span class="kw">pub </span>vccaux      : u16, 
-  <span class="kw">pub </span>vccbram     : u16, 
-  <span class="kw">pub </span>rate        : u16, 
-  <span class="kw">pub </span>lost_rate   : u16, 
+  <span class="comment">//pub calibration  : u16, 
+  //pub vccpint      : u16, 
+  </span><span class="kw">pub </span>tiu_busy_len : u32,
+  <span class="doccomment">/// tiu_status[0] = emu_mode
+  /// tiu_status[1] = use_aux_link
+  /// tiu_status[2] = tiu_bad
+  /// tiu_status[3] = bsy_stuck
+  /// tiu_status[4] = ignore_bsy
+  </span><span class="kw">pub </span>tiu_status   : u8,
+  <span class="doccomment">/// Prescale factor in per cent
+  /// (might not be accurate)
+  </span><span class="kw">pub </span>prescale_pc  : u8,
+  <span class="kw">pub </span>daq_queue_len: u16,
+  <span class="comment">//pub vccpaux      : u16, 
+  //pub vccoddr      : u16, 
+  </span><span class="kw">pub </span>temp         : u16, 
+  <span class="kw">pub </span>vccint       : u16, 
+  <span class="kw">pub </span>vccaux       : u16, 
+  <span class="kw">pub </span>vccbram      : u16, 
+  <span class="kw">pub </span>rate         : u16, 
+  <span class="kw">pub </span>lost_rate    : u16, 
 }
 
 <span class="kw">impl </span>MtbMoniData {
   
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
-      calibration  : u16::MAX,
-      vccpint      : u16::MAX,
-      vccpaux      : u16::MAX,
-      vccoddr      : u16::MAX,
-      temp         : u16::MAX,
-      vccint       : u16::MAX,
-      vccaux       : u16::MAX,
-      vccbram      : u16::MAX,
-      rate         : u16::MAX,
-      lost_rate    : u16::MAX
+      tiu_busy_len  : u32::MAX,
+      tiu_status    : u8::MAX,
+      prescale_pc   : u8::MAX,
+      daq_queue_len : u16::MAX,
+      temp          : u16::MAX,
+      vccint        : u16::MAX,
+      vccaux        : u16::MAX,
+      vccbram       : u16::MAX,
+      rate          : u16::MAX,
+      lost_rate     : u16::MAX
     }
   }
+
+  <span class="kw">pub fn </span>get_tiu_emulation_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="self">self</span>.tiu_status &amp; <span class="number">0x1 </span>&gt; <span class="number">0
+  </span>}
+  
+  <span class="kw">pub fn </span>get_tiu_use_aux_link(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="self">self</span>.tiu_status &amp; <span class="number">0x2 </span>&gt; <span class="number">0
+  </span>}
+
+  <span class="kw">pub fn </span>get_tiu_bad(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool { 
+    <span class="self">self</span>.tiu_status &amp; <span class="number">0x4 </span>&gt; <span class="number">0
+  </span>}
+
+  <span class="kw">pub fn </span>get_tiu_busy_stuck(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="self">self</span>.tiu_status &amp; <span class="number">0x8 </span>&gt; <span class="number">0
+  </span>}
+
+  <span class="kw">pub fn </span>get_tiu_ignore_busy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="self">self</span>.tiu_status &amp; <span class="number">0x10 </span>&gt; <span class="number">0
+  </span>}
+
 
   <span class="doccomment">/// Convert ADC temp from adc values to Celsius
   </span><span class="kw">pub fn </span>get_fpga_temp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
@@ -3133,20 +3201,30 @@
     <span class="macro">write!</span>(f, <span class="string">"&lt;MtbMoniData:
   MTB  EVT RATE  [Hz] {}
   LOST EVT RATE  [Hz] {}
-  CALIBRATION  [ADC?] {}
-  VCCPINT         [V] {:.3}
-  VCCPAUX         [V] {:.3}
-  VCCODDR         [V] {:.3}
+  TIU BUSY CNT  [CLK] {}
+  DAQ QUEUE LEN       {}
+  PRESCALE        [%] {}
+  --- TIU STATUS ---
+    EMU MODE          {}
+    USE AUX LINK      {}
+    TIU BAD           {}
+    BUSY STUCK        {}
+    IGNROE BUSY       {}
+  --- --- --- --- --
   FPGA TEMP      [\u{00B0}C] {:.2}
   VCCINT          [V] {:.3}
   VCCAUX          [V] {:.3}
   VCCBRAM         [V] {:.3}&gt;"</span>,
            <span class="self">self</span>.rate,
            <span class="self">self</span>.lost_rate,
-           <span class="self">self</span>.calibration,
-           MtbMoniData::adc_vcc_conversion(<span class="self">self</span>.vccpint   ),
-           MtbMoniData::adc_vcc_conversion(<span class="self">self</span>.vccpaux   ),
-           MtbMoniData::adc_vcc_conversion(<span class="self">self</span>.vccoddr   ),
+           <span class="self">self</span>.tiu_busy_len,
+           <span class="self">self</span>.daq_queue_len,
+           <span class="self">self</span>.prescale_pc,
+           <span class="self">self</span>.get_tiu_emulation_mode(),
+           <span class="self">self</span>.get_tiu_use_aux_link(),
+           <span class="self">self</span>.get_tiu_bad(),
+           <span class="self">self</span>.get_tiu_busy_stuck(),
+           <span class="self">self</span>.get_tiu_ignore_busy(),
            <span class="self">self</span>.get_fpga_temp(),
            MtbMoniData::adc_vcc_conversion(<span class="self">self</span>.vccint    ),
            MtbMoniData::adc_vcc_conversion(<span class="self">self</span>.vccaux    ),
@@ -3168,10 +3246,10 @@
   <span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>stream = Vec::&lt;u8&gt;::with_capacity(<span class="self">Self</span>::SIZE);
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::HEAD.to_le_bytes());
-    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.calibration.to_le_bytes());
-    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.vccpint    .to_le_bytes());
-    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.vccpaux    .to_le_bytes());
-    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.vccoddr    .to_le_bytes());
+    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tiu_busy_len.to_le_bytes());
+    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tiu_status .to_le_bytes());
+    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.prescale_pc.to_le_bytes());
+    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.daq_queue_len.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.temp       .to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.vccint     .to_le_bytes()); 
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.vccaux     .to_le_bytes()); 
@@ -3186,16 +3264,16 @@
     -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>moni_data      = <span class="self">Self</span>::new();
     <span class="self">Self</span>::verify_fixed(stream, pos)<span class="question-mark">?</span>;
-    moni_data.calibration  = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
-    moni_data.vccpint      = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
-    moni_data.vccpaux      = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
-    moni_data.vccoddr      = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
-    moni_data.temp         = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
-    moni_data.vccint       = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
-    moni_data.vccaux       = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
-    moni_data.vccbram      = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
-    moni_data.rate         = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
-    moni_data.lost_rate    = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
+    moni_data.tiu_busy_len  = parse_u32(<span class="kw-2">&amp;</span>stream, pos);
+    moni_data.tiu_status    = parse_u8(<span class="kw-2">&amp;</span>stream, pos);
+    moni_data.prescale_pc   = parse_u8(<span class="kw-2">&amp;</span>stream, pos);
+    moni_data.daq_queue_len = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
+    moni_data.temp          = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
+    moni_data.vccint        = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
+    moni_data.vccaux        = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
+    moni_data.vccbram       = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
+    moni_data.rate          = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
+    moni_data.lost_rate     = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
     <span class="kw-2">*</span>pos += <span class="number">2</span>; <span class="comment">// since we deserialized the tail earlier and 
               // didn't account for it
     </span><span class="prelude-val">Ok</span>(moni_data)
@@ -3211,10 +3289,9 @@
   <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, varname : <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;f32&gt; {
     <span class="kw">match </span>varname {
       <span class="string">"board_id"     </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">0.0f32</span>),
-      <span class="string">"calibration"  </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.calibration <span class="kw">as </span>f32), 
-      <span class="string">"vccpint"      </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::adc_vcc_conversion(<span class="self">self</span>.vccpint)), 
-      <span class="string">"vccpaux"      </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::adc_vcc_conversion(<span class="self">self</span>.vccpaux)), 
-      <span class="string">"vccoddr"      </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::adc_vcc_conversion(<span class="self">self</span>.vccoddr)), 
+      <span class="string">"tiu_busy_len" </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.tiu_busy_len <span class="kw">as </span>f32), 
+      <span class="string">"tiu_status"   </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.tiu_status <span class="kw">as </span>f32), 
+      <span class="string">"daq_queue_len"  </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.daq_queue_len <span class="kw">as </span>f32), 
       <span class="string">"temp"         </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.get_fpga_temp()), 
       <span class="string">"vccint"       </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::adc_vcc_conversion(<span class="self">self</span>.vccint)), 
       <span class="string">"vccaux"       </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::adc_vcc_conversion(<span class="self">self</span>.vccaux)), 
@@ -3227,11 +3304,10 @@
   
   <span class="kw">fn </span>keys() -&gt; Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
     <span class="macro">vec!</span>[
-      <span class="string">"board_id"   </span>,  
-      <span class="string">"calibration"</span>, 
-      <span class="string">"vccpint"    </span>, 
-      <span class="string">"vccpaux"    </span>, 
-      <span class="string">"vccoddr"    </span>, 
+      <span class="string">"board_id"      </span>,  
+      <span class="string">"tiu_busy_len"  </span>, 
+      <span class="string">"tiu_status"    </span>, 
+      <span class="string">"daq_queue_len" </span>, 
       <span class="string">"temp"       </span>, 
       <span class="string">"vccint"     </span>, 
       <span class="string">"vccaux"     </span>, 
@@ -3246,10 +3322,10 @@
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
     <span class="kw">let </span><span class="kw-2">mut </span>moni      = <span class="self">Self</span>::new();
     <span class="kw">let </span><span class="kw-2">mut </span>rng       = rand::thread_rng();
-    moni.calibration  = rng.gen::&lt;u16&gt;();
-    moni.vccpint      = rng.gen::&lt;u16&gt;();
-    moni.vccpaux      = rng.gen::&lt;u16&gt;();
-    moni.vccoddr      = rng.gen::&lt;u16&gt;();
+    moni.tiu_busy_len = rng.gen::&lt;u32&gt;();
+    moni.tiu_status   = rng.gen::&lt;u8&gt;();
+    moni.prescale_pc  = rng.gen::&lt;u8&gt;();
+    moni.daq_queue_len= rng.gen::&lt;u16&gt;();
     moni.temp         = rng.gen::&lt;u16&gt;();
     moni.vccint       = rng.gen::&lt;u16&gt;();
     moni.vccaux       = rng.gen::&lt;u16&gt;();

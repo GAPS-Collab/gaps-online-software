@@ -123,6 +123,29 @@
 <a href="#123" id="123">123</a>
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// Theming for liftof-tui
 
 </span><span class="kw">use </span>ratatui::style::{
@@ -130,13 +153,15 @@
     Style
 };
 
-<span class="attr">#[derive(Debug, Copy, Clone)]
+<span class="doccomment">/// Implementation of a color palette
+</span><span class="attr">#[derive(Debug, Copy, Clone)]
 </span><span class="kw">pub struct </span>ColorSet {
   <span class="kw">pub </span>c0 : Color,
   <span class="kw">pub </span>c1 : Color,
   <span class="kw">pub </span>c2 : Color,
   <span class="kw">pub </span>c3 : Color,
-  <span class="kw">pub </span>hc : Color,
+  <span class="doccomment">/// Used to highlight
+  </span><span class="kw">pub </span>hc : Color,
 }
 
 <span class="kw">impl </span>ColorSet {
@@ -155,51 +180,72 @@
   }
 }
 
-<span class="kw">pub const </span>COLORSETBW : ColorSet = ColorSet::new(Color::Black, Color::White, 
+<span class="doccomment">/// Black and white color palette for highest contrast
+</span><span class="kw">pub const </span>COLORSETBW : ColorSet = ColorSet::new(Color::Black, Color::White, 
                                                 Color::White, Color::White,
                                                 Color::Rgb(<span class="number">244</span>,<span class="number">133</span>,<span class="number">0</span>));
-<span class="kw">pub const </span>COLORSETOMILU : ColorSet = ColorSet::new(Color::Rgb(<span class="number">5</span>, <span class="number">59</span>, <span class="number">80</span>),
+
+<span class="doccomment">/// A color palette designed for the OMILU branch
+</span><span class="kw">pub const </span>COLORSETOMILU : ColorSet = ColorSet::new(Color::Rgb(<span class="number">5</span>, <span class="number">59</span>, <span class="number">80</span>),
                                                    Color::Rgb(<span class="number">23</span>, <span class="number">107</span>, <span class="number">135</span>),
                                                    Color::Rgb(<span class="number">100</span>, <span class="number">204</span>, <span class="number">197</span>),
                                                    Color::Rgb(<span class="number">238</span>, <span class="number">238</span>, <span class="number">238</span>),
                                                    Color::Rgb(<span class="number">225</span>, <span class="number">170</span>, <span class="number">116</span>));
-<span class="kw">pub const </span>COLORSETNIUHI : ColorSet = ColorSet::new(Color::Rgb(<span class="number">0</span>,<span class="number">41</span>,<span class="number">170</span>),
+
+<span class="doccomment">/// A color palette designed for the NIUHI brnach
+</span><span class="kw">pub const </span>COLORSETNIUHI : ColorSet = ColorSet::new(Color::Rgb(<span class="number">0</span>,<span class="number">41</span>,<span class="number">170</span>),
                                                    Color::Rgb(<span class="number">0</span>,<span class="number">63</span>,<span class="number">136</span>),
                                                    Color::Rgb(<span class="number">0</span>,<span class="number">80</span>,<span class="number">157</span>),
                                                    Color::Rgb(<span class="number">253</span>,<span class="number">197</span>,<span class="number">0</span>),
                                                    Color::Rgb(<span class="number">255</span>,<span class="number">213</span>,<span class="number">0</span>));
-<span class="kw">pub const </span>COLORSETDUNE : ColorSet = ColorSet::new(Color::Rgb(<span class="number">161</span>,<span class="number">18</span>,<span class="number">37</span>),
+
+
+<span class="doccomment">/// A color palette inspired by the recent Dune movie
+</span><span class="kw">pub const </span>COLORSETDUNE : ColorSet = ColorSet::new(Color::Rgb(<span class="number">161</span>,<span class="number">18</span>,<span class="number">37</span>),
                                                   Color::Rgb(<span class="number">223</span>,<span class="number">135</span>,<span class="number">53</span>),
                                                   Color::Rgb(<span class="number">181</span>,<span class="number">164</span>,<span class="number">146</span>),
                                                   Color::Rgb(<span class="number">225</span>, <span class="number">170</span>, <span class="number">116</span>),
                                                   Color::Rgb(<span class="number">244</span>,<span class="number">193</span>,<span class="number">110</span>));
 
-<span class="kw">pub const </span>COLORSETLD    : ColorSet = ColorSet::new(Color::Rgb(<span class="number">255</span>,<span class="number">68</span>,<span class="number">0</span>),
+<span class="doccomment">/// A color palette inspired by Star Trek Lower Decks
+</span><span class="kw">pub const </span>COLORSETLD    : ColorSet = ColorSet::new(Color::Rgb(<span class="number">255</span>,<span class="number">68</span>,<span class="number">0</span>),
                                                    Color::Rgb(<span class="number">255</span>, <span class="number">170</span>, <span class="number">68</span>),
                                                    Color::Rgb(<span class="number">255</span>, <span class="number">119</span>, <span class="number">0</span>),
                                                    Color::Rgb(<span class="number">255</span>, <span class="number">204</span>, <span class="number">153</span>),
                                                    Color::Rgb(<span class="number">255</span>, <span class="number">238</span>, <span class="number">204</span>));
 
-<span class="kw">pub const </span>COLORSETMATRIX : ColorSet = ColorSet::new(Color::Rgb(<span class="number">2</span>,<span class="number">2</span>,<span class="number">4</span>),
+<span class="doccomment">/// A color palette inspired by the original Matrix trilogy
+</span><span class="kw">pub const </span>COLORSETMATRIX : ColorSet = ColorSet::new(Color::Rgb(<span class="number">2</span>,<span class="number">2</span>,<span class="number">4</span>),
                                                     Color::Rgb(<span class="number">32</span>,<span class="number">72</span>,<span class="number">41</span>),
                                                     Color::Rgb(<span class="number">34</span>,<span class="number">180</span>,<span class="number">85</span>),
                                                     Color::Rgb(<span class="number">128</span>,<span class="number">206</span>,<span class="number">135</span>),
                                                     Color::Rgb(<span class="number">156</span>,<span class="number">229</span>,<span class="number">161</span>));
 
-<span class="kw">pub const </span>COLORSETSTARFIELD : ColorSet = ColorSet::new(Color::Rgb(<span class="number">48</span>,<span class="number">76</span>,<span class="number">122</span>),
+<span class="doccomment">/// A color palette inspired by Bethesda's recent ARPG
+</span><span class="kw">pub const </span>COLORSETSTARFIELD : ColorSet = ColorSet::new(Color::Rgb(<span class="number">48</span>,<span class="number">76</span>,<span class="number">122</span>),
                                                        Color::Rgb(<span class="number">224</span>,<span class="number">98</span>,<span class="number">54</span>),
                                                        Color::Rgb(<span class="number">215</span>,<span class="number">166</span>,<span class="number">75</span>),
                                                        Color::Rgb(<span class="number">244</span>,<span class="number">245</span>,<span class="number">247</span>),
                                                        Color::Rgb(<span class="number">199</span>,<span class="number">33</span>,<span class="number">56</span>));
 
-<span class="kw">pub const </span>COLORSETGAPS : ColorSet = ColorSet::new(Color::Rgb(<span class="number">27</span>,<span class="number">51</span>,<span class="number">88</span>),
+<span class="doccomment">/// A color palette created from the colors of the GAPS logo
+</span><span class="kw">pub const </span>COLORSETGAPS : ColorSet = ColorSet::new(Color::Rgb(<span class="number">27</span>,<span class="number">51</span>,<span class="number">88</span>),
                                                   Color::Rgb(<span class="number">228</span>,<span class="number">60</span>,<span class="number">65</span>),
                                                   Color::Rgb(<span class="number">132</span>,<span class="number">203</span>,<span class="number">187</span>),
                                                   Color::Rgb(<span class="number">212</span>,<span class="number">202</span>,<span class="number">87</span>),
                                                   Color::Rgb(<span class="number">227</span>,<span class="number">76</span>,<span class="number">68</span>));
 
+<span class="doccomment">/// A pink color palette
+</span><span class="kw">pub const </span>COLORSETPRINCESSPEACH : ColorSet = ColorSet::new(Color::Rgb(<span class="number">255</span>,<span class="number">8</span>,<span class="number">74</span>),
+                                                           Color::Rgb(<span class="number">252</span>,<span class="number">52</span>,<span class="number">104</span>),
+                                                           Color::Rgb(<span class="number">255</span>,<span class="number">98</span>,<span class="number">137</span>),
+                                                           Color::Rgb(<span class="number">255</span>,<span class="number">147</span>,<span class="number">172</span>),
+                                                           Color::Rgb(<span class="number">255</span>,<span class="number">194</span>,<span class="number">205</span>));
 
-<span class="attr">#[derive(Debug, Copy, Clone)]
+
+<span class="doccomment">/// A color theme, created from a color palette whcih 
+/// allows to provide style variants for ui elements
+</span><span class="attr">#[derive(Debug, Copy, Clone)]
 </span><span class="kw">pub struct </span>ColorTheme {
   <span class="kw">pub </span>bg0 : Color,
   <span class="kw">pub </span>bg1 : Color,
