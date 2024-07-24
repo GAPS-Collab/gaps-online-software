@@ -31,6 +31,7 @@ pub enum PacketType {
   TriggerConfig       = 61u8,
   MTBHeartbeat        = 62u8, 
   EVTBLDRHeartbeat   = 63u8,
+  RBChannelMaskConfig = 64u8,
   AnalysisEngineConfig = 69u8,
   RBEventHeader       = 70u8,    // needs to go away
   TOFEventBuilderConfig = 71u8,
