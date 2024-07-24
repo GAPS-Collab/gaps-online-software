@@ -146,7 +146,16 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut write_stream  = false;
   let mut runid : u32 = 0;
   let mut new_run_start = false;
+  let mut retire   = false;
   loop {
+    if retire {
+      // take a long nap to give other threads 
+      // a chance to finish first
+      warn!("Will end data sink thread in 25 seconds!");
+      println!("= =>Will end data sink thread in 25 seconds!");
+      sleep(Duration::from_secs(25));
+      break;
+    }
     // even though this is called kill timer, check
     // the settings in general, since they might have
     // changed due to remote access.
@@ -156,7 +165,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
           //println!("== ==> [global_data_sink] tc lock acquired!");
           if tc.stop_flag {
             tc.thread_data_sink_active = false;
-            break;
+            // we want to make sure that data sink ends the latest
+            retire = true;
           } 
           if tc.new_run_start_flag {
             new_run_start         = true;
@@ -218,7 +228,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 *tc.finished_calibrations.get_mut(&cali_rb_id).unwrap() = true; 
                 cali_expected = tc.n_rbs;
                 cali_completed += 1;
-                println!("Changed tc {}", tc);
+                //println!("Changed tc {}", tc);
                 info!("{} of {} calibrattions completed!", cali_completed, cali_expected);
               },
               Err(err) => {

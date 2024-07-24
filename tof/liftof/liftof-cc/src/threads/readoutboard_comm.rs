@@ -101,6 +101,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
         Ok(tc) => {
           //println!("== ==> [rbcomm] tc lock acquired!");
           if tc.stop_flag {
+            //println!("= => [rbcomm] initiate ending thread for RB {}!", board_id);
             break;
           }
         },
@@ -169,7 +170,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                 // Currently, we will just forward all other packets
                 // directly to the data sink
                 if tp.packet_type == PacketType::RBCalibration {
-                  println!("== ==> [rb_comm] Received RBCalibration!");
+                  println!("= => [rb_comm] Received RBCalibration!");
                 }
                 match tp_to_sink.send(tp) {
                   Err(err) => error!("Can not send tof packet to data sink! Err {err}"),
@@ -187,5 +188,6 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
     //  println!("[RBCOM] => Received {n_received} packets!");
     //}
   } // end loop
+  println!("= => [rbcomm] thread for RB {} finished! (not recoverable)", board_id);
 } // end fun
 

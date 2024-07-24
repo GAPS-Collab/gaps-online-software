@@ -129,14 +129,19 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut misaligned_cache_err = 0usize; 
   let mut daq_reset_cooldown   = Instant::now();
   let mut reset_daq_flag       = false;
+  let mut retire               = false;
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
+      //println!("= => [evt_builder] checkling tc..");
+
       let mut cali_still_active = false;
       match thread_control.try_lock() {
         Ok(mut tc) => {
-          if !tc.thread_event_bldr_active {
+          //println!("= => [evt_builder] {}", tc);
+          if (!tc.thread_event_bldr_active) || tc.stop_flag {
             // end myself
-            break;
+            println!("= => [evt_builder] shutting down...");
+            retire = true;
           }
           //println!("== ==> [evt_builder] tc lock acquired!");
           if tc.calibration_active {
@@ -158,6 +163,10 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         thread::sleep(Duration::from_secs(1));
         continue;
       }
+    }
+    if retire {
+      thread::sleep(Duration::from_secs(2));
+      break;
     }
     n_received = 0;
     while n_received < settings.n_mte_per_loop {

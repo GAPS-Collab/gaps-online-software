@@ -90,6 +90,10 @@ impl PyMasterTrigger {
   }
 
   /// Check if the TIU emulation mode is on
+  ///
+  /// # Arguments:
+  ///
+  /// * bus : IPBus 
   fn get_tiu_emulation_mode(&mut self) -> PyResult<u32> {
     match TIU_EMULATION_MODE.get(&mut self.ipbus) {
       Ok(mode) => {

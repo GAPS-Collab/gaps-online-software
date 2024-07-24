@@ -145,6 +145,7 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
        \\/__/         \\/__/       \\/__/           \\/__/       \\/__/         \\/__/    
 
           (LIFTOF - liftof is for tof, Version 0.10 'LELEWAA', Mar 2024)
+          >> with support from the Hawaiian islands \u{1f30a}\u{1f308}\u{1f965}\u{1f334}
 
           * Documentation
           ==> GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/LELEWAA-0.10

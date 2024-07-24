@@ -82,7 +82,9 @@ impl fmt::Display for ThreadControl {
     repr        += &(format!("\n  wr to disk     : {}", self.write_data_to_disk));
     repr        += "\n    -- reported RB calibration activity:";
     repr        += &(format!("\n  RB cali active : {}", self.calibration_active));
-    repr        += &(format!("\n  -- finished    : \n{:?}", self.finished_calibrations));       
+    for k in self.finished_calibrations.keys() {
+      repr        += &(format!("\n  -- finished  {}  : {}", k, self.finished_calibrations.get(k).unwrap()));       
+    }
     repr        += "\n    -- program status:";
     repr        += &(format!("\n  stop flag : {}", self.stop_flag));
     repr        += "\n    -- reported thread activity:";
@@ -90,6 +92,8 @@ impl fmt::Display for ThreadControl {
     repr        += &(format!("\n  runner         : {}", self.thread_runner_active));
     repr        += &(format!("\n  data sink      : {}", self.thread_data_sink_active));
     repr        += &(format!("\n  monitoring     : {}", self.thread_monitoring_active));
+    repr        += &(format!("\n  evt builder    : {}", self.thread_event_bldr_active));
+    repr        += &(format!("\n  master_trigger : {}", self.thread_master_trg_active));
     if self.thread_rbcomm_active.len() > 0 {
       repr        += "\n -- active RB threads";
       for k in self.thread_rbcomm_active.keys() {
