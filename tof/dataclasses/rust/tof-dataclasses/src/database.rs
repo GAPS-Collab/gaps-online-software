@@ -131,11 +131,6 @@ impl Run {
 }
 
 impl fmt::Display for Run {
-      //runtime_secs  : Some(0), 
-      //calib_before  : Some(true), 
-      //shifter       : Some(0), 
-      //run_type      : Some(0), 
-      //run_path      : Some(String::from("")), 
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<Run");
     repr += &(format!("\n  RunID         : {}", self.run_id));                   
