@@ -25,15 +25,14 @@ pub enum PacketType {
   TofEvent            = 21u8,
   RBWaveform          = 22u8,
   TofEventSummary     = 23u8,
-  //Monitor             = 30u8,    // needs to go away
   HeartBeatDataSink   = 40u8,    
   MasterTrigger       = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
-  TriggerConfig       = 61u8,
-  MTBHeartbeat        = 62u8, 
-  EVTBLDRHeartbeat   = 63u8,
-  RBChannelMaskConfig = 64u8,
+  TriggerConfig        = 61u8,
+  MTBHeartbeat         = 62u8, 
+  EVTBLDRHeartbeat     = 63u8,
+  RBChannelMaskConfig  = 64u8,
   AnalysisEngineConfig = 69u8,
-  RBEventHeader       = 70u8,    // needs to go away
+  RBEventHeader        = 70u8,    // needs to go away
   TOFEventBuilderConfig = 71u8,
   CPUMoniData         = 80u8,
   MonitorMtb          = 90u8,
@@ -85,7 +84,11 @@ impl From<u8> for PacketType {
       //30u8  => PacketType::Monitor,
       40u8  => PacketType::HeartBeatDataSink,
       60u8  => PacketType::MasterTrigger,
-      61u8 => PacketType::TriggerConfig,
+      61u8  => PacketType::TriggerConfig,
+      62u8  => PacketType::MTBHeartbeat,
+      63u8  => PacketType::EVTBLDRHeartbeat,
+      64u8  => PacketType::RBChannelMaskConfig,
+      69u8  => PacketType::AnalysisEngineConfig,
       70u8  => PacketType::RBEventHeader,
       80u8  => PacketType::CPUMoniData,
       90u8  => PacketType::MonitorMtb,
@@ -126,12 +129,16 @@ impl FromRandom for PacketType {
       PacketType::MasterTrigger,
       PacketType::TriggerConfig, 
       PacketType::HeartBeatDataSink,
+      PacketType::MTBHeartbeat,
+      PacketType::EVTBLDRHeartbeat,
       PacketType::RBEventHeader,
       PacketType::RBEvent,
       PacketType::RBEventMemoryView,
       PacketType::TofCommand,
       PacketType::TofCommandV2,
       PacketType::TofResponse,
+      PacketType::RBChannelMaskConfig,
+      PacketType::AnalysisEngineConfig,
       PacketType::RBCommand,
       PacketType::RBPing,
       PacketType::PreampBiasConfig,
@@ -166,6 +173,8 @@ fn test_packet_types() {
   type_codes.push(PacketType::TriggerConfig as u8);
   type_codes.push(PacketType::MasterTrigger as u8);
   type_codes.push(PacketType::HeartBeatDataSink as u8);
+  type_codes.push(PacketType::MTBHeartbeat as u8);
+  type_codes.push(PacketType::EVTBLDRHeartbeat as u8);
   type_codes.push(PacketType::RBEventHeader as u8);
   type_codes.push(PacketType::RBEvent as u8);
   type_codes.push(PacketType::RBEventMemoryView as u8);
@@ -182,6 +191,8 @@ fn test_packet_types() {
   type_codes.push(PacketType::PreampBiasConfig as u8);
   type_codes.push(PacketType::RunConfig as u8);
   type_codes.push(PacketType::LTBThresholdConfig as u8);
+  type_codes.push(PacketType::AnalysisEngineConfig as u8);
+  type_codes.push(PacketType::RBChannelMaskConfig as u8);
   type_codes.push(PacketType::MonitorMtb as u8);
   type_codes.push(PacketType::RBCalibration as u8);
   type_codes.push(PacketType::ConfigBinary as u8);
