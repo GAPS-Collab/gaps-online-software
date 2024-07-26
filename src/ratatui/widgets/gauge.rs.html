@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/widgets/gauge.rs`."><title>gauge.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/widgets/gauge.rs`."><title>gauge.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -499,15 +499,42 @@
 <a href="#499" id="499">499</a>
 <a href="#500" id="500">500</a>
 <a href="#501" id="501">501</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, widgets::Block};
+<a href="#502" id="502">502</a>
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
+<a href="#505" id="505">505</a>
+<a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
+<a href="#509" id="509">509</a>
+<a href="#510" id="510">510</a>
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, style::Styled, widgets::Block};
 
 <span class="doccomment">/// A widget to display a progress bar.
 ///
 /// A `Gauge` renders a bar filled according to the value given to [`Gauge::percent`] or
 /// [`Gauge::ratio`]. The bar width and height are defined by the [`Rect`] it is
 /// [rendered](Widget::render) in.
+///
 /// The associated label is always centered horizontally and vertically. If not set with
 /// [`Gauge::label`], the label is the percentage of the bar filled.
+///
 /// You might want to have a higher precision bar using [`Gauge::use_unicode`].
 ///
 /// This can be useful to indicate the progression of a task, like a download.
@@ -532,7 +559,7 @@
 ///
 /// - [`LineGauge`] for a thin progress bar
 </span><span class="attr">#[allow(clippy::struct_field_names)] </span><span class="comment">// gauge_style needs to be differentiated to style
-</span><span class="attr">#[derive(Debug, Clone, PartialEq)]
+</span><span class="attr">#[derive(Debug, Default, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>Gauge&lt;<span class="lifetime">'a</span>&gt; {
     block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">'a</span>&gt;&gt;,
     ratio: f64,
@@ -540,19 +567,6 @@
     use_unicode: bool,
     style: Style,
     gauge_style: Style,
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Default <span class="kw">for </span>Gauge&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            block: <span class="prelude-val">None</span>,
-            ratio: <span class="number">0.0</span>,
-            label: <span class="prelude-val">None</span>,
-            use_unicode: <span class="bool-val">false</span>,
-            style: Style::default(),
-            gauge_style: Style::default(),
-        }
-    }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Gauge&lt;<span class="lifetime">'a</span>&gt; {
@@ -736,14 +750,20 @@
 
 <span class="doccomment">/// A compact widget to display a progress bar over a single thin line.
 ///
+/// This can be useful to indicate the progression of a task, like a download.
+///
 /// A `LineGauge` renders a thin line filled according to the value given to [`LineGauge::ratio`].
-/// Unlike [`Gauge`], only the width can be defined by the [rendering](Widget::render) [`Rect`].
-/// The height is always 1.
-/// The associated label is always left-aligned. If not set with [`LineGauge::label`], the label
-/// is the percentage of the bar filled.
+/// Unlike [`Gauge`], only the width can be defined by the [rendering](Widget::render) [`Rect`]. The
+/// height is always 1.
+///
+/// The associated label is always left-aligned. If not set with [`LineGauge::label`], the label is
+/// the percentage of the bar filled.
+///
 /// You can also set the symbols used to draw the bar with [`LineGauge::line_set`].
 ///
-/// This can be useful to indicate the progression of a task, like a download.
+/// To style the gauge line use [`LineGauge::filled_style`] and [`LineGauge::unfilled_style`] which
+/// let you pick a color for foreground (i.e. line) and background of the filled and unfilled part
+/// of gauge respectively.
 ///
 /// # Examples:
 ///
@@ -752,7 +772,7 @@
 ///
 /// LineGauge::default()
 ///     .block(Block::bordered().title("Progress"))
-///     .gauge_style(
+///     .filled_style(
 ///         Style::default()
 ///             .fg(Color::White)
 ///             .bg(Color::Black)
@@ -772,7 +792,8 @@
     label: <span class="prelude-ty">Option</span>&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
     line_set: symbols::line::Set,
     style: Style,
-    gauge_style: Style,
+    filled_style: Style,
+    unfilled_style: Style,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; LineGauge&lt;<span class="lifetime">'a</span>&gt; {
@@ -844,9 +865,40 @@
     ///
     /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
     /// your own type that implements [`Into&lt;Style&gt;`]).
-    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="attr">#[deprecated(
+        since = <span class="string">"0.27.0"</span>,
+        note = <span class="string">"You should use `LineGauge::filled_style` instead."
+    </span>)]
+    #[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>gauge_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.gauge_style = style.into();
+        <span class="kw">let </span>style: Style = style.into();
+
+        <span class="comment">// maintain backward compatibility, which used the background color of the style as the
+        // unfilled part of the gauge and the foreground color as the filled part of the gauge
+        </span><span class="kw">let </span>filled_color = style.fg.unwrap_or(Color::Reset);
+        <span class="kw">let </span>unfilled_color = style.bg.unwrap_or(Color::Reset);
+        <span class="self">self</span>.filled_style = style.fg(filled_color).bg(Color::Reset);
+        <span class="self">self</span>.unfilled_style = style.fg(unfilled_color).bg(Color::Reset);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the style of filled part of the bar.
+    ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>filled_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.filled_style = style.into();
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the style of the unfilled part of the bar.
+    ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>unfilled_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.unfilled_style = style.into();
         <span class="self">self
     </span>}
 }
@@ -880,26 +932,12 @@
         <span class="kw">for </span>col <span class="kw">in </span>start..end {
             buf.get_mut(col, row)
                 .set_symbol(<span class="self">self</span>.line_set.horizontal)
-                .set_style(Style {
-                    fg: <span class="self">self</span>.gauge_style.fg,
-                    bg: <span class="prelude-val">None</span>,
-                    <span class="attr">#[cfg(feature = <span class="string">"underline-color"</span>)]
-                    </span>underline_color: <span class="self">self</span>.gauge_style.underline_color,
-                    add_modifier: <span class="self">self</span>.gauge_style.add_modifier,
-                    sub_modifier: <span class="self">self</span>.gauge_style.sub_modifier,
-                });
+                .set_style(<span class="self">self</span>.filled_style);
         }
         <span class="kw">for </span>col <span class="kw">in </span>end..gauge_area.right() {
             buf.get_mut(col, row)
                 .set_symbol(<span class="self">self</span>.line_set.horizontal)
-                .set_style(Style {
-                    fg: <span class="self">self</span>.gauge_style.bg,
-                    bg: <span class="prelude-val">None</span>,
-                    <span class="attr">#[cfg(feature = <span class="string">"underline-color"</span>)]
-                    </span>underline_color: <span class="self">self</span>.gauge_style.underline_color,
-                    add_modifier: <span class="self">self</span>.gauge_style.add_modifier,
-                    sub_modifier: <span class="self">self</span>.gauge_style.sub_modifier,
-                });
+                .set_style(<span class="self">self</span>.unfilled_style);
         }
     }
 }
@@ -979,25 +1017,37 @@
         );
     }
 
+    <span class="attr">#[allow(deprecated)]
+    #[test]
+    </span><span class="kw">fn </span>line_gauge_can_be_stylized_with_deprecated_gauge_style() {
+        <span class="kw">let </span>gauge =
+            LineGauge::default().gauge_style(Style::default().fg(Color::Red).bg(Color::Blue));
+
+        <span class="macro">assert_eq!</span>(
+            gauge.filled_style,
+            Style::default().fg(Color::Red).bg(Color::Reset)
+        );
+
+        <span class="macro">assert_eq!</span>(
+            gauge.unfilled_style,
+            Style::default().fg(Color::Blue).bg(Color::Reset)
+        );
+    }
+
     <span class="attr">#[test]
     </span><span class="kw">fn </span>line_gauge_default() {
-        <span class="comment">// TODO: replace to `assert_eq!(LineGauge::default(), LineGauge::default())`
-        // when `Eq` or `PartialEq` is implemented for `LineGauge`.
-        </span><span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">"{:?}"</span>, LineGauge::default()),
-            <span class="macro">format!</span>(
-                <span class="string">"{:?}"</span>,
-                LineGauge {
-                    block: <span class="prelude-val">None</span>,
-                    ratio: <span class="number">0.0</span>,
-                    label: <span class="prelude-val">None</span>,
-                    style: Style::default(),
-                    line_set: symbols::line::NORMAL,
-                    gauge_style: Style::default(),
-                }
-            ),
-            <span class="string">"LineGauge::default() should have correct default values."
-        </span>);
+        <span class="macro">assert_eq!</span>(
+            LineGauge::default(),
+            LineGauge {
+                block: <span class="prelude-val">None</span>,
+                ratio: <span class="number">0.0</span>,
+                label: <span class="prelude-val">None</span>,
+                style: Style::default(),
+                line_set: symbols::line::NORMAL,
+                filled_style: Style::default(),
+                unfilled_style: Style::default()
+            }
+        );
     }
 }
 </code></pre></div></section></main></body></html>

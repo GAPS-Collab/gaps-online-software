@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/widgets/canvas.rs`."><title>canvas.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/widgets/canvas.rs`."><title>canvas.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -904,8 +904,6 @@
 <a href="#904" id="904">904</a>
 <a href="#905" id="905">905</a>
 <a href="#906" id="906">906</a>
-<a href="#907" id="907">907</a>
-<a href="#908" id="908">908</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A [`Canvas`] and a collection of [`Shape`]s.
 //!
 //! The [`Canvas`] is a blank space on which you can draw anything manually or use one of the
@@ -938,7 +936,7 @@
     points::Points,
     rectangle::Rectangle,
 };
-<span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, text::Line <span class="kw">as </span>TextLine, widgets::Block};
+<span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, symbols::Marker, text::Line <span class="kw">as </span>TextLine, widgets::Block};
 
 <span class="doccomment">/// Something that can be drawn on a [`Canvas`].
 ///
@@ -1372,17 +1370,17 @@
         height: u16,
         x_bounds: [f64; <span class="number">2</span>],
         y_bounds: [f64; <span class="number">2</span>],
-        marker: symbols::Marker,
+        marker: Marker,
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>dot = symbols::DOT.chars().next().unwrap();
         <span class="kw">let </span>block = symbols::block::FULL.chars().next().unwrap();
         <span class="kw">let </span>bar = symbols::bar::HALF.chars().next().unwrap();
         <span class="kw">let </span>grid: Box&lt;<span class="kw">dyn </span>Grid&gt; = <span class="kw">match </span>marker {
-            symbols::Marker::Dot =&gt; Box::new(CharGrid::new(width, height, dot)),
-            symbols::Marker::Block =&gt; Box::new(CharGrid::new(width, height, block)),
-            symbols::Marker::Bar =&gt; Box::new(CharGrid::new(width, height, bar)),
-            symbols::Marker::Braille =&gt; Box::new(BrailleGrid::new(width, height)),
-            symbols::Marker::HalfBlock =&gt; Box::new(HalfBlockGrid::new(width, height)),
+            Marker::Dot =&gt; Box::new(CharGrid::new(width, height, dot)),
+            Marker::Block =&gt; Box::new(CharGrid::new(width, height, block)),
+            Marker::Bar =&gt; Box::new(CharGrid::new(width, height, bar)),
+            Marker::Braille =&gt; Box::new(BrailleGrid::new(width, height)),
+            Marker::HalfBlock =&gt; Box::new(HalfBlockGrid::new(width, height)),
         };
         <span class="self">Self </span>{
             x_bounds,
@@ -1512,7 +1510,7 @@
     y_bounds: [f64; <span class="number">2</span>],
     paint_func: <span class="prelude-ty">Option</span>&lt;F&gt;,
     background_color: Color,
-    marker: symbols::Marker,
+    marker: Marker,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, F&gt; Default <span class="kw">for </span>Canvas&lt;<span class="lifetime">'a</span>, F&gt;
@@ -1526,7 +1524,7 @@
             y_bounds: [<span class="number">0.0</span>, <span class="number">0.0</span>],
             paint_func: <span class="prelude-val">None</span>,
             background_color: Color::Reset,
-            marker: symbols::Marker::Braille,
+            marker: Marker::Braille,
         }
     }
 }
@@ -1625,7 +1623,7 @@
     ///     .paint(|ctx| {});
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub const fn </span>marker(<span class="kw-2">mut </span><span class="self">self</span>, marker: symbols::Marker) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub const fn </span>marker(<span class="kw-2">mut </span><span class="self">self</span>, marker: Marker) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.marker = marker;
         <span class="self">self
     </span>}
@@ -1725,9 +1723,7 @@
     // results in the expected output
     </span><span class="kw">fn </span>test_marker(marker: Marker, expected: <span class="kw-2">&amp;</span>str) {
         <span class="kw">let </span>area = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">5</span>);
-        <span class="kw">let </span><span class="kw-2">mut </span>cell = Cell::default();
-        cell.set_char(<span class="string">'x'</span>);
-        <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::filled(area, <span class="kw-2">&amp;</span>cell);
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::filled(area, Cell::new(<span class="string">"x"</span>));
         <span class="kw">let </span>horizontal_line = Line {
             x1: <span class="number">0.0</span>,
             y1: <span class="number">0.0</span>,

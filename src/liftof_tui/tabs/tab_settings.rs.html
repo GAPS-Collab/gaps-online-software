@@ -245,6 +245,7 @@
 <a href="#245" id="245">245</a>
 <a href="#246" id="246">246</a>
 <a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>ratatui::prelude::<span class="kw-2">*</span>;
 
 <span class="comment">//use ratatui::symbols;
@@ -484,8 +485,9 @@
     frame.render_widget(refresh_view, sub_rows0[<span class="number">1</span>]);
     frame.render_stateful_widget(color_theme_list, sub_rows0[<span class="number">0</span>], <span class="kw-2">&amp;mut </span><span class="self">self</span>.ctl_state );
     <span class="kw">if </span><span class="self">self</span>.colortheme_popup {
-      <span class="kw">let </span>popup = Popup::new(<span class="string">"New color theme selected!"</span>, <span class="string">"Any key to continue!"</span>)
-      .style(<span class="self">self</span>.theme.style());
+      <span class="kw">let </span>popup = Popup::new(<span class="string">"Any key to continue!"</span>)
+        .title(<span class="string">"New color theme selected!"</span>)
+        .style(<span class="self">self</span>.theme.style());
       frame.render_widget(<span class="kw-2">&amp;</span>popup, frame.size());
     }
   }

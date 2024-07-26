@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/style.rs`."><title>style.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/style.rs`."><title>style.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -799,82 +799,6 @@
 <a href="#799" id="799">799</a>
 <a href="#800" id="800">800</a>
 <a href="#801" id="801">801</a>
-<a href="#802" id="802">802</a>
-<a href="#803" id="803">803</a>
-<a href="#804" id="804">804</a>
-<a href="#805" id="805">805</a>
-<a href="#806" id="806">806</a>
-<a href="#807" id="807">807</a>
-<a href="#808" id="808">808</a>
-<a href="#809" id="809">809</a>
-<a href="#810" id="810">810</a>
-<a href="#811" id="811">811</a>
-<a href="#812" id="812">812</a>
-<a href="#813" id="813">813</a>
-<a href="#814" id="814">814</a>
-<a href="#815" id="815">815</a>
-<a href="#816" id="816">816</a>
-<a href="#817" id="817">817</a>
-<a href="#818" id="818">818</a>
-<a href="#819" id="819">819</a>
-<a href="#820" id="820">820</a>
-<a href="#821" id="821">821</a>
-<a href="#822" id="822">822</a>
-<a href="#823" id="823">823</a>
-<a href="#824" id="824">824</a>
-<a href="#825" id="825">825</a>
-<a href="#826" id="826">826</a>
-<a href="#827" id="827">827</a>
-<a href="#828" id="828">828</a>
-<a href="#829" id="829">829</a>
-<a href="#830" id="830">830</a>
-<a href="#831" id="831">831</a>
-<a href="#832" id="832">832</a>
-<a href="#833" id="833">833</a>
-<a href="#834" id="834">834</a>
-<a href="#835" id="835">835</a>
-<a href="#836" id="836">836</a>
-<a href="#837" id="837">837</a>
-<a href="#838" id="838">838</a>
-<a href="#839" id="839">839</a>
-<a href="#840" id="840">840</a>
-<a href="#841" id="841">841</a>
-<a href="#842" id="842">842</a>
-<a href="#843" id="843">843</a>
-<a href="#844" id="844">844</a>
-<a href="#845" id="845">845</a>
-<a href="#846" id="846">846</a>
-<a href="#847" id="847">847</a>
-<a href="#848" id="848">848</a>
-<a href="#849" id="849">849</a>
-<a href="#850" id="850">850</a>
-<a href="#851" id="851">851</a>
-<a href="#852" id="852">852</a>
-<a href="#853" id="853">853</a>
-<a href="#854" id="854">854</a>
-<a href="#855" id="855">855</a>
-<a href="#856" id="856">856</a>
-<a href="#857" id="857">857</a>
-<a href="#858" id="858">858</a>
-<a href="#859" id="859">859</a>
-<a href="#860" id="860">860</a>
-<a href="#861" id="861">861</a>
-<a href="#862" id="862">862</a>
-<a href="#863" id="863">863</a>
-<a href="#864" id="864">864</a>
-<a href="#865" id="865">865</a>
-<a href="#866" id="866">866</a>
-<a href="#867" id="867">867</a>
-<a href="#868" id="868">868</a>
-<a href="#869" id="869">869</a>
-<a href="#870" id="870">870</a>
-<a href="#871" id="871">871</a>
-<a href="#872" id="872">872</a>
-<a href="#873" id="873">873</a>
-<a href="#874" id="874">874</a>
-<a href="#875" id="875">875</a>
-<a href="#876" id="876">876</a>
-<a href="#877" id="877">877</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! `style` contains the primitives used to control how your user interface will look.
 //!
 //! There are two ways to set styles:
@@ -948,13 +872,14 @@
 </span><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span>bitflags::bitflags;
-
-<span class="kw">mod </span>color;
-<span class="kw">mod </span>stylize;
-
 <span class="kw">pub use </span>color::{Color, ParseColorError};
 <span class="kw">pub use </span>stylize::{Styled, Stylize};
+
+<span class="kw">mod </span>color;
 <span class="kw">pub mod </span>palette;
+<span class="attr">#[cfg(feature = <span class="string">"palette"</span>)]
+</span><span class="kw">mod </span>palette_conversion;
+<span class="kw">mod </span>stylize;
 
 <span class="macro">bitflags!</span> {
     <span class="doccomment">/// Modifier changes the way a piece of text is displayed.
@@ -1099,7 +1024,7 @@
 ///     buffer.get(0, 0).style(),
 /// );
 /// ```
-</span><span class="attr">#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="attr">#[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = <span class="string">"serde"</span>, derive(serde::Serialize, serde::Deserialize))]
 </span><span class="kw">pub struct </span>Style {
     <span class="kw">pub </span>fg: <span class="prelude-ty">Option</span>&lt;Color&gt;,
@@ -1108,12 +1033,6 @@
     </span><span class="kw">pub </span>underline_color: <span class="prelude-ty">Option</span>&lt;Color&gt;,
     <span class="kw">pub </span>add_modifier: Modifier,
     <span class="kw">pub </span>sub_modifier: Modifier,
-}
-
-<span class="kw">impl </span>Default <span class="kw">for </span>Style {
-    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new()
-    }
 }
 
 <span class="kw">impl </span>Styled <span class="kw">for </span>Style {
@@ -1529,152 +1448,81 @@
         );
     }
 
-    <span class="attr">#[allow(clippy::too_many_lines)]
-    #[test]
-    </span><span class="kw">fn </span>style_can_be_stylized() {
-        <span class="comment">// foreground colors
-        </span><span class="macro">assert_eq!</span>(Style::new().black(), Style::new().fg(Color::Black));
-        <span class="macro">assert_eq!</span>(Style::new().red(), Style::new().fg(Color::Red));
-        <span class="macro">assert_eq!</span>(Style::new().green(), Style::new().fg(Color::Green));
-        <span class="macro">assert_eq!</span>(Style::new().yellow(), Style::new().fg(Color::Yellow));
-        <span class="macro">assert_eq!</span>(Style::new().blue(), Style::new().fg(Color::Blue));
-        <span class="macro">assert_eq!</span>(Style::new().magenta(), Style::new().fg(Color::Magenta));
-        <span class="macro">assert_eq!</span>(Style::new().cyan(), Style::new().fg(Color::Cyan));
-        <span class="macro">assert_eq!</span>(Style::new().white(), Style::new().fg(Color::White));
-        <span class="macro">assert_eq!</span>(Style::new().gray(), Style::new().fg(Color::Gray));
-        <span class="macro">assert_eq!</span>(Style::new().dark_gray(), Style::new().fg(Color::DarkGray));
-        <span class="macro">assert_eq!</span>(Style::new().light_red(), Style::new().fg(Color::LightRed));
-        <span class="macro">assert_eq!</span>(
-            Style::new().light_green(),
-            Style::new().fg(Color::LightGreen)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().light_yellow(),
-            Style::new().fg(Color::LightYellow)
-        );
-        <span class="macro">assert_eq!</span>(Style::new().light_blue(), Style::new().fg(Color::LightBlue));
-        <span class="macro">assert_eq!</span>(
-            Style::new().light_magenta(),
-            Style::new().fg(Color::LightMagenta)
-        );
-        <span class="macro">assert_eq!</span>(Style::new().light_cyan(), Style::new().fg(Color::LightCyan));
-        <span class="macro">assert_eq!</span>(Style::new().white(), Style::new().fg(Color::White));
+    <span class="attr">#[rstest]
+    #[case(Style::new().black(), Color::Black)]
+    #[case(Style::new().red(), Color::Red)]
+    #[case(Style::new().green(), Color::Green)]
+    #[case(Style::new().yellow(), Color::Yellow)]
+    #[case(Style::new().blue(), Color::Blue)]
+    #[case(Style::new().magenta(), Color::Magenta)]
+    #[case(Style::new().cyan(), Color::Cyan)]
+    #[case(Style::new().white(), Color::White)]
+    #[case(Style::new().gray(), Color::Gray)]
+    #[case(Style::new().dark_gray(), Color::DarkGray)]
+    #[case(Style::new().light_red(), Color::LightRed)]
+    #[case(Style::new().light_green(), Color::LightGreen)]
+    #[case(Style::new().light_yellow(), Color::LightYellow)]
+    #[case(Style::new().light_blue(), Color::LightBlue)]
+    #[case(Style::new().light_magenta(), Color::LightMagenta)]
+    #[case(Style::new().light_cyan(), Color::LightCyan)]
+    #[case(Style::new().white(), Color::White)]
+    </span><span class="kw">fn </span>fg_can_be_stylized(<span class="attr">#[case] </span>stylized: Style, <span class="attr">#[case] </span>expected: Color) {
+        <span class="macro">assert_eq!</span>(stylized, Style::new().fg(expected));
+    }
 
-        <span class="comment">// Background colors
-        </span><span class="macro">assert_eq!</span>(Style::new().on_black(), Style::new().bg(Color::Black));
-        <span class="macro">assert_eq!</span>(Style::new().on_red(), Style::new().bg(Color::Red));
-        <span class="macro">assert_eq!</span>(Style::new().on_green(), Style::new().bg(Color::Green));
-        <span class="macro">assert_eq!</span>(Style::new().on_yellow(), Style::new().bg(Color::Yellow));
-        <span class="macro">assert_eq!</span>(Style::new().on_blue(), Style::new().bg(Color::Blue));
-        <span class="macro">assert_eq!</span>(Style::new().on_magenta(), Style::new().bg(Color::Magenta));
-        <span class="macro">assert_eq!</span>(Style::new().on_cyan(), Style::new().bg(Color::Cyan));
-        <span class="macro">assert_eq!</span>(Style::new().on_white(), Style::new().bg(Color::White));
-        <span class="macro">assert_eq!</span>(Style::new().on_gray(), Style::new().bg(Color::Gray));
-        <span class="macro">assert_eq!</span>(
-            Style::new().on_dark_gray(),
-            Style::new().bg(Color::DarkGray)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().on_light_red(),
-            Style::new().bg(Color::LightRed)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().on_light_green(),
-            Style::new().bg(Color::LightGreen)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().on_light_yellow(),
-            Style::new().bg(Color::LightYellow)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().on_light_blue(),
-            Style::new().bg(Color::LightBlue)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().on_light_magenta(),
-            Style::new().bg(Color::LightMagenta)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().on_light_cyan(),
-            Style::new().bg(Color::LightCyan)
-        );
-        <span class="macro">assert_eq!</span>(Style::new().on_white(), Style::new().bg(Color::White));
+    <span class="attr">#[rstest]
+    #[case(Style::new().on_black(), Color::Black)]
+    #[case(Style::new().on_red(), Color::Red)]
+    #[case(Style::new().on_green(), Color::Green)]
+    #[case(Style::new().on_yellow(), Color::Yellow)]
+    #[case(Style::new().on_blue(), Color::Blue)]
+    #[case(Style::new().on_magenta(), Color::Magenta)]
+    #[case(Style::new().on_cyan(), Color::Cyan)]
+    #[case(Style::new().on_white(), Color::White)]
+    #[case(Style::new().on_gray(), Color::Gray)]
+    #[case(Style::new().on_dark_gray(), Color::DarkGray)]
+    #[case(Style::new().on_light_red(), Color::LightRed)]
+    #[case(Style::new().on_light_green(), Color::LightGreen)]
+    #[case(Style::new().on_light_yellow(), Color::LightYellow)]
+    #[case(Style::new().on_light_blue(), Color::LightBlue)]
+    #[case(Style::new().on_light_magenta(), Color::LightMagenta)]
+    #[case(Style::new().on_light_cyan(), Color::LightCyan)]
+    #[case(Style::new().on_white(), Color::White)]
+    </span><span class="kw">fn </span>bg_can_be_stylized(<span class="attr">#[case] </span>stylized: Style, <span class="attr">#[case] </span>expected: Color) {
+        <span class="macro">assert_eq!</span>(stylized, Style::new().bg(expected));
+    }
 
-        <span class="comment">// Add Modifiers
-        </span><span class="macro">assert_eq!</span>(
-            Style::new().bold(),
-            Style::new().add_modifier(Modifier::BOLD)
-        );
-        <span class="macro">assert_eq!</span>(Style::new().dim(), Style::new().add_modifier(Modifier::DIM));
-        <span class="macro">assert_eq!</span>(
-            Style::new().italic(),
-            Style::new().add_modifier(Modifier::ITALIC)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().underlined(),
-            Style::new().add_modifier(Modifier::UNDERLINED)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().slow_blink(),
-            Style::new().add_modifier(Modifier::SLOW_BLINK)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().rapid_blink(),
-            Style::new().add_modifier(Modifier::RAPID_BLINK)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().reversed(),
-            Style::new().add_modifier(Modifier::REVERSED)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().hidden(),
-            Style::new().add_modifier(Modifier::HIDDEN)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().crossed_out(),
-            Style::new().add_modifier(Modifier::CROSSED_OUT)
-        );
+    <span class="attr">#[rstest]
+    #[case(Style::new().bold(), Modifier::BOLD)]
+    #[case(Style::new().dim(), Modifier::DIM)]
+    #[case(Style::new().italic(), Modifier::ITALIC)]
+    #[case(Style::new().underlined(), Modifier::UNDERLINED)]
+    #[case(Style::new().slow_blink(), Modifier::SLOW_BLINK)]
+    #[case(Style::new().rapid_blink(), Modifier::RAPID_BLINK)]
+    #[case(Style::new().reversed(), Modifier::REVERSED)]
+    #[case(Style::new().hidden(), Modifier::HIDDEN)]
+    #[case(Style::new().crossed_out(), Modifier::CROSSED_OUT)]
+    </span><span class="kw">fn </span>add_modifier_can_be_stylized(<span class="attr">#[case] </span>stylized: Style, <span class="attr">#[case] </span>expected: Modifier) {
+        <span class="macro">assert_eq!</span>(stylized, Style::new().add_modifier(expected));
+    }
 
-        <span class="comment">// Remove Modifiers
-        </span><span class="macro">assert_eq!</span>(
-            Style::new().not_bold(),
-            Style::new().remove_modifier(Modifier::BOLD)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().not_dim(),
-            Style::new().remove_modifier(Modifier::DIM)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().not_italic(),
-            Style::new().remove_modifier(Modifier::ITALIC)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().not_underlined(),
-            Style::new().remove_modifier(Modifier::UNDERLINED)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().not_slow_blink(),
-            Style::new().remove_modifier(Modifier::SLOW_BLINK)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().not_rapid_blink(),
-            Style::new().remove_modifier(Modifier::RAPID_BLINK)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().not_reversed(),
-            Style::new().remove_modifier(Modifier::REVERSED)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().not_hidden(),
-            Style::new().remove_modifier(Modifier::HIDDEN)
-        );
-        <span class="macro">assert_eq!</span>(
-            Style::new().not_crossed_out(),
-            Style::new().remove_modifier(Modifier::CROSSED_OUT)
-        );
+    <span class="attr">#[rstest]
+    #[case(Style::new().not_bold(), Modifier::BOLD)]
+    #[case(Style::new().not_dim(), Modifier::DIM)]
+    #[case(Style::new().not_italic(), Modifier::ITALIC)]
+    #[case(Style::new().not_underlined(), Modifier::UNDERLINED)]
+    #[case(Style::new().not_slow_blink(), Modifier::SLOW_BLINK)]
+    #[case(Style::new().not_rapid_blink(), Modifier::RAPID_BLINK)]
+    #[case(Style::new().not_reversed(), Modifier::REVERSED)]
+    #[case(Style::new().not_hidden(), Modifier::HIDDEN)]
+    #[case(Style::new().not_crossed_out(), Modifier::CROSSED_OUT)]
+    </span><span class="kw">fn </span>remove_modifier_can_be_stylized(<span class="attr">#[case] </span>stylized: Style, <span class="attr">#[case] </span>expected: Modifier) {
+        <span class="macro">assert_eq!</span>(stylized, Style::new().remove_modifier(expected));
+    }
 
-        <span class="comment">// reset
-        </span><span class="macro">assert_eq!</span>(Style::new().reset(), Style::reset());
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>reset_can_be_stylized() {
+        <span class="macro">assert_eq!</span>(Style::new().reset(), Style::reset());
     }
 
     <span class="attr">#[test]

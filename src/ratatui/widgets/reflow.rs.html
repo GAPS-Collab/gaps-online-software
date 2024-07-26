@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/widgets/reflow.rs`."><title>reflow.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/widgets/reflow.rs`."><title>reflow.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -716,6 +716,7 @@
 <a href="#716" id="716">716</a>
 <a href="#717" id="717">717</a>
 <a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{collections::VecDeque, vec::IntoIter};
 
 <span class="kw">use </span>unicode_segmentation::UnicodeSegmentation;
@@ -1054,7 +1055,8 @@
             <span class="kw">break</span>;
         }
     }
-    <span class="kw-2">&amp;</span>src[start..]
+    <span class="attr">#[allow(clippy::string_slice)] </span><span class="comment">// Is safe as it comes from UnicodeSegmentation
+    </span><span class="kw-2">&amp;</span>src[start..]
 }
 
 <span class="attr">#[cfg(test)]
@@ -1149,17 +1151,17 @@
         <span class="kw">let </span>(line_truncator, <span class="kw">_</span>, <span class="kw">_</span>) = run_composer(Composer::LineTruncator, text, width <span class="kw">as </span>u16);
 
         <span class="kw">let </span>wrapped = <span class="macro">vec!</span>[
-            <span class="kw-2">&amp;</span>text[..width],
-            <span class="kw-2">&amp;</span>text[width..width * <span class="number">2</span>],
-            <span class="kw-2">&amp;</span>text[width * <span class="number">2</span>..width * <span class="number">3</span>],
-            <span class="kw-2">&amp;</span>text[width * <span class="number">3</span>..],
+            text.get(..width).unwrap(),
+            text.get(width..width * <span class="number">2</span>).unwrap(),
+            text.get(width * <span class="number">2</span>..width * <span class="number">3</span>).unwrap(),
+            text.get(width * <span class="number">3</span>..).unwrap(),
         ];
         <span class="macro">assert_eq!</span>(
             word_wrapper, wrapped,
             <span class="string">"WordWrapper should detect the line cannot be broken on word boundary and \
              break it at line width limit."
         </span>);
-        <span class="macro">assert_eq!</span>(line_truncator, <span class="macro">vec!</span>[<span class="kw-2">&amp;</span>text[..width]]);
+        <span class="macro">assert_eq!</span>(line_truncator, [text.get(..width).unwrap()]);
     }
 
     <span class="attr">#[test]
@@ -1189,7 +1191,7 @@
         <span class="macro">assert_eq!</span>(word_wrapper_single_space, word_wrapped);
         <span class="macro">assert_eq!</span>(word_wrapper_multi_space, word_wrapped);
 
-        <span class="macro">assert_eq!</span>(line_truncator, <span class="macro">vec!</span>[<span class="kw-2">&amp;</span>text[..width]]);
+        <span class="macro">assert_eq!</span>(line_truncator, [text.get(..width).unwrap()]);
     }
 
     <span class="attr">#[test]
@@ -1390,11 +1392,11 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>line_composer_zero_width_at_end() {
         <span class="kw">let </span>width = <span class="number">3</span>;
-        <span class="kw">let </span>line = <span class="string">"foo\0"</span>;
+        <span class="kw">let </span>line = <span class="string">"foo\u{200B}"</span>;
         <span class="kw">let </span>(word_wrapper, <span class="kw">_</span>, <span class="kw">_</span>) = run_composer(Composer::WordWrapper { trim: <span class="bool-val">true </span>}, line, width);
         <span class="kw">let </span>(line_truncator, <span class="kw">_</span>, <span class="kw">_</span>) = run_composer(Composer::LineTruncator, line, width);
-        <span class="macro">assert_eq!</span>(word_wrapper, <span class="macro">vec!</span>[<span class="string">"foo\0"</span>]);
-        <span class="macro">assert_eq!</span>(line_truncator, <span class="macro">vec!</span>[<span class="string">"foo\0"</span>]);
+        <span class="macro">assert_eq!</span>(word_wrapper, <span class="macro">vec!</span>[<span class="string">"foo"</span>]);
+        <span class="macro">assert_eq!</span>(line_truncator, <span class="macro">vec!</span>[<span class="string">"foo\u{200B}"</span>]);
     }
 
     <span class="attr">#[test]

@@ -776,6 +776,18 @@
 <a href="#776" id="776">776</a>
 <a href="#777" id="777">777</a>
 <a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard communications
 //!
 //! The MTB (MasterTriggerBoard) is currently
@@ -1024,7 +1036,7 @@
   <span class="kw">if </span>data.len() &lt; <span class="number">4 </span>{
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::BrokenPackage);
   }
-  <span class="kw">let </span>tiu_link_bad   = !(tiu_link_is_good(bus)<span class="question-mark">?</span>);
+  <span class="kw">let </span>tiu_link_bad   = TIU_BAD.get(bus)<span class="question-mark">?</span>;
   <span class="kw">let </span>tiu_busy_len   = TIU_BUSY_LENGTH.get(bus)<span class="question-mark">?</span>;
   <span class="kw">let </span>tiu_aux_link   = TIU_USE_AUX_LINK.get(bus)<span class="question-mark">? </span><span class="kw">as </span>u8;
   <span class="kw">let </span>tiu_emu_mode   = TIU_EMULATION_MODE.get(bus)<span class="question-mark">? </span><span class="kw">as </span>u8;
@@ -1134,8 +1146,17 @@
       }
     }
   }
+  
+  <span class="comment">//match TIU_USE_AUX_LINK.set(&amp;mut bus, 1) {
+  //  Err(err) =&gt; {
+  //    error!("Unable to use TIU AUX link! {err}");
+  //  }
+  //  Ok(_) =&gt; {
+  //    println!("==&gt; Using TIU AUX link!");
+  //  }
+  //}
 
-  <span class="macro">info!</span>(<span class="string">"Settting rb integration window!"</span>);
+  </span><span class="macro">info!</span>(<span class="string">"Settting rb integration window!"</span>);
   <span class="kw">let </span>int_wind = settings.rb_int_window;
   <span class="kw">match </span>set_rb_int_window(<span class="kw-2">&amp;mut </span>bus, int_wind) {
     <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set rb integration window! {err}"</span>),
@@ -1266,7 +1287,7 @@
     //}
     </span><span class="kw">_ </span>=&gt; {
       <span class="macro">error!</span>(<span class="string">"Trigger type {} not covered!"</span>, settings.trigger_type);
-      <span class="macro">println!</span>(<span class="string">"== ==&gt; Not setting any trigger condition. You can set it through pico_hal.py"</span>);
+      <span class="macro">println!</span>(<span class="string">"= =&gt; Not setting any trigger condition. You can set it through pico_hal.py"</span>);
       <span class="macro">warn!</span>(<span class="string">"Trigger condition undefined! Not setting anything!"</span>);
       <span class="macro">error!</span>(<span class="string">"Trigger conditions unknown!"</span>);
     }
@@ -1314,13 +1335,18 @@
     <span class="comment">// Check thread control and what to do
     </span><span class="kw">if </span>tc_timer.elapsed().as_secs_f32() &gt; <span class="number">1.5 </span>{
       <span class="kw">match </span>thread_control.try_lock() {
-        <span class="prelude-val">Ok</span>(tc) =&gt; {
-          <span class="kw">if </span>tc.thread_master_trg_active {
+        <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
+          <span class="kw">if </span>tc.thread_master_trg_active || tc.stop_flag {
             <span class="comment">// if the thread is not supposed to be active, 
             // idle
             </span>is_active = <span class="bool-val">true</span>;
-          } <span class="kw">else </span>{
+          }
+          <span class="kw">if </span>!tc.thread_master_trg_active {
             is_active = <span class="bool-val">false</span>;
+          }
+          <span class="kw">if </span>tc.stop_flag {
+            tc.thread_master_trg_active = <span class="bool-val">false</span>;
+            <span class="kw">break</span>;
           }
         },
         <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1329,16 +1355,13 @@
       }
       tc_timer = Instant::now();
     }
-    <span class="kw">if </span>!is_active {
-      <span class="kw">continue</span>;
-    }
     <span class="comment">// This is a recovery mechanism. In case we don't see an event
     // for mtb_timeout_sec, we attempt to reconnect to the MTB
     </span><span class="kw">if </span>mtb_timeout.elapsed().as_secs() &gt; mtb_timeout_sec {
       <span class="kw">if </span>mtb_timeout.elapsed().as_secs() &gt; mtb_timeout_sec {
-        <span class="macro">println!</span>(<span class="string">"==&gt; [master_trigger] reconnection timer elapsed"</span>);
+        <span class="macro">println!</span>(<span class="string">"= =&gt; [master_trigger] reconnection timer elapsed"</span>);
       } <span class="kw">else </span>{
-        <span class="macro">println!</span>(<span class="string">"==&gt; [master_trigger] reconnection requested"</span>);
+        <span class="macro">println!</span>(<span class="string">"= =&gt; [master_trigger] reconnection requested"</span>);
       }
       <span class="kw">match </span>IPBus::new(mt_address.clone()) {
         <span class="prelude-val">Err</span>(err) =&gt; {
@@ -1433,6 +1456,12 @@
       }
       moni_interval = Instant::now();
     }
+    
+    <span class="comment">// if we ar not active, don't get events
+    </span><span class="kw">if </span>!is_active {
+      <span class="kw">continue</span>;
+    }
+
     <span class="kw">match </span>get_event(<span class="kw-2">&amp;mut </span>bus){ <span class="comment">//,
       </span><span class="prelude-val">Err</span>(err) =&gt; {
         <span class="kw">match </span>err {
@@ -1477,72 +1506,67 @@
       }
     }
 
-    <span class="kw">if </span>verbose {
-      <span class="kw">let </span>verbose_timer_elapsed = verbose_timer.elapsed().as_secs_f64();
-      <span class="comment">//let mut missing = 0usize;
-      //if event_id_test.len() &gt; 0 {
-      //  let mut evid = event_id_test[0];
-      //  for _ in 0..event_id_test.len() {
-      //    if !event_id_test.contains(&amp;evid) {
-      //      missing += 1;
-      //    }
-      //    evid += 1;
-      //  }
-      //}
-      //let evid_check_str = format!("&gt;&gt; ==&gt; In a chunk of {} events, we missed {} ({}%) &lt;&lt;", event_id_test.len(), missing, 100.0*(missing as f64)/event_id_test.len() as f64);
-      //event_id_test.clear();
-      </span><span class="kw">if </span>verbose_timer_elapsed &gt; <span class="number">30.0 </span>{
-        <span class="kw">match </span>EVQ_NUM_EVENTS.get(<span class="kw-2">&amp;mut </span>bus) {
-          <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, EVQ_NUM_EVENTS);
-          }
-          <span class="prelude-val">Ok</span>(num_ev) =&gt; {
-            heartbeat.evq_num_events_last = num_ev <span class="kw">as </span>u64;
-            evq_num_events += num_ev <span class="kw">as </span>u64;
-            n_iter_loop    += <span class="number">1</span>;
-            heartbeat.evq_num_events_avg = evq_num_events <span class="kw">as </span>u64/n_iter_loop <span class="kw">as </span>u64;
-          }
+    <span class="kw">let </span>verbose_timer_elapsed = verbose_timer.elapsed().as_secs_f64();
+    <span class="comment">//let mut missing = 0usize;
+    //if event_id_test.len() &gt; 0 {
+    //  let mut evid = event_id_test[0];
+    //  for _ in 0..event_id_test.len() {
+    //    if !event_id_test.contains(&amp;evid) {
+    //      missing += 1;
+    //    }
+    //    evid += 1;
+    //  }
+    //}
+    //let evid_check_str = format!("&gt;&gt; ==&gt; In a chunk of {} events, we missed {} ({}%) &lt;&lt;", event_id_test.len(), missing, 100.0*(missing as f64)/event_id_test.len() as f64);
+    //event_id_test.clear();
+    </span><span class="kw">if </span>verbose_timer_elapsed &gt; <span class="number">30.0 </span>{
+      <span class="kw">match </span>EVQ_NUM_EVENTS.get(<span class="kw-2">&amp;mut </span>bus) {
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, EVQ_NUM_EVENTS);
         }
-        heartbeat.total_elapsed += verbose_timer_elapsed <span class="kw">as </span>u64;
-        <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="string">"&gt;&gt; == == == == == == ==  MT HEARTBEAT == ==  == == == == =="</span>.bright_blue().bold());
-        <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; MET (Mission Elapsed Time) (sec) {:.1}"</span>,total_elapsed).bright_blue());
-        <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Recorded Events                  {}"</span>, n_events).bright_blue());
-        <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Last MTB EVQ size                {}"</span>, evq_num_events_last).bright_blue());
-        <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Avg. MTB EVQ size (per 30s )     {:.2}"</span>, evq_num_events_avg).bright_blue());
-        <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, recorded  (Hz)  {:.2}"</span>, n_events <span class="kw">as </span>f64/total_elapsed).bright_blue());
-        <span class="kw">match </span>TRIGGER_RATE.get(<span class="kw-2">&amp;mut </span>bus) {
-          <span class="prelude-val">Ok</span>(trate) =&gt; {
-            <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, from reg. (Hz)  {}"</span>, trate).bright_blue());
-            heartbeat.trate = trate <span class="kw">as </span>u64;
-          }
-          <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, TRIGGER_RATE);
-            <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, String::from(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, from reg. (Hz)   N/A"</span>).bright_blue());
-          }
+        <span class="prelude-val">Ok</span>(num_ev) =&gt; {
+          heartbeat.evq_num_events_last = num_ev <span class="kw">as </span>u64;
+          evq_num_events += num_ev <span class="kw">as </span>u64;
+          n_iter_loop    += <span class="number">1</span>;
+          heartbeat.evq_num_events_avg = evq_num_events <span class="kw">as </span>u64/n_iter_loop <span class="kw">as </span>u64;
         }
-        <span class="kw">match </span>LOST_TRIGGER_RATE.get(<span class="kw-2">&amp;mut </span>bus) {
-          <span class="prelude-val">Ok</span>(lost_trate) =&gt; {
-            <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- lost trg rate, from reg. (Hz)   {}"</span>, lost_trate).bright_blue());
-            heartbeat.lost_trate = lost_trate <span class="kw">as </span>u64;
-          }
-        
-          <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, LOST_TRIGGER_RATE);
-            <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, String::from(<span class="string">"&gt;&gt; ==&gt; -- lost trigger rate, from reg. (Hz)   N/A"</span>).bright_blue());
-          }
-        }
-        <span class="kw">if </span>n_ev_unsent &gt; <span class="number">0 </span>{
-          <span class="macro">println!</span>(<span class="string">"  {}{}{}"</span>, <span class="string">"&gt;&gt; ==&gt; "</span>.yellow().bold(),n_ev_unsent, <span class="string">" sent errors                       &lt;&lt;"</span>.yellow().bold());
-        }
-        <span class="kw">if </span>n_ev_missed &gt; <span class="number">0 </span>{
-          <span class="macro">println!</span>(<span class="string">"  {}{}{}"</span>, <span class="string">"&gt;&gt; ==&gt; "</span>.yellow().bold(),n_events, <span class="string">" missed events                       &lt;&lt;"</span>.yellow().bold());
-        }
-        <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="string">"&gt;&gt; == == == == == == ==  END HEARTBEAT = ==  == == == == =="</span>.bright_blue().bold());
-        verbose_timer = Instant::now();
       }
-
-    }
-    <span class="kw">if </span>verbose_timer.elapsed().as_secs() &gt; <span class="number">120 </span>{
+      heartbeat.total_elapsed += verbose_timer_elapsed <span class="kw">as </span>u64;
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="string">"&gt;&gt; == == == == == == ==  MT HEARTBEAT == ==  == == == == =="</span>.bright_blue().bold());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; MET (Mission Elapsed Time) (sec) {:.1}"</span>,total_elapsed).bright_blue());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Recorded Events                  {}"</span>, n_events).bright_blue());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Last MTB EVQ size                {}"</span>, evq_num_events_last).bright_blue());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Avg. MTB EVQ size (per 30s )     {:.2}"</span>, evq_num_events_avg).bright_blue());
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, recorded  (Hz)  {:.2}"</span>, n_events <span class="kw">as </span>f64/total_elapsed).bright_blue());
+      <span class="kw">match </span>TRIGGER_RATE.get(<span class="kw-2">&amp;mut </span>bus) {
+        <span class="prelude-val">Ok</span>(trate) =&gt; {
+          <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, from reg. (Hz)  {}"</span>, trate).bright_blue());
+          heartbeat.trate = trate <span class="kw">as </span>u64;
+        }
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, TRIGGER_RATE);
+          <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, String::from(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, from reg. (Hz)   N/A"</span>).bright_blue());
+        }
+      }
+      <span class="kw">match </span>LOST_TRIGGER_RATE.get(<span class="kw-2">&amp;mut </span>bus) {
+        <span class="prelude-val">Ok</span>(lost_trate) =&gt; {
+          <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- lost trg rate, from reg. (Hz)   {}"</span>, lost_trate).bright_blue());
+          heartbeat.lost_trate = lost_trate <span class="kw">as </span>u64;
+        }
+      
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, LOST_TRIGGER_RATE);
+          <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, String::from(<span class="string">"&gt;&gt; ==&gt; -- lost trigger rate, from reg. (Hz)   N/A"</span>).bright_blue());
+        }
+      }
+      <span class="kw">if </span>n_ev_unsent &gt; <span class="number">0 </span>{
+        <span class="macro">println!</span>(<span class="string">"  {}{}{}"</span>, <span class="string">"&gt;&gt; ==&gt; "</span>.yellow().bold(),n_ev_unsent, <span class="string">" sent errors                       &lt;&lt;"</span>.yellow().bold());
+      }
+      <span class="kw">if </span>n_ev_missed &gt; <span class="number">0 </span>{
+        <span class="macro">println!</span>(<span class="string">"  {}{}{}"</span>, <span class="string">"&gt;&gt; ==&gt; "</span>.yellow().bold(),n_events, <span class="string">" missed events                       &lt;&lt;"</span>.yellow().bold());
+      }
+      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="string">"&gt;&gt; == == == == == == ==  END HEARTBEAT = ==  == == == == =="</span>.bright_blue().bold());
+      verbose_timer = Instant::now();
       <span class="kw">let </span>pack = heartbeat.pack();
       <span class="kw">match </span>moni_sender.send(pack) {
         <span class="prelude-val">Err</span>(err) =&gt; {

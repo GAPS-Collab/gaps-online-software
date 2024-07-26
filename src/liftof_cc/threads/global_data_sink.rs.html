@@ -446,6 +446,7 @@
 <a href="#446" id="446">446</a>
 <a href="#447" id="447">447</a>
 <a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Communication with the flight computer
 //!
 //! Using two dedicated 0MQ wires - one for 
@@ -487,7 +488,8 @@
 
 <span class="comment">//use tof_dataclasses::events::TofEvent;
 </span><span class="kw">use </span>tof_dataclasses::serialization::{
-    Serialization,
+  Serialization,
+  Packable,
 };
 
 <span class="kw">use </span>tof_dataclasses::io::{
@@ -498,7 +500,7 @@
 
 <span class="kw">use </span>tof_dataclasses::events::TofEvent;
 
-<span class="attr">#[cfg(features=<span class="string">"debug"</span>)]
+<span class="comment">//#[cfg(features="debug")]
 </span><span class="kw">use </span>tof_dataclasses::heartbeats::HeartBeatDataSink;
 
 <span class="comment">//use liftof_lib::settings::DataPublisherSettings;
@@ -594,6 +596,7 @@
   <span class="kw">let </span><span class="kw-2">mut </span>runid : u32 = <span class="number">0</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>new_run_start = <span class="bool-val">false</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>retire   = <span class="bool-val">false</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>heartbeat = HeartBeatDataSink::new();
   <span class="kw">loop </span>{
     <span class="kw">if </span>retire {
       <span class="comment">// take a long nap to give other threads 
@@ -647,13 +650,13 @@
         <span class="macro">debug!</span>(<span class="string">"Got new tof packet {}"</span>, pack.packet_type);
         <span class="kw">if </span>writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(<span class="kw-2">&amp;</span>pack);
-          <span class="macro">cfg_if::cfg_if!</span>{
-            <span class="kw">if </span><span class="attr">#[cfg(features=<span class="string">"debug"</span>)] </span>{
-              heartbeat.n_pack_write_disk += <span class="number">1</span>;
-              heartbeat.n_bytes_written += pack.payload.len();   
-            }
-          }
-          n_pack_write_disk += <span class="number">1</span>;
+          <span class="comment">//cfg_if::cfg_if!{
+            //if #[cfg(features="debug")] {
+          </span>heartbeat.n_pack_write_disk += <span class="number">1</span>;
+          heartbeat.n_bytes_written += pack.payload.len() <span class="kw">as </span>u64;   
+            <span class="comment">//}
+          //}
+          </span>n_pack_write_disk += <span class="number">1</span>;
           bytes_sec_disk    += pack.payload.len() <span class="kw">as </span>f64;
         }
         <span class="comment">// yeah, this is it. 
@@ -766,12 +769,12 @@
                 }
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
                   <span class="comment">//trace!("Event Summary for event id {} send!", evid);
-                  </span><span class="macro">cfg_if::cfg_if!</span>{
-                    <span class="kw">if </span><span class="attr">#[cfg(features=<span class="string">"debug"</span>)] </span>{
-                      heartbeat.n_pack_sent += <span class="number">1</span>;
-                    }
-                  }
-                  n_pack_sent += <span class="number">1</span>;
+                  //cfg_if::cfg_if!{
+                  //  if #[cfg(features="debug")] {
+                  </span>heartbeat.n_packets_sent += <span class="number">1</span>;
+                    <span class="comment">//}
+                  //}
+                  </span>n_pack_sent += <span class="number">1</span>;
                 }
               }
             }
@@ -784,12 +787,12 @@
                   }
                   <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
                     <span class="comment">//trace!("RB waveform for event id {} send!", evid);
-                    </span><span class="macro">cfg_if::cfg_if!</span>{
-                      <span class="kw">if </span><span class="attr">#[cfg(features=<span class="string">"debug"</span>)] </span>{
-                        heartbeat.n_pack_sent += <span class="number">1</span>;
-                      }
-                    }
-                    n_pack_sent += <span class="number">1</span>;
+                    //cfg_if::cfg_if!{
+                    //  if #[cfg(features="debug")] {
+                    </span>heartbeat.n_packets_sent += <span class="number">1</span>;
+                      <span class="comment">//}
+                    //}
+                    </span>n_pack_sent += <span class="number">1</span>;
                   }
                 }
               }
@@ -802,12 +805,12 @@
                 }
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
                   <span class="comment">//trace!("RB waveform for event id {} send!", evid);
-                  </span><span class="macro">cfg_if::cfg_if!</span>{
-                    <span class="kw">if </span><span class="attr">#[cfg(features=<span class="string">"debug"</span>)] </span>{
-                      heartbeat.n_pack_sent += <span class="number">1</span>;
-                    }
-                  }
-                  n_pack_sent += <span class="number">1</span>;
+                  //cfg_if::cfg_if!{
+                  //  if #[cfg(features="debug")] {
+                  </span>heartbeat.n_packets_sent += <span class="number">1</span>;
+                  <span class="comment">//  }
+                  //}
+                  </span>n_pack_sent += <span class="number">1</span>;
                 }
               }
             }
@@ -817,12 +820,12 @@
               <span class="prelude-val">Err</span>(err) =&gt; error !(<span class="string">"Not able to send packet over 0MQ PUB! {err}"</span>),
               <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
                 <span class="macro">trace!</span>(<span class="string">"TofPacket sent"</span>);
-                <span class="macro">cfg_if::cfg_if!</span>{
-                  <span class="kw">if </span><span class="attr">#[cfg(features=<span class="string">"debug"</span>)] </span>{
-                    heartbeat.n_pack_sent += <span class="number">1</span>;
-                  }
-                }
-                n_pack_sent += <span class="number">1</span>;
+                <span class="comment">//cfg_if::cfg_if!{
+                //  if #[cfg(features="debug")] {
+                </span>heartbeat.n_packets_sent += <span class="number">1</span>;
+                <span class="comment">//  }
+                //}
+                </span>n_pack_sent += <span class="number">1</span>;
               }
             } <span class="comment">// end match
           </span>}
@@ -831,15 +834,14 @@
             <span class="prelude-val">Err</span>(err) =&gt; error !(<span class="string">"Not able to send packet over 0MQ PUB! {err}"</span>),
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
               <span class="macro">trace!</span>(<span class="string">"TofPacket sent"</span>);
-              <span class="macro">cfg_if::cfg_if!</span>{
-                <span class="kw">if </span><span class="attr">#[cfg(features=<span class="string">"debug"</span>)] </span>{
-                  heartbeat.n_pack_sent += <span class="number">1</span>;
-                }
-              }
-              n_pack_sent += <span class="number">1</span>;
+              <span class="comment">//cfg_if::cfg_if!{
+              //  if #[cfg(features="debug")] {
+              </span>heartbeat.n_packets_sent += <span class="number">1</span>;
+              <span class="comment">//  }
+              //}
+              </span>n_pack_sent += <span class="number">1</span>;
             }
           } <span class="comment">// end match
-          
         </span>}
       } <span class="comment">// end if pk == event packet
     </span>} <span class="comment">// end incoming.recv
@@ -854,29 +856,29 @@
         //println!("len of evid_id_test {}", evid_id_test_len);
         </span><span class="kw">for _ in </span><span class="number">0</span>..evid_check_len {
           <span class="kw">if </span>!evid_check.contains(<span class="kw-2">&amp;</span>evid) {
-            <span class="macro">cfg_if::cfg_if!</span>{
-              <span class="kw">if </span><span class="attr">#[cfg(features=<span class="string">"debug"</span>)] </span>{
-                heartbeat.n_evid_missing += <span class="number">1</span>;
-                heartbeat.n_evid_chunksize = evid_check_len;
-              }
-            }
-          }
+            <span class="comment">//cfg_if::cfg_if!{
+            //if #[cfg(features="debug")] {
+            </span>heartbeat.n_evid_missing += <span class="number">1</span>;
+            heartbeat.n_evid_chunksize = evid_check_len <span class="kw">as </span>u64;
+            <span class="comment">//  }
+            //}
+          </span>}
           evid += <span class="number">1</span>;
         }
       }
-      <span class="macro">cfg_if::cfg_if!</span>{
-        <span class="kw">if </span><span class="attr">#[cfg(features=<span class="string">"debug"</span>)] </span>{
-          heartbeat.incoming_ch_len = incoming.len();
-          heartbeat.met += timer.elapsed().as_secs_u64();
-          <span class="kw">match </span>data_socket.send(heartbeat.pack().to_bytestream(),<span class="number">0</span>) {
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Not able to send heartbeat over 0MQ PUB! {err}"</span>),
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-              <span class="macro">trace!</span>(<span class="string">"TofPacket sent"</span>);
-            }
-          } <span class="comment">// end match
-        </span>}
-      } 
-      evid_check.clear();
+      <span class="comment">//cfg_if::cfg_if!{
+      //  if #[cfg(features="debug")] {
+      </span>heartbeat.incoming_ch_len = incoming.len() <span class="kw">as </span>u64;
+      heartbeat.met += timer.elapsed().as_secs();
+      <span class="kw">match </span>data_socket.send(heartbeat.pack().to_bytestream(),<span class="number">0</span>) {
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Not able to send heartbeat over 0MQ PUB! {err}"</span>),
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+          <span class="macro">trace!</span>(<span class="string">"Heartbeat sent"</span>);
+        }
+      } <span class="comment">// end match
+      //  }
+      //} 
+      </span>evid_check.clear();
       <span class="comment">////println!("DEBUG 2");
       //event_id_test.clear();
       //println!("DEBUG 3");

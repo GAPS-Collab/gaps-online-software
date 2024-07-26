@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/text/line.rs`."><title>line.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/text/line.rs`."><title>line.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1361,20 +1361,61 @@
 <a href="#1361" id="1361">1361</a>
 <a href="#1362" id="1362">1362</a>
 <a href="#1363" id="1363">1363</a>
+<a href="#1364" id="1364">1364</a>
+<a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
+<a href="#1372" id="1372">1372</a>
+<a href="#1373" id="1373">1373</a>
+<a href="#1374" id="1374">1374</a>
+<a href="#1375" id="1375">1375</a>
+<a href="#1376" id="1376">1376</a>
+<a href="#1377" id="1377">1377</a>
+<a href="#1378" id="1378">1378</a>
+<a href="#1379" id="1379">1379</a>
+<a href="#1380" id="1380">1380</a>
+<a href="#1381" id="1381">1381</a>
+<a href="#1382" id="1382">1382</a>
+<a href="#1383" id="1383">1383</a>
+<a href="#1384" id="1384">1384</a>
+<a href="#1385" id="1385">1385</a>
+<a href="#1386" id="1386">1386</a>
+<a href="#1387" id="1387">1387</a>
+<a href="#1388" id="1388">1388</a>
+<a href="#1389" id="1389">1389</a>
+<a href="#1390" id="1390">1390</a>
+<a href="#1391" id="1391">1391</a>
+<a href="#1392" id="1392">1392</a>
+<a href="#1393" id="1393">1393</a>
+<a href="#1394" id="1394">1394</a>
+<a href="#1395" id="1395">1395</a>
+<a href="#1396" id="1396">1396</a>
+<a href="#1397" id="1397">1397</a>
+<a href="#1398" id="1398">1398</a>
+<a href="#1399" id="1399">1399</a>
+<a href="#1400" id="1400">1400</a>
+<a href="#1401" id="1401">1401</a>
+<a href="#1402" id="1402">1402</a>
 </pre></div><pre class="rust"><code><span class="attr">#![deny(missing_docs)]
 #![warn(clippy::pedantic, clippy::nursery, clippy::arithmetic_side_effects)]
 </span><span class="kw">use </span>std::{borrow::Cow, fmt};
 
 <span class="kw">use </span>unicode_truncate::UnicodeTruncateStr;
 
-<span class="kw">use </span><span class="kw">super</span>::StyledGrapheme;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, style::Styled, text::StyledGrapheme};
 
 <span class="doccomment">/// A line of text, consisting of one or more [`Span`]s.
 ///
 /// [`Line`]s are used wherever text is displayed in the terminal and represent a single line of
 /// text. When a [`Line`] is rendered, it is rendered as a single line of text, with each [`Span`]
 /// being rendered in order (left to right).
+///
+/// Any newlines in the content are removed when creating a [`Line`] using the constructor or
+/// conversion methods.
 ///
 /// # Constructor Methods
 ///
@@ -1866,13 +1907,13 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;String&gt; <span class="kw">for </span>Line&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from(s: String) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::from(<span class="macro">vec!</span>[Span::from(s)])
+        <span class="self">Self</span>::raw(s)
     }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>Line&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::from(<span class="macro">vec!</span>[Span::from(s)])
+        <span class="self">Self</span>::raw(s)
     }
 }
 
@@ -2008,6 +2049,29 @@
                 first_grapheme_offset,
             )
         })
+}
+
+<span class="doccomment">/// A trait for converting a value to a [`Line`].
+///
+/// This trait is automatically implemented for any type that implements the [`Display`] trait. As
+/// such, `ToLine` shouln't be implemented directly: [`Display`] should be implemented instead, and
+/// you get the `ToLine` implementation for free.
+///
+/// [`Display`]: std::fmt::Display
+</span><span class="kw">pub trait </span>ToLine {
+    <span class="doccomment">/// Converts the value to a [`Line`].
+    </span><span class="kw">fn </span>to_line(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Line&lt;<span class="lifetime">'_</span>&gt;;
+}
+
+<span class="doccomment">/// # Panics
+///
+/// In this implementation, the `to_line` method panics if the `Display` implementation returns an
+/// error. This indicates an incorrect `Display` implementation since `fmt::Write for String` never
+/// returns an error itself.
+</span><span class="kw">impl</span>&lt;T: fmt::Display&gt; ToLine <span class="kw">for </span>T {
+    <span class="kw">fn </span>to_line(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Line&lt;<span class="lifetime">'_</span>&gt; {
+        Line::from(<span class="self">self</span>.to_string())
+    }
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Line&lt;<span class="lifetime">'_</span>&gt; {
@@ -2167,14 +2231,28 @@
     </span><span class="kw">fn </span>from_string() {
         <span class="kw">let </span>s = String::from(<span class="string">"Hello, world!"</span>);
         <span class="kw">let </span>line = Line::from(s);
-        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[Span::from(<span class="string">"Hello, world!"</span>)], line.spans);
+        <span class="macro">assert_eq!</span>(line.spans, <span class="macro">vec!</span>[Span::from(<span class="string">"Hello, world!"</span>)]);
+
+        <span class="kw">let </span>s = String::from(<span class="string">"Hello\nworld!"</span>);
+        <span class="kw">let </span>line = Line::from(s);
+        <span class="macro">assert_eq!</span>(line.spans, <span class="macro">vec!</span>[Span::from(<span class="string">"Hello"</span>), Span::from(<span class="string">"world!"</span>)]);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_str() {
         <span class="kw">let </span>s = <span class="string">"Hello, world!"</span>;
         <span class="kw">let </span>line = Line::from(s);
-        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[Span::from(<span class="string">"Hello, world!"</span>)], line.spans);
+        <span class="macro">assert_eq!</span>(line.spans, <span class="macro">vec!</span>[Span::from(<span class="string">"Hello, world!"</span>)]);
+
+        <span class="kw">let </span>s = <span class="string">"Hello\nworld!"</span>;
+        <span class="kw">let </span>line = Line::from(s);
+        <span class="macro">assert_eq!</span>(line.spans, <span class="macro">vec!</span>[Span::from(<span class="string">"Hello"</span>), Span::from(<span class="string">"world!"</span>)]);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>to_line() {
+        <span class="kw">let </span>line = <span class="number">42</span>.to_line();
+        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[Span::from(<span class="string">"42"</span>)], line.spans);
     }
 
     <span class="attr">#[test]
@@ -2184,7 +2262,7 @@
             Span::styled(<span class="string">" world!"</span>, Style::default().fg(Color::Green)),
         ];
         <span class="kw">let </span>line = Line::from(spans.clone());
-        <span class="macro">assert_eq!</span>(spans, line.spans);
+        <span class="macro">assert_eq!</span>(line.spans, spans);
     }
 
     <span class="attr">#[test]
@@ -2217,7 +2295,7 @@
     </span><span class="kw">fn </span>from_span() {
         <span class="kw">let </span>span = Span::styled(<span class="string">"Hello, world!"</span>, Style::default().fg(Color::Yellow));
         <span class="kw">let </span>line = Line::from(span.clone());
-        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[span], line.spans);
+        <span class="macro">assert_eq!</span>(line.spans, <span class="macro">vec!</span>[span],);
     }
 
     <span class="attr">#[test]
@@ -2227,7 +2305,7 @@
             Span::styled(<span class="string">" world!"</span>, Style::default().fg(Color::Green)),
         ]);
         <span class="kw">let </span>s: String = line.into();
-        <span class="macro">assert_eq!</span>(<span class="string">"Hello, world!"</span>, s);
+        <span class="macro">assert_eq!</span>(s, <span class="string">"Hello, world!"</span>);
     }
 
     <span class="attr">#[test]
@@ -2532,7 +2610,7 @@
         </span><span class="kw">fn </span>render_truncates_away_from_0x0(<span class="attr">#[case] </span>alignment: Alignment, <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str) {
             <span class="kw">let </span>line = Line::from(<span class="macro">vec!</span>[Span::raw(<span class="string">"a🦀b"</span>), Span::raw(<span class="string">"c🦀d"</span>)]).alignment(alignment);
             <span class="comment">// Fill buffer with stuff to ensure the output is indeed padded
-            </span><span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::filled(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">1</span>), Cell::default().set_symbol(<span class="string">"X"</span>));
+            </span><span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::filled(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">1</span>), Cell::new(<span class="string">"X"</span>));
             <span class="kw">let </span>area = Rect::new(<span class="number">2</span>, <span class="number">0</span>, <span class="number">6</span>, <span class="number">1</span>);
             line.render_ref(area, <span class="kw-2">&amp;mut </span>buf);
             <span class="macro">assert_eq!</span>(buf, Buffer::with_lines([expected]));
@@ -2551,7 +2629,7 @@
             <span class="kw">let </span>line = Line::from(<span class="macro">vec!</span>[Span::raw(<span class="string">"a🦀b"</span>), Span::raw(<span class="string">"c🦀d"</span>)]).right_aligned();
             <span class="kw">let </span>area = Rect::new(<span class="number">0</span>, <span class="number">0</span>, buf_width, <span class="number">1</span>);
             <span class="comment">// Fill buffer with stuff to ensure the output is indeed padded
-            </span><span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::filled(area, Cell::default().set_symbol(<span class="string">"X"</span>));
+            </span><span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::filled(area, Cell::new(<span class="string">"X"</span>));
             line.render_ref(buf.area, <span class="kw-2">&amp;mut </span>buf);
             <span class="macro">assert_eq!</span>(buf, Buffer::with_lines([expected]));
         }

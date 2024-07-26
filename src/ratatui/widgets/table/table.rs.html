@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/widgets/table/table.rs`."><title>table.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/widgets/table/table.rs`."><title>table.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1755,10 +1755,62 @@
 <a href="#1755" id="1755">1755</a>
 <a href="#1756" id="1756">1756</a>
 <a href="#1757" id="1757">1757</a>
+<a href="#1758" id="1758">1758</a>
+<a href="#1759" id="1759">1759</a>
+<a href="#1760" id="1760">1760</a>
+<a href="#1761" id="1761">1761</a>
+<a href="#1762" id="1762">1762</a>
+<a href="#1763" id="1763">1763</a>
+<a href="#1764" id="1764">1764</a>
+<a href="#1765" id="1765">1765</a>
+<a href="#1766" id="1766">1766</a>
+<a href="#1767" id="1767">1767</a>
+<a href="#1768" id="1768">1768</a>
+<a href="#1769" id="1769">1769</a>
+<a href="#1770" id="1770">1770</a>
+<a href="#1771" id="1771">1771</a>
+<a href="#1772" id="1772">1772</a>
+<a href="#1773" id="1773">1773</a>
+<a href="#1774" id="1774">1774</a>
+<a href="#1775" id="1775">1775</a>
+<a href="#1776" id="1776">1776</a>
+<a href="#1777" id="1777">1777</a>
+<a href="#1778" id="1778">1778</a>
+<a href="#1779" id="1779">1779</a>
+<a href="#1780" id="1780">1780</a>
+<a href="#1781" id="1781">1781</a>
+<a href="#1782" id="1782">1782</a>
+<a href="#1783" id="1783">1783</a>
+<a href="#1784" id="1784">1784</a>
+<a href="#1785" id="1785">1785</a>
+<a href="#1786" id="1786">1786</a>
+<a href="#1787" id="1787">1787</a>
+<a href="#1788" id="1788">1788</a>
+<a href="#1789" id="1789">1789</a>
+<a href="#1790" id="1790">1790</a>
+<a href="#1791" id="1791">1791</a>
+<a href="#1792" id="1792">1792</a>
+<a href="#1793" id="1793">1793</a>
+<a href="#1794" id="1794">1794</a>
+<a href="#1795" id="1795">1795</a>
+<a href="#1796" id="1796">1796</a>
+<a href="#1797" id="1797">1797</a>
+<a href="#1798" id="1798">1798</a>
+<a href="#1799" id="1799">1799</a>
+<a href="#1800" id="1800">1800</a>
+<a href="#1801" id="1801">1801</a>
+<a href="#1802" id="1802">1802</a>
+<a href="#1803" id="1803">1803</a>
+<a href="#1804" id="1804">1804</a>
+<a href="#1805" id="1805">1805</a>
+<a href="#1806" id="1806">1806</a>
+<a href="#1807" id="1807">1807</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>itertools::Itertools;
 
-<span class="kw">use super</span>::<span class="kw-2">*</span>;
-<span class="kw">use crate</span>::{layout::Flex, prelude::<span class="kw-2">*</span>, widgets::Block};
+<span class="attr">#[allow(unused_imports)] </span><span class="comment">// `Cell` is used in the doc comment but not the code
+</span><span class="kw">use </span><span class="kw">super</span>::Cell;
+<span class="kw">use super</span>::{HighlightSpacing, Row, TableState};
+<span class="kw">use crate</span>::{layout::Flex, prelude::<span class="kw-2">*</span>, style::Styled, widgets::Block};
 
 <span class="doccomment">/// A widget to display data in formatted columns.
 ///
@@ -1775,7 +1827,9 @@
 /// [`Table`] implements [`Widget`] and so it can be drawn using [`Frame::render_widget`].
 ///
 /// [`Table`] is also a [`StatefulWidget`], which means you can use it with [`TableState`] to allow
-/// the user to scroll through the rows and select one of them.
+/// the user to scroll through the rows and select one of them. When rendering a [`Table`] with a
+/// [`TableState`], the selected row will be highlighted. If the selected row is not visible (based
+/// on the offset), the table will be scrolled to make the selected row visible.
 ///
 /// Note: if the `widths` field is empty, the table will be rendered with equal widths.
 ///
@@ -1933,7 +1987,11 @@
 ///     Row::new(vec!["Row21", "Row22", "Row23"]),
 ///     Row::new(vec!["Row31", "Row32", "Row33"]),
 /// ];
-/// let widths = [Constraint::Length(5), Constraint::Length(5), Constraint::Length(10)];
+/// let widths = [
+///     Constraint::Length(5),
+///     Constraint::Length(5),
+///     Constraint::Length(10),
+/// ];
 /// let table = Table::new(rows, widths)
 ///     .block(Block::new().title("Table"))
 ///     .highlight_style(Style::new().add_modifier(Modifier::REVERSED))
@@ -1941,6 +1999,7 @@
 ///
 /// frame.render_stateful_widget(table, area, &amp;mut table_state);
 /// # }
+/// ```
 </span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 </span><span class="kw">pub struct </span>Table&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Data to display in each row
@@ -2525,8 +2584,15 @@
             end += <span class="number">1</span>;
         }
 
-        <span class="kw">let </span>selected = selected.unwrap_or(<span class="number">0</span>).min(<span class="self">self</span>.rows.len() - <span class="number">1</span>);
-        <span class="kw">while </span>selected &gt;= end {
+        <span class="kw">let </span><span class="prelude-val">Some</span>(selected) = selected <span class="kw">else </span>{
+            <span class="kw">return </span>(start, end);
+        };
+
+        <span class="comment">// clamp the selected row to the last row
+        </span><span class="kw">let </span>selected = selected.min(<span class="self">self</span>.rows.len() - <span class="number">1</span>);
+
+        <span class="comment">// scroll down until the selected row is visible
+        </span><span class="kw">while </span>selected &gt;= end {
             height = height.saturating_add(<span class="self">self</span>.rows[end].height_with_margin());
             end += <span class="number">1</span>;
             <span class="kw">while </span>height &gt; max_height {
@@ -2534,7 +2600,9 @@
                 start += <span class="number">1</span>;
             }
         }
-        <span class="kw">while </span>selected &lt; start {
+
+        <span class="comment">// scroll up until the selected row is visible
+        </span><span class="kw">while </span>selected &lt; start {
             start -= <span class="number">1</span>;
             height = height.saturating_add(<span class="self">self</span>.rows[start].height_with_margin());
             <span class="kw">while </span>height &gt; max_height {
@@ -2599,7 +2667,7 @@
     <span class="kw">use </span>std::vec;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use crate</span>::{layout::Constraint::<span class="kw-2">*</span>, style::Style, text::Line};
+    <span class="kw">use crate</span>::{layout::Constraint::<span class="kw-2">*</span>, style::Style, text::Line, widgets::Cell};
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>new() {
@@ -2757,6 +2825,8 @@
 
     <span class="attr">#[cfg(test)]
     </span><span class="kw">mod </span>render {
+        <span class="kw">use </span>rstest::rstest;
+
         <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
         <span class="attr">#[test]
@@ -2946,6 +3016,36 @@
                 <span class="string">"               "</span>.into(),
             ]);
             <span class="macro">assert_eq!</span>(buf, expected);
+        }
+
+        <span class="doccomment">/// Note that this includes a regression test for a bug where the table would not render the
+        /// correct rows when there is no selection.
+        /// &lt;https://github.com/ratatui-org/ratatui/issues/1179&gt;
+        </span><span class="attr">#[rstest]
+        #[case::no_selection(<span class="prelude-val">None</span>, <span class="number">50</span>, [<span class="string">"50"</span>, <span class="string">"51"</span>, <span class="string">"52"</span>, <span class="string">"53"</span>, <span class="string">"54"</span>]</span>)]
+        <span class="attr">#[case::selection_before_offset(<span class="number">20</span>, <span class="number">20</span>, [<span class="string">"20"</span>, <span class="string">"21"</span>, <span class="string">"22"</span>, <span class="string">"23"</span>, <span class="string">"24"</span>]</span>)]
+        <span class="attr">#[case::selection_immediately_before_offset(<span class="number">49</span>, <span class="number">49</span>, [<span class="string">"49"</span>, <span class="string">"50"</span>, <span class="string">"51"</span>, <span class="string">"52"</span>, <span class="string">"53"</span>]</span>)]
+        <span class="attr">#[case::selection_at_start_of_offset(<span class="number">50</span>, <span class="number">50</span>, [<span class="string">"50"</span>, <span class="string">"51"</span>, <span class="string">"52"</span>, <span class="string">"53"</span>, <span class="string">"54"</span>]</span>)]
+        <span class="attr">#[case::selection_at_end_of_offset(<span class="number">54</span>, <span class="number">50</span>, [<span class="string">"50"</span>, <span class="string">"51"</span>, <span class="string">"52"</span>, <span class="string">"53"</span>, <span class="string">"54"</span>]</span>)]
+        <span class="attr">#[case::selection_immediately_after_offset(<span class="number">55</span>, <span class="number">51</span>, [<span class="string">"51"</span>, <span class="string">"52"</span>, <span class="string">"53"</span>, <span class="string">"54"</span>, <span class="string">"55"</span>]</span>)]
+        <span class="attr">#[case::selection_after_offset(<span class="number">80</span>, <span class="number">76</span>, [<span class="string">"76"</span>, <span class="string">"77"</span>, <span class="string">"78"</span>, <span class="string">"79"</span>, <span class="string">"80"</span>]</span>)]
+        <span class="kw">fn </span>render_with_selection_and_offset&lt;T: Into&lt;<span class="prelude-ty">Option</span>&lt;usize&gt;&gt;&gt;(
+            <span class="attr">#[case] </span>selected_row: T,
+            <span class="attr">#[case] </span>expected_offset: usize,
+            <span class="attr">#[case] </span>expected_items: [<span class="kw-2">&amp;</span>str; <span class="number">5</span>],
+        ) {
+            <span class="comment">// render 100 rows offset at 50, with a selected row
+            </span><span class="kw">let </span>rows = (<span class="number">0</span>..<span class="number">100</span>).map(|i| Row::new([i.to_string()]));
+            <span class="kw">let </span>table = Table::new(rows, [Constraint::Length(<span class="number">2</span>)]);
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">5</span>));
+            <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::new()
+                .with_offset(<span class="number">50</span>)
+                .with_selected(selected_row);
+
+            StatefulWidget::render(table.clone(), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">5</span>), <span class="kw-2">&amp;mut </span>buf, <span class="kw-2">&amp;mut </span>state);
+
+            <span class="macro">assert_eq!</span>(buf, Buffer::with_lines(expected_items));
+            <span class="macro">assert_eq!</span>(state.offset, expected_offset);
         }
     }
 

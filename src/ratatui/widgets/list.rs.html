@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.26.3/src/widgets/list.rs`."><title>list.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/widgets/list.rs`."><title>list.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../ratatui/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2190,11 +2190,113 @@
 <a href="#2190" id="2190">2190</a>
 <a href="#2191" id="2191">2191</a>
 <a href="#2192" id="2192">2192</a>
+<a href="#2193" id="2193">2193</a>
+<a href="#2194" id="2194">2194</a>
+<a href="#2195" id="2195">2195</a>
+<a href="#2196" id="2196">2196</a>
+<a href="#2197" id="2197">2197</a>
+<a href="#2198" id="2198">2198</a>
+<a href="#2199" id="2199">2199</a>
+<a href="#2200" id="2200">2200</a>
+<a href="#2201" id="2201">2201</a>
+<a href="#2202" id="2202">2202</a>
+<a href="#2203" id="2203">2203</a>
+<a href="#2204" id="2204">2204</a>
+<a href="#2205" id="2205">2205</a>
+<a href="#2206" id="2206">2206</a>
+<a href="#2207" id="2207">2207</a>
+<a href="#2208" id="2208">2208</a>
+<a href="#2209" id="2209">2209</a>
+<a href="#2210" id="2210">2210</a>
+<a href="#2211" id="2211">2211</a>
+<a href="#2212" id="2212">2212</a>
+<a href="#2213" id="2213">2213</a>
+<a href="#2214" id="2214">2214</a>
+<a href="#2215" id="2215">2215</a>
+<a href="#2216" id="2216">2216</a>
+<a href="#2217" id="2217">2217</a>
+<a href="#2218" id="2218">2218</a>
+<a href="#2219" id="2219">2219</a>
+<a href="#2220" id="2220">2220</a>
+<a href="#2221" id="2221">2221</a>
+<a href="#2222" id="2222">2222</a>
+<a href="#2223" id="2223">2223</a>
+<a href="#2224" id="2224">2224</a>
+<a href="#2225" id="2225">2225</a>
+<a href="#2226" id="2226">2226</a>
+<a href="#2227" id="2227">2227</a>
+<a href="#2228" id="2228">2228</a>
+<a href="#2229" id="2229">2229</a>
+<a href="#2230" id="2230">2230</a>
+<a href="#2231" id="2231">2231</a>
+<a href="#2232" id="2232">2232</a>
+<a href="#2233" id="2233">2233</a>
+<a href="#2234" id="2234">2234</a>
+<a href="#2235" id="2235">2235</a>
+<a href="#2236" id="2236">2236</a>
+<a href="#2237" id="2237">2237</a>
+<a href="#2238" id="2238">2238</a>
+<a href="#2239" id="2239">2239</a>
+<a href="#2240" id="2240">2240</a>
+<a href="#2241" id="2241">2241</a>
+<a href="#2242" id="2242">2242</a>
+<a href="#2243" id="2243">2243</a>
+<a href="#2244" id="2244">2244</a>
+<a href="#2245" id="2245">2245</a>
+<a href="#2246" id="2246">2246</a>
+<a href="#2247" id="2247">2247</a>
+<a href="#2248" id="2248">2248</a>
+<a href="#2249" id="2249">2249</a>
+<a href="#2250" id="2250">2250</a>
+<a href="#2251" id="2251">2251</a>
+<a href="#2252" id="2252">2252</a>
+<a href="#2253" id="2253">2253</a>
+<a href="#2254" id="2254">2254</a>
+<a href="#2255" id="2255">2255</a>
+<a href="#2256" id="2256">2256</a>
+<a href="#2257" id="2257">2257</a>
+<a href="#2258" id="2258">2258</a>
+<a href="#2259" id="2259">2259</a>
+<a href="#2260" id="2260">2260</a>
+<a href="#2261" id="2261">2261</a>
+<a href="#2262" id="2262">2262</a>
+<a href="#2263" id="2263">2263</a>
+<a href="#2264" id="2264">2264</a>
+<a href="#2265" id="2265">2265</a>
+<a href="#2266" id="2266">2266</a>
+<a href="#2267" id="2267">2267</a>
+<a href="#2268" id="2268">2268</a>
+<a href="#2269" id="2269">2269</a>
+<a href="#2270" id="2270">2270</a>
+<a href="#2271" id="2271">2271</a>
+<a href="#2272" id="2272">2272</a>
+<a href="#2273" id="2273">2273</a>
+<a href="#2274" id="2274">2274</a>
+<a href="#2275" id="2275">2275</a>
+<a href="#2276" id="2276">2276</a>
+<a href="#2277" id="2277">2277</a>
+<a href="#2278" id="2278">2278</a>
+<a href="#2279" id="2279">2279</a>
+<a href="#2280" id="2280">2280</a>
+<a href="#2281" id="2281">2281</a>
+<a href="#2282" id="2282">2282</a>
+<a href="#2283" id="2283">2283</a>
+<a href="#2284" id="2284">2284</a>
+<a href="#2285" id="2285">2285</a>
+<a href="#2286" id="2286">2286</a>
+<a href="#2287" id="2287">2287</a>
+<a href="#2288" id="2288">2288</a>
+<a href="#2289" id="2289">2289</a>
+<a href="#2290" id="2290">2290</a>
+<a href="#2291" id="2291">2291</a>
+<a href="#2292" id="2292">2292</a>
+<a href="#2293" id="2293">2293</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>strum::{Display, EnumString};
 <span class="kw">use </span>unicode_width::UnicodeWidthStr;
 
 <span class="kw">use crate</span>::{
     prelude::<span class="kw-2">*</span>,
+    style::Styled,
     widgets::{Block, HighlightSpacing},
 };
 
@@ -2347,6 +2449,72 @@
         <span class="kw">if </span>index.is_none() {
             <span class="self">self</span>.offset = <span class="number">0</span>;
         }
+    }
+
+    <span class="doccomment">/// Selects the next item or the first one if no item is selected
+    ///
+    /// Note: until the list is rendered, the number of items is not known, so the index is set to
+    /// `0` and will be corrected when the list is rendered
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use ratatui::{prelude::*, widgets::*};
+    /// let mut state = ListState::default();
+    /// state.select_next();
+    /// ```
+    </span><span class="kw">pub fn </span>select_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>next = <span class="self">self</span>.selected.map_or(<span class="number">0</span>, |i| i.saturating_add(<span class="number">1</span>));
+        <span class="self">self</span>.select(<span class="prelude-val">Some</span>(next));
+    }
+
+    <span class="doccomment">/// Selects the previous item or the last one if no item is selected
+    ///
+    /// Note: until the list is rendered, the number of items is not known, so the index is set to
+    /// `usize::MAX` and will be corrected when the list is rendered
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use ratatui::{prelude::*, widgets::*};
+    /// let mut state = ListState::default();
+    /// state.select_previous();
+    /// ```
+    </span><span class="kw">pub fn </span>select_previous(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>previous = <span class="self">self</span>.selected.map_or(usize::MAX, |i| i.saturating_sub(<span class="number">1</span>));
+        <span class="self">self</span>.select(<span class="prelude-val">Some</span>(previous));
+    }
+
+    <span class="doccomment">/// Selects the first item
+    ///
+    /// Note: until the list is rendered, the number of items is not known, so the index is set to
+    /// `0` and will be corrected when the list is rendered
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use ratatui::{prelude::*, widgets::*};
+    /// let mut state = ListState::default();
+    /// state.select_first();
+    /// ```
+    </span><span class="kw">pub fn </span>select_first(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.select(<span class="prelude-val">Some</span>(<span class="number">0</span>));
+    }
+
+    <span class="doccomment">/// Selects the last item
+    ///
+    /// Note: until the list is rendered, the number of items is not known, so the index is set to
+    /// `usize::MAX` and will be corrected when the list is rendered
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use ratatui::{prelude::*, widgets::*};
+    /// let mut state = ListState::default();
+    /// state.select_last();
+    /// ```
+    </span><span class="kw">pub fn </span>select_last(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.select(<span class="prelude-val">Some</span>(usize::MAX));
     }
 }
 
@@ -2898,48 +3066,6 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Defines the list direction (up or down)
-    ///
-    /// Defines if the `List` is displayed *top to bottom* (default) or *bottom to top*. Use
-    /// [`Corner::BottomLeft`] to go *bottom to top*. **Any** other variant will go *top to bottom*.
-    /// If there is too few items to fill the screen, the list will stick to the starting edge.
-    ///
-    /// This is set to [`Corner::TopLeft`] by default.
-    ///
-    /// This is a fluent setter method which must be chained or used as it consumes self
-    ///
-    /// ## Note
-    ///
-    /// Despite its name, this method doesn't change the horizontal alignment, i.e. the `List`
-    /// **won't** start in a corner.
-    ///
-    /// # Example
-    ///
-    /// Same as default, i.e. *top to bottom*. Despite the name implying otherwise.
-    ///
-    /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
-    /// # let items = ["Item 1"];
-    /// let list = List::new(items).start_corner(Corner::BottomRight);
-    /// ```
-    ///
-    /// Bottom to top
-    ///
-    /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
-    /// # let items = ["Item 1"];
-    /// let list = List::new(items).start_corner(Corner::BottomLeft);
-    /// ```
-    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    #[deprecated(since = <span class="string">"0.25.0"</span>, note = <span class="string">"You should use `List::direction` instead."</span>)]
-    </span><span class="kw">pub fn </span>start_corner(<span class="self">self</span>, corner: Corner) -&gt; <span class="self">Self </span>{
-        <span class="kw">if </span>corner == Corner::BottomLeft {
-            <span class="self">self</span>.direction(ListDirection::BottomToTop)
-        } <span class="kw">else </span>{
-            <span class="self">self</span>.direction(ListDirection::TopToBottom)
-        }
-    }
-
     <span class="doccomment">/// Returns the number of [`ListItem`]s in the list
     </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.items.len()
@@ -3115,8 +3241,18 @@
         <span class="self">self</span>.block.render_ref(area, buf);
         <span class="kw">let </span>list_area = <span class="self">self</span>.block.inner_if_some(area);
 
-        <span class="kw">if </span>list_area.is_empty() || <span class="self">self</span>.items.is_empty() {
+        <span class="kw">if </span>list_area.is_empty() {
             <span class="kw">return</span>;
+        }
+
+        <span class="kw">if </span><span class="self">self</span>.items.is_empty() {
+            state.select(<span class="prelude-val">None</span>);
+            <span class="kw">return</span>;
+        }
+
+        <span class="comment">// If the selected index is out of bounds, set it to the last item
+        </span><span class="kw">if </span>state.selected.is_some_and(|s| s &gt;= <span class="self">self</span>.items.len()) {
+            state.select(<span class="prelude-val">Some</span>(<span class="self">self</span>.items.len().saturating_sub(<span class="number">1</span>)));
         }
 
         <span class="kw">let </span>list_height = list_area.height <span class="kw">as </span>usize;
@@ -3242,6 +3378,11 @@
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
+    <span class="attr">#[fixture]
+    </span><span class="kw">fn </span>single_line_buf() -&gt; Buffer {
+        Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">1</span>))
+    }
+
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_list_state_selected() {
         <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
@@ -3267,6 +3408,96 @@
         state.select(<span class="prelude-val">None</span>);
         <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">None</span>);
         <span class="macro">assert_eq!</span>(state.offset, <span class="number">0</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_list_state_navigation() {
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
+        state.select_first();
+        <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+
+        state.select_previous(); <span class="comment">// should not go below 0
+        </span><span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+
+        state.select_next();
+        <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">1</span>));
+
+        state.select_previous();
+        <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+
+        state.select_last();
+        <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(usize::MAX));
+
+        state.select_next(); <span class="comment">// should not go above usize::MAX
+        </span><span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(usize::MAX));
+
+        state.select_previous();
+        <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(usize::MAX - <span class="number">1</span>));
+
+        state.select_next();
+        <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(usize::MAX));
+
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
+        state.select_next();
+        <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
+        state.select_previous();
+        <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(usize::MAX));
+    }
+
+    <span class="attr">#[rstest]
+    </span><span class="kw">fn </span>test_list_state_empty_list(<span class="kw-2">mut </span>single_line_buf: Buffer) {
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
+
+        <span class="kw">let </span>items: Vec&lt;ListItem&gt; = Vec::new();
+        <span class="kw">let </span>list = List::new(items);
+        state.select_first();
+        StatefulWidget::render(list, single_line_buf.area, <span class="kw-2">&amp;mut </span>single_line_buf, <span class="kw-2">&amp;mut </span>state);
+        <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">None</span>);
+    }
+
+    <span class="attr">#[rstest]
+    </span><span class="kw">fn </span>test_list_state_single_item(<span class="kw-2">mut </span>single_line_buf: Buffer) {
+        <span class="kw">let </span><span class="kw-2">mut </span>state = ListState::default();
+
+        <span class="kw">let </span>items = <span class="macro">vec!</span>[ListItem::new(<span class="string">"Item 1"</span>)];
+        <span class="kw">let </span>list = List::new(items);
+        state.select_first();
+        StatefulWidget::render(
+            <span class="kw-2">&amp;</span>list,
+            single_line_buf.area,
+            <span class="kw-2">&amp;mut </span>single_line_buf,
+            <span class="kw-2">&amp;mut </span>state,
+        );
+        <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+
+        state.select_last();
+        StatefulWidget::render(
+            <span class="kw-2">&amp;</span>list,
+            single_line_buf.area,
+            <span class="kw-2">&amp;mut </span>single_line_buf,
+            <span class="kw-2">&amp;mut </span>state,
+        );
+        <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+
+        state.select_previous();
+        StatefulWidget::render(
+            <span class="kw-2">&amp;</span>list,
+            single_line_buf.area,
+            <span class="kw-2">&amp;mut </span>single_line_buf,
+            <span class="kw-2">&amp;mut </span>state,
+        );
+        <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+
+        state.select_next();
+        StatefulWidget::render(
+            <span class="kw-2">&amp;</span>list,
+            single_line_buf.area,
+            <span class="kw-2">&amp;mut </span>single_line_buf,
+            <span class="kw-2">&amp;mut </span>state,
+        );
+        <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">0</span>));
     }
 
     <span class="attr">#[test]
@@ -3535,7 +3766,7 @@
             <span class="kw-2">&amp;</span>single_item,
             <span class="prelude-val">Some</span>(<span class="number">1</span>),
             [
-                <span class="string">"  Item 0  "</span>,
+                <span class="string">"&gt;&gt;Item 0  "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
@@ -3593,7 +3824,7 @@
             [
                 <span class="string">"  Item 0  "</span>,
                 <span class="string">"  Item 1  "</span>,
-                <span class="string">"  Item 2  "</span>,
+                <span class="string">"&gt;&gt;Item 2  "</span>,
                 <span class="string">"          "</span>,
                 <span class="string">"          "</span>,
             ],
@@ -3879,30 +4110,6 @@
         Lines::Item: Into&lt;Line&lt;<span class="lifetime">'line</span>&gt;&gt;,
     {
         <span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]).direction(direction);
-        <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(expected));
-    }
-
-    <span class="attr">#[rstest]
-    #[case::topleft(Corner::TopLeft, [
-        <span class="string">"Item 0    "</span>,
-        <span class="string">"Item 1    "</span>,
-        <span class="string">"Item 2    "</span>,
-        <span class="string">"          "</span>,
-    ]</span>)]
-    <span class="attr">#[case::bottomleft(Corner::BottomLeft, [
-        <span class="string">"          "</span>,
-        <span class="string">"Item 2    "</span>,
-        <span class="string">"Item 1    "</span>,
-        <span class="string">"Item 0    "</span>,
-    ]</span>)]
-    <span class="kw">fn </span>start_corner&lt;<span class="lifetime">'line</span>, Lines&gt;(<span class="attr">#[case] </span>corner: Corner, <span class="attr">#[case] </span>expected: Lines)
-    <span class="kw">where
-        </span>Lines: IntoIterator,
-        Lines::Item: Into&lt;Line&lt;<span class="lifetime">'line</span>&gt;&gt;,
-    {
-        <span class="attr">#[allow(deprecated)] </span><span class="comment">// For start_corner
-        </span><span class="kw">let </span>list = List::new([<span class="string">"Item 0"</span>, <span class="string">"Item 1"</span>, <span class="string">"Item 2"</span>]).start_corner(corner);
         <span class="kw">let </span>buffer = render_widget(list, <span class="number">10</span>, <span class="number">4</span>);
         <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(expected));
     }
@@ -4354,11 +4561,6 @@
             <span class="string">"   Item 3 "</span>,
             <span class="string">"          "</span>,
         ]);
-    }
-
-    <span class="attr">#[fixture]
-    </span><span class="kw">fn </span>single_line_buf() -&gt; Buffer {
-        Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">1</span>))
     }
 
     <span class="doccomment">/// Regression test for a bug where highlight symbol being greater than width caused a panic due

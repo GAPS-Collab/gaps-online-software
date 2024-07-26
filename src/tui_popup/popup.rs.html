@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tui-popup-0.3.2/src/popup.rs`."><title>popup.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tui_popup" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../tui_popup/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tui-popup-0.4.4/src/popup.rs`."><title>popup.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tui_popup" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../tui_popup/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -121,29 +121,105 @@
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
 <a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::Debug;
 
+<span class="kw">use </span><span class="kw">crate</span>::PopupState;
 <span class="kw">use </span>derive_setters::Setters;
 <span class="kw">use </span>ratatui::{
-    prelude::<span class="kw-2">*</span>,
-    widgets::{Borders, WidgetRef},
+    prelude::{Buffer, Line, Rect, Style, Text},
+    symbols::border::Set,
+    widgets::{Block, Borders, Clear, StatefulWidgetRef, Widget, WidgetRef},
 };
+<span class="kw">use </span>std::cmp::min;
 
 <span class="doccomment">/// Configuration for a popup.
 ///
-/// This struct is used to configure a [`PopupWidget`]. It can be created using
-/// [`Popup::new`](Popup::new). Convert it into a Ratatui widget using
-/// [`Popup::to_widget`](Popup::to_widget).
+/// This struct is used to configure a [`Popup`]. It can be created using
+/// [`Popup::new`](Popup::new).
 ///
 /// # Example
 ///
 /// ```rust
-/// use ratatui::prelude::*;
+/// use ratatui::{prelude::*, symbols::border};
 /// use tui_popup::Popup;
 ///
 /// fn render_popup(frame: &amp;mut Frame) {
-///     let popup = Popup::new("tui-popup demo", "Press any key to exit")
-///         .style(Style::new().white().on_blue());
+///     let popup = Popup::new("Press any key to exit")
+///         .title("tui-popup demo")
+///         .style(Style::new().white().on_blue())
+///         .border_set(border::ROUNDED)
+///         .border_style(Style::new().bold());
 ///     frame.render_widget(&amp;popup, frame.size());
 /// }
 /// ```
@@ -152,6 +228,7 @@
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Popup&lt;<span class="lifetime">'content</span>, W: SizedWidgetRef&gt; {
     <span class="doccomment">/// The body of the popup.
+    </span><span class="attr">#[setters(skip)]
     </span><span class="kw">pub </span>body: W,
     <span class="doccomment">/// The title of the popup.
     </span><span class="kw">pub </span>title: Line&lt;<span class="lifetime">'content</span>&gt;,
@@ -159,6 +236,10 @@
     </span><span class="kw">pub </span>style: Style,
     <span class="doccomment">/// The borders of the popup.
     </span><span class="kw">pub </span>borders: Borders,
+    <span class="doccomment">/// The symbols used to render the border.
+    </span><span class="kw">pub </span>border_set: Set,
+    <span class="doccomment">/// Border style
+    </span><span class="kw">pub </span>border_style: Style,
 }
 
 <span class="doccomment">/// A trait for widgets that have a fixed size.
@@ -177,8 +258,6 @@
     ///
     /// # Parameters
     ///
-    /// - `title` - The title of the popup. This can be any type that can be converted into a
-    ///   [`Line`].
     /// - `body` - The body of the popup. This can be any type that can be converted into a
     ///   [`Text`].
     ///
@@ -187,17 +266,16 @@
     /// ```rust
     /// use tui_popup::Popup;
     ///
-    /// let popup = Popup::new("tui-popup demo", "Press any key to exit");
+    /// let popup = Popup::new("Press any key to exit").title("tui-popup demo");
     /// ```
-    </span><span class="kw">pub fn </span>new&lt;L&gt;(title: L, body: W) -&gt; <span class="self">Self
-    </span><span class="kw">where
-        </span>L: Into&lt;Line&lt;<span class="lifetime">'content</span>&gt;&gt;,
-    {
+    </span><span class="kw">pub fn </span>new(body: W) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             body,
-            title: title.into(),
-            style: Style::default(),
             borders: Borders::ALL,
+            border_set: Set::default(),
+            border_style: Style::default(),
+            title: Line::default(),
+            style: Style::default(),
         }
     }
 }
@@ -242,6 +320,70 @@
 
     <span class="kw">fn </span>height(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.height
+    }
+}
+
+<span class="kw">impl</span>&lt;W: SizedWidgetRef&gt; WidgetRef <span class="kw">for </span>Popup&lt;<span class="lifetime">'_</span>, W&gt; {
+    <span class="kw">fn </span>render_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
+        <span class="kw">let </span><span class="kw-2">mut </span>state = PopupState::default();
+        StatefulWidgetRef::render_ref(<span class="self">self</span>, area, buf, <span class="kw-2">&amp;mut </span>state);
+    }
+}
+
+<span class="kw">impl</span>&lt;W: SizedWidgetRef&gt; StatefulWidgetRef <span class="kw">for </span>Popup&lt;<span class="lifetime">'_</span>, W&gt; {
+    <span class="kw">type </span>State = PopupState;
+
+    <span class="kw">fn </span>render_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer, state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::State) {
+        <span class="kw">let </span>area = <span class="kw">if let </span><span class="prelude-val">Some</span>(next) = state.area.take() {
+            <span class="comment">// ensure that the popup remains on screen
+            </span><span class="kw">let </span>width = min(next.width, area.width);
+            <span class="kw">let </span>height = min(next.height, area.height);
+            <span class="kw">let </span>x = next.x.clamp(buf.area.x, area.right() - width);
+            <span class="kw">let </span>y = next.y.clamp(buf.area.y, area.bottom() - height);
+
+            Rect::new(x, y, width, height)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>border_height = usize::from(<span class="self">self</span>.borders.intersects(Borders::TOP))
+                + usize::from(<span class="self">self</span>.borders.intersects(Borders::BOTTOM));
+            <span class="kw">let </span>border_width = usize::from(<span class="self">self</span>.borders.intersects(Borders::LEFT))
+                + usize::from(<span class="self">self</span>.borders.intersects(Borders::RIGHT));
+
+            <span class="kw">let </span>height = <span class="self">self
+                </span>.body
+                .height()
+                .saturating_add(border_height)
+                .try_into()
+                .unwrap_or(area.height);
+            <span class="kw">let </span>width = <span class="self">self
+                </span>.body
+                .width()
+                .saturating_add(border_width)
+                .try_into()
+                .unwrap_or(area.width);
+            centered_rect(width, height, area)
+        };
+
+        state.area.replace(area);
+
+        Clear.render(area, buf);
+        <span class="kw">let </span>block = Block::default()
+            .borders(<span class="self">self</span>.borders)
+            .border_set(<span class="self">self</span>.border_set)
+            .border_style(<span class="self">self</span>.border_style)
+            .title(<span class="self">self</span>.title.clone())
+            .style(<span class="self">self</span>.style);
+        block.render_ref(area, buf);
+        <span class="self">self</span>.body.render_ref(block.inner(area), buf);
+    }
+}
+
+<span class="doccomment">/// Create a rectangle centered in the given area.
+</span><span class="kw">fn </span>centered_rect(width: u16, height: u16, area: Rect) -&gt; Rect {
+    Rect {
+        x: area.width.saturating_sub(width) / <span class="number">2</span>,
+        y: area.height.saturating_sub(height) / <span class="number">2</span>,
+        width: min(width, area.width),
+        height: min(height, area.height),
     }
 }
 </code></pre></div></section></main></body></html>

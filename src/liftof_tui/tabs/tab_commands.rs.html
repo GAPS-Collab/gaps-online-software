@@ -402,29 +402,8 @@
 <a href="#402" id="402">402</a>
 <a href="#403" id="403">403</a>
 <a href="#404" id="404">404</a>
-<a href="#405" id="405">405</a>
-<a href="#406" id="406">406</a>
-<a href="#407" id="407">407</a>
-<a href="#408" id="408">408</a>
-<a href="#409" id="409">409</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Commands tab
 //! 
-//! Display available commands as a list, if issued show 
-//! the corresponding response recieved over the command 
-//! channel and show the incoming data stream as well
-//!
-//! The layout is somewhat like this
-//!
-//! -----------------------------------------
-//! | Menu  | .. | .. |                     |
-//! -----------------------------------------
-//! | Command List | | Response: &lt;Success&gt;  |
-//! | ..           | | ----------------------
-//! | &lt;StartRun&gt;   | | Stream               |
-//! |              | |   -&gt; ...             |
-//! -----------------------------------------
-//! | Logs                                  |
-
 </span><span class="comment">//use chrono::Utc;
 
 </span><span class="kw">use </span>ratatui::prelude::<span class="kw-2">*</span>;
@@ -479,14 +458,16 @@
   <span class="kw">pub </span>cmdl_items         : Vec::&lt;ListItem&lt;<span class="lifetime">'a</span>&gt;&gt;,
   <span class="kw">pub </span>cmdl_active        : bool,
   <span class="kw">pub </span>cmdl_selector      : usize,
+  <span class="kw">pub </span>allow_commands     : bool,
   <span class="kw">pub </span>active_cmd         : TofCommandV2,
 }
 
 <span class="kw">impl </span>CommandTab&lt;<span class="lifetime">'_</span>&gt; {
 
-  <span class="kw">pub fn </span>new&lt;<span class="lifetime">'a</span>&gt;(resp_rc      : Receiver&lt;TofResponse&gt;,
-                 cmd_pub_addr : String,
-                 theme        : ColorTheme) -&gt; CommandTab&lt;<span class="lifetime">'a</span>&gt; {  
+  <span class="kw">pub fn </span>new&lt;<span class="lifetime">'a</span>&gt;(resp_rc        : Receiver&lt;TofResponse&gt;,
+                 cmd_pub_addr   : String,
+                 theme          : ColorTheme,
+                 allow_commands : bool) -&gt; CommandTab&lt;<span class="lifetime">'a</span>&gt; {  
     <span class="kw">let </span><span class="kw-2">mut </span>ping_cmd = TofCommandV2::new();
     ping_cmd.command_code = TofCommandCode::Ping;
     <span class="kw">let </span><span class="kw-2">mut </span>start_cmd = TofCommandV2::new();
@@ -503,18 +484,21 @@
     } 
     <span class="kw">let </span>ctx = zmq::Context::new();
     <span class="kw">let </span>cmd_sender = ctx.socket(zmq::PUB).expect(<span class="string">"Can not create 0MQ PUB socket!"</span>); 
-    cmd_sender.bind(<span class="kw-2">&amp;</span>cmd_pub_addr).expect(<span class="string">"Unable to bind to (PUB) socket!"</span>);
+    <span class="kw">if </span>allow_commands {
+      cmd_sender.bind(<span class="kw-2">&amp;</span>cmd_pub_addr).expect(<span class="string">"Unable to bind to (PUB) socket!"</span>);
+    }
     <span class="comment">//thread::sleep(10*one_second);
 
     </span>CommandTab {
       theme   ,
       resp_rc ,
       cmd_sender,
-      cmdl_state    : ListState::default(),
-      cmdl_items    : cmd_select_items,
-      cmdl_active   : <span class="bool-val">false</span>,
-      cmdl_selector : <span class="number">0</span>,
-      active_cmd    : TofCommandV2::new(),
+      cmdl_state     : ListState::default(),
+      cmdl_items     : cmd_select_items,
+      cmdl_active    : <span class="bool-val">false</span>,
+      cmdl_selector  : <span class="number">0</span>,
+      allow_commands : allow_commands,
+      active_cmd     : TofCommandV2::new(),
     }
   }
   
@@ -549,6 +533,10 @@
  
   <span class="doccomment">/// send the selected dommand
   </span><span class="kw">pub fn </span>send_command(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="kw">if </span>!<span class="self">self</span>.allow_commands {
+      <span class="macro">error!</span>(<span class="string">"To send commands, run program with --send-commands!"</span>);
+      <span class="kw">return</span>;
+    }
     <span class="macro">info!</span>(<span class="string">"Sending TOF cmd {}"</span>, <span class="self">self</span>.active_cmd);
     <span class="kw">match </span><span class="self">self</span>.active_cmd.command_code {
       TofCommandCode::DataRunStop =&gt; {
@@ -611,7 +599,9 @@
         </span>}
       },
     }
-    frame.render_stateful_widget(cmd_select_list, main_lo[<span class="number">0</span>], <span class="kw-2">&amp;mut </span><span class="self">self</span>.cmdl_state );
+    <span class="kw">if </span><span class="self">self</span>.allow_commands {
+      frame.render_stateful_widget(cmd_select_list, main_lo[<span class="number">0</span>], <span class="kw-2">&amp;mut </span><span class="self">self</span>.cmdl_state );
+    }
   }
 } <span class="comment">// end impl
     

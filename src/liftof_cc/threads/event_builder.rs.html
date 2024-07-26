@@ -716,6 +716,7 @@
 <a href="#716" id="716">716</a>
 <a href="#717" id="717">717</a>
 <a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::thread;
 <span class="kw">use </span>std::time::{
     Instant,
@@ -1067,6 +1068,18 @@
       //let end   = String::from("== == == == == == == == == == == == == == == == == == == ==");
       //hbs.push(end);
       </span>heartbeat.met_seconds += debug_timer_elapsed <span class="kw">as </span>usize;
+      heartbeat.mte_receiver_cbc_len = m_trig_ev.len();
+      heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
+      heartbeat.tp_sender_cbc_len = data_sink.len();
+      <span class="kw">let </span>pack = heartbeat.pack();
+      <span class="kw">match </span>data_sink.send(pack) {
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"EVTBLDR Heartbeat sending failed! Err {}"</span>, err);
+        }
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+          <span class="macro">debug!</span>(<span class="string">"Heartbeat sent &lt;3 &lt;3 &lt;3"</span>);
+        }
+      }
       <span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="string">"&gt;&gt; == == == == == == ==  EVTBLDR HEARTBEAT == ==  == == == == =="</span>.bright_purple().bold());
     <span class="comment">//if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
       </span><span class="macro">println!</span>(<span class="string">"  {:&lt;70} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Received MTEvents {}"</span>, n_mte_received_tot).bright_purple());
@@ -1396,6 +1409,7 @@
               <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
                 <span class="macro">debug!</span>(<span class="string">"Event with id {} sent!"</span>, evid);
                 n_sent += <span class="number">1</span>;
+                heartbeat.n_sent += <span class="number">1</span>;
               }
             }
           } <span class="kw">else </span>{
@@ -1404,18 +1418,6 @@
         }
       }
     } 
-    heartbeat.mte_receiver_cbc_len = m_trig_ev.len();
-    heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
-    heartbeat.tp_sender_cbc_len = data_sink.len();
-    <span class="kw">let </span>pack = heartbeat.pack();
-    <span class="kw">match </span>data_sink.send(pack) {
-      <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">"EVTBLDR Heartbeat sending failed! Err {}"</span>, err);
-      }
-      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-        <span class="macro">debug!</span>(<span class="string">"Heartbeat sent &lt;3 &lt;3 &lt;3"</span>);
-      }
-    }
     <span class="comment">// end loop over event_id_cache
     // this is related to the above way to deal with the
     // event_id_cache. But it might be too slow.

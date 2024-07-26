@@ -1552,11 +1552,6 @@
 <a href="#1552" id="1552">1552</a>
 <a href="#1553" id="1553">1553</a>
 <a href="#1554" id="1554">1554</a>
-<a href="#1555" id="1555">1555</a>
-<a href="#1556" id="1556">1556</a>
-<a href="#1557" id="1557">1557</a>
-<a href="#1558" id="1558">1558</a>
-<a href="#1559" id="1559">1559</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Database access &amp; entities of the TOF
 //!
 //! A local .sqlite database is shipped with 
@@ -1690,12 +1685,7 @@
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Run {
-      <span class="comment">//runtime_secs  : Some(0), 
-      //calib_before  : Some(true), 
-      //shifter       : Some(0), 
-      //run_type      : Some(0), 
-      //run_path      : Some(String::from("")), 
-  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;Run"</span>);
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  RunID         : {}"</span>, <span class="self">self</span>.run_id));                   
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  - auto cali   : {}"</span>, <span class="self">self</span>.calib_before.unwrap_or(<span class="bool-val">false</span>)));

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["tab_commands","tab_cpu","tab_events","tab_home","tab_mt","tab_paddles","tab_rbs","tab_rbwaveform","tab_settings","tab_telemetry","tab_tofhit","tab_tofsummary"]};
+window.SIDEBAR_ITEMS = {"mod":["tab_commands","tab_cpu","tab_events","tab_heartbeats","tab_home","tab_mt","tab_paddles","tab_rbs","tab_rbwaveform","tab_settings","tab_telemetry","tab_tofhit","tab_tofsummary"]};

@@ -193,6 +193,17 @@
 <a href="#193" id="193">193</a>
 <a href="#194" id="194">194</a>
 <a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// PacketType identifies the payload in TofPackets
 ///
 /// This needs to be kept in sync with the C++ API
@@ -220,15 +231,14 @@
   TofEvent            = <span class="number">21u8</span>,
   RBWaveform          = <span class="number">22u8</span>,
   TofEventSummary     = <span class="number">23u8</span>,
-  <span class="comment">//Monitor             = 30u8,    // needs to go away
-  </span>HeartBeatDataSink   = <span class="number">40u8</span>,    
+  HeartBeatDataSink   = <span class="number">40u8</span>,    
   MasterTrigger       = <span class="number">60u8</span>,    <span class="comment">// needs to be renamed to either MasterTriggerEvent or MTEvent
-  </span>TriggerConfig       = <span class="number">61u8</span>,
-  MTBHeartbeat        = <span class="number">62u8</span>, 
-  EVTBLDRHeartbeat   = <span class="number">63u8</span>,
-  RBChannelMaskConfig = <span class="number">64u8</span>,
+  </span>TriggerConfig        = <span class="number">61u8</span>,
+  MTBHeartbeat         = <span class="number">62u8</span>, 
+  EVTBLDRHeartbeat     = <span class="number">63u8</span>,
+  RBChannelMaskConfig  = <span class="number">64u8</span>,
   AnalysisEngineConfig = <span class="number">69u8</span>,
-  RBEventHeader       = <span class="number">70u8</span>,    <span class="comment">// needs to go away
+  RBEventHeader        = <span class="number">70u8</span>,    <span class="comment">// needs to go away
   </span>TOFEventBuilderConfig = <span class="number">71u8</span>,
   CPUMoniData         = <span class="number">80u8</span>,
   MonitorMtb          = <span class="number">90u8</span>,
@@ -280,7 +290,11 @@
       <span class="comment">//30u8  =&gt; PacketType::Monitor,
       </span><span class="number">40u8  </span>=&gt; PacketType::HeartBeatDataSink,
       <span class="number">60u8  </span>=&gt; PacketType::MasterTrigger,
-      <span class="number">61u8 </span>=&gt; PacketType::TriggerConfig,
+      <span class="number">61u8  </span>=&gt; PacketType::TriggerConfig,
+      <span class="number">62u8  </span>=&gt; PacketType::MTBHeartbeat,
+      <span class="number">63u8  </span>=&gt; PacketType::EVTBLDRHeartbeat,
+      <span class="number">64u8  </span>=&gt; PacketType::RBChannelMaskConfig,
+      <span class="number">69u8  </span>=&gt; PacketType::AnalysisEngineConfig,
       <span class="number">70u8  </span>=&gt; PacketType::RBEventHeader,
       <span class="number">80u8  </span>=&gt; PacketType::CPUMoniData,
       <span class="number">90u8  </span>=&gt; PacketType::MonitorMtb,
@@ -321,12 +335,16 @@
       </span>PacketType::MasterTrigger,
       PacketType::TriggerConfig, 
       PacketType::HeartBeatDataSink,
+      PacketType::MTBHeartbeat,
+      PacketType::EVTBLDRHeartbeat,
       PacketType::RBEventHeader,
       PacketType::RBEvent,
       PacketType::RBEventMemoryView,
       PacketType::TofCommand,
       PacketType::TofCommandV2,
       PacketType::TofResponse,
+      PacketType::RBChannelMaskConfig,
+      PacketType::AnalysisEngineConfig,
       PacketType::RBCommand,
       PacketType::RBPing,
       PacketType::PreampBiasConfig,
@@ -361,6 +379,8 @@
   </span>type_codes.push(PacketType::TriggerConfig <span class="kw">as </span>u8);
   type_codes.push(PacketType::MasterTrigger <span class="kw">as </span>u8);
   type_codes.push(PacketType::HeartBeatDataSink <span class="kw">as </span>u8);
+  type_codes.push(PacketType::MTBHeartbeat <span class="kw">as </span>u8);
+  type_codes.push(PacketType::EVTBLDRHeartbeat <span class="kw">as </span>u8);
   type_codes.push(PacketType::RBEventHeader <span class="kw">as </span>u8);
   type_codes.push(PacketType::RBEvent <span class="kw">as </span>u8);
   type_codes.push(PacketType::RBEventMemoryView <span class="kw">as </span>u8);
@@ -377,6 +397,8 @@
   type_codes.push(PacketType::PreampBiasConfig <span class="kw">as </span>u8);
   type_codes.push(PacketType::RunConfig <span class="kw">as </span>u8);
   type_codes.push(PacketType::LTBThresholdConfig <span class="kw">as </span>u8);
+  type_codes.push(PacketType::AnalysisEngineConfig <span class="kw">as </span>u8);
+  type_codes.push(PacketType::RBChannelMaskConfig <span class="kw">as </span>u8);
   type_codes.push(PacketType::MonitorMtb <span class="kw">as </span>u8);
   type_codes.push(PacketType::RBCalibration <span class="kw">as </span>u8);
   type_codes.push(PacketType::ConfigBinary <span class="kw">as </span>u8);

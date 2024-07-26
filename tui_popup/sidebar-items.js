@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["MouseState"],"struct":["Popup","PopupState","SizedWrapper"],"trait":["SizedWidgetRef"]};
+window.SIDEBAR_ITEMS = {"enum":["DragState"],"struct":["Popup","PopupState","SizedWrapper"],"trait":["SizedWidgetRef"]};

@@ -476,6 +476,7 @@
 <a href="#476" id="476">476</a>
 <a href="#477" id="477">477</a>
 <a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Master Trigger tab
 //! 
 //! Show current data from the master trigger
@@ -865,6 +866,7 @@
         .graph_type(GraphType::Line)
         .style(Style::default().patch(<span class="self">self</span>.theme.style()))
         .data(<span class="self">self</span>.fpgatmp_queue.make_contiguous())];
+
     <span class="kw">let </span>fpga_temp_chart = Chart::new(fpga_temp_dataset)
       .block(
         Block::default()

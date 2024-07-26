@@ -910,6 +910,21 @@
 <a href="#910" id="910">910</a>
 <a href="#911" id="911">911</a>
 <a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Commmands which can be issued
 //! to the various components of 
 //! the tof system.
@@ -992,12 +1007,10 @@
   </span>StartValidationRun       = <span class="number">32u8</span>,         
   <span class="doccomment">/// command code for "Get all waveforms"
   </span>GetFullWaveforms         = <span class="number">41u8</span>,
+  <span class="doccomment">/// command code for "Send the whole event cache over the wire"
+  </span>UnspoolEventCache        = <span class="number">44u8</span>,
   <span class="doccomment">/// command code for "Run full calibration"
   </span>RBCalibration            = <span class="number">53u8</span>, 
-
-  <span class="doccomment">/// command code for "Send the whole event cache over the wire"
-  </span>UnspoolEventCache       = <span class="number">44u8</span>,
-
   <span class="doccomment">/// command code for setting the size of the rb buffers.
   /// technically, this does not change the size, but sets 
   /// a different value for trip
@@ -1013,6 +1026,15 @@
   </span>Lock                    = <span class="number">80u8</span>,
   <span class="doccomment">/// unlock the cmd dispatcher
   </span>Unlock                  = <span class="number">81u8</span>,
+  <span class="doccomment">/// Enable sending of TOF packets
+  </span>SendTofEvents           = <span class="number">90u8</span>,
+  <span class="doccomment">/// Diesable sending of TofEventPacket
+  </span>NoSendTofEvents         = <span class="number">91u8</span>,
+  <span class="doccomment">/// Enable sending of RBWaveform packets
+  </span>SendRBWaveforms         = <span class="number">92u8</span>,
+  <span class="doccomment">/// Disable sending of RBWaveform packets
+  </span>NoSendRBWaveforms       = <span class="number">93u8</span>,
+
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofCommandCode {
@@ -1046,6 +1068,10 @@
       <span class="number">71u8 </span>=&gt; TofCommandCode::Staging,
       <span class="number">80u8 </span>=&gt; TofCommandCode::Lock,
       <span class="number">81u8 </span>=&gt; TofCommandCode::Unlock,
+      <span class="number">90u8 </span>=&gt; TofCommandCode::SendTofEvents,
+      <span class="number">91u8 </span>=&gt; TofCommandCode::NoSendTofEvents,
+      <span class="number">92u8 </span>=&gt; TofCommandCode::SendRBWaveforms,
+      <span class="number">93u8 </span>=&gt; TofCommandCode::NoSendRBWaveforms,
       <span class="kw">_    </span>=&gt; TofCommandCode::Unknown
     }
   }
@@ -1074,6 +1100,10 @@
       TofCommandCode::Staging,
       TofCommandCode::Lock,
       TofCommandCode::Unlock,
+      TofCommandCode::SendTofEvents,
+      TofCommandCode::NoSendTofEvents,
+      TofCommandCode::SendRBWaveforms,
+      TofCommandCode::NoSendRBWaveforms,
       TofCommandCode::Kill,
     ];
     <span class="kw">let </span><span class="kw-2">mut </span>rng  = rand::thread_rng();

@@ -669,6 +669,13 @@
 <a href="#669" id="669">669</a>
 <a href="#670" id="670">670</a>
 <a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Heartbeats - regularly (or on demand) sent 
 //! software monitoring data
 //!
@@ -824,12 +831,12 @@
 
   <span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
     <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;HearBeatDataSink"</span>);
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  {:&lt;75}"</span>, <span class="string">"&gt;&gt; == == == == == == DATA SINK HEARTBEAT  == == == == == == &lt;&lt;"</span>.bright_cyan().bold()));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Sent {} TofPackets! (packet rate {:.2}/s)"</span>, <span class="self">self</span>.n_packets_sent , <span class="self">self</span>.get_sent_packet_rate()).bright_cyan()));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Incoming cb channel len {}"</span>, <span class="self">self</span>.incoming_ch_len).bright_cyan()));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Writing events to disk: {} packets written, data write rate {:.2} MB/sec"</span>, <span class="self">self</span>.n_pack_write_disk, <span class="self">self</span>.get_mbytes_to_disk_per_sec()).bright_purple()));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)"</span>, <span class="self">self</span>.evid_missing, <span class="self">self</span>.evid_check_len, <span class="number">100.0</span><span class="kw-2">*</span>(<span class="self">self</span>.evid_missing <span class="kw">as </span>f64/<span class="self">self</span>.evid_check_len <span class="kw">as </span>f64)).bright_purple()));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  {:&lt;75}"</span>, <span class="string">"&gt;&gt; == == == == == == == == == == == == == == == == == == == &lt;&lt;"</span>.bright_cyan().bold()));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  {:&lt;75}"</span>, <span class="string">"&gt;&gt; == == == == == == DATA SINK HEARTBEAT  == == == == == == &lt;&lt;"</span>.bright_cyan().bold()));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Sent {} TofPackets! (packet rate {:.2}/s)"</span>, <span class="self">self</span>.n_packets_sent , <span class="self">self</span>.get_sent_packet_rate()).bright_cyan()));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Incoming cb channel len {}"</span>, <span class="self">self</span>.incoming_ch_len).bright_cyan()));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Writing events to disk: {} packets written, data write rate {:.2} MB/sec"</span>, <span class="self">self</span>.n_pack_write_disk, <span class="self">self</span>.get_mbytes_to_disk_per_sec()).bright_purple()));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)"</span>, <span class="self">self</span>.evid_missing, <span class="self">self</span>.evid_check_len, <span class="number">100.0</span><span class="kw-2">*</span>(<span class="self">self</span>.evid_missing <span class="kw">as </span>f64/<span class="self">self</span>.evid_check_len <span class="kw">as </span>f64)).bright_purple()));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  {:&lt;75}"</span>, <span class="string">"&gt;&gt; == == == == == == == == == == == == == == == == == == == &lt;&lt;"</span>.bright_cyan().bold()));
     repr 
   }
 }
@@ -966,7 +973,7 @@
   <span class="kw">pub </span>n_ev_missed         : u64,
   <span class="kw">pub </span>trate               : u64,
   <span class="kw">pub </span>lost_trate          : u64,
-  }
+}
 
   <span class="kw">impl </span>MTBHeartbeat {
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
@@ -981,26 +988,27 @@
         lost_trate          : <span class="number">0</span>,
       }
     }
+
     <span class="kw">pub fn </span>get_sent_packet_rate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
       <span class="self">self</span>.n_events <span class="kw">as </span>f64 / <span class="self">self</span>.total_elapsed <span class="kw">as </span>f64
     }
     <span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
       <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;MTBHeartbeats"</span>);
-      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75}"</span>, <span class="string">"&gt;&gt; == == == == == == MTB HEARTBEAT == == == == == == &lt;&lt;"</span>.bright_cyan().bold()));
-      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; MET (Mission Elapsed Time) (sec) {:.1}"</span>,<span class="self">self</span>.total_elapsed).bright_blue()));
-      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Recorded Events                  {}"</span>, <span class="self">self</span>.n_events).bright_blue()));
-      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Last MTB EVQ size                {}"</span>, <span class="self">self</span>.evq_num_events_last).bright_blue()));
-      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Avg. MTB EVQ size (per 30s )     {:.2}"</span>, <span class="self">self</span>.evq_num_events_avg).bright_blue()));
-      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, recorded  (Hz)  {:.2}"</span>, <span class="self">self</span>.n_events <span class="kw">as </span>f64/<span class="self">self</span>.total_elapsed <span class="kw">as </span>f64).bright_blue()));
-      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75}"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, from reg. (Hz)  {}"</span>, <span class="self">self</span>.trate).bright_blue()));
-      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75}"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- lost trg rate, from reg. (Hz)   {}"</span>, <span class="self">self</span>.lost_trate)).bright_blue());
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">"&gt;&gt; == == == == == == MTB HEARTBEAT == == == == == == &lt;&lt;"</span>.bright_cyan().bold()));
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; MET (Mission Elapsed Time) (sec) {:.1}"</span>,<span class="self">self</span>.total_elapsed).bright_blue()));
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Recorded Events                  {}"</span>, <span class="self">self</span>.n_events).bright_blue()));
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Last MTB EVQ size                {}"</span>, <span class="self">self</span>.evq_num_events_last).bright_blue()));
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Avg. MTB EVQ size (per 30s )     {:.2}"</span>, <span class="self">self</span>.evq_num_events_avg).bright_blue()));
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, recorded  (Hz)  {:.2}"</span>, <span class="self">self</span>.n_events <span class="kw">as </span>f64/<span class="self">self</span>.total_elapsed <span class="kw">as </span>f64).bright_blue()));
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, from reg. (Hz)  {}"</span>, <span class="self">self</span>.trate).bright_blue()));
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- lost trg rate, from reg. (Hz)   {}"</span>, <span class="self">self</span>.lost_trate)).bright_blue());
       <span class="kw">if </span><span class="self">self</span>.n_ev_unsent &gt; <span class="number">0 </span>{
-        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">" {}{}"</span>, <span class="macro">format!</span>(<span class="string">"{}&gt;&gt; ==&gt; "</span>,<span class="self">self</span>.n_ev_unsent).yellow().bold(), <span class="string">" sent errors  &lt;&lt;"</span>)).yellow().bold();
+        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n {}{}"</span>, <span class="macro">format!</span>(<span class="string">"{}&gt;&gt; ==&gt; "</span>,<span class="self">self</span>.n_ev_unsent).yellow().bold(), <span class="string">" sent errors  &lt;&lt;"</span>)).yellow().bold();
       }
       <span class="kw">if </span><span class="self">self</span>.n_ev_missed &gt; <span class="number">0 </span>{
-        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  {}{}"</span>, <span class="macro">format!</span>(<span class="string">"{}&gt;&gt; ==&gt; "</span>,<span class="self">self</span>.n_events).yellow().bold(), <span class="string">" missed events   &lt;&lt;"</span>)).yellow().bold();
+        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  {}{}"</span>, <span class="macro">format!</span>(<span class="string">"{}&gt;&gt; ==&gt; "</span>,<span class="self">self</span>.n_events).yellow().bold(), <span class="string">" missed events   &lt;&lt;"</span>)).yellow().bold();
       }
-      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  {:&lt;75}"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; == == == == == == ==  END HEARTBEAT = ==  == == == == =="</span>).bright_blue().bold()));
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  {:&lt;75}"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; == == == == == == ==  END HEARTBEAT = ==  == == == == =="</span>).bright_blue().bold()));
       repr
     }
   }
@@ -1095,7 +1103,7 @@
   }
 } 
 
-<span class="attr">#[derive(Debug, Clone, PartialEq)]
+<span class="attr">#[derive(Debug, Copy, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>EVTBLDRHeartbeat {
   <span class="kw">pub </span>met_seconds           : usize,
   <span class="kw">pub </span>n_mte_received_tot    : usize,
@@ -1175,42 +1183,48 @@
   <span class="number">0.0
 </span>}
 
-<span class="kw">pub fn </span>get_nrbe_discarded_frac(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
-  <span class="kw">if </span><span class="self">self</span>.n_rbe_received_tot &gt; <span class="number">0 </span>{
+ <span class="kw">pub fn </span>get_nrbe_discarded_frac(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+   <span class="kw">if </span><span class="self">self</span>.n_rbe_received_tot &gt; <span class="number">0 </span>{
     <span class="kw">return </span><span class="self">self</span>.n_rbe_discarded_tot <span class="kw">as </span>f64 / <span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64;
   }
   <span class="number">0.0
  </span>}
- <span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+ 
+<span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
   <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;EVTBLDRHearbeats"</span>);
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} &lt;&lt;"</span>.bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; {} events sent"</span>, <span class="self">self</span>.n_sent)));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Size of event cache    \t{}"</span>, <span class="self">self</span>.event_cache_size).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Size of event ID cache   \t{}"</span>, <span class="self">self</span>.event_id_cache_size).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; {} Events timed out"</span>, <span class="self">self</span>.n_timed_out).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent events timed out {}%"</span>, <span class="self">self</span>.get_timed_out_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent events w/out event ID: {}%"</span>, (((<span class="self">self</span>.n_ev_wo_evid / <span class="self">self</span>.n_sent) <span class="kw">as </span>f64)<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64))).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Received MTEvents \t\t{}"</span>, <span class="self">self</span>.n_mte_received_tot).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Skipped MTEvents \t\t{}"</span>, <span class="self">self</span>.n_mte_skipped).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Incoming/outgoing MTEvents fraction {}"</span>, <span class="self">self</span>.get_incoming_vs_outgoing_mte()).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Received RBEvents \t\t{}"</span>, <span class="self">self</span>.n_rbe_received_tot).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; RBEvents Discarded \t\t{}"</span>, <span class="self">self</span>.n_rbe_discarded_tot).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent RBEvents discarded {}%"</span>, <span class="self">self</span>.get_nrbe_discarded_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Avg. ratio RBEvent/ToFEvent {:4.2}"</span>, <span class="self">self</span>.n_rbe_per_te).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Getting MTE from cache for RBEvent failed {} times :("</span>, <span class="self">self</span>.rbe_wo_mte).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; {} RBEvents with evid from past"</span>, <span class="self">self</span>.n_rbe_from_past).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; {} Orphan RBEvents"</span>, <span class="self">self</span>.n_rbe_orphan).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Ch. len MTE Receiver   \t{}"</span>, <span class="self">self</span>.mte_receiver_cbc_len).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Ch. len RBE Reveiver   \t{}"</span>, <span class="self">self</span>.rbe_receiver_cbc_len).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Ch. len TP Sender    \t{}"</span>, <span class="self">self</span>.tp_sender_cbc_len).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"   {:&lt;75}"</span>, <span class="string">" &gt;&gt;  \u{2B50} \u{2B50} \u{2B50} \u{2B50} END EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50}  &lt;&lt;"</span>));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} &lt;&lt;"</span>.bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; {} events sent"</span>, <span class="self">self</span>.n_sent)));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Size of event cache    \t{}"</span>, <span class="self">self</span>.event_cache_size).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Size of event ID cache   \t{}"</span>, <span class="self">self</span>.event_id_cache_size).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; {} Events timed out"</span>, <span class="self">self</span>.n_timed_out).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent events timed out {}%"</span>, <span class="self">self</span>.get_timed_out_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple()));
+  <span class="kw">if </span><span class="self">self</span>.n_sent &gt; <span class="number">0 </span>{
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent events w/out event ID: {}%"</span>, (((<span class="self">self</span>.n_ev_wo_evid / <span class="self">self</span>.n_sent) <span class="kw">as </span>f64)<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64))).bright_purple()));
+  } <span class="kw">else </span>{ 
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent events w/out event ID: N/A"</span>).bright_purple()));
+  }
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Received MTEvents \t\t{}"</span>, <span class="self">self</span>.n_mte_received_tot).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Skipped MTEvents \t\t{}"</span>, <span class="self">self</span>.n_mte_skipped).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Incoming/outgoing MTEvents fraction {}"</span>, <span class="self">self</span>.get_incoming_vs_outgoing_mte()).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Received RBEvents \t\t{}"</span>, <span class="self">self</span>.n_rbe_received_tot).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; RBEvents Discarded \t\t{}"</span>, <span class="self">self</span>.n_rbe_discarded_tot).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent RBEvents discarded {}%"</span>, <span class="self">self</span>.get_nrbe_discarded_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Avg. ratio RBEvent/ToFEvent {:4.2}"</span>, <span class="self">self</span>.n_rbe_per_te).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Getting MTE from cache for RBEvent failed {} times :("</span>, <span class="self">self</span>.rbe_wo_mte).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; {} RBEvents with evid from past"</span>, <span class="self">self</span>.n_rbe_from_past).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; {} Orphan RBEvents"</span>, <span class="self">self</span>.n_rbe_orphan).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Ch. len MTE Receiver   \t{}"</span>, <span class="self">self</span>.mte_receiver_cbc_len).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Ch. len RBE Reveiver   \t{}"</span>, <span class="self">self</span>.rbe_receiver_cbc_len).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Ch. len TP Sender    \t{}"</span>, <span class="self">self</span>.tp_sender_cbc_len).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt;  \u{2B50} \u{2B50} \u{2B50} \u{2B50} END EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50}  &lt;&lt;"</span>));
   repr
   }
 }
+
 <span class="kw">impl </span>Default <span class="kw">for </span>EVTBLDRHeartbeat {
   <span class="kw">fn </span>default () -&gt; <span class="self">Self </span>{
     <span class="self">Self</span>::new()
@@ -1339,4 +1353,5 @@
     <span class="kw">let </span>test : EVTBLDRHeartbeat = hb.pack().unpack().unwrap();
     <span class="macro">assert_eq!</span>(hb, test);
   }
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>
