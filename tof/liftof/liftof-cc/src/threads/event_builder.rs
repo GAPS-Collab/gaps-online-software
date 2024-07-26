@@ -349,6 +349,18 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       //let end   = String::from("== == == == == == == == == == == == == == == == == == == ==");
       //hbs.push(end);
       heartbeat.met_seconds += debug_timer_elapsed as usize;
+      heartbeat.mte_receiver_cbc_len = m_trig_ev.len();
+      heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
+      heartbeat.tp_sender_cbc_len = data_sink.len();
+      let pack = heartbeat.pack();
+      match data_sink.send(pack) {
+        Err(err) => {
+          error!("EVTBLDR Heartbeat sending failed! Err {}", err);
+        }
+        Ok(_)    => {
+          debug!("Heartbeat sent <3 <3 <3");
+        }
+      }
       println!("  {:<70} <<", ">> == == == == == == ==  EVTBLDR HEARTBEAT == ==  == == == == ==".bright_purple().bold());
     //if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
       println!("  {:<70} <<", format!(">> ==> Received MTEvents {}", n_mte_received_tot).bright_purple());
@@ -678,6 +690,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               Ok(_)    => {
                 debug!("Event with id {} sent!", evid);
                 n_sent += 1;
+                heartbeat.n_sent += 1;
               }
             }
           } else {
@@ -686,18 +699,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         }
       }
     } 
-    heartbeat.mte_receiver_cbc_len = m_trig_ev.len();
-    heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
-    heartbeat.tp_sender_cbc_len = data_sink.len();
-    let pack = heartbeat.pack();
-    match data_sink.send(pack) {
-      Err(err) => {
-        error!("EVTBLDR Heartbeat sending failed! Err {}", err);
-      }
-      Ok(_)    => {
-        debug!("Heartbeat sent <3 <3 <3");
-      }
-    }
     // end loop over event_id_cache
     // this is related to the above way to deal with the
     // event_id_cache. But it might be too slow.

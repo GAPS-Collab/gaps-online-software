@@ -39,7 +39,8 @@ use tof_dataclasses::monitoring::{
 
 //use tof_dataclasses::events::TofEvent;
 use tof_dataclasses::serialization::{
-    Serialization,
+  Serialization,
+  Packable,
 };
 
 use tof_dataclasses::io::{
@@ -50,7 +51,7 @@ use tof_dataclasses::io::{
 
 use tof_dataclasses::events::TofEvent;
 
-#[cfg(features="debug")]
+//#[cfg(features="debug")]
 use tof_dataclasses::heartbeats::HeartBeatDataSink;
 
 //use liftof_lib::settings::DataPublisherSettings;
@@ -146,6 +147,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut runid : u32 = 0;
   let mut new_run_start = false;
   let mut retire   = false;
+  let mut heartbeat = HeartBeatDataSink::new();
   loop {
     if retire {
       // take a long nap to give other threads 
@@ -199,12 +201,12 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         debug!("Got new tof packet {}", pack.packet_type);
         if writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(&pack);
-          cfg_if::cfg_if!{
-            if #[cfg(features="debug")] {
-              heartbeat.n_pack_write_disk += 1;
-              heartbeat.n_bytes_written += pack.payload.len();   
-            }
-          }
+          //cfg_if::cfg_if!{
+            //if #[cfg(features="debug")] {
+          heartbeat.n_pack_write_disk += 1;
+          heartbeat.n_bytes_written += pack.payload.len() as u64;   
+            //}
+          //}
           n_pack_write_disk += 1;
           bytes_sec_disk    += pack.payload.len() as f64;
         }
@@ -318,11 +320,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 }
                 Ok(_)    => {
                   //trace!("Event Summary for event id {} send!", evid);
-                  cfg_if::cfg_if!{
-                    if #[cfg(features="debug")] {
-                      heartbeat.n_pack_sent += 1;
-                    }
-                  }
+                  //cfg_if::cfg_if!{
+                  //  if #[cfg(features="debug")] {
+                  heartbeat.n_packets_sent += 1;
+                    //}
+                  //}
                   n_pack_sent += 1;
                 }
               }
@@ -336,11 +338,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                   }
                   Ok(_)    => {
                     //trace!("RB waveform for event id {} send!", evid);
-                    cfg_if::cfg_if!{
-                      if #[cfg(features="debug")] {
-                        heartbeat.n_pack_sent += 1;
-                      }
-                    }
+                    //cfg_if::cfg_if!{
+                    //  if #[cfg(features="debug")] {
+                    heartbeat.n_packets_sent += 1;
+                      //}
+                    //}
                     n_pack_sent += 1;
                   }
                 }
@@ -354,11 +356,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 }
                 Ok(_)    => {
                   //trace!("RB waveform for event id {} send!", evid);
-                  cfg_if::cfg_if!{
-                    if #[cfg(features="debug")] {
-                      heartbeat.n_pack_sent += 1;
-                    }
-                  }
+                  //cfg_if::cfg_if!{
+                  //  if #[cfg(features="debug")] {
+                  heartbeat.n_packets_sent += 1;
+                  //  }
+                  //}
                   n_pack_sent += 1;
                 }
               }
@@ -369,11 +371,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
               Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
               Ok(_)    => {
                 trace!("TofPacket sent");
-                cfg_if::cfg_if!{
-                  if #[cfg(features="debug")] {
-                    heartbeat.n_pack_sent += 1;
-                  }
-                }
+                //cfg_if::cfg_if!{
+                //  if #[cfg(features="debug")] {
+                heartbeat.n_packets_sent += 1;
+                //  }
+                //}
                 n_pack_sent += 1;
               }
             } // end match
@@ -383,15 +385,14 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
             Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
             Ok(_)    => {
               trace!("TofPacket sent");
-              cfg_if::cfg_if!{
-                if #[cfg(features="debug")] {
-                  heartbeat.n_pack_sent += 1;
-                }
-              }
+              //cfg_if::cfg_if!{
+              //  if #[cfg(features="debug")] {
+              heartbeat.n_packets_sent += 1;
+              //  }
+              //}
               n_pack_sent += 1;
             }
           } // end match
-          
         }
       } // end if pk == event packet
     } // end incoming.recv
@@ -406,28 +407,28 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         //println!("len of evid_id_test {}", evid_id_test_len);
         for _ in 0..evid_check_len {
           if !evid_check.contains(&evid) {
-            cfg_if::cfg_if!{
-              if #[cfg(features="debug")] {
-                heartbeat.n_evid_missing += 1;
-                heartbeat.n_evid_chunksize = evid_check_len;
-              }
-            }
+            //cfg_if::cfg_if!{
+            //if #[cfg(features="debug")] {
+            heartbeat.n_evid_missing += 1;
+            heartbeat.n_evid_chunksize = evid_check_len as u64;
+            //  }
+            //}
           }
           evid += 1;
         }
       }
-      cfg_if::cfg_if!{
-        if #[cfg(features="debug")] {
-          heartbeat.incoming_ch_len = incoming.len();
-          heartbeat.met += timer.elapsed().as_secs_u64();
-          match data_socket.send(heartbeat.pack().to_bytestream(),0) {
-            Err(err) => error!("Not able to send heartbeat over 0MQ PUB! {err}"),
-            Ok(_)    => {
-              trace!("TofPacket sent");
-            }
-          } // end match
+      //cfg_if::cfg_if!{
+      //  if #[cfg(features="debug")] {
+      heartbeat.incoming_ch_len = incoming.len() as u64;
+      heartbeat.met += timer.elapsed().as_secs();
+      match data_socket.send(heartbeat.pack().to_bytestream(),0) {
+        Err(err) => error!("Not able to send heartbeat over 0MQ PUB! {err}"),
+        Ok(_)    => {
+          trace!("Heartbeat sent");
         }
-      } 
+      } // end match
+      //  }
+      //} 
       evid_check.clear();
       ////println!("DEBUG 2");
       //event_id_test.clear();

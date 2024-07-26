@@ -125,6 +125,12 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
     // check if we get a command from the main 
     // thread
     thread::sleep(sleep_time);
+    match cmd_receiver.connect(&fc_sub_addr) {
+      Ok(_)    => (),
+      Err(err) => {
+        error!("JUnable to connect to {}! {}", fc_sub_addr, err);
+      }
+    }
     match thread_ctrl.try_lock() {
       Ok(mut tc) => {
         //println!("== ==> [cmd_dispatcher] tc locked!");
@@ -225,6 +231,46 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                 }
 
                 match cmd.command_code {
+                  TofCommandCode::SendTofEvents => {
+                    match thread_ctrl.lock() {
+                      Ok(mut tc) => {
+                        tc.liftof_settings.data_publisher_settings.send_tof_event_packets = true;
+                      }
+                      Err(err) => {
+                        error!("Unable to lock thread control! {err}");
+                      }
+                    }
+                  }
+                  TofCommandCode::NoSendTofEvents => {
+                    match thread_ctrl.lock() {
+                      Ok(mut tc) => {
+                        tc.liftof_settings.data_publisher_settings.send_tof_event_packets = false;
+                      }
+                      Err(err) => {
+                        error!("Unable to lock thread control! {err}");
+                      }
+                    }
+                  }
+                  TofCommandCode::SendRBWaveforms => {
+                    match thread_ctrl.lock() {
+                      Ok(mut tc) => {
+                        tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets = true;
+                      }
+                      Err(err) => {
+                        error!("Unable to lock thread control! {err}");
+                      }
+                    }
+                  }
+                  TofCommandCode::NoSendRBWaveforms => {
+                    match thread_ctrl.lock() {
+                      Ok(mut tc) => {
+                        tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets = true;
+                      }
+                      Err(err) => {
+                        error!("Unable to lock thread control! {err}");
+                      }
+                    }
+                  }
                   TofCommandCode::Kill => {
                     match thread_ctrl.lock() {
                       Ok(mut tc) => {
