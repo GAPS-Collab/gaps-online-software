@@ -246,7 +246,7 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
   if data.len() < 4 {
     return Err(MasterTriggerError::BrokenPackage);
   }
-  let tiu_link_bad   = !(tiu_link_is_good(bus)?);
+  let tiu_link_bad   = TIU_BAD.get(bus)?;
   let tiu_busy_len   = TIU_BUSY_LENGTH.get(bus)?;
   let tiu_aux_link   = TIU_USE_AUX_LINK.get(bus)? as u8;
   let tiu_emu_mode   = TIU_EMULATION_MODE.get(bus)? as u8;
@@ -356,6 +356,15 @@ pub fn master_trigger(mt_address     : String,
       }
     }
   }
+  
+  //match TIU_USE_AUX_LINK.set(&mut bus, 1) {
+  //  Err(err) => {
+  //    error!("Unable to use TIU AUX link! {err}");
+  //  }
+  //  Ok(_) => {
+  //    println!("==> Using TIU AUX link!");
+  //  }
+  //}
 
   info!("Settting rb integration window!");
   let int_wind = settings.rb_int_window;
@@ -488,7 +497,7 @@ pub fn master_trigger(mt_address     : String,
     //}
     _ => {
       error!("Trigger type {} not covered!", settings.trigger_type);
-      println!("== ==> Not setting any trigger condition. You can set it through pico_hal.py");
+      println!("= => Not setting any trigger condition. You can set it through pico_hal.py");
       warn!("Trigger condition undefined! Not setting anything!");
       error!("Trigger conditions unknown!");
     }
@@ -536,13 +545,18 @@ pub fn master_trigger(mt_address     : String,
     // Check thread control and what to do
     if tc_timer.elapsed().as_secs_f32() > 1.5 {
       match thread_control.try_lock() {
-        Ok(tc) => {
-          if tc.thread_master_trg_active {
+        Ok(mut tc) => {
+          if tc.thread_master_trg_active || tc.stop_flag {
             // if the thread is not supposed to be active, 
             // idle
             is_active = true;
-          } else {
+          }
+          if !tc.thread_master_trg_active {
             is_active = false;
+          }
+          if tc.stop_flag {
+            tc.thread_master_trg_active = false;
+            break;
           }
         },
         Err(err) => {
@@ -551,16 +565,13 @@ pub fn master_trigger(mt_address     : String,
       }
       tc_timer = Instant::now();
     }
-    if !is_active {
-      continue;
-    }
     // This is a recovery mechanism. In case we don't see an event
     // for mtb_timeout_sec, we attempt to reconnect to the MTB
     if mtb_timeout.elapsed().as_secs() > mtb_timeout_sec {
       if mtb_timeout.elapsed().as_secs() > mtb_timeout_sec {
-        println!("==> [master_trigger] reconnection timer elapsed");
+        println!("= => [master_trigger] reconnection timer elapsed");
       } else {
-        println!("==> [master_trigger] reconnection requested");
+        println!("= => [master_trigger] reconnection requested");
       }
       match IPBus::new(mt_address.clone()) {
         Err(err) => {
@@ -655,6 +666,12 @@ pub fn master_trigger(mt_address     : String,
       }
       moni_interval = Instant::now();
     }
+    
+    // if we ar not active, don't get events
+    if !is_active {
+      continue;
+    }
+
     match get_event(&mut bus){ //,
       Err(err) => {
         match err {
@@ -699,72 +716,67 @@ pub fn master_trigger(mt_address     : String,
       }
     }
 
-    if verbose {
-      let verbose_timer_elapsed = verbose_timer.elapsed().as_secs_f64();
-      //let mut missing = 0usize;
-      //if event_id_test.len() > 0 {
-      //  let mut evid = event_id_test[0];
-      //  for _ in 0..event_id_test.len() {
-      //    if !event_id_test.contains(&evid) {
-      //      missing += 1;
-      //    }
-      //    evid += 1;
-      //  }
-      //}
-      //let evid_check_str = format!(">> ==> In a chunk of {} events, we missed {} ({}%) <<", event_id_test.len(), missing, 100.0*(missing as f64)/event_id_test.len() as f64);
-      //event_id_test.clear();
-      if verbose_timer_elapsed > 30.0 {
-        match EVQ_NUM_EVENTS.get(&mut bus) {
-          Err(err) => {
-            error!("Unable to query {}! {err}", EVQ_NUM_EVENTS);
-          }
-          Ok(num_ev) => {
-            heartbeat.evq_num_events_last = num_ev as u64;
-            evq_num_events += num_ev as u64;
-            n_iter_loop    += 1;
-            heartbeat.evq_num_events_avg = evq_num_events as u64/n_iter_loop as u64;
-          }
+    let verbose_timer_elapsed = verbose_timer.elapsed().as_secs_f64();
+    //let mut missing = 0usize;
+    //if event_id_test.len() > 0 {
+    //  let mut evid = event_id_test[0];
+    //  for _ in 0..event_id_test.len() {
+    //    if !event_id_test.contains(&evid) {
+    //      missing += 1;
+    //    }
+    //    evid += 1;
+    //  }
+    //}
+    //let evid_check_str = format!(">> ==> In a chunk of {} events, we missed {} ({}%) <<", event_id_test.len(), missing, 100.0*(missing as f64)/event_id_test.len() as f64);
+    //event_id_test.clear();
+    if verbose_timer_elapsed > 30.0 {
+      match EVQ_NUM_EVENTS.get(&mut bus) {
+        Err(err) => {
+          error!("Unable to query {}! {err}", EVQ_NUM_EVENTS);
         }
-        heartbeat.total_elapsed += verbose_timer_elapsed as u64;
-        println!("  {:<60} <<", ">> == == == == == == ==  MT HEARTBEAT == ==  == == == == ==".bright_blue().bold());
-        println!("  {:<60} <<", format!(">> ==> MET (Mission Elapsed Time) (sec) {:.1}",total_elapsed).bright_blue());
-        println!("  {:<60} <<", format!(">> ==> Recorded Events                  {}", n_events).bright_blue());
-        println!("  {:<60} <<", format!(">> ==> Last MTB EVQ size                {}", evq_num_events_last).bright_blue());
-        println!("  {:<60} <<", format!(">> ==> Avg. MTB EVQ size (per 30s )     {:.2}", evq_num_events_avg).bright_blue());
-        println!("  {:<60} <<", format!(">> ==> -- trigger rate, recorded  (Hz)  {:.2}", n_events as f64/total_elapsed).bright_blue());
-        match TRIGGER_RATE.get(&mut bus) {
-          Ok(trate) => {
-            println!("  {:<60} <<", format!(">> ==> -- trigger rate, from reg. (Hz)  {}", trate).bright_blue());
-            heartbeat.trate = trate as u64;
-          }
-          Err(err) => {
-            error!("Unable to query {}! {err}", TRIGGER_RATE);
-            println!("  {:<60} <<", String::from(">> ==> -- trigger rate, from reg. (Hz)   N/A").bright_blue());
-          }
+        Ok(num_ev) => {
+          heartbeat.evq_num_events_last = num_ev as u64;
+          evq_num_events += num_ev as u64;
+          n_iter_loop    += 1;
+          heartbeat.evq_num_events_avg = evq_num_events as u64/n_iter_loop as u64;
         }
-        match LOST_TRIGGER_RATE.get(&mut bus) {
-          Ok(lost_trate) => {
-            println!("  {:<60} <<", format!(">> ==> -- lost trg rate, from reg. (Hz)   {}", lost_trate).bright_blue());
-            heartbeat.lost_trate = lost_trate as u64;
-          }
-        
-          Err(err) => {
-            error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
-            println!("  {:<60} <<", String::from(">> ==> -- lost trigger rate, from reg. (Hz)   N/A").bright_blue());
-          }
-        }
-        if n_ev_unsent > 0 {
-          println!("  {}{}{}", ">> ==> ".yellow().bold(),n_ev_unsent, " sent errors                       <<".yellow().bold());
-        }
-        if n_ev_missed > 0 {
-          println!("  {}{}{}", ">> ==> ".yellow().bold(),n_events, " missed events                       <<".yellow().bold());
-        }
-        println!("  {:<60} <<", ">> == == == == == == ==  END HEARTBEAT = ==  == == == == ==".bright_blue().bold());
-        verbose_timer = Instant::now();
       }
-
-    }
-    if verbose_timer.elapsed().as_secs() > 120 {
+      heartbeat.total_elapsed += verbose_timer_elapsed as u64;
+      println!("  {:<60} <<", ">> == == == == == == ==  MT HEARTBEAT == ==  == == == == ==".bright_blue().bold());
+      println!("  {:<60} <<", format!(">> ==> MET (Mission Elapsed Time) (sec) {:.1}",total_elapsed).bright_blue());
+      println!("  {:<60} <<", format!(">> ==> Recorded Events                  {}", n_events).bright_blue());
+      println!("  {:<60} <<", format!(">> ==> Last MTB EVQ size                {}", evq_num_events_last).bright_blue());
+      println!("  {:<60} <<", format!(">> ==> Avg. MTB EVQ size (per 30s )     {:.2}", evq_num_events_avg).bright_blue());
+      println!("  {:<60} <<", format!(">> ==> -- trigger rate, recorded  (Hz)  {:.2}", n_events as f64/total_elapsed).bright_blue());
+      match TRIGGER_RATE.get(&mut bus) {
+        Ok(trate) => {
+          println!("  {:<60} <<", format!(">> ==> -- trigger rate, from reg. (Hz)  {}", trate).bright_blue());
+          heartbeat.trate = trate as u64;
+        }
+        Err(err) => {
+          error!("Unable to query {}! {err}", TRIGGER_RATE);
+          println!("  {:<60} <<", String::from(">> ==> -- trigger rate, from reg. (Hz)   N/A").bright_blue());
+        }
+      }
+      match LOST_TRIGGER_RATE.get(&mut bus) {
+        Ok(lost_trate) => {
+          println!("  {:<60} <<", format!(">> ==> -- lost trg rate, from reg. (Hz)   {}", lost_trate).bright_blue());
+          heartbeat.lost_trate = lost_trate as u64;
+        }
+      
+        Err(err) => {
+          error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
+          println!("  {:<60} <<", String::from(">> ==> -- lost trigger rate, from reg. (Hz)   N/A").bright_blue());
+        }
+      }
+      if n_ev_unsent > 0 {
+        println!("  {}{}{}", ">> ==> ".yellow().bold(),n_ev_unsent, " sent errors                       <<".yellow().bold());
+      }
+      if n_ev_missed > 0 {
+        println!("  {}{}{}", ">> ==> ".yellow().bold(),n_events, " missed events                       <<".yellow().bold());
+      }
+      println!("  {:<60} <<", ">> == == == == == == ==  END HEARTBEAT = ==  == == == == ==".bright_blue().bold());
+      verbose_timer = Instant::now();
       let pack = heartbeat.pack();
       match moni_sender.send(pack) {
         Err(err) => {
