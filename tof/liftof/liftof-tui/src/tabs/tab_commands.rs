@@ -1,21 +1,5 @@
 //! Commands tab
 //! 
-//! Display available commands as a list, if issued show 
-//! the corresponding response recieved over the command 
-//! channel and show the incoming data stream as well
-//!
-//! The layout is somewhat like this
-//!
-//! -----------------------------------------
-//! | Menu  | .. | .. |                     |
-//! -----------------------------------------
-//! | Command List | | Response: <Success>  |
-//! | ..           | | ----------------------
-//! | <StartRun>   | | Stream               |
-//! |              | |   -> ...             |
-//! -----------------------------------------
-//! | Logs                                  |
-
 //use chrono::Utc;
 
 use ratatui::prelude::*;
@@ -70,14 +54,16 @@ pub struct CommandTab<'a> {
   pub cmdl_items         : Vec::<ListItem<'a>>,
   pub cmdl_active        : bool,
   pub cmdl_selector      : usize,
+  pub allow_commands     : bool,
   pub active_cmd         : TofCommandV2,
 }
 
 impl CommandTab<'_> {
 
-  pub fn new<'a>(resp_rc      : Receiver<TofResponse>,
-                 cmd_pub_addr : String,
-                 theme        : ColorTheme) -> CommandTab<'a> {  
+  pub fn new<'a>(resp_rc        : Receiver<TofResponse>,
+                 cmd_pub_addr   : String,
+                 theme          : ColorTheme,
+                 allow_commands : bool) -> CommandTab<'a> {  
     let mut ping_cmd = TofCommandV2::new();
     ping_cmd.command_code = TofCommandCode::Ping;
     let mut start_cmd = TofCommandV2::new();
@@ -94,18 +80,21 @@ impl CommandTab<'_> {
     } 
     let ctx = zmq::Context::new();
     let cmd_sender = ctx.socket(zmq::PUB).expect("Can not create 0MQ PUB socket!"); 
-    cmd_sender.bind(&cmd_pub_addr).expect("Unable to bind to (PUB) socket!");
+    if allow_commands {
+      cmd_sender.bind(&cmd_pub_addr).expect("Unable to bind to (PUB) socket!");
+    }
     //thread::sleep(10*one_second);
 
     CommandTab {
       theme   ,
       resp_rc ,
       cmd_sender,
-      cmdl_state    : ListState::default(),
-      cmdl_items    : cmd_select_items,
-      cmdl_active   : false,
-      cmdl_selector : 0,
-      active_cmd    : TofCommandV2::new(),
+      cmdl_state     : ListState::default(),
+      cmdl_items     : cmd_select_items,
+      cmdl_active    : false,
+      cmdl_selector  : 0,
+      allow_commands : allow_commands,
+      active_cmd     : TofCommandV2::new(),
     }
   }
   
@@ -140,6 +129,10 @@ impl CommandTab<'_> {
  
   /// send the selected dommand
   pub fn send_command(&self) {
+    if !self.allow_commands {
+      error!("To send commands, run program with --send-commands!");
+      return;
+    }
     info!("Sending TOF cmd {}", self.active_cmd);
     match self.active_cmd.command_code {
       TofCommandCode::DataRunStop => {
@@ -202,7 +195,9 @@ impl CommandTab<'_> {
         }
       },
     }
-    frame.render_stateful_widget(cmd_select_list, main_lo[0], &mut self.cmdl_state );
+    if self.allow_commands {
+      frame.render_stateful_widget(cmd_select_list, main_lo[0], &mut self.cmdl_state );
+    }
   }
 } // end impl
     

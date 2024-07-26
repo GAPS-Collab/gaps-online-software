@@ -387,6 +387,7 @@ impl MTTab {
         .graph_type(GraphType::Line)
         .style(Style::default().patch(self.theme.style()))
         .data(self.fpgatmp_queue.make_contiguous())];
+
     let fpga_temp_chart = Chart::new(fpga_temp_dataset)
       .block(
         Block::default()

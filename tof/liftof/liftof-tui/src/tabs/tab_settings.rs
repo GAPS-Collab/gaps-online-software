@@ -237,8 +237,9 @@ impl SettingsTab<'_> {
     frame.render_widget(refresh_view, sub_rows0[1]);
     frame.render_stateful_widget(color_theme_list, sub_rows0[0], &mut self.ctl_state );
     if self.colortheme_popup {
-      let popup = Popup::new("New color theme selected!", "Any key to continue!")
-      .style(self.theme.style());
+      let popup = Popup::new("Any key to continue!")
+        .title("New color theme selected!")
+        .style(self.theme.style());
       frame.render_widget(&popup, frame.size());
     }
   }

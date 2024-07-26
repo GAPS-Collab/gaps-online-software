@@ -38,7 +38,7 @@ def get_version(binary):
 def build_for_muslx86_64(binary, njobs=24):
     os.chdir(f'{binary}')
     sub.run(["cargo clean"], shell=True)
-    build_cmd = f'CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build -j {njobs} --target=x86_64-unknown-linux-musl --bin {binary} --release'
+    build_cmd = f'CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build -j {njobs} --target=x86_64-unknown-linux-musl --bin {binary} --release --all-features'
     result = sub.run([build_cmd], shell=True)
     shutil.move(f'../target/x86_64-unknown-linux-musl/release/{binary}', '../build/')
     os.chdir('..')

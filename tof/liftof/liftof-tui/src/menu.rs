@@ -1,4 +1,5 @@
-
+//! Menus for the main application and 
+//! individual tabs
 
 use ratatui::widgets::Tabs;
 use ratatui::text::{Span, Line};
@@ -19,6 +20,7 @@ pub enum ActiveMenu {
   Trigger,
   Events,
   Monitoring,
+  Heartbeats,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -96,7 +98,12 @@ pub enum UIMenuItem {
   LTBThresholds,
   // paddle menu
   Signal,
-  RecoVars
+  RecoVars,
+  // heartbeats
+  Heartbeats,
+  EventBuilderHB,
+  TriggerHB,
+  DataSenderHB,
 }
 
 impl UIMenuItem {
@@ -131,6 +138,10 @@ impl UIMenuItem {
       UIMenuItem::Paddles        => String::from("Paddles"),
       UIMenuItem::Signal         => String::from("Wf & Charge"),
       UIMenuItem::RecoVars       => String::from("Reco Vars"),
+      UIMenuItem::Heartbeats     => String::from("Heartbeats"),
+      UIMenuItem::EventBuilderHB => String::from("EventBuilderHB"),
+      UIMenuItem::TriggerHB      => String::from("TriggerHB"),
+      UIMenuItem::DataSenderHB   => String::from("DataSenderHB"),
       _ => String::from("Unknown"),
     } 
   }
@@ -208,7 +219,6 @@ pub struct MainMenu2<'a> {
 }
 
 impl UIMenu<'_> for MainMenu2<'_> {
-  
   fn get_items() -> Vec<UIMenuItem> {
     let items = vec![UIMenuItem::Home,
                      UIMenuItem::Events,
@@ -216,6 +226,7 @@ impl UIMenu<'_> for MainMenu2<'_> {
                      UIMenuItem::Paddles,
                      UIMenuItem::Trigger,
                      UIMenuItem::Monitoring,
+                     UIMenuItem::Heartbeats,
                      UIMenuItem::Telemetry,
                      UIMenuItem::Commands,
                      UIMenuItem::Settings,
@@ -245,39 +256,10 @@ impl UIMenu<'_> for MainMenu2<'_> {
   fn get_active_menu_item(&self) -> UIMenuItem {
     self.active_menu_item2
   }
-
-  //fn get_active_menu_item(&self) -> UIMenuItem {
-  //  match self.active_index {
-  //    0 => UIMenuItem::Home,
-  //    1 => UIMenuItem::Events,
-  //    2 => UIMenuItem::ReadoutBoards,
-  //    3 => UIMenuItem::Trigger,
-  //    4 => UIMenuItem::Monitoring,
-  //    5 => UIMenuItem::Telemetry,
-  //    6 => UIMenuItem::Commands,
-  //    7 => UIMenuItem::Quit,
-  //    _ => UIMenuItem::Unknown
-  //  }
-  //}
 }
 
 impl MainMenu2<'_> {
   pub fn new(theme : ColorTheme) -> Self {
-    //let title_str  =  vec!["Home", "Events",
-    //                       "Readoutboards", 
-    //                       "Trigger", "Monitoring",
-    //                       "Telemetry", "Commands",
-    //                       "Quit"];
-
-    //let titles : Vec<Line> = title_str
-    //            .iter()
-    //            .map(|t| {
-    //               Line::from(vec![
-    //                 Span::styled(*t, theme.style()),
-    //               ])
-    //            })
-    //            .collect();
-    // 
     let titles = Self::get_titles(theme);
     let theme_cl = theme.clone();
     Self {
@@ -294,11 +276,11 @@ impl MainMenu2<'_> {
 
 #[derive(Debug, Clone)]
 pub struct RBMenu2<'a>  {
-  pub theme            : ColorTheme,
-  pub active_menu_item : RBMenuItem,
+  pub theme             : ColorTheme,
+  pub active_menu_item  : RBMenuItem,
   pub active_menu_item2 : UIMenuItem,
-  pub active_index     : usize, 
-  pub titles           : Vec<Line<'a>>,
+  pub active_index      : usize, 
+  pub titles            : Vec<Line<'a>>,
 }
 
 impl UIMenu<'_> for RBMenu2<'_> {
@@ -531,6 +513,62 @@ impl UIMenu<'_> for PaddleMenu<'_> {
 }
 
 impl PaddleMenu<'_> {
+
+  pub fn new(theme : ColorTheme) -> Self {
+    let theme_c = theme.clone();
+    let titles  = Self::get_titles(theme_c);
+    let n_titles = titles.len();
+    Self {
+      theme,
+      active_index : 0,
+      titles,
+      active_menu_item : UIMenuItem::Back,
+    }
+  }
+}
+
+//============================================
+
+#[derive(Debug, Clone)]
+pub struct HBMenu<'a>  {
+  pub theme            : ColorTheme,
+  pub active_menu_item : UIMenuItem,
+  pub active_index     : usize, 
+  pub titles           : Vec<Line<'a>>,
+}
+
+impl UIMenu<'_> for HBMenu<'_> {
+  
+  fn get_items() -> Vec<UIMenuItem> {
+    let items = vec![UIMenuItem::Back,
+                     UIMenuItem::EventBuilderHB,
+                     UIMenuItem::TriggerHB,
+                     UIMenuItem::DataSenderHB];
+    items
+  }
+
+  fn get_theme(&self) -> ColorTheme {
+    self.theme
+  }
+
+  fn set_active_idx(&mut self, idx : usize) {
+    self.active_index = idx;
+  }
+
+  fn get_active_idx(&self) -> usize {
+    self.active_index
+  }
+  
+  fn set_active_menu_item(&mut self, item : UIMenuItem) {
+    self.active_menu_item = item;
+  }
+  
+  fn get_active_menu_item(&self) -> UIMenuItem {
+    self.active_menu_item
+  }
+}
+
+impl HBMenu<'_> {
 
   pub fn new(theme : ColorTheme) -> Self {
     let theme_c = theme.clone();

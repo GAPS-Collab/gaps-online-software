@@ -1,5 +1,12 @@
 # LELEWAA series
 
+##v0.10.3
+* new command line flag --allow-commands. If this is not 
+  set, then commands will not be able to get send and the 
+  zmq pub socket for the commands will not be bound
+* heartbeats ! <3 implements Heartbeat display to monitor
+  liftof-cc
+
 ##v0.10.2
 * massive overhaul - show waveforms per each paddle
 * interface change - use arrow keys to navigate
