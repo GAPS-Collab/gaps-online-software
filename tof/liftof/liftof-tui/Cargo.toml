@@ -27,8 +27,9 @@ tui-logger = "0.11"
 
 crossterm  = { version = "0.23", features=["serde"]}
 
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["database","smoothed_z_score"], version = "0.10"} 
 
-tof-dataclasses = { workspace = true }
+#tof-dataclasses = { workspace = true }
 liftof-lib      = { path = "../liftof-lib" , features = ["random"], version = "0.10"}
 telemetry-dataclasses = { path = "../../../telemetry/dataclasses/rust/telemetry-dataclasses", optional = true }
 
