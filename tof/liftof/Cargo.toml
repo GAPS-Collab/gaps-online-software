@@ -16,15 +16,17 @@ cfg-if           = "1.0"
 # serialization
 serde      = {version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+
 # thread and network communication
 crossbeam-channel = "0.5"
 zmq               = "0.10.0"
 signal-hook       = "0.3"
 
-
 # logging and command line parsing
-log = "0.4"
-clap = { version = "4.0", features = ["derive"] }
+log =   "0.4"
+clap   = { version = "4.0", features = ["derive"] }
+chrono = "0.4"
+
 # own projects
 tof-dataclasses       = { path = "../dataclasses/rust/tof-dataclasses" , features = ["database", "tofcontrol", "advanced-algorithms"], version = "0.10"}
 
