@@ -25,10 +25,6 @@ use std::time::{
 };
 //use std::io::Write;
 
-extern crate crossbeam_channel;
-extern crate signal_hook;
-extern crate env_logger;
-
 use signal_hook::iterator::Signals;
 use signal_hook::consts::signal::{
     SIGTERM,
@@ -37,7 +33,6 @@ use signal_hook::consts::signal::{
 
 #[macro_use] extern crate log;
 
-extern crate clap;
 use clap::{
     arg,
     command,
