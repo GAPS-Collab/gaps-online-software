@@ -134,16 +134,8 @@ impl HeartBeatTab{
           [Constraint::Percentage(100)].as_ref(),
       )
       .split(*main_window);
-    
-
-    let last_evbhb = self.evb_queue.back();
-    let last_mtbhb = self.mtb_queue.back();
-    let last_dshb  = self.gds_queue.back();
 
     let mut view_string = String::from("HB QUEUE EMPTY!");
-    let mut evb_is_empty = false;
-    let mut mtb_is_empty = false;
-    let mut gds_is_empty = false;
     self.last_evb = self.evb_queue.back().copied();
     self.last_mtb = self.mtb_queue.back().copied();
     self.last_gds = self.gds_queue.back().copied();

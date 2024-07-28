@@ -33,7 +33,7 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode},
 };
 
-extern crate crossbeam_channel;
+//extern crate crossbeam_channel;
 use crossbeam_channel::{unbounded,
                         Sender,
                         Receiver};
@@ -144,7 +144,7 @@ use liftof_tui::{
 };
 
 
-extern crate clap;
+//extern crate clap;
 use clap::{arg,
            command,
            //value_parser,
@@ -434,10 +434,6 @@ fn packet_sorter(packet_type : &PacketType,
   }
 }
 
-
-
-
-
 /// Receive packets from an IP address
 /// and distrubute them to their receivers
 /// while taking notes of everything
@@ -449,6 +445,7 @@ fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
                       tp_sender_rb : Sender<TofPacket>,
                       tp_sender_ev : Sender<TofPacket>,
                       tp_sender_cp : Sender<TofPacket>,
+                      tp_sender_tr : Sender<TofPacket>,
                       rbwf_sender  : Sender<TofPacket>,
                       ts_send      : Sender<TofEventSummary>,
                       th_send      : Sender<TofHit>,
@@ -456,9 +453,8 @@ fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
                       str_list     : Arc<Mutex<VecDeque<String>>>,
                       pck_map      : Arc<Mutex<HashMap<String, usize>>>) {
   let mut n_pack = 0usize;
-  //info!("0MQ SUB socket connected to address {address}");
-  //// per default, we create master trigger packets from TofEventSummary, 
-  //// except we have "real" mtb packets
+  // per default, we create master trigger packets from TofEventSummary, 
+  // except we have "real" mtb packets
   let mut craft_mte_packets = true;
 
   loop {
@@ -480,6 +476,12 @@ fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
           }
         }
         match tp.packet_type {
+          PacketType::TofResponse => { 
+            match tp_sender_tr.send(tp) {
+              Err(err) => error!("Can't send TP! {err}"),
+              Ok(_)    => (),
+            }
+          }
           PacketType::MonitorMtb |
           PacketType::MasterTrigger => {
             // apparently, we are getting MasterTriggerEvents, 
@@ -1363,6 +1365,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (ev_pack_send, ev_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (cp_pack_send, cp_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (rbwf_pack_send, rbwf_pack_recv)  : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
+  let (tr_pack_send, tr_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   #[cfg(feature = "telemetry")]
   let (te_pack_send,  te_pack_recv)     : (Sender<TelemetryPacket>, Receiver<TelemetryPacket>) = unbounded();
 
@@ -1371,7 +1374,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (rbe_send, rbe_recv)         : (Sender<RBEvent>, Receiver<RBEvent>)                       = unbounded();
   let (th_send, th_recv)           : (Sender<TofHit>, Receiver<TofHit>)                         = unbounded();
   let (ts_send, ts_recv)           : (Sender<TofEventSummary>, Receiver<TofEventSummary>)       = unbounded();
-  let (tr_send, tr_recv)           : (Sender<TofResponse>, Receiver<TofResponse>)               = unbounded();
   let (te_send, te_recv)           : (Sender<TofEvent>, Receiver<TofEvent>)                     = unbounded();
 
   // send tof packets containing heartbeats
@@ -1423,6 +1425,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                          rb_pack_send,
                          ev_pack_send,
                          cp_pack_send,
+                         tr_pack_send,
                          rbwf_pack_send,
                          ts_send,
                          th_sender_c,
@@ -1548,7 +1551,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   
   }
   let cmd_sender_addr = String::from("tcp://192.168.37.5:42000");
-  let cmd_tab         = CommandTab::new(tr_recv, cmd_sender_addr, color_theme.clone(), allow_commands);
+  let cmd_tab         = CommandTab::new(tr_pack_recv, cmd_sender_addr, color_theme.clone(), allow_commands);
   let pd_tab          = PaddleTab::new(te_recv, paddle_map, rbcalibrations, color_theme.clone());
   let hb_tab          = HeartBeatTab::new(hb_pack_recv, color_theme.clone());
   let active_menu     = ActiveMenu::MainMenu;

@@ -134,7 +134,6 @@ impl UIMenuItem {
       UIMenuItem::PreampBias     => String::from("Preamp Bias Voltages"   ),
       UIMenuItem::PreampTemp     => String::from("Preamp Temps"),
       UIMenuItem::LTBThresholds  => String::from("LTBThresholds"),
-      UIMenuItem::Quit           => String::from("Quit"),
       UIMenuItem::Paddles        => String::from("Paddles"),
       UIMenuItem::Signal         => String::from("Wf & Charge"),
       UIMenuItem::RecoVars       => String::from("Reco Vars"),
@@ -142,7 +141,7 @@ impl UIMenuItem {
       UIMenuItem::EventBuilderHB => String::from("EventBuilderHB"),
       UIMenuItem::TriggerHB      => String::from("TriggerHB"),
       UIMenuItem::DataSenderHB   => String::from("DataSenderHB"),
-      _ => String::from("Unknown"),
+     // _ => String::from("Unknown"),
     } 
   }
 }
@@ -351,7 +350,6 @@ impl  RBMenu2<'_> {
                 })
                 .collect();
  
-    let n_titles = titles.len();
     Self {
       theme,
       active_index : 0,
@@ -404,7 +402,6 @@ impl  TriggerMenu<'_> {
   pub fn new(theme : ColorTheme) -> Self {
     let theme_c = theme.clone();
     let titles  = Self::get_titles(theme_c);
-    let n_titles = titles.len();
     Self {
       theme,
       active_index : 0,
@@ -461,7 +458,6 @@ impl  EventMenu<'_> {
   pub fn new(theme : ColorTheme) -> Self {
     let theme_c = theme.clone();
     let titles  = Self::get_titles(theme_c);
-    let n_titles = titles.len();
     Self {
       theme,
       active_index : 0,
@@ -517,7 +513,6 @@ impl PaddleMenu<'_> {
   pub fn new(theme : ColorTheme) -> Self {
     let theme_c = theme.clone();
     let titles  = Self::get_titles(theme_c);
-    let n_titles = titles.len();
     Self {
       theme,
       active_index : 0,
@@ -573,7 +568,6 @@ impl HBMenu<'_> {
   pub fn new(theme : ColorTheme) -> Self {
     let theme_c = theme.clone();
     let titles  = Self::get_titles(theme_c);
-    let n_titles = titles.len();
     Self {
       theme,
       active_index : 0,
@@ -630,7 +624,6 @@ impl  MoniMenu<'_> {
   pub fn new(theme : ColorTheme) -> Self {
     let theme_c = theme.clone();
     let titles  = Self::get_titles(theme_c);
-    let n_titles = titles.len();
     Self {
       theme,
       active_index : 0,
