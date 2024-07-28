@@ -54,6 +54,9 @@ pub enum EventStatus {
   /// one of the channels ChannelSyncError bits 
   /// has been set (RB)
   ChnSyncErrors          = 14u8,
+  /// Both of the bits (at least one for the cell sync errors)
+  /// have been set
+  CellAndChnSyncErrors   = 15u8,
   IncompleteReadout      = 21u8,
   /// This can be used if there is a version
   /// missmatch and we have to hack something
@@ -97,6 +100,9 @@ impl EventStatus {
       EventStatus::ChnSyncErrors => {
         return 14;
       }
+      EventStatus::CellAndChnSyncErrors => {
+        return 15;
+      }
       EventStatus::IncompleteReadout => {
         return 21;
       }
@@ -128,6 +134,7 @@ impl From<u8> for EventStatus {
       12u8 => EventStatus::ChannelIDWrong,
       13u8 => EventStatus::CellSyncErrors,
       14u8 => EventStatus::ChnSyncErrors,
+      15u8 => EventStatus::CellAndChnSyncErrors,
       21u8 => EventStatus::IncompleteReadout,
       22u8 => EventStatus::IncompatibleData,
       39u8 => EventStatus::GoodNoCRCOrErrBitCheck,
@@ -150,6 +157,7 @@ impl FromRandom for EventStatus {
       EventStatus::ChannelIDWrong,
       EventStatus::CellSyncErrors,
       EventStatus::ChnSyncErrors,
+      EventStatus::CellAndChnSyncErrors,
       EventStatus::IncompleteReadout,
       EventStatus::IncompatibleData,
       EventStatus::GoodNoCRCOrErrBitCheck,
