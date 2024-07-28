@@ -57,6 +57,9 @@ pub enum EventStatus {
   /// Both of the bits (at least one for the cell sync errors)
   /// have been set
   CellAndChnSyncErrors   = 15u8,
+  /// If any of the RBEvents have Sync erros, we flag the tof 
+  /// event summary to indicate there were issues
+  AnyDataMangling        = 16u8,
   IncompleteReadout      = 21u8,
   /// This can be used if there is a version
   /// missmatch and we have to hack something
@@ -103,6 +106,9 @@ impl EventStatus {
       EventStatus::CellAndChnSyncErrors => {
         return 15;
       }
+      EventStatus::AnyDataMangling => {
+        return 16;
+      }
       EventStatus::IncompleteReadout => {
         return 21;
       }
@@ -135,6 +141,7 @@ impl From<u8> for EventStatus {
       13u8 => EventStatus::CellSyncErrors,
       14u8 => EventStatus::ChnSyncErrors,
       15u8 => EventStatus::CellAndChnSyncErrors,
+      16u8 => EventStatus::AnyDataMangling,
       21u8 => EventStatus::IncompleteReadout,
       22u8 => EventStatus::IncompatibleData,
       39u8 => EventStatus::GoodNoCRCOrErrBitCheck,
@@ -158,6 +165,7 @@ impl FromRandom for EventStatus {
       EventStatus::CellSyncErrors,
       EventStatus::ChnSyncErrors,
       EventStatus::CellAndChnSyncErrors,
+      EventStatus::AnyDataMangling,
       EventStatus::IncompleteReadout,
       EventStatus::IncompatibleData,
       EventStatus::GoodNoCRCOrErrBitCheck,
