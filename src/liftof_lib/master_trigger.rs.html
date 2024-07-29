@@ -788,6 +788,10 @@
 <a href="#788" id="788">788</a>
 <a href="#789" id="789">789</a>
 <a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard communications
 //!
 //! The MTB (MasterTriggerBoard) is currently
@@ -1314,19 +1318,19 @@
   <span class="kw">let </span>mtb_moni_interval  = settings.mtb_moni_interval;
   <span class="comment">// verbose, debugging
   </span><span class="kw">let </span><span class="kw-2">mut </span>last_event_id  = <span class="number">0u32</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_events       = <span class="number">0u64</span>;
-  <span class="comment">//let mut rate_from_reg  : Option&lt;u32&gt; = None;
+  <span class="comment">//let mut n_events       = 0u64;
+  //let mut rate_from_reg  : Option&lt;u32&gt; = None;
   </span><span class="kw">let </span><span class="kw-2">mut </span>verbose_timer  = Instant::now();
-  <span class="kw">let </span><span class="kw-2">mut </span>total_elapsed  = <span class="number">0f64</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_ev_unsent    = <span class="number">0u64</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_ev_missed    = <span class="number">0u64</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>first          = <span class="bool-val">true</span>;
+  <span class="comment">//let mut total_elapsed  = 0f64;
+  //let mut n_ev_unsent    = 0u64;
+  //let mut n_ev_missed    = 0u64;
+  </span><span class="kw">let </span><span class="kw-2">mut </span>first          = <span class="bool-val">true</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>slack_cadence  = <span class="number">5</span>; <span class="comment">// send only one slack message 
                               // every 5 times we send moni data
   </span><span class="kw">let </span><span class="kw-2">mut </span>evq_num_events      = <span class="number">0u64</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>evq_num_events_last = <span class="number">0u32</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>evq_num_events_avg  = <span class="number">0f64</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_iter_loop         = <span class="number">0u64</span>;
+  <span class="comment">//let mut evq_num_events_last = 0u32;
+  //let mut evq_num_events_avg  = 0f64;
+  </span><span class="kw">let </span><span class="kw-2">mut </span>n_iter_loop         = <span class="number">0u64</span>;
 
   <span class="comment">// indicator if the thread is active (it can 
   // sleep during calibrations)
@@ -1532,40 +1536,44 @@
         }
       }
       heartbeat.total_elapsed += verbose_timer_elapsed <span class="kw">as </span>u64;
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="string">"&gt;&gt; == == == == == == ==  MT HEARTBEAT == ==  == == == == =="</span>.bright_blue().bold());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; MET (Mission Elapsed Time) (sec) {:.1}"</span>,total_elapsed).bright_blue());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Recorded Events                  {}"</span>, n_events).bright_blue());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Last MTB EVQ size                {}"</span>, evq_num_events_last).bright_blue());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Avg. MTB EVQ size (per 30s )     {:.2}"</span>, evq_num_events_avg).bright_blue());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, recorded  (Hz)  {:.2}"</span>, n_events <span class="kw">as </span>f64/total_elapsed).bright_blue());
-      <span class="kw">match </span>TRIGGER_RATE.get(<span class="kw-2">&amp;mut </span>bus) {
+      <span class="comment">//println!("  {:&lt;60} &lt;&lt;", "&gt;&gt; == == == == == == ==  MT HEARTBEAT == ==  == == == == ==".bright_blue().bold());
+      //println!("  {:&lt;60} &lt;&lt;", format!("&gt;&gt; ==&gt; MET (Mission Elapsed Time) (sec) {:.1}",total_elapsed).bright_blue());
+      //println!("  {:&lt;60} &lt;&lt;", format!("&gt;&gt; ==&gt; Recorded Events                  {}", n_events).bright_blue());
+      //println!("  {:&lt;60} &lt;&lt;", format!("&gt;&gt; ==&gt; Last MTB EVQ size                {}", evq_num_events_last).bright_blue());
+      //println!("  {:&lt;60} &lt;&lt;", format!("&gt;&gt; ==&gt; Avg. MTB EVQ size (per 30s )     {:.2}", evq_num_events_avg).bright_blue());
+      //println!("  {:&lt;60} &lt;&lt;", format!("&gt;&gt; ==&gt; -- trigger rate, recorded  (Hz)  {:.2}", n_events as f64/total_elapsed).bright_blue());
+      </span><span class="kw">match </span>TRIGGER_RATE.get(<span class="kw-2">&amp;mut </span>bus) {
         <span class="prelude-val">Ok</span>(trate) =&gt; {
           <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, from reg. (Hz)  {}"</span>, trate).bright_blue());
           heartbeat.trate = trate <span class="kw">as </span>u64;
         }
         <span class="prelude-val">Err</span>(err) =&gt; {
           <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, TRIGGER_RATE);
-          <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, String::from(<span class="string">"&gt;&gt; ==&gt; -- trigger rate, from reg. (Hz)   N/A"</span>).bright_blue());
-        }
+          <span class="comment">//println!("  {:&lt;60} &lt;&lt;", String::from("&gt;&gt; ==&gt; -- trigger rate, from reg. (Hz)   N/A").bright_blue());
+        </span>}
       }
       <span class="kw">match </span>LOST_TRIGGER_RATE.get(<span class="kw-2">&amp;mut </span>bus) {
         <span class="prelude-val">Ok</span>(lost_trate) =&gt; {
-          <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; -- lost trg rate, from reg. (Hz)   {}"</span>, lost_trate).bright_blue());
-          heartbeat.lost_trate = lost_trate <span class="kw">as </span>u64;
+          <span class="comment">//println!("  {:&lt;60} &lt;&lt;", format!("&gt;&gt; ==&gt; -- lost trg rate, from reg. (Hz)   {}", lost_trate).bright_blue());
+          </span>heartbeat.lost_trate = lost_trate <span class="kw">as </span>u64;
         }
       
         <span class="prelude-val">Err</span>(err) =&gt; {
           <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, LOST_TRIGGER_RATE);
-          <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, String::from(<span class="string">"&gt;&gt; ==&gt; -- lost trigger rate, from reg. (Hz)   N/A"</span>).bright_blue());
-        }
+          <span class="comment">//println!("  {:&lt;60} &lt;&lt;", String::from("&gt;&gt; ==&gt; -- lost trigger rate, from reg. (Hz)   N/A").bright_blue());
+        </span>}
       }
-      <span class="kw">if </span>n_ev_unsent &gt; <span class="number">0 </span>{
-        <span class="macro">println!</span>(<span class="string">"  {}{}{}"</span>, <span class="string">"&gt;&gt; ==&gt; "</span>.yellow().bold(),n_ev_unsent, <span class="string">" sent errors                       &lt;&lt;"</span>.yellow().bold());
+      <span class="comment">//if n_ev_unsent &gt; 0 {
+      //  println!("  {}{}{}", "&gt;&gt; ==&gt; ".yellow().bold(),n_ev_unsent, " sent errors                       &lt;&lt;".yellow().bold());
+      //}
+      //if n_ev_missed &gt; 0 {
+      //  //println!("  {}{}{}", "&gt;&gt; ==&gt; ".yellow().bold(),n_events, " missed events                       &lt;&lt;".yellow().bold());
+      //}
+      //println!("  {:&lt;60} &lt;&lt;", "&gt;&gt; == == == == == == ==  END HEARTBEAT = ==  == == == == ==".bright_blue().bold());
+      
+      </span><span class="kw">if </span>verbose {
+        <span class="macro">println!</span>(<span class="string">"{}"</span>, heartbeat);
       }
-      <span class="kw">if </span>n_ev_missed &gt; <span class="number">0 </span>{
-        <span class="macro">println!</span>(<span class="string">"  {}{}{}"</span>, <span class="string">"&gt;&gt; ==&gt; "</span>.yellow().bold(),n_events, <span class="string">" missed events                       &lt;&lt;"</span>.yellow().bold());
-      }
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;60} &lt;&lt;"</span>, <span class="string">"&gt;&gt; == == == == == == ==  END HEARTBEAT = ==  == == == == =="</span>.bright_blue().bold());
       verbose_timer = Instant::now();
       <span class="kw">let </span>pack = heartbeat.pack();
       <span class="kw">match </span>moni_sender.send(pack) {

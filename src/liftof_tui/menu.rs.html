@@ -1280,13 +1280,6 @@
 <a href="#1280" id="1280">1280</a>
 <a href="#1281" id="1281">1281</a>
 <a href="#1282" id="1282">1282</a>
-<a href="#1283" id="1283">1283</a>
-<a href="#1284" id="1284">1284</a>
-<a href="#1285" id="1285">1285</a>
-<a href="#1286" id="1286">1286</a>
-<a href="#1287" id="1287">1287</a>
-<a href="#1288" id="1288">1288</a>
-<a href="#1289" id="1289">1289</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Menus for the main application and 
 //! individual tabs
 
@@ -1423,7 +1416,6 @@
       UIMenuItem::PreampBias     =&gt; String::from(<span class="string">"Preamp Bias Voltages"   </span>),
       UIMenuItem::PreampTemp     =&gt; String::from(<span class="string">"Preamp Temps"</span>),
       UIMenuItem::LTBThresholds  =&gt; String::from(<span class="string">"LTBThresholds"</span>),
-      UIMenuItem::Quit           =&gt; String::from(<span class="string">"Quit"</span>),
       UIMenuItem::Paddles        =&gt; String::from(<span class="string">"Paddles"</span>),
       UIMenuItem::Signal         =&gt; String::from(<span class="string">"Wf &amp; Charge"</span>),
       UIMenuItem::RecoVars       =&gt; String::from(<span class="string">"Reco Vars"</span>),
@@ -1431,8 +1423,8 @@
       UIMenuItem::EventBuilderHB =&gt; String::from(<span class="string">"EventBuilderHB"</span>),
       UIMenuItem::TriggerHB      =&gt; String::from(<span class="string">"TriggerHB"</span>),
       UIMenuItem::DataSenderHB   =&gt; String::from(<span class="string">"DataSenderHB"</span>),
-      <span class="kw">_ </span>=&gt; String::from(<span class="string">"Unknown"</span>),
-    } 
+     <span class="comment">// _ =&gt; String::from("Unknown"),
+    </span>} 
   }
 }
 
@@ -1640,7 +1632,6 @@
                 })
                 .collect();
  
-    <span class="kw">let </span>n_titles = titles.len();
     <span class="self">Self </span>{
       theme,
       active_index : <span class="number">0</span>,
@@ -1693,7 +1684,6 @@
   <span class="kw">pub fn </span>new(theme : ColorTheme) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>theme_c = theme.clone();
     <span class="kw">let </span>titles  = <span class="self">Self</span>::get_titles(theme_c);
-    <span class="kw">let </span>n_titles = titles.len();
     <span class="self">Self </span>{
       theme,
       active_index : <span class="number">0</span>,
@@ -1750,7 +1740,6 @@
   <span class="kw">pub fn </span>new(theme : ColorTheme) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>theme_c = theme.clone();
     <span class="kw">let </span>titles  = <span class="self">Self</span>::get_titles(theme_c);
-    <span class="kw">let </span>n_titles = titles.len();
     <span class="self">Self </span>{
       theme,
       active_index : <span class="number">0</span>,
@@ -1806,7 +1795,6 @@
   <span class="kw">pub fn </span>new(theme : ColorTheme) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>theme_c = theme.clone();
     <span class="kw">let </span>titles  = <span class="self">Self</span>::get_titles(theme_c);
-    <span class="kw">let </span>n_titles = titles.len();
     <span class="self">Self </span>{
       theme,
       active_index : <span class="number">0</span>,
@@ -1862,7 +1850,6 @@
   <span class="kw">pub fn </span>new(theme : ColorTheme) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>theme_c = theme.clone();
     <span class="kw">let </span>titles  = <span class="self">Self</span>::get_titles(theme_c);
-    <span class="kw">let </span>n_titles = titles.len();
     <span class="self">Self </span>{
       theme,
       active_index : <span class="number">0</span>,
@@ -1919,7 +1906,6 @@
   <span class="kw">pub fn </span>new(theme : ColorTheme) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>theme_c = theme.clone();
     <span class="kw">let </span>titles  = <span class="self">Self</span>::get_titles(theme_c);
-    <span class="kw">let </span>n_titles = titles.len();
     <span class="self">Self </span>{
       theme,
       active_index : <span class="number">0</span>,

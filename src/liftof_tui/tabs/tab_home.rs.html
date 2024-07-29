@@ -129,23 +129,59 @@
 <a href="#129" id="129">129</a>
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! The front page of the app, including a view of received packets
+
+</span><span class="kw">use </span>std::collections::{
     HashMap,
     VecDeque,
 };
+
+<span class="kw">use </span>std::time::{
+  Instant,
+  <span class="comment">//Duration
+</span>};
+
 <span class="kw">use </span>std::sync::{
-    Arc,
-    Mutex,
+  Arc,
+  Mutex,
 };
 <span class="kw">use </span>ratatui::prelude::<span class="kw-2">*</span>;
 
 <span class="kw">use </span>ratatui::terminal::Frame;
 <span class="kw">use </span>ratatui::layout::Rect;
 <span class="kw">use </span>ratatui::widgets::{
-    Block,
-    BorderType,
-    Borders,
-    Paragraph,
+  Block,
+  BorderType,
+  Borders,
+  Paragraph,
+  Table,
+  Row,
 };
 
 <span class="kw">use </span>liftof_lib::LIFTOF_LOGO_SHOW;
@@ -159,6 +195,7 @@
   <span class="kw">pub </span>pack_stat  : Arc&lt;Mutex&lt;HashMap&lt;String, usize&gt;&gt;&gt;,
   <span class="kw">pub </span>stream     : String,
   <span class="kw">pub </span>stream_max : usize, 
+  start_time     : Instant,
 }
 
 <span class="kw">impl </span>HomeTab {
@@ -171,11 +208,11 @@
       pack_stat,
       stream     : String::from(<span class="string">""</span>),
       stream_max : <span class="number">30</span>,
+      start_time : Instant::now(),
     }
   }
 
-  <span class="comment">// Color::Blue was nice for background
-  </span><span class="kw">pub fn </span>render(<span class="kw-2">&amp;mut </span><span class="self">self</span>, main_window : <span class="kw-2">&amp;</span>Rect, frame : <span class="kw-2">&amp;mut </span>Frame) {
+  <span class="kw">pub fn </span>render(<span class="kw-2">&amp;mut </span><span class="self">self</span>, main_window : <span class="kw-2">&amp;</span>Rect, frame : <span class="kw-2">&amp;mut </span>Frame) {
     <span class="kw">let </span>main_chunks = Layout::default()
       .direction(Direction::Vertical)
       .constraints(
@@ -191,36 +228,51 @@
             Constraint::Percentage(<span class="number">30</span>)].as_ref(),
         )
         .split(main_chunks[<span class="number">0</span>]);
-    
-    <span class="kw">let </span><span class="kw-2">mut </span>stat_string_render = String::from(<span class="string">"\n\n"</span>);
+ 
+    <span class="kw">let </span><span class="kw-2">mut </span>rows   = Vec::&lt;Row&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>sum_pack = <span class="number">0</span>;
+    <span class="kw">let </span>passed_time = <span class="self">self</span>.start_time.elapsed().as_secs_f64();
     <span class="kw">match </span><span class="self">self</span>.pack_stat.lock() {
       <span class="prelude-val">Err</span>(_err) =&gt; (),
       <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>_stat) =&gt;  {
         <span class="kw">for </span>k <span class="kw">in </span>_stat.keys() {
           <span class="comment">//stat_string_render += "  -- -- -- -- -- -- -- -- -- --\n";
           </span><span class="kw">if </span>_stat[k] != <span class="number">0 </span>{
-            <span class="kw">let </span>line = <span class="macro">format!</span>(<span class="string">"  {} \t=&gt; \t[{}]\n"</span>,  _stat[k],k);
-            stat_string_render += <span class="kw-2">&amp;</span>line;
             sum_pack += _stat[k];
+            <span class="kw">if </span>k.contains(<span class="string">"Heart"</span>){
+              rows.push(Row::new(<span class="macro">vec!</span>[<span class="macro">format!</span>(<span class="string">"  \u{1f493} {:.1}"</span>, _stat[k]),
+                                      <span class="macro">format!</span>(<span class="string">"{:.1}"</span>, (_stat[k] <span class="kw">as </span>f64)/passed_time,),
+                                      <span class="macro">format!</span>(<span class="string">"[{}]"</span>, k)]));
+            } <span class="kw">else </span>{
+              rows.push(Row::new(<span class="macro">vec!</span>[<span class="macro">format!</span>(<span class="string">"  \u{279f} {:.1}"</span>, _stat[k]),
+                                      <span class="macro">format!</span>(<span class="string">"{:.1}"</span>, (_stat[k] <span class="kw">as </span>f64)/passed_time,),
+                                      <span class="macro">format!</span>(<span class="string">"[{}]"</span>, k)]));
+            }
           }
         }
-      }, 
+      } 
     }
-    stat_string_render += <span class="string">"  == == == == == == ==\n"</span>;
-    <span class="kw">let </span>sum_string      = <span class="macro">format!</span>(<span class="string">"  {} [total]"</span>, sum_pack); 
-    stat_string_render += <span class="kw-2">&amp;</span>sum_string; 
-
-    <span class="kw">let </span>statistics_view = Paragraph::new(stat_string_render)
-    .style(<span class="self">self</span>.theme.style())
-    .alignment(Alignment::Left)
-    .block(
-      Block::default()
-        .borders(Borders::ALL)
-        .border_type(BorderType::Rounded)
-        .title(<span class="string">"Received Packets"</span>)
-    );
-        
+    rows.push(Row::new(<span class="macro">vec!</span>[<span class="string">"  \u{FE4C}\u{FE4C}\u{FE4C}"</span>,<span class="string">"\u{FE4C}\u{FE4C}"</span>,<span class="string">"\u{FE4C}\u{FE4C}\u{FE4C}\u{FE4C}\u{FE4C}\u{FE4C}"</span>])); 
+    rows.push(Row::new(<span class="macro">vec!</span>[<span class="macro">format!</span>(<span class="string">"  \u{279f}{}"</span>, sum_pack),
+                       <span class="macro">format!</span>(<span class="string">"{:.1}/s"</span>, (sum_pack <span class="kw">as </span>f64)/passed_time),
+                       <span class="macro">format!</span>(<span class="string">"[TOTAL]"</span>)]));
+    
+    <span class="kw">let </span>widths = [Constraint::Percentage(<span class="number">30</span>),
+                  Constraint::Percentage(<span class="number">20</span>),
+                  Constraint::Percentage(<span class="number">50</span>)];
+    <span class="kw">let </span>table  = Table::new(rows, widths)
+      .column_spacing(<span class="number">1</span>)
+      .header(
+        Row::new(<span class="macro">vec!</span>[<span class="string">"  N"</span>, <span class="string">"\u{1f4e6}/s"</span>, <span class="string">"Type"</span>])
+        .bottom_margin(<span class="number">1</span>)
+        .top_margin(<span class="number">1</span>)
+        .style(Style::new().add_modifier(Modifier::UNDERLINED))
+      )
+      .block(Block::new()
+             .title(<span class="string">"Packet summary \u{1f4e6}"</span>)
+             .borders(Borders::ALL)
+             .border_type(BorderType::Rounded)
+             );
 
     <span class="kw">let </span>main_view = Paragraph::new(LIFTOF_LOGO_SHOW)
     .style(<span class="self">self</span>.theme.style())
@@ -256,7 +308,7 @@
     );
     frame.render_widget(main_view,       upper_chunks[<span class="number">0</span>]);
     frame.render_widget(side_view,       main_chunks[<span class="number">1</span>]);
-    frame.render_widget(statistics_view, upper_chunks[<span class="number">1</span>])
+    frame.render_widget(table, upper_chunks[<span class="number">1</span>])
   }
 }
 

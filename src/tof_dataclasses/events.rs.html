@@ -174,6 +174,22 @@
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
 <a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Events  
 </span><span class="comment">//
 //
@@ -230,6 +246,12 @@
   <span class="doccomment">/// one of the channels ChannelSyncError bits 
   /// has been set (RB)
   </span>ChnSyncErrors          = <span class="number">14u8</span>,
+  <span class="doccomment">/// Both of the bits (at least one for the cell sync errors)
+  /// have been set
+  </span>CellAndChnSyncErrors   = <span class="number">15u8</span>,
+  <span class="doccomment">/// If any of the RBEvents have Sync erros, we flag the tof 
+  /// event summary to indicate there were issues
+  </span>AnyDataMangling        = <span class="number">16u8</span>,
   IncompleteReadout      = <span class="number">21u8</span>,
   <span class="doccomment">/// This can be used if there is a version
   /// missmatch and we have to hack something
@@ -273,6 +295,12 @@
       EventStatus::ChnSyncErrors =&gt; {
         <span class="kw">return </span><span class="number">14</span>;
       }
+      EventStatus::CellAndChnSyncErrors =&gt; {
+        <span class="kw">return </span><span class="number">15</span>;
+      }
+      EventStatus::AnyDataMangling =&gt; {
+        <span class="kw">return </span><span class="number">16</span>;
+      }
       EventStatus::IncompleteReadout =&gt; {
         <span class="kw">return </span><span class="number">21</span>;
       }
@@ -304,6 +332,8 @@
       <span class="number">12u8 </span>=&gt; EventStatus::ChannelIDWrong,
       <span class="number">13u8 </span>=&gt; EventStatus::CellSyncErrors,
       <span class="number">14u8 </span>=&gt; EventStatus::ChnSyncErrors,
+      <span class="number">15u8 </span>=&gt; EventStatus::CellAndChnSyncErrors,
+      <span class="number">16u8 </span>=&gt; EventStatus::AnyDataMangling,
       <span class="number">21u8 </span>=&gt; EventStatus::IncompleteReadout,
       <span class="number">22u8 </span>=&gt; EventStatus::IncompatibleData,
       <span class="number">39u8 </span>=&gt; EventStatus::GoodNoCRCOrErrBitCheck,
@@ -326,6 +356,8 @@
       EventStatus::ChannelIDWrong,
       EventStatus::CellSyncErrors,
       EventStatus::ChnSyncErrors,
+      EventStatus::CellAndChnSyncErrors,
+      EventStatus::AnyDataMangling,
       EventStatus::IncompleteReadout,
       EventStatus::IncompatibleData,
       EventStatus::GoodNoCRCOrErrBitCheck,
