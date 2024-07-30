@@ -14,6 +14,7 @@ use crate::io::*;
 // these are already wrapped in a pyclass (enum)
 use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::commands::TofCommandCode;
+use tof_dataclasses::events::master_trigger::LTBThreshold;
 
 //#[pyfunction]
 //#[pyo3(name="test_db")]
@@ -114,6 +115,7 @@ fn tof_events<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyRBWaveform>()?;
   m.add_class::<PyRBCalibration>()?;
   m.add_class::<PyTofEventSummary>()?;
+  m.add_class::<LTBThreshold>()?;
   Ok(())
 }
 
