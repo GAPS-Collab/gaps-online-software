@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bytemuck-1.16.1/src/allocation.rs`."><title>allocation.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bytemuck" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../bytemuck/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bytemuck-1.16.2/src/allocation.rs`."><title>allocation.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bytemuck" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../bytemuck/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -910,6 +910,28 @@
 <a href="#910" id="910">910</a>
 <a href="#911" id="911">911</a>
 <a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg(feature = <span class="string">"extern_crate_alloc"</span>)]
 #![allow(clippy::duplicated_attributes)]
 
@@ -933,7 +955,7 @@
   vec::Vec,
 };
 <span class="kw">use </span>core::{
-  mem::ManuallyDrop,
+  mem::{size_of_val, ManuallyDrop},
   ops::{Deref, DerefMut},
 };
 
@@ -1084,7 +1106,10 @@
   <span class="kw">if </span>align_of::&lt;A&gt;() != align_of::&lt;B&gt;() {
     <span class="prelude-val">Err</span>((PodCastError::AlignmentMismatch, input))
   } <span class="kw">else if </span>size_of::&lt;A&gt;() != size_of::&lt;B&gt;() {
-    <span class="kw">if </span>size_of::&lt;A&gt;() * input.len() % size_of::&lt;B&gt;() != <span class="number">0 </span>{
+    <span class="kw">let </span>input_bytes = size_of_val::&lt;[A]&gt;(<span class="kw-2">&amp;*</span>input);
+    <span class="kw">if </span>(size_of::&lt;B&gt;() == <span class="number">0 </span>&amp;&amp; input_bytes != <span class="number">0</span>)
+      || (size_of::&lt;B&gt;() != <span class="number">0 </span>&amp;&amp; input_bytes % size_of::&lt;B&gt;() != <span class="number">0</span>)
+    {
       <span class="comment">// If the size in bytes of the underlying buffer does not match an exact
       // multiple of the size of B, we cannot cast between them.
       </span><span class="prelude-val">Err</span>((PodCastError::SizeMismatch, input))
@@ -1097,7 +1122,8 @@
       // Luckily, Layout only stores two things, the alignment, and the size in
       // bytes. So as long as both of those stay the same, the Layout will
       // remain a valid input to dealloc.
-      </span><span class="kw">let </span>length = size_of::&lt;A&gt;() * input.len() / size_of::&lt;B&gt;();
+      </span><span class="kw">let </span>length =
+        <span class="kw">if </span>size_of::&lt;B&gt;() != <span class="number">0 </span>{ input_bytes / size_of::&lt;B&gt;() } <span class="kw">else </span>{ <span class="number">0 </span>};
       <span class="kw">let </span>box_ptr: <span class="kw-2">*mut </span>A = Box::into_raw(input) <span class="kw">as </span><span class="kw-2">*mut </span>A;
       <span class="kw">let </span>ptr: <span class="kw-2">*mut </span>[B] =
         <span class="kw">unsafe </span>{ core::slice::from_raw_parts_mut(box_ptr <span class="kw">as </span><span class="kw-2">*mut </span>B, length) };
@@ -1134,9 +1160,13 @@
   <span class="kw">if </span>align_of::&lt;A&gt;() != align_of::&lt;B&gt;() {
     <span class="prelude-val">Err</span>((PodCastError::AlignmentMismatch, input))
   } <span class="kw">else if </span>size_of::&lt;A&gt;() != size_of::&lt;B&gt;() {
-    <span class="kw">if </span>size_of::&lt;A&gt;() * input.len() % size_of::&lt;B&gt;() != <span class="number">0
-      </span>|| size_of::&lt;A&gt;() * input.capacity() % size_of::&lt;B&gt;() != <span class="number">0
-    </span>{
+    <span class="kw">let </span>input_size = size_of_val::&lt;[A]&gt;(<span class="kw-2">&amp;*</span>input);
+    <span class="kw">let </span>input_capacity = input.capacity() * size_of::&lt;A&gt;();
+    <span class="kw">if </span>(size_of::&lt;B&gt;() == <span class="number">0 </span>&amp;&amp; input_capacity != <span class="number">0</span>)
+      || (size_of::&lt;B&gt;() != <span class="number">0
+        </span>&amp;&amp; (input_size % size_of::&lt;B&gt;() != <span class="number">0
+          </span>|| input_capacity % size_of::&lt;B&gt;() != <span class="number">0</span>))
+    {
       <span class="comment">// If the size in bytes of the underlying buffer does not match an exact
       // multiple of the size of B, we cannot cast between them.
       // Note that we have to pay special attention to make sure that both
@@ -1156,8 +1186,10 @@
 
       // Note(Lokathor): First we record the length and capacity, which don't
       // have any secret provenance metadata.
-      </span><span class="kw">let </span>length: usize = size_of::&lt;A&gt;() * input.len() / size_of::&lt;B&gt;();
-      <span class="kw">let </span>capacity: usize = size_of::&lt;A&gt;() * input.capacity() / size_of::&lt;B&gt;();
+      </span><span class="kw">let </span>length: usize =
+        <span class="kw">if </span>size_of::&lt;B&gt;() != <span class="number">0 </span>{ input_size / size_of::&lt;B&gt;() } <span class="kw">else </span>{ <span class="number">0 </span>};
+      <span class="kw">let </span>capacity: usize =
+        <span class="kw">if </span>size_of::&lt;B&gt;() != <span class="number">0 </span>{ input_capacity / size_of::&lt;B&gt;() } <span class="kw">else </span>{ <span class="number">0 </span>};
       <span class="comment">// Note(Lokathor): Next we "pre-forget" the old Vec by wrapping with
       // ManuallyDrop, because if we used `core::mem::forget` after taking the
       // pointer then that would invalidate our pointer. In nightly there's a
@@ -1327,7 +1359,10 @@
   <span class="kw">if </span>align_of::&lt;A&gt;() != align_of::&lt;B&gt;() {
     <span class="prelude-val">Err</span>((PodCastError::AlignmentMismatch, input))
   } <span class="kw">else if </span>size_of::&lt;A&gt;() != size_of::&lt;B&gt;() {
-    <span class="kw">if </span>size_of::&lt;A&gt;() * input.len() % size_of::&lt;B&gt;() != <span class="number">0 </span>{
+    <span class="kw">let </span>input_bytes = size_of_val::&lt;[A]&gt;(<span class="kw-2">&amp;*</span>input);
+    <span class="kw">if </span>(size_of::&lt;B&gt;() == <span class="number">0 </span>&amp;&amp; input_bytes != <span class="number">0</span>)
+      || (size_of::&lt;B&gt;() != <span class="number">0 </span>&amp;&amp; input_bytes % size_of::&lt;B&gt;() != <span class="number">0</span>)
+    {
       <span class="comment">// If the size in bytes of the underlying buffer does not match an exact
       // multiple of the size of B, we cannot cast between them.
       </span><span class="prelude-val">Err</span>((PodCastError::SizeMismatch, input))
@@ -1339,7 +1374,8 @@
       // acquired from Rc::into_raw() must have the same size alignment and
       // size of the type T in the new Rc&lt;T&gt;. So as long as both the size
       // and alignment stay the same, the Rc will remain a valid Rc.
-      </span><span class="kw">let </span>length = size_of::&lt;A&gt;() * input.len() / size_of::&lt;B&gt;();
+      </span><span class="kw">let </span>length =
+        <span class="kw">if </span>size_of::&lt;B&gt;() != <span class="number">0 </span>{ input_bytes / size_of::&lt;B&gt;() } <span class="kw">else </span>{ <span class="number">0 </span>};
       <span class="kw">let </span>rc_ptr: <span class="kw-2">*const </span>A = Rc::into_raw(input) <span class="kw">as </span><span class="kw-2">*const </span>A;
       <span class="comment">// Must use ptr::slice_from_raw_parts, because we cannot make an
       // intermediate const reference, because it has mutable provenance,
@@ -1391,7 +1427,10 @@
   <span class="kw">if </span>align_of::&lt;A&gt;() != align_of::&lt;B&gt;() {
     <span class="prelude-val">Err</span>((PodCastError::AlignmentMismatch, input))
   } <span class="kw">else if </span>size_of::&lt;A&gt;() != size_of::&lt;B&gt;() {
-    <span class="kw">if </span>size_of::&lt;A&gt;() * input.len() % size_of::&lt;B&gt;() != <span class="number">0 </span>{
+    <span class="kw">let </span>input_bytes = size_of_val::&lt;[A]&gt;(<span class="kw-2">&amp;*</span>input);
+    <span class="kw">if </span>(size_of::&lt;B&gt;() == <span class="number">0 </span>&amp;&amp; input_bytes != <span class="number">0</span>)
+      || (size_of::&lt;B&gt;() != <span class="number">0 </span>&amp;&amp; input_bytes % size_of::&lt;B&gt;() != <span class="number">0</span>)
+    {
       <span class="comment">// If the size in bytes of the underlying buffer does not match an exact
       // multiple of the size of B, we cannot cast between them.
       </span><span class="prelude-val">Err</span>((PodCastError::SizeMismatch, input))
@@ -1403,7 +1442,8 @@
       // acquired from Arc::into_raw() must have the same size alignment and
       // size of the type T in the new Arc&lt;T&gt;. So as long as both the size
       // and alignment stay the same, the Arc will remain a valid Arc.
-      </span><span class="kw">let </span>length = size_of::&lt;A&gt;() * input.len() / size_of::&lt;B&gt;();
+      </span><span class="kw">let </span>length =
+        <span class="kw">if </span>size_of::&lt;B&gt;() != <span class="number">0 </span>{ input_bytes / size_of::&lt;B&gt;() } <span class="kw">else </span>{ <span class="number">0 </span>};
       <span class="kw">let </span>arc_ptr: <span class="kw-2">*const </span>A = Arc::into_raw(input) <span class="kw">as </span><span class="kw-2">*const </span>A;
       <span class="comment">// Must use ptr::slice_from_raw_parts, because we cannot make an
       // intermediate const reference, because it has mutable provenance,
@@ -1636,8 +1676,9 @@
 
 <span class="doccomment">/// As `Box&lt;[u8]&gt;`, but remembers the original alignment.
 </span><span class="kw">pub struct </span>BoxBytes {
-  <span class="comment">// SAFETY: `ptr` is owned, was allocated with `layout`, and points to
-  // `layout.size()` initialized bytes.
+  <span class="comment">// SAFETY: `ptr` is owned, points to `layout.size()` initialized bytes, and
+  // was allocated with `layout` (unless `layout.size() == 0` in which case it
+  // is dangling).
   </span>ptr: NonNull&lt;u8&gt;,
   layout: Layout,
 }
@@ -1664,8 +1705,11 @@
 
 <span class="kw">impl </span>Drop <span class="kw">for </span>BoxBytes {
   <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-    <span class="comment">// SAFETY: See type invariant.
-    </span><span class="kw">unsafe </span>{ alloc::alloc::dealloc(<span class="self">self</span>.ptr.as_ptr(), <span class="self">self</span>.layout) };
+    <span class="kw">if </span><span class="self">self</span>.layout.size() != <span class="number">0 </span>{
+      <span class="comment">// SAFETY: See type invariant: if `self.layout.size() != 0`, then
+      // `self.ptr` is owned and was allocated with `self.layout`.
+      </span><span class="kw">unsafe </span>{ alloc::alloc::dealloc(<span class="self">self</span>.ptr.as_ptr(), <span class="self">self</span>.layout) };
+    }
   }
 }
 
