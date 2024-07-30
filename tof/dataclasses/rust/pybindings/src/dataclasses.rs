@@ -1114,6 +1114,10 @@ impl PyHeartBeatDataSink{
       }
     }
   }
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.config)) 
+  }
+
 }
 
 #[pyclass]
@@ -1181,6 +1185,9 @@ impl PyMTBHeartbeat {
         return Err(PyIOError::new_err(err_msg));
       }
     }
+  }
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.config)) 
   }
 }
 #[pyclass]
@@ -1271,6 +1278,9 @@ impl PyEVTBLDRHeartbeat {
         return Err(PyIOError::new_err(err_msg));
       }
     }
+  }
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.config)) 
   }
 }
 
