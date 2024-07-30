@@ -1100,6 +1100,20 @@ impl PyHeartBeatDataSink{
   fn get_n_pack_write_disk(&self) -> PyResult<u64> {
     Ok(self.config.n_pack_write_disk)
   }
+  
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<HeartBeatDataSink>() {
+      Ok(hb) => {
+        self.config = hb;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
 }
 
 #[pyclass]
@@ -1153,6 +1167,20 @@ impl PyMTBHeartbeat {
   #[getter]
   fn get_lost_trate(&self) -> PyResult<u64> {
     Ok(self.config.lost_trate)
+  }
+  
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<MTBHeartbeat>() {
+      Ok(hb) => {
+        self.config = hb;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
   }
 }
 #[pyclass]
@@ -1229,6 +1257,20 @@ impl PyEVTBLDRHeartbeat {
   #[getter]
   fn get_tp_sender_cbc_len(&self) -> PyResult<usize> {
     Ok(self.config.tp_sender_cbc_len)
+  }
+  
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<EVTBLDRHeartbeat>() {
+      Ok(hb) => {
+        self.config = hb;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
   }
 }
 
