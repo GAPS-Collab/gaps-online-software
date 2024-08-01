@@ -87,6 +87,10 @@ use tof_dataclasses::database::ReadoutBoard;
 //    ThreadControl,
 //};
 
+use nalgebra::Vector3;
+use nalgebra::Matrix3;
+use core::f64::consts::PI;
+
 #[cfg(feature="database")]
 use tof_dataclasses::constants::NWORDS;
 #[cfg(feature="database")]
@@ -410,7 +414,6 @@ impl fmt::Display for RunStatistics {
 /// This here is bad, because it does not interpolate between 
 /// the bins
 #[cfg(feature="database")]
-// the 'original'
 // fn fit_sine(time: &Vec<f32>, data: &Vec<f32>) -> (f32, f32, f32) {
 //   let z_cross   = find_zero_crossings(&data);
 //   let mut y_max = f32::MIN;
@@ -434,7 +437,7 @@ impl fmt::Display for RunStatistics {
 // }
 
 // sydney's version in rust
-fn fit_sine_sydney(volts: Vec<f64>, times: Vec<f64>) -> f64 {
+fn fit_sine(volts: &Vec<f32>, times: &Vec<f32>) -> (f32, f32, f32) {
   let start_bin = 20;
   let size_bin  = 900; // can probably make this smaller
 
@@ -450,12 +453,12 @@ fn fit_sine_sydney(volts: Vec<f64>, times: Vec<f64>) -> f64 {
   let mut zi_sum    = 0.0;
 
   for i in start_bin..start_bin+size_bin {
-      let xi = (2.0 * pi * 0.02 * times[i]).cos();  // for this fit we know the frequency is 0.02 waves/ns
-      let yi = (2.0 * pi * 0.02 * times[i]).sin();
+      let xi = (2.0 * pi * 0.02 * times[i] as f64).cos();  // for this fit we know the frequency is 0.02 waves/ns
+      let yi = (2.0 * pi * 0.02 * times[i] as f64).sin();
       let zi = volts[i];
       xi_yi      += xi * yi;
-      xi_zi      += xi * zi;
-      yi_zi      += yi * zi;
+      xi_zi      += xi * (zi as f64);
+      yi_zi      += yi * (zi as f64);
       xi_xi      += xi * xi;
       yi_yi      += yi * yi;
       xi_sum     += xi;
@@ -472,7 +475,7 @@ fn fit_sine_sydney(volts: Vec<f64>, times: Vec<f64>) -> f64 {
 let determinant = a_matrix.determinant();
 let inv_matrix = a_matrix.try_inverse().expect("Matrix is not invertible");
 
-let p = Vector3::new(xi_zi, yi_zi, zi_sum);
+let p = Vector3::new(xi_zi, yi_zi, zi_sum.into());
 let result = inv_matrix * p;
 
 let a = result[0];
@@ -481,7 +484,7 @@ let b = result[1];
 
 let phi = a.atan2(b);
 
-phi
+(0.0, 0.0, phi as f32)
 }
 
 //*************************************************
@@ -588,7 +591,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     rb.calibration.nanoseconds(9,
                                event.header.stop_cell as usize,
                                &mut times);
-    fit_result = fit_sine(&times, &voltages);
+    fit_result = fit_sine(&voltages, &times);
     //println!("FIT RESULT = {:?}", fit_result);
     event.header.set_sine_fit(fit_result);
   }
