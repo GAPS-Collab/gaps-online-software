@@ -604,9 +604,11 @@ pub struct LiftofSettings {
   /// The interval (in seconds) to retrive CPUMoniData from 
   /// the TOF CPU
   pub cpu_moni_interval_sec      : u64,
-  /// ignore these RB. These RB ids do not exist in the configuration.
-  /// Every RB Id > 50 will be ignored by default
-  pub rb_ignorelist              : Vec<u8>,
+  /// In an intervall from 1-50, these RB simply do not exist
+  /// or might have never existed. Always ingore these
+  pub rb_ignorelist_always       : Vec<u8>,
+  /// ignore these specific RB for this run
+  pub rb_ignorelist_run          : Vec<u8>,
   /// Should TofHits be generated?
   pub run_analysis_engine        : bool,
   /// Settings to control the MTB
@@ -636,7 +638,8 @@ impl LiftofSettings {
       runtime_sec               : 0,
       mtb_address               : String::from("10.0.1.10:50001"),
       cpu_moni_interval_sec     : 60,
-      rb_ignorelist             : Vec::<u8>::new(),
+      rb_ignorelist_always      : Vec::<u8>::new(),
+      rb_ignorelist_run         : Vec::<u8>::new(),
       run_analysis_engine       : true,
       mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
