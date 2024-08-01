@@ -1,16 +1,4 @@
 #[macro_use] extern crate log;
-extern crate clap;
-extern crate colored;
-
-extern crate crossbeam_channel;
-
-extern crate zmq;
-//extern crate openssh;
-extern crate comfy_table;
-extern crate tof_dataclasses;
-#[cfg(features="tof-ctrl")]
-extern crate tof_control;
-extern crate liftof_lib;
 
 pub mod constants;
 pub mod threads;

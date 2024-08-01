@@ -23,6 +23,8 @@ use std::time::{
     Duration,
 };
 
+use chrono::Utc;
+
 use crossbeam_channel::{
     Receiver,
     Sender
@@ -125,10 +127,11 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
     // check if we get a command from the main 
     // thread
     thread::sleep(sleep_time);
+    println!("=> Cmd responder loop iteration!");
     match cmd_receiver.connect(&fc_sub_addr) {
       Ok(_)    => (),
       Err(err) => {
-        error!("JUnable to connect to {}! {}", fc_sub_addr, err);
+        error!("Unable to connect to {}! {}", fc_sub_addr, err);
       }
     }
     match thread_ctrl.try_lock() {
@@ -188,6 +191,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
           },
           Ok(packet) => {
             let mut resp = TofResponse::Unknown;
+            println!("Got packet {}!", packet);
             match packet.packet_type {
               PacketType::TofCommandV2 => {
                 let mut cmd = TofCommandV2::new();
@@ -195,7 +199,8 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                   Ok(_cmd) => {cmd = _cmd;},
                   Err(err) => error!("Unable to decode TofCommand! {err}")
                 }
-                let now = Instant::now();
+                println!("= => [cmd_djispatcher] Received command {}!", cmd);
+                let now = Utc::now().to_string();
                 let write_to_file = format!("{:?}: {}\n",now, cmd);
                 match log_file.write_all(&write_to_file.into_bytes()) {
                   Err(err) => {
@@ -291,9 +296,70 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       Ok(_)    => ()
                     }
                   }
+                  TofCommandCode::DataRunStop  => {
+                    println!("= => Received DataRunStop!");
+                    let cmd          = TofCommand::DataRunStop(DEFAULT_RB_ID as u32);
+                    let packed_cmd   = cmd.pack();
+                    let mut payload  = String::from("BRCT").into_bytes();
+                    payload.append(&mut packed_cmd.to_bytestream());
+                    match cmd_sender.send(&payload, 0) {
+                      Err(err) => {
+                        error!("Unable to send command, error{err}");
+                        resp = TofResponse::ZMQProblem(0x0); // response code not assigned, 
+                                                                 // let's just let it be 0 for now
+                        let ack_tp = resp.pack();
+                        match tof_ack_sender.send(ack_tp) {
+                          Err(err) => {
+                            error!("Unable to send ACK packet! {err}");
+                          }
+                          Ok(_)    => ()
+                        }
+                      },
+                      Ok(_)    => {
+                        info!("Stop run command sent");
+                        // Now we wait for the RB acknowledgement packets and see if our command
+                        // went through
+                        let mut n_rb_ack_rcved = 0u8;
+                        let run_start_timeout  = Instant::now();
+                        // let's wait 20 seconds here
+                        resp = TofResponse::TimeOut(0x0);
+                        while run_start_timeout.elapsed().as_secs() < 20 {
+                          match rb_ack_recv.recv() {
+                            Err(_) => {
+                              continue;
+                            }
+                            Ok(_ack_pack) => {
+                              //FIXME - do something with it
+                              n_rb_ack_rcved += 1;
+                            }
+                          }
+                          if n_rb_ack_rcved == 40 {
+                            resp = TofResponse::Success(0);
+                          }
+                        }
+                        let ack_tp = resp.pack();
+                        match tof_ack_sender.send(ack_tp) {
+                          Err(err) => {
+                            error!("Unable to send ACK packet! {err}");
+                          }
+                          Ok(_)    => ()
+                        }
+                      }
+                    }
+                    let ack_rp = TofResponseCode::RespSuccFingersCrossed;
+                    resp = TofResponse::Success(ack_rp as u32);
+
+                    let ack_tp = resp.pack();
+                    match tof_ack_sender.send(ack_tp) {
+                      Err(err) => {
+                        error!("Unable to send ACK packet! {err}");
+                      }
+                      Ok(_)    => ()
+                    }
+                  }
                   TofCommandCode::DataRunStart => {
                     let mut run_id : u32 = 0;
-                    println!("== ==> Received DataRunStart!");
+                    println!("= => Received DataRunStart!");
                     info!("Received data run start command");
                     // technically, it is run_typ, rb_id, event number
                     // all to the max means run start for all
@@ -384,7 +450,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                         // let's wait 20 seconds here
                         resp = TofResponse::TimeOut(0x0);
                         while run_start_timeout.elapsed().as_secs() < 20 {
-                          match rb_ack_recv.recv() {
+                          match rb_ack_recv.try_recv() {
                             Err(_) => {
                               continue;
                             }
@@ -397,6 +463,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                             resp = TofResponse::Success(0);
                           }
                         }
+                        info!("Gathered {} ack packets from RBs!", n_rb_ack_rcved);
                         let ack_tp = resp.pack();
                         match tof_ack_sender.send(ack_tp) {
                           Err(err) => {
@@ -405,6 +472,16 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                           Ok(_)    => ()
                         }
                       }
+                    }
+                    let ack_rp = TofResponseCode::RespSuccFingersCrossed;
+                    resp = TofResponse::Success(ack_rp as u32);
+
+                    let ack_tp = resp.pack();
+                    match tof_ack_sender.send(ack_tp) {
+                      Err(err) => {
+                        error!("Unable to send ACK packet! {err}");
+                      }
+                      Ok(_)    => ()
                     }
                   }
                   TofCommandCode::Ping => {
