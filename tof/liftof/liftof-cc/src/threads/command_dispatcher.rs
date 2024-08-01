@@ -127,7 +127,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
     // check if we get a command from the main 
     // thread
     thread::sleep(sleep_time);
-    println!("=> Cmd responder loop iteration!");
+    //println!("=> Cmd responder loop iteration!");
     match cmd_receiver.connect(&fc_sub_addr) {
       Ok(_)    => (),
       Err(err) => {
