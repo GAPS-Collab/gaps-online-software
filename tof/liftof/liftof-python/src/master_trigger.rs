@@ -840,7 +840,30 @@ impl PyMasterTrigger {
       }
     }
   }
+
+  fn get_tiu_busy_ignore(&mut self) -> PyResult<bool> {
+    match TIU_BUSY_IGNORE.get(&mut self.ipbus) {
+      Ok(bsy) => {
+        let res = bsy != 0;
+        return Ok(res);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
   
+  fn set_tiu_busy_ignore(&mut self, bsy : bool) -> PyResult<()> {
+    match TIU_BUSY_IGNORE.set(&mut self.ipbus, bsy as u32) {
+      Ok(bsy) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   fn get_event_cnt(&mut self) -> PyResult<u32> {
     match EVENT_CNT.get(&mut self.ipbus) {
       Ok(cnt) => {

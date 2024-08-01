@@ -92,9 +92,6 @@ use tof_dataclasses::database::ReadoutBoard;
 //    ThreadControl,
 //};
 
-use nalgebra::Vector3;
-use nalgebra::Matrix3;
-use core::f64::consts::PI;
 
 #[cfg(feature="database")]
 use tof_dataclasses::constants::NWORDS;
@@ -415,10 +412,10 @@ impl fmt::Display for RunStatistics {
 //}
 
 
-/// FIXME - proper fitting algorithm
-/// This here is bad, because it does not interpolate between 
-/// the bins
-#[cfg(feature="database")]
+///// FIXME - proper fitting algorithm
+///// This here is bad, because it does not interpolate between 
+///// the bins
+//#[cfg(feature="database")]
 // fn fit_sine(time: &Vec<f32>, data: &Vec<f32>) -> (f32, f32, f32) {
 //   let z_cross   = find_zero_crossings(&data);
 //   let mut y_max = f32::MIN;
@@ -458,12 +455,12 @@ fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f32 {
   let mut zi_sum    = 0.0;
 
   for i in start_bin..start_bin+size_bin {
-      let xi = (2.0 * pi * 0.02 * times[i] as f64).cos();  // for this fit we know the frequency is 0.02 waves/ns
-      let yi = (2.0 * pi * 0.02 * times[i] as f64).sin();
+      let xi = (2.0 * pi * 0.02 * times[i]).cos();  // for this fit we know the frequency is 0.02 waves/ns
+      let yi = (2.0 * pi * 0.02 * times[i]).sin();
       let zi = volts[i];
       xi_yi      += xi * yi;
-      xi_zi      += xi * (zi as f64);
-      yi_zi      += yi * (zi as f64);
+      xi_zi      += xi * zi;
+      yi_zi      += yi * zi;
       xi_xi      += xi * xi;
       yi_yi      += yi * yi;
       xi_sum     += xi;
