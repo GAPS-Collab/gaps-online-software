@@ -260,7 +260,7 @@ fn main() {
   // if this call does not go through, we might as well fail early.
   let mut rb_list           = ReadoutBoard::all(&mut conn).expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
   let rb_ignorelist         = config.rb_ignorelist_always.clone();
-  let rb_ignroelist_tmp     = config.rb_ignroelist_run.clone();
+  let rb_ignorelist_tmp     = config.rb_ignorelist_run.clone();
   for k in 0..rb_ignorelist.len() {
     let bad_rb = rb_ignorelist[k];
     rb_list.retain(|x| x.rb_id != bad_rb);
