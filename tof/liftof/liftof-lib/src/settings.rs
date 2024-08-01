@@ -16,6 +16,7 @@ use std::io::{
 use std::fmt;
 use std::collections::HashMap;
 
+use signal_hook::low_level::channel::Channel;
 use tof_dataclasses::config::BuildStrategy;
 
 
@@ -888,4 +889,92 @@ impl fmt::Display for LiftofRBConfig {
 //    assert_eq!(cfg, test_json);
 //  }
 //}
+<<<<<<< Updated upstream
 
+=======
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub struct ChannelMaskSettings {
+  /// actually apply the below settings
+  pub set_channel_mask   : bool,
+  /// liftof-cc will send commands to set the 
+  /// preamp bias voltages
+  pub set_strategy           : ParameterSetStrategy,
+  /// channels to mask (one set of 18 values per RB)
+  pub rb_channel_mask     : HashMap<String, [bool;9]>
+}
+
+impl ChannelMaskSettings {
+  pub fn new() -> Self {
+    let default_thresholds = HashMap::from([
+      (String::from("RAT01"), [false; 9]),
+      (String::from("RAT02"), [false; 9]),
+      (String::from("RAT03"), [false; 9]),
+      (String::from("RAT04"), [false; 9]),
+      (String::from("RAT05"), [false; 9]),
+      (String::from("RAT06"), [false; 9]),
+      (String::from("RAT07"), [false; 9]),
+      (String::from("RAT08"), [false; 9]),
+      (String::from("RAT09"), [false; 9]),
+      (String::from("RAT10"), [false; 9]),
+      (String::from("RAT11"), [false; 9]),
+      (String::from("RAT12"), [false; 9]),
+      (String::from("RAT13"), [false; 9]),
+      (String::from("RAT14"), [false; 9]),
+      (String::from("RAT15"), [false; 9]),
+      (String::from("RAT16"), [false; 9]),
+      (String::from("RAT17"), [false; 9]),
+      (String::from("RAT18"), [false; 9]),
+      (String::from("RAT19"), [false; 9]),
+      (String::from("RAT20"), [false; 9])]);
+
+      Self {
+        set_channel_mask    : false,
+        set_strategy          : ParameterSetStrategy::ControlServer,
+        rb_channel_mask    : default_thresholds,
+      }
+  }
+
+  #[cfg(feature="database")]
+  pub fn emit_ch_mask_packets(&self, rbs : &HashMap<u8,RAT>) -> Vec<TofPacket> {
+    let mut packets = Vec::<TofPacket>::new();
+    for k in rbs.keys() {
+      let rb          = &rbs[&k];
+      let rb_key      = format!("RB{:2}", rb);
+      let mut cmd      = TofCommandV2::new();
+      cmd.command_code = TofCommandCode::SetRBChannelMask;
+      let mut payload  = RBChannelMaskConfig::new();
+      payload.rb_id    = rb.rb2_id as u8;
+      if *k as usize >= self.rb_channel_mask.len() {
+        error!("RB ID {k} larger than 46!");
+        continue;
+      }
+      payload.channels = self.rb_channel_mask[&rb_key];
+      cmd.payload = payload.to_bytestream();
+      let tp = cmd.pack();
+      packets.push(tp);
+    }
+    packets
+  }
+}
+impl fmt::Display for ChannelMaskSettings {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp : String;
+    match toml::to_string(self) {
+      Err(err) => {
+        error!("Deserialization error! {err}");
+        disp = String::from("-- DESERIALIZATION ERROR! --");
+      }
+      Ok(_disp) => {
+        disp = _disp;
+      }
+    }
+    write!(f, "<RBChannelMaskConfig :\n{}>", disp)
+  }
+}
+
+impl Default for ChannelMaskSettings {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+>>>>>>> Stashed changes
