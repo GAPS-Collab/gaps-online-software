@@ -1,8 +1,8 @@
 use std::path::Path;
 use tof_dataclasses::io::read_file;
 use tof_dataclasses::serialization::{
-    search_for_u16,
-    Serialization
+  search_for_u16,
+  Serialization
 };
 use crate::packets::{
   TelemetryHeader,
@@ -11,8 +11,8 @@ use crate::packets::{
   GapsEvent,
 };
 use tof_dataclasses::packets::{
-    TofPacket,
-    PacketType,
+  TofPacket,
+  PacketType,
 };
 use tof_dataclasses::events::TofEventSummary;
 

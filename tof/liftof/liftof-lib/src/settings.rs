@@ -892,43 +892,57 @@ impl fmt::Display for LiftofRBConfig {
 //    assert_eq!(cfg, test_json);
 //  }
 //}
-<<<<<<< Updated upstream
 
-=======
+
+
+/// Ignore RB channnels
+///
+/// The values in these arrays correspond to 
+/// (physical) channels 1-9
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ChannelMaskSettings {
   /// actually apply the below settings
   pub set_channel_mask   : bool,
-  /// liftof-cc will send commands to set the 
-  /// preamp bias voltages
+  /// The set strat defines who should acutally set
+  /// the parameters. Will that be done by each board
+  /// independently (ParameterSetStrategy::Board) or
+  /// will a command be sent by liftof-cc 
+  /// (ParameterSetStrategy::ControlServer)
   pub set_strategy           : ParameterSetStrategy,
-  /// channels to mask (one set of 18 values per RB)
+  /// channels to mask (one set of 9 values per RB)
+  /// "true" means the channel is enabled, "false", 
+  /// disabled
   pub rb_channel_mask     : HashMap<String, [bool;9]>
 }
 
 impl ChannelMaskSettings {
   pub fn new() -> Self {
-    let default_thresholds = HashMap::from([
-      (String::from("RAT01"), [false; 9]),
-      (String::from("RAT02"), [false; 9]),
-      (String::from("RAT03"), [false; 9]),
-      (String::from("RAT04"), [false; 9]),
-      (String::from("RAT05"), [false; 9]),
-      (String::from("RAT06"), [false; 9]),
-      (String::from("RAT07"), [false; 9]),
-      (String::from("RAT08"), [false; 9]),
-      (String::from("RAT09"), [false; 9]),
-      (String::from("RAT10"), [false; 9]),
-      (String::from("RAT11"), [false; 9]),
-      (String::from("RAT12"), [false; 9]),
-      (String::from("RAT13"), [false; 9]),
-      (String::from("RAT14"), [false; 9]),
-      (String::from("RAT15"), [false; 9]),
-      (String::from("RAT16"), [false; 9]),
-      (String::from("RAT17"), [false; 9]),
-      (String::from("RAT18"), [false; 9]),
-      (String::from("RAT19"), [false; 9]),
-      (String::from("RAT20"), [false; 9])]);
+    let mut default_thresholds = HashMap::<String, [bool; 9]>::new();
+    for k in 1..51 {
+      let key = format!("RB{k:02}");
+      default_thresholds.insert((key, [true;9]));
+    }
+//    let default_thresholds = HashMap::from([
+//      (String::from("RAT01"), [false; 9]),
+//      (String::from("RAT02"), [false; 9]),
+//      (String::from("RAT03"), [false; 9]),
+//      (String::from("RAT04"), [false; 9]),
+//      (String::from("RAT05"), [false; 9]),
+//      (String::from("RAT06"), [false; 9]),
+//      (String::from("RAT07"), [false; 9]),
+//      (String::from("RAT08"), [false; 9]),
+//      (String::from("RAT09"), [false; 9]),
+//      (String::from("RAT10"), [false; 9]),
+//      (String::from("RAT11"), [false; 9]),
+//      (String::from("RAT12"), [false; 9]),
+//      (String::from("RAT13"), [false; 9]),
+//      (String::from("RAT14"), [false; 9]),
+//      (String::from("RAT15"), [false; 9]),
+//      (String::from("RAT16"), [false; 9]),
+//      (String::from("RAT17"), [false; 9]),
+//      (String::from("RAT18"), [false; 9]),
+//      (String::from("RAT19"), [false; 9]),
+//      (String::from("RAT20"), [false; 9])]);
 
       Self {
         set_channel_mask    : false,
@@ -980,4 +994,3 @@ impl Default for ChannelMaskSettings {
     Self::new()
   }
 }
->>>>>>> Stashed changes

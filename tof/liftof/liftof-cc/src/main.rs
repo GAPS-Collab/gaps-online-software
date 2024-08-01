@@ -6,14 +6,6 @@
 //!
 
 #[macro_use] extern crate log;
-extern crate env_logger;
-extern crate clap;
-extern crate tof_dataclasses;
-extern crate crossbeam_channel;
-extern crate colored;
-extern crate signal_hook;
-extern crate liftof_lib;
-extern crate liftof_cc;
 
 use std::sync::{
     Arc,
@@ -37,7 +29,6 @@ use std::{
     thread,
     time
 };
-
 
 use std::path::{
     //Path,
@@ -106,7 +97,6 @@ use liftof_lib::constants::{
     DEFAULT_RB_ID,
     DEFAULT_CALIB_EXTRA
 };
-
 
 use liftof_cc::prepare_run;
 use liftof_cc::threads::{
@@ -269,12 +259,18 @@ fn main() {
   let mut conn              = connect_to_db(db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
   // if this call does not go through, we might as well fail early.
   let mut rb_list           = ReadoutBoard::all(&mut conn).expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
-  let rb_ignorelist         = config.rb_ignorelist.clone();
+  let rb_ignorelist         = config.rb_ignorelist_always.clone();
+  let rb_ignroelist_tmp     = config.rb_ignroelist_run.clone();
   for k in 0..rb_ignorelist.len() {
     let bad_rb = rb_ignorelist[k];
-    //println!("=> We will INGORE RB {:02}, since it is being marked as IGNORE in the config file!", bad_rb);
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
+  for k in 0..rb_ignorelist_tmp.len() {
+    let bad_rb = rb_ignorelist_tmp[k];
+    rb_list.retain(|x| x.rb_id != bad_rb);
+  }
+
+
   nboards = rb_list.len();
   println!("=> Will use {} readoutboards! Ignoring {:?} sicne they are mareked as 'ignore' in the config file!", rb_list.len(), rb_ignorelist );
   //debug!("--> Following RBs are expected:");
@@ -773,6 +769,12 @@ fn main() {
       }
       println!("=> Give the RBs a chance to connect and wait a bit..");
       thread::sleep(10*one_second);
+
+      // for now, we end brutally
+      // FIXME
+      println!(">> So long and thanks for all the \u{1F41F} <<"); 
+      exit(0);
+    
 
       println!("=> Shutting down signal hanlder...");
       // event builder first, to avoid a lot of error messages

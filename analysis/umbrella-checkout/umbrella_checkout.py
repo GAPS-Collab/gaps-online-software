@@ -247,7 +247,7 @@ if __name__ == '__main__':
     h.line(filled=True, alpha=0.5, color='b')
     ax.set_xlabel('paddleID')
     ax.set_ylabel('occupancy (counts)')
-    figname_occ = f'paddle_occupancy.png'
+    figname_occ = f'paddle_occupancy.webp'
     fig.savefig(f'{args.plotdir}/{figname_occ}')
 
     fig  = plt.figure(figsize = lo.FIGSIZE_A4_LANDSCAPE)

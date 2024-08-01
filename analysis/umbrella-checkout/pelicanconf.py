@@ -1,6 +1,8 @@
 AUTHOR = 'J.A. Stoessl'
 SITENAME = 'Umbrella Checkout'
-SITEURL = ""
+SITEURL = "https://uhcra04.phys.hawaii.edu/umbrella-checkout/"
+
+THEME = 'pelican-twitchy'
 
 PATH = "content"
 

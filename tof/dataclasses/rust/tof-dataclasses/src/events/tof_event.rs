@@ -175,7 +175,13 @@ impl TofEvent {
   pub fn is_complete(&self) -> bool {
     self.mt_event.get_rb_link_ids().len() == self.rb_events.len()
   }
-  
+ 
+  /// A more advanced check, where events which are not in the 
+  /// provided mtb_link_id list don't count for completion
+  pub fn is_complete_masked(&self, mtb_link_ids : &Vec::<u8>) -> {
+    
+  }
+
   /// Encode the sizes of the vectors holding the 
   /// into an u32
   ///
@@ -232,6 +238,7 @@ impl TofEvent {
     //summary.status          = self.header.status;
     //summary.quality         = self.header.quality;
     //summary.status            = self.header.event_status;
+    summary.status            = self.mt_event.event_status;
     // FIXME - this is not trigger paddles, but trigger hits!
     summary.trigger_sources   = self.mt_event.trigger_source;
     summary.n_trigger_paddles = self.mt_event.get_trigger_hits().len() as u8;

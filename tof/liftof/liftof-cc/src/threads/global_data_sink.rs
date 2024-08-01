@@ -17,7 +17,7 @@ use std::sync::{
 
 use std::fs::create_dir_all;
 
-extern crate crossbeam_channel;
+//extern crate crossbeam_channel;
 use crossbeam_channel::Receiver; 
 
 use colored::Colorize;
@@ -164,6 +164,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
       match thread_control.try_lock() {
         Ok(mut tc) => {
           //println!("== ==> [global_data_sink] tc lock acquired!");
+          send_tof_event_packets   = tc.liftof_settings.data_publisher_settings.send_tof_event_packets;      
+          send_tof_summary_packets = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
+          send_rbwaveform_packets  = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
+          send_mtb_event_packets   = tc.liftof_settings.data_publisher_settings.send_mtb_event_packets;
+    
           if tc.stop_flag {
             tc.thread_data_sink_active = false;
             // we want to make sure that data sink ends the latest

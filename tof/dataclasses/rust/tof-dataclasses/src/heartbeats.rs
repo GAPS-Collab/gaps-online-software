@@ -615,57 +615,58 @@ impl Serialization for EVTBLDRHeartbeat {
           bs
         }
     }
-    #[cfg(feature="random")]
-    impl FromRandom for EVTBLDRHeartbeat {
-      fn from_random() -> Self {
-      let mut rng       = rand::thread_rng();
-      let met_seconds   = rng.gen::<usize>();
-      let n_mte_received_tot = rng.gen::<usize>();
-      let n_rbe_received_tot = rng.gen::<usize>();
-      let n_rbe_per_te = rng.gen::<usize>();
-      let n_rbe_discarded_tot = rng.gen::<usize>();
-      let n_mte_skipped = rng.gen::<usize>();
-      let n_timed_out = rng.gen::<usize>();
-      let n_sent = rng.gen::<usize>();
-      let delta_mte_rbe = rng.gen::<usize>();
-      let event_cache_size = rng.gen::<usize>();
-      let event_id_cache_size = rng.gen::<usize>();
-      let rbe_wo_mte = rng.gen::<usize>();
-      let mte_receiver_cbc_len = rng.gen::<usize>();
-      let rbe_receiver_cbc_len = rng.gen::<usize>();
-      let tp_sender_cbc_len = rng.gen::<usize>();
-      let n_ev_wo_evid = rng.gen::<usize>();
-      let n_rbe_from_past = rng.gen::<usize>();
-      let n_rbe_orphan = rng.gen::<usize>();
-      Self {
-        met_seconds,
-        n_rbe_received_tot,
-        n_rbe_per_te,
-        n_rbe_discarded_tot,
-        n_mte_skipped,
-        n_timed_out,
-        n_sent,
-        delta_mte_rbe,
-        event_cache_size,
-        event_id_cache_size,
-        rbe_wo_mte,
-        mte_receiver_cbc_len,
-        rbe_receiver_cbc_len,
-        tp_sender_cbc_len,
-        n_mte_received_tot,
-        n_ev_wo_evid,
-        n_rbe_from_past,
-        n_rbe_orphan,
-      }
-    }
-  } 
 
-  impl fmt::Display for EVTBLDRHeartbeat {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-      let repr = self.to_string();
-      write!(f, "{}", repr)
+#[cfg(feature="random")]
+impl FromRandom for EVTBLDRHeartbeat {
+  fn from_random() -> Self {
+    let mut rng       = rand::thread_rng();
+    let met_seconds   = rng.gen::<usize>();
+    let n_mte_received_tot = rng.gen::<usize>();
+    let n_rbe_received_tot = rng.gen::<usize>();
+    let n_rbe_per_te = rng.gen::<usize>();
+    let n_rbe_discarded_tot = rng.gen::<usize>();
+    let n_mte_skipped = rng.gen::<usize>();
+    let n_timed_out = rng.gen::<usize>();
+    let n_sent = rng.gen::<usize>();
+    let delta_mte_rbe = rng.gen::<usize>();
+    let event_cache_size = rng.gen::<usize>();
+    let event_id_cache_size = rng.gen::<usize>();
+    let rbe_wo_mte = rng.gen::<usize>();
+    let mte_receiver_cbc_len = rng.gen::<usize>();
+    let rbe_receiver_cbc_len = rng.gen::<usize>();
+    let tp_sender_cbc_len = rng.gen::<usize>();
+    let n_ev_wo_evid = rng.gen::<usize>();
+    let n_rbe_from_past = rng.gen::<usize>();
+    let n_rbe_orphan = rng.gen::<usize>();
+    Self {
+      met_seconds,
+      n_rbe_received_tot,
+      n_rbe_per_te,
+      n_rbe_discarded_tot,
+      n_mte_skipped,
+      n_timed_out,
+      n_sent,
+      delta_mte_rbe,
+      event_cache_size,
+      event_id_cache_size,
+      rbe_wo_mte,
+      mte_receiver_cbc_len,
+      rbe_receiver_cbc_len,
+      tp_sender_cbc_len,
+      n_mte_received_tot,
+      n_ev_wo_evid,
+      n_rbe_from_past,
+      n_rbe_orphan,
     }
-  }  
+  }
+} 
+
+impl fmt::Display for EVTBLDRHeartbeat {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let repr = self.to_string();
+    write!(f, "{}", repr)
+  }
+}  
 
 #[cfg(feature="random")]
 #[test]

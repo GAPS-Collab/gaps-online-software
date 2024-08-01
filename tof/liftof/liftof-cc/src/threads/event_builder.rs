@@ -11,7 +11,7 @@ use std::sync::{
 use std::collections::VecDeque;
 use std::collections::HashMap;
 //use std::path::Path;
-
+//
 use crossbeam_channel::{
     Receiver,
     Sender,
@@ -34,6 +34,9 @@ use tof_dataclasses::serialization::Packable;
 
 use tof_dataclasses::packets::TofPacket;
 //use tof_dataclasses::threading::ThreadControl;
+use tof_dataclasses::events::EventStatus;
+
+
 
 //use liftof_lib::heartbeat_printer;
 use liftof_lib::settings::{
@@ -227,6 +230,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           // I hope it won't be a problem. Otherwise we have
           // to add another cache.
           //println!("==> Len evt cache {}", event_cache.len());
+          heartbeat.event_cache_size    = event_cache.len();
           heartbeat.n_rbe_received_tot += 1;
           n_received += 1;
           match seen_rbevents.get_mut(&rb_ev.header.rb_id) {
@@ -319,35 +323,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         }
         evid_check += 1;
       }
-      //event_id_test.dedup();
-      //println!("DEBUG 1");
-      //let evid_id_test_len = event_id_test.len();
-      //println!("DEBUG .1.");
-      //let evid_test_len = event_id_cache.len();
-      //let mut evid_test_missing = 0usize;
-      //if evid_test_len > 0 {
-      //  let mut evid = event_id_cache[0];
-      //  //println!("DEBUG 1.5");
-      //  //println!("len of evid_id_test {}", evid_id_test_len);
-      //  for _ in 0..evid_test_len {
-      //    if !event_id_cache.contains(&evid) {
-      //      evid_test_missing += 1;
-      //    }
-      //    evid += 1;
-      //  }
-      //}
-      ////println!("DEBUG 2");
-      //event_id_test.clear();
-      //println!("DEBUG 3");
-      
-      //let mut hbs : Vec<String>;
-      //let mut line :String;
-      //let title = String::from("== == == == == == EVENTBUILDER HEARTBTEAT == == == == == ==");
-      //hbs.push(title);
-      //line = format!("==> Received MTEvents \t{}", n_mte_received_tot).bright_purple();
-      //hbs.push(line);
-      //let end   = String::from("== == == == == == == == == == == == == == == == == == == ==");
-      //hbs.push(end);
       heartbeat.met_seconds += debug_timer_elapsed as usize;
       heartbeat.mte_receiver_cbc_len = m_trig_ev.len();
       heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
@@ -361,40 +336,41 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           debug!("Heartbeat sent <3 <3 <3");
         }
       }
-      println!("  {:<70} <<", ">> == == == == == == ==  EVTBLDR HEARTBEAT == ==  == == == == ==".bright_purple().bold());
-    //if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
-      println!("  {:<70} <<", format!(">> ==> Received MTEvents {}", n_mte_received_tot).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Received RBEvents {}", n_rbe_received_tot).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Skipped MTEvents  {}", n_mte_skipped).bright_purple());
-      //println!("  {:<80}", format!(">> ==> Missing evid analysis:  {} of {} events missing ({:.2}%)<<", ev_id_test_missing, ev_id_test_len, 100.0*(ev_id_test_missing as f64/evid_test_len as f64)).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Size of event cache    {}", event_cache.len()).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Size of event ID cache {}", event_id_cache.len()).bright_purple());
-      // println!("  {:<70} <<", format!(">> ==> Gathered events from cache, last iter {}", n_gathered_fr_cache).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Misaligned cache errs  {}", misaligned_cache_err).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!").bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Sent {} events! rate   {:4.2} Hz", n_sent, n_sent as f64/met_seconds).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Failed in sending {} events!", n_sent_ch_err).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Chn len MTE receiver   {}",m_trig_ev.len() ).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Chn len RBE receiver   {}",ev_from_rb.len()).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Chn len TP  sender     {}",data_sink.len()).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Event id check: {:4.2}% of events missing in the event ID cache", n_ev_wo_evid as f64 / event_cache.len() as f64).bright_purple());
-      if n_sent > 0 {
-        let av_rb_ev = n_rbe_per_te as f64 / n_sent as f64;
-        println!("  {:<70} <<", format!(">> ==> Average number of RBEvents/TofEvent {:4.2}", av_rb_ev).bright_purple());
-        let to_frac = 100.0 * n_timed_out as f64 / n_sent as f64;
-        println!("  {:<70} <<", format!(">> ==> Fraction of timed out events {:4.2}%", to_frac).bright_purple());
-        let recv_sent_frac = 100.0* n_mte_received_tot as f64 / n_sent as f64;
-        println!("  {:<70} <<", format!(">> ==> Fraction of incoming vs outgoing MTEvents {:4.2}%", recv_sent_frac).bright_purple());
-      }
-      if n_rbe_received_tot > 0 {
-        let rbe_discarded_frac = 100.0 * n_rbe_discarded_tot as f64 / n_rbe_received_tot as f64;
-        let rbe_fpast_frac     = 100.0 * n_rbe_from_past   as f64 / n_rbe_received_tot as f64;
-        let rbe_orphaned_frac  = 100.0 * n_rbe_orphan        as f64 / n_rbe_received_tot as f64;
-        println!("  {:<70} <<", format!(">> ==> Fraction of discarded RBEvents {:4.2}%", rbe_discarded_frac).bright_purple());
-        println!("  {:<70} <<", format!(">> ==> RBEvents discarded (too early) {} ({:4.2}%)",n_rbe_from_past, rbe_fpast_frac).bright_purple());
-        println!("  {:<70} <<", format!(">> ==> RBEvents discarded (orphaned, too late?) {} ({:4.2}%)",n_rbe_orphan, rbe_orphaned_frac).bright_purple());
-      }
+      println!("{}", heartbeat);
+      //println!("  {:<70} <<", ">> == == == == == == ==  EVTBLDR HEARTBEAT == ==  == == == == ==".bright_purple().bold());
+    ////if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
+      //println!("  {:<70} <<", format!(">> ==> Received MTEvents {}", n_mte_received_tot).bright_purple());
+      //println!("  {:<70} <<", format!(">> ==> Received RBEvents {}", n_rbe_received_tot).bright_purple());
+      //println!("  {:<70} <<", format!(">> ==> Skipped MTEvents  {}", n_mte_skipped).bright_purple());
+      ////println!("  {:<80}", format!(">> ==> Missing evid analysis:  {} of {} events missing ({:.2}%)<<", ev_id_test_missing, ev_id_test_len, 100.0*(ev_id_test_missing as f64/evid_test_len as f64)).bright_purple());
+      //println!("  {:<70} <<", format!(">> ==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid).bright_purple());
+      //println!("  {:<70} <<", format!(">> ==> Size of event cache    {}", event_cache.len()).bright_purple());
+      //println!("  {:<70} <<", format!(">> ==> Size of event ID cache {}", event_id_cache.len()).bright_purple());
+      //// println!("  {:<70} <<", format!(">> ==> Gathered events from cache, last iter {}", n_gathered_fr_cache).bright_purple());
+      //println!("  {:<70} <<", format!(">> ==> Misaligned cache errs  {}", misaligned_cache_err).bright_purple());
+      //println!("  {:<70} <<", format!(">> ==> Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!").bright_purple());
+      //println!("  {:<70} <<", format!(">> ==> Sent {} events! rate   {:4.2} Hz", n_sent, n_sent as f64/met_seconds).bright_purple());
+      //println!("  {:<70} <<", format!(">> ==> Failed in sending {} events!", n_sent_ch_err).bright_purple());
+      //println!("  {:<70} <<", format!(">> ==> Chn len MTE receiver   {}",m_trig_ev.len() ).bright_purple());
+      //println!("  {:<70} <<", format!(">> ==> Chn len RBE receiver   {}",ev_from_rb.len()).bright_purple());
+      //println!("  {:<70} <<", format!(">> ==> Chn len TP  sender     {}",data_sink.len()).bright_purple());
+      //println!("  {:<70} <<", format!(">> ==> Event id check: {:4.2}% of events missing in the event ID cache", n_ev_wo_evid as f64 / event_cache.len() as f64).bright_purple());
+      //if n_sent > 0 {
+      //  let av_rb_ev = n_rbe_per_te as f64 / n_sent as f64;
+      //  println!("  {:<70} <<", format!(">> ==> Average number of RBEvents/TofEvent {:4.2}", av_rb_ev).bright_purple());
+      //  let to_frac = 100.0 * n_timed_out as f64 / n_sent as f64;
+      //  println!("  {:<70} <<", format!(">> ==> Fraction of timed out events {:4.2}%", to_frac).bright_purple());
+      //  let recv_sent_frac = 100.0* n_mte_received_tot as f64 / n_sent as f64;
+      //  println!("  {:<70} <<", format!(">> ==> Fraction of incoming vs outgoing MTEvents {:4.2}%", recv_sent_frac).bright_purple());
+      //}
+      //if n_rbe_received_tot > 0 {
+      //  let rbe_discarded_frac = 100.0 * n_rbe_discarded_tot as f64 / n_rbe_received_tot as f64;
+      //  let rbe_fpast_frac     = 100.0 * n_rbe_from_past   as f64 / n_rbe_received_tot as f64;
+      //  let rbe_orphaned_frac  = 100.0 * n_rbe_orphan        as f64 / n_rbe_received_tot as f64;
+      //  println!("  {:<70} <<", format!(">> ==> Fraction of discarded RBEvents {:4.2}%", rbe_discarded_frac).bright_purple());
+      //  println!("  {:<70} <<", format!(">> ==> RBEvents discarded (too early) {} ({:4.2}%)",n_rbe_from_past, rbe_fpast_frac).bright_purple());
+      //  println!("  {:<70} <<", format!(">> ==> RBEvents discarded (orphaned, too late?) {} ({:4.2}%)",n_rbe_orphan, rbe_orphaned_frac).bright_purple());
+      //}
       println!("RBEvents received overview (rate/RB [Hz]):");
       //if rbe_fpast_frac > 0.1 {
       //  warn!("We will reset the MTB DAQ since the MT events seem to lag behind");
@@ -615,7 +591,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           //let cache_it : bool;
           if ev_timed_out {
             if !ev.is_complete() {
-              n_timed_out += 1;
+              heartbeat.n_timed_out += 1;
             }
           }
           // always ready when the event is timed out
@@ -678,8 +654,18 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             // here even if it might require re-allocating memory
             // we should have an eye on performance though
             //idx_to_remove.push(idx);
-            let ev_to_send = event_cache.remove(&evid).unwrap();
+            let mut ev_to_send = event_cache.remove(&evid).unwrap();
+            // update event status, so that we will also see in an 
+            // (optionally) produced tof event summary if the 
+            // event has isuses
             n_rbe_per_te  += ev_to_send.rb_events.len(); 
+            let ev_satus  = ev_to_send.mt_event.event_status;
+            for ev in &ev_to_send.rb_events {
+              if ev.status == EventStatus::CellSyncErrors || ev.status == EventStatus::ChnSyncErrors {
+                ev_to_send.mt_event.event_status = EventStatus::AnyDataMangling {
+                }
+              }
+            }
             // can we avoid unpacking and repacking?
             let pack       = TofPacket::from(&ev_to_send);
             match data_sink.send(pack) {

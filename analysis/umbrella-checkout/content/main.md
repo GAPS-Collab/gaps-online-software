@@ -1,7 +1,13 @@
-Title: My First Review
-Date: 2010-12-03 10:20
-Category: Review
+Title: Umbrella Checkout
+Date: 2024/05/28 16:28:09UTC
+Category: Umbrella Checkout
+![av wf A]({static}/images/11/nreco_hits.png)
+![av wf B]({static}/images/11/paddle_occupancy.webp)
 
-Following is a review of my favorite mechanical keyboard.
+No bad channels found (all channels have mean reco pk height != 0
 
-![Alt Text]({static}/images/baseline84A.png)
+Runconfig
+
+
+
+{rc}
