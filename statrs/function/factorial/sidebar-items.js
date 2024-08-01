@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["MAX_FACTORIAL"],"fn":["binomial","checked_multinomial","factorial","ln_binomial","ln_factorial","multinomial"]};

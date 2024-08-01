@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bytemuck-1.16.2/src/allocation.rs`."><title>allocation.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bytemuck" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../bytemuck/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bytemuck-1.16.3/src/allocation.rs`."><title>allocation.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bytemuck" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../bytemuck/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -932,6 +932,11 @@
 <a href="#932" id="932">932</a>
 <a href="#933" id="933">933</a>
 <a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg(feature = <span class="string">"extern_crate_alloc"</span>)]
 #![allow(clippy::duplicated_attributes)]
 
@@ -1112,7 +1117,7 @@
     {
       <span class="comment">// If the size in bytes of the underlying buffer does not match an exact
       // multiple of the size of B, we cannot cast between them.
-      </span><span class="prelude-val">Err</span>((PodCastError::SizeMismatch, input))
+      </span><span class="prelude-val">Err</span>((PodCastError::OutputSliceWouldHaveSlop, input))
     } <span class="kw">else </span>{
       <span class="comment">// Because the size is an exact multiple, we can now change the length
       // of the slice and recreate the Box
@@ -1173,7 +1178,7 @@
       // length and capacity are valid under B, as we do not want to
       // change which bytes are considered part of the initialized slice
       // of the Vec
-      </span><span class="prelude-val">Err</span>((PodCastError::SizeMismatch, input))
+      </span><span class="prelude-val">Err</span>((PodCastError::OutputSliceWouldHaveSlop, input))
     } <span class="kw">else </span>{
       <span class="comment">// Because the size is an exact multiple, we can now change the length and
       // capacity and recreate the Vec
@@ -1365,7 +1370,7 @@
     {
       <span class="comment">// If the size in bytes of the underlying buffer does not match an exact
       // multiple of the size of B, we cannot cast between them.
-      </span><span class="prelude-val">Err</span>((PodCastError::SizeMismatch, input))
+      </span><span class="prelude-val">Err</span>((PodCastError::OutputSliceWouldHaveSlop, input))
     } <span class="kw">else </span>{
       <span class="comment">// Because the size is an exact multiple, we can now change the length
       // of the slice and recreate the Rc
@@ -1433,7 +1438,7 @@
     {
       <span class="comment">// If the size in bytes of the underlying buffer does not match an exact
       // multiple of the size of B, we cannot cast between them.
-      </span><span class="prelude-val">Err</span>((PodCastError::SizeMismatch, input))
+      </span><span class="prelude-val">Err</span>((PodCastError::OutputSliceWouldHaveSlop, input))
     } <span class="kw">else </span>{
       <span class="comment">// Because the size is an exact multiple, we can now change the length
       // of the slice and recreate the Arc
@@ -1784,13 +1789,18 @@
     <span class="kw">let </span>single_layout = Layout::new::&lt;T&gt;();
     <span class="kw">if </span>bytes.layout.align() != single_layout.align() {
       <span class="prelude-val">Err</span>((PodCastError::AlignmentMismatch, bytes))
-    } <span class="kw">else if </span>single_layout.size() == <span class="number">0 </span>{
-      <span class="prelude-val">Err</span>((PodCastError::SizeMismatch, bytes))
-    } <span class="kw">else if </span>bytes.layout.size() % single_layout.size() != <span class="number">0 </span>{
+    } <span class="kw">else if </span>(single_layout.size() == <span class="number">0 </span>&amp;&amp; bytes.layout.size() != <span class="number">0</span>)
+      || (single_layout.size() != <span class="number">0
+        </span>&amp;&amp; bytes.layout.size() % single_layout.size() != <span class="number">0</span>)
+    {
       <span class="prelude-val">Err</span>((PodCastError::OutputSliceWouldHaveSlop, bytes))
     } <span class="kw">else </span>{
       <span class="kw">let </span>(ptr, layout) = bytes.into_raw_parts();
-      <span class="kw">let </span>length = layout.size() / single_layout.size();
+      <span class="kw">let </span>length = <span class="kw">if </span>single_layout.size() != <span class="number">0 </span>{
+        layout.size() / single_layout.size()
+      } <span class="kw">else </span>{
+        <span class="number">0
+      </span>};
       <span class="kw">let </span>ptr =
         core::ptr::slice_from_raw_parts_mut(ptr.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>T, length);
       <span class="comment">// SAFETY: See BoxBytes type invariant.

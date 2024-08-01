@@ -1,1 +1,1 @@
-searchState.loadedDescShard("paste", 0, "github crates-io docs-rs")
+searchState.loadedDescShard("paste", 0, "github crates-io docs-rs\nPaste identifiers within a macro invocation that expands …\nPaste identifiers within a macro invocation that expands …\nPaste identifiers within a macro invocation that expands …")

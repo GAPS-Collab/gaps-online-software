@@ -889,6 +889,92 @@
 <a href="#889" id="889">889</a>
 <a href="#890" id="890">890</a>
 <a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
+<a href="#931" id="931">931</a>
+<a href="#932" id="932">932</a>
+<a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Aggregate settings for the TOF system
 //!
 //! Control the settings for the C&amp;C server
@@ -928,6 +1014,7 @@
 </span><span class="kw">use </span>tof_dataclasses::config::PreampBiasConfig;
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">use </span>tof_dataclasses::config::LTBThresholdConfig;
+<span class="kw">use </span>tof_dataclasses::config::RBChannelMaskConfig;
 <span class="kw">use </span><span class="kw">crate</span>::master_trigger::MTBSettings;
 
 <span class="kw">use </span>tof_dataclasses::serialization::{
@@ -1779,5 +1866,90 @@
 //    assert_eq!(cfg, test_json);
 //  }
 //}
+// #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+// pub struct ChannelMaskSettings {
+//   /// actually apply the below settings
+//   pub set_channel_mask   : bool,
+//   /// liftof-cc will send commands to set the 
+//   /// preamp bias voltages
+//   pub set_strategy           : ParameterSetStrategy,
+//   /// channels to mask (one set of 18 values per RAT)
+//   pub rat_channel_mask     : HashMap&lt;String, [bool;18]&gt;
+// }
 
+// impl ChannelMaskSettings {
+//   pub fn new() -&gt; Self {
+//     let default_thresholds = HashMap::from([
+//       (String::from("RAT01"), [40.0,32.0,375.0]),
+//       (String::from("RAT02"), [40.0,32.0,375.0]),
+//       (String::from("RAT03"), [40.0,32.0,375.0]),
+//       (String::from("RAT04"), [40.0,32.0,375.0]),
+//       (String::from("RAT05"), [40.0,32.0,375.0]),
+//       (String::from("RAT06"), [40.0,32.0,375.0]),
+//       (String::from("RAT07"), [40.0,32.0,375.0]),
+//       (String::from("RAT08"), [40.0,32.0,375.0]),
+//       (String::from("RAT09"), [40.0,32.0,375.0]),
+//       (String::from("RAT10"), [40.0,32.0,375.0]),
+//       (String::from("RAT11"), [40.0,32.0,375.0]),
+//       (String::from("RAT12"), [40.0,32.0,375.0]),
+//       (String::from("RAT13"), [40.0,32.0,375.0]),
+//       (String::from("RAT14"), [40.0,32.0,375.0]),
+//       (String::from("RAT15"), [40.0,32.0,375.0]),
+//       (String::from("RAT16"), [40.0,32.0,375.0]),
+//       (String::from("RAT17"), [40.0,32.0,375.0]),
+//       (String::from("RAT18"), [40.0,32.0,375.0]),
+//       (String::from("RAT19"), [40.0,32.0,375.0]),
+//       (String::from("RAT20"), [40.0,32.0,375.0])]);
+
+//       Self {
+//         set_ltb_thresholds    : false,
+//         set_strategy          : ParameterSetStrategy::ControlServer,
+//         rat_ltb_thresholds    : default_thresholds,
+//       }
+//   }
+
+//   #[cfg(feature="database")]
+//   pub fn emit_pb_settings_packets(&amp;self, rats : &amp;HashMap&lt;u8,RAT&gt;) -&gt; Vec&lt;TofPacket&gt; {
+//     let mut packets = Vec::&lt;TofPacket&gt;::new();
+//     for k in rats.keys() {
+//       let rat          = &amp;rats[&amp;k];
+//       let rat_key      = format!("RAT{:2}", rat);
+//       let mut cmd      = TofCommandV2::new();
+//       cmd.command_code = TofCommandCode::SetPreampBias;
+//       let mut payload  = PreampBiasConfig::new();
+//       payload.rb_id    = rat.rb2_id as u8;
+//       if *k as usize &gt;= self.rat_preamp_biases.len() {
+//         error!("RAT ID {k} larger than 20!");
+//         continue;
+//       }
+//       payload.biases = self.rat_preamp_biases[&amp;rat_key];
+//       cmd.payload = payload.to_bytestream();
+//       let tp = cmd.pack();
+//       packets.push(tp);
+//     }
+//     packets
+//   }
+// }
+
+// impl fmt::Display for PreampSettings {
+//   fn fmt(&amp;self, f: &amp;mut fmt::Formatter) -&gt; fmt::Result {
+//     let disp : String;
+//     match toml::to_string(self) {
+//       Err(err) =&gt; {
+//         error!("Deserialization error! {err}");
+//         disp = String::from("-- DESERIALIZATION ERROR! --");
+//       }
+//       Ok(_disp) =&gt; {
+//         disp = _disp;
+//       }
+//     }
+//     write!(f, "&lt;PreampBiasSettings :\n{}&gt;", disp)
+//   }
+// }
+
+// impl Default for PreampSettings {
+//   fn default() -&gt; Self {
+//     Self::new()
+//   }
+// }
 </span></code></pre></div></section></main></body></html>

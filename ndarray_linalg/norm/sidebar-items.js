@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["NormalizeAxis"],"fn":["normalize"],"trait":["Norm"]};

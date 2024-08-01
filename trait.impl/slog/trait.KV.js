@@ -1,0 +1,4 @@
+(function() {var implementors = {
+"argmin":[["impl <a class=\"trait\" href=\"slog/trait.KV.html\" title=\"trait slog::KV\">KV</a> for <a class=\"struct\" href=\"argmin/core/slog_logger/struct.ArgminSlogKV.html\" title=\"struct argmin::core::slog_logger::ArgminSlogKV\">ArgminSlogKV</a>"],["impl&lt;O: <a class=\"trait\" href=\"argmin/core/trait.ArgminOp.html\" title=\"trait argmin::core::ArgminOp\">ArgminOp</a>&gt; <a class=\"trait\" href=\"slog/trait.KV.html\" title=\"trait slog::KV\">KV</a> for <a class=\"struct\" href=\"argmin/core/struct.IterState.html\" title=\"struct argmin::core::IterState\">IterState</a>&lt;O&gt;"]],
+"slog":[]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

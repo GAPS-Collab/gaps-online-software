@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Least Squares"><title>ndarray_linalg::least_squares - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ndarray_linalg" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../ndarray_linalg/index.html">ndarray_linalg</a><span class="version">0.15.0</span></h2></div><h2 class="location"><a href="#">Module least_squares</a></h2><div class="sidebar-elems"><section><ul class="block"><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li></ul></section><h2><a href="../index.html">In crate ndarray_linalg</a></h2></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../ndarray_linalg/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Module <a href="../index.html">ndarray_linalg</a>::<wbr><a class="mod" href="#">least_squares</a><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><span class="out-of-band"><a class="src" href="../../src/ndarray_linalg/least_squares.rs.html#1-599">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="least-squares"><a class="doc-anchor" href="#least-squares">§</a>Least Squares</h2>
+<p>Compute a least-squares solution to the equation Ax = b.
+Compute a vector x such that the 2-norm <code>|b - A x|</code> is minimized.</p>
+<p>Finding the least squares solutions is implemented as traits, meaning
+that to solve <code>A x = b</code> for a matrix <code>A</code> and a RHS <code>b</code>, we call
+<code>let result = A.least_squares(&amp;b);</code>. This returns a <code>result</code> of
+type <code>LeastSquaresResult</code>, the solution for the least square problem
+is in <code>result.solution</code>.</p>
+<p>There are three traits, <code>LeastSquaresSvd</code> with the method <code>least_squares</code>,
+which operates on immutable references, <code>LeastSquaresInto</code> with the method
+<code>least_squares_into</code>, which takes ownership over both the array <code>A</code> and the
+RHS <code>b</code> and <code>LeastSquaresSvdInPlace</code> with the method <code>least_squares_in_place</code>,
+which operates on mutable references for <code>A</code> and <code>b</code> and destroys these when
+solving the least squares problem. <code>LeastSquaresSvdInto</code> and
+<code>LeastSquaresSvdInPlace</code> avoid an extra allocation for <code>A</code> and <code>b</code> which
+<code>LeastSquaresSvd</code> has do perform to preserve the values in <code>A</code> and <code>b</code>.</p>
+<p>All methods use the Lapacke family of methods <code>*gelsd</code> which solves the least
+squares problem using the SVD with a divide-and-conquer strategy.</p>
+<p>The traits are implemented for value types <code>f32</code>, <code>f64</code>, <code>c32</code> and <code>c64</code>
+and vector or matrix right-hand-sides (<code>ArrayBase&lt;S, Ix1&gt;</code> or <code>ArrayBase&lt;S, Ix2&gt;</code>).</p>
+<h3 id="example"><a class="doc-anchor" href="#example">§</a>Example</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>approx::AbsDiffEq; <span class="comment">// for abs_diff_eq
+</span><span class="kw">use </span>ndarray::{array, Array1, Array2};
+<span class="kw">use </span>ndarray_linalg::{LeastSquaresSvd, LeastSquaresSvdInto, LeastSquaresSvdInPlace};
+
+<span class="kw">let </span>a: Array2&lt;f64&gt; = <span class="macro">array!</span>[
+    [<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>],
+    [<span class="number">2.</span>, <span class="number">3.</span>, <span class="number">4.</span>],
+    [<span class="number">3.</span>, <span class="number">5.</span>, <span class="number">2.</span>],
+    [<span class="number">4.</span>, <span class="number">2.</span>, <span class="number">5.</span>],
+    [<span class="number">5.</span>, <span class="number">4.</span>, <span class="number">3.</span>]
+];
+<span class="comment">// solving for a single right-hand side
+</span><span class="kw">let </span>b: Array1&lt;f64&gt; = <span class="macro">array!</span>[-<span class="number">10.</span>, <span class="number">12.</span>, <span class="number">14.</span>, <span class="number">16.</span>, <span class="number">18.</span>];
+<span class="kw">let </span>expected: Array1&lt;f64&gt; = <span class="macro">array!</span>[<span class="number">2.</span>, <span class="number">1.</span>, <span class="number">1.</span>];
+<span class="kw">let </span>result = a.least_squares(<span class="kw-2">&amp;</span>b).unwrap();
+<span class="macro">assert!</span>(result.solution.abs_diff_eq(<span class="kw-2">&amp;</span>expected, <span class="number">1e-12</span>));
+
+<span class="comment">// solving for two right-hand sides at once
+</span><span class="kw">let </span>b_2: Array2&lt;f64&gt; =
+    <span class="macro">array!</span>[[-<span class="number">10.</span>, -<span class="number">3.</span>], [<span class="number">12.</span>, <span class="number">14.</span>], [<span class="number">14.</span>, <span class="number">12.</span>], [<span class="number">16.</span>, <span class="number">16.</span>], [<span class="number">18.</span>, <span class="number">16.</span>]];
+<span class="kw">let </span>expected_2: Array2&lt;f64&gt; = <span class="macro">array!</span>[[<span class="number">2.</span>, <span class="number">1.</span>], [<span class="number">1.</span>, <span class="number">1.</span>], [<span class="number">1.</span>, <span class="number">2.</span>]];
+<span class="kw">let </span>result_2 = a.least_squares(<span class="kw-2">&amp;</span>b_2).unwrap();
+<span class="macro">assert!</span>(result_2.solution.abs_diff_eq(<span class="kw-2">&amp;</span>expected_2, <span class="number">1e-12</span>));
+
+<span class="comment">// using `least_squares_in_place` which overwrites its arguments
+</span><span class="kw">let </span><span class="kw-2">mut </span>a_3 = a.clone();
+<span class="kw">let </span><span class="kw-2">mut </span>b_3 = b.clone();
+<span class="kw">let </span>result_3 = a_3.least_squares_in_place(<span class="kw-2">&amp;mut </span>b_3).unwrap();
+
+<span class="comment">// using `least_squares_into` which consumes its arguments
+</span><span class="kw">let </span>result_4 = a.least_squares_into(b).unwrap();
+<span class="comment">// `a` and `b` have been moved, no longer valid</span></code></pre></div>
+</div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.LeastSquaresResult.html" title="struct ndarray_linalg::least_squares::LeastSquaresResult">LeastSquaresResult</a></div><div class="desc docblock-short">Result of a LeastSquares computation</div></li></ul><h2 id="traits" class="section-header">Traits<a href="#traits" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="trait" href="trait.LeastSquaresSvd.html" title="trait ndarray_linalg::least_squares::LeastSquaresSvd">LeastSquaresSvd</a></div><div class="desc docblock-short">Solve least squares for immutable references</div></li><li><div class="item-name"><a class="trait" href="trait.LeastSquaresSvdInPlace.html" title="trait ndarray_linalg::least_squares::LeastSquaresSvdInPlace">LeastSquaresSvdInPlace</a></div><div class="desc docblock-short">Solve least squares for mutable references, overwriting
+the input fields in the process</div></li><li><div class="item-name"><a class="trait" href="trait.LeastSquaresSvdInto.html" title="trait ndarray_linalg::least_squares::LeastSquaresSvdInto">LeastSquaresSvdInto</a></div><div class="desc docblock-short">Solve least squares for owned matrices</div></li></ul></section></div></main></body></html>

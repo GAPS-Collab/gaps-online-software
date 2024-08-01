@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["UPLO"],"trait":["QR","QRInto","QRSquare","QRSquareInplace","QRSquareInto"]};

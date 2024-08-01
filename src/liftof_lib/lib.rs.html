@@ -1337,10 +1337,67 @@
 <a href="#1337" id="1337">1337</a>
 <a href="#1338" id="1338">1338</a>
 <a href="#1339" id="1339">1339</a>
+<a href="#1340" id="1340">1340</a>
+<a href="#1341" id="1341">1341</a>
+<a href="#1342" id="1342">1342</a>
+<a href="#1343" id="1343">1343</a>
+<a href="#1344" id="1344">1344</a>
+<a href="#1345" id="1345">1345</a>
+<a href="#1346" id="1346">1346</a>
+<a href="#1347" id="1347">1347</a>
+<a href="#1348" id="1348">1348</a>
+<a href="#1349" id="1349">1349</a>
+<a href="#1350" id="1350">1350</a>
+<a href="#1351" id="1351">1351</a>
+<a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a>
+<a href="#1356" id="1356">1356</a>
+<a href="#1357" id="1357">1357</a>
+<a href="#1358" id="1358">1358</a>
+<a href="#1359" id="1359">1359</a>
+<a href="#1360" id="1360">1360</a>
+<a href="#1361" id="1361">1361</a>
+<a href="#1362" id="1362">1362</a>
+<a href="#1363" id="1363">1363</a>
+<a href="#1364" id="1364">1364</a>
+<a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
+<a href="#1372" id="1372">1372</a>
+<a href="#1373" id="1373">1373</a>
+<a href="#1374" id="1374">1374</a>
+<a href="#1375" id="1375">1375</a>
+<a href="#1376" id="1376">1376</a>
+<a href="#1377" id="1377">1377</a>
+<a href="#1378" id="1378">1378</a>
+<a href="#1379" id="1379">1379</a>
+<a href="#1380" id="1380">1380</a>
+<a href="#1381" id="1381">1381</a>
+<a href="#1382" id="1382">1382</a>
+<a href="#1383" id="1383">1383</a>
+<a href="#1384" id="1384">1384</a>
+<a href="#1385" id="1385">1385</a>
+<a href="#1386" id="1386">1386</a>
+<a href="#1387" id="1387">1387</a>
+<a href="#1388" id="1388">1388</a>
+<a href="#1389" id="1389">1389</a>
+<a href="#1390" id="1390">1390</a>
+<a href="#1391" id="1391">1391</a>
+<a href="#1392" id="1392">1392</a>
+<a href="#1393" id="1393">1393</a>
+<a href="#1394" id="1394">1394</a>
+<a href="#1395" id="1395">1395</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
 <span class="kw">pub mod </span>settings;
 <span class="kw">pub mod </span>constants;
 <span class="kw">pub mod </span>thread_control;
+<span class="kw">pub mod </span>sine_fitter;
 
 <span class="kw">use </span>constants::{
     DEFAULT_CALIB_VOLTAGE,
@@ -1425,7 +1482,11 @@
 //    ThreadControl,
 //};
 
-</span><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="kw">use </span>nalgebra::Vector3;
+<span class="kw">use </span>nalgebra::Matrix3;
+<span class="kw">use </span>core::f64::consts::PI;
+
+<span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">use </span>tof_dataclasses::constants::NWORDS;
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">use </span>tof_dataclasses::calibrations::find_zero_crossings;
@@ -1748,26 +1809,77 @@
 /// This here is bad, because it does not interpolate between 
 /// the bins
 </span><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
-</span><span class="kw">fn </span>fit_sine(time: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;, data: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;) -&gt; (f32, f32, f32) {
-  <span class="kw">let </span>z_cross   = find_zero_crossings(<span class="kw-2">&amp;</span>data);
-  <span class="kw">let </span><span class="kw-2">mut </span>y_max = f32::MIN;
-  <span class="kw">let </span><span class="kw-2">mut </span>y_min = f32::MAX;
-  <span class="kw">for </span>y <span class="kw">in </span>data {
-    <span class="kw">if </span><span class="kw-2">*</span>y &gt; y_max {
-      y_max = <span class="kw-2">*</span>y;
-    }
-    <span class="kw">if </span><span class="kw-2">*</span>y &lt; y_min {
-      y_min = <span class="kw-2">*</span>y;
-    }
+</span><span class="comment">// fn fit_sine(time: &amp;Vec&lt;f32&gt;, data: &amp;Vec&lt;f32&gt;) -&gt; (f32, f32, f32) {
+//   let z_cross   = find_zero_crossings(&amp;data);
+//   let mut y_max = f32::MIN;
+//   let mut y_min = f32::MAX;
+//   for y in data {
+//     if *y &gt; y_max {
+//       y_max = *y;
+//     }
+//     if *y &lt; y_min {
+//       y_min = *y;
+//     }
+//   }
+//   let amp   = f32::abs(y_max - y_min)/2.0;
+//   let mut phase = 0.0;
+//   let mut freq  = 0.0;
+//   if z_cross.len() &gt;= 3 {
+//     phase = time[z_cross[0]];
+//     freq  = 1.0/(time[z_cross[2]] - time[z_cross[0]]);
+//   }
+//   (amp,freq,phase)
+// }
+
+// sydney's version in rust
+</span><span class="kw">fn </span>fit_sine(volts: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;, times: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;) -&gt; (f32, f32, f32) {
+  <span class="kw">let </span>start_bin = <span class="number">20</span>;
+  <span class="kw">let </span>size_bin  = <span class="number">900</span>; <span class="comment">// can probably make this smaller
+
+  </span><span class="kw">let </span><span class="kw-2">mut </span>data_size = <span class="number">0</span>;
+  <span class="kw">let </span>pi            = PI;
+  <span class="kw">let </span><span class="kw-2">mut </span>xi_yi     = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>xi_zi     = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>yi_zi     = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>xi_xi     = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>yi_yi     = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>xi_sum    = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>yi_sum    = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>zi_sum    = <span class="number">0.0</span>;
+
+  <span class="kw">for </span>i <span class="kw">in </span>start_bin..start_bin+size_bin {
+      <span class="kw">let </span>xi = (<span class="number">2.0 </span>* pi * <span class="number">0.02 </span>* times[i] <span class="kw">as </span>f64).cos();  <span class="comment">// for this fit we know the frequency is 0.02 waves/ns
+      </span><span class="kw">let </span>yi = (<span class="number">2.0 </span>* pi * <span class="number">0.02 </span>* times[i] <span class="kw">as </span>f64).sin();
+      <span class="kw">let </span>zi = volts[i];
+      xi_yi      += xi * yi;
+      xi_zi      += xi * (zi <span class="kw">as </span>f64);
+      yi_zi      += yi * (zi <span class="kw">as </span>f64);
+      xi_xi      += xi * xi;
+      yi_yi      += yi * yi;
+      xi_sum     += xi;
+      yi_sum     += yi;
+      zi_sum     += zi;
+      data_size  += <span class="number">1</span>;
   }
-  <span class="kw">let </span>amp   = f32::abs(y_max - y_min)/<span class="number">2.0</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>phase = <span class="number">0.0</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>freq  = <span class="number">0.0</span>;
-  <span class="kw">if </span>z_cross.len() &gt;= <span class="number">3 </span>{
-    phase = time[z_cross[<span class="number">0</span>]];
-    freq  = <span class="number">1.0</span>/(time[z_cross[<span class="number">2</span>]] - time[z_cross[<span class="number">0</span>]]);
-  }
-  (amp,freq,phase)
+  <span class="kw">let </span>a_matrix = Matrix3::new(
+    xi_xi, xi_yi, xi_sum,
+    xi_yi, yi_yi, yi_sum,
+    xi_sum, yi_sum, data_size <span class="kw">as </span>f64
+);
+
+<span class="kw">let </span>determinant = a_matrix.determinant();
+<span class="kw">let </span>inv_matrix = a_matrix.try_inverse().expect(<span class="string">"Matrix is not invertible"</span>);
+
+<span class="kw">let </span>p = Vector3::new(xi_zi, yi_zi, zi_sum.into());
+<span class="kw">let </span>result = inv_matrix * p;
+
+<span class="kw">let </span>a = result[<span class="number">0</span>];
+<span class="kw">let </span>b = result[<span class="number">1</span>];
+<span class="comment">// let c = result[2]; // offset parameter if needed
+
+</span><span class="kw">let </span>phi = a.atan2(b);
+
+(<span class="number">0.0</span>, <span class="number">0.0</span>, phi <span class="kw">as </span>f32)
 }
 
 <span class="comment">//*************************************************
@@ -1874,7 +1986,7 @@
     </span>rb.calibration.nanoseconds(<span class="number">9</span>,
                                event.header.stop_cell <span class="kw">as </span>usize,
                                <span class="kw-2">&amp;mut </span>times);
-    fit_result = fit_sine(<span class="kw-2">&amp;</span>times, <span class="kw-2">&amp;</span>voltages);
+    fit_result = fit_sine(<span class="kw-2">&amp;</span>voltages, <span class="kw-2">&amp;</span>times);
     <span class="comment">//println!("FIT RESULT = {:?}", fit_result);
     </span>event.header.set_sine_fit(fit_result);
   }

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Diagonal"],"trait":["AsDiagonal","IntoDiagonal"]};

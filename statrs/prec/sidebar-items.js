@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DEFAULT_F64_ACC","F64_PREC"],"fn":["almost_eq"]};

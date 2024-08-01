@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"trait":["Scalar"],"type":["c32","c64"]};

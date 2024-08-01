@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/lru-0.12.3/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="lru" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../lru/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/lru-0.12.4/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="lru" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../lru/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2385,6 +2385,312 @@
 <a href="#2385" id="2385">2385</a>
 <a href="#2386" id="2386">2386</a>
 <a href="#2387" id="2387">2387</a>
+<a href="#2388" id="2388">2388</a>
+<a href="#2389" id="2389">2389</a>
+<a href="#2390" id="2390">2390</a>
+<a href="#2391" id="2391">2391</a>
+<a href="#2392" id="2392">2392</a>
+<a href="#2393" id="2393">2393</a>
+<a href="#2394" id="2394">2394</a>
+<a href="#2395" id="2395">2395</a>
+<a href="#2396" id="2396">2396</a>
+<a href="#2397" id="2397">2397</a>
+<a href="#2398" id="2398">2398</a>
+<a href="#2399" id="2399">2399</a>
+<a href="#2400" id="2400">2400</a>
+<a href="#2401" id="2401">2401</a>
+<a href="#2402" id="2402">2402</a>
+<a href="#2403" id="2403">2403</a>
+<a href="#2404" id="2404">2404</a>
+<a href="#2405" id="2405">2405</a>
+<a href="#2406" id="2406">2406</a>
+<a href="#2407" id="2407">2407</a>
+<a href="#2408" id="2408">2408</a>
+<a href="#2409" id="2409">2409</a>
+<a href="#2410" id="2410">2410</a>
+<a href="#2411" id="2411">2411</a>
+<a href="#2412" id="2412">2412</a>
+<a href="#2413" id="2413">2413</a>
+<a href="#2414" id="2414">2414</a>
+<a href="#2415" id="2415">2415</a>
+<a href="#2416" id="2416">2416</a>
+<a href="#2417" id="2417">2417</a>
+<a href="#2418" id="2418">2418</a>
+<a href="#2419" id="2419">2419</a>
+<a href="#2420" id="2420">2420</a>
+<a href="#2421" id="2421">2421</a>
+<a href="#2422" id="2422">2422</a>
+<a href="#2423" id="2423">2423</a>
+<a href="#2424" id="2424">2424</a>
+<a href="#2425" id="2425">2425</a>
+<a href="#2426" id="2426">2426</a>
+<a href="#2427" id="2427">2427</a>
+<a href="#2428" id="2428">2428</a>
+<a href="#2429" id="2429">2429</a>
+<a href="#2430" id="2430">2430</a>
+<a href="#2431" id="2431">2431</a>
+<a href="#2432" id="2432">2432</a>
+<a href="#2433" id="2433">2433</a>
+<a href="#2434" id="2434">2434</a>
+<a href="#2435" id="2435">2435</a>
+<a href="#2436" id="2436">2436</a>
+<a href="#2437" id="2437">2437</a>
+<a href="#2438" id="2438">2438</a>
+<a href="#2439" id="2439">2439</a>
+<a href="#2440" id="2440">2440</a>
+<a href="#2441" id="2441">2441</a>
+<a href="#2442" id="2442">2442</a>
+<a href="#2443" id="2443">2443</a>
+<a href="#2444" id="2444">2444</a>
+<a href="#2445" id="2445">2445</a>
+<a href="#2446" id="2446">2446</a>
+<a href="#2447" id="2447">2447</a>
+<a href="#2448" id="2448">2448</a>
+<a href="#2449" id="2449">2449</a>
+<a href="#2450" id="2450">2450</a>
+<a href="#2451" id="2451">2451</a>
+<a href="#2452" id="2452">2452</a>
+<a href="#2453" id="2453">2453</a>
+<a href="#2454" id="2454">2454</a>
+<a href="#2455" id="2455">2455</a>
+<a href="#2456" id="2456">2456</a>
+<a href="#2457" id="2457">2457</a>
+<a href="#2458" id="2458">2458</a>
+<a href="#2459" id="2459">2459</a>
+<a href="#2460" id="2460">2460</a>
+<a href="#2461" id="2461">2461</a>
+<a href="#2462" id="2462">2462</a>
+<a href="#2463" id="2463">2463</a>
+<a href="#2464" id="2464">2464</a>
+<a href="#2465" id="2465">2465</a>
+<a href="#2466" id="2466">2466</a>
+<a href="#2467" id="2467">2467</a>
+<a href="#2468" id="2468">2468</a>
+<a href="#2469" id="2469">2469</a>
+<a href="#2470" id="2470">2470</a>
+<a href="#2471" id="2471">2471</a>
+<a href="#2472" id="2472">2472</a>
+<a href="#2473" id="2473">2473</a>
+<a href="#2474" id="2474">2474</a>
+<a href="#2475" id="2475">2475</a>
+<a href="#2476" id="2476">2476</a>
+<a href="#2477" id="2477">2477</a>
+<a href="#2478" id="2478">2478</a>
+<a href="#2479" id="2479">2479</a>
+<a href="#2480" id="2480">2480</a>
+<a href="#2481" id="2481">2481</a>
+<a href="#2482" id="2482">2482</a>
+<a href="#2483" id="2483">2483</a>
+<a href="#2484" id="2484">2484</a>
+<a href="#2485" id="2485">2485</a>
+<a href="#2486" id="2486">2486</a>
+<a href="#2487" id="2487">2487</a>
+<a href="#2488" id="2488">2488</a>
+<a href="#2489" id="2489">2489</a>
+<a href="#2490" id="2490">2490</a>
+<a href="#2491" id="2491">2491</a>
+<a href="#2492" id="2492">2492</a>
+<a href="#2493" id="2493">2493</a>
+<a href="#2494" id="2494">2494</a>
+<a href="#2495" id="2495">2495</a>
+<a href="#2496" id="2496">2496</a>
+<a href="#2497" id="2497">2497</a>
+<a href="#2498" id="2498">2498</a>
+<a href="#2499" id="2499">2499</a>
+<a href="#2500" id="2500">2500</a>
+<a href="#2501" id="2501">2501</a>
+<a href="#2502" id="2502">2502</a>
+<a href="#2503" id="2503">2503</a>
+<a href="#2504" id="2504">2504</a>
+<a href="#2505" id="2505">2505</a>
+<a href="#2506" id="2506">2506</a>
+<a href="#2507" id="2507">2507</a>
+<a href="#2508" id="2508">2508</a>
+<a href="#2509" id="2509">2509</a>
+<a href="#2510" id="2510">2510</a>
+<a href="#2511" id="2511">2511</a>
+<a href="#2512" id="2512">2512</a>
+<a href="#2513" id="2513">2513</a>
+<a href="#2514" id="2514">2514</a>
+<a href="#2515" id="2515">2515</a>
+<a href="#2516" id="2516">2516</a>
+<a href="#2517" id="2517">2517</a>
+<a href="#2518" id="2518">2518</a>
+<a href="#2519" id="2519">2519</a>
+<a href="#2520" id="2520">2520</a>
+<a href="#2521" id="2521">2521</a>
+<a href="#2522" id="2522">2522</a>
+<a href="#2523" id="2523">2523</a>
+<a href="#2524" id="2524">2524</a>
+<a href="#2525" id="2525">2525</a>
+<a href="#2526" id="2526">2526</a>
+<a href="#2527" id="2527">2527</a>
+<a href="#2528" id="2528">2528</a>
+<a href="#2529" id="2529">2529</a>
+<a href="#2530" id="2530">2530</a>
+<a href="#2531" id="2531">2531</a>
+<a href="#2532" id="2532">2532</a>
+<a href="#2533" id="2533">2533</a>
+<a href="#2534" id="2534">2534</a>
+<a href="#2535" id="2535">2535</a>
+<a href="#2536" id="2536">2536</a>
+<a href="#2537" id="2537">2537</a>
+<a href="#2538" id="2538">2538</a>
+<a href="#2539" id="2539">2539</a>
+<a href="#2540" id="2540">2540</a>
+<a href="#2541" id="2541">2541</a>
+<a href="#2542" id="2542">2542</a>
+<a href="#2543" id="2543">2543</a>
+<a href="#2544" id="2544">2544</a>
+<a href="#2545" id="2545">2545</a>
+<a href="#2546" id="2546">2546</a>
+<a href="#2547" id="2547">2547</a>
+<a href="#2548" id="2548">2548</a>
+<a href="#2549" id="2549">2549</a>
+<a href="#2550" id="2550">2550</a>
+<a href="#2551" id="2551">2551</a>
+<a href="#2552" id="2552">2552</a>
+<a href="#2553" id="2553">2553</a>
+<a href="#2554" id="2554">2554</a>
+<a href="#2555" id="2555">2555</a>
+<a href="#2556" id="2556">2556</a>
+<a href="#2557" id="2557">2557</a>
+<a href="#2558" id="2558">2558</a>
+<a href="#2559" id="2559">2559</a>
+<a href="#2560" id="2560">2560</a>
+<a href="#2561" id="2561">2561</a>
+<a href="#2562" id="2562">2562</a>
+<a href="#2563" id="2563">2563</a>
+<a href="#2564" id="2564">2564</a>
+<a href="#2565" id="2565">2565</a>
+<a href="#2566" id="2566">2566</a>
+<a href="#2567" id="2567">2567</a>
+<a href="#2568" id="2568">2568</a>
+<a href="#2569" id="2569">2569</a>
+<a href="#2570" id="2570">2570</a>
+<a href="#2571" id="2571">2571</a>
+<a href="#2572" id="2572">2572</a>
+<a href="#2573" id="2573">2573</a>
+<a href="#2574" id="2574">2574</a>
+<a href="#2575" id="2575">2575</a>
+<a href="#2576" id="2576">2576</a>
+<a href="#2577" id="2577">2577</a>
+<a href="#2578" id="2578">2578</a>
+<a href="#2579" id="2579">2579</a>
+<a href="#2580" id="2580">2580</a>
+<a href="#2581" id="2581">2581</a>
+<a href="#2582" id="2582">2582</a>
+<a href="#2583" id="2583">2583</a>
+<a href="#2584" id="2584">2584</a>
+<a href="#2585" id="2585">2585</a>
+<a href="#2586" id="2586">2586</a>
+<a href="#2587" id="2587">2587</a>
+<a href="#2588" id="2588">2588</a>
+<a href="#2589" id="2589">2589</a>
+<a href="#2590" id="2590">2590</a>
+<a href="#2591" id="2591">2591</a>
+<a href="#2592" id="2592">2592</a>
+<a href="#2593" id="2593">2593</a>
+<a href="#2594" id="2594">2594</a>
+<a href="#2595" id="2595">2595</a>
+<a href="#2596" id="2596">2596</a>
+<a href="#2597" id="2597">2597</a>
+<a href="#2598" id="2598">2598</a>
+<a href="#2599" id="2599">2599</a>
+<a href="#2600" id="2600">2600</a>
+<a href="#2601" id="2601">2601</a>
+<a href="#2602" id="2602">2602</a>
+<a href="#2603" id="2603">2603</a>
+<a href="#2604" id="2604">2604</a>
+<a href="#2605" id="2605">2605</a>
+<a href="#2606" id="2606">2606</a>
+<a href="#2607" id="2607">2607</a>
+<a href="#2608" id="2608">2608</a>
+<a href="#2609" id="2609">2609</a>
+<a href="#2610" id="2610">2610</a>
+<a href="#2611" id="2611">2611</a>
+<a href="#2612" id="2612">2612</a>
+<a href="#2613" id="2613">2613</a>
+<a href="#2614" id="2614">2614</a>
+<a href="#2615" id="2615">2615</a>
+<a href="#2616" id="2616">2616</a>
+<a href="#2617" id="2617">2617</a>
+<a href="#2618" id="2618">2618</a>
+<a href="#2619" id="2619">2619</a>
+<a href="#2620" id="2620">2620</a>
+<a href="#2621" id="2621">2621</a>
+<a href="#2622" id="2622">2622</a>
+<a href="#2623" id="2623">2623</a>
+<a href="#2624" id="2624">2624</a>
+<a href="#2625" id="2625">2625</a>
+<a href="#2626" id="2626">2626</a>
+<a href="#2627" id="2627">2627</a>
+<a href="#2628" id="2628">2628</a>
+<a href="#2629" id="2629">2629</a>
+<a href="#2630" id="2630">2630</a>
+<a href="#2631" id="2631">2631</a>
+<a href="#2632" id="2632">2632</a>
+<a href="#2633" id="2633">2633</a>
+<a href="#2634" id="2634">2634</a>
+<a href="#2635" id="2635">2635</a>
+<a href="#2636" id="2636">2636</a>
+<a href="#2637" id="2637">2637</a>
+<a href="#2638" id="2638">2638</a>
+<a href="#2639" id="2639">2639</a>
+<a href="#2640" id="2640">2640</a>
+<a href="#2641" id="2641">2641</a>
+<a href="#2642" id="2642">2642</a>
+<a href="#2643" id="2643">2643</a>
+<a href="#2644" id="2644">2644</a>
+<a href="#2645" id="2645">2645</a>
+<a href="#2646" id="2646">2646</a>
+<a href="#2647" id="2647">2647</a>
+<a href="#2648" id="2648">2648</a>
+<a href="#2649" id="2649">2649</a>
+<a href="#2650" id="2650">2650</a>
+<a href="#2651" id="2651">2651</a>
+<a href="#2652" id="2652">2652</a>
+<a href="#2653" id="2653">2653</a>
+<a href="#2654" id="2654">2654</a>
+<a href="#2655" id="2655">2655</a>
+<a href="#2656" id="2656">2656</a>
+<a href="#2657" id="2657">2657</a>
+<a href="#2658" id="2658">2658</a>
+<a href="#2659" id="2659">2659</a>
+<a href="#2660" id="2660">2660</a>
+<a href="#2661" id="2661">2661</a>
+<a href="#2662" id="2662">2662</a>
+<a href="#2663" id="2663">2663</a>
+<a href="#2664" id="2664">2664</a>
+<a href="#2665" id="2665">2665</a>
+<a href="#2666" id="2666">2666</a>
+<a href="#2667" id="2667">2667</a>
+<a href="#2668" id="2668">2668</a>
+<a href="#2669" id="2669">2669</a>
+<a href="#2670" id="2670">2670</a>
+<a href="#2671" id="2671">2671</a>
+<a href="#2672" id="2672">2672</a>
+<a href="#2673" id="2673">2673</a>
+<a href="#2674" id="2674">2674</a>
+<a href="#2675" id="2675">2675</a>
+<a href="#2676" id="2676">2676</a>
+<a href="#2677" id="2677">2677</a>
+<a href="#2678" id="2678">2678</a>
+<a href="#2679" id="2679">2679</a>
+<a href="#2680" id="2680">2680</a>
+<a href="#2681" id="2681">2681</a>
+<a href="#2682" id="2682">2682</a>
+<a href="#2683" id="2683">2683</a>
+<a href="#2684" id="2684">2684</a>
+<a href="#2685" id="2685">2685</a>
+<a href="#2686" id="2686">2686</a>
+<a href="#2687" id="2687">2687</a>
+<a href="#2688" id="2688">2688</a>
+<a href="#2689" id="2689">2689</a>
+<a href="#2690" id="2690">2690</a>
+<a href="#2691" id="2691">2691</a>
+<a href="#2692" id="2692">2692</a>
+<a href="#2693" id="2693">2693</a>
 </pre></div><pre class="rust"><code><span class="comment">// MIT License
 
 // Copyright (c) 2016 Jerome Froelich
@@ -2461,7 +2767,6 @@
 <span class="kw">use </span>core::mem;
 <span class="kw">use </span>core::num::NonZeroUsize;
 <span class="kw">use </span>core::ptr::{<span class="self">self</span>, NonNull};
-<span class="kw">use </span>core::usize;
 
 <span class="attr">#[cfg(any(test, not(feature = <span class="string">"hashbrown"</span>)))]
 </span><span class="kw">extern crate </span>std;
@@ -3002,6 +3307,57 @@
     <span class="doccomment">/// Returns a reference to the value of the key in the cache if it is
     /// present in the cache and moves the key to the head of the LRU list.
     /// If the key does not exist the provided `FnOnce` is used to populate
+    /// the list and a reference is returned. The value referenced by the
+    /// key is only cloned (using `to_owned()`) if it doesn't exist in the
+    /// cache.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use lru::LruCache;
+    /// use std::num::NonZeroUsize;
+    /// use std::rc::Rc;
+    ///
+    /// let key1 = Rc::new("1".to_owned());
+    /// let key2 = Rc::new("2".to_owned());
+    /// let mut cache = LruCache::&lt;Rc&lt;String&gt;, String&gt;::new(NonZeroUsize::new(2).unwrap());
+    /// assert_eq!(cache.get_or_insert_ref(&amp;key1, ||"One".to_owned()), "One");
+    /// assert_eq!(cache.get_or_insert_ref(&amp;key2, ||"Two".to_owned()), "Two");
+    /// assert_eq!(cache.get_or_insert_ref(&amp;key2, ||"Not two".to_owned()), "Two");
+    /// assert_eq!(cache.get_or_insert_ref(&amp;key2, ||"Again not two".to_owned()), "Two");
+    /// assert_eq!(Rc::strong_count(&amp;key1), 2);
+    /// assert_eq!(Rc::strong_count(&amp;key2), 2); // key2 was only cloned once even though we
+    ///                                         // queried it 3 times
+    /// ```
+    </span><span class="kw">pub fn </span>get_or_insert_ref&lt;<span class="lifetime">'a</span>, Q, F&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span><span class="lifetime">'_ </span>Q, f: F) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span>V
+    <span class="kw">where
+        </span>K: Borrow&lt;Q&gt;,
+        Q: Hash + Eq + <span class="question-mark">?</span>Sized + alloc::borrow::ToOwned&lt;Owned = K&gt;,
+        F: FnOnce() -&gt; V,
+    {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(node) = <span class="self">self</span>.map.get_mut(KeyWrapper::from_ref(k)) {
+            <span class="kw">let </span>node_ptr: <span class="kw-2">*mut </span>LruEntry&lt;K, V&gt; = node.as_ptr();
+
+            <span class="self">self</span>.detach(node_ptr);
+            <span class="self">self</span>.attach(node_ptr);
+
+            <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(<span class="kw-2">*</span>node_ptr).val.as_ptr() }
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>v = f();
+            <span class="kw">let </span>(<span class="kw">_</span>, node) = <span class="self">self</span>.replace_or_create_node(k.to_owned(), v);
+            <span class="kw">let </span>node_ptr: <span class="kw-2">*mut </span>LruEntry&lt;K, V&gt; = node.as_ptr();
+
+            <span class="self">self</span>.attach(node_ptr);
+
+            <span class="kw">let </span>keyref = <span class="kw">unsafe </span>{ (<span class="kw-2">*</span>node_ptr).key.as_ptr() };
+            <span class="self">self</span>.map.insert(KeyRef { k: keyref }, node);
+            <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(<span class="kw-2">*</span>node_ptr).val.as_ptr() }
+        }
+    }
+
+    <span class="doccomment">/// Returns a reference to the value of the key in the cache if it is
+    /// present in the cache and moves the key to the head of the LRU list.
+    /// If the key does not exist the provided `FnOnce` is used to populate
     /// the list and a reference is returned. If `FnOnce` returns `Err`,
     /// returns the `Err`.
     ///
@@ -3040,6 +3396,61 @@
         } <span class="kw">else </span>{
             <span class="kw">let </span>v = f()<span class="question-mark">?</span>;
             <span class="kw">let </span>(<span class="kw">_</span>, node) = <span class="self">self</span>.replace_or_create_node(k, v);
+            <span class="kw">let </span>node_ptr: <span class="kw-2">*mut </span>LruEntry&lt;K, V&gt; = node.as_ptr();
+
+            <span class="self">self</span>.attach(node_ptr);
+
+            <span class="kw">let </span>keyref = <span class="kw">unsafe </span>{ (<span class="kw-2">*</span>node_ptr).key.as_ptr() };
+            <span class="self">self</span>.map.insert(KeyRef { k: keyref }, node);
+            <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(<span class="kw-2">*</span>node_ptr).val.as_ptr() })
+        }
+    }
+
+    <span class="doccomment">/// Returns a reference to the value of the key in the cache if it is
+    /// present in the cache and moves the key to the head of the LRU list.
+    /// If the key does not exist the provided `FnOnce` is used to populate
+    /// the list and a reference is returned. If `FnOnce` returns `Err`,
+    /// returns the `Err`. The value referenced by the key is only cloned
+    /// (using `to_owned()`) if it doesn't exist in the cache and `FnOnce`
+    /// succeeds.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use lru::LruCache;
+    /// use std::num::NonZeroUsize;
+    /// use std::rc::Rc;
+    ///
+    /// let key1 = Rc::new("1".to_owned());
+    /// let key2 = Rc::new("2".to_owned());
+    /// let mut cache = LruCache::&lt;Rc&lt;String&gt;, String&gt;::new(NonZeroUsize::new(2).unwrap());
+    /// let f = ||-&gt;Result&lt;String, ()&gt; {Err(())};
+    /// let a = ||-&gt;Result&lt;String, ()&gt; {Ok("One".to_owned())};
+    /// let b = ||-&gt;Result&lt;String, ()&gt; {Ok("Two".to_owned())};
+    /// assert_eq!(cache.try_get_or_insert_ref(&amp;key1, a), Ok(&amp;"One".to_owned()));
+    /// assert_eq!(cache.try_get_or_insert_ref(&amp;key2, f), Err(()));
+    /// assert_eq!(cache.try_get_or_insert_ref(&amp;key2, b), Ok(&amp;"Two".to_owned()));
+    /// assert_eq!(cache.try_get_or_insert_ref(&amp;key2, a), Ok(&amp;"Two".to_owned()));
+    /// assert_eq!(Rc::strong_count(&amp;key1), 2);
+    /// assert_eq!(Rc::strong_count(&amp;key2), 2); // key2 was only cloned once even though we
+    ///                                         // queried it 3 times
+    /// ```
+    </span><span class="kw">pub fn </span>try_get_or_insert_ref&lt;<span class="lifetime">'a</span>, Q, F, E&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span><span class="lifetime">'_ </span>Q, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>V, E&gt;
+    <span class="kw">where
+        </span>K: Borrow&lt;Q&gt;,
+        Q: Hash + Eq + <span class="question-mark">?</span>Sized + alloc::borrow::ToOwned&lt;Owned = K&gt;,
+        F: FnOnce() -&gt; <span class="prelude-ty">Result</span>&lt;V, E&gt;,
+    {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(node) = <span class="self">self</span>.map.get_mut(KeyWrapper::from_ref(k)) {
+            <span class="kw">let </span>node_ptr: <span class="kw-2">*mut </span>LruEntry&lt;K, V&gt; = node.as_ptr();
+
+            <span class="self">self</span>.detach(node_ptr);
+            <span class="self">self</span>.attach(node_ptr);
+
+            <span class="kw">unsafe </span>{ <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;*</span>(<span class="kw-2">*</span>node_ptr).val.as_ptr()) }
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>v = f()<span class="question-mark">?</span>;
+            <span class="kw">let </span>(<span class="kw">_</span>, node) = <span class="self">self</span>.replace_or_create_node(k.to_owned(), v);
             <span class="kw">let </span>node_ptr: <span class="kw-2">*mut </span>LruEntry&lt;K, V&gt; = node.as_ptr();
 
             <span class="self">self</span>.attach(node_ptr);
@@ -3099,6 +3510,56 @@
     <span class="doccomment">/// Returns a mutable reference to the value of the key in the cache if it is
     /// present in the cache and moves the key to the head of the LRU list.
     /// If the key does not exist the provided `FnOnce` is used to populate
+    /// the list and a mutable reference is returned. The value referenced by the
+    /// key is only cloned (using `to_owned()`) if it doesn't exist in the cache.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use lru::LruCache;
+    /// use std::num::NonZeroUsize;
+    /// use std::rc::Rc;
+    ///
+    /// let key1 = Rc::new("1".to_owned());
+    /// let key2 = Rc::new("2".to_owned());
+    /// let mut cache = LruCache::&lt;Rc&lt;String&gt;, &amp;'static str&gt;::new(NonZeroUsize::new(2).unwrap());
+    /// cache.get_or_insert_mut_ref(&amp;key1, ||"One");
+    /// let v = cache.get_or_insert_mut_ref(&amp;key2, ||"Two");
+    /// *v = "New two";
+    /// assert_eq!(cache.get_or_insert_mut_ref(&amp;key2, ||"Two"), &amp;mut "New two");
+    /// assert_eq!(Rc::strong_count(&amp;key1), 2);
+    /// assert_eq!(Rc::strong_count(&amp;key2), 2); // key2 was only cloned once even though we
+    ///                                         // queried it 2 times
+    /// ```
+    </span><span class="kw">pub fn </span>get_or_insert_mut_ref&lt;<span class="lifetime">'a</span>, Q, F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span><span class="lifetime">'_ </span>Q, f: F) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>V
+    <span class="kw">where
+        </span>K: Borrow&lt;Q&gt;,
+        Q: Hash + Eq + <span class="question-mark">?</span>Sized + alloc::borrow::ToOwned&lt;Owned = K&gt;,
+        F: FnOnce() -&gt; V,
+    {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(node) = <span class="self">self</span>.map.get_mut(KeyWrapper::from_ref(k)) {
+            <span class="kw">let </span>node_ptr: <span class="kw-2">*mut </span>LruEntry&lt;K, V&gt; = node.as_ptr();
+
+            <span class="self">self</span>.detach(node_ptr);
+            <span class="self">self</span>.attach(node_ptr);
+
+            <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>(<span class="kw-2">*</span>node_ptr).val.as_mut_ptr() }
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>v = f();
+            <span class="kw">let </span>(<span class="kw">_</span>, node) = <span class="self">self</span>.replace_or_create_node(k.to_owned(), v);
+            <span class="kw">let </span>node_ptr: <span class="kw-2">*mut </span>LruEntry&lt;K, V&gt; = node.as_ptr();
+
+            <span class="self">self</span>.attach(node_ptr);
+
+            <span class="kw">let </span>keyref = <span class="kw">unsafe </span>{ (<span class="kw-2">*</span>node_ptr).key.as_ptr() };
+            <span class="self">self</span>.map.insert(KeyRef { k: keyref }, node);
+            <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>(<span class="kw-2">*</span>node_ptr).val.as_mut_ptr() }
+        }
+    }
+
+    <span class="doccomment">/// Returns a mutable reference to the value of the key in the cache if it is
+    /// present in the cache and moves the key to the head of the LRU list.
+    /// If the key does not exist the provided `FnOnce` is used to populate
     /// the list and a mutable reference is returned. If `FnOnce` returns `Err`,
     /// returns the `Err`.
     ///
@@ -3138,6 +3599,67 @@
         } <span class="kw">else </span>{
             <span class="kw">let </span>v = f()<span class="question-mark">?</span>;
             <span class="kw">let </span>(<span class="kw">_</span>, node) = <span class="self">self</span>.replace_or_create_node(k, v);
+            <span class="kw">let </span>node_ptr: <span class="kw-2">*mut </span>LruEntry&lt;K, V&gt; = node.as_ptr();
+
+            <span class="self">self</span>.attach(node_ptr);
+
+            <span class="kw">let </span>keyref = <span class="kw">unsafe </span>{ (<span class="kw-2">*</span>node_ptr).key.as_ptr() };
+            <span class="self">self</span>.map.insert(KeyRef { k: keyref }, node);
+            <span class="kw">unsafe </span>{ <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;mut *</span>(<span class="kw-2">*</span>node_ptr).val.as_mut_ptr()) }
+        }
+    }
+
+    <span class="doccomment">/// Returns a mutable reference to the value of the key in the cache if it is
+    /// present in the cache and moves the key to the head of the LRU list.
+    /// If the key does not exist the provided `FnOnce` is used to populate
+    /// the list and a mutable reference is returned. If `FnOnce` returns `Err`,
+    /// returns the `Err`. The value referenced by the key is only cloned
+    /// (using `to_owned()`) if it doesn't exist in the cache and `FnOnce`
+    /// succeeds.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use lru::LruCache;
+    /// use std::num::NonZeroUsize;
+    /// use std::rc::Rc;
+    ///
+    /// let key1 = Rc::new("1".to_owned());
+    /// let key2 = Rc::new("2".to_owned());
+    /// let mut cache = LruCache::&lt;Rc&lt;String&gt;, String&gt;::new(NonZeroUsize::new(2).unwrap());
+    /// let f = ||-&gt;Result&lt;String, ()&gt; {Err(())};
+    /// let a = ||-&gt;Result&lt;String, ()&gt; {Ok("One".to_owned())};
+    /// let b = ||-&gt;Result&lt;String, ()&gt; {Ok("Two".to_owned())};
+    /// assert_eq!(cache.try_get_or_insert_mut_ref(&amp;key1, a), Ok(&amp;mut "One".to_owned()));
+    /// assert_eq!(cache.try_get_or_insert_mut_ref(&amp;key2, f), Err(()));
+    /// if let Ok(v) = cache.try_get_or_insert_mut_ref(&amp;key2, b) {
+    ///     *v = "New two".to_owned();
+    /// }
+    /// assert_eq!(cache.try_get_or_insert_mut_ref(&amp;key2, a), Ok(&amp;mut "New two".to_owned()));
+    /// assert_eq!(Rc::strong_count(&amp;key1), 2);
+    /// assert_eq!(Rc::strong_count(&amp;key2), 2); // key2 was only cloned once even though we
+    ///                                         // queried it 3 times
+    /// ```
+    </span><span class="kw">pub fn </span>try_get_or_insert_mut_ref&lt;<span class="lifetime">'a</span>, Q, F, E&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        k: <span class="kw-2">&amp;</span><span class="lifetime">'_ </span>Q,
+        f: F,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>V, E&gt;
+    <span class="kw">where
+        </span>K: Borrow&lt;Q&gt;,
+        Q: Hash + Eq + <span class="question-mark">?</span>Sized + alloc::borrow::ToOwned&lt;Owned = K&gt;,
+        F: FnOnce() -&gt; <span class="prelude-ty">Result</span>&lt;V, E&gt;,
+    {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(node) = <span class="self">self</span>.map.get_mut(KeyWrapper::from_ref(k)) {
+            <span class="kw">let </span>node_ptr: <span class="kw-2">*mut </span>LruEntry&lt;K, V&gt; = node.as_ptr();
+
+            <span class="self">self</span>.detach(node_ptr);
+            <span class="self">self</span>.attach(node_ptr);
+
+            <span class="kw">unsafe </span>{ <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;mut *</span>(<span class="kw-2">*</span>node_ptr).val.as_mut_ptr()) }
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>v = f()<span class="question-mark">?</span>;
+            <span class="kw">let </span>(<span class="kw">_</span>, node) = <span class="self">self</span>.replace_or_create_node(k.to_owned(), v);
             <span class="kw">let </span>node_ptr: <span class="kw-2">*mut </span>LruEntry&lt;K, V&gt; = node.as_ptr();
 
             <span class="self">self</span>.attach(node_ptr);
@@ -3897,6 +4419,7 @@
     <span class="kw">use </span><span class="kw">super</span>::LruCache;
     <span class="kw">use </span>core::{fmt::Debug, num::NonZeroUsize};
     <span class="kw">use </span>scoped_threadpool::Pool;
+    <span class="kw">use </span>std::rc::Rc;
     <span class="kw">use </span>std::sync::atomic::{AtomicUsize, Ordering};
 
     <span class="kw">fn </span>assert_opt_eq&lt;V: PartialEq + Debug&gt;(opt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>V&gt;, v: V) {
@@ -3987,6 +4510,31 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_get_or_insert_ref() {
+        <span class="kw">use </span>alloc::borrow::ToOwned;
+        <span class="kw">use </span>alloc::string::String;
+
+        <span class="kw">let </span>key1 = Rc::new(<span class="string">"1"</span>.to_owned());
+        <span class="kw">let </span>key2 = Rc::new(<span class="string">"2"</span>.to_owned());
+        <span class="kw">let </span><span class="kw-2">mut </span>cache = LruCache::&lt;Rc&lt;String&gt;, String&gt;::new(NonZeroUsize::new(<span class="number">2</span>).unwrap());
+        <span class="macro">assert!</span>(cache.is_empty());
+        <span class="macro">assert_eq!</span>(cache.get_or_insert_ref(<span class="kw-2">&amp;</span>key1, || <span class="string">"One"</span>.to_owned()), <span class="string">"One"</span>);
+        <span class="macro">assert_eq!</span>(cache.get_or_insert_ref(<span class="kw-2">&amp;</span>key2, || <span class="string">"Two"</span>.to_owned()), <span class="string">"Two"</span>);
+        <span class="macro">assert_eq!</span>(cache.len(), <span class="number">2</span>);
+        <span class="macro">assert!</span>(!cache.is_empty());
+        <span class="macro">assert_eq!</span>(
+            cache.get_or_insert_ref(<span class="kw-2">&amp;</span>key2, || <span class="string">"Not two"</span>.to_owned()),
+            <span class="string">"Two"
+        </span>);
+        <span class="macro">assert_eq!</span>(
+            cache.get_or_insert_ref(<span class="kw-2">&amp;</span>key2, || <span class="string">"Again not two"</span>.to_owned()),
+            <span class="string">"Two"
+        </span>);
+        <span class="macro">assert_eq!</span>(Rc::strong_count(<span class="kw-2">&amp;</span>key1), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(Rc::strong_count(<span class="kw-2">&amp;</span>key2), <span class="number">2</span>);
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_try_get_or_insert() {
         <span class="kw">let </span><span class="kw-2">mut </span>cache = LruCache::new(NonZeroUsize::new(<span class="number">2</span>).unwrap());
 
@@ -4013,6 +4561,26 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_try_get_or_insert_ref() {
+        <span class="kw">use </span>alloc::borrow::ToOwned;
+        <span class="kw">use </span>alloc::string::String;
+
+        <span class="kw">let </span>key1 = Rc::new(<span class="string">"1"</span>.to_owned());
+        <span class="kw">let </span>key2 = Rc::new(<span class="string">"2"</span>.to_owned());
+        <span class="kw">let </span><span class="kw-2">mut </span>cache = LruCache::&lt;Rc&lt;String&gt;, String&gt;::new(NonZeroUsize::new(<span class="number">2</span>).unwrap());
+        <span class="kw">let </span>f = || -&gt; <span class="prelude-ty">Result</span>&lt;String, ()&gt; { <span class="prelude-val">Err</span>(()) };
+        <span class="kw">let </span>a = || -&gt; <span class="prelude-ty">Result</span>&lt;String, ()&gt; { <span class="prelude-val">Ok</span>(<span class="string">"One"</span>.to_owned()) };
+        <span class="kw">let </span>b = || -&gt; <span class="prelude-ty">Result</span>&lt;String, ()&gt; { <span class="prelude-val">Ok</span>(<span class="string">"Two"</span>.to_owned()) };
+        <span class="macro">assert_eq!</span>(cache.try_get_or_insert_ref(<span class="kw-2">&amp;</span>key1, a), <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="string">"One"</span>.to_owned()));
+        <span class="macro">assert_eq!</span>(cache.try_get_or_insert_ref(<span class="kw-2">&amp;</span>key2, f), <span class="prelude-val">Err</span>(()));
+        <span class="macro">assert_eq!</span>(cache.try_get_or_insert_ref(<span class="kw-2">&amp;</span>key2, b), <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="string">"Two"</span>.to_owned()));
+        <span class="macro">assert_eq!</span>(cache.try_get_or_insert_ref(<span class="kw-2">&amp;</span>key2, a), <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="string">"Two"</span>.to_owned()));
+        <span class="macro">assert_eq!</span>(cache.len(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(Rc::strong_count(<span class="kw-2">&amp;</span>key1), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(Rc::strong_count(<span class="kw-2">&amp;</span>key2), <span class="number">2</span>);
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_put_and_get_or_insert_mut() {
         <span class="kw">let </span><span class="kw-2">mut </span>cache = LruCache::new(NonZeroUsize::new(<span class="number">2</span>).unwrap());
         <span class="macro">assert!</span>(cache.is_empty());
@@ -4034,6 +4602,22 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_get_or_insert_mut_ref() {
+        <span class="kw">use </span>alloc::borrow::ToOwned;
+        <span class="kw">use </span>alloc::string::String;
+
+        <span class="kw">let </span>key1 = Rc::new(<span class="string">"1"</span>.to_owned());
+        <span class="kw">let </span>key2 = Rc::new(<span class="string">"2"</span>.to_owned());
+        <span class="kw">let </span><span class="kw-2">mut </span>cache = LruCache::&lt;Rc&lt;String&gt;, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt;::new(NonZeroUsize::new(<span class="number">2</span>).unwrap());
+        <span class="macro">assert_eq!</span>(cache.get_or_insert_mut_ref(<span class="kw-2">&amp;</span>key1, || <span class="string">"One"</span>), <span class="kw-2">&amp;mut </span><span class="string">"One"</span>);
+        <span class="kw">let </span>v = cache.get_or_insert_mut_ref(<span class="kw-2">&amp;</span>key2, || <span class="string">"Two"</span>);
+        <span class="kw-2">*</span>v = <span class="string">"New two"</span>;
+        <span class="macro">assert_eq!</span>(cache.get_or_insert_mut_ref(<span class="kw-2">&amp;</span>key2, || <span class="string">"Two"</span>), <span class="kw-2">&amp;mut </span><span class="string">"New two"</span>);
+        <span class="macro">assert_eq!</span>(Rc::strong_count(<span class="kw-2">&amp;</span>key1), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(Rc::strong_count(<span class="kw-2">&amp;</span>key2), <span class="number">2</span>);
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_try_get_or_insert_mut() {
         <span class="kw">let </span><span class="kw-2">mut </span>cache = LruCache::new(NonZeroUsize::new(<span class="number">2</span>).unwrap());
 
@@ -4051,6 +4635,34 @@
         <span class="macro">assert_eq!</span>(cache.try_get_or_insert_mut(<span class="number">3</span>, f), <span class="prelude-val">Err</span>(<span class="string">"failed"</span>));
         <span class="macro">assert_eq!</span>(cache.try_get_or_insert_mut(<span class="number">4</span>, b), <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;mut </span><span class="string">"b"</span>));
         <span class="macro">assert_eq!</span>(cache.try_get_or_insert_mut(<span class="number">4</span>, a), <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;mut </span><span class="string">"b"</span>));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_try_get_or_insert_mut_ref() {
+        <span class="kw">use </span>alloc::borrow::ToOwned;
+        <span class="kw">use </span>alloc::string::String;
+
+        <span class="kw">let </span>key1 = Rc::new(<span class="string">"1"</span>.to_owned());
+        <span class="kw">let </span>key2 = Rc::new(<span class="string">"2"</span>.to_owned());
+        <span class="kw">let </span><span class="kw-2">mut </span>cache = LruCache::&lt;Rc&lt;String&gt;, String&gt;::new(NonZeroUsize::new(<span class="number">2</span>).unwrap());
+        <span class="kw">let </span>f = || -&gt; <span class="prelude-ty">Result</span>&lt;String, ()&gt; { <span class="prelude-val">Err</span>(()) };
+        <span class="kw">let </span>a = || -&gt; <span class="prelude-ty">Result</span>&lt;String, ()&gt; { <span class="prelude-val">Ok</span>(<span class="string">"One"</span>.to_owned()) };
+        <span class="kw">let </span>b = || -&gt; <span class="prelude-ty">Result</span>&lt;String, ()&gt; { <span class="prelude-val">Ok</span>(<span class="string">"Two"</span>.to_owned()) };
+        <span class="macro">assert_eq!</span>(
+            cache.try_get_or_insert_mut_ref(<span class="kw-2">&amp;</span>key1, a),
+            <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;mut </span><span class="string">"One"</span>.to_owned())
+        );
+        <span class="macro">assert_eq!</span>(cache.try_get_or_insert_mut_ref(<span class="kw-2">&amp;</span>key2, f), <span class="prelude-val">Err</span>(()));
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(v) = cache.try_get_or_insert_mut_ref(<span class="kw-2">&amp;</span>key2, b) {
+            <span class="macro">assert_eq!</span>(v, <span class="kw-2">&amp;mut </span><span class="string">"Two"</span>);
+            <span class="kw-2">*</span>v = <span class="string">"New two"</span>.to_owned();
+        }
+        <span class="macro">assert_eq!</span>(
+            cache.try_get_or_insert_mut_ref(<span class="kw-2">&amp;</span>key2, a),
+            <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;mut </span><span class="string">"New two"</span>.to_owned())
+        );
+        <span class="macro">assert_eq!</span>(Rc::strong_count(<span class="kw-2">&amp;</span>key1), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(Rc::strong_count(<span class="kw-2">&amp;</span>key2), <span class="number">2</span>);
     }
 
     <span class="attr">#[test]

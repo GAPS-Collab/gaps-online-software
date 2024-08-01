@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["LobpcgResult","TruncatedOrder"],"fn":["lobpcg"],"struct":["TruncatedEig","TruncatedSvd"]};

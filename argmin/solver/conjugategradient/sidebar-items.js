@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["beta","cg","nonlinear_cg"]};
