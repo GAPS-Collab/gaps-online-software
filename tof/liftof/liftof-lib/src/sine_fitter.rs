@@ -70,7 +70,7 @@ pub fn fit_sine(nanoseconds: &Array1<f64>, volts: &Array1<f64>) -> Result<(f64, 
     let residuals: Vec<f64> = tt.iter().zip(yy.iter()).map(|(&t, &y)| y - fitfunc(t)).collect();
     let ss_res = residuals.iter().map(|&r| r.powi(2)).sum::<f64>();
     let ss_tot = yy.iter().map(|&y| (y - yy.mean().unwrap()).powi(2)).sum::<f64>();
-    let r_squared = 1.0 - (ss_res / ss_tot);
+    //let r_squared = 1.0 - (ss_res / ss_tot);
 
     // Chi-squared calculation
     let expected_values: Vec<f64> = tt.iter().map(|&t| fitfunc(t)).collect();
