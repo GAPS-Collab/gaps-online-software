@@ -107,6 +107,8 @@ pub enum TofCommandCode {
   SendRBWaveforms         = 92u8,
   /// Disable sending of RBWaveform packets
   NoSendRBWaveforms       = 93u8,
+  /// Enable RB Channel Masks
+  SetRBChannelMask        = 99u8,
 
 }
 

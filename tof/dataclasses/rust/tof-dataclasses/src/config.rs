@@ -228,7 +228,7 @@ impl Default for RBChannelMaskConfig {
 }
 impl fmt::Display for RBChannelMaskConfig {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let mut repr = String::from("<LTBThresholdConfig");
+    let mut repr = String::from("<RBCHannelMaskConfig");
     repr += &(format!("\n  RB ID      : {}", self.rb_id));
     repr += &(format!("\n Problematic Channels >:( {:?}", self.channels));
     write!(f, "{}", repr)

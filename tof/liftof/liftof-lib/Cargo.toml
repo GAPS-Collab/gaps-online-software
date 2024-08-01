@@ -34,6 +34,15 @@ env_logger  = "0.10"
 
 ureq        = "2.1"
 indicatif   = "0.17"
+
+ndarray = "0.15"
+ndarray-rand = "0.13"
+ndarray-linalg = "0.15"
+rustfft = "6.2"
+statrs = "0.16"
+nalgebra = "0.33"
+argmin = "0.3.1"
+
 #cfg-if      = "1.0" # TODO - have a propper debugging feature
 
 #[target.armv7-unknown-linux-gnueabi]
