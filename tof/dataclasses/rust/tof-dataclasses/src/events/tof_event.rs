@@ -178,8 +178,14 @@ impl TofEvent {
  
   /// A more advanced check, where events which are not in the 
   /// provided mtb_link_id list don't count for completion
-  pub fn is_complete_masked(&self, mtb_link_ids : &Vec::<u8>) -> {
-    
+  pub fn is_complete_masked(&self, mtb_link_ids_excluded : &Vec::<u8>) -> bool {
+    let mut expected_events = 0usize;
+    for k in &self.mt_event.get_rb_link_ids() {
+      if !mtb_link_ids_excluded.contains(k) {
+        expected_events += 1
+      }
+    }
+    self.rb_events.len() == expected_events
   }
 
   /// Encode the sizes of the vectors holding the 
