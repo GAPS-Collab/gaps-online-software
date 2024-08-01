@@ -39,7 +39,6 @@ use tof_dataclasses::config::PreampBiasConfig;
 #[cfg(feature="database")]
 use tof_dataclasses::config::LTBThresholdConfig;
 use tof_dataclasses::config::RBChannelMaskConfig;
-
 use crate::master_trigger::MTBSettings;
 
 use tof_dataclasses::serialization::{
@@ -894,8 +893,16 @@ impl fmt::Display for LiftofRBConfig {
 //    assert_eq!(cfg, test_json);
 //  }
 //}
-
-
+// #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+// pub struct ChannelMaskSettings {
+//   /// actually apply the below settings
+//   pub set_channel_mask   : bool,
+//   /// liftof-cc will send commands to set the 
+//   /// preamp bias voltages
+//   pub set_strategy           : ParameterSetStrategy,
+//   /// channels to mask (one set of 18 values per RAT)
+//   pub rat_channel_mask     : HashMap<String, [bool;18]>
+// }
 
 /// Ignore RB channnels
 ///
