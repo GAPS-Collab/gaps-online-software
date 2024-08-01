@@ -29,6 +29,8 @@ use std::sync::{
 };
 use std::process::exit;
 
+use core::f32::consts::PI;
+
 #[cfg(feature="database")]
 use half::f16;
 
@@ -79,6 +81,9 @@ use signal_hook::consts::signal::{
 };
 //use ndarray::{array, Array1};
 //use nlopt::{Algorithm, Objective, Optimization, Result};
+use nalgebra::Matrix3;
+use nalgebra::Vector3;
+
 
 use tof_dataclasses::DsiLtbRBMapping;
 #[cfg(feature="database")]
@@ -434,7 +439,7 @@ impl fmt::Display for RunStatistics {
 // }
 
 // sydney's version in rust
-fn fit_sine_sydney(volts: Vec<f64>, times: Vec<f64>) -> f64 {
+fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f32 {
   let start_bin = 20;
   let size_bin  = 900; // can probably make this smaller
 
@@ -466,22 +471,25 @@ fn fit_sine_sydney(volts: Vec<f64>, times: Vec<f64>) -> f64 {
   let a_matrix = Matrix3::new(
     xi_xi, xi_yi, xi_sum,
     xi_yi, yi_yi, yi_sum,
-    xi_sum, yi_sum, data_size as f64
-);
-
-let determinant = a_matrix.determinant();
-let inv_matrix = a_matrix.try_inverse().expect("Matrix is not invertible");
-
-let p = Vector3::new(xi_zi, yi_zi, zi_sum);
-let result = inv_matrix * p;
-
-let a = result[0];
-let b = result[1];
-// let c = result[2]; // offset parameter if needed
-
-let phi = a.atan2(b);
-
-phi
+    xi_sum, yi_sum, data_size as f32
+  );
+  
+  let determinant = a_matrix.determinant();
+  match a_matrix.try_inverse() {
+    Some(inv_matrix) => {
+      let p = Vector3::new(xi_zi, yi_zi, zi_sum);
+      let result = inv_matrix * p;
+      let a = result[0];
+      let b = result[1];
+      // let c = result[2]; // offset parameter if needed
+      let phi = a.atan2(b);
+      return phi as f32;
+    }
+    None => {
+      error!("Finding invers matrix failed!");
+      return 99.9;
+    }
+  }
 }
 
 //*************************************************
@@ -588,8 +596,9 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     rb.calibration.nanoseconds(9,
                                event.header.stop_cell as usize,
                                &mut times);
-    fit_result = fit_sine(&times, &voltages);
+    let fit_result_phi = fit_sine_sydney(&times, &voltages);
     //println!("FIT RESULT = {:?}", fit_result);
+    fit_result = (0.0, 0.0, fit_result_phi as f32);
     event.header.set_sine_fit(fit_result);
   }
 

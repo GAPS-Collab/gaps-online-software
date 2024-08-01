@@ -38,6 +38,8 @@ use tof_dataclasses::database::RAT;
 use tof_dataclasses::config::PreampBiasConfig;
 #[cfg(feature="database")]
 use tof_dataclasses::config::LTBThresholdConfig;
+use tof_dataclasses::config::RBChannelMaskConfig;
+
 use crate::master_trigger::MTBSettings;
 
 use tof_dataclasses::serialization::{
@@ -920,7 +922,7 @@ impl ChannelMaskSettings {
     let mut default_thresholds = HashMap::<String, [bool; 9]>::new();
     for k in 1..51 {
       let key = format!("RB{k:02}");
-      default_thresholds.insert((key, [true;9]));
+      default_thresholds.insert(key, [true;9]);
     }
 //    let default_thresholds = HashMap::from([
 //      (String::from("RAT01"), [false; 9]),
