@@ -37,6 +37,7 @@ use tof_dataclasses::database::RAT;
 use tof_dataclasses::config::PreampBiasConfig;
 #[cfg(feature="database")]
 use tof_dataclasses::config::LTBThresholdConfig;
+use tof_dataclasses::config::RBChannelMaskConfig;
 use crate::master_trigger::MTBSettings;
 
 use tof_dataclasses::serialization::{
@@ -888,4 +889,89 @@ impl fmt::Display for LiftofRBConfig {
 //    assert_eq!(cfg, test_json);
 //  }
 //}
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub struct ChannelMaskSettings {
+  /// actually apply the below settings
+  pub set_channel_mask   : bool,
+  /// liftof-cc will send commands to set the 
+  /// preamp bias voltages
+  pub set_strategy           : ParameterSetStrategy,
+  /// channels to mask (one set of 18 values per RAT)
+  pub rat_channel_mask     : HashMap<String, [bool;18]>
+}
 
+impl ChannelMaskSettings {
+  pub fn new() -> Self {
+    let default_thresholds = HashMap::from([
+      (String::from("RAT01"), [40.0,32.0,375.0]),
+      (String::from("RAT02"), [40.0,32.0,375.0]),
+      (String::from("RAT03"), [40.0,32.0,375.0]),
+      (String::from("RAT04"), [40.0,32.0,375.0]),
+      (String::from("RAT05"), [40.0,32.0,375.0]),
+      (String::from("RAT06"), [40.0,32.0,375.0]),
+      (String::from("RAT07"), [40.0,32.0,375.0]),
+      (String::from("RAT08"), [40.0,32.0,375.0]),
+      (String::from("RAT09"), [40.0,32.0,375.0]),
+      (String::from("RAT10"), [40.0,32.0,375.0]),
+      (String::from("RAT11"), [40.0,32.0,375.0]),
+      (String::from("RAT12"), [40.0,32.0,375.0]),
+      (String::from("RAT13"), [40.0,32.0,375.0]),
+      (String::from("RAT14"), [40.0,32.0,375.0]),
+      (String::from("RAT15"), [40.0,32.0,375.0]),
+      (String::from("RAT16"), [40.0,32.0,375.0]),
+      (String::from("RAT17"), [40.0,32.0,375.0]),
+      (String::from("RAT18"), [40.0,32.0,375.0]),
+      (String::from("RAT19"), [40.0,32.0,375.0]),
+      (String::from("RAT20"), [40.0,32.0,375.0])]);
+
+      Self {
+        set_ltb_thresholds    : false,
+        set_strategy          : ParameterSetStrategy::ControlServer,
+        rat_ltb_thresholds    : default_thresholds,
+      }
+  }
+
+  #[cfg(feature="database")]
+  pub fn emit_pb_settings_packets(&self, rats : &HashMap<u8,RAT>) -> Vec<TofPacket> {
+    let mut packets = Vec::<TofPacket>::new();
+    for k in rats.keys() {
+      let rat          = &rats[&k];
+      let rat_key      = format!("RAT{:2}", rat);
+      let mut cmd      = TofCommandV2::new();
+      cmd.command_code = TofCommandCode::SetPreampBias;
+      let mut payload  = PreampBiasConfig::new();
+      payload.rb_id    = rat.rb2_id as u8;
+      if *k as usize >= self.rat_preamp_biases.len() {
+        error!("RAT ID {k} larger than 20!");
+        continue;
+      }
+      payload.biases = self.rat_preamp_biases[&rat_key];
+      cmd.payload = payload.to_bytestream();
+      let tp = cmd.pack();
+      packets.push(tp);
+    }
+    packets
+  }
+}
+
+impl fmt::Display for PreampSettings {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp : String;
+    match toml::to_string(self) {
+      Err(err) => {
+        error!("Deserialization error! {err}");
+        disp = String::from("-- DESERIALIZATION ERROR! --");
+      }
+      Ok(_disp) => {
+        disp = _disp;
+      }
+    }
+    write!(f, "<PreampBiasSettings :\n{}>", disp)
+  }
+}
+
+impl Default for PreampSettings {
+  fn default() -> Self {
+    Self::new()
+  }
+}
