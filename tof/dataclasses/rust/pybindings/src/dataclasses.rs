@@ -1301,7 +1301,30 @@ impl PyMtbMoniSeries {
       mtbmoniseries,
     }
   }
-  
+
+  /// Add an additional file to the series
+  fn add_file(&mut self, filename : String) {
+    let mut reader = TofPacketReader::new(filename);
+    reader.filter = PacketType::MonitorMtb;
+    for tp in reader {
+      if let Ok(moni) =  tp.unpack::<MtbMoniData>() {
+        self.mtbmoniseries.add(moni);
+      }
+    }
+  }
+
+  fn get_dataframe(&mut self) -> PyResult<PyDataFrame> {
+    match self.mtbmoniseries.get_dataframe() {
+      Ok(df) => {
+        let pydf = PyDataFrame(df);
+        return Ok(pydf);
+      },
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   fn from_file(&mut self, filename : String) -> PyResult<PyDataFrame> {
     let mut reader = TofPacketReader::new(filename);
     reader.filter = PacketType::MonitorMtb;
