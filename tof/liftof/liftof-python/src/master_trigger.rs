@@ -142,6 +142,24 @@ impl PyMasterTrigger {
     }
   }
 
+  fn get_ltb_links_ready(&mut self) -> PyResult<HashMap<u8, u32>> {
+    let registers = [LT_LINK_READY0, LT_LINK_READY1,
+                     LT_LINK_READY2, LT_LINK_READY3,
+                     LT_LINK_READY4];
+    let mut ready = HashMap::<u8, u32>::new();
+    for (k,reg) in registers.iter().enumerate() {
+      match reg.get(&mut self.ipbus) {
+        Err(err) => {
+          return Err(PyValueError::new_err(err.to_string()));
+        }
+        Ok(cnt) => {
+          ready.insert(k as u8, cnt);
+        }
+      }
+    }
+    Ok(ready)
+  }
+
   fn get_ltb_event_cnts(&mut self) -> PyResult<HashMap<u8, u32>> {
     let registers = [LT0, LT1, LT2, LT3, LT4, LT5, LT6, LT7, LT8, LT9,
                      LT10, LT11, LT12, LT13, LT14, LT15, LT16, LT17, LT18, LT19,

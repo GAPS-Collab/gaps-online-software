@@ -591,6 +591,61 @@ pub const TRIGGER_RATE : MTBRegister<'static> = MTBRegister {
 //
 // Counters
 
+/// LTB link 0 available and ready to receive data
+//LT_LINK_READY0    0x1a    0x68    \[9:0\]   r       DSI 0 RX Link OK
+pub const LT_LINK_READY0 : MTBRegister<'static> = MTBRegister {
+  addr  : 0x1a,
+  mask  : 0x1ff,
+  descr : "LT link 0 ready",
+  rmw   : false,
+  ro    : true,
+  pulse : false,
+};
+
+/// LTB link 1 available and ready to receive data
+//LT_LINK_READY1    0x1b    0x6c    \[9:0\]   r       DSI 1 RX Link OK
+pub const LT_LINK_READY1 : MTBRegister<'static> = MTBRegister {
+  addr  : 0x1b,
+  mask  : 0x1ff,
+  descr : "LT link 1 ready",
+  rmw   : false,
+  ro    : true,
+  pulse : false,
+};
+
+/// LTB link 2 available and ready to receive data
+//LT_LINK_READY2    0x1c    0x70    \[9:0\]   r       DSI 2 RX Link OK
+pub const LT_LINK_READY2 : MTBRegister<'static> = MTBRegister {
+  addr  : 0x1c,
+  mask  : 0x1ff,
+  descr : "LT link 2 ready",
+  rmw   : false,
+  ro    : true,
+  pulse : false,
+};
+
+/// LTB link 3 available and ready to receive data
+//LT_LINK_READY3    0x1d    0x74    \[9:0\]   r       DSI 3 RX Link OK
+pub const LT_LINK_READY3 : MTBRegister<'static> = MTBRegister {
+  addr  : 0x1d,
+  mask  : 0x1ff,
+  descr : "LT link 3 ready",
+  rmw   : false,
+  ro    : true,
+  pulse : false,
+};
+
+/// LTB link 4 available and ready to receive data
+//LT_LINK_READY4    0x1e    0x78    \[9:0\]   r       DSI 4 RX Link OK
+pub const LT_LINK_READY4 : MTBRegister<'static> = MTBRegister {
+  addr  : 0x1e,
+  mask  : 0x1ff,
+  descr : "LT link 4 ready",
+  rmw   : false,
+  ro    : true,
+  pulse : false,
+};
+
 /// LTB Hit counter for slot 0
 //LT0   0x20    0x80    \[23:0\]  r       hit count on LT=0
 pub const LT0 : MTBRegister<'static> = MTBRegister {
@@ -1881,11 +1936,6 @@ pub const TIU_USE_AUX_LINK : MTBRegister<'static> = MTBRegister {
 //
 //MT
 //
-//LT_LINK_READY0    0x1a    0x68    [9:0]   r       DSI 0 RX Link OK
-//LT_LINK_READY1    0x1b    0x6c    [9:0]   r       DSI 1 RX Link OK
-//LT_LINK_READY2    0x1c    0x70    [9:0]   r       DSI 2 RX Link OK
-//LT_LINK_READY3    0x1d    0x74    [9:0]   r       DSI 3 RX Link OK
-//LT_LINK_READY4    0x1e    0x78    [9:0]   r       DSI 4 RX Link OK
 //
 //MT.HIT_COUNTERS
 //
