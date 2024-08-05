@@ -415,27 +415,27 @@ impl fmt::Display for RunStatistics {
 /// This here is bad, because it does not interpolate between 
 /// the bins
 #[cfg(feature="database")]
-// fn fit_sine(time: &Vec<f32>, data: &Vec<f32>) -> (f32, f32, f32) {
-//   let z_cross   = find_zero_crossings(&data);
-//   let mut y_max = f32::MIN;
-//   let mut y_min = f32::MAX;
-//   for y in data {
-//     if *y > y_max {
-//       y_max = *y;
-//     }
-//     if *y < y_min {
-//       y_min = *y;
-//     }
-//   }
-//   let amp   = f32::abs(y_max - y_min)/2.0;
-//   let mut phase = 0.0;
-//   let mut freq  = 0.0;
-//   if z_cross.len() >= 3 {
-//     phase = time[z_cross[0]];
-//     freq  = 1.0/(time[z_cross[2]] - time[z_cross[0]]);
-//   }
-//   (amp,freq,phase)
-// }
+fn fit_sine(time: &Vec<f32>, data: &Vec<f32>) -> (f32, f32, f32) {
+  let z_cross   = find_zero_crossings(&data);
+  let mut y_max = f32::MIN;
+  let mut y_min = f32::MAX;
+  for y in data {
+    if *y > y_max {
+      y_max = *y;
+    }
+    if *y < y_min {
+      y_min = *y;
+    }
+  }
+  let amp   = f32::abs(y_max - y_min)/2.0;
+  let mut phase = 0.0;
+  let mut freq  = 0.0;
+  if z_cross.len() >= 3 {
+    phase = time[z_cross[0]];
+    freq  = 1.0/(time[z_cross[2]] - time[z_cross[0]]);
+  }
+  (amp,freq,phase)
+}
 
 // sydney's version in rust
 fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f32 {
@@ -454,12 +454,12 @@ fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f32 {
   let mut zi_sum    = 0.0;
 
   for i in start_bin..start_bin+size_bin {
-      let xi = (2.0 * pi * 0.02 * times[i] as f64).cos();  // for this fit we know the frequency is 0.02 waves/ns
-      let yi = (2.0 * pi * 0.02 * times[i] as f64).sin();
+      let xi = (2.0 * pi * 0.02 * times[i] as f32).cos();  // for this fit we know the frequency is 0.02 waves/ns
+      let yi = (2.0 * pi * 0.02 * times[i] as f32).sin();
       let zi = volts[i];
       xi_yi      += xi * yi;
-      xi_zi      += xi * (zi as f64);
-      yi_zi      += yi * (zi as f64);
+      xi_zi      += xi * (zi as f32);
+      yi_zi      += yi * (zi as f32);
       xi_xi      += xi * xi;
       yi_yi      += yi * yi;
       xi_sum     += xi;
