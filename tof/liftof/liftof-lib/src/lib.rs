@@ -390,53 +390,6 @@ impl fmt::Display for RunStatistics {
   }
 }
 
-//fn sine_to_fit(amp : f32, freq : f32, phase : f32, time : &Vec<f32>, ys : &mut Vec<f32>) {
-//  //let ys = Vec::<f32>::with_capacity(time.len());
-//  for k in 0..time.len() {
-//    ys[k] = amp * (freq * time[k] + phase).sin(); 
-//  }
-//}
-//
-//fn cost_function(amp : f32, freq : f32, phase : f32, time : &Vec<f32>, volts : &Vec<f32>) -> f32 {
-//  //let 
-//  //let fitted_values = amplitude * (2.0 * std::f32::consts::PI * frequency * time + phase).sin();
-//  let fit_volts = Vec::<f32>::with_capacity(time.len());
-//  sine_to_fit(amp, freq, phase, &time, &mut fit_volts);
-//  let mut chi_square = 0f32;
-//  for k in 0..fit_volts.len() {
-//    chi_square += (volts[k] - fit_volts[k]).powi(2);
-//    // FIXME - error
-//  }
-//  chi_square
-//}
-
-
-/// FIXME - proper fitting algorithm
-/// This here is bad, because it does not interpolate between 
-/// the bins
-#[cfg(feature="database")]
-fn fit_sine(time: &Vec<f32>, data: &Vec<f32>) -> (f32, f32, f32) {
-  let z_cross   = find_zero_crossings(&data);
-  let mut y_max = f32::MIN;
-  let mut y_min = f32::MAX;
-  for y in data {
-    if *y > y_max {
-      y_max = *y;
-    }
-    if *y < y_min {
-      y_min = *y;
-    }
-  }
-  let amp   = f32::abs(y_max - y_min)/2.0;
-  let mut phase = 0.0;
-  let mut freq  = 0.0;
-  if z_cross.len() >= 3 {
-    phase = time[z_cross[0]];
-    freq  = 1.0/(time[z_cross[2]] - time[z_cross[0]]);
-  }
-  (amp,freq,phase)
-}
-
 // sydney's version in rust
 fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f32 {
   let start_bin = 20;
@@ -504,10 +457,6 @@ pub fn read_value_from_file(file_path: &str) -> io::Result<u32> {
   })?;
   Ok(value)
 }
-
-
-
-
 
 /**************************************************/
 
