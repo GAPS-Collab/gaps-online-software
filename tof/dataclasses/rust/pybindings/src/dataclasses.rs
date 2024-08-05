@@ -1651,8 +1651,8 @@ impl PyTofEventSummary {
 
   /// Hits which formed a trigger
   #[getter]
-  fn trigger_hits(&self) -> Vec<(u8, u8, u8, LTBThreshold)> {
-    self.event.get_trigger_hits()
+  pub fn trigger_hits(&self) -> PyResult<Vec<(u8, u8, (u8, u8), LTBThreshold)>> {
+    Ok(self.event.get_trigger_hits())
   }
   
   ///
