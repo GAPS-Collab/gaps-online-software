@@ -92,10 +92,6 @@ use tof_dataclasses::database::ReadoutBoard;
 //    ThreadControl,
 //};
 
-use nalgebra::Vector3;
-use nalgebra::Matrix3;
-use core::f64::consts::PI;
-
 #[cfg(feature="database")]
 use tof_dataclasses::constants::NWORDS;
 #[cfg(feature="database")]

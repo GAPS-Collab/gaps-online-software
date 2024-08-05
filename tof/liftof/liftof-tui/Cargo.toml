@@ -8,16 +8,13 @@ telemetry  = ["telemetry-dataclasses"]
 default    = ["telemetry"]
 
 [dependencies]
-
 cfg-if     = { workspace = true }
-
 zmq        = { workspace = true } 
 log        = { workspace = true }
 clap       = { workspace = true } 
 serde      = { workspace = true }
 serde_json = { workspace = true } 
 crossbeam-channel = { workspace = true }
-
 chrono     = { version = "0.4", features = ["serde"] }
 
 # tui stuff
