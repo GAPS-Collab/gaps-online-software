@@ -515,33 +515,33 @@ pub fn get_incoming_vs_outgoing_mte(&self) -> f64 {
 pub fn to_string(&self) -> String {
   let mut repr = String::from("<EVTBLDRHearbeats");
   repr += &(format!("\n   {:<75}", " >> \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} <<".bright_purple()));
-  repr += &(format!("\n   {:<75} <<", format!("==> {} events sent", self.n_sent)));
-  repr += &(format!("\n   {:<75} <<", format!("==> Size of event cache    \t{}", self.event_cache_size).bright_purple()));
-  repr += &(format!("\n   {:<75} <<", format!("==> Size of event ID cache   \t{}", self.event_id_cache_size).bright_purple()));
-  repr += &(format!("\n   {:<75} <<", format!("==> {} Events timed out", self.n_timed_out).bright_purple()));
-  repr += &(format!("\n   {:<75} <<", format!("==> Percent events timed out {}%", self.get_timed_out_frac()*(100 as f64)).bright_purple()));
+  repr += &(format!("\n   {:<75} <<", format!("==> events sent: \t\t{}", self.n_sent)));
+  repr += &(format!("\n   {:<75} <<", format!("==> Size of event cache: \t\t{}", self.event_cache_size).bright_purple()));
+  repr += &(format!("\n   {:<75} <<", format!("==> Size of event ID cache: \t\t{}", self.event_id_cache_size).bright_purple()));
+  repr += &(format!("\n   {:<75} <<", format!("==> # events timed out \t\t{}", self.n_timed_out).bright_purple()));
+  repr += &(format!("\n   {:<75} <<", format!("==> Percent events timed out: \t\t{:.2}%", self.get_timed_out_frac()*(100 as f64)).bright_purple()));
   if self.n_sent > 0 {
-    repr += &(format!("\n   {:<75} <<", format!("==> Percent events w/out event ID: {}%", (((self.n_ev_wo_evid / self.n_sent) as f64)*(100 as f64))).bright_purple()));
+    repr += &(format!("\n   {:<75} <<", format!("==> Percent events w/out event ID: \t\t{:.2}%", (((self.n_ev_wo_evid / self.n_sent) as f64)*(100 as f64))).bright_purple()));
   } else { 
-    repr += &(format!("\n   {:<75} <<", format!("==> Percent events w/out event ID: N/A").bright_purple()));
+    repr += &(format!("\n   {:<75} <<", format!("==> Percent events w/out event ID: \t\tN/A").bright_purple()));
   }
-  repr += &(format!("\n   {:<75}", " >> \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} <<"));
-  repr += &(format!("\n   {:<75} <<", format!("==> Received MTEvents \t\t{}", self.n_mte_received_tot).bright_purple()));
-  repr += &(format!("\n   {:<75} <<", format!("==> Skipped MTEvents \t\t{}", self.n_mte_skipped).bright_purple()));
-  repr += &(format!("\n   {:<75} <<", format!("==> Incoming/outgoing MTEvents fraction {}", self.get_incoming_vs_outgoing_mte()).bright_purple()));
-  repr += &(format!("\n   {:<75}", " >> \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} <<"));
-  repr += &(format!("\n   {:<75} <<", format!("==> Received RBEvents \t\t{}", self.n_rbe_received_tot).bright_purple()));
-  repr += &(format!("\n   {:<75} <<", format!("==> RBEvents Discarded \t\t{}", self.n_rbe_discarded_tot).bright_purple()));
-  repr += &(format!("\n   {:<75} <<", format!("==> Percent RBEvents discarded {}%", self.get_nrbe_discarded_frac()*(100 as f64)).bright_purple()));
-  repr += &(format!("\n   {:<75}", " >> \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} <<"));
+  repr += &(format!("\n   {:<75}", " >> \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} <<"));
+  repr += &(format!("\n   {:<75} <<", format!("==> Received MTEvents: \t\t{}", self.n_mte_received_tot).bright_purple()));
+  repr += &(format!("\n   {:<75} <<", format!("==> Skipped MTEvents: \t\t{}", self.n_mte_skipped).bright_purple()));
+  repr += &(format!("\n   {:<75} <<", format!("==> Incoming/outgoing MTEvents fraction {:.2}", self.get_incoming_vs_outgoing_mte()).bright_purple()));
+  repr += &(format!("\n   {:<75}", " >> \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} <<"));
+  repr += &(format!("\n   {:<75} <<", format!("==> Received RBEvents: \t\t{}", self.n_rbe_received_tot).bright_purple()));
+  repr += &(format!("\n   {:<75} <<", format!("==> RBEvents Discarded: \t\t{}", self.n_rbe_discarded_tot).bright_purple()));
+  repr += &(format!("\n   {:<75} <<", format!("==> Percent RBEvents discarded: {:.2}%", self.get_nrbe_discarded_frac()*(100 as f64)).bright_purple()));
+  repr += &(format!("\n   {:<75}", " >> \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} <<"));
   repr += &(format!("\n   {:<75} <<", format!("==> Avg. ratio RBEvent/ToFEvent {:4.2}", self.n_rbe_per_te).bright_purple()));
   repr += &(format!("\n   {:<75} <<", format!("==> Getting MTE from cache for RBEvent failed {} times :(", self.rbe_wo_mte).bright_purple()));
-  repr += &(format!("\n   {:<75} <<", format!("==> {} RBEvents with evid from past", self.n_rbe_from_past).bright_purple()));
-  repr += &(format!("\n   {:<75} <<", format!("==> {} Orphan RBEvents", self.n_rbe_orphan).bright_purple()));
-  repr += &(format!("\n   {:<75}", " >> \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} <<"));
-  repr += &(format!("\n   {:<75} <<", format!("==> Ch. len MTE Receiver   \t{}", self.mte_receiver_cbc_len).bright_purple()));
-  repr += &(format!("\n   {:<75} <<", format!("==> Ch. len RBE Reveiver   \t{}", self.rbe_receiver_cbc_len).bright_purple()));
-  repr += &(format!("\n   {:<75} <<", format!("==> Ch. len TP Sender    \t{}", self.tp_sender_cbc_len).bright_purple()));
+  repr += &(format!("\n   {:<75} <<", format!("==> # RBEvents with evid from past: \t\t{}", self.n_rbe_from_past).bright_purple()));
+  repr += &(format!("\n   {:<75} <<", format!("==> # Orphan RBEvents: \t\t{}", self.n_rbe_orphan).bright_purple()));
+  repr += &(format!("\n   {:<75}", " >> \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} <<"));
+  repr += &(format!("\n   {:<75} <<", format!("==> Ch. len MTE Receiver: \t\t{}", self.mte_receiver_cbc_len).bright_purple()));
+  repr += &(format!("\n   {:<75} <<", format!("==> Ch. len RBE Reveiver: \t\t{}", self.rbe_receiver_cbc_len).bright_purple()));
+  repr += &(format!("\n   {:<75} <<", format!("==> Ch. len TP Sender: \t\t{}", self.tp_sender_cbc_len).bright_purple()));
   repr += &(format!("\n   {:<75}", " >>  \u{2B50} \u{2B50} \u{2B50} \u{2B50} END EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50}  <<"));
   repr
   }
