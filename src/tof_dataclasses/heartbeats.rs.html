@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/heartbeats.rs`."><title>heartbeats.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/heartbeats.rs`."><title>heartbeats.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -676,6 +676,7 @@
 <a href="#676" id="676">676</a>
 <a href="#677" id="677">677</a>
 <a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Heartbeats - regularly (or on demand) sent 
 //! software monitoring data
 //!
@@ -1193,33 +1194,33 @@
 <span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
   <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;EVTBLDRHearbeats"</span>);
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} &lt;&lt;"</span>.bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; {} events sent"</span>, <span class="self">self</span>.n_sent)));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Size of event cache    \t{}"</span>, <span class="self">self</span>.event_cache_size).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Size of event ID cache   \t{}"</span>, <span class="self">self</span>.event_id_cache_size).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; {} Events timed out"</span>, <span class="self">self</span>.n_timed_out).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent events timed out {}%"</span>, <span class="self">self</span>.get_timed_out_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; events sent: \t\t{}"</span>, <span class="self">self</span>.n_sent)));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Size of event cache: \t\t{}"</span>, <span class="self">self</span>.event_cache_size).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Size of event ID cache: \t\t{}"</span>, <span class="self">self</span>.event_id_cache_size).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; # events timed out \t\t{}"</span>, <span class="self">self</span>.n_timed_out).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent events timed out: \t\t{:.2}%"</span>, <span class="self">self</span>.get_timed_out_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple()));
   <span class="kw">if </span><span class="self">self</span>.n_sent &gt; <span class="number">0 </span>{
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent events w/out event ID: {}%"</span>, (((<span class="self">self</span>.n_ev_wo_evid / <span class="self">self</span>.n_sent) <span class="kw">as </span>f64)<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64))).bright_purple()));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent events w/out event ID: \t\t{:.2}%"</span>, (((<span class="self">self</span>.n_ev_wo_evid / <span class="self">self</span>.n_sent) <span class="kw">as </span>f64)<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64))).bright_purple()));
   } <span class="kw">else </span>{ 
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent events w/out event ID: N/A"</span>).bright_purple()));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent events w/out event ID: \t\tN/A"</span>).bright_purple()));
   }
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Received MTEvents \t\t{}"</span>, <span class="self">self</span>.n_mte_received_tot).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Skipped MTEvents \t\t{}"</span>, <span class="self">self</span>.n_mte_skipped).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Incoming/outgoing MTEvents fraction {}"</span>, <span class="self">self</span>.get_incoming_vs_outgoing_mte()).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Received RBEvents \t\t{}"</span>, <span class="self">self</span>.n_rbe_received_tot).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; RBEvents Discarded \t\t{}"</span>, <span class="self">self</span>.n_rbe_discarded_tot).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent RBEvents discarded {}%"</span>, <span class="self">self</span>.get_nrbe_discarded_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Received MTEvents: \t\t{}"</span>, <span class="self">self</span>.n_mte_received_tot).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Skipped MTEvents: \t\t{}"</span>, <span class="self">self</span>.n_mte_skipped).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Incoming/outgoing MTEvents fraction {:.2}"</span>, <span class="self">self</span>.get_incoming_vs_outgoing_mte()).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Received RBEvents: \t\t{}"</span>, <span class="self">self</span>.n_rbe_received_tot).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; RBEvents Discarded: \t\t{}"</span>, <span class="self">self</span>.n_rbe_discarded_tot).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Percent RBEvents discarded: {:.2}%"</span>, <span class="self">self</span>.get_nrbe_discarded_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Avg. ratio RBEvent/ToFEvent {:4.2}"</span>, <span class="self">self</span>.n_rbe_per_te).bright_purple()));
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Getting MTE from cache for RBEvent failed {} times :("</span>, <span class="self">self</span>.rbe_wo_mte).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; {} RBEvents with evid from past"</span>, <span class="self">self</span>.n_rbe_from_past).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; {} Orphan RBEvents"</span>, <span class="self">self</span>.n_rbe_orphan).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Ch. len MTE Receiver   \t{}"</span>, <span class="self">self</span>.mte_receiver_cbc_len).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Ch. len RBE Reveiver   \t{}"</span>, <span class="self">self</span>.rbe_receiver_cbc_len).bright_purple()));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Ch. len TP Sender    \t{}"</span>, <span class="self">self</span>.tp_sender_cbc_len).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; # RBEvents with evid from past: \t\t{}"</span>, <span class="self">self</span>.n_rbe_from_past).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; # Orphan RBEvents: \t\t{}"</span>, <span class="self">self</span>.n_rbe_orphan).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt; \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} &lt;&lt;"</span>));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Ch. len MTE Receiver: \t\t{}"</span>, <span class="self">self</span>.mte_receiver_cbc_len).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Ch. len RBE Reveiver: \t\t{}"</span>, <span class="self">self</span>.rbe_receiver_cbc_len).bright_purple()));
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"==&gt; Ch. len TP Sender: \t\t{}"</span>, <span class="self">self</span>.tp_sender_cbc_len).bright_purple()));
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n   {:&lt;75}"</span>, <span class="string">" &gt;&gt;  \u{2B50} \u{2B50} \u{2B50} \u{2B50} END EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50}  &lt;&lt;"</span>));
   repr
   }
@@ -1293,57 +1294,58 @@
           bs
         }
     }
-    <span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
-    </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>EVTBLDRHeartbeat {
-      <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
-      <span class="kw">let </span><span class="kw-2">mut </span>rng       = rand::thread_rng();
-      <span class="kw">let </span>met_seconds   = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>n_mte_received_tot = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>n_rbe_received_tot = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>n_rbe_per_te = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>n_rbe_discarded_tot = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>n_mte_skipped = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>n_timed_out = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>n_sent = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>delta_mte_rbe = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>event_cache_size = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>event_id_cache_size = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>rbe_wo_mte = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>mte_receiver_cbc_len = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>rbe_receiver_cbc_len = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>tp_sender_cbc_len = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>n_ev_wo_evid = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>n_rbe_from_past = rng.gen::&lt;usize&gt;();
-      <span class="kw">let </span>n_rbe_orphan = rng.gen::&lt;usize&gt;();
-      <span class="self">Self </span>{
-        met_seconds,
-        n_rbe_received_tot,
-        n_rbe_per_te,
-        n_rbe_discarded_tot,
-        n_mte_skipped,
-        n_timed_out,
-        n_sent,
-        delta_mte_rbe,
-        event_cache_size,
-        event_id_cache_size,
-        rbe_wo_mte,
-        mte_receiver_cbc_len,
-        rbe_receiver_cbc_len,
-        tp_sender_cbc_len,
-        n_mte_received_tot,
-        n_ev_wo_evid,
-        n_rbe_from_past,
-        n_rbe_orphan,
-      }
-    }
-  } 
 
-  <span class="kw">impl </span>fmt::Display <span class="kw">for </span>EVTBLDRHeartbeat {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-      <span class="kw">let </span>repr = <span class="self">self</span>.to_string();
-      <span class="macro">write!</span>(f, <span class="string">"{}"</span>, repr)
+<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
+</span><span class="kw">impl </span>FromRandom <span class="kw">for </span>EVTBLDRHeartbeat {
+  <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
+    <span class="kw">let </span><span class="kw-2">mut </span>rng       = rand::thread_rng();
+    <span class="kw">let </span>met_seconds   = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>n_mte_received_tot = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>n_rbe_received_tot = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>n_rbe_per_te = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>n_rbe_discarded_tot = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>n_mte_skipped = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>n_timed_out = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>n_sent = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>delta_mte_rbe = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>event_cache_size = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>event_id_cache_size = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>rbe_wo_mte = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>mte_receiver_cbc_len = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>rbe_receiver_cbc_len = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>tp_sender_cbc_len = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>n_ev_wo_evid = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>n_rbe_from_past = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>n_rbe_orphan = rng.gen::&lt;usize&gt;();
+    <span class="self">Self </span>{
+      met_seconds,
+      n_rbe_received_tot,
+      n_rbe_per_te,
+      n_rbe_discarded_tot,
+      n_mte_skipped,
+      n_timed_out,
+      n_sent,
+      delta_mte_rbe,
+      event_cache_size,
+      event_id_cache_size,
+      rbe_wo_mte,
+      mte_receiver_cbc_len,
+      rbe_receiver_cbc_len,
+      tp_sender_cbc_len,
+      n_mte_received_tot,
+      n_ev_wo_evid,
+      n_rbe_from_past,
+      n_rbe_orphan,
     }
-  }  
+  }
+} 
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>EVTBLDRHeartbeat {
+  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">let </span>repr = <span class="self">self</span>.to_string();
+    <span class="macro">write!</span>(f, <span class="string">"{}"</span>, repr)
+  }
+}  
 
 <span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 #[test]

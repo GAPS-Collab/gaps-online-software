@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/io.rs`."><title>io.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../tof_dataclasses/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/io.rs`."><title>io.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1556,37 +1556,6 @@
 <a href="#1556" id="1556">1556</a>
 <a href="#1557" id="1557">1557</a>
 <a href="#1558" id="1558">1558</a>
-<a href="#1559" id="1559">1559</a>
-<a href="#1560" id="1560">1560</a>
-<a href="#1561" id="1561">1561</a>
-<a href="#1562" id="1562">1562</a>
-<a href="#1563" id="1563">1563</a>
-<a href="#1564" id="1564">1564</a>
-<a href="#1565" id="1565">1565</a>
-<a href="#1566" id="1566">1566</a>
-<a href="#1567" id="1567">1567</a>
-<a href="#1568" id="1568">1568</a>
-<a href="#1569" id="1569">1569</a>
-<a href="#1570" id="1570">1570</a>
-<a href="#1571" id="1571">1571</a>
-<a href="#1572" id="1572">1572</a>
-<a href="#1573" id="1573">1573</a>
-<a href="#1574" id="1574">1574</a>
-<a href="#1575" id="1575">1575</a>
-<a href="#1576" id="1576">1576</a>
-<a href="#1577" id="1577">1577</a>
-<a href="#1578" id="1578">1578</a>
-<a href="#1579" id="1579">1579</a>
-<a href="#1580" id="1580">1580</a>
-<a href="#1581" id="1581">1581</a>
-<a href="#1582" id="1582">1582</a>
-<a href="#1583" id="1583">1583</a>
-<a href="#1584" id="1584">1584</a>
-<a href="#1585" id="1585">1585</a>
-<a href="#1586" id="1586">1586</a>
-<a href="#1587" id="1587">1587</a>
-<a href="#1588" id="1588">1588</a>
-<a href="#1589" id="1589">1589</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Dataio - readino/writing of different types
 //! of TOF data products.
 //!
@@ -2117,7 +2086,8 @@
     //let expected_packet_size =   header.get_channels().len()*nwords*2 
     //                           + header.get_channels().len()*2 
     //                           + header.get_channels().len()*4;
-    </span><span class="kw">for </span>ch <span class="kw">in </span>header.get_channels().iter() {
+    </span><span class="kw">let </span><span class="kw-2">mut </span>any_cell_error = <span class="bool-val">false</span>;
+    <span class="kw">for </span>ch <span class="kw">in </span>header.get_channels().iter() {
       <span class="kw">let </span>ch_id = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
       <span class="kw">if </span>ch_id != <span class="kw-2">*</span>ch <span class="kw">as </span>u16 {
         <span class="comment">// check where is the next header
@@ -2160,6 +2130,7 @@
               <span class="kw">if </span>((<span class="number">0x4000 </span>&amp; this_field) &gt;&gt; <span class="number">14</span>) == <span class="number">0x1 </span>{
                 <span class="macro">error!</span>(<span class="string">"Cell error bit set for ch {}!"</span>, ch);
                 event_status = EventStatus::CellSyncErrors;
+                any_cell_error = <span class="bool-val">true</span>;
               }
             }
             this_ch_adc.push(<span class="number">0x3fff </span>&amp; this_field)
@@ -2171,6 +2142,7 @@
             <span class="kw">if </span>adc_w_errs.<span class="number">1 </span>{
               <span class="macro">error!</span>(<span class="string">"Ch error bit set for ch {}!"</span>, ch);
               event_status = EventStatus::ChnSyncErrors;
+              any_cell_error = <span class="bool-val">true</span>;
             } <span class="kw">else if </span>adc_w_errs.<span class="number">2 </span>{
               <span class="macro">error!</span>(<span class="string">"Cell error bit set for ch {}!"</span>, ch);
               event_status = EventStatus::CellSyncErrors;
@@ -2199,6 +2171,11 @@
           }
           <span class="macro">println!</span>(<span class="string">"== ==&gt; Checksum {}, channel checksum {}!"</span>, checksum, crc32); 
         }
+      }
+    }
+    <span class="kw">if </span>any_cell_error {
+      <span class="kw">if </span>event_status == EventStatus::ChnSyncErrors {
+        event_status = EventStatus::CellAndChnSyncErrors;
       }
     }
     
@@ -2311,16 +2288,16 @@
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>TofPacketReader {
   <span class="doccomment">/// Read from this file
-  </span><span class="kw">pub </span>filename    : String,
-  file_reader     : BufReader&lt;File&gt;,
+  </span><span class="kw">pub </span>filename        : String,
+  file_reader         : BufReader&lt;File&gt;,
   <span class="doccomment">/// Current (byte) position in the file
-  </span>cursor          : usize,
+  </span>cursor              : usize,
   <span class="doccomment">/// Read only packets of type == PacketType
   </span><span class="kw">pub </span>filter          : PacketType,
   <span class="doccomment">/// Number of read packets
-  </span>n_packs_read    : usize,
+  </span>n_packs_read        : usize,
   <span class="doccomment">/// Number of skipped packets
-  </span>n_packs_skipped : usize,
+  </span>n_packs_skipped     : usize,
   <span class="doccomment">/// Skip the first n packets
   </span><span class="kw">pub </span>skip_ahead      : usize,
   <span class="doccomment">/// Stop reading after n packets
@@ -2594,45 +2571,6 @@
       } <span class="comment">// if no 0xAA found
     </span>} <span class="comment">// end loop
   </span>} <span class="comment">// end fn
-
-  //pub fn get_next_packet_size(&amp;self, stream : &amp;Vec&lt;u8&gt;) -&gt; u32 {
-  //  // cursor needs at HEAD position and then we have to 
-  //  // add one byte for the packet type
-  //  let mut pos    = self.cursor + 2;
-  //  let ptype_int  = parse_u8(stream, &amp;mut pos);
-  //  let next_psize = parse_u32(stream, &amp;mut pos);
-  //  let ptype      = ptype_int as u8;
-  //  debug!("We anticpate a TofPacket of type {:?} and size {} (bytes)",ptype, next_psize);
-  //  next_psize
-  //}
-
-  //pub fn open(&amp;mut self, filename : String) {
-  //  if self.filename != "" {
-  //    warn!("Overiding previously set filename {}", self.filename);
-  //  }
-  //  let self_filename = filename.clone();
-  //  self.filename     = self_filename;
-  //  if filename != "" {
-  //    let path = Path::new(&amp;filename); 
-  //    info!("Reading from {}", &amp;self.filename);
-  //    let file = OpenOptions::new().create(false).append(false).read(true).open(path).expect("Unable to open file {filename}");
-  //    self.file_reader    = Some(BufReader::new(file));
-  //    self.init();
-  //  }
-  //}
-
-  //fn init(&amp;mut self) {
-  //  match self.search_start() {
-  //    Err(err) =&gt; {
-  //      error!("Can not find any header signature (typically 0xAAAA) in file! Err {err}");
-  //      panic!("This is most likely a useless endeavour! Hence, I panic!");
-  //    }
-  //    Ok(start_pos) =&gt; {
-  //      self.cursor = start_pos;
-  //    }
-  //  }
-  //}
-
 </span>}
 
 <span class="kw">impl </span>Default <span class="kw">for </span>TofPacketReader {

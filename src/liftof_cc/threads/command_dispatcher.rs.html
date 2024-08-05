@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/threads/command_dispatcher.rs`."><title>command_dispatcher.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_cc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../liftof_cc/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/threads/command_dispatcher.rs`."><title>command_dispatcher.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_cc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -592,6 +592,83 @@
 <a href="#592" id="592">592</a>
 <a href="#593" id="593">593</a>
 <a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Command receiving, processing and sending
 //! We need to fullfill the following requirements
 //! 1) Receive a command from the flight computer/elsewhere
@@ -616,6 +693,8 @@
     Instant,
     Duration,
 };
+
+<span class="kw">use </span>chrono::Utc;
 
 <span class="kw">use </span>crossbeam_channel::{
     Receiver,
@@ -719,10 +798,11 @@
     <span class="comment">// check if we get a command from the main 
     // thread
     </span>thread::sleep(sleep_time);
+    <span class="macro">println!</span>(<span class="string">"=&gt; Cmd responder loop iteration!"</span>);
     <span class="kw">match </span>cmd_receiver.connect(<span class="kw-2">&amp;</span>fc_sub_addr) {
       <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; (),
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">"JUnable to connect to {}! {}"</span>, fc_sub_addr, err);
+        <span class="macro">error!</span>(<span class="string">"Unable to connect to {}! {}"</span>, fc_sub_addr, err);
       }
     }
     <span class="kw">match </span>thread_ctrl.try_lock() {
@@ -782,6 +862,7 @@
           },
           <span class="prelude-val">Ok</span>(packet) =&gt; {
             <span class="kw">let </span><span class="kw-2">mut </span>resp = TofResponse::Unknown;
+            <span class="macro">println!</span>(<span class="string">"Got packet {}!"</span>, packet);
             <span class="kw">match </span>packet.packet_type {
               PacketType::TofCommandV2 =&gt; {
                 <span class="kw">let </span><span class="kw-2">mut </span>cmd = TofCommandV2::new();
@@ -789,7 +870,8 @@
                   <span class="prelude-val">Ok</span>(_cmd) =&gt; {cmd = _cmd;},
                   <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to decode TofCommand! {err}"</span>)
                 }
-                <span class="kw">let </span>now = Instant::now();
+                <span class="macro">println!</span>(<span class="string">"= =&gt; [cmd_djispatcher] Received command {}!"</span>, cmd);
+                <span class="kw">let </span>now = Utc::now().to_string();
                 <span class="kw">let </span>write_to_file = <span class="macro">format!</span>(<span class="string">"{:?}: {}\n"</span>,now, cmd);
                 <span class="kw">match </span>log_file.write_all(<span class="kw-2">&amp;</span>write_to_file.into_bytes()) {
                   <span class="prelude-val">Err</span>(err) =&gt; {
@@ -885,9 +967,70 @@
                       <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
                     }
                   }
+                  TofCommandCode::DataRunStop  =&gt; {
+                    <span class="macro">println!</span>(<span class="string">"= =&gt; Received DataRunStop!"</span>);
+                    <span class="kw">let </span>cmd          = TofCommand::DataRunStop(DEFAULT_RB_ID <span class="kw">as </span>u32);
+                    <span class="kw">let </span>packed_cmd   = cmd.pack();
+                    <span class="kw">let </span><span class="kw-2">mut </span>payload  = String::from(<span class="string">"BRCT"</span>).into_bytes();
+                    payload.append(<span class="kw-2">&amp;mut </span>packed_cmd.to_bytestream());
+                    <span class="kw">match </span>cmd_sender.send(<span class="kw-2">&amp;</span>payload, <span class="number">0</span>) {
+                      <span class="prelude-val">Err</span>(err) =&gt; {
+                        <span class="macro">error!</span>(<span class="string">"Unable to send command, error{err}"</span>);
+                        resp = TofResponse::ZMQProblem(<span class="number">0x0</span>); <span class="comment">// response code not assigned, 
+                                                                 // let's just let it be 0 for now
+                        </span><span class="kw">let </span>ack_tp = resp.pack();
+                        <span class="kw">match </span>tof_ack_sender.send(ack_tp) {
+                          <span class="prelude-val">Err</span>(err) =&gt; {
+                            <span class="macro">error!</span>(<span class="string">"Unable to send ACK packet! {err}"</span>);
+                          }
+                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+                        }
+                      },
+                      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+                        <span class="macro">info!</span>(<span class="string">"Stop run command sent"</span>);
+                        <span class="comment">// Now we wait for the RB acknowledgement packets and see if our command
+                        // went through
+                        </span><span class="kw">let </span><span class="kw-2">mut </span>n_rb_ack_rcved = <span class="number">0u8</span>;
+                        <span class="kw">let </span>run_start_timeout  = Instant::now();
+                        <span class="comment">// let's wait 20 seconds here
+                        </span>resp = TofResponse::TimeOut(<span class="number">0x0</span>);
+                        <span class="kw">while </span>run_start_timeout.elapsed().as_secs() &lt; <span class="number">20 </span>{
+                          <span class="kw">match </span>rb_ack_recv.recv() {
+                            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
+                              <span class="kw">continue</span>;
+                            }
+                            <span class="prelude-val">Ok</span>(_ack_pack) =&gt; {
+                              <span class="comment">//FIXME - do something with it
+                              </span>n_rb_ack_rcved += <span class="number">1</span>;
+                            }
+                          }
+                          <span class="kw">if </span>n_rb_ack_rcved == <span class="number">40 </span>{
+                            resp = TofResponse::Success(<span class="number">0</span>);
+                          }
+                        }
+                        <span class="kw">let </span>ack_tp = resp.pack();
+                        <span class="kw">match </span>tof_ack_sender.send(ack_tp) {
+                          <span class="prelude-val">Err</span>(err) =&gt; {
+                            <span class="macro">error!</span>(<span class="string">"Unable to send ACK packet! {err}"</span>);
+                          }
+                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+                        }
+                      }
+                    }
+                    <span class="kw">let </span>ack_rp = TofResponseCode::RespSuccFingersCrossed;
+                    resp = TofResponse::Success(ack_rp <span class="kw">as </span>u32);
+
+                    <span class="kw">let </span>ack_tp = resp.pack();
+                    <span class="kw">match </span>tof_ack_sender.send(ack_tp) {
+                      <span class="prelude-val">Err</span>(err) =&gt; {
+                        <span class="macro">error!</span>(<span class="string">"Unable to send ACK packet! {err}"</span>);
+                      }
+                      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+                    }
+                  }
                   TofCommandCode::DataRunStart =&gt; {
                     <span class="kw">let </span><span class="kw-2">mut </span>run_id : u32 = <span class="number">0</span>;
-                    <span class="macro">println!</span>(<span class="string">"== ==&gt; Received DataRunStart!"</span>);
+                    <span class="macro">println!</span>(<span class="string">"= =&gt; Received DataRunStart!"</span>);
                     <span class="macro">info!</span>(<span class="string">"Received data run start command"</span>);
                     <span class="comment">// technically, it is run_typ, rb_id, event number
                     // all to the max means run start for all
@@ -978,7 +1121,7 @@
                         <span class="comment">// let's wait 20 seconds here
                         </span>resp = TofResponse::TimeOut(<span class="number">0x0</span>);
                         <span class="kw">while </span>run_start_timeout.elapsed().as_secs() &lt; <span class="number">20 </span>{
-                          <span class="kw">match </span>rb_ack_recv.recv() {
+                          <span class="kw">match </span>rb_ack_recv.try_recv() {
                             <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                               <span class="kw">continue</span>;
                             }
@@ -991,6 +1134,7 @@
                             resp = TofResponse::Success(<span class="number">0</span>);
                           }
                         }
+                        <span class="macro">info!</span>(<span class="string">"Gathered {} ack packets from RBs!"</span>, n_rb_ack_rcved);
                         <span class="kw">let </span>ack_tp = resp.pack();
                         <span class="kw">match </span>tof_ack_sender.send(ack_tp) {
                           <span class="prelude-val">Err</span>(err) =&gt; {
@@ -999,6 +1143,16 @@
                           <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
                         }
                       }
+                    }
+                    <span class="kw">let </span>ack_rp = TofResponseCode::RespSuccFingersCrossed;
+                    resp = TofResponse::Success(ack_rp <span class="kw">as </span>u32);
+
+                    <span class="kw">let </span>ack_tp = resp.pack();
+                    <span class="kw">match </span>tof_ack_sender.send(ack_tp) {
+                      <span class="prelude-val">Err</span>(err) =&gt; {
+                        <span class="macro">error!</span>(<span class="string">"Unable to send ACK packet! {err}"</span>);
+                      }
+                      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
                     }
                   }
                   TofCommandCode::Ping =&gt; {

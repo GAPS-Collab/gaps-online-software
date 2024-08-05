@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/settings.rs`."><title>settings.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../liftof_lib/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/settings.rs`."><title>settings.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -975,6 +975,34 @@
 <a href="#975" id="975">975</a>
 <a href="#976" id="976">976</a>
 <a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Aggregate settings for the TOF system
 //!
 //! Control the settings for the C&amp;C server
@@ -993,6 +1021,7 @@
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::collections::HashMap;
 
+<span class="kw">use </span>signal_hook::low_level::channel::Channel;
 <span class="kw">use </span>tof_dataclasses::config::BuildStrategy;
 
 
@@ -1582,9 +1611,11 @@
   <span class="doccomment">/// The interval (in seconds) to retrive CPUMoniData from 
   /// the TOF CPU
   </span><span class="kw">pub </span>cpu_moni_interval_sec      : u64,
-  <span class="doccomment">/// ignore these RB. These RB ids do not exist in the configuration.
-  /// Every RB Id &gt; 50 will be ignored by default
-  </span><span class="kw">pub </span>rb_ignorelist              : Vec&lt;u8&gt;,
+  <span class="doccomment">/// In an intervall from 1-50, these RB simply do not exist
+  /// or might have never existed. Always ingore these
+  </span><span class="kw">pub </span>rb_ignorelist_always       : Vec&lt;u8&gt;,
+  <span class="doccomment">/// ignore these specific RB for this run
+  </span><span class="kw">pub </span>rb_ignorelist_run          : Vec&lt;u8&gt;,
   <span class="doccomment">/// Should TofHits be generated?
   </span><span class="kw">pub </span>run_analysis_engine        : bool,
   <span class="doccomment">/// Settings to control the MTB
@@ -1614,7 +1645,8 @@
       runtime_sec               : <span class="number">0</span>,
       mtb_address               : String::from(<span class="string">"10.0.1.10:50001"</span>),
       cpu_moni_interval_sec     : <span class="number">60</span>,
-      rb_ignorelist             : Vec::&lt;u8&gt;::new(),
+      rb_ignorelist_always      : Vec::&lt;u8&gt;::new(),
+      rb_ignorelist_run         : Vec::&lt;u8&gt;::new(),
       run_analysis_engine       : <span class="bool-val">true</span>,
       mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
@@ -1877,79 +1909,103 @@
 //   pub rat_channel_mask     : HashMap&lt;String, [bool;18]&gt;
 // }
 
-// impl ChannelMaskSettings {
-//   pub fn new() -&gt; Self {
-//     let default_thresholds = HashMap::from([
-//       (String::from("RAT01"), [40.0,32.0,375.0]),
-//       (String::from("RAT02"), [40.0,32.0,375.0]),
-//       (String::from("RAT03"), [40.0,32.0,375.0]),
-//       (String::from("RAT04"), [40.0,32.0,375.0]),
-//       (String::from("RAT05"), [40.0,32.0,375.0]),
-//       (String::from("RAT06"), [40.0,32.0,375.0]),
-//       (String::from("RAT07"), [40.0,32.0,375.0]),
-//       (String::from("RAT08"), [40.0,32.0,375.0]),
-//       (String::from("RAT09"), [40.0,32.0,375.0]),
-//       (String::from("RAT10"), [40.0,32.0,375.0]),
-//       (String::from("RAT11"), [40.0,32.0,375.0]),
-//       (String::from("RAT12"), [40.0,32.0,375.0]),
-//       (String::from("RAT13"), [40.0,32.0,375.0]),
-//       (String::from("RAT14"), [40.0,32.0,375.0]),
-//       (String::from("RAT15"), [40.0,32.0,375.0]),
-//       (String::from("RAT16"), [40.0,32.0,375.0]),
-//       (String::from("RAT17"), [40.0,32.0,375.0]),
-//       (String::from("RAT18"), [40.0,32.0,375.0]),
-//       (String::from("RAT19"), [40.0,32.0,375.0]),
-//       (String::from("RAT20"), [40.0,32.0,375.0])]);
+</span><span class="doccomment">/// Ignore RB channnels
+///
+/// The values in these arrays correspond to 
+/// (physical) channels 1-9
+</span><span class="attr">#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+</span><span class="kw">pub struct </span>ChannelMaskSettings {
+  <span class="doccomment">/// actually apply the below settings
+  </span><span class="kw">pub </span>set_channel_mask   : bool,
+  <span class="doccomment">/// The set strat defines who should acutally set
+  /// the parameters. Will that be done by each board
+  /// independently (ParameterSetStrategy::Board) or
+  /// will a command be sent by liftof-cc 
+  /// (ParameterSetStrategy::ControlServer)
+  </span><span class="kw">pub </span>set_strategy           : ParameterSetStrategy,
+  <span class="doccomment">/// channels to mask (one set of 9 values per RB)
+  /// "true" means the channel is enabled, "false", 
+  /// disabled
+  </span><span class="kw">pub </span>rb_channel_mask     : HashMap&lt;String, [bool;<span class="number">9</span>]&gt;
+}
 
-//       Self {
-//         set_ltb_thresholds    : false,
-//         set_strategy          : ParameterSetStrategy::ControlServer,
-//         rat_ltb_thresholds    : default_thresholds,
-//       }
-//   }
+<span class="kw">impl </span>ChannelMaskSettings {
+  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+    <span class="kw">let </span><span class="kw-2">mut </span>default_thresholds = HashMap::&lt;String, [bool; <span class="number">9</span>]&gt;::new();
+    <span class="kw">for </span>k <span class="kw">in </span><span class="number">1</span>..<span class="number">51 </span>{
+      <span class="kw">let </span>key = <span class="macro">format!</span>(<span class="string">"RB{k:02}"</span>);
+      default_thresholds.insert(key, [<span class="bool-val">true</span>;<span class="number">9</span>]);
+    }
+<span class="comment">//    let default_thresholds = HashMap::from([
+//      (String::from("RAT01"), [false; 9]),
+//      (String::from("RAT02"), [false; 9]),
+//      (String::from("RAT03"), [false; 9]),
+//      (String::from("RAT04"), [false; 9]),
+//      (String::from("RAT05"), [false; 9]),
+//      (String::from("RAT06"), [false; 9]),
+//      (String::from("RAT07"), [false; 9]),
+//      (String::from("RAT08"), [false; 9]),
+//      (String::from("RAT09"), [false; 9]),
+//      (String::from("RAT10"), [false; 9]),
+//      (String::from("RAT11"), [false; 9]),
+//      (String::from("RAT12"), [false; 9]),
+//      (String::from("RAT13"), [false; 9]),
+//      (String::from("RAT14"), [false; 9]),
+//      (String::from("RAT15"), [false; 9]),
+//      (String::from("RAT16"), [false; 9]),
+//      (String::from("RAT17"), [false; 9]),
+//      (String::from("RAT18"), [false; 9]),
+//      (String::from("RAT19"), [false; 9]),
+//      (String::from("RAT20"), [false; 9])]);
 
-//   #[cfg(feature="database")]
-//   pub fn emit_pb_settings_packets(&amp;self, rats : &amp;HashMap&lt;u8,RAT&gt;) -&gt; Vec&lt;TofPacket&gt; {
-//     let mut packets = Vec::&lt;TofPacket&gt;::new();
-//     for k in rats.keys() {
-//       let rat          = &amp;rats[&amp;k];
-//       let rat_key      = format!("RAT{:2}", rat);
-//       let mut cmd      = TofCommandV2::new();
-//       cmd.command_code = TofCommandCode::SetPreampBias;
-//       let mut payload  = PreampBiasConfig::new();
-//       payload.rb_id    = rat.rb2_id as u8;
-//       if *k as usize &gt;= self.rat_preamp_biases.len() {
-//         error!("RAT ID {k} larger than 20!");
-//         continue;
-//       }
-//       payload.biases = self.rat_preamp_biases[&amp;rat_key];
-//       cmd.payload = payload.to_bytestream();
-//       let tp = cmd.pack();
-//       packets.push(tp);
-//     }
-//     packets
-//   }
-// }
+      </span><span class="self">Self </span>{
+        set_channel_mask    : <span class="bool-val">false</span>,
+        set_strategy          : ParameterSetStrategy::ControlServer,
+        rb_channel_mask    : default_thresholds,
+      }
+  }
 
-// impl fmt::Display for PreampSettings {
-//   fn fmt(&amp;self, f: &amp;mut fmt::Formatter) -&gt; fmt::Result {
-//     let disp : String;
-//     match toml::to_string(self) {
-//       Err(err) =&gt; {
-//         error!("Deserialization error! {err}");
-//         disp = String::from("-- DESERIALIZATION ERROR! --");
-//       }
-//       Ok(_disp) =&gt; {
-//         disp = _disp;
-//       }
-//     }
-//     write!(f, "&lt;PreampBiasSettings :\n{}&gt;", disp)
-//   }
-// }
+  <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+  </span><span class="kw">pub fn </span>emit_ch_mask_packets(<span class="kw-2">&amp;</span><span class="self">self</span>, rbs : <span class="kw-2">&amp;</span>HashMap&lt;u8,RAT&gt;) -&gt; Vec&lt;TofPacket&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>packets = Vec::&lt;TofPacket&gt;::new();
+    <span class="kw">for </span>k <span class="kw">in </span>rbs.keys() {
+      <span class="kw">let </span>rb          = <span class="kw-2">&amp;</span>rbs[<span class="kw-2">&amp;</span>k];
+      <span class="kw">let </span>rb_key      = <span class="macro">format!</span>(<span class="string">"RB{:2}"</span>, rb);
+      <span class="kw">let </span><span class="kw-2">mut </span>cmd      = TofCommandV2::new();
+      cmd.command_code = TofCommandCode::SetRBChannelMask;
+      <span class="kw">let </span><span class="kw-2">mut </span>payload  = RBChannelMaskConfig::new();
+      payload.rb_id    = rb.rb2_id <span class="kw">as </span>u8;
+      <span class="kw">if </span><span class="kw-2">*</span>k <span class="kw">as </span>usize &gt;= <span class="self">self</span>.rb_channel_mask.len() {
+        <span class="macro">error!</span>(<span class="string">"RB ID {k} larger than 46!"</span>);
+        <span class="kw">continue</span>;
+      }
+      payload.channels = <span class="self">self</span>.rb_channel_mask[<span class="kw-2">&amp;</span>rb_key];
+      cmd.payload = payload.to_bytestream();
+      <span class="kw">let </span>tp = cmd.pack();
+      packets.push(tp);
+    }
+    packets
+  }
+}
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ChannelMaskSettings {
+  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">let </span>disp : String;
+    <span class="kw">match </span>toml::to_string(<span class="self">self</span>) {
+      <span class="prelude-val">Err</span>(err) =&gt; {
+        <span class="macro">error!</span>(<span class="string">"Deserialization error! {err}"</span>);
+        disp = String::from(<span class="string">"-- DESERIALIZATION ERROR! --"</span>);
+      }
+      <span class="prelude-val">Ok</span>(_disp) =&gt; {
+        disp = _disp;
+      }
+    }
+    <span class="macro">write!</span>(f, <span class="string">"&lt;RBChannelMaskConfig :\n{}&gt;"</span>, disp)
+  }
+}
 
-// impl Default for PreampSettings {
-//   fn default() -&gt; Self {
-//     Self::new()
-//   }
-// }
-</span></code></pre></div></section></main></body></html>
+<span class="kw">impl </span>Default <span class="kw">for </span>ChannelMaskSettings {
+  <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+    <span class="self">Self</span>::new()
+  }
+}
+</code></pre></div></section></main></body></html>

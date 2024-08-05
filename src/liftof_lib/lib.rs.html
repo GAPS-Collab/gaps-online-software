@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0 (129f3b996 2024-06-10)" data-channel="1.79.0" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../liftof_lib/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1393,6 +1393,11 @@
 <a href="#1393" id="1393">1393</a>
 <a href="#1394" id="1394">1394</a>
 <a href="#1395" id="1395">1395</a>
+<a href="#1396" id="1396">1396</a>
+<a href="#1397" id="1397">1397</a>
+<a href="#1398" id="1398">1398</a>
+<a href="#1399" id="1399">1399</a>
+<a href="#1400" id="1400">1400</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
 <span class="kw">pub mod </span>settings;
 <span class="kw">pub mod </span>constants;
@@ -1423,6 +1428,8 @@
     Mutex,
 };
 <span class="kw">use </span>std::process::exit;
+
+<span class="kw">use </span>core::f32::consts::PI;
 
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">use </span>half::f16;
@@ -1474,19 +1481,18 @@
 };
 <span class="comment">//use ndarray::{array, Array1};
 //use nlopt::{Algorithm, Objective, Optimization, Result};
+</span><span class="kw">use </span>nalgebra::Matrix3;
+<span class="kw">use </span>nalgebra::Vector3;
 
-</span><span class="kw">use </span>tof_dataclasses::DsiLtbRBMapping;
+
+<span class="kw">use </span>tof_dataclasses::DsiLtbRBMapping;
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">use </span>tof_dataclasses::database::ReadoutBoard;
 <span class="comment">//use tof_dataclasses::threading::{
 //    ThreadControl,
 //};
 
-</span><span class="kw">use </span>nalgebra::Vector3;
-<span class="kw">use </span>nalgebra::Matrix3;
-<span class="kw">use </span>core::f64::consts::PI;
-
-<span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">use </span>tof_dataclasses::constants::NWORDS;
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">use </span>tof_dataclasses::calibrations::find_zero_crossings;
@@ -1809,30 +1815,30 @@
 /// This here is bad, because it does not interpolate between 
 /// the bins
 </span><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
-</span><span class="comment">// fn fit_sine(time: &amp;Vec&lt;f32&gt;, data: &amp;Vec&lt;f32&gt;) -&gt; (f32, f32, f32) {
-//   let z_cross   = find_zero_crossings(&amp;data);
-//   let mut y_max = f32::MIN;
-//   let mut y_min = f32::MAX;
-//   for y in data {
-//     if *y &gt; y_max {
-//       y_max = *y;
-//     }
-//     if *y &lt; y_min {
-//       y_min = *y;
-//     }
-//   }
-//   let amp   = f32::abs(y_max - y_min)/2.0;
-//   let mut phase = 0.0;
-//   let mut freq  = 0.0;
-//   if z_cross.len() &gt;= 3 {
-//     phase = time[z_cross[0]];
-//     freq  = 1.0/(time[z_cross[2]] - time[z_cross[0]]);
-//   }
-//   (amp,freq,phase)
-// }
+</span><span class="kw">fn </span>fit_sine(time: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;, data: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;) -&gt; (f32, f32, f32) {
+  <span class="kw">let </span>z_cross   = find_zero_crossings(<span class="kw-2">&amp;</span>data);
+  <span class="kw">let </span><span class="kw-2">mut </span>y_max = f32::MIN;
+  <span class="kw">let </span><span class="kw-2">mut </span>y_min = f32::MAX;
+  <span class="kw">for </span>y <span class="kw">in </span>data {
+    <span class="kw">if </span><span class="kw-2">*</span>y &gt; y_max {
+      y_max = <span class="kw-2">*</span>y;
+    }
+    <span class="kw">if </span><span class="kw-2">*</span>y &lt; y_min {
+      y_min = <span class="kw-2">*</span>y;
+    }
+  }
+  <span class="kw">let </span>amp   = f32::abs(y_max - y_min)/<span class="number">2.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>phase = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>freq  = <span class="number">0.0</span>;
+  <span class="kw">if </span>z_cross.len() &gt;= <span class="number">3 </span>{
+    phase = time[z_cross[<span class="number">0</span>]];
+    freq  = <span class="number">1.0</span>/(time[z_cross[<span class="number">2</span>]] - time[z_cross[<span class="number">0</span>]]);
+  }
+  (amp,freq,phase)
+}
 
-// sydney's version in rust
-</span><span class="kw">fn </span>fit_sine(volts: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;, times: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;) -&gt; (f32, f32, f32) {
+<span class="comment">// sydney's version in rust
+</span><span class="kw">fn </span>fit_sine_sydney(volts: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;, times: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;) -&gt; f32 {
   <span class="kw">let </span>start_bin = <span class="number">20</span>;
   <span class="kw">let </span>size_bin  = <span class="number">900</span>; <span class="comment">// can probably make this smaller
 
@@ -1848,12 +1854,12 @@
   <span class="kw">let </span><span class="kw-2">mut </span>zi_sum    = <span class="number">0.0</span>;
 
   <span class="kw">for </span>i <span class="kw">in </span>start_bin..start_bin+size_bin {
-      <span class="kw">let </span>xi = (<span class="number">2.0 </span>* pi * <span class="number">0.02 </span>* times[i] <span class="kw">as </span>f64).cos();  <span class="comment">// for this fit we know the frequency is 0.02 waves/ns
-      </span><span class="kw">let </span>yi = (<span class="number">2.0 </span>* pi * <span class="number">0.02 </span>* times[i] <span class="kw">as </span>f64).sin();
+      <span class="kw">let </span>xi = (<span class="number">2.0 </span>* pi * <span class="number">0.02 </span>* times[i] <span class="kw">as </span>f32).cos();  <span class="comment">// for this fit we know the frequency is 0.02 waves/ns
+      </span><span class="kw">let </span>yi = (<span class="number">2.0 </span>* pi * <span class="number">0.02 </span>* times[i] <span class="kw">as </span>f32).sin();
       <span class="kw">let </span>zi = volts[i];
       xi_yi      += xi * yi;
-      xi_zi      += xi * (zi <span class="kw">as </span>f64);
-      yi_zi      += yi * (zi <span class="kw">as </span>f64);
+      xi_zi      += xi * (zi <span class="kw">as </span>f32);
+      yi_zi      += yi * (zi <span class="kw">as </span>f32);
       xi_xi      += xi * xi;
       yi_yi      += yi * yi;
       xi_sum     += xi;
@@ -1864,22 +1870,25 @@
   <span class="kw">let </span>a_matrix = Matrix3::new(
     xi_xi, xi_yi, xi_sum,
     xi_yi, yi_yi, yi_sum,
-    xi_sum, yi_sum, data_size <span class="kw">as </span>f64
-);
-
-<span class="kw">let </span>determinant = a_matrix.determinant();
-<span class="kw">let </span>inv_matrix = a_matrix.try_inverse().expect(<span class="string">"Matrix is not invertible"</span>);
-
-<span class="kw">let </span>p = Vector3::new(xi_zi, yi_zi, zi_sum.into());
-<span class="kw">let </span>result = inv_matrix * p;
-
-<span class="kw">let </span>a = result[<span class="number">0</span>];
-<span class="kw">let </span>b = result[<span class="number">1</span>];
-<span class="comment">// let c = result[2]; // offset parameter if needed
-
-</span><span class="kw">let </span>phi = a.atan2(b);
-
-(<span class="number">0.0</span>, <span class="number">0.0</span>, phi <span class="kw">as </span>f32)
+    xi_sum, yi_sum, data_size <span class="kw">as </span>f32
+  );
+  
+  <span class="kw">let </span>determinant = a_matrix.determinant();
+  <span class="kw">match </span>a_matrix.try_inverse() {
+    <span class="prelude-val">Some</span>(inv_matrix) =&gt; {
+      <span class="kw">let </span>p = Vector3::new(xi_zi, yi_zi, zi_sum);
+      <span class="kw">let </span>result = inv_matrix * p;
+      <span class="kw">let </span>a = result[<span class="number">0</span>];
+      <span class="kw">let </span>b = result[<span class="number">1</span>];
+      <span class="comment">// let c = result[2]; // offset parameter if needed
+      </span><span class="kw">let </span>phi = a.atan2(b);
+      <span class="kw">return </span>phi <span class="kw">as </span>f32;
+    }
+    <span class="prelude-val">None </span>=&gt; {
+      <span class="macro">error!</span>(<span class="string">"Finding invers matrix failed!"</span>);
+      <span class="kw">return </span><span class="number">99.9</span>;
+    }
+  }
 }
 
 <span class="comment">//*************************************************
@@ -1986,9 +1995,10 @@
     </span>rb.calibration.nanoseconds(<span class="number">9</span>,
                                event.header.stop_cell <span class="kw">as </span>usize,
                                <span class="kw-2">&amp;mut </span>times);
-    fit_result = fit_sine(<span class="kw-2">&amp;</span>voltages, <span class="kw-2">&amp;</span>times);
+    <span class="kw">let </span>fit_result_phi = fit_sine_sydney(<span class="kw-2">&amp;</span>times, <span class="kw-2">&amp;</span>voltages);
     <span class="comment">//println!("FIT RESULT = {:?}", fit_result);
-    </span>event.header.set_sine_fit(fit_result);
+    </span>fit_result = (<span class="number">0.0</span>, <span class="number">0.0</span>, fit_result_phi <span class="kw">as </span>f32);
+    event.header.set_sine_fit(fit_result);
   }
 
   <span class="comment">// structure to store final result

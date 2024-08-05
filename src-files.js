@@ -318,7 +318,8 @@ var srcIndex = new Map(JSON.parse('[\
 ["wide",["",[],["f32x4_.rs","f32x8_.rs","f64x2_.rs","f64x4_.rs","i16x16_.rs","i16x8_.rs","i32x4_.rs","i32x8_.rs","i64x2_.rs","i64x4_.rs","i8x16_.rs","i8x32_.rs","lib.rs","macros.rs","u16x16_.rs","u16x8_.rs","u32x4_.rs","u32x8_.rs","u64x2_.rs","u64x4_.rs","u8x16_.rs"]]],\
 ["winnow",["",[["ascii",[],["mod.rs"]],["binary",[["bits",[],["mod.rs"]]],["mod.rs"]],["combinator",[["debug",[],["mod.rs"]]],["branch.rs","core.rs","mod.rs","multi.rs","parser.rs","sequence.rs"]],["macros",[],["dispatch.rs","mod.rs","seq.rs"]],["stream",[],["impls.rs","mod.rs"]],["token",[],["mod.rs"]]],["error.rs","lib.rs","parser.rs"]]],\
 ["xxhash_rust",["",[],["lib.rs","xxh3.rs","xxh32_common.rs","xxh3_common.rs","xxh64_common.rs"]]],\
-["zerocopy",["",[["third_party",[["rust",[],["layout.rs"]]]]],["lib.rs","macro_util.rs","macros.rs","post_monomorphization_compile_fail_tests.rs","util.rs","wrappers.rs"]]],\
+["zerocopy",["",[["third_party",[["rust",[],["layout.rs"]]]]],["byteorder.rs","lib.rs","macro_util.rs","macros.rs","post_monomorphization_compile_fail_tests.rs","util.rs","wrappers.rs"]]],\
+["zerocopy_derive",["",[],["ext.rs","lib.rs","repr.rs"]]],\
 ["zeroize",["",[],["lib.rs","x86.rs"]]],\
 ["zmq",["",[],["lib.rs","message.rs","sockopt.rs"]]],\
 ["zmq_sys",["",[],["errno.rs","ffi.rs","lib.rs","unix.rs"]]]\
