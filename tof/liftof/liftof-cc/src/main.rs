@@ -193,7 +193,6 @@ fn main() {
   println!(" >> It connects to the MasterTriggerBoard and the ReadoutBoards");
   println!("-----------------------------------------------\n\n");
 
-  //panic!("auf der titanic!");
   // settings 
   //let foo = LiftofSettings::new();
   //foo.to_toml(String::from("foo-settings.toml"));
@@ -223,10 +222,11 @@ fn main() {
   let nboards         : usize;
   let args              = LiftofCCArgs::parse();
   let verbose           = args.verbose;
-  
+  let cfg_file_str   : String; 
   match args.config {
     None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
     Some(cfg_file) => {
+      cfg_file_str = cfg_file.clone();
       match LiftofSettings::from_toml(cfg_file) {
         Err(err) => {
           error!("CRITICAL! Unable to parse .toml settings file! {}", err);
@@ -289,7 +289,50 @@ fn main() {
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
     },
   }
-  //let mut handles = Vec::<std::thread::JoinHandle<_>>::new();
+  
+  println!("=> Copying config to all RBs!");
+  let mut children = Vec::<(u8,Child)>::new();
+  for rb in &rb_list {
+    // also populate the rb thread nandles
+    rb_handles.push(thread::spawn(||{}));
+    
+    let rb_address = format!("tof-rb{:02}:config/liftof-config.toml", rb.rb_id);
+    match Command::new("scp")
+      .args([&cfg_file_str, &rb_address])
+      .spawn() {
+      Err(err) => {
+        error!("Unable to spawn ssh process to copy config on RB {}! {}", rb.rb_id, err);
+      }
+      Ok(child) => {
+        children.push((rb.rb_id,child));
+      }
+    }
+  }
+  let mut issues = Vec::<u8>::new();
+  for rb_child in &mut children {
+    match rb_child.1.wait() {
+      Err(err) => {
+        error!("Child process failed with stderr {:?}! {}", rb_child.1.stderr, err);
+      }
+      Ok(status) => {
+        if status.success() {
+          info!("Copied config to RB {} successfully!", rb_child.0);
+          //println!("=> Restarted liftof-rb on {} successfully \u{1F389}!", rb_child.0)
+        } else {
+          error!("Copy config to RB {} failed with exit code {:?}!", rb_child.0, status.code());
+          issues.push(rb_child.0);
+        }
+      }
+    }
+  }
+  if issues.len() == 0 {
+    println!("=> Copied config to all RBs successfully \u{1F389}!");
+    info!("Copied config to all RBs successfully!");
+  }
+  
+  // FIXME - this needs to be a function
+  // copy the current config file on all RBs
+  rb_handles.clear();
   println!("=> Restarting liftof-rb clients on all RBs!");
   let mut children = Vec::<(u8,Child)>::new();
   for rb in &rb_list {
@@ -329,7 +372,8 @@ fn main() {
     println!("=> Restarted liftof-rb on all RBs successfully \u{1F389}!");
     info!("=> Restarted liftof-rb on all RBs successfully!");
   }
-  
+
+
   let mtb_link_id_map = get_linkid_rbid_map(&rb_list);
   // A global kill timer
   let program_start = Instant::now();

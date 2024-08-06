@@ -625,6 +625,9 @@ pub struct LiftofSettings {
   pub cmd_dispatcher_settings    : CommandDispatcherSettings,
   /// Settings for the individual RBs
   pub rb_settings                : RBSettings,
+  /// Mask individual channels (e.g. dead preamps) 
+  /// for the readout boards
+  pub rb_channel_mask            : ChannelMaskSettings,
   /// Preamp configuration
   pub preamp_settings            : PreampSettings,
   /// LTB threshold configuration
@@ -649,6 +652,7 @@ impl LiftofSettings {
       data_publisher_settings   : DataPublisherSettings::new(),
       cmd_dispatcher_settings   : CommandDispatcherSettings::new(),
       rb_settings               : RBSettings::new(),
+      rb_channel_mask           : ChannelMaskSettings::new(),
       preamp_settings           : PreampSettings::new(),
       ltb_settings              : LTBThresholdSettings::new(),
     }
