@@ -50,7 +50,6 @@ use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 
 use colored::{
     Colorize,
-    ColoredString
 };
 
 use tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
@@ -117,27 +116,27 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   //let mut event_sending      = 0;
   let mut n_mte_received_tot   = 0u64;
   let mut n_mte_skipped        = 0u32;
-  let mut n_rbe_received_tot   = 0u64;
-  let mut n_rbe_discarded_tot  = 0u64;
+  let n_rbe_received_tot   = 0u64;
+  let n_rbe_discarded_tot  = 0u64;
   let mut first_evid           : u32;
   let mut last_evid            = 0;
   let mut n_sent               = 0usize;
   let mut n_sent_ch_err        = 0usize;
-  let mut n_timed_out          = 0usize; 
+  let n_timed_out          = 0usize; 
   // debug
   let mut last_rb_evid         = 0u32;
   let mut n_rbe_per_te         = 0usize;
-  let mut rb_ev_wo_mte         = 0usize;
-  let mut n_rbe_from_past      = 0usize;
-  let mut n_rbe_orphan         = 0usize;
+  let rb_ev_wo_mte         = 0usize;
+  let n_rbe_from_past      = 0usize;
+  let n_rbe_orphan         = 0usize;
   let mut debug_timer          = Instant::now();
-  let mut met_seconds          = 0f64;  
+  let met_seconds          = 0f64;  
   //let mut n_receiving_errors  = 0;
   let mut check_tc_update      = Instant::now();
   let mut n_gathered_fr_cache  = 0usize;
   let mut misaligned_cache_err = 0usize; 
-  let mut daq_reset_cooldown   = Instant::now();
-  let mut reset_daq_flag       = false;
+  let daq_reset_cooldown   = Instant::now();
+  let reset_daq_flag       = false;
   let mut retire               = false;
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
@@ -603,7 +602,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               BuildStrategy::WaitForNBoards => {
                 // we will always wait for the expected number of boards, 
                 // FIXME - make this a member of settings
-                let wait_nrb : usize = 40;
+                let _wait_nrb : usize = 40;
                 // except the event times out
                 if ev.rb_events.len() as u8 == settings.wait_nrb {
                   ready_to_send = true;
@@ -659,7 +658,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             // (optionally) produced tof event summary if the 
             // event has isuses
             n_rbe_per_te  += ev_to_send.rb_events.len(); 
-            let ev_satus  = ev_to_send.mt_event.event_status;
+            let _ev_satus  = ev_to_send.mt_event.event_status;
             for ev in &ev_to_send.rb_events {
               if ev.status == EventStatus::CellSyncErrors || ev.status == EventStatus::ChnSyncErrors {
                 ev_to_send.mt_event.event_status = EventStatus::AnyDataMangling {
