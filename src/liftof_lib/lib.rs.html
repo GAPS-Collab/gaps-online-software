@@ -1398,6 +1398,9 @@
 <a href="#1398" id="1398">1398</a>
 <a href="#1399" id="1399">1399</a>
 <a href="#1400" id="1400">1400</a>
+<a href="#1401" id="1401">1401</a>
+<a href="#1402" id="1402">1402</a>
+<a href="#1403" id="1403">1403</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
 <span class="kw">pub mod </span>settings;
 <span class="kw">pub mod </span>constants;
@@ -1483,7 +1486,7 @@
 //use nlopt::{Algorithm, Objective, Optimization, Result};
 </span><span class="kw">use </span>nalgebra::Matrix3;
 <span class="kw">use </span>nalgebra::Vector3;
-
+<span class="kw">use </span>nalgebra::RowVector3;
 
 <span class="kw">use </span>tof_dataclasses::DsiLtbRBMapping;
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
@@ -1873,11 +1876,14 @@
     xi_sum, yi_sum, data_size <span class="kw">as </span>f32
   );
   
-  <span class="kw">let </span>determinant = a_matrix.determinant();
-  <span class="kw">match </span>a_matrix.try_inverse() {
+  <span class="comment">//let determinant = a_matrix.determinant(); unused bc we find inverse directly
+  </span><span class="kw">match </span>a_matrix.try_inverse() {
     <span class="prelude-val">Some</span>(inv_matrix) =&gt; {
       <span class="kw">let </span>p = Vector3::new(xi_zi, yi_zi, zi_sum);
-      <span class="kw">let </span>result = inv_matrix * p;
+      <span class="comment">// Transpose the Vector3 to get a RowVector3
+      </span><span class="kw">let </span>p_transposed: RowVector3&lt;f32&gt; = p.transpose();
+      <span class="comment">//let result = inv_matrix * p;
+      </span><span class="kw">let </span>result = p_transposed * inv_matrix;
       <span class="kw">let </span>a = result[<span class="number">0</span>];
       <span class="kw">let </span>b = result[<span class="number">1</span>];
       <span class="comment">// let c = result[2]; // offset parameter if needed
