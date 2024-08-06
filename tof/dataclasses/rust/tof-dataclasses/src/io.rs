@@ -183,10 +183,12 @@ pub fn read_file(filename: &Path) -> io::Result<Vec<u8>> {
 /// as a generator for RBEvents
 pub struct RBEventMemoryStreamer {
   /// Raw stream read out from the RB buffers.
-  pub stream         : Vec<u8>,
+  pub stream               : Vec<u8>,
   /// Error checking mode - check error bits for 
   /// channels/cells
   pub check_channel_errors : bool,
+  /// Ignore channels in this list
+  pub mask                 : Vec<u8>,
 
   /// Current position in the stream
   pos                      : usize,
@@ -229,6 +231,7 @@ impl RBEventMemoryStreamer {
     Self {
       stream               : Vec::<u8>::new(),
       check_channel_errors : false,
+      mask                 : Vec::<u8>::new(),
       pos                  : 0,
       pos_at_head          : false,
       tp_sender            : None,
@@ -477,7 +480,7 @@ impl RBEventMemoryStreamer {
     // they are dna, rsv, rsv, rsv, fw_hash
     self.pos += 10;
     self.pos += 1; // rb id first byte is rsvd
-    header.rb_id        =  parse_u8(&self.stream, &mut self.pos);
+    header.rb_id        = parse_u8(&self.stream, &mut self.pos);
     header.channel_mask = parse_u16(&self.stream, &mut self.pos); 
     match replace_channel_mask {
       None => (),
@@ -529,7 +532,12 @@ impl RBEventMemoryStreamer {
     //                           + header.get_channels().len()*2 
     //                           + header.get_channels().len()*4;
     let mut any_cell_error = false;
-    for ch in header.get_channels().iter() {
+    let mut header_channels = header.get_channels().clone();
+    for k in &self.mask {
+      header_channels.retain(|x| x != k);
+    }
+
+    for ch in header_channels.iter() {
       let ch_id = parse_u16(&self.stream, &mut self.pos);
       if ch_id != *ch as u16 {
         // check where is the next header
