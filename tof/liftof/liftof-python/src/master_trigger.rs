@@ -16,8 +16,8 @@ use tof_dataclasses::events::MasterTriggerEvent;
 use liftof_lib::master_trigger::registers::*;
 use liftof_lib::master_trigger as mt_api;
 
-use crate::dataclasses::{
-    PyMasterTriggerEvent,
+use rpy_tof_dataclasses::dataclasses::{
+  PyMasterTriggerEvent,
 };
 
 #[pyclass]
@@ -873,7 +873,7 @@ impl PyMasterTrigger {
   
   fn set_tiu_busy_ignore(&mut self, bsy : bool) -> PyResult<()> {
     match TIU_BUSY_IGNORE.set(&mut self.ipbus, bsy as u32) {
-      Ok(bsy) => {
+      Ok(_) => {
         return Ok(());
       }
       Err(err) => {
