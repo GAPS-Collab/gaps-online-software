@@ -702,7 +702,6 @@
 <a href="#702" id="702">702</a>
 <a href="#703" id="703">703</a>
 <a href="#704" id="704">704</a>
-<a href="#705" id="705">705</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::thread;
 <span class="kw">use </span>std::time::{
     Instant,
@@ -755,7 +754,6 @@
 
 <span class="kw">use </span>colored::{
     Colorize,
-    ColoredString
 };
 
 <span class="kw">use </span>tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
@@ -822,27 +820,27 @@
   //let mut event_sending      = 0;
   </span><span class="kw">let </span><span class="kw-2">mut </span>n_mte_received_tot   = <span class="number">0u64</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_mte_skipped        = <span class="number">0u32</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_received_tot   = <span class="number">0u64</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_discarded_tot  = <span class="number">0u64</span>;
+  <span class="kw">let </span>n_rbe_received_tot   = <span class="number">0u64</span>;
+  <span class="kw">let </span>n_rbe_discarded_tot  = <span class="number">0u64</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>first_evid           : u32;
   <span class="kw">let </span><span class="kw-2">mut </span>last_evid            = <span class="number">0</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_sent               = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_sent_ch_err        = <span class="number">0usize</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_timed_out          = <span class="number">0usize</span>; 
+  <span class="kw">let </span>n_timed_out          = <span class="number">0usize</span>; 
   <span class="comment">// debug
   </span><span class="kw">let </span><span class="kw-2">mut </span>last_rb_evid         = <span class="number">0u32</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_per_te         = <span class="number">0usize</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>rb_ev_wo_mte         = <span class="number">0usize</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_from_past      = <span class="number">0usize</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_orphan         = <span class="number">0usize</span>;
+  <span class="kw">let </span>rb_ev_wo_mte         = <span class="number">0usize</span>;
+  <span class="kw">let </span>n_rbe_from_past      = <span class="number">0usize</span>;
+  <span class="kw">let </span>n_rbe_orphan         = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>debug_timer          = Instant::now();
-  <span class="kw">let </span><span class="kw-2">mut </span>met_seconds          = <span class="number">0f64</span>;  
+  <span class="kw">let </span>met_seconds          = <span class="number">0f64</span>;  
   <span class="comment">//let mut n_receiving_errors  = 0;
   </span><span class="kw">let </span><span class="kw-2">mut </span>check_tc_update      = Instant::now();
   <span class="kw">let </span><span class="kw-2">mut </span>n_gathered_fr_cache  = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>misaligned_cache_err = <span class="number">0usize</span>; 
-  <span class="kw">let </span><span class="kw-2">mut </span>daq_reset_cooldown   = Instant::now();
-  <span class="kw">let </span><span class="kw-2">mut </span>reset_daq_flag       = <span class="bool-val">false</span>;
+  <span class="kw">let </span>daq_reset_cooldown   = Instant::now();
+  <span class="kw">let </span>reset_daq_flag       = <span class="bool-val">false</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>retire               = <span class="bool-val">false</span>;
   <span class="kw">loop </span>{
     <span class="kw">if </span>check_tc_update.elapsed().as_secs() &gt; <span class="number">2 </span>{
@@ -1308,7 +1306,7 @@
               BuildStrategy::WaitForNBoards =&gt; {
                 <span class="comment">// we will always wait for the expected number of boards, 
                 // FIXME - make this a member of settings
-                </span><span class="kw">let </span>wait_nrb : usize = <span class="number">40</span>;
+                </span><span class="kw">let </span>_wait_nrb : usize = <span class="number">40</span>;
                 <span class="comment">// except the event times out
                 </span><span class="kw">if </span>ev.rb_events.len() <span class="kw">as </span>u8 == settings.wait_nrb {
                   ready_to_send = <span class="bool-val">true</span>;
@@ -1364,7 +1362,7 @@
             // (optionally) produced tof event summary if the 
             // event has isuses
             </span>n_rbe_per_te  += ev_to_send.rb_events.len(); 
-            <span class="kw">let </span>ev_satus  = ev_to_send.mt_event.event_status;
+            <span class="kw">let </span>_ev_satus  = ev_to_send.mt_event.event_status;
             <span class="kw">for </span>ev <span class="kw">in </span><span class="kw-2">&amp;</span>ev_to_send.rb_events {
               <span class="kw">if </span>ev.status == EventStatus::CellSyncErrors || ev.status == EventStatus::ChnSyncErrors {
                 ev_to_send.mt_event.event_status = EventStatus::AnyDataMangling {

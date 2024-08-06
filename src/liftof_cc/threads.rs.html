@@ -14,14 +14,14 @@
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>readoutboard_comm;
 <span class="kw">pub mod </span>event_builder;
 <span class="kw">pub mod </span>global_data_sink;
-<span class="attr">#[cfg(features=<span class="string">"tof-ctrl"</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"tof-ctrl"</span>)]
 </span><span class="kw">pub mod </span>monitoring;
 <span class="kw">pub mod </span>command_dispatcher;
 
 <span class="kw">pub use </span><span class="self">self</span>::event_builder::event_builder;
 <span class="kw">pub use </span><span class="self">self</span>::readoutboard_comm::readoutboard_communicator;
 <span class="kw">pub use </span><span class="self">self</span>::global_data_sink::global_data_sink;
-<span class="attr">#[cfg(features=<span class="string">"tof-ctrl"</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"tof-ctrl"</span>)]
 </span><span class="kw">pub use </span><span class="self">self</span>::monitoring::monitor_cpu;
 <span class="kw">pub use </span><span class="self">self</span>::command_dispatcher::command_dispatcher;
 </code></pre></div></section></main></body></html>
