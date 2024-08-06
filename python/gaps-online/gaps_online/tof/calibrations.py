@@ -128,11 +128,11 @@ def plot_tbins(self, bins=20):
 
 if cxx_api_loaded:
     # monkey patch the C++ API RBEvent
-    #gt.RBCalibration.plot_offsets = plot_offsets
-    #gt.RBCalibration.plot_dips    = plot_dips
-    #gt.RBCalibration.plot_incs    = plot_incs
-    #gt.RBCalibration.plot_tbins   = plot_tbins
-    #RBCalibration = gt.RBCalibration
+    gt.RBCalibration.plot_offsets = plot_offsets
+    gt.RBCalibration.plot_dips    = plot_dips
+    gt.RBCalibration.plot_incs    = plot_incs
+    gt.RBCalibration.plot_tbins   = plot_tbins
+    RBCalibration = gt.RBCalibration
 
 ## convenience functions
 def load_calibrations_rapi(cali_dir : Path, load_event_data = False):
