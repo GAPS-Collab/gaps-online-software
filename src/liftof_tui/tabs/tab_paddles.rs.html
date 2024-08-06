@@ -535,9 +535,6 @@
 <a href="#535" id="535">535</a>
 <a href="#536" id="536">536</a>
 <a href="#537" id="537">537</a>
-<a href="#538" id="538">538</a>
-<a href="#539" id="539">539</a>
-<a href="#540" id="540">540</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{
     HashMap,
     VecDeque,
@@ -762,11 +759,11 @@
         <span class="kw">let </span><span class="kw-2">mut </span>bl_a  = <span class="number">0f32</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>bl_b  = <span class="number">0f32</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>rms_a = <span class="number">0f32</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>rms_b = <span class="number">0f32</span>;
+        <span class="kw">let </span>rms_b = <span class="number">0f32</span>;
         <span class="kw">for </span><span class="kw-2">mut </span>wf <span class="kw">in </span>wfs {
           <span class="kw">if </span>wf.rb_id == <span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8 {
             <span class="kw">match </span><span class="self">self</span>.calibrations.lock() {
-              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to get lock on rbcalibrations!"</span>),
+              <span class="prelude-val">Err</span>(_err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to get lock on rbcalibrations!"</span>),
               <span class="prelude-val">Ok</span>(cali) =&gt; {
                 <span class="kw">match </span>cali.get(<span class="kw-2">&amp;</span>wf.rb_id) {
                   <span class="prelude-val">None </span>=&gt; <span class="macro">error!</span>(<span class="string">"RBCalibrations for board {} not available!"</span>, wf.rb_id),
@@ -787,7 +784,6 @@
               <span class="kw">if </span>wf.voltages.len() &gt; <span class="number">0 </span>{
                 <span class="kw">let </span>ped = calculate_pedestal(<span class="kw-2">&amp;</span>wf.voltages, <span class="number">10.0</span>, <span class="number">850</span>, <span class="number">100</span>);
                 bl_a  = ped.<span class="number">0</span>;
-                rms_a = ped.<span class="number">1</span>;
                 <span class="self">self</span>.baseline_ch_a.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>bl_a);
                 <span class="self">self</span>.baseline_rms_ch_a.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>bl_a);
               }
@@ -854,7 +850,7 @@
             }
           }
         }
-        <span class="kw">let </span><span class="kw-2">mut </span>view_string : String;
+        <span class="kw">let </span>view_string : String;
         <span class="kw">match </span><span class="self">self</span>.all_paddles.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.pdl_selector <span class="kw">as </span>u8)) {
           <span class="prelude-val">Some</span>(_pd) =&gt; {
             view_string = <span class="macro">format!</span>(<span class="string">"{}"</span>, _pd);
@@ -961,8 +957,7 @@
             <span class="self">self</span>.last_wf_ch_b = wf_data_b.clone();
           }
         }
-        <span class="kw">let </span>len_wf_data_a = wf_data_a.len();
-        <span class="kw">let </span>len_wf_data_b = wf_data_b.len();
+        
         <span class="kw">if </span>wf_data_a.len() == <span class="number">0 </span>{
           wf_data_a = <span class="self">self</span>.last_wf_ch_a.clone();
         }
@@ -989,25 +984,25 @@
                             <span class="self">self</span>.charge_b.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap()[k]));
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>charge_plot = Canvas::default()
+        <span class="kw">let </span>charge_plot = Canvas::default()
           .block(Block::bordered().title(<span class="string">"Charge AvsB"</span>))
           .marker(Marker::Braille)
           .paint(|ctx| {
-            <span class="kw">let </span><span class="kw-2">mut </span>xaxis  = canvas::Line {
-              x1 : <span class="number">0.0</span>,
-              x2 : <span class="number">30.0</span>,
-              y1 : <span class="number">0.0</span>,
-              y2 : <span class="number">0.0</span>,
-              color : <span class="self">self</span>.theme.fg0
-            };
-            <span class="kw">let </span><span class="kw-2">mut </span>yaxis  = canvas::Line {
-              x1 : <span class="number">0.0</span>,
-              x2 : <span class="number">0.0</span>,
-              y1 : <span class="number">0.0</span>,
-              y2 : <span class="number">30.0</span>,
-              color : <span class="self">self</span>.theme.fg0
-            };
-            <span class="kw">let </span><span class="kw-2">mut </span>points = Points {
+            <span class="comment">// let xaxis  = canvas::Line {
+            //   x1 : 0.0,
+            //   x2 : 30.0,
+            //   y1 : 0.0,
+            //   y2 : 0.0,
+            //   color : self.theme.fg0
+            // };
+            // let yaxis  = canvas::Line {
+            //   x1 : 0.0,
+            //   x2 : 0.0,
+            //   y1 : 0.0,
+            //   y2 : 30.0,
+            //   color : self.theme.fg0
+            // };
+            </span><span class="kw">let </span>points = Points {
               coords : <span class="kw-2">&amp;</span>ch2d_points.as_slice(),
               color  : <span class="self">self</span>.theme.hc,
             };
@@ -1025,19 +1020,18 @@
       <span class="kw">let </span>bl_a_chart  = histogram(bl_a_data, String::from(<span class="string">"Baseline Side A [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
       frame.render_widget(bl_a_chart, bla_lo[<span class="number">0</span>]);
       
-      <span class="kw">let </span>bl_a_rms_labels = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_rms_ch_a.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap());
       <span class="kw">let </span>bl_a_rms_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_rms_ch_a.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
       <span class="kw">let </span>bl_a_rms_chart  = histogram(bl_a_rms_data, String::from(<span class="string">"Baseline RMS Side A [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
       frame.render_widget(bl_a_rms_chart, bla_lo[<span class="number">1</span>]);
       
       <span class="comment">// B side
-      </span><span class="kw">let </span>bl_b_labels = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_ch_b.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap());
-      <span class="kw">let </span>bl_b_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_ch_b.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
+      // let bl_b_labels = create_labels(&amp;self.baseline_ch_b.get(&amp;(self.current_paddle.paddle_id as u8)).unwrap());
+      </span><span class="kw">let </span>bl_b_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_ch_b.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
       <span class="kw">let </span>bl_b_chart  = histogram(bl_b_data, String::from(<span class="string">"Baseline Side B [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
       frame.render_widget(bl_b_chart, blb_lo[<span class="number">0</span>]);
       
-      <span class="kw">let </span>bl_b_rms_labels = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_rms_ch_b.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap());
-      <span class="kw">let </span>bl_b_rms_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_rms_ch_b.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
+      <span class="comment">// let bl_b_rms_labels = create_labels(&amp;self.baseline_rms_ch_b.get(&amp;(self.current_paddle.paddle_id as u8)).unwrap());
+      </span><span class="kw">let </span>bl_b_rms_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_rms_ch_b.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
       <span class="kw">let </span>bl_b_rms_chart  = histogram(bl_b_rms_data, String::from(<span class="string">"Baseline RMS Side B [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
       frame.render_widget(bl_b_rms_chart, blb_lo[<span class="number">1</span>]);
 
