@@ -488,7 +488,7 @@ fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f32 {
       return phi as f32;
     }
     None => {
-      error!("Finding invers matrix failed!");
+      error!("Finding inverse matrix failed!");
       return 99.9;
     }
   }
