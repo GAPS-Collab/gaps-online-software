@@ -83,7 +83,7 @@ use signal_hook::consts::signal::{
 //use nlopt::{Algorithm, Objective, Optimization, Result};
 use nalgebra::Matrix3;
 use nalgebra::Vector3;
-
+use nalgebra::RowVector3;
 
 use tof_dataclasses::DsiLtbRBMapping;
 #[cfg(feature="database")]
@@ -426,11 +426,14 @@ fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f32 {
     xi_sum, yi_sum, data_size as f32
   );
   
-  let determinant = a_matrix.determinant();
+  //let determinant = a_matrix.determinant(); unused bc we find inverse directly
   match a_matrix.try_inverse() {
     Some(inv_matrix) => {
       let p = Vector3::new(xi_zi, yi_zi, zi_sum);
-      let result = inv_matrix * p;
+      // Transpose the Vector3 to get a RowVector3
+      let p_transposed: RowVector3<f32> = p.transpose();
+      //let result = inv_matrix * p;
+      let result = p_transposed * inv_matrix;
       let a = result[0];
       let b = result[1];
       // let c = result[2]; // offset parameter if needed
@@ -438,7 +441,7 @@ fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f32 {
       return phi as f32;
     }
     None => {
-      error!("Finding invers matrix failed!");
+      error!("Finding inverse matrix failed!");
       return 99.9;
     }
   }
