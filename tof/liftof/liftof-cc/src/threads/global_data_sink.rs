@@ -405,7 +405,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
       let evid_check_len = evid_check.len();
       //println!("DEBUG .1.");
       //let mut evid_test_missing = 0usize;
-      let mut evid_missing = 0;
+      let evid_missing = 0;
       if evid_check_len > 0 {
         let mut evid = evid_check[0];
         //println!("DEBUG 1.5");
@@ -424,7 +424,6 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
       }
       //cfg_if::cfg_if!{
       //  if #[cfg(features="debug")] {
-      heartbeat.incoming_ch_len = incoming.len() as u64;
       heartbeat.met += timer.elapsed().as_secs();
       match data_socket.send(heartbeat.pack().to_bytestream(),0) {
         Err(err) => error!("Not able to send heartbeat over 0MQ PUB! {err}"),
@@ -443,7 +442,6 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
       let packet_rate = n_pack_sent as f32 /met_time_secs;
       println!("  {:<75}", ">> == == == == == == DATA SINK HEARTBEAT  == == == == == == <<".bright_cyan().bold());
       println!("  {:<75} <<", format!(">> ==> Sent {} TofPackets! (packet rate {:.2}/s)", n_pack_sent ,packet_rate).bright_cyan());
-      println!("  {:<75} <<", format!(">> ==> Incoming cb channel len {}", incoming.len()).bright_cyan());
       println!("  {:<75} <<", format!(">> ==> Writing events to disk: {} packets written, data write rate {:.2} MB/sec", n_pack_write_disk, bytes_sec_disk/(1e6*met_time_secs as f64)).bright_purple());
       println!("  {:<75} <<", format!(">> ==> Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)", evid_missing, evid_check_len, 100.0*(evid_missing as f64/evid_check_len as f64)).bright_purple());
 

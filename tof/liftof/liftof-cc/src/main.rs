@@ -72,7 +72,6 @@ use tof_dataclasses::database::{
     connect_to_db,
     get_linkid_rbid_map,
     ReadoutBoard,
-    Run,
 };
 
 use tof_dataclasses::constants::PAD_CMD_32BIT;
@@ -210,7 +209,7 @@ fn main() {
   // there seems to be now way to create handles without thread
   let mut evtbldr_handle   : thread::JoinHandle<_> = thread::spawn(||{});
   let mut data_sink_handle : thread::JoinHandle<_> = thread::spawn(||{});
-  let mut ckpumoni_handle  : thread::JoinHandle<_> = thread::spawn(||{});
+  let ckpumoni_handle  : thread::JoinHandle<_> = thread::spawn(||{});
   let mut mtb_handle       : thread::JoinHandle<_> = thread::spawn(||{});
   let mut cmd_handle       : thread::JoinHandle<_> = thread::spawn(||{});
   let mut sig_handle       : thread::JoinHandle<_> = thread::spawn(||{});
@@ -400,14 +399,14 @@ fn main() {
 
 
   // no cpu monitoring for cmdline calibration tasks
-  #[cfg(features="tof-ctrl")]
+  #[cfg(feature="tof-ctrl")]
   if cpu_moni_interval > 0 {
     debug!("Starting main monitoring thread...");
     let _thread_control_c = Arc::clone(&thread_control);
     // this is anonymus, but we control the thread
     // through the thread control mechanism, so we
     // can still end it.
-    #[cfg(features="tof-ctrl")]
+    #[cfg(feature="tof-ctrl")]
     let tp_to_sink_c = tp_to_sink.clone();
     #[cfg(features="tof-ctrl")]
     cpu_moni_handle = thread::Builder::new()
