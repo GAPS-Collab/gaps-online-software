@@ -105,7 +105,7 @@ use liftof_cc::threads::{
     global_data_sink,
     readoutboard_communicator
 };
-#[cfg(features="tof-ctrl")]
+#[cfg(feature="tof-ctrl")]
 use liftof_cc::threads::monitor_cpu;
 
 /*************************************/
@@ -192,7 +192,6 @@ fn main() {
   println!(" >> It connects to the MasterTriggerBoard and the ReadoutBoards");
   println!("-----------------------------------------------\n\n");
 
-  //panic!("auf der titanic!");
   // settings 
   //let foo = LiftofSettings::new();
   //foo.to_toml(String::from("foo-settings.toml"));
@@ -212,6 +211,8 @@ fn main() {
   let ckpumoni_handle  : thread::JoinHandle<_> = thread::spawn(||{});
   let mut mtb_handle       : thread::JoinHandle<_> = thread::spawn(||{});
   let mut cmd_handle       : thread::JoinHandle<_> = thread::spawn(||{});
+  #[cfg(feature="tof-ctrl")]
+  let mut cpu_moni_handle  : thread::JoinHandle<_> = thread::spawn(||{});
   let mut sig_handle       : thread::JoinHandle<_> = thread::spawn(||{});
   let mut rb_handles       = Vec::<thread::JoinHandle<_>>::new();
 
@@ -406,9 +407,7 @@ fn main() {
     // this is anonymus, but we control the thread
     // through the thread control mechanism, so we
     // can still end it.
-    #[cfg(feature="tof-ctrl")]
     let tp_to_sink_c = tp_to_sink.clone();
-    #[cfg(features="tof-ctrl")]
     cpu_moni_handle = thread::Builder::new()
         .name("cpu-monitoring".into())
         .spawn(move || {

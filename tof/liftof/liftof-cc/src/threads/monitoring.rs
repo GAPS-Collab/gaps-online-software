@@ -20,11 +20,12 @@ use tof_dataclasses::monitoring::{
 use tof_dataclasses::packets::TofPacket;
 //use tof_dataclasses::threading::ThreadControl;
 
-#[cfg(feature="tof_control")]
+#[cfg(feature="tof-ctrl")]
 use tof_control::helper::cpu_type::{
     CPUTempDebug,
     CPUInfoDebug,
 };
+
 use liftof_lib::thread_control::ThreadControl;
 
 
@@ -41,7 +42,7 @@ use liftof_lib::thread_control::ThreadControl;
 ///                    externally
 /// * verbose        - print monitoring information 
 ///                    to the terminal
-#[cfg(features="tof-ctrl")]
+#[cfg(feature="tof-ctrl")]
 pub fn monitor_cpu(tp_sender      : Sender<TofPacket>,
                    moni_interval  : u64,
                    thread_control : Arc<Mutex<ThreadControl>>,
