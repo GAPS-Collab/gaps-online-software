@@ -51,7 +51,6 @@ use ratatui::{
     style::{
         Color,
         Style,
-        Stylize
     },
     widgets::{
         Block,
@@ -85,33 +84,25 @@ use tof_dataclasses::events::{
     TofEventSummary,
     //RBWaveform,
 };
-use tof_dataclasses::commands::TofResponse;
 use tof_dataclasses::calibrations::RBCalibrations;
 //use liftof_lib::settings::LiftofSettings;
 
 use liftof_tui::menu::{
     UIMenuItem,
     MenuItem,
-    MainMenu,
     MainMenu2,
     TriggerMenu,
     EventMenu,
     MoniMenu,
     ActiveMenu,
-    UIMenu,
-    RBMenuItem,
-    RBMenu,
     RBMenu2,
-    PAMoniMenuItem,
+    UIMenu,
     PAMoniMenu,
-    MTMenu,
     SettingsMenu,
     THMenu,
-    THMenuItem,
     TSMenu,
     //TSMenuItem,
     RWMenu,
-    TEMenu,
     HBMenu,
     //RWMenuItem,
 };
@@ -128,14 +119,12 @@ use liftof_tui::{
     HomeTab,
     SettingsTab,
     TofHitTab,
-    TofHitView,
     RBTab,
     RBTabView,
     MTTab,
     CPUTab,
     RBWaveformTab,
     TofSummaryTab, 
-    RBLTBListFocus,
     TelemetryTab,
     CommandTab,
     PaddleTab,
@@ -1313,7 +1302,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
       Err(err) => error!("Unable to load calibration for {}! {}", rb, err),
       Ok(_) => {
         match rbcalibrations.lock() {
-          Err(err)  => error!("Unable to lock rbcalibrations mutex!"),
+          Err(_err)  => error!("Unable to lock rbcalibrations mutex!"),
           Ok(mut rbcal) => {
             rbcal.insert(rb.rb_id as u8, rb.calibration.clone()); 
           }
