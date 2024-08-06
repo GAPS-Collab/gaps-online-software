@@ -336,7 +336,7 @@ fn main() {
 
   // Prepare outputfiles
   let mut new_run_id : u32;
-  match prepare_run(write_stream_path.clone()) {
+  match prepare_run(write_stream_path.clone(), &config) {
     None => {
       error!("Unable to assign new run id, falling back to 0!");
       new_run_id = 0;

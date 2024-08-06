@@ -52,7 +52,11 @@ use tof_dataclasses::serialization::{
     //SerializationError
 };
 
-use liftof_lib::settings::CommandDispatcherSettings;
+use liftof_lib::settings::{
+    CommandDispatcherSettings,
+    LiftofSettings
+};
+
 use liftof_lib::thread_control::ThreadControl;
 
 use liftof_lib::constants::{
@@ -361,11 +365,6 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                     let mut run_id : u32 = 0;
                     println!("= => Received DataRunStart!");
                     info!("Received data run start command");
-                    // technically, it is run_typ, rb_id, event number
-                    // all to the max means run start for all
-                    // let payload: u32 =  PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
-                    // make sure the relevant threads are active
-                    // We don't need this - just need to make sure it gets broadcasted
                     match RunConfig::from_bytestream(&cmd.payload, &mut 0) {
                       Err(err) => error!("Unable to unpack run config! {err}"),
                       Ok(pld) => {
@@ -375,16 +374,18 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                     // if we don't get a specific run id here, we are 
                     // using our own
                     let mut write_stream_path = String::from("");
+                    let mut config_from_tc = LiftofSettings::new(); 
                     match thread_ctrl.lock() {
                       Ok(tc) => {
                         write_stream_path = tc.liftof_settings.data_publisher_settings.data_dir.clone();
+                        config_from_tc    = tc.liftof_settings.clone();
                       }
                       Err(err) => {
                         error!("Unable to lock thread control! {err}");
                       }
                     }
                     if run_id == 0 {
-                      match prepare_run(write_stream_path.clone()) {
+                      match prepare_run(write_stream_path.clone(), &config_from_tc) {
                         None => {
                           error!("Unable to assign new run id, falling back to 999!");
                         }
