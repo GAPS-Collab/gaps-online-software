@@ -1284,6 +1284,79 @@ impl PyEVTBLDRHeartbeat {
   }
 }
 
+#[pyclass]
+#[pyo3(name="MtbMoniData")]
+pub struct PyMtbMoniData {
+  moni : MtbMoniData,
+}
+
+impl PyMtbMoniData {
+  pub fn set_moni(&mut self, moni : MtbMoniData) {
+    self.moni = moni;
+  }
+}
+
+#[pymethods]
+impl PyMtbMoniData {
+  
+  #[new]
+  fn new() -> Self {
+    let moni = MtbMoniData::new();
+    Self {
+      moni,
+    }
+  }
+
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<MtbMoniData>() {
+      Ok(moni) => {
+        self.moni = moni;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+
+  #[getter]
+  pub fn get_tiu_emulation_mode(&self) -> bool {
+    self.moni.get_tiu_emulation_mode()
+  }
+  
+  #[getter]
+  pub fn get_tiu_use_aux_link(&self) -> bool {
+    self.moni.get_tiu_use_aux_link()
+  }
+
+  #[getter]
+  pub fn get_tiu_bad(&self) -> bool { 
+    self.moni.get_tiu_bad()
+  }
+
+  #[getter]
+  pub fn get_tiu_busy_stuck(&self) -> bool {
+    self.moni.get_tiu_busy_stuck()
+  }
+
+  #[getter]
+  pub fn get_tiu_ignore_busy(&self) -> bool {
+    self.moni.get_tiu_ignore_busy()
+  }
+
+
+  #[getter]
+  pub fn get_fpga_temp(&self) -> f32 {
+    self.moni.get_fpga_temp()
+  }
+
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.moni)) 
+  }
+}
 
 
 #[pyclass]
