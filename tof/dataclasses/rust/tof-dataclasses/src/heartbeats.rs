@@ -426,6 +426,7 @@ pub struct EVTBLDRHeartbeat {
   pub n_rbe_from_past       : usize,
   pub n_rbe_orphan          : usize,
   pub n_ev_wo_evid          : usize,
+  pub data_mangled_ev       : usize,
   // pub seen_rbevents         : HashMap<u8, usize>,
 }
 impl EVTBLDRHeartbeat {
@@ -458,6 +459,7 @@ impl EVTBLDRHeartbeat {
       n_ev_wo_evid         : 0,
       n_rbe_orphan         : 0,
       n_rbe_from_past      : 0,
+      data_mangled_ev      : 0,
       // seen_rbevents        : seen_rbevents, 
     }
  }
@@ -506,6 +508,7 @@ pub fn to_string(&self) -> String {
   } else { 
     repr += &(format!("\n Percent events w/out event ID: \tN/A").bright_purple());
   }
+  repr += &(format!("\n Percent events with data mangling: \t\t {:.2}", ((self.data_mangled_ev)/(self.n_rbe_received_tot))*(100 as usize)));
   repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
   repr += &(format!("\n Received MTEvents: \t\t\t{}", self.n_mte_received_tot).bright_purple());
   repr += &(format!("\n Skipped MTEvents: \t\t\t{}", self.n_mte_skipped).bright_purple());
@@ -541,7 +544,7 @@ impl Packable for EVTBLDRHeartbeat {
 impl Serialization for EVTBLDRHeartbeat {
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
-  const SIZE : usize = 148; //
+  const SIZE : usize = 156; //
 
   fn from_bytestream(stream : &Vec<u8>, 
                        pos        : &mut usize)
@@ -566,6 +569,7 @@ impl Serialization for EVTBLDRHeartbeat {
         hb.n_ev_wo_evid         = parse_usize(stream,pos);
         hb.n_rbe_from_past      = parse_usize(stream,pos);
         hb.n_rbe_orphan         = parse_usize(stream,pos);
+        hb.data_mangled_ev      = parse_usize(stream,pos);
         // hb.seen_rbevents        = HashMap::from(parse_u8(stream, pos));
         *pos += 2;
         Ok(hb)
@@ -591,6 +595,7 @@ impl Serialization for EVTBLDRHeartbeat {
           bs.extend_from_slice(&self.n_ev_wo_evid.to_le_bytes());
           bs.extend_from_slice(&self.n_rbe_from_past.to_le_bytes());
           bs.extend_from_slice(&self.n_rbe_orphan.to_le_bytes());
+          bs.extend_from_slice(&self.data_mangled_ev.to_le_bytes());
           // bs.push(self.seen_rbevents.to_u8());
           bs.extend_from_slice(&Self::TAIL.to_le_bytes());
           bs
@@ -619,6 +624,7 @@ impl FromRandom for EVTBLDRHeartbeat {
     let n_ev_wo_evid = rng.gen::<usize>();
     let n_rbe_from_past = rng.gen::<usize>();
     let n_rbe_orphan = rng.gen::<usize>();
+    let data_mangled_ev = rng.gen::<usize>();
     Self {
       met_seconds,
       n_rbe_received_tot,
@@ -638,6 +644,7 @@ impl FromRandom for EVTBLDRHeartbeat {
       n_ev_wo_evid,
       n_rbe_from_past,
       n_rbe_orphan,
+      data_mangled_ev
     }
   }
 } 

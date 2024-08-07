@@ -198,7 +198,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               //error!("We skipped event ids {}", delta_id );
             }
           }
-          heartbeat.n_mte_skipped = n_mte_skipped;
+          heartbeat.n_mte_skipped = n_mte_skipped as usize;
           last_evid = event.mt_event.event_id;
           event_cache.insert(last_evid, event);
           // use this to keep track of the order
@@ -620,7 +620,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             for ev in &ev_to_send.rb_events {
               if ev.status == EventStatus::CellSyncErrors || ev.status == EventStatus::ChnSyncErrors {
                 ev_to_send.mt_event.event_status = EventStatus::AnyDataMangling {
-                }
+                };
+                heartbeat.data_mangled_ev += 1;
               }
             }
             // can we avoid unpacking and repacking?
