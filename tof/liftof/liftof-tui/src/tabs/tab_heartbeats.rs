@@ -17,9 +17,6 @@ use ratatui::widgets::{
     Borders,
     Paragraph,
     //BarChart,
-    List,
-    ListItem,
-    ListState,
 };
 //use tui::{
 //    symbols,
@@ -40,8 +37,6 @@ use tof_dataclasses::packets::{
 
 use tof_dataclasses::serialization::{
     SerializationError,
-    Serialization,
-    Packable
 };
 
 use tof_dataclasses::heartbeats::{
