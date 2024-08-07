@@ -1322,6 +1322,28 @@ impl PyMtbMoniData {
   }
 
   #[getter]
+  pub fn get_rate(&self) -> u16 {
+    self.moni.rate
+  }
+  
+  #[getter]
+  pub fn get_lost_rate(&self) -> u16 {
+    self.moni.lost_rate
+  }
+
+  #[getter]
+  /// Length of the received BUSY signal from 
+  /// the TIU in nanoseconds
+  pub fn get_tiu_busy_len(&self) -> u32 {
+    self.moni.tiu_busy_len * 10
+  }
+
+  #[getter]
+  pub fn get_daq_queue_len(&self) -> u16 {
+    self.moni.daq_queue_len
+  }
+
+  #[getter]
   pub fn get_tiu_emulation_mode(&self) -> bool {
     self.moni.get_tiu_emulation_mode()
   }
