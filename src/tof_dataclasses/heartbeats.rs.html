@@ -658,6 +658,13 @@
 <a href="#658" id="658">658</a>
 <a href="#659" id="659">659</a>
 <a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Heartbeats - regularly (or on demand) sent 
 //! software monitoring data
 //!
@@ -1086,6 +1093,7 @@
   <span class="kw">pub </span>n_rbe_from_past       : usize,
   <span class="kw">pub </span>n_rbe_orphan          : usize,
   <span class="kw">pub </span>n_ev_wo_evid          : usize,
+  <span class="kw">pub </span>data_mangled_ev       : usize,
   <span class="comment">// pub seen_rbevents         : HashMap&lt;u8, usize&gt;,
 </span>}
 <span class="kw">impl </span>EVTBLDRHeartbeat {
@@ -1118,6 +1126,7 @@
       n_ev_wo_evid         : <span class="number">0</span>,
       n_rbe_orphan         : <span class="number">0</span>,
       n_rbe_from_past      : <span class="number">0</span>,
+      data_mangled_ev      : <span class="number">0</span>,
       <span class="comment">// seen_rbevents        : seen_rbevents, 
     </span>}
  }
@@ -1166,6 +1175,7 @@
   } <span class="kw">else </span>{ 
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events w/out event ID: \tN/A"</span>).bright_purple());
   }
+  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events with data mangling: \t\t {:.2}"</span>, ((<span class="self">self</span>.data_mangled_ev)/(<span class="self">self</span>.n_rbe_received_tot))<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>usize)));
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Received MTEvents: \t\t\t{}"</span>, <span class="self">self</span>.n_mte_received_tot).bright_purple());
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Skipped MTEvents: \t\t\t{}"</span>, <span class="self">self</span>.n_mte_skipped).bright_purple());
@@ -1201,7 +1211,7 @@
 <span class="kw">impl </span>Serialization <span class="kw">for </span>EVTBLDRHeartbeat {
   <span class="kw">const </span>HEAD : u16 = <span class="number">0xAAAA</span>;
   <span class="kw">const </span>TAIL : u16 = <span class="number">0x5555</span>;
-  <span class="kw">const </span>SIZE : usize = <span class="number">148</span>; <span class="comment">//
+  <span class="kw">const </span>SIZE : usize = <span class="number">156</span>; <span class="comment">//
 
   </span><span class="kw">fn </span>from_bytestream(stream : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;, 
                        pos        : <span class="kw-2">&amp;mut </span>usize)
@@ -1226,6 +1236,7 @@
         hb.n_ev_wo_evid         = parse_usize(stream,pos);
         hb.n_rbe_from_past      = parse_usize(stream,pos);
         hb.n_rbe_orphan         = parse_usize(stream,pos);
+        hb.data_mangled_ev      = parse_usize(stream,pos);
         <span class="comment">// hb.seen_rbevents        = HashMap::from(parse_u8(stream, pos));
         </span><span class="kw-2">*</span>pos += <span class="number">2</span>;
         <span class="prelude-val">Ok</span>(hb)
@@ -1251,6 +1262,7 @@
           bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_ev_wo_evid.to_le_bytes());
           bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_from_past.to_le_bytes());
           bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_orphan.to_le_bytes());
+          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.data_mangled_ev.to_le_bytes());
           <span class="comment">// bs.push(self.seen_rbevents.to_u8());
           </span>bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::TAIL.to_le_bytes());
           bs
@@ -1279,6 +1291,7 @@
     <span class="kw">let </span>n_ev_wo_evid = rng.gen::&lt;usize&gt;();
     <span class="kw">let </span>n_rbe_from_past = rng.gen::&lt;usize&gt;();
     <span class="kw">let </span>n_rbe_orphan = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>data_mangled_ev = rng.gen::&lt;usize&gt;();
     <span class="self">Self </span>{
       met_seconds,
       n_rbe_received_tot,
@@ -1298,6 +1311,7 @@
       n_ev_wo_evid,
       n_rbe_from_past,
       n_rbe_orphan,
+      data_mangled_ev
     }
   }
 } 

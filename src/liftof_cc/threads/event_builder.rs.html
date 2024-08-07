@@ -661,47 +661,6 @@
 <a href="#661" id="661">661</a>
 <a href="#662" id="662">662</a>
 <a href="#663" id="663">663</a>
-<a href="#664" id="664">664</a>
-<a href="#665" id="665">665</a>
-<a href="#666" id="666">666</a>
-<a href="#667" id="667">667</a>
-<a href="#668" id="668">668</a>
-<a href="#669" id="669">669</a>
-<a href="#670" id="670">670</a>
-<a href="#671" id="671">671</a>
-<a href="#672" id="672">672</a>
-<a href="#673" id="673">673</a>
-<a href="#674" id="674">674</a>
-<a href="#675" id="675">675</a>
-<a href="#676" id="676">676</a>
-<a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-<a href="#679" id="679">679</a>
-<a href="#680" id="680">680</a>
-<a href="#681" id="681">681</a>
-<a href="#682" id="682">682</a>
-<a href="#683" id="683">683</a>
-<a href="#684" id="684">684</a>
-<a href="#685" id="685">685</a>
-<a href="#686" id="686">686</a>
-<a href="#687" id="687">687</a>
-<a href="#688" id="688">688</a>
-<a href="#689" id="689">689</a>
-<a href="#690" id="690">690</a>
-<a href="#691" id="691">691</a>
-<a href="#692" id="692">692</a>
-<a href="#693" id="693">693</a>
-<a href="#694" id="694">694</a>
-<a href="#695" id="695">695</a>
-<a href="#696" id="696">696</a>
-<a href="#697" id="697">697</a>
-<a href="#698" id="698">698</a>
-<a href="#699" id="699">699</a>
-<a href="#700" id="700">700</a>
-<a href="#701" id="701">701</a>
-<a href="#702" id="702">702</a>
-<a href="#703" id="703">703</a>
-<a href="#704" id="704">704</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::thread;
 <span class="kw">use </span>std::time::{
     Instant,
@@ -902,6 +861,7 @@
               <span class="comment">//error!("We skipped event ids {}", delta_id );
             </span>}
           }
+          heartbeat.n_mte_skipped = n_mte_skipped <span class="kw">as </span>usize;
           last_evid = event.mt_event.event_id;
           event_cache.insert(last_evid, event);
           <span class="comment">// use this to keep track of the order
@@ -909,6 +869,7 @@
           </span>event_id_cache.push_back(last_evid);
           n_received  += <span class="number">1</span>;
           n_mte_received_tot += <span class="number">1</span>;
+          heartbeat.n_mte_received_tot += <span class="number">1</span>;
         }
       } <span class="comment">// end match Ok(mt)
       //if n_received % 10 == 0 {
@@ -934,6 +895,7 @@
           // to add another cache.
           //println!("==&gt; Len evt cache {}", event_cache.len());
           </span>heartbeat.event_cache_size    = event_cache.len();
+          heartbeat.event_id_cache_size = event_id_cache.len();
           heartbeat.n_rbe_received_tot += <span class="number">1</span>;
           n_received += <span class="number">1</span>;
           <span class="kw">match </span>seen_rbevents.get_mut(<span class="kw-2">&amp;</span>rb_ev.header.rb_id) {
@@ -1040,53 +1002,8 @@
         }
       }
       <span class="macro">println!</span>(<span class="string">"{}"</span>, heartbeat);
-      <span class="comment">//println!("  {:&lt;70} &lt;&lt;", "&gt;&gt; == == == == == == ==  EVTBLDR HEARTBEAT == ==  == == == == ==".bright_purple().bold());
-    ////if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Received MTEvents {}", n_mte_received_tot).bright_purple());
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Received RBEvents {}", n_rbe_received_tot).bright_purple());
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Skipped MTEvents  {}", n_mte_skipped).bright_purple());
-      ////println!("  {:&lt;80}", format!("&gt;&gt; ==&gt; Missing evid analysis:  {} of {} events missing ({:.2}%)&lt;&lt;", ev_id_test_missing, ev_id_test_len, 100.0*(ev_id_test_missing as f64/evid_test_len as f64)).bright_purple());
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid).bright_purple());
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Size of event cache    {}", event_cache.len()).bright_purple());
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Size of event ID cache {}", event_id_cache.len()).bright_purple());
-      //// println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Gathered events from cache, last iter {}", n_gathered_fr_cache).bright_purple());
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Misaligned cache errs  {}", misaligned_cache_err).bright_purple());
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!").bright_purple());
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Sent {} events! rate   {:4.2} Hz", n_sent, n_sent as f64/met_seconds).bright_purple());
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Failed in sending {} events!", n_sent_ch_err).bright_purple());
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Chn len MTE receiver   {}",m_trig_ev.len() ).bright_purple());
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Chn len RBE receiver   {}",ev_from_rb.len()).bright_purple());
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Chn len TP  sender     {}",data_sink.len()).bright_purple());
-      //println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Event id check: {:4.2}% of events missing in the event ID cache", n_ev_wo_evid as f64 / event_cache.len() as f64).bright_purple());
-      //if n_sent &gt; 0 {
-      //  let av_rb_ev = n_rbe_per_te as f64 / n_sent as f64;
-      //  println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Average number of RBEvents/TofEvent {:4.2}", av_rb_ev).bright_purple());
-      //  let to_frac = 100.0 * n_timed_out as f64 / n_sent as f64;
-      //  println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Fraction of timed out events {:4.2}%", to_frac).bright_purple());
-      //  let recv_sent_frac = 100.0* n_mte_received_tot as f64 / n_sent as f64;
-      //  println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Fraction of incoming vs outgoing MTEvents {:4.2}%", recv_sent_frac).bright_purple());
-      //}
-      //if n_rbe_received_tot &gt; 0 {
-      //  let rbe_discarded_frac = 100.0 * n_rbe_discarded_tot as f64 / n_rbe_received_tot as f64;
-      //  let rbe_fpast_frac     = 100.0 * n_rbe_from_past   as f64 / n_rbe_received_tot as f64;
-      //  let rbe_orphaned_frac  = 100.0 * n_rbe_orphan        as f64 / n_rbe_received_tot as f64;
-      //  println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; Fraction of discarded RBEvents {:4.2}%", rbe_discarded_frac).bright_purple());
-      //  println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; RBEvents discarded (too early) {} ({:4.2}%)",n_rbe_from_past, rbe_fpast_frac).bright_purple());
-      //  println!("  {:&lt;70} &lt;&lt;", format!("&gt;&gt; ==&gt; RBEvents discarded (orphaned, too late?) {} ({:4.2}%)",n_rbe_orphan, rbe_orphaned_frac).bright_purple());
-      //}
-      </span><span class="macro">println!</span>(<span class="string">"RBEvents received overview (rate/RB [Hz]):"</span>);
-      <span class="comment">//if rbe_fpast_frac &gt; 0.1 {
-      //  warn!("We will reset the MTB DAQ since the MT events seem to lag behind");
-      //  reset_daq_flag = true;
-      //}
-      //let mut key_value_pairs: Vec&lt;_&gt; = seen_rbevents.iter().collect();
-      //key_value_pairs.sort_by(|a, b| a.0.cmp(b.0));
-      //for (key, value) in key_value_pairs {
-      //    if key &lt; &amp;10 {
-      //      head0 += &amp;(format!(" RB {:02}\t| ", key)); 
-      //      row0  += &amp;(format!(" {:.1}\t| ", *value as f64/met_total_sec as f64));
-      //      continue;
-      </span><span class="kw">let </span><span class="kw-2">mut </span>counters = HashMap::&lt;u8,f64&gt;::new();
+   
+      <span class="kw">let </span><span class="kw-2">mut </span>counters = HashMap::&lt;u8,f64&gt;::new();
       <span class="kw">for </span>k <span class="kw">in </span>seen_rbevents.keys() {
         counters.insert(<span class="kw-2">*</span>k, seen_rbevents[<span class="kw-2">&amp;</span>k] <span class="kw">as </span>f64/met_seconds <span class="kw">as </span>f64);
       }
@@ -1366,7 +1283,8 @@
             <span class="kw">for </span>ev <span class="kw">in </span><span class="kw-2">&amp;</span>ev_to_send.rb_events {
               <span class="kw">if </span>ev.status == EventStatus::CellSyncErrors || ev.status == EventStatus::ChnSyncErrors {
                 ev_to_send.mt_event.event_status = EventStatus::AnyDataMangling {
-                }
+                };
+                heartbeat.data_mangled_ev += <span class="number">1</span>;
               }
             }
             <span class="comment">// can we avoid unpacking and repacking?
