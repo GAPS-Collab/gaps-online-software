@@ -45,7 +45,7 @@ jobs:
       run: cd ${{github.workspace}}/build && make -j 4 && make doc && make install
 
     - name: Docs
-      run: cd ${{github.workspace}}/build && make doc && make liftof-doc
+      run: cd ${{github.workspace}}/build && make doc && make liftof-doc && make tof-pydataclasses-rust-doc
       
     - name: Test-Dataclasses
       working-directory: ${{github.workspace}}/build
