@@ -191,7 +191,7 @@ pub const TRIG_CYCLIC_EN : MTBRegister<'static> = MTBRegister {
 /// Set cyclic trigger interval (in # clock cycles, 1 clock cycle ~ 10 ns)
 /// TRIG_CYCLIC_INTERVAL 0x241 0x904 [31:0] rw 0x0
 pub const TRIG_CYCLIC_INTERVAL : MTBRegister<'static> = MTBRegister {
-  addr   : 0x240,
+  addr   : 0x241,
   mask   : 0xffffffff,
   descr  : "Set the cyclic trigger interval in # clock cycles (int only) --> ie if desire trigger every 20 nsec, set interval = 2",
   rmw    : true,
