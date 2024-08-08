@@ -1265,6 +1265,10 @@ impl PyEVTBLDRHeartbeat {
   fn get_tp_sender_cbc_len(&self) -> PyResult<usize> {
     Ok(self.config.tp_sender_cbc_len)
   }
+  #[getter]
+  fn get_data_mangled_ev(&self) -> PyResult<usize> {
+    Ok(self.config.data_mangled_ev)
+  }
   
   fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
     let tp = packet.get_tp();

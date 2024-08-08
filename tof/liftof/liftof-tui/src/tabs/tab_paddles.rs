@@ -25,7 +25,6 @@ use ratatui::widgets::{
     List,
     ListItem,
     ListState,
-    canvas,
     canvas::{
         Canvas,
         //Circle,

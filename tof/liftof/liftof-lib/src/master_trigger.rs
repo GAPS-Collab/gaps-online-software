@@ -738,7 +738,7 @@ pub fn master_trigger(mt_address     : String,
           heartbeat.evq_num_events_last = num_ev as u64;
           evq_num_events += num_ev as u64;
           n_iter_loop    += 1;
-          heartbeat.evq_num_events_avg = evq_num_events as u64/n_iter_loop as u64;
+          heartbeat.evq_num_events_avg = (evq_num_events as u64)/(n_iter_loop as u64);
         }
       }
       heartbeat.total_elapsed += verbose_timer_elapsed as u64;
