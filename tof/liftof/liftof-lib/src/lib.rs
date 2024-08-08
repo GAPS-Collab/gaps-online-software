@@ -391,7 +391,7 @@ impl fmt::Display for RunStatistics {
 }
 
 //sydney's sine fit without libraries
-fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f64 {
+fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f32 {
   let start_bin = 20;
   let size_bin = 900;
   let pi = PI;
@@ -407,9 +407,9 @@ fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f64 {
   let mut zi_sum = 0.0;
 
   for i in start_bin..(start_bin + size_bin) {
-      let xi = (2.0 as f64 * pi as f64 * 0.02 as f64 * (times[i] as f64)).cos();
-      let yi = (2.0 as f64 * pi as f64 * 0.02 as f64 * (times[i] as f64)).sin();
-      let zi = volts[i] as f64;
+      let xi = (2.0 * pi * 0.02 * times[i]).cos();
+      let yi = (2.0 * pi * 0.02 * times[i]).sin();
+      let zi = volts[i];
 
       xi_yi += xi * yi;
       xi_zi += xi * zi;
@@ -432,7 +432,7 @@ fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f64 {
   a_matrix[1][2] = yi_sum;
   a_matrix[2][0] = xi_sum;
   a_matrix[2][1] = yi_sum;
-  a_matrix[2][2] = data_size as f64;
+  a_matrix[2][2] = data_size as f32;
 
   let determinant = a_matrix[0][0] * a_matrix[1][1] * a_matrix[2][2]
       + a_matrix[0][1] * a_matrix[1][2] * a_matrix[2][0]
@@ -467,7 +467,7 @@ fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f64 {
 
   let phi = a.atan2(b);
 
-  phi as f64
+  phi
 }
 
 
