@@ -2081,6 +2081,16 @@ impl PyTofHit {
     self.hit.get_charge_b()
   }
 
+  #[getter]
+  fn time_a(&self) -> f32 {
+    self.hit.get_time_a()
+  }
+  
+  #[getter]
+  fn time_b(&self) -> f32 {
+    self.hit.get_time_b()
+  }
+
   /// Reconstructed particle interaction position
   /// along the long axis of the paddle.
   /// For the other dimensions, there is no information
