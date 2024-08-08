@@ -30,6 +30,7 @@ chrono = {version ="0.4", features =["serde"] }
 
 # own projects
 tof-dataclasses       = { path = "../dataclasses/rust/tof-dataclasses" , features = ["database", "tofcontrol", "advanced-algorithms"], version = "0.10"}
+rpy-tof-dataclasses   = { path = "../dataclasses/rust/pybindings", version = "0.10" }
 
 [profile.release]
 opt-level = 3

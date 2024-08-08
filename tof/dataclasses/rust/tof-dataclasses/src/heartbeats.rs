@@ -123,6 +123,9 @@ pub struct HeartBeatDataSink {
   pub evid_check_len     : u64,
   /// number of packets written to disk
   pub n_pack_write_disk  : u64,
+  /// length of the incoming channel, which 
+  /// is basically packets queued to be sent
+  pub incoming_ch_len    : u64,
 }
 
 impl HeartBeatDataSink {
@@ -138,6 +141,7 @@ impl HeartBeatDataSink {
       evid_missing       : 0,
       evid_check_len     : 0,
       n_pack_write_disk  : 0,
+      incoming_ch_len    : 0,
     }
   }
 
