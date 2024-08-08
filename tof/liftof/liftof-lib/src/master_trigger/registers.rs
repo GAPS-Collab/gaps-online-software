@@ -177,6 +177,28 @@ pub const TIU_EMU_BUSY_CNT : MTBRegister<'static> = MTBRegister {
   pulse : false
 };
 
+/// Enable cyclic trigger
+/// TRIG_CYCLIC_EN 0x240 0x900 0 rw 0x0
+pub const TRIG_CYCLIC_EN : MTBRegister<'static> = MTBRegister {
+  addr  : 0x240,
+  mask  : 0x00000001,
+  descr : "Enable the use of a cyclic trigger",
+  rmw   : true, 
+  ro    : false,
+  pulse : false
+};
+
+/// Set cyclic trigger interval (in # clock cycles, 1 clock cycle ~ 10 ns)
+/// TRIG_CYCLIC_INTERVAL 0x241 0x904 [31:0] rw 0x0
+pub const TRIG_CYCLIC_INTERVAL : MTBRegister<'static> = MTBRegister {
+  addr   : 0x240,
+  mask   : 0xffffffff,
+  descr  : "Set the cyclic trigger interval in # clock cycles (int only) --> ie if desire trigger every 20 nsec, set interval = 2",
+  rmw    : true,
+  ro     : false, 
+  pulse  : false
+};
+
 /// Set/Unset the TIU emulation mode
 /// TIU_EMULATION_MODE  0xe     0x38    0   rw  0x0     1 to emulate the TIU
 pub const TIU_EMULATION_MODE : MTBRegister<'static> = MTBRegister {
