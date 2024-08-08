@@ -391,7 +391,7 @@ impl fmt::Display for RunStatistics {
 }
 
 //sydney's sine fit without libraries
-fn fit_sine_sydney(volts: Vec<f32>, times: Vec<f32>) -> f32 {
+fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f32 {
   let start_bin = 20;
   let size_bin = 900;
   let pi = PI;
@@ -629,7 +629,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     rb.calibration.nanoseconds(9,
                                event.header.stop_cell as usize,
                                &mut times);
-    let fit_result_phi = fit_sine_sydney(voltages, times);
+    let fit_result_phi = fit_sine_sydney(&voltages, &times);
     //println!("FIT RESULT = {:?}", fit_result);
     fit_result = (0.0, 0.0, fit_result_phi as f32);
     event.header.set_sine_fit(fit_result);
