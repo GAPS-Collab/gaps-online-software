@@ -116,7 +116,48 @@ impl PyMasterTrigger {
     }
   }
 
-  fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
+  fn get_enable_cyclic_trig(&mut self) -> PyResult<u32> {
+    match TRIG_CYCLIC_EN.get(&mut self.ipbus, value) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  fn set_enable_cyclic_trig(&mut self, value : u32) -> PyResult<()> {
+    match TRIG_CYCLIC_EN.set(&mut self.ipbus, value) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  
+  fn get_cyclic_trigger_interval(&mut self, interval : u32) -> PyResult<()> {
+    match TRIG_CYCLIC_INTERVAL.get(&mut self.ipbus, interval) {
+      Ok(_) =>  {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  fn set_cyclic_trigger_interval(&mut self, interval : u32) -> PyResult<()> {
+    match TRIG_CYCLIC_INTERVAL.set(&mut self.ipbus, interval) {
+      Ok(_) =>  {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
     match TRACK_CENTRAL_IS_GLOBAL.set(&mut self.ipbus, 1) {
       Ok(_) => {
         return Ok(());
