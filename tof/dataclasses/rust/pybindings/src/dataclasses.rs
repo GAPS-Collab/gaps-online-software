@@ -1080,11 +1080,6 @@ impl PyHeartBeatDataSink{
   fn get_n_evid_chunksize(&self) -> PyResult<u64> {
     Ok(self.config.n_evid_chunksize)
   }
-  // len incomming buffer for the thread
-  #[getter]
-  fn get_incoming_ch_len(&self) -> PyResult<u64> {
-    Ok(self.config.incoming_ch_len)
-  }
   // num. missing event id
   #[getter]
   fn get_evid_missing(&self) -> PyResult<u64> {
@@ -1653,8 +1648,11 @@ impl PyRBEventHeader {
   pub fn set_header(&mut self, header : RBEventHeader) {
     self.header = header;
   }
-}
 
+fn __repr__(&self) -> PyResult<String> {
+  Ok(format!("<PyO3Wrapper: {}>", self.header)) 
+  }
+} 
 #[pymethods]
 impl PyRBEventHeader {
   #[new]
