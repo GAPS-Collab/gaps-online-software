@@ -432,7 +432,7 @@ fn fit_sine_sydney(volts: Vec<f32>, times: Vec<f32>) -> f32 {
   a_matrix[1][2] = yi_sum;
   a_matrix[2][0] = xi_sum;
   a_matrix[2][1] = yi_sum;
-  a_matrix[2][2] = data_size as f64;
+  a_matrix[2][2] = data_size as f32;
 
   let determinant = a_matrix[0][0] * a_matrix[1][1] * a_matrix[2][2]
       + a_matrix[0][1] * a_matrix[1][2] * a_matrix[2][0]
@@ -629,7 +629,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     rb.calibration.nanoseconds(9,
                                event.header.stop_cell as usize,
                                &mut times);
-    let fit_result_phi = fit_sine_sydney(&voltages, &times);
+    let fit_result_phi = fit_sine_sydney(voltages, times);
     //println!("FIT RESULT = {:?}", fit_result);
     fit_result = (0.0, 0.0, fit_result_phi as f32);
     event.header.set_sine_fit(fit_result);
