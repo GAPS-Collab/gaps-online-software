@@ -16,9 +16,7 @@ use tof_dataclasses::events::MasterTriggerEvent;
 use liftof_lib::master_trigger::registers::*;
 use liftof_lib::master_trigger as mt_api;
 
-use crate::dataclasses::{
-    PyMasterTriggerEvent,
-};
+use crate::dataclasses::PyMasterTriggerEvent;
 
 #[pyclass]
 #[pyo3(name = "MasterTrigger")]
@@ -117,7 +115,7 @@ impl PyMasterTrigger {
   }
 
   fn get_enable_cyclic_trig(&mut self) -> PyResult<u32> {
-    match TRIG_CYCLIC_EN.get(&mut self.ipbus, value) {
+    match TRIG_CYCLIC_EN.get(&mut self.ipbus) {
       Ok(_) => {
         return Ok(());
       }
@@ -138,7 +136,7 @@ impl PyMasterTrigger {
   }
   
   fn get_cyclic_trigger_interval(&mut self, interval : u32) -> PyResult<()> {
-    match TRIG_CYCLIC_INTERVAL.get(&mut self.ipbus, interval) {
+    match TRIG_CYCLIC_INTERVAL.get(&mut self.ipbus) {
       Ok(_) =>  {
         return Ok(());
       }
@@ -157,6 +155,140 @@ impl PyMasterTrigger {
       }
     }
   }
+
+  /// Get the status of enabling for LTBs 0-9
+  fn get_lt_link_en0(&mut self) -> PyResult<u32> {
+    match LT_LINK_EN0.get(&mut self.ipbus) {
+      Ok(_)  => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  /// Get the status of enabling for LTBs 10-19
+  fn get_lt_link_en1(&mut self) -> PyResult<u32> {
+    match LT_LINK_EN1.get(&mut self.ipbus) {
+      Ok(_)  => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  /// Get the status of enabling for LTBs 20-29
+  fn get_lt_link_en02(&mut self) -> PyResult<u32> {
+    match LT_LINK_EN2.get(&mut self.ipbus) {
+      Ok(_)  => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  /// Get the status of enabling for LTBs 30-39
+  fn get_lt_link_en3(&mut self) -> PyResult<u32> {
+    match LT_LINK_EN3.get(&mut self.ipbus) {
+      Ok(_)  => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  /// Get the status of enabling for LTBs 40-49
+  fn get_lt_link_en4(&mut self) -> PyResult<u32> {
+    match LT_LINK_EN4.get(&mut self.ipbus) {
+      Ok(_)  => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  ///Set on/off link enabling for LTBs 0-9
+  fn set_lt_link_en0(&mut self, value : u32) -> PyResult<u32> {
+    match LT_LINK_EN0.set(&mut self.ipbus, value) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_error(err.to_string()));
+      }
+    }
+  }
+  ///Set on/off link enabling for LTBs 10-19
+  fn set_lt_link_en1(&mut self, value : u32) -> PyResult<u32> {
+    match LT_LINK_EN1.set(&mut self.ipbus, value) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_error(err.to_string()));
+      }
+    }
+  }
+  ///Set on/off link enabling for LTBs 20-29
+  fn set_lt_link_en2(&mut self, value : u32) -> PyResult<u32> {
+    match LT_LINK_EN2.set(&mut self.ipbus, value) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_error(err.to_string()));
+      }
+    }
+  }
+  ///Set on/off link enabling for LTBs 30-39
+  fn set_lt_link_en3(&mut self, value : u32) -> PyResult<u32> {
+    match LT_LINK_EN3.set(&mut self.ipbus, value) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_error(err.to_string()));
+      }
+    }
+  }
+  ///Set on/off link enabling for LTBs 40-49
+  fn set_lt_link_en4(&mut self, value : u32) -> PyResult<u32> {
+    match LT_LINK_EN4.set(&mut self.ipbus, value) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_error(err.to_string()));
+      }
+    }
+  }
+  ///get LT LINK AUTOMASK toggle status
+  fn get_lt_link_automask(&mut self) -> PyResult<bool> {
+    match LT_LINK_AUTOMASK.get(&mut self.ipbus) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_error(err.to_string()));
+      }
+    }
+  }
+  ///set LT LINK AUTOMASK toggle status
+  fn set_lt_link_automask(&mut self, toggle : bool) -> PyResult<bool> {
+    match LT_LINK_AUTOMASK.set(&mut self.ipbus, toggle as u32) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_error(err.to_string()));
+      }
+    }
+  }
+
 fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
     match TRACK_CENTRAL_IS_GLOBAL.set(&mut self.ipbus, 1) {
       Ok(_) => {
