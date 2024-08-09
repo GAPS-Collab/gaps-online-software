@@ -231,7 +231,7 @@ pub const LT_LINK_EN2 : MTBRegister<'static> = MTBRegister {
 };
 /// Toggle on/off LTBs 30-39
 /// DSI 3 RX Link Enable 0x245 0x914 [9:0] rw 0x3FF
-pub const LT_LINK_EN4 : MTBRegister<'static> = MTBRegister {
+pub const LT_LINK_EN3 : MTBRegister<'static> = MTBRegister {
   addr    : 0x245,
   mask    : 0x000003ff,
   descr   : "Enable DSI link for LTBs 30-39",
