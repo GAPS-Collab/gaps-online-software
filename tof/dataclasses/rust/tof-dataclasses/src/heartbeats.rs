@@ -512,7 +512,10 @@ pub fn to_string(&self) -> String {
   } else { 
     repr += &(format!("\n Percent events w/out event ID: \tN/A").bright_purple());
   }
-  repr += &(format!("\n Percent events with data mangling: \t\t {:.2}", ((self.data_mangled_ev)/(self.n_rbe_received_tot))*(100 as usize)));
+  if self.n_rbe_received_tot > 0{
+    repr += &(format!("\n Percent events with data mangling: \t\t {:.2}", ((self.data_mangled_ev)/(self.n_rbe_received_tot))*(100 as usize)));
+  }
+  else {repr += &(format!("\n Percent events with data mangling: unable to calculate"));}
   repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
   repr += &(format!("\n Received MTEvents: \t\t\t{}", self.n_mte_received_tot).bright_purple());
   repr += &(format!("\n Skipped MTEvents: \t\t\t{}", self.n_mte_skipped).bright_purple());
