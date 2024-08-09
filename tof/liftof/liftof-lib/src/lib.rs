@@ -572,7 +572,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     rb.calibration.nanoseconds(9,
                                event.header.stop_cell as usize,
                                &mut times);
-    let fit_result_amp      = fit_sine_sydney(&voltage,  &times).0; 
+    let fit_result_amp      = fit_sine_sydney(&voltages,  &times).0; 
     let fit_result_freq     = fit_sine_sydney(&voltages, &times).1;
     let fit_result_phi      = fit_sine_sydney(&voltages, &times).2;
 
