@@ -207,6 +207,21 @@ pub fn set_gaps_trigger(bus : &mut IPBus, use_beta : bool)
   Ok(())
 }
 
+pub fn set_gaps633_trigger(bus : &mut IPBus, use_beta : bool) 
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting GAPS Antiparticle trigger, use beta {}!", use_beta);
+  set_inner_tof_threshold(bus,0x3)?;
+  set_outer_tof_threshold(bus,0x3)?;
+  set_total_tof_threshold(bus,0x6)?;
+  let mut trig_settings = bus.read(0x14)?;
+  trig_settings = trig_settings | u32::pow(2,24);
+  if use_beta {
+    trig_settings = trig_settings | u32::pow(2,25);
+  }
+  bus.write(0x14, trig_settings)?;
+  Ok(())
+}
+
 pub fn set_configurable_trigger(bus : &mut IPBus, enable : bool) 
   -> Result<(), Box<dyn Error>> {
   if enable {

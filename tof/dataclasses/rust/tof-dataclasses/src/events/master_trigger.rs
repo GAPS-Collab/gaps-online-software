@@ -117,6 +117,7 @@ pub enum TriggerType {
   Unknown      = 0u8,
   /// -> 1-10 "pysics" triggers
   Gaps         = 4u8,
+  Gaps633      = 5u8,
   Any          = 1u8,
   Track        = 2u8,
   TrackCentral = 3u8,
@@ -176,6 +177,9 @@ impl TriggerType {
       TriggerType::Gaps => {
         return 4;
       }
+      TriggerType::Gaps633 => {
+        return 5;
+      }
       TriggerType::UmbCube => {
         return 21;
       }
@@ -209,6 +213,7 @@ impl From<u8> for TriggerType {
       2   => TriggerType::Track,
       3   => TriggerType::TrackCentral,
       4   => TriggerType::Gaps,
+      5   => TriggerType::Gaps633,
       21  => TriggerType::UmbCube,
       22  => TriggerType::UmbCubeZ,
       23  => TriggerType::UmbCorCube,
@@ -233,6 +238,7 @@ impl FromRandom for TriggerType {
       TriggerType::Track,
       TriggerType::TrackCentral,
       TriggerType::Gaps,
+      TriggerType::Gaps633,
       TriggerType::UmbCube,
       TriggerType::UmbCubeZ,
       TriggerType::UmbCorCube,

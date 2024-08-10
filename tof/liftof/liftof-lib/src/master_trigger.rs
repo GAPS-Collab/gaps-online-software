@@ -432,6 +432,16 @@ pub fn master_trigger(mt_address     : String,
         Ok(_)    => ()
       }
     }
+    TriggerType::Gaps633    => {
+      match unset_all_triggers(&mut bus) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_gaps633_trigger(&mut bus, settings.gaps_trigger_use_beta) {
+        Err(err) => error!("Unable to set the GAPS trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
     TriggerType::Unknown => {
       println!("== ==> Not setting any trigger condition. You can set it through pico_hal.py");
       warn!("Trigger condition undefined! Not setting anything!");
