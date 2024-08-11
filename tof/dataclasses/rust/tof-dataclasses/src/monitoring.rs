@@ -1479,7 +1479,7 @@ impl fmt::Display for MtbMoniData {
     USE AUX LINK      {}
     TIU BAD           {}
     BUSY STUCK        {}
-    IGNROE BUSY       {}
+    IGNORE BUSY       {}
   --- --- --- --- --
   FPGA TEMP      [\u{00B0}C] {:.2}
   VCCINT          [V] {:.3}

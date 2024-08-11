@@ -330,7 +330,7 @@ impl MTTab {
           .borders(Borders::ALL)
           .style(Style::default().patch(self.theme.style()))
           .title("MT rate ".to_owned() )
-          .border_type(BorderType::Double),
+          .border_type(BorderType::Rounded),
       )
       .x_axis(Axis::default()
         .title(Span::styled("MET [s]", Style::default().patch(self.theme.style())))
@@ -394,7 +394,7 @@ impl MTTab {
           .borders(Borders::ALL)
           .style(Style::default().patch(self.theme.style()))
           .title("FPGA T [\u{00B0}C] ".to_owned() )
-          .border_type(BorderType::Double),
+          .border_type(BorderType::Rounded),
       )
       .x_axis(Axis::default()
         .title(Span::styled("MET [s]", Style::default().fg(Color::White)))

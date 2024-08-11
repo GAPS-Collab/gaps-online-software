@@ -54,12 +54,12 @@ use crate::colors::ColorTheme;
 // no clone ore debug implemented for 
 // zmq socket
 pub struct TelemetryTab {
-  pub theme         : ColorTheme,
+  pub theme         : ColorTheme, 
   //pub tp_receiver   : Receiver<TofPacket>,
   //pub event_queue   : VecDeque<TofEvent>,
   //pub zmq_socket    : zmq::Socket,
   pub tele_recv     : Receiver<TelemetryPacket>,
-  pub queue_size    : usize,
+  pub queue_size    : usize, //8
   pub merged_queue  : VecDeque<MergedEvent>,
   pub header_queue  : VecDeque<TelemetryHeader>,
   // when we decide to use ONLY the telemetry stream,
@@ -187,53 +187,111 @@ impl TelemetryTab {
     //}
   }
 
-  pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
+//   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
     
-    // as usual, layout first
-    let main_lo = Layout::default()
+//     // as usual, layout first
+//     let main_lo = Layout::default()
+//       .direction(Direction::Horizontal)
+//       .constraints(
+//           [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
+//       )
+//       .split(*main_window);
+    
+//     let packet_lo = Layout::default()
+//       .direction(Direction::Vertical)
+//       .constraints(
+//           [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
+//       )
+//       .split(main_lo[0]);
+
+
+//     let mut header_string = String::from("");
+//     if let Some(header) = self.header_queue.back() {
+//       header_string = format!("{}", header);
+//     }
+//     let header_view = Paragraph::new(header_string)
+//       .style(self.theme.style())
+//       .alignment(Alignment::Left)
+//       .block(
+//         Block::default()
+//           .borders(Borders::ALL)
+//           .border_type(BorderType::Rounded)
+//           .title("Last Header from Telemetry stream")
+//       );
+
+//     frame.render_widget(header_view, packet_lo[0]);
+//     let mut merged_string = String::from("");
+//     if let Some(ev) =  self.merged_queue.back() {
+//       merged_string = format!("{}", ev);
+//     }
+//     let merged_view = Paragraph::new(merged_string)
+//     //let merged_view = Paragraph::new(header_string)
+//       .style(self.theme.style())
+//       .alignment(Alignment::Left)
+//       .block(
+//         Block::default()
+//           .borders(Borders::ALL)
+//           .border_type(BorderType::Rounded)
+//           .title("Last MergedEvent from Telemetry stream")
+//       );
+//     frame.render_widget(merged_view, packet_lo[1]);
+//   }
+// }
+
+pub fn render(&mut self, main_window: &Rect, frame: &mut Frame) {
+  // Layout first
+  let main_lo = Layout::default()
       .direction(Direction::Horizontal)
       .constraints(
           [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
       )
       .split(*main_window);
-    
-    let packet_lo = Layout::default()
+  
+  let packet_lo = Layout::default()
       .direction(Direction::Vertical)
       .constraints(
           [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
       )
       .split(main_lo[0]);
 
-
-    let mut header_string = String::from("");
-    if let Some(header) = self.header_queue.back() {
-      header_string = format!("{}", header);
-    }
-    let header_view = Paragraph::new(header_string)
+  // Create header_string safely
+  let header_string = if let Some(header) = self.header_queue.back() {
+      format!("{}", header)
+  } else {
+      String::from("No header available")
+  };
+  
+  let header_view = Paragraph::new(header_string)
       .style(self.theme.style())
       .alignment(Alignment::Left)
       .block(
-        Block::default()
-          .borders(Borders::ALL)
-          .border_type(BorderType::Rounded)
-          .title("Last Header from Telemetry stream")
+          Block::default()
+              .borders(Borders::ALL)
+              .border_type(BorderType::Rounded)
+              .title("Last Header from Telemetry stream")
       );
 
-    frame.render_widget(header_view, packet_lo[0]);
-    let mut merged_string = String::from("");
-    if let Some(ev) =  self.merged_queue.back() {
-      merged_string = format!("{}", ev);
-    }
-    let merged_view = Paragraph::new(merged_string)
-    //let merged_view = Paragraph::new(header_string)
+  frame.render_widget(header_view, packet_lo[0]);
+
+  // Create merged_string safely
+  let merged_string = if let Some(ev) = self.merged_queue.back() {
+      format!("{}", ev)
+  } else {
+      String::from("No merged event available")
+  };
+  
+  let merged_view = Paragraph::new(merged_string)
       .style(self.theme.style())
       .alignment(Alignment::Left)
       .block(
-        Block::default()
-          .borders(Borders::ALL)
-          .border_type(BorderType::Rounded)
-          .title("Last MergedEvent from Telemetry stream")
+          Block::default()
+              .borders(Borders::ALL)
+              .border_type(BorderType::Rounded)
+              .title("Last MergedEvent from Telemetry stream")
       );
-    frame.render_widget(merged_view, packet_lo[1]);
+
+  frame.render_widget(merged_view, packet_lo[1]);
   }
+
+
 }

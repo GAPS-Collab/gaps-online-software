@@ -47,9 +47,7 @@ pub use settings::{
 use std::error::Error;
 use std::fmt;
 
-use std::{
-    fs::File,
-};
+use std::fs::File;
 use std::path::PathBuf;
 use std::fs::read_to_string;
 use std::io::{
@@ -391,7 +389,7 @@ impl fmt::Display for RunStatistics {
 }
 
 //sydney's sine fit without libraries
-fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f32 {
+fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> (f32, f32, f32) {
   let start_bin = 20;
   let size_bin = 900;
   let pi = PI;
@@ -465,69 +463,12 @@ fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f32 {
   let a = inverse_matrix[0][0] * p[0] + inverse_matrix[1][0] * p[1] + inverse_matrix[2][0] * p[2];
   let b = inverse_matrix[0][1] * p[0] + inverse_matrix[1][1] * p[1] + inverse_matrix[2][1] * p[2];
 
-  let phi = a.atan2(b);
+  let phi    = a.atan2(b);
+  let amp    = (a*a + b*b).sqrt();
+  let freq   = 0.02 as f32;
 
-  phi
+  (amp, freq, phi)
 }
-
-
-
-// // sydney's version in rust
-// fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> f32 {
-//   let start_bin = 20;
-//   let size_bin  = 900; // can probably make this smaller
-
-//   let mut data_size = 0;
-//   let pi            = PI;
-//   let mut xi_yi     = 0.0;
-//   let mut xi_zi     = 0.0;
-//   let mut yi_zi     = 0.0;
-//   let mut xi_xi     = 0.0;
-//   let mut yi_yi     = 0.0;
-//   let mut xi_sum    = 0.0;
-//   let mut yi_sum    = 0.0;
-//   let mut zi_sum    = 0.0;
-
-//   for i in start_bin..start_bin+size_bin {
-//       let xi = (2.0 * pi * 0.02 * times[i] as f32).cos();  // for this fit we know the frequency is 0.02 waves/ns
-//       let yi = (2.0 * pi * 0.02 * times[i] as f32).sin();
-//       let zi = volts[i];
-//       xi_yi      += xi * yi;
-//       xi_zi      += xi * (zi as f32);
-//       yi_zi      += yi * (zi as f32);
-//       xi_xi      += xi * xi;
-//       yi_yi      += yi * yi;
-//       xi_sum     += xi;
-//       yi_sum     += yi;
-//       zi_sum     += zi;
-//       data_size  += 1;
-//   }
-//   let a_matrix = Matrix3::new(
-//     xi_xi, xi_yi, xi_sum,
-//     xi_yi, yi_yi, yi_sum,
-//     xi_sum, yi_sum, data_size as f32
-//   );
-  
-//   //let determinant = a_matrix.determinant(); unused bc we find inverse directly
-//   match a_matrix.try_inverse() {
-//     Some(inv_matrix) => {
-//       let p = Vector3::new(xi_zi, yi_zi, zi_sum);
-//       // Transpose the Vector3 to get a RowVector3
-//       let p_transposed: RowVector3<f32> = p.transpose();
-//       //let result = inv_matrix * p;
-//       let result = p_transposed * inv_matrix;
-//       let a = result[0];
-//       let b = result[1];
-//       // let c = result[2]; // offset parameter if needed
-//       let phi = a.atan2(b);
-//       return phi as f32;
-//     }
-//     None => {
-//       error!("Finding inverse matrix failed!");
-//       return 99.9;
-//     }
-//   }
-// }
 
 //*************************************************
 // I/O - read/write (general purpose) files
@@ -629,9 +570,12 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     rb.calibration.nanoseconds(9,
                                event.header.stop_cell as usize,
                                &mut times);
-    let fit_result_phi = fit_sine_sydney(&voltages, &times);
+    let fit_result_amp      = fit_sine_sydney(&voltages,  &times).0; 
+    let fit_result_freq     = fit_sine_sydney(&voltages, &times).1;
+    let fit_result_phi      = fit_sine_sydney(&voltages, &times).2;
+
     //println!("FIT RESULT = {:?}", fit_result);
-    fit_result = (0.0, 0.0, fit_result_phi as f32);
+    fit_result = (fit_result_amp, fit_result_freq, fit_result_phi);
     event.header.set_sine_fit(fit_result);
   }
 

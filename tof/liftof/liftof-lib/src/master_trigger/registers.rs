@@ -199,6 +199,68 @@ pub const TRIG_CYCLIC_INTERVAL : MTBRegister<'static> = MTBRegister {
   pulse  : false
 };
 
+/// Toggle on/off LTBs 0-9
+/// DSI 0 RX Link Enable 0x242 0x908 [9:0] rw 0x3FF
+pub const LT_LINK_EN0 : MTBRegister<'static> = MTBRegister {
+  addr    : 0x242,
+  mask    : 0x000003ff,
+  descr   : "Enable DSI link for LTBs 0-9",
+  rmw     : true,
+  ro      : false,
+  pulse   : false
+};
+/// Toggle on/off LTBs 10-19
+/// DSI 1 RX Link Enable 0x243 0x90c [9:0] rw 0x3FF
+pub const LT_LINK_EN1 : MTBRegister<'static> = MTBRegister {
+  addr    : 0x243,
+  mask    : 0x000003ff,
+  descr   : "Enable DSI link for LTBs 10-19",
+  rmw     : true,
+  ro      : false,
+  pulse   : false
+};
+/// Toggle on/off LTBs 20-29
+/// DSI 2 RX Link Enable 0x244 0x910 [9:0] rw 0x3FF
+pub const LT_LINK_EN2 : MTBRegister<'static> = MTBRegister {
+  addr    : 0x244,
+  mask    : 0x000003ff,
+  descr   : "Enable DSI link for LTBs 20-29",
+  rmw     : true,
+  ro      : false,
+  pulse   : false
+};
+/// Toggle on/off LTBs 30-39
+/// DSI 3 RX Link Enable 0x245 0x914 [9:0] rw 0x3FF
+pub const LT_LINK_EN3 : MTBRegister<'static> = MTBRegister {
+  addr    : 0x245,
+  mask    : 0x000003ff,
+  descr   : "Enable DSI link for LTBs 30-39",
+  rmw     : true,
+  ro      : false,
+  pulse   : false
+};
+/// Toggle on/off LTBs 40-49
+/// DSI 4 RX Link Enable 0x246 0x918 [9:0] rw 0x3FF
+pub const LT_LINK_EN4 : MTBRegister<'static> = MTBRegister {
+  addr    : 0x246,
+  mask    : 0x000003ff,
+  descr   : "Enable DSI link for LTBs 40-49",
+  rmw     : true,
+  ro      : false,
+  pulse   : false
+};
+///Toggle on/off LTB Automasking
+/// LT_LINK_AUTOMASK 0x247 0x91c 0 rw 0x1
+/// 1 to enable automatic LT link masking
+pub const LT_LINK_AUTOMASK : MTBRegister<'static> = MTBRegister {
+  addr    : 0x247,
+  mask    : 0x00000001,
+  descr   : "Enable LT Automasking -> 1 to enable LTB link masking",
+  rmw     : true,
+  ro      : false,
+  pulse   : false,
+};
+
 /// Set/Unset the TIU emulation mode
 /// TIU_EMULATION_MODE  0xe     0x38    0   rw  0x0     1 to emulate the TIU
 pub const TIU_EMULATION_MODE : MTBRegister<'static> = MTBRegister {

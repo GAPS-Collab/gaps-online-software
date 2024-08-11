@@ -18,7 +18,7 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-tof-dataclasses     = { workspace = true, features = ["polars"] } 
+tof-dataclasses     = { path = "../../dataclasses/rust/tof-dataclasses" , features =     ["database", "polars","pybindings","advanced-algorithms"], version = "0.10"} 
 liftof-lib          = { path = "../liftof-lib", features=["database"]}
 rpy-tof-dataclasses = { workspace = true }
 
