@@ -47,9 +47,7 @@ pub use settings::{
 use std::error::Error;
 use std::fmt;
 
-use std::{
-    fs::File,
-};
+use std::fs::File;
 use std::path::PathBuf;
 use std::fs::read_to_string;
 use std::io::{
