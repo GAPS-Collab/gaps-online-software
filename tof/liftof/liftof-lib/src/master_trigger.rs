@@ -442,6 +442,26 @@ pub fn master_trigger(mt_address     : String,
         Ok(_)    => ()
       }
     }
+    TriggerType::Gaps422    => {
+      match unset_all_triggers(&mut bus) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_gaps422_trigger(&mut bus, settings.gaps_trigger_use_beta) {
+        Err(err) => error!("Unable to set the GAPS trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
+    TriggerType::Gaps211    => {
+      match unset_all_triggers(&mut bus) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_gaps211_trigger(&mut bus, settings.gaps_trigger_use_beta) {
+        Err(err) => error!("Unable to set the GAPS trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
     TriggerType::Unknown => {
       println!("== ==> Not setting any trigger condition. You can set it through pico_hal.py");
       warn!("Trigger condition undefined! Not setting anything!");
@@ -526,7 +546,7 @@ pub fn master_trigger(mt_address     : String,
   // timers - when to reconnect if no 
   // events have been received in a 
   // certain timeinterval
-  let mut heartbeat          = MTBHeartbeat::new();
+  let mut heartbeat      = MTBHeartbeat::new();
   let mut mtb_timeout    = Instant::now();
   let mut moni_interval  = Instant::now();
   let mut tc_timer       = Instant::now();
