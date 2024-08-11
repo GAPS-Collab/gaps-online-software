@@ -116,11 +116,11 @@ pub const LTB_CHANNELS : [u16;8] = [
 pub enum TriggerType {
   Unknown      = 0u8,
   /// -> 1-10 "pysics" triggers
-  Gaps         = 4u8,
-  Gaps633      = 5u8,
   Any          = 1u8,
   Track        = 2u8,
   TrackCentral = 3u8,
+  Gaps         = 4u8,
+  Gaps633      = 5u8, // 
   /// -> 20+ "Philip's triggers"
   /// Any paddle HIT in UMB  + any paddle HIT in CUB
   UmbCube      = 21u8,
