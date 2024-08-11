@@ -544,7 +544,7 @@ pub fn master_trigger(mt_address     : String,
   let mut slack_cadence  = 5; // send only one slack message 
                               // every 5 times we send moni data
   let mut evq_num_events      = 0u64;
-  //let mut evq_num_events_last = 0u32;
+  let mut evq_num_events_last = 0u32;
   //let mut evq_num_events_avg  = 0f64;
   let mut n_iter_loop         = 0u64;
 
@@ -745,22 +745,15 @@ pub fn master_trigger(mt_address     : String,
           error!("Unable to query {}! {err}", EVQ_NUM_EVENTS);
         }
         Ok(num_ev) => {
-          heartbeat.evq_num_events_last = num_ev as u64;
           evq_num_events += num_ev as u64;
+          heartbeat.evq_num_events_last = num_ev as u64;
           n_iter_loop    += 1;
           heartbeat.evq_num_events_avg = (evq_num_events as u64)/(n_iter_loop as u64);
         }
       }
       heartbeat.total_elapsed += verbose_timer_elapsed as u64;
-      //println!("  {:<60} <<", ">> == == == == == == ==  MT HEARTBEAT == ==  == == == == ==".bright_blue().bold());
-      //println!("  {:<60} <<", format!(">> ==> MET (Mission Elapsed Time) (sec) {:.1}",total_elapsed).bright_blue());
-      //println!("  {:<60} <<", format!(">> ==> Recorded Events                  {}", n_events).bright_blue());
-      //println!("  {:<60} <<", format!(">> ==> Last MTB EVQ size                {}", evq_num_events_last).bright_blue());
-      //println!("  {:<60} <<", format!(">> ==> Avg. MTB EVQ size (per 30s )     {:.2}", evq_num_events_avg).bright_blue());
-      //println!("  {:<60} <<", format!(">> ==> -- trigger rate, recorded  (Hz)  {:.2}", n_events as f64/total_elapsed).bright_blue());
       match TRIGGER_RATE.get(&mut bus) {
         Ok(trate) => {
-          println!("  {:<60} <<", format!(">> ==> -- trigger rate, from reg. (Hz)  {}", trate).bright_blue());
           heartbeat.trate = trate as u64;
         }
         Err(err) => {
@@ -789,6 +782,7 @@ pub fn master_trigger(mt_address     : String,
       
       if verbose {
         println!("{}", heartbeat);
+        println!(EVQ_NUM_EVENTS.get(&mut bus).unwrap())
       }
       verbose_timer = Instant::now();
       let pack = heartbeat.pack();
