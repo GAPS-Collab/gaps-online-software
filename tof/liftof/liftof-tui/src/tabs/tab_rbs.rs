@@ -267,7 +267,7 @@ impl RBTab<'_>  {
           debug!("Got next packet {}!", pack);
           match pack.packet_type {
             PacketType::PAMoniData => {
-              info!("Received new PAMoniData!");
+              trace!("Received new PAMoniData!");
               let moni : PAMoniData = pack.unpack()?;
               self.pa_moni_queue.add(moni);
               if !self.met_queue_pa_moni.contains_key(&moni.board_id) {
@@ -281,7 +281,7 @@ impl RBTab<'_>  {
               return Ok(());
             }
             PacketType::LTBMoniData => {
-              info!("Received new LTBMoniData!");
+              trace!("Received new LTBMoniData!");
               let moni : LTBMoniData = pack.unpack()?;
               self.ltb_moni_queue.add(moni);
               if !self.met_queue_ltb_moni.contains_key(&moni.board_id) {
@@ -295,7 +295,7 @@ impl RBTab<'_>  {
               return Ok(());
             },
             PacketType::RBMoniData   => {
-              info!("Received new RBMoniData!");
+              trace!("Received new RBMoniData!");
               let moni : RBMoniData = pack.unpack()?;
               self.moni_queue.add(moni);
               self.n_moni += 1;
