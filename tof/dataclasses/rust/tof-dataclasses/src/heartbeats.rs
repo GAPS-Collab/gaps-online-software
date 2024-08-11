@@ -513,7 +513,9 @@ pub fn to_string(&self) -> String {
     repr += &(format!("\n Percent events w/out event ID: \tN/A").bright_purple());
   }
   if self.n_rbe_received_tot > 0{
-    repr += &(format!("\n Percent events with data mangling: \t\t {:.2}", ((self.data_mangled_ev)/(self.n_rbe_received_tot))*(100 as usize)));
+    repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
+    repr += &(format!("\n Num. evts with data mangling: \t\t{}", self.data_mangled_ev));
+    repr += &(format!("\n Percent events with data mangling: \t\t\t {:.2}", ((self.data_mangled_ev as f64)/(self.n_rbe_received_tot as f64))*(100 as f64)));
   }
   else {repr += &(format!("\n Percent events with data mangling: unable to calculate"));}
   repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
@@ -525,8 +527,8 @@ pub fn to_string(&self) -> String {
   repr += &(format!("\n RBEvents Discarded: \t\t\t{}", self.n_rbe_discarded_tot).bright_purple());
   repr += &(format!("\n Percent RBEvents discarded: \t\t{:.2}%", self.get_nrbe_discarded_frac()*(100 as f64)).bright_purple());
   repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-  repr += &(format!("\n RBEvent/Evts sent       \t{:.2}", (self.n_rbe_received_tot / self.n_sent)).bright_purple());
-  repr += &(format!("\n RBEvent/MTEvents       \t{:.2}", (self.n_rbe_received_tot / self.n_mte_received_tot)).bright_purple());
+  repr += &(format!("\n RBEvent/Evts sent       \t\t{:.2}", (self.n_rbe_received_tot as f64/ self.n_sent as f64)).bright_purple());
+  repr += &(format!("\n RBEvent/MTEvents       \t\t{:.2}", (self.n_rbe_received_tot as f64 / self.n_mte_received_tot as f64)).bright_purple());
   repr += &(format!("\n Num. RBEvents with evid from past:  \t{}", self.n_rbe_from_past).bright_purple());
   repr += &(format!("\n Num. orphan RBEvents: \t\t{}", self.n_rbe_orphan).bright_purple());
   repr += &(format!("\n\n Getting MTE from cache for RBEvent failed {} times :(", self.rbe_wo_mte).bright_blue());
