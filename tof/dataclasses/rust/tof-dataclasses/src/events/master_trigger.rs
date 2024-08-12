@@ -120,7 +120,9 @@ pub enum TriggerType {
   Track        = 2u8,
   TrackCentral = 3u8,
   Gaps         = 4u8,
-  Gaps633      = 5u8, // 
+  Gaps633      = 5u8, 
+  Gaps422      = 6u8,
+  Gaps211      = 7u8,
   /// -> 20+ "Philip's triggers"
   /// Any paddle HIT in UMB  + any paddle HIT in CUB
   UmbCube      = 21u8,
@@ -180,6 +182,12 @@ impl TriggerType {
       TriggerType::Gaps633 => {
         return 5;
       }
+      TriggerType::Gaps422 => {
+        return 6;
+      }
+      TriggerType::Gaps211 => {
+        return 7;
+      }
       TriggerType::UmbCube => {
         return 21;
       }
@@ -214,6 +222,8 @@ impl From<u8> for TriggerType {
       3   => TriggerType::TrackCentral,
       4   => TriggerType::Gaps,
       5   => TriggerType::Gaps633,
+      6   => TriggerType::Gaps422,
+      7   => TriggerType::Gaps211,
       21  => TriggerType::UmbCube,
       22  => TriggerType::UmbCubeZ,
       23  => TriggerType::UmbCorCube,
@@ -239,6 +249,8 @@ impl FromRandom for TriggerType {
       TriggerType::TrackCentral,
       TriggerType::Gaps,
       TriggerType::Gaps633,
+      TriggerType::Gaps422,
+      TriggerType::Gaps211,
       TriggerType::UmbCube,
       TriggerType::UmbCubeZ,
       TriggerType::UmbCorCube,
@@ -518,6 +530,10 @@ impl MasterTriggerEvent {
     if gaps_trigger {
       t_types.push(TriggerType::Gaps);
     }
+    // let gaps_trigger_633 = self.trigger_source >> 6 & 0x1 == 1;
+    // if gaps_trigger_633 {
+    //   t_types.push(TriggerType::Gaps633);
+    // }
     let any_trigger    = self.trigger_source >> 6 & 0x1 == 1;
     if any_trigger {
       t_types.push(TriggerType::Any);
