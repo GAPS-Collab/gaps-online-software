@@ -1631,6 +1631,11 @@ impl PyMasterTriggerEvent {
     self.event.tiu_gps16
   }
 
+  #[getter]
+  pub fn timestamp_tiu(&self) -> u32 { 
+    self.event.tiu_timestamp
+  }
+
   /// Get absolute timestamp as sent by the GPS
   #[getter]
   pub fn timestamp_abs48(&self) -> u64 {
