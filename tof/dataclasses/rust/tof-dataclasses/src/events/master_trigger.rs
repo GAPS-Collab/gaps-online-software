@@ -121,6 +121,7 @@ pub enum TriggerType {
   TrackCentral = 3u8,
   Gaps         = 4u8,
   Gaps633      = 5u8,
+  Gaps633      = 5u8, 
   Gaps422      = 6u8,
   Gaps211      = 7u8,
   /// -> 20+ "Philip's triggers"
@@ -530,6 +531,10 @@ impl MasterTriggerEvent {
     if gaps_trigger {
       t_types.push(TriggerType::Gaps);
     }
+    // let gaps_trigger_633 = self.trigger_source >> 6 & 0x1 == 1;
+    // if gaps_trigger_633 {
+    //   t_types.push(TriggerType::Gaps633);
+    // }
     let any_trigger    = self.trigger_source >> 6 & 0x1 == 1;
     if any_trigger {
       t_types.push(TriggerType::Any);

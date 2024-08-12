@@ -138,6 +138,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let daq_reset_cooldown   = Instant::now();
   let reset_daq_flag       = false;
   let mut retire               = false;
+  let mut hb_timer               = Instant::now(); 
+  let mut hb_interval         = Duration::from_secs(settings.hb_send_interval as u64);
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
       //println!("= => [evt_builder] checkling tc..");
@@ -329,17 +331,25 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       heartbeat.mte_receiver_cbc_len = m_trig_ev.len();
       heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
       heartbeat.tp_sender_cbc_len = data_sink.len();
-      let pack = heartbeat.pack();
-      match data_sink.send(pack) {
-        Err(err) => {
-          error!("EVTBLDR Heartbeat sending failed! Err {}", err);
-        }
-        Ok(_)    => {
-          debug!("Heartbeat sent <3 <3 <3");
-        }
-      }
-      println!("{}", heartbeat);
-   
+
+      //while hb_timer.elapsed() < hb_interval {};
+      //}
+
+      //while hb_timer.elapsed() >= hb_interval {
+      //let pack = heartbeat.pack();
+      //match data_sink.send(pack) {
+      //  Err(err) => {
+      //    error!("EVTBLDR Heartbeat sending failed! Err {}", err);
+      //  }
+      //  Ok(_)    => {
+      //    debug!("Heartbeat sent <3 <3 <3");
+      //  }
+      //}
+      //println!("{}", heartbeat);
+      //hb_timer = Instant::now();
+
+      ////while hb_timer.elapsed() < hb_interval {};
+      //}
       let mut counters = HashMap::<u8,f64>::new();
       for k in seen_rbevents.keys() {
         counters.insert(*k, seen_rbevents[&k] as f64/met_seconds as f64);
@@ -615,7 +625,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             // update event status, so that we will also see in an 
             // (optionally) produced tof event summary if the 
             // event has isuses
-            n_rbe_per_te  += ev_to_send.rb_events.len(); 
+            n_rbe_per_te  += ev_to_send.rb_events.len();
+            heartbeat.data_mangled_ev = 69;
             let _ev_satus  = ev_to_send.mt_event.event_status;
             for ev in &ev_to_send.rb_events {
               if ev.status == EventStatus::CellSyncErrors || ev.status == EventStatus::ChnSyncErrors {
@@ -625,7 +636,25 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               }
             }
             // can we avoid unpacking and repacking?
-            let pack       = TofPacket::from(&ev_to_send);
+            
+          //  while hb_timer.elapsed() < hb_interval {
+          //    // Do nothing, wait for the next heartbeat cycle
+          //}
+          let pack       = TofPacket::from(&ev_to_send);
+          match data_sink.send(pack) {
+            Err(err) => {
+              error!("Packet sending failed! Err {}", err);
+              n_sent_ch_err += 1; 
+            }
+            Ok(_)    => {
+              debug!("Event with id {} sent!", evid);
+              n_sent += 1;
+              heartbeat.n_sent += 1;
+            }
+          }
+          if hb_timer.elapsed() >= hb_interval {
+            //let pack       = TofPacket::from(&ev_to_send);
+            let pack         = heartbeat.pack();
             match data_sink.send(pack) {
               Err(err) => {
                 error!("Packet sending failed! Err {}", err);
@@ -637,7 +666,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                 heartbeat.n_sent += 1;
               }
             }
-          } else {
+            hb_timer = Instant::now();
+            // Wait until the configured interval has passed
+            //while hb_timer.elapsed() < hb_interval {};
+          } 
+        } else {
             event_id_cache.push_front(evid);
           }
         }
@@ -658,6 +691,5 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     //event_cache.retain(|ev| ev.valid);
     debug!("Debug timer! EVT SENDING {:?}", debug_timer.elapsed());
   } // end loop
-}
-
+}  
 
