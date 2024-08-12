@@ -649,10 +649,10 @@ pub const CORTINA_THRESH : MTBRegister<'static> = MTBRegister {
 /// LOST_TRIGGER_RATE     0x18    0x60    \[23:0\]  r       Rate of lost triggers in Hz
 pub const LOST_TRIGGER_RATE : MTBRegister<'static> = MTBRegister {
   addr  : 0x18,
-  mask  : 0x800000,
-  descr : "Set the nhit threshold for the cortina. Needs configurable trigger enabled to be in effect.",
-  rmw   : true,
-  ro    : false,
+  mask  : 0x00ffffff,
+  descr : "Get lost trigger rate in Hz",
+  rmw   : false,
+  ro    : true,
   pulse : false
 };
 

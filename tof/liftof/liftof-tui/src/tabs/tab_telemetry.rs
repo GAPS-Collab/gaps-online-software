@@ -96,65 +96,56 @@ impl TelemetryTab {
  
   pub fn receive_packet(&mut self) -> Result<(), SerializationError> {  
     match self.tele_recv.try_recv() {
-      Err(err)    => trace!("Can't receive TofPacket!
-          {err}"),
-      Ok(packet) => {
-        self.header_queue.push_back(packet.header.clone());
-        if self.header_queue.len() > self.queue_size {
-          let _ = self.header_queue.pop_front();
-        }
-        //if header.ptype == 80 {
-        //  match TrackerPacket::from_bytestream(&payload, &mut pos) {
-        //    Err(err) => {
-        //      //for k in pos - 5 .. pos + 5 {
-        //      //  println!("{}",stream[k]);
-        //      //}
-        //      error!("Unable to decode TrackerPacket! {err}");
-        //    }
-        //    Ok(mut tp) => {
-        //      tp.telemetry_header = header;
-        //      //println!("{}", tp);
-        //    }
-        //  }
-        //}
-        if packet.header.ptype == 90 {
-          //println!("{}",packet.header);
-          let expected_size = (packet.header.length as usize) - TelemetryHeader::SIZE;
-          if expected_size > packet.payload.len() {
-            println!("Unable to decode MergedEvent Telemetry packet! The expected size is {}, but the payload len in {}", expected_size - TelemetryHeader::SIZE, packet.payload.len());
-            return Err(SerializationError::StreamTooShort);
-          }
-          match MergedEvent::from_bytestream(&packet.payload, &mut 0) {
-            Err(err) => {
-              error!("Unable to decode MergedEvent! {err}");
+        Err(crossbeam_channel::TryRecvError::Empty) => {
+            trace!("No data available yet.");
+            // Handle the empty case, possibly by doing nothing or logging.
+        },
+        Err(crossbeam_channel::TryRecvError::Disconnected) => {
+            error!("Telemetry channel disconnected.");
+            // Handle the disconnection, possibly by stopping processing or returning an error.
+            return Err(SerializationError::Disconnected);
+        },
+        Ok(packet) => {
+            // Process the received packet as before
+            self.header_queue.push_back(packet.header.clone());
+            if self.header_queue.len() > self.queue_size {
+                let _ = self.header_queue.pop_front();
             }
-            Ok(me) => {
-              match &self.tp_sender {
-                Some(sender) => {
-                  match TofPacket::from_bytestream(&me.tof_data, &mut 0) {
-                    Err(err) => {
-                      error!("Can't unpack TofPacket! {err}");
-                    }
-                    Ok(tp) => {
-                      match sender.send(tp) {
-                        Ok(_)    => (),
-                        Err(err) => error!("Unable to send TP over channel! {err}")
-                      }
-                    }
-                  }
+
+            if packet.header.ptype == 90 {
+                let expected_size = (packet.header.length as usize) - TelemetryHeader::SIZE;
+                if expected_size > packet.payload.len() {
+                    println!("Unable to decode MergedEvent Telemetry packet! The expected size is {}, but the payload len is {}", expected_size - TelemetryHeader::SIZE, packet.payload.len());
+                    return Err(SerializationError::StreamTooShort);
                 }
-                None => ()
-              }
-              self.merged_queue.push_back(me);
-              if self.merged_queue.len() > self.queue_size {
-                let _ = self.merged_queue.pop_front();
-              }
+                match MergedEvent::from_bytestream(&packet.payload, &mut 0) {
+                    Err(err) => {
+                        error!("Unable to decode MergedEvent! {err}");
+                    }
+                    Ok(me) => {
+                        if let Some(sender) = &self.tp_sender {
+                            match TofPacket::from_bytestream(&me.tof_data, &mut 0) {
+                                Err(err) => {
+                                    error!("Can't unpack TofPacket! {err}");
+                                }
+                                Ok(tp) => {
+                                    if let Err(err) = sender.send(tp) {
+                                        error!("Unable to send TP over channel! {err}");
+                                    }
+                                }
+                            }
+                        }
+                        self.merged_queue.push_back(me);
+                        if self.merged_queue.len() > self.queue_size {
+                            let _ = self.merged_queue.pop_front();
+                        }
+                    }
+                }
             }
-          }
         }
-      }
     }
-    return Ok(());
+    Ok(())
+  }
     //match self.tp_receiver.try_recv() {
     //  Err(_err) => {
     //    return Ok(());
@@ -185,7 +176,6 @@ impl TelemetryTab {
     //    return Ok(());
     //  }
     //}
-  }
 
 //   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
     
@@ -292,6 +282,4 @@ pub fn render(&mut self, main_window: &Rect, frame: &mut Frame) {
 
   frame.render_widget(merged_view, packet_lo[1]);
   }
-
-
 }
