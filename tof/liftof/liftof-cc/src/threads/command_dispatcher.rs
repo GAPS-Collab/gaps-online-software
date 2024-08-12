@@ -337,7 +337,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                               n_rb_ack_rcved += 1;
                             }
                           }
-                          if n_rb_ack_rcved == 40 {
+                          if n_rb_ack_rcved == 38 {
                             resp = TofResponse::Success(0);
                           }
                         }

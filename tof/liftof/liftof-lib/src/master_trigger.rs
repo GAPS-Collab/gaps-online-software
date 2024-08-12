@@ -116,6 +116,7 @@ pub struct MTBSettings {
   pub rb_int_window      : u8,
   pub tiu_emulation_mode : bool,
   pub tofbot_webhook     : String,
+  pub hb_send_interval   : u8,
 }
 
 impl MTBSettings {
@@ -131,6 +132,7 @@ impl MTBSettings {
       rb_int_window           : 1,
       tiu_emulation_mode      : false,
       tofbot_webhook          : String::from(""),
+      hb_send_interval        : 30,
     }
   }
 }
@@ -547,7 +549,8 @@ pub fn master_trigger(mt_address     : String,
   let mut evq_num_events_last = 0u32;
   //let mut evq_num_events_avg  = 0f64;
   let mut n_iter_loop         = 0u64;
-
+  let mut hb_timer            = Instant::now();
+  let mut hb_interval           = Duration::from_secs(settings.hb_send_interval as u64);
   // indicator if the thread is active (it can 
   // sleep during calibrations)
   let mut is_active = true;
@@ -770,14 +773,22 @@ pub fn master_trigger(mt_address     : String,
         println!("EVG_NUM_EVENTS {}", EVQ_NUM_EVENTS.get(&mut bus).unwrap())
       }
       verbose_timer = Instant::now();
+      while hb_timer.elapsed() < hb_interval {
+        // Do nothing, wait for the next heartbeat cycle
+    }
+
+    while hb_timer.elapsed() >= hb_interval {
+
       let pack = heartbeat.pack();
       match moni_sender.send(pack) {
         Err(err) => {
           error!("Can not send MTB Heartbeat over channel! {err}");
         },
         Ok(_) => ()
+        }
       }
+      hb_timer = Instant::now();
+      while hb_timer.elapsed() < hb_interval {};
     }
-  }
-} 
-
+  } 
+}
