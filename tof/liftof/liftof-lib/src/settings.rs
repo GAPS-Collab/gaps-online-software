@@ -500,6 +500,7 @@ pub struct TofEventBuilderSettings {
   pub build_strategy      : BuildStrategy,
   pub greediness          : u8,
   pub wait_nrb            : u8,
+  pub hb_send_interval    : u8,
 }
 
 impl TofEventBuilderSettings {
@@ -513,6 +514,7 @@ impl TofEventBuilderSettings {
       build_strategy      : BuildStrategy::Adaptive,
       greediness          : 3,
       wait_nrb            : 40,
+      hb_send_interval    : 30,
     }
   }
 }
@@ -556,7 +558,8 @@ pub struct DataPublisherSettings {
   /// are sending flight packets)
   pub send_rbwaveform_packets   : bool,
   pub send_tof_summary_packets  : bool,
-  pub send_tof_event_packets    : bool
+  pub send_tof_event_packets    : bool,
+  pub hb_send_interval          : u8,
 }
 
 impl DataPublisherSettings {
@@ -569,7 +572,8 @@ impl DataPublisherSettings {
       send_mtb_event_packets    : false,
       send_rbwaveform_packets   : false,
       send_tof_summary_packets  : true,
-      send_tof_event_packets    : false
+      send_tof_event_packets    : false,
+      hb_send_interval          : 30,
     }
   }
 }
