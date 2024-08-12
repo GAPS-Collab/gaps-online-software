@@ -615,7 +615,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             // update event status, so that we will also see in an 
             // (optionally) produced tof event summary if the 
             // event has isuses
-            n_rbe_per_te  += ev_to_send.rb_events.len(); 
+            n_rbe_per_te  += ev_to_send.rb_events.len();
+            heartbeat.data_mangled_ev = 69;
             let _ev_satus  = ev_to_send.mt_event.event_status;
             for ev in &ev_to_send.rb_events {
               if ev.status == EventStatus::CellSyncErrors || ev.status == EventStatus::ChnSyncErrors {
@@ -625,6 +626,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               }
             }
             // can we avoid unpacking and repacking?
+            if debug_timer_elapsed > 35.0  {
             let pack       = TofPacket::from(&ev_to_send);
             match data_sink.send(pack) {
               Err(err) => {
@@ -657,7 +659,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     //event_sending = 0;
     //event_cache.retain(|ev| ev.valid);
     debug!("Debug timer! EVT SENDING {:?}", debug_timer.elapsed());
-  } // end loop
+    } // end loop
+  }
 }
-
 
