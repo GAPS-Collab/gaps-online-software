@@ -282,5 +282,4 @@ pub fn render(&mut self, main_window: &Rect, frame: &mut Frame) {
 
   frame.render_widget(merged_view, packet_lo[1]);
   }
-
 }

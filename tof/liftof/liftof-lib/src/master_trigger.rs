@@ -615,7 +615,6 @@ pub fn master_trigger(mt_address     : String,
         first = false;
       }
       match get_mtbmonidata(&mut bus) { 
-                            //&mut buffer) {
         Err(err) => {
           error!("Can not get MtbMoniData! {err}");
         },
@@ -668,10 +667,6 @@ pub fn master_trigger(mt_address     : String,
             },
             Ok(_) => ()
           }
-          //if verbose {
-          //  println!("{}", _moni);
-          //  rate_from_reg = Some(_moni.rate as u32);
-          //}
         }
       }
       moni_interval = Instant::now();
@@ -758,31 +753,21 @@ pub fn master_trigger(mt_address     : String,
         }
         Err(err) => {
           error!("Unable to query {}! {err}", TRIGGER_RATE);
-          //println!("  {:<60} <<", String::from(">> ==> -- trigger rate, from reg. (Hz)   N/A").bright_blue());
         }
       }
       match LOST_TRIGGER_RATE.get(&mut bus) {
         Ok(lost_trate) => {
-          //println!("  {:<60} <<", format!(">> ==> -- lost trg rate, from reg. (Hz)   {}", lost_trate).bright_blue());
           heartbeat.lost_trate = lost_trate as u64;
         }
       
         Err(err) => {
           error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
-          //println!("  {:<60} <<", String::from(">> ==> -- lost trigger rate, from reg. (Hz)   N/A").bright_blue());
         }
       }
-      //if n_ev_unsent > 0 {
-      //  println!("  {}{}{}", ">> ==> ".yellow().bold(),n_ev_unsent, " sent errors                       <<".yellow().bold());
-      //}
-      //if n_ev_missed > 0 {
-      //  //println!("  {}{}{}", ">> ==> ".yellow().bold(),n_events, " missed events                       <<".yellow().bold());
-      //}
-      //println!("  {:<60} <<", ">> == == == == == == ==  END HEARTBEAT = ==  == == == == ==".bright_blue().bold());
       
       if verbose {
         println!("{}", heartbeat);
-        println!(EVQ_NUM_EVENTS.get(&mut bus).unwrap())
+        println!("EVG_NUM_EVENTS {}", EVQ_NUM_EVENTS.get(&mut bus).unwrap())
       }
       verbose_timer = Instant::now();
       let pack = heartbeat.pack();
