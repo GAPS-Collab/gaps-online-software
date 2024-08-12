@@ -69,8 +69,9 @@ def deploy(binary, dest_dir='bin'):
     #version = get_version(binary)
     version = '0.10.3'
     if binary == 'liftof-cc':
-        deploy_cmd = f"rsync -avz build/{binary} tofcpu-pl:{dest_dir}/{binary}.{version}"
-   
+       deploy_cmd = f"rsync -avz build/{binary} tofcpu-pl:{dest_dir}/{binary}.{version}"
+       sub.run([deploy_cmd], shell=True)
+		   
     elif binary == 'liftof-rb':
         rbids = all_rbs() 
         rb_targets = [f'tof-rb{k:02}' for k in rbids]
