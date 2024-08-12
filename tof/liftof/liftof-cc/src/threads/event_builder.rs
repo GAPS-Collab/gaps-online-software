@@ -640,8 +640,21 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           //  while hb_timer.elapsed() < hb_interval {
           //    // Do nothing, wait for the next heartbeat cycle
           //}
+          let pack       = TofPacket::from(&ev_to_send);
+          match data_sink.send(pack) {
+            Err(err) => {
+              error!("Packet sending failed! Err {}", err);
+              n_sent_ch_err += 1; 
+            }
+            Ok(_)    => {
+              debug!("Event with id {} sent!", evid);
+              n_sent += 1;
+              heartbeat.n_sent += 1;
+            }
+          }
           if hb_timer.elapsed() >= hb_interval {
-            let pack       = TofPacket::from(&ev_to_send);
+            //let pack       = TofPacket::from(&ev_to_send);
+            let pack         = heartbeat.pack();
             match data_sink.send(pack) {
               Err(err) => {
                 error!("Packet sending failed! Err {}", err);
