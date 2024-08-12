@@ -782,7 +782,7 @@ pub fn master_trigger(mt_address     : String,
       
       if verbose {
         println!("{}", heartbeat);
-        println!(EVQ_NUM_EVENTS.get(&mut bus).unwrap())
+        println!("{}", EVQ_NUM_EVENTS.get(&mut bus).unwrap())
       }
       verbose_timer = Instant::now();
       let pack = heartbeat.pack();
