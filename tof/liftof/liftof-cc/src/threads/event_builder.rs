@@ -138,6 +138,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let daq_reset_cooldown   = Instant::now();
   let reset_daq_flag       = false;
   let mut retire               = false;
+  let mut hb_timer               = Instant::now(); 
+  let mut hb_interval         = Duration::from_secs(settings.hb_send_interval as u64);
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
       //println!("= => [evt_builder] checkling tc..");
@@ -329,6 +331,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       heartbeat.mte_receiver_cbc_len = m_trig_ev.len();
       heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
       heartbeat.tp_sender_cbc_len = data_sink.len();
+
+      while hb_timer.elapsed() < hb_interval {};
+      }
+
+      while hb_timer.elapsed() >= hb_interval {
       let pack = heartbeat.pack();
       match data_sink.send(pack) {
         Err(err) => {
@@ -339,7 +346,10 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         }
       }
       println!("{}", heartbeat);
-   
+      hb_timer = Instant::now();
+
+      while hb_timer.elapsed() < hb_interval {};
+    }
       let mut counters = HashMap::<u8,f64>::new();
       for k in seen_rbevents.keys() {
         counters.insert(*k, seen_rbevents[&k] as f64/met_seconds as f64);
@@ -626,7 +636,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               }
             }
             // can we avoid unpacking and repacking?
-            if debug_timer_elapsed > 35.0  {
+            
+            while hb_timer.elapsed() < hb_interval {
+              // Do nothing, wait for the next heartbeat cycle
+          }
+          while hb_timer.elapsed() >= hb_interval {
             let pack       = TofPacket::from(&ev_to_send);
             match data_sink.send(pack) {
               Err(err) => {
@@ -639,7 +653,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                 heartbeat.n_sent += 1;
               }
             }
-          } else {
+            hb_timer = Instant::now();
+            // Wait until the configured interval has passed
+            while hb_timer.elapsed() < hb_interval {};
+          } 
+        } else {
             event_id_cache.push_front(evid);
           }
         }
@@ -660,6 +678,5 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     //event_cache.retain(|ev| ev.valid);
     debug!("Debug timer! EVT SENDING {:?}", debug_timer.elapsed());
     } // end loop
-  }
-}
+  
 
