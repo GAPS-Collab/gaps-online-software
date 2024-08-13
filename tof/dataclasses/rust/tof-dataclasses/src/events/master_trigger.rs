@@ -120,7 +120,6 @@ pub enum TriggerType {
   Track        = 2u8,
   TrackCentral = 3u8,
   Gaps         = 4u8,
-  Gaps633      = 5u8,
   Gaps633      = 5u8, 
   Gaps422      = 6u8,
   Gaps211      = 7u8,
