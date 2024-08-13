@@ -1,7 +1,7 @@
 //! Events  
 //
 //
-
+use pyo3::pyclass;
 pub mod tof_event;
 pub mod master_trigger;
 pub mod rb_event;
@@ -43,6 +43,7 @@ use std::fmt;
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
+#[cfg_attr(feature = "pybindings", pyclass)]
 pub enum EventStatus {
   Unknown                = 0u8,
   CRC32Wrong             = 10u8,
