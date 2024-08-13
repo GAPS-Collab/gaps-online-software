@@ -1966,8 +1966,30 @@ pub const RB_CNTS_SNAP : MTBRegister<'static> = MTBRegister {
 /// TRACK_CENTRAL_IS_GLOBAL   0xb     0x2c    2   rw  0x0     1 makes the TRACK central read all paddles.
 pub const TRACK_CENTRAL_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
   addr  : 0xb,
+  mask  : 0x00000002,
+  descr : "1 makes the TRACK central read all paddles",
+  rmw   : true,
+  ro    : false,
+  pulse : false,
+};
+
+/// Add the track trigger to all triggers
+/// TRACE_TRIG_IS_GLOBAL 0xb 0x2c 1 rw 0x0
+pub const TRACK_TRIG_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
+  addr  : 0xb,
   mask  : 0x00000001,
-  descr : "Allow everything to always trigger on a track trigger",
+  descr : "1 makes the TRACK trigger read all paddles",
+  rmw   : true,
+  ro    : false,
+  pulse : false,
+};
+
+/// Add any trigger to all triggers
+/// ANY_TRIG_IS_GLOBAL 0xb 0x2c 0 rw 0x0
+pub const ANY_TRIG_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
+  addr  : 0xb,
+  mask  : 0x00000000,
+  descr : "1 makes the ANY trigger read all paddles",
   rmw   : true,
   ro    : false,
   pulse : false,
