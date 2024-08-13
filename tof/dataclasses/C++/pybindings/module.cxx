@@ -372,12 +372,14 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def(py::init())
         .def("from_bytestream"      , &MtbMoniData::from_bytestream)
         .def("from_tofpacket"       , &MtbMoniData::from_tofpacket)
-        .def_readonly("fpga_temp"   , &MtbMoniData::fpga_temp   ) 
-        .def_readonly("fpga_vccint" , &MtbMoniData::fpga_vccint ) 
-        .def_readonly("fpga_vccaux" , &MtbMoniData::fpga_vccaux ) 
-        .def_readonly("fpga_vccbram", &MtbMoniData::fpga_vccbram) 
+        .def_property_readonly("fpga_temp"   , &MtbMoniData::get_fpga_temp   ) 
         .def_readonly("rate"        , &MtbMoniData::rate        ) 
         .def_readonly("lost_rate"   , &MtbMoniData::lost_rate   ) 
+        .def_property_readonly("tiu_emulation_mode", &MtbMoniData::get_tiu_emulation_mode ) 
+        .def_property_readonly("tiu_use_aux_link",   &MtbMoniData::get_tiu_use_aux_link   )   
+        .def_property_readonly("tiu_bad",            &MtbMoniData::get_tiu_bad            )            
+        .def_property_readonly("tiu_busy_stuck",     &MtbMoniData::get_tiu_busy_stuck     )     
+        .def_property_readonly("tiu_ignore_busy",    &MtbMoniData::get_tiu_ignore_busy    )    
         .def("__repr__",          [](const MtbMoniData &moni) {
                                   return moni.to_string();
                                   }) 

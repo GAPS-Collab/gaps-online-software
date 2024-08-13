@@ -180,10 +180,27 @@ struct MtbMoniData : FromTofPacket<MtbMoniData> {
   f32 fpga_vccbram ;
   u16 rate         ;
   u16 lost_rate    ;
+  u32 tiu_busy_len ;
+  u8  tiu_status   ;
+  u8  prescale_pc  ;
+  u16 daq_queue_len;
  
   MtbMoniData();
 
-  std::string to_string() const;
+  std::string to_string()  const;
+  
+  bool get_tiu_emulation_mode() const;
+  
+  bool get_tiu_use_aux_link()   const;
+
+  bool get_tiu_bad()            const;
+
+  bool get_tiu_busy_stuck()     const;
+
+  bool get_tiu_ignore_busy()    const;
+  
+  /// Convert ADC temp from adc values to Celsius
+  f32 get_fpga_temp() const;
 
   /// extract moni data from payload
   static MtbMoniData from_bytestream(const Vec<u8>& payload,

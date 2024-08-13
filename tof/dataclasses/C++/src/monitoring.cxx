@@ -310,27 +310,75 @@ MtbMoniData MtbMoniData::from_bytestream(const Vec<u8> &payload,
   if (head != MtbMoniData::HEAD) {
     log_error("No header signature (0xAAAA) found for decoding of MtbMoniData!");   
   }
-  moni.fpga_temp    = Gaps::parse_f32(payload, pos);
-  moni.fpga_vccint  = Gaps::parse_f32(payload, pos);
-  moni.fpga_vccaux  = Gaps::parse_f32(payload, pos);
-  moni.fpga_vccbram = Gaps::parse_f32(payload, pos);
-  moni.rate         = Gaps::parse_u16(payload, pos);
-  moni.lost_rate    = Gaps::parse_u16(payload, pos);
-  u16 tail     = Gaps::parse_u16(payload, pos);
+  moni.tiu_busy_len  = Gaps::parse_u32(payload, pos);
+  moni.tiu_status    = Gaps::parse_u8( payload, pos);
+  moni.prescale_pc   = Gaps::parse_u8( payload, pos);
+  moni.daq_queue_len = Gaps::parse_u16(payload, pos);
+  moni.fpga_temp     = Gaps::parse_u16(payload, pos);
+  moni.fpga_vccint   = Gaps::parse_u16(payload, pos);
+  moni.fpga_vccaux   = Gaps::parse_u16(payload, pos);
+  moni.fpga_vccbram  = Gaps::parse_u16(payload, pos);
+  moni.rate          = Gaps::parse_u16(payload, pos);
+  moni.lost_rate     = Gaps::parse_u16(payload, pos);
+  u16 tail           = Gaps::parse_u16(payload, pos);
   if (tail != MtbMoniData::TAIL) {
     log_error("No tail signature (0x5555) found for decoding of MtbMoniData!");   
   }
   return moni;
 }
 
+bool MtbMoniData::get_tiu_emulation_mode() const {
+  return (tiu_status & 0x1) > 0;
+}
+
+bool MtbMoniData::get_tiu_use_aux_link() const {
+  return (tiu_status & 0x2) > 0;
+}
+
+bool MtbMoniData::get_tiu_bad() const { 
+  return (tiu_status & 0x4) > 0;
+}
+
+bool MtbMoniData::get_tiu_busy_stuck() const {
+  return (tiu_status & 0x8) > 0;
+}
+
+bool MtbMoniData::get_tiu_ignore_busy() const {
+  return (tiu_status & 0x10) > 0;
+}
+  
+f32 MtbMoniData::get_fpga_temp() const {
+  return (f32)fpga_temp * 503.975 / 4096.0 - 273.15;
+}
+
+  /// Convert ADC temp from adc values to Celsius
+  //pub fn get_fpga_temp(&self) -> f32 {
+  //  self.temp as f32 * 503.975 / 4096.0 - 273.15
+  //}
+
 std::string MtbMoniData::to_string() const {
+  //  write!(f, "<MtbMoniData:
+  //MTB  EVT RATE  [Hz] {}
+  //LOST EVT RATE  [Hz] {}
+  //TIU BUSY CNT  [CLK] {}
+  //DAQ QUEUE LEN       {}
+  //PRESCALE        [%] {}
+  //--- TIU STATUS ---
+  //  EMU MODE          {}
+  //  USE AUX LINK      {}
+  //  TIU BAD           {}
+  //  BUSY STUCK        {}
+  //  IGNORE BUSY       {}
+  //--- --- --- --- --
+  //FPGA TEMP      [\u{00B0}C] {:.2}
+  //VCCINT          [V] {:.3}
+  //VCCAUX          [V] {:.3}
+  //VCCBRAM         [V] {:.3}>",
   std::string repr = "<MtbMoniData :";
-  repr += "\n fpga_temp    :" + std::to_string(fpga_temp     );
-  repr += "\n fpga_vccint  :" + std::to_string(fpga_vccint   );
-  repr += "\n fpga_vccaux  :" + std::to_string(fpga_vccaux   );
-  repr += "\n fpga_vccbram :" + std::to_string(fpga_vccbram  );
   repr += "\n rate         :" + std::to_string(rate          );
   repr += "\n lost_rate    :" + std::to_string(lost_rate     );
+  repr += std::format("\n  fpga temp   [\u00B0C] : {:.2}", get_fpga_temp()); 
+  repr += ">";
   return repr; 
 }
 
