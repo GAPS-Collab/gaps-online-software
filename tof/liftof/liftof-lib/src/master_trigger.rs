@@ -549,31 +549,31 @@ pub fn master_trigger(mt_address     : String,
   // events have been received in a 
   // certain timeinterval
   let mut heartbeat      = MTBHeartbeat::new();
-  let mut mtb_timeout         = Instant::now();
-  let mut moni_interval       = Instant::now();
-  let mut tc_timer            = Instant::now();
-  let mtb_timeout_sec             = settings.mtb_timeout_sec;
-  let mtb_moni_interval           = settings.mtb_moni_interval;
+  let mut mtb_timeout    = Instant::now();
+  let mut moni_interval  = Instant::now();
+  let mut tc_timer       = Instant::now();
+  let mtb_timeout_sec    = settings.mtb_timeout_sec;
+  let mtb_moni_interval  = settings.mtb_moni_interval;
   // verbose, debugging
-  let mut last_event_id           = 0u32;
-  //let mut n_events                   = 0u64;
+  let mut last_event_id  = 0u32;
+  //let mut n_events       = 0u64;
   //let mut rate_from_reg  : Option<u32> = None;
-  let mut verbose_timer       = Instant::now();
-  //let mut total_elapsed              = 0f64;
-  //let mut n_ev_unsent                = 0u64;
-  //let mut n_ev_missed                = 0u64;
-  let mut first                  = true;
-  let mut slack_cadence           = 5; // send only one slack message 
+  let mut verbose_timer  = Instant::now();
+  //let mut total_elapsed  = 0f64;
+  //let mut n_ev_unsent    = 0u64;
+  //let mut n_ev_missed    = 0u64;
+  let mut first          = true;
+  let mut slack_cadence  = 5; // send only one slack message 
                               // every 5 times we send moni data
-  let mut evq_num_events          = 0u64;
-  let mut evq_num_events_last     = 0u32;
-  //let mut evq_num_events_avg         = 0f64;
-  let mut n_iter_loop             = 0u64;
+  let mut evq_num_events      = 0u64;
+  let mut evq_num_events_last = 0u32;
+  //let mut evq_num_events_avg  = 0f64;
+  let mut n_iter_loop         = 0u64;
   let mut hb_timer            = Instant::now();
-  let mut hb_interval        = Duration::from_secs(settings.hb_send_interval as u64);
+  let mut hb_interval         = Duration::from_secs(settings.hb_send_interval as u64);
   // indicator if the thread is active (it can 
   // sleep during calibrations)
-  let mut is_active              = true;
+  let mut is_active = true;
   loop {
     // Check thread control and what to do
     if tc_timer.elapsed().as_secs_f32() > 1.5 {
@@ -757,7 +757,7 @@ pub fn master_trigger(mt_address     : String,
     //}
     //let evid_check_str = format!(">> ==> In a chunk of {} events, we missed {} ({}%) <<", event_id_test.len(), missing, 100.0*(missing as f64)/event_id_test.len() as f64);
     //event_id_test.clear();
-    if hb_timer.elapsed() >= hb_interval {
+    if verbose_timer_elapsed > 30.0 {
       match EVQ_NUM_EVENTS.get(&mut bus) {
         Err(err) => {
           error!("Unable to query {}! {err}", EVQ_NUM_EVENTS);
@@ -769,7 +769,7 @@ pub fn master_trigger(mt_address     : String,
           heartbeat.evq_num_events_avg = (evq_num_events as u64)/(n_iter_loop as u64);
         }
       }
-      heartbeat.total_elapsed += hb_timer.elapsed() as u64;
+      heartbeat.total_elapsed += verbose_timer_elapsed as u64;
       match TRIGGER_RATE.get(&mut bus) {
         Ok(trate) => {
           heartbeat.trate = trate as u64;
@@ -792,6 +792,9 @@ pub fn master_trigger(mt_address     : String,
         println!("{}", heartbeat);
         println!("EVG_NUM_EVENTS {}", EVQ_NUM_EVENTS.get(&mut bus).unwrap())
       }
+      verbose_timer = Instant::now();
+
+      if hb_timer.elapsed() >= hb_interval {
 
         let pack = heartbeat.pack();
         match moni_sender.send(pack) {
@@ -800,7 +803,7 @@ pub fn master_trigger(mt_address     : String,
           },
           Ok(_) => ()
           }
-        
+        }
         hb_timer = Instant::now();
       }
     } 
