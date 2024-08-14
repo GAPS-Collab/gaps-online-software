@@ -159,6 +159,7 @@ impl HeartBeatDataSink {
     repr += &(format!("\n Sent {} TofPackets! (packet rate {:.2}/s)", self.n_packets_sent , self.get_sent_packet_rate()));
     repr += &(format!("\n Writing events to disk: {} packets written, data write rate {:.2} MB/sec", self.n_pack_write_disk, self.get_mbytes_to_disk_per_sec()));
     repr += &(format!("\n Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)", self.evid_missing, self.evid_check_len, 100.0*(self.evid_missing as f64/self.evid_check_len as f64)));
+    repr += &(format!("\n Incoming channel length: {}", self.incoming_ch_len));
     repr += &(format!("\n \u{1F98B} \u{1F98B} \u{1F98B} \u{1F98B} \u{1F98B} END HEARTBEAT \u{1F98B} \u{1F98B} \u{1F98B} \u{1F98B} \u{1F98B}"));
     repr 
   }
@@ -178,7 +179,7 @@ impl Serialization for HeartBeatDataSink {
   
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
-  const SIZE : usize = 76; 
+  const SIZE : usize = 84; 
   
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
@@ -194,6 +195,7 @@ impl Serialization for HeartBeatDataSink {
     hb.evid_missing       = parse_u64(stream, pos);
     hb.evid_check_len     = parse_u64(stream, pos);
     hb.n_pack_write_disk  = parse_u64(stream, pos);
+    hb.incoming_ch_len    = parse_u64(stream, pos);
     *pos += 2;
     Ok(hb)
   }
@@ -210,6 +212,7 @@ impl Serialization for HeartBeatDataSink {
     bs.extend_from_slice(&self.evid_missing     .to_le_bytes() );
     bs.extend_from_slice(&self.evid_check_len   .to_le_bytes() );
     bs.extend_from_slice(&self.n_pack_write_disk.to_le_bytes() );
+    bs.extend_from_slice(&self.incoming_ch_len.to_le_bytes());
     bs.extend_from_slice(&Self::TAIL.to_le_bytes());
     bs
   }
@@ -228,6 +231,7 @@ impl FromRandom for HeartBeatDataSink {
     let evid_missing       = rng.gen::<u64>();
     let evid_check_len     = rng.gen::<u64>();
     let n_pack_write_disk  = rng.gen::<u64>();
+    let incoming_ch_len    = rng.gen::<u64>();
     Self {
       met,
       n_packets_sent,
@@ -237,7 +241,8 @@ impl FromRandom for HeartBeatDataSink {
       n_evid_chunksize,
       evid_missing,
       evid_check_len,
-      n_pack_write_disk
+      n_pack_write_disk,
+      incoming_ch_len
     }
   }
 }
