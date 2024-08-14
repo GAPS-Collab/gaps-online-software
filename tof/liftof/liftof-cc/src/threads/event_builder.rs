@@ -652,24 +652,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               heartbeat.n_sent += 1;
             }
           }
-          if hb_timer.elapsed() >= hb_interval {
-            //let pack       = TofPacket::from(&ev_to_send);
-            let pack         = heartbeat.pack();
-            match data_sink.send(pack) {
-              Err(err) => {
-                error!("Packet sending failed! Err {}", err);
-                n_sent_ch_err += 1; 
-              }
-              Ok(_)    => {
-                debug!("Event with id {} sent!", evid);
-                n_sent += 1;
-                heartbeat.n_sent += 1;
-              }
-            }
-            hb_timer = Instant::now();
-            // Wait until the configured interval has passed
-            //while hb_timer.elapsed() < hb_interval {};
-          } 
         } else {
             event_id_cache.push_front(evid);
           }
@@ -690,6 +672,21 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     //event_sending = 0;
     //event_cache.retain(|ev| ev.valid);
     debug!("Debug timer! EVT SENDING {:?}", debug_timer.elapsed());
+    if hb_timer.elapsed() >= hb_interval {
+      //let pack       = TofPacket::from(&ev_to_send);
+      let pack         = heartbeat.pack();
+      match data_sink.send(pack) {
+        Err(err) => {
+          error!("Packet sending failed! Err {}", err);
+          n_sent_ch_err += 1; 
+        }
+        Ok(_)    => {
+        }
+      }
+      hb_timer = Instant::now();
+      // Wait until the configured interval has passed
+      //while hb_timer.elapsed() < hb_interval {};
+    } 
   } // end loop
 }  
 
