@@ -188,6 +188,9 @@ pub fn unset_all_triggers(bus : &mut IPBus)
   set_track_trigger  (bus, 0.0)?;
   set_central_track_trigger(bus, 0.0)?;
   set_configurable_trigger(bus, false)?;
+  TRACK_TRIG_IS_GLOBAL.set(bus, 0)?; 
+  ANY_TRIG_IS_GLOBAL.set(bus, 0)?;
+  TRACK_CENTRAL_IS_GLOBAL.set(bus, 0)?;
   Ok(())
 }
 
@@ -228,6 +231,7 @@ pub fn set_gaps_any_trigger(bus : &mut IPBus, prescale : f32, use_beta : bool)
 pub fn set_gaps_central_track_trigger(bus : &mut IPBus, prescale : f32, use_beta : bool)
   -> Result<(), Box<dyn Error>> {
     info!("Setting GAPS + Central Track trigger combo");
+    TRACK_CENTRAL_IS_GLOBAL.set(bus, 1)?;
     set_gaps_trigger(bus, use_beta)?;
     set_central_track_trigger(bus, prescale)?;
     Ok(())
