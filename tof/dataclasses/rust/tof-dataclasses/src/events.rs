@@ -1,6 +1,7 @@
 //! Events  
 //
 //
+#[cfg(feature = "pybindings")]
 use pyo3::pyclass;
 pub mod tof_event;
 pub mod master_trigger;
