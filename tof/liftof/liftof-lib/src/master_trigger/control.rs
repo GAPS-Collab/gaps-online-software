@@ -237,6 +237,15 @@ pub fn set_gaps_central_track_trigger(bus : &mut IPBus, prescale : f32, use_beta
     Ok(())
   }
 
+pub fn set_gaps422_central_track_trigger(bus : &mut IPBus, prescale : f32, use_beta : bool)
+  -> Result<(), Box<dyn Error>> {
+    info!("Setting GAPS + Central Track trigger combo");
+    TRACK_CENTRAL_IS_GLOBAL.set(bus, 1)?;
+    set_gaps422_trigger(bus, use_beta)?;
+    set_central_track_trigger(bus, prescale)?;
+    Ok(())
+  }
+
 pub fn set_gaps633_trigger(bus : &mut IPBus, use_beta : bool) 
   -> Result<(), Box<dyn Error>> {
   info!("Setting GAPS Antiparticle trigger, use beta {}!", use_beta);

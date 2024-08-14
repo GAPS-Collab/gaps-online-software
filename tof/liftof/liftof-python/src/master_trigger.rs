@@ -203,6 +203,17 @@ impl PyMasterTrigger {
     }
   }
 
+  fn set_gaps422_central_track_trigger(&mut self, prescale : f32, use_beta : bool) -> PyResult<()>  {
+    match mt_api::control::set_gaps422_central_track_trigger(&mut self.ipbus, prescale, use_beta) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   /// Get the status of enabling for LTBs 0-9
   fn get_lt_link_en0(&mut self) -> PyResult<u32> {
     match LT_LINK_EN0.get(&mut self.ipbus) {
