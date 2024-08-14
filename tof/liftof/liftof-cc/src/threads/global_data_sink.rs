@@ -405,48 +405,38 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         }
       } // end if pk == event packet
     } // end incoming.recv
-    if hb_timer.elapsed() >= hb_interval {
+      //
+      //
+
       let evid_check_len = evid_check.len();
       //println!("DEBUG .1.");
       //let mut evid_test_missing = 0usize;
       let evid_missing = 0;
+    if timer.elapsed().as_secs() > 10 {
+      // FIXME - might be too slow?
       if evid_check_len > 0 {
         let mut evid = evid_check[0];
-        //println!("DEBUG 1.5");
-        //println!("len of evid_id_test {}", evid_id_test_len);
         for _ in 0..evid_check_len {
           if !evid_check.contains(&evid) {
-            //cfg_if::cfg_if!{
-            //if #[cfg(features="debug")] {
             heartbeat.n_evid_missing += 1;
             heartbeat.n_evid_chunksize = evid_check_len as u64;
-            //  }
-            //}
           }
           evid += 1;
         }
       }
-      //cfg_if::cfg_if!{
-      //  if #[cfg(features="debug")] {
+      timer = Instant::now();
+    }
+    if hb_timer.elapsed() >= hb_interval {
       heartbeat.met += hb_timer.elapsed().as_secs();
       
-        match data_socket.send(heartbeat.pack().to_bytestream(),0) {
-          Err(err) => error!("Not able to send heartbeat over 0MQ PUB! {err}"),
-          Ok(_)    => {
-            trace!("Heartbeat sent");
-          }
+      match data_socket.send(heartbeat.pack().to_bytestream(),0) {
+        Err(err) => error!("Not able to send heartbeat over 0MQ PUB! {err}"),
+        Ok(_)    => {
+          trace!("Heartbeat sent");
+        }
       } 
-    evid_check.clear();
-    hb_timer = Instant::now();
+      evid_check.clear();
+      hb_timer = Instant::now();
     }
-    // met_time_secs += hb_timer.elapsed().as_secs_f32();
-    // let packet_rate = n_pack_sent as f32 /met_time_secs;
-    // println!("  {:<75}", ">> == == == == == == DATA SINK HEARTBEAT  == == == == == == <<".bright_cyan().bold());
-    // println!("  {:<75} <<", format!(">> ==> Sent {} TofPackets! (packet rate {:.2}/s)", n_pack_sent ,packet_rate).bright_cyan());
-    // println!("  {:<75} <<", format!(">> ==> Writing events to disk: {} packets written, data write rate {:.2} MB/sec", n_pack_write_disk, bytes_sec_disk/(1e6*met_time_secs as f64)).bright_purple());
-    // println!("  {:<75} <<", format!(">> ==> Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)", evid_missing, evid_check_len, 100.0*(evid_missing as f64/evid_check_len as f64)).bright_purple());
-
-    // println!("  {:<75}", ">> == == == == == == == == == == == == == == == == == == == <<".bright_cyan().bold());
-  
   } //end loop
 } //end function
