@@ -22,6 +22,7 @@ use crossbeam_channel::Receiver;
 
 use colored::Colorize;
 
+use liftof_lib::settings::{self, DataPublisherSettings};
 use tof_dataclasses::packets::{
     TofPacket,
     PacketType
@@ -71,7 +72,8 @@ use liftof_lib::thread_control::ThreadControl;
 /// * thread_control     : start/stop thread, calibration information
 pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                         print_moni_packets : bool,
-                        thread_control     : Arc<Mutex<ThreadControl>>) {
+                        thread_control     : Arc<Mutex<ThreadControl>>,
+                        settings           : DataPublisherSettings) {
   // when the thread starts, we need to wait a bit
   // till thread_control becomes usable
   sleep(Duration::from_secs(10));
@@ -148,6 +150,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut new_run_start = false;
   let mut retire   = false;
   let mut heartbeat = HeartBeatDataSink::new();
+  let mut hb_timer               = Instant::now(); 
+  let mut hb_interval         = Duration::from_secs(settings.hb_send_interval as u64);
   loop {
     if retire {
       // take a long nap to give other threads 
@@ -401,7 +405,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         }
       } // end if pk == event packet
     } // end incoming.recv
-    if timer.elapsed().as_secs() > 120 {
+    if hb_timer.elapsed() >= hb_interval {
       let evid_check_len = evid_check.len();
       //println!("DEBUG .1.");
       //let mut evid_test_missing = 0usize;
@@ -424,29 +428,25 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
       }
       //cfg_if::cfg_if!{
       //  if #[cfg(features="debug")] {
-      heartbeat.met += timer.elapsed().as_secs();
-      match data_socket.send(heartbeat.pack().to_bytestream(),0) {
-        Err(err) => error!("Not able to send heartbeat over 0MQ PUB! {err}"),
-        Ok(_)    => {
-          trace!("Heartbeat sent");
-        }
-      } // end match
-      //  }
-      //} 
-      evid_check.clear();
-      ////println!("DEBUG 2");
-      //event_id_test.clear();
-      //println!("DEBUG 3");
-
-      met_time_secs += timer.elapsed().as_secs_f32();
-      let packet_rate = n_pack_sent as f32 /met_time_secs;
-      println!("  {:<75}", ">> == == == == == == DATA SINK HEARTBEAT  == == == == == == <<".bright_cyan().bold());
-      println!("  {:<75} <<", format!(">> ==> Sent {} TofPackets! (packet rate {:.2}/s)", n_pack_sent ,packet_rate).bright_cyan());
-      println!("  {:<75} <<", format!(">> ==> Writing events to disk: {} packets written, data write rate {:.2} MB/sec", n_pack_write_disk, bytes_sec_disk/(1e6*met_time_secs as f64)).bright_purple());
-      println!("  {:<75} <<", format!(">> ==> Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)", evid_missing, evid_check_len, 100.0*(evid_missing as f64/evid_check_len as f64)).bright_purple());
-
-      println!("  {:<75}", ">> == == == == == == == == == == == == == == == == == == == <<".bright_cyan().bold());
-      timer = Instant::now();
+      heartbeat.met += hb_timer.elapsed().as_secs();
+      
+        match data_socket.send(heartbeat.pack().to_bytestream(),0) {
+          Err(err) => error!("Not able to send heartbeat over 0MQ PUB! {err}"),
+          Ok(_)    => {
+            trace!("Heartbeat sent");
+          }
+      } 
+    evid_check.clear();
+    hb_timer = Instant::now();
     }
-  }
-}
+    // met_time_secs += hb_timer.elapsed().as_secs_f32();
+    // let packet_rate = n_pack_sent as f32 /met_time_secs;
+    // println!("  {:<75}", ">> == == == == == == DATA SINK HEARTBEAT  == == == == == == <<".bright_cyan().bold());
+    // println!("  {:<75} <<", format!(">> ==> Sent {} TofPackets! (packet rate {:.2}/s)", n_pack_sent ,packet_rate).bright_cyan());
+    // println!("  {:<75} <<", format!(">> ==> Writing events to disk: {} packets written, data write rate {:.2} MB/sec", n_pack_write_disk, bytes_sec_disk/(1e6*met_time_secs as f64)).bright_purple());
+    // println!("  {:<75} <<", format!(">> ==> Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)", evid_missing, evid_check_len, 100.0*(evid_missing as f64/evid_check_len as f64)).bright_purple());
+
+    // println!("  {:<75}", ">> == == == == == == == == == == == == == == == == == == == <<".bright_cyan().bold());
+  
+  } //end loop
+} //end function

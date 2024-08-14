@@ -469,12 +469,14 @@ fn main() {
 
   debug!("Starting data sink thread!");
   let thread_control_gds = Arc::clone(&thread_control);
+  let dp_settings      = config.data_publisher_settings.clone();
   data_sink_handle = thread::Builder::new()
     .name("data-sink".into())
     .spawn(move || {
       global_data_sink(&tp_from_threads,
                        false,
-                       thread_control_gds);
+                       thread_control_gds, 
+                        dp_settings);
     })
     .expect("Failed to spawn data-sink thread!");
   debug!("Data sink thread started!");
