@@ -177,20 +177,22 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
     // check if we get a command from the main 
     // thread
     match cmd_receiver.recv_bytes(zmq::DONTWAIT) {
-      Err(_)   => {
+      Err(err)   => {
+        error!("ZMQ socket receiving error! {err}");
         continue;
       }
       Ok(buffer) => {
+        error!("RECEIVED COMMAND {:?}", buffer);
         // identfiy if we have a GAPS packet
-        if buffer[0] == 0xeb && buffer[1] == 0x90 {
+        if buffer[0] == 0xeb && buffer[1] == 0x90 && buffer[4] == 0x5a {
           // We have a GAPS packet -> FIXME:
           error!("GAPS packet command receiving not supported yet! Currently, we can only process TofPackets!");
           // strip away the GAPS header!  
           continue;
         } 
-        match TofPacket::from_bytestream(&buffer, &mut 0) {
+        match TofPacket::from_bytestream(&buffer, &mut 8) {
           Err(err) => {
-            error!("Unable to decode bytestream! {:?}", err);
+            error!("Unable to decode bytestream for command ! {:?}", err);
             continue;  
           },
           Ok(packet) => {
