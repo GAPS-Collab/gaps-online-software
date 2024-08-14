@@ -749,7 +749,7 @@ pub fn master_trigger(mt_address     : String,
           heartbeat.evq_num_events_avg = (evq_num_events as u64)/(n_iter_loop as u64);
         }
       }
-      heartbeat.total_elapsed += hb_timer.elapsed() as u64;
+      heartbeat.total_elapsed += hb_timer.elapsed().as_secs() as u64;
       match TRIGGER_RATE.get(&mut bus) {
         Ok(trate) => {
           heartbeat.trate = trate as u64;
