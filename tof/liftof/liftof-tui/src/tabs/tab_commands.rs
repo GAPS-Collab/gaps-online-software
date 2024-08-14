@@ -81,6 +81,10 @@ impl CommandTab<'_> {
     let mut no_send_rw      = TofCommandV2::new();
     no_send_rw.command_code = TofCommandCode::NoSendRBWaveforms;
 
+    let mut kill_cmd        = TofCommandV2::new();
+    kill_cmd.command_code   = TofCommandCode::Kill;
+
+
     let commands = vec![ping_cmd,
                         start_cmd,
                         stop_cmd,
@@ -88,7 +92,8 @@ impl CommandTab<'_> {
                         send_te,
                         no_send_te,
                         send_rw,
-                        no_send_rw];
+                        no_send_rw,
+                        kill_cmd];
 
     let mut cmd_select_items = Vec::<ListItem>::new();
     for k in &commands {
