@@ -546,11 +546,11 @@ pub fn master_trigger(mt_address     : String,
   let mut slack_cadence  = 5; // send only one slack message 
                               // every 5 times we send moni data
   let mut evq_num_events      = 0u64;
-  let mut evq_num_events_last = 0u32;
+  //let mut evq_num_events_last = 0u32;
   //let mut evq_num_events_avg  = 0f64;
   let mut n_iter_loop         = 0u64;
   let mut hb_timer            = Instant::now();
-  let mut hb_interval         = Duration::from_secs(settings.hb_send_interval as u64);
+  let hb_interval             = Duration::from_secs(settings.hb_send_interval as u64);
   // indicator if the thread is active (it can 
   // sleep during calibrations)
   let mut is_active = true;

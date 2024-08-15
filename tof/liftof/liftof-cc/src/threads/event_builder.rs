@@ -114,32 +114,22 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut n_received           : usize;
   //let mut clear_cache        = 0; // clear cache every 
   //let mut event_sending      = 0;
-  let mut n_mte_received_tot   = 0u64;
   let mut n_mte_skipped        = 0u32;
-  let n_rbe_received_tot   = 0u64;
-  let n_rbe_discarded_tot  = 0u64;
   let mut first_evid           : u32;
   let mut last_evid            = 0;
   let mut n_sent               = 0usize;
-  let mut n_sent_ch_err        = 0usize;
-  let n_timed_out          = 0usize; 
   // debug
-  let mut last_rb_evid         = 0u32;
+  let mut last_rb_evid         : u32;
   let mut n_rbe_per_te         = 0usize;
-  let rb_ev_wo_mte         = 0usize;
-  let n_rbe_from_past      = 0usize;
-  let n_rbe_orphan         = 0usize;
   let mut debug_timer          = Instant::now();
   let met_seconds          = 0f64;  
   //let mut n_receiving_errors  = 0;
   let mut check_tc_update      = Instant::now();
-  let mut n_gathered_fr_cache  = 0usize;
-  let mut misaligned_cache_err = 0usize; 
   let daq_reset_cooldown   = Instant::now();
   let reset_daq_flag       = false;
-  let mut retire               = false;
-  let mut hb_timer               = Instant::now(); 
-  let mut hb_interval         = Duration::from_secs(settings.hb_send_interval as u64);
+  let mut retire           = false;
+  let mut hb_timer         = Instant::now(); 
+  let hb_interval          = Duration::from_secs(settings.hb_send_interval as u64);
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
       //println!("= => [evt_builder] checkling tc..");
@@ -207,7 +197,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           // of events
           event_id_cache.push_back(last_evid);
           n_received  += 1;
-          n_mte_received_tot += 1;
           heartbeat.n_mte_received_tot += 1;
         }
       } // end match Ok(mt)
@@ -320,10 +309,10 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     if debug_timer_elapsed > 35.0  {
       // missing event id check
       let mut evid_check = event_id_cache[0];
-      let mut n_ev_wo_evid = 0usize;
+      heartbeat.n_ev_wo_evid = 0usize;
       for _ in 0..event_id_cache.len() {
         if !event_id_cache.contains(&evid_check) {
-          n_ev_wo_evid += 1;
+          heartbeat.n_ev_wo_evid += 1;
         }
         evid_check += 1;
       }
@@ -528,7 +517,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     }
     trace!("Debug timer RBE received! {:?}", debug_timer.elapsed());
     //if event_sending == send_every_x_event {
-    n_gathered_fr_cache = 0;
     let mut prior_ev_sent = 0u32;
     let mut first_ev_sent = false;
     
@@ -549,8 +537,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       match event_cache.get(&evid) {
         None => {
           error!("Event id and event caches are misaligned for event id {}, idx {} and sizes {} {}! This is BAD and most likely a BUG!", evid, idx, event_cache.len(), event_id_cache.len());
-          //event_id_cache.push_back(evid);
-          misaligned_cache_err += 1;
           continue;
         },
         Some(ev) => {
@@ -574,7 +560,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                 // except the event times out
                 if ev.rb_events.len() as u8 == settings.wait_nrb {
                   ready_to_send = true;
-                  //n_gathered_fr_cache += 1;
                 } // else ready_to_send is still false 
               },
               BuildStrategy::Adaptive 
@@ -644,7 +629,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           match data_sink.send(pack) {
             Err(err) => {
               error!("Packet sending failed! Err {}", err);
-              n_sent_ch_err += 1; 
             }
             Ok(_)    => {
               debug!("Event with id {} sent!", evid);
@@ -678,7 +662,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       match data_sink.send(pack) {
         Err(err) => {
           error!("Packet sending failed! Err {}", err);
-          n_sent_ch_err += 1; 
         }
         Ok(_)    => {
         }

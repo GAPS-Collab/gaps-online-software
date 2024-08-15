@@ -142,13 +142,13 @@ fn main() {
   println!("-- Will read calibration data from {}", config.calibration_dir);
   let mut conn              = connect_to_db(db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
   // if this call does not go through, we might as well fail early.
-  let mut rb_list           = ReadoutBoard::all(&mut conn).expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
-  let rb_ignorelist = config.rb_ignorelist.clone();
-  for k in 0..rb_ignorelist.len() {
-    let bad_rb = rb_ignorelist[k];
-    println!("=> We will INGORE RB {:02}, since it is being marked as IGNORE in the config file!", bad_rb);
-    rb_list.retain(|x| x.rb_id != bad_rb);
-  }
+  //let mut rb_list           = ReadoutBoard::all(&mut conn).expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
+  //let rb_ignorelist = config.rb_ignorelist.clone();
+  //for k in 0..rb_ignorelist.len() {
+  //  let bad_rb = rb_ignorelist[k];
+  //  println!("=> We will INGORE RB {:02}, since it is being marked as IGNORE in the config file!", bad_rb);
+  //  rb_list.retain(|x| x.rb_id != bad_rb);
+  //}
   
   // loading the calibrations
   //println!("-- Loaded the following RBs");
@@ -384,16 +384,19 @@ fn main() {
   chart.configure_mesh()
     .x_desc("Paddle ID") // Set the x-axis label
     .y_desc("Occupancy (hits)") // Set the y-axis label
-    .draw();
+    .draw().unwrap();
   chart.draw_series(
     PHist::vertical(&chart)
       .style(BLUE.mix(0.9).filled())
       //.data(piddata.iter().map(|&(x, y)| (x, y))),
       .data(piddata)
-  );
+  ).unwrap();
   // Generate some example data for the histogram
   // This is where you would put your actual data
-  root_drawing_area.present();
+  match root_drawing_area.present() {
+    Ok(_) => (),
+    Err(_err) =>(),
+  }
   println!("Histogram saved to 'histogram.bmp'");
 
 
