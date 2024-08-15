@@ -1,4 +1,10 @@
-import gaps_tof as gt
+
+cxx_api_loaded=False
+try:
+    import gaps_tof as gt
+except ImportError as err:
+    cxx_api_loaded=True
+
 import matplotlib.pyplot as p
 import numpy as np
 try:
@@ -14,7 +20,8 @@ except ImportError as e:
     FIGSIZE=FIGSIZE_A4
 
 # monkey patch the C++ API RBEvent
-gt.RBEvent.calib = None
+if cxx_api_loaded:
+    gt.RBEvent.calib = None
 
 def _adc_plotter(axes, ev, ch, calib=None, plot_stop_cell=False, skip_first_bins = 0):
     """
@@ -60,7 +67,7 @@ def _adc_plotter(axes, ev, ch, calib=None, plot_stop_cell=False, skip_first_bins
         axes[ax_j].vlines(ev.header.stop_cell, *axes[ax_j].get_xlim(),lw=0.9, ls='dashed', color='gray')
 
 def plot(self,\
-         calib : gt.RBCalibration = None,
+         calib = None,
          spike_cleaning = True,
          plot_stop_cell = False,
          skip_first_bins = 0):
@@ -149,6 +156,6 @@ def plot(self,\
                     axes[4].vlines(stop_cell_time, *axes[0].get_xlim(), lw=0.9, ls='dashed', color='gray')
     return fig
 
-
-gt.RBEvent.plot = plot
-RBEvent = gt.RBEvent
+if cxx_api_loaded:
+    gt.RBEvent.plot = plot
+    RBEvent = gt.RBEvent

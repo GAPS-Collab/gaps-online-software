@@ -10,8 +10,6 @@ GAPS online software TOF part
 from .events import RBEvent
 from .calibrations import RBCalibration
 from .mapping import DsiJChRBMap
-from gaps_tof import TofPacket,\
-                     get_tofpackets
 
 from . import sensors
 try:
