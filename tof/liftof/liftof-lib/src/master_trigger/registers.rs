@@ -142,6 +142,17 @@ impl fmt::Display for MTBRegister<'_> {
 //
 // Implements various control and monitoring functions of the DRS Logic
 
+///Prescale value for the GAPS trigger. 0 == 0% (off), 2**32-1 == 100%
+/// GAPS_TRIG_PRESCALE 0x248 0x920 [31:0] rw 0xffffffff
+pub const GAPS_TRIG_PRESCALE : MTBRegister<'static> = MTBRegister {
+  addr    : 0x248,
+  mask    : 0xffffffff,
+  descr   : "Prescale value for the GAPS trigger. 0 == 0% (off), 2**32-1 == 100%",
+  rmw     : true,
+  ro      : false,
+  pulse   : false,
+};
+
 
 /// Force a trigger (has to be previously set)
 /// FORCE_TRIGGER   0x8     0x20    0   w   Pulse   Write 1 to generate a trigger

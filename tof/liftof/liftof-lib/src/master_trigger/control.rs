@@ -103,6 +103,20 @@ pub fn get_tiu_emu_busy_cnt(bus : &mut IPBus)
   TIU_EMU_BUSY_CNT.get(bus)
 }
 
+pub fn get_gaps_trigger_prescale(bus : &mut IPBus)
+  -> Result<f32, Box<dyn Error>> {
+    let prescale_bus = GAPS_TRIG_PRESCALE.get(bus)?;
+    let prescale_val = (u32::MAX as f32 * prescale_bus as f32).floor() as f32;
+    return Ok(prescale_val)
+  }
+
+pub fn set_gaps_trigger_prescale(bus : &mut IPBus, prescale : f32)
+  -> Result<(), Box<dyn Error>> {
+    let prescale_val = (u32::MAX as f32 * prescale).floor() as u32;
+    info!("Setting gaps trigger with prescale {};)", prescale);
+    bus.write(0x248, prescale_val)?;
+  Ok(())
+  }
 /// The readoutboard integration window
 ///
 /// The default setting is "1" and currently 
