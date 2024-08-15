@@ -189,7 +189,7 @@ pub const TRIG_CYCLIC_EN : MTBRegister<'static> = MTBRegister {
 };
 
 /// Set cyclic trigger interval (in # clock cycles, 1 clock cycle ~ 10 ns)
-/// TRIG_CYCLIC_INTERVAL 0x241 0x904 [31:0] rw 0x0
+/// TRIG_CYCLIC_INTERVAL 0x241 0x904 \[31:0\] rw 0x0
 pub const TRIG_CYCLIC_INTERVAL : MTBRegister<'static> = MTBRegister {
   addr   : 0x241,
   mask   : 0xffffffff,
@@ -200,7 +200,7 @@ pub const TRIG_CYCLIC_INTERVAL : MTBRegister<'static> = MTBRegister {
 };
 
 /// Toggle on/off LTBs 0-9
-/// DSI 0 RX Link Enable 0x242 0x908 [9:0] rw 0x3FF
+/// DSI 0 RX Link Enable 0x242 0x908 \[9:0\] rw 0x3FF
 pub const LT_LINK_EN0 : MTBRegister<'static> = MTBRegister {
   addr    : 0x242,
   mask    : 0x000003ff,
@@ -210,7 +210,7 @@ pub const LT_LINK_EN0 : MTBRegister<'static> = MTBRegister {
   pulse   : false
 };
 /// Toggle on/off LTBs 10-19
-/// DSI 1 RX Link Enable 0x243 0x90c [9:0] rw 0x3FF
+/// DSI 1 RX Link Enable 0x243 0x90c \[9:0\] rw 0x3FF
 pub const LT_LINK_EN1 : MTBRegister<'static> = MTBRegister {
   addr    : 0x243,
   mask    : 0x000003ff,
@@ -220,7 +220,7 @@ pub const LT_LINK_EN1 : MTBRegister<'static> = MTBRegister {
   pulse   : false
 };
 /// Toggle on/off LTBs 20-29
-/// DSI 2 RX Link Enable 0x244 0x910 [9:0] rw 0x3FF
+/// DSI 2 RX Link Enable 0x244 0x910 \[9:0\] rw 0x3FF
 pub const LT_LINK_EN2 : MTBRegister<'static> = MTBRegister {
   addr    : 0x244,
   mask    : 0x000003ff,
@@ -230,7 +230,7 @@ pub const LT_LINK_EN2 : MTBRegister<'static> = MTBRegister {
   pulse   : false
 };
 /// Toggle on/off LTBs 30-39
-/// DSI 3 RX Link Enable 0x245 0x914 [9:0] rw 0x3FF
+/// DSI 3 RX Link Enable 0x245 0x914 \[9:0\] rw 0x3FF
 pub const LT_LINK_EN3 : MTBRegister<'static> = MTBRegister {
   addr    : 0x245,
   mask    : 0x000003ff,
@@ -240,7 +240,7 @@ pub const LT_LINK_EN3 : MTBRegister<'static> = MTBRegister {
   pulse   : false
 };
 /// Toggle on/off LTBs 40-49
-/// DSI 4 RX Link Enable 0x246 0x918 [9:0] rw 0x3FF
+/// DSI 4 RX Link Enable 0x246 0x918 \[9:0\] rw 0x3FF
 pub const LT_LINK_EN4 : MTBRegister<'static> = MTBRegister {
   addr    : 0x246,
   mask    : 0x000003ff,
@@ -273,7 +273,7 @@ pub const TIU_EMULATION_MODE : MTBRegister<'static> = MTBRegister {
 };
 
 /// The length of the tiu busy signal 
-// TIU_BUSY_LENGTH 	0x11f 	0x47c 	[31:0] 	r 		Length in 10ns cycles of the last TIU busy flag
+/// TIU_BUSY_LENGTH 	0x11f 	0x47c 	\[31:0\] 	r 		Length in 10ns cycles of the last TIU busy flag
 pub const TIU_BUSY_LENGTH : MTBRegister<'static> = MTBRegister {
   addr  : 0x11f,
   mask  : 0xffffffff,
