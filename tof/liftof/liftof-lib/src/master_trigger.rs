@@ -24,29 +24,20 @@ use std::sync::{
 };
 
 use std::time::{
-    Duration,
-    Instant
+  Duration,
+  Instant
 };
 use std::fmt;
-//use std::io;
-//use std::collections::HashMap;
-//use std::collections::VecDeque;
 use std::thread;
 use crossbeam_channel::Sender;
-use colored::Colorize;
 use serde_json::json;
 
-//use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::monitoring::MtbMoniData;
-//use tof_dataclasses::commands::RBCommand;
 use tof_dataclasses::events::MasterTriggerEvent;
-//use tof_dataclasses::threading::{
-//    ThreadControl,
-//};
+
 use tof_dataclasses::events::master_trigger::TriggerType;
 use tof_dataclasses::errors::{
-    //IPBusError,
     MasterTriggerError
 };
 use tof_dataclasses::ipbus::{
@@ -256,13 +247,11 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
   let tiu_busy_stuck = (TIU_BUSY_STUCK.get(bus)? != 0) as u8;
   let tiu_busy_ign   = (TIU_BUSY_IGNORE.get(bus)? != 0) as u8;
   let mut tiu_status = 0u8;
-  println! ("tiu status {}", tiu_status);
   tiu_status         = tiu_status | (tiu_emu_mode);
   tiu_status         = tiu_status | (tiu_aux_link << 1);
   tiu_status         = tiu_status | ((tiu_link_bad as u8) << 2);
   tiu_status         = tiu_status | (tiu_busy_stuck << 3);
   tiu_status         = tiu_status | (tiu_busy_ign << 4);
-  println! ("tiu status {}", tiu_status);
   let daq_queue_len  = EVQ_NUM_EVENTS.get(bus)? as u16;
   moni.tiu_status    = tiu_status;
   moni.tiu_busy_len  = tiu_busy_len;
@@ -781,7 +770,6 @@ pub fn master_trigger(mt_address     : String,
       
       if verbose {
         println!("{}", heartbeat);
-        println!("EVG_NUM_EVENTS {}", EVQ_NUM_EVENTS.get(&mut bus).unwrap())
       }
       verbose_timer = Instant::now();
 
@@ -799,3 +787,4 @@ pub fn master_trigger(mt_address     : String,
       }
     } 
   }
+}

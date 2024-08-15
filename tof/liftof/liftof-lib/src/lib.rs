@@ -29,6 +29,7 @@ use std::sync::{
 };
 use std::process::exit;
 
+#[cfg(feature="database")]
 use core::f32::consts::PI;
 
 #[cfg(feature="database")]
@@ -77,22 +78,15 @@ use signal_hook::consts::signal::{
     SIGTERM,
     SIGINT
 };
-//use ndarray::{array, Array1};
-//use nlopt::{Algorithm, Objective, Optimization, Result};
-use nalgebra::Matrix3;
-use nalgebra::Vector3;
-use nalgebra::RowVector3;
 
 use tof_dataclasses::DsiLtbRBMapping;
 #[cfg(feature="database")]
 use tof_dataclasses::database::ReadoutBoard;
-//use tof_dataclasses::threading::{
-//    ThreadControl,
-//};
 
 #[cfg(feature="database")]
 use tof_dataclasses::constants::NWORDS;
-#[cfg(feature="database")]
+//#[cfg(feature="database")]
+#[cfg(all(feature = "database", feature = "advanced-algorithms"))]
 use tof_dataclasses::calibrations::find_zero_crossings;
 #[cfg(feature="database")]
 use tof_dataclasses::errors::AnalysisError;
@@ -389,6 +383,7 @@ impl fmt::Display for RunStatistics {
 }
 
 //sydney's sine fit without libraries
+#[cfg(feature="database")]
 fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> (f32, f32, f32) {
   let start_bin = 20;
   let size_bin = 900;

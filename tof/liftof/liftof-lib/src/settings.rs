@@ -16,7 +16,6 @@ use std::io::{
 use std::fmt;
 use std::collections::HashMap;
 
-use signal_hook::low_level::channel::Channel;
 use tof_dataclasses::config::BuildStrategy;
 
 
@@ -38,6 +37,7 @@ use tof_dataclasses::database::RAT;
 use tof_dataclasses::config::PreampBiasConfig;
 #[cfg(feature="database")]
 use tof_dataclasses::config::LTBThresholdConfig;
+#[cfg(feature="database")]
 use tof_dataclasses::config::RBChannelMaskConfig;
 use crate::master_trigger::MTBSettings;
 

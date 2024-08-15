@@ -28,7 +28,6 @@ toml              = "0.8"
 
 tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["smoothed_z_score"], version = "0.10"} 
 
-
 colored     = "2.0"
 env_logger  = "0.10"
 
@@ -42,9 +41,4 @@ rustfft = "6.2"
 statrs = "0.16"
 nalgebra = "0.33"
 argmin = "0.3.1"
-
-#cfg-if      = "1.0" # TODO - have a propper debugging feature
-
-#[target.armv7-unknown-linux-gnueabi]
-#linker = "/usr/bin/arm-none-eabi-gcc"
 
