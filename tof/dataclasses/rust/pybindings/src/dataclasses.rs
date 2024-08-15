@@ -1614,12 +1614,11 @@ impl PyMasterTriggerEvent {
     Ok(self.event.get_trigger_hits())
   }
 
-  /// combine the tiu gps 16 and 32bit timestamps 
-  /// into a 48bit timestamp
   #[getter]
-  pub fn timestamp_gps48(&self) -> u64 {
-    self.event.get_timestamp_gps48()
+  pub fn timestamp_mtb(&self) -> u32 {
+    self.event.timestamp
   }
+
 
   #[getter]
   pub fn timestamp_gps32(&self) -> u32 {

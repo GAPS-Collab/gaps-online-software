@@ -359,15 +359,6 @@ pub fn master_trigger(mt_address     : String,
     }
   }
   
-  //match TIU_USE_AUX_LINK.set(&mut bus, 1) {
-  //  Err(err) => {
-  //    error!("Unable to use TIU AUX link! {err}");
-  //  }
-  //  Ok(_) => {
-  //    println!("==> Using TIU AUX link!");
-  //  }
-  //}
-
   info!("Settting rb integration window!");
   let int_wind = settings.rb_int_window;
   match set_rb_int_window(&mut bus, int_wind) {
@@ -796,15 +787,15 @@ pub fn master_trigger(mt_address     : String,
 
       if hb_timer.elapsed() >= hb_interval {
 
-        let pack = heartbeat.pack();
-        match moni_sender.send(pack) {
-          Err(err) => {
-            error!("Can not send MTB Heartbeat over channel! {err}");
-          },
-          Ok(_) => ()
-          }
-        }
-        hb_timer = Instant::now();
+      let pack = heartbeat.pack();
+      match moni_sender.send(pack) {
+        Err(err) => {
+          error!("Can not send MTB Heartbeat over channel! {err}");
+        },
+        Ok(_) => ()
+      }
+      
+      hb_timer = Instant::now();
       }
     } 
   }
