@@ -206,14 +206,13 @@ fn main() {
   // global thread control
   let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
   // there seems to be now way to create handles without thread
-  let mut evtbldr_handle   : thread::JoinHandle<_> = thread::spawn(||{});
-  let mut data_sink_handle : thread::JoinHandle<_> = thread::spawn(||{});
-  let ckpumoni_handle  : thread::JoinHandle<_> = thread::spawn(||{});
-  let mut mtb_handle       : thread::JoinHandle<_> = thread::spawn(||{});
-  let mut cmd_handle       : thread::JoinHandle<_> = thread::spawn(||{});
-  #[cfg(feature="tof-ctrl")]
-  let mut cpu_moni_handle  : thread::JoinHandle<_> = thread::spawn(||{});
-  let mut sig_handle       : thread::JoinHandle<_> = thread::spawn(||{});
+  //let mut evtbldr_handle   : thread::JoinHandle<_> = thread::spawn(||{});
+  //let mut data_sink_handle : thread::JoinHandle<_> = thread::spawn(||{});
+  //let mut mtb_handle       : thread::JoinHandle<_> = thread::spawn(||{});
+  //let mut cmd_handle       : thread::JoinHandle<_> = thread::spawn(||{});
+  //#[cfg(feature="tof-ctrl")]
+  //let mut cpu_moni_handle  : thread::JoinHandle<_> = thread::spawn(||{});
+  //let mut sig_handle       : thread::JoinHandle<_> = thread::spawn(||{});
   let mut rb_handles       = Vec::<thread::JoinHandle<_>>::new();
 
   let one_second = time::Duration::from_millis(1000);
@@ -251,6 +250,7 @@ fn main() {
   let calib_file_path       = config.calibration_dir.clone();
   let runtime_nseconds      = config.runtime_sec;
   let db_path               = config.db_path.clone();
+  #[cfg(feature="tof-ctrl")]
   let cpu_moni_interval     = config.cpu_moni_interval_sec;
   let cmd_dispatch_settings = config.cmd_dispatcher_settings.clone();
   let mtb_settings          = config.mtb_settings.clone();
@@ -453,7 +453,7 @@ fn main() {
     // through the thread control mechanism, so we
     // can still end it.
     let tp_to_sink_c = tp_to_sink.clone();
-    cpu_moni_handle = thread::Builder::new()
+    let _cpu_moni_handle = thread::Builder::new()
         .name("cpu-monitoring".into())
         .spawn(move || {
           monitor_cpu(
@@ -469,7 +469,7 @@ fn main() {
 
   debug!("Starting data sink thread!");
   let thread_control_gds = Arc::clone(&thread_control);
-  data_sink_handle = thread::Builder::new()
+  let _data_sink_handle = thread::Builder::new()
     .name("data-sink".into())
     .spawn(move || {
       global_data_sink(&tp_from_threads,
@@ -479,7 +479,7 @@ fn main() {
     .expect("Failed to spawn data-sink thread!");
   debug!("Data sink thread started!");
   let thread_control_sh = Arc::clone(&thread_control);
-  sig_handle = thread::Builder::new()
+  let _sig_handle = thread::Builder::new()
     .name("signal_handler".into())
     .spawn(move || {
       signal_handler(
@@ -493,7 +493,7 @@ fn main() {
   let evb_settings      = config.event_builder_settings.clone();
   let thread_control_eb = Arc::clone(&thread_control);
   let tp_to_sink_c      = tp_to_sink.clone();
-  evtbldr_handle = thread::Builder::new()
+  let _evtbldr_handle = thread::Builder::new()
     .name("event-builder".into())
     .spawn(move || {
                     event_builder(&master_ev_rec,
@@ -509,7 +509,7 @@ fn main() {
   // master trigger
   let mtb_moni_sender = tp_to_sink.clone(); 
   let thread_control_mt = Arc::clone(&thread_control);
-  mtb_handle = thread::Builder::new()
+  let _mtb_handle = thread::Builder::new()
     .name("master-trigger".into())
     .spawn(move || {
                     master_trigger(mtb_address, 
@@ -611,7 +611,7 @@ fn main() {
       // start command dispatcher thread
       let tc = Arc::clone(&thread_control);
       let ts = tp_to_sink.clone();
-      cmd_handle = thread::Builder::new()
+      let _cmd_handle = thread::Builder::new()
         .name("command-dispatcher".into())
         .spawn(move || {
           command_dispatcher(
@@ -818,89 +818,90 @@ fn main() {
       println!(">> So long and thanks for all the \u{1F41F} <<"); 
       exit(0);
     
-
-      println!("=> Shutting down signal hanlder...");
-      // event builder first, to avoid a lot of error messages
-      match thread_control.lock() {
-        Ok(mut tc) => {
-          tc.thread_signal_hdlr_active = false;
-        }
-        Err(err) => {
-          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-        }
-      }
-      let _ = sig_handle.join();
-      //thread::sleep(2*one_second);
+      // FIXME - this all needs debugging. The goal is to shut down 
+      // the threads in order
+      //println!("=> Shutting down signal handler...");
+      //// event builder first, to avoid a lot of error messages
+      //match thread_control.lock() {
+      //  Ok(mut tc) => {
+      //    tc.thread_signal_hdlr_active = false;
+      //  }
+      //  Err(err) => {
+      //    error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+      //  }
+      //}
+      //let _ = sig_handle.join();
+      ////thread::sleep(2*one_second);
     
-      // end RB threads
-      println!("=> Shutting down rb threads...");
-      match thread_control.lock() {
-        Ok(mut tc) => {
-          for rb in &rb_list {
-            if tc.thread_rbcomm_active.contains_key(&rb.rb_id) {
-              *tc.thread_rbcomm_active.get_mut(&rb.rb_id).unwrap() = false;
-            }
-          }
-        }
-        Err(err) => {
-          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-        }
-      }
+      //// end RB threads
+      //println!("=> Shutting down rb threads...");
+      //match thread_control.lock() {
+      //  Ok(mut tc) => {
+      //    for rb in &rb_list {
+      //      if tc.thread_rbcomm_active.contains_key(&rb.rb_id) {
+      //        *tc.thread_rbcomm_active.get_mut(&rb.rb_id).unwrap() = false;
+      //      }
+      //    }
+      //  }
+      //  Err(err) => {
+      //    error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+      //  }
+      //}
 
-      for k in rb_handles {
-        let _ = k.join();
-      }
+      //for k in rb_handles {
+      //  let _ = k.join();
+      //}
 
-      // event builder first, to avoid a lot of error messages
-      println!("=> Shutting down event builder...");
-      match thread_control.lock() {
-        Ok(mut tc) => {
-          tc.thread_event_bldr_active = false;
-          println!("tc {}", tc);
-        }
-        Err(err) => {
-          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-        }
-      } 
-      println!("=> Waiting for event builder thread to finish up...");
-      println!("=> evt builder thread is finsihed: {}", evtbldr_handle.is_finished());
-      let _ = evtbldr_handle.join();
-      println!("=> .. done!");
+      //// event builder first, to avoid a lot of error messages
+      //println!("=> Shutting down event builder...");
+      //match thread_control.lock() {
+      //  Ok(mut tc) => {
+      //    tc.thread_event_bldr_active = false;
+      //    println!("tc {}", tc);
+      //  }
+      //  Err(err) => {
+      //    error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+      //  }
+      //} 
+      //println!("=> Waiting for event builder thread to finish up...");
+      //println!("=> evt builder thread is finsihed: {}", evtbldr_handle.is_finished());
+      //let _ = evtbldr_handle.join();
+      //println!("=> .. done!");
 
-      match thread_control.lock() {
-        Ok(mut tc) => {
-          tc.stop_flag = true;
-        },
-        Err(err) => {
-          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-        },
-      }
-      // wait actually until all threads have been finished
-      let timeout = Instant::now();
-      loop {
-        match thread_control.lock() {
-          Ok(mut tc) => {
-            tc.stop_flag = true;
-            // each thread will report here if
-            // it is done
-            if !tc.thread_cmd_dispatch_active 
-            && !tc.thread_data_sink_active
-            && !tc.thread_event_bldr_active 
-            && !tc.thread_master_trg_active {
-              break;
-            }
-          },
-          Err(err) => {
-            error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-          },
-        }
-        // in any case, break after timeout
-        if timeout.elapsed() > 5*one_second {
-          break;
-        }
-      }
-      println!(">> So long and thanks for all the \u{1F41F} <<"); 
-      exit(0);
+      //match thread_control.lock() {
+      //  Ok(mut tc) => {
+      //    tc.stop_flag = true;
+      //  },
+      //  Err(err) => {
+      //    error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+      //  },
+      //}
+      //// wait actually until all threads have been finished
+      //let timeout = Instant::now();
+      //loop {
+      //  match thread_control.lock() {
+      //    Ok(mut tc) => {
+      //      tc.stop_flag = true;
+      //      // each thread will report here if
+      //      // it is done
+      //      if !tc.thread_cmd_dispatch_active 
+      //      && !tc.thread_data_sink_active
+      //      && !tc.thread_event_bldr_active 
+      //      && !tc.thread_master_trg_active {
+      //        break;
+      //      }
+      //    },
+      //    Err(err) => {
+      //      error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+      //    },
+      //  }
+      //  // in any case, break after timeout
+      //  if timeout.elapsed() > 5*one_second {
+      //    break;
+      //  }
+      //}
+      //println!(">> So long and thanks for all the \u{1F41F} <<"); 
+      //exit(0);
     }
 
     // check thread control - this is useful 

@@ -205,7 +205,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                   Ok(_cmd) => {cmd = _cmd;},
                   Err(err) => error!("Unable to decode TofCommand! {err}")
                 }
-                println!("= => [cmd_djispatcher] Received command {}!", cmd);
+                println!("= => [cmd_dispatcher] Received command {}!", cmd);
                 let now = Utc::now().to_string();
                 let write_to_file = format!("{:?}: {}\n",now, cmd);
                 match log_file.write_all(&write_to_file.into_bytes()) {
