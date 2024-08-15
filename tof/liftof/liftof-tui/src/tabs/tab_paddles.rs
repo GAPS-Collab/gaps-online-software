@@ -218,9 +218,9 @@ impl PaddleTab<'_> {
             self.baseline_rms_ch_b.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_b_rms());
           
         }
-        let mut bl_a  = 0f32;
-        let mut bl_b  = 0f32;
-        let mut rms_a = 0f32;
+        let mut bl_a  : f32;
+        let mut bl_b  : f32;
+        let rms_a = 0f32;
         let rms_b = 0f32;
         for mut wf in wfs {
           if wf.rb_id == self.current_paddle.rb_id as u8 {
@@ -247,7 +247,7 @@ impl PaddleTab<'_> {
                 let ped = calculate_pedestal(&wf.voltages, 10.0, 850, 100);
                 bl_a  = ped.0;
                 self.baseline_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_a);
-                self.baseline_rms_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_a);
+                self.baseline_rms_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&rms_a);
               }
               self.wf_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().push_back(wf);
               if self.wf_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().len() > self.queue_size {
@@ -257,7 +257,7 @@ impl PaddleTab<'_> {
               if wf.voltages.len() > 0 {
                 bl_b = calculate_pedestal(&wf.voltages, 10.0, 850, 100).0;
                 self.baseline_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_b);
-                self.baseline_rms_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_b);
+                self.baseline_rms_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&rms_b);
               }
               self.wf_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().push_back(wf);
               if self.wf_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().len() > self.queue_size {

@@ -529,7 +529,7 @@ impl RBTab<'_>  {
           //  }
           //}
         }
-        let mut view_string : String;
+        let view_string : String;
         match self.rbs.get(&self.rb_selector) {
           Some(_rb) => {
             view_string = format!("{}", _rb.to_summary_str());
