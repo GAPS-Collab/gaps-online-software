@@ -688,7 +688,7 @@ impl fmt::Display for MasterTriggerEvent {
     repr += "\n  ** ** timestamps ** **";
     repr += &(format!("\n    timestamp     : {}", self.timestamp));
     repr += &(format!("\n    tiu_timestamp : {}", self.tiu_timestamp));
-    repr += &(format!("\n    gps 48bit     : {}", self.get_timestamp_gps48()));
+    repr += &(format!("\n    gps_timestamp : {}", self.tiu_gps32));
     repr += &(format!("\n    absolute 48bit: {}", self.get_timestamp_abs48()));
     repr += "\n  -- -- --";
     repr += &(format!("\n  crc             : {}", self.crc));
