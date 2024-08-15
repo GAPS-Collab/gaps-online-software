@@ -7,8 +7,6 @@ GAPS online software TOF part
 """
 
 
-from .events import RBEvent
-from .calibrations import RBCalibration
 from .mapping import DsiJChRBMap
 
 from . import sensors

@@ -50,6 +50,7 @@ use tof_dataclasses::series::{
 use tof_dataclasses::events::{
     TofEvent,
     TofEventSummary,
+    EventStatus,
     TofHit,
     MasterTriggerEvent,
     RBEvent,
@@ -1803,7 +1804,11 @@ impl PyTofEventSummary {
     self.event.get_timestamp48()
   }
   
-  
+  #[getter]
+  fn status(&self) -> EventStatus {
+    self.event.status
+  }
+
   fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
     let tp = packet.get_tp();
     match tp.unpack::<TofEventSummary>() {
