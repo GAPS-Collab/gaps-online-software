@@ -58,6 +58,8 @@ use tof_dataclasses::events::{
     RBWaveform
 };
 
+
+use tof_dataclasses::events::EventStatus;
 use tof_dataclasses::serialization::{
     Serialization,
     Packable
@@ -1752,7 +1754,10 @@ impl PyTofEventSummary {
   fn event_id(&self) -> u32 {
     self.event.event_id
   }
-
+  #[getter]
+  fn event_status(&self) -> EventStatus {
+    self.event.status
+  }
 
   /// RB Link IDS (not RB ids) which fall into the 
   /// trigger window

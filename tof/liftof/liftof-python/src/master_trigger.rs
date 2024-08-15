@@ -345,6 +345,29 @@ impl PyMasterTrigger {
       }
     }
   }
+fn get_gaps_trigger_prescale(&mut self) -> PyResult<f32> {
+  match GAPS_TRIG_PRESCALE.get(&mut self.ipbus) {
+    Ok (prescale_bus) => {
+      let prescale_val = (u32::MAX as f32 * prescale_bus as f32).floor() as f32;
+    return Ok(prescale_val)
+    }
+    Err(err) => {
+      return Err(PyValueError::new_err(err.to_string()));
+    }
+  }
+}
+
+fn set_gaps_trigger_prescale(&mut self, prescale : f32) -> PyResult<f32> {
+  let prescale_val = (f32::MAX * prescale as f32).floor() as u32;
+  match GAPS_TRIG_PRESCALE.set(&mut self.ipbus, prescale_val) {
+    Ok(_) => {
+      return Ok(prescale)
+    }
+    Err(err) => {
+      return Err(PyValueError::new_err(err.to_string()));
+    }
+  }
+}
 
 fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
     match TRACK_CENTRAL_IS_GLOBAL.set(&mut self.ipbus, 1) {
