@@ -1977,7 +1977,7 @@ pub const RB_CNTS_SNAP : MTBRegister<'static> = MTBRegister {
 /// TRACK_CENTRAL_IS_GLOBAL   0xb     0x2c    2   rw  0x0     1 makes the TRACK central read all paddles.
 pub const TRACK_CENTRAL_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
   addr  : 0xb,
-  mask  : 0x00000002,
+  mask  : 0x4,
   descr : "1 makes the TRACK central read all paddles",
   rmw   : true,
   ro    : false,
