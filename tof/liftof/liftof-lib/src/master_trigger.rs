@@ -779,7 +779,7 @@ pub fn master_trigger(mt_address     : String,
       }
       
       hb_timer = Instant::now();
-      }
+      
     } 
   }
 }

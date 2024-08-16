@@ -59,7 +59,6 @@ use tof_dataclasses::events::{
 };
 
 
-use tof_dataclasses::events::EventStatus;
 use tof_dataclasses::serialization::{
     Serialization,
     Packable
