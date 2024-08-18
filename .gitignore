@@ -63,6 +63,10 @@ dataclasses/*pb2.py
 # whatever script
 *.png
 
+# doc stuff
+doc/html
+doc/latex
+
 # ingore automatically generated files
 # for static websites
 analysis/umbrella-checkout/content/*.md

@@ -110,14 +110,14 @@ execute_process(
   OUTPUT_QUIET
 )
 
-if (BUILD_LIFTOF OR BUILD_RUSTPYBIDINGS)
+if (BUILD_LIFTOF OR BUILD_RUSTPYBINDINGS)
   if(CARGO_RESULT EQUAL 0)
     message(STATUS "-- found `cargo` - will be able to build liftof!")
   else()
     message(WARNING "-- `cargo` NOT found! Unable to build liftof.")
     message(STATUS "Please install a rust toolchain including cargo if you want to build liftof, and make sure cargo is in your $PATH!")
     option (BUILD_LIFTOF OFF)
-    option (BUILD_RUSTPYBIDINGS OFF)
+    option (BUILD_RUSTPYBINDINGS OFF)
   endif()
 endif()
 
@@ -173,7 +173,7 @@ if (UNIX AND NOT APPLE)
   )
 endif(BUILD_LIFTOF)
 
-if(BUILD_RUSTPYBIDINGS)
+if(BUILD_RUSTPYBINDINGS)
   # Define the command to build your Rust project
   message(STATUS "building Rust \\U1F980 pybindings wiut pyO3...")
   set(RUST_BUILD_COMMAND cargo build --release --all-features)
@@ -200,7 +200,7 @@ if(BUILD_RUSTPYBIDINGS)
           RENAME rpy_tof_dataclasses.so
   )
 
-endif(BUILD_RUSTPYBIDINGS)
+endif(BUILD_RUSTPYBINDINGS)
 
 #################################################
 # installation
