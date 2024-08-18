@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["PyIPBus","PyMasterTriggerEvent","PyRBCalibration","PyRBEvent"]};
+window.SIDEBAR_ITEMS = {"struct":["PyIPBus"]};

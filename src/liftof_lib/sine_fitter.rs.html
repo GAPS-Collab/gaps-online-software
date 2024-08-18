@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/sine_fitter.rs`."><title>sine_fitter.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/sine_fitter.rs`."><title>sine_fitter.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -102,14 +102,18 @@
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>ndarray::{Array1, Array, ArrayBase, Data, Ix1};
-<span class="kw">use </span>ndarray_linalg::solve::Inverse;
-<span class="kw">use </span>rustfft::{FftPlanner, num_complex::Complex};
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>ndarray::Array1;
+<span class="comment">//, Array, ArrayBase, Data, Ix1};
+//use ndarray_linalg::solve::Inverse;
+</span><span class="kw">use </span>rustfft::{FftPlanner, num_complex::Complex};
 <span class="kw">use </span>std::f64::consts::PI;
 <span class="kw">use </span>statrs::distribution::ChiSquared;
-<span class="kw">use </span>ndarray_rand::RandomExt;
-<span class="kw">use </span>ndarray_rand::rand_distr::Uniform;
-<span class="kw">use </span>argmin::prelude::<span class="kw-2">*</span>;
+<span class="comment">//use ndarray_rand::RandomExt;
+//use ndarray_rand::rand_distr::Uniform;
+</span><span class="kw">use </span>argmin::prelude::<span class="kw-2">*</span>;
 <span class="comment">//use argmin::ArgminOp;
 // use argmin::core::Executor;
 // use argmin::core::Error;
@@ -129,7 +133,8 @@
     <span class="kw">type </span>Float = f64;
 
     <span class="kw">fn </span>apply(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
-        <span class="kw">let </span>(A, w, ph, c) = (p[<span class="number">0</span>], p[<span class="number">1</span>], p[<span class="number">2</span>], p[<span class="number">3</span>]);
+        <span class="attr">#[allow(non_snake_case)]
+        </span><span class="kw">let </span>(A, w, ph, c) = (p[<span class="number">0</span>], p[<span class="number">1</span>], p[<span class="number">2</span>], p[<span class="number">3</span>]);
         <span class="kw">let </span>sinfunc = |t: f64| A * (w * t + ph).sin() + c;
         <span class="kw">let </span>residuals: f64 = <span class="self">self</span>.tt.iter().zip(<span class="self">self</span>.yy.iter())
             .map(|(<span class="kw-2">&amp;</span>t, <span class="kw-2">&amp;</span>y)| (y - sinfunc(t)).powi(<span class="number">2</span>))
@@ -164,7 +169,8 @@
         .run()<span class="question-mark">?</span>;
 
     <span class="kw">let </span>result = <span class="kw-2">&amp;</span>res.state().best_param;
-    <span class="kw">let </span>(A, w, p, c) = (result[<span class="number">0</span>], result[<span class="number">1</span>], result[<span class="number">2</span>], result[<span class="number">3</span>]);
+    <span class="attr">#[allow(non_snake_case)]
+    </span><span class="kw">let </span>(A, w, p, c) = (result[<span class="number">0</span>], result[<span class="number">1</span>], result[<span class="number">2</span>], result[<span class="number">3</span>]);
     <span class="kw">let </span>phase_multiple_pi = p / PI;
 
     <span class="kw">let </span>fitfunc = |t: f64| -&gt; f64 {
@@ -172,8 +178,8 @@
     };
 
     <span class="kw">let </span>residuals: Vec&lt;f64&gt; = tt.iter().zip(yy.iter()).map(|(<span class="kw-2">&amp;</span>t, <span class="kw-2">&amp;</span>y)| y - fitfunc(t)).collect();
-    <span class="kw">let </span>ss_res = residuals.iter().map(|<span class="kw-2">&amp;</span>r| r.powi(<span class="number">2</span>)).sum::&lt;f64&gt;();
-    <span class="kw">let </span>ss_tot = yy.iter().map(|<span class="kw-2">&amp;</span>y| (y - yy.mean().unwrap()).powi(<span class="number">2</span>)).sum::&lt;f64&gt;();
+    <span class="kw">let </span>_ss_res = residuals.iter().map(|<span class="kw-2">&amp;</span>r| r.powi(<span class="number">2</span>)).sum::&lt;f64&gt;();
+    <span class="kw">let </span>_ss_tot = yy.iter().map(|<span class="kw-2">&amp;</span>y| (y - yy.mean().unwrap()).powi(<span class="number">2</span>)).sum::&lt;f64&gt;();
     <span class="comment">//let r_squared = 1.0 - (ss_res / ss_tot);
 
     // Chi-squared calculation
@@ -186,10 +192,10 @@
     <span class="kw">let </span>reduced_chi_squared = chi_squared_stat / df;
 
     <span class="kw">let </span>chi_squared = ChiSquared::new(df).unwrap();
-    <span class="kw">let </span>p_value = <span class="number">1.0 </span>- chi_squared.cdf(chi_squared_stat);
+    <span class="kw">let </span>_p_value = <span class="number">1.0 </span>- chi_squared.cdf(chi_squared_stat);
 
     <span class="kw">let </span>f = w / (<span class="number">2.0 </span>* PI);
-    <span class="kw">let </span>period = <span class="number">1.0 </span>/ f;
+    <span class="kw">let </span>_period = <span class="number">1.0 </span>/ f;
 
 
     <span class="prelude-val">Ok</span>((A, f, p, phase_multiple_pi, c, reduced_chi_squared))
@@ -205,4 +211,5 @@
     // println!("p_value: {:.2}", p_value);
     // println!("reduced_chi_squared: {:.2}", reduced_chi_squared);
 
-</span>}</code></pre></div></section></main></body></html>
+</span>}
+</code></pre></div></section></main></body></html>

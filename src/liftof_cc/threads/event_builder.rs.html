@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/threads/event_builder.rs`."><title>event_builder.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_cc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/threads/event_builder.rs`."><title>event_builder.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_cc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -661,6 +661,18 @@
 <a href="#661" id="661">661</a>
 <a href="#662" id="662">662</a>
 <a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::thread;
 <span class="kw">use </span>std::time::{
     Instant,
@@ -777,30 +789,22 @@
   </span><span class="kw">let </span><span class="kw-2">mut </span>n_received           : usize;
   <span class="comment">//let mut clear_cache        = 0; // clear cache every 
   //let mut event_sending      = 0;
-  </span><span class="kw">let </span><span class="kw-2">mut </span>n_mte_received_tot   = <span class="number">0u64</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_mte_skipped        = <span class="number">0u32</span>;
-  <span class="kw">let </span>n_rbe_received_tot   = <span class="number">0u64</span>;
-  <span class="kw">let </span>n_rbe_discarded_tot  = <span class="number">0u64</span>;
+  </span><span class="kw">let </span><span class="kw-2">mut </span>n_mte_skipped        = <span class="number">0u32</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>first_evid           : u32;
   <span class="kw">let </span><span class="kw-2">mut </span>last_evid            = <span class="number">0</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_sent               = <span class="number">0usize</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_sent_ch_err        = <span class="number">0usize</span>;
-  <span class="kw">let </span>n_timed_out          = <span class="number">0usize</span>; 
   <span class="comment">// debug
-  </span><span class="kw">let </span><span class="kw-2">mut </span>last_rb_evid         = <span class="number">0u32</span>;
+  </span><span class="kw">let </span><span class="kw-2">mut </span>last_rb_evid         : u32;
   <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_per_te         = <span class="number">0usize</span>;
-  <span class="kw">let </span>rb_ev_wo_mte         = <span class="number">0usize</span>;
-  <span class="kw">let </span>n_rbe_from_past      = <span class="number">0usize</span>;
-  <span class="kw">let </span>n_rbe_orphan         = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>debug_timer          = Instant::now();
   <span class="kw">let </span>met_seconds          = <span class="number">0f64</span>;  
   <span class="comment">//let mut n_receiving_errors  = 0;
   </span><span class="kw">let </span><span class="kw-2">mut </span>check_tc_update      = Instant::now();
-  <span class="kw">let </span><span class="kw-2">mut </span>n_gathered_fr_cache  = <span class="number">0usize</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>misaligned_cache_err = <span class="number">0usize</span>; 
   <span class="kw">let </span>daq_reset_cooldown   = Instant::now();
   <span class="kw">let </span>reset_daq_flag       = <span class="bool-val">false</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>retire               = <span class="bool-val">false</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>retire           = <span class="bool-val">false</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>hb_timer         = Instant::now(); 
+  <span class="kw">let </span>hb_interval          = Duration::from_secs(settings.hb_send_interval <span class="kw">as </span>u64);
   <span class="kw">loop </span>{
     <span class="kw">if </span>check_tc_update.elapsed().as_secs() &gt; <span class="number">2 </span>{
       <span class="comment">//println!("= =&gt; [evt_builder] checkling tc..");
@@ -868,7 +872,6 @@
           // of events
           </span>event_id_cache.push_back(last_evid);
           n_received  += <span class="number">1</span>;
-          n_mte_received_tot += <span class="number">1</span>;
           heartbeat.n_mte_received_tot += <span class="number">1</span>;
         }
       } <span class="comment">// end match Ok(mt)
@@ -981,10 +984,10 @@
     </span><span class="kw">if </span>debug_timer_elapsed &gt; <span class="number">35.0  </span>{
       <span class="comment">// missing event id check
       </span><span class="kw">let </span><span class="kw-2">mut </span>evid_check = event_id_cache[<span class="number">0</span>];
-      <span class="kw">let </span><span class="kw-2">mut </span>n_ev_wo_evid = <span class="number">0usize</span>;
+      heartbeat.n_ev_wo_evid = <span class="number">0usize</span>;
       <span class="kw">for _ in </span><span class="number">0</span>..event_id_cache.len() {
         <span class="kw">if </span>!event_id_cache.contains(<span class="kw-2">&amp;</span>evid_check) {
-          n_ev_wo_evid += <span class="number">1</span>;
+          heartbeat.n_ev_wo_evid += <span class="number">1</span>;
         }
         evid_check += <span class="number">1</span>;
       }
@@ -992,18 +995,26 @@
       heartbeat.mte_receiver_cbc_len = m_trig_ev.len();
       heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
       heartbeat.tp_sender_cbc_len = data_sink.len();
-      <span class="kw">let </span>pack = heartbeat.pack();
-      <span class="kw">match </span>data_sink.send(pack) {
-        <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">"EVTBLDR Heartbeat sending failed! Err {}"</span>, err);
-        }
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-          <span class="macro">debug!</span>(<span class="string">"Heartbeat sent &lt;3 &lt;3 &lt;3"</span>);
-        }
-      }
-      <span class="macro">println!</span>(<span class="string">"{}"</span>, heartbeat);
-   
-      <span class="kw">let </span><span class="kw-2">mut </span>counters = HashMap::&lt;u8,f64&gt;::new();
+
+      <span class="comment">//while hb_timer.elapsed() &lt; hb_interval {};
+      //}
+
+      //while hb_timer.elapsed() &gt;= hb_interval {
+      //let pack = heartbeat.pack();
+      //match data_sink.send(pack) {
+      //  Err(err) =&gt; {
+      //    error!("EVTBLDR Heartbeat sending failed! Err {}", err);
+      //  }
+      //  Ok(_)    =&gt; {
+      //    debug!("Heartbeat sent &lt;3 &lt;3 &lt;3");
+      //  }
+      //}
+      //println!("{}", heartbeat);
+      //hb_timer = Instant::now();
+
+      ////while hb_timer.elapsed() &lt; hb_interval {};
+      //}
+      </span><span class="kw">let </span><span class="kw-2">mut </span>counters = HashMap::&lt;u8,f64&gt;::new();
       <span class="kw">for </span>k <span class="kw">in </span>seen_rbevents.keys() {
         counters.insert(<span class="kw-2">*</span>k, seen_rbevents[<span class="kw-2">&amp;</span>k] <span class="kw">as </span>f64/met_seconds <span class="kw">as </span>f64);
       }
@@ -1181,8 +1192,7 @@
     }
     <span class="macro">trace!</span>(<span class="string">"Debug timer RBE received! {:?}"</span>, debug_timer.elapsed());
     <span class="comment">//if event_sending == send_every_x_event {
-    </span>n_gathered_fr_cache = <span class="number">0</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>prior_ev_sent = <span class="number">0u32</span>;
+    </span><span class="kw">let </span><span class="kw-2">mut </span>prior_ev_sent = <span class="number">0u32</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>first_ev_sent = <span class="bool-val">false</span>;
     
     <span class="kw">for </span>idx <span class="kw">in </span><span class="number">0</span>..event_id_cache.len() {
@@ -1202,8 +1212,6 @@
       </span><span class="kw">match </span>event_cache.get(<span class="kw-2">&amp;</span>evid) {
         <span class="prelude-val">None </span>=&gt; {
           <span class="macro">error!</span>(<span class="string">"Event id and event caches are misaligned for event id {}, idx {} and sizes {} {}! This is BAD and most likely a BUG!"</span>, evid, idx, event_cache.len(), event_id_cache.len());
-          <span class="comment">//event_id_cache.push_back(evid);
-          </span>misaligned_cache_err += <span class="number">1</span>;
           <span class="kw">continue</span>;
         },
         <span class="prelude-val">Some</span>(ev) =&gt; {
@@ -1227,8 +1235,7 @@
                 <span class="comment">// except the event times out
                 </span><span class="kw">if </span>ev.rb_events.len() <span class="kw">as </span>u8 == settings.wait_nrb {
                   ready_to_send = <span class="bool-val">true</span>;
-                  <span class="comment">//n_gathered_fr_cache += 1;
-                </span>} <span class="comment">// else ready_to_send is still false 
+                } <span class="comment">// else ready_to_send is still false 
               </span>},
               BuildStrategy::Adaptive 
               | BuildStrategy::AdaptiveThorough
@@ -1278,7 +1285,8 @@
             <span class="comment">// update event status, so that we will also see in an 
             // (optionally) produced tof event summary if the 
             // event has isuses
-            </span>n_rbe_per_te  += ev_to_send.rb_events.len(); 
+            </span>n_rbe_per_te  += ev_to_send.rb_events.len();
+            heartbeat.data_mangled_ev = <span class="number">69</span>;
             <span class="kw">let </span>_ev_satus  = ev_to_send.mt_event.event_status;
             <span class="kw">for </span>ev <span class="kw">in </span><span class="kw-2">&amp;</span>ev_to_send.rb_events {
               <span class="kw">if </span>ev.status == EventStatus::CellSyncErrors || ev.status == EventStatus::ChnSyncErrors {
@@ -1288,19 +1296,22 @@
               }
             }
             <span class="comment">// can we avoid unpacking and repacking?
-            </span><span class="kw">let </span>pack       = TofPacket::from(<span class="kw-2">&amp;</span>ev_to_send);
-            <span class="kw">match </span>data_sink.send(pack) {
-              <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="macro">error!</span>(<span class="string">"Packet sending failed! Err {}"</span>, err);
-                n_sent_ch_err += <span class="number">1</span>; 
-              }
-              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-                <span class="macro">debug!</span>(<span class="string">"Event with id {} sent!"</span>, evid);
-                n_sent += <span class="number">1</span>;
-                heartbeat.n_sent += <span class="number">1</span>;
-              }
+            
+          //  while hb_timer.elapsed() &lt; hb_interval {
+          //    // Do nothing, wait for the next heartbeat cycle
+          //}
+          </span><span class="kw">let </span>pack       = TofPacket::from(<span class="kw-2">&amp;</span>ev_to_send);
+          <span class="kw">match </span>data_sink.send(pack) {
+            <span class="prelude-val">Err</span>(err) =&gt; {
+              <span class="macro">error!</span>(<span class="string">"Packet sending failed! Err {}"</span>, err);
             }
-          } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+              <span class="macro">debug!</span>(<span class="string">"Event with id {} sent!"</span>, evid);
+              n_sent += <span class="number">1</span>;
+              heartbeat.n_sent += <span class="number">1</span>;
+            }
+          }
+        } <span class="kw">else </span>{
             event_id_cache.push_front(evid);
           }
         }
@@ -1320,8 +1331,21 @@
     //event_sending = 0;
     //event_cache.retain(|ev| ev.valid);
     </span><span class="macro">debug!</span>(<span class="string">"Debug timer! EVT SENDING {:?}"</span>, debug_timer.elapsed());
+    <span class="kw">if </span>hb_timer.elapsed() &gt;= hb_interval {
+      <span class="comment">//let pack       = TofPacket::from(&amp;ev_to_send);
+      </span><span class="kw">let </span>pack         = heartbeat.pack();
+      <span class="kw">match </span>data_sink.send(pack) {
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"Packet sending failed! Err {}"</span>, err);
+        }
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+        }
+      }
+      hb_timer = Instant::now();
+      <span class="comment">// Wait until the configured interval has passed
+      //while hb_timer.elapsed() &lt; hb_interval {};
+    </span>} 
   } <span class="comment">// end loop
-</span>}
-
+</span>}  
 
 </code></pre></div></section></main></body></html>

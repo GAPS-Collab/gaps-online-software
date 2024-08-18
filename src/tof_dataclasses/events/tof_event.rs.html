@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/tof_event.rs`."><title>tof_event.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/tof_event.rs`."><title>tof_event.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1010,6 +1010,9 @@
 <a href="#1010" id="1010">1010</a>
 <a href="#1011" id="1011">1011</a>
 <a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Event strucutures for data reconrded byi the tof
 //!
 //! Compressed format containing analysis results of 
@@ -1268,7 +1271,7 @@
     </span><span class="kw">let </span>mt_timestamp          = <span class="self">self</span>.mt_event.get_timestamp_abs48();
     
     summary.timestamp32       = (mt_timestamp &amp; <span class="number">0x00000000ffffffff </span>) <span class="kw">as </span>u32;
-    summary.timestamp16       = ((mt_timestamp &amp; <span class="number">0x0000ffff00000000 </span>) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;
+    summary.timestamp16       = ((mt_timestamp &amp; <span class="number">0x0000ffff00000000 </span>) &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u16;
     summary.primary_beta      = <span class="self">self</span>.header.primary_beta; 
     summary.primary_charge    = <span class="self">self</span>.header.primary_charge; 
     summary.dsi_j_mask        = <span class="self">self</span>.mt_event.dsi_j_mask;
@@ -1680,8 +1683,10 @@
   /// # Returns
   ///
   ///   Vec&lt;(hit)&gt; where hit is (DSI, J, CH) 
-  </span><span class="kw">pub fn </span>get_trigger_hits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(u8, u8, u8, LTBThreshold)&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>hits = Vec::&lt;(u8,u8,u8,LTBThreshold)&gt;::new(); 
+  </span><span class="kw">pub fn </span>get_trigger_hits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(u8, u8, (u8, u8), LTBThreshold)&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>hits = Vec::&lt;(u8,u8,(u8,u8),LTBThreshold)&gt;::with_capacity(<span class="number">5</span>); 
+    <span class="kw">let </span>physical_channels = [(<span class="number">1u8</span>,  <span class="number">2u8</span>), (<span class="number">3u8</span>,<span class="number">4u8</span>), (<span class="number">5u8</span>, <span class="number">6u8</span>), (<span class="number">7u8</span>, <span class="number">8u8</span>),
+                             (<span class="number">9u8</span>, <span class="number">10u8</span>), (<span class="number">11u8</span>,<span class="number">12u8</span>), (<span class="number">13u8</span>, <span class="number">14u8</span>), (<span class="number">15u8</span>, <span class="number">16u8</span>)];
     <span class="comment">//let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
     </span><span class="kw">let </span>n_masks_needed = <span class="self">self</span>.dsi_j_mask.count_ones();
     <span class="kw">if </span><span class="self">self</span>.channel_mask.len() &lt; n_masks_needed <span class="kw">as </span>usize {
@@ -1693,6 +1698,8 @@
     <span class="macro">trace!</span>(<span class="string">"ltb channels {:?}"</span>, <span class="self">self</span>.dsi_j_mask);
     <span class="macro">trace!</span>(<span class="string">"hit masks {:?}"</span>, <span class="self">self</span>.channel_mask); 
     <span class="comment">//println!("We see LTB Channels {:?} with Hit masks {:?} for {} masks requested by us!", self.dsi_j_mask, self.channel_mask, n_masks_needed);
+    
+    // one k here is for one ltb
     </span><span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">32 </span>{
       <span class="kw">if </span>(<span class="self">self</span>.dsi_j_mask &gt;&gt; k) <span class="kw">as </span>u32 &amp; <span class="number">0x1 </span>== <span class="number">1 </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>dsi = <span class="number">0u8</span>;
@@ -1719,21 +1726,20 @@
         </span><span class="kw">let </span>channels = <span class="self">self</span>.channel_mask[n_mask]; 
         <span class="kw">for </span>(i,ch) <span class="kw">in </span>LTB_CHANNELS.iter().enumerate() {
           <span class="comment">//let chn = *ch as u8 + 1;
-          </span><span class="kw">let </span>chn = i <span class="kw">as </span>u8 + <span class="number">1</span>;
-          <span class="comment">//println!("i,ch {}, {}", i, ch);
+          </span><span class="kw">let </span>ph_chn = physical_channels[i];
+          <span class="comment">//let chn = i as u8 + 1;
+          //println!("i,ch {}, {}", i, ch);
           </span><span class="kw">let </span>thresh_bits = ((channels &amp; ch) &gt;&gt; (i<span class="kw-2">*</span><span class="number">2</span>)) <span class="kw">as </span>u8;
           <span class="comment">//println!("thresh_bits {}", thresh_bits);
           </span><span class="kw">if </span>thresh_bits &gt; <span class="number">0 </span>{ <span class="comment">// hit over threshold
-            </span>hits.push((dsi, j, chn, LTBThreshold::from(thresh_bits)));
-            
+            </span>hits.push((dsi, j, ph_chn, LTBThreshold::from(thresh_bits)));
           }
         }
         n_mask += <span class="number">1</span>;
-      }
-    }
+      } <span class="comment">// next ltb
+    </span>}
     hits
   }
-
   
   <span class="doccomment">/// Get the trigger sources from trigger source byte
   /// FIXME! (Does not return anything)
@@ -1899,7 +1905,7 @@
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  PrimaryCharge    : {}"</span>, <span class="self">self</span>.primary_charge));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **"</span>, <span class="self">self</span>.dsi_j_mask.count_ones()));
     <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.get_trigger_hits() {
-      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  =&gt; {}/{}/{} ({}) "</span>, k.<span class="number">0</span>, k.<span class="number">1</span>, k.<span class="number">2</span>, k.<span class="number">3</span>));
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  =&gt; {}/{}/({},{}) ({}) "</span>, k.<span class="number">0</span>, k.<span class="number">1</span>, k.<span class="number">2.0</span>, k.<span class="number">2.1</span>, k.<span class="number">3</span>));
     }
     repr += <span class="string">"\n  ** ** MTB LINK IDs ** **"</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>mtblink_str = String::from(<span class="string">"\n  =&gt; "</span>);

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/threads/global_data_sink.rs`."><title>global_data_sink.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_cc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/threads/global_data_sink.rs`."><title>global_data_sink.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_cc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -440,16 +440,6 @@
 <a href="#440" id="440">440</a>
 <a href="#441" id="441">441</a>
 <a href="#442" id="442">442</a>
-<a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
-<a href="#445" id="445">445</a>
-<a href="#446" id="446">446</a>
-<a href="#447" id="447">447</a>
-<a href="#448" id="448">448</a>
-<a href="#449" id="449">449</a>
-<a href="#450" id="450">450</a>
-<a href="#451" id="451">451</a>
-<a href="#452" id="452">452</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Communication with the flight computer
 //!
 //! Using two dedicated 0MQ wires - one for 
@@ -474,6 +464,7 @@
 
 <span class="kw">use </span>colored::Colorize;
 
+<span class="kw">use </span>liftof_lib::settings::{<span class="self">self</span>, DataPublisherSettings};
 <span class="kw">use </span>tof_dataclasses::packets::{
     TofPacket,
     PacketType
@@ -523,7 +514,8 @@
 /// * thread_control     : start/stop thread, calibration information
 </span><span class="kw">pub fn </span>global_data_sink(incoming           : <span class="kw-2">&amp;</span>Receiver&lt;TofPacket&gt;,
                         print_moni_packets : bool,
-                        thread_control     : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;) {
+                        thread_control     : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;,
+                        settings           : DataPublisherSettings) {
   <span class="comment">// when the thread starts, we need to wait a bit
   // till thread_control becomes usable
   </span>sleep(Duration::from_secs(<span class="number">10</span>));
@@ -600,6 +592,8 @@
   <span class="kw">let </span><span class="kw-2">mut </span>new_run_start = <span class="bool-val">false</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>retire   = <span class="bool-val">false</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>heartbeat = HeartBeatDataSink::new();
+  <span class="kw">let </span><span class="kw-2">mut </span>hb_timer               = Instant::now(); 
+  <span class="kw">let </span><span class="kw-2">mut </span>hb_interval         = Duration::from_secs(settings.hb_send_interval <span class="kw">as </span>u64);
   <span class="kw">loop </span>{
     <span class="kw">if </span>retire {
       <span class="comment">// take a long nap to give other threads 
@@ -853,53 +847,39 @@
         </span>}
       } <span class="comment">// end if pk == event packet
     </span>} <span class="comment">// end incoming.recv
-    </span><span class="kw">if </span>timer.elapsed().as_secs() &gt; <span class="number">120 </span>{
-      <span class="kw">let </span>evid_check_len = evid_check.len();
+      //
+      //
+
+      </span><span class="kw">let </span>evid_check_len = evid_check.len();
       <span class="comment">//println!("DEBUG .1.");
       //let mut evid_test_missing = 0usize;
       </span><span class="kw">let </span>evid_missing = <span class="number">0</span>;
-      <span class="kw">if </span>evid_check_len &gt; <span class="number">0 </span>{
+    <span class="kw">if </span>timer.elapsed().as_secs() &gt; <span class="number">10 </span>{
+      <span class="comment">// FIXME - might be too slow?
+      </span><span class="kw">if </span>evid_check_len &gt; <span class="number">0 </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>evid = evid_check[<span class="number">0</span>];
-        <span class="comment">//println!("DEBUG 1.5");
-        //println!("len of evid_id_test {}", evid_id_test_len);
-        </span><span class="kw">for _ in </span><span class="number">0</span>..evid_check_len {
+        <span class="kw">for _ in </span><span class="number">0</span>..evid_check_len {
           <span class="kw">if </span>!evid_check.contains(<span class="kw-2">&amp;</span>evid) {
-            <span class="comment">//cfg_if::cfg_if!{
-            //if #[cfg(features="debug")] {
-            </span>heartbeat.n_evid_missing += <span class="number">1</span>;
+            heartbeat.n_evid_missing += <span class="number">1</span>;
             heartbeat.n_evid_chunksize = evid_check_len <span class="kw">as </span>u64;
-            <span class="comment">//  }
-            //}
-          </span>}
+          }
           evid += <span class="number">1</span>;
         }
       }
-      <span class="comment">//cfg_if::cfg_if!{
-      //  if #[cfg(features="debug")] {
-      </span>heartbeat.met += timer.elapsed().as_secs();
+      timer = Instant::now();
+    }
+    <span class="kw">if </span>hb_timer.elapsed() &gt;= hb_interval {
+      heartbeat.met += hb_timer.elapsed().as_secs();
+      
       <span class="kw">match </span>data_socket.send(heartbeat.pack().to_bytestream(),<span class="number">0</span>) {
         <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Not able to send heartbeat over 0MQ PUB! {err}"</span>),
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
           <span class="macro">trace!</span>(<span class="string">"Heartbeat sent"</span>);
         }
-      } <span class="comment">// end match
-      //  }
-      //} 
-      </span>evid_check.clear();
-      <span class="comment">////println!("DEBUG 2");
-      //event_id_test.clear();
-      //println!("DEBUG 3");
-
-      </span>met_time_secs += timer.elapsed().as_secs_f32();
-      <span class="kw">let </span>packet_rate = n_pack_sent <span class="kw">as </span>f32 /met_time_secs;
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;75}"</span>, <span class="string">"&gt;&gt; == == == == == == DATA SINK HEARTBEAT  == == == == == == &lt;&lt;"</span>.bright_cyan().bold());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Sent {} TofPackets! (packet rate {:.2}/s)"</span>, n_pack_sent ,packet_rate).bright_cyan());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Writing events to disk: {} packets written, data write rate {:.2} MB/sec"</span>, n_pack_write_disk, bytes_sec_disk/(<span class="number">1e6</span><span class="kw-2">*</span>met_time_secs <span class="kw">as </span>f64)).bright_purple());
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;75} &lt;&lt;"</span>, <span class="macro">format!</span>(<span class="string">"&gt;&gt; ==&gt; Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)"</span>, evid_missing, evid_check_len, <span class="number">100.0</span><span class="kw-2">*</span>(evid_missing <span class="kw">as </span>f64/evid_check_len <span class="kw">as </span>f64)).bright_purple());
-
-      <span class="macro">println!</span>(<span class="string">"  {:&lt;75}"</span>, <span class="string">"&gt;&gt; == == == == == == == == == == == == == == == == == == == &lt;&lt;"</span>.bright_cyan().bold());
-      timer = Instant::now();
+      } 
+      evid_check.clear();
+      hb_timer = Instant::now();
     }
-  }
-}
-</code></pre></div></section></main></body></html>
+  } <span class="comment">//end loop
+</span>} <span class="comment">//end function
+</span></code></pre></div></section></main></body></html>

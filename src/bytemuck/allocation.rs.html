@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bytemuck-1.16.3/src/allocation.rs`."><title>allocation.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bytemuck" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bytemuck-1.17.0/src/allocation.rs`."><title>allocation.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="bytemuck" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -937,6 +937,8 @@
 <a href="#937" id="937">937</a>
 <a href="#938" id="938">938</a>
 <a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg(feature = <span class="string">"extern_crate_alloc"</span>)]
 #![allow(clippy::duplicated_attributes)]
 
@@ -1007,9 +1009,10 @@
 </span><span class="attr">#[inline]
 </span><span class="kw">pub fn </span>try_zeroed_box&lt;T: Zeroable&gt;() -&gt; <span class="prelude-ty">Result</span>&lt;Box&lt;T&gt;, ()&gt; {
   <span class="kw">if </span>size_of::&lt;T&gt;() == <span class="number">0 </span>{
-    <span class="comment">// This will not allocate but simply create a dangling pointer.
-    </span><span class="kw">let </span>dangling = core::ptr::NonNull::dangling().as_ptr();
-    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ Box::from_raw(dangling) });
+    <span class="comment">// This will not allocate but simply create an arbitrary non-null
+    // aligned pointer, valid for Box for a zero-sized pointee.
+    </span><span class="kw">let </span>ptr = core::ptr::NonNull::dangling().as_ptr();
+    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ Box::from_raw(ptr) });
   }
   <span class="kw">let </span>layout = Layout::new::&lt;T&gt;();
   <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ alloc_zeroed(layout) };
@@ -1064,10 +1067,11 @@
   length: usize,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Box&lt;[T]&gt;, ()&gt; {
   <span class="kw">if </span>size_of::&lt;T&gt;() == <span class="number">0 </span>|| length == <span class="number">0 </span>{
-    <span class="comment">// This will not allocate but simply create a dangling slice pointer.
-    </span><span class="kw">let </span>dangling = core::ptr::NonNull::dangling().as_ptr();
-    <span class="kw">let </span>dangling_slice = core::ptr::slice_from_raw_parts_mut(dangling, length);
-    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ Box::from_raw(dangling_slice) });
+    <span class="comment">// This will not allocate but simply create an arbitrary non-null aligned
+    // slice pointer, valid for Box for a zero-sized pointee.
+    </span><span class="kw">let </span>ptr = core::ptr::NonNull::dangling().as_ptr();
+    <span class="kw">let </span>slice_ptr = core::ptr::slice_from_raw_parts_mut(ptr, length);
+    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ Box::from_raw(slice_ptr) });
   }
   <span class="kw">let </span>layout = core::alloc::Layout::array::&lt;T&gt;(length).map_err(|<span class="kw">_</span>| ())<span class="question-mark">?</span>;
   <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ alloc_zeroed(layout) };
@@ -1681,9 +1685,9 @@
 
 <span class="doccomment">/// As `Box&lt;[u8]&gt;`, but remembers the original alignment.
 </span><span class="kw">pub struct </span>BoxBytes {
-  <span class="comment">// SAFETY: `ptr` is owned, points to `layout.size()` initialized bytes, and
-  // was allocated with `layout` (unless `layout.size() == 0` in which case it
-  // is dangling).
+  <span class="comment">// SAFETY: `ptr` is aligned to `layout.align()`, points to
+  // `layout.size()` initialized bytes, and, if `layout.size() &gt; 0`,
+  // is owned and was allocated with the global allocator with `layout`.
   </span>ptr: NonNull&lt;u8&gt;,
   layout: Layout,
 }

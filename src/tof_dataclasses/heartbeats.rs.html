@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/heartbeats.rs`."><title>heartbeats.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/heartbeats.rs`."><title>heartbeats.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -665,6 +665,22 @@
 <a href="#665" id="665">665</a>
 <a href="#666" id="666">666</a>
 <a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Heartbeats - regularly (or on demand) sent 
 //! software monitoring data
 //!
@@ -790,6 +806,9 @@
   </span><span class="kw">pub </span>evid_check_len     : u64,
   <span class="doccomment">/// number of packets written to disk
   </span><span class="kw">pub </span>n_pack_write_disk  : u64,
+  <span class="doccomment">/// length of the incoming channel, which 
+  /// is basically packets queued to be sent
+  </span><span class="kw">pub </span>incoming_ch_len    : u64,
 }
 
 <span class="kw">impl </span>HeartBeatDataSink {
@@ -805,6 +824,7 @@
       evid_missing       : <span class="number">0</span>,
       evid_check_len     : <span class="number">0</span>,
       n_pack_write_disk  : <span class="number">0</span>,
+      incoming_ch_len    : <span class="number">0</span>,
     }
   }
 
@@ -822,6 +842,7 @@
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Sent {} TofPackets! (packet rate {:.2}/s)"</span>, <span class="self">self</span>.n_packets_sent , <span class="self">self</span>.get_sent_packet_rate()));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Writing events to disk: {} packets written, data write rate {:.2} MB/sec"</span>, <span class="self">self</span>.n_pack_write_disk, <span class="self">self</span>.get_mbytes_to_disk_per_sec()));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)"</span>, <span class="self">self</span>.evid_missing, <span class="self">self</span>.evid_check_len, <span class="number">100.0</span><span class="kw-2">*</span>(<span class="self">self</span>.evid_missing <span class="kw">as </span>f64/<span class="self">self</span>.evid_check_len <span class="kw">as </span>f64)));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Incoming channel length: {}"</span>, <span class="self">self</span>.incoming_ch_len));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{1F98B} \u{1F98B} \u{1F98B} \u{1F98B} \u{1F98B} END HEARTBEAT \u{1F98B} \u{1F98B} \u{1F98B} \u{1F98B} \u{1F98B}"</span>));
     repr 
   }
@@ -841,7 +862,7 @@
   
   <span class="kw">const </span>HEAD : u16 = <span class="number">0xAAAA</span>;
   <span class="kw">const </span>TAIL : u16 = <span class="number">0x5555</span>;
-  <span class="kw">const </span>SIZE : usize = <span class="number">76</span>; 
+  <span class="kw">const </span>SIZE : usize = <span class="number">84</span>; 
   
   <span class="kw">fn </span>from_bytestream(stream    : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;, 
                      pos       : <span class="kw-2">&amp;mut </span>usize) 
@@ -857,6 +878,7 @@
     hb.evid_missing       = parse_u64(stream, pos);
     hb.evid_check_len     = parse_u64(stream, pos);
     hb.n_pack_write_disk  = parse_u64(stream, pos);
+    hb.incoming_ch_len    = parse_u64(stream, pos);
     <span class="kw-2">*</span>pos += <span class="number">2</span>;
     <span class="prelude-val">Ok</span>(hb)
   }
@@ -873,6 +895,7 @@
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.evid_missing     .to_le_bytes() );
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.evid_check_len   .to_le_bytes() );
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_pack_write_disk.to_le_bytes() );
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.incoming_ch_len.to_le_bytes());
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::TAIL.to_le_bytes());
     bs
   }
@@ -891,6 +914,7 @@
     <span class="kw">let </span>evid_missing       = rng.gen::&lt;u64&gt;();
     <span class="kw">let </span>evid_check_len     = rng.gen::&lt;u64&gt;();
     <span class="kw">let </span>n_pack_write_disk  = rng.gen::&lt;u64&gt;();
+    <span class="kw">let </span>incoming_ch_len    = rng.gen::&lt;u64&gt;();
     <span class="self">Self </span>{
       met,
       n_packets_sent,
@@ -900,7 +924,8 @@
       n_evid_chunksize,
       evid_missing,
       evid_check_len,
-      n_pack_write_disk
+      n_pack_write_disk,
+      incoming_ch_len
     }
   }
 }
@@ -1175,7 +1200,12 @@
   } <span class="kw">else </span>{ 
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events w/out event ID: \tN/A"</span>).bright_purple());
   }
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events with data mangling: \t\t {:.2}"</span>, ((<span class="self">self</span>.data_mangled_ev)/(<span class="self">self</span>.n_rbe_received_tot))<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>usize)));
+  <span class="kw">if </span><span class="self">self</span>.n_rbe_received_tot &gt; <span class="number">0</span>{
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. evts with data mangling: \t\t{}"</span>, <span class="self">self</span>.data_mangled_ev));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events with data mangling: \t\t\t {:.2}"</span>, ((<span class="self">self</span>.data_mangled_ev <span class="kw">as </span>f64)/(<span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64))<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)));
+  }
+  <span class="kw">else </span>{repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events with data mangling: unable to calculate"</span>));}
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Received MTEvents: \t\t\t{}"</span>, <span class="self">self</span>.n_mte_received_tot).bright_purple());
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Skipped MTEvents: \t\t\t{}"</span>, <span class="self">self</span>.n_mte_skipped).bright_purple());
@@ -1185,7 +1215,9 @@
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n RBEvents Discarded: \t\t\t{}"</span>, <span class="self">self</span>.n_rbe_discarded_tot).bright_purple());
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent RBEvents discarded: \t\t{:.2}%"</span>, <span class="self">self</span>.get_nrbe_discarded_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple());
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Avg. ratio RBEvent/ToFEvent       \t{:.2}"</span>, <span class="self">self</span>.n_rbe_per_te).bright_purple());
+  <span class="kw">if </span><span class="self">self</span>.n_sent &gt; <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.n_mte_received_tot &gt; <span class="number">0 </span>{
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n RBEvent/Evts sent       \t\t{:.2}"</span>, (<span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64/ <span class="self">self</span>.n_sent <span class="kw">as </span>f64)).bright_purple());
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n RBEvent/MTEvents       \t\t{:.2}"</span>, (<span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64 / <span class="self">self</span>.n_mte_received_tot <span class="kw">as </span>f64)).bright_purple()); }
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. RBEvents with evid from past:  \t{}"</span>, <span class="self">self</span>.n_rbe_from_past).bright_purple());
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. orphan RBEvents: \t\t{}"</span>, <span class="self">self</span>.n_rbe_orphan).bright_purple());
   repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n\n Getting MTE from cache for RBEvent failed {} times :("</span>, <span class="self">self</span>.rbe_wo_mte).bright_blue());

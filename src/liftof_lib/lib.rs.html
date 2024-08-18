@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1350,6 +1350,27 @@
 <a href="#1350" id="1350">1350</a>
 <a href="#1351" id="1351">1351</a>
 <a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a>
+<a href="#1356" id="1356">1356</a>
+<a href="#1357" id="1357">1357</a>
+<a href="#1358" id="1358">1358</a>
+<a href="#1359" id="1359">1359</a>
+<a href="#1360" id="1360">1360</a>
+<a href="#1361" id="1361">1361</a>
+<a href="#1362" id="1362">1362</a>
+<a href="#1363" id="1363">1363</a>
+<a href="#1364" id="1364">1364</a>
+<a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
+<a href="#1372" id="1372">1372</a>
+<a href="#1373" id="1373">1373</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
 <span class="kw">pub mod </span>settings;
 <span class="kw">pub mod </span>constants;
@@ -1381,7 +1402,8 @@
 };
 <span class="kw">use </span>std::process::exit;
 
-<span class="kw">use </span>core::f32::consts::PI;
+<span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="kw">use </span>core::f32::consts::PI;
 
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">use </span>half::f16;
@@ -1399,9 +1421,7 @@
 <span class="kw">use </span>std::error::Error;
 <span class="kw">use </span>std::fmt;
 
-<span class="kw">use </span>std::{
-    fs::File,
-};
+<span class="kw">use </span>std::fs::File;
 <span class="kw">use </span>std::path::PathBuf;
 <span class="kw">use </span>std::fs::read_to_string;
 <span class="kw">use </span>std::io::{
@@ -1431,22 +1451,15 @@
     SIGTERM,
     SIGINT
 };
-<span class="comment">//use ndarray::{array, Array1};
-//use nlopt::{Algorithm, Objective, Optimization, Result};
-</span><span class="kw">use </span>nalgebra::Matrix3;
-<span class="kw">use </span>nalgebra::Vector3;
-<span class="kw">use </span>nalgebra::RowVector3;
 
 <span class="kw">use </span>tof_dataclasses::DsiLtbRBMapping;
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">use </span>tof_dataclasses::database::ReadoutBoard;
-<span class="comment">//use tof_dataclasses::threading::{
-//    ThreadControl,
-//};
 
-</span><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
-</span><span class="kw">use </span>tof_dataclasses::constants::NWORDS;
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="kw">use </span>tof_dataclasses::constants::NWORDS;
+<span class="comment">//#[cfg(feature="database")]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"database"</span>, feature = <span class="string">"advanced-algorithms"</span>))]
 </span><span class="kw">use </span>tof_dataclasses::calibrations::find_zero_crossings;
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">use </span>tof_dataclasses::errors::AnalysisError;
@@ -1742,61 +1755,87 @@
   }
 }
 
-<span class="comment">// sydney's version in rust
-</span><span class="kw">fn </span>fit_sine_sydney(volts: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;, times: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;) -&gt; f32 {
+<span class="comment">//sydney's sine fit without libraries
+</span><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="kw">fn </span>fit_sine_sydney(volts: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;, times: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;) -&gt; (f32, f32, f32) {
   <span class="kw">let </span>start_bin = <span class="number">20</span>;
-  <span class="kw">let </span>size_bin  = <span class="number">900</span>; <span class="comment">// can probably make this smaller
+  <span class="kw">let </span>size_bin = <span class="number">900</span>;
+  <span class="kw">let </span>pi = PI;
+  <span class="kw">let </span><span class="kw-2">mut </span>data_size = <span class="number">0</span>;
 
-  </span><span class="kw">let </span><span class="kw-2">mut </span>data_size = <span class="number">0</span>;
-  <span class="kw">let </span>pi            = PI;
-  <span class="kw">let </span><span class="kw-2">mut </span>xi_yi     = <span class="number">0.0</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>xi_zi     = <span class="number">0.0</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>yi_zi     = <span class="number">0.0</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>xi_xi     = <span class="number">0.0</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>yi_yi     = <span class="number">0.0</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>xi_sum    = <span class="number">0.0</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>yi_sum    = <span class="number">0.0</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>zi_sum    = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>xi_yi = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>xi_zi = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>yi_zi = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>xi_xi = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>yi_yi = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>xi_sum = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>yi_sum = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>zi_sum = <span class="number">0.0</span>;
 
-  <span class="kw">for </span>i <span class="kw">in </span>start_bin..start_bin+size_bin {
-      <span class="kw">let </span>xi = (<span class="number">2.0 </span>* pi * <span class="number">0.02 </span>* times[i] <span class="kw">as </span>f32).cos();  <span class="comment">// for this fit we know the frequency is 0.02 waves/ns
-      </span><span class="kw">let </span>yi = (<span class="number">2.0 </span>* pi * <span class="number">0.02 </span>* times[i] <span class="kw">as </span>f32).sin();
+  <span class="kw">for </span>i <span class="kw">in </span>start_bin..(start_bin + size_bin) {
+      <span class="kw">let </span>xi = (<span class="number">2.0 </span>* pi * <span class="number">0.02 </span>* times[i]).cos();
+      <span class="kw">let </span>yi = (<span class="number">2.0 </span>* pi * <span class="number">0.02 </span>* times[i]).sin();
       <span class="kw">let </span>zi = volts[i];
-      xi_yi      += xi * yi;
-      xi_zi      += xi * (zi <span class="kw">as </span>f32);
-      yi_zi      += yi * (zi <span class="kw">as </span>f32);
-      xi_xi      += xi * xi;
-      yi_yi      += yi * yi;
-      xi_sum     += xi;
-      yi_sum     += yi;
-      zi_sum     += zi;
-      data_size  += <span class="number">1</span>;
+
+      xi_yi += xi * yi;
+      xi_zi += xi * zi;
+      yi_zi += yi * zi;
+      xi_xi += xi * xi;
+      yi_yi += yi * yi;
+      xi_sum += xi;
+      yi_sum += yi;
+      zi_sum += zi;
+
+      data_size += <span class="number">1</span>;
   }
-  <span class="kw">let </span>a_matrix = Matrix3::new(
-    xi_xi, xi_yi, xi_sum,
-    xi_yi, yi_yi, yi_sum,
-    xi_sum, yi_sum, data_size <span class="kw">as </span>f32
-  );
-  
-  <span class="comment">//let determinant = a_matrix.determinant(); unused bc we find inverse directly
-  </span><span class="kw">match </span>a_matrix.try_inverse() {
-    <span class="prelude-val">Some</span>(inv_matrix) =&gt; {
-      <span class="kw">let </span>p = Vector3::new(xi_zi, yi_zi, zi_sum);
-      <span class="comment">// Transpose the Vector3 to get a RowVector3
-      </span><span class="kw">let </span>p_transposed: RowVector3&lt;f32&gt; = p.transpose();
-      <span class="comment">//let result = inv_matrix * p;
-      </span><span class="kw">let </span>result = p_transposed * inv_matrix;
-      <span class="kw">let </span>a = result[<span class="number">0</span>];
-      <span class="kw">let </span>b = result[<span class="number">1</span>];
-      <span class="comment">// let c = result[2]; // offset parameter if needed
-      </span><span class="kw">let </span>phi = a.atan2(b);
-      <span class="kw">return </span>phi <span class="kw">as </span>f32;
-    }
-    <span class="prelude-val">None </span>=&gt; {
-      <span class="macro">error!</span>(<span class="string">"Finding inverse matrix failed!"</span>);
-      <span class="kw">return </span><span class="number">99.9</span>;
-    }
+
+  <span class="kw">let </span><span class="kw-2">mut </span>a_matrix = [[<span class="number">0.0</span>; <span class="number">3</span>]; <span class="number">3</span>];
+  a_matrix[<span class="number">0</span>][<span class="number">0</span>] = xi_xi;
+  a_matrix[<span class="number">0</span>][<span class="number">1</span>] = xi_yi;
+  a_matrix[<span class="number">0</span>][<span class="number">2</span>] = xi_sum;
+  a_matrix[<span class="number">1</span>][<span class="number">0</span>] = xi_yi;
+  a_matrix[<span class="number">1</span>][<span class="number">1</span>] = yi_yi;
+  a_matrix[<span class="number">1</span>][<span class="number">2</span>] = yi_sum;
+  a_matrix[<span class="number">2</span>][<span class="number">0</span>] = xi_sum;
+  a_matrix[<span class="number">2</span>][<span class="number">1</span>] = yi_sum;
+  a_matrix[<span class="number">2</span>][<span class="number">2</span>] = data_size <span class="kw">as </span>f32;
+
+  <span class="kw">let </span>determinant = a_matrix[<span class="number">0</span>][<span class="number">0</span>] * a_matrix[<span class="number">1</span>][<span class="number">1</span>] * a_matrix[<span class="number">2</span>][<span class="number">2</span>]
+      + a_matrix[<span class="number">0</span>][<span class="number">1</span>] * a_matrix[<span class="number">1</span>][<span class="number">2</span>] * a_matrix[<span class="number">2</span>][<span class="number">0</span>]
+      + a_matrix[<span class="number">0</span>][<span class="number">2</span>] * a_matrix[<span class="number">1</span>][<span class="number">0</span>] * a_matrix[<span class="number">2</span>][<span class="number">1</span>]
+      - a_matrix[<span class="number">0</span>][<span class="number">0</span>] * a_matrix[<span class="number">1</span>][<span class="number">2</span>] * a_matrix[<span class="number">2</span>][<span class="number">1</span>]
+      - a_matrix[<span class="number">0</span>][<span class="number">1</span>] * a_matrix[<span class="number">1</span>][<span class="number">0</span>] * a_matrix[<span class="number">2</span>][<span class="number">2</span>]
+      - a_matrix[<span class="number">0</span>][<span class="number">2</span>] * a_matrix[<span class="number">1</span>][<span class="number">1</span>] * a_matrix[<span class="number">2</span>][<span class="number">0</span>];
+
+  <span class="kw">let </span>inverse_factor = <span class="number">1.0 </span>/ determinant;
+
+  <span class="kw">let </span><span class="kw-2">mut </span>cofactor_matrix = [[<span class="number">0.0</span>; <span class="number">3</span>]; <span class="number">3</span>];
+  cofactor_matrix[<span class="number">0</span>][<span class="number">0</span>] = a_matrix[<span class="number">1</span>][<span class="number">1</span>] * a_matrix[<span class="number">2</span>][<span class="number">2</span>] - a_matrix[<span class="number">2</span>][<span class="number">1</span>] * a_matrix[<span class="number">1</span>][<span class="number">2</span>];
+  cofactor_matrix[<span class="number">0</span>][<span class="number">1</span>] = (a_matrix[<span class="number">1</span>][<span class="number">0</span>] * a_matrix[<span class="number">2</span>][<span class="number">2</span>] - a_matrix[<span class="number">2</span>][<span class="number">0</span>] * a_matrix[<span class="number">1</span>][<span class="number">2</span>]) * -<span class="number">1.0</span>;
+  cofactor_matrix[<span class="number">0</span>][<span class="number">2</span>] = a_matrix[<span class="number">1</span>][<span class="number">0</span>] * a_matrix[<span class="number">2</span>][<span class="number">1</span>] - a_matrix[<span class="number">2</span>][<span class="number">0</span>] * a_matrix[<span class="number">1</span>][<span class="number">1</span>];
+  cofactor_matrix[<span class="number">1</span>][<span class="number">0</span>] = (a_matrix[<span class="number">0</span>][<span class="number">1</span>] * a_matrix[<span class="number">2</span>][<span class="number">2</span>] - a_matrix[<span class="number">2</span>][<span class="number">1</span>] * a_matrix[<span class="number">0</span>][<span class="number">2</span>]) * -<span class="number">1.0</span>;
+  cofactor_matrix[<span class="number">1</span>][<span class="number">1</span>] = a_matrix[<span class="number">0</span>][<span class="number">0</span>] * a_matrix[<span class="number">2</span>][<span class="number">2</span>] - a_matrix[<span class="number">2</span>][<span class="number">0</span>] * a_matrix[<span class="number">0</span>][<span class="number">2</span>];
+  cofactor_matrix[<span class="number">1</span>][<span class="number">2</span>] = (a_matrix[<span class="number">0</span>][<span class="number">0</span>] * a_matrix[<span class="number">2</span>][<span class="number">1</span>] - a_matrix[<span class="number">2</span>][<span class="number">0</span>] * a_matrix[<span class="number">0</span>][<span class="number">1</span>]) * -<span class="number">1.0</span>;
+  cofactor_matrix[<span class="number">2</span>][<span class="number">0</span>] = a_matrix[<span class="number">0</span>][<span class="number">1</span>] * a_matrix[<span class="number">1</span>][<span class="number">2</span>] - a_matrix[<span class="number">1</span>][<span class="number">1</span>] * a_matrix[<span class="number">0</span>][<span class="number">2</span>];
+  cofactor_matrix[<span class="number">2</span>][<span class="number">1</span>] = (a_matrix[<span class="number">0</span>][<span class="number">0</span>] * a_matrix[<span class="number">1</span>][<span class="number">2</span>] - a_matrix[<span class="number">1</span>][<span class="number">0</span>] * a_matrix[<span class="number">0</span>][<span class="number">2</span>]) * -<span class="number">1.0</span>;
+  cofactor_matrix[<span class="number">2</span>][<span class="number">2</span>] = a_matrix[<span class="number">0</span>][<span class="number">0</span>] * a_matrix[<span class="number">1</span>][<span class="number">1</span>] - a_matrix[<span class="number">1</span>][<span class="number">0</span>] * a_matrix[<span class="number">0</span>][<span class="number">1</span>];
+
+  <span class="kw">let </span><span class="kw-2">mut </span>inverse_matrix = [[<span class="number">0.0</span>; <span class="number">3</span>]; <span class="number">3</span>];
+  <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
+      <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
+          inverse_matrix[i][j] = cofactor_matrix[j][i] * inverse_factor;
+      }
   }
+
+  <span class="kw">let </span>p = [xi_zi, yi_zi, zi_sum];
+  <span class="kw">let </span>a = inverse_matrix[<span class="number">0</span>][<span class="number">0</span>] * p[<span class="number">0</span>] + inverse_matrix[<span class="number">1</span>][<span class="number">0</span>] * p[<span class="number">1</span>] + inverse_matrix[<span class="number">2</span>][<span class="number">0</span>] * p[<span class="number">2</span>];
+  <span class="kw">let </span>b = inverse_matrix[<span class="number">0</span>][<span class="number">1</span>] * p[<span class="number">0</span>] + inverse_matrix[<span class="number">1</span>][<span class="number">1</span>] * p[<span class="number">1</span>] + inverse_matrix[<span class="number">2</span>][<span class="number">1</span>] * p[<span class="number">2</span>];
+
+  <span class="kw">let </span>phi    = a.atan2(b);
+  <span class="kw">let </span>amp    = (a<span class="kw-2">*</span>a + b<span class="kw-2">*</span>b).sqrt();
+  <span class="kw">let </span>freq   = <span class="number">0.02 </span><span class="kw">as </span>f32;
+
+  (amp, freq, phi)
 }
 
 <span class="comment">//*************************************************
@@ -1899,9 +1938,12 @@
     </span>rb.calibration.nanoseconds(<span class="number">9</span>,
                                event.header.stop_cell <span class="kw">as </span>usize,
                                <span class="kw-2">&amp;mut </span>times);
-    <span class="kw">let </span>fit_result_phi = fit_sine_sydney(<span class="kw-2">&amp;</span>times, <span class="kw-2">&amp;</span>voltages);
+    <span class="kw">let </span>fit_result_amp      = fit_sine_sydney(<span class="kw-2">&amp;</span>voltages,  <span class="kw-2">&amp;</span>times).<span class="number">0</span>; 
+    <span class="kw">let </span>fit_result_freq     = fit_sine_sydney(<span class="kw-2">&amp;</span>voltages, <span class="kw-2">&amp;</span>times).<span class="number">1</span>;
+    <span class="kw">let </span>fit_result_phi      = fit_sine_sydney(<span class="kw-2">&amp;</span>voltages, <span class="kw-2">&amp;</span>times).<span class="number">2</span>;
+
     <span class="comment">//println!("FIT RESULT = {:?}", fit_result);
-    </span>fit_result = (<span class="number">0.0</span>, <span class="number">0.0</span>, fit_result_phi <span class="kw">as </span>f32);
+    </span>fit_result = (fit_result_amp, fit_result_freq, fit_result_phi);
     event.header.set_sine_fit(fit_result);
   }
 

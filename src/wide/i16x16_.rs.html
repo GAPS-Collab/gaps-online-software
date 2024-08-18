@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wide-0.7.26/src/i16x16_.rs`."><title>i16x16_.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wide" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wide-0.7.28/src/i16x16_.rs`."><title>i16x16_.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wide" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -564,6 +564,24 @@
 <a href="#564" id="564">564</a>
 <a href="#565" id="565">565</a>
 <a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="macro">pick!</span> {
@@ -849,6 +867,24 @@
   }
 }
 
+<span class="kw">impl </span>From&lt;i8x16&gt; <span class="kw">for </span>i16x16 {
+  <span class="doccomment">/// widen with sign extend from i8 to i16
+  </span><span class="attr">#[inline]
+  #[must_use]
+  </span><span class="kw">fn </span>from(i: i8x16) -&gt; <span class="self">Self </span>{
+    i16x16::from_i8x16(i)
+  }
+}
+
+<span class="kw">impl </span>From&lt;u8x16&gt; <span class="kw">for </span>i16x16 {
+  <span class="doccomment">/// widen with zero extend from u8 to i16
+  </span><span class="attr">#[inline]
+  #[must_use]
+  </span><span class="kw">fn </span>from(i: u8x16) -&gt; <span class="self">Self </span>{
+    cast(u16x16::from(i))
+  }
+}
+
 <span class="kw">impl </span>i16x16 {
   <span class="attr">#[inline]
   #[must_use]
@@ -1071,13 +1107,13 @@
     }
   }
 
-  <span class="doccomment">/// Multiply and scale equivilent to ((self * rhs) + 0x4000) &gt;&gt; 15 on each
-  /// lane, effectively multiplying by a 16 bit fixed point number between -1
-  /// and 1. This corresponds to the following instructions:
-  /// - vqrdmulhq_n_s16 instruction on neon
-  /// - i16x8_q15mulr_sat on simd128
-  /// - _mm256_mulhrs_epi16 on avx2
-  /// - emulated via mul_i16_* on sse2
+  <span class="doccomment">/// Multiply and scale equivalent to `((self * rhs) + 0x4000) &gt;&gt; 15` on each
+  /// lane, effectively multiplying by a 16 bit fixed point number between `-1`
+  /// and `1`. This corresponds to the following instructions:
+  /// - `vqrdmulhq_n_s16` instruction on neon
+  /// - `i16x8_q15mulr_sat` on simd128
+  /// - `_mm256_mulhrs_epi16` on avx2
+  /// - emulated via `mul_i16_*` on sse2
   </span><span class="attr">#[inline]
   #[must_use]
   </span><span class="kw">pub fn </span>mul_scale_round(<span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
@@ -1093,13 +1129,13 @@
     }
   }
 
-  <span class="doccomment">/// Multiply and scale equivilent to ((self * rhs) + 0x4000) &gt;&gt; 15 on each
-  /// lane, effectively multiplying by a 16 bit fixed point number between -1
-  /// and 1. This corresponds to the following instructions:
-  /// - vqrdmulhq_n_s16 instruction on neon
-  /// - i16x8_q15mulr_sat on simd128
-  /// - _mm256_mulhrs_epi16 on avx2
-  /// - emulated via mul_i16_* on sse2
+  <span class="doccomment">/// Multiply and scale equivalent to `((self * rhs) + 0x4000) &gt;&gt; 15` on each
+  /// lane, effectively multiplying by a 16 bit fixed point number between `-1`
+  /// and `1`. This corresponds to the following instructions:
+  /// - `vqrdmulhq_n_s16` instruction on neon
+  /// - `i16x8_q15mulr_sat` on simd128
+  /// - `_mm256_mulhrs_epi16` on avx2
+  /// - emulated via `mul_i16_*` on sse2
   </span><span class="attr">#[inline]
   #[must_use]
   </span><span class="kw">pub fn </span>mul_scale_round_n(<span class="self">self</span>, rhs: i16) -&gt; <span class="self">Self </span>{

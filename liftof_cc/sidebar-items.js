@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["prefix_tof_cpu","prepare_run"],"mod":["constants","threads"]};
+window.SIDEBAR_ITEMS = {"fn":["prepare_run"],"mod":["constants","threads"]};

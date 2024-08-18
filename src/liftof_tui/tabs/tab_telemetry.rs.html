@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_telemetry.rs`."><title>tab_telemetry.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_telemetry.rs`."><title>tab_telemetry.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -237,6 +237,52 @@
 <a href="#237" id="237">237</a>
 <a href="#238" id="238">238</a>
 <a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{
     <span class="comment">//HashMap,
     </span>VecDeque,
@@ -293,13 +339,13 @@
 <span class="comment">// no clone ore debug implemented for 
 // zmq socket
 </span><span class="kw">pub struct </span>TelemetryTab {
-  <span class="kw">pub </span>theme         : ColorTheme,
+  <span class="kw">pub </span>theme         : ColorTheme, 
   <span class="comment">//pub tp_receiver   : Receiver&lt;TofPacket&gt;,
   //pub event_queue   : VecDeque&lt;TofEvent&gt;,
   //pub zmq_socket    : zmq::Socket,
   </span><span class="kw">pub </span>tele_recv     : Receiver&lt;TelemetryPacket&gt;,
-  <span class="kw">pub </span>queue_size    : usize,
-  <span class="kw">pub </span>merged_queue  : VecDeque&lt;MergedEvent&gt;,
+  <span class="kw">pub </span>queue_size    : usize, <span class="comment">//8
+  </span><span class="kw">pub </span>merged_queue  : VecDeque&lt;MergedEvent&gt;,
   <span class="kw">pub </span>header_queue  : VecDeque&lt;TelemetryHeader&gt;,
   <span class="comment">// when we decide to use ONLY the telemetry stream,
   // we have to pass on the decoded TOF packets
@@ -335,65 +381,56 @@
  
   <span class="kw">pub fn </span>receive_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), SerializationError&gt; {  
     <span class="kw">match </span><span class="self">self</span>.tele_recv.try_recv() {
-      <span class="prelude-val">Err</span>(err)    =&gt; <span class="macro">trace!</span>(<span class="string">"Can't receive TofPacket!
-          {err}"</span>),
-      <span class="prelude-val">Ok</span>(packet) =&gt; {
-        <span class="self">self</span>.header_queue.push_back(packet.header.clone());
-        <span class="kw">if </span><span class="self">self</span>.header_queue.len() &gt; <span class="self">self</span>.queue_size {
-          <span class="kw">let _ </span>= <span class="self">self</span>.header_queue.pop_front();
-        }
-        <span class="comment">//if header.ptype == 80 {
-        //  match TrackerPacket::from_bytestream(&amp;payload, &amp;mut pos) {
-        //    Err(err) =&gt; {
-        //      //for k in pos - 5 .. pos + 5 {
-        //      //  println!("{}",stream[k]);
-        //      //}
-        //      error!("Unable to decode TrackerPacket! {err}");
-        //    }
-        //    Ok(mut tp) =&gt; {
-        //      tp.telemetry_header = header;
-        //      //println!("{}", tp);
-        //    }
-        //  }
-        //}
-        </span><span class="kw">if </span>packet.header.ptype == <span class="number">90 </span>{
-          <span class="comment">//println!("{}",packet.header);
-          </span><span class="kw">let </span>expected_size = (packet.header.length <span class="kw">as </span>usize) - TelemetryHeader::SIZE;
-          <span class="kw">if </span>expected_size &gt; packet.payload.len() {
-            <span class="macro">println!</span>(<span class="string">"Unable to decode MergedEvent Telemetry packet! The expected size is {}, but the payload len in {}"</span>, expected_size - TelemetryHeader::SIZE, packet.payload.len());
-            <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::StreamTooShort);
-          }
-          <span class="kw">match </span>MergedEvent::from_bytestream(<span class="kw-2">&amp;</span>packet.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
-            <span class="prelude-val">Err</span>(err) =&gt; {
-              <span class="macro">error!</span>(<span class="string">"Unable to decode MergedEvent! {err}"</span>);
+        <span class="prelude-val">Err</span>(crossbeam_channel::TryRecvError::Empty) =&gt; {
+            <span class="macro">trace!</span>(<span class="string">"No data available yet."</span>);
+            <span class="comment">// Handle the empty case, possibly by doing nothing or logging.
+        </span>},
+        <span class="prelude-val">Err</span>(crossbeam_channel::TryRecvError::Disconnected) =&gt; {
+            <span class="macro">error!</span>(<span class="string">"Telemetry channel disconnected."</span>);
+            <span class="comment">// Handle the disconnection, possibly by stopping processing or returning an error.
+            </span><span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::Disconnected);
+        },
+        <span class="prelude-val">Ok</span>(packet) =&gt; {
+            <span class="comment">// Process the received packet as before
+            </span><span class="self">self</span>.header_queue.push_back(packet.header.clone());
+            <span class="kw">if </span><span class="self">self</span>.header_queue.len() &gt; <span class="self">self</span>.queue_size {
+                <span class="kw">let _ </span>= <span class="self">self</span>.header_queue.pop_front();
             }
-            <span class="prelude-val">Ok</span>(me) =&gt; {
-              <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.tp_sender {
-                <span class="prelude-val">Some</span>(sender) =&gt; {
-                  <span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>me.tof_data, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
-                    <span class="prelude-val">Err</span>(err) =&gt; {
-                      <span class="macro">error!</span>(<span class="string">"Can't unpack TofPacket! {err}"</span>);
-                    }
-                    <span class="prelude-val">Ok</span>(tp) =&gt; {
-                      <span class="kw">match </span>sender.send(tp) {
-                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; (),
-                        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to send TP over channel! {err}"</span>)
-                      }
-                    }
-                  }
+
+            <span class="kw">if </span>packet.header.ptype == <span class="number">90 </span>{
+                <span class="kw">let </span>expected_size = (packet.header.length <span class="kw">as </span>usize) - TelemetryHeader::SIZE;
+                <span class="kw">if </span>expected_size &gt; packet.payload.len() {
+                    <span class="macro">println!</span>(<span class="string">"Unable to decode MergedEvent Telemetry packet! The expected size is {}, but the payload len is {}"</span>, expected_size - TelemetryHeader::SIZE, packet.payload.len());
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::StreamTooShort);
                 }
-                <span class="prelude-val">None </span>=&gt; ()
-              }
-              <span class="self">self</span>.merged_queue.push_back(me);
-              <span class="kw">if </span><span class="self">self</span>.merged_queue.len() &gt; <span class="self">self</span>.queue_size {
-                <span class="kw">let _ </span>= <span class="self">self</span>.merged_queue.pop_front();
-              }
+                <span class="kw">match </span>MergedEvent::from_bytestream(<span class="kw-2">&amp;</span>packet.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
+                    <span class="prelude-val">Err</span>(err) =&gt; {
+                        <span class="macro">error!</span>(<span class="string">"Unable to decode MergedEvent! {err}"</span>);
+                    }
+                    <span class="prelude-val">Ok</span>(me) =&gt; {
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(sender) = <span class="kw-2">&amp;</span><span class="self">self</span>.tp_sender {
+                            <span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>me.tof_data, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
+                                <span class="prelude-val">Err</span>(err) =&gt; {
+                                    <span class="macro">error!</span>(<span class="string">"Can't unpack TofPacket! {err}"</span>);
+                                }
+                                <span class="prelude-val">Ok</span>(tp) =&gt; {
+                                    <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = sender.send(tp) {
+                                        <span class="macro">error!</span>(<span class="string">"Unable to send TP over channel! {err}"</span>);
+                                    }
+                                }
+                            }
+                        }
+                        <span class="self">self</span>.merged_queue.push_back(me);
+                        <span class="kw">if </span><span class="self">self</span>.merged_queue.len() &gt; <span class="self">self</span>.queue_size {
+                            <span class="kw">let _ </span>= <span class="self">self</span>.merged_queue.pop_front();
+                        }
+                    }
+                }
             }
-          }
         }
-      }
     }
-    <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+    <span class="prelude-val">Ok</span>(())
+  }
     <span class="comment">//match self.tp_receiver.try_recv() {
     //  Err(_err) =&gt; {
     //    return Ok(());
@@ -424,56 +461,111 @@
     //    return Ok(());
     //  }
     //}
-  </span>}
 
-  <span class="kw">pub fn </span>render(<span class="kw-2">&amp;mut </span><span class="self">self</span>, main_window : <span class="kw-2">&amp;</span>Rect, frame : <span class="kw-2">&amp;mut </span>Frame) {
+//   pub fn render(&amp;mut self, main_window : &amp;Rect, frame : &amp;mut Frame) {
     
-    <span class="comment">// as usual, layout first
-    </span><span class="kw">let </span>main_lo = Layout::default()
+//     // as usual, layout first
+//     let main_lo = Layout::default()
+//       .direction(Direction::Horizontal)
+//       .constraints(
+//           [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
+//       )
+//       .split(*main_window);
+    
+//     let packet_lo = Layout::default()
+//       .direction(Direction::Vertical)
+//       .constraints(
+//           [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
+//       )
+//       .split(main_lo[0]);
+
+
+//     let mut header_string = String::from("");
+//     if let Some(header) = self.header_queue.back() {
+//       header_string = format!("{}", header);
+//     }
+//     let header_view = Paragraph::new(header_string)
+//       .style(self.theme.style())
+//       .alignment(Alignment::Left)
+//       .block(
+//         Block::default()
+//           .borders(Borders::ALL)
+//           .border_type(BorderType::Rounded)
+//           .title("Last Header from Telemetry stream")
+//       );
+
+//     frame.render_widget(header_view, packet_lo[0]);
+//     let mut merged_string = String::from("");
+//     if let Some(ev) =  self.merged_queue.back() {
+//       merged_string = format!("{}", ev);
+//     }
+//     let merged_view = Paragraph::new(merged_string)
+//     //let merged_view = Paragraph::new(header_string)
+//       .style(self.theme.style())
+//       .alignment(Alignment::Left)
+//       .block(
+//         Block::default()
+//           .borders(Borders::ALL)
+//           .border_type(BorderType::Rounded)
+//           .title("Last MergedEvent from Telemetry stream")
+//       );
+//     frame.render_widget(merged_view, packet_lo[1]);
+//   }
+// }
+
+</span><span class="kw">pub fn </span>render(<span class="kw-2">&amp;mut </span><span class="self">self</span>, main_window: <span class="kw-2">&amp;</span>Rect, frame: <span class="kw-2">&amp;mut </span>Frame) {
+  <span class="comment">// Layout first
+  </span><span class="kw">let </span>main_lo = Layout::default()
       .direction(Direction::Horizontal)
       .constraints(
           [Constraint::Percentage(<span class="number">30</span>), Constraint::Percentage(<span class="number">70</span>)].as_ref(),
       )
       .split(<span class="kw-2">*</span>main_window);
-    
-    <span class="kw">let </span>packet_lo = Layout::default()
+  
+  <span class="kw">let </span>packet_lo = Layout::default()
       .direction(Direction::Vertical)
       .constraints(
           [Constraint::Percentage(<span class="number">30</span>), Constraint::Percentage(<span class="number">70</span>)].as_ref(),
       )
       .split(main_lo[<span class="number">0</span>]);
 
-
-    <span class="kw">let </span><span class="kw-2">mut </span>header_string = String::from(<span class="string">""</span>);
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(header) = <span class="self">self</span>.header_queue.back() {
-      header_string = <span class="macro">format!</span>(<span class="string">"{}"</span>, header);
-    }
-    <span class="kw">let </span>header_view = Paragraph::new(header_string)
+  <span class="comment">// Create header_string safely
+  </span><span class="kw">let </span>header_string = <span class="kw">if let </span><span class="prelude-val">Some</span>(header) = <span class="self">self</span>.header_queue.back() {
+      <span class="macro">format!</span>(<span class="string">"{}"</span>, header)
+  } <span class="kw">else </span>{
+      String::from(<span class="string">"No header available"</span>)
+  };
+  
+  <span class="kw">let </span>header_view = Paragraph::new(header_string)
       .style(<span class="self">self</span>.theme.style())
       .alignment(Alignment::Left)
       .block(
-        Block::default()
-          .borders(Borders::ALL)
-          .border_type(BorderType::Rounded)
-          .title(<span class="string">"Last Header from Telemetry stream"</span>)
+          Block::default()
+              .borders(Borders::ALL)
+              .border_type(BorderType::Rounded)
+              .title(<span class="string">"Last Header from Telemetry stream"</span>)
       );
 
-    frame.render_widget(header_view, packet_lo[<span class="number">0</span>]);
-    <span class="kw">let </span><span class="kw-2">mut </span>merged_string = String::from(<span class="string">""</span>);
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(ev) =  <span class="self">self</span>.merged_queue.back() {
-      merged_string = <span class="macro">format!</span>(<span class="string">"{}"</span>, ev);
-    }
-    <span class="kw">let </span>merged_view = Paragraph::new(merged_string)
-    <span class="comment">//let merged_view = Paragraph::new(header_string)
-      </span>.style(<span class="self">self</span>.theme.style())
+  frame.render_widget(header_view, packet_lo[<span class="number">0</span>]);
+
+  <span class="comment">// Create merged_string safely
+  </span><span class="kw">let </span>merged_string = <span class="kw">if let </span><span class="prelude-val">Some</span>(ev) = <span class="self">self</span>.merged_queue.back() {
+      <span class="macro">format!</span>(<span class="string">"{}"</span>, ev)
+  } <span class="kw">else </span>{
+      String::from(<span class="string">"No merged event available"</span>)
+  };
+  
+  <span class="kw">let </span>merged_view = Paragraph::new(merged_string)
+      .style(<span class="self">self</span>.theme.style())
       .alignment(Alignment::Left)
       .block(
-        Block::default()
-          .borders(Borders::ALL)
-          .border_type(BorderType::Rounded)
-          .title(<span class="string">"Last MergedEvent from Telemetry stream"</span>)
+          Block::default()
+              .borders(Borders::ALL)
+              .border_type(BorderType::Rounded)
+              .title(<span class="string">"Last MergedEvent from Telemetry stream"</span>)
       );
-    frame.render_widget(merged_view, packet_lo[<span class="number">1</span>]);
+
+  frame.render_widget(merged_view, packet_lo[<span class="number">1</span>]);
   }
 }
 </code></pre></div></section></main></body></html>
