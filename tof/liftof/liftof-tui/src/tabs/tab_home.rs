@@ -115,7 +115,8 @@ impl HomeTab {
              .title("Packet summary \u{1f4e6}")
              .borders(Borders::ALL)
              .border_type(BorderType::Rounded)
-             );
+             )
+      .style(self.theme.style());
 
     let main_view = Paragraph::new(LIFTOF_LOGO_SHOW)
     .style(self.theme.style())
