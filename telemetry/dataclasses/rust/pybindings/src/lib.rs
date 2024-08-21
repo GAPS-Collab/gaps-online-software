@@ -100,6 +100,7 @@ impl PyMergedEvent {
     for k in &self.event.tracker_events {
       let mut pytrk = PyTrackerEvent::new();
       pytrk.set_event(k.clone());
+      events.push(pytrk);
     }
     Ok(events)
   }
