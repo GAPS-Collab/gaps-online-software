@@ -95,6 +95,16 @@ impl PyMergedEvent {
   }
 
   #[getter]
+  fn tracker(&self) -> PyResult<Vec<PyTrackerEvent>> {
+    let mut events = Vec::<PyTrackerEvent>::new();
+    for k in &self.event.tracker_events {
+      let mut pytrk = PyTrackerEvent::new();
+      pytrk.set_event(k.clone());
+    }
+    Ok(events)
+  }
+
+  #[getter]
   fn tof(&self) -> PyResult<PyTofEventSummary> {
     match TofPacket::from_bytestream(&self.event.tof_data, &mut 0) {
       Err(err) => {
