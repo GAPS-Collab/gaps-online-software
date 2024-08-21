@@ -16,14 +16,17 @@ use tof_dataclasses::serialization::{
 use tof_dataclasses::events::TofEventSummary;
 use tof_dataclasses::packets::TofPacket;
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[repr(u8)]
 pub enum TelemetryPacketType {
+  Unknown          = 0,
   RBWaveform  = 91,
   Tracker     = 80,
   MergedEvent = 90,
-  Uknown      = 0,
-  TmP30       = 30,
+  AnyTofHK    = 92,
+  InterestingEvent = 190,
+  Command          = 200,       
+  CardHKP          = 30,
   TmP33       = 33,
   TmP34       = 34,
   TmP37       = 37,
@@ -34,15 +37,34 @@ pub enum TelemetryPacketType {
   TmP64       = 64,
   Tmp81       = 81,
   TmP83       = 83,
-  TmP92       = 92,
+  //TmP92       = 92,
   TmP96       = 96,
   TmP214      = 214,
   TmP255      = 255
 }
 
-//impl TelemetryPacketType {
-//
-//}
+impl From<u8> for TelemetryPacketType {
+  fn from(value: u8) -> Self {
+    match value {
+      0u8   => TelemetryPacketType::Unknown,
+      80u8  => TelemetryPacketType::Tracker,
+      90u8  => TelemetryPacketType::MergedEvent,
+      91u8  => TelemetryPacketType::RBWaveform,
+      92u8  => TelemetryPacketType::AnyTofHK,
+      190u8 => TelemetryPacketType::InterestingEvent,
+      200u8 => TelemetryPacketType::Command,
+      _     => TelemetryPacketType::Unknown,
+    }
+  }
+}
+
+impl fmt::Display for TelemetryPacketType {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error - Don't understand packet type!"));
+    write!(f, "<TelemetryPacketType: {}>", r)
+  }
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TelemetryPacket {
@@ -59,9 +81,18 @@ impl TelemetryPacket {
   }
 }
 
+impl fmt::Display for TelemetryPacket {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TelemetryPacket:");
+    repr += &(format!("\n  Header      : {}",self.header));
+    repr += &(format!("\n  Payload len : {}>",self.payload.len()));
+    write!(f, "{}", repr)
+  }
+}
+
+
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct TelemetryHeader {
-
   pub sync      : u16,
   pub ptype     : u8,
   pub timestamp : u32,
@@ -69,6 +100,7 @@ pub struct TelemetryHeader {
   pub length    : u16,
   pub checksum  : u16
 }
+
 //    fn from_bytestream(
 //    bytestream: &Vec<u8>,
 //    pos: &mut usize
@@ -155,6 +187,28 @@ impl MergedEvent {
     
     }
   }
+
+
+  pub fn get_tofeventsummary(&self) -> Result<TofEventSummary, SerializationError> {
+    match TofPacket::from_bytestream(&self.tof_data, &mut 0) {
+      Err(err) => {
+        error!("Unable to parse TofPacket! {err}");
+        return Err(err);
+      }
+      Ok(pack) => {
+        match pack.unpack::<TofEventSummary>() {
+          Err(err) => {
+            error!("Unable to parse TofEventSummary! {err}");
+            return Err(err);
+          }
+          Ok(ts)    => {
+            return Ok(ts);
+          }
+        }
+      }
+    }
+  }
+
 
   pub fn from_bytestream(stream : &Vec<u8>,
                          pos    : &mut usize)
@@ -377,7 +431,7 @@ impl fmt::Display for TrackerHit {
   }
 }
 
-
+#[derive(Clone)]
 pub struct TrackerHeader {
   pub sync        : u16,
   pub crc         : u16,
@@ -409,6 +463,10 @@ impl TrackerHeader {
   pub fn from_bytestream(stream: &Vec<u8>,
                          pos: &mut usize)
     -> Result<Self, SerializationError> {
+    if stream.len() <= Self::SIZE {
+      error!("Unable to decode TrackerHeader!"); 
+      return Err(SerializationError::StreamTooShort);
+    }
     let mut h     = TrackerHeader::new();
     h.sync        = parse_u16(stream, pos);
     h.crc         = parse_u16(stream, pos); 
@@ -436,6 +494,7 @@ impl fmt::Display for TrackerHeader {
   }
 }
 
+/// Re-implementation of Alex' tracker packet
 pub struct TrackerPacket {
   pub telemetry_header : TelemetryHeader,
   pub tracker_header   : TrackerHeader,
@@ -471,17 +530,25 @@ impl TrackerPacket {
     let mut tp          = TrackerPacket::new();
     //tp.telemetry_header = TelemetryHeader::from_bytestream(stream, pos)?;
     tp.tracker_header   = TrackerHeader::from_bytestream(stream, pos)?;
-    let _settings        = parse_u8(stream, pos);
+    if stream.len() == *pos as usize {
+      error!("Packet contains only header!");
+      return Ok(tp);
+    }
+    let _settings       = parse_u8(stream, pos);
 
     loop {    
-      let mut event  = TrackerEvent::new();
-      event.layer    = tp.tracker_header.sys_id;
-      let num_hits   = parse_u8(stream, pos);
-      event.flags1   = parse_u8(stream, pos);
-      event.event_id = parse_u32(stream, pos);
-      let ts32       = parse_u32(stream, pos);
-      let ts16       = parse_u16(stream, pos);
-      event.event_time = (ts32 as u64) << 32 | ts16 as u64;
+      let mut event    = TrackerEvent::new();
+      event.layer      = tp.tracker_header.sys_id;
+      if *pos + 12 > stream.len() {
+        error!("Unable to decode header part for tracker event!");
+        return Err(SerializationError::StreamTooShort);
+      }
+      let num_hits     = parse_u8(stream, pos);
+      event.flags1     = parse_u8(stream, pos);
+      event.event_id   = parse_u32(stream, pos);
+      let ts32         = parse_u32(stream, pos);
+      let ts16         = parse_u16(stream, pos);
+      event.event_time = (ts16 as u64) << 32 | ts32 as u64;
       if num_hits > 192 {
         //isn't a real event, looking at filler bytes.
         //once event packets stop having filler,
@@ -489,6 +556,7 @@ impl TrackerPacket {
         break; 
       }
       if *pos + 3*(num_hits as usize) > stream.len() {
+        error!("We expect {} hits, but the stream is not long enough!", num_hits);
         return Err(SerializationError::StreamTooShort);
       }
       for _ in 0..num_hits {
