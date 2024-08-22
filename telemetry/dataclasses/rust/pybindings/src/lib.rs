@@ -42,6 +42,12 @@ impl PyTelemetryHeader {
     }
   }
 
+  /// Alex' special time convention
+  #[getter]
+  fn gcutime(&self) -> f64 {
+    self.header.get_gcutime()
+  }
+
   /// Get the current packet count
   /// 
   /// (16bit number) so rollovers are 

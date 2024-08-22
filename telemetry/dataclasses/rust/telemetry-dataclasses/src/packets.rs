@@ -118,6 +118,11 @@ impl TelemetryHeader {
       checksum  : 0,
     }
   }
+
+  /// This is a reimplementation of bfsw's timestamp_to_double
+  pub fn get_gcutime(&self) -> f64 {
+    (self.timestamp as f64) * 0.064 + 1631030675.0
+  }
 }
 
 impl Serialization for TelemetryHeader {
