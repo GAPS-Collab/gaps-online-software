@@ -143,7 +143,7 @@ impl fmt::Display for MTBRegister<'_> {
 // Implements various control and monitoring functions of the DRS Logic
 
 ///Prescale value for the GAPS trigger. 0 == 0% (off), 2**32-1 == 100%
-/// GAPS_TRIG_PRESCALE 0x248 0x920 [31:0] rw 0xffffffff
+/// GAPS_TRIG_PRESCALE 0x248 0x920 \[31:0\] rw 0xffffffff
 pub const GAPS_TRIG_PRESCALE : MTBRegister<'static> = MTBRegister {
   addr    : 0x248,
   mask    : 0xffffffff,
@@ -2012,13 +2012,22 @@ pub const ANY_TRIG_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
 pub const TIU_USE_AUX_LINK : MTBRegister<'static> = MTBRegister {
   addr  : 0xe,
   mask  : 0x00000010,
-  descr : "Choose betweent the 2 tiu links",
+  descr : "Choose between the 2 tiu links",
   rmw   : true,
   ro    : false,
   pulse : false,
 };
 
-
+///TRIG_GEN_RATE     0x9     0x24    \[31:0\]  rw  0x0     Rate of generated triggers f_trig = (1/clk_period) * rate/0xffffffff
+/// Set a random forced trigger
+pub const TRIG_GEN_RATE : MTBRegister<'static> = MTBRegister {
+  addr  : 0x9,
+  mask  : 0xffffffff,
+  descr : "Set a forced trigger (1/clk_period) * rate/0xffffffff",
+  rmw   : false,
+  ro    : false,
+  pulse : false,
+};
 
 // All the trigger settings
 
@@ -2032,7 +2041,6 @@ pub const TIU_USE_AUX_LINK : MTBRegister<'static> = MTBRegister {
 //FB_CLOCK_RATE_3   0x5     0x14    [31:0]  r       Feedback clock frequency
 //FB_CLOCK_RATE_4   0x6     0x18    [31:0]  r       Feedback clock frequency
 //DSI_ON    0x7     0x1c    [4:0]   rw  0x1F    Bitmask 1 = enable DSI
-//TRIG_GEN_RATE     0x9     0x24    [31:0]  rw  0x0     Rate of generated triggers f_trig = (1/clk_period) * rate/0xffffffff
 //RESYNC    0xa     0x28    0   w   Pulse   Write 1 to resync
 //ANY_TRIG_IS_GLOBAL    0xb     0x2c    0   rw  0x0     1 makes the ANY trigger read all paddles.
 //TRACK_TRIG_IS_GLOBAL  0xb     0x2c    1   rw  0x0     1 makes the TRACK trigger read all paddles.

@@ -169,6 +169,17 @@ impl PyMasterTrigger {
     }
   }
 
+  fn set_poisson_trigger(&mut self, rate : u32) -> PyResult<()> {
+    match mt_api::control::set_poisson_trigger(&mut self.ipbus, rate) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   fn set_gaps_track_trigger(&mut self, prescale : f32, use_beta : bool) -> PyResult<()>  {
     match mt_api::control::set_gaps_track_trigger(&mut self.ipbus, prescale, use_beta) {
       Ok(_) => {
