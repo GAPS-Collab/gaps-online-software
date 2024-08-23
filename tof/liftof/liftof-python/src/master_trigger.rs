@@ -168,6 +168,18 @@ impl PyMasterTrigger {
       }
     }
   }
+  
+  /// Issue a one-time forced trigger
+  fn trigger(&mut self) -> PyResult<()> {
+    match FORCE_TRIGGER.set(&mut self.ipbus, 1) {
+      Ok(_)  => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
 
   fn set_poisson_trigger(&mut self, rate : u32) -> PyResult<()> {
     let clk_period = 100000000;
