@@ -170,8 +170,10 @@ impl PyMasterTrigger {
   }
 
   fn set_poisson_trigger(&mut self, rate : u32) -> PyResult<()> {
-    match mt_api::control::set_poisson_trigger(&mut self.ipbus, rate) {
-      Ok(_) => {
+    let clk_period = 100000000;
+    let rate_val   = (u32::MAX*rate)/clk_period;//(1.0/ clk_period)).floor() as u32;
+    match TRIG_GEN_RATE.set(&mut self.ipbus, rate_val) {
+      Ok(_)  => {
         return Ok(());
       }
       Err(err) => {
