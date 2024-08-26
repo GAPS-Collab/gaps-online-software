@@ -503,7 +503,7 @@ impl MasterTriggerEvent {
 
   /// Get absolute timestamp as sent by the GPS
   pub fn get_timestamp_abs48(&self) -> u64 {
-    let gps = self.get_timestamp_gps() as u64;
+    let gps = self.get_timestamp_gps48() as u64;
     let mut timestamp = self.timestamp as u64;
     if timestamp < self.tiu_timestamp as u64 {
       // it has wrapped
