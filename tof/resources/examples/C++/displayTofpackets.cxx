@@ -193,7 +193,7 @@ int main(int argc, char *argv[]){
   x_sc_lo =    0.0;    // in ns
   x_sc_hi =  500.0;    // in ns
   y_sc_lo =  -20.0;    // in mV
-  y_sc_hi =  160.0;    // in mV
+  y_sc_hi =   40.0;    // in mV
   //y_sc_lo = -500.0;    // in mV
   //y_sc_hi = 1500.0;    // in mV
   //x_sc_lo =  -9999;    // in ns
@@ -236,7 +236,7 @@ int main(int argc, char *argv[]){
       // THe format will change as well soon.
       case PacketType::TofEvent : {
 
-        usize pos = 0;
+	usize pos = 0;
 	//std::vector<GAPS::Waveform> wave;
 	//wave.reserve(NTOT); // Number of SiPMs
 	//wch9.reserve(NRB);  // Number of RBs
@@ -254,12 +254,17 @@ int main(int argc, char *argv[]){
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
 	printf("%ld.", evt_ctr); fflush(stdout);
+	// Now, let's plot the data to see what it looks like
+	int PLOT_EVENT = event_flag(evt_ctr);
+	//ch_start = 0;
+	if (PLOT_EVENT) {
+
 	for (auto const &rbid : ev.get_rbids()) {
 	  RBEvent rb_event = ev.get_rbevent(rbid);
 	  if (verbose) {
 	    std::cout << rb_event << std::endl;
           }
-	  //printf(" %d (%d)", rbid, rb_event.header.channel_mask);
+	  //printf(" %d (%d)\n", rbid, rb_event.header.channel_mask);
 	  int ch_mask = rb_event.header.channel_mask;
 	  // Now that we know the RBID, we can set the starting ch_no
 	  // Eventually we will use a function to map RB_ch to GAPS_ch
@@ -268,6 +273,7 @@ int main(int argc, char *argv[]){
 
 	  Vec<Vec<f32>> volts;
 	  Vec<Vec<f32>> times;
+	  //if ((calname != "") && rbid < 44 ){
 	  //if ((calname != "") && cali.rb_id == rbid ){
 	  if (calname != "") { // For combined data all boards calibrated
 	  /*if (calname != "" &&  // For combined data all boards calibrated
@@ -288,7 +294,8 @@ int main(int argc, char *argv[]){
 
 	    nrbs++;
 	    // Vec<f32> is a typedef for std::vector<float32>
-	    volts = cali[rbid].voltages(rb_event, false); // second argument is for spike cleaning
+	    //printf(" %d (%d)", rbid, rb_event.header.channel_mask);
+	    volts = cali[rbid].voltages(rb_event, true); // second argument is for spike cleaning
 	    // (C++ implementation causes a segfault sometimes when "true"
 	    times = cali[rbid].nanoseconds(rb_event);
 	    // volts and times are now ch 0-8 with the waveforms
@@ -336,9 +343,9 @@ int main(int argc, char *argv[]){
 	
 	n_chan = NTOT;
 	// Now, let's plot the data to see what it looks like
-	int PLOT_EVENT = event_flag(evt_ctr);
+	//int PLOT_EVENT = event_flag(evt_ctr);
 	//ch_start = 0;
-	if (PLOT_EVENT) {
+	//if (PLOT_EVENT) {
 	  //printf(".%ld", evt_ctr); fflush(stdout);
 	  //plotrb(n_chan, ch_start);
 	  plotall(n_chan, nrbs);

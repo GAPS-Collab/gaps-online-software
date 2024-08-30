@@ -190,6 +190,7 @@ int main(int argc, char *argv[]){
   Event.SetThreshold(CThresh);
   Event.SetCFDFraction(CFDS_frac);
   Event.InitializeHistograms();
+  Event.OffsetHistograms(true);
   //return (0);
   
   // the reader is something for the future, when the 
@@ -284,7 +285,7 @@ int main(int argc, char *argv[]){
 	  //if (calname != "") { // For combined data all boards calibrated
 	  if (RB_Calibrated[rbid]) { // Have cali data for this RBID
 	    // Vec<f32> is a typedef for std::vector<float32>
-	    volts = cali[rbid].voltages(rb_event, false); //second argument is for spike cleaning
+	    volts = cali[rbid].voltages(rb_event, true); //second argument is for spike cleaning
 	    // (C++ implementation causes a segfault sometimes when "true"
 	    times = cali[rbid].nanoseconds(rb_event);
 	    // volts and times are now ch 0-8 with the waveform for this event.
@@ -356,6 +357,7 @@ int main(int argc, char *argv[]){
 	// Now fill out histograms
 	Event.FillChannelHistos(0);
 	Event.FillPaddleHistos();
+	Event.FillOffsetHistos();
 
 	Event.UnsetWaveforms();
 	for (int i=0;i<NTOT;i++) 
@@ -405,6 +407,7 @@ int main(int argc, char *argv[]){
   }
   // Write histograms after analyzing all the files
   Event.WriteHistograms();
+  Event.WriteOffsetHistos();
   
   std::cout << "-- -- packets summary:" << std::endl;
   
