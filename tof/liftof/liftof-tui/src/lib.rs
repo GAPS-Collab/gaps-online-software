@@ -1,7 +1,5 @@
 #[macro_use] extern crate log;
 
-
-//pub mod tab_commands;
 pub mod menu;
 pub mod colors;
 pub mod widgets;

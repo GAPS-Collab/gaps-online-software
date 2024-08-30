@@ -28,6 +28,8 @@ use ratatui::widgets::{
 //    Tabs,
 };
 
+use tui_popup::Popup;
+
 use crate::colors::{
     ColorTheme,
     ColorSet,
@@ -39,12 +41,14 @@ use crate::colors::{
     COLORSETMATRIX,
     COLORSETSTARFIELD,
     COLORSETGAPS,
+    COLORSETPRINCESSPEACH
 };
 
 
 #[derive(Debug, Clone)]
 pub struct SettingsTab<'a> {
   pub theme      : ColorTheme,
+  pub colortheme_popup : bool,
   pub ctl_state  : ListState,
   pub ctl_items  : Vec::<ListItem<'a>>,
   pub ctl_active : bool,
@@ -60,9 +64,11 @@ impl SettingsTab<'_> {
                              ListItem::new(Line::from("Dune")),
                              ListItem::new(Line::from("LowerDecks")),
                              ListItem::new(Line::from("Matrix")),
-                             ];
+                             ListItem::new(Line::from("PrincessPeach")),
+    ];
     SettingsTab {
       theme,
+      colortheme_popup : false,
       ctl_state  : ListState::default(),
       ctl_items  : ct_list_items,
       ctl_active : false,
@@ -113,6 +119,7 @@ impl SettingsTab<'_> {
           5 => Some(COLORSETDUNE),
           6 => Some(COLORSETLD),
           7 => Some(COLORSETMATRIX),
+          8 => Some(COLORSETPRINCESSPEACH),
           _ => None,
         }
       }
@@ -229,6 +236,12 @@ impl SettingsTab<'_> {
     frame.render_widget(side_view, main_cols0[0]);
     frame.render_widget(refresh_view, sub_rows0[1]);
     frame.render_stateful_widget(color_theme_list, sub_rows0[0], &mut self.ctl_state );
+    if self.colortheme_popup {
+      let popup = Popup::new("Any key to continue!")
+        .title("New color theme selected!")
+        .style(self.theme.style());
+      frame.render_widget(&popup, frame.size());
+    }
   }
 }
 

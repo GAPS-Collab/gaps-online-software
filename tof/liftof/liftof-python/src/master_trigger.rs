@@ -1,3 +1,4 @@
+use std::collections::btree_map::Values;
 use std::collections::HashMap;
 
 use pyo3::prelude::*;
@@ -16,9 +17,7 @@ use tof_dataclasses::events::MasterTriggerEvent;
 use liftof_lib::master_trigger::registers::*;
 use liftof_lib::master_trigger as mt_api;
 
-use crate::dataclasses::{
-    PyMasterTriggerEvent,
-};
+use crate::PyMasterTriggerEvent;
 
 #[pyclass]
 #[pyo3(name = "MasterTrigger")]
@@ -90,6 +89,10 @@ impl PyMasterTrigger {
   }
 
   /// Check if the TIU emulation mode is on
+  ///
+  /// # Arguments:
+  ///
+  /// * bus : IPBus 
   fn get_tiu_emulation_mode(&mut self) -> PyResult<u32> {
     match TIU_EMULATION_MODE.get(&mut self.ipbus) {
       Ok(mode) => {
@@ -112,7 +115,218 @@ impl PyMasterTrigger {
     }
   }
 
-  fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
+  fn get_enable_cyclic_trig(&mut self) -> PyResult<bool> {
+    match TRIG_CYCLIC_EN.get(&mut self.ipbus) {
+      Ok(value) => {
+        return Ok(value > 0);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  fn disable_cyclic_trig(&mut self) -> PyResult<()> {
+    match TRIG_CYCLIC_EN.set(&mut self.ipbus, 0x0) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  
+  fn enable_cyclic_trig(&mut self) -> PyResult<()> {
+    match TRIG_CYCLIC_EN.set(&mut self.ipbus, 0x1) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  
+  fn get_cyclic_trigger_interval(&mut self) -> PyResult<u32> {
+    match TRIG_CYCLIC_INTERVAL.get(&mut self.ipbus) {
+      Ok(interval) =>  {
+        return Ok(interval);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  } 
+
+  fn set_cyclic_trigger_interval(&mut self, interval : u32) -> PyResult<()> {
+    match TRIG_CYCLIC_INTERVAL.set(&mut self.ipbus, interval) {
+      Ok(_) =>  {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  /// Get the status of enabling for LTBs 0-9
+  fn get_lt_link_en0(&mut self) -> PyResult<u32> {
+    match LT_LINK_EN0.get(&mut self.ipbus) {
+      Ok(value)  => {
+        return Ok(value);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  /// Get the status of enabling for LTBs 10-19
+  fn get_lt_link_en1(&mut self) -> PyResult<u32> {
+    match LT_LINK_EN1.get(&mut self.ipbus) {
+      Ok(value)  => {
+        return Ok(value);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  /// Get the status of enabling for LTBs 20-29
+  fn get_lt_link_en02(&mut self) -> PyResult<u32> {
+    match LT_LINK_EN2.get(&mut self.ipbus) {
+      Ok(value)  => {
+        return Ok(value);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  /// Get the status of enabling for LTBs 30-39
+  fn get_lt_link_en3(&mut self) -> PyResult<u32> {
+    match LT_LINK_EN3.get(&mut self.ipbus) {
+      Ok(value)  => {
+        return Ok(value);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  /// Get the status of enabling for LTBs 40-49
+  fn get_lt_link_en4(&mut self) -> PyResult<u32> {
+    match LT_LINK_EN4.get(&mut self.ipbus) {
+      Ok(value)  => {
+        return Ok(value);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  ///Set on/off link enabling for LTBs 0-9
+  fn set_lt_link_en0(&mut self, value : u32) -> PyResult<u32> {
+    match LT_LINK_EN0.set(&mut self.ipbus, value) {
+      Ok(_) => {
+        return Ok(value);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  ///Set on/off link enabling for LTBs 10-19
+  fn set_lt_link_en1(&mut self, value : u32) -> PyResult<u32> {
+    match LT_LINK_EN1.set(&mut self.ipbus, value) {
+      Ok(_) => {
+        return Ok(value);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  ///Set on/off link enabling for LTBs 20-29
+  fn set_lt_link_en2(&mut self, value : u32) -> PyResult<u32> {
+    match LT_LINK_EN2.set(&mut self.ipbus, value) {
+      Ok(_) => {
+        return Ok(value);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  ///Set on/off link enabling for LTBs 30-39
+  fn set_lt_link_en3(&mut self, value : u32) -> PyResult<u32> {
+    match LT_LINK_EN3.set(&mut self.ipbus, value) {
+      Ok(_) => {
+        return Ok(value);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  ///Set on/off link enabling for LTBs 40-49
+  fn set_lt_link_en4(&mut self, value : u32) -> PyResult<u32> {
+    match LT_LINK_EN4.set(&mut self.ipbus, value) {
+      Ok(_) => {
+        return Ok(value);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  ///get LT LINK AUTOMASK toggle status
+  fn get_lt_link_automask(&mut self) -> PyResult<bool> {
+    match LT_LINK_AUTOMASK.get(&mut self.ipbus) {
+      Ok(value) => {
+        return Ok(value != 0);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  ///set LT LINK AUTOMASK toggle status
+  fn set_lt_link_automask(&mut self, toggle : bool) -> PyResult<bool> {
+    match LT_LINK_AUTOMASK.set(&mut self.ipbus, toggle as u32) {
+      Ok(_) => {
+        return Ok(true);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+fn get_gaps_trigger_prescale(&mut self) -> PyResult<f32> {
+  match GAPS_TRIG_PRESCALE.get(&mut self.ipbus) {
+    Ok (prescale_bus) => {
+      let prescale_val = (u32::MAX as f32 * prescale_bus as f32).floor() as f32;
+    return Ok(prescale_val)
+    }
+    Err(err) => {
+      return Err(PyValueError::new_err(err.to_string()));
+    }
+  }
+}
+
+fn set_gaps_trigger_prescale(&mut self, prescale : f32) -> PyResult<f32> {
+  let prescale_val = (f32::MAX * prescale as f32).floor() as u32;
+  match GAPS_TRIG_PRESCALE.set(&mut self.ipbus, prescale_val) {
+    Ok(_) => {
+      return Ok(prescale)
+    }
+    Err(err) => {
+      return Err(PyValueError::new_err(err.to_string()));
+    }
+  }
+}
+
+fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
     match TRACK_CENTRAL_IS_GLOBAL.set(&mut self.ipbus, 1) {
       Ok(_) => {
         return Ok(());
@@ -136,6 +350,24 @@ impl PyMasterTrigger {
         return Err(PyValueError::new_err(err.to_string()));
       }
     }
+  }
+
+  fn get_ltb_links_ready(&mut self) -> PyResult<HashMap<u8, u32>> {
+    let registers = [LT_LINK_READY0, LT_LINK_READY1,
+                     LT_LINK_READY2, LT_LINK_READY3,
+                     LT_LINK_READY4];
+    let mut ready = HashMap::<u8, u32>::new();
+    for (k,reg) in registers.iter().enumerate() {
+      match reg.get(&mut self.ipbus) {
+        Err(err) => {
+          return Err(PyValueError::new_err(err.to_string()));
+        }
+        Ok(cnt) => {
+          ready.insert(k as u8, cnt);
+        }
+      }
+    }
+    Ok(ready)
   }
 
   fn get_ltb_event_cnts(&mut self) -> PyResult<HashMap<u8, u32>> {
@@ -760,6 +992,17 @@ impl PyMasterTrigger {
     }
   }
 
+  fn use_tiu_aux_link(&mut self, use_it : bool) -> PyResult<()> {
+    match mt_api::control::use_tiu_aux_link(&mut self.ipbus, use_it) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   fn stop_all_triggers(&mut self) -> PyResult<()> {
     match mt_api::control::unset_all_triggers(&mut self.ipbus) {
       Ok(_) => {
@@ -825,7 +1068,30 @@ impl PyMasterTrigger {
       }
     }
   }
+
+  fn get_tiu_busy_ignore(&mut self) -> PyResult<bool> {
+    match TIU_BUSY_IGNORE.get(&mut self.ipbus) {
+      Ok(bsy) => {
+        let res = bsy != 0;
+        return Ok(res);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
   
+  fn set_tiu_busy_ignore(&mut self, bsy : bool) -> PyResult<()> {
+    match TIU_BUSY_IGNORE.set(&mut self.ipbus, bsy as u32) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   fn get_event_cnt(&mut self) -> PyResult<u32> {
     match EVENT_CNT.get(&mut self.ipbus) {
       Ok(cnt) => {

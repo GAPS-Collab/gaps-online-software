@@ -1,6 +1,6 @@
 [package]
 name = "liftof-tui"
-version = "0.10.2"
+version = "0.10.3"
 edition = "2021"
 
 [features]
@@ -8,28 +8,25 @@ telemetry  = ["telemetry-dataclasses"]
 default    = ["telemetry"]
 
 [dependencies]
-
 cfg-if     = { workspace = true }
-
 zmq        = { workspace = true } 
 log        = { workspace = true }
 clap       = { workspace = true } 
 serde      = { workspace = true }
 serde_json = { workspace = true } 
 crossbeam-channel = { workspace = true }
-
 chrono     = { version = "0.4", features = ["serde"] }
 
 # tui stuff
-# FIXME - ratatui is now at 0.27, but there are issues with 
-# tui-logger. Check back again in the future.
-tui-logger = { version = "=0.11.0" } 
-ratatui    = { version = "=0.26.3", features = ["all-widgets"]}
-tui-popup  = "=0.3.2"
+ratatui    = { version = "0.27", features = ["all-widgets"]}
+tui-popup  = "0.4"
+tui-logger = "0.11"
+
 crossterm  = { version = "0.23", features=["serde"]}
 
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["database","smoothed_z_score"], version = "0.10"} 
 
-tof-dataclasses = { workspace = true }
+#tof-dataclasses = { workspace = true }
 liftof-lib      = { path = "../liftof-lib" , features = ["random"], version = "0.10"}
 telemetry-dataclasses = { path = "../../../telemetry/dataclasses/rust/telemetry-dataclasses", optional = true }
 

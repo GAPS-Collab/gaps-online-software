@@ -168,6 +168,10 @@ impl MTTab {
             if self.rate_queue.len() > self.queue_size {
               self.rate_queue.pop_front();
             }
+            self.lost_r_queue.push_back((met, moni.lost_rate as f64));
+            if self.lost_r_queue.len() > self.queue_size {
+              self.rate_queue.pop_front();
+            }
             self.fpgatmp_queue.push_back((met, moni.get_fpga_temp() as f64));
             if self.fpgatmp_queue.len() > self.queue_size {
               self.fpgatmp_queue.pop_front();
@@ -219,7 +223,7 @@ impl MTTab {
       self.nch_histo.fill(&(hits.len() as f32));
       for k in rb_links {
         // FIXME unwrap
-        let linked_rbid = self.mtlink_rb_map.get(&k).unwrap();
+        let linked_rbid = self.mtlink_rb_map.get(&k).unwrap_or(&0);
         self.mtb_link_histo.fill(&(*linked_rbid as f32));
       }
       self.n_events += 1;
@@ -326,7 +330,7 @@ impl MTTab {
           .borders(Borders::ALL)
           .style(Style::default().patch(self.theme.style()))
           .title("MT rate ".to_owned() )
-          .border_type(BorderType::Double),
+          .border_type(BorderType::Rounded),
       )
       .x_axis(Axis::default()
         .title(Span::styled("MET [s]", Style::default().patch(self.theme.style())))
@@ -383,13 +387,14 @@ impl MTTab {
         .graph_type(GraphType::Line)
         .style(Style::default().patch(self.theme.style()))
         .data(self.fpgatmp_queue.make_contiguous())];
+
     let fpga_temp_chart = Chart::new(fpga_temp_dataset)
       .block(
         Block::default()
           .borders(Borders::ALL)
           .style(Style::default().patch(self.theme.style()))
           .title("FPGA T [\u{00B0}C] ".to_owned() )
-          .border_type(BorderType::Double),
+          .border_type(BorderType::Rounded),
       )
       .x_axis(Axis::default()
         .title(Span::styled("MET [s]", Style::default().fg(Color::White)))

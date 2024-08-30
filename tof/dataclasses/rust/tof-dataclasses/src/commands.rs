@@ -80,12 +80,10 @@ pub enum TofCommandCode {
   StartValidationRun       = 32u8,         
   /// command code for "Get all waveforms"
   GetFullWaveforms         = 41u8,
+  /// command code for "Send the whole event cache over the wire"
+  UnspoolEventCache        = 44u8,
   /// command code for "Run full calibration"
   RBCalibration            = 53u8, 
-
-  /// command code for "Send the whole event cache over the wire"
-  UnspoolEventCache       = 44u8,
-
   /// command code for setting the size of the rb buffers.
   /// technically, this does not change the size, but sets 
   /// a different value for trip
@@ -101,6 +99,17 @@ pub enum TofCommandCode {
   Lock                    = 80u8,
   /// unlock the cmd dispatcher
   Unlock                  = 81u8,
+  /// Enable sending of TOF packets
+  SendTofEvents           = 90u8,
+  /// Diesable sending of TofEventPacket
+  NoSendTofEvents         = 91u8,
+  /// Enable sending of RBWaveform packets
+  SendRBWaveforms         = 92u8,
+  /// Disable sending of RBWaveform packets
+  NoSendRBWaveforms       = 93u8,
+  /// Enable RB Channel Masks
+  SetRBChannelMask        = 99u8,
+
 }
 
 impl fmt::Display for TofCommandCode {
@@ -134,6 +143,10 @@ impl From<u8> for TofCommandCode {
       71u8 => TofCommandCode::Staging,
       80u8 => TofCommandCode::Lock,
       81u8 => TofCommandCode::Unlock,
+      90u8 => TofCommandCode::SendTofEvents,
+      91u8 => TofCommandCode::NoSendTofEvents,
+      92u8 => TofCommandCode::SendRBWaveforms,
+      93u8 => TofCommandCode::NoSendRBWaveforms,
       _    => TofCommandCode::Unknown
     }
   }
@@ -162,6 +175,10 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::Staging,
       TofCommandCode::Lock,
       TofCommandCode::Unlock,
+      TofCommandCode::SendTofEvents,
+      TofCommandCode::NoSendTofEvents,
+      TofCommandCode::SendRBWaveforms,
+      TofCommandCode::NoSendRBWaveforms,
       TofCommandCode::Kill,
     ];
     let mut rng  = rand::thread_rng();

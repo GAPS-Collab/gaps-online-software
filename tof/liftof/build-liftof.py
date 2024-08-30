@@ -38,7 +38,7 @@ def get_version(binary):
 def build_for_muslx86_64(binary, njobs=24):
     os.chdir(f'{binary}')
     sub.run(["cargo clean"], shell=True)
-    build_cmd = f'CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build -j {njobs} --target=x86_64-unknown-linux-musl --bin {binary} --release'
+    build_cmd = f'CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build -j {njobs} --target=x86_64-unknown-linux-musl --bin {binary} --release --all-features'
     result = sub.run([build_cmd], shell=True)
     shutil.move(f'../target/x86_64-unknown-linux-musl/release/{binary}', '../build/')
     os.chdir('..')
@@ -66,19 +66,24 @@ def pack(binary):
 
 
 def deploy(binary, dest_dir='bin'):
-    version = get_version(binary)
+    #version = get_version(binary)
+    version = '0.10.3'
     if binary == 'liftof-cc':
-        deploy_cmd = f"rsync -avz build/{binary} tofcpu-pl:{dest_dir}/{binary}.{version}"
-    if binary == 'liftof-rb':
+       deploy_cmd = f"rsync -avz build/{binary} tofcpu-pl:{dest_dir}/{binary}.{version}"
+       sub.run([deploy_cmd], shell=True)
+		   
+    elif binary == 'liftof-rb':
         rbids = all_rbs() 
         rb_targets = [f'tof-rb{k:02}' for k in rbids]
         for target in tqdm.tqdm(rb_targets, desc='Deploying to rbs'):
             deploy_cmd = f"rsync -avz build/{binary} tofcpu-pl:{dest_dir}/{binary}.{version}"
             sub.run([deploy_cmd], shell=True)
-        return
-    if binary == 'liftof-tui':
-        deploy_cmd = f"rsync -avz build/{binary} gse5-pl:tof-moni/{binary}.{version}"
-    sub.run([deploy_cmd], shell=True)
+     
+    elif binary == 'liftof-tui':
+        deploy_cmd = f"rsync -avz build/{binary} gaps-gse5:tof-moni/{binary}.{version}"
+        deploy_cmd1 = f"rsync -avz build/{binary} tof-gse5:tof-moni/{binary}.{version}"
+        sub.run([deploy_cmd], shell=True)
+        sub.run([deploy_cmd1], shell=True)
     
 def deploy_asset(asset):
     if asset == 'db':

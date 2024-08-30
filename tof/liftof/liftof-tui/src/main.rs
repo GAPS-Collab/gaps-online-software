@@ -33,7 +33,7 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode},
 };
 
-extern crate crossbeam_channel;
+//extern crate crossbeam_channel;
 use crossbeam_channel::{unbounded,
                         Sender,
                         Receiver};
@@ -51,7 +51,6 @@ use ratatui::{
     style::{
         Color,
         Style,
-        Stylize
     },
     widgets::{
         Block,
@@ -85,33 +84,26 @@ use tof_dataclasses::events::{
     TofEventSummary,
     //RBWaveform,
 };
-use tof_dataclasses::commands::TofResponse;
 use tof_dataclasses::calibrations::RBCalibrations;
 //use liftof_lib::settings::LiftofSettings;
 
 use liftof_tui::menu::{
     UIMenuItem,
     MenuItem,
-    MainMenu,
     MainMenu2,
     TriggerMenu,
     EventMenu,
     MoniMenu,
     ActiveMenu,
-    UIMenu,
-    RBMenuItem,
-    RBMenu,
     RBMenu2,
-    PAMoniMenuItem,
+    UIMenu,
     PAMoniMenu,
-    MTMenu,
     SettingsMenu,
     THMenu,
-    THMenuItem,
     TSMenu,
     //TSMenuItem,
     RWMenu,
-    TEMenu,
+    HBMenu,
     //RWMenuItem,
 };
 
@@ -127,20 +119,21 @@ use liftof_tui::{
     HomeTab,
     SettingsTab,
     TofHitTab,
-    TofHitView,
     RBTab,
     RBTabView,
     MTTab,
     CPUTab,
     RBWaveformTab,
     TofSummaryTab, 
-    RBLTBListFocus,
     TelemetryTab,
     CommandTab,
     PaddleTab,
+    HeartBeatTab,
+    HeartBeatView
 };
 
-extern crate clap;
+
+//extern crate clap;
 use clap::{arg,
            command,
            //value_parser,
@@ -279,6 +272,12 @@ struct Args {
   /// --features=telemetry
   #[arg(short, long, default_value_t = false)]
   from_telemetry : bool,
+  /// Allow to control the liftof-cc server with commands
+  /// WARNING - this is an expert feature. Only use if 
+  /// you are know what you are doing
+  #[arg(long, default_value_t = false)]
+  allow_commands : bool
+
   ///// generic liftof config file. If not given, we 
   ///// assume liftof-config.toml in this directory
   //#[arg(short, long)]
@@ -356,6 +355,12 @@ fn packet_sorter(packet_type : &PacketType,
         PacketType::HeartBeatDataSink  => { 
           *pm.get_mut("HeartBeatDataSink").unwrap() += 1;
         },
+        PacketType::MTBHeartbeat => {
+          *pm.get_mut("MTBHeartbeat").unwrap() += 1;
+        }
+        PacketType::EVTBLDRHeartbeat => { 
+          *pm.get_mut("EVTBLDRHeartbeat").unwrap() += 1;
+        }
         PacketType::MasterTrigger      => { 
           *pm.get_mut("MasterTrigger").unwrap() += 1;
         },
@@ -379,6 +384,9 @@ fn packet_sorter(packet_type : &PacketType,
         },
         PacketType::TofCommand         => { 
           *pm.get_mut("TofCommand").unwrap() += 1;
+        },
+        PacketType::TofResponse        => {
+          *pm.get_mut("TofResponse").unwrap() += 1;
         },
         PacketType::RBCommand          => { 
           *pm.get_mut("RBCommand").unwrap() += 1;
@@ -415,10 +423,6 @@ fn packet_sorter(packet_type : &PacketType,
   }
 }
 
-
-
-
-
 /// Receive packets from an IP address
 /// and distrubute them to their receivers
 /// while taking notes of everything
@@ -430,45 +434,22 @@ fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
                       tp_sender_rb : Sender<TofPacket>,
                       tp_sender_ev : Sender<TofPacket>,
                       tp_sender_cp : Sender<TofPacket>,
+                      tp_sender_tr : Sender<TofPacket>,
                       rbwf_sender  : Sender<TofPacket>,
                       ts_send      : Sender<TofEventSummary>,
                       th_send      : Sender<TofHit>,
+                      tp_sender_hb : Sender<TofPacket>,
                       str_list     : Arc<Mutex<VecDeque<String>>>,
                       pck_map      : Arc<Mutex<HashMap<String, usize>>>) {
-  //let ctx = zmq::Context::new();
-  //// FIXME - don't hardcode this IP
-  //// tof-computer tailscale is 100.101.96.10/32
-  ////let address    : &str = "tcp://100.96.207.91:42000";
-  ////let address_rb : &str = "tcp://100.96.207.91:42001";
-  //let address : &str = "tcp://192.168.37.20:42000";
-  ////let address : &str = "tcp://100.101.96.10:42000";
-  //let data_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
-  //data_socket.connect(address).expect("Unable to connect to data (PUB) socket {adress}");
-  ////data_socket.connect(address_rb).expect("Unable to connect to (PUB) socket {address_rb}");
-  //match data_socket.set_subscribe(b"") {
-  //  Err(err) => error!("Can't subscribe to any message on 0MQ socket! {err}"),
-  //  Ok(_)    => (),
-  //}
   let mut n_pack = 0usize;
-  //info!("0MQ SUB socket connected to address {address}");
-  //// per default, we create master trigger packets from TofEventSummary, 
-  //// except we have "real" mtb packets
+  // per default, we create master trigger packets from TofEventSummary, 
+  // except we have "real" mtb packets
   let mut craft_mte_packets = true;
 
   loop {
     //match data_socket.recv_bytes(0) {
     match tp_from_sock.recv() {
       Err(err) => error!("Can't receive TofPacket! {err}"),
-      //Ok(payload)    => {
-      //  match TofPacket::from_bytestream(&payload, &mut 0) {
-      //    Err(err) => {
-      //      debug!("Can't decode payload! {err}");
-      //      // that might have an RB prefix, forward 
-      //      // it 
-      //      match TofPacket::from_bytestream(&payload, &mut 4) {
-      //        Err(err) => {
-      //          error!("Don't understand bytestream! {err}"); 
-      //        },
       Ok(tp) => {
         //println!("{:?}", pck_map);
         packet_sorter(&tp.packet_type, &pck_map);
@@ -484,6 +465,12 @@ fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
           }
         }
         match tp.packet_type {
+          PacketType::TofResponse => { 
+            match tp_sender_tr.send(tp) {
+              Err(err) => error!("Can't send TP! {err}"),
+              Ok(_)    => (),
+            }
+          }
           PacketType::MonitorMtb |
           PacketType::MasterTrigger => {
             // apparently, we are getting MasterTriggerEvents, 
@@ -569,6 +556,15 @@ fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
               Ok(_)    => (),
             }
           }
+          PacketType::HeartBeatDataSink |
+          PacketType::EVTBLDRHeartbeat  | 
+          PacketType::MTBHeartbeat      => {
+            match tp_sender_hb.send(tp) {
+              Err(err) => error!("Can't send TP! {err}"),
+              Ok(_)    => {
+              },
+            }
+          }
           _ => () 
         }
       }
@@ -590,6 +586,7 @@ struct TabbedInterface<'a> {
   pub pa_menu       :  PAMoniMenu,
   pub te_menu       :  EventMenu<'a>,
   pub mo_menu       :  MoniMenu<'a>,
+  pub hb_menu       :  HBMenu<'a>,
   pub active_menu   :  ActiveMenu,
 
   // The tabs
@@ -613,6 +610,8 @@ struct TabbedInterface<'a> {
   // paddles 
   pub pd_tab        : PaddleTab<'a>,
 
+  pub hb_tab        : HeartBeatTab,
+
   // latest color set
   pub color_set     : ColorSet,
 
@@ -630,6 +629,7 @@ impl<'a> TabbedInterface<'a> {
              pa_menu      : PAMoniMenu,
              te_menu      : EventMenu<'a>,
              mo_menu      : MoniMenu<'a>,
+             hb_menu      : HBMenu<'a>,
              active_menu  : ActiveMenu,
              mt_tab       : MTTab,
              cpu_tab      : CPUTab,
@@ -642,6 +642,7 @@ impl<'a> TabbedInterface<'a> {
              ts_tab       : TofSummaryTab,
              te_tab       : TelemetryTab,
              cmd_tab      : CommandTab<'a>,
+             hb_tab       : HeartBeatTab,
              pd_tab       : PaddleTab<'a>) -> Self {
     Self {
 
@@ -655,6 +656,7 @@ impl<'a> TabbedInterface<'a> {
       pa_menu     ,
       te_menu     ,
       mo_menu     ,
+      hb_menu     ,
       active_menu ,
       mt_tab      , 
       cpu_tab     , 
@@ -668,6 +670,7 @@ impl<'a> TabbedInterface<'a> {
       te_tab      ,
       cmd_tab     ,
       pd_tab      , 
+      hb_tab      ,
       color_set   : COLORSETBW,
       quit_request: false,
     }
@@ -710,8 +713,10 @@ impl<'a> TabbedInterface<'a> {
       Err(err) => error!("Can not receive TofEventSummaries for TofEventSummaryTab! {err}"),
       Ok(_)    => ()
     }
-    // technically, this should live in a seperate thread! This tab as its own 
-    // ZMQ socket, and is independent of the others. The frequency should be about 
+    match self.hb_tab.receive_packet() {
+      Err(err) => error!("Can not receive Heartbeats for HeartBeatTab! {err}"),
+      Ok(_)    => ()
+    }
     // the same though, so maybe for now it is fine
     match self.te_tab.receive_packet() {
       Err(err) => error!("Can not receive a new packet from the Telemetry Stream! {err}"),
@@ -728,6 +733,7 @@ impl<'a> TabbedInterface<'a> {
     self.ts_menu.theme.update(&cs);
     self.th_menu.theme.update(&cs);
     self.te_menu.theme.update(&cs);
+    self.hb_menu.theme.update(&cs);
     self.home_tab    .theme.update(&cs);
     self.event_tab   .theme.update(&cs);
     self.wf_tab      .theme.update(&cs);
@@ -738,6 +744,9 @@ impl<'a> TabbedInterface<'a> {
     self.rbwf_tab    .theme.update(&cs);
     self.ts_tab      .theme.update(&cs);
     self.te_tab      .theme.update(&cs);
+    self.cmd_tab     .theme.update(&cs);
+    self.pd_tab      .theme.update(&cs);
+    self.hb_tab      .theme.update(&cs);
     self.color_set = cs;
   }
   
@@ -791,7 +800,19 @@ impl<'a> TabbedInterface<'a> {
       }
     }
   }
- 
+
+  pub fn render_heartbeats(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    match self.active_menu {
+      ActiveMenu::Heartbeats => {
+        self.hb_menu.render(&master_lo.rect[0], frame);
+      }
+      _ => {
+        self.ui_menu.render(&master_lo.rect[0], frame);
+      }
+    }
+    self.hb_tab.render(&master_lo.rect[1], frame);
+  }
+
   pub fn render_commands(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
     self.ui_menu.render(&master_lo.rect[0], frame);
     self.cmd_tab.render(&master_lo.rect[1], frame);
@@ -805,9 +826,9 @@ impl<'a> TabbedInterface<'a> {
   pub fn render_quit(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
     self.ui_menu.render(&master_lo.rect[0], frame);
     if self.quit_request {
-      let popup = Popup::new("Quit liftof-tui?", "Press Y to confirm, any key to abort")
-      //.style(Style::new().white().on_blue());
-      .style(self.home_tab.theme.style());
+      let popup = Popup::new("Quit liftof-tui?")
+        .title("Press Y to confirm, any key to abort")
+        .style(self.home_tab.theme.style());
       frame.render_widget(&popup, frame.size());
     }
   }
@@ -838,7 +859,11 @@ impl<'a> TabbedInterface<'a> {
     self.te_tab.render(&master_lo.rect[1], frame);
   }
 
-  pub fn render(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+  pub fn render(&mut self,
+                master_lo : &mut MasterLayout,
+                frame     : &mut Frame) {
+    
+
     match self.active_menu {
       ActiveMenu::MainMenu => {
         match self.ui_menu.get_active_menu_item() {
@@ -870,6 +895,9 @@ impl<'a> TabbedInterface<'a> {
           UIMenuItem::Paddles => {
             self.render_paddles(master_lo, frame);
           }
+          UIMenuItem::Heartbeats => {
+            self.render_heartbeats(master_lo, frame);
+          }
           UIMenuItem::Quit => {
             self.render_quit(master_lo, frame);
           }
@@ -881,6 +909,9 @@ impl<'a> TabbedInterface<'a> {
       }
       ActiveMenu::Paddles => {
         self.render_paddles(master_lo, frame);
+      }
+      ActiveMenu::Heartbeats => {
+        self.render_heartbeats(master_lo, frame);
       }
       //ActiveMenu::Trigger => {
       //  self.render_mt(master_lo, frame);
@@ -918,82 +949,44 @@ impl<'a> TabbedInterface<'a> {
       }
       _ => ()
     }
-    //match self.ui_menu.get_active_menu_item() {
-    //  UIMenuItem::ReadoutBoards => {
-    //    self.render_rbs(master_lo, frame);
-    //    return;
-    //  }
-    //  UIMenuItem::Home => {
-    //    self.render_home(master_lo, frame);
-    //  }
-    //  _ => ()
-    //}
-    //match self.ui_menu.active_menu_item {
-    //  MenuItem::Home => {
-    //    self.render_home(master_lo, frame);
-    //  },
-    //  MenuItem::TofEvents => {
-    //    self.render_events(master_lo, frame);
-    //  },
-    //  MenuItem::TOFCpu => { 
-    //    self.render_cpu(master_lo, frame);
-    //  },
-    //  MenuItem::MasterTrigger => {
-    //    self.render_mt(master_lo, frame);
-    //  },
-    //  MenuItem::ReadoutBoards => {
-    //    if self.wf_tab.view == RBTabView::PAMoniData {
-    //      self.render_pamonidatatab(master_lo, frame);
-    //    } else {
-    //      self.render_rbs(master_lo, frame);
-    //    }
-    //  },
-    //  MenuItem::Settings => {
-    //    self.render_settings(master_lo, frame);
-    //  },
-    //  MenuItem::TofHits => {
-    //    self.render_tofhittab(master_lo, frame);
-    //  }
-    //  MenuItem::RBWaveform => {
-    //    self.render_rbwaveformtab(master_lo, frame);
-    //  }
-    //  MenuItem::TofSummary => {
-    //    self.render_tofsummarytab(master_lo, frame);
-    //  }
-    //  MenuItem::Telemetry => {
-    //    self.render_telemetrytab(master_lo, frame);
-    //  }
-    //  _ => {
-    //    self.ui_menu.render(&master_lo.rect[0], frame);
-    //  }
-    //}
   }
 
   /// Perform actions depending on the input.
   ///
   /// Returns a flag indicating if we should 
   /// close the app
+  ///
+  /// # Returns:
+  ///
+  /// * (bool, bool) - quit and tab_changed. Indicator if the app should quit or if a tab
+  ///   has changed
   pub fn digest_input(&mut self, key_code : KeyCode)
-  -> bool {
+  -> (bool, bool) {
+    let mut tab_changed = false;
     if self.quit_request {
       match key_code {
         KeyCode::Char('Y') => {
-          return true;
+          return (true, tab_changed);
         }
         _ => {
           self.quit_request = false;
         }
       }
     }
+    if self.settings_tab.colortheme_popup {
+      self.settings_tab.colortheme_popup = false;
+    }
+
     match key_code {
       KeyCode::Char('a') => {
         if self.ui_menu.get_active_menu_item() == UIMenuItem::Settings {
           self.settings_tab.ctl_active = true;
-          self.settings_tab.ctl_state.select(Some(0));
+          //self.settings_tab.ctl_state.select(Some(0));
         }
       }
       KeyCode::Enter => {
         //info!("{:?}", self.ui_menu.get_active_menu_item());
+        self.settings_tab.ctl_active = false;
         match self.active_menu {
           ActiveMenu::Events  => {
             match self.te_menu.get_active_menu_item() {
@@ -1035,6 +1028,16 @@ impl<'a> TabbedInterface<'a> {
               _ => ()
             }
           }
+          ActiveMenu::Heartbeats => {
+            match self.hb_menu.get_active_menu_item() {
+              UIMenuItem::Back => {
+                self.ui_menu.set_active_menu_item(UIMenuItem::Home);
+                self.ui_menu.active_menu_item = MenuItem::Home;
+                self.active_menu = ActiveMenu::MainMenu;
+              }
+              _ => ()
+            }
+          }
           ActiveMenu::RBMenu => {
             match self.rb_menu.get_active_menu_item() {
               UIMenuItem::Back => {
@@ -1064,8 +1067,16 @@ impl<'a> TabbedInterface<'a> {
               UIMenuItem::Paddles => {
                 self.active_menu = ActiveMenu::Paddles;
               }
+              UIMenuItem::Heartbeats => {
+                self.active_menu = ActiveMenu::Heartbeats;
+              }
               UIMenuItem::Commands => {
+                self.cmd_tab.send_command(); 
                 //self.active_menu = ActiveMenu::Paddles;
+              }
+              UIMenuItem::Settings => {
+                self.settings_tab.ctl_active       = true;
+                self.settings_tab.colortheme_popup = true;
               }
               UIMenuItem::Quit => {
                 info!("Feeling a desire of the user to quit this application...");
@@ -1078,6 +1089,8 @@ impl<'a> TabbedInterface<'a> {
         }
       }
       KeyCode::Right => {
+        tab_changed = true;
+        self.settings_tab.ctl_active = false;
         match self.active_menu {
           ActiveMenu::MainMenu => {
             self.ui_menu.next();
@@ -1109,6 +1122,21 @@ impl<'a> TabbedInterface<'a> {
           ActiveMenu::Paddles => {
             self.pd_tab.menu.next();
           }
+          ActiveMenu::Heartbeats => {
+            self.hb_menu.next();
+            match self.hb_menu.get_active_menu_item() {
+              UIMenuItem::EventBuilderHB => {
+                self.hb_tab.view = HeartBeatView::EventBuilder; 
+              }
+              UIMenuItem::TriggerHB => {
+                self.hb_tab.view = HeartBeatView::MTB; 
+              }
+              UIMenuItem::DataSenderHB => {
+                self.hb_tab.view = HeartBeatView::DataSink; 
+              }
+              _ => ()
+            }
+          }
           //ActiveMenu::Trigger => {
           //  self.mt_menu.next();
           //}
@@ -1122,6 +1150,8 @@ impl<'a> TabbedInterface<'a> {
         }
       }
       KeyCode::Left => {
+        tab_changed = true;
+        self.settings_tab.ctl_active = false;
         match self.active_menu {
           ActiveMenu::MainMenu => {
             self.ui_menu.prev();
@@ -1161,6 +1191,24 @@ impl<'a> TabbedInterface<'a> {
           }
           ActiveMenu::Monitoring => {
             self.mo_menu.prev();
+          }
+          ActiveMenu::Heartbeats => {
+            self.hb_menu.prev();
+            match self.hb_menu.get_active_menu_item() {
+              UIMenuItem::Back => {
+                self.hb_tab.view = HeartBeatView::EventBuilder; 
+              }
+              UIMenuItem::EventBuilderHB => {
+                self.hb_tab.view = HeartBeatView::EventBuilder; 
+              }
+              UIMenuItem::TriggerHB => {
+                self.hb_tab.view = HeartBeatView::MTB; 
+              }
+              UIMenuItem::DataSenderHB => {
+                self.hb_tab.view = HeartBeatView::DataSink; 
+              }
+              _ => ()
+            }
           }
           _ => ()
         }
@@ -1227,200 +1275,16 @@ impl<'a> TabbedInterface<'a> {
         self.settings_tab.ctl_active = false;
       }
     }
-    //match self.ui_menu.active_menu_item {
-    //  // if we are in the RBTab, 
-    //  // route input accordingly
-    //  MenuItem::Settings   => {
-    //    match key_code {
-    //      KeyCode::Char('h') => self.ui_menu.active_menu_item = MenuItem::Home,
-    //      KeyCode::Char('a') => {
-    //        self.settings_tab.ctl_active = true;
-    //        self.settings_tab.ctl_state.select(Some(0));
-    //      }
-    //      KeyCode::Up  => {
-    //        if self.settings_tab.ctl_active {
-    //          self.settings_tab.previous_ct();
-    //          match self.settings_tab.get_colorset() {
-    //            None => info!("Did not get a new colorset!"),
-    //            Some(cs) => {
-    //              self.update_color_theme(cs);
-    //            }
-    //          }
-    //        }
-    //      },
-    //      KeyCode::Down => {
-    //        if self.settings_tab.ctl_active {
-    //          self.settings_tab.next_ct();
-    //          match self.settings_tab.get_colorset() {
-    //            None => info!("Did not get a new colorset!"),
-    //            Some(cs) => {
-    //              self.update_color_theme(cs);
-    //            }
-    //          }
-    //        }
-    //      },
-    //      KeyCode::Char('q') => {
-    //        self.quit_request = true;
-    //        //return true; // we want to quit
-    //                     // the app
-    //      },
-    //      _ => (),
-    //    }
-    //  },
-    //  MenuItem::ReadoutBoards => {
-    //    self.settings_tab.ctl_active = false;
-
-    //    match key_code {
-    //      KeyCode::Right => {
-    //        if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-    //          self.wf_tab.list_focus = RBLTBListFocus::LTBList;
-    //        }
-    //      },
-    //      KeyCode::Left => {
-    //        if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-    //          self.wf_tab.list_focus = RBLTBListFocus::RBList;
-    //        }
-    //      },
-    //      KeyCode::Up  => {
-    //        if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-    //          match self.wf_tab.list_focus {
-    //            RBLTBListFocus::RBList => {
-    //              self.wf_tab.previous_rb();
-    //            },
-    //            RBLTBListFocus::LTBList => {
-    //              self.wf_tab.previous_ltb();    
-    //            }
-    //          }
-    //        }
-    //      },
-    //      KeyCode::Down => {
-    //        if self.rb_menu.active_menu_item == RBMenuItem::SelectRB {
-    //          match self.wf_tab.list_focus {
-    //            RBLTBListFocus::RBList => {
-    //              self.wf_tab.next_rb();
-    //            },
-    //            RBLTBListFocus::LTBList => {
-    //              self.wf_tab.next_ltb();    
-    //            }
-    //          }
-    //        }
-    //      },
-    //      KeyCode::Char('h') => {
-    //        self.ui_menu.active_menu_item = MenuItem::Home;
-    //        self.rb_menu.active_menu_item = RBMenuItem::Home;
-    //      },
-    //      KeyCode::Char('i') => {
-    //        if self.wf_tab.view == RBTabView::PAMoniData {
-    //          self.pa_menu.active_menu_item = PAMoniMenuItem::Biases;
-    //          self.wf_tab.pa_show_biases = true;
-    //        } else {
-    //          self.rb_menu.active_menu_item = RBMenuItem::Info;
-    //          self.wf_tab.view = RBTabView::Info;
-    //        }
-    //      },
-    //      KeyCode::Char('w') => {
-    //        self.rb_menu.active_menu_item = RBMenuItem::Waveforms;
-    //        self.wf_tab.view = RBTabView::Waveform;
-    //      },
-    //      KeyCode::Char('r') => {
-    //        self.rb_menu.active_menu_item = RBMenuItem::RBMoniData;
-    //        self.wf_tab.view = RBTabView::RBMoniData;
-    //      },
-    //      KeyCode::Char('p') => {
-    //        self.rb_menu.active_menu_item = RBMenuItem::PAMoniData;
-    //        self.wf_tab.view = RBTabView::PAMoniData;
-    //      },
-    //      KeyCode::Char('b') => {
-    //        if self.wf_tab.view == RBTabView::PAMoniData {
-    //          self.pa_menu.active_menu_item = PAMoniMenuItem::Back;
-    //          self.wf_tab.view = RBTabView::Info;
-    //        } else {
-    //          self.rb_menu.active_menu_item = RBMenuItem::PBMoniData;
-    //          self.wf_tab.view = RBTabView::PBMoniData;
-    //        }
-    //      },
-    //      KeyCode::Char('l') => {
-    //        self.rb_menu.active_menu_item = RBMenuItem::LTBMoniData;
-    //        self.wf_tab.view = RBTabView::LTBMoniData;
-    //      },
-    //      KeyCode::Char('s') => {
-    //        self.rb_menu.active_menu_item = RBMenuItem::SelectRB;
-    //        self.wf_tab.view = RBTabView::SelectRB;
-    //      },
-    //      KeyCode::Char('t') => {
-    //        if self.wf_tab.view == RBTabView::PAMoniData {
-    //          self.pa_menu.active_menu_item = PAMoniMenuItem::Temperatures;
-    //          self.wf_tab.pa_show_biases = false;
-    //        }
-    //      }
-    //      KeyCode::Char('q') => {
-    //        self.quit_request = true;
-    //        //return true; // we want to quit the app
-    //      },
-    //      _ => ()
-    //    }
-    //  },
-    //  MenuItem::TofHits => {
-    //    match key_code {
-    //      KeyCode::Char('h') => {
-    //        self.ui_menu.active_menu_item = MenuItem::Home;
-    //        self.th_menu.active_menu_item = THMenuItem::Home;
-    //        self.th_tab.view = TofHitView::Pulses;
-    //      }
-    //      KeyCode::Char('i') => {
-    //        self.th_menu.active_menu_item = THMenuItem::Hits;
-    //        self.th_tab.view = TofHitView::Hits;
-    //      }
-    //      KeyCode::Char('p') => {
-    //        self.th_menu.active_menu_item = THMenuItem::Pulses;
-    //        self.th_tab.view = TofHitView::Pulses;
-    //      }
-    //      KeyCode::Char('a') => {
-    //        self.th_menu.active_menu_item = THMenuItem::Paddles;
-    //        self.th_tab.view = TofHitView::Paddles;
-    //      }
-    //      KeyCode::Char('s') => {
-    //        self.th_menu.active_menu_item = THMenuItem::SelectPaddle;
-    //        self.th_tab.view = TofHitView::SelectPaddle;
-    //      }
-    //      KeyCode::Char('q') => {
-    //        self.quit_request = true;
-    //        //return true; // we want to quit the app
-    //      }
-    //      _ => ()
-    //    }
-    //  }
-    //  _ => {
-    //    self.settings_tab.ctl_active = false;
-    //    match key_code {
-    //      // it seems we have to carry thos allong for every tab
-    //      KeyCode::Char('h') => self.ui_menu.active_menu_item = MenuItem::Home,
-    //      KeyCode::Char('t') => self.ui_menu.active_menu_item = MenuItem::TofEvents,
-    //      KeyCode::Char('r') => self.ui_menu.active_menu_item = MenuItem::ReadoutBoards,
-    //      KeyCode::Char('y') => self.ui_menu.active_menu_item = MenuItem::TofSummary,
-    //      KeyCode::Char('w') => self.ui_menu.active_menu_item = MenuItem::RBWaveform,
-    //      KeyCode::Char('f') => self.ui_menu.active_menu_item = MenuItem::TofHits,
-    //      KeyCode::Char('e') => self.ui_menu.active_menu_item = MenuItem::Telemetry,
-    //      KeyCode::Char('s') => self.ui_menu.active_menu_item = MenuItem::Settings,
-    //      KeyCode::Char('m') => self.ui_menu.active_menu_item = MenuItem::MasterTrigger,
-    //      KeyCode::Char('c') => self.ui_menu.active_menu_item = MenuItem::TOFCpu,
-    //      KeyCode::Char('q') => {
-    //        self.quit_request = true;
-    //        //return true; // trigger exit
-    //      },
-    //      _ => trace!("Some other key pressed!"),
-    //    }
-    //  }
-    //} // end match ui_menu
     info!("Returning false");
-    false // if we arrive here, we don't
-          // want to exit the app
+    (false, tab_changed) // if we arrive here, we don't
+                        // want to exit the app
   }
 }
 
 fn main () -> Result<(), Box<dyn std::error::Error>>{
   
   let args = Args::parse();                   
+  let allow_commands = args.allow_commands;
 
   let home_stream_wd_cnt : Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
   let home_streamer      = home_stream_wd_cnt.clone();
@@ -1438,7 +1302,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
       Err(err) => error!("Unable to load calibration for {}! {}", rb, err),
       Ok(_) => {
         match rbcalibrations.lock() {
-          Err(err)  => error!("Unable to lock rbcalibrations mutex!"),
+          Err(_err)  => error!("Unable to lock rbcalibrations mutex!"),
           Ok(mut rbcal) => {
             rbcal.insert(rb.rb_id as u8, rb.calibration.clone()); 
           }
@@ -1458,6 +1322,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   pm.insert(String::from("RBEvent"          ) ,0); 
   pm.insert(String::from("TofEvent"         ) ,0); 
   pm.insert(String::from("HeartBeatDataSink") ,0); 
+  pm.insert(String::from("MTBHeartbeat"     ) ,0); 
+  pm.insert(String::from("EVTBLDRHeartbeat" ) ,0); 
   pm.insert(String::from("MasterTrigger"    ) ,0);
   pm.insert(String::from("RBEventHeader"    ) ,0);
   pm.insert(String::from("CPUMoniData"      ) ,0); 
@@ -1469,6 +1335,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   pm.insert(String::from("RBEventMemoryView") ,0); 
   pm.insert(String::from("RBCalibration"    ) ,0); 
   pm.insert(String::from("TofCommand"       ) ,0); 
+  pm.insert(String::from("TofResponse"      ) ,0); 
   pm.insert(String::from("RBCommand"        ) ,0); 
   pm.insert(String::from("MultiPacket"      ) ,0); 
   pm.insert(String::from("RBPing"           ) ,0); 
@@ -1487,6 +1354,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (ev_pack_send, ev_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (cp_pack_send, cp_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (rbwf_pack_send, rbwf_pack_recv)  : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
+  let (tr_pack_send, tr_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   #[cfg(feature = "telemetry")]
   let (te_pack_send,  te_pack_recv)     : (Sender<TelemetryPacket>, Receiver<TelemetryPacket>) = unbounded();
 
@@ -1495,8 +1363,11 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (rbe_send, rbe_recv)         : (Sender<RBEvent>, Receiver<RBEvent>)                       = unbounded();
   let (th_send, th_recv)           : (Sender<TofHit>, Receiver<TofHit>)                         = unbounded();
   let (ts_send, ts_recv)           : (Sender<TofEventSummary>, Receiver<TofEventSummary>)       = unbounded();
-  let (tr_send, tr_recv)           : (Sender<TofResponse>, Receiver<TofResponse>)               = unbounded();
   let (te_send, te_recv)           : (Sender<TofEvent>, Receiver<TofEvent>)                     = unbounded();
+
+  // send tof packets containing heartbeats
+  let (hb_pack_send, hb_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
+  
 
   // depending on the switch in the 
   // commandline args, we either 
@@ -1543,9 +1414,11 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                          rb_pack_send,
                          ev_pack_send,
                          cp_pack_send,
+                         tr_pack_send,
                          rbwf_pack_send,
                          ts_send,
                          th_sender_c,
+                         hb_pack_send,
                          home_stream_wd_cnt,
                          packet_map,
                          );
@@ -1631,7 +1504,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let pa_menu         = PAMoniMenu::new(color_theme.clone());
   let te_menu         = EventMenu::new(color_theme.clone());
   let mo_menu         = MoniMenu::new(color_theme.clone());
-
+  let hb_menu         = HBMenu::new(color_theme.clone());
   // The tabs
   let mt_tab          = MTTab::new(mt_pack_recv,
                                    mte_recv,
@@ -1666,8 +1539,10 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   
   
   }
-  let cmd_tab         = CommandTab::new(tr_recv, color_theme.clone());
+  let cmd_sender_addr = String::from("tcp://192.168.37.5:42000");
+  let cmd_tab         = CommandTab::new(tr_pack_recv, cmd_sender_addr, color_theme.clone(), allow_commands);
   let pd_tab          = PaddleTab::new(te_recv, paddle_map, rbcalibrations, color_theme.clone());
+  let hb_tab          = HeartBeatTab::new(hb_pack_recv, color_theme.clone());
   let active_menu     = ActiveMenu::MainMenu;
   let tabs            = TabbedInterface::new(ui_menu,
                                              rb_menu,
@@ -1679,6 +1554,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                              pa_menu,
                                              te_menu,
                                              mo_menu,
+                                             hb_menu,
                                              active_menu,
                                              mt_tab,
                                              cpu_tab,
@@ -1691,6 +1567,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                              ts_tab,
                                              te_tab,
                                              cmd_tab,
+                                             hb_tab,
                                              pd_tab);
 
   let shared_tabs : Arc<Mutex<TabbedInterface>> = Arc::new(Mutex::new(tabs));
@@ -1721,10 +1598,15 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               Err(err) => error!("Unable to get lock on shared tabbed interface! {err}"),
               Ok(mut tabs) => {
                 //tabs.receive_packet();
-                if tabs.digest_input(ev.code) {
-                  quit_app = true;
-                  // true means end program
+                let (want_quit, tab_changed) = tabs.digest_input(ev.code);
+                quit_app = want_quit;
+                if tab_changed {
+                  let _ = terminal.clear();
                 }
+                //if want_quit {
+                //  quit_app = true;
+                //  // true means end program
+                //}
                 let cs = tabs.get_colorset();
                 color_theme.update(&cs);
               }
@@ -1737,10 +1619,10 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               Ok(mut tabs) => {
                 match terminal.draw(|frame| {
                   let size           = frame.size();
-                  let mut mster_lo   = MasterLayout::new(size); 
+                  let mut main_lo    = MasterLayout::new(size); 
                   let w_logs         = render_logs(color_theme.clone());
-                  frame.render_widget(w_logs, mster_lo.rect[2]);
-                  tabs.render(&mut mster_lo, frame);
+                  frame.render_widget(w_logs, main_lo.rect[2]);
+                  tabs.render(&mut main_lo, frame);
                 }) {
                   Err(err) => error!("Can't render terminal! {err}"),
                   Ok(_)    => () ,

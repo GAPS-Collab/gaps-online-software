@@ -152,6 +152,7 @@ impl MergedEvent {
       raw_data       : Vec::<u8>::new(),
       flags0         : 0,
       flags1         : 1,
+    
     }
   }
 
@@ -162,14 +163,10 @@ impl MergedEvent {
     let _version      = parse_u8(stream, pos);
     //println!("_version {}", _version);
     me.flags0         = parse_u8(stream, pos);
-    //println!("flags0 {}", me.flags0);
-    me.flags1         = parse_u8(stream, pos);
-    //println!("flags1 {}", me.flags1);
-    //let a = parse_u8(stream, pos);
-    //let b = parse_u8(stream, pos);
-    //let c = parse_u8(stream, pos);
-    //let d = parse_u8(stream, pos);
-    //println!("a,b,c,d {} {} {} {}", a,b,c,d);
+    // skip a bunch of Alex newly implemented things
+    // FIXME
+    *pos += 8;
+
     me.event_id       = parse_u32(stream, pos);
     //println!("EVENT ID {}", me.event_id);
     let _tof_delim    = parse_u8(stream, pos);
@@ -184,6 +181,7 @@ impl MergedEvent {
       me.tof_data.push(parse_u8(stream, pos));
     }
     let trk_delim    = parse_u8(stream, pos);
+
     //println!("TRK delim {}", trk_delim);
     if trk_delim != 0xbb {
       return Err(SerializationError::HeadInvalid);

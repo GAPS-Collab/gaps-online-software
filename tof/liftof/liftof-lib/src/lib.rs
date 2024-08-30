@@ -2,6 +2,7 @@ pub mod master_trigger;
 pub mod settings;
 pub mod constants;
 pub mod thread_control;
+pub mod sine_fitter;
 
 use constants::{
     DEFAULT_CALIB_VOLTAGE,
@@ -28,6 +29,8 @@ use std::sync::{
 };
 use std::process::exit;
 
+use core::f32::consts::PI;
+
 #[cfg(feature="database")]
 use half::f16;
 
@@ -44,9 +47,7 @@ pub use settings::{
 use std::error::Error;
 use std::fmt;
 
-use std::{
-    fs::File,
-};
+use std::fs::File;
 use std::path::PathBuf;
 use std::fs::read_to_string;
 use std::io::{
@@ -78,6 +79,9 @@ use signal_hook::consts::signal::{
 };
 //use ndarray::{array, Array1};
 //use nlopt::{Algorithm, Objective, Optimization, Result};
+use nalgebra::Matrix3;
+use nalgebra::Vector3;
+use nalgebra::RowVector3;
 
 use tof_dataclasses::DsiLtbRBMapping;
 #[cfg(feature="database")]
@@ -145,6 +149,7 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
        \\/__/         \\/__/       \\/__/           \\/__/       \\/__/         \\/__/    
 
           (LIFTOF - liftof is for tof, Version 0.10 'LELEWAA', Mar 2024)
+          >> with support from the Hawaiian islands \u{1f30a}\u{1f308}\u{1f965}\u{1f334}
 
           * Documentation
           ==> GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/LELEWAA-0.10
@@ -184,6 +189,32 @@ pub fn check_liftof_rb_status() {
 }
 
 
+/// Routine to end the liftof-cc program, finish up with current run 
+/// and clean up
+///
+/// FIXME - maybe this should go to liftof-cc
+pub fn end_liftof_cc(thread_control     : Arc<Mutex<ThreadControl>>) {
+  match thread_control.try_lock() {
+    Ok(mut tc) => {
+      //println!("== ==> [signal_handler] acquired thread_control lock!");
+      //println!("Tread control {:?}", tc);
+      if !tc.thread_cmd_dispatch_active 
+      && !tc.thread_data_sink_active
+      && !tc.thread_event_bldr_active 
+      && !tc.thread_master_trg_active  {
+        println!(">> So long and thanks for all the \u{1F41F} <<"); 
+        exit(0);
+      }
+      tc.stop_flag = true;
+      println!("== ==> [signal_handler] Stop flag is set, we are waiting for threads to finish...");
+      //println!("{}", tc);
+    }
+    Err(err) => {
+      error!("Can't acquire lock for ThreadControl! {err}");
+    }
+  }
+}
+
 /// Handle incoming POSIX signals
 pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
   let sleep_time = Duration::from_millis(300);
@@ -194,6 +225,11 @@ pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
     thread::sleep(sleep_time);
     match thread_control.try_lock() {
       Ok(mut tc) => {
+        if !tc.thread_signal_hdlr_active {
+          //end myself
+          info!("Shutting down siganl handler thread!");
+          break;
+        }
         //println!("== ==> [signal_handler] acquired thread_control lock!");
         //println!("Tread control {:?}", tc);
         if !tc.thread_cmd_dispatch_active 
@@ -352,51 +388,86 @@ impl fmt::Display for RunStatistics {
   }
 }
 
-//fn sine_to_fit(amp : f32, freq : f32, phase : f32, time : &Vec<f32>, ys : &mut Vec<f32>) {
-//  //let ys = Vec::<f32>::with_capacity(time.len());
-//  for k in 0..time.len() {
-//    ys[k] = amp * (freq * time[k] + phase).sin(); 
-//  }
-//}
-//
-//fn cost_function(amp : f32, freq : f32, phase : f32, time : &Vec<f32>, volts : &Vec<f32>) -> f32 {
-//  //let 
-//  //let fitted_values = amplitude * (2.0 * std::f32::consts::PI * frequency * time + phase).sin();
-//  let fit_volts = Vec::<f32>::with_capacity(time.len());
-//  sine_to_fit(amp, freq, phase, &time, &mut fit_volts);
-//  let mut chi_square = 0f32;
-//  for k in 0..fit_volts.len() {
-//    chi_square += (volts[k] - fit_volts[k]).powi(2);
-//    // FIXME - error
-//  }
-//  chi_square
-//}
+//sydney's sine fit without libraries
+fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> (f32, f32, f32) {
+  let start_bin = 20;
+  let size_bin = 900;
+  let pi = PI;
+  let mut data_size = 0;
 
+  let mut xi_yi = 0.0;
+  let mut xi_zi = 0.0;
+  let mut yi_zi = 0.0;
+  let mut xi_xi = 0.0;
+  let mut yi_yi = 0.0;
+  let mut xi_sum = 0.0;
+  let mut yi_sum = 0.0;
+  let mut zi_sum = 0.0;
 
-/// FIXME - proper fitting algorithm
-/// This here is bad, because it does not interpolate between 
-/// the bins
-#[cfg(feature="database")]
-fn fit_sine(time: &Vec<f32>, data: &Vec<f32>) -> (f32, f32, f32) {
-  let z_cross   = find_zero_crossings(&data);
-  let mut y_max = f32::MIN;
-  let mut y_min = f32::MAX;
-  for y in data {
-    if *y > y_max {
-      y_max = *y;
-    }
-    if *y < y_min {
-      y_min = *y;
-    }
+  for i in start_bin..(start_bin + size_bin) {
+      let xi = (2.0 * pi * 0.02 * times[i]).cos();
+      let yi = (2.0 * pi * 0.02 * times[i]).sin();
+      let zi = volts[i];
+
+      xi_yi += xi * yi;
+      xi_zi += xi * zi;
+      yi_zi += yi * zi;
+      xi_xi += xi * xi;
+      yi_yi += yi * yi;
+      xi_sum += xi;
+      yi_sum += yi;
+      zi_sum += zi;
+
+      data_size += 1;
   }
-  let amp   = f32::abs(y_max - y_min)/2.0;
-  let mut phase = 0.0;
-  let mut freq  = 0.0;
-  if z_cross.len() >= 3 {
-    phase = time[z_cross[0]];
-    freq  = 1.0/(time[z_cross[2]] - time[z_cross[0]]);
+
+  let mut a_matrix = [[0.0; 3]; 3];
+  a_matrix[0][0] = xi_xi;
+  a_matrix[0][1] = xi_yi;
+  a_matrix[0][2] = xi_sum;
+  a_matrix[1][0] = xi_yi;
+  a_matrix[1][1] = yi_yi;
+  a_matrix[1][2] = yi_sum;
+  a_matrix[2][0] = xi_sum;
+  a_matrix[2][1] = yi_sum;
+  a_matrix[2][2] = data_size as f32;
+
+  let determinant = a_matrix[0][0] * a_matrix[1][1] * a_matrix[2][2]
+      + a_matrix[0][1] * a_matrix[1][2] * a_matrix[2][0]
+      + a_matrix[0][2] * a_matrix[1][0] * a_matrix[2][1]
+      - a_matrix[0][0] * a_matrix[1][2] * a_matrix[2][1]
+      - a_matrix[0][1] * a_matrix[1][0] * a_matrix[2][2]
+      - a_matrix[0][2] * a_matrix[1][1] * a_matrix[2][0];
+
+  let inverse_factor = 1.0 / determinant;
+
+  let mut cofactor_matrix = [[0.0; 3]; 3];
+  cofactor_matrix[0][0] = a_matrix[1][1] * a_matrix[2][2] - a_matrix[2][1] * a_matrix[1][2];
+  cofactor_matrix[0][1] = (a_matrix[1][0] * a_matrix[2][2] - a_matrix[2][0] * a_matrix[1][2]) * -1.0;
+  cofactor_matrix[0][2] = a_matrix[1][0] * a_matrix[2][1] - a_matrix[2][0] * a_matrix[1][1];
+  cofactor_matrix[1][0] = (a_matrix[0][1] * a_matrix[2][2] - a_matrix[2][1] * a_matrix[0][2]) * -1.0;
+  cofactor_matrix[1][1] = a_matrix[0][0] * a_matrix[2][2] - a_matrix[2][0] * a_matrix[0][2];
+  cofactor_matrix[1][2] = (a_matrix[0][0] * a_matrix[2][1] - a_matrix[2][0] * a_matrix[0][1]) * -1.0;
+  cofactor_matrix[2][0] = a_matrix[0][1] * a_matrix[1][2] - a_matrix[1][1] * a_matrix[0][2];
+  cofactor_matrix[2][1] = (a_matrix[0][0] * a_matrix[1][2] - a_matrix[1][0] * a_matrix[0][2]) * -1.0;
+  cofactor_matrix[2][2] = a_matrix[0][0] * a_matrix[1][1] - a_matrix[1][0] * a_matrix[0][1];
+
+  let mut inverse_matrix = [[0.0; 3]; 3];
+  for i in 0..3 {
+      for j in 0..3 {
+          inverse_matrix[i][j] = cofactor_matrix[j][i] * inverse_factor;
+      }
   }
-  (amp,freq,phase)
+
+  let p = [xi_zi, yi_zi, zi_sum];
+  let a = inverse_matrix[0][0] * p[0] + inverse_matrix[1][0] * p[1] + inverse_matrix[2][0] * p[2];
+  let b = inverse_matrix[0][1] * p[0] + inverse_matrix[1][1] * p[1] + inverse_matrix[2][1] * p[2];
+
+  let phi    = a.atan2(b);
+  let amp    = (a*a + b*b).sqrt();
+  let freq   = 0.02 as f32;
+
+  (amp, freq, phi)
 }
 
 //*************************************************
@@ -412,10 +483,6 @@ pub fn read_value_from_file(file_path: &str) -> io::Result<u32> {
   })?;
   Ok(value)
 }
-
-
-
-
 
 /**************************************************/
 
@@ -503,8 +570,12 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     rb.calibration.nanoseconds(9,
                                event.header.stop_cell as usize,
                                &mut times);
-    fit_result = fit_sine(&times, &voltages);
+    let fit_result_amp      = fit_sine_sydney(&voltages,  &times).0; 
+    let fit_result_freq     = fit_sine_sydney(&voltages, &times).1;
+    let fit_result_phi      = fit_sine_sydney(&voltages, &times).2;
+
     //println!("FIT RESULT = {:?}", fit_result);
+    fit_result = (fit_result_amp, fit_result_freq, fit_result_phi);
     event.header.set_sine_fit(fit_result);
   }
 

@@ -56,6 +56,7 @@ use tof_dataclasses::ipbus::{
 
 use crate::thread_control::ThreadControl;
 use tof_dataclasses::heartbeats::MTBHeartbeat;
+use tof_dataclasses::serialization::Packable;
 /// The DAQ packet from the MTB has a flexible size, but it will
 /// be at least this number of words long.
 const MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = 11; 
@@ -115,6 +116,7 @@ pub struct MTBSettings {
   pub rb_int_window      : u8,
   pub tiu_emulation_mode : bool,
   pub tofbot_webhook     : String,
+  pub hb_send_interval   : u8,
 }
 
 impl MTBSettings {
@@ -130,6 +132,7 @@ impl MTBSettings {
       rb_int_window           : 1,
       tiu_emulation_mode      : false,
       tofbot_webhook          : String::from(""),
+      hb_send_interval        : 30,
     }
   }
 }
@@ -245,14 +248,29 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
   if data.len() < 4 {
     return Err(MasterTriggerError::BrokenPackage);
   }
+  let tiu_link_bad   = TIU_BAD.get(bus)?;
+  let tiu_busy_len   = TIU_BUSY_LENGTH.get(bus)?;
+  let tiu_aux_link   = (TIU_USE_AUX_LINK.get(bus)? != 0) as u8;
+  let tiu_emu_mode   = (TIU_EMULATION_MODE.get(bus)? != 0) as u8;
+  //let tiu_bad        = TIU_BAD.get(bus)? as u8;
+  let tiu_busy_stuck = (TIU_BUSY_STUCK.get(bus)? != 0) as u8;
+  let tiu_busy_ign   = (TIU_BUSY_IGNORE.get(bus)? != 0) as u8;
+  let mut tiu_status = 0u8;
+  println! ("tiu status {}", tiu_status);
+  tiu_status         = tiu_status | (tiu_emu_mode);
+  tiu_status         = tiu_status | (tiu_aux_link << 1);
+  tiu_status         = tiu_status | ((tiu_link_bad as u8) << 2);
+  tiu_status         = tiu_status | (tiu_busy_stuck << 3);
+  tiu_status         = tiu_status | (tiu_busy_ign << 4);
+  println! ("tiu status {}", tiu_status);
+  let daq_queue_len  = EVQ_NUM_EVENTS.get(bus)? as u16;
+  moni.tiu_status    = tiu_status;
+  moni.tiu_busy_len  = tiu_busy_len;
+  moni.daq_queue_len = daq_queue_len;
   // sensors are 12 bit
   let first_word   = 0x00000fff;
   let second_word  = 0x0fff0000;
   //println!("[get_mtbmonidata] => Received data from registers {:?} data", data);
-  moni.calibration = ( data[0] & first_word  ) as u16;
-  moni.vccpint     = ((data[0] & second_word ) >> 16) as u16;  
-  moni.vccpaux     = ( data[1] & first_word  ) as u16;  
-  moni.vccoddr     = ((data[1] & second_word ) >> 16) as u16;  
   moni.temp        = ( data[2] & first_word  ) as u16;  
   moni.vccint      = ((data[2] & second_word ) >> 16) as u16;  
   moni.vccaux      = ( data[3] & first_word  ) as u16;  
@@ -340,6 +358,15 @@ pub fn master_trigger(mt_address     : String,
       }
     }
   }
+  
+  //match TIU_USE_AUX_LINK.set(&mut bus, 1) {
+  //  Err(err) => {
+  //    error!("Unable to use TIU AUX link! {err}");
+  //  }
+  //  Ok(_) => {
+  //    println!("==> Using TIU AUX link!");
+  //  }
+  //}
 
   info!("Settting rb integration window!");
   let int_wind = settings.rb_int_window;
@@ -403,6 +430,16 @@ pub fn master_trigger(mt_address     : String,
         Ok(_)    => ()
       }
       match set_gaps_trigger(&mut bus, settings.gaps_trigger_use_beta) {
+        Err(err) => error!("Unable to set the GAPS trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
+    TriggerType::Gaps633    => {
+      match unset_all_triggers(&mut bus) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_gaps633_trigger(&mut bus, settings.gaps_trigger_use_beta) {
         Err(err) => error!("Unable to set the GAPS trigger! {err}"),
         Ok(_)    => ()
       }
@@ -472,11 +509,13 @@ pub fn master_trigger(mt_address     : String,
     //}
     _ => {
       error!("Trigger type {} not covered!", settings.trigger_type);
-      println!("== ==> Not setting any trigger condition. You can set it through pico_hal.py");
+      println!("= => Not setting any trigger condition. You can set it through pico_hal.py");
       warn!("Trigger condition undefined! Not setting anything!");
       error!("Trigger conditions unknown!");
     }
   }
+
+  //TIU_BUSY_IGNORE.set(&mut bus, 1);
 
   // reset the DAQ event queue before start
   match reset_daq(&mut bus) {//, &mt_address) {
@@ -489,41 +528,48 @@ pub fn master_trigger(mt_address     : String,
   // timers - when to reconnect if no 
   // events have been received in a 
   // certain timeinterval
-  let mut mtb_timeout    = Instant::now();
-  let mut moni_interval  = Instant::now();
-  let mut tc_timer       = Instant::now();
-  let mtb_timeout_sec    = settings.mtb_timeout_sec;
-  let mtb_moni_interval  = settings.mtb_moni_interval;
+  let mut heartbeat      = MTBHeartbeat::new();
+  let mut mtb_timeout         = Instant::now();
+  let mut moni_interval       = Instant::now();
+  let mut tc_timer            = Instant::now();
+  let mtb_timeout_sec             = settings.mtb_timeout_sec;
+  let mtb_moni_interval           = settings.mtb_moni_interval;
   // verbose, debugging
-  let mut last_event_id  = 0u32;
-  let mut n_events       = 0u64;
+  let mut last_event_id           = 0u32;
+  //let mut n_events                   = 0u64;
   //let mut rate_from_reg  : Option<u32> = None;
-  let mut verbose_timer  = Instant::now();
-  let mut total_elapsed  = 0f64;
-  let mut n_ev_unsent    = 0u64;
-  let mut n_ev_missed    = 0u64;
-  let mut first          = true;
-  let mut slack_cadence  = 5; // send only one slack message 
+  let mut verbose_timer       = Instant::now();
+  //let mut total_elapsed              = 0f64;
+  //let mut n_ev_unsent                = 0u64;
+  //let mut n_ev_missed                = 0u64;
+  let mut first                  = true;
+  let mut slack_cadence           = 5; // send only one slack message 
                               // every 5 times we send moni data
-  let mut evq_num_events      = 0u64;
-  let mut evq_num_events_last = 0u32;
-  let mut evq_num_events_avg  = 0f64;
-  let mut n_iter_loop         = 0u64;
-
+  let mut evq_num_events          = 0u64;
+  let mut evq_num_events_last     = 0u32;
+  //let mut evq_num_events_avg         = 0f64;
+  let mut n_iter_loop             = 0u64;
+  let mut hb_timer            = Instant::now();
+  let mut hb_interval        = Duration::from_secs(settings.hb_send_interval as u64);
   // indicator if the thread is active (it can 
   // sleep during calibrations)
-  let mut is_active = true;
+  let mut is_active              = true;
   loop {
     // Check thread control and what to do
     if tc_timer.elapsed().as_secs_f32() > 1.5 {
       match thread_control.try_lock() {
-        Ok(tc) => {
-          if tc.thread_master_trg_active {
+        Ok(mut tc) => {
+          if tc.thread_master_trg_active || tc.stop_flag {
             // if the thread is not supposed to be active, 
             // idle
             is_active = true;
-          } else {
+          }
+          if !tc.thread_master_trg_active {
             is_active = false;
+          }
+          if tc.stop_flag {
+            tc.thread_master_trg_active = false;
+            break;
           }
         },
         Err(err) => {
@@ -532,16 +578,13 @@ pub fn master_trigger(mt_address     : String,
       }
       tc_timer = Instant::now();
     }
-    if !is_active {
-      continue;
-    }
     // This is a recovery mechanism. In case we don't see an event
     // for mtb_timeout_sec, we attempt to reconnect to the MTB
     if mtb_timeout.elapsed().as_secs() > mtb_timeout_sec {
       if mtb_timeout.elapsed().as_secs() > mtb_timeout_sec {
-        println!("==> [master_trigger] reconnection timer elapsed");
+        println!("= => [master_trigger] reconnection timer elapsed");
       } else {
-        println!("==> [master_trigger] reconnection requested");
+        println!("= => [master_trigger] reconnection requested");
       }
       match IPBus::new(mt_address.clone()) {
         Err(err) => {
@@ -575,7 +618,6 @@ pub fn master_trigger(mt_address     : String,
         first = false;
       }
       match get_mtbmonidata(&mut bus) { 
-                            //&mut buffer) {
         Err(err) => {
           error!("Can not get MtbMoniData! {err}");
         },
@@ -628,14 +670,16 @@ pub fn master_trigger(mt_address     : String,
             },
             Ok(_) => ()
           }
-          //if verbose {
-          //  println!("{}", _moni);
-          //  rate_from_reg = Some(_moni.rate as u32);
-          //}
         }
       }
       moni_interval = Instant::now();
     }
+    
+    // if we ar not active, don't get events
+    if !is_active {
+      continue;
+    }
+
     match get_event(&mut bus){ //,
       Err(err) => {
         match err {
@@ -661,7 +705,7 @@ pub fn master_trigger(mt_address     : String,
         if _ev.event_id > last_event_id + 1 {
           if last_event_id != 0 {
             error!("We skipped {} events!", _ev.event_id - last_event_id); 
-            n_ev_missed += (_ev.event_id - last_event_id) as u64;
+            heartbeat.n_ev_missed += (_ev.event_id - last_event_id) as u64;
             //event_id_test.push(_ev.event_id);
           }
         }
@@ -669,78 +713,75 @@ pub fn master_trigger(mt_address     : String,
         // we got an even successfully, so reset the 
         // connection timeout
         mtb_timeout = Instant::now();
-        n_events += 1;
+        heartbeat.n_events += 1;
         match mt_sender.send(_ev) {
           Err(err) => {
             error!("Can not send MasterTriggerEvent over channel! {err}");
-            n_ev_unsent += 1;
+            heartbeat.n_ev_unsent += 1;
           },
           Ok(_) => ()
         }
       }
     }
 
-    if verbose {
-      let verbose_timer_elapsed = verbose_timer.elapsed().as_secs_f64();
-      //let mut missing = 0usize;
-      //if event_id_test.len() > 0 {
-      //  let mut evid = event_id_test[0];
-      //  for _ in 0..event_id_test.len() {
-      //    if !event_id_test.contains(&evid) {
-      //      missing += 1;
-      //    }
-      //    evid += 1;
-      //  }
-      //}
-      //let evid_check_str = format!(">> ==> In a chunk of {} events, we missed {} ({}%) <<", event_id_test.len(), missing, 100.0*(missing as f64)/event_id_test.len() as f64);
-      //event_id_test.clear();
-      if verbose_timer_elapsed > 30.0 {
-        match EVQ_NUM_EVENTS.get(&mut bus) {
-          Err(err) => {
-            error!("Unable to query {}! {err}", EVQ_NUM_EVENTS);
-          }
-          Ok(num_ev) => {
-            evq_num_events_last = num_ev;
-            evq_num_events += num_ev as u64;
-            n_iter_loop    += 1;
-            evq_num_events_avg = evq_num_events as f64/n_iter_loop as f64;
-          }
+    let verbose_timer_elapsed = verbose_timer.elapsed().as_secs_f64();
+    //let mut missing = 0usize;
+    //if event_id_test.len() > 0 {
+    //  let mut evid = event_id_test[0];
+    //  for _ in 0..event_id_test.len() {
+    //    if !event_id_test.contains(&evid) {
+    //      missing += 1;
+    //    }
+    //    evid += 1;
+    //  }
+    //}
+    //let evid_check_str = format!(">> ==> In a chunk of {} events, we missed {} ({}%) <<", event_id_test.len(), missing, 100.0*(missing as f64)/event_id_test.len() as f64);
+    //event_id_test.clear();
+    if hb_timer.elapsed() >= hb_interval {
+      match EVQ_NUM_EVENTS.get(&mut bus) {
+        Err(err) => {
+          error!("Unable to query {}! {err}", EVQ_NUM_EVENTS);
         }
-        total_elapsed += verbose_timer_elapsed;
-        println!("  {:<60} <<", ">> == == == == == == ==  MT HEARTBEAT == ==  == == == == ==".bright_blue().bold());
-        println!("  {:<60} <<", format!(">> ==> MET (Mission Elapsed Time) (sec) {:.1}",total_elapsed).bright_blue());
-        println!("  {:<60} <<", format!(">> ==> Recorded Events                  {}", n_events).bright_blue());
-        println!("  {:<60} <<", format!(">> ==> Last MTB EVQ size                {}", evq_num_events_last).bright_blue());
-        println!("  {:<60} <<", format!(">> ==> Avg. MTB EVQ size (per 30s )     {:.2}", evq_num_events_avg).bright_blue());
-        println!("  {:<60} <<", format!(">> ==> -- trigger rate, recorded  (Hz)  {:.2}", n_events as f64/total_elapsed).bright_blue());
-        match TRIGGER_RATE.get(&mut bus) {
-          Ok(trate) => {
-            println!("  {:<60} <<", format!(">> ==> -- trigger rate, from reg. (Hz)  {}", trate).bright_blue());
-          }
-          Err(err) => {
-            error!("Unable to query {}! {err}", TRIGGER_RATE);
-            println!("  {:<60} <<", String::from(">> ==> -- trigger rate, from reg. (Hz)   N/A").bright_blue());
-          }
+        Ok(num_ev) => {
+          evq_num_events += num_ev as u64;
+          heartbeat.evq_num_events_last = num_ev as u64;
+          n_iter_loop    += 1;
+          heartbeat.evq_num_events_avg = (evq_num_events as u64)/(n_iter_loop as u64);
         }
-        match LOST_TRIGGER_RATE.get(&mut bus) {
-          Ok(trate) => {
-            println!("  {:<60} <<", format!(">> ==> -- lost trg rate, from reg. (Hz)   {}", trate).bright_blue());
-          }
-          Err(err) => {
-            error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
-            println!("  {:<60} <<", String::from(">> ==> -- lost trigger rate, from reg. (Hz)   N/A").bright_blue());
-          }
-        }
-        if n_ev_unsent > 0 {
-          println!("  {}{}{}", ">> ==> ".yellow().bold(),n_ev_unsent, " sent errors                       <<".yellow().bold());
-        }
-        if n_ev_missed > 0 {
-          println!("  {}{}{}", ">> ==> ".yellow().bold(),n_events, " missed events                       <<".yellow().bold());
-        }
-        println!("  {:<60} <<", ">> == == == == == == ==  END HEARTBEAT = ==  == == == == ==".bright_blue().bold());
-        verbose_timer = Instant::now();
       }
-    }
-  }
-}
+      heartbeat.total_elapsed += hb_timer.elapsed().as_secs() as u64;
+      match TRIGGER_RATE.get(&mut bus) {
+        Ok(trate) => {
+          heartbeat.trate = trate as u64;
+        }
+        Err(err) => {
+          error!("Unable to query {}! {err}", TRIGGER_RATE);
+        }
+      }
+      match LOST_TRIGGER_RATE.get(&mut bus) {
+        Ok(lost_trate) => {
+          heartbeat.lost_trate = lost_trate as u64;
+        }
+      
+        Err(err) => {
+          error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
+        }
+      }
+      
+      if verbose {
+        println!("{}", heartbeat);
+        println!("EVG_NUM_EVENTS {}", EVQ_NUM_EVENTS.get(&mut bus).unwrap())
+      }
 
+        let pack = heartbeat.pack();
+        match moni_sender.send(pack) {
+          Err(err) => {
+            error!("Can not send MTB Heartbeat over channel! {err}");
+          },
+          Ok(_) => ()
+          }
+        
+        hb_timer = Instant::now();
+      }
+    } 
+  }

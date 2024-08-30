@@ -116,10 +116,13 @@ pub const LTB_CHANNELS : [u16;8] = [
 pub enum TriggerType {
   Unknown      = 0u8,
   /// -> 1-10 "pysics" triggers
-  Gaps         = 4u8,
   Any          = 1u8,
   Track        = 2u8,
   TrackCentral = 3u8,
+  Gaps         = 4u8,
+  Gaps633      = 5u8, 
+  Gaps422      = 6u8,
+  Gaps211      = 7u8,
   /// -> 20+ "Philip's triggers"
   /// Any paddle HIT in UMB  + any paddle HIT in CUB
   UmbCube      = 21u8,
@@ -176,6 +179,15 @@ impl TriggerType {
       TriggerType::Gaps => {
         return 4;
       }
+      TriggerType::Gaps633 => {
+        return 5;
+      }
+      TriggerType::Gaps422 => {
+        return 6;
+      }
+      TriggerType::Gaps211 => {
+        return 7;
+      }
       TriggerType::UmbCube => {
         return 21;
       }
@@ -209,6 +221,9 @@ impl From<u8> for TriggerType {
       2   => TriggerType::Track,
       3   => TriggerType::TrackCentral,
       4   => TriggerType::Gaps,
+      5   => TriggerType::Gaps633,
+      6   => TriggerType::Gaps422,
+      7   => TriggerType::Gaps211,
       21  => TriggerType::UmbCube,
       22  => TriggerType::UmbCubeZ,
       23  => TriggerType::UmbCorCube,
@@ -233,6 +248,9 @@ impl FromRandom for TriggerType {
       TriggerType::Track,
       TriggerType::TrackCentral,
       TriggerType::Gaps,
+      TriggerType::Gaps633,
+      TriggerType::Gaps422,
+      TriggerType::Gaps211,
       TriggerType::UmbCube,
       TriggerType::UmbCubeZ,
       TriggerType::UmbCorCube,
@@ -479,7 +497,7 @@ impl MasterTriggerEvent {
 
   /// Get absolute timestamp as sent by the GPS
   pub fn get_timestamp_abs48(&self) -> u64 {
-    let gps = self.get_timestamp_gps48();
+    let gps = self.get_timestamp_gps48() as u64;
     let mut timestamp = self.timestamp as u64;
     if timestamp < self.tiu_timestamp as u64 {
       // it has wrapped
@@ -495,9 +513,9 @@ impl MasterTriggerEvent {
     };
   
     let ts = gps_mult + (timestamp - self.tiu_timestamp as u64);
-    //ts
+    ts
     // change for debugging with Field
-    self.timestamp as u64
+    //self.timestamp as u64
   }
 
   /// Get the trigger sources from trigger source byte
@@ -512,6 +530,10 @@ impl MasterTriggerEvent {
     if gaps_trigger {
       t_types.push(TriggerType::Gaps);
     }
+    // let gaps_trigger_633 = self.trigger_source >> 6 & 0x1 == 1;
+    // if gaps_trigger_633 {
+    //   t_types.push(TriggerType::Gaps633);
+    // }
     let any_trigger    = self.trigger_source >> 6 & 0x1 == 1;
     if any_trigger {
       t_types.push(TriggerType::Any);

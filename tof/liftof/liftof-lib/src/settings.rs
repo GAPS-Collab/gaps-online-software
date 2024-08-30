@@ -16,6 +16,7 @@ use std::io::{
 use std::fmt;
 use std::collections::HashMap;
 
+use signal_hook::low_level::channel::Channel;
 use tof_dataclasses::config::BuildStrategy;
 
 
@@ -37,6 +38,7 @@ use tof_dataclasses::database::RAT;
 use tof_dataclasses::config::PreampBiasConfig;
 #[cfg(feature="database")]
 use tof_dataclasses::config::LTBThresholdConfig;
+use tof_dataclasses::config::RBChannelMaskConfig;
 use crate::master_trigger::MTBSettings;
 
 use tof_dataclasses::serialization::{
@@ -498,6 +500,7 @@ pub struct TofEventBuilderSettings {
   pub build_strategy      : BuildStrategy,
   pub greediness          : u8,
   pub wait_nrb            : u8,
+  pub hb_send_interval    : u8,
 }
 
 impl TofEventBuilderSettings {
@@ -511,6 +514,7 @@ impl TofEventBuilderSettings {
       build_strategy      : BuildStrategy::Adaptive,
       greediness          : 3,
       wait_nrb            : 40,
+      hb_send_interval    : 30,
     }
   }
 }
@@ -554,7 +558,8 @@ pub struct DataPublisherSettings {
   /// are sending flight packets)
   pub send_rbwaveform_packets   : bool,
   pub send_tof_summary_packets  : bool,
-  pub send_tof_event_packets    : bool
+  pub send_tof_event_packets    : bool,
+  pub hb_send_interval          : u8,
 }
 
 impl DataPublisherSettings {
@@ -567,7 +572,8 @@ impl DataPublisherSettings {
       send_mtb_event_packets    : false,
       send_rbwaveform_packets   : false,
       send_tof_summary_packets  : true,
-      send_tof_event_packets    : false
+      send_tof_event_packets    : false,
+      hb_send_interval          : 30,
     }
   }
 }
@@ -604,9 +610,11 @@ pub struct LiftofSettings {
   /// The interval (in seconds) to retrive CPUMoniData from 
   /// the TOF CPU
   pub cpu_moni_interval_sec      : u64,
-  /// ignore these RB. These RB ids do not exist in the configuration.
-  /// Every RB Id > 50 will be ignored by default
-  pub rb_ignorelist              : Vec<u8>,
+  /// In an intervall from 1-50, these RB simply do not exist
+  /// or might have never existed. Always ingore these
+  pub rb_ignorelist_always       : Vec<u8>,
+  /// ignore these specific RB for this run
+  pub rb_ignorelist_run          : Vec<u8>,
   /// Should TofHits be generated?
   pub run_analysis_engine        : bool,
   /// Settings to control the MTB
@@ -621,6 +629,9 @@ pub struct LiftofSettings {
   pub cmd_dispatcher_settings    : CommandDispatcherSettings,
   /// Settings for the individual RBs
   pub rb_settings                : RBSettings,
+  /// Mask individual channels (e.g. dead preamps) 
+  /// for the readout boards
+  pub rb_channel_mask            : ChannelMaskSettings,
   /// Preamp configuration
   pub preamp_settings            : PreampSettings,
   /// LTB threshold configuration
@@ -636,7 +647,8 @@ impl LiftofSettings {
       runtime_sec               : 0,
       mtb_address               : String::from("10.0.1.10:50001"),
       cpu_moni_interval_sec     : 60,
-      rb_ignorelist             : Vec::<u8>::new(),
+      rb_ignorelist_always      : Vec::<u8>::new(),
+      rb_ignorelist_run         : Vec::<u8>::new(),
       run_analysis_engine       : true,
       mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
@@ -644,6 +656,7 @@ impl LiftofSettings {
       data_publisher_settings   : DataPublisherSettings::new(),
       cmd_dispatcher_settings   : CommandDispatcherSettings::new(),
       rb_settings               : RBSettings::new(),
+      rb_channel_mask           : ChannelMaskSettings::new(),
       preamp_settings           : PreampSettings::new(),
       ltb_settings              : LTBThresholdSettings::new(),
     }
@@ -888,4 +901,113 @@ impl fmt::Display for LiftofRBConfig {
 //    assert_eq!(cfg, test_json);
 //  }
 //}
+// #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+// pub struct ChannelMaskSettings {
+//   /// actually apply the below settings
+//   pub set_channel_mask   : bool,
+//   /// liftof-cc will send commands to set the 
+//   /// preamp bias voltages
+//   pub set_strategy           : ParameterSetStrategy,
+//   /// channels to mask (one set of 18 values per RAT)
+//   pub rat_channel_mask     : HashMap<String, [bool;18]>
+// }
 
+/// Ignore RB channnels
+///
+/// The values in these arrays correspond to 
+/// (physical) channels 1-9
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub struct ChannelMaskSettings {
+  /// actually apply the below settings
+  pub set_channel_mask   : bool,
+  /// The set strat defines who should acutally set
+  /// the parameters. Will that be done by each board
+  /// independently (ParameterSetStrategy::Board) or
+  /// will a command be sent by liftof-cc 
+  /// (ParameterSetStrategy::ControlServer)
+  pub set_strategy           : ParameterSetStrategy,
+  /// channels to mask (one set of 9 values per RB)
+  /// "true" means the channel is enabled, "false", 
+  /// disabled
+  pub rb_channel_mask     : HashMap<String, [bool;9]>
+}
+
+impl ChannelMaskSettings {
+  pub fn new() -> Self {
+    let mut default_thresholds = HashMap::<String, [bool; 9]>::new();
+    for k in 1..51 {
+      let key = format!("RB{k:02}");
+      default_thresholds.insert(key, [true;9]);
+    }
+//    let default_thresholds = HashMap::from([
+//      (String::from("RAT01"), [false; 9]),
+//      (String::from("RAT02"), [false; 9]),
+//      (String::from("RAT03"), [false; 9]),
+//      (String::from("RAT04"), [false; 9]),
+//      (String::from("RAT05"), [false; 9]),
+//      (String::from("RAT06"), [false; 9]),
+//      (String::from("RAT07"), [false; 9]),
+//      (String::from("RAT08"), [false; 9]),
+//      (String::from("RAT09"), [false; 9]),
+//      (String::from("RAT10"), [false; 9]),
+//      (String::from("RAT11"), [false; 9]),
+//      (String::from("RAT12"), [false; 9]),
+//      (String::from("RAT13"), [false; 9]),
+//      (String::from("RAT14"), [false; 9]),
+//      (String::from("RAT15"), [false; 9]),
+//      (String::from("RAT16"), [false; 9]),
+//      (String::from("RAT17"), [false; 9]),
+//      (String::from("RAT18"), [false; 9]),
+//      (String::from("RAT19"), [false; 9]),
+//      (String::from("RAT20"), [false; 9])]);
+
+      Self {
+        set_channel_mask    : false,
+        set_strategy          : ParameterSetStrategy::ControlServer,
+        rb_channel_mask    : default_thresholds,
+      }
+  }
+
+  #[cfg(feature="database")]
+  pub fn emit_ch_mask_packets(&self, rbs : &HashMap<u8,RAT>) -> Vec<TofPacket> {
+    let mut packets = Vec::<TofPacket>::new();
+    for k in rbs.keys() {
+      let rb          = &rbs[&k];
+      let rb_key      = format!("RB{:2}", rb);
+      let mut cmd      = TofCommandV2::new();
+      cmd.command_code = TofCommandCode::SetRBChannelMask;
+      let mut payload  = RBChannelMaskConfig::new();
+      payload.rb_id    = rb.rb2_id as u8;
+      if *k as usize >= self.rb_channel_mask.len() {
+        error!("RB ID {k} larger than 46!");
+        continue;
+      }
+      payload.channels = self.rb_channel_mask[&rb_key];
+      cmd.payload = payload.to_bytestream();
+      let tp = cmd.pack();
+      packets.push(tp);
+    }
+    packets
+  }
+}
+impl fmt::Display for ChannelMaskSettings {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp : String;
+    match toml::to_string(self) {
+      Err(err) => {
+        error!("Deserialization error! {err}");
+        disp = String::from("-- DESERIALIZATION ERROR! --");
+      }
+      Ok(_disp) => {
+        disp = _disp;
+      }
+    }
+    write!(f, "<RBChannelMaskConfig :\n{}>", disp)
+  }
+}
+
+impl Default for ChannelMaskSettings {
+  fn default() -> Self {
+    Self::new()
+  }
+}

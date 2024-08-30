@@ -207,6 +207,89 @@ fn pack_preampbiasconfig() {
     assert_eq!(cfg, test);
   }
 }
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct RBChannelMaskConfig {
+  pub rb_id       : u8,
+  pub channels      : [bool;9],
+}
+
+impl RBChannelMaskConfig {
+  pub fn new() -> Self {
+    Self {
+      rb_id     : 0,
+      channels    : [false;9],
+    }
+  }
+}
+impl Default for RBChannelMaskConfig {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+impl fmt::Display for RBChannelMaskConfig {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<RBCHannelMaskConfig");
+    repr += &(format!("\n  RB ID      : {}", self.rb_id));
+    repr += &(format!("\n Problematic Channels >:( {:?}", self.channels));
+    write!(f, "{}", repr)
+  }
+}
+impl Packable for RBChannelMaskConfig {
+  const PACKET_TYPE : PacketType = PacketType::RBChannelMaskConfig;
+}
+
+impl Serialization for RBChannelMaskConfig {
+
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  const SIZE : usize = 14;
+
+  fn from_bytestream(stream     : &Vec<u8>,
+                     pos        : &mut usize)
+    -> Result<Self, SerializationError>{
+      Self::verify_fixed(stream, pos)?;
+      let mut cfg = RBChannelMaskConfig::new();
+      cfg.rb_id   = parse_u8(stream, pos);
+      for k in 0..9 {
+        cfg.channels[k] = parse_bool(stream, pos);
+      }
+      *pos += 2;
+      Ok(cfg)
+    }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
+    bs.extend_from_slice(&Self::HEAD.to_le_bytes());
+    bs.push(self.rb_id);
+    for k in 0..9 {
+      bs.push(self.channels[k] as u8);
+    }
+    bs.extend_from_slice(&Self::TAIL.to_le_bytes());
+    bs
+  }
+} 
+#[cfg(feature = "random")]
+impl FromRandom for RBChannelMaskConfig {
+  fn from_random() -> Self {
+    let mut cfg   = RBChannelMaskConfig::new();
+    let mut rng   = rand::thread_rng();
+    cfg.rb_id     = rng.gen::<u8>();
+    for k in 0..9 {
+      cfg.channels[k] = rng.gen::<bool>();
+    }
+    cfg
+  }
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_rb_channel_mask_config() {
+  for _ in 0..100 {
+    let cfg   = RBChannelMaskConfig::from_random();
+    let test : RBChannelMaskConfig = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}
 
 /// Set ltb thresholds
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -479,7 +562,7 @@ pub struct TriggerConfig{
 impl TriggerConfig {
   pub fn new() -> Self { 
     Self {
-      gaps_trigger_use_beta   : false,
+      gaps_trigger_use_beta   : true,
       tiu_emulation_mode  : false,
       prescale : 0.0,
       trigger_type : TriggerType::Unknown

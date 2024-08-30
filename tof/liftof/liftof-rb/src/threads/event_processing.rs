@@ -5,8 +5,10 @@ use std::sync::{
     Mutex,
 };
 
-use crossbeam_channel::{Sender,
-                        Receiver};
+use crossbeam_channel::{
+  Sender,
+  Receiver
+};
 
 use tof_dataclasses::events::DataType;
 use tof_dataclasses::packets::{

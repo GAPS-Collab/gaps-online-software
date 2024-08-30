@@ -17,7 +17,10 @@ except Exception as e:
 
 from . import tof
 
-import gaps_tof as cxx_api
+try:
+    import gaps_tof as cxx_api
+except ImportError as e:
+    print(f"Can't load CXX API! {e}")
 try:
     import rpy_tof_dataclasses as rust_api
 except ImportError as e:

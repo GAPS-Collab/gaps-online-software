@@ -3,7 +3,6 @@ use std::collections::HashMap;
 //use std::path::Path;
 pub mod dataclasses;
 pub mod master_trigger;
-//pub mod mtb_registers;
 
 use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
@@ -13,12 +12,14 @@ extern crate comfy_table;
 
 use numpy::PyArray1;
 
-use crate::dataclasses::{
+use rpy_tof_dataclasses::dataclasses::{
     PyRBCalibration,
     PyMasterTriggerEvent,
     PyRBEvent,
-    PyIPBus,
 };
+
+use crate::dataclasses::PyIPBus;
+
 use crate::master_trigger::{
     PyMasterTrigger,
 };
@@ -411,7 +412,7 @@ fn rust_dataclasses(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(test_db,m)?)?;
     m.add_class::<PyIPBus>()?;
     m.add_class::<PyMasterTrigger>()?;
-    m.add_class::<PyMasterTriggerEvent>()?;
-    m.add_class::<PyRBCalibration>()?;
+    //m.add_class::<PyMasterTriggerEvent>()?;
+    //m.add_class::<PyRBCalibration>()?;
     Ok(())
 }

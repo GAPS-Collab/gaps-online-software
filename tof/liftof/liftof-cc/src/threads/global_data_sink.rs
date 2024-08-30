@@ -17,11 +17,12 @@ use std::sync::{
 
 use std::fs::create_dir_all;
 
-extern crate crossbeam_channel;
+//extern crate crossbeam_channel;
 use crossbeam_channel::Receiver; 
 
 use colored::Colorize;
 
+use liftof_lib::settings::{self, DataPublisherSettings};
 use tof_dataclasses::packets::{
     TofPacket,
     PacketType
@@ -39,7 +40,8 @@ use tof_dataclasses::monitoring::{
 
 //use tof_dataclasses::events::TofEvent;
 use tof_dataclasses::serialization::{
-    Serialization,
+  Serialization,
+  Packable,
 };
 
 use tof_dataclasses::io::{
@@ -50,7 +52,7 @@ use tof_dataclasses::io::{
 
 use tof_dataclasses::events::TofEvent;
 
-#[cfg(features="debug")]
+//#[cfg(features="debug")]
 use tof_dataclasses::heartbeats::HeartBeatDataSink;
 
 //use liftof_lib::settings::DataPublisherSettings;
@@ -70,7 +72,8 @@ use liftof_lib::thread_control::ThreadControl;
 /// * thread_control     : start/stop thread, calibration information
 pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                         print_moni_packets : bool,
-                        thread_control     : Arc<Mutex<ThreadControl>>) {
+                        thread_control     : Arc<Mutex<ThreadControl>>,
+                        settings           : DataPublisherSettings) {
   // when the thread starts, we need to wait a bit
   // till thread_control becomes usable
   sleep(Duration::from_secs(10));
@@ -125,8 +128,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
 
   //let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
 
-  #[cfg(features="debug")]
-  let mut heartbeat         = HeartBeatDataSink::new();
+  
   let mut n_pack_sent       = 0;
   //let mut last_evid       = 0u32;
   let mut n_pack_write_disk = 0usize;
@@ -146,7 +148,19 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut write_stream  = false;
   let mut runid : u32 = 0;
   let mut new_run_start = false;
+  let mut retire   = false;
+  let mut heartbeat = HeartBeatDataSink::new();
+  let mut hb_timer               = Instant::now(); 
+  let mut hb_interval         = Duration::from_secs(settings.hb_send_interval as u64);
   loop {
+    if retire {
+      // take a long nap to give other threads 
+      // a chance to finish first
+      warn!("Will end data sink thread in 25 seconds!");
+      println!("= =>Will end data sink thread in 25 seconds!");
+      sleep(Duration::from_secs(25));
+      break;
+    }
     // even though this is called kill timer, check
     // the settings in general, since they might have
     // changed due to remote access.
@@ -154,9 +168,15 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
       match thread_control.try_lock() {
         Ok(mut tc) => {
           //println!("== ==> [global_data_sink] tc lock acquired!");
+          send_tof_event_packets   = tc.liftof_settings.data_publisher_settings.send_tof_event_packets;      
+          send_tof_summary_packets = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
+          send_rbwaveform_packets  = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
+          send_mtb_event_packets   = tc.liftof_settings.data_publisher_settings.send_mtb_event_packets;
+    
           if tc.stop_flag {
             tc.thread_data_sink_active = false;
-            break;
+            // we want to make sure that data sink ends the latest
+            retire = true;
           } 
           if tc.new_run_start_flag {
             new_run_start         = true;
@@ -190,12 +210,12 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         debug!("Got new tof packet {}", pack.packet_type);
         if writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(&pack);
-          cfg_if::cfg_if!{
-            if #[cfg(features="debug")] {
-              heartbeat.n_pack_write_disk += 1;
-              heartbeat.n_bytes_written += pack.payload.len();   
-            }
-          }
+          //cfg_if::cfg_if!{
+            //if #[cfg(features="debug")] {
+          heartbeat.n_pack_write_disk += 1;
+          heartbeat.n_bytes_written += pack.payload.len() as u64;   
+            //}
+          //}
           n_pack_write_disk += 1;
           bytes_sec_disk    += pack.payload.len() as f64;
         }
@@ -218,7 +238,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 *tc.finished_calibrations.get_mut(&cali_rb_id).unwrap() = true; 
                 cali_expected = tc.n_rbs;
                 cali_completed += 1;
-                println!("Changed tc {}", tc);
+                //println!("Changed tc {}", tc);
                 info!("{} of {} calibrattions completed!", cali_completed, cali_expected);
               },
               Err(err) => {
@@ -309,11 +329,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 }
                 Ok(_)    => {
                   //trace!("Event Summary for event id {} send!", evid);
-                  cfg_if::cfg_if!{
-                    if #[cfg(features="debug")] {
-                      heartbeat.n_pack_sent += 1;
-                    }
-                  }
+                  //cfg_if::cfg_if!{
+                  //  if #[cfg(features="debug")] {
+                  heartbeat.n_packets_sent += 1;
+                    //}
+                  //}
                   n_pack_sent += 1;
                 }
               }
@@ -327,11 +347,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                   }
                   Ok(_)    => {
                     //trace!("RB waveform for event id {} send!", evid);
-                    cfg_if::cfg_if!{
-                      if #[cfg(features="debug")] {
-                        heartbeat.n_pack_sent += 1;
-                      }
-                    }
+                    //cfg_if::cfg_if!{
+                    //  if #[cfg(features="debug")] {
+                    heartbeat.n_packets_sent += 1;
+                      //}
+                    //}
                     n_pack_sent += 1;
                   }
                 }
@@ -345,11 +365,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 }
                 Ok(_)    => {
                   //trace!("RB waveform for event id {} send!", evid);
-                  cfg_if::cfg_if!{
-                    if #[cfg(features="debug")] {
-                      heartbeat.n_pack_sent += 1;
-                    }
-                  }
+                  //cfg_if::cfg_if!{
+                  //  if #[cfg(features="debug")] {
+                  heartbeat.n_packets_sent += 1;
+                  //  }
+                  //}
                   n_pack_sent += 1;
                 }
               }
@@ -360,11 +380,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
               Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
               Ok(_)    => {
                 trace!("TofPacket sent");
-                cfg_if::cfg_if!{
-                  if #[cfg(features="debug")] {
-                    heartbeat.n_pack_sent += 1;
-                  }
-                }
+                //cfg_if::cfg_if!{
+                //  if #[cfg(features="debug")] {
+                heartbeat.n_packets_sent += 1;
+                //  }
+                //}
                 n_pack_sent += 1;
               }
             } // end match
@@ -374,66 +394,49 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
             Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
             Ok(_)    => {
               trace!("TofPacket sent");
-              cfg_if::cfg_if!{
-                if #[cfg(features="debug")] {
-                  heartbeat.n_pack_sent += 1;
-                }
-              }
+              //cfg_if::cfg_if!{
+              //  if #[cfg(features="debug")] {
+              heartbeat.n_packets_sent += 1;
+              //  }
+              //}
               n_pack_sent += 1;
             }
           } // end match
-          
         }
       } // end if pk == event packet
     } // end incoming.recv
-    if timer.elapsed().as_secs() > 120 {
+      //
+      //
+
       let evid_check_len = evid_check.len();
       //println!("DEBUG .1.");
       //let mut evid_test_missing = 0usize;
-      let mut evid_missing = 0;
+      let evid_missing = 0;
+    if timer.elapsed().as_secs() > 10 {
+      // FIXME - might be too slow?
       if evid_check_len > 0 {
         let mut evid = evid_check[0];
-        //println!("DEBUG 1.5");
-        //println!("len of evid_id_test {}", evid_id_test_len);
         for _ in 0..evid_check_len {
           if !evid_check.contains(&evid) {
-            cfg_if::cfg_if!{
-              if #[cfg(features="debug")] {
-                heartbeat.n_evid_missing += 1;
-                heartbeat.n_evid_chunksize = evid_check_len;
-              }
-            }
+            heartbeat.n_evid_missing += 1;
+            heartbeat.n_evid_chunksize = evid_check_len as u64;
           }
           evid += 1;
         }
       }
-      cfg_if::cfg_if!{
-        if #[cfg(features="debug")] {
-          heartbeat.incoming_ch_len = incoming.len();
-          heartbeat.met += timer.elapsed().as_secs_u64();
-          match data_socket.send(heartbeat.to_bytestream(),0) {
-            Err(err) => error!("Not able to send heartbeat over 0MQ PUB! {err}"),
-            Ok(_)    => {
-              trace!("TofPacket sent");
-            }
-          } // end match
+      timer = Instant::now();
+    }
+    if hb_timer.elapsed() >= hb_interval {
+      heartbeat.met += hb_timer.elapsed().as_secs();
+      
+      match data_socket.send(heartbeat.pack().to_bytestream(),0) {
+        Err(err) => error!("Not able to send heartbeat over 0MQ PUB! {err}"),
+        Ok(_)    => {
+          trace!("Heartbeat sent");
         }
       } 
       evid_check.clear();
-      ////println!("DEBUG 2");
-      //event_id_test.clear();
-      //println!("DEBUG 3");
-
-      met_time_secs += timer.elapsed().as_secs_f32();
-      let packet_rate = n_pack_sent as f32 /met_time_secs;
-      println!("  {:<75}", ">> == == == == == == DATA SINK HEARTBEAT  == == == == == == <<".bright_cyan().bold());
-      println!("  {:<75} <<", format!(">> ==> Sent {} TofPackets! (packet rate {:.2}/s)", n_pack_sent ,packet_rate).bright_cyan());
-      println!("  {:<75} <<", format!(">> ==> Incoming cb channel len {}", incoming.len()).bright_cyan());
-      println!("  {:<75} <<", format!(">> ==> Writing events to disk: {} packets written, data write rate {:.2} MB/sec", n_pack_write_disk, bytes_sec_disk/(1e6*met_time_secs as f64)).bright_purple());
-      println!("  {:<75} <<", format!(">> ==> Missing evid analysis:  {} of {} a chunk of events missing ({:.2}%)", evid_missing, evid_check_len, 100.0*(evid_missing as f64/evid_check_len as f64)).bright_purple());
-
-      println!("  {:<75}", ">> == == == == == == == == == == == == == == == == == == == <<".bright_cyan().bold());
-      timer = Instant::now();
+      hb_timer = Instant::now();
     }
-  }
-}
+  } //end loop
+} //end function

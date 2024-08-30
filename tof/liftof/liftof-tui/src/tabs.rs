@@ -10,12 +10,17 @@ pub mod tab_tofhit;
 pub mod tab_telemetry;
 pub mod tab_commands;
 pub mod tab_paddles;
+pub mod tab_heartbeats;
 
 pub use crate::tab_mt::MTTab;
 pub use crate::tab_settings::SettingsTab;
 pub use crate::tab_home::HomeTab;
 pub use crate::tab_events::EventTab;
 pub use crate::tab_paddles::PaddleTab;
+pub use crate::tab_heartbeats::{
+    HeartBeatTab,
+    HeartBeatView
+};
 pub use crate::tab_rbs::{
     RBTab,
     RBTabView,

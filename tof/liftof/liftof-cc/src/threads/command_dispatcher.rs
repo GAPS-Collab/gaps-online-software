@@ -8,6 +8,7 @@
 
 use std::path::Path;
 use std::thread;
+use std::fs;
 use std::sync::{
     Arc,
     Mutex,
@@ -22,11 +23,14 @@ use std::time::{
     Duration,
 };
 
+use chrono::Utc;
+
 use crossbeam_channel::{
     Receiver,
     Sender
 };
 
+use liftof_lib::master_trigger::registers::ANY_TRIG_PRESCALE;
 //use tof_dataclasses::threading::ThreadControl;
 use tof_dataclasses::config::{
     AnalysisEngineConfig, RunConfig, TOFEventBuilderConfig, TriggerConfig
@@ -46,10 +50,16 @@ use tof_dataclasses::packets::{
 use tof_dataclasses::serialization::{
     Serialization,
     Packable,
-    SerializationError
+    //SerializationError
 };
 
-use liftof_lib::settings::CommandDispatcherSettings;
+use tof_dataclasses::events::TriggerType;
+
+use liftof_lib::settings::{
+    CommandDispatcherSettings,
+    LiftofSettings
+};
+
 use liftof_lib::thread_control::ThreadControl;
 
 use liftof_lib::constants::{
@@ -57,6 +67,8 @@ use liftof_lib::constants::{
     DEFAULT_RB_ID,
     DEFAULT_CALIB_EXTRA
 };
+
+use crate::prepare_run;
 
 const MAX_CALI_TIME : u64 = 360; // calibration should be done within 6 mins?
 
@@ -122,6 +134,13 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
     // check if we get a command from the main 
     // thread
     thread::sleep(sleep_time);
+    //println!("=> Cmd responder loop iteration!");
+    match cmd_receiver.connect(&fc_sub_addr) {
+      Ok(_)    => (),
+      Err(err) => {
+        error!("Unable to connect to {}! {}", fc_sub_addr, err);
+      }
+    }
     match thread_ctrl.try_lock() {
       Ok(mut tc) => {
         //println!("== ==> [cmd_dispatcher] tc locked!");
@@ -161,24 +180,27 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
     // check if we get a command from the main 
     // thread
     match cmd_receiver.recv_bytes(zmq::DONTWAIT) {
-      Err(_)   => {
+      Err(err)   => {
+        error!("ZMQ socket receiving error! {err}");
         continue;
       }
       Ok(buffer) => {
+        error!("RECEIVED COMMAND {:?}", buffer);
         // identfiy if we have a GAPS packet
-        if buffer[0] == 0xeb && buffer[1] == 0x90 {
+        if buffer[0] == 0xeb && buffer[1] == 0x90 && buffer[4] == 0x5a {
           // We have a GAPS packet -> FIXME:
           error!("GAPS packet command receiving not supported yet! Currently, we can only process TofPackets!");
           // strip away the GAPS header!  
           continue;
         } 
-        match TofPacket::from_bytestream(&buffer, &mut 0) {
+        match TofPacket::from_bytestream(&buffer, &mut 8) {
           Err(err) => {
-            error!("Unable to decode bytestream! {:?}", err);
+            error!("Unable to decode bytestream for command ! {:?}", err);
             continue;  
           },
           Ok(packet) => {
             let mut resp = TofResponse::Unknown;
+            println!("Got packet {}!", packet);
             match packet.packet_type {
               PacketType::TofCommandV2 => {
                 let mut cmd = TofCommandV2::new();
@@ -186,7 +208,8 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                   Ok(_cmd) => {cmd = _cmd;},
                   Err(err) => error!("Unable to decode TofCommand! {err}")
                 }
-                let now = Instant::now();
+                println!("= => [cmd_djispatcher] Received command {}!", cmd);
+                let now = Utc::now().to_string();
                 let write_to_file = format!("{:?}: {}\n",now, cmd);
                 match log_file.write_all(&write_to_file.into_bytes()) {
                   Err(err) => {
@@ -222,6 +245,46 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                 }
 
                 match cmd.command_code {
+                  TofCommandCode::SendTofEvents => {
+                    match thread_ctrl.lock() {
+                      Ok(mut tc) => {
+                        tc.liftof_settings.data_publisher_settings.send_tof_event_packets = true;
+                      }
+                      Err(err) => {
+                        error!("Unable to lock thread control! {err}");
+                      }
+                    }
+                  }
+                  TofCommandCode::NoSendTofEvents => {
+                    match thread_ctrl.lock() {
+                      Ok(mut tc) => {
+                        tc.liftof_settings.data_publisher_settings.send_tof_event_packets = false;
+                      }
+                      Err(err) => {
+                        error!("Unable to lock thread control! {err}");
+                      }
+                    }
+                  }
+                  TofCommandCode::SendRBWaveforms => {
+                    match thread_ctrl.lock() {
+                      Ok(mut tc) => {
+                        tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets = true;
+                      }
+                      Err(err) => {
+                        error!("Unable to lock thread control! {err}");
+                      }
+                    }
+                  }
+                  TofCommandCode::NoSendRBWaveforms => {
+                    match thread_ctrl.lock() {
+                      Ok(mut tc) => {
+                        tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets = true;
+                      }
+                      Err(err) => {
+                        error!("Unable to lock thread control! {err}");
+                      }
+                    }
+                  }
                   TofCommandCode::Kill => {
                     match thread_ctrl.lock() {
                       Ok(mut tc) => {
@@ -242,19 +305,112 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       Ok(_)    => ()
                     }
                   }
+                  TofCommandCode::DataRunStop  => {
+                    println!("= => Received DataRunStop!");
+                    let cmd          = TofCommand::DataRunStop(DEFAULT_RB_ID as u32);
+                    let packed_cmd   = cmd.pack();
+                    let mut payload  = String::from("BRCT").into_bytes();
+                    payload.append(&mut packed_cmd.to_bytestream());
+                    match cmd_sender.send(&payload, 0) {
+                      Err(err) => {
+                        error!("Unable to send command, error{err}");
+                        resp = TofResponse::ZMQProblem(0x0); // response code not assigned, 
+                                                                 // let's just let it be 0 for now
+                        let ack_tp = resp.pack();
+                        match tof_ack_sender.send(ack_tp) {
+                          Err(err) => {
+                            error!("Unable to send ACK packet! {err}");
+                          }
+                          Ok(_)    => ()
+                        }
+                      },
+                      Ok(_)    => {
+                        info!("Stop run command sent");
+                        // Now we wait for the RB acknowledgement packets and see if our command
+                        // went through
+                        let mut n_rb_ack_rcved = 0u8;
+                        let run_start_timeout  = Instant::now();
+                        // let's wait 20 seconds here
+                        resp = TofResponse::TimeOut(0x0);
+                        while run_start_timeout.elapsed().as_secs() < 20 {
+                          match rb_ack_recv.recv() {
+                            Err(_) => {
+                              continue;
+                            }
+                            Ok(_ack_pack) => {
+                              //FIXME - do something with it
+                              n_rb_ack_rcved += 1;
+                            }
+                          }
+                          if n_rb_ack_rcved == 38 {
+                            resp = TofResponse::Success(0);
+                          }
+                        }
+                        let ack_tp = resp.pack();
+                        match tof_ack_sender.send(ack_tp) {
+                          Err(err) => {
+                            error!("Unable to send ACK packet! {err}");
+                          }
+                          Ok(_)    => ()
+                        }
+                      }
+                    }
+                    let ack_rp = TofResponseCode::RespSuccFingersCrossed;
+                    resp = TofResponse::Success(ack_rp as u32);
+
+                    let ack_tp = resp.pack();
+                    match tof_ack_sender.send(ack_tp) {
+                      Err(err) => {
+                        error!("Unable to send ACK packet! {err}");
+                      }
+                      Ok(_)    => ()
+                    }
+                  }
                   TofCommandCode::DataRunStart => {
                     let mut run_id : u32 = 0;
-                    println!("== ==> Received DataRunStart!");
+                    println!("= => Received DataRunStart!");
                     info!("Received data run start command");
-                    // technically, it is run_typ, rb_id, event number
-                    // all to the max means run start for all
-                    // let payload: u32 =  PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
-                    // make sure the relevant threads are active
-                    // We don't need this - just need to make sure it gets broadcasted
                     match RunConfig::from_bytestream(&cmd.payload, &mut 0) {
                       Err(err) => error!("Unable to unpack run config! {err}"),
                       Ok(pld) => {
                         run_id = pld.runid;
+                      }
+                    }
+                    // if we don't get a specific run id here, we are 
+                    // using our own
+                    let mut write_stream_path = String::from("");
+                    let mut config_from_tc = LiftofSettings::new(); 
+                    match thread_ctrl.lock() {
+                      Ok(tc) => {
+                        write_stream_path = tc.liftof_settings.data_publisher_settings.data_dir.clone();
+                        config_from_tc    = tc.liftof_settings.clone();
+                      }
+                      Err(err) => {
+                        error!("Unable to lock thread control! {err}");
+                      }
+                    }
+                    if run_id == 0 {
+                      match prepare_run(write_stream_path.clone(), &config_from_tc) {
+                        None => {
+                          error!("Unable to assign new run id, falling back to 999!");
+                        }
+                        Some(_rid) => {
+                          run_id = _rid;
+                          info!("Will use new run id {}!", run_id);
+                        }
+                      }
+                    }
+                    write_stream_path += run_id.to_string().as_str();
+                    if let Ok(metadata) = fs::metadata(&write_stream_path) {
+                      if metadata.is_dir() {
+                        warn!("Directory {} for run number {} already consists and may contain files!", write_stream_path, run_id);
+                        // FILXME - in flight, we can not have interactivity.
+                        // But the whole system with the run ids might change 
+                      } 
+                    } else {
+                      match fs::create_dir(&write_stream_path) {
+                        Ok(())   => info!("=> Created {} to save stream data", write_stream_path),
+                        Err(err) => error!("Failed to create directory: {}! {}", write_stream_path, err),
                       }
                     }
                     match thread_ctrl.lock() {
@@ -264,6 +420,8 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                         tc.thread_event_bldr_active  = true;
                         tc.calibration_active        = false;
                         tc.run_id                    = run_id;
+                        // always write data to disk for remote 
+                        // operations
                         tc.write_data_to_disk        = true;
                         tc.new_run_start_flag        = true;
                       },
@@ -298,7 +456,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                         // let's wait 20 seconds here
                         resp = TofResponse::TimeOut(0x0);
                         while run_start_timeout.elapsed().as_secs() < 20 {
-                          match rb_ack_recv.recv() {
+                          match rb_ack_recv.try_recv() {
                             Err(_) => {
                               continue;
                             }
@@ -311,6 +469,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                             resp = TofResponse::Success(0);
                           }
                         }
+                        info!("Gathered {} ack packets from RBs!", n_rb_ack_rcved);
                         let ack_tp = resp.pack();
                         match tof_ack_sender.send(ack_tp) {
                           Err(err) => {
@@ -319,6 +478,16 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                           Ok(_)    => ()
                         }
                       }
+                    }
+                    let ack_rp = TofResponseCode::RespSuccFingersCrossed;
+                    resp = TofResponse::Success(ack_rp as u32);
+
+                    let ack_tp = resp.pack();
+                    match tof_ack_sender.send(ack_tp) {
+                      Err(err) => {
+                        error!("Unable to send ACK packet! {err}");
+                      }
+                      Ok(_)    => ()
                     }
                   }
                   TofCommandCode::Ping => {
@@ -422,18 +591,40 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                     } // end loop
                   }
                   TofCommandCode::SetMTConfig => {
+                    let mut prescale  : f32 = 0.0;
+                    let mut gaps_trigger_use_beta : bool = true;
+                    let mut tiu_emulation_mode : bool = false;
+                    let mut trigger_type : TriggerType = TriggerType::Unknown;
+
+                    //println!("= => ChangeTrigger Command Received (:");
+                    info!("Received change trigger command");
+                    match TriggerConfig::from_bytestream(&cmd.payload, &mut 0) {
+                      Err(err) => error!("Unable to decode TriggerConfig! {err}"),
+                      Ok(config) => {
+                        gaps_trigger_use_beta = config.gaps_trigger_use_beta;
+                        tiu_emulation_mode    = config.tiu_emulation_mode;
+                        prescale              = config.prescale;
+                        trigger_type          = config.trigger_type;
+                      }
+                    }
+                    let mut write_stream_path = String::from("");
+                    let mut config_from_tc = LiftofSettings::new(); 
+                    match thread_ctrl.lock() {
+                      Err(err) => {
+                        error!("Unable to lock thread control! {err}");
+                      }
+                      Ok(tc) => {
+                        //write_stream_path = tc.liftof_settings.mtb_settings.data_dir.clone();
+                        config_from_tc    = tc.liftof_settings.clone();
+                      }
+                    }
                     match thread_ctrl.lock() {
                       Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
                       Ok(mut tc) => {
-                        match TriggerConfig::from_bytestream(&packet.payload, &mut 0) {
-                          Err(err) => error!("Unable to decode TriggerConfig!"),
-                          Ok(config) => {
-                            tc.liftof_settings.mtb_settings.trigger_prescale=config.prescale;
-                            tc.liftof_settings.mtb_settings.trigger_type=config.trigger_type;
-                            tc.liftof_settings.mtb_settings.gaps_trigger_use_beta=config.gaps_trigger_use_beta;
-                            tc.liftof_settings.mtb_settings.tiu_emulation_mode=config.tiu_emulation_mode;
-                          }
-                        }
+                        gaps_trigger_use_beta = tc.liftof_settings.mtb_settings.gaps_trigger_use_beta;
+                        tiu_emulation_mode    = tc.liftof_settings.mtb_settings.tiu_emulation_mode;
+                        prescale              = tc.liftof_settings.mtb_settings.trigger_prescale;
+                        trigger_type          = tc.liftof_settings.mtb_settings.trigger_type;
                       }
                     }
                   }
@@ -442,7 +633,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
                       Ok(mut tc) => {
                         match AnalysisEngineConfig::from_bytestream(&packet.payload, &mut 0) {
-                          Err(err) => error!("Serialization Error! Cannot get analysis engine config from bytestream"),
+                          Err(err) => error!("Serialization Error! Cannot get analysis engine config from bytestream! {err}"),
                           Ok(config) => {
                           tc.liftof_settings.analysis_engine_settings.integration_start=config.integration_start;
                           tc.liftof_settings.analysis_engine_settings.integration_window=config.integration_window;
@@ -466,7 +657,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       Err(err) => error!("Unable to acquire lock for thread contorl! {err}"),
                       Ok(mut tc) => {
                         match TOFEventBuilderConfig::from_bytestream(&packet.payload, &mut 0) {
-                          Err(err)=> error!("Serialization error! Cannot get TOF event builder config from bytestream"),
+                          Err(err)=> error!("Serialization error! Cannot get TOF event builder config from bytestream! {err}"),
                           Ok(config) => {
                             tc.liftof_settings.event_builder_settings.cachesize=config.cachesize;
                             tc.liftof_settings.event_builder_settings.n_mte_per_loop=config.n_mte_per_loop;

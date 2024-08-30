@@ -126,6 +126,7 @@ pub enum SerializationError {
   WrongByteSize,
   JsonDecodingError,
   TomlDecodingError,
+  Disconnected
 }
 
 impl fmt::Display for SerializationError {

@@ -175,7 +175,19 @@ impl TofEvent {
   pub fn is_complete(&self) -> bool {
     self.mt_event.get_rb_link_ids().len() == self.rb_events.len()
   }
-  
+ 
+  /// A more advanced check, where events which are not in the 
+  /// provided mtb_link_id list don't count for completion
+  pub fn is_complete_masked(&self, mtb_link_ids_excluded : &Vec::<u8>) -> bool {
+    let mut expected_events = 0usize;
+    for k in &self.mt_event.get_rb_link_ids() {
+      if !mtb_link_ids_excluded.contains(k) {
+        expected_events += 1
+      }
+    }
+    self.rb_events.len() == expected_events
+  }
+
   /// Encode the sizes of the vectors holding the 
   /// into an u32
   ///
@@ -232,6 +244,7 @@ impl TofEvent {
     //summary.status          = self.header.status;
     //summary.quality         = self.header.quality;
     //summary.status            = self.header.event_status;
+    summary.status            = self.mt_event.event_status;
     // FIXME - this is not trigger paddles, but trigger hits!
     summary.trigger_sources   = self.mt_event.trigger_source;
     summary.n_trigger_paddles = self.mt_event.get_trigger_hits().len() as u8;
@@ -655,8 +668,10 @@ impl TofEventSummary {
   /// # Returns
   ///
   ///   Vec<(hit)> where hit is (DSI, J, CH) 
-  pub fn get_trigger_hits(&self) -> Vec<(u8, u8, u8, LTBThreshold)> {
-    let mut hits = Vec::<(u8,u8,u8,LTBThreshold)>::new(); 
+  pub fn get_trigger_hits(&self) -> Vec<(u8, u8, (u8, u8), LTBThreshold)> {
+    let mut hits = Vec::<(u8,u8,(u8,u8),LTBThreshold)>::with_capacity(5); 
+    let physical_channels = [(1u8,  2u8), (3u8,4u8), (5u8, 6u8), (7u8, 8u8),
+                             (9u8, 10u8), (11u8,12u8), (13u8, 14u8), (15u8, 16u8)];
     //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
     let n_masks_needed = self.dsi_j_mask.count_ones();
     if self.channel_mask.len() < n_masks_needed as usize {
@@ -668,6 +683,8 @@ impl TofEventSummary {
     trace!("ltb channels {:?}", self.dsi_j_mask);
     trace!("hit masks {:?}", self.channel_mask); 
     //println!("We see LTB Channels {:?} with Hit masks {:?} for {} masks requested by us!", self.dsi_j_mask, self.channel_mask, n_masks_needed);
+    
+    // one k here is for one ltb
     for k in 0..32 {
       if (self.dsi_j_mask >> k) as u32 & 0x1 == 1 {
         let mut dsi = 0u8;
@@ -694,21 +711,20 @@ impl TofEventSummary {
         let channels = self.channel_mask[n_mask]; 
         for (i,ch) in LTB_CHANNELS.iter().enumerate() {
           //let chn = *ch as u8 + 1;
-          let chn = i as u8 + 1;
+          let ph_chn = physical_channels[i];
+          //let chn = i as u8 + 1;
           //println!("i,ch {}, {}", i, ch);
           let thresh_bits = ((channels & ch) >> (i*2)) as u8;
           //println!("thresh_bits {}", thresh_bits);
           if thresh_bits > 0 { // hit over threshold
-            hits.push((dsi, j, chn, LTBThreshold::from(thresh_bits)));
-            
+            hits.push((dsi, j, ph_chn, LTBThreshold::from(thresh_bits)));
           }
         }
         n_mask += 1;
-      }
+      } // next ltb
     }
     hits
   }
-
   
   /// Get the trigger sources from trigger source byte
   /// FIXME! (Does not return anything)
@@ -874,7 +890,7 @@ impl fmt::Display for TofEventSummary {
     repr += &(format!("\n  PrimaryCharge    : {}", self.primary_charge));
     repr += &(format!("\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **", self.dsi_j_mask.count_ones()));
     for k in self.get_trigger_hits() {
-      repr += &(format!("\n  => {}/{}/{} ({}) ", k.0, k.1, k.2, k.3));
+      repr += &(format!("\n  => {}/{}/({},{}) ({}) ", k.0, k.1, k.2.0, k.2.1, k.3));
     }
     repr += "\n  ** ** MTB LINK IDs ** **";
     let mut mtblink_str = String::from("\n  => ");

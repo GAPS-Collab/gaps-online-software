@@ -25,6 +25,7 @@ use tof_dataclasses::packets::{
 
 use tof_dataclasses::heartbeats::HeartBeatDataSink;
 use tof_dataclasses::heartbeats::MTBHeartbeat;
+use tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
 
 use tof_dataclasses::monitoring::{
     MoniData,
@@ -56,6 +57,8 @@ use tof_dataclasses::events::{
     RBWaveform
 };
 
+
+use tof_dataclasses::events::EventStatus;
 use tof_dataclasses::serialization::{
     Serialization,
     Packable
@@ -1032,6 +1035,7 @@ impl PyRBMoniSeries {
     }
   }
 }
+
 #[pyclass]
 #[pyo3(name="HeartbeatDataSink")]
 
@@ -1078,11 +1082,6 @@ impl PyHeartBeatDataSink{
   fn get_n_evid_chunksize(&self) -> PyResult<u64> {
     Ok(self.config.n_evid_chunksize)
   }
-  // len incomming buffer for the thread
-  #[getter]
-  fn get_incoming_ch_len(&self) -> PyResult<u64> {
-    Ok(self.config.incoming_ch_len)
-  }
   // num. missing event id
   #[getter]
   fn get_evid_missing(&self) -> PyResult<u64> {
@@ -1098,6 +1097,24 @@ impl PyHeartBeatDataSink{
   fn get_n_pack_write_disk(&self) -> PyResult<u64> {
     Ok(self.config.n_pack_write_disk)
   }
+  
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<HeartBeatDataSink>() {
+      Ok(hb) => {
+        self.config = hb;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.config)) 
+  }
+
 }
 
 #[pyclass]
@@ -1152,7 +1169,218 @@ impl PyMTBHeartbeat {
   fn get_lost_trate(&self) -> PyResult<u64> {
     Ok(self.config.lost_trate)
   }
+  
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<MTBHeartbeat>() {
+      Ok(hb) => {
+        self.config = hb;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.config)) 
+  }
 }
+#[pyclass]
+#[pyo3(name="EVTBLDRHeartbeat")]
+pub struct PyEVTBLDRHeartbeat {
+  pub config : EVTBLDRHeartbeat 
+}
+impl PyEVTBLDRHeartbeat {
+  pub fn set_config(&mut self, cfg : EVTBLDRHeartbeat) {
+    self.config = cfg;
+  }
+}
+#[pymethods]
+impl PyEVTBLDRHeartbeat {
+  #[new]
+  fn new () -> Self {
+    let cfg: EVTBLDRHeartbeat = EVTBLDRHeartbeat::new();
+    Self {
+      config : cfg
+    }
+  }
+  #[getter]
+  fn get_met_seconds(&self) -> PyResult<usize> {
+    Ok(self.config.met_seconds)
+  }
+  #[getter]
+  fn get_n_mte_received_tot(&self) -> PyResult<usize> {
+    Ok(self.config.n_mte_received_tot)
+  }
+  #[getter]
+  fn get_n_rbe_received_tot(&self) -> PyResult<usize> {
+    Ok(self.config.n_rbe_received_tot )
+  }
+  #[getter]
+  fn get_n_rbe_per_te(&self) -> PyResult<usize> {
+    Ok(self.config.n_rbe_per_te)
+  }
+  #[getter]
+  fn get_n_rbe_discarded_tot(&self) -> PyResult<usize> {
+    Ok(self.config.n_rbe_discarded_tot)
+  }
+  #[getter]
+  fn get_n_mte_skipped(&self) -> PyResult<usize> {
+    Ok(self.config.n_mte_skipped)
+  }
+  #[getter]
+  fn get_n_timed_out(&self) -> PyResult<usize> {
+    Ok(self.config.n_timed_out)
+  }
+  #[getter]
+  fn get_n_sent(&self) -> PyResult<usize> {
+    Ok(self.config.n_sent)
+  }
+  #[getter]
+  fn get_delta_mte_rbe(&self) -> PyResult<usize> {
+    Ok(self.config.delta_mte_rbe)
+  }
+  #[getter]
+  fn get_event_cache_size(&self) -> PyResult<usize> {
+    Ok(self.config.event_cache_size)
+  }
+  #[getter]
+  fn get_rbe_wo_mte(&self) -> PyResult<usize> {
+    Ok(self.config.rbe_wo_mte)
+  }
+  #[getter]
+  fn get_mte_receiver_cbc_len(&self) -> PyResult<usize> {
+    Ok(self.config.mte_receiver_cbc_len)
+  }
+  #[getter]
+  fn get_rbe_receiver_cbc_len(&self) -> PyResult<usize> {
+    Ok(self.config.rbe_receiver_cbc_len)
+  }
+  #[getter]
+  fn get_tp_sender_cbc_len(&self) -> PyResult<usize> {
+    Ok(self.config.tp_sender_cbc_len)
+  }
+  #[getter]
+  fn get_data_mangled_ev(&self) -> PyResult<usize> {
+    Ok(self.config.data_mangled_ev)
+  }
+  
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<EVTBLDRHeartbeat>() {
+      Ok(hb) => {
+        self.config = hb;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.config)) 
+  }
+}
+
+#[pyclass]
+#[pyo3(name="MtbMoniData")]
+pub struct PyMtbMoniData {
+  moni : MtbMoniData,
+}
+
+impl PyMtbMoniData {
+  pub fn set_moni(&mut self, moni : MtbMoniData) {
+    self.moni = moni;
+  }
+}
+
+#[pymethods]
+impl PyMtbMoniData {
+  
+  #[new]
+  fn new() -> Self {
+    let moni = MtbMoniData::new();
+    Self {
+      moni,
+    }
+  }
+
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<MtbMoniData>() {
+      Ok(moni) => {
+        self.moni = moni;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+
+  #[getter]
+  pub fn get_rate(&self) -> u16 {
+    self.moni.rate
+  }
+  
+  #[getter]
+  pub fn get_lost_rate(&self) -> u16 {
+    self.moni.lost_rate
+  }
+
+  #[getter]
+  /// Length of the received BUSY signal from 
+  /// the TIU in nanoseconds
+  pub fn get_tiu_busy_len(&self) -> u32 {
+    self.moni.tiu_busy_len * 10
+  }
+
+  #[getter]
+  pub fn get_daq_queue_len(&self) -> u16 {
+    self.moni.daq_queue_len
+  }
+
+  #[getter]
+  pub fn get_tiu_emulation_mode(&self) -> bool {
+    self.moni.get_tiu_emulation_mode()
+  }
+  
+  #[getter]
+  pub fn get_tiu_use_aux_link(&self) -> bool {
+    self.moni.get_tiu_use_aux_link()
+  }
+
+  #[getter]
+  pub fn get_tiu_bad(&self) -> bool { 
+    self.moni.get_tiu_bad()
+  }
+
+  #[getter]
+  pub fn get_tiu_busy_stuck(&self) -> bool {
+    self.moni.get_tiu_busy_stuck()
+  }
+
+  #[getter]
+  pub fn get_tiu_ignore_busy(&self) -> bool {
+    self.moni.get_tiu_ignore_busy()
+  }
+
+
+  #[getter]
+  pub fn get_fpga_temp(&self) -> f32 {
+    self.moni.get_fpga_temp()
+  }
+
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.moni)) 
+  }
+}
+
 
 #[pyclass]
 #[pyo3(name="MtbMoniSeries")]
@@ -1169,7 +1397,30 @@ impl PyMtbMoniSeries {
       mtbmoniseries,
     }
   }
-  
+
+  /// Add an additional file to the series
+  fn add_file(&mut self, filename : String) {
+    let mut reader = TofPacketReader::new(filename);
+    reader.filter = PacketType::MonitorMtb;
+    for tp in reader {
+      if let Ok(moni) =  tp.unpack::<MtbMoniData>() {
+        self.mtbmoniseries.add(moni);
+      }
+    }
+  }
+
+  fn get_dataframe(&mut self) -> PyResult<PyDataFrame> {
+    match self.mtbmoniseries.get_dataframe() {
+      Ok(df) => {
+        let pydf = PyDataFrame(df);
+        return Ok(pydf);
+      },
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   fn from_file(&mut self, filename : String) -> PyResult<PyDataFrame> {
     let mut reader = TofPacketReader::new(filename);
     reader.filter = PacketType::MonitorMtb;
@@ -1372,6 +1623,16 @@ impl PyMasterTriggerEvent {
     self.event.get_timestamp_gps48()
   }
 
+  #[getter]
+  pub fn timestamp_gps32(&self) -> u32 {
+    self.event.tiu_gps32
+  }
+  
+  #[getter]
+  pub fn timestamp_gps16(&self) -> u16 {
+    self.event.tiu_gps16
+  }
+
   /// Get absolute timestamp as sent by the GPS
   #[getter]
   pub fn timestamp_abs48(&self) -> u64 {
@@ -1399,8 +1660,11 @@ impl PyRBEventHeader {
   pub fn set_header(&mut self, header : RBEventHeader) {
     self.header = header;
   }
-}
 
+fn __repr__(&self) -> PyResult<String> {
+  Ok(format!("<PyO3Wrapper: {}>", self.header)) 
+  }
+} 
 #[pymethods]
 impl PyRBEventHeader {
   #[new]
@@ -1485,7 +1749,10 @@ impl PyTofEventSummary {
   fn event_id(&self) -> u32 {
     self.event.event_id
   }
-
+  #[getter]
+  fn event_status(&self) -> EventStatus {
+    self.event.status
+  }
 
   /// RB Link IDS (not RB ids) which fall into the 
   /// trigger window
@@ -1496,8 +1763,8 @@ impl PyTofEventSummary {
 
   /// Hits which formed a trigger
   #[getter]
-  fn trigger_hits(&self) -> Vec<(u8, u8, u8, LTBThreshold)> {
-    self.event.get_trigger_hits()
+  pub fn trigger_hits(&self) -> PyResult<Vec<(u8, u8, (u8, u8), LTBThreshold)>> {
+    Ok(self.event.get_trigger_hits())
   }
   
   ///
@@ -1831,6 +2098,16 @@ impl PyTofHit {
     self.hit.get_charge_b()
   }
 
+  #[getter]
+  fn time_a(&self) -> f32 {
+    self.hit.get_time_a()
+  }
+  
+  #[getter]
+  fn time_b(&self) -> f32 {
+    self.hit.get_time_b()
+  }
+
   /// Reconstructed particle interaction position
   /// along the long axis of the paddle.
   /// For the other dimensions, there is no information
@@ -1940,7 +2217,7 @@ impl PyRBWaveform {
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.wf)) 
   }
-}
+} 
 
 
 
