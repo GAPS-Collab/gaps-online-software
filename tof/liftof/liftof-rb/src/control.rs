@@ -356,3 +356,8 @@ pub fn get_board_id_string() -> Result<String, RegisterError> {
 }
 
 
+/// Read te last DRS4 Deadtime
+pub fn get_deadtime() -> Result<u32, RegisterError> {
+  let deadtime = read_control_reg(DRS_DEADTIME)?;
+  Ok(deadtime)
+}

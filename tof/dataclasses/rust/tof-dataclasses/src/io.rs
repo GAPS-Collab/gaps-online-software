@@ -731,6 +731,29 @@ impl Iterator for RBEventMemoryStreamer {
   }
 }
 
+
+/// Generics for packet reading (TofPacket, Telemetry packet,...)
+pub trait PacketReader {
+  /// header bytes, e.g. 0xAAAA for TofPackets
+  const HEADER0 : u8 = 0;
+  const HEADER1 : u8 = 0;
+
+  /// Manage the internal cursor attribute
+  fn set_cursor(&mut self, pos : usize) {
+  }
+
+  /// Rewind the file, so it can be read again from the 
+  /// beginning
+  fn rewind(&mut self) -> io::Result<()> {
+    //self.file_reader.rewind()?;
+    self.set_cursor(0);
+    Ok(())
+  }
+}
+
+
+
+
 /// Read serialized TofPackets from an existing file
 ///
 /// This is mainly to read stream files previously
@@ -1206,6 +1229,7 @@ impl Default for TofPacketWriter {
 /// The robin reader consumes a file. 
 ///
 ///
+//#[deprecated(since="0.10.0", note="There are no robin files anymore. RBs will write data with RBEvents wrapped in TofPackets!")]
 pub struct RobinReader {
   pub streamer    : RBEventMemoryStreamer,
   pub filename    : String,
