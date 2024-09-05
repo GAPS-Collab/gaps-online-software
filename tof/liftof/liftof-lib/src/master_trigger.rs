@@ -538,7 +538,7 @@ pub fn master_trigger(mt_address     : String,
   let mut last_event_id           = 0u32;
   //let mut n_events                   = 0u64;
   //let mut rate_from_reg  : Option<u32> = None;
-  let mut verbose_timer       = Instant::now();
+  //let mut verbose_timer       = Instant::now();
   //let mut total_elapsed              = 0f64;
   //let mut n_ev_unsent                = 0u64;
   //let mut n_ev_missed                = 0u64;
@@ -722,7 +722,7 @@ pub fn master_trigger(mt_address     : String,
       }
     }
 
-    let verbose_timer_elapsed = verbose_timer.elapsed().as_secs_f64();
+    //let verbose_timer_elapsed = verbose_timer.elapsed().as_secs_f64();
     //let mut missing = 0usize;
     //if event_id_test.len() > 0 {
     //  let mut evid = event_id_test[0];
