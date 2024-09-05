@@ -672,6 +672,31 @@
 <a href="#672" id="672">672</a>
 <a href="#673" id="673">673</a>
 <a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Command receiving, processing and sending
 //! We need to fullfill the following requirements
 //! 1) Receive a command from the flight computer/elsewhere
@@ -704,6 +729,7 @@
     Sender
 };
 
+<span class="kw">use </span>liftof_lib::master_trigger::registers::ANY_TRIG_PRESCALE;
 <span class="comment">//use tof_dataclasses::threading::ThreadControl;
 </span><span class="kw">use </span>tof_dataclasses::config::{
     AnalysisEngineConfig, RunConfig, TOFEventBuilderConfig, TriggerConfig
@@ -725,6 +751,8 @@
     Packable,
     <span class="comment">//SerializationError
 </span>};
+
+<span class="kw">use </span>tof_dataclasses::events::TriggerType;
 
 <span class="kw">use </span>liftof_lib::settings::{
     CommandDispatcherSettings,
@@ -1262,18 +1290,40 @@
                     </span>} <span class="comment">// end loop
                   </span>}
                   TofCommandCode::SetMTConfig =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>prescale  : f32 = <span class="number">0.0</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>gaps_trigger_use_beta : bool = <span class="bool-val">true</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>tiu_emulation_mode : bool = <span class="bool-val">false</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>trigger_type : TriggerType = TriggerType::Unknown;
+
+                    <span class="comment">//println!("= =&gt; ChangeTrigger Command Received (:");
+                    </span><span class="macro">info!</span>(<span class="string">"Received change trigger command"</span>);
+                    <span class="kw">match </span>TriggerConfig::from_bytestream(<span class="kw-2">&amp;</span>cmd.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
+                      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to decode TriggerConfig! {err}"</span>),
+                      <span class="prelude-val">Ok</span>(config) =&gt; {
+                        gaps_trigger_use_beta = config.gaps_trigger_use_beta;
+                        tiu_emulation_mode    = config.tiu_emulation_mode;
+                        prescale              = config.prescale;
+                        trigger_type          = config.trigger_type;
+                      }
+                    }
+                    <span class="kw">let </span><span class="kw-2">mut </span>write_stream_path = String::from(<span class="string">""</span>);
+                    <span class="kw">let </span><span class="kw-2">mut </span>config_from_tc = LiftofSettings::new(); 
+                    <span class="kw">match </span>thread_ctrl.lock() {
+                      <span class="prelude-val">Err</span>(err) =&gt; {
+                        <span class="macro">error!</span>(<span class="string">"Unable to lock thread control! {err}"</span>);
+                      }
+                      <span class="prelude-val">Ok</span>(tc) =&gt; {
+                        <span class="comment">//write_stream_path = tc.liftof_settings.mtb_settings.data_dir.clone();
+                        </span>config_from_tc    = tc.liftof_settings.clone();
+                      }
+                    }
                     <span class="kw">match </span>thread_ctrl.lock() {
                       <span class="prelude-val">Err</span>(err)   =&gt; <span class="macro">error!</span>(<span class="string">"Unable to acquire lock for thread ctrl! {err}"</span>),
                       <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
-                        <span class="kw">match </span>TriggerConfig::from_bytestream(<span class="kw-2">&amp;</span>packet.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
-                          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to decode TriggerConfig! {err}"</span>),
-                          <span class="prelude-val">Ok</span>(config) =&gt; {
-                            tc.liftof_settings.mtb_settings.trigger_prescale=config.prescale;
-                            tc.liftof_settings.mtb_settings.trigger_type=config.trigger_type;
-                            tc.liftof_settings.mtb_settings.gaps_trigger_use_beta=config.gaps_trigger_use_beta;
-                            tc.liftof_settings.mtb_settings.tiu_emulation_mode=config.tiu_emulation_mode;
-                          }
-                        }
+                        gaps_trigger_use_beta = tc.liftof_settings.mtb_settings.gaps_trigger_use_beta;
+                        tiu_emulation_mode    = tc.liftof_settings.mtb_settings.tiu_emulation_mode;
+                        prescale              = tc.liftof_settings.mtb_settings.trigger_prescale;
+                        trigger_type          = tc.liftof_settings.mtb_settings.trigger_type;
                       }
                     }
                   }

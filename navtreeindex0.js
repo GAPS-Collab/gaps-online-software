@@ -28,11 +28,12 @@ var NAVTREEINDEX0 =
 "functions_func.html":[2,3,1],
 "functions_vars.html":[2,3,2],
 "hierarchy.html":[2,2],
-"index.html":[0],
 "index.html":[],
+"index.html":[0],
 "index.html#autotoc_md3":[0,0],
 "index.html#autotoc_md4":[0,1],
 "index.html#autotoc_md5":[0,2],
+"index.html#autotoc_md6":[0,3],
 "io_8hpp_source.html":[3,0,0,0,0,0,6],
 "legacy_8h_source.html":[3,0,0,0,0,0,7],
 "logging_8hpp_source.html":[3,0,0,0,0,0,8],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "structRBMoniData.html":[2,0,13],
 "structRBMoniData.html#a01b009477c7bae11d5f2b204c98959de":[2,0,13,20],
 "structRBMoniData.html#a10ba2673c2e73bf9414c2e4282f610cf":[2,0,13,22],
-"structRBMoniData.html#a13db6f0d7103175ffb480b1e110e39c0":[2,0,13,32],
-"structRBMoniData.html#a1c15756a484b85f4e942c5a66671d2d2":[2,0,13,28]
+"structRBMoniData.html#a13db6f0d7103175ffb480b1e110e39c0":[2,0,13,32]
 };

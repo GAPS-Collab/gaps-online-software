@@ -1,6 +1,6 @@
 var srcIndex = new Map(JSON.parse('[\
 ["ab_glyph_rasterizer",["",[],["geometry.rs","lib.rs","raster.rs"]]],\
-["adler",["",[],["algo.rs","lib.rs"]]],\
+["adler2",["",[],["algo.rs","lib.rs"]]],\
 ["ahash",["",[],["convert.rs","fallback_hash.rs","hash_map.rs","hash_set.rs","lib.rs","operations.rs","random_state.rs","specialize.rs"]]],\
 ["aho_corasick",["",[["nfa",[],["contiguous.rs","mod.rs","noncontiguous.rs"]],["packed",[["teddy",[],["builder.rs","generic.rs","mod.rs"]]],["api.rs","ext.rs","mod.rs","pattern.rs","rabinkarp.rs","vector.rs"]],["util",[],["alphabet.rs","buffer.rs","byte_frequencies.rs","debug.rs","error.rs","int.rs","mod.rs","prefilter.rs","primitives.rs","remapper.rs","search.rs","special.rs"]]],["ahocorasick.rs","automaton.rs","dfa.rs","lib.rs","macros.rs"]]],\
 ["allocator_api2",["",[["stable",[["alloc",[],["global.rs","mod.rs"]],["vec",[],["drain.rs","into_iter.rs","mod.rs","partial_eq.rs","set_len_on_drop.rs","splice.rs"]]],["boxed.rs","macros.rs","mod.rs","raw_vec.rs","slice.rs"]]],["lib.rs"]]],\
@@ -313,7 +313,7 @@ var srcIndex = new Map(JSON.parse('[\
 ["utf8parse",["",[],["lib.rs","types.rs"]]],\
 ["walkdir",["",[],["dent.rs","error.rs","lib.rs","util.rs"]]],\
 ["watch_buffer_fill",["",[],["watch_buffer_fill.rs"]]],\
-["webpki",["",[["crl",[],["mod.rs","types.rs"]],["subject_name",[],["dns_name.rs","ip_address.rs","mod.rs","verify.rs"]]],["cert.rs","der.rs","end_entity.rs","error.rs","lib.rs","ring_algs.rs","signed_data.rs","time.rs","trust_anchor.rs","verify_cert.rs","x509.rs"]]],\
+["webpki",["",[["crl",[],["mod.rs","types.rs"]],["subject_name",[],["dns_name.rs","ip_address.rs","mod.rs","verify.rs"]]],["cert.rs","der.rs","end_entity.rs","error.rs","lib.rs","ring_algs.rs","rpk_entity.rs","signed_data.rs","time.rs","trust_anchor.rs","verify_cert.rs","x509.rs"]]],\
 ["webpki_roots",["",[],["lib.rs"]]],\
 ["weezl",["",[],["decode.rs","encode.rs","error.rs","lib.rs"]]],\
 ["wide",["",[],["f32x4_.rs","f32x8_.rs","f64x2_.rs","f64x4_.rs","i16x16_.rs","i16x8_.rs","i32x4_.rs","i32x8_.rs","i64x2_.rs","i64x4_.rs","i8x16_.rs","i8x32_.rs","lib.rs","macros.rs","u16x16_.rs","u16x8_.rs","u32x4_.rs","u32x8_.rs","u64x2_.rs","u64x4_.rs","u8x16_.rs"]]],\

@@ -1270,7 +1270,7 @@
     <span class="comment">//let status                = self.header.status;
     </span><span class="kw">let </span>mt_timestamp          = <span class="self">self</span>.mt_event.get_timestamp_abs48();
     
-    summary.timestamp32       = (mt_timestamp &amp; <span class="number">0x00000000ffffffff </span>) <span class="kw">as </span>u32;
+    summary.timestamp32       = (mt_timestamp  &amp; <span class="number">0x00000000ffffffff </span>) <span class="kw">as </span>u32;
     summary.timestamp16       = ((mt_timestamp &amp; <span class="number">0x0000ffff00000000 </span>) &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u16;
     summary.primary_beta      = <span class="self">self</span>.header.primary_beta; 
     summary.primary_charge    = <span class="self">self</span>.header.primary_charge; 

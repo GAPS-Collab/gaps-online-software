@@ -155,6 +155,7 @@
 <a href="#155" id="155">155</a>
 <a href="#156" id="156">156</a>
 <a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The front page of the app, including a view of received packets
 
 </span><span class="kw">use </span>std::collections::{
@@ -272,7 +273,8 @@
              .title(<span class="string">"Packet summary \u{1f4e6}"</span>)
              .borders(Borders::ALL)
              .border_type(BorderType::Rounded)
-             );
+             )
+      .style(<span class="self">self</span>.theme.style());
 
     <span class="kw">let </span>main_view = Paragraph::new(LIFTOF_LOGO_SHOW)
     .style(<span class="self">self</span>.theme.style())

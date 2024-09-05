@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["get_gaps_events"]};
+window.SIDEBAR_ITEMS = {"fn":["get_gaps_events"],"struct":["TelemetryPacketReader"]};

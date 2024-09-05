@@ -2299,6 +2299,15 @@
 <a href="#2299" id="2299">2299</a>
 <a href="#2300" id="2300">2300</a>
 <a href="#2301" id="2301">2301</a>
+<a href="#2302" id="2302">2302</a>
+<a href="#2303" id="2303">2303</a>
+<a href="#2304" id="2304">2304</a>
+<a href="#2305" id="2305">2305</a>
+<a href="#2306" id="2306">2306</a>
+<a href="#2307" id="2307">2307</a>
+<a href="#2308" id="2308">2308</a>
+<a href="#2309" id="2309">2309</a>
+<a href="#2310" id="2310">2310</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard registers
 //!
 //! This should be the same as the reference
@@ -2438,13 +2447,14 @@
 
 <span class="comment">/////////////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////////////
 
 // Module MT adr = 0x0
 //
 // Implements various control and monitoring functions of the DRS Logic
 
 </span><span class="doccomment">///Prescale value for the GAPS trigger. 0 == 0% (off), 2**32-1 == 100%
-/// GAPS_TRIG_PRESCALE 0x248 0x920 [31:0] rw 0xffffffff
+/// GAPS_TRIG_PRESCALE 0x248 0x920 \[31:0\] rw 0xffffffff
 </span><span class="kw">pub const </span>GAPS_TRIG_PRESCALE : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
   addr    : <span class="number">0x248</span>,
   mask    : <span class="number">0xffffffff</span>,
@@ -4313,13 +4323,22 @@
 </span><span class="kw">pub const </span>TIU_USE_AUX_LINK : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
   addr  : <span class="number">0xe</span>,
   mask  : <span class="number">0x00000010</span>,
-  descr : <span class="string">"Choose betweent the 2 tiu links"</span>,
+  descr : <span class="string">"Choose between the 2 tiu links"</span>,
   rmw   : <span class="bool-val">true</span>,
   ro    : <span class="bool-val">false</span>,
   pulse : <span class="bool-val">false</span>,
 };
 
-
+<span class="doccomment">///TRIG_GEN_RATE     0x9     0x24    \[31:0\]  rw  0x0     Rate of generated triggers f_trig = (1/clk_period) * rate/0xffffffff
+/// Set a random forced trigger
+</span><span class="kw">pub const </span>TRIG_GEN_RATE : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
+  addr  : <span class="number">0x9</span>,
+  mask  : <span class="number">0xffffffff</span>,
+  descr : <span class="string">"Set a forced trigger (1/clk_period) * rate/0xffffffff"</span>,
+  rmw   : <span class="bool-val">false</span>,
+  ro    : <span class="bool-val">false</span>,
+  pulse : <span class="bool-val">false</span>,
+};
 
 <span class="comment">// All the trigger settings
 
@@ -4333,7 +4352,6 @@
 //FB_CLOCK_RATE_3   0x5     0x14    [31:0]  r       Feedback clock frequency
 //FB_CLOCK_RATE_4   0x6     0x18    [31:0]  r       Feedback clock frequency
 //DSI_ON    0x7     0x1c    [4:0]   rw  0x1F    Bitmask 1 = enable DSI
-//TRIG_GEN_RATE     0x9     0x24    [31:0]  rw  0x0     Rate of generated triggers f_trig = (1/clk_period) * rate/0xffffffff
 //RESYNC    0xa     0x28    0   w   Pulse   Write 1 to resync
 //ANY_TRIG_IS_GLOBAL    0xb     0x2c    0   rw  0x0     1 makes the ANY trigger read all paddles.
 //TRACK_TRIG_IS_GLOBAL  0xb     0x2c    1   rw  0x0     1 makes the TRACK trigger read all paddles.

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/diesel-2.2.2/src/sqlite/connection/raw.rs`."><title>raw.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="diesel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/diesel-2.2.4/src/sqlite/connection/raw.rs`."><title>raw.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="diesel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -606,6 +606,32 @@
 <a href="#606" id="606">606</a>
 <a href="#607" id="607">607</a>
 <a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(unsafe_code)] </span><span class="comment">// ffi calls
 </span><span class="kw">extern crate </span>libsqlite3_sys <span class="kw">as </span>ffi;
 
@@ -688,8 +714,12 @@
         ensure_sqlite_ok(result, <span class="self">self</span>.internal_connection.as_ptr())
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>rows_affected_by_last_query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="kw">unsafe </span>{ ffi::sqlite3_changes(<span class="self">self</span>.internal_connection.as_ptr()) <span class="kw">as </span>usize }
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>rows_affected_by_last_query(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;usize, Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync&gt;&gt; {
+        <span class="kw">let </span>r = <span class="kw">unsafe </span>{ ffi::sqlite3_changes(<span class="self">self</span>.internal_connection.as_ptr()) };
+
+        <span class="prelude-val">Ok</span>(r.try_into()<span class="question-mark">?</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>register_sql_function&lt;F, Ret, RetSqlType&gt;(
@@ -713,12 +743,15 @@
         }));
         <span class="kw">let </span>fn_name = <span class="self">Self</span>::get_fn_name(fn_name)<span class="question-mark">?</span>;
         <span class="kw">let </span>flags = <span class="self">Self</span>::get_flags(deterministic);
+        <span class="kw">let </span>num_args = num_args
+            .try_into()
+            .map_err(|e| Error::SerializationError(Box::new(e)))<span class="question-mark">?</span>;
 
         <span class="kw">let </span>result = <span class="kw">unsafe </span>{
             ffi::sqlite3_create_function_v2(
                 <span class="self">self</span>.internal_connection.as_ptr(),
                 fn_name.as_ptr(),
-                num_args <span class="kw">as _</span>,
+                num_args,
                 flags,
                 callback_fn <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>,
                 <span class="prelude-val">Some</span>(run_custom_function::&lt;F, Ret, RetSqlType&gt;),
@@ -744,12 +777,15 @@
     {
         <span class="kw">let </span>fn_name = <span class="self">Self</span>::get_fn_name(fn_name)<span class="question-mark">?</span>;
         <span class="kw">let </span>flags = <span class="self">Self</span>::get_flags(<span class="bool-val">false</span>);
+        <span class="kw">let </span>num_args = num_args
+            .try_into()
+            .map_err(|e| Error::SerializationError(Box::new(e)))<span class="question-mark">?</span>;
 
         <span class="kw">let </span>result = <span class="kw">unsafe </span>{
             ffi::sqlite3_create_function_v2(
                 <span class="self">self</span>.internal_connection.as_ptr(),
                 fn_name.as_ptr(),
-                num_args <span class="kw">as _</span>,
+                num_args,
                 flags,
                 ptr::null_mut(),
                 <span class="prelude-val">None</span>,
@@ -803,11 +839,19 @@
                 <span class="kw-2">&amp;mut </span>size <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>,
                 <span class="number">0</span>,
             );
-            SerializedDatabase::new(data_ptr, size <span class="kw">as </span>usize)
+            SerializedDatabase::new(
+                data_ptr,
+                size.try_into()
+                    .expect(<span class="string">"Cannot fit the serialized database into memory"</span>),
+            )
         }
     }
 
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>deserialize(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span>[u8]) -&gt; QueryResult&lt;()&gt; {
+        <span class="kw">let </span>db_size = data
+            .len()
+            .try_into()
+            .map_err(|e| Error::DeserializationError(Box::new(e)))<span class="question-mark">?</span>;
         <span class="comment">// the cast for `ffi::SQLITE_DESERIALIZE_READONLY` is required for old libsqlite3-sys versions
         </span><span class="attr">#[allow(clippy::unnecessary_cast)]
         </span><span class="kw">unsafe </span>{
@@ -815,8 +859,8 @@
                 <span class="self">self</span>.internal_connection.as_ptr(),
                 std::ptr::null(),
                 data.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>u8,
-                data.len() <span class="kw">as </span>i64,
-                data.len() <span class="kw">as </span>i64,
+                db_size,
+                db_size,
                 ffi::SQLITE_DESERIALIZE_READONLY <span class="kw">as </span>u32,
             );
 
@@ -1010,6 +1054,9 @@
     <span class="kw">static </span>NULL_CTX_ERR: <span class="kw-2">&amp;</span>str =
         <span class="string">"We've written the aggregator to the aggregate context, but it could not be retrieved."</span>;
 
+    <span class="kw">let </span>n_bytes: i32 = std::mem::size_of::&lt;OptionalAggregator&lt;A&gt;&gt;()
+        .try_into()
+        .expect(<span class="string">"Aggregate context should be larger than 2^32"</span>);
     <span class="kw">let </span>aggregate_context = <span class="kw">unsafe </span>{
         <span class="comment">// This block of unsafe code makes the following assumptions:
         //
@@ -1032,7 +1079,7 @@
         //   the memory will have a correct alignment.
         //   (Note I(weiznich): would assume that it is aligned correctly, but we
         //    we cannot guarantee it, so better be safe than sorry)
-        </span>ffi::sqlite3_aggregate_context(ctx, std::mem::size_of::&lt;OptionalAggregator&lt;A&gt;&gt;() <span class="kw">as </span>i32)
+        </span>ffi::sqlite3_aggregate_context(ctx, n_bytes)
     };
     <span class="kw">let </span>aggregate_context = NonNull::new(aggregate_context <span class="kw">as </span><span class="kw-2">*mut </span>OptionalAggregator&lt;A&gt;);
     <span class="kw">let </span>aggregator = <span class="kw">unsafe </span>{
@@ -1094,9 +1141,10 @@
         <span class="kw">let </span>res = A::finalize(aggregator);
         <span class="kw">let </span>value = process_sql_function_result(<span class="kw-2">&amp;</span>res)<span class="question-mark">?</span>;
         <span class="comment">// We've checked already that ctx is not null
-        </span><span class="kw">unsafe </span>{
-            value.result_of(<span class="kw-2">&amp;mut *</span>ctx);
-        }
+        </span><span class="kw">let </span>r = <span class="kw">unsafe </span>{ value.result_of(<span class="kw-2">&amp;mut *</span>ctx) };
+        r.map_err(|e| {
+            SqliteCallbackError::DieselError(<span class="kw">crate</span>::result::Error::SerializationError(Box::new(e)))
+        })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     })
     .unwrap_or_else(|_e| {
@@ -1111,7 +1159,11 @@
 }
 
 <span class="kw">unsafe fn </span>context_error_str(ctx: <span class="kw-2">*mut </span>ffi::sqlite3_context, error: <span class="kw-2">&amp;</span>str) {
-    ffi::sqlite3_result_error(ctx, error.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>, error.len() <span class="kw">as _</span>);
+    <span class="kw">let </span>len: i32 = error
+        .len()
+        .try_into()
+        .expect(<span class="string">"Trying to set a error message with more than 2^32 byte is not supported"</span>);
+    ffi::sqlite3_result_error(ctx, error.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>, len);
 }
 
 <span class="kw">struct </span>CollationUserPtr&lt;F&gt; {

@@ -93,6 +93,13 @@
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Registers of the DRS4 are accessed through
 //! the sytem ram (Addr8). It is a 32bit system, 
 //! so the address format is u32.
@@ -188,4 +195,11 @@
 </span><span class="kw">pub const </span>MT_EVENT_CNT : u32 = <span class="number">0x120</span>;
 <span class="kw">pub const </span>MT_TRIG_RATE : u32 = <span class="number">0x124</span>;
 <span class="kw">pub const </span>MT_LINK_ID   : u32 = <span class="number">0x104</span>;
+
+
+<span class="comment">// RB DEADTIME
+//
+//
+</span><span class="doccomment">///DRS_DEADTIME 	0x1e 	0x78 	[15:0] 	r 		Measured last deadtime of the DRS in clock cycles
+</span><span class="kw">pub const </span>DRS_DEADTIME : u32 = <span class="number">0x78</span>;
 </code></pre></div></section></main></body></html>

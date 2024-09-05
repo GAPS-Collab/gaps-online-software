@@ -1564,6 +1564,30 @@
 <a href="#1564" id="1564">1564</a>
 <a href="#1565" id="1565">1565</a>
 <a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
+<a href="#1577" id="1577">1577</a>
+<a href="#1578" id="1578">1578</a>
+<a href="#1579" id="1579">1579</a>
+<a href="#1580" id="1580">1580</a>
+<a href="#1581" id="1581">1581</a>
+<a href="#1582" id="1582">1582</a>
+<a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
+<a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
+<a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
+<a href="#1590" id="1590">1590</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Dataio - readino/writing of different types
 //! of TOF data products.
 //!
@@ -2297,6 +2321,29 @@
   }
 }
 
+
+<span class="doccomment">/// Generics for packet reading (TofPacket, Telemetry packet,...)
+</span><span class="kw">pub trait </span>PacketReader {
+  <span class="doccomment">/// header bytes, e.g. 0xAAAA for TofPackets
+  </span><span class="kw">const </span>HEADER0 : u8 = <span class="number">0</span>;
+  <span class="kw">const </span>HEADER1 : u8 = <span class="number">0</span>;
+
+  <span class="doccomment">/// Manage the internal cursor attribute
+  </span><span class="kw">fn </span>set_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pos : usize) {
+  }
+
+  <span class="doccomment">/// Rewind the file, so it can be read again from the 
+  /// beginning
+  </span><span class="kw">fn </span>rewind(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
+    <span class="comment">//self.file_reader.rewind()?;
+    </span><span class="self">self</span>.set_cursor(<span class="number">0</span>);
+    <span class="prelude-val">Ok</span>(())
+  }
+}
+
+
+
+
 <span class="doccomment">/// Read serialized TofPackets from an existing file
 ///
 /// This is mainly to read stream files previously
@@ -2772,6 +2819,7 @@
 /// The robin reader consumes a file. 
 ///
 ///
+</span><span class="comment">//#[deprecated(since="0.10.0", note="There are no robin files anymore. RBs will write data with RBEvents wrapped in TofPackets!")]
 </span><span class="kw">pub struct </span>RobinReader {
   <span class="kw">pub </span>streamer    : RBEventMemoryStreamer,
   <span class="kw">pub </span>filename    : String,

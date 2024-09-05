@@ -2229,6 +2229,20 @@
 <a href="#2229" id="2229">2229</a>
 <a href="#2230" id="2230">2230</a>
 <a href="#2231" id="2231">2231</a>
+<a href="#2232" id="2232">2232</a>
+<a href="#2233" id="2233">2233</a>
+<a href="#2234" id="2234">2234</a>
+<a href="#2235" id="2235">2235</a>
+<a href="#2236" id="2236">2236</a>
+<a href="#2237" id="2237">2237</a>
+<a href="#2238" id="2238">2238</a>
+<a href="#2239" id="2239">2239</a>
+<a href="#2240" id="2240">2240</a>
+<a href="#2241" id="2241">2241</a>
+<a href="#2242" id="2242">2242</a>
+<a href="#2243" id="2243">2243</a>
+<a href="#2244" id="2244">2244</a>
+<a href="#2245" id="2245">2245</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>numpy::{
     PyArray,
     PyArray1,
@@ -2298,7 +2312,11 @@
     TofCommandV2,
     TofCommandCode
 };
-<span class="kw">use </span>tof_dataclasses::calibrations::RBCalibrations;
+<span class="kw">use </span>tof_dataclasses::calibrations::{
+  RBCalibrations,
+  clean_spikes,
+  <span class="comment">//spike_cleaning
+</span>};
 <span class="kw">use </span>tof_dataclasses::config::{AnalysisEngineConfig, RunConfig, TOFEventBuilderConfig, BuildStrategy};
 
 
@@ -2877,8 +2895,18 @@
     <span class="prelude-val">Ok</span>(())
   }
 }
+  
+<span class="comment">//#[getter]
+//fn spike_cleaning_all_channel&lt;'_py&gt;(&amp;self, py: Python&lt;'_py&gt;) -&gt; PyResult&lt;Bound&lt;'_py, PyArray2&lt;f32&gt;&gt;&gt; {  
+//  let mut data = Vec::&lt;Vec&lt;f32&gt;&gt;::with_capacity(9);
+//  for ch in 0..9 {
+//    data.push(self.cali.tbin[ch].to_vec());
+//  }
+//  let pyarray = PyArray::from_vec2_bound(py, &amp;data).unwrap();
+//  Ok(pyarray)
+//}
 
-<span class="attr">#[pyclass]
+</span><span class="attr">#[pyclass]
 #[pyo3(name=<span class="string">"PAMoniSeries"</span>)]
 </span><span class="kw">pub struct </span>PyPAMoniSeries {
   pamoniseries : PAMoniDataSeries,

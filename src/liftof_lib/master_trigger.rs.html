@@ -1323,8 +1323,8 @@
   </span><span class="kw">let </span><span class="kw-2">mut </span>last_event_id           = <span class="number">0u32</span>;
   <span class="comment">//let mut n_events                   = 0u64;
   //let mut rate_from_reg  : Option&lt;u32&gt; = None;
-  </span><span class="kw">let </span><span class="kw-2">mut </span>verbose_timer       = Instant::now();
-  <span class="comment">//let mut total_elapsed              = 0f64;
+  //let mut verbose_timer       = Instant::now();
+  //let mut total_elapsed              = 0f64;
   //let mut n_ev_unsent                = 0u64;
   //let mut n_ev_missed                = 0u64;
   </span><span class="kw">let </span><span class="kw-2">mut </span>first                  = <span class="bool-val">true</span>;
@@ -1507,8 +1507,8 @@
       }
     }
 
-    <span class="kw">let </span>verbose_timer_elapsed = verbose_timer.elapsed().as_secs_f64();
-    <span class="comment">//let mut missing = 0usize;
+    <span class="comment">//let verbose_timer_elapsed = verbose_timer.elapsed().as_secs_f64();
+    //let mut missing = 0usize;
     //if event_id_test.len() &gt; 0 {
     //  let mut evid = event_id_test[0];
     //  for _ in 0..event_id_test.len() {

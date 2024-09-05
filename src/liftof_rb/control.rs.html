@@ -356,6 +356,11 @@
 <a href="#356" id="356">356</a>
 <a href="#357" id="357">357</a>
 <a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Convenience functions to read/write
 //!  the various control registers
 //!
@@ -714,4 +719,9 @@
 }
 
 
+<span class="doccomment">/// Read te last DRS4 Deadtime
+</span><span class="kw">pub fn </span>get_deadtime() -&gt; <span class="prelude-ty">Result</span>&lt;u32, RegisterError&gt; {
+  <span class="kw">let </span>deadtime = read_control_reg(DRS_DEADTIME)<span class="question-mark">?</span>;
+  <span class="prelude-val">Ok</span>(deadtime)
+}
 </code></pre></div></section></main></body></html>
