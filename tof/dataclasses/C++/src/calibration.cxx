@@ -85,6 +85,180 @@ void spike_cleaning_simple(Vec<Vec<f32>> &wf, bool calibrated) {
 
 /************************************************/
 
+/// A simple version of the spike cleaning, which does not rely on 
+/// all channels being present and can work independently on each 
+/// channel
+void spike_cleaning_all(Vec<Vec<f32>> &wf, bool calibrated) {
+//    # TODO: make robust (symmetric, doubles, fixed/estimated spike height)
+//    thresh = 360
+//    if vcaldone:
+//        thresh = 16
+//    spikefilter = -wf[:,:-3]+wf[:,1:-2]+wf[:,2:-1]-wf[:,3:]
+//    spikes = np.where(np.sum(spikefilter > thresh,axis=0) >= 2)[0]
+//    for i in spikes:
+//        dV = (wf[:,i+3]-wf[:,i])/3.0
+//        wf[:,i+1] = wf[:,i] + dV
+//        wf[:,i+2] = wf[:,i] + 2*dV
+//    return wf
+  int thresh = 360;
+  int thresh_single = 200;  // threshold for single spikes 
+
+  if (calibrated) {
+    thresh = 16;
+    thresh_single = 20;
+  }
+
+  // First, remedy the known DRS4 spikes
+  std::vector<std::vector<double>> spikefilter(wf.size());
+  for (size_t i = 0; i < wf.size(); ++i) {
+    for (size_t j = 0; j < wf[i].size() - 3; ++j) {
+      double value = -wf[i][j] + wf[i][j + 1] + wf[i][j + 2] - wf[i][j + 3];
+      spikefilter[i].push_back(value);
+    }
+  }
+
+  // find spikes
+  std::vector<int> spikes;
+  for (size_t j = 0; j < spikefilter[0].size(); ++j) {
+    int count = 0;
+    for (size_t i = 0; i < spikefilter.size(); ++i) {
+      if (spikefilter[i][j] > thresh) {
+        count++;
+      }
+    }
+    if (count >= 2) {
+      spikes.push_back(j);
+    }
+  }
+
+  // adjust wf based on spikes
+  for (int i : spikes) {
+    for (size_t row = 0; row < wf.size(); ++row) {
+      if (i + 3 < (int)wf[row].size()) {  // Check to avoid out-of-bounds
+        double dV = (wf[row][i + 3] - wf[row][i]) / 3.0;
+        wf[row][i + 1] = wf[row][i] + dV;
+        wf[row][i + 2] = wf[row][i] + 2 * dV;
+      }
+    }
+  }
+  
+  // Now, deal with the single spikes separated by 32 bins. Since the
+  // spikes are associated with the RB, we look for single-bin spikes,
+  // separated by 32 bins, that show up on multiple channels in an RB
+  // (excluding ch9) .
+  size_t start = 5;  // First few bins of trace are often weird. 
+  size_t nsegs = 20; // How many 32-bin segments to use
+  double sum;
+
+  std::vector<double> singles;
+  // For each of the 32-bin series, sum the signals in ch 0-7;
+  for (size_t j = 0; j < 32; j++) {
+      sum = 0.0; // initialize our sum
+      for (size_t k = 0; k < nsegs; k++) {
+	size_t ind = start + j + k*32;
+	for (size_t i=0; i<wf.size()-1; i++) 
+	  sum += wf[i][ind] - (wf[i][ind-1]+wf[i][ind+1])/2.0;
+      }
+      //printf(" %4.1lf", sum); 
+      singles.push_back(sum);
+  }
+  
+  // Now check for spikes
+  double combined, largest=0.0;
+  size_t spike = 999;
+  for (size_t j=0;j<singles.size(); j++) {
+    if (j==0)
+      combined = singles[j] - (singles[singles.size()-1] + singles[j+1]); 
+    else if (j==singles.size()-1)
+      combined = singles[j] - (singles[j-1] + singles[0]); 
+    else 
+      combined = singles[j] - (singles[j-1] + singles[j+1]); 
+    if (fabs(combined) > thresh_single && fabs(combined) > largest) {
+      spike = j; 
+      largest = fabs(combined);
+    }
+  }
+  //if (spike < 999) printf(" :%ld", spike+start);
+  //printf("\n");
+  
+  // If we found spikes, remove them on each waveform present.
+  if (spike < 999) {
+    // First, determine which channels (0-7) have data
+    for (size_t i=0; i<wf.size()-1; i++) {
+        double test=0.0;
+      for (size_t m=0;m<10;m++) test += wf[i][m+5];
+      if ( fabs(test) > 0.001 ) { // Channel has data  
+	size_t ind = spike+start; // This is the first bin to correct. 
+	do {
+	  wf[i][ind] = (wf[i][ind-1] + wf[i][ind+1])/2.0;
+	  ind +=32;
+	} while ( ind < wf[i].size()-2 ) ;
+      }
+    }
+  }
+
+  /* OLD ALGORITHM THAT WORKS WITH INDIVIDUAL CHANNELS
+  // Now, deal with the single spikes separated by 32 bins. Currently,
+  // I look at each individual trace to determine if spikes
+  // exist. However, the spikes are associated with the readout
+  // board. So, we could modify the routine to look at the pairs of
+  // channels associated with each paddle to be more sensitive to
+  // spikes.
+  for (size_t i = 0; i < wf.size()-1; ++i) { // Don't use ch9
+    double test=0.0;;
+    for (size_t m=0;m<10;m++) test += wf[i][m+5];
+    //printf("ch %ld: test = %.2lf\n", i, test);
+    std::vector<double> singles;
+    for (size_t j = 0; j < 32; j++) {
+      sum = 0.0; // initialize our sum
+      for (size_t k = 0; k < nsegs; k++) {
+	size_t ind = start + j + k*32;
+	sum += wf[i][ind] - (wf[i][ind-1]+wf[i][ind+1])/2.0;
+      }
+      //if (sum!=0) printf(" %4.1lf", sum); 
+      singles.push_back(sum);
+    }
+    if (sum!=0) {
+      
+      // Now check for spikes
+      double combined, largest=0.0;
+      size_t spike = 999;
+      for (size_t j=0;j<singles.size(); j++) {
+	if (j==0)
+	  combined = singles[j] - (singles[singles.size()-1] + singles[j+1]); 
+	else if (j==singles.size()-1)
+	  combined = singles[j] - (singles[j-1] + singles[0]); 
+	else 
+	  combined = singles[j] - (singles[j-1] + singles[j+1]); 
+	if (fabs(combined) > thresh_single && fabs(combined) > largest) {
+	  spike = j; 
+	  largest = fabs(combined);
+	}
+      }
+      // Found spikes in the waveform
+      if (spike < 999) {
+	size_t ind = spike+start;
+	do {
+	  //wf[i][ind] = (wf[i][ind-1] + wf[i][ind+1])/2.0;
+	  ind +=32;
+	} while ( ind < wf[i].size()-2 ) ;
+	//printf("  Sp -> %ld", spike+start);
+      }
+      //printf("\n");
+    }
+  } */
+  
+  // Printing the adjusted wf for demonstration
+  //for (const auto& row : wf) {
+  //  for (double num : row) {
+  //    std::cout << num << " ";
+  //  }
+  //  std::cout << "\n";
+  //}
+}
+
+/************************************************/
+
 void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) {
   int i, j, k, l;
   double x, y;
@@ -278,11 +452,15 @@ Vec<Vec<f32>> RBCalibration::voltages    (const RBEvent &event,
     all_ch_voltages.push_back(voltages(event, ch));
   }
   if (spike_cleaning) {
+    /*
     int spikes[NWORDS];
     for (usize n=0;n<NWORDS;n++) {
       spikes[n] = 0;
     }
     spike_cleaning_drs4(all_ch_voltages, event.header.stop_cell, spikes);
+    */
+    //spike_cleaning_simple(all_ch_voltages, true); // true -> calibrated
+    spike_cleaning_all(all_ch_voltages, true); // true -> calibrated
   }
   return all_ch_voltages;
 }

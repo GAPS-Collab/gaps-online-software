@@ -17,6 +17,11 @@
 
 #define ERRVAL		(999999999)
 
+// Just some variables that we will use later. Should make more robust
+// Need 1 larger to account for no "zero" cube paddle
+#define NCUBE 61  
+#define NUMBC 12
+
 // Types of Thresholds to use in determining timing
 enum THRTYPE { CONSTANT, CFD_ELEC, CFD_SIMPLE, PCONSTANT, PCFD };
 
@@ -55,7 +60,11 @@ public:
   void    FillChannelHistos(int old);
   void    FillPaddleHistos(void);
   void    WriteHistograms(void);
-  
+
+  // Stuff related to calculating paddle offsets
+  void    OffsetHistograms(bool flag);
+  void    FillOffsetHistos(void);
+  void    WriteOffsetHistos(void);
   
 private:
   
@@ -93,6 +102,7 @@ private:
   float   TCorrFixed[NPAD];          // Timing correction (cables, pad_len)
   float   TCorrEvent[NPAD];          // Timing correction (ch9)
   float   Offset[NPAD];              // Offset of this paddle
+  bool    CalcOffset;                // Set true if calculating offsets
   int     EarlyPaddle;               // Which paddle is first hit
   float   EarlyTime;                 // Time of earliest hit
   
@@ -127,14 +137,14 @@ private:
   TH1D    *Peak[NTOT];                 // VPeak histograms
   TH1D    *Charge[NTOT];               // Charge histograms
   TH1D    *Charge_cut[NTOT];           // Charge (cut) histograms
-  TH1D    *tdcCFD[NTOT];                  // TDC histograms
+  TH1D    *tdcCFD[NTOT];               // TDC histograms
   
   TH2D    *QEnd2End[NPAD];             // End 2 End charge 
   TH1I    *HitMask[NPAD];              // Hit mask of paddle
   TH1D    *tDiff[NPAD];                // tdc diff of paddle ends
   TH1D    *Ch9Shift[NPAD];             // T shift from ch9 analysis
-  TH2F    *Ch9Good[2];                // T shift from ch9 analysis
-  TH2F    *Ch9Bad[2];                // T shift from ch9 analysis
+  TH2F    *Ch9Good[2];                 // T shift from ch9 analysis
+  TH2F    *Ch9Bad[2];                  // T shift from ch9 analysis
   TH1F    *HitTime[NPAD];              // Hit Time in detector
   TH1F    *HitPosition[NPAD];          // Hit Position along paddle (cm)
   TH3F    *HitGAPS;                    // Hit Position in detector (mm)
@@ -154,6 +164,8 @@ private:
   TH1I    *NPaddlesCube;
   TH1I    *NPaddlesUmbrella;
   TH1I    *NPaddlesCortina;
+
+  TH1F    *H_Offset[NCUBE][NUMBC];  // 60 Cube paddles, 12 Umb-Center paddles
   
   // MEMBER FUNCTIONS
   void    Message(const char *s);           // Print out messages as needed

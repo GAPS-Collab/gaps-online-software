@@ -23,6 +23,9 @@ void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]);
 /// An adjusted, simpler version of the spike cleaing written by Jamie
 void spike_cleaning_simple(Vec<Vec<f32>> &voltages, bool calibrated = true);
 
+/// Jamie's simpler version with single-width spike correction
+void spike_cleaning_all(Vec<Vec<f32>> &voltages, bool calibrated = true);
+
 /** 
  * A set of calibration constants for a single readoutboard
  *
