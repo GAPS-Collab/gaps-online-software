@@ -67,7 +67,11 @@ use tof_dataclasses::commands::{
     TofCommandV2,
     TofCommandCode
 };
-use tof_dataclasses::calibrations::RBCalibrations;
+use tof_dataclasses::calibrations::{
+  RBCalibrations,
+  clean_spikes,
+  //spike_cleaning
+};
 use tof_dataclasses::config::{AnalysisEngineConfig, RunConfig, TOFEventBuilderConfig, BuildStrategy};
 
 
@@ -646,6 +650,16 @@ impl PyRBCalibration {
     Ok(())
   }
 }
+  
+//#[getter]
+//fn spike_cleaning_all_channel<'_py>(&self, py: Python<'_py>) -> PyResult<Bound<'_py, PyArray2<f32>>> {  
+//  let mut data = Vec::<Vec<f32>>::with_capacity(9);
+//  for ch in 0..9 {
+//    data.push(self.cali.tbin[ch].to_vec());
+//  }
+//  let pyarray = PyArray::from_vec2_bound(py, &data).unwrap();
+//  Ok(pyarray)
+//}
 
 #[pyclass]
 #[pyo3(name="PAMoniSeries")]
