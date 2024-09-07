@@ -101,6 +101,11 @@ impl PyMergedEvent {
   }
 
   #[getter]
+  fn version(&self) -> u8 {
+    self.event.version
+  }
+
+  #[getter]
   fn tracker(&self) -> PyResult<Vec<PyTrackerEvent>> {
     let mut events = Vec::<PyTrackerEvent>::new();
     for k in &self.event.tracker_events {

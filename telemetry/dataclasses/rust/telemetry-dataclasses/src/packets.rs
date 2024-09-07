@@ -175,6 +175,7 @@ pub struct MergedEvent {
   pub raw_data       : Vec<u8>,
   pub flags0         : u8,
   pub flags1         : u8,
+  pub version        : u8
 }
 
 impl MergedEvent {
@@ -189,7 +190,7 @@ impl MergedEvent {
       raw_data       : Vec::<u8>::new(),
       flags0         : 0,
       flags1         : 1,
-    
+      version        : 0, 
     }
   }
 
@@ -219,12 +220,16 @@ impl MergedEvent {
                          pos    : &mut usize)
     -> Result<Self, SerializationError> {
     let mut me        = MergedEvent::new();
-    let _version      = parse_u8(stream, pos);
+    let version      = parse_u8(stream, pos);
     //println!("_version {}", _version);
     me.flags0         = parse_u8(stream, pos);
     // skip a bunch of Alex newly implemented things
     // FIXME
-    *pos += 8;
+    if version == 0 {
+      me.flags1      = parse_u8(stream, pos);
+    } else {
+      *pos += 8;
+    }
 
     me.event_id       = parse_u32(stream, pos);
     //println!("EVENT ID {}", me.event_id);
