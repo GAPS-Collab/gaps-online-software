@@ -18,10 +18,11 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-telemetry-dataclasses = { path = "../telemetry-dataclasses"}
+telemetry-dataclasses = { path = "../telemetry-dataclasses", features=["pybindings"]}
 tof-dataclasses       = { path = "../../../../tof/dataclasses/rust/tof-dataclasses/" , features = ["advanced-algorithms", "database"]} 
 rpy-tof-dataclasses   = { path = "../../../../tof/dataclasses/rust/pybindings/" }
 #liftof-lib = { path = "../liftof-lib" }
+# latest version is 0.22 
 pyo3                  = { version = "0.21", features = ["extension-module"] }
 pyo3-log              = "0.10"
 numpy                 = "0.21"

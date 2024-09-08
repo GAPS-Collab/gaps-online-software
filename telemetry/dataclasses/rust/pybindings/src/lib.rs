@@ -8,7 +8,7 @@ extern crate pyo3_log;
 
 use telemetry_dataclasses::packets as tel_api;
 use telemetry_dataclasses::io as tel_io_api;
-extern crate rpy_tof_dataclasses;
+//extern crate rpy_tof_dataclasses;
 use rpy_tof_dataclasses::dataclasses::{
   PyTofHit,
   PyTofEventSummary,
@@ -116,6 +116,32 @@ impl PyMergedEvent {
     Ok(events)
   }
 
+
+
+  /// Check if TOF/trackler data can be unpacked an no errors are thrown
+  #[getter]
+  fn broken(&self) -> bool {
+    // since the tracker part is already deserialized, the check
+    // is only relevant for the tof part
+    match TofPacket::from_bytestream(&self.event.tof_data, &mut 0) {
+      Err(err) => {
+        //error!("Unable to parse TofPacket! {err}");
+        return true;
+      }
+      Ok(pack) => {
+        match pack.unpack::<tof_api::TofEventSummary>() {
+          Err(err) => {
+            return true;
+            //error!("Unable to parse TofEventSummary! {err}");
+          }
+          Ok(ts)    => {
+            return false;
+          }
+        }
+      }
+    }
+  }
+
   #[getter]
   fn tof(&self) -> PyResult<PyTofEventSummary> {
     match TofPacket::from_bytestream(&self.event.tof_data, &mut 0) {
@@ -139,6 +165,9 @@ impl PyMergedEvent {
     }
   }
 
+  /// Populate a merged event from a TelemetryPacket.
+  ///
+  /// Telemetry packet type should be 90 (MergedEvent)
   fn from_telemetrypacket(&mut self, packet : PyTelemetryPacket) -> PyResult<()> {
     match tel_api::MergedEvent::from_bytestream(&packet.packet.payload, &mut 0) {
       Ok(event) => {
@@ -336,6 +365,21 @@ impl PyTelemetryPacketReader {
       reader     : tel_io_api::TelemetryPacketReader::new(filename)
     }
   }
+
+  /// Any filter will be selecting packets of only this type
+  ///
+  /// If all packets should be allowed, set the packet type to Unknown
+  #[getter]
+  fn get_filter(&self) -> PyResult<tel_api::TelemetryPacketType> {
+    Ok(self.reader.filter)
+  }
+
+  #[setter]
+  fn set_filter(&mut self, ptype : tel_api::TelemetryPacketType) -> PyResult<()> {
+    self.reader.filter = ptype;
+    Ok(())
+  }
+
 
   #[getter]
   fn packet_index(&mut self) -> PyResult<HashMap<u8, usize>> {
@@ -565,6 +609,7 @@ impl PyTrackerEvent {
 fn rust_dataclasses(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     pyo3_log::init();
     m.add_function(wrap_pyfunction!(get_gapsevents,m)?)?;
+    m.add_class::<tel_api::TelemetryPacketType>()?;
     m.add_class::<PyTelemetryPacket>()?;
     m.add_class::<PyTelemetryPacketReader>()?;
     m.add_class::<PyMergedEvent>()?;

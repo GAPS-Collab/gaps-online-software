@@ -8,9 +8,4 @@ GAPS online software TOF part
 
 
 from .mapping import DsiJChRBMap
-
 from . import sensors
-try:
-    from . import converters
-except ImportError as e:
-    print(f"HDF converter tools not available! {e}")

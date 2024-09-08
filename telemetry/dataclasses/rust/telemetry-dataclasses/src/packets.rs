@@ -16,7 +16,11 @@ use tof_dataclasses::serialization::{
 use tof_dataclasses::events::TofEventSummary;
 use tof_dataclasses::packets::TofPacket;
 
+#[cfg(feature = "pybindings")]
+use pyo3::pyclass;
+
 #[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "pybindings", pyclass)]
 #[repr(u8)]
 pub enum TelemetryPacketType {
   Unknown          = 0,

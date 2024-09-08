@@ -13,8 +13,8 @@ use std::path::Path;
 use std::collections::VecDeque;
 
 use crate::packets::{
-    TofPacket,
-    PacketType,
+  TofPacket,
+  PacketType,
 };
 
 
