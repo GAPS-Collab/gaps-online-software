@@ -19,44 +19,66 @@ use tof_dataclasses::packets::TofPacket;
 #[cfg(feature = "pybindings")]
 use pyo3::pyclass;
 
+/// Recreate 48bit timestamp from u32 and u16
+pub fn make_systime(lower : u32, upper : u16) -> u64 {
+  (upper as u64) << 32 | lower as u64
+}
+
+
 #[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[cfg_attr(feature = "pybindings", pyclass)]
 #[repr(u8)]
 pub enum TelemetryPacketType {
-  Unknown          = 0,
-  RBWaveform  = 91,
-  Tracker     = 80,
-  MergedEvent = 90,
-  AnyTofHK    = 92,
-  InterestingEvent = 190,
-  Command          = 200,       
-  CardHKP          = 30,
-  TmP33       = 33,
-  TmP34       = 34,
-  TmP37       = 37,
-  TmP38       = 38,
-  TmP40       = 40,
-  TmP50       = 50,
-  TmP55       = 55,
-  TmP64       = 64,
-  Tmp81       = 81,
-  TmP83       = 83,
-  //TmP92       = 92,
-  TmP96       = 96,
-  TmP214      = 214,
-  TmP255      = 255
+  Unknown           = 0,
+  CardHKP           = 30,
+  CoolingHK         = 40,
+  PDUHK             = 50,
+  Tracker           = 80,
+  TrackerDAQCntr    = 81,
+  GPS               = 82,
+  TrkTempLeak       = 83,
+  MergedEvent       = 90,
+  RBWaveform        = 91,
+  AnyTofHK          = 92,
+  GcuEvtBldSettings = 93,
+  LabJackHK         = 100,
+  MagHK             = 108,
+  GcuMon            = 110,
+  InterestingEvent  = 190,
+  Ack               = 200,     
+  // unknown/unused stuff
+  TmP33            = 33,
+  TmP34            = 34,
+  TmP37            = 37,
+  TmP38            = 38,
+  TmP55            = 55,
+  TmP64            = 64,
+  //TmP92          = 92,
+  TmP96            = 96,
+  TmP214           = 214,
+  TmP255           = 255
 }
 
 impl From<u8> for TelemetryPacketType {
   fn from(value: u8) -> Self {
     match value {
-      0u8   => TelemetryPacketType::Unknown,
-      80u8  => TelemetryPacketType::Tracker,
-      90u8  => TelemetryPacketType::MergedEvent,
-      91u8  => TelemetryPacketType::RBWaveform,
-      92u8  => TelemetryPacketType::AnyTofHK,
-      190u8 => TelemetryPacketType::InterestingEvent,
-      200u8 => TelemetryPacketType::Command,
+      0     => TelemetryPacketType::Unknown,
+      30    => TelemetryPacketType::CardHKP,
+      40    => TelemetryPacketType::CoolingHK,
+      50    => TelemetryPacketType::PDUHK,
+      80    => TelemetryPacketType::Tracker,
+      81    => TelemetryPacketType::TrackerDAQCntr,
+      82    => TelemetryPacketType::GPS,
+      83    => TelemetryPacketType::TrkTempLeak,
+      90    => TelemetryPacketType::MergedEvent,
+      91    => TelemetryPacketType::RBWaveform,
+      92    => TelemetryPacketType::AnyTofHK,
+      93    => TelemetryPacketType::GcuEvtBldSettings,
+      100   => TelemetryPacketType::LabJackHK,
+      108   => TelemetryPacketType::MagHK,
+      110   => TelemetryPacketType::GcuMon,
+      190   => TelemetryPacketType::InterestingEvent,
+      200   => TelemetryPacketType::Ack,
       _     => TelemetryPacketType::Unknown,
     }
   }
@@ -488,7 +510,9 @@ impl TrackerHeader {
     h.packet_id   = parse_u8 (stream, pos);
     h.length      = parse_u16(stream, pos);
     h.daq_count   = parse_u16(stream, pos);
-    h.sys_time    = parse_u64(stream, pos);
+    let lower     = parse_u32(stream, pos);
+    let upper     = parse_u16(stream, pos);
+    h.sys_time    = make_systime(lower, upper);
     h.version     = parse_u8 (stream, pos);
     Ok(h)
   }
@@ -504,6 +528,52 @@ impl fmt::Display for TrackerHeader {
     repr    += &(format!("\n  DAQ Cnt  : {}", self.daq_count));
     repr    += &(format!("\n  Sys Time : {}", self.sys_time));
     repr    += &(format!("\n  Version  : {}>", self.version));
+    write!(f, "{}", repr)
+  }
+}
+
+
+pub struct GPSPacket {
+  pub telemetry_header : TelemetryHeader,
+  pub tracker_header   : TrackerHeader,
+  pub utc_time         : u32,
+  pub gps_info         : u8
+}
+
+impl GPSPacket {
+  pub fn new() -> Self {
+    Self {
+      telemetry_header : TelemetryHeader::new(),
+      tracker_header   : TrackerHeader::new(),
+      utc_time         : 0,
+      gps_info         : 0,
+    }
+  }
+  
+  pub fn from_bytestream(stream: &Vec<u8>,
+                         pos: &mut usize)
+    -> Result<Self, SerializationError> {
+    let mut gps_p       = GPSPacket::new();
+    gps_p.tracker_header   = TrackerHeader::from_bytestream(stream, pos)?;
+    if stream.len() == *pos as usize {
+      error!("Packet contains only header!");
+      return Ok(gps_p);
+    }
+    gps_p.utc_time = parse_u32(stream, pos);
+    gps_p.gps_info = parse_u8(stream, pos);
+    Ok(gps_p)
+  }
+}
+
+impl fmt::Display for GPSPacket {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<GPSPacket");
+    repr    += &(format!("\n {}", self.telemetry_header));
+    repr    += &(format!("\n {}", self.tracker_header));
+    repr    += "\n*** GPS TIME ***";
+    repr    += &(format!("\n UTC TIME (32bit) {}", self.utc_time));
+    repr    += &(format!("\n GSP INFO (8bit)  {}", self.gps_info));
+    repr    += ">";
     write!(f, "{}", repr)
   }
 }
@@ -542,7 +612,6 @@ impl TrackerPacket {
                          pos: &mut usize)
     -> Result<Self, SerializationError> {
     let mut tp          = TrackerPacket::new();
-    //tp.telemetry_header = TelemetryHeader::from_bytestream(stream, pos)?;
     tp.tracker_header   = TrackerHeader::from_bytestream(stream, pos)?;
     if stream.len() == *pos as usize {
       error!("Packet contains only header!");
@@ -593,6 +662,75 @@ impl TrackerPacket {
     Ok(tp)
   }
 }
+      
+pub struct TrackerTempLeakPacket {
+  pub telemetry_header : TelemetryHeader,
+  pub tracker_header   : TrackerHeader,
+  pub row_offset       : u8,
+  pub templeak         : [[u32;6];6],
+  pub seu              : [[u32;6];6]
+}
+
+impl fmt::Display for TrackerTempLeakPacket {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerTempLeakPacket");
+    repr    += &(format!("\n {}", self.telemetry_header));
+    repr    += &(format!("\n {}", self.tracker_header));
+    repr    += "\n*** TEMPLEAK ***";
+    for k in 0..6 {
+      repr  += &(format!("\n {:?}", self.templeak[k]));
+    }
+    repr    += "\n*** SEU ***";
+    for k in 0..6 {
+      repr  += &(format!("\n {:?}", self.seu[k]));
+    }
+    repr    += ">";
+    write!(f, "{}", repr)
+  }
+}
+
+impl TrackerTempLeakPacket {
+  pub fn new() -> Self {
+    Self {
+      telemetry_header : TelemetryHeader::new(),
+      tracker_header   : TrackerHeader::new(),
+      row_offset       : 0,
+      templeak         : [[0;6];6],
+      seu              : [[0;6];6]
+    }
+  }
+  
+  pub fn from_bytestream(stream: &Vec<u8>,
+                         pos: &mut usize)
+    -> Result<Self, SerializationError> {
+    let mut tp          = TrackerTempLeakPacket::new();
+    tp.tracker_header   = TrackerHeader::from_bytestream(stream, pos)?;
+    if stream.len() == *pos as usize {
+      error!("Packet contains only header!");
+      return Ok(tp);
+    }
+    if stream.len() - *pos < (36*3 + 1) {
+      return Err(SerializationError::StreamTooShort);
+    }
+    let row_info = parse_u8(stream, pos);
+    tp.row_offset = row_info & 0x7;
+    for row in 0..6 {
+      for module in 0..6 {
+        let b0 = parse_u8(stream, pos) as u32;
+        let b1 = parse_u8(stream, pos) as u32;
+        let b2 = parse_u8(stream, pos) as u32;
+        let seu_ : u32 = b2 >> 1;
+        let mut templeak_ : u32 = (b2 << 10) | (b1 << 2)  | (b0 >> 6);
+        templeak_ &= 0x7ff;
+        tp.templeak[row][module] = templeak_;
+        tp.seu[row][module] = seu_;
+      }
+    }
+    Ok(tp)
+  }
+}
+
+
 
 /// This is mine :) Not telemetry
 pub struct GapsTracker {

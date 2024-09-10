@@ -30,8 +30,11 @@ impl PyTofPacketReader {
     pyreader
   }
 
-  fn get_packet_index(&mut self) -> PyResult<HashMap<u8, usize>> {
-    Ok(self.reader.get_packet_index()?)
+  #[getter]
+  fn packet_index(&mut self) -> PyResult<HashMap<u8, usize>> {
+    let idx = self.reader.get_packet_index()?;
+    self.reader.rewind()?;
+    Ok(idx)
   }
 
   fn rewind(&mut self) {

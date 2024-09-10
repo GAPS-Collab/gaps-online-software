@@ -351,6 +351,27 @@ impl PyTelemetryPacket {
   }
 }
 
+
+/// Read the GAPS binary data stream, dubbed as "telemetry"
+///
+/// These are binary files, typically with a name like RAW240716_094940.bin,
+/// where the numbers are the UTC timestamp when the file has been written.
+///
+/// These telemetry files contains data seperated by delimiters, called "packets".
+/// The TelemetryPacketReader will recognized the delimiters, and emit these 
+/// individual packets.
+///  
+/// When creating a new instalnce of TelemetryPacketReader, the intance will emit packets
+/// until the whole file is consumed. To re-use the same instance, call
+/// TelemetryPacketReader::rewind
+///
+/// # Arguments
+///
+/// * filename - the name of the binary file to be read
+/// * filter   - emit only TelemetryPackets of a certain type. If set to 
+///              TelemetryPacketType::Unknown, all packets will be emitted
+/// * start    - [NOT IMPLEMENTED]
+/// * stop     - [NOT IMPLEMENTED]
 #[pyclass]
 #[pyo3(name="TelemetryPacketReader")]
 struct PyTelemetryPacketReader {
@@ -360,10 +381,13 @@ struct PyTelemetryPacketReader {
 #[pymethods]
 impl PyTelemetryPacketReader {
   #[new]
-  fn new(filename : String) -> Self {
-    Self {
+  #[pyo3(signature = (filename, filter=tel_api::TelemetryPacketType::Unknown,start=0, nevents=0))]
+  fn new(filename : String, filter : tel_api::TelemetryPacketType, start : usize, nevents : usize) -> Self {
+    let mut reader_init = Self {
       reader     : tel_io_api::TelemetryPacketReader::new(filename)
-    }
+    };
+    reader_init.reader.filter = filter;
+    reader_init
   }
 
   /// Any filter will be selecting packets of only this type
@@ -380,14 +404,29 @@ impl PyTelemetryPacketReader {
     Ok(())
   }
 
-
-  #[getter]
-  fn packet_index(&mut self) -> PyResult<HashMap<u8, usize>> {
-    let index = self.reader.get_packet_index()?;
+  /// Return an inventory of packets in this file, where TelemetryPacketType is
+  /// represented by its associtated integer
+  ///
+  /// # Arguments
+  /// * verbose    : print the associated TelemetryPacketTypes (names)
+  #[pyo3(signature = (verbose=false))]
+  fn get_packet_index(&mut self, verbose : bool) -> PyResult<HashMap<u8, usize>> {
+    let idx = self.reader.get_packet_index()?;
+    if verbose {
+      println!("<TelemetryPacketReader::index");
+      for k in idx.keys() {
+        let ptype = tel_api::TelemetryPacketType::from(*k);
+        println!("--> {} ({}) : {}",k, ptype, idx.get(&k).unwrap());
+      }
+      println!(">");
+    }
     self.reader.rewind();
-    Ok(index)
+    Ok(idx)
   }
- 
+
+  /// "Rewind" the file, meaning set the cursor to the beginning again.
+  ///
+  /// All packets can be emitted again
   fn rewind(&mut self) -> PyResult<()> {
     Ok(self.reader.rewind()?)
   }
@@ -477,6 +516,10 @@ impl PyGapsEvent {
   }
 }
 
+
+/// Representation of a TrackerHit 
+///
+/// This is the same representation as in the GSE DB
 #[pyclass]
 #[pyo3(name="TrackerHit")]
 struct PyTrackerHit {
@@ -599,6 +642,118 @@ impl PyTrackerEvent {
   }
 }
 
+#[pyclass]
+#[pyo3(name="GPSPacket")]
+struct PyGPSPacket {
+  gps : tel_api::GPSPacket,
+}
+
+impl PyGPSPacket {
+  pub fn set_gps(&mut self, gps : tel_api::GPSPacket) {
+    self.gps = gps;
+  }
+}
+
+#[pymethods]
+impl PyGPSPacket {
+
+  #[new]
+  fn new() -> Self {
+    Self {
+      gps : tel_api::GPSPacket::new(),
+    }
+  }
+
+  #[getter]
+  fn utctime(&self) -> u32 {
+    self.gps.utc_time
+  }
+  
+  #[getter]
+  fn gps_info(&self) -> u8 {
+    self.gps.gps_info
+  }
+
+  /// Populate a GPSPacket from a TelemetryPacket.
+  ///
+  /// Telemetry packet type should be 82 (MergedEvent)
+  fn from_telemetrypacket(&mut self, packet : PyTelemetryPacket) -> PyResult<()> {
+    match tel_api::GPSPacket::from_bytestream(&packet.packet.payload, &mut 0) {
+      Ok(gps) => {
+        self.set_gps(gps);
+        self.gps.telemetry_header = packet.packet.header.clone();
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }  
+    }
+    Ok(())
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.gps))
+  }
+}
+
+#[pyclass]
+#[pyo3(name="TrackerTempLeakPacket")]
+struct PyTrackerTempLeakPacket {
+  tl : tel_api::TrackerTempLeakPacket,
+}
+
+impl PyTrackerTempLeakPacket {
+  pub fn set_tl(&mut self, tl : tel_api::TrackerTempLeakPacket) {
+    self.tl = tl;
+  }
+}
+
+#[pymethods]
+impl PyTrackerTempLeakPacket {
+
+  #[new]
+  fn new() -> Self {
+    Self {
+      tl : tel_api::TrackerTempLeakPacket::new(),
+    }
+  }
+
+  #[getter]
+  fn row_offset(&self) -> u8 {
+    self.tl.row_offset
+  }
+  
+  #[getter]
+  fn temp_leak(&self) -> [[u32;6];6] {
+    self.tl.templeak
+  }
+  
+  #[getter]
+  fn seu(&self) -> [[u32;6];6] {
+    self.tl.seu
+  }
+
+  /// Populate a TrackerTempLeakPacket from a TelemetryPacket.
+  ///
+  /// Telemetry packet type should be 82 (MergedEvent)
+  fn from_telemetrypacket(&mut self, packet : PyTelemetryPacket) -> PyResult<()> {
+    match tel_api::TrackerTempLeakPacket::from_bytestream(&packet.packet.payload, &mut 0) {
+      Ok(tl) => {
+        self.set_tl(tl);
+        self.tl.telemetry_header = packet.packet.header.clone();
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }  
+    }
+    Ok(())
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.tl))
+  }
+}
+
+
 
 /// Python API to rust version of tof-dataclasses.
 ///
@@ -619,6 +774,8 @@ fn rust_dataclasses(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyTrackerHit>()?;
     m.add_class::<PyTrackerEvent>()?;
     m.add_class::<PyTrackerPacket>()?;
+    m.add_class::<PyTrackerTempLeakPacket>()?;
+    m.add_class::<PyGPSPacket>()?;
     Ok(())
 }
 
