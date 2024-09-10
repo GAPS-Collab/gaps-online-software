@@ -27,6 +27,9 @@ if __name__ == '__main__':
                         help='Input XLS spreadsheet')
     parser.add_argument('--coordinates', type=str,\
                         help='XLS spreadsheet with paddle coordinates (from Erik)')
+    parser.add_argument('--teststand', \
+                        action='store_true', default=False,\
+                        help='Set this flag if creating a db for teststand purposes. This will have less strict error checking.')
     parser.add_argument('--volid-map', default="",\
                         help=".json file with mapping pid->volid")
     #parser.add_argument('--level0-geo', default="",\
@@ -190,7 +193,8 @@ if __name__ == '__main__':
             paddle.dsi                 = int(r[10]) 
             paddle.j_ltb               = int(r[11][1])
             paddle.j_rb                = int(r[12][1])
-            paddle.mtb_link_id         = int(r[18]) 
+            if not args.teststand:
+                paddle.mtb_link_id         = int(r[18]) 
             #l0_coord = level0_geo[str(paddle.volume_id)]
             x,y,z                      = coords['X'][pid_q], coords['Y'][pid_q], coords['Z'][pid_q]
             length, width, height      = coords['Length'][pid_q], coords['Width'][pid_q], coords['Thickness'][pid_q]
@@ -327,13 +331,18 @@ if __name__ == '__main__':
         # The readoutboard table can be generated completely from 
         # a list of eligible RBs and the paddle table
         rb_ids = [k for k in range(1,51) if not k in RB_IGNORELIST]
-        print('-- creating RB table for ids {rb_ids}')
+        #rb_ids = [49,50]
+        print(f'-- creating RB table for ids {rb_ids}')
         for rid in rb_ids:
             rb = m.ReadoutBoard()
             paddles = m.Paddle.objects.filter(rb_id = rid)
-            assert len(paddles) == 4
+            if not args.teststand:
+                assert len(paddles) == 4
             dsi = set([pdl.dsi for pdl in paddles])
-            assert len(dsi) == 1
+            if not args.teststand:
+                assert len(dsi) == 1
+            else:
+                print (paddles)
             dsi = list(dsi)[0]
             j   = set([pdl.j_rb for pdl in paddles])
             assert len(j) == 1
@@ -396,7 +405,8 @@ if __name__ == '__main__':
                 ltb.j   = dsi.get_j(ltb.rat)
             # for later
             paddles = m.Paddle.objects.filter(ltb_id = ltb.board_id)
-            assert len(paddles) == 8
+            if not args.teststand:
+                assert len(paddles) == 8
             paddles = sorted([k for k in paddles], key=lambda x : x.ltb_chA)  
             for k,pdl in enumerate(paddles):
                 match k:
@@ -420,7 +430,8 @@ if __name__ == '__main__':
             ltbs[ltb.board_id]  = ltb
 
         for k in ltbs:
-            print (ltbs[k])
+            if not args.teststand:
+                print (ltbs[k])
             if not args.dry_run:
                 ltbs[k].save()
 
