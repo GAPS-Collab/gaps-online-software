@@ -2,6 +2,9 @@ use std::collections::HashMap;
 
 use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
+use pyo3::types::PyFunction;
+
+use std::fmt;
 
 extern crate pyo3_log;
 //extern crate rpy-tof-dataclasses;
@@ -346,6 +349,12 @@ impl PyTelemetryPacket {
     self.packet.payload.clone()
   }
 
+  #[getter]
+  fn packet_type(&self) -> tel_api::TelemetryPacketType {
+    let ptype = tel_api::TelemetryPacketType::from(self.packet.header.ptype);
+    ptype
+  }
+
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.packet))
   }
@@ -522,13 +531,23 @@ impl PyGapsEvent {
 /// This is the same representation as in the GSE DB
 #[pyclass]
 #[pyo3(name="TrackerHit")]
+#[derive(Debug, Clone)]
 struct PyTrackerHit {
-  th : tel_api::TrackerHit,
+  //th : tel_api::TrackerHit,
+  pub row             : u8,
+  pub module          : u8,
+  pub channel         : u8,
+  pub adc             : u16,
+  pub asic_event_code : u8,
 }
 
 impl PyTrackerHit {
   pub fn set_hit(&mut self, th : tel_api::TrackerHit) {
-    self.th = th;
+    self.row             = th.row;
+    self.module          = th.module;
+    self.channel         = th.channel;
+    self.adc             = th.adc;
+    self.asic_event_code = th.asic_event_code;
   }
 }
 
@@ -538,39 +557,65 @@ impl PyTrackerHit {
   #[new]
   fn new() -> Self {
     Self {
-      th : tel_api::TrackerHit::new(),
+      row             : 0,
+      module          : 0,
+      channel         : 0,
+      adc             : 0,
+      asic_event_code : 0,
     }
   }
 
   #[getter]
   fn row(&self) -> u8 {
-    self.th.row
+    self.row
   }
 
   #[getter]
   fn module(&self) -> u8 {
-    self.th.module
+    self.module
   }
 
   #[getter]
   fn channel(&self) -> u8 {
-    self.th.channel
+    self.channel
   }
 
   #[getter]
   fn adc(&self) -> u16 {
-    self.th.adc
+    self.adc
   }
 
   #[getter]
   fn asic_event_code(&self) -> u8 {
-    self.th.asic_event_code
+    self.asic_event_code
   }
   
   fn __repr__(&self) -> PyResult<String> {
-    Ok(format!("<PyO3Wrapper: {}>", self.th))
+    Ok(format!("{}", self))
   }
 }
+
+impl fmt::Display for PyTrackerHit {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<PyTrackerHit:");
+    repr += &(format!("\n  Row           : {}" ,self.row));
+    repr += &(format!("\n  Module        : {}" ,self.module));
+    repr += &(format!("\n  Channel       : {}" ,self.channel));
+    repr += &(format!("\n  ADC           : {}" ,self.adc));
+    repr += &(format!("\n  ASIC Ev. Code : {}>",self.asic_event_code));
+    write!(f, "{}", repr)
+  }
+}
+
+//// Implement the AsRef<PyAny> trait
+//impl AsRef<PyAny> for PyTrackerHit {
+//  fn as_ref(&self) -> &PyAny {
+//    Python::with_gil(|py| {
+//      let py_object = PyCell::new(py, self).unwrap();
+//      py_object.as_ref(py)
+//    })
+//  }
+//}
 
 #[pyclass]
 #[pyo3(name="Trackerevent")]
@@ -591,6 +636,26 @@ impl PyTrackerEvent {
     Self {
       te : tel_api::TrackerEvent::new(),
     }
+  } 
+
+  /// Loop over the filtered hits, returning only those satisfying a condition
+  ///
+  /// # Arguments:
+  /// 
+  /// * filter : filter function - take input hit and decide if it should be 
+  ///            returned.
+  ///            E.g, this can be something like 
+  ///            .filter_hits(lambda h : h.asic_event_code == 0 or h.asic_event_code ==2)
+  pub fn filter_hits(&self, filter : &PyFunction) -> PyResult<Vec<PyTrackerHit>> {
+    let mut filtered_hits = Vec::<PyTrackerHit>::new();
+    for h in self.hits() {
+      //let hit_ref = h.as_ref(py);
+      let result : bool = filter.call1((h.clone(),))?.extract()?;
+      if result {
+        filtered_hits.push(h);
+      }
+    }
+    Ok(filtered_hits)
   }
 
   #[getter]
@@ -753,6 +818,120 @@ impl PyTrackerTempLeakPacket {
   }
 }
 
+#[pyclass]
+#[pyo3(name="TrackerDAQTempPacket")]
+struct PyTrackerDAQTempPacket {
+  tp : tel_api::TrackerDAQTempPacket,
+}
+
+impl PyTrackerDAQTempPacket {
+  pub fn set_tp(&mut self, tp : tel_api::TrackerDAQTempPacket) {
+    self.tp = tp;
+  }
+}
+
+#[pymethods]
+impl PyTrackerDAQTempPacket {
+
+  #[new]
+  fn new() -> Self {
+    Self {
+      tp : tel_api::TrackerDAQTempPacket::new(),
+    }
+  }
+
+  #[getter]
+  fn rom_id(&self) -> [u64;256] {
+    self.tp.rom_id
+  }
+  
+  #[getter]
+  fn temp(&self) -> [u16;256] {
+    self.tp.temp
+  }
+  
+  /// Populate a TrackerTempLeakPacket from a TelemetryPacket.
+  ///
+  /// Telemetry packet type should be 82 (MergedEvent)
+  fn from_telemetrypacket(&mut self, packet : PyTelemetryPacket) -> PyResult<()> {
+    let ptype = tel_api::TelemetryPacketType::from(packet.packet.header.ptype);
+    if ptype != tel_api::TelemetryPacketType::AnyTrackerHK {
+      return Err(PyValueError::new_err(format!("This is packet has type {}, but it should have {}", ptype, tel_api::TelemetryPacketType::AnyTrackerHK)));
+    }
+    if packet.packet.payload.len() <= 18 {
+      return Err(PyValueError::new_err("StreamTooShort"));
+    }
+    match tel_api::TrackerDAQTempPacket::from_bytestream(&packet.packet.payload, &mut 0) {
+      Ok(tp) => {
+        self.set_tp(tp);
+        self.tp.telemetry_header = packet.packet.header.clone();
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }  
+    }
+    Ok(())
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.tp))
+  }
+}
+
+#[pyclass]
+#[pyo3(name="TrackerDAQHSKPacket")]
+struct PyTrackerDAQHSKPacket {
+  tp : tel_api::TrackerDAQHSKPacket,
+}
+
+impl PyTrackerDAQHSKPacket {
+  pub fn set_tp(&mut self, tp : tel_api::TrackerDAQHSKPacket) {
+    self.tp = tp;
+  }
+}
+
+#[pymethods]
+impl PyTrackerDAQHSKPacket {
+
+  #[new]
+  fn new() -> Self {
+    Self {
+      tp : tel_api::TrackerDAQHSKPacket::new(),
+    }
+  }
+
+  #[getter]
+  fn temp(&self) -> [u16;12] {
+    self.tp.temp
+  }
+  
+  /// Populate a TrackerTempLeakPacket from a TelemetryPacket.
+  ///
+  /// Telemetry packet type should be 82 (MergedEvent)
+  fn from_telemetrypacket(&mut self, packet : PyTelemetryPacket) -> PyResult<()> {
+    let ptype = tel_api::TelemetryPacketType::from(packet.packet.header.ptype);
+    if ptype != tel_api::TelemetryPacketType::AnyTrackerHK {
+      return Err(PyValueError::new_err(format!("This is packet has type {}, but it should have {}", ptype, tel_api::TelemetryPacketType::AnyTrackerHK)));
+    }
+    if packet.packet.payload.len() <= 18 {
+      return Err(PyValueError::new_err("StreamTooShort"));
+    }
+    match tel_api::TrackerDAQHSKPacket::from_bytestream(&packet.packet.payload, &mut 0) {
+      Ok(tp) => {
+        self.set_tp(tp);
+        self.tp.telemetry_header = packet.packet.header.clone();
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }  
+    }
+    Ok(())
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.tp))
+  }
+}
 
 
 /// Python API to rust version of tof-dataclasses.
@@ -776,6 +955,8 @@ fn rust_dataclasses(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyTrackerPacket>()?;
     m.add_class::<PyTrackerTempLeakPacket>()?;
     m.add_class::<PyGPSPacket>()?;
+    m.add_class::<PyTrackerDAQTempPacket>()?;
+    m.add_class::<PyTrackerDAQHSKPacket>()?;
     Ok(())
 }
 

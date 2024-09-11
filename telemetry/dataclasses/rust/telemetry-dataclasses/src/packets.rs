@@ -46,6 +46,7 @@ pub enum TelemetryPacketType {
   GcuMon            = 110,
   InterestingEvent  = 190,
   Ack               = 200,     
+  AnyTrackerHK      = 255,
   // unknown/unused stuff
   TmP33            = 33,
   TmP34            = 34,
@@ -56,7 +57,6 @@ pub enum TelemetryPacketType {
   //TmP92          = 92,
   TmP96            = 96,
   TmP214           = 214,
-  TmP255           = 255
 }
 
 impl From<u8> for TelemetryPacketType {
@@ -79,6 +79,7 @@ impl From<u8> for TelemetryPacketType {
       110   => TelemetryPacketType::GcuMon,
       190   => TelemetryPacketType::InterestingEvent,
       200   => TelemetryPacketType::Ack,
+      255   => TelemetryPacketType::AnyTrackerHK,
       _     => TelemetryPacketType::Unknown,
     }
   }
@@ -375,6 +376,22 @@ impl TrackerEvent {
       event_time : 0,
       hits       : Vec::<TrackerHit>::new(),
     }
+  }
+
+  /// Loop over the filtered hits, returning only those satisfying a condition
+  ///
+  /// # Arguments:
+  /// 
+  /// * filter : filter function - take input hit and decide if it should be 
+  ///            returned
+  pub fn filter_hits(&self, filter : fn(&TrackerHit) -> bool) -> Vec<TrackerHit> {
+    let mut filtered_hits = Vec::<TrackerHit>::new();
+    for h in &self.hits {
+      if filter(h) {
+        filtered_hits.push(*h);
+      }
+    }
+    filtered_hits
   }
 
   pub fn from_bytestream(stream : &Vec<u8>,
@@ -676,6 +693,7 @@ impl fmt::Display for TrackerTempLeakPacket {
     let mut repr = String::from("<TrackerTempLeakPacket");
     repr    += &(format!("\n {}", self.telemetry_header));
     repr    += &(format!("\n {}", self.tracker_header));
+    repr    += &(format!("\n ROW OFFSET {}", self.row_offset));
     repr    += "\n*** TEMPLEAK ***";
     for k in 0..6 {
       repr  += &(format!("\n {:?}", self.templeak[k]));
@@ -730,7 +748,124 @@ impl TrackerTempLeakPacket {
   }
 }
 
+pub struct TrackerDAQTempPacket {
+  pub telemetry_header : TelemetryHeader,
+  pub tracker_header   : TrackerHeader,
+  pub rom_id           : [u64;256],
+  pub temp             : [u16;256]
+}
 
+impl fmt::Display for TrackerDAQTempPacket {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerDAQTempPacket");
+    repr    += &(format!("\n {}", self.telemetry_header));
+    repr    += &(format!("\n {}", self.tracker_header));
+    repr    += "\n*** ROM ID ***";
+    repr  += &(format!("\n {:?}", self.rom_id));
+    repr    += "\n*** TEMP ***";
+    repr  += &(format!("\n {:?}>", self.temp));
+    write!(f, "{}", repr)
+  }
+}
+
+impl TrackerDAQTempPacket {
+  pub fn new() -> Self {
+    Self {
+      telemetry_header : TelemetryHeader::new(),
+      tracker_header   : TrackerHeader::new(),
+      rom_id           : [0;256],
+      temp             : [0;256]
+    }
+  }
+  
+  pub fn from_bytestream(stream: &Vec<u8>,
+                         pos: &mut usize)
+    -> Result<Self, SerializationError> {
+    let mut tp          = TrackerDAQTempPacket::new();
+    tp.tracker_header   = TrackerHeader::from_bytestream(stream, pos)?;
+    if tp.tracker_header.packet_id != 0x09 {
+      error!("This is not a TrackerDAQTempPacket, but has packet_id {} instead!", tp.tracker_header.packet_id);
+      return Err(SerializationError::IncorrectPacketType);
+    }
+    println!("tracker header {}", tp.tracker_header);
+    if stream.len() == *pos as usize {
+      error!("Packet contains only header!");
+      return Ok(tp);
+    }
+    //if stream.len() - *pos < (36*3 + 1) {
+    //  return Err(SerializationError::StreamTooShort);
+    //}
+    // this is hack, since the TreckerHeader in this packet does not have a 
+    // version (-> Alex) 
+    *pos -= 1;
+    let dummy64 = 0u64;
+    let dummy16 = 0u16;
+    error!("{}", tp.tracker_header);
+    error!("Expected of the packet {}", (tp.tracker_header.length as usize)/2);
+    for k in 0..256usize {
+      if k < (tp.tracker_header.length as usize)/2 {
+        tp.rom_id[k] = parse_u64(stream, pos);
+        tp.temp[k]   = parse_u16(stream, pos);
+      } else {
+        tp.rom_id[k] = dummy64;
+        tp.temp[k]   = dummy16;
+      }
+    }
+    Ok(tp)
+  }
+}
+
+pub struct TrackerDAQHSKPacket {
+  pub telemetry_header : TelemetryHeader,
+  pub tracker_header   : TrackerHeader,
+  pub temp             : [u16;12],
+}
+
+impl fmt::Display for TrackerDAQHSKPacket {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerDAQHSKPacket");
+    repr    += &(format!("\n {}", self.telemetry_header));
+    repr    += &(format!("\n {}", self.tracker_header));
+    repr    += "\n*** TEMP ***";
+    repr    += &(format!("\n {:?}>", self.temp));
+    write!(f, "{}", repr)
+  }
+}
+
+impl TrackerDAQHSKPacket {
+  pub fn new() -> Self {
+    Self {
+      telemetry_header : TelemetryHeader::new(),
+      tracker_header   : TrackerHeader::new(),
+      temp             : [0;12]
+    }
+  }
+  
+  pub fn from_bytestream(stream: &Vec<u8>,
+                         pos: &mut usize)
+    -> Result<Self, SerializationError> {
+    let mut tp          = TrackerDAQHSKPacket::new();
+    tp.tracker_header   = TrackerHeader::from_bytestream(stream, pos)?;
+    if tp.tracker_header.packet_id != 0xff {
+      error!("This is not a TrackerDAQHSKPacket, but has packet_id {} instead!", tp.tracker_header.packet_id);
+      return Err(SerializationError::IncorrectPacketType);
+    }
+    if stream.len() == *pos as usize {
+      error!("Packet contains only header!");
+      return Ok(tp);
+    }
+    //if stream.len() - *pos < (36*3 + 1) {
+    //  return Err(SerializationError::StreamTooShort);
+    //}
+    // this is hack, since the TreckerHeader in this packet does not have a 
+    // version (-> Alex) 
+    *pos += 193; // skip a bunch of other stuff right now (Alex)
+    for k in 0..12usize {
+      tp.temp[k]   = parse_u16(stream, pos);
+    }
+    Ok(tp)
+  }
+}
 
 /// This is mine :) Not telemetry
 pub struct GapsTracker {
