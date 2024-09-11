@@ -933,6 +933,60 @@ impl PyTrackerDAQHSKPacket {
   }
 }
 
+#[pyclass]
+#[pyo3(name="TrackerEventIDEchoPacket")]
+struct PyTrackerEventIDEchoPacket {
+  tp : tel_api::TrackerEventIDEchoPacket,
+}
+
+impl PyTrackerEventIDEchoPacket {
+  pub fn set_tp(&mut self, tp : tel_api::TrackerEventIDEchoPacket) {
+    self.tp = tp;
+  }
+}
+
+#[pymethods]
+impl PyTrackerEventIDEchoPacket {
+
+  #[new]
+  fn new() -> Self {
+    Self {
+      tp : tel_api::TrackerEventIDEchoPacket::new(),
+    }
+  }
+
+  #[getter]
+  fn temp(&self) -> [u16;12] {
+    self.tp.temp
+  }
+  
+  /// Populate a TrackerEventIDEchoPacket from a TelemetryPacket.
+  ///
+  /// Telemetry packet type should be 82 (MergedEvent)
+  fn from_telemetrypacket(&mut self, packet : PyTelemetryPacket) -> PyResult<()> {
+    let ptype = tel_api::TelemetryPacketType::from(packet.packet.header.ptype);
+    if ptype != tel_api::TelemetryPacketType::AnyTrackerHK {
+      return Err(PyValueError::new_err(format!("This is packet has type {}, but it should have {}", ptype, tel_api::TelemetryPacketType::AnyTrackerHK)));
+    }
+    if packet.packet.payload.len() <= 18 {
+      return Err(PyValueError::new_err("StreamTooShort"));
+    }
+    match tel_api::TrackerEventIDEchoPacket::from_bytestream(&packet.packet.payload, &mut 0) {
+      Ok(tp) => {
+        self.set_tp(tp);
+        self.tp.telemetry_header = packet.packet.header.clone();
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }  
+    }
+    Ok(())
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.tp))
+  }
+}
 
 /// Python API to rust version of tof-dataclasses.
 ///
@@ -957,6 +1011,7 @@ fn rust_dataclasses(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyGPSPacket>()?;
     m.add_class::<PyTrackerDAQTempPacket>()?;
     m.add_class::<PyTrackerDAQHSKPacket>()?;
+    m.add_class::<PyTrackerEventIDEchoPacket>()?;
     Ok(())
 }
 
