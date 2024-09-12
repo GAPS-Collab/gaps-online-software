@@ -673,9 +673,19 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                 cfd_times.push(cfd);
               }
             }
-            // just do the first peak for now
             let pk_height = voltages[pk.0..pk.1].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
-            max_volts = *pk_height; 
+            max_volts = *pk_height;
+             let max_index = voltages.iter().position(|element| element == max_volts).unwrap();
+
+            if max_index - 40 < 10 {
+                let start_Qint = 10;
+                let stop_Qint = 210;
+            }
+            else {
+                let start_Qint = max_index - 40;
+                let stop_Qint = max_index + 160;
+            }
+
             //debug!("Check impedance value! Just using 50 [Ohm]");
             // Step 3 : charge integration
             // FIXME - make impedance a settings parameter
@@ -683,8 +693,10 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                             &times,
                             //settings.integration_start,
                             //settings.integration_window,
-                            pk.0, 
-                            pk.1,
+                            //pk.0, 
+                            //pk.1,
+                            start_Qint,
+                            stop_Qint,
                             50.0) {
               Err(err) => {
                 error!("Integration failed! Err {err}");
@@ -693,6 +705,23 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                 charge = chrg;
               }
             }
+            // // just do the first peak for now
+            // let pk_height = voltages[pk.0..pk.1].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
+            // max_volts = *pk_height; 
+            // //debug!("Check impedance value! Just using 50 [Ohm]");
+            // // Step 3 : charge integration
+            // // FIXME - make impedance a settings parameter
+            // match integrate(&voltages,
+            //                 &times,
+            //                 //settings.integration_start,
+            //                 //settings.integration_window,
+            //                 pk.0, 
+            //                 pk.1,
+            //                 50.0) {
+            //   Err(err) => {
+            //     error!("Integration failed! Err {err}");
+            //   }
+              
             break;
           }
         }// end OK
