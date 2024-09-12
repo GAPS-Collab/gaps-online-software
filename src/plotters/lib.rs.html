@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/plotters-0.3.6/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="plotters" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/plotters-0.3.7/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="plotters" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -935,10 +935,8 @@
 <a href="#935" id="935">935</a>
 <a href="#936" id="936">936</a>
 <a href="#937" id="937">937</a>
-<a href="#938" id="938">938</a>
-<a href="#939" id="939">939</a>
-<a href="#940" id="940">940</a>
 </pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
+#![allow(clippy::type_complexity)]
 #![cfg_attr(doc_cfg, feature(doc_cfg))]
 </span><span class="doccomment">/*!
 
@@ -1302,7 +1300,7 @@ The feature `evcxr` should be enabled when including Plotters to Jupyter Noteboo
 The following code shows a minimal example of this.
 
 ```text
-:dep plotters = { version = "^0.3.6", default_features = false, features = ["evcxr", "all_series", "all_elements"] }
+:dep plotters = { version = "^0.3.6", default-features = false, features = ["evcxr", "all_series", "all_elements"] }
 extern crate plotters;
 use plotters::prelude::*;
 
@@ -1360,19 +1358,19 @@ Also, there's a static HTML version of this notebook available at [this location
 Rust is a perfect language for data visualization. Although there are many mature visualization libraries in many different languages, Rust is one of the best languages that fits the need.
 
 * **Easy to use** Rust has a very good iterator system built into the standard library. With the help of iterators,
-plotting in Rust can be as easy as most of the high-level programming languages. The Rust based plotting library
-can be very easy to use.
+  plotting in Rust can be as easy as most of the high-level programming languages. The Rust based plotting library
+  can be very easy to use.
 
 * **Fast** If you need to render a figure with trillions of data points,
-Rust is a good choice. Rust's performance allows you to combine the data processing step
-and rendering step into a single application. When plotting in high-level programming languages,
-e.g. Javascript or Python, data points must be down-sampled before feeding into the plotting
-program because of the performance considerations. Rust is fast enough to do the data processing and visualization
-within a single program. You can also integrate the
-figure rendering code into your application to handle a huge amount of data and visualize it in real-time.
+  Rust is a good choice. Rust's performance allows you to combine the data processing step
+  and rendering step into a single application. When plotting in high-level programming languages,
+  e.g. Javascript or Python, data points must be down-sampled before feeding into the plotting
+  program because of the performance considerations. Rust is fast enough to do the data processing and visualization
+  within a single program. You can also integrate the
+  figure rendering code into your application to handle a huge amount of data and visualize it in real-time.
 
 * **WebAssembly Support** Rust is one of the languages with the best WASM support. Plotting in Rust could be
-very useful for visualization on a web page and would have a huge performance improvement comparing to Javascript.
+  very useful for visualization on a web page and would have a huge performance improvement comparing to Javascript.
 
 ## Plotting on HTML5 canvas with WASM Backend
 
@@ -1580,7 +1578,7 @@ plotters = { git = "https://github.com/plotters-rs/plotters.git" }
 
 ### Reducing Depending Libraries &amp;&amp; Turning Off Backends
 Plotters now supports use features to control the backend dependencies. By default, `BitMapBackend` and `SVGBackend` are supported,
-use `default_features = false` in the dependency description in `Cargo.toml` and you can cherry-pick the backend implementations.
+use `default-features = false` in the dependency description in `Cargo.toml` and you can cherry-pick the backend implementations.
 
 - `svg` Enable the `SVGBackend`
 - `bitmap` Enable the `BitMapBackend`
@@ -1589,16 +1587,16 @@ For example, the following dependency description would avoid compiling with bit
 
 ```toml
 [dependencies]
-plotters = { git = "https://github.com/plotters-rs/plotters.git", default_features = false, features = ["svg"] }
+plotters = { git = "https://github.com/plotters-rs/plotters.git", default-features = false, features = ["svg"] }
 ```
 
 The library also allows consumers to make use of the [`Palette`](https://crates.io/crates/palette/) crate's color types by default.
-This behavior can also be turned off by setting `default_features = false`.
+This behavior can also be turned off by setting `default-features = false`.
 
 ### List of Features
 
 This is the full list of features that is defined by `Plotters` crate.
-Use `default_features = false` to disable those default enabled features,
+Use `default-features = false` to disable those default enabled features,
 and then you should be able to cherry-pick what features you want to include into `Plotters` crate.
 By doing so, you can minimize the number of dependencies down to only `itertools` and compile time is less than 6s.
 
@@ -1742,10 +1740,6 @@ pub fn register_font(
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::drawing::{check_color, create_mocked_drawing_area};
-
-<span class="attr">#[cfg(feature = <span class="string">"palette_ext"</span>)]
-#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">"palette_ext"</span>)))]
-</span><span class="kw">pub use </span>palette;
 
 <span class="doccomment">/// The module imports the most commonly used types and modules in Plotters
 </span><span class="kw">pub mod </span>prelude {
