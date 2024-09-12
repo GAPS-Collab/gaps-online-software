@@ -214,33 +214,66 @@ if __name__ == '__main__':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0 + paddle.length/2 
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
+                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0 - paddle.length/2 
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0
                 case '-X':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0 - paddle.length/2 
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
+                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0 + paddle.length/2 
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0
                 case '+Y':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0  
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0 + paddle.length/2
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
+                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0  
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0 - paddle.length/2
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0
                 case '-Y':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0 
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0 - paddle.length/2
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
+                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0 
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0 + paddle.length/2
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0
                 case '+Z':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0  
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0 + paddle.length/2
+                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0  
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0 - paddle.length/2
                 case '-Z':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0  
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0 + paddle.length/2
+                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0  
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0 - paddle.length/2
                 case _:
                     raise ValueError("Can not parse {paddle_end_loc} for paddle end location!")
             if k%2 != 0:
                 print (paddle)
+                # fix - there is a bug in the spreadsheet for paddle 108
+                if paddle.paddle_id == 108:
+                    if paddle.global_pos_y_l0 == 0:
+                        paddle.global_pos_y_l0 = -85.4
+                        paddle.global_pos_y_l0_A = paddle.global_pos_y_l0 - paddle.length/2
+                        paddle.global_pos_y_l0_B = paddle.global_pos_y_l0 + paddle.length/2
+                    if paddle.global_pos_x_l0 == 118.31:
+                        paddle.global_pos_x_l0 = 167.40
+                        paddle.global_pos_x_l0_A = paddle.global_pos_x_l0
+                        paddle.global_pos_x_l0_B = paddle.global_pos_x_l0
+                    if paddle.global_pos_z_l0 == 140.93:
+                        paddle.global_pos_z_l0 = 209.91
+                        paddle.global_pos_z_l0_A = paddle.global_pos_z_l0
+                        paddle.global_pos_z_l0_B = paddle.global_pos_z_l0
                 if not args.dry_run:
                     paddle.save()
-    
+
+
     if args.create_panel_table:
         print ('-- Creating panel table!')
         try:
@@ -328,6 +361,8 @@ if __name__ == '__main__':
 
 
     if args.create_rb_table:
+        if args.teststand:
+            RB_IGNORELIST = [k for k in range(49)]
         # The readoutboard table can be generated completely from 
         # a list of eligible RBs and the paddle table
         rb_ids = [k for k in range(1,51) if not k in RB_IGNORELIST]

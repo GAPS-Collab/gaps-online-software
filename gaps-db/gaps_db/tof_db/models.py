@@ -206,6 +206,19 @@ class Paddle(models.Model):
                                      null=False,
                                      default=0.0,
                                      help_text="Global X (L0) position of the A side")
+    global_pos_x_l0_B          = models.FloatField(
+                                     null=False,
+                                     default=0.0,
+                                     help_text="Global X (L0) position of the B side")
+    global_pos_y_l0_B          = models.FloatField(
+                                     null=False,
+                                     default=0.0,
+                                     help_text="Global X (L0) position of the B side")
+    global_pos_z_l0_B          = models.FloatField(
+                                     null=False,
+                                     default=0.0,
+                                     help_text="Global X (L0) position of the B side")
+
     @property
     def lt_slot(self) -> int:
         """
@@ -221,6 +234,7 @@ class Paddle(models.Model):
     @property
     def sideA_pos(self) -> tuple:
         return (self.global_pos_x_l0_A, self.global_pos_y_l0_A, self.global_pos_z_l0_A)
+
 
     @property
     def rb_slot(self) -> int:
