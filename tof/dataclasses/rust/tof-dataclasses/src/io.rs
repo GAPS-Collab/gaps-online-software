@@ -183,10 +183,12 @@ pub fn read_file(filename: &Path) -> io::Result<Vec<u8>> {
 /// as a generator for RBEvents
 pub struct RBEventMemoryStreamer {
   /// Raw stream read out from the RB buffers.
-  pub stream         : Vec<u8>,
+  pub stream               : Vec<u8>,
   /// Error checking mode - check error bits for 
   /// channels/cells
   pub check_channel_errors : bool,
+  /// Ignore channels in this list
+  pub mask                 : Vec<u8>,
 
   /// Current position in the stream
   pos                      : usize,
@@ -229,6 +231,7 @@ impl RBEventMemoryStreamer {
     Self {
       stream               : Vec::<u8>::new(),
       check_channel_errors : false,
+      mask                 : Vec::<u8>::new(),
       pos                  : 0,
       pos_at_head          : false,
       tp_sender            : None,
@@ -477,7 +480,7 @@ impl RBEventMemoryStreamer {
     // they are dna, rsv, rsv, rsv, fw_hash
     self.pos += 10;
     self.pos += 1; // rb id first byte is rsvd
-    header.rb_id        =  parse_u8(&self.stream, &mut self.pos);
+    header.rb_id        = parse_u8(&self.stream, &mut self.pos);
     header.channel_mask = parse_u16(&self.stream, &mut self.pos); 
     match replace_channel_mask {
       None => (),
@@ -528,7 +531,13 @@ impl RBEventMemoryStreamer {
     //let expected_packet_size =   header.get_channels().len()*nwords*2 
     //                           + header.get_channels().len()*2 
     //                           + header.get_channels().len()*4;
-    for ch in header.get_channels().iter() {
+    let mut any_cell_error = false;
+    let mut header_channels = header.get_channels().clone();
+    for k in &self.mask {
+      header_channels.retain(|x| x != k);
+    }
+
+    for ch in header_channels.iter() {
       let ch_id = parse_u16(&self.stream, &mut self.pos);
       if ch_id != *ch as u16 {
         // check where is the next header
@@ -571,6 +580,7 @@ impl RBEventMemoryStreamer {
               if ((0x4000 & this_field) >> 14) == 0x1 {
                 error!("Cell error bit set for ch {}!", ch);
                 event_status = EventStatus::CellSyncErrors;
+                any_cell_error = true;
               }
             }
             this_ch_adc.push(0x3fff & this_field)
@@ -582,6 +592,7 @@ impl RBEventMemoryStreamer {
             if adc_w_errs.1 {
               error!("Ch error bit set for ch {}!", ch);
               event_status = EventStatus::ChnSyncErrors;
+              any_cell_error = true;
             } else if adc_w_errs.2 {
               error!("Cell error bit set for ch {}!", ch);
               event_status = EventStatus::CellSyncErrors;
@@ -610,6 +621,11 @@ impl RBEventMemoryStreamer {
           }
           println!("== ==> Checksum {}, channel checksum {}!", checksum, crc32); 
         }
+      }
+    }
+    if any_cell_error {
+      if event_status == EventStatus::ChnSyncErrors {
+        event_status = EventStatus::CellAndChnSyncErrors;
       }
     }
     
@@ -715,6 +731,29 @@ impl Iterator for RBEventMemoryStreamer {
   }
 }
 
+
+/// Generics for packet reading (TofPacket, Telemetry packet,...)
+pub trait PacketReader {
+  /// header bytes, e.g. 0xAAAA for TofPackets
+  const HEADER0 : u8 = 0;
+  const HEADER1 : u8 = 0;
+
+  /// Manage the internal cursor attribute
+  fn set_cursor(&mut self, pos : usize) {
+  }
+
+  /// Rewind the file, so it can be read again from the 
+  /// beginning
+  fn rewind(&mut self) -> io::Result<()> {
+    //self.file_reader.rewind()?;
+    self.set_cursor(0);
+    Ok(())
+  }
+}
+
+
+
+
 /// Read serialized TofPackets from an existing file
 ///
 /// This is mainly to read stream files previously
@@ -722,16 +761,16 @@ impl Iterator for RBEventMemoryStreamer {
 #[derive(Debug)]
 pub struct TofPacketReader {
   /// Read from this file
-  pub filename    : String,
-  file_reader     : BufReader<File>,
+  pub filename        : String,
+  file_reader         : BufReader<File>,
   /// Current (byte) position in the file
-  cursor          : usize,
+  cursor              : usize,
   /// Read only packets of type == PacketType
   pub filter          : PacketType,
   /// Number of read packets
-  n_packs_read    : usize,
+  n_packs_read        : usize,
   /// Number of skipped packets
-  n_packs_skipped : usize,
+  n_packs_skipped     : usize,
   /// Skip the first n packets
   pub skip_ahead      : usize,
   /// Stop reading after n packets
@@ -1005,45 +1044,6 @@ impl TofPacketReader {
       } // if no 0xAA found
     } // end loop
   } // end fn
-
-  //pub fn get_next_packet_size(&self, stream : &Vec<u8>) -> u32 {
-  //  // cursor needs at HEAD position and then we have to 
-  //  // add one byte for the packet type
-  //  let mut pos    = self.cursor + 2;
-  //  let ptype_int  = parse_u8(stream, &mut pos);
-  //  let next_psize = parse_u32(stream, &mut pos);
-  //  let ptype      = ptype_int as u8;
-  //  debug!("We anticpate a TofPacket of type {:?} and size {} (bytes)",ptype, next_psize);
-  //  next_psize
-  //}
-
-  //pub fn open(&mut self, filename : String) {
-  //  if self.filename != "" {
-  //    warn!("Overiding previously set filename {}", self.filename);
-  //  }
-  //  let self_filename = filename.clone();
-  //  self.filename     = self_filename;
-  //  if filename != "" {
-  //    let path = Path::new(&filename); 
-  //    info!("Reading from {}", &self.filename);
-  //    let file = OpenOptions::new().create(false).append(false).read(true).open(path).expect("Unable to open file {filename}");
-  //    self.file_reader    = Some(BufReader::new(file));
-  //    self.init();
-  //  }
-  //}
-
-  //fn init(&mut self) {
-  //  match self.search_start() {
-  //    Err(err) => {
-  //      error!("Can not find any header signature (typically 0xAAAA) in file! Err {err}");
-  //      panic!("This is most likely a useless endeavour! Hence, I panic!");
-  //    }
-  //    Ok(start_pos) => {
-  //      self.cursor = start_pos;
-  //    }
-  //  }
-  //}
-
 }
 
 impl Default for TofPacketReader {
@@ -1229,6 +1229,7 @@ impl Default for TofPacketWriter {
 /// The robin reader consumes a file. 
 ///
 ///
+//#[deprecated(since="0.10.0", note="There are no robin files anymore. RBs will write data with RBEvents wrapped in TofPackets!")]
 pub struct RobinReader {
   pub streamer    : RBEventMemoryStreamer,
   pub filename    : String,

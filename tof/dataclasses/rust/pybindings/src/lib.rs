@@ -16,41 +16,6 @@ use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::commands::TofCommandCode;
 use tof_dataclasses::events::master_trigger::LTBThreshold;
 
-//#[pyfunction]
-//#[pyo3(name="test_db")]
-//pub fn test_db() {
-//  let mut conn = connect_to_db(String::from("/srv/gaps/gaps-online-software/gaps-db/gaps_db/gaps_flight.db")).unwrap();
-//  let rats = RAT::all(&mut conn).unwrap();
-//  for r in rats {
-//    println!("{}", r);
-//  }
-//  let dsis = DSICard::all(&mut conn).unwrap();
-//  for dsi in dsis {
-//    println!("{}", dsi);
-//  }
-//  let paddles = Paddle::all(&mut conn).unwrap();
-//  for pdl in paddles {
-//    println!("{}", pdl);
-//  }
-//  let mtbch = MTBChannel::all(&mut conn).unwrap();
-//  for chnl in mtbch {
-//    println!("{}", chnl);
-//  }
-//  let ltbs = LocalTriggerBoard::all(&mut conn).unwrap();
-//  for ltb in ltbs {
-//    println!("{}", ltb);
-//  }
-//  let rbs = ReadoutBoard::all(&mut conn).unwrap();
-//  for rb in rbs {
-//    println!("{}", rb);
-//  }
-//  let panels = Panel::all(&mut conn).unwrap();
-//  for pnl in panels {
-//    println!("{}", pnl);
-//  }
-//}
-
-
 #[pymodule]
 #[pyo3(name = "analysis")]
 fn tof_analysis<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
@@ -75,26 +40,12 @@ fn tof_moni<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyCPUMoniSeries>()?;
   m.add_class::<PyLTBMoniSeries>()?;
   m.add_class::<PyRBMoniData>()?;
+  m.add_class::<PyMtbMoniData>()?;
   Ok(())
 }
 
 
 /// I/O features to read TofPackets from disk
-// /
-// # Example 
-// ```
-// use gaps_online::rust_api as api;
-// # read 100 TofEvents from the file
-// reader = api.io.TofPacketReader("/path/to/your/file", filter=api.io.PacketType.TofEvent, nevents=100)
-// for pack in reader:
-//    ev = api.events.TofEvent()
-//    ev.from_tofpacket(ev)
-//    for h in ev.hits:
-//        print (h.t0)
-//        print (h)
-//
-//
-// ```
 #[pymodule]
 #[pyo3(name = "io")]
 fn tof_io<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
@@ -112,6 +63,7 @@ fn tof_events<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyRBEvent>()?;
   m.add_class::<PyRBEventHeader>()?;
   m.add_class::<PyTofEvent>()?;
+  m.add_class::<PyTofHit>()?;
   m.add_class::<PyRBWaveform>()?;
   m.add_class::<PyRBCalibration>()?;
   m.add_class::<PyTofEventSummary>()?;

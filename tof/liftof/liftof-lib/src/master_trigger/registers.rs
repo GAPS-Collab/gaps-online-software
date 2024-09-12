@@ -52,7 +52,7 @@ impl MTBRegister<'_> {
       self.write(bus, value)?;
     }
     let rv = self.read_all(bus)?;
-    println!("Register reads {:x} after write ops!", rv);
+    println!("Register reads {:x} {} {:x} after write ops!", self.addr, self.descr, rv);
     Ok(())
   }
 
@@ -63,7 +63,11 @@ impl MTBRegister<'_> {
     //if self.pulse {
     //  return(Err)
     //}
-    Ok(self.read(bus)?)
+    let rv = self.read(bus)?;
+    if self.addr != 0x13 && self.addr != 0x11 {
+      println!("Register reads {:x} {} {:x}!", self.addr, self.descr, rv);
+    }
+    Ok(rv)
   }
 
 
@@ -133,10 +137,22 @@ impl fmt::Display for MTBRegister<'_> {
 
 /////////////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////////////
 
 // Module MT adr = 0x0
 //
 // Implements various control and monitoring functions of the DRS Logic
+
+///Prescale value for the GAPS trigger. 0 == 0% (off), 2**32-1 == 100%
+/// GAPS_TRIG_PRESCALE 0x248 0x920 \[31:0\] rw 0xffffffff
+pub const GAPS_TRIG_PRESCALE : MTBRegister<'static> = MTBRegister {
+  addr    : 0x248,
+  mask    : 0xffffffff,
+  descr   : "Prescale value for the GAPS trigger. 0 == 0% (off), 2**32-1 == 100%",
+  rmw     : true,
+  ro      : false,
+  pulse   : false,
+};
 
 
 /// Force a trigger (has to be previously set)
@@ -173,6 +189,90 @@ pub const TIU_EMU_BUSY_CNT : MTBRegister<'static> = MTBRegister {
   pulse : false
 };
 
+/// Enable cyclic trigger
+/// TRIG_CYCLIC_EN 0x240 0x900 0 rw 0x0
+pub const TRIG_CYCLIC_EN : MTBRegister<'static> = MTBRegister {
+  addr  : 0x240,
+  mask  : 0x00000001,
+  descr : "Enable the use of a cyclic trigger",
+  rmw   : true, 
+  ro    : false,
+  pulse : false
+};
+
+/// Set cyclic trigger interval (in # clock cycles, 1 clock cycle ~ 10 ns)
+/// TRIG_CYCLIC_INTERVAL 0x241 0x904 \[31:0\] rw 0x0
+pub const TRIG_CYCLIC_INTERVAL : MTBRegister<'static> = MTBRegister {
+  addr   : 0x241,
+  mask   : 0xffffffff,
+  descr  : "Set the cyclic trigger interval in # clock cycles (int only) --> ie if desire trigger every 20 nsec, set interval = 2",
+  rmw    : true,
+  ro     : false, 
+  pulse  : false
+};
+
+/// Toggle on/off LTBs 0-9
+/// DSI 0 RX Link Enable 0x242 0x908 \[9:0\] rw 0x3FF
+pub const LT_LINK_EN0 : MTBRegister<'static> = MTBRegister {
+  addr    : 0x242,
+  mask    : 0x000003ff,
+  descr   : "Enable DSI link for LTBs 0-9",
+  rmw     : true,
+  ro      : false,
+  pulse   : false
+};
+/// Toggle on/off LTBs 10-19
+/// DSI 1 RX Link Enable 0x243 0x90c \[9:0\] rw 0x3FF
+pub const LT_LINK_EN1 : MTBRegister<'static> = MTBRegister {
+  addr    : 0x243,
+  mask    : 0x000003ff,
+  descr   : "Enable DSI link for LTBs 10-19",
+  rmw     : true,
+  ro      : false,
+  pulse   : false
+};
+/// Toggle on/off LTBs 20-29
+/// DSI 2 RX Link Enable 0x244 0x910 \[9:0\] rw 0x3FF
+pub const LT_LINK_EN2 : MTBRegister<'static> = MTBRegister {
+  addr    : 0x244,
+  mask    : 0x000003ff,
+  descr   : "Enable DSI link for LTBs 20-29",
+  rmw     : true,
+  ro      : false,
+  pulse   : false
+};
+/// Toggle on/off LTBs 30-39
+/// DSI 3 RX Link Enable 0x245 0x914 \[9:0\] rw 0x3FF
+pub const LT_LINK_EN3 : MTBRegister<'static> = MTBRegister {
+  addr    : 0x245,
+  mask    : 0x000003ff,
+  descr   : "Enable DSI link for LTBs 30-39",
+  rmw     : true,
+  ro      : false,
+  pulse   : false
+};
+/// Toggle on/off LTBs 40-49
+/// DSI 4 RX Link Enable 0x246 0x918 \[9:0\] rw 0x3FF
+pub const LT_LINK_EN4 : MTBRegister<'static> = MTBRegister {
+  addr    : 0x246,
+  mask    : 0x000003ff,
+  descr   : "Enable DSI link for LTBs 40-49",
+  rmw     : true,
+  ro      : false,
+  pulse   : false
+};
+///Toggle on/off LTB Automasking
+/// LT_LINK_AUTOMASK 0x247 0x91c 0 rw 0x1
+/// 1 to enable automatic LT link masking
+pub const LT_LINK_AUTOMASK : MTBRegister<'static> = MTBRegister {
+  addr    : 0x247,
+  mask    : 0x00000001,
+  descr   : "Enable LT Automasking -> 1 to enable LTB link masking",
+  rmw     : true,
+  ro      : false,
+  pulse   : false,
+};
+
 /// Set/Unset the TIU emulation mode
 /// TIU_EMULATION_MODE  0xe     0x38    0   rw  0x0     1 to emulate the TIU
 pub const TIU_EMULATION_MODE : MTBRegister<'static> = MTBRegister {
@@ -185,7 +285,7 @@ pub const TIU_EMULATION_MODE : MTBRegister<'static> = MTBRegister {
 };
 
 /// The length of the tiu busy signal 
-// TIU_BUSY_LENGTH 	0x11f 	0x47c 	[31:0] 	r 		Length in 10ns cycles of the last TIU busy flag
+/// TIU_BUSY_LENGTH 	0x11f 	0x47c 	\[31:0\] 	r 		Length in 10ns cycles of the last TIU busy flag
 pub const TIU_BUSY_LENGTH : MTBRegister<'static> = MTBRegister {
   addr  : 0x11f,
   mask  : 0xffffffff,
@@ -561,10 +661,10 @@ pub const CORTINA_THRESH : MTBRegister<'static> = MTBRegister {
 /// LOST_TRIGGER_RATE     0x18    0x60    \[23:0\]  r       Rate of lost triggers in Hz
 pub const LOST_TRIGGER_RATE : MTBRegister<'static> = MTBRegister {
   addr  : 0x18,
-  mask  : 0x800000,
-  descr : "Set the nhit threshold for the cortina. Needs configurable trigger enabled to be in effect.",
-  rmw   : true,
-  ro    : false,
+  mask  : 0x00ffffff,
+  descr : "Get lost trigger rate in Hz",
+  rmw   : false,
+  ro    : true,
   pulse : false
 };
 
@@ -586,6 +686,61 @@ pub const TRIGGER_RATE : MTBRegister<'static> = MTBRegister {
 // MT.HIT_COUNTERS
 //
 // Counters
+
+/// LTB link 0 available and ready to receive data
+//LT_LINK_READY0    0x1a    0x68    \[9:0\]   r       DSI 0 RX Link OK
+pub const LT_LINK_READY0 : MTBRegister<'static> = MTBRegister {
+  addr  : 0x1a,
+  mask  : 0x1ff,
+  descr : "LT link 0 ready",
+  rmw   : false,
+  ro    : true,
+  pulse : false,
+};
+
+/// LTB link 1 available and ready to receive data
+//LT_LINK_READY1    0x1b    0x6c    \[9:0\]   r       DSI 1 RX Link OK
+pub const LT_LINK_READY1 : MTBRegister<'static> = MTBRegister {
+  addr  : 0x1b,
+  mask  : 0x1ff,
+  descr : "LT link 1 ready",
+  rmw   : false,
+  ro    : true,
+  pulse : false,
+};
+
+/// LTB link 2 available and ready to receive data
+//LT_LINK_READY2    0x1c    0x70    \[9:0\]   r       DSI 2 RX Link OK
+pub const LT_LINK_READY2 : MTBRegister<'static> = MTBRegister {
+  addr  : 0x1c,
+  mask  : 0x1ff,
+  descr : "LT link 2 ready",
+  rmw   : false,
+  ro    : true,
+  pulse : false,
+};
+
+/// LTB link 3 available and ready to receive data
+//LT_LINK_READY3    0x1d    0x74    \[9:0\]   r       DSI 3 RX Link OK
+pub const LT_LINK_READY3 : MTBRegister<'static> = MTBRegister {
+  addr  : 0x1d,
+  mask  : 0x1ff,
+  descr : "LT link 3 ready",
+  rmw   : false,
+  ro    : true,
+  pulse : false,
+};
+
+/// LTB link 4 available and ready to receive data
+//LT_LINK_READY4    0x1e    0x78    \[9:0\]   r       DSI 4 RX Link OK
+pub const LT_LINK_READY4 : MTBRegister<'static> = MTBRegister {
+  addr  : 0x1e,
+  mask  : 0x1ff,
+  descr : "LT link 4 ready",
+  rmw   : false,
+  ro    : true,
+  pulse : false,
+};
 
 /// LTB Hit counter for slot 0
 //LT0   0x20    0x80    \[23:0\]  r       hit count on LT=0
@@ -1823,8 +1978,30 @@ pub const RB_CNTS_SNAP : MTBRegister<'static> = MTBRegister {
 /// TRACK_CENTRAL_IS_GLOBAL   0xb     0x2c    2   rw  0x0     1 makes the TRACK central read all paddles.
 pub const TRACK_CENTRAL_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
   addr  : 0xb,
+  mask  : 0x4,
+  descr : "1 makes the TRACK central read all paddles",
+  rmw   : true,
+  ro    : false,
+  pulse : false,
+};
+
+/// Add the track trigger to all triggers
+/// TRACE_TRIG_IS_GLOBAL 0xb 0x2c 1 rw 0x0
+pub const TRACK_TRIG_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
+  addr  : 0xb,
   mask  : 0x00000001,
-  descr : "Allow everything to always trigger on a track trigger",
+  descr : "1 makes the TRACK trigger read all paddles",
+  rmw   : true,
+  ro    : false,
+  pulse : false,
+};
+
+/// Add any trigger to all triggers
+/// ANY_TRIG_IS_GLOBAL 0xb 0x2c 0 rw 0x0
+pub const ANY_TRIG_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
+  addr  : 0xb,
+  mask  : 0x00000000,
+  descr : "1 makes the ANY trigger read all paddles",
   rmw   : true,
   ro    : false,
   pulse : false,
@@ -1836,13 +2013,22 @@ pub const TRACK_CENTRAL_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
 pub const TIU_USE_AUX_LINK : MTBRegister<'static> = MTBRegister {
   addr  : 0xe,
   mask  : 0x00000010,
-  descr : "Choose betweent the 2 tiu links",
+  descr : "Choose between the 2 tiu links",
   rmw   : true,
   ro    : false,
   pulse : false,
 };
 
-
+///TRIG_GEN_RATE     0x9     0x24    \[31:0\]  rw  0x0     Rate of generated triggers f_trig = (1/clk_period) * rate/0xffffffff
+/// Set a random forced trigger
+pub const TRIG_GEN_RATE : MTBRegister<'static> = MTBRegister {
+  addr  : 0x9,
+  mask  : 0xffffffff,
+  descr : "Set a forced trigger (1/clk_period) * rate/0xffffffff",
+  rmw   : false,
+  ro    : false,
+  pulse : false,
+};
 
 // All the trigger settings
 
@@ -1856,7 +2042,6 @@ pub const TIU_USE_AUX_LINK : MTBRegister<'static> = MTBRegister {
 //FB_CLOCK_RATE_3   0x5     0x14    [31:0]  r       Feedback clock frequency
 //FB_CLOCK_RATE_4   0x6     0x18    [31:0]  r       Feedback clock frequency
 //DSI_ON    0x7     0x1c    [4:0]   rw  0x1F    Bitmask 1 = enable DSI
-//TRIG_GEN_RATE     0x9     0x24    [31:0]  rw  0x0     Rate of generated triggers f_trig = (1/clk_period) * rate/0xffffffff
 //RESYNC    0xa     0x28    0   w   Pulse   Write 1 to resync
 //ANY_TRIG_IS_GLOBAL    0xb     0x2c    0   rw  0x0     1 makes the ANY trigger read all paddles.
 //TRACK_TRIG_IS_GLOBAL  0xb     0x2c    1   rw  0x0     1 makes the TRACK trigger read all paddles.
@@ -1877,11 +2062,6 @@ pub const TIU_USE_AUX_LINK : MTBRegister<'static> = MTBRegister {
 //
 //MT
 //
-//LT_LINK_READY0    0x1a    0x68    [9:0]   r       DSI 0 RX Link OK
-//LT_LINK_READY1    0x1b    0x6c    [9:0]   r       DSI 1 RX Link OK
-//LT_LINK_READY2    0x1c    0x70    [9:0]   r       DSI 2 RX Link OK
-//LT_LINK_READY3    0x1d    0x74    [9:0]   r       DSI 3 RX Link OK
-//LT_LINK_READY4    0x1e    0x78    [9:0]   r       DSI 4 RX Link OK
 //
 //MT.HIT_COUNTERS
 //

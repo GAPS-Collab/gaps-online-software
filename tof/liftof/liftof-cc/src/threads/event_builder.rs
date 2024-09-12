@@ -11,7 +11,7 @@ use std::sync::{
 use std::collections::VecDeque;
 use std::collections::HashMap;
 //use std::path::Path;
-
+//
 use crossbeam_channel::{
     Receiver,
     Sender,
@@ -34,6 +34,9 @@ use tof_dataclasses::serialization::Packable;
 
 use tof_dataclasses::packets::TofPacket;
 //use tof_dataclasses::threading::ThreadControl;
+use tof_dataclasses::events::EventStatus;
+
+
 
 //use liftof_lib::heartbeat_printer;
 use liftof_lib::settings::{
@@ -47,7 +50,6 @@ use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 
 use colored::{
     Colorize,
-    ColoredString
 };
 
 use tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
@@ -112,30 +114,22 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut n_received           : usize;
   //let mut clear_cache        = 0; // clear cache every 
   //let mut event_sending      = 0;
-  let mut n_mte_received_tot   = 0u64;
   let mut n_mte_skipped        = 0u32;
-  let mut n_rbe_received_tot   = 0u64;
-  let mut n_rbe_discarded_tot  = 0u64;
   let mut first_evid           : u32;
   let mut last_evid            = 0;
   let mut n_sent               = 0usize;
-  let mut n_sent_ch_err        = 0usize;
-  let mut n_timed_out          = 0usize; 
   // debug
-  let mut last_rb_evid         = 0u32;
+  let mut last_rb_evid         : u32;
   let mut n_rbe_per_te         = 0usize;
-  let mut rb_ev_wo_mte         = 0usize;
-  let mut n_rbe_from_past      = 0usize;
-  let mut n_rbe_orphan         = 0usize;
   let mut debug_timer          = Instant::now();
-  let mut met_seconds          = 0f64;  
+  let met_seconds          = 0f64;  
   //let mut n_receiving_errors  = 0;
   let mut check_tc_update      = Instant::now();
-  let mut n_gathered_fr_cache  = 0usize;
-  let mut misaligned_cache_err = 0usize; 
-  let mut daq_reset_cooldown   = Instant::now();
-  let mut reset_daq_flag       = false;
-  let mut retire               = false;
+  let daq_reset_cooldown   = Instant::now();
+  let reset_daq_flag       = false;
+  let mut retire           = false;
+  let mut hb_timer         = Instant::now(); 
+  let hb_interval          = Duration::from_secs(settings.hb_send_interval as u64);
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
       //println!("= => [evt_builder] checkling tc..");
@@ -196,13 +190,14 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               //error!("We skipped event ids {}", delta_id );
             }
           }
+          heartbeat.n_mte_skipped = n_mte_skipped as usize;
           last_evid = event.mt_event.event_id;
           event_cache.insert(last_evid, event);
           // use this to keep track of the order
           // of events
           event_id_cache.push_back(last_evid);
           n_received  += 1;
-          n_mte_received_tot += 1;
+          heartbeat.n_mte_received_tot += 1;
         }
       } // end match Ok(mt)
       //if n_received % 10 == 0 {
@@ -227,6 +222,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           // I hope it won't be a problem. Otherwise we have
           // to add another cache.
           //println!("==> Len evt cache {}", event_cache.len());
+          heartbeat.event_cache_size    = event_cache.len();
+          heartbeat.event_id_cache_size = event_id_cache.len();
           heartbeat.n_rbe_received_tot += 1;
           n_received += 1;
           match seen_rbevents.get_mut(&rb_ev.header.rb_id) {
@@ -312,101 +309,36 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     if debug_timer_elapsed > 35.0  {
       // missing event id check
       let mut evid_check = event_id_cache[0];
-      let mut n_ev_wo_evid = 0usize;
+      heartbeat.n_ev_wo_evid = 0usize;
       for _ in 0..event_id_cache.len() {
         if !event_id_cache.contains(&evid_check) {
-          n_ev_wo_evid += 1;
+          heartbeat.n_ev_wo_evid += 1;
         }
         evid_check += 1;
       }
-      //event_id_test.dedup();
-      //println!("DEBUG 1");
-      //let evid_id_test_len = event_id_test.len();
-      //println!("DEBUG .1.");
-      //let evid_test_len = event_id_cache.len();
-      //let mut evid_test_missing = 0usize;
-      //if evid_test_len > 0 {
-      //  let mut evid = event_id_cache[0];
-      //  //println!("DEBUG 1.5");
-      //  //println!("len of evid_id_test {}", evid_id_test_len);
-      //  for _ in 0..evid_test_len {
-      //    if !event_id_cache.contains(&evid) {
-      //      evid_test_missing += 1;
-      //    }
-      //    evid += 1;
-      //  }
-      //}
-      ////println!("DEBUG 2");
-      //event_id_test.clear();
-      //println!("DEBUG 3");
-      
-      //let mut hbs : Vec<String>;
-      //let mut line :String;
-      //let title = String::from("== == == == == == EVENTBUILDER HEARTBTEAT == == == == == ==");
-      //hbs.push(title);
-      //line = format!("==> Received MTEvents \t{}", n_mte_received_tot).bright_purple();
-      //hbs.push(line);
-      //let end   = String::from("== == == == == == == == == == == == == == == == == == == ==");
-      //hbs.push(end);
       heartbeat.met_seconds += debug_timer_elapsed as usize;
       heartbeat.mte_receiver_cbc_len = m_trig_ev.len();
       heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
       heartbeat.tp_sender_cbc_len = data_sink.len();
-      let pack = heartbeat.pack();
-      match data_sink.send(pack) {
-        Err(err) => {
-          error!("EVTBLDR Heartbeat sending failed! Err {}", err);
-        }
-        Ok(_)    => {
-          debug!("Heartbeat sent <3 <3 <3");
-        }
-      }
-      println!("  {:<70} <<", ">> == == == == == == ==  EVTBLDR HEARTBEAT == ==  == == == == ==".bright_purple().bold());
-    //if n_mte_received_tot % 50 == 0 || n_rbe_received_tot % 200 == 0 {
-      println!("  {:<70} <<", format!(">> ==> Received MTEvents {}", n_mte_received_tot).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Received RBEvents {}", n_rbe_received_tot).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Skipped MTEvents  {}", n_mte_skipped).bright_purple());
-      //println!("  {:<80}", format!(">> ==> Missing evid analysis:  {} of {} events missing ({:.2}%)<<", ev_id_test_missing, ev_id_test_len, 100.0*(ev_id_test_missing as f64/evid_test_len as f64)).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Size of event cache    {}", event_cache.len()).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Size of event ID cache {}", event_id_cache.len()).bright_purple());
-      // println!("  {:<70} <<", format!(">> ==> Gathered events from cache, last iter {}", n_gathered_fr_cache).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Misaligned cache errs  {}", misaligned_cache_err).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!").bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Sent {} events! rate   {:4.2} Hz", n_sent, n_sent as f64/met_seconds).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Failed in sending {} events!", n_sent_ch_err).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Chn len MTE receiver   {}",m_trig_ev.len() ).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Chn len RBE receiver   {}",ev_from_rb.len()).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Chn len TP  sender     {}",data_sink.len()).bright_purple());
-      println!("  {:<70} <<", format!(">> ==> Event id check: {:4.2}% of events missing in the event ID cache", n_ev_wo_evid as f64 / event_cache.len() as f64).bright_purple());
-      if n_sent > 0 {
-        let av_rb_ev = n_rbe_per_te as f64 / n_sent as f64;
-        println!("  {:<70} <<", format!(">> ==> Average number of RBEvents/TofEvent {:4.2}", av_rb_ev).bright_purple());
-        let to_frac = 100.0 * n_timed_out as f64 / n_sent as f64;
-        println!("  {:<70} <<", format!(">> ==> Fraction of timed out events {:4.2}%", to_frac).bright_purple());
-        let recv_sent_frac = 100.0* n_mte_received_tot as f64 / n_sent as f64;
-        println!("  {:<70} <<", format!(">> ==> Fraction of incoming vs outgoing MTEvents {:4.2}%", recv_sent_frac).bright_purple());
-      }
-      if n_rbe_received_tot > 0 {
-        let rbe_discarded_frac = 100.0 * n_rbe_discarded_tot as f64 / n_rbe_received_tot as f64;
-        let rbe_fpast_frac     = 100.0 * n_rbe_from_past   as f64 / n_rbe_received_tot as f64;
-        let rbe_orphaned_frac  = 100.0 * n_rbe_orphan        as f64 / n_rbe_received_tot as f64;
-        println!("  {:<70} <<", format!(">> ==> Fraction of discarded RBEvents {:4.2}%", rbe_discarded_frac).bright_purple());
-        println!("  {:<70} <<", format!(">> ==> RBEvents discarded (too early) {} ({:4.2}%)",n_rbe_from_past, rbe_fpast_frac).bright_purple());
-        println!("  {:<70} <<", format!(">> ==> RBEvents discarded (orphaned, too late?) {} ({:4.2}%)",n_rbe_orphan, rbe_orphaned_frac).bright_purple());
-      }
-      println!("RBEvents received overview (rate/RB [Hz]):");
-      //if rbe_fpast_frac > 0.1 {
-      //  warn!("We will reset the MTB DAQ since the MT events seem to lag behind");
-      //  reset_daq_flag = true;
+
+      //while hb_timer.elapsed() < hb_interval {};
       //}
-      //let mut key_value_pairs: Vec<_> = seen_rbevents.iter().collect();
-      //key_value_pairs.sort_by(|a, b| a.0.cmp(b.0));
-      //for (key, value) in key_value_pairs {
-      //    if key < &10 {
-      //      head0 += &(format!(" RB {:02}\t| ", key)); 
-      //      row0  += &(format!(" {:.1}\t| ", *value as f64/met_total_sec as f64));
-      //      continue;
+
+      //while hb_timer.elapsed() >= hb_interval {
+      //let pack = heartbeat.pack();
+      //match data_sink.send(pack) {
+      //  Err(err) => {
+      //    error!("EVTBLDR Heartbeat sending failed! Err {}", err);
+      //  }
+      //  Ok(_)    => {
+      //    debug!("Heartbeat sent <3 <3 <3");
+      //  }
+      //}
+      //println!("{}", heartbeat);
+      //hb_timer = Instant::now();
+
+      ////while hb_timer.elapsed() < hb_interval {};
+      //}
       let mut counters = HashMap::<u8,f64>::new();
       for k in seen_rbevents.keys() {
         counters.insert(*k, seen_rbevents[&k] as f64/met_seconds as f64);
@@ -585,7 +517,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     }
     trace!("Debug timer RBE received! {:?}", debug_timer.elapsed());
     //if event_sending == send_every_x_event {
-    n_gathered_fr_cache = 0;
     let mut prior_ev_sent = 0u32;
     let mut first_ev_sent = false;
     
@@ -606,8 +537,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       match event_cache.get(&evid) {
         None => {
           error!("Event id and event caches are misaligned for event id {}, idx {} and sizes {} {}! This is BAD and most likely a BUG!", evid, idx, event_cache.len(), event_id_cache.len());
-          //event_id_cache.push_back(evid);
-          misaligned_cache_err += 1;
           continue;
         },
         Some(ev) => {
@@ -615,7 +544,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           //let cache_it : bool;
           if ev_timed_out {
             if !ev.is_complete() {
-              n_timed_out += 1;
+              heartbeat.n_timed_out += 1;
             }
           }
           // always ready when the event is timed out
@@ -627,11 +556,10 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               BuildStrategy::WaitForNBoards => {
                 // we will always wait for the expected number of boards, 
                 // FIXME - make this a member of settings
-                let wait_nrb : usize = 40;
+                let _wait_nrb : usize = 40;
                 // except the event times out
                 if ev.rb_events.len() as u8 == settings.wait_nrb {
                   ready_to_send = true;
-                  //n_gathered_fr_cache += 1;
                 } // else ready_to_send is still false 
               },
               BuildStrategy::Adaptive 
@@ -678,22 +606,37 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             // here even if it might require re-allocating memory
             // we should have an eye on performance though
             //idx_to_remove.push(idx);
-            let ev_to_send = event_cache.remove(&evid).unwrap();
-            n_rbe_per_te  += ev_to_send.rb_events.len(); 
-            // can we avoid unpacking and repacking?
-            let pack       = TofPacket::from(&ev_to_send);
-            match data_sink.send(pack) {
-              Err(err) => {
-                error!("Packet sending failed! Err {}", err);
-                n_sent_ch_err += 1; 
-              }
-              Ok(_)    => {
-                debug!("Event with id {} sent!", evid);
-                n_sent += 1;
-                heartbeat.n_sent += 1;
+            let mut ev_to_send = event_cache.remove(&evid).unwrap();
+            // update event status, so that we will also see in an 
+            // (optionally) produced tof event summary if the 
+            // event has isuses
+            n_rbe_per_te  += ev_to_send.rb_events.len();
+            heartbeat.data_mangled_ev = 69;
+            let _ev_satus  = ev_to_send.mt_event.event_status;
+            for ev in &ev_to_send.rb_events {
+              if ev.status == EventStatus::CellSyncErrors || ev.status == EventStatus::ChnSyncErrors {
+                ev_to_send.mt_event.event_status = EventStatus::AnyDataMangling {
+                };
+                heartbeat.data_mangled_ev += 1;
               }
             }
-          } else {
+            // can we avoid unpacking and repacking?
+            
+          //  while hb_timer.elapsed() < hb_interval {
+          //    // Do nothing, wait for the next heartbeat cycle
+          //}
+          let pack       = TofPacket::from(&ev_to_send);
+          match data_sink.send(pack) {
+            Err(err) => {
+              error!("Packet sending failed! Err {}", err);
+            }
+            Ok(_)    => {
+              debug!("Event with id {} sent!", evid);
+              n_sent += 1;
+              heartbeat.n_sent += 1;
+            }
+          }
+        } else {
             event_id_cache.push_front(evid);
           }
         }
@@ -713,7 +656,20 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     //event_sending = 0;
     //event_cache.retain(|ev| ev.valid);
     debug!("Debug timer! EVT SENDING {:?}", debug_timer.elapsed());
+    if hb_timer.elapsed() >= hb_interval {
+      //let pack       = TofPacket::from(&ev_to_send);
+      let pack         = heartbeat.pack();
+      match data_sink.send(pack) {
+        Err(err) => {
+          error!("Packet sending failed! Err {}", err);
+        }
+        Ok(_)    => {
+        }
+      }
+      hb_timer = Instant::now();
+      // Wait until the configured interval has passed
+      //while hb_timer.elapsed() < hb_interval {};
+    } 
   } // end loop
-}
-
+}  
 

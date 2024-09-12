@@ -16,8 +16,9 @@ title: Debugging Dead TOF Channels
   }
 }%%
 flowchart TB
-  START["You have verified\n by looking at a waveform\n (e.g. with liftof-tui)\n that a signal does not\n show a typical SiPM pulse\n\n Make sure that after debugging\n all cables are connected as\ they are supposed to"]== "RAT OFF!" ==>DBG1["Reseat power connector\n on SiPM side\n Obviously after each\n debugging step turn RAT ON\n verify that the liftof-rb clients\n are running and check again!"]
-  DBG1== "RAT OFF!" ==> DBG2["Swap power cable with\n neighbor paddle, SiPM side"]
+  START["You have verified\n by looking at a waveform\n (e.g. with liftof-tui)\n that a signal does not\n show a typical SiPM pulse\n\n Make sure that after debugging\n all cables are connected as\ they are supposed to"]==>DBG0["Power cycle RAT and check again"]
+  DBG0== "RAT OFF!" ==>DBG1["Reseat power connector\n on SiPM side\n Obviously after each\n debugging step turn RAT ON\n verify that the liftof-rb clients\n are running and check again!"]
+  DBG1== "RAT OFF! Check which RAT the neighbor paddle connects to and make sure that is off, too!" ==> DBG2["Swap power cable with\n neighbor paddle, SiPM side"]
   DBG2-- "Good signal!"--> GOOD0["The SiPM is fine!"]
   DBG2-- "No pulse!"--> BAD0["Either the HG\n connection or the SiPM\n might be bad!"]
   subgraph SiPM-Debugging

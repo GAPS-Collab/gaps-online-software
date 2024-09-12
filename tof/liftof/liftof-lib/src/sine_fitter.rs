@@ -1,10 +1,11 @@
-use ndarray::{Array1, Array, ArrayBase, Data, Ix1};
-use ndarray_linalg::solve::Inverse;
+use ndarray::Array1;
+//, Array, ArrayBase, Data, Ix1};
+//use ndarray_linalg::solve::Inverse;
 use rustfft::{FftPlanner, num_complex::Complex};
 use std::f64::consts::PI;
 use statrs::distribution::ChiSquared;
-use ndarray_rand::RandomExt;
-use ndarray_rand::rand_distr::Uniform;
+//use ndarray_rand::RandomExt;
+//use ndarray_rand::rand_distr::Uniform;
 use argmin::prelude::*;
 //use argmin::ArgminOp;
 // use argmin::core::Executor;
@@ -25,6 +26,7 @@ impl ArgminOp for SinFunc<'_> {
     type Float = f64;
 
     fn apply(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+        #[allow(non_snake_case)]
         let (A, w, ph, c) = (p[0], p[1], p[2], p[3]);
         let sinfunc = |t: f64| A * (w * t + ph).sin() + c;
         let residuals: f64 = self.tt.iter().zip(self.yy.iter())
@@ -60,6 +62,7 @@ pub fn fit_sine(nanoseconds: &Array1<f64>, volts: &Array1<f64>) -> Result<(f64, 
         .run()?;
 
     let result = &res.state().best_param;
+    #[allow(non_snake_case)]
     let (A, w, p, c) = (result[0], result[1], result[2], result[3]);
     let phase_multiple_pi = p / PI;
 
@@ -68,9 +71,9 @@ pub fn fit_sine(nanoseconds: &Array1<f64>, volts: &Array1<f64>) -> Result<(f64, 
     };
 
     let residuals: Vec<f64> = tt.iter().zip(yy.iter()).map(|(&t, &y)| y - fitfunc(t)).collect();
-    let ss_res = residuals.iter().map(|&r| r.powi(2)).sum::<f64>();
-    let ss_tot = yy.iter().map(|&y| (y - yy.mean().unwrap()).powi(2)).sum::<f64>();
-    let r_squared = 1.0 - (ss_res / ss_tot);
+    let _ss_res = residuals.iter().map(|&r| r.powi(2)).sum::<f64>();
+    let _ss_tot = yy.iter().map(|&y| (y - yy.mean().unwrap()).powi(2)).sum::<f64>();
+    //let r_squared = 1.0 - (ss_res / ss_tot);
 
     // Chi-squared calculation
     let expected_values: Vec<f64> = tt.iter().map(|&t| fitfunc(t)).collect();
@@ -82,10 +85,10 @@ pub fn fit_sine(nanoseconds: &Array1<f64>, volts: &Array1<f64>) -> Result<(f64, 
     let reduced_chi_squared = chi_squared_stat / df;
 
     let chi_squared = ChiSquared::new(df).unwrap();
-    let p_value = 1.0 - chi_squared.cdf(chi_squared_stat);
+    let _p_value = 1.0 - chi_squared.cdf(chi_squared_stat);
 
     let f = w / (2.0 * PI);
-    let period = 1.0 / f;
+    let _period = 1.0 / f;
 
 
     Ok((A, f, p, phase_multiple_pi, c, reduced_chi_squared))

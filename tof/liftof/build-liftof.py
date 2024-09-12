@@ -66,19 +66,24 @@ def pack(binary):
 
 
 def deploy(binary, dest_dir='bin'):
-    version = get_version(binary)
+    #version = get_version(binary)
+    version = '0.10.3'
     if binary == 'liftof-cc':
-        deploy_cmd = f"rsync -avz build/{binary} tofcpu-pl:{dest_dir}/{binary}.{version}"
-    if binary == 'liftof-rb':
+       deploy_cmd = f"rsync -avz build/{binary} tofcpu-pl:{dest_dir}/{binary}.{version}"
+       sub.run([deploy_cmd], shell=True)
+		   
+    elif binary == 'liftof-rb':
         rbids = all_rbs() 
         rb_targets = [f'tof-rb{k:02}' for k in rbids]
         for target in tqdm.tqdm(rb_targets, desc='Deploying to rbs'):
             deploy_cmd = f"rsync -avz build/{binary} tofcpu-pl:{dest_dir}/{binary}.{version}"
             sub.run([deploy_cmd], shell=True)
-        return
-    if binary == 'liftof-tui':
-        deploy_cmd = f"rsync -avz build/{binary} gse5-pl:tof-moni/{binary}.{version}"
-    sub.run([deploy_cmd], shell=True)
+     
+    elif binary == 'liftof-tui':
+        deploy_cmd = f"rsync -avz build/{binary} gaps-gse5:tof-moni/{binary}.{version}"
+        deploy_cmd1 = f"rsync -avz build/{binary} tof-gse5:tof-moni/{binary}.{version}"
+        sub.run([deploy_cmd], shell=True)
+        sub.run([deploy_cmd1], shell=True)
     
 def deploy_asset(asset):
     if asset == 'db':

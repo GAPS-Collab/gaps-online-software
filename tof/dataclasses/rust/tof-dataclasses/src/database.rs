@@ -116,11 +116,11 @@ impl Run {
         error!("Unable to load DSICards from db! {err}");
         return None;
       }
-      Ok(runs) => {
+      Ok(_runs) => {
         //return Some(runs);
       }
     }
-    let results = tof_db_run
+    let _results = tof_db_run
       //.filter(published.eq(true))
       .limit(1)
       //.select(Run::as_select())

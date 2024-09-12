@@ -562,7 +562,7 @@ pub struct TriggerConfig{
 impl TriggerConfig {
   pub fn new() -> Self { 
     Self {
-      gaps_trigger_use_beta   : false,
+      gaps_trigger_use_beta   : true,
       tiu_emulation_mode  : false,
       prescale : 0.0,
       trigger_type : TriggerType::Unknown

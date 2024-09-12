@@ -103,6 +103,20 @@ pub fn get_tiu_emu_busy_cnt(bus : &mut IPBus)
   TIU_EMU_BUSY_CNT.get(bus)
 }
 
+pub fn get_gaps_trigger_prescale(bus : &mut IPBus)
+  -> Result<f32, Box<dyn Error>> {
+    let prescale_bus = GAPS_TRIG_PRESCALE.get(bus)?;
+    let prescale_val = (u32::MAX as f32 * prescale_bus as f32).floor() as f32;
+    return Ok(prescale_val)
+  }
+
+pub fn set_gaps_trigger_prescale(bus : &mut IPBus, prescale : f32)
+  -> Result<(), Box<dyn Error>> {
+    let prescale_val = (u32::MAX as f32 * prescale).floor() as u32;
+    info!("Setting gaps trigger with prescale {};)", prescale);
+    bus.write(0x248, prescale_val)?;
+  Ok(())
+  }
 /// The readoutboard integration window
 ///
 /// The default setting is "1" and currently 
@@ -188,6 +202,9 @@ pub fn unset_all_triggers(bus : &mut IPBus)
   set_track_trigger  (bus, 0.0)?;
   set_central_track_trigger(bus, 0.0)?;
   set_configurable_trigger(bus, false)?;
+  TRACK_TRIG_IS_GLOBAL.set(bus, 0)?; 
+  ANY_TRIG_IS_GLOBAL.set(bus, 0)?;
+  TRACK_CENTRAL_IS_GLOBAL.set(bus, 0)?;
   Ok(())
 }
 
@@ -198,6 +215,87 @@ pub fn set_gaps_trigger(bus : &mut IPBus, use_beta : bool)
   set_inner_tof_threshold(bus,0x3)?;
   set_outer_tof_threshold(bus,0x3)?;
   set_total_tof_threshold(bus,0x8)?;
+  let mut trig_settings = bus.read(0x14)?;
+  trig_settings = trig_settings | u32::pow(2,24);
+  if use_beta {
+    trig_settings = trig_settings | u32::pow(2,25);
+  }
+  bus.write(0x14, trig_settings)?;
+  Ok(())
+}
+
+pub fn set_gaps_track_trigger(bus : &mut IPBus, prescale : f32, use_beta : bool) 
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting GAPS + Track trigger combo");
+  TRACK_TRIG_IS_GLOBAL.set(bus, 1)?;
+  set_gaps_trigger(bus, use_beta)?;
+  set_track_trigger(bus, prescale)?;
+  Ok(())
+}
+
+pub fn set_gaps_any_trigger(bus : &mut IPBus, prescale : f32, use_beta : bool)
+  -> Result<(), Box<dyn Error>> {
+    info!("Setting GAPS + Any trigger combo");
+    ANY_TRIG_IS_GLOBAL.set(bus, 1)?;
+    set_gaps_trigger(bus, use_beta)?;
+    set_any_trigger(bus, prescale)?;
+    Ok(())
+  }
+
+pub fn set_gaps_central_track_trigger(bus : &mut IPBus, prescale : f32, use_beta : bool)
+  -> Result<(), Box<dyn Error>> {
+    info!("Setting GAPS + Central Track trigger combo");
+    TRACK_CENTRAL_IS_GLOBAL.set(bus, 1)?;
+    set_gaps_trigger(bus, use_beta)?;
+    set_central_track_trigger(bus, prescale)?;
+    Ok(())
+  }
+
+pub fn set_gaps422_central_track_trigger(bus : &mut IPBus, prescale : f32, use_beta : bool)
+  -> Result<(), Box<dyn Error>> {
+    info!("Setting GAPS + Central Track trigger combo");
+    TRACK_CENTRAL_IS_GLOBAL.set(bus, 1)?;
+    set_gaps422_trigger(bus, use_beta)?;
+    set_central_track_trigger(bus, prescale)?;
+    Ok(())
+  }
+
+pub fn set_gaps633_trigger(bus : &mut IPBus, use_beta : bool) 
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting GAPS Antiparticle trigger, use beta {}!", use_beta);
+  set_inner_tof_threshold(bus,0x3)?;
+  set_outer_tof_threshold(bus,0x3)?;
+  set_total_tof_threshold(bus,0x6)?;
+  let mut trig_settings = bus.read(0x14)?;
+  trig_settings = trig_settings | u32::pow(2,24);
+  if use_beta {
+    trig_settings = trig_settings | u32::pow(2,25);
+  }
+  bus.write(0x14, trig_settings)?;
+  Ok(())
+}
+
+pub fn set_gaps422_trigger(bus : &mut IPBus, use_beta : bool) 
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting GAPS Antiparticle trigger, use beta {}!", use_beta);
+  set_inner_tof_threshold(bus,0x2)?;
+  set_outer_tof_threshold(bus,0x2)?;
+  set_total_tof_threshold(bus,0x4)?;
+  let mut trig_settings = bus.read(0x14)?;
+  trig_settings = trig_settings | u32::pow(2,24);
+  if use_beta {
+    trig_settings = trig_settings | u32::pow(2,25);
+  }
+  bus.write(0x14, trig_settings)?;
+  Ok(())
+}
+
+pub fn set_gaps211_trigger(bus : &mut IPBus, use_beta : bool) 
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting GAPS Antiparticle trigger, use beta {}!", use_beta);
+  set_inner_tof_threshold(bus,0x1)?;
+  set_outer_tof_threshold(bus,0x1)?;
+  set_total_tof_threshold(bus,0x2)?;
   let mut trig_settings = bus.read(0x14)?;
   trig_settings = trig_settings | u32::pow(2,24);
   if use_beta {

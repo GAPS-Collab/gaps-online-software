@@ -415,6 +415,9 @@ impl Serialization for TofPacket {
 
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
   -> Result<Self, SerializationError> {
+    if stream.len() < 2 {
+      return Err(SerializationError::HeadInvalid {});
+    }
     let head = parse_u16(stream, pos);
     if Self::HEAD != head {
       error!("Packet does not start with HEAD signature");

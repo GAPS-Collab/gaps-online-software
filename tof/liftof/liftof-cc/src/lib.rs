@@ -1,16 +1,4 @@
 #[macro_use] extern crate log;
-extern crate clap;
-extern crate colored;
-
-extern crate crossbeam_channel;
-
-extern crate zmq;
-//extern crate openssh;
-extern crate comfy_table;
-extern crate tof_dataclasses;
-#[cfg(features="tof-ctrl")]
-extern crate tof_control;
-extern crate liftof_lib;
 
 pub mod constants;
 pub mod threads;
@@ -18,10 +6,14 @@ pub mod threads;
 use std::fs;
 use std::path::PathBuf;
 
+use liftof_lib::settings::LiftofSettings;
+
 /// Prepare a new folder with the run id
 ///
 /// This will assign a run id based on the 
-/// run ids in that folder
+/// run ids in that folder. Additionally, 
+/// we will copy the current settings into
+/// that folder
 ///
 /// TODO - connect it to the run database
 ///
@@ -29,7 +21,14 @@ use std::path::PathBuf;
 ///
 /// * data_path : The global path on the inflight 
 ///               tof computer where to store data.
-pub fn prepare_run(data_path : String) -> Option<u32> {
+/// * config    : The current configuration, to be 
+///               copied into the new folder
+///
+pub fn prepare_run(data_path : String,
+                   config    : &LiftofSettings) -> Option<u32> {
+
+
+
   let stream_files_path = PathBuf::from(data_path);
   let paths = fs::read_dir(stream_files_path.clone()).unwrap();
   let mut used_runids = Vec::<u32>::new();
@@ -56,22 +55,13 @@ pub fn prepare_run(data_path : String) -> Option<u32> {
   if max_run_id == 0 {
     return None;
   } else {
-    return Some(max_run_id + 1);
+    let new_run_id = max_run_id + 1;
+    let settings_fname = format!("{}/run{}.toml",stream_files_path.display(), new_run_id); 
+    println!("=> Writing data to {}!", stream_files_path.display());
+    println!("=> Writing settings to {}!", settings_fname);
+    config.to_toml(settings_fname);
+    return Some(new_run_id);
   }
 }
-
-
-#[deprecated(since="0.10.2", note="Unclear purpose")]
-pub fn prefix_tof_cpu(input : &mut Vec<u8>) -> Vec<u8> {
-  let mut bytestream : Vec::<u8>;
-  let tof_cpu : String;
-  tof_cpu = String::from("TOFCPU");
-  //let mut response = 
-  bytestream = tof_cpu.as_bytes().to_vec();
-  //bytestream.append(&mut resp.to_bytestream());
-  bytestream.append(input);
-  bytestream
-}
-
 
 

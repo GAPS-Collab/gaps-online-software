@@ -18,8 +18,10 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-tof-dataclasses = { workspace = true, features = ["polars"] } 
-liftof-lib      = { path = "../liftof-lib", features=["database"]}
+tof-dataclasses     = { path = "../../dataclasses/rust/tof-dataclasses" , features =     ["database", "polars","pybindings","advanced-algorithms"], version = "0.10"} 
+liftof-lib          = { path = "../liftof-lib", features=["database"]}
+rpy-tof-dataclasses = { workspace = true }
+
 # somehow pyo3 is very picky with the version
 pyo3            = { version = "0.21", features = ["extension-module"] }
 pyo3-log        = "0.10"

@@ -6,14 +6,6 @@
 //!
 
 #[macro_use] extern crate log;
-extern crate env_logger;
-extern crate clap;
-extern crate tof_dataclasses;
-extern crate crossbeam_channel;
-extern crate colored;
-extern crate signal_hook;
-extern crate liftof_lib;
-extern crate liftof_cc;
 
 use std::sync::{
     Arc,
@@ -37,7 +29,6 @@ use std::{
     thread,
     time
 };
-
 
 use std::path::{
     //Path,
@@ -81,7 +72,6 @@ use tof_dataclasses::database::{
     connect_to_db,
     get_linkid_rbid_map,
     ReadoutBoard,
-    Run,
 };
 
 use tof_dataclasses::constants::PAD_CMD_32BIT;
@@ -107,7 +97,6 @@ use liftof_lib::constants::{
     DEFAULT_CALIB_EXTRA
 };
 
-
 use liftof_cc::prepare_run;
 use liftof_cc::threads::{
     event_builder,
@@ -116,7 +105,7 @@ use liftof_cc::threads::{
     global_data_sink,
     readoutboard_communicator
 };
-#[cfg(features="tof-ctrl")]
+#[cfg(feature="tof-ctrl")]
 use liftof_cc::threads::monitor_cpu;
 
 /*************************************/
@@ -203,7 +192,6 @@ fn main() {
   println!(" >> It connects to the MasterTriggerBoard and the ReadoutBoards");
   println!("-----------------------------------------------\n\n");
 
-  //panic!("auf der titanic!");
   // settings 
   //let foo = LiftofSettings::new();
   //foo.to_toml(String::from("foo-settings.toml"));
@@ -218,12 +206,13 @@ fn main() {
   // global thread control
   let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
   // there seems to be now way to create handles without thread
-  let mut evtbldr_handle   : thread::JoinHandle<_> = thread::spawn(||{});
-  let mut data_sink_handle : thread::JoinHandle<_> = thread::spawn(||{});
-  let mut ckpumoni_handle  : thread::JoinHandle<_> = thread::spawn(||{});
-  let mut mtb_handle       : thread::JoinHandle<_> = thread::spawn(||{});
-  let mut cmd_handle       : thread::JoinHandle<_> = thread::spawn(||{});
-  let mut sig_handle       : thread::JoinHandle<_> = thread::spawn(||{});
+  //let mut evtbldr_handle   : thread::JoinHandle<_> = thread::spawn(||{});
+  //let mut data_sink_handle : thread::JoinHandle<_> = thread::spawn(||{});
+  //let mut mtb_handle       : thread::JoinHandle<_> = thread::spawn(||{});
+  //let mut cmd_handle       : thread::JoinHandle<_> = thread::spawn(||{});
+  //#[cfg(feature="tof-ctrl")]
+  //let mut cpu_moni_handle  : thread::JoinHandle<_> = thread::spawn(||{});
+  //let mut sig_handle       : thread::JoinHandle<_> = thread::spawn(||{});
   let mut rb_handles       = Vec::<thread::JoinHandle<_>>::new();
 
   let one_second = time::Duration::from_millis(1000);
@@ -233,10 +222,11 @@ fn main() {
   let nboards         : usize;
   let args              = LiftofCCArgs::parse();
   let verbose           = args.verbose;
-  
+  let cfg_file_str   : String; 
   match args.config {
     None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
     Some(cfg_file) => {
+      cfg_file_str = cfg_file.clone();
       match LiftofSettings::from_toml(cfg_file) {
         Err(err) => {
           error!("CRITICAL! Unable to parse .toml settings file! {}", err);
@@ -260,6 +250,7 @@ fn main() {
   let calib_file_path       = config.calibration_dir.clone();
   let runtime_nseconds      = config.runtime_sec;
   let db_path               = config.db_path.clone();
+  #[cfg(feature="tof-ctrl")]
   let cpu_moni_interval     = config.cpu_moni_interval_sec;
   let cmd_dispatch_settings = config.cmd_dispatcher_settings.clone();
   let mtb_settings          = config.mtb_settings.clone();
@@ -269,12 +260,18 @@ fn main() {
   let mut conn              = connect_to_db(db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
   // if this call does not go through, we might as well fail early.
   let mut rb_list           = ReadoutBoard::all(&mut conn).expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
-  let rb_ignorelist         = config.rb_ignorelist.clone();
+  let rb_ignorelist         = config.rb_ignorelist_always.clone();
+  let rb_ignorelist_tmp     = config.rb_ignorelist_run.clone();
   for k in 0..rb_ignorelist.len() {
     let bad_rb = rb_ignorelist[k];
-    //println!("=> We will INGORE RB {:02}, since it is being marked as IGNORE in the config file!", bad_rb);
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
+  for k in 0..rb_ignorelist_tmp.len() {
+    let bad_rb = rb_ignorelist_tmp[k];
+    rb_list.retain(|x| x.rb_id != bad_rb);
+  }
+
+
   nboards = rb_list.len();
   println!("=> Will use {} readoutboards! Ignoring {:?} sicne they are mareked as 'ignore' in the config file!", rb_list.len(), rb_ignorelist );
   //debug!("--> Following RBs are expected:");
@@ -293,7 +290,50 @@ fn main() {
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
     },
   }
-  //let mut handles = Vec::<std::thread::JoinHandle<_>>::new();
+  
+  println!("=> Copying config to all RBs!");
+  let mut children = Vec::<(u8,Child)>::new();
+  for rb in &rb_list {
+    // also populate the rb thread nandles
+    rb_handles.push(thread::spawn(||{}));
+    
+    let rb_address = format!("tof-rb{:02}:config/liftof-config.toml", rb.rb_id);
+    match Command::new("scp")
+      .args([&cfg_file_str, &rb_address])
+      .spawn() {
+      Err(err) => {
+        error!("Unable to spawn ssh process to copy config on RB {}! {}", rb.rb_id, err);
+      }
+      Ok(child) => {
+        children.push((rb.rb_id,child));
+      }
+    }
+  }
+  let mut issues = Vec::<u8>::new();
+  for rb_child in &mut children {
+    match rb_child.1.wait() {
+      Err(err) => {
+        error!("Child process failed with stderr {:?}! {}", rb_child.1.stderr, err);
+      }
+      Ok(status) => {
+        if status.success() {
+          info!("Copied config to RB {} successfully!", rb_child.0);
+          //println!("=> Restarted liftof-rb on {} successfully \u{1F389}!", rb_child.0)
+        } else {
+          error!("Copy config to RB {} failed with exit code {:?}!", rb_child.0, status.code());
+          issues.push(rb_child.0);
+        }
+      }
+    }
+  }
+  if issues.len() == 0 {
+    println!("=> Copied config to all RBs successfully \u{1F389}!");
+    info!("Copied config to all RBs successfully!");
+  }
+  
+  // FIXME - this needs to be a function
+  // copy the current config file on all RBs
+  rb_handles.clear();
   println!("=> Restarting liftof-rb clients on all RBs!");
   let mut children = Vec::<(u8,Child)>::new();
   for rb in &rb_list {
@@ -333,14 +373,15 @@ fn main() {
     println!("=> Restarted liftof-rb on all RBs successfully \u{1F389}!");
     info!("=> Restarted liftof-rb on all RBs successfully!");
   }
-  
+
+
   let mtb_link_id_map = get_linkid_rbid_map(&rb_list);
   // A global kill timer
   let program_start = Instant::now();
 
   // Prepare outputfiles
   let mut new_run_id : u32;
-  match prepare_run(write_stream_path.clone()) {
+  match prepare_run(write_stream_path.clone(), &config) {
     None => {
       error!("Unable to assign new run id, falling back to 0!");
       new_run_id = 0;
@@ -404,17 +445,15 @@ fn main() {
 
 
   // no cpu monitoring for cmdline calibration tasks
-  #[cfg(features="tof-ctrl")]
+  #[cfg(feature="tof-ctrl")]
   if cpu_moni_interval > 0 {
     debug!("Starting main monitoring thread...");
     let _thread_control_c = Arc::clone(&thread_control);
     // this is anonymus, but we control the thread
     // through the thread control mechanism, so we
     // can still end it.
-    #[cfg(features="tof-ctrl")]
     let tp_to_sink_c = tp_to_sink.clone();
-    #[cfg(features="tof-ctrl")]
-    cpu_moni_handle = thread::Builder::new()
+    let _cpu_moni_handle = thread::Builder::new()
         .name("cpu-monitoring".into())
         .spawn(move || {
           monitor_cpu(
@@ -430,17 +469,19 @@ fn main() {
 
   debug!("Starting data sink thread!");
   let thread_control_gds = Arc::clone(&thread_control);
-  data_sink_handle = thread::Builder::new()
+  let dp_settings      = config.data_publisher_settings.clone();
+  let _data_sink_handle = thread::Builder::new()
     .name("data-sink".into())
     .spawn(move || {
       global_data_sink(&tp_from_threads,
                        false,
-                       thread_control_gds);
+                       thread_control_gds, 
+                        dp_settings);
     })
     .expect("Failed to spawn data-sink thread!");
   debug!("Data sink thread started!");
   let thread_control_sh = Arc::clone(&thread_control);
-  sig_handle = thread::Builder::new()
+  let _sig_handle = thread::Builder::new()
     .name("signal_handler".into())
     .spawn(move || {
       signal_handler(
@@ -454,7 +495,7 @@ fn main() {
   let evb_settings      = config.event_builder_settings.clone();
   let thread_control_eb = Arc::clone(&thread_control);
   let tp_to_sink_c      = tp_to_sink.clone();
-  evtbldr_handle = thread::Builder::new()
+  let _evtbldr_handle = thread::Builder::new()
     .name("event-builder".into())
     .spawn(move || {
                     event_builder(&master_ev_rec,
@@ -470,7 +511,7 @@ fn main() {
   // master trigger
   let mtb_moni_sender = tp_to_sink.clone(); 
   let thread_control_mt = Arc::clone(&thread_control);
-  mtb_handle = thread::Builder::new()
+  let _mtb_handle = thread::Builder::new()
     .name("master-trigger".into())
     .spawn(move || {
                     master_trigger(mtb_address, 
@@ -572,7 +613,7 @@ fn main() {
       // start command dispatcher thread
       let tc = Arc::clone(&thread_control);
       let ts = tp_to_sink.clone();
-      cmd_handle = thread::Builder::new()
+      let _cmd_handle = thread::Builder::new()
         .name("command-dispatcher".into())
         .spawn(move || {
           command_dispatcher(
@@ -774,88 +815,95 @@ fn main() {
       println!("=> Give the RBs a chance to connect and wait a bit..");
       thread::sleep(10*one_second);
 
-      println!("=> Shutting down signal hanlder...");
-      // event builder first, to avoid a lot of error messages
-      match thread_control.lock() {
-        Ok(mut tc) => {
-          tc.thread_signal_hdlr_active = false;
-        }
-        Err(err) => {
-          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-        }
-      }
-      let _ = sig_handle.join();
-      //thread::sleep(2*one_second);
-    
-      // end RB threads
-      println!("=> Shutting down rb threads...");
-      match thread_control.lock() {
-        Ok(mut tc) => {
-          for rb in &rb_list {
-            if tc.thread_rbcomm_active.contains_key(&rb.rb_id) {
-              *tc.thread_rbcomm_active.get_mut(&rb.rb_id).unwrap() = false;
-            }
-          }
-        }
-        Err(err) => {
-          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-        }
-      }
-
-      for k in rb_handles {
-        let _ = k.join();
-      }
-
-      // event builder first, to avoid a lot of error messages
-      println!("=> Shutting down event builder...");
-      match thread_control.lock() {
-        Ok(mut tc) => {
-          tc.thread_event_bldr_active = false;
-          println!("tc {}", tc);
-        }
-        Err(err) => {
-          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-        }
-      } 
-      println!("=> Waiting for event builder thread to finish up...");
-      println!("=> evt builder thread is finsihed: {}", evtbldr_handle.is_finished());
-      let _ = evtbldr_handle.join();
-      println!("=> .. done!");
-
-      match thread_control.lock() {
-        Ok(mut tc) => {
-          tc.stop_flag = true;
-        },
-        Err(err) => {
-          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-        },
-      }
-      // wait actually until all threads have been finished
-      let timeout = Instant::now();
-      loop {
-        match thread_control.lock() {
-          Ok(mut tc) => {
-            tc.stop_flag = true;
-            // each thread will report here if
-            // it is done
-            if !tc.thread_cmd_dispatch_active 
-            && !tc.thread_data_sink_active
-            && !tc.thread_event_bldr_active 
-            && !tc.thread_master_trg_active {
-              break;
-            }
-          },
-          Err(err) => {
-            error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-          },
-        }
-        // in any case, break after timeout
-        if timeout.elapsed() > 5*one_second {
-          break;
-        }
-      }
+      // for now, we end brutally
+      // FIXME
       println!(">> So long and thanks for all the \u{1F41F} <<"); 
       exit(0);
+    
+      // FIXME - this all needs debugging. The goal is to shut down 
+      // the threads in order
+      //println!("=> Shutting down signal handler...");
+      //// event builder first, to avoid a lot of error messages
+      //match thread_control.lock() {
+      //  Ok(mut tc) => {
+      //    tc.thread_signal_hdlr_active = false;
+      //  }
+      //  Err(err) => {
+      //    error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+      //  }
+      //}
+      //let _ = sig_handle.join();
+      ////thread::sleep(2*one_second);
+    
+      //// end RB threads
+      //println!("=> Shutting down rb threads...");
+      //match thread_control.lock() {
+      //  Ok(mut tc) => {
+      //    for rb in &rb_list {
+      //      if tc.thread_rbcomm_active.contains_key(&rb.rb_id) {
+      //        *tc.thread_rbcomm_active.get_mut(&rb.rb_id).unwrap() = false;
+      //      }
+      //    }
+      //  }
+      //  Err(err) => {
+      //    error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+      //  }
+      //}
+
+      //for k in rb_handles {
+      //  let _ = k.join();
+      //}
+
+      //// event builder first, to avoid a lot of error messages
+      //println!("=> Shutting down event builder...");
+      //match thread_control.lock() {
+      //  Ok(mut tc) => {
+      //    tc.thread_event_bldr_active = false;
+      //    println!("tc {}", tc);
+      //  }
+      //  Err(err) => {
+      //    error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+      //  }
+      //} 
+      //println!("=> Waiting for event builder thread to finish up...");
+      //println!("=> evt builder thread is finsihed: {}", evtbldr_handle.is_finished());
+      //let _ = evtbldr_handle.join();
+      //println!("=> .. done!");
+
+      //match thread_control.lock() {
+      //  Ok(mut tc) => {
+      //    tc.stop_flag = true;
+      //  },
+      //  Err(err) => {
+      //    error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+      //  },
+      //}
+      //// wait actually until all threads have been finished
+      //let timeout = Instant::now();
+      //loop {
+      //  match thread_control.lock() {
+      //    Ok(mut tc) => {
+      //      tc.stop_flag = true;
+      //      // each thread will report here if
+      //      // it is done
+      //      if !tc.thread_cmd_dispatch_active 
+      //      && !tc.thread_data_sink_active
+      //      && !tc.thread_event_bldr_active 
+      //      && !tc.thread_master_trg_active {
+      //        break;
+      //      }
+      //    },
+      //    Err(err) => {
+      //      error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+      //    },
+      //  }
+      //  // in any case, break after timeout
+      //  if timeout.elapsed() > 5*one_second {
+      //    break;
+      //  }
+      //}
+      //println!(">> So long and thanks for all the \u{1F41F} <<"); 
+      //exit(0);
     }
 
     // check thread control - this is useful 

@@ -108,7 +108,7 @@ pub enum UIMenuItem {
 
 impl UIMenuItem {
 
-  pub fn get_title(&self, theme : ColorTheme) -> String {
+  pub fn get_title(&self) -> String {
     match self {
       UIMenuItem::Unknown        => String::from("Unknown"       ),
       UIMenuItem::Home           => String::from("Home"          ),
@@ -168,7 +168,7 @@ pub trait UIMenu<'a> {
   fn get_titles(theme : ColorTheme) -> Vec<Line<'a>> {
     let mut titles = Vec::<Line>::new();
     for item in Self::get_items().clone() {
-      let ti = item.get_title(theme).clone();
+      let ti = item.get_title().clone();
       let line =  Line::from(vec![Span::styled(ti, theme.style()),]);
       titles.push(line);
     }

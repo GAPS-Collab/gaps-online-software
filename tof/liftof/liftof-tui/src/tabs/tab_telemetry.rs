@@ -54,12 +54,12 @@ use crate::colors::ColorTheme;
 // no clone ore debug implemented for 
 // zmq socket
 pub struct TelemetryTab {
-  pub theme         : ColorTheme,
+  pub theme         : ColorTheme, 
   //pub tp_receiver   : Receiver<TofPacket>,
   //pub event_queue   : VecDeque<TofEvent>,
   //pub zmq_socket    : zmq::Socket,
   pub tele_recv     : Receiver<TelemetryPacket>,
-  pub queue_size    : usize,
+  pub queue_size    : usize, //8
   pub merged_queue  : VecDeque<MergedEvent>,
   pub header_queue  : VecDeque<TelemetryHeader>,
   // when we decide to use ONLY the telemetry stream,
@@ -96,65 +96,56 @@ impl TelemetryTab {
  
   pub fn receive_packet(&mut self) -> Result<(), SerializationError> {  
     match self.tele_recv.try_recv() {
-      Err(err)    => trace!("Can't receive TofPacket!
-          {err}"),
-      Ok(packet) => {
-        self.header_queue.push_back(packet.header.clone());
-        if self.header_queue.len() > self.queue_size {
-          let _ = self.header_queue.pop_front();
-        }
-        //if header.ptype == 80 {
-        //  match TrackerPacket::from_bytestream(&payload, &mut pos) {
-        //    Err(err) => {
-        //      //for k in pos - 5 .. pos + 5 {
-        //      //  println!("{}",stream[k]);
-        //      //}
-        //      error!("Unable to decode TrackerPacket! {err}");
-        //    }
-        //    Ok(mut tp) => {
-        //      tp.telemetry_header = header;
-        //      //println!("{}", tp);
-        //    }
-        //  }
-        //}
-        if packet.header.ptype == 90 {
-          //println!("{}",packet.header);
-          let expected_size = (packet.header.length as usize) - TelemetryHeader::SIZE;
-          if expected_size > packet.payload.len() {
-            println!("Unable to decode MergedEvent Telemetry packet! The expected size is {}, but the payload len in {}", expected_size - TelemetryHeader::SIZE, packet.payload.len());
-            return Err(SerializationError::StreamTooShort);
-          }
-          match MergedEvent::from_bytestream(&packet.payload, &mut 0) {
-            Err(err) => {
-              error!("Unable to decode MergedEvent! {err}");
+        Err(crossbeam_channel::TryRecvError::Empty) => {
+            trace!("No data available yet.");
+            // Handle the empty case, possibly by doing nothing or logging.
+        },
+        Err(crossbeam_channel::TryRecvError::Disconnected) => {
+            error!("Telemetry channel disconnected.");
+            // Handle the disconnection, possibly by stopping processing or returning an error.
+            return Err(SerializationError::Disconnected);
+        },
+        Ok(packet) => {
+            // Process the received packet as before
+            self.header_queue.push_back(packet.header.clone());
+            if self.header_queue.len() > self.queue_size {
+                let _ = self.header_queue.pop_front();
             }
-            Ok(me) => {
-              match &self.tp_sender {
-                Some(sender) => {
-                  match TofPacket::from_bytestream(&me.tof_data, &mut 0) {
-                    Err(err) => {
-                      error!("Can't unpack TofPacket! {err}");
-                    }
-                    Ok(tp) => {
-                      match sender.send(tp) {
-                        Ok(_)    => (),
-                        Err(err) => error!("Unable to send TP over channel! {err}")
-                      }
-                    }
-                  }
+
+            if packet.header.ptype == 90 {
+                let expected_size = (packet.header.length as usize) - TelemetryHeader::SIZE;
+                if expected_size > packet.payload.len() {
+                    println!("Unable to decode MergedEvent Telemetry packet! The expected size is {}, but the payload len is {}", expected_size - TelemetryHeader::SIZE, packet.payload.len());
+                    return Err(SerializationError::StreamTooShort);
                 }
-                None => ()
-              }
-              self.merged_queue.push_back(me);
-              if self.merged_queue.len() > self.queue_size {
-                let _ = self.merged_queue.pop_front();
-              }
+                match MergedEvent::from_bytestream(&packet.payload, &mut 0) {
+                    Err(err) => {
+                        error!("Unable to decode MergedEvent! {err}");
+                    }
+                    Ok(me) => {
+                        if let Some(sender) = &self.tp_sender {
+                            match TofPacket::from_bytestream(&me.tof_data, &mut 0) {
+                                Err(err) => {
+                                    error!("Can't unpack TofPacket! {err}");
+                                }
+                                Ok(tp) => {
+                                    if let Err(err) = sender.send(tp) {
+                                        error!("Unable to send TP over channel! {err}");
+                                    }
+                                }
+                            }
+                        }
+                        self.merged_queue.push_back(me);
+                        if self.merged_queue.len() > self.queue_size {
+                            let _ = self.merged_queue.pop_front();
+                        }
+                    }
+                }
             }
-          }
         }
-      }
     }
-    return Ok(());
+    Ok(())
+  }
     //match self.tp_receiver.try_recv() {
     //  Err(_err) => {
     //    return Ok(());
@@ -185,55 +176,110 @@ impl TelemetryTab {
     //    return Ok(());
     //  }
     //}
-  }
 
-  pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
+//   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
     
-    // as usual, layout first
-    let main_lo = Layout::default()
+//     // as usual, layout first
+//     let main_lo = Layout::default()
+//       .direction(Direction::Horizontal)
+//       .constraints(
+//           [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
+//       )
+//       .split(*main_window);
+    
+//     let packet_lo = Layout::default()
+//       .direction(Direction::Vertical)
+//       .constraints(
+//           [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
+//       )
+//       .split(main_lo[0]);
+
+
+//     let mut header_string = String::from("");
+//     if let Some(header) = self.header_queue.back() {
+//       header_string = format!("{}", header);
+//     }
+//     let header_view = Paragraph::new(header_string)
+//       .style(self.theme.style())
+//       .alignment(Alignment::Left)
+//       .block(
+//         Block::default()
+//           .borders(Borders::ALL)
+//           .border_type(BorderType::Rounded)
+//           .title("Last Header from Telemetry stream")
+//       );
+
+//     frame.render_widget(header_view, packet_lo[0]);
+//     let mut merged_string = String::from("");
+//     if let Some(ev) =  self.merged_queue.back() {
+//       merged_string = format!("{}", ev);
+//     }
+//     let merged_view = Paragraph::new(merged_string)
+//     //let merged_view = Paragraph::new(header_string)
+//       .style(self.theme.style())
+//       .alignment(Alignment::Left)
+//       .block(
+//         Block::default()
+//           .borders(Borders::ALL)
+//           .border_type(BorderType::Rounded)
+//           .title("Last MergedEvent from Telemetry stream")
+//       );
+//     frame.render_widget(merged_view, packet_lo[1]);
+//   }
+// }
+
+pub fn render(&mut self, main_window: &Rect, frame: &mut Frame) {
+  // Layout first
+  let main_lo = Layout::default()
       .direction(Direction::Horizontal)
       .constraints(
           [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
       )
       .split(*main_window);
-    
-    let packet_lo = Layout::default()
+  
+  let packet_lo = Layout::default()
       .direction(Direction::Vertical)
       .constraints(
           [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
       )
       .split(main_lo[0]);
 
-
-    let mut header_string = String::from("");
-    if let Some(header) = self.header_queue.back() {
-      header_string = format!("{}", header);
-    }
-    let header_view = Paragraph::new(header_string)
+  // Create header_string safely
+  let header_string = if let Some(header) = self.header_queue.back() {
+      format!("{}", header)
+  } else {
+      String::from("No header available")
+  };
+  
+  let header_view = Paragraph::new(header_string)
       .style(self.theme.style())
       .alignment(Alignment::Left)
       .block(
-        Block::default()
-          .borders(Borders::ALL)
-          .border_type(BorderType::Rounded)
-          .title("Last Header from Telemetry stream")
+          Block::default()
+              .borders(Borders::ALL)
+              .border_type(BorderType::Rounded)
+              .title("Last Header from Telemetry stream")
       );
 
-    frame.render_widget(header_view, packet_lo[0]);
-    let mut merged_string = String::from("");
-    if let Some(ev) =  self.merged_queue.back() {
-      merged_string = format!("{}", ev);
-    }
-    let merged_view = Paragraph::new(merged_string)
-    //let merged_view = Paragraph::new(header_string)
+  frame.render_widget(header_view, packet_lo[0]);
+
+  // Create merged_string safely
+  let merged_string = if let Some(ev) = self.merged_queue.back() {
+      format!("{}", ev)
+  } else {
+      String::from("No merged event available")
+  };
+  
+  let merged_view = Paragraph::new(merged_string)
       .style(self.theme.style())
       .alignment(Alignment::Left)
       .block(
-        Block::default()
-          .borders(Borders::ALL)
-          .border_type(BorderType::Rounded)
-          .title("Last MergedEvent from Telemetry stream")
+          Block::default()
+              .borders(Borders::ALL)
+              .border_type(BorderType::Rounded)
+              .title("Last MergedEvent from Telemetry stream")
       );
-    frame.render_widget(merged_view, packet_lo[1]);
+
+  frame.render_widget(merged_view, packet_lo[1]);
   }
 }

@@ -72,14 +72,14 @@ void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0) {
 		  -0.166, 0.003,-0.089, 0.000};
   float bot[12] = {0.792, 0.000, 0.631, 0.751, 0.772, 0.615, 0.626, 0.942,
 		   0.664, 0.000, 0.716, 0.000};
+
   for (int i=0;i<NPAD;i++) {
     if (i>0&&i<13) Offset[i] = top[i-1];
     else if (i>12&&i<25) Offset[i] = bot[i-13];
     else if (i>60&&i<73) Offset[i] = -1.0*umb[i-61];
-    //if (i>0&&i<13) Offset[i] = umb[i-1];
-    //else if (i>12&&i<25) Offset[i] = umb[i-1];
-    ///else if (i>60&&i<73) Offset[i] = umb[i-1];
     else Offset[i] = 0.0;
+    // If we want to calculate the offsets, set them all to zero.
+    //Offset[i] = 0.0;
   }
   
   // Reset everything that is stored by Paddle number (1-160)
@@ -99,7 +99,7 @@ void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0) {
   NPadCube     = 0;
   NPadUmbrella = 0;
   NPadCortina  = 0;
-  
+
 }
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -583,6 +583,26 @@ void EventGAPS::WriteHistograms() {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
+void EventGAPS::OffsetHistograms(bool flag=false) {
+
+  char text[400];
+  CalcOffset = flag;
+  
+  // Histograms for the Hit times between each UMB paddle and cube paddle
+  for (int b = 0; b < NCUBE; b++) {
+    for (int c = 0; c < NUMBC; c++) {
+      sprintf(text, "h_Offset[%d][%d]", b, c);
+      H_Offset[b][c] = new TH1F(text, "", 250, -2, 14);
+      sprintf(text, "Hit Time (ns): Cube %d - Umb %d", b, c+61);
+      //H_Offset[b][c]->GetXaxis()->SetTitle("Hit Time (ns)");
+      H_Offset[b][c]->GetXaxis()->SetTitle(text);
+      H_Offset[b][c]->GetYaxis()->SetTitle("Counts");
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 void EventGAPS::AnalyzePedestals(float Ped_low, float Ped_win) {
 
   float rms_m = 3.0;
@@ -761,11 +781,12 @@ void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
       // Calculate hit time for the paddle
       HitT[i] = (TDC_Cor[chA]+TDC_Cor[chB])/2.0 - Dimension[i][0]/(2.0*sc_speed);
       //if (i<61 || i>72) // For all paddles except UMB
-      HitT[i] -= Offset[i];
       
       if ( TDC[chA]>5 && TDC[chA]<220 && TDC[chB]>5 && TDC[chB]<220 ) {
-	if (PedRMS[chA]<2.0 && PedRMS[chB]<2.0) 
+	if (PedRMS[chA]<2.0 && PedRMS[chB]<2.0) {
 	  IsHit[i] = true;
+	}
+	HitT[i] -= Offset[i];
       }
     }
     
@@ -797,7 +818,6 @@ void EventGAPS::AnalyzeEvent(void) {
   // either in the umbrella or cortina
   //for (int i=61; i<NPAD; i++) {
   for (int i=61; i<73; i++) { // UMB-Center
-  //for (int i=66; i<68; i++) {
     if (IsHit[i] ) {
       if (0) {
 	printf(" %3d %7.3f %7.3f %7.2f -%7.2f (%7.2f) %8.2f %6.2f\n", i,
@@ -839,8 +859,8 @@ void EventGAPS::AnalyzeEvent(void) {
       ctr++;
       //if (ctr>1) printf("%ld: Previous beta = %.3f\n", evtno, beta);
       beta = speed/(CSPEED);
-      //if (0 && e_pad>60 && e_pad<73) {
-      if (0 && (EarlyPaddle>65 && EarlyPaddle<68) ) {
+      if (0 && e_pad>60 && e_pad<73) {
+	//if (0 && (EarlyPaddle>65 && EarlyPaddle<68) ) {
 	printf("Positions: (%d %d) (%.2f %.2f)  (%.2f %.2f)  (%.2f %.2f)\n",
 	       i, EarlyPaddle, HitX[i], HitX[EarlyPaddle], HitY[i],
 	       HitY[EarlyPaddle], HitZ[i], HitZ[EarlyPaddle]);
@@ -944,48 +964,20 @@ void EventGAPS::FillPaddleHistos(void) {
 	Ch9Shift[i]->Fill(TShift[RB[Paddle_A[i]]]); // Paddle ends in same RB
       }
       if (IsHit[i]) { // Both ends of paddle hit
-	//if (EarlyPaddle>60) { // Demand a UMB or COR paddle hit
+
 	//if (EarlyPaddle>60 && EarlyPaddle<109) { // Demand a UMB paddle hit
 	// Only record HitTimes[] and beta for events which hit two
 	// center umbrella paddles and two center Cube top paddles
 	// (and within 10cm of center).
-	//if ( (EarlyPaddle>65&&EarlyPaddle<68) && ((i>5&&i<8) || (i>17&&i<20))){ 
-	//if ( (EarlyPaddle>60&&EarlyPaddle<73) && (i>0&&i<13) ) { 
-	if ( (EarlyPaddle>60&&EarlyPaddle<73) && (i>12&&i<25) ) { 
+
+	if ( (EarlyPaddle>60&&EarlyPaddle<73) && (i>0&&i<13) ) { 
+	//if ( (EarlyPaddle>60&&EarlyPaddle<73) && (i>12&&i<25) ) { 
 	  if ( ABS(delta[i])< 15.4 && ABS(delta[EarlyPaddle])<15.4 &&
 	       NHitPaddles < 4 ) {
 	    int ind = (EarlyPaddle-61)*12;
-	    //if (EarlyPaddle==66) 
 	    HitTime[i+ind]->Fill(HitT[i]);
-	    // HitTime[i+ind]->Fill(HitT[i] - Offset[EarlyPaddle]); // Subtract offset for UMB paddle
-	      //else
-	      //HitTime[i+10]->Fill(HitT[i]);
 	    FirstPaddle->Fill(EarlyPaddle);
 	    
-	    /*
-	    printf("\nEv %ld - %d ( %6.3f %6.3lf %6.3f ) ",
-		   evtno, i,HitT[i],TShift[RB[Paddle_A[i]]],Phi[RB[Paddle_A[i]]]);
-	    printf("- %d ( %6.3f %6.3lf %6.3f )\n",
-		   EarlyPaddle, HitT[EarlyPaddle],
-		   TShift[RB[Paddle_A[EarlyPaddle]]],
-		   Phi[RB[Paddle_A[EarlyPaddle]]]);
-	    printf("%ld TDC     %d %d - %.3f = %.3f : %d - %.3f = %.3f\n",
-		   evtno, i, 
-		   Paddle_A[i], TDC[Paddle_A[i]], TDC_Cor[Paddle_A[i]],
-		   Paddle_B[i], TDC[Paddle_B[i]], TDC_Cor[Paddle_B[i]]);
-	    printf("%ld HIT     %d ( %.3f %.3f %.3f ) : %.3f\n", evtno, i, 
-		   TCorrEvent[i], TCorrFixed[i], Dimension[i][0], HitT[i]);
-	    printf("%ld TDC_ref %d %d - %.3f = %.3f : %d - %.3f = %.3f\n",
-		   evtno, EarlyPaddle, 
-		   Paddle_A[EarlyPaddle], TDC[Paddle_A[EarlyPaddle]],
-		   TDC_Cor[Paddle_A[EarlyPaddle]], Paddle_B[EarlyPaddle],
-		   TDC[Paddle_B[EarlyPaddle]], TDC_Cor[Paddle_B[EarlyPaddle]]);
-	    printf("%ld HIT_ref %d ( %.3f %.3f %.3f ) : %.3f\n",
-		   evtno, EarlyPaddle,
-		   TCorrEvent[EarlyPaddle], TCorrFixed[EarlyPaddle],
-		   Dimension[EarlyPaddle][0], HitT[EarlyPaddle]);
-	    */
-
 	    if (beta>0 && (i==6||i==7)) {
 	      //printf("Found Event %ld - %d: %.3f %.2f %.2f %.2f\n", evtno,i,
 	      //     EarlyTime, beta, TShift[RB[Paddle_A[EarlyPaddle]]],
@@ -1029,6 +1021,41 @@ void EventGAPS::FillPaddleHistos(void) {
   NPaddlesUmbrella->Fill(NPadUmbrella);
   NPaddlesCortina->Fill(NPadCortina);
 }
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+void EventGAPS::FillOffsetHistos(void) {
+  
+  for (int i=1; i<NCUBE; i++) {
+    if (Paddle_A[i] > 0) { // Paddle-channel map exists
+      if ( IsHit[i] && (EarlyPaddle>60&&EarlyPaddle<73) ) { // Good hits
+      //if ( IsHit[i] && (EarlyPaddle>60&&EarlyPaddle<109) ) { // Good hits
+	  // Only fill H_Offset[][] with events which hit an UMB-Center paddle 
+	  // and a CUBE paddle 
+	  
+	  // Make further cuts: hit <15cm from center, and NHitPaddles<4
+	  if ( ABS(delta[i])< 15.4 && ABS(delta[EarlyPaddle])<15.4 &&
+	       NPadCube+NPadUmbrella < 4 ) {
+	    H_Offset[i][EarlyPaddle-61]->Fill(HitT[i]);
+	  }
+      }
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+void EventGAPS::WriteOffsetHistos(void) {
+  TFile *outfile = TFile::Open("/home/gaps/zweerink/offset.root","RECREATE"); 
+  
+  for (int i = 1; i < NCUBE; i++) {
+    for (int j = 0; j < NUMBC; j++) {
+      H_Offset[i][j]->Write();
+    }
+  }
+  outfile->Close();
+}
+
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 

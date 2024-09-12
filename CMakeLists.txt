@@ -50,7 +50,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
 # -- pybindings with pybind11
 option(BUILD_CXXPYBINDINGS "build C++ pybindings with pybind11" OFF)
-option(BUILD_RUSTPYBIDINGS "build Rust \\U+1F980 pybindings wiut pyO3 (better)" OFF)
+option(BUILD_RUSTPYBINDINGS "build Rust \\U+1F980 pybindings wiut pyO3 (better)" OFF)
 option(BUILD_RUSTTELEMETRY "builds Rust telemetry library and pybindings" OFF)
 
 if (BUILD_CXXPYBINDINGS)

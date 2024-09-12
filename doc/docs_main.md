@@ -12,12 +12,19 @@ classes for events, calibration and (de)serialization methods_
 _tof-control is Takeru's code for changing voltages/thresholds etc and monitor
 Tof environmental sensors_
 
+## Rust/python API
+
+* [rpy-tof-dataclasses](rpy_tof_dataclasses/index.html). The Rust `tof-dataclasses` project wrapped in pybindings.
+
 ## CXX/python API
 
 The python API follows the CXX API very closely. Right now, there is now dedicated 
 API documentation (which we are working on). 
 Examples can be found in `tof/resources/examples/python`
 The python API will undergo some easy-of-use improvements soon.
+
+_as of version 0.10 (LELEWAA) we discourage to use the cxx pybindings, sinde the 
+rust pybindings have matured enough and are faster as well as more stable_
 
 * [CXX-API](index.html)
 

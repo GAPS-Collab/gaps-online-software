@@ -50,12 +50,14 @@ use tof_dataclasses::series::{
 use tof_dataclasses::events::{
     TofEvent,
     TofEventSummary,
+    EventStatus,
     TofHit,
     MasterTriggerEvent,
     RBEvent,
     RBEventHeader,
     RBWaveform
 };
+
 
 use tof_dataclasses::serialization::{
     Serialization,
@@ -65,7 +67,11 @@ use tof_dataclasses::commands::{
     TofCommandV2,
     TofCommandCode
 };
-use tof_dataclasses::calibrations::RBCalibrations;
+use tof_dataclasses::calibrations::{
+  RBCalibrations,
+  clean_spikes,
+  //spike_cleaning
+};
 use tof_dataclasses::config::{AnalysisEngineConfig, RunConfig, TOFEventBuilderConfig, BuildStrategy};
 
 
@@ -644,6 +650,16 @@ impl PyRBCalibration {
     Ok(())
   }
 }
+  
+//#[getter]
+//fn spike_cleaning_all_channel<'_py>(&self, py: Python<'_py>) -> PyResult<Bound<'_py, PyArray2<f32>>> {  
+//  let mut data = Vec::<Vec<f32>>::with_capacity(9);
+//  for ch in 0..9 {
+//    data.push(self.cali.tbin[ch].to_vec());
+//  }
+//  let pyarray = PyArray::from_vec2_bound(py, &data).unwrap();
+//  Ok(pyarray)
+//}
 
 #[pyclass]
 #[pyo3(name="PAMoniSeries")]
@@ -1080,11 +1096,6 @@ impl PyHeartBeatDataSink{
   fn get_n_evid_chunksize(&self) -> PyResult<u64> {
     Ok(self.config.n_evid_chunksize)
   }
-  // len incomming buffer for the thread
-  #[getter]
-  fn get_incoming_ch_len(&self) -> PyResult<u64> {
-    Ok(self.config.incoming_ch_len)
-  }
   // num. missing event id
   #[getter]
   fn get_evid_missing(&self) -> PyResult<u64> {
@@ -1265,6 +1276,10 @@ impl PyEVTBLDRHeartbeat {
   fn get_tp_sender_cbc_len(&self) -> PyResult<usize> {
     Ok(self.config.tp_sender_cbc_len)
   }
+  #[getter]
+  fn get_data_mangled_ev(&self) -> PyResult<usize> {
+    Ok(self.config.data_mangled_ev)
+  }
   
   fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
     let tp = packet.get_tp();
@@ -1284,6 +1299,101 @@ impl PyEVTBLDRHeartbeat {
   }
 }
 
+#[pyclass]
+#[pyo3(name="MtbMoniData")]
+pub struct PyMtbMoniData {
+  moni : MtbMoniData,
+}
+
+impl PyMtbMoniData {
+  pub fn set_moni(&mut self, moni : MtbMoniData) {
+    self.moni = moni;
+  }
+}
+
+#[pymethods]
+impl PyMtbMoniData {
+  
+  #[new]
+  fn new() -> Self {
+    let moni = MtbMoniData::new();
+    Self {
+      moni,
+    }
+  }
+
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<MtbMoniData>() {
+      Ok(moni) => {
+        self.moni = moni;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+
+  #[getter]
+  pub fn get_rate(&self) -> u16 {
+    self.moni.rate
+  }
+  
+  #[getter]
+  pub fn get_lost_rate(&self) -> u16 {
+    self.moni.lost_rate
+  }
+
+  #[getter]
+  /// Length of the received BUSY signal from 
+  /// the TIU in nanoseconds
+  pub fn get_tiu_busy_len(&self) -> u32 {
+    self.moni.tiu_busy_len * 10
+  }
+
+  #[getter]
+  pub fn get_daq_queue_len(&self) -> u16 {
+    self.moni.daq_queue_len
+  }
+
+  #[getter]
+  pub fn get_tiu_emulation_mode(&self) -> bool {
+    self.moni.get_tiu_emulation_mode()
+  }
+  
+  #[getter]
+  pub fn get_tiu_use_aux_link(&self) -> bool {
+    self.moni.get_tiu_use_aux_link()
+  }
+
+  #[getter]
+  pub fn get_tiu_bad(&self) -> bool { 
+    self.moni.get_tiu_bad()
+  }
+
+  #[getter]
+  pub fn get_tiu_busy_stuck(&self) -> bool {
+    self.moni.get_tiu_busy_stuck()
+  }
+
+  #[getter]
+  pub fn get_tiu_ignore_busy(&self) -> bool {
+    self.moni.get_tiu_ignore_busy()
+  }
+
+
+  #[getter]
+  pub fn get_fpga_temp(&self) -> f32 {
+    self.moni.get_fpga_temp()
+  }
+
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.moni)) 
+  }
+}
 
 
 #[pyclass]
@@ -1301,7 +1411,30 @@ impl PyMtbMoniSeries {
       mtbmoniseries,
     }
   }
-  
+
+  /// Add an additional file to the series
+  fn add_file(&mut self, filename : String) {
+    let mut reader = TofPacketReader::new(filename);
+    reader.filter = PacketType::MonitorMtb;
+    for tp in reader {
+      if let Ok(moni) =  tp.unpack::<MtbMoniData>() {
+        self.mtbmoniseries.add(moni);
+      }
+    }
+  }
+
+  fn get_dataframe(&mut self) -> PyResult<PyDataFrame> {
+    match self.mtbmoniseries.get_dataframe() {
+      Ok(df) => {
+        let pydf = PyDataFrame(df);
+        return Ok(pydf);
+      },
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   fn from_file(&mut self, filename : String) -> PyResult<PyDataFrame> {
     let mut reader = TofPacketReader::new(filename);
     reader.filter = PacketType::MonitorMtb;
@@ -1497,11 +1630,25 @@ impl PyMasterTriggerEvent {
     Ok(self.event.get_trigger_hits())
   }
 
-  /// combine the tiu gps 16 and 32bit timestamps 
-  /// into a 48bit timestamp
   #[getter]
-  pub fn timestamp_gps48(&self) -> u64 {
-    self.event.get_timestamp_gps48()
+  pub fn timestamp_mtb(&self) -> u32 {
+    self.event.timestamp
+  }
+
+
+  #[getter]
+  pub fn timestamp_gps32(&self) -> u32 {
+    self.event.tiu_gps32
+  }
+  
+  #[getter]
+  pub fn timestamp_gps16(&self) -> u16 {
+    self.event.tiu_gps16
+  }
+
+  #[getter]
+  pub fn timestamp_tiu(&self) -> u32 { 
+    self.event.tiu_timestamp
   }
 
   /// Get absolute timestamp as sent by the GPS
@@ -1531,8 +1678,11 @@ impl PyRBEventHeader {
   pub fn set_header(&mut self, header : RBEventHeader) {
     self.header = header;
   }
-}
 
+fn __repr__(&self) -> PyResult<String> {
+  Ok(format!("<PyO3Wrapper: {}>", self.header)) 
+  }
+} 
 #[pymethods]
 impl PyRBEventHeader {
   #[new]
@@ -1617,7 +1767,10 @@ impl PyTofEventSummary {
   fn event_id(&self) -> u32 {
     self.event.event_id
   }
-
+  #[getter]
+  fn event_status(&self) -> EventStatus {
+    self.event.status
+  }
 
   /// RB Link IDS (not RB ids) which fall into the 
   /// trigger window
@@ -1628,8 +1781,8 @@ impl PyTofEventSummary {
 
   /// Hits which formed a trigger
   #[getter]
-  fn trigger_hits(&self) -> Vec<(u8, u8, u8, LTBThreshold)> {
-    self.event.get_trigger_hits()
+  pub fn trigger_hits(&self) -> PyResult<Vec<(u8, u8, (u8, u8), LTBThreshold)>> {
+    Ok(self.event.get_trigger_hits())
   }
   
   ///
@@ -1669,7 +1822,11 @@ impl PyTofEventSummary {
     self.event.get_timestamp48()
   }
   
-  
+  #[getter]
+  fn status(&self) -> EventStatus {
+    self.event.status
+  }
+
   fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
     let tp = packet.get_tp();
     match tp.unpack::<TofEventSummary>() {
@@ -1961,6 +2118,16 @@ impl PyTofHit {
   #[getter]
   fn charge_b(&self) -> f32 {
     self.hit.get_charge_b()
+  }
+
+  #[getter]
+  fn time_a(&self) -> f32 {
+    self.hit.get_time_a()
+  }
+  
+  #[getter]
+  fn time_b(&self) -> f32 {
+    self.hit.get_time_b()
   }
 
   /// Reconstructed particle interaction position

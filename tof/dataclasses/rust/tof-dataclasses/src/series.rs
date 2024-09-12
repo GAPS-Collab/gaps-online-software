@@ -37,7 +37,7 @@ pub trait MoniSeries<T>
  
   fn get_max_size(&self) -> usize;
 
-  /// A HashMap of <rbid, Vec<var>>
+  /// A HashMap of -> rbid, Vec\<var\> 
   fn get_var(&self, varname : &str) -> HashMap<u8, Vec<f32>> {
     let mut values = HashMap::<u8, Vec<f32>>::new();
     for k in self.get_data().keys() {

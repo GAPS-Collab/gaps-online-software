@@ -25,7 +25,6 @@ use ratatui::widgets::{
     List,
     ListItem,
     ListState,
-    canvas,
     canvas::{
         Canvas,
         //Circle,
@@ -219,14 +218,14 @@ impl PaddleTab<'_> {
             self.baseline_rms_ch_b.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_b_rms());
           
         }
-        let mut bl_a  = 0f32;
-        let mut bl_b  = 0f32;
-        let mut rms_a = 0f32;
-        let mut rms_b = 0f32;
+        let mut bl_a  : f32;
+        let mut bl_b  : f32;
+        let rms_a = 0f32;
+        let rms_b = 0f32;
         for mut wf in wfs {
           if wf.rb_id == self.current_paddle.rb_id as u8 {
             match self.calibrations.lock() {
-              Err(err) => error!("Unable to get lock on rbcalibrations!"),
+              Err(_err) => error!("Unable to get lock on rbcalibrations!"),
               Ok(cali) => {
                 match cali.get(&wf.rb_id) {
                   None => error!("RBCalibrations for board {} not available!", wf.rb_id),
@@ -247,9 +246,8 @@ impl PaddleTab<'_> {
               if wf.voltages.len() > 0 {
                 let ped = calculate_pedestal(&wf.voltages, 10.0, 850, 100);
                 bl_a  = ped.0;
-                rms_a = ped.1;
                 self.baseline_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_a);
-                self.baseline_rms_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_a);
+                self.baseline_rms_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&rms_a);
               }
               self.wf_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().push_back(wf);
               if self.wf_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().len() > self.queue_size {
@@ -259,7 +257,7 @@ impl PaddleTab<'_> {
               if wf.voltages.len() > 0 {
                 bl_b = calculate_pedestal(&wf.voltages, 10.0, 850, 100).0;
                 self.baseline_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_b);
-                self.baseline_rms_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_b);
+                self.baseline_rms_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&rms_b);
               }
               self.wf_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().push_back(wf);
               if self.wf_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().len() > self.queue_size {
@@ -314,7 +312,7 @@ impl PaddleTab<'_> {
             }
           }
         }
-        let mut view_string : String;
+        let view_string : String;
         match self.all_paddles.get(&(self.pdl_selector as u8)) {
           Some(_pd) => {
             view_string = format!("{}", _pd);
@@ -421,8 +419,7 @@ impl PaddleTab<'_> {
             self.last_wf_ch_b = wf_data_b.clone();
           }
         }
-        let len_wf_data_a = wf_data_a.len();
-        let len_wf_data_b = wf_data_b.len();
+        
         if wf_data_a.len() == 0 {
           wf_data_a = self.last_wf_ch_a.clone();
         }
@@ -449,25 +446,25 @@ impl PaddleTab<'_> {
                             self.charge_b.get(&(self.current_paddle.paddle_id as u8)).unwrap()[k]));
         }
 
-        let mut charge_plot = Canvas::default()
+        let charge_plot = Canvas::default()
           .block(Block::bordered().title("Charge AvsB"))
           .marker(Marker::Braille)
           .paint(|ctx| {
-            let mut xaxis  = canvas::Line {
-              x1 : 0.0,
-              x2 : 30.0,
-              y1 : 0.0,
-              y2 : 0.0,
-              color : self.theme.fg0
-            };
-            let mut yaxis  = canvas::Line {
-              x1 : 0.0,
-              x2 : 0.0,
-              y1 : 0.0,
-              y2 : 30.0,
-              color : self.theme.fg0
-            };
-            let mut points = Points {
+            // let xaxis  = canvas::Line {
+            //   x1 : 0.0,
+            //   x2 : 30.0,
+            //   y1 : 0.0,
+            //   y2 : 0.0,
+            //   color : self.theme.fg0
+            // };
+            // let yaxis  = canvas::Line {
+            //   x1 : 0.0,
+            //   x2 : 0.0,
+            //   y1 : 0.0,
+            //   y2 : 30.0,
+            //   color : self.theme.fg0
+            // };
+            let points = Points {
               coords : &ch2d_points.as_slice(),
               color  : self.theme.hc,
             };
@@ -485,18 +482,17 @@ impl PaddleTab<'_> {
       let bl_a_chart  = histogram(bl_a_data, String::from("Baseline Side A [mV]"), 2, 0, &self.theme);
       frame.render_widget(bl_a_chart, bla_lo[0]);
       
-      let bl_a_rms_labels = create_labels(&self.baseline_rms_ch_a.get(&(self.current_paddle.paddle_id as u8)).unwrap());
       let bl_a_rms_data   = prep_data(&self.baseline_rms_ch_a.get(&(self.current_paddle.paddle_id as u8)).unwrap(), &bl_a_labels, 1, false); 
       let bl_a_rms_chart  = histogram(bl_a_rms_data, String::from("Baseline RMS Side A [mV]"), 2, 0, &self.theme);
       frame.render_widget(bl_a_rms_chart, bla_lo[1]);
       
       // B side
-      let bl_b_labels = create_labels(&self.baseline_ch_b.get(&(self.current_paddle.paddle_id as u8)).unwrap());
+      // let bl_b_labels = create_labels(&self.baseline_ch_b.get(&(self.current_paddle.paddle_id as u8)).unwrap());
       let bl_b_data   = prep_data(&self.baseline_ch_b.get(&(self.current_paddle.paddle_id as u8)).unwrap(), &bl_a_labels, 1, false); 
       let bl_b_chart  = histogram(bl_b_data, String::from("Baseline Side B [mV]"), 2, 0, &self.theme);
       frame.render_widget(bl_b_chart, blb_lo[0]);
       
-      let bl_b_rms_labels = create_labels(&self.baseline_rms_ch_b.get(&(self.current_paddle.paddle_id as u8)).unwrap());
+      // let bl_b_rms_labels = create_labels(&self.baseline_rms_ch_b.get(&(self.current_paddle.paddle_id as u8)).unwrap());
       let bl_b_rms_data   = prep_data(&self.baseline_rms_ch_b.get(&(self.current_paddle.paddle_id as u8)).unwrap(), &bl_a_labels, 1, false); 
       let bl_b_rms_chart  = histogram(bl_b_rms_data, String::from("Baseline RMS Side B [mV]"), 2, 0, &self.theme);
       frame.render_widget(bl_b_rms_chart, blb_lo[1]);

@@ -1390,11 +1390,11 @@ pub struct MtbMoniData {
   //pub calibration  : u16, 
   //pub vccpint      : u16, 
   pub tiu_busy_len : u32,
-  /// tiu_status[0] = emu_mode
-  /// tiu_status[1] = use_aux_link
-  /// tiu_status[2] = tiu_bad
-  /// tiu_status[3] = bsy_stuck
-  /// tiu_status[4] = ignore_bsy
+  /// tiu_status\[0\] = emu_mode
+  /// tiu_status\[1\] = use_aux_link
+  /// tiu_status\[2\] = tiu_bad
+  /// tiu_status\[3\] = bsy_stuck
+  /// tiu_status\[4\] = ignore_bsy
   pub tiu_status   : u8,
   /// Prescale factor in per cent
   /// (might not be accurate)
@@ -1479,7 +1479,7 @@ impl fmt::Display for MtbMoniData {
     USE AUX LINK      {}
     TIU BAD           {}
     BUSY STUCK        {}
-    IGNROE BUSY       {}
+    IGNORE BUSY       {}
   --- --- --- --- --
   FPGA TEMP      [\u{00B0}C] {:.2}
   VCCINT          [V] {:.3}

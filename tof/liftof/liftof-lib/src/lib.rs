@@ -30,6 +30,9 @@ use std::sync::{
 use std::process::exit;
 
 #[cfg(feature="database")]
+use core::f32::consts::PI;
+
+#[cfg(feature="database")]
 use half::f16;
 
 pub use master_trigger::{
@@ -45,9 +48,7 @@ pub use settings::{
 use std::error::Error;
 use std::fmt;
 
-use std::{
-    fs::File,
-};
+use std::fs::File;
 use std::path::PathBuf;
 use std::fs::read_to_string;
 use std::io::{
@@ -77,19 +78,15 @@ use signal_hook::consts::signal::{
     SIGTERM,
     SIGINT
 };
-//use ndarray::{array, Array1};
-//use nlopt::{Algorithm, Objective, Optimization, Result};
 
 use tof_dataclasses::DsiLtbRBMapping;
 #[cfg(feature="database")]
 use tof_dataclasses::database::ReadoutBoard;
-//use tof_dataclasses::threading::{
-//    ThreadControl,
-//};
 
 #[cfg(feature="database")]
 use tof_dataclasses::constants::NWORDS;
-#[cfg(feature="database")]
+//#[cfg(feature="database")]
+#[cfg(all(feature = "database", feature = "advanced-algorithms"))]
 use tof_dataclasses::calibrations::find_zero_crossings;
 #[cfg(feature="database")]
 use tof_dataclasses::errors::AnalysisError;
@@ -385,103 +382,87 @@ impl fmt::Display for RunStatistics {
   }
 }
 
-//fn sine_to_fit(amp : f32, freq : f32, phase : f32, time : &Vec<f32>, ys : &mut Vec<f32>) {
-//  //let ys = Vec::<f32>::with_capacity(time.len());
-//  for k in 0..time.len() {
-//    ys[k] = amp * (freq * time[k] + phase).sin(); 
-//  }
-//}
-//
-//fn cost_function(amp : f32, freq : f32, phase : f32, time : &Vec<f32>, volts : &Vec<f32>) -> f32 {
-//  //let 
-//  //let fitted_values = amplitude * (2.0 * std::f32::consts::PI * frequency * time + phase).sin();
-//  let fit_volts = Vec::<f32>::with_capacity(time.len());
-//  sine_to_fit(amp, freq, phase, &time, &mut fit_volts);
-//  let mut chi_square = 0f32;
-//  for k in 0..fit_volts.len() {
-//    chi_square += (volts[k] - fit_volts[k]).powi(2);
-//    // FIXME - error
-//  }
-//  chi_square
-//}
-
-
-/// FIXME - proper fitting algorithm
-/// This here is bad, because it does not interpolate between 
-/// the bins
+//sydney's sine fit without libraries
 #[cfg(feature="database")]
-// the 'original'
-// fn fit_sine(time: &Vec<f32>, data: &Vec<f32>) -> (f32, f32, f32) {
-//   let z_cross   = find_zero_crossings(&data);
-//   let mut y_max = f32::MIN;
-//   let mut y_min = f32::MAX;
-//   for y in data {
-//     if *y > y_max {
-//       y_max = *y;
-//     }
-//     if *y < y_min {
-//       y_min = *y;
-//     }
-//   }
-//   let amp   = f32::abs(y_max - y_min)/2.0;
-//   let mut phase = 0.0;
-//   let mut freq  = 0.0;
-//   if z_cross.len() >= 3 {
-//     phase = time[z_cross[0]];
-//     freq  = 1.0/(time[z_cross[2]] - time[z_cross[0]]);
-//   }
-//   (amp,freq,phase)
-// }
-
-// sydney's version in rust
-fn fit_sine_sydney(volts: Vec<f64>, times: Vec<f64>) -> f64 {
+fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> (f32, f32, f32) {
   let start_bin = 20;
-  let size_bin  = 900; // can probably make this smaller
-
+  let size_bin = 900;
+  let pi = PI;
   let mut data_size = 0;
-  let pi            = PI;
-  let mut xi_yi     = 0.0;
-  let mut xi_zi     = 0.0;
-  let mut yi_zi     = 0.0;
-  let mut xi_xi     = 0.0;
-  let mut yi_yi     = 0.0;
-  let mut xi_sum    = 0.0;
-  let mut yi_sum    = 0.0;
-  let mut zi_sum    = 0.0;
 
-  for i in start_bin..start_bin+size_bin {
-      let xi = (2.0 * pi * 0.02 * times[i]).cos();  // for this fit we know the frequency is 0.02 waves/ns
+  let mut xi_yi = 0.0;
+  let mut xi_zi = 0.0;
+  let mut yi_zi = 0.0;
+  let mut xi_xi = 0.0;
+  let mut yi_yi = 0.0;
+  let mut xi_sum = 0.0;
+  let mut yi_sum = 0.0;
+  let mut zi_sum = 0.0;
+
+  for i in start_bin..(start_bin + size_bin) {
+      let xi = (2.0 * pi * 0.02 * times[i]).cos();
       let yi = (2.0 * pi * 0.02 * times[i]).sin();
       let zi = volts[i];
-      xi_yi      += xi * yi;
-      xi_zi      += xi * zi;
-      yi_zi      += yi * zi;
-      xi_xi      += xi * xi;
-      yi_yi      += yi * yi;
-      xi_sum     += xi;
-      yi_sum     += yi;
-      zi_sum     += zi;
-      data_size  += 1;
+
+      xi_yi += xi * yi;
+      xi_zi += xi * zi;
+      yi_zi += yi * zi;
+      xi_xi += xi * xi;
+      yi_yi += yi * yi;
+      xi_sum += xi;
+      yi_sum += yi;
+      zi_sum += zi;
+
+      data_size += 1;
   }
-  let a_matrix = Matrix3::new(
-    xi_xi, xi_yi, xi_sum,
-    xi_yi, yi_yi, yi_sum,
-    xi_sum, yi_sum, data_size as f64
-);
 
-let determinant = a_matrix.determinant();
-let inv_matrix = a_matrix.try_inverse().expect("Matrix is not invertible");
+  let mut a_matrix = [[0.0; 3]; 3];
+  a_matrix[0][0] = xi_xi;
+  a_matrix[0][1] = xi_yi;
+  a_matrix[0][2] = xi_sum;
+  a_matrix[1][0] = xi_yi;
+  a_matrix[1][1] = yi_yi;
+  a_matrix[1][2] = yi_sum;
+  a_matrix[2][0] = xi_sum;
+  a_matrix[2][1] = yi_sum;
+  a_matrix[2][2] = data_size as f32;
 
-let p = Vector3::new(xi_zi, yi_zi, zi_sum);
-let result = inv_matrix * p;
+  let determinant = a_matrix[0][0] * a_matrix[1][1] * a_matrix[2][2]
+      + a_matrix[0][1] * a_matrix[1][2] * a_matrix[2][0]
+      + a_matrix[0][2] * a_matrix[1][0] * a_matrix[2][1]
+      - a_matrix[0][0] * a_matrix[1][2] * a_matrix[2][1]
+      - a_matrix[0][1] * a_matrix[1][0] * a_matrix[2][2]
+      - a_matrix[0][2] * a_matrix[1][1] * a_matrix[2][0];
 
-let a = result[0];
-let b = result[1];
-// let c = result[2]; // offset parameter if needed
+  let inverse_factor = 1.0 / determinant;
 
-let phi = a.atan2(b);
+  let mut cofactor_matrix = [[0.0; 3]; 3];
+  cofactor_matrix[0][0] = a_matrix[1][1] * a_matrix[2][2] - a_matrix[2][1] * a_matrix[1][2];
+  cofactor_matrix[0][1] = (a_matrix[1][0] * a_matrix[2][2] - a_matrix[2][0] * a_matrix[1][2]) * -1.0;
+  cofactor_matrix[0][2] = a_matrix[1][0] * a_matrix[2][1] - a_matrix[2][0] * a_matrix[1][1];
+  cofactor_matrix[1][0] = (a_matrix[0][1] * a_matrix[2][2] - a_matrix[2][1] * a_matrix[0][2]) * -1.0;
+  cofactor_matrix[1][1] = a_matrix[0][0] * a_matrix[2][2] - a_matrix[2][0] * a_matrix[0][2];
+  cofactor_matrix[1][2] = (a_matrix[0][0] * a_matrix[2][1] - a_matrix[2][0] * a_matrix[0][1]) * -1.0;
+  cofactor_matrix[2][0] = a_matrix[0][1] * a_matrix[1][2] - a_matrix[1][1] * a_matrix[0][2];
+  cofactor_matrix[2][1] = (a_matrix[0][0] * a_matrix[1][2] - a_matrix[1][0] * a_matrix[0][2]) * -1.0;
+  cofactor_matrix[2][2] = a_matrix[0][0] * a_matrix[1][1] - a_matrix[1][0] * a_matrix[0][1];
 
-phi
+  let mut inverse_matrix = [[0.0; 3]; 3];
+  for i in 0..3 {
+      for j in 0..3 {
+          inverse_matrix[i][j] = cofactor_matrix[j][i] * inverse_factor;
+      }
+  }
+
+  let p = [xi_zi, yi_zi, zi_sum];
+  let a = inverse_matrix[0][0] * p[0] + inverse_matrix[1][0] * p[1] + inverse_matrix[2][0] * p[2];
+  let b = inverse_matrix[0][1] * p[0] + inverse_matrix[1][1] * p[1] + inverse_matrix[2][1] * p[2];
+
+  let phi    = a.atan2(b);
+  let amp    = (a*a + b*b).sqrt();
+  let freq   = 0.02 as f32;
+
+  (amp, freq, phi)
 }
 
 //*************************************************
@@ -497,10 +478,6 @@ pub fn read_value_from_file(file_path: &str) -> io::Result<u32> {
   })?;
   Ok(value)
 }
-
-
-
-
 
 /**************************************************/
 
@@ -588,8 +565,12 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     rb.calibration.nanoseconds(9,
                                event.header.stop_cell as usize,
                                &mut times);
-    fit_result = fit_sine(&times, &voltages);
+    let fit_result_amp      = fit_sine_sydney(&voltages,  &times).0; 
+    let fit_result_freq     = fit_sine_sydney(&voltages, &times).1;
+    let fit_result_phi      = fit_sine_sydney(&voltages, &times).2;
+
     //println!("FIT RESULT = {:?}", fit_result);
+    fit_result = (fit_result_amp, fit_result_freq, fit_result_phi);
     event.header.set_sine_fit(fit_result);
   }
 

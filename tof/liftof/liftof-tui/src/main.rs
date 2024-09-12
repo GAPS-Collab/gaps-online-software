@@ -51,7 +51,6 @@ use ratatui::{
     style::{
         Color,
         Style,
-        Stylize
     },
     widgets::{
         Block,
@@ -85,33 +84,25 @@ use tof_dataclasses::events::{
     TofEventSummary,
     //RBWaveform,
 };
-use tof_dataclasses::commands::TofResponse;
 use tof_dataclasses::calibrations::RBCalibrations;
 //use liftof_lib::settings::LiftofSettings;
 
 use liftof_tui::menu::{
     UIMenuItem,
     MenuItem,
-    MainMenu,
     MainMenu2,
     TriggerMenu,
     EventMenu,
     MoniMenu,
     ActiveMenu,
-    UIMenu,
-    RBMenuItem,
-    RBMenu,
     RBMenu2,
-    PAMoniMenuItem,
+    UIMenu,
     PAMoniMenu,
-    MTMenu,
     SettingsMenu,
     THMenu,
-    THMenuItem,
     TSMenu,
     //TSMenuItem,
     RWMenu,
-    TEMenu,
     HBMenu,
     //RWMenuItem,
 };
@@ -128,14 +119,12 @@ use liftof_tui::{
     HomeTab,
     SettingsTab,
     TofHitTab,
-    TofHitView,
     RBTab,
     RBTabView,
     MTTab,
     CPUTab,
     RBWaveformTab,
     TofSummaryTab, 
-    RBLTBListFocus,
     TelemetryTab,
     CommandTab,
     PaddleTab,
@@ -322,7 +311,7 @@ fn render_logs<'a>(theme : ColorTheme) -> TuiLoggerWidget<'a> {
 }
 
 #[derive(Debug, Clone)]
-struct MasterLayout {
+pub struct MasterLayout {
   pub rect : Vec<Rect>
 }
 
@@ -586,7 +575,7 @@ fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
 // make a "holder" for all the tabs and menus, 
 // so that it can be put in an Arc(Mutex), so
 // we can multithread it
-struct TabbedInterface<'a> {
+pub struct TabbedInterface<'a> {
   pub ui_menu       :  MainMenu2<'a>,
   pub rb_menu       :  RBMenu2<'a>,
   pub mt_menu       :  TriggerMenu<'a>,
@@ -776,10 +765,10 @@ impl<'a> TabbedInterface<'a> {
     self.home_tab.render(&master_lo.rect[1], frame);
   }
 
-  pub fn render_cpu(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.ui_menu.render(&master_lo.rect[0], frame);
-    self.cpu_tab.render(&master_lo.rect[1], frame);
-  }
+  //pub fn render_cpu(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+  //  self.ui_menu.render(&master_lo.rect[0], frame);
+  //  self.cpu_tab.render(&master_lo.rect[1], frame);
+  //}
   
   pub fn render_mt(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
     self.ui_menu.render(&master_lo.rect[0], frame);
@@ -859,10 +848,10 @@ impl<'a> TabbedInterface<'a> {
     self.rbwf_tab.render(&master_lo.rect[1], frame);
   }
 
-  pub fn render_pamonidatatab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.pa_menu.render(&master_lo.rect[0], frame);
-    self.wf_tab.render(&master_lo.rect[1], frame);
-  }
+  //pub fn render_pamonidatatab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+  //  self.pa_menu.render(&master_lo.rect[0], frame);
+  //  self.wf_tab.render(&master_lo.rect[1], frame);
+  //}
   
   pub fn render_telemetrytab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
     //self.ts_menu.render(&master_lo.rect[0], frame);
@@ -1313,7 +1302,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
       Err(err) => error!("Unable to load calibration for {}! {}", rb, err),
       Ok(_) => {
         match rbcalibrations.lock() {
-          Err(err)  => error!("Unable to lock rbcalibrations mutex!"),
+          Err(_err)  => error!("Unable to lock rbcalibrations mutex!"),
           Ok(mut rbcal) => {
             rbcal.insert(rb.rb_id as u8, rb.calibration.clone()); 
           }
