@@ -1064,16 +1064,16 @@ impl ReadoutBoard {
         //  error!("Got unpopulated LTB from DB for LTB {}", dbltb);
         //  continue;
         //}
-        if pdl.paddle_id == dbrb.paddle12_id.unwrap() {
+        if pdl.paddle_id == dbrb.paddle12_id.unwrap_or(0) {
           rb.paddle12     = pdl.clone();
         }
-        if pdl.paddle_id == dbrb.paddle34_id.unwrap() {
+        if pdl.paddle_id == dbrb.paddle34_id.unwrap_or(0) {
           rb.paddle34   = pdl.clone();
         }
-        if pdl.paddle_id == dbrb.paddle56_id.unwrap() {
+        if pdl.paddle_id == dbrb.paddle56_id.unwrap_or(0) {
           rb.paddle56   = pdl.clone();
         }
-        if pdl.paddle_id == dbrb.paddle78_id.unwrap() {
+        if pdl.paddle_id == dbrb.paddle78_id.unwrap_or(0) {
           rb.paddle78   = pdl.clone();
         }
       }
