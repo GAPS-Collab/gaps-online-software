@@ -160,4 +160,3 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/gaps-online/gaps_online
         DESTINATION ${INSTALL_PYTHON_DIR}
        )
 
-## Be a bit more fine grained and install        
