@@ -12,6 +12,7 @@ dependencies = [
     "ipython>=8.27.0",
     "django>=5.1.1",
     "charmingbeauty>=0.1.4",
+    "polars>=1.7.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

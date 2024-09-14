@@ -121,6 +121,48 @@ if __name__ == '__main__':
             print(f'--> Will use TOF-only data stream for run {args.run_id}')
             use_tof_stream = True
             use_binary_stream = False
+    if args.run_id != -1:
+        use_tof_stream = True
+
+    if use_tof_stream:
+        print('-> Will use TOF only stream!')
+        tof_files = go.io.get_tof_binaries(args.run_id, data_dir=args.tof_dir)
+        n_trigger_hits = 0
+        n_readout_hits = 0
+        npack          = 0
+        done           = False
+        evtbld_hb      = []
+        # examnple - loop over all the files and count the hits
+        for f in tqdm.tqdm(tof_files,desc='Reading TOF data files'):
+            if done:
+                break
+            reader = go.io.TofPacketReader(str(f))
+            #print(reader.packet_index)
+            #continue
+            for pack in reader:
+                npack += 1
+                if pack.packet_type == go.io.TofPacketType.TofEvent:
+                    ev = go.events.TofEvent()
+                    ev.from_tofpacket(pack)
+                    n_readout_hits += len(ev.hits)
+                    n_trigger_hits += len(ev.mastertriggerevent.trigger_hits)
+
+                # heartbeat data is only stored in later runs
+                elif pack.packet_type == go.io.TofPacketType.EVTBLDRHeartbeat:
+                    hb = go.tof.monitoring.EVTBLDRHeartbeat()
+                    hb.from_tofpacket(pack)
+                    evtbld_hb.append(hb)
+                    done = True
+                    break
+
+                if npack == args.npackets:
+                    done = True
+                    break
+
+        print(f'-> Readout {n_readout_hits} (HG) hits and {n_trigger_hits} (LG/Trigger) hits from TOF stream files!')
+        print(f'-> Found {len(evtbld_hb)} event builder heartbeats!')
+        if len(evtbld_hb):
+            print (evtbld_hb[0])
 
     if use_telemetry_stream:
         if not args.telemetry_dir:
