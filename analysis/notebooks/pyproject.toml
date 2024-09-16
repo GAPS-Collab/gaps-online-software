@@ -16,6 +16,8 @@ dependencies = [
     "charmingbeauty>=0.1.4",
     "jupyter>=1.1.1",
     "pyfonts>=0.0.1",
+    "jinja2>=3.1.4",
+    "pdfkit>=1.0.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

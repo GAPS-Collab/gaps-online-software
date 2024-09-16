@@ -1848,6 +1848,7 @@ impl PyTofEventSummary {
 
 #[pyclass]
 #[pyo3(name="TofEvent")]
+#[derive(Debug, Clone)]
 pub struct PyTofEvent {
   event : TofEvent,
 }
@@ -1862,7 +1863,7 @@ impl PyTofEvent {
 #[pymethods]
 impl PyTofEvent {
   #[new]
-  fn new() -> Self {
+  pub fn new() -> Self {
     Self {
       event : TofEvent::new(),
     }

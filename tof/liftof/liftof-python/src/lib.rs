@@ -1,23 +1,25 @@
 //use std::collections::VecDeque;
-use std::collections::HashMap;
 //use std::path::Path;
 pub mod dataclasses;
 pub mod master_trigger;
 
 use pyo3::prelude::*;
 
-extern crate pyo3_log;
-extern crate comfy_table;
+//extern crate pyo3_log;
+//extern crate comfy_table;
+use std::collections::HashMap;
+use pyo3::exceptions::PyValueError;
 
 use rpy_tof_dataclasses::dataclasses::{
-    PyMasterTriggerEvent,
-    PyRBEvent,
+  PyMasterTriggerEvent,
+  PyRBEvent,
+  PyTofEvent
 };
 
 use crate::dataclasses::PyIPBus;
 
 use crate::master_trigger::{
-    PyMasterTrigger,
+  PyMasterTrigger,
 };
 
 use tof_dataclasses::analysis::{
@@ -45,7 +47,10 @@ use tof_dataclasses::io::TofPacketReader;
 //use tof_dataclasses::serialization::Serialization;
 
 use liftof_lib::waveform_analysis;
-use liftof_lib::settings::AnalysisEngineSettings;
+use liftof_lib::settings::{
+  AnalysisEngineSettings,
+  LiftofSettings
+};
 
 #[pyfunction]
 #[pyo3(name="test_db")]
@@ -81,6 +86,55 @@ pub fn test_db() {
   }
 }
 
+/// A wrapper for Liftof settings. Can be useful to pass 
+/// settings to functions
+#[pyclass]
+#[pyo3(name="LiftofSettings")]
+struct PyLiftofSettings {
+  pub settings : LiftofSettings
+}
+
+impl PyLiftofSettings {
+  pub fn set_settings(&mut self, settings : &LiftofSettings) {
+    self.settings = settings.clone()
+  }
+}
+
+#[pymethods]
+impl PyLiftofSettings {
+  #[new]
+  fn new() -> Self {
+    let settings = LiftofSettings::new();
+    Self { 
+      settings : settings
+    }
+  }
+
+  /// Read settings from a .toml file
+  ///
+  /// # Arugments:
+  ///
+  /// * filename : A .toml file with settings fro the 
+  ///              liftof flight suite
+  #[staticmethod]
+  fn from_file(filename : String) -> PyResult<Self> {
+    let mut pysettings = PyLiftofSettings::new();
+    match LiftofSettings::from_toml(filename) {
+      Ok(settings) => {
+        pysettings.settings = settings;
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+    Ok(pysettings)
+  }
+ 
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.settings))
+  } 
+
+}
 
 #[pyfunction]
 #[pyo3(name="calc_edep_simple")]
@@ -88,6 +142,17 @@ pub fn wrap_calc_edep_simple(peak_voltage : f32) -> f32 {
   calc_edep_simple(peak_voltage)
 }
 
+#[pyfunction]
+#[pyo3(name="waveform_analysis")]
+fn py_waveform_analysis(event : &PyTofEvent) -> PyResult<PyTofEvent> {
+//match waveform_analysis(
+//  &mut rbev,
+//  &rb_map[&rb_id],
+//  settings.clone()
+//) {
+  let ev = PyTofEvent::new();
+  Ok(ev)
+}
 
 #[pyfunction]
 #[pyo3(name = "test_waveform_analysis")]
@@ -170,9 +235,10 @@ fn test_waveform_analysis(filename : String) -> PyRBEvent {
 /// Currently, this contains only the analysis 
 /// functions
 #[pymodule]
-#[pyo3(name = "rust_dataclasses")]
-fn rust_dataclasses<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { 
+#[pyo3(name = "liftof")]
+fn lfitof<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { 
     pyo3_log::init();
+    m.add_function(wrap_pyfunction!(py_waveform_analysis,m)?)?;
     m.add_function(wrap_pyfunction!(test_waveform_analysis,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_calc_edep_simple,m)?)?;
     m.add_function(wrap_pyfunction!(test_db,m)?)?;

@@ -37,7 +37,7 @@ if(BUILD_ROOTCOMPONENTS)
   endif(ROOT_FOUND)
 endif(BUILD_ROOTCOMPONENTS)
 
-
+option(BUILD_LIFTOFPYBINDINGS "build pybindings for a part of liftof (flight software)" OFF)
 option(BUILD_CXXBINDINGS "build C++ language bindings for the rust project tof-dataclasses to provide an API to interface with downstream C++ written analysis" OFF)
 if(BUILD_CXXBINDINGS)
   set(GAPSTOF_LIBRARY_SHARED GapsTof CACHE INTERNAL "GapsTof shared library" FORCE)
@@ -199,8 +199,34 @@ if(BUILD_RUSTPYBINDINGS)
           DESTINATION ${INSTALL_PYTHON_DIR}
           RENAME rpy_tof_dataclasses.so
   )
-
 endif(BUILD_RUSTPYBINDINGS)
+
+if(BUILD_LIFTOFPYBINDINGS)
+  message(STATUS "building Rust \\U1F980 pybindings wiut pyO3 for LIFTOF...")
+  set(RUST_BUILD_COMMAND cargo build --release --all-features)
+  add_custom_target(
+    tof-liftof-rust
+      ALL
+      COMMAND ${RUST_BUILD_COMMAND} 
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python
+  )
+  add_custom_target(
+    tof-pyliftof-rust-doc
+      COMMAND cargo doc 
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python
+  )
+  #install(TARGETS tof-pydataclasses-rust
+  #    EXPORT GAPSTargets         
+  #    LIBRARY DESTINATION ${INSTALL_PYTHON_DIR}
+  #    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
+  #    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
+  #)
+  install(FILES
+          "${CMAKE_SOURCE_DIR}/tof/liftof/target/release/libliftof.so"
+          DESTINATION ${INSTALL_PYTHON_DIR}
+          RENAME liftof.so
+  )
+endif(BUILD_LIFTOFPYBINDINGS)
 
 #################################################
 # installation
