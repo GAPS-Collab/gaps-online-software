@@ -52,7 +52,7 @@ impl MTBRegister<'_> {
       self.write(bus, value)?;
     }
     let rv = self.read_all(bus)?;
-    println!("Register reads {:x} {} {:x} after write ops!", self.addr, self.descr, rv);
+    //println!("Register reads {:x} {} {:x} after write ops!", self.addr, self.descr, rv);
     Ok(())
   }
 
@@ -64,9 +64,10 @@ impl MTBRegister<'_> {
     //  return(Err)
     //}
     let rv = self.read(bus)?;
-    if self.addr != 0x13 && self.addr != 0x11 {
-      println!("Register reads {:x} {} {:x}!", self.addr, self.descr, rv);
-    }
+    //if self.addr != 0x13 && self.addr != 0x11 {
+    //  //
+    //  //println!("Register reads {:x} {} {:x}!", self.addr, self.descr, rv);
+    //}
     Ok(rv)
   }
 
