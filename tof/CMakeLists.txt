@@ -194,11 +194,20 @@ if(BUILD_RUSTPYBINDINGS)
   #    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
   #    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
   #)
-  install(FILES
-          "${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librpy_tof_dataclasses.so"
-          DESTINATION ${INSTALL_PYTHON_DIR}
-          RENAME rpy_tof_dataclasses.so
-  )
+  if(APPLE) 
+    install(FILES
+            "${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librpy_tof_dataclasses.dylib"
+            DESTINATION ${INSTALL_PYTHON_DIR}
+            RENAME rpy_tof_dataclasses.so
+    )
+   elseif(UNIX)
+    install(FILES
+            "${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librpy_tof_dataclasses.so"
+            DESTINATION ${INSTALL_PYTHON_DIR}
+            RENAME rpy_tof_dataclasses.so
+    )
+
+   endif(APPLE)
 endif(BUILD_RUSTPYBINDINGS)
 
 if(BUILD_LIFTOFPYBINDINGS)
@@ -221,11 +230,19 @@ if(BUILD_LIFTOFPYBINDINGS)
   #    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
   #    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
   #)
-  install(FILES
-          "${CMAKE_SOURCE_DIR}/tof/liftof/target/release/libliftof.so"
-          DESTINATION ${INSTALL_PYTHON_DIR}
-          RENAME liftof.so
-  )
+  if (APPLE)
+    install(FILES
+            "${CMAKE_SOURCE_DIR}/tof/liftof/target/release/libliftof.dylib"
+            DESTINATION ${INSTALL_PYTHON_DIR}
+            RENAME liftof.so
+    )
+  elseif(UNIX)
+    install(FILES
+            "${CMAKE_SOURCE_DIR}/tof/liftof/target/release/libliftof.so"
+            DESTINATION ${INSTALL_PYTHON_DIR}
+            RENAME liftof.so
+    )
+  endif(APPLE
 endif(BUILD_LIFTOFPYBINDINGS)
 
 #################################################
