@@ -242,7 +242,7 @@ if(BUILD_LIFTOFPYBINDINGS)
             DESTINATION ${INSTALL_PYTHON_DIR}
             RENAME liftof.so
     )
-  endif(APPLE
+  endif(APPLE)
 endif(BUILD_LIFTOFPYBINDINGS)
 
 #################################################

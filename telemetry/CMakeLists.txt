@@ -36,11 +36,19 @@ if(BUILD_RUSTTELEMETRY)
   #    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
   #    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
   #)
-  install(FILES
-          "${CMAKE_SOURCE_DIR}/telemetry/dataclasses/rust/pybindings/target/release/librust_telemetry.so"
-          DESTINATION ${INSTALL_PYTHON_DIR}
-          RENAME rust_telemetry.so
-  )
-
+  
+  if(APPLE)
+    install(FILES
+            "${CMAKE_SOURCE_DIR}/telemetry/dataclasses/rust/pybindings/target/release/librust_telemetry.dylib"
+            DESTINATION ${INSTALL_PYTHON_DIR}
+            RENAME rust_telemetry.so
+    )
+  elseif(UNIX)
+    install(FILES
+            "${CMAKE_SOURCE_DIR}/telemetry/dataclasses/rust/pybindings/target/release/librust_telemetry.so"
+            DESTINATION ${INSTALL_PYTHON_DIR}
+            RENAME rust_telemetry.so
+    )
+  endif(APPLE)
 endif(BUILD_RUSTTELEMETRY)
 
