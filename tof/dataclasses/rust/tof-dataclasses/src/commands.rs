@@ -52,7 +52,7 @@ cfg_if::cfg_if! {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
-#[cfg_attr(feature = "pybindings", pyclass)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 #[repr(u8)]
 pub enum TofCommandCode {
   Unknown                  = 0u8,

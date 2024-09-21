@@ -174,12 +174,18 @@ diesel::table! {
         height -> Float,
         width -> Float,
         length -> Float,
+        normal_x -> Float,
+        normal_y -> Float,
+        normal_z -> Float,
         global_pos_x_l0 -> Float,
         global_pos_y_l0 -> Float,
         global_pos_z_l0 -> Float,
         global_pos_x_l0_A -> Float,
         global_pos_y_l0_A -> Float,
         global_pos_z_l0_A -> Float,
+        global_pos_x_l0_B -> Float,
+        global_pos_y_l0_B -> Float,
+        global_pos_z_l0_B -> Float,
     }
 }
 

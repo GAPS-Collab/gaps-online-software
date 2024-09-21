@@ -17,7 +17,7 @@ use pyo3::pyclass;
 /// Types of serializable data structures used
 /// throughout the tof system
 #[derive(Debug, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
-#[cfg_attr(feature = "pybindings", pyclass)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 #[repr(u8)]
 pub enum PacketType {
   Unknown             = 0u8, 

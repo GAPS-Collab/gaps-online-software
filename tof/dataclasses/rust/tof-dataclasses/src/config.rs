@@ -38,7 +38,7 @@ cfg_if::cfg_if! {
 /// Build Strategy
 /// 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = "pybindings", pyclass)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 pub enum BuildStrategy {
   Unknown,
   Smart,

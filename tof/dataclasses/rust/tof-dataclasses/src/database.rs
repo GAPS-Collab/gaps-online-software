@@ -409,12 +409,18 @@ pub struct Paddle {
   pub height            : f32, 
   pub width             : f32, 
   pub length            : f32, 
+  pub normal_x          : f32, 
+  pub normal_y          : f32, 
+  pub normal_z          : f32, 
   pub global_pos_x_l0   : f32, 
   pub global_pos_y_l0   : f32, 
   pub global_pos_z_l0   : f32, 
   pub global_pos_x_l0_A : f32, 
   pub global_pos_y_l0_A : f32, 
   pub global_pos_z_l0_A : f32, 
+  pub global_pos_x_l0_B : f32, 
+  pub global_pos_y_l0_B : f32, 
+  pub global_pos_z_l0_B : f32, 
 }
 
 impl Paddle {
@@ -440,12 +446,18 @@ impl Paddle {
       height            : 0.0, 
       width             : 0.0, 
       length            : 0.0, 
+      normal_x          : 0.0,
+      normal_y          : 0.0,
+      normal_z          : 0.0,
       global_pos_x_l0   : 0.0, 
       global_pos_y_l0   : 0.0, 
       global_pos_z_l0   : 0.0, 
       global_pos_x_l0_A : 0.0, 
       global_pos_y_l0_A : 0.0, 
       global_pos_z_l0_A : 0.0, 
+      global_pos_x_l0_B : 0.0, 
+      global_pos_y_l0_B : 0.0, 
+      global_pos_z_l0_B : 0.0, 
     }
   }
 
