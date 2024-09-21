@@ -167,10 +167,6 @@ if (UNIX AND NOT APPLE)
   install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-tui
       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   )
-  install(FILES ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/librust_dataclasses.so
-      DESTINATION ${INSTALL_PYTHON_DIR}/
-      RENAME rust_dataclasses.so
-  )
 endif(BUILD_LIFTOF)
 
 if(BUILD_RUSTPYBINDINGS)

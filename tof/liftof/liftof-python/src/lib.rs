@@ -144,14 +144,36 @@ pub fn wrap_calc_edep_simple(peak_voltage : f32) -> f32 {
 
 #[pyfunction]
 #[pyo3(name="waveform_analysis")]
-fn py_waveform_analysis(event : &PyTofEvent) -> PyResult<PyTofEvent> {
+fn py_waveform_analysis(event : &PyTofEvent,
+                        settings : &PyLiftofSettings) -> PyResult<PyTofEvent> {
 //match waveform_analysis(
 //  &mut rbev,
 //  &rb_map[&rb_id],
 //  settings.clone()
 //) {
-  let ev = PyTofEvent::new();
-  Ok(ev)
+  let ana_settings = settings.settings.analysis_engine_settings;
+  let pth          = settings.settings.db_path.clone();
+  let mut conn     = connect_to_db(pth).expect("Check the DB path in the liftof settings!");
+  let rbs          = ReadoutBoard::all(&mut conn).expect("Check DB");
+  let mut rb       = ReadoutBoard::new();
+  let mut ev_new   = event.clone();
+  let mut new_rb_evs = event.event.rb_events.clone();
+  for rb_ev in new_rb_evs.iter_mut() {
+    for rb_ in &rbs {
+      if rb_.rb_id == rb_ev.header.rb_id {
+        match waveform_analysis(rb_ev, rb_, ana_settings) {
+          Err(err) => {
+            println!("Unable to perform waveform_analysis! {err}");
+          }
+          Ok(_) => ()
+        }
+      }
+    }
+    //if rb_ev.rb_id = 
+  }
+  ev_new.event.rb_events = new_rb_evs;
+  //match waveform_analysis(
+  Ok(ev_new)
 }
 
 #[pyfunction]
@@ -239,9 +261,10 @@ fn test_waveform_analysis(filename : String) -> PyRBEvent {
 fn lfitof<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { 
     pyo3_log::init();
     m.add_function(wrap_pyfunction!(py_waveform_analysis,m)?)?;
-    m.add_function(wrap_pyfunction!(test_waveform_analysis,m)?)?;
+    //m.add_function(wrap_pyfunction!(test_waveform_analysis,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_calc_edep_simple,m)?)?;
     m.add_function(wrap_pyfunction!(test_db,m)?)?;
+    m.add_class::<PyLiftofSettings>()?;
     m.add_class::<PyIPBus>()?;
     m.add_class::<PyMasterTrigger>()?;
     Ok(())

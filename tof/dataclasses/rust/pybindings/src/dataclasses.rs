@@ -1850,7 +1850,7 @@ impl PyTofEventSummary {
 #[pyo3(name="TofEvent")]
 #[derive(Debug, Clone)]
 pub struct PyTofEvent {
-  event : TofEvent,
+  pub event : TofEvent,
 }
 
 impl PyTofEvent {
