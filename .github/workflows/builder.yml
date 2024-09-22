@@ -46,7 +46,7 @@ jobs:
       run: cd ${{github.workspace}}/build && make -j 4 && make doc && make install
 
     - name: Docs
-      run: cd ${{github.workspace}}/build && make doc && make liftof-doc && make go-pybidingins-rust-doc
+      run: cd ${{github.workspace}}/build && make doc && make liftof-doc && make go-pybindings-rust-doc
       
     - name: Test-Dataclasses
       working-directory: ${{github.workspace}}/build
