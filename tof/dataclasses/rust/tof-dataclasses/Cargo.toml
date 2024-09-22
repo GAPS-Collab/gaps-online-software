@@ -43,7 +43,7 @@ indicatif         = "0.17" # TODO  - maybe this might go away or we introduce
 colored           = "2.0"  #         a debugging feature  
 crossbeam-channel = "0.5"
 statistical       = "1.0"  # FIXME - replace this with our own implementation
-polars            = { version = "0.39", features = ["lazy"], optional = true }
+polars            = { version = "0.41", features = ["lazy"], optional = true }
 pyo3              = { version = "0.21", features = ["extension-module"], optional = true }
 
 # for testing / features
