@@ -20,6 +20,12 @@ except ImportError as e:
     print(f"Can't load CXX API! {e}")
 try:
     import go_pybindings as rust_api
+    try:
+        rust_api.liftof
+        liftof = rust_api.liftof
+    except Exception as e:
+        print (e)
+
 except ImportError as e:
     print(f"Can't load RUST API! {e}")
 
