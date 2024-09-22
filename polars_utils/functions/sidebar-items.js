@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["arc_map","flatten","range_portion","try_arc_map"]};

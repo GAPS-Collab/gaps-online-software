@@ -97,16 +97,17 @@ Rust API</h1>
 <li><a href="tof_control/index.html">tof-control</a> <em>tof-control is Takeru's code for changing voltages/thresholds etc and monitor Tof environmental sensors</em></li>
 </ul>
 <h1><a class="anchor" id="autotoc_md4"></a>
-Rust/python API</h1>
-<ul>
-<li><a href="rpy_tof_dataclasses/index.html">rpy-tof-dataclasses</a>. The Rust <code>tof-dataclasses</code> project wrapped in pybindings.</li>
-</ul>
-<h1><a class="anchor" id="autotoc_md5"></a>
-CXX/python API</h1>
-<p>The python API follows the CXX API very closely. Right now, there is now dedicated API documentation (which we are working on). Examples can be found in <code>tof/resources/examples/python</code> The python API will undergo some easy-of-use improvements soon.</p>
-<p><em>as of version 0.10 (LELEWAA) we discourage to use the cxx pybindings, sinde the rust pybindings have matured enough and are faster as well as more stable</em></p>
+CXX API</h1>
+<p>The CXX API is an independent implementation of the rust <code>tof-dataclasses</code> project.</p>
 <ul>
 <li><a href="index.html">CXX-API</a></li>
+</ul>
+<h1><a class="anchor" id="autotoc_md5"></a>
+Python API</h1>
+<p>The python API is exposed through <code>gaps_online</code> which can be imported if the <code>setup-env.sh</code> shell has been sourced and the thus PYTHONPATH has been modified. If <code>BUILD_RUSTPYBINDINGS</code> are enabled, the project exposes the rust code throug pyo3 crafted pybindings. The CXX interface is wrapped through pybind11, these pybindings can be enable with <code>BUILD_CXXPYBINDINGS</code> <em>as of version 0.10 (LELEWAA) we discourage to use the cxx pybindings, sinde the rust pybindings have matured enough and are faster as well as more stable</em></p>
+<p>The rust side of the rust pybdingings is documented through the <code>rust doc</code> system and can be found here:</p>
+<ul>
+<li><a href="go_pybindings/index.html">go-pybidings</a>. Pyo3 wrapper for a part of the rust code. If <code>BUILD_TELEMETRY</code> and/or <code>BUILD_LIFTOF</code> are enabled, these parts of the code will be exposed through python as well.</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md6"></a>
 Executable programs and higher level libraries [liftof]</h1>

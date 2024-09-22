@@ -2618,16 +2618,16 @@
         //  error!("Got unpopulated LTB from DB for LTB {}", dbltb);
         //  continue;
         //}
-        </span><span class="kw">if </span>pdl.paddle_id == dbrb.paddle12_id.unwrap() {
+        </span><span class="kw">if </span>pdl.paddle_id == dbrb.paddle12_id.unwrap_or(<span class="number">0</span>) {
           rb.paddle12     = pdl.clone();
         }
-        <span class="kw">if </span>pdl.paddle_id == dbrb.paddle34_id.unwrap() {
+        <span class="kw">if </span>pdl.paddle_id == dbrb.paddle34_id.unwrap_or(<span class="number">0</span>) {
           rb.paddle34   = pdl.clone();
         }
-        <span class="kw">if </span>pdl.paddle_id == dbrb.paddle56_id.unwrap() {
+        <span class="kw">if </span>pdl.paddle_id == dbrb.paddle56_id.unwrap_or(<span class="number">0</span>) {
           rb.paddle56   = pdl.clone();
         }
-        <span class="kw">if </span>pdl.paddle_id == dbrb.paddle78_id.unwrap() {
+        <span class="kw">if </span>pdl.paddle_id == dbrb.paddle78_id.unwrap_or(<span class="number">0</span>) {
           rb.paddle78   = pdl.clone();
         }
       }

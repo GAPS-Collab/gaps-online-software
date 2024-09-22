@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["clmul64","portable_clmul64","portable_prefix_xorsum","prefix_xorsum"]};

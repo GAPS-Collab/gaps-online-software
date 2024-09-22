@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["OutputName"],"struct":["ColumnNode","ExprIR"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["no_nulls","nulls","quantile_filter"],"struct":["RollingQuantileParams","RollingVarParams"],"type":["DynArgs"]};

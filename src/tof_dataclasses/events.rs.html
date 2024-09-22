@@ -192,6 +192,13 @@
 <a href="#192" id="192">192</a>
 <a href="#193" id="193">193</a>
 <a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Events  
 </span><span class="comment">//
 //
@@ -260,6 +267,8 @@
   <span class="doccomment">/// This can be used if there is a version
   /// missmatch and we have to hack something
   </span>IncompatibleData       = <span class="number">22u8</span>,
+  <span class="doccomment">/// The TofEvent timed out while waiting for more Readoutboards
+  </span>EventTimeOut           = <span class="number">23u8</span>,
   GoodNoCRCOrErrBitCheck = <span class="number">39u8</span>,
   <span class="doccomment">/// The event status is good, but we did not 
   /// perform any CRC32 check
@@ -311,6 +320,9 @@
       EventStatus::IncompatibleData =&gt; {
         <span class="kw">return </span><span class="number">22</span>;
       }
+      EventStatus::EventTimeOut =&gt; {
+        <span class="kw">return </span><span class="number">23</span>;
+      }
       EventStatus::GoodNoCRCOrErrBitCheck =&gt; {
         <span class="kw">return </span><span class="number">39</span>;
       }
@@ -330,20 +342,21 @@
 <span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>EventStatus {
   <span class="kw">fn </span>from(value: u8) -&gt; <span class="self">Self </span>{
     <span class="kw">match </span>value {
-      <span class="number">0u8  </span>=&gt; EventStatus::Unknown,
-      <span class="number">10u8 </span>=&gt; EventStatus::CRC32Wrong,
-      <span class="number">11u8 </span>=&gt; EventStatus::TailWrong,
-      <span class="number">12u8 </span>=&gt; EventStatus::ChannelIDWrong,
-      <span class="number">13u8 </span>=&gt; EventStatus::CellSyncErrors,
-      <span class="number">14u8 </span>=&gt; EventStatus::ChnSyncErrors,
-      <span class="number">15u8 </span>=&gt; EventStatus::CellAndChnSyncErrors,
-      <span class="number">16u8 </span>=&gt; EventStatus::AnyDataMangling,
-      <span class="number">21u8 </span>=&gt; EventStatus::IncompleteReadout,
-      <span class="number">22u8 </span>=&gt; EventStatus::IncompatibleData,
-      <span class="number">39u8 </span>=&gt; EventStatus::GoodNoCRCOrErrBitCheck,
-      <span class="number">40u8 </span>=&gt; EventStatus::GoodNoCRCCheck,
-      <span class="number">41u8 </span>=&gt; EventStatus::GoodNoErrBitCheck,
-      <span class="number">42u8 </span>=&gt; EventStatus::Perfect,
+      <span class="number">0  </span>=&gt; EventStatus::Unknown,
+      <span class="number">10 </span>=&gt; EventStatus::CRC32Wrong,
+      <span class="number">11 </span>=&gt; EventStatus::TailWrong,
+      <span class="number">12 </span>=&gt; EventStatus::ChannelIDWrong,
+      <span class="number">13 </span>=&gt; EventStatus::CellSyncErrors,
+      <span class="number">14 </span>=&gt; EventStatus::ChnSyncErrors,
+      <span class="number">15 </span>=&gt; EventStatus::CellAndChnSyncErrors,
+      <span class="number">16 </span>=&gt; EventStatus::AnyDataMangling,
+      <span class="number">21 </span>=&gt; EventStatus::IncompleteReadout,
+      <span class="number">22 </span>=&gt; EventStatus::IncompatibleData,
+      <span class="number">23 </span>=&gt; EventStatus::EventTimeOut,
+      <span class="number">39 </span>=&gt; EventStatus::GoodNoCRCOrErrBitCheck,
+      <span class="number">40 </span>=&gt; EventStatus::GoodNoCRCCheck,
+      <span class="number">41 </span>=&gt; EventStatus::GoodNoErrBitCheck,
+      <span class="number">42 </span>=&gt; EventStatus::Perfect,
       <span class="kw">_    </span>=&gt; EventStatus::Unknown
     }
   }
@@ -364,6 +377,7 @@
       EventStatus::AnyDataMangling,
       EventStatus::IncompleteReadout,
       EventStatus::IncompatibleData,
+      EventStatus::EventTimeOut,
       EventStatus::GoodNoCRCOrErrBitCheck,
       EventStatus::GoodNoCRCCheck,
       EventStatus::GoodNoErrBitCheck,

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml_edit-0.22.20/src/table.rs`."><title>table.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="toml_edit" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml_edit-0.22.21/src/table.rs`."><title>table.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="toml_edit" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -771,26 +771,6 @@
 <a href="#771" id="771">771</a>
 <a href="#772" id="772">772</a>
 <a href="#773" id="773">773</a>
-<a href="#774" id="774">774</a>
-<a href="#775" id="775">775</a>
-<a href="#776" id="776">776</a>
-<a href="#777" id="777">777</a>
-<a href="#778" id="778">778</a>
-<a href="#779" id="779">779</a>
-<a href="#780" id="780">780</a>
-<a href="#781" id="781">781</a>
-<a href="#782" id="782">782</a>
-<a href="#783" id="783">783</a>
-<a href="#784" id="784">784</a>
-<a href="#785" id="785">785</a>
-<a href="#786" id="786">786</a>
-<a href="#787" id="787">787</a>
-<a href="#788" id="788">788</a>
-<a href="#789" id="789">789</a>
-<a href="#790" id="790">790</a>
-<a href="#791" id="791">791</a>
-<a href="#792" id="792">792</a>
-<a href="#793" id="793">793</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::iter::FromIterator;
 
 <span class="kw">use </span>indexmap::map::IndexMap;
@@ -842,8 +822,8 @@
 
     <span class="doccomment">/// Convert to an inline table
     </span><span class="kw">pub fn </span>into_inline_table(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; InlineTable {
-        <span class="kw">for </span>(<span class="kw">_</span>, kv) <span class="kw">in </span><span class="self">self</span>.items.iter_mut() {
-            kv.value.make_value();
+        <span class="kw">for </span>(<span class="kw">_</span>, value) <span class="kw">in </span><span class="self">self</span>.items.iter_mut() {
+            value.make_value();
         }
         <span class="kw">let </span><span class="kw-2">mut </span>t = InlineTable::with_pairs(<span class="self">self</span>.items);
         t.fmt();
@@ -868,10 +848,10 @@
         parent: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">'s </span>Key],
         values: <span class="kw-2">&amp;mut </span>Vec&lt;(Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">'s </span>Key&gt;, <span class="kw-2">&amp;</span><span class="lifetime">'s </span>Value)&gt;,
     ) {
-        <span class="kw">for </span>value <span class="kw">in </span><span class="self">self</span>.items.values() {
+        <span class="kw">for </span>(key, value) <span class="kw">in </span><span class="self">self</span>.items.iter() {
             <span class="kw">let </span><span class="kw-2">mut </span>path = parent.to_vec();
-            path.push(<span class="kw-2">&amp;</span>value.key);
-            <span class="kw">match </span><span class="kw-2">&amp;</span>value.value {
+            path.push(key);
+            <span class="kw">match </span>value {
                 Item::Table(table) <span class="kw">if </span>table.is_dotted() =&gt; {
                     table.append_values(<span class="kw-2">&amp;</span>path, values);
                 }
@@ -902,8 +882,8 @@
     </span><span class="kw">pub fn </span>sort_values(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="comment">// Assuming standard tables have their doc_position set and this won't negatively impact them
         </span><span class="self">self</span>.items.sort_keys();
-        <span class="kw">for </span>kv <span class="kw">in </span><span class="self">self</span>.items.values_mut() {
-            <span class="kw">match </span><span class="kw-2">&amp;mut </span>kv.value {
+        <span class="kw">for </span>value <span class="kw">in </span><span class="self">self</span>.items.values_mut() {
+            <span class="kw">match </span>value {
                 Item::Table(table) <span class="kw">if </span>table.is_dotted() =&gt; {
                     table.sort_values();
                 }
@@ -927,18 +907,15 @@
     <span class="kw">where
         </span>F: FnMut(<span class="kw-2">&amp;</span>Key, <span class="kw-2">&amp;</span>Item, <span class="kw-2">&amp;</span>Key, <span class="kw-2">&amp;</span>Item) -&gt; std::cmp::Ordering,
     {
-        <span class="kw">let </span>modified_cmp = |<span class="kw">_</span>: <span class="kw-2">&amp;</span>InternalString,
-                            val1: <span class="kw-2">&amp;</span>TableKeyValue,
-                            <span class="kw">_</span>: <span class="kw-2">&amp;</span>InternalString,
-                            val2: <span class="kw-2">&amp;</span>TableKeyValue|
-         -&gt; std::cmp::Ordering {
-            compare(<span class="kw-2">&amp;</span>val1.key, <span class="kw-2">&amp;</span>val1.value, <span class="kw-2">&amp;</span>val2.key, <span class="kw-2">&amp;</span>val2.value)
-        };
+        <span class="kw">let </span>modified_cmp =
+            |key1: <span class="kw-2">&amp;</span>Key, val1: <span class="kw-2">&amp;</span>Item, key2: <span class="kw-2">&amp;</span>Key, val2: <span class="kw-2">&amp;</span>Item| -&gt; std::cmp::Ordering {
+                compare(key1, val1, key2, val2)
+            };
 
         <span class="self">self</span>.items.sort_by(modified_cmp);
 
-        <span class="kw">for </span>kv <span class="kw">in </span><span class="self">self</span>.items.values_mut() {
-            <span class="kw">match </span><span class="kw-2">&amp;mut </span>kv.value {
+        <span class="kw">for </span>value <span class="kw">in </span><span class="self">self</span>.items.values_mut() {
+            <span class="kw">match </span>value {
                 Item::Table(table) <span class="kw">if </span>table.is_dotted() =&gt; {
                     table.sort_values_by_internal(compare);
                 }
@@ -1013,26 +990,32 @@
 
     <span class="doccomment">/// Returns an accessor to a key's formatting
     </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'_ </span>Key&gt; {
-        <span class="self">self</span>.items.get(key).map(|kv| <span class="kw-2">&amp;</span>kv.key)
+        <span class="self">self</span>.items.get_full(key).map(|(<span class="kw">_</span>, key, <span class="kw">_</span>)| key)
     }
 
     <span class="doccomment">/// Returns an accessor to a key's formatting
     </span><span class="kw">pub fn </span>key_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;KeyMut&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="self">self</span>.items.get_mut(key).map(|kv| kv.key.as_mut())
+        <span class="kw">use </span>indexmap::map::MutableKeys;
+        <span class="self">self</span>.items
+            .get_full_mut2(key)
+            .map(|(<span class="kw">_</span>, key, <span class="kw">_</span>)| key.as_mut())
     }
 
     <span class="doccomment">/// Returns the decor associated with a given key of the table.
     </span><span class="attr">#[deprecated(since = <span class="string">"0.21.1"</span>, note = <span class="string">"Replaced with `key_mut`"</span>)]
     </span><span class="kw">pub fn </span>key_decor_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Decor&gt; {
         <span class="attr">#![allow(deprecated)]
-        </span><span class="self">self</span>.items.get_mut(key).map(|kv| kv.key.leaf_decor_mut())
+        </span><span class="kw">use </span>indexmap::map::MutableKeys;
+        <span class="self">self</span>.items
+            .get_full_mut2(key)
+            .map(|(<span class="kw">_</span>, key, <span class="kw">_</span>)| key.leaf_decor_mut())
     }
 
     <span class="doccomment">/// Returns the decor associated with a given key of the table.
     </span><span class="attr">#[deprecated(since = <span class="string">"0.21.1"</span>, note = <span class="string">"Replaced with `key_mut`"</span>)]
     </span><span class="kw">pub fn </span>key_decor(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Decor&gt; {
         <span class="attr">#![allow(deprecated)]
-        </span><span class="self">self</span>.items.get(key).map(|kv| kv.key.leaf_decor())
+        </span><span class="self">self</span>.items.get_full(key).map(|(<span class="kw">_</span>, key, <span class="kw">_</span>)| key.leaf_decor())
     }
 
     <span class="doccomment">/// The location within the original document
@@ -1043,11 +1026,12 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>despan(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">use </span>indexmap::map::MutableKeys;
         <span class="self">self</span>.span = <span class="prelude-val">None</span>;
         <span class="self">self</span>.decor.despan(input);
-        <span class="kw">for </span>kv <span class="kw">in </span><span class="self">self</span>.items.values_mut() {
-            kv.key.despan(input);
-            kv.value.despan(input);
+        <span class="kw">for </span>(key, value) <span class="kw">in </span><span class="self">self</span>.items.iter_mut2() {
+            key.despan(input);
+            value.despan(input);
         }
     }
 }
@@ -1058,24 +1042,25 @@
         Box::new(
             <span class="self">self</span>.items
                 .iter()
-                .filter(|(<span class="kw">_</span>, kv)| !kv.value.is_none())
-                .map(|(key, kv)| (<span class="kw-2">&amp;</span>key[..], <span class="kw-2">&amp;</span>kv.value)),
+                .filter(|(<span class="kw">_</span>, value)| !value.is_none())
+                .map(|(key, value)| (key.get(), value)),
         )
     }
 
     <span class="doccomment">/// Returns an mutable iterator over all key/value pairs, including empty.
     </span><span class="kw">pub fn </span>iter_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; IterMut&lt;<span class="lifetime">'_</span>&gt; {
+        <span class="kw">use </span>indexmap::map::MutableKeys;
         Box::new(
             <span class="self">self</span>.items
-                .iter_mut()
-                .filter(|(<span class="kw">_</span>, kv)| !kv.value.is_none())
-                .map(|(<span class="kw">_</span>, kv)| (kv.key.as_mut(), <span class="kw-2">&amp;mut </span>kv.value)),
+                .iter_mut2()
+                .filter(|(<span class="kw">_</span>, value)| !value.is_none())
+                .map(|(key, value)| (key.as_mut(), value)),
         )
     }
 
     <span class="doccomment">/// Returns the number of non-empty items in the table.
     </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="self">self</span>.items.iter().filter(|i| !(i.<span class="number">1</span>).value.is_none()).count()
+        <span class="self">self</span>.iter().count()
     }
 
     <span class="doccomment">/// Returns true if the table is empty.
@@ -1093,49 +1078,38 @@
         <span class="comment">// Accept a `&amp;str` rather than an owned type to keep `InternalString`, well, internal
         </span><span class="kw">match </span><span class="self">self</span>.items.entry(key.into()) {
             indexmap::map::Entry::Occupied(entry) =&gt; Entry::Occupied(OccupiedEntry { entry }),
-            indexmap::map::Entry::Vacant(entry) =&gt; Entry::Vacant(VacantEntry { entry, key: <span class="prelude-val">None </span>}),
+            indexmap::map::Entry::Vacant(entry) =&gt; Entry::Vacant(VacantEntry { entry }),
         }
     }
 
     <span class="doccomment">/// Gets the given key's corresponding entry in the Table for in-place manipulation.
     </span><span class="kw">pub fn </span>entry_format&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Entry&lt;<span class="lifetime">'a</span>&gt; {
         <span class="comment">// Accept a `&amp;Key` to be consistent with `entry`
-        </span><span class="kw">match </span><span class="self">self</span>.items.entry(key.get().into()) {
+        </span><span class="kw">match </span><span class="self">self</span>.items.entry(key.clone()) {
             indexmap::map::Entry::Occupied(entry) =&gt; Entry::Occupied(OccupiedEntry { entry }),
-            indexmap::map::Entry::Vacant(entry) =&gt; Entry::Vacant(VacantEntry {
-                entry,
-                key: <span class="prelude-val">Some</span>(key.to_owned()),
-            }),
+            indexmap::map::Entry::Vacant(entry) =&gt; Entry::Vacant(VacantEntry { entry }),
         }
     }
 
     <span class="doccomment">/// Returns an optional reference to an item given the key.
     </span><span class="kw">pub fn </span>get&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Item&gt; {
-        <span class="self">self</span>.items.get(key).and_then(|kv| {
-            <span class="kw">if </span>!kv.value.is_none() {
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>kv.value)
-            } <span class="kw">else </span>{
-                <span class="prelude-val">None
-            </span>}
-        })
+        <span class="self">self</span>.items
+            .get(key)
+            .and_then(|value| <span class="kw">if </span>!value.is_none() { <span class="prelude-val">Some</span>(value) } <span class="kw">else </span>{ <span class="prelude-val">None </span>})
     }
 
     <span class="doccomment">/// Returns an optional mutable reference to an item given the key.
     </span><span class="kw">pub fn </span>get_mut&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Item&gt; {
-        <span class="self">self</span>.items.get_mut(key).and_then(|kv| {
-            <span class="kw">if </span>!kv.value.is_none() {
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>kv.value)
-            } <span class="kw">else </span>{
-                <span class="prelude-val">None
-            </span>}
-        })
+        <span class="self">self</span>.items
+            .get_mut(key)
+            .and_then(|value| <span class="kw">if </span>!value.is_none() { <span class="prelude-val">Some</span>(value) } <span class="kw">else </span>{ <span class="prelude-val">None </span>})
     }
 
     <span class="doccomment">/// Return references to the key-value pair stored for key, if it is present, else None.
     </span><span class="kw">pub fn </span>get_key_value&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Key, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Item)&gt; {
-        <span class="self">self</span>.items.get(key).and_then(|kv| {
-            <span class="kw">if </span>!kv.value.is_none() {
-                <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>kv.key, <span class="kw-2">&amp;</span>kv.value))
+        <span class="self">self</span>.items.get_full(key).and_then(|(<span class="kw">_</span>, key, value)| {
+            <span class="kw">if </span>!value.is_none() {
+                <span class="prelude-val">Some</span>((key, value))
             } <span class="kw">else </span>{
                 <span class="prelude-val">None
             </span>}
@@ -1144,9 +1118,10 @@
 
     <span class="doccomment">/// Return mutable references to the key-value pair stored for key, if it is present, else None.
     </span><span class="kw">pub fn </span>get_key_value_mut&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(KeyMut&lt;<span class="lifetime">'a</span>&gt;, <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Item)&gt; {
-        <span class="self">self</span>.items.get_mut(key).and_then(|kv| {
-            <span class="kw">if </span>!kv.value.is_none() {
-                <span class="prelude-val">Some</span>((kv.key.as_mut(), <span class="kw-2">&amp;mut </span>kv.value))
+        <span class="kw">use </span>indexmap::map::MutableKeys;
+        <span class="self">self</span>.items.get_full_mut2(key).and_then(|(<span class="kw">_</span>, key, value)| {
+            <span class="kw">if </span>!value.is_none() {
+                <span class="prelude-val">Some</span>((key.as_mut(), value))
             } <span class="kw">else </span>{
                 <span class="prelude-val">None
             </span>}
@@ -1155,8 +1130,8 @@
 
     <span class="doccomment">/// Returns true if the table contains an item with the given key.
     </span><span class="kw">pub fn </span>contains_key(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(kv) = <span class="self">self</span>.items.get(key) {
-            !kv.value.is_none()
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(value) = <span class="self">self</span>.items.get(key) {
+            !value.is_none()
         } <span class="kw">else </span>{
             <span class="bool-val">false
         </span>}
@@ -1164,8 +1139,8 @@
 
     <span class="doccomment">/// Returns true if the table contains a table with the given key.
     </span><span class="kw">pub fn </span>contains_table(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(kv) = <span class="self">self</span>.items.get(key) {
-            kv.value.is_table()
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(value) = <span class="self">self</span>.items.get(key) {
+            value.is_table()
         } <span class="kw">else </span>{
             <span class="bool-val">false
         </span>}
@@ -1173,8 +1148,8 @@
 
     <span class="doccomment">/// Returns true if the table contains a value with the given key.
     </span><span class="kw">pub fn </span>contains_value(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(kv) = <span class="self">self</span>.items.get(key) {
-            kv.value.is_value()
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(value) = <span class="self">self</span>.items.get(key) {
+            value.is_value()
         } <span class="kw">else </span>{
             <span class="bool-val">false
         </span>}
@@ -1182,8 +1157,8 @@
 
     <span class="doccomment">/// Returns true if the table contains an array of tables with the given key.
     </span><span class="kw">pub fn </span>contains_array_of_tables(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(kv) = <span class="self">self</span>.items.get(key) {
-            kv.value.is_array_of_tables()
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(value) = <span class="self">self</span>.items.get(key) {
+            value.is_array_of_tables()
         } <span class="kw">else </span>{
             <span class="bool-val">false
         </span>}
@@ -1191,24 +1166,24 @@
 
     <span class="doccomment">/// Inserts a key-value pair into the map.
     </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str, item: Item) -&gt; <span class="prelude-ty">Option</span>&lt;Item&gt; {
-        <span class="kw">let </span>kv = TableKeyValue::new(Key::new(key), item);
-        <span class="self">self</span>.items.insert(key.into(), kv).map(|kv| kv.value)
+        <span class="kw">let </span>key = Key::new(key);
+        <span class="self">self</span>.items.insert(key, item)
     }
 
     <span class="doccomment">/// Inserts a key-value pair into the map.
     </span><span class="kw">pub fn </span>insert_formatted(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key, item: Item) -&gt; <span class="prelude-ty">Option</span>&lt;Item&gt; {
-        <span class="kw">let </span>kv = TableKeyValue::new(key.to_owned(), item);
-        <span class="self">self</span>.items.insert(key.get().into(), kv).map(|kv| kv.value)
+        <span class="kw">let </span>key = key.to_owned();
+        <span class="self">self</span>.items.insert(key, item)
     }
 
     <span class="doccomment">/// Removes an item given the key.
     </span><span class="kw">pub fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Item&gt; {
-        <span class="self">self</span>.items.shift_remove(key).map(|kv| kv.value)
+        <span class="self">self</span>.items.shift_remove(key)
     }
 
     <span class="doccomment">/// Removes a key from the map, returning the stored key and value if the key was previously in the map.
     </span><span class="kw">pub fn </span>remove_entry(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(Key, Item)&gt; {
-        <span class="self">self</span>.items.shift_remove(key).map(|kv| (kv.key, kv.value))
+        <span class="self">self</span>.items.shift_remove_entry(key)
     }
 
     <span class="doccomment">/// Retains only the elements specified by the `keep` predicate.
@@ -1221,8 +1196,7 @@
     <span class="kw">where
         </span>F: FnMut(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;mut </span>Item) -&gt; bool,
     {
-        <span class="self">self</span>.items
-            .retain(|key, key_value| keep(key, <span class="kw-2">&amp;mut </span>key_value.value));
+        <span class="self">self</span>.items.retain(|key, value| keep(key, value));
     }
 }
 
@@ -1241,18 +1215,17 @@
     }
 }
 
-<span class="kw">impl</span>&lt;K: Into&lt;Key&gt;, V: Into&lt;Value&gt;&gt; Extend&lt;(K, V)&gt; <span class="kw">for </span>Table {
+<span class="kw">impl</span>&lt;K: Into&lt;Key&gt;, V: Into&lt;Item&gt;&gt; Extend&lt;(K, V)&gt; <span class="kw">for </span>Table {
     <span class="kw">fn </span>extend&lt;T: IntoIterator&lt;Item = (K, V)&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) {
         <span class="kw">for </span>(key, value) <span class="kw">in </span>iter {
             <span class="kw">let </span>key = key.into();
-            <span class="kw">let </span>value = Item::Value(value.into());
-            <span class="kw">let </span>value = TableKeyValue::new(key, value);
-            <span class="self">self</span>.items.insert(value.key.get().into(), value);
+            <span class="kw">let </span>value = value.into();
+            <span class="self">self</span>.items.insert(key, value);
         }
     }
 }
 
-<span class="kw">impl</span>&lt;K: Into&lt;Key&gt;, V: Into&lt;Value&gt;&gt; FromIterator&lt;(K, V)&gt; <span class="kw">for </span>Table {
+<span class="kw">impl</span>&lt;K: Into&lt;Key&gt;, V: Into&lt;Item&gt;&gt; FromIterator&lt;(K, V)&gt; <span class="kw">for </span>Table {
     <span class="kw">fn </span>from_iter&lt;I&gt;(iter: I) -&gt; <span class="self">Self
     </span><span class="kw">where
         </span>I: IntoIterator&lt;Item = (K, V)&gt;,
@@ -1268,7 +1241,7 @@
     <span class="kw">type </span>IntoIter = IntoIter;
 
     <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
-        Box::new(<span class="self">self</span>.items.into_iter().map(|(k, kv)| (k, kv.value)))
+        Box::new(<span class="self">self</span>.items.into_iter().map(|(k, value)| (k.into(), value)))
     }
 }
 
@@ -1281,14 +1254,15 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>KeyValuePairs = IndexMap&lt;InternalString, TableKeyValue&gt;;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>KeyValuePairs = IndexMap&lt;Key, Item&gt;;
 
 <span class="kw">fn </span>decorate_table(table: <span class="kw-2">&amp;mut </span>Table) {
+    <span class="kw">use </span>indexmap::map::MutableKeys;
     <span class="kw">for </span>(<span class="kw-2">mut </span>key, value) <span class="kw">in </span>table
         .items
-        .iter_mut()
-        .filter(|(<span class="kw">_</span>, kv)| kv.value.is_value())
-        .map(|(<span class="kw">_</span>, kv)| (kv.key.as_mut(), kv.value.as_value_mut().unwrap()))
+        .iter_mut2()
+        .filter(|(<span class="kw">_</span>, value)| value.is_value())
+        .map(|(key, value)| (key.as_mut(), value.as_value_mut().unwrap()))
     {
         key.leaf_decor_mut().clear();
         key.dotted_decor_mut().clear();
@@ -1301,18 +1275,6 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>DEFAULT_KEY_DECOR: (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str) = (<span class="string">""</span>, <span class="string">" "</span>);
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>DEFAULT_TABLE_DECOR: (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str) = (<span class="string">"\n"</span>, <span class="string">""</span>);
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>DEFAULT_KEY_PATH_DECOR: (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str) = (<span class="string">""</span>, <span class="string">""</span>);
-
-<span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TableKeyValue {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) key: Key,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) value: Item,
-}
-
-<span class="kw">impl </span>TableKeyValue {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(key: Key, value: Item) -&gt; <span class="self">Self </span>{
-        TableKeyValue { key, value }
-    }
-}
 
 <span class="doccomment">/// An owned iterator type over `Table`'s key/value pairs.
 </span><span class="kw">pub type </span>IntoIter = Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = (InternalString, Item)&gt;&gt;;
@@ -1502,7 +1464,7 @@
 
 <span class="doccomment">/// A view into a single occupied location in a `IndexMap`.
 </span><span class="kw">pub struct </span>OccupiedEntry&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) entry: indexmap::map::OccupiedEntry&lt;<span class="lifetime">'a</span>, InternalString, TableKeyValue&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) entry: indexmap::map::OccupiedEntry&lt;<span class="lifetime">'a</span>, Key, Item&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; OccupiedEntry&lt;<span class="lifetime">'a</span>&gt; {
@@ -1518,46 +1480,45 @@
     /// assert_eq!("foo", map.entry("foo").key());
     /// ```
     </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="self">self</span>.entry.key().as_str()
+        <span class="self">self</span>.entry.key().get()
     }
 
     <span class="doccomment">/// Gets a mutable reference to the entry key
     </span><span class="kw">pub fn </span>key_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; KeyMut&lt;<span class="lifetime">'_</span>&gt; {
-        <span class="self">self</span>.entry.get_mut().key.as_mut()
+        <span class="kw">use </span>indexmap::map::MutableEntryKey;
+        <span class="self">self</span>.entry.key_mut().as_mut()
     }
 
     <span class="doccomment">/// Gets a reference to the value in the entry.
     </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Item {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.entry.get().value
+        <span class="self">self</span>.entry.get()
     }
 
     <span class="doccomment">/// Gets a mutable reference to the value in the entry.
     </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Item {
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>.entry.get_mut().value
+        <span class="self">self</span>.entry.get_mut()
     }
 
     <span class="doccomment">/// Converts the `OccupiedEntry` into a mutable reference to the value in the entry
     /// with a lifetime bound to the map itself
     </span><span class="kw">pub fn </span>into_mut(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Item {
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>.entry.into_mut().value
+        <span class="self">self</span>.entry.into_mut()
     }
 
     <span class="doccomment">/// Sets the value of the entry, and returns the entry's old value
-    </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>value: Item) -&gt; Item {
-        std::mem::swap(<span class="kw-2">&amp;mut </span>value, <span class="kw-2">&amp;mut </span><span class="self">self</span>.entry.get_mut().value);
-        value
+    </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: Item) -&gt; Item {
+        <span class="self">self</span>.entry.insert(value)
     }
 
     <span class="doccomment">/// Takes the value out of the entry, and returns it
     </span><span class="kw">pub fn </span>remove(<span class="self">self</span>) -&gt; Item {
-        <span class="self">self</span>.entry.shift_remove().value
+        <span class="self">self</span>.entry.shift_remove()
     }
 }
 
 <span class="doccomment">/// A view into a single empty location in a `IndexMap`.
 </span><span class="kw">pub struct </span>VacantEntry&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) entry: indexmap::map::VacantEntry&lt;<span class="lifetime">'a</span>, InternalString, TableKeyValue&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) key: <span class="prelude-ty">Option</span>&lt;Key&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) entry: indexmap::map::VacantEntry&lt;<span class="lifetime">'a</span>, Key, Item&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; VacantEntry&lt;<span class="lifetime">'a</span>&gt; {
@@ -1573,15 +1534,14 @@
     /// assert_eq!("foo", map.entry("foo").key());
     /// ```
     </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="self">self</span>.entry.key().as_str()
+        <span class="self">self</span>.entry.key().get()
     }
 
     <span class="doccomment">/// Sets the value of the entry with the `VacantEntry`'s key,
     /// and returns a mutable reference to it
     </span><span class="kw">pub fn </span>insert(<span class="self">self</span>, value: Item) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Item {
         <span class="kw">let </span>entry = <span class="self">self</span>.entry;
-        <span class="kw">let </span>key = <span class="self">self</span>.key.unwrap_or_else(|| Key::new(entry.key().as_str()));
-        <span class="kw-2">&amp;mut </span>entry.insert(TableKeyValue::new(key, value)).value
+        entry.insert(value)
     }
 }
 </code></pre></div></section></main></body></html>

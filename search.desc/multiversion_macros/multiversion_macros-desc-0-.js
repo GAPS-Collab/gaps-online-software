@@ -1,1 +1,0 @@
-searchState.loadedDescShard("multiversion_macros", 0, "Implementation crate for <code>multiversion</code>.")

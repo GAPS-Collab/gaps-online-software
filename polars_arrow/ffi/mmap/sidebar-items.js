@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["bitmap","bitmap_and_owner","slice","slice_and_owner"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["list","strings"],"trait":["AsBinary","BinaryNameSpaceImpl","ChunkedSet","DfTake","TakeChunked"]};

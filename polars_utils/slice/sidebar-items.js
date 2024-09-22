@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["load_padded_le_u64"],"trait":["Extrema","GetSaferUnchecked","Slice2Uninit","SliceAble","SortedSlice"]};

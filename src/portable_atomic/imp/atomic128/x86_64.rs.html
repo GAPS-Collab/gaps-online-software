@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/portable-atomic-1.7.0/src/imp/atomic128/x86_64.rs`."><title>x86_64.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/portable-atomic-1.8.0/src/imp/atomic128/x86_64.rs`."><title>x86_64.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -874,19 +874,26 @@
 <a href="#874" id="874">874</a>
 <a href="#875" id="875">875</a>
 <a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
 </pre></div><pre class="rust"><code><span class="comment">// SPDX-License-Identifier: Apache-2.0 OR MIT
 
-// Atomic{I,U}128 implementation on x86_64 using CMPXCHG16B (DWCAS).
-//
-// Note: On Miri and ThreadSanitizer which do not support inline assembly, we don't use
-// this module and use intrinsics.rs instead.
-//
-// Refs:
-// - x86 and amd64 instruction reference https://www.felixcloutier.com/x86
-// - atomic-maybe-uninit https://github.com/taiki-e/atomic-maybe-uninit
-//
-// Generated asm:
-// - x86_64 (+cmpxchg16b) https://godbolt.org/z/r5x9M8PdK
+/*
+128-bit atomic implementation on x86_64 using CMPXCHG16B (DWCAS).
+
+Note: On Miri and ThreadSanitizer which do not support inline assembly, we don't use
+this module and use intrinsics.rs instead.
+
+Refs:
+- x86 and amd64 instruction reference https://www.felixcloutier.com/x86
+- atomic-maybe-uninit https://github.com/taiki-e/atomic-maybe-uninit
+
+Generated asm:
+- x86_64 (+cmpxchg16b) https://godbolt.org/z/r5x9M8PdK
+*/
 
 // TODO: use core::arch::x86_64::cmpxchg16b where available and efficient than asm
 
@@ -898,8 +905,11 @@
 
 <span class="attr">#[cfg(not(portable_atomic_no_outline_atomics))]
 #[cfg(not(target_env = <span class="string">"sgx"</span>))]
-#[cfg_attr(not(target_feature = <span class="string">"sse"</span>), cfg(not(target_feature = <span class="string">"cmpxchg16b"</span>)))]
-#[path = <span class="string">"detect/x86_64.rs"</span>]
+#[cfg_attr(
+    not(target_feature = <span class="string">"sse"</span>),
+    cfg(not(any(target_feature = <span class="string">"cmpxchg16b"</span>, portable_atomic_target_feature = <span class="string">"cmpxchg16b"</span>)))
+)]
+#[path = <span class="string">"../detect/x86_64.rs"</span>]
 </span><span class="kw">mod </span>detect;
 
 <span class="attr">#[cfg(not(portable_atomic_no_asm))]
@@ -948,7 +958,7 @@
 
 <span class="comment">// Unlike AArch64 and RISC-V, x86's assembler doesn't check instruction
 // requirements for the currently enabled target features. In the first place,
-// there is no option in the x86 assembly for such case, like ARM .arch_extension,
+// there is no option in the x86 assembly for such case, like Arm .arch_extension,
 // RISC-V .option arch, PowerPC .machine, etc.
 // However, we set target_feature(enable) when available (Rust 1.69+) in case a
 // new codegen backend is added that checks for it in the future, or an option
@@ -1016,7 +1026,7 @@
 // baseline and is always available, but the SSE target feature is disabled for
 // use cases such as kernels and firmware that should not use vector registers.
 // So, do not use vector registers unless SSE target feature is enabled.
-// See also https://github.com/rust-lang/rust/blob/1.77.0/src/doc/rustc/src/platform-support/x86_64-unknown-none.md.
+// See also https://github.com/rust-lang/rust/blob/1.80.0/src/doc/rustc/src/platform-support/x86_64-unknown-none.md.
 </span><span class="attr">#[cfg(not(any(portable_atomic_no_outline_atomics, target_env = <span class="string">"sgx"</span>)))]
 #[cfg(target_feature = <span class="string">"sse"</span>)]
 #[target_feature(enable = <span class="string">"avx"</span>)]

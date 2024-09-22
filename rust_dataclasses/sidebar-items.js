@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["test_db","wrap_calc_edep_simple"],"mod":["dataclasses","master_trigger"]};
