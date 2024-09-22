@@ -12,21 +12,30 @@ classes for events, calibration and (de)serialization methods_
 _tof-control is Takeru's code for changing voltages/thresholds etc and monitor
 Tof environmental sensors_
 
-## Rust/python API
+## CXX API
 
-* [rpy-tof-dataclasses](rpy_tof_dataclasses/index.html). The Rust `tof-dataclasses` project wrapped in pybindings.
+The CXX API is an independent implementation of the rust `tof-dataclasses` project.
 
-## CXX/python API
+* [CXX-API](index.html)
 
-The python API follows the CXX API very closely. Right now, there is now dedicated 
-API documentation (which we are working on). 
-Examples can be found in `tof/resources/examples/python`
-The python API will undergo some easy-of-use improvements soon.
+## Python API
 
+The python API is exposed through `gaps_online` which can be imported
+if the `setup-env.sh` shell has been sourced and the thus PYTHONPATH
+has been modified.
+If `BUILD_RUSTPYBINDINGS` are enabled, the project exposes the rust 
+code throug pyo3 crafted pybindings. The CXX interface is wrapped 
+through pybind11, these pybindings can be enable with `BUILD_CXXPYBINDINGS`
 _as of version 0.10 (LELEWAA) we discourage to use the cxx pybindings, sinde the 
 rust pybindings have matured enough and are faster as well as more stable_
 
-* [CXX-API](index.html)
+The rust side of the rust pybdingings is documented through the `rust doc` system and can be found here:
+
+* [go-pybidings](go_pybindings/index.html). Pyo3 wrapper for a part of the rust code. If `BUILD_TELEMETRY` and/or `BUILD_LIFTOF` are enabled, these parts of the code will be exposed through python as well.
+
+ 
+
+
 
 ## Executable programs and higher level libraries [liftof]
 

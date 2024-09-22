@@ -10,11 +10,9 @@ rtd_import_success = False
 rt_import_success = False
 try:
     import go_pybindings as rt
-    from go_pybindings.telemetry import TelemetryPacketType as TelemetryPacketType
-    from go_pybindings.telemetry import TelemetryPacketReader as TelemetryPacketReader
-    # FIXME
-    #from rust_telemetry import TelemetryPacketHeader as TelemetryPacketHeader
-    from go_pybindings.telemetry import TelemetryPacket as TelemetryPacket
+    TelemetryPacketType   = rt.telemetry.TelemetryPacketType
+    TelemetryPacketReader = rt.telemetry.TelemetryPacketReader
+    TelemetryPacket       = rt.telemetry.TelemetryPacket
     rt_import_success = True
 except ImportError as e:
     print(e)
