@@ -95,7 +95,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut seen_rbevents      = HashMap::<u8, usize>::new();
   let mut too_early_rbevents = HashMap::<u8, usize>::new(); 
   // 10, 12, 37,38, 43, 45 don't exist
-  for k in 1..47 {
+  for k in 1..51 {
     if k == 10 || k ==12 || k == 37 || k == 38 || k == 43 || k == 45 {
       continue;
     } else {
