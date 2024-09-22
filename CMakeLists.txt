@@ -13,51 +13,34 @@ project(GAPS_ONLINE_SOFTWARE VERSION 0.10 LANGUAGES C CXX)
 message(STATUS "Running cmake for ${CMAKE_PROJECT_NAME} softwere version ${GAPS_ONLINE_SOFTWARE_VERSION}")
 message(STATUS "-- Current release LELEWAA (Whale shark)")
 message(STATUS "-- Building software for ${CMAKE_SYSTEM_NAME}")
-if (UNIX AND NOT APPLE)
-endif()
+if (APPLE)
+  message(WARNING "-- -- will attempt build for MacOSX system. This is experimental and might not work!")
+  message(WARNING "-- -- tof-control depends on LINUX and can not work on MacOSX due to the lack of Mac's I2C support. However, tof-control is only needed for the flight software, which runs linux and thus would need to be cross-compiled on Mac anyway.")
+endif(APPLE)
+
 message(STATUS "Using build directory: ${PROJECT_BINARY_DIR}")
 set(CMAKE_WARN_DEPRECATED ON)
 
 # suppress the Up-to-date output when installing
 set(CMAKE_INSTALL_MESSAGE LAZY)
 
+# we really, really want CXX20. Sometimes, cmake is a little bit
+# difficult to convince
 set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20" FORCE)
 set(CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20" FORCE)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
-# == ALEX bfsw repository. 
-# == currently not used, but maybe in the future?
-
-#
-#FetchContent_Declare(
-#  bfsw
-#  GIT_REPOSITORY https://git.ssl.berkeley.edu/bfsw/bfsw.git 
-#  GIT_TAG origin/main
-#)
-#
-#FetchContent_MakeAvailable(bfsw)
-#FetchContent_GetProperties(bfsw)
-#if(NOT bfsw_POPULATED)
-#  # Fetch the content using previously declared details
-#  FetchContent_Populate(bfsw)
-#
-#  # Set custom variables, policies, etc.
-#  # ...
-#
-#  # Bring the populated content into the build
-#  add_subdirectory(${bfsw_SOURCE_DIR} ${bfsw_BINARY_DIR})
-#endif()
 
 # -- pybindings with pybind11
-option(BUILD_CXXPYBINDINGS "build C++ pybindings with pybind11" OFF)
-option(BUILD_RUSTPYBINDINGS "build Rust \\U+1F980 pybindings wiut pyO3 (better)" OFF)
+option(BUILD_CXXPYBINDINGS "build C++ pybindings with pybind11 (deprecated)" OFF)
 option(BUILD_RUSTTELEMETRY "builds Rust telemetry library and pybindings" OFF)
+option(BUILD_RUSTPYBINDINGS "build pybindings for the RUST code with py03 \\U+1F980 (better). Includes telemetry and liftof pybindings, if the respective options are selected." OFF)
 
 if (BUILD_CXXPYBINDINGS)
-message(STATUS "Checking for pyoind11....")
-# populates Python_INCLUDE_DIRS
-find_package (Python 3.10 COMPONENTS Interpreter Development)
-find_package(pybind11 )
+  message(STATUS "Checking for pyoind11....")
+  # populates Python_INCLUDE_DIRS
+  find_package (Python 3.10 COMPONENTS Interpreter Development)
+  find_package(pybind11 )
   if(NOT ${pybind11_FOUND})
     message(WARNING "-- Can not find pybind11! Please install with sudo apt install pybind11-dev on a linux system!")
     set(BUILD_PYBINDINGS OFF CACHE BOOL "build pybindings with pybind11" FORCE)
@@ -89,10 +72,14 @@ set(INSTALL_BINARY_DIR   "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH      "installa
 set(INSTALL_PYTHON_DIR   "${CMAKE_INSTALL_PREFIX}/python" CACHE PATH   "installation directory for python code" FORCE)
 
 add_subdirectory(tof)
-if (BUILD_RUSTTELEMETRY)
-  add_subdirectory(telemetry)
-endif()
+#if (BUILD_RUSTTELEMETRY)
+#  add_subdirectory(telemetry)
+#endif()
 
+# finally all the rust pybindings
+if (BUILD_RUSTPYBINDINGS)
+  add_subdirectory(python)
+endif (BUILD_RUSTPYBINDINGS)
 # Make relative paths absolute (needed later on)
 foreach(p LIBRARY BINARY INCLUDE PYTHON EXAMPLES)
   set(var INSTALL_${p}_DIR)

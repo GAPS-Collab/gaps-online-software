@@ -19,19 +19,10 @@ try:
 except ImportError as e:
     print(f"Can't load CXX API! {e}")
 try:
-    import rpy_tof_dataclasses as rust_api
+    import go_pybindings as rust_api
 except ImportError as e:
     print(f"Can't load RUST API! {e}")
 
-try:
-    import rust_telemetry as telemetry
-except ImportError as e:
-    print(f"Can't load RUST TELEMETRY API {e}")
-
-try:
-    import liftof as liftof
-except ImportError as e:
-    print("Can't load pybingings for LIFTOF! {e}")
 
 from . import tof
 from . import io

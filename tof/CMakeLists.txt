@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
 option(BUILD_CXXDB "Build C++ bindings to access GAPS DB" OFF) 
 if(BUILD_CXXDB)
   find_package(SQLite3 REQUIRED)
-  if(SQLite3_FOUND)
+   if(SQLite3_FOUND)
     message(STATUS "-- found SQLite3 libary")
     message(STATUS "-- -- will use sqlite library ${SQLite3_LIBRARIES}")
     add_definitions( -DBUILD_CXXDB)
@@ -110,14 +110,15 @@ execute_process(
   OUTPUT_QUIET
 )
 
-if (BUILD_LIFTOF OR BUILD_RUSTPYBINDINGS)
+#if (BUILD_LIFTOF OR BUILD_RUSTPYBINDINGS)
+if (BUILD_LIFTOF)
   if(CARGO_RESULT EQUAL 0)
-    message(STATUS "-- found `cargo` - will be able to build liftof!")
+      message(STATUS "Found `cargo` - will be able to build liftof!")
   else()
     message(WARNING "-- `cargo` NOT found! Unable to build liftof.")
     message(STATUS "Please install a rust toolchain including cargo if you want to build liftof, and make sure cargo is in your $PATH!")
     option (BUILD_LIFTOF OFF)
-    option (BUILD_RUSTPYBINDINGS OFF)
+    #option (BUILD_RUSTPYBINDINGS OFF)
   endif()
 endif()
 
@@ -131,12 +132,12 @@ if (BUILD_LIFTOF)
       COMMAND cargo doc 
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof
   )
-  add_custom_target(
-    rust-pybindings
-      ALL
-      COMMAND ${RUST_BUILD_COMMAND} 
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python 
-  )
+  #add_custom_target(
+  #  rust-pybindings
+  #    ALL
+  #    COMMAND ${RUST_BUILD_COMMAND} 
+  #    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python 
+  #)
 if (UNIX AND NOT APPLE)
   add_custom_target(
     liftof-cc
@@ -169,77 +170,77 @@ if (UNIX AND NOT APPLE)
   )
 endif(BUILD_LIFTOF)
 
-if(BUILD_RUSTPYBINDINGS)
-  # Define the command to build your Rust project
-  message(STATUS "building Rust \\U1F980 pybindings wiut pyO3...")
-  set(RUST_BUILD_COMMAND cargo build --release --all-features)
-  add_custom_target(
-    tof-pydataclasses-rust
-      ALL
-      COMMAND ${RUST_BUILD_COMMAND} 
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings
-  )
-  add_custom_target(
-    tof-pydataclasses-rust-doc
-      COMMAND cargo doc 
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings
-  )
-  #install(TARGETS tof-pydataclasses-rust
-  #    EXPORT GAPSTargets         
-  #    LIBRARY DESTINATION ${INSTALL_PYTHON_DIR}
-  #    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
-  #    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
-  #)
-  if(APPLE) 
-    install(FILES
-            "${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librpy_tof_dataclasses.dylib"
-            DESTINATION ${INSTALL_PYTHON_DIR}
-            RENAME rpy_tof_dataclasses.so
-    )
-   elseif(UNIX)
-    install(FILES
-            "${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librpy_tof_dataclasses.so"
-            DESTINATION ${INSTALL_PYTHON_DIR}
-            RENAME rpy_tof_dataclasses.so
-    )
-
-   endif(APPLE)
-endif(BUILD_RUSTPYBINDINGS)
-
-if(BUILD_LIFTOFPYBINDINGS)
-  message(STATUS "building Rust \\U1F980 pybindings wiut pyO3 for LIFTOF...")
-  set(RUST_BUILD_COMMAND cargo build --release --all-features)
-  add_custom_target(
-    tof-liftof-rust
-      ALL
-      COMMAND ${RUST_BUILD_COMMAND} 
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python
-  )
-  add_custom_target(
-    tof-pyliftof-rust-doc
-      COMMAND cargo doc 
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python
-  )
-  #install(TARGETS tof-pydataclasses-rust
-  #    EXPORT GAPSTargets         
-  #    LIBRARY DESTINATION ${INSTALL_PYTHON_DIR}
-  #    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
-  #    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
-  #)
-  if (APPLE)
-    install(FILES
-            "${CMAKE_SOURCE_DIR}/tof/liftof/target/release/libliftof.dylib"
-            DESTINATION ${INSTALL_PYTHON_DIR}
-            RENAME liftof.so
-    )
-  elseif(UNIX)
-    install(FILES
-            "${CMAKE_SOURCE_DIR}/tof/liftof/target/release/libliftof.so"
-            DESTINATION ${INSTALL_PYTHON_DIR}
-            RENAME liftof.so
-    )
-  endif(APPLE)
-endif(BUILD_LIFTOFPYBINDINGS)
+#if(BUILD_RUSTPYBINDINGS)
+#  # Define the command to build your Rust project
+#  message(STATUS "building Rust \\U1F980 pybindings wiut pyO3...")
+#  set(RUST_BUILD_COMMAND cargo build --release --all-features)
+#  add_custom_target(
+#    tof-pydataclasses-rust
+#      ALL
+#      COMMAND ${RUST_BUILD_COMMAND} 
+#      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings
+#  )
+#  add_custom_target(
+#    tof-pydataclasses-rust-doc
+#      COMMAND cargo doc 
+#      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings
+#  )
+#  #install(TARGETS tof-pydataclasses-rust
+#  #    EXPORT GAPSTargets         
+#  #    LIBRARY DESTINATION ${INSTALL_PYTHON_DIR}
+#  #    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
+#  #    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
+#  #)
+#  if(APPLE) 
+#    install(FILES
+#            "${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librpy_tof_dataclasses.dylib"
+#            DESTINATION ${INSTALL_PYTHON_DIR}
+#            RENAME rpy_tof_dataclasses.so
+#    )
+#   elseif(UNIX)
+#    install(FILES
+#            "${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librpy_tof_dataclasses.so"
+#            DESTINATION ${INSTALL_PYTHON_DIR}
+#            RENAME rpy_tof_dataclasses.so
+#    )
+#
+#   endif(APPLE)
+#endif(BUILD_RUSTPYBINDINGS)
+#
+#if(BUILD_LIFTOFPYBINDINGS)
+#  message(STATUS "building Rust \\U1F980 pybindings wiut pyO3 for LIFTOF...")
+#  set(RUST_BUILD_COMMAND cargo build --release --all-features)
+#  add_custom_target(
+#    tof-liftof-rust
+#      ALL
+#      COMMAND ${RUST_BUILD_COMMAND} 
+#      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python
+#  )
+#  add_custom_target(
+#    tof-pyliftof-rust-doc
+#      COMMAND cargo doc 
+#      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python
+#  )
+#  #install(TARGETS tof-pydataclasses-rust
+#  #    EXPORT GAPSTargets         
+#  #    LIBRARY DESTINATION ${INSTALL_PYTHON_DIR}
+#  #    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
+#  #    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
+#  #)
+#  if (APPLE)
+#    install(FILES
+#            "${CMAKE_SOURCE_DIR}/tof/liftof/target/release/libliftof.dylib"
+#            DESTINATION ${INSTALL_PYTHON_DIR}
+#            RENAME liftof.so
+#    )
+#  elseif(UNIX)
+#    install(FILES
+#            "${CMAKE_SOURCE_DIR}/tof/liftof/target/release/libliftof.so"
+#            DESTINATION ${INSTALL_PYTHON_DIR}
+#            RENAME liftof.so
+#    )
+#  endif(APPLE)
+#endif(BUILD_LIFTOFPYBINDINGS)
 
 #################################################
 # installation
@@ -478,7 +479,4 @@ if (BUILD_EXAMPLES)
 
   endif(BUILD_ROOTCOMPONENTS)
 endif()
-
-
-
 

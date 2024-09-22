@@ -1,7 +1,8 @@
 import_tl_success  = False
 import_rtd_success = False
 try:
-    import rust_telemetry as tl
+    import go_pybindings
+    tl = go_pybindings.telemetry
     import_tl_success = True
 except ImportError as e:
     print('--> gaps_online.events reports ImportError {e}')
@@ -10,7 +11,7 @@ except ImportError as e:
     print('--> If you want to mitigate this, check your build, e.g. with ccmake and make sure the respective features are turned ON')
 
 try:
-    import rpy_tof_dataclasses as rtd
+    import go_pybindings as rtd
     import_rtd_success = True
 except ImportError as e:
     print(f'gaps_online.events reports ImportError {e}')

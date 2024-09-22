@@ -9,13 +9,12 @@ from pathlib import Path
 rtd_import_success = False
 rt_import_success = False
 try:
-    #import rpy_tof_dataclasses.io import *
-    import rust_telemetry as rt
-    from rust_telemetry import TelemetryPacketType as TelemetryPacketType
-    from rust_telemetry import TelemetryPacketReader as TelemetryPacketReader
+    import go_pybindings as rt
+    from go_pybindings.telemetry import TelemetryPacketType as TelemetryPacketType
+    from go_pybindings.telemetry import TelemetryPacketReader as TelemetryPacketReader
     # FIXME
     #from rust_telemetry import TelemetryPacketHeader as TelemetryPacketHeader
-    from rust_telemetry import TelemetryPacket as TelemetryPacket
+    from go_pybindings.telemetry import TelemetryPacket as TelemetryPacket
     rt_import_success = True
 except ImportError as e:
     print(e)
@@ -24,7 +23,7 @@ except ImportError as e:
     print('--> If you want to mitigate this, check your build, e.g. with ccmake and make sure the respective features are turned ON')
 
 try:
-    import rpy_tof_dataclasses as rtd
+    import go_pybindings as rtd
     TofPacketType   = rtd.io.PacketType
     TofPacket       = rtd.io.TofPacket
     TofPacketReader = rtd.io.TofPacketReader

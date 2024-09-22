@@ -26,7 +26,7 @@ signal-hook       = "0.3"
 # logging and command line parsing
 log =   "0.4"
 clap   = { version = "4.0", features = ["derive"] }
-chrono = {version ="0.4", features =["serde"] }
+chrono = { version ="0.4", features =["serde"] }
 
 # own projects
 tof-dataclasses       = { path = "../dataclasses/rust/tof-dataclasses" , features = ["database", "tofcontrol", "advanced-algorithms"], version = "0.10"}
@@ -36,5 +36,5 @@ rpy-tof-dataclasses   = { path = "../dataclasses/rust/pybindings", version = "0.
 opt-level = 3
 
 [workspace.metadata]
-authors     = ["J.A. Stoessl <stoessl@hawaii.edu>", "Paolo Lazzaroni <paolo.lazzaroni@unibg.it>", "Jeff Zweerink <zweering@astro.ucla.edu>"]
+authors     = ["J.A. Stoessl <stoessl@hawaii.edu>", "Paolo Lazzaroni <paolo.lazzaroni@unibg.it>", "Jeff Zweerink <zweering@astro.ucla.edu>", "G. Tytus <gtytus@hawaii.edu>"]
 description = "The liftof suite comprises programs and tools to control the GAPS TOF system and acquire data"

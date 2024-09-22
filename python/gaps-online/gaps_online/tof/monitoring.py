@@ -1,5 +1,5 @@
 try:
-    import rpy_tof_dataclasses as tdc
+    import go_pybindings as tdc
 
     PAMoniSeries      = tdc.moni.PAMoniSeries
     PBMoniSeries      = tdc.moni.PBMoniSeries
