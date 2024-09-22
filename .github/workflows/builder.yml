@@ -5,10 +5,11 @@ on:
   push:
     branches:
     - LELEWAA-0.10
+    - main
   pull_request:
     branches: 
     - LELEWAA-0.10
-
+    - main
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
@@ -45,7 +46,7 @@ jobs:
       run: cd ${{github.workspace}}/build && make -j 4 && make doc && make install
 
     - name: Docs
-      run: cd ${{github.workspace}}/build && make doc && make liftof-doc && make tof-pydataclasses-rust-doc
+      run: cd ${{github.workspace}}/build && make doc && make liftof-doc && make go-pybidingins-rust-doc
       
     - name: Test-Dataclasses
       working-directory: ${{github.workspace}}/build
