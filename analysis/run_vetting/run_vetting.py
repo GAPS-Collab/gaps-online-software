@@ -2,14 +2,16 @@
 
 import matplotlib
 import matplotlib.pyplot as plt
-import charmingbeauty.layout as lo
+import polars as pl
 import numpy as np
+
+import charmingbeauty.layout as lo
 from collections import defaultdict
 
 matplotlib.use('agg') # for non-interactive use,
                       # if gtk and such are not installed
 
-def mtb_rate_plot(data : list[tuple]):
+def mtb_rate_plot(data : list):
     """
     Create a plot of MTB rates + MTB lost rate for these quantities
     as extrected from the telemetry stream
@@ -18,16 +20,28 @@ def mtb_rate_plot(data : list[tuple]):
         data :  A list of tuples (met, MtbMoniData) where met is the
                 "mission elapsed time" in seconds, which we can get
                 from the TelemetryPacketHeader
+                Alternatively, this can be a list of polars dataframes
+                obtained from MtbMoniData as well
     """
     fig = plt.figure(figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT)
     ax = fig.gca()
     ax.set_ylabel('Hz', loc='top')
     ax.set_xlabel('MET [s] (gcu)')
-    times   = np.array([j[0] for j in data])
-    times  -= times[0]
-    times   /= 1e9
-    rates   = np.array([j[1].rate for j in data])
-    l_rates = np.array([j[1].lost_rate for j in data])
+    if isinstance(data[0], pl.DataFrame):
+        stacked = pl.concat([k[1] for k in data])
+        rates   = stacked['rate']
+        l_rates = stacked['lost_rate']
+        times   = range(len(rates))
+        times   = 20*np.array(times) # mtb moni every 20s
+        
+        #rates   = np.array([j[1]['rate'] for j in data])
+        #l_rates = np.array([j[1]['lost_rate'] for j in data])
+    else:
+        rates   = np.array([j[1].rate for j in data])
+        l_rates = np.array([j[1].lost_rate for j in data])
+        times   = np.array([j[0] for j in data])
+        times  -= times[0]
+        times   /= 1e9
     #print(times[l_rates < 500][-1])
     print(f'-> Avg MTB rate {rates.mean()}')
     print(f'-> Avg Lost rate {l_rates.mean()}')
@@ -96,6 +110,8 @@ if __name__ == '__main__':
                         )
     parser.add_argument('-n','--npackets', type=int,\
                         default=-1, help='Limit readout to npackets, -1 for all packets (default)')
+    parser.add_argument('--n-tof-files', type=int,\
+                        default=-1, help='Limit the readout to number of tif files, -1 for all files (default)')
     parser.add_argument('--tof-dir', default='',
                         help='A directory with tof data files (.tof.gaps)',)
     parser.add_argument('-s','--start-time',\
@@ -109,6 +125,8 @@ if __name__ == '__main__':
     parser.add_argument('-o','--outdir',\
                         help='Outdir to save plots',
                         default='')
+    parser.add_argument('--use-polars', default=False, action='store_true',\
+                        help='This is more for the sake of the example. When reading data from the TOF only stream, we can use polars to extract monitoring data, which will provide the respective monitoring data as polars dataframe')
     args = parser.parse_args()
     use_telemetry_stream = True
     use_tof_stream       = False
@@ -123,22 +141,49 @@ if __name__ == '__main__':
             use_binary_stream = False
     if args.run_id != -1:
         use_tof_stream = True
+    
+    # preparing outdir for plots
+    outdir = args.outdir
+    if not outdir:
+        # create generic output directory
+        outdir = 'plots'
+    outdir = Path(outdir)
+    if not outdir.exists():
+        outdir.mkdir(parents=True)
 
     if use_tof_stream:
         print('-> Will use TOF only stream!')
         tof_files = go.io.get_tof_binaries(args.run_id, data_dir=args.tof_dir)
-        n_trigger_hits = 0
-        n_readout_hits = 0
-        npack          = 0
-        done           = False
-        evtbld_hb      = []
+        if args.n_tof_files != -1:
+            tof_files = tof_files[:args.n_tof_files]
+        # polars example - read mtb moni data
+        # FIXME - EXPERIMENTAL, needs work!
+        if args.use_polars:
+            print('-> Getting MTBMoni data through polars interface')
+            dfs = []    
+            for f in tqdm.tqdm(tof_files,desc='Reading TOF data files'):
+                mtbmoni = go.tof.monitoring.MtbMoniSeries()
+                mtbmoni.from_file(str(f))
+                df = mtbmoni.get_dataframe()
+                dfs.append(df)
+            
+            fig  = mtb_rate_plot(dfs)
+            fig.savefig(outdir / 'mtb_rates_fromtofstream_polars.webp')
+
         # examnple - loop over all the files and count the hits
+        done = False
         for f in tqdm.tqdm(tof_files,desc='Reading TOF data files'):
             if done:
                 break
             reader = go.io.TofPacketReader(str(f))
             #print(reader.packet_index)
             #continue
+            n_trigger_hits = 0
+            n_readout_hits = 0
+            npack          = 0
+            done           = False
+            evtbld_hb      = []
+            mtbmonis       = []
             for pack in reader:
                 npack += 1
                 if pack.packet_type == go.io.TofPacketType.TofEvent:
@@ -152,8 +197,11 @@ if __name__ == '__main__':
                     hb = go.tof.monitoring.EVTBLDRHeartbeat()
                     hb.from_tofpacket(pack)
                     evtbld_hb.append(hb)
-                    done = True
-                    break
+
+                elif pack.packet_type == go.io.TofPacketType.MonitorMtb:
+                    moni = go.tof.monitoring.MtbMoniData()
+                    moni.from_tofpacket(pack)
+                    mtbmonis.append(moni)
 
                 if npack == args.npackets:
                     done = True
@@ -163,6 +211,10 @@ if __name__ == '__main__':
         print(f'-> Found {len(evtbld_hb)} event builder heartbeats!')
         if len(evtbld_hb):
             print (evtbld_hb[0])
+        mtbmonis = [(j*20e9,k) for j,k in enumerate(mtbmonis)] # mtb moni data all 20 seconds
+        print(f'-> Found {len(mtbmonis)} MTBMoniData!') 
+        fig = mtb_rate_plot(mtbmonis)
+        fig.savefig(outdir / 'mtb_rates_fromtofstream.webp')
 
     if use_telemetry_stream:
         if not args.telemetry_dir:
@@ -183,7 +235,6 @@ if __name__ == '__main__':
         mtb_moni_series = []
         rb_moni_series  = []
         merged_events   = []
-        done = False
         for f in tqdm.tqdm(files, desc='Reading files..'):
             treader = go.io.TelemetryPacketReader(str(f))
             if done: #You're done!
@@ -223,14 +274,6 @@ if __name__ == '__main__':
             print (f'-> When unpacking the packets, we encountered {errors} errors. This is {100*errors/len(merged_events):.3f}')
         clean_events = [k for k in tqdm.tqdm(merged_events, desc='Filtering....') if k is not None]
 
-        # plot creating section
-        outdir = args.outdir
-        if not outdir:
-            # create generic output directory
-            outdir = 'plots'
-        outdir = Path(outdir)
-        if not outdir.exists():
-            outdir.mkdir(parents=True)
 
         # create mtb rate plot
         fig = mtb_rate_plot(mtb_moni_series)

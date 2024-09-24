@@ -58,7 +58,6 @@ use tof_dataclasses::events::{
     RBWaveform
 };
 
-
 use tof_dataclasses::serialization::{
     Serialization,
     Packable
@@ -1657,15 +1656,18 @@ impl PyMasterTriggerEvent {
     self.event.get_timestamp_abs48()
   }
   
+  /// Get the trigger sources from trigger source byte
+  /// This returns a list with the fired triggers for 
+  /// this event
+  #[getter]
+  pub fn trigger_sources(&self) -> Vec<TriggerType> {
+    self.event.get_trigger_sources() 
+  }
+  
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.event))
   }
 
-  ///// Get the trigger sources from trigger source byte
-  ///// FIXME! (Does not return anything)
-  //pub fn get_trigger_sources(&self) -> Vec<x> {
-  //
-  //}
 }
 
 #[pyclass]
