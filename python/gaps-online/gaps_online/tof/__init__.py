@@ -8,6 +8,5 @@ GAPS online software TOF part
 
 
 from .mapping import DsiJChRBMap
-from . import sensors
 from . import monitoring
 
