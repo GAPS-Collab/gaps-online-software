@@ -1769,6 +1769,7 @@ impl PyTofEventSummary {
   fn event_id(&self) -> u32 {
     self.event.event_id
   }
+  
   #[getter]
   fn event_status(&self) -> EventStatus {
     self.event.status
@@ -1787,7 +1788,8 @@ impl PyTofEventSummary {
     Ok(self.event.get_trigger_hits())
   }
   
-  ///
+  /// The active triggers in this event. This can be more than one, 
+  /// if multiple trigger conditions are satisfied.
   #[getter]
   pub fn trigger_sources(&self) -> Vec<TriggerType> {
     self.event.get_trigger_sources()
@@ -1829,6 +1831,7 @@ impl PyTofEventSummary {
     self.event.status
   }
 
+  /// Unpack a tofpacket
   fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
     let tp = packet.get_tp();
     match tp.unpack::<TofEventSummary>() {
@@ -1917,6 +1920,13 @@ impl PyTofEvent {
       wfs.push(pywf);
     }
     wfs
+  }
+
+  fn get_summary(&self) -> PyTofEventSummary {
+    let ts = self.event.get_summary();
+    let mut pyts = PyTofEventSummary::new();
+    pyts.set_event(ts);
+    return pyts;
   }
 
   fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
