@@ -66,20 +66,33 @@ void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0) {
     Phi[i]           = -999.0;
   }
 
+  /*
   float umb[12] = {0.215, 0.187, 0.172, 0.154, 0.102, 0.000, 1.021, 0.279,
 		   1.064, 0.431, 1.235, 0.390};
-  float top[12] = {0.070, 0.537,-0.008, 0.471, 0.046, 0.504,-0.143, 0.050,
+  float cube_top[12] = {0.070, 0.537,-0.008, 0.471, 0.046, 0.504,-0.143, 0.050,
 		  -0.166, 0.003,-0.089, 0.000};
-  float bot[12] = {0.792, 0.000, 0.631, 0.751, 0.772, 0.615, 0.626, 0.942,
+  float cube_bot[12] = {0.792, 0.000, 0.631, 0.751, 0.772, 0.615, 0.626, 0.942,
 		   0.664, 0.000, 0.716, 0.000};
-
+  */
+  float umb[12] = {0.164, 0.133, 0.146, 0.138, 0.098, 0.000, 1.006, 0.354,
+		   1.052, 0.421, 1.180, 0.247};
+  float c_top[12] = { 0.060, 0.480,-0.017, 0.461, 0.035, 0.491,-0.153, 0.038,
+		      -0.176, 0.008,-0.038, 0.000};
+  float c_bot[12] = { 0.793, 0.000, 0.609, 0.750, 0.751, 0.613, 0.622, 0.937,
+		      0.646, 0.923, 0.699, 0.872};
+  float c_sid[32] = { 0.380,-0.054, 0.453, 0.386, 0.433, 0.401, 0.649, 0.524,
+		      0.033, 0.468, 0.332, 0.517, 0.080, 0.598, 0.123, 0.540,
+		      -0.124, 0.245, 0.566, 0.411, 0.423, 0.301, 0.445, 0.081,
+		      0.515, 0.581, 0.438, 0.693, 0.380, 0.697, 0.662, 0.817};
+  
   for (int i=0;i<NPAD;i++) {
-    if (i>0&&i<13) Offset[i] = top[i-1];
-    else if (i>12&&i<25) Offset[i] = bot[i-13];
+    if (i>0&&i<13) Offset[i] = c_top[i-1];
+    else if (i>12&&i<25) Offset[i] = c_bot[i-13];
+    else if (i>24&&i<57) Offset[i] = c_sid[i-25];
     else if (i>60&&i<73) Offset[i] = -1.0*umb[i-61];
     else Offset[i] = 0.0;
     // If we want to calculate the offsets, set them all to zero.
-    //Offset[i] = 0.0;
+    Offset[i] = 0.0;
   }
   
   // Reset everything that is stored by Paddle number (1-160)
@@ -591,8 +604,8 @@ void EventGAPS::OffsetHistograms(bool flag=false) {
   // Histograms for the Hit times between each UMB paddle and cube paddle
   for (int b = 0; b < NCUBE; b++) {
     for (int c = 0; c < NUMBC; c++) {
-      sprintf(text, "h_Offset[%d][%d]", b, c);
-      H_Offset[b][c] = new TH1F(text, "", 250, -2, 14);
+      sprintf(text, "H_Offset[%d][%d]", b, c);
+      H_Offset[b][c] = new TH1F(text, "", 160, -5, 11);
       sprintf(text, "Hit Time (ns): Cube %d - Umb %d", b, c+61);
       //H_Offset[b][c]->GetXaxis()->SetTitle("Hit Time (ns)");
       H_Offset[b][c]->GetXaxis()->SetTitle(text);
@@ -1029,15 +1042,30 @@ void EventGAPS::FillOffsetHistos(void) {
   for (int i=1; i<NCUBE; i++) {
     if (Paddle_A[i] > 0) { // Paddle-channel map exists
       if ( IsHit[i] && (EarlyPaddle>60&&EarlyPaddle<73) ) { // Good hits
-      //if ( IsHit[i] && (EarlyPaddle>60&&EarlyPaddle<109) ) { // Good hits
-	  // Only fill H_Offset[][] with events which hit an UMB-Center paddle 
-	  // and a CUBE paddle 
-	  
-	  // Make further cuts: hit <15cm from center, and NHitPaddles<4
-	  if ( ABS(delta[i])< 15.4 && ABS(delta[EarlyPaddle])<15.4 &&
-	       NPadCube+NPadUmbrella < 4 ) {
-	    H_Offset[i][EarlyPaddle-61]->Fill(HitT[i]);
-	  }
+	//if ( IsHit[i] && (EarlyPaddle>60&&EarlyPaddle<109) ) { // Good hits
+	// Only fill H_Offset[][] with events which hit an UMB-Center paddle 
+	// and a CUBE paddle 
+	
+	// Make further cuts: hit <15cm from center, and NHitPaddles<4
+	// This method requires a cut near the center so that all the
+	// hit times should have the same value.
+	/*if ( ABS(delta[i])< 15.4 && ABS(delta[EarlyPaddle])<15.4 &&
+	  NPadCube+NPadUmbrella < 4 ) {
+	  H_Offset[i][EarlyPaddle-61]->Fill(HitT[i]);
+	  }*/
+	
+	// Here we use a much wider range on the paddle, which we
+	// can do because we are calculating the residual compared
+	// to the maximum time. We probably want to use a percentage
+	// of the paddle size instead of constant distance.
+	if ( ABS(delta[i]) < 0.70*Dimension[i][0] &&
+	     ABS(delta[EarlyPaddle]) < 0.70*Dimension[EarlyPaddle][0] &&
+	     NPadCube+NPadUmbrella < 4 ) {
+	  double dist = sqrt( SQR(HitX[i]-HitX[EarlyPaddle]) +
+			      SQR(HitY[i]-HitY[EarlyPaddle]) +
+			      SQR(HitZ[i]-HitZ[EarlyPaddle]) );
+	  H_Offset[i][EarlyPaddle-61]->Fill(HitT[i] - dist/CSPEED);
+	}
       }
     }
   }
