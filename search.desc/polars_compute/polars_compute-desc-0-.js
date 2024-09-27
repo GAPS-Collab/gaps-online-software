@@ -1,0 +1,1 @@
+searchState.loadedDescShard("polars_compute", 0, "Contains operators to filter arrays such as <code>filter</code>.\nApply a binary function to all the values (regardless of …\nApplies a function to all the values (regardless of …")

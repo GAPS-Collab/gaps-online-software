@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["RewriteRecursion","VisitRecursion"],"struct":["AExprArena","AexprNode","IRNode"],"trait":["RewritingVisitor","TreeWalker","Visitor"],"type":["IRNodeArena"]};

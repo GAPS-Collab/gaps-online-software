@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["aggregate","arity","arity_assign","bitwise","boolean","boolean_kleene","cast","concatenate","take","temporal","utils"]};

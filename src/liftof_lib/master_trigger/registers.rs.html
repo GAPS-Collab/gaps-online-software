@@ -2308,7 +2308,6 @@
 <a href="#2308" id="2308">2308</a>
 <a href="#2309" id="2309">2309</a>
 <a href="#2310" id="2310">2310</a>
-<a href="#2311" id="2311">2311</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard registers
 //!
 //! This should be the same as the reference
@@ -2363,8 +2362,8 @@
       <span class="self">self</span>.write(bus, value)<span class="question-mark">?</span>;
     }
     <span class="kw">let </span>rv = <span class="self">self</span>.read_all(bus)<span class="question-mark">?</span>;
-    <span class="comment">//println!("Register reads {:x} {} {:x} after write ops!", self.addr, self.descr, rv);
-    </span><span class="prelude-val">Ok</span>(())
+    <span class="macro">println!</span>(<span class="string">"Register reads {:x} {} {:x} after write ops!"</span>, <span class="self">self</span>.addr, <span class="self">self</span>.descr, rv);
+    <span class="prelude-val">Ok</span>(())
   }
 
   <span class="doccomment">/// Get the value this register is set to
@@ -2375,11 +2374,10 @@
     //  return(Err)
     //}
     </span><span class="kw">let </span>rv = <span class="self">self</span>.read(bus)<span class="question-mark">?</span>;
-    <span class="comment">//if self.addr != 0x13 &amp;&amp; self.addr != 0x11 {
-    //  //
-    //  //println!("Register reads {:x} {} {:x}!", self.addr, self.descr, rv);
-    //}
-    </span><span class="prelude-val">Ok</span>(rv)
+    <span class="kw">if </span><span class="self">self</span>.addr != <span class="number">0x13 </span>&amp;&amp; <span class="self">self</span>.addr != <span class="number">0x11 </span>{
+      <span class="macro">println!</span>(<span class="string">"Register reads {:x} {} {:x}!"</span>, <span class="self">self</span>.addr, <span class="self">self</span>.descr, rv);
+    }
+    <span class="prelude-val">Ok</span>(rv)
   }
 
 

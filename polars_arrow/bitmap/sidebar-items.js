@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["and","and_not","binary","binary_assign","chunk_iter_to_vec","or","or_not","quaternary","ternary","unary","unary_assign","xor"],"mod":["aligned","bitmask","iterator","utils"],"struct":["Bitmap","MutableBitmap"]};

@@ -1,0 +1,4 @@
+(function() {var implementors = {
+"polars_arrow":[["impl&lt;T: <a class=\"trait\" href=\"polars_arrow/types/trait.NativeType.html\" title=\"trait polars_arrow::types::NativeType\">NativeType</a>&gt; <a class=\"trait\" href=\"polars_utils/slice/trait.SliceAble.html\" title=\"trait polars_utils::slice::SliceAble\">SliceAble</a> for <a class=\"struct\" href=\"polars_arrow/array/struct.PrimitiveArray.html\" title=\"struct polars_arrow::array::PrimitiveArray\">PrimitiveArray</a>&lt;T&gt;"]],
+"polars_utils":[]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

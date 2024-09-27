@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["PyPolarsErr"],"struct":["ColumnNotFound","ComputeError","DuplicateError","NoDataError","SchemaError","SchemaFieldNotFound","ShapeError","StringCacheMismatchError","StructFieldNotFound"]};

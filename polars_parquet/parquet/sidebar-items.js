@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["FOOTER_SIZE","HEADER_SIZE","PARQUET_MAGIC"],"mod":["compression","deserialize","encoding","error","indexes","metadata","page","read","schema","statistics","types","write"],"trait":["FallibleStreamingIterator"]};

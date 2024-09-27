@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Ambiguous","NonExistent"],"mod":["atan2","concatenate","ewm","fixed_size_list","float","list","pow","rolling","set","sort_partition","take_agg"]};
