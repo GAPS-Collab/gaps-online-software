@@ -37,6 +37,8 @@ use tof_dataclasses::monitoring::{
     LTBMoniData,
 };
 
+use tof_dataclasses::status::TofDetectorStatus;
+
 use tof_dataclasses::series::{
     PAMoniDataSeries,
     PBMoniDataSeries,
@@ -108,6 +110,95 @@ use tof_dataclasses::events::master_trigger::LTBThreshold;
 //    Ok(format!("<PyO3Wrapper: {}>", self.moni)) 
 //  }
 //
+
+#[pyclass]
+#[pyo3(name="TofDetectorStatus")]
+pub struct PyTofDetectorstatus {
+  pub status : TofDetectorStatus
+}
+
+#[pymethods]
+impl PyTofDetectorstatus {
+  #[new]
+  fn new() -> Self {
+    let status =  TofDetectorStatus::new();
+    Self {
+      status
+    }
+  }
+  //fn to_bytestream(&self) -> Vec<u8> {
+  //  self.config.to_bytestream()
+  //}
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<TofDetectorStatus>() {
+      Ok(status) => {
+        self.status = status;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+
+  #[getter]
+  fn channels000_031(&self) -> u32 {
+    self.status.channels000_031
+  }
+
+  #[getter]
+  fn channels032_063(&self) -> u32 { 
+    self.status.channels032_063
+  }
+
+  #[getter]
+  fn channels064_095(&self) -> u32 { 
+    self.status.channels064_095
+  }
+
+  #[getter]
+  fn channels096_127(&self) -> u32 { 
+    self.status.channels096_127
+  }  
+
+  #[getter]
+  fn channels128_159(&self) -> u32 { 
+    self.status.channels128_159
+  }
+
+  #[getter]
+  fn channels160_191(&self) -> u32 { 
+    self.status.channels160_191
+  }
+
+  #[getter]
+  fn channels192_223(&self) -> u32 { 
+    self.status.channels192_223
+  }
+
+  #[getter]
+  fn channels224_255(&self) -> u32 { 
+    self.status.channels224_255
+  }
+  
+  #[getter]
+  fn channels256_297(&self) -> u32 { 
+    self.status.channels256_297
+  }
+
+  #[getter]
+  fn channels298_319(&self) -> u32 { 
+    self.status.channels298_319
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.status)) 
+  }
+}
+
+
 #[pyclass]
 #[pyo3(name="RunConfig")]
 pub struct PyRunConfig {
