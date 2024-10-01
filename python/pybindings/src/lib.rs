@@ -22,6 +22,7 @@ cfg_if::cfg_if! {
       PyTelemetryPacketReader,
       PyMergedEvent,
       PyTrackerHit,
+      PyTrackerHitV2,
       PyTrackerEvent,
       PyTrackerPacket,
       PyTrackerTempLeakPacket,
@@ -48,6 +49,9 @@ cfg_if::cfg_if! {
 
 use pyo3::prelude::*;
 use pyo3::wrap_pymodule;
+use pyo3::exceptions::{
+    PyIOError,
+};
 
 use crate::analysis::*;
 use crate::dataclasses::*;
@@ -57,6 +61,77 @@ use crate::io::*;
 use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::commands::TofCommandCode;
 use tof_dataclasses::events::master_trigger::LTBThreshold;
+// additionally, let's add this functionality
+use tof_dataclasses::database::{
+  get_dsi_j_ch_pid_map,
+  DsiJChPidMapping,
+  RbChPidMapping,
+  get_rb_ch_pid_map,
+  Paddle,
+  connect_to_db
+};
+
+/// Create a map from the database which allows to map
+/// DSI,J,LTB channel for a connected LTB to the respective
+/// Paddle ID
+///
+/// This will query the database and then create a map
+/// structure, which can then be used for further queries
+///
+/// # Arguments:
+///     db_path : Path to the gaps_flight.db (or similar 
+///               db with paddle information)
+#[pyfunction]
+#[pyo3(name="create_mtb_connection_to_pid_map")]
+fn py_create_mtb_connection_to_pid_map(db_path : String) -> PyResult<DsiJChPidMapping> {
+  match connect_to_db(db_path) {
+    Err(err) => {
+      return Err(PyIOError::new_err(err.to_string()));
+    }
+    Ok(mut conn) => {
+      match Paddle::all(&mut conn) {
+        None => {
+          return Err(PyIOError::new_err("Unable to retrieve paddle information from DB!"));
+        }
+        Some(paddles) => {
+          let mapping = get_dsi_j_ch_pid_map(&paddles);
+          Ok(mapping)
+        }
+      }
+    }
+  }
+}
+
+/// Create a map from the database which allows to map
+/// DSI,J,LTB channel for a connected LTB to the respective
+/// Paddle ID
+///
+/// This will query the database and then create a map
+/// structure, which can then be used for further queries
+///
+/// # Arguments:
+///     db_path : Path to the gaps_flight.db (or similar 
+///               db with paddle information)
+#[pyfunction]
+#[pyo3(name="create_rb_ch_to_pid_map")]
+fn py_create_rb_ch_to_pid_map(db_path : String) -> PyResult<RbChPidMapping> {
+  match connect_to_db(db_path) {
+    Err(err) => {
+      return Err(PyIOError::new_err(err.to_string()));
+    }
+    Ok(mut conn) => {
+      match Paddle::all(&mut conn) {
+        None => {
+          return Err(PyIOError::new_err("Unable to retrieve paddle information from DB!"));
+        }
+        Some(paddles) => {
+          let mapping = get_rb_ch_pid_map(&paddles);
+          Ok(mapping)
+        }
+      }
+    }
+  }
+}
 
 #[pymodule]
 #[pyo3(name = "analysis")]
@@ -91,6 +166,8 @@ fn tof_moni<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 #[pymodule]
 #[pyo3(name = "io")]
 fn tof_io<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  m.add_function(wrap_pyfunction!(py_create_rb_ch_to_pid_map, m)?)?;
+  m.add_function(wrap_pyfunction!(py_create_mtb_connection_to_pid_map, m)?)?;
   m.add_class::<PyTofPacket>()?;
   m.add_class::<PyTofPacketReader>()?;
   m.add_class::<PacketType>()?;
@@ -127,6 +204,7 @@ cfg_if::cfg_if! {
       //m.add_class::<PyTofHit>()?;
       //m.add_class::<PyTofEventSummary>()?;
       m.add_class::<PyTrackerHit>()?;
+      m.add_class::<PyTrackerHitV2>()?;
       m.add_class::<PyTrackerEvent>()?;
       m.add_class::<PyTrackerPacket>()?;
       m.add_class::<PyTrackerTempLeakPacket>()?;

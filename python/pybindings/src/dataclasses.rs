@@ -7,7 +7,6 @@ use numpy::{
     //ndarray::Array,
 };
 
-//extern crate pyo3_polars;
 use pyo3_polars::{
     PyDataFrame,
     //PySeries
