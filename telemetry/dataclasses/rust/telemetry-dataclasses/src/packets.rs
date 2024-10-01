@@ -259,6 +259,7 @@ impl MergedEvent {
     -> Result<Self, SerializationError> {
     let mut me        = MergedEvent::new();
     let version      = parse_u8(stream, pos);
+    me.version       = version;
     //println!("_version {}", _version);
     me.flags0         = parse_u8(stream, pos);
     // skip a bunch of Alex newly implemented things
