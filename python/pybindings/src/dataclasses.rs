@@ -7,7 +7,6 @@ use numpy::{
     //ndarray::Array,
 };
 
-//extern crate pyo3_polars;
 use pyo3_polars::{
     PyDataFrame,
     //PySeries
@@ -38,6 +37,8 @@ use tof_dataclasses::monitoring::{
     LTBMoniData,
 };
 
+use tof_dataclasses::status::TofDetectorStatus;
+
 use tof_dataclasses::series::{
     PAMoniDataSeries,
     PBMoniDataSeries,
@@ -57,7 +58,6 @@ use tof_dataclasses::events::{
     RBEventHeader,
     RBWaveform
 };
-
 
 use tof_dataclasses::serialization::{
     Serialization,
@@ -110,6 +110,95 @@ use tof_dataclasses::events::master_trigger::LTBThreshold;
 //    Ok(format!("<PyO3Wrapper: {}>", self.moni)) 
 //  }
 //
+
+#[pyclass]
+#[pyo3(name="TofDetectorStatus")]
+pub struct PyTofDetectorstatus {
+  pub status : TofDetectorStatus
+}
+
+#[pymethods]
+impl PyTofDetectorstatus {
+  #[new]
+  fn new() -> Self {
+    let status =  TofDetectorStatus::new();
+    Self {
+      status
+    }
+  }
+  //fn to_bytestream(&self) -> Vec<u8> {
+  //  self.config.to_bytestream()
+  //}
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<TofDetectorStatus>() {
+      Ok(status) => {
+        self.status = status;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+
+  #[getter]
+  fn channels000_031(&self) -> u32 {
+    self.status.channels000_031
+  }
+
+  #[getter]
+  fn channels032_063(&self) -> u32 { 
+    self.status.channels032_063
+  }
+
+  #[getter]
+  fn channels064_095(&self) -> u32 { 
+    self.status.channels064_095
+  }
+
+  #[getter]
+  fn channels096_127(&self) -> u32 { 
+    self.status.channels096_127
+  }  
+
+  #[getter]
+  fn channels128_159(&self) -> u32 { 
+    self.status.channels128_159
+  }
+
+  #[getter]
+  fn channels160_191(&self) -> u32 { 
+    self.status.channels160_191
+  }
+
+  #[getter]
+  fn channels192_223(&self) -> u32 { 
+    self.status.channels192_223
+  }
+
+  #[getter]
+  fn channels224_255(&self) -> u32 { 
+    self.status.channels224_255
+  }
+  
+  #[getter]
+  fn channels256_297(&self) -> u32 { 
+    self.status.channels256_297
+  }
+
+  #[getter]
+  fn channels298_319(&self) -> u32 { 
+    self.status.channels298_319
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.status)) 
+  }
+}
+
+
 #[pyclass]
 #[pyo3(name="RunConfig")]
 pub struct PyRunConfig {
@@ -1657,15 +1746,18 @@ impl PyMasterTriggerEvent {
     self.event.get_timestamp_abs48()
   }
   
+  /// Get the trigger sources from trigger source byte
+  /// This returns a list with the fired triggers for 
+  /// this event
+  #[getter]
+  pub fn trigger_sources(&self) -> Vec<TriggerType> {
+    self.event.get_trigger_sources() 
+  }
+  
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.event))
   }
 
-  ///// Get the trigger sources from trigger source byte
-  ///// FIXME! (Does not return anything)
-  //pub fn get_trigger_sources(&self) -> Vec<x> {
-  //
-  //}
 }
 
 #[pyclass]
@@ -1767,6 +1859,7 @@ impl PyTofEventSummary {
   fn event_id(&self) -> u32 {
     self.event.event_id
   }
+  
   #[getter]
   fn event_status(&self) -> EventStatus {
     self.event.status
@@ -1785,7 +1878,8 @@ impl PyTofEventSummary {
     Ok(self.event.get_trigger_hits())
   }
   
-  ///
+  /// The active triggers in this event. This can be more than one, 
+  /// if multiple trigger conditions are satisfied.
   #[getter]
   pub fn trigger_sources(&self) -> Vec<TriggerType> {
     self.event.get_trigger_sources()
@@ -1827,6 +1921,7 @@ impl PyTofEventSummary {
     self.event.status
   }
 
+  /// Unpack a tofpacket
   fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
     let tp = packet.get_tp();
     match tp.unpack::<TofEventSummary>() {
@@ -1915,6 +2010,13 @@ impl PyTofEvent {
       wfs.push(pywf);
     }
     wfs
+  }
+
+  fn get_summary(&self) -> PyTofEventSummary {
+    let ts = self.event.get_summary();
+    let mut pyts = PyTofEventSummary::new();
+    pyts.set_event(ts);
+    return pyts;
   }
 
   fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {

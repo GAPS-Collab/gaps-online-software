@@ -108,7 +108,18 @@ impl PyMergedEvent {
   }
 
   #[getter]
-  fn tracker(&self) -> PyResult<Vec<PyTrackerEvent>> {
+  fn tracker_v2(&self) -> PyResult<Vec<PyTrackerHitV2>> {
+    let mut hits = Vec::<PyTrackerHitV2>::new();
+    for h in &self.event.tracker_hitsv2 {
+      let mut pyhit = PyTrackerHitV2::new();
+      pyhit.set_hit(h.clone());
+      hits.push(pyhit);
+    }
+    Ok(hits)
+  }
+
+  #[getter]
+  fn tracker_v1(&self) -> PyResult<Vec<PyTrackerEvent>> {
     let mut events = Vec::<PyTrackerEvent>::new();
     for k in &self.event.tracker_events {
       let mut pytrk = PyTrackerEvent::new();
@@ -605,6 +616,104 @@ impl fmt::Display for PyTrackerHit {
     write!(f, "{}", repr)
   }
 }
+
+////////////////////////////////////////////////////////////
+
+/// Updated representation of a TrackerHit 
+///
+/// A new-style tracker hit, which is not part 
+/// of a TrackerEvent anymore and can stand by 
+/// itself
+///
+/// Note that the values are u16, this is in 
+/// accordance with what is in bfsw
+#[pyclass]
+#[pyo3(name="TrackerHitV2")]
+#[derive(Debug, Clone)]
+pub struct PyTrackerHitV2 {
+  pub layer           : u16,
+  pub row             : u16,
+  pub module          : u16,
+  pub channel         : u16,
+  pub adc             : u16,
+  pub oscillator      : u64,
+}
+
+impl PyTrackerHitV2 {
+  pub fn set_hit(&mut self, th : tel_api::TrackerHitV2) {
+    self.layer           = th.layer;
+    self.row             = th.row;
+    self.module          = th.module;
+    self.channel         = th.channel;
+    self.adc             = th.adc;
+    self.oscillator      = th.oscillator;
+  }
+}
+
+#[pymethods]
+impl PyTrackerHitV2 {
+
+  #[new]
+  fn new() -> Self {
+    Self {
+      layer           : 0,
+      row             : 0,
+      module          : 0,
+      channel         : 0,
+      adc             : 0,
+      oscillator      : 0,
+    }
+  }
+
+  #[getter]
+  fn layer(&self) -> u16 {
+    self.layer
+  }
+
+  #[getter]
+  fn row(&self) -> u16 {
+    self.row
+  }
+
+  #[getter]
+  fn module(&self) -> u16 {
+    self.module
+  }
+
+  #[getter]
+  fn channel(&self) -> u16 {
+    self.channel
+  }
+
+  #[getter]
+  fn adc(&self) -> u16 {
+    self.adc
+  }
+
+  #[getter]
+  fn oscillator(&self) -> u64 {
+    self.oscillator
+  }
+  
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("{}", self))
+  }
+}
+
+impl fmt::Display for PyTrackerHitV2 {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<PyTrackerHitV2:");
+    repr += &(format!("\n  Layer         : {}" ,self.layer));
+    repr += &(format!("\n  Row           : {}" ,self.row));
+    repr += &(format!("\n  Module        : {}" ,self.module));
+    repr += &(format!("\n  Channel       : {}" ,self.channel));
+    repr += &(format!("\n  ADC           : {}" ,self.adc));
+    repr += &(format!("\n  Oscillator    : {}>",self.oscillator));
+    write!(f, "{}", repr)
+  }
+}
+
+
 
 //// Implement the AsRef<PyAny> trait
 //impl AsRef<PyAny> for PyTrackerHit {

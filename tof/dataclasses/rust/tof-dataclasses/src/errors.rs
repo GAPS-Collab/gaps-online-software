@@ -108,15 +108,15 @@ impl Error for EventError {
 
 ////////////////////////////////////////
 
-/// This error shall be thrown whenver there
-/// is an issue in the de(serialization),
-/// e.g. the from_bytestream methods.
+/// Indicate issues with (de)serialization
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum SerializationError {
   //HeaderNotFound,
   TailInvalid,
   HeadInvalid,
+  TrackerDelimiterInvalid,
+  TofDelimiterInvalid,
   StreamTooShort,
   StreamTooLong,
   ValueNotFound,

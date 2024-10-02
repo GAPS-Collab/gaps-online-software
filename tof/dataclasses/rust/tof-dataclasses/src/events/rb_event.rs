@@ -1239,6 +1239,7 @@ impl fmt::Display for RBWaveform {
     repr += &(format!("\n  Event ID  : {}", self.event_id));
     repr += &(format!("\n  RB        : {}", self.rb_id));
     repr += &(format!("\n  Channel   : {}", self.rb_channel));
+    repr += &(format!("\n  Paddle ID : {}", self.paddle_id));
     repr += &(format!("\n  Stop cell : {}", self.stop_cell));
     if self.adc.len() >= 273 {
       repr += &(format!("\n  adc [{}]      : .. {} {} {} ..",self.adc.len(), self.adc[270], self.adc[271], self.adc[272]));

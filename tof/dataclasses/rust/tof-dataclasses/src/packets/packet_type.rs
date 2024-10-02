@@ -20,49 +20,52 @@ use pyo3::pyclass;
 #[cfg_attr(feature = "pybindings", pyclass)]
 #[repr(u8)]
 pub enum PacketType {
-  Unknown             = 0u8, 
-  RBEvent             = 20u8,
-  TofEvent            = 21u8,
-  RBWaveform          = 22u8,
-  TofEventSummary     = 23u8,
-  HeartBeatDataSink   = 40u8,    
-  MasterTrigger       = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
-  TriggerConfig        = 61u8,
-  MTBHeartbeat         = 62u8, 
-  EVTBLDRHeartbeat     = 63u8,
-  RBChannelMaskConfig  = 64u8,
-  AnalysisEngineConfig = 69u8,
-  RBEventHeader        = 70u8,    // needs to go away
+  Unknown               = 0u8, 
+  RBEvent               = 20u8,
+  TofEvent              = 21u8,
+  RBWaveform            = 22u8,
+  TofEventSummary       = 23u8,
+  HeartBeatDataSink     = 40u8,    
+  MasterTrigger         = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
+  TriggerConfig         = 61u8,
+  MTBHeartbeat          = 62u8, 
+  EVTBLDRHeartbeat      = 63u8,
+  RBChannelMaskConfig   = 64u8,
+  AnalysisEngineConfig  = 69u8,
+  RBEventHeader         = 70u8,    // needs to go away
   TOFEventBuilderConfig = 71u8,
-  CPUMoniData         = 80u8,
-  MonitorMtb          = 90u8,
-  RBMoniData          = 100u8,
-  PBMoniData          = 101u8,
-  LTBMoniData         = 102u8,
-  PAMoniData          = 103u8,
-  RBEventMemoryView   = 120u8, // We'll keep it for now - indicates that the event
-                               // still needs to be processed.
-  RBCalibration       = 130u8,
-  TofCommand          = 140u8,
-  TofCommandV2        = 141u8,
-  TofResponse         = 142u8,
+  CPUMoniData           = 80u8,
+  MonitorMtb            = 90u8,
+  RBMoniData            = 100u8,
+  PBMoniData            = 101u8,
+  LTBMoniData           = 102u8,
+  PAMoniData            = 103u8,
+  RBEventMemoryView     = 120u8, // We'll keep it for now - indicates that the event
+                                 // still needs to be processed.
+  RBCalibration         = 130u8,
+  TofCommand            = 140u8,
+  TofCommandV2          = 141u8,
+  TofResponse           = 142u8,
   // needs to go away
-  RBCommand           = 150u8,
+  RBCommand             = 150u8,
   // > 160 configuration packets
-  RBPing              = 160u8,
-  PreampBiasConfig    = 161u8,
-  RunConfig           = 162u8,
-  LTBThresholdConfig  = 163u8,
-
+  RBPing                = 160u8,
+  PreampBiasConfig      = 161u8,
+  RunConfig             = 162u8,
+  LTBThresholdConfig    = 163u8,
+  // avoid 170 since it is our 
+  // delimiter
+  // >= 171 detector status
+  TofDetectorStatus     = 171u8,
   // use the > 200 values for transmitting
   // various binary files
-  ConfigBinary        = 201u8,
-  LiftofRBBinary      = 202u8,
-  LiftofBinaryService = 203u8,
-  LiftofCCBinary      = 204u8,
+  ConfigBinary          = 201u8,
+  LiftofRBBinary        = 202u8,
+  LiftofBinaryService   = 203u8,
+  LiftofCCBinary        = 204u8,
 
   /// a MultiPacket consists of other TofPackets
-  MultiPacket         = 255u8,
+  MultiPacket           = 255u8,
 }
 
 impl fmt::Display for PacketType {
@@ -76,41 +79,41 @@ impl fmt::Display for PacketType {
 impl From<u8> for PacketType {
   fn from(value: u8) -> Self {
     match value {
-      0u8   => PacketType::Unknown,
-      20u8  => PacketType::RBEvent,
-      21u8  => PacketType::TofEvent,
-      22u8  => PacketType::RBWaveform,
-      23u8  => PacketType::TofEventSummary,
-      //30u8  => PacketType::Monitor,
-      40u8  => PacketType::HeartBeatDataSink,
-      60u8  => PacketType::MasterTrigger,
-      61u8  => PacketType::TriggerConfig,
-      62u8  => PacketType::MTBHeartbeat,
-      63u8  => PacketType::EVTBLDRHeartbeat,
-      64u8  => PacketType::RBChannelMaskConfig,
-      69u8  => PacketType::AnalysisEngineConfig,
-      70u8  => PacketType::RBEventHeader,
-      80u8  => PacketType::CPUMoniData,
-      90u8  => PacketType::MonitorMtb,
-      100u8 => PacketType::RBMoniData,
-      101u8 => PacketType::PBMoniData   ,
-      102u8 => PacketType::LTBMoniData  ,
-      103u8 => PacketType::PAMoniData   ,
-      120u8 => PacketType::RBEventMemoryView,
-      130u8 => PacketType::RBCalibration,
-      140u8 => PacketType::TofCommand,
-      141u8 => PacketType::TofCommandV2,
-      142u8 => PacketType::TofResponse,
-      150u8 => PacketType::RBCommand,
-      160u8 => PacketType::RBPing,
-      161u8 => PacketType::PreampBiasConfig,
-      162u8 => PacketType::RunConfig,
-      163u8 => PacketType::LTBThresholdConfig,
-      201u8 => PacketType::ConfigBinary,
-      202u8 => PacketType::LiftofRBBinary,
-      203u8 => PacketType::LiftofBinaryService,
-      204u8 => PacketType::LiftofCCBinary,
-      255u8 => PacketType::MultiPacket,
+      0   => PacketType::Unknown,
+      20  => PacketType::RBEvent,
+      21  => PacketType::TofEvent,
+      22  => PacketType::RBWaveform,
+      23  => PacketType::TofEventSummary,
+      40  => PacketType::HeartBeatDataSink,
+      60  => PacketType::MasterTrigger,
+      61  => PacketType::TriggerConfig,
+      62  => PacketType::MTBHeartbeat,
+      63  => PacketType::EVTBLDRHeartbeat,
+      64  => PacketType::RBChannelMaskConfig,
+      69  => PacketType::AnalysisEngineConfig,
+      70  => PacketType::RBEventHeader,
+      80  => PacketType::CPUMoniData,
+      90  => PacketType::MonitorMtb,
+      100 => PacketType::RBMoniData,
+      101 => PacketType::PBMoniData   ,
+      102 => PacketType::LTBMoniData  ,
+      103 => PacketType::PAMoniData   ,
+      120 => PacketType::RBEventMemoryView,
+      130 => PacketType::RBCalibration,
+      140 => PacketType::TofCommand,
+      141 => PacketType::TofCommandV2,
+      142 => PacketType::TofResponse,
+      150 => PacketType::RBCommand,
+      160 => PacketType::RBPing,
+      161 => PacketType::PreampBiasConfig,
+      162 => PacketType::RunConfig,
+      163 => PacketType::LTBThresholdConfig,
+      171 => PacketType::TofDetectorStatus,
+      201 => PacketType::ConfigBinary,
+      202 => PacketType::LiftofRBBinary,
+      203 => PacketType::LiftofBinaryService,
+      204 => PacketType::LiftofCCBinary,
+      255 => PacketType::MultiPacket,
       _     => PacketType::Unknown
     }
   }
@@ -125,7 +128,6 @@ impl FromRandom for PacketType {
       PacketType::TofEvent,
       PacketType::RBWaveform,
       PacketType::TofEventSummary,
-      //PacketType::Monitor,
       PacketType::MasterTrigger,
       PacketType::TriggerConfig, 
       PacketType::HeartBeatDataSink,
@@ -151,6 +153,7 @@ impl FromRandom for PacketType {
       PacketType::CPUMoniData,
       PacketType::MonitorMtb,
       PacketType::RBCalibration,
+      PacketType::TofDetectorStatus,
       PacketType::ConfigBinary,
       PacketType::LiftofRBBinary,
       PacketType::LiftofBinaryService,
@@ -169,7 +172,6 @@ fn test_packet_types() {
   type_codes.push(PacketType::TofEvent as u8);
   type_codes.push(PacketType::RBWaveform as u8);
   type_codes.push(PacketType::TofEventSummary as u8);
-  //type_codes.push(PacketType::Monitor as u8);
   type_codes.push(PacketType::TriggerConfig as u8);
   type_codes.push(PacketType::MasterTrigger as u8);
   type_codes.push(PacketType::HeartBeatDataSink as u8);
@@ -195,6 +197,7 @@ fn test_packet_types() {
   type_codes.push(PacketType::RBChannelMaskConfig as u8);
   type_codes.push(PacketType::MonitorMtb as u8);
   type_codes.push(PacketType::RBCalibration as u8);
+  type_codes.push(PacketType::TofDetectorStatus as u8);
   type_codes.push(PacketType::ConfigBinary as u8);
   type_codes.push(PacketType::LiftofCCBinary as u8);
   type_codes.push(PacketType::LiftofRBBinary as u8);
