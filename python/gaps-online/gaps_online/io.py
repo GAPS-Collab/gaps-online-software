@@ -25,6 +25,18 @@ try:
     TofPacketType   = rtd.io.PacketType
     TofPacket       = rtd.io.TofPacket
     TofPacketReader = rtd.io.TofPacketReader
+    try:
+        # let's see if we can get the mtb connection map
+        import os
+        db_path = os.environ["DATABASE_URL"]
+        dsi_j_pid_map = rtd.io.create_mtb_connection_to_pid_map(db_path)
+    except Exception as e:
+        print(f'-> Unable to create dsi_j_pid_map! {e}')
+    try:
+        rb_pid_map    = rtd.io.create_rb_ch_to_pid_map(db_path)
+    except Exception as e:
+        print(f'-> Unable to create dsi_j_pid_map! {e}')
+
     rtd_unpack_success = True
 except ImportError as e:
     print(e)
@@ -34,7 +46,10 @@ except ImportError as e:
 
 def get_ts_from_toffile(fname):
     """
-    Get the timestamp from a .gaps.tof file
+    Get the timestamp from a .tof.gaps file
+    
+    # Arguments:
+        fname : Filename of .tof.gaps file
     """
     pattern = re.compile('Run[0-9]*_[0-9]*.(?P<tdate>[0-9_]*)')
     ts = pattern.search(str(fname)).groupdict()['tdate']
@@ -68,7 +83,15 @@ def get_tof_binaries(run_id : int, data_dir='') -> list[Path]:
     datapath = Path(data_dir) / f'{run_id}'
     files    = [f for f in datapath.glob('*.tof.gaps')]
     files    = sorted(files, key=get_ts_from_toffile)
-    print(f'-> Found {len(files)} files for run {run_id}!')
+    t_start  = get_ts_from_toffile(files[0])
+    t_stop   = get_ts_from_toffile(files[-1])
+    if files:
+        print(f'-> Found {len(files)} files for run {run_id}!')
+        print(f'-> Found {len(files)} files within range of {t_start} - {t_stop}')
+        print(f'--> Earliest file {files[0]}')
+        print(f'--> Latest file {files[-1]}')
+    else:
+        print(f'! No files have been found within {t_start} and {t_stop}!')
     #pattern = re.compile('Run(?P<runid>[0-9]*)_(?P<subrunid>[0-9]*).(?P<timestamp>[0-9_])UTC.tof.gaps')
     return files
 
@@ -119,7 +142,7 @@ if rt_import_success:
         """
         if pack.header.packet_type != TelemetryPacketType.MergedEvent:
             return None
-        ev = rt.MergedEvent()
+        ev = rt.telemetry.MergedEvent()
         try:
             ev.from_telemetrypacket(pack)
         except Exception:
