@@ -106,6 +106,27 @@ impl TelemetryPacket {
       payload : Vec::<u8>::new()
     }
   }
+
+  pub fn from_bytestream(stream : &Vec<u8>, pos : &mut usize) -> Result<Self, SerializationError> {
+    let mut tpacket = TelemetryPacket::new();
+    let header  = TelemetryHeader::from_bytestream(stream, pos)?;
+    tpacket.header = header;
+    println!("Found header {}", tpacket.header);
+    // it seems the payload size is header.size
+    // fix - the payload is either sizeof(header) + payload.len 
+    tpacket.payload = stream[*pos..*pos + header.length as usize - TelemetryHeader::SIZE].to_vec();
+    Ok(tpacket)
+  }
+
+  // FIXME - this needs to be a trait
+  pub fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::new();
+    let mut s_head = self.header.to_bytestream();
+    stream.append(&mut s_head);
+    stream.extend_from_slice(self.payload.as_slice());
+    //stream.append(&mut self.payload);
+    stream
+  }
 }
 
 impl fmt::Display for TelemetryPacket {
@@ -177,6 +198,19 @@ impl Serialization for TelemetryHeader {
     thead.checksum  = parse_u16(stream, pos);
     Ok(thead)
   }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::new();
+    let head : u16 = 0x90eb;
+    stream.extend_from_slice(&self.sync.to_le_bytes());
+    stream.extend_from_slice(&self.ptype.to_le_bytes());
+    stream.extend_from_slice(&self.timestamp.to_le_bytes());
+    stream.extend_from_slice(&self.counter.to_le_bytes());
+    stream.extend_from_slice(&self.length.to_le_bytes());
+    stream.extend_from_slice(&self.checksum.to_le_bytes());
+    stream
+  }
+
 }
 
 impl fmt::Display for TelemetryHeader {
