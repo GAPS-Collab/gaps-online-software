@@ -1619,6 +1619,7 @@ impl PyLTBMoniSeries {
 
 #[pyclass]
 #[pyo3(name="TofPacket")]
+#[derive(Clone)]
 pub struct PyTofPacket {
   pub packet : TofPacket,
 }

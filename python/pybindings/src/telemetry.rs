@@ -328,8 +328,9 @@ impl PyTrackerPacket {
 #[pyclass]
 #[pyo3(name="TelemetryPacket")]
 pub struct PyTelemetryPacket {
-  packet : tel_api::TelemetryPacket,
+  pub packet : tel_api::TelemetryPacket,
 }
+
 
 impl PyTelemetryPacket {
   pub fn set_packet(&mut self, packet : tel_api::TelemetryPacket) {
@@ -340,7 +341,7 @@ impl PyTelemetryPacket {
 #[pymethods]
 impl PyTelemetryPacket {
   #[new]
-  fn new() -> Self {
+  pub fn new() -> Self {
     Self {
       packet : tel_api::TelemetryPacket::new(),
     }

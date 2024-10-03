@@ -21,14 +21,17 @@ path = "src/lib.rs"
 crate-type = ["cdylib", "lib"]
 
 [features]
-liftof    = ['liftof-lib']
-telemetry = ['telemetry-dataclasses']
+liftof    = ["liftof-lib"]
+telemetry = ["telemetry-dataclasses"]
+caraspace-serial = ["caraspace", "tof-dataclasses/caraspace-serial", "telemetry-dataclasses/caraspace-serial"]
 
 [dependencies]
 cfg-if                = "1.0"
-tof-dataclasses       = { path = "../../tof/dataclasses/rust/tof-dataclasses", features = ["polars", "database", "advanced-algorithms","pybindings"] } 
+tof-dataclasses       = { version = "0.10", path = "../../tof/dataclasses/rust/tof-dataclasses", features = ["polars", "database", "advanced-algorithms","pybindings"] } 
 telemetry-dataclasses = { path = "../../telemetry/dataclasses/rust/telemetry-dataclasses", optional = true , features=["pybindings"]}
-
+#caraspace             = { version = "0.10", path = "../../caraspace", features = ["pybindings"], optional = true }
+#caraspace             = { version = "0.10", path = "../../caraspace", optional = true }
+caraspace             = { version = "0.10", path = "../../caraspace", features = ["pybindings"], optional = true}
 # somehow pyo3 is very picky with the version
 liftof-lib            = { version = "0.10", optional = true, path = '../../tof/liftof/liftof-lib', features = ["database"] }
 pyo3                  = { version = "0.21", features = ["extension-module"] }

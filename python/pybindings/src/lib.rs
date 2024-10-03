@@ -11,7 +11,8 @@ pub mod liftof;
 pub mod liftof_dataclasses;
 #[cfg(feature="liftof")]
 pub mod master_trigger;
-
+#[cfg(feature="caraspace-serial")]
+pub mod caraspace;
 #[cfg(feature="telemetry")]
 use telemetry_dataclasses::packets as tel_api;
 
@@ -30,6 +31,20 @@ cfg_if::cfg_if! {
       PyTrackerDAQTempPacket,
       PyTrackerDAQHSKPacket,
       PyTrackerEventIDEchoPacket,
+    };
+  }
+}
+
+cfg_if::cfg_if! {
+  if #[cfg(feature = "caraspace-serial")] {
+    use crate::caraspace::{
+      py_parse_u8,
+      py_parse_u16,
+      py_parse_u32,
+      py_parse_u64,
+      PyCRFrame,
+      PyCRReader,
+      PyCRWriter,
     };
   }
 }
@@ -132,6 +147,8 @@ fn py_create_rb_ch_to_pid_map(db_path : String) -> PyResult<RbChPidMapping> {
     }
   }
 }
+
+
 
 #[pymodule]
 #[pyo3(name = "analysis")]
@@ -237,6 +254,24 @@ cfg_if::cfg_if! {
   }
 }
 
+cfg_if::cfg_if! {
+  if #[cfg(feature = "caraspace-serial")] {
+    #[pymodule]
+    #[pyo3(name = "caraspace")]
+    fn py_caraspace<'_py> (m: &Bound<'_py, PyModule>) -> PyResult<()> {
+      m.add_function(wrap_pyfunction!(py_parse_u8, m)?)?;
+      m.add_function(wrap_pyfunction!(py_parse_u16, m)?)?;
+      m.add_function(wrap_pyfunction!(py_parse_u32, m)?)?;
+      m.add_function(wrap_pyfunction!(py_parse_u64, m)?)?;
+      //m.add_class::<tel_api::TelemetryPacketType>()?;
+      m.add_class::<PyCRFrame>()?;
+      m.add_class::<PyCRReader>()?;
+      m.add_class::<PyCRWriter>()?;
+      Ok(())
+    }
+  }
+}
+
 /// Commands for the whole TOF system
 #[pymodule]
 #[pyo3(name = "commands")]
@@ -270,5 +305,7 @@ fn go_pybindings<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { //: Python<
   m.add_wrapped(wrap_pymodule!(py_telemetry))?;
   #[cfg(feature="liftof")]
   m.add_wrapped(wrap_pymodule!(py_liftof))?;
+  #[cfg(feature="caraspace-serial")]
+  m.add_wrapped(wrap_pymodule!(py_caraspace))?;
   Ok(())
 }
