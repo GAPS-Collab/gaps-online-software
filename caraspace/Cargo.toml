@@ -1,0 +1,64 @@
+[package]
+name    = "caraspace"
+version = "0.10.0"
+edition = "2021"
+
+[lib]
+name = "caraspace"
+path = "src/lib.rs"
+crate-type = ["cdylib", "lib"]
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bench]]
+name = "bench"
+harness = false
+
+[[test]]
+name = "test"
+required-features = ["random"]
+
+[features]
+random            = ["rand"]
+pybindings        = ["pyo3"]
+#database=["sqlite", "diesel"]
+#database           =["diesel"]
+#tofcontrol         =["tof-control"]
+#advanced-algorithms=["smoothed_z_score"]
+#polars=["polars"] # automatically added?
+
+[dev-dependencies]
+# for testing
+# used for the random number generation
+rand = "0.8"
+criterion = "0.4"
+#tempfile  = "3.10"
+
+[dependencies]
+chrono            = "0.4"
+log               = "0.4"
+#half              = "2.4"
+#regex             = "1.5"
+#glob              = "0.3"
+#serde             = { version = "1.0", features = ["derive"] }
+#serde_json        = "1.0"
+#crc               = "3.0"
+#cfg-if            = "1.0"
+#indicatif         = "0.17" # TODO  - maybe this might go away or we introduce
+#colored           = "2.0"  #         a debugging feature  
+#crossbeam-channel = "0.5"
+#statistical       = "1.0"  # FIXME - replace this with our own implementation
+#polars            = { version = "0.41", features = ["lazy"], optional = true }
+pyo3              = { version = "0.21", features = ["extension-module"], optional = true }
+
+# for testing / features
+rand   = { version = "0.8", optional = true}
+# for the database - in case we want to use postgres, 
+# the feature needs to be added here, however, this would
+# also require libpq to be installed.
+#diesel = { version = "2.1", features = ["sqlite", "64-column-tables"], optional=true }
+## this fixes all compiling issues for the musl target with libsqlite
+#libsqlite3-sys = { version = "0.28", features = ["bundled"] }
+## Takeru's tof-control
+#tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.9", features=[] }
+#smoothed_z_score = {version = "0.1", optional = true}
+##sqlite = {version = "0.30", optional = true}
