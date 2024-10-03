@@ -22,7 +22,12 @@
 //! * database - access a data base for advanced paddle
 //!              mapping, readoutboard and ltb information etc.
 //!
-
+//! * caraspace - register TofPacket through the caraspace library
+//!               This allows to write TofPackets to frames, which 
+//!               will ultimatly allow them to write them to 
+//!               caraspace files
+//!
+//!
 pub mod events;
 pub mod packets;
 pub mod errors;
@@ -39,11 +44,11 @@ pub mod series;
 pub mod heartbeats;
 pub mod config;
 pub mod version;
-//#[cfg(feature="database")]
-//extern crate diesel;
+pub mod status;
 #[cfg(feature="database")]
 pub mod database;
-pub mod status;
+#[cfg(feature="caraspace-serial")]
+pub mod caraspace;
 
 pub use version::ProtocolVersion;
 

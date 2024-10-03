@@ -32,7 +32,7 @@ const ALGO : crc::Algorithm<u32> = crc::Algorithm {
 
 use std::fmt;
 
-extern crate crc;
+//extern crate crc;
 use crc::Crc;
 
 use std::path::Path;
