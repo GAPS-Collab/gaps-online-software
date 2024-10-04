@@ -13,9 +13,12 @@ else()
 endif()
 
 if(BUILD_RUSTPYBINDINGS)
+  # FXIME - assemble the featrues string prgromaatically
+  # this here acutally does not really work
   set(RUST_BUILD_COMMAND_PLAIN cargo build --release --all-features)
   set(RUST_BUILD_COMMAND_LIFTOF cargo build --release --features=liftof)
   set(RUST_BUILD_COMMAND_TELEMETRY cargo build --release --features=telemetry)
+  set(RUST_BUILD_COMMAND_CARASPACE cargo build --release --features=caraspace-serial)
   set(RUST_BUILD_COMMAND_FEATALL cargo build --release --all-features)
   # Define the command to build your Rust project
   message(STATUS "-- -- building Rust \\U1F980 pybindings wiut pyO3...")

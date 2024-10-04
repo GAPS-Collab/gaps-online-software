@@ -37,12 +37,35 @@ try:
     except Exception as e:
         print(f'-> Unable to create dsi_j_pid_map! {e}')
 
-    rtd_unpack_success = True
+    rtd_import_success = True
 except ImportError as e:
     print(e)
     print('--> Pybindings for tof-dataclasses are missing!')
     print('--> Limited functionality available only!')
     print('--> If you want to mitigate this, check your build, e.g. with ccmake and make sure the respective features are turned ON')
+
+# check for the caraspace system
+try:
+    import go_pybindings as rtd
+    try:
+        CRReader = rtd.caraspace.CRReader
+        CRWriter = rtd.caraspace.CRWriter
+        CRFrame  = rtd.caraspace.CRFrame
+    except Exception as e:
+        print(f'-> Pybdingins for the caraspace serializaztion library are missing! {e}')
+        print('--> Limited functionality available only!')
+        print('--> If you want to mitigate this, check your build, e.g. with ccmake and make sure the respective features are turned ON')
+
+    rtd_import_success = True
+except ImportError as e:
+    print(e)
+    print('--> Pybindings are missing!')
+    print('--> Limited functionality available only!')
+    print('--> If you want to mitigate this, check your build, e.g. with ccmake and make sure the respective features (BUILD_PYBIDINGIS) are turned ON')
+
+
+##################################################################
+
 
 def get_ts_from_toffile(fname):
     """
@@ -109,10 +132,11 @@ def get_telemetry_binaries(unix_time_start, unix_time_stop,\
     """
     # file format is something like RAW240712_094325.bin
     t_start = datetime.fromtimestamp(unix_time_start, UTC)
-    t_stop = datetime.fromtimestamp(unix_time_stop, UTC)
+    t_stop  = datetime.fromtimestamp(unix_time_stop, UTC)
     all_files = sorted([k for k in Path(f'{data_dir}').glob('*.bin')])
     print(f'-> Found {len(all_files)} files in {data_dir}')
     ts = [get_ts_from_binfile(f) for f in all_files]
+    # FiXME - this might throw away 1 file
     files = [f for f, ts in zip(all_files, ts) if t_start <= ts <= t_stop]
     ts = [get_ts_from_binfile(f) for f in files]
     print(f'-> Run duration {ts[-1] - ts[0]}')
@@ -124,6 +148,8 @@ def get_telemetry_binaries(unix_time_start, unix_time_stop,\
         print(f'! No files have been found within {t_start} and {t_stop}!')
     return files
 
+# if telemetry is available, we add additional
+# functionality
 if rt_import_success:
     def safe_unpack_merged_event(pack : TelemetryPacket):
         """
