@@ -74,8 +74,14 @@ if __name__ == '__main__':
     #                    default='')
     parser.add_argument('-v','--verbose', action='store_true',\
                         help='More verbose output')
+    parser.add_argument('--reprocess', action='store_true', \
+                        help='Recalculate tof packets with latest version of the code')
     args = parser.parse_args()
-    
+   
+    if args.reprocess:
+        settings = go.liftof.LiftofSettings()
+        settings = settings.from_file('settings.toml')
+
     cr_outdir = str(args.tof_dir / 'caraspace')
 
     telemetry_files = go.io.get_telemetry_binaries(args.start_time, args.end_time,\
@@ -222,7 +228,13 @@ if __name__ == '__main__':
                 # check if there is an event in the tof_event_later buffer
                 if telly_ev.tof.event_id in tofevent_buffer_later:
                     tpack = tofevent_buffer_later.pop(telly_ev.tof.event_id)
-                    frame.put_tofpacket(tofpack, str(tofpack.packet_type))
+                    frame.put_tofpacket(tofpack, str(tpack.packet_type))
+                    if args.reprocess:
+                        new_tofev = go.events.TofEvent()
+                        new_tofev.from_tofpacket(tpack)
+                        new_tofev = go.liftof.waveform_analysis(new_tofev, settings)
+                        new_tofpack = new_tofev.pack()
+                        frame.put_tofpacket(new_tofpack, str('TofEvent.reprocessed'))
                     writer.add_frame(frame)
                     frames_written += 1
                     continue # get next telemetrypacket
@@ -257,6 +269,10 @@ if __name__ == '__main__':
                             #print (f'-> When reading from the tof stream, we encountered an exception! {e}')
                             break
                         if tofev.mastertriggerevent.event_id == telly_ev.tof.event_id:
+                            if args.reprocess:
+                                new_tofev = go.liftof.waveform_analysis(tofev, settings)
+                                new_tofpack = new_tofev.pack()
+                                frame.put_tofpacket(new_tofpack, str('TofEvent.reprocessed'))
                             frame.put_tofpacket(tofpack, str(tofpack.packet_type))
                             break
                         # if it is larger, we buffer it for now

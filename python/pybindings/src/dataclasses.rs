@@ -2020,6 +2020,13 @@ impl PyTofEvent {
     return pyts;
   }
 
+  fn pack(&self) -> PyTofPacket {
+    let packet   = self.event.pack();
+    let mut pytp = PyTofPacket::new();
+    pytp.set_tp(packet);
+    pytp
+  }
+
   fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
     let tp = packet.get_tp();
     if tp.packet_type != PacketType::TofEvent {
