@@ -206,6 +206,7 @@ int main(int argc, char *argv[]){
   u32 n_mtbmoni = 0;
   u32 n_unknown = 0;
   u32 n_tofevents = 0;
+  u32 n_tes = 0;
 
   for (int k=0; k<nfiles; k++) { 
     auto packets = get_tofpackets(fnames[k]);
@@ -252,7 +253,10 @@ int main(int argc, char *argv[]){
 	
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
-	//printf("Event %ld: RBs -", evt_ctr);
+	if (verbose) {
+          std::cout << ev << std::endl;
+	}
+       //printf("Event %ld: RBs -", evt_ctr);
 	//printf("%ld.", evt_ctr);
 	/*for (int k=0;k<NRB;k++) {
 	  if (k%9==0) printf("\n");
@@ -277,7 +281,7 @@ int main(int argc, char *argv[]){
 	  // Let's also store the channel mask to use later. 
  	  int ch_mask = rb_event.header.channel_mask;
 	  if (verbose) {
-	    std::cout << rb_event << std::endl;
+	    //std::cout << rb_event << std::endl;
           }
 	  Vec<Vec<f32>> volts;
 	  Vec<Vec<f32>> times;
@@ -368,6 +372,15 @@ int main(int argc, char *argv[]){
 	n_tofevents++;
         break;
       }
+      case PacketType::TofEventSummary : {
+        usize pos = 0;
+        auto tes = TofEventSummary::from_bytestream(p.payload, pos);
+        if (verbose) {
+          std::cout << tes << std::endl;
+        }
+        n_tes++;
+        break;
+      }
       case PacketType::RBMoni : {
         usize pos = 0;
         auto moni = RBMoniData::from_bytestream(p.payload, pos);
@@ -415,6 +428,7 @@ int main(int argc, char *argv[]){
   std::cout << "-- -- RBMoniData        : " << n_rbmoni  << "\t (packets) " <<  std::endl;
   std::cout << "-- -- MasterTriggerEvent: " << n_mte     << "\t (packets) " <<  std::endl;
   std::cout << "-- -- TofEvent          : " << n_tofevents  << "\t (packets) " <<  std::endl;
+  std::cout << "-- -- TofEventSummary   : " << n_tes  << "\t (packets) " <<  std::endl;
   std::cout << "-- -- TofCmpMoniData    : " << n_tcmoni  << "\t (packets) " <<  std::endl;
   std::cout << "-- -- MtbMoniData       : " << n_mtbmoni << "\t (packets) " <<  std::endl;
   std::cout << "-- -- undecoded         : " << n_unknown << "\t (packets) " <<  std::endl;

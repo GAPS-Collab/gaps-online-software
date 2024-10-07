@@ -63,7 +63,7 @@ int main(int argc, char *argv[]){
   cxxopts::Options options("unpack-tofpackets", "Unpack example for .tof.gaps files with TofPackets.");
   options.add_options()
   ("h,help", "Print help")
-  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/mnt/tof-nas/nevis-data/tofdata/calibration/latest/"))
+  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/home/gaps/nevis-data/tofdata/calibration/latest/"))
   ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
   ;
