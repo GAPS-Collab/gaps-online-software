@@ -1772,10 +1772,27 @@ impl PyRBEventHeader {
     self.header = header;
   }
 
-fn __repr__(&self) -> PyResult<String> {
-  Ok(format!("<PyO3Wrapper: {}>", self.header)) 
-  }
+  //pub rb_id                : u8   ,    
+  //pub event_id             : u32  , 
+  //pub status_byte          : u8   ,
+  //// FIXME - channel mask still has space
+  //// for the status_bytes, since it only
+  //// uses 9bits
+  //pub channel_mask         : u16  , 
+  //pub stop_cell            : u16  , 
+  //// we change this by keeping the byte
+  //// order the same to accomodate the sine 
+  //// values
+  //pub ch9_amp              : u16, 
+  //pub ch9_freq             : u16, 
+  //pub ch9_phase            : u32, 
+  ////pub crc32              : u32  , 
+  ////pub dtap0              : u16  , 
+  ////pub drs4_temp          : u16  , 
+  //pub fpga_temp            : u16  , 
+  //pub timestamp32          : u32  ,
 } 
+
 #[pymethods]
 impl PyRBEventHeader {
   #[new]
@@ -1831,6 +1848,41 @@ impl PyRBEventHeader {
 
   fn get_channels(&self) -> Vec<u8> {
     self.header.get_channels()
+  }
+
+  #[getter]
+  pub fn is_event_fragment(&self) -> bool {
+    self.header.is_event_fragment()
+  }
+
+  #[getter]
+  pub fn drs_lost_trigger(&self) -> bool {
+    self.header.drs_lost_trigger()
+  }
+
+  #[getter]
+  fn lost_lock(&self) -> bool {
+    self.header.lost_lock()
+  }
+
+  #[getter]
+  fn lost_lock_last_sec(&self) -> bool {
+    self.header.lost_lock_last_sec()
+  }
+
+  #[getter]
+  fn is_locked(&self) -> bool {
+    self.header.is_locked()
+  }
+
+  #[getter]
+  fn is_locked_last_sec(&self) -> bool {
+    self.header.is_locked_last_sec()
+  }
+
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.header)) 
   }
 
 }
