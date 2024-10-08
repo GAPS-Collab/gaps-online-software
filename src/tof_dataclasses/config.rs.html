@@ -956,7 +956,6 @@
 <a href="#956" id="956">956</a>
 <a href="#957" id="957">957</a>
 <a href="#958" id="958">958</a>
-<a href="#959" id="959">959</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Payloads for commands that configure an entity of 
 //! the TOF system.
 //!
@@ -989,7 +988,6 @@
 <span class="macro">cfg_if::cfg_if!</span> {
   <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"random"</span>)]  </span>{
     <span class="kw">use </span><span class="kw">crate</span>::FromRandom;
-    <span class="kw">extern crate </span>rand;
     <span class="kw">use </span>rand::Rng;
   }
 }

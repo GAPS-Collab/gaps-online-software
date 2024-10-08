@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"trait":["DateMethods","DatetimeMethods","DurationMethods","StringMethods","TimeMethods"]};

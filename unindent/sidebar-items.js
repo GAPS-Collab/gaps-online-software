@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["unindent","unindent_bytes"],"trait":["Unindent"]};

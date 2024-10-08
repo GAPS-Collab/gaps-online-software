@@ -1552,6 +1552,28 @@
 <a href="#1552" id="1552">1552</a>
 <a href="#1553" id="1553">1553</a>
 <a href="#1554" id="1554">1554</a>
+<a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
+<a href="#1560" id="1560">1560</a>
+<a href="#1561" id="1561">1561</a>
+<a href="#1562" id="1562">1562</a>
+<a href="#1563" id="1563">1563</a>
+<a href="#1564" id="1564">1564</a>
+<a href="#1565" id="1565">1565</a>
+<a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Database access &amp; entities of the TOF
 //!
 //! A local .sqlite database is shipped with 
@@ -1582,6 +1604,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::calibrations::RBCalibrations;
 <span class="comment">//use crate::constants::HUMAN_TIMESTAMP_FORMAT;
 </span><span class="kw">use </span><span class="kw">crate</span>::DsiLtbRBMapping;
+<span class="kw">pub use </span><span class="kw">crate</span>::RbChPidMapping;
 
 <span class="comment">// FIXME - probably we should make this nicer
 </span><span class="kw">pub type </span>DsiJChPidMapping = DsiLtbRBMapping; 
@@ -1636,6 +1659,27 @@
     mapping.get_mut(<span class="kw-2">&amp;</span>dsi).unwrap().get_mut(<span class="kw-2">&amp;</span>j).unwrap().insert(ch_b,(pid, panel_id));
   }
   <span class="kw">return </span>mapping;
+}
+
+<span class="kw">pub fn </span>get_rb_ch_pid_map(paddles : <span class="kw-2">&amp;</span>Vec&lt;Paddle&gt;) -&gt; RbChPidMapping {
+  <span class="kw">let </span><span class="kw-2">mut </span>mapping = RbChPidMapping::new();
+  <span class="kw">for </span>rbid  <span class="kw">in </span><span class="number">1</span>..<span class="number">51 </span>{
+    <span class="kw">let </span><span class="kw-2">mut </span>chmap = HashMap::&lt;u8, u8&gt;::new();
+    <span class="kw">for </span>ch <span class="kw">in </span><span class="number">1</span>..<span class="number">9 </span>{
+      chmap.insert(ch,<span class="number">0</span>);
+    }
+    mapping.insert(rbid,chmap);
+  }
+  <span class="kw">for </span>pdl <span class="kw">in </span>paddles {
+    <span class="kw">let </span>rb_id = pdl.rb_id  <span class="kw">as </span>u8;
+    <span class="kw">let </span>ch_a  = pdl.rb_chA <span class="kw">as </span>u8;
+    <span class="kw">let </span>ch_b  = pdl.rb_chB <span class="kw">as </span>u8;
+    <span class="kw">let </span>pid   = pdl.paddle_id <span class="kw">as </span>u8;
+    <span class="comment">//println!("rb_id {rb_id}, chA {ch_a}, chB {ch_b}");
+    </span><span class="kw-2">*</span>mapping.get_mut(<span class="kw-2">&amp;</span>rb_id).unwrap().get_mut(<span class="kw-2">&amp;</span>ch_a).unwrap() = pid;
+    <span class="kw-2">*</span>mapping.get_mut(<span class="kw-2">&amp;</span>rb_id).unwrap().get_mut(<span class="kw-2">&amp;</span>ch_b).unwrap() = pid;
+  }
+  mapping
 }
 
 <span class="doccomment">/// A representation of a run 
@@ -2618,16 +2662,16 @@
         //  error!("Got unpopulated LTB from DB for LTB {}", dbltb);
         //  continue;
         //}
-        </span><span class="kw">if </span>pdl.paddle_id == dbrb.paddle12_id.unwrap() {
+        </span><span class="kw">if </span>pdl.paddle_id == dbrb.paddle12_id.unwrap_or(<span class="number">0</span>) {
           rb.paddle12     = pdl.clone();
         }
-        <span class="kw">if </span>pdl.paddle_id == dbrb.paddle34_id.unwrap() {
+        <span class="kw">if </span>pdl.paddle_id == dbrb.paddle34_id.unwrap_or(<span class="number">0</span>) {
           rb.paddle34   = pdl.clone();
         }
-        <span class="kw">if </span>pdl.paddle_id == dbrb.paddle56_id.unwrap() {
+        <span class="kw">if </span>pdl.paddle_id == dbrb.paddle56_id.unwrap_or(<span class="number">0</span>) {
           rb.paddle56   = pdl.clone();
         }
-        <span class="kw">if </span>pdl.paddle_id == dbrb.paddle78_id.unwrap() {
+        <span class="kw">if </span>pdl.paddle_id == dbrb.paddle78_id.unwrap_or(<span class="number">0</span>) {
           rb.paddle78   = pdl.clone();
         }
       }

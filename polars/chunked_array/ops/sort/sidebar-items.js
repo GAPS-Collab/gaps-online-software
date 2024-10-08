@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["_broadcast_descending"],"mod":["arg_bottom_k","arg_sort_multiple","options"],"trait":["SlicedArray"]};

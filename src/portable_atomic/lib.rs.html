@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/portable-atomic-1.8.0/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/portable-atomic-1.9.0/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -4916,6 +4916,83 @@
 <a href="#4916" id="4916">4916</a>
 <a href="#4917" id="4917">4917</a>
 <a href="#4918" id="4918">4918</a>
+<a href="#4919" id="4919">4919</a>
+<a href="#4920" id="4920">4920</a>
+<a href="#4921" id="4921">4921</a>
+<a href="#4922" id="4922">4922</a>
+<a href="#4923" id="4923">4923</a>
+<a href="#4924" id="4924">4924</a>
+<a href="#4925" id="4925">4925</a>
+<a href="#4926" id="4926">4926</a>
+<a href="#4927" id="4927">4927</a>
+<a href="#4928" id="4928">4928</a>
+<a href="#4929" id="4929">4929</a>
+<a href="#4930" id="4930">4930</a>
+<a href="#4931" id="4931">4931</a>
+<a href="#4932" id="4932">4932</a>
+<a href="#4933" id="4933">4933</a>
+<a href="#4934" id="4934">4934</a>
+<a href="#4935" id="4935">4935</a>
+<a href="#4936" id="4936">4936</a>
+<a href="#4937" id="4937">4937</a>
+<a href="#4938" id="4938">4938</a>
+<a href="#4939" id="4939">4939</a>
+<a href="#4940" id="4940">4940</a>
+<a href="#4941" id="4941">4941</a>
+<a href="#4942" id="4942">4942</a>
+<a href="#4943" id="4943">4943</a>
+<a href="#4944" id="4944">4944</a>
+<a href="#4945" id="4945">4945</a>
+<a href="#4946" id="4946">4946</a>
+<a href="#4947" id="4947">4947</a>
+<a href="#4948" id="4948">4948</a>
+<a href="#4949" id="4949">4949</a>
+<a href="#4950" id="4950">4950</a>
+<a href="#4951" id="4951">4951</a>
+<a href="#4952" id="4952">4952</a>
+<a href="#4953" id="4953">4953</a>
+<a href="#4954" id="4954">4954</a>
+<a href="#4955" id="4955">4955</a>
+<a href="#4956" id="4956">4956</a>
+<a href="#4957" id="4957">4957</a>
+<a href="#4958" id="4958">4958</a>
+<a href="#4959" id="4959">4959</a>
+<a href="#4960" id="4960">4960</a>
+<a href="#4961" id="4961">4961</a>
+<a href="#4962" id="4962">4962</a>
+<a href="#4963" id="4963">4963</a>
+<a href="#4964" id="4964">4964</a>
+<a href="#4965" id="4965">4965</a>
+<a href="#4966" id="4966">4966</a>
+<a href="#4967" id="4967">4967</a>
+<a href="#4968" id="4968">4968</a>
+<a href="#4969" id="4969">4969</a>
+<a href="#4970" id="4970">4970</a>
+<a href="#4971" id="4971">4971</a>
+<a href="#4972" id="4972">4972</a>
+<a href="#4973" id="4973">4973</a>
+<a href="#4974" id="4974">4974</a>
+<a href="#4975" id="4975">4975</a>
+<a href="#4976" id="4976">4976</a>
+<a href="#4977" id="4977">4977</a>
+<a href="#4978" id="4978">4978</a>
+<a href="#4979" id="4979">4979</a>
+<a href="#4980" id="4980">4980</a>
+<a href="#4981" id="4981">4981</a>
+<a href="#4982" id="4982">4982</a>
+<a href="#4983" id="4983">4983</a>
+<a href="#4984" id="4984">4984</a>
+<a href="#4985" id="4985">4985</a>
+<a href="#4986" id="4986">4986</a>
+<a href="#4987" id="4987">4987</a>
+<a href="#4988" id="4988">4988</a>
+<a href="#4989" id="4989">4989</a>
+<a href="#4990" id="4990">4990</a>
+<a href="#4991" id="4991">4991</a>
+<a href="#4992" id="4992">4992</a>
+<a href="#4993" id="4993">4993</a>
+<a href="#4994" id="4994">4994</a>
+<a href="#4995" id="4995">4995</a>
 </pre></div><pre class="rust"><code><span class="comment">// SPDX-License-Identifier: Apache-2.0 OR MIT
 
 </span><span class="doccomment">/*!
@@ -4964,7 +5041,7 @@ portable-atomic = { version = "1.3", default-features = false, features = ["requ
 
 ## 128-bit atomics support
 
-Native 128-bit atomic operations are available on x86_64 (Rust 1.59+), AArch64 (Rust 1.59+), riscv64 (Rust 1.82+), powerpc64 (nightly only), and s390x (nightly only), otherwise the fallback implementation is used.
+Native 128-bit atomic operations are available on x86_64 (Rust 1.59+), AArch64 (Rust 1.59+), riscv64 (Rust 1.82+), powerpc64 (nightly only), s390x (nightly only), and Arm64EC (nightly only), otherwise the fallback implementation is used.
 
 On x86_64, even if `cmpxchg16b` is not available at compile-time (note: `cmpxchg16b` target feature is enabled by default only on Apple and Windows (except Windows 7) targets), run-time detection checks whether `cmpxchg16b` is available. If `cmpxchg16b` is not available at either compile-time or run-time detection, the fallback implementation is used. See also [`portable_atomic_no_outline_atomics`](#optional-cfg-no-outline-atomics) cfg.
 
@@ -5082,7 +5159,7 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
   If dynamic dispatching by run-time CPU feature detection is enabled, it allows maintaining support for older CPUs while using features that are not supported on older CPUs, such as CMPXCHG16B (x86_64) and FEAT_LSE/FEAT_LSE2 (AArch64).
 
   Note:
-  - Dynamic detection is currently only enabled in Rust 1.59+ for x86_64 and AArch64, nightly only for powerpc64 (disabled by default), otherwise it works the same as when this cfg is set.
+  - Dynamic detection is currently only enabled in Rust 1.59+ for x86_64 and AArch64, Rust 1.82+ for RISC-V (disabled by default), nightly only for powerpc64 (disabled by default) and Arm64EC, otherwise it works the same as when this cfg is set.
   - If the required target features are enabled at compile-time, the atomic operations are inlined.
   - This is compatible with no-std (as with all features except `std`).
   - On some targets, run-time detection is disabled by default mainly for compatibility with older versions of operating systems or incomplete build environments, and can be enabled by `--cfg portable_atomic_outline_atomics`. (When both cfg are enabled, `*_no_*` cfg is preferred.)
@@ -5130,10 +5207,10 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
     </span>clippy::float_arithmetic,
 )]
 #![cfg_attr(not(portable_atomic_no_asm), warn(missing_docs))] </span><span class="comment">// module-level #![allow(missing_docs)] doesn't work for macros on old rustc
-</span><span class="attr">#![allow(clippy::inline_always)]
+</span><span class="attr">#![allow(clippy::inline_always, clippy::used_underscore_items)]
 </span><span class="comment">// asm_experimental_arch
 // AVR, MSP430, and Xtensa are tier 3 platforms and require nightly anyway.
-// On tier 2 platforms (powerpc64 and s390x), we use cfg set by build script to
+// On tier 2 platforms (arm64ec, powerpc64, and s390x), we use cfg set by build script to
 // determine whether this feature is available or not.
 </span><span class="attr">#![cfg_attr(
     all(
@@ -5142,6 +5219,7 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
             target_arch = <span class="string">"avr"</span>,
             target_arch = <span class="string">"msp430"</span>,
             all(target_arch = <span class="string">"xtensa"</span>, portable_atomic_unsafe_assume_single_core),
+            all(target_arch = <span class="string">"arm64ec"</span>, portable_atomic_unstable_asm_experimental_arch),
             all(target_arch = <span class="string">"powerpc64"</span>, portable_atomic_unstable_asm_experimental_arch),
             all(target_arch = <span class="string">"s390x"</span>, portable_atomic_unstable_asm_experimental_arch),
         ),
@@ -5195,6 +5273,7 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
     all(
         any(
             target_arch = <span class="string">"aarch64"</span>,
+            target_arch = <span class="string">"arm64ec"</span>,
             target_arch = <span class="string">"powerpc64"</span>,
             target_arch = <span class="string">"riscv64"</span>,
             target_arch = <span class="string">"s390x"</span>,
@@ -5207,6 +5286,7 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
     all(
         any(
             target_arch = <span class="string">"aarch64"</span>,
+            target_arch = <span class="string">"arm64ec"</span>,
             target_arch = <span class="string">"powerpc64"</span>,
             target_arch = <span class="string">"riscv64"</span>,
             target_arch = <span class="string">"s390x"</span>,
@@ -5276,13 +5356,21 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
 <span class="attr">#[cfg(portable_atomic_no_outline_atomics)]
 #[cfg(not(any(
     target_arch = <span class="string">"aarch64"</span>,
+    target_arch = <span class="string">"arm64ec"</span>,
     target_arch = <span class="string">"arm"</span>,
     target_arch = <span class="string">"powerpc64"</span>,
+    target_arch = <span class="string">"riscv32"</span>,
+    target_arch = <span class="string">"riscv64"</span>,
     target_arch = <span class="string">"x86_64"</span>,
 )))]
 </span><span class="macro">compile_error!</span>(<span class="string">"`portable_atomic_no_outline_atomics` cfg does not compatible with this target"</span>);
 <span class="attr">#[cfg(portable_atomic_outline_atomics)]
-#[cfg(not(any(target_arch = <span class="string">"aarch64"</span>, target_arch = <span class="string">"powerpc64"</span>)))]
+#[cfg(not(any(
+    target_arch = <span class="string">"aarch64"</span>,
+    target_arch = <span class="string">"powerpc64"</span>,
+    target_arch = <span class="string">"riscv32"</span>,
+    target_arch = <span class="string">"riscv64"</span>,
+)))]
 </span><span class="macro">compile_error!</span>(<span class="string">"`portable_atomic_outline_atomics` cfg does not compatible with this target"</span>);
 
 <span class="attr">#[cfg(portable_atomic_disable_fiq)]
@@ -5431,23 +5519,7 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
 </span><span class="kw">use </span><span class="kw">crate</span>::utils::strict;
 
 <span class="macro">cfg_has_atomic_8!</span> {
-<span class="macro">cfg_has_atomic_cas!</span> {
-<span class="comment">// See https://github.com/rust-lang/rust/pull/114034 for details.
-// https://github.com/rust-lang/rust/blob/1.80.0/library/core/src/sync/atomic.rs#L233
-// https://godbolt.org/z/Enh87Ph9b
-</span><span class="attr">#[cfg(portable_atomic_no_cfg_target_has_atomic)]
-</span><span class="kw">const </span>EMULATE_ATOMIC_BOOL: bool = <span class="macro">cfg!</span>(all(
-    not(portable_atomic_no_atomic_cas),
-    any(target_arch = <span class="string">"riscv32"</span>, target_arch = <span class="string">"riscv64"</span>, target_arch = <span class="string">"loongarch64"</span>),
-));
-<span class="attr">#[cfg(not(portable_atomic_no_cfg_target_has_atomic))]
-</span><span class="kw">const </span>EMULATE_ATOMIC_BOOL: bool = <span class="macro">cfg!</span>(all(
-    target_has_atomic = <span class="string">"8"</span>,
-    any(target_arch = <span class="string">"riscv32"</span>, target_arch = <span class="string">"riscv64"</span>, target_arch = <span class="string">"loongarch64"</span>),
-));
-} <span class="comment">// cfg_has_atomic_cas!
-
-</span><span class="doccomment">/// A boolean type which can be safely shared between threads.
+<span class="doccomment">/// A boolean type which can be safely shared between threads.
 ///
 /// This type has the same in-memory representation as a [`bool`].
 ///
@@ -5690,7 +5762,7 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
         <span class="self">self</span>.as_atomic_u8().store(val <span class="kw">as </span>u8, order);
     }
 
-    <span class="macro">cfg_has_atomic_cas!</span> {
+    <span class="macro">cfg_has_atomic_cas_or_amo32!</span> {
     <span class="doccomment">/// Stores a value into the bool, returning the previous value.
     ///
     /// `swap` takes an [`Ordering`] argument which describes the memory ordering
@@ -5711,9 +5783,15 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
     </span><span class="attr">#[inline]
     #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
     </span><span class="kw">pub fn </span>swap(<span class="kw-2">&amp;</span><span class="self">self</span>, val: bool, order: Ordering) -&gt; bool {
-        <span class="kw">if </span>EMULATE_ATOMIC_BOOL {
-            <span class="kw">if </span>val { <span class="self">self</span>.fetch_or(<span class="bool-val">true</span>, order) } <span class="kw">else </span>{ <span class="self">self</span>.fetch_and(<span class="bool-val">false</span>, order) }
-        } <span class="kw">else </span>{
+        <span class="attr">#[cfg(any(target_arch = <span class="string">"riscv32"</span>, target_arch = <span class="string">"riscv64"</span>, target_arch = <span class="string">"loongarch64"</span>))]
+        </span>{
+            <span class="comment">// See https://github.com/rust-lang/rust/pull/114034 for details.
+            // https://github.com/rust-lang/rust/blob/1.80.0/library/core/src/sync/atomic.rs#L233
+            // https://godbolt.org/z/Enh87Ph9b
+            </span><span class="kw">if </span>val { <span class="self">self</span>.fetch_or(<span class="bool-val">true</span>, order) } <span class="kw">else </span>{ <span class="self">self</span>.fetch_and(<span class="bool-val">false</span>, order) }
+        }
+        <span class="attr">#[cfg(not(any(target_arch = <span class="string">"riscv32"</span>, target_arch = <span class="string">"riscv64"</span>, target_arch = <span class="string">"loongarch64"</span>)))]
+        </span>{
             <span class="self">self</span>.as_atomic_u8().swap(val <span class="kw">as </span>u8, order) != <span class="number">0
         </span>}
     }
@@ -5767,8 +5845,12 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
         success: Ordering,
         failure: Ordering,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;bool, bool&gt; {
-        <span class="kw">if </span>EMULATE_ATOMIC_BOOL {
-            <span class="kw">crate</span>::utils::assert_compare_exchange_ordering(success, failure);
+        <span class="attr">#[cfg(any(target_arch = <span class="string">"riscv32"</span>, target_arch = <span class="string">"riscv64"</span>, target_arch = <span class="string">"loongarch64"</span>))]
+        </span>{
+            <span class="comment">// See https://github.com/rust-lang/rust/pull/114034 for details.
+            // https://github.com/rust-lang/rust/blob/1.80.0/library/core/src/sync/atomic.rs#L233
+            // https://godbolt.org/z/Enh87Ph9b
+            </span><span class="kw">crate</span>::utils::assert_compare_exchange_ordering(success, failure);
             <span class="kw">let </span>order = <span class="kw">crate</span>::utils::upgrade_success_ordering(success, failure);
             <span class="kw">let </span>old = <span class="kw">if </span>current == new {
                 <span class="comment">// This is a no-op, but we still need to perform the operation
@@ -5779,7 +5861,9 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
                 </span><span class="self">self</span>.swap(new, order)
             };
             <span class="kw">if </span>old == current { <span class="prelude-val">Ok</span>(old) } <span class="kw">else </span>{ <span class="prelude-val">Err</span>(old) }
-        } <span class="kw">else </span>{
+        }
+        <span class="attr">#[cfg(not(any(target_arch = <span class="string">"riscv32"</span>, target_arch = <span class="string">"riscv64"</span>, target_arch = <span class="string">"loongarch64"</span>)))]
+        </span>{
             <span class="kw">match </span><span class="self">self</span>.as_atomic_u8().compare_exchange(current <span class="kw">as </span>u8, new <span class="kw">as </span>u8, success, failure) {
                 <span class="prelude-val">Ok</span>(x) =&gt; <span class="prelude-val">Ok</span>(x != <span class="number">0</span>),
                 <span class="prelude-val">Err</span>(x) =&gt; <span class="prelude-val">Err</span>(x != <span class="number">0</span>),
@@ -5835,14 +5919,22 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
         success: Ordering,
         failure: Ordering,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;bool, bool&gt; {
-        <span class="kw">if </span>EMULATE_ATOMIC_BOOL {
-            <span class="kw">return </span><span class="self">self</span>.compare_exchange(current, new, success, failure);
+        <span class="attr">#[cfg(any(target_arch = <span class="string">"riscv32"</span>, target_arch = <span class="string">"riscv64"</span>, target_arch = <span class="string">"loongarch64"</span>))]
+        </span>{
+            <span class="comment">// See https://github.com/rust-lang/rust/pull/114034 for details.
+            // https://github.com/rust-lang/rust/blob/1.80.0/library/core/src/sync/atomic.rs#L233
+            // https://godbolt.org/z/Enh87Ph9b
+            </span><span class="self">self</span>.compare_exchange(current, new, success, failure)
         }
-
-        <span class="kw">match </span><span class="self">self</span>.as_atomic_u8().compare_exchange_weak(current <span class="kw">as </span>u8, new <span class="kw">as </span>u8, success, failure)
-        {
-            <span class="prelude-val">Ok</span>(x) =&gt; <span class="prelude-val">Ok</span>(x != <span class="number">0</span>),
-            <span class="prelude-val">Err</span>(x) =&gt; <span class="prelude-val">Err</span>(x != <span class="number">0</span>),
+        <span class="attr">#[cfg(not(any(target_arch = <span class="string">"riscv32"</span>, target_arch = <span class="string">"riscv64"</span>, target_arch = <span class="string">"loongarch64"</span>)))]
+        </span>{
+            <span class="kw">match </span><span class="self">self
+                </span>.as_atomic_u8()
+                .compare_exchange_weak(current <span class="kw">as </span>u8, new <span class="kw">as </span>u8, success, failure)
+            {
+                <span class="prelude-val">Ok</span>(x) =&gt; <span class="prelude-val">Ok</span>(x != <span class="number">0</span>),
+                <span class="prelude-val">Err</span>(x) =&gt; <span class="prelude-val">Err</span>(x != <span class="number">0</span>),
+            }
         }
     }
 
@@ -6266,7 +6358,7 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
         }
         <span class="prelude-val">Err</span>(prev)
     }
-    } <span class="comment">// cfg_has_atomic_cas!
+    } <span class="comment">// cfg_has_atomic_cas_or_amo32!
 
     </span><span class="macro">const_fn!</span> {
         <span class="comment">// This function is actually `const fn`-compatible on Rust 1.32+,
@@ -6305,6 +6397,7 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
 <span class="attr">#[doc(hidden)]
 #[allow(unused_variables, clippy::unused_self)]
 </span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; AtomicBool {
+    <span class="macro">cfg_no_atomic_cas_or_amo32!</span> {
     <span class="attr">#[inline]
     </span><span class="kw">pub fn </span>swap(<span class="kw-2">&amp;</span><span class="self">self</span>, val: bool, order: Ordering) -&gt; bool
     <span class="kw">where
@@ -6414,7 +6507,8 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
     {
         <span class="macro">unimplemented!</span>()
     }
-}
+    } <span class="comment">// cfg_no_atomic_cas_or_amo32!
+</span>}
 } <span class="comment">// cfg_no_atomic_cas!
 </span>} <span class="comment">// cfg_has_atomic_8!
 
@@ -6679,7 +6773,7 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
         <span class="self">self</span>.inner.store(ptr, order);
     }
 
-    <span class="macro">cfg_has_atomic_cas!</span> {
+    <span class="macro">cfg_has_atomic_cas_or_amo32!</span> {
     <span class="doccomment">/// Stores a value into the pointer, returning the previous value.
     ///
     /// `swap` takes an [`Ordering`] argument which describes the memory ordering
@@ -6705,6 +6799,7 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
         <span class="self">self</span>.inner.swap(ptr, order)
     }
 
+    <span class="macro">cfg_has_atomic_cas!</span> {
     <span class="doccomment">/// Stores a value into the pointer if the current value is the same as the `current` value.
     ///
     /// The return value is a result indicating whether the new value was written and containing
@@ -6896,8 +6991,9 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
             }
         }
     }
+    } <span class="comment">// cfg_has_atomic_cas!
 
-    <span class="doccomment">/// Offsets the pointer's address by adding `val` (in units of `T`),
+    </span><span class="doccomment">/// Offsets the pointer's address by adding `val` (in units of `T`),
     /// returning the previous pointer.
     ///
     /// This is equivalent to using [`wrapping_add`] to atomically perform the
@@ -7382,7 +7478,7 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
         // and both access data in the same way.
         </span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(<span class="self">self </span><span class="kw">as </span><span class="kw-2">*const </span><span class="self">Self </span><span class="kw">as </span><span class="kw-2">*const </span>AtomicUsize) }
     }
-    } <span class="comment">// cfg_has_atomic_cas!
+    } <span class="comment">// cfg_has_atomic_cas_or_amo32!
 
     </span><span class="macro">const_fn!</span> {
         const_if: <span class="attr">#[cfg(not(portable_atomic_no_const_raw_ptr_deref))]</span>;
@@ -7412,6 +7508,7 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
 <span class="attr">#[doc(hidden)]
 #[allow(unused_variables, clippy::unused_self)]
 </span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T: <span class="lifetime">'a</span>&gt; AtomicPtr&lt;T&gt; {
+    <span class="macro">cfg_no_atomic_cas_or_amo32!</span> {
     <span class="attr">#[inline]
     </span><span class="kw">pub fn </span>swap(<span class="kw-2">&amp;</span><span class="self">self</span>, ptr: <span class="kw-2">*mut </span>T, order: Ordering) -&gt; <span class="kw-2">*mut </span>T
     <span class="kw">where
@@ -7419,7 +7516,8 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
     {
         <span class="macro">unimplemented!</span>()
     }
-    <span class="attr">#[inline]
+    } <span class="comment">// cfg_no_atomic_cas_or_amo32!
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>compare_exchange(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         current: <span class="kw-2">*mut </span>T,
@@ -7458,6 +7556,7 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
     {
         <span class="macro">unimplemented!</span>()
     }
+    <span class="macro">cfg_no_atomic_cas_or_amo32!</span> {
     <span class="attr">#[inline]
     </span><span class="kw">pub fn </span>fetch_ptr_add(<span class="kw-2">&amp;</span><span class="self">self</span>, val: usize, order: Ordering) -&gt; <span class="kw-2">*mut </span>T
     <span class="kw">where
@@ -7528,28 +7627,17 @@ RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
     {
         <span class="macro">unimplemented!</span>()
     }
-}
+    } <span class="comment">// cfg_no_atomic_cas_or_amo32!
+</span>}
 } <span class="comment">// cfg_no_atomic_cas!
 </span>} <span class="comment">// cfg_has_atomic_ptr!
 
 </span><span class="macro">macro_rules!</span> atomic_int {
-    <span class="comment">// TODO: support AtomicF{16,128} once https://github.com/rust-lang/rust/issues/116909 stabilized.
-    </span>(AtomicU32, <span class="macro-nonterminal">$int_type</span>:ident, <span class="macro-nonterminal">$align</span>:literal) =&gt; {
-        <span class="macro">atomic_int!</span>(int, AtomicU32, <span class="macro-nonterminal">$int_type</span>, <span class="macro-nonterminal">$align</span>);
-        <span class="attr">#[cfg(feature = <span class="string">"float"</span>)]
-        </span><span class="macro">atomic_int!</span>(float, AtomicF32, f32, AtomicU32, <span class="macro-nonterminal">$int_type</span>, <span class="macro-nonterminal">$align</span>);
-    };
-    (AtomicU64, <span class="macro-nonterminal">$int_type</span>:ident, <span class="macro-nonterminal">$align</span>:literal) =&gt; {
-        <span class="macro">atomic_int!</span>(int, AtomicU64, <span class="macro-nonterminal">$int_type</span>, <span class="macro-nonterminal">$align</span>);
-        <span class="attr">#[cfg(feature = <span class="string">"float"</span>)]
-        </span><span class="macro">atomic_int!</span>(float, AtomicF64, f64, AtomicU64, <span class="macro-nonterminal">$int_type</span>, <span class="macro-nonterminal">$align</span>);
-    };
-    (<span class="macro-nonterminal">$atomic_type</span>:ident, <span class="macro-nonterminal">$int_type</span>:ident, <span class="macro-nonterminal">$align</span>:literal) =&gt; {
-        <span class="macro">atomic_int!</span>(int, <span class="macro-nonterminal">$atomic_type</span>, <span class="macro-nonterminal">$int_type</span>, <span class="macro-nonterminal">$align</span>);
-    };
-
     <span class="comment">// Atomic{I,U}* impls
-    </span>(int, <span class="macro-nonterminal">$atomic_type</span>:ident, <span class="macro-nonterminal">$int_type</span>:ident, <span class="macro-nonterminal">$align</span>:literal) =&gt; {
+    </span>(<span class="macro-nonterminal">$atomic_type</span>:ident, <span class="macro-nonterminal">$int_type</span>:ident, <span class="macro-nonterminal">$align</span>:literal,
+        <span class="macro-nonterminal">$cfg_has_atomic_cas_or_amo32_or_8</span>:ident, <span class="macro-nonterminal">$cfg_no_atomic_cas_or_amo32_or_8</span>:ident
+        $(, <span class="attr">#[<span class="macro-nonterminal">$cfg_float</span>:meta] </span><span class="macro-nonterminal">$atomic_float_type</span>:ident, <span class="macro-nonterminal">$float_type</span>:ident)<span class="question-mark">?
+    </span>) =&gt; {
         <span class="macro">doc_comment!</span> {
             <span class="macro">concat!</span>(<span class="string">"An integer type which can be safely shared between threads.
 
@@ -7833,7 +7921,8 @@ assert_eq!(some_var.load(Ordering::Relaxed), 10);
                 }
             }
 
-            <span class="macro">cfg_has_atomic_cas!</span> {
+            <span class="macro">cfg_has_atomic_cas_or_amo32!</span> {
+            <span class="macro-nonterminal">$</span><span class="macro">cfg_has_atomic_cas_or_amo32_or_8!</span> {
             <span class="macro">doc_comment!</span> {
                 <span class="macro">concat!</span>(<span class="string">"Stores a value into the atomic integer, returning the previous value.
 
@@ -7857,7 +7946,9 @@ assert_eq!(some_var.swap(10, Ordering::Relaxed), 5);
                     <span class="self">self</span>.inner.swap(val, order)
                 }
             }
+            } <span class="comment">// $cfg_has_atomic_cas_or_amo32_or_8!
 
+            </span><span class="macro">cfg_has_atomic_cas!</span> {
             <span class="macro">doc_comment!</span> {
                 <span class="macro">concat!</span>(<span class="string">"Stores a value into the atomic integer if the current value is the same as
 the `current` value.
@@ -7967,7 +8058,9 @@ loop {
                     <span class="self">self</span>.inner.compare_exchange_weak(current, new, success, failure)
                 }
             }
+            } <span class="comment">// cfg_has_atomic_cas!
 
+            </span><span class="macro-nonterminal">$</span><span class="macro">cfg_has_atomic_cas_or_amo32_or_8!</span> {
             <span class="macro">doc_comment!</span> {
                 <span class="macro">concat!</span>(<span class="string">"Adds to the current value, returning the previous value.
 
@@ -8083,8 +8176,9 @@ assert_eq!(foo.load(Ordering::SeqCst), 10);
                     <span class="self">self</span>.inner.sub(val, order);
                 }
             }
+            } <span class="comment">// $cfg_has_atomic_cas_or_amo32_or_8!
 
-            <span class="macro">doc_comment!</span> {
+            </span><span class="macro">doc_comment!</span> {
                 <span class="macro">concat!</span>(<span class="string">"Bitwise \"and\" with the current value.
 
 Performs a bitwise \"and\" operation on the current value and the argument `val`, and
@@ -8151,6 +8245,7 @@ assert_eq!(foo.load(Ordering::SeqCst), 0b100001);
                 }
             }
 
+            <span class="macro">cfg_has_atomic_cas!</span> {
             <span class="macro">doc_comment!</span> {
                 <span class="macro">concat!</span>(<span class="string">"Bitwise \"nand\" with the current value.
 
@@ -8179,8 +8274,9 @@ assert_eq!(foo.load(Ordering::SeqCst), !(0x13 &amp; 0x31));
                     <span class="self">self</span>.inner.fetch_nand(val, order)
                 }
             }
+            } <span class="comment">// cfg_has_atomic_cas!
 
-            <span class="macro">doc_comment!</span> {
+            </span><span class="macro">doc_comment!</span> {
                 <span class="macro">concat!</span>(<span class="string">"Bitwise \"or\" with the current value.
 
 Performs a bitwise \"or\" operation on the current value and the argument `val`, and
@@ -8314,6 +8410,7 @@ assert_eq!(foo.load(Ordering::SeqCst), 0b011110);
                 }
             }
 
+            <span class="macro">cfg_has_atomic_cas!</span> {
             <span class="macro">doc_comment!</span> {
                 <span class="macro">concat!</span>(<span class="string">"Fetches the value, and applies a function to it that returns an optional
 new value. Returns a `Result` of `Ok(previous_value)` if the function returned `Some(_)`, else
@@ -8380,7 +8477,9 @@ assert_eq!(x.load(Ordering::SeqCst), 9);
                     <span class="prelude-val">Err</span>(prev)
                 }
             }
+            } <span class="comment">// cfg_has_atomic_cas!
 
+            </span><span class="macro-nonterminal">$</span><span class="macro">cfg_has_atomic_cas_or_amo32_or_8!</span> {
             <span class="macro">doc_comment!</span> {
                 <span class="macro">concat!</span>(<span class="string">"Maximum with the current value.
 
@@ -8462,8 +8561,9 @@ assert_eq!(min_foo, 12);
                     <span class="self">self</span>.inner.fetch_min(val, order)
                 }
             }
+            } <span class="comment">// $cfg_has_atomic_cas_or_amo32_or_8!
 
-            <span class="macro">doc_comment!</span> {
+            </span><span class="macro">doc_comment!</span> {
                 <span class="macro">concat!</span>(<span class="string">"Sets the bit at the specified bit-position to 1.
 
 Returns `true` if the specified bit was previously set to 1.
@@ -8608,6 +8708,7 @@ assert_eq!(foo.load(Ordering::Relaxed), !0);
                 }
             }
 
+            <span class="macro">cfg_has_atomic_cas!</span> {
             <span class="macro">doc_comment!</span> {
                 <span class="macro">concat!</span>(<span class="string">"Negates the current value, and sets the new value to the result.
 
@@ -8668,6 +8769,7 @@ assert_eq!(foo.load(Ordering::Relaxed), 5);
                 }
             }
             } <span class="comment">// cfg_has_atomic_cas!
+            </span>} <span class="comment">// cfg_has_atomic_cas_or_amo32!
 
             </span><span class="macro">const_fn!</span> {
                 const_if: <span class="attr">#[cfg(not(portable_atomic_no_const_raw_ptr_deref))]</span>;
@@ -8697,14 +8799,16 @@ assert_eq!(foo.load(Ordering::Relaxed), 5);
         <span class="attr">#[doc(hidden)]
         #[allow(unused_variables, clippy::unused_self)]
         </span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; <span class="macro-nonterminal">$atomic_type </span>{
-            <span class="attr">#[inline]
+            <span class="macro-nonterminal">$</span><span class="macro">cfg_no_atomic_cas_or_amo32_or_8!</span> {
+            <span class="attr">#[<span class="macro-nonterminal">inline</span>]
             </span><span class="kw">pub fn </span>swap(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type
             </span><span class="kw">where
                 </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">Self</span>: HasSwap,
             {
                 <span class="macro">unimplemented!</span>()
             }
-            <span class="attr">#[inline]
+            } <span class="comment">// $cfg_no_atomic_cas_or_amo32_or_8!
+            </span><span class="attr">#[inline]
             </span><span class="kw">pub fn </span>compare_exchange(
                 <span class="kw-2">&amp;</span><span class="self">self</span>,
                 current: <span class="macro-nonterminal">$int_type</span>,
@@ -8730,7 +8834,8 @@ assert_eq!(foo.load(Ordering::Relaxed), 5);
             {
                 <span class="macro">unimplemented!</span>()
             }
-            <span class="attr">#[inline]
+            <span class="macro-nonterminal">$</span><span class="macro">cfg_no_atomic_cas_or_amo32_or_8!</span> {
+            <span class="attr">#[<span class="macro-nonterminal">inline</span>]
             </span><span class="kw">pub fn </span>fetch_add(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type
             </span><span class="kw">where
                 </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">Self</span>: HasFetchAdd,
@@ -8758,6 +8863,8 @@ assert_eq!(foo.load(Ordering::Relaxed), 5);
             {
                 <span class="macro">unimplemented!</span>()
             }
+            } <span class="comment">// $cfg_no_atomic_cas_or_amo32_or_8!
+            </span><span class="macro">cfg_no_atomic_cas_or_amo32!</span> {
             <span class="attr">#[inline]
             </span><span class="kw">pub fn </span>fetch_and(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type
             </span><span class="kw">where
@@ -8772,13 +8879,15 @@ assert_eq!(foo.load(Ordering::Relaxed), 5);
             {
                 <span class="macro">unimplemented!</span>()
             }
-            <span class="attr">#[inline]
+            } <span class="comment">// cfg_no_atomic_cas_or_amo32!
+            </span><span class="attr">#[inline]
             </span><span class="kw">pub fn </span>fetch_nand(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type
             </span><span class="kw">where
                 </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">Self</span>: HasFetchNand,
             {
                 <span class="macro">unimplemented!</span>()
             }
+            <span class="macro">cfg_no_atomic_cas_or_amo32!</span> {
             <span class="attr">#[inline]
             </span><span class="kw">pub fn </span>fetch_or(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type
             </span><span class="kw">where
@@ -8807,7 +8916,8 @@ assert_eq!(foo.load(Ordering::Relaxed), 5);
             {
                 <span class="macro">unimplemented!</span>()
             }
-            <span class="attr">#[inline]
+            } <span class="comment">// cfg_no_atomic_cas_or_amo32!
+            </span><span class="attr">#[inline]
             </span><span class="kw">pub fn </span>fetch_update&lt;F&gt;(
                 <span class="kw-2">&amp;</span><span class="self">self</span>,
                 set_order: Ordering,
@@ -8820,7 +8930,8 @@ assert_eq!(foo.load(Ordering::Relaxed), 5);
             {
                 <span class="macro">unimplemented!</span>()
             }
-            <span class="attr">#[inline]
+            <span class="macro-nonterminal">$</span><span class="macro">cfg_no_atomic_cas_or_amo32_or_8!</span> {
+            <span class="attr">#[<span class="macro-nonterminal">inline</span>]
             </span><span class="kw">pub fn </span>fetch_max(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type
             </span><span class="kw">where
                 </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">Self</span>: HasFetchMax,
@@ -8834,6 +8945,8 @@ assert_eq!(foo.load(Ordering::Relaxed), 5);
             {
                 <span class="macro">unimplemented!</span>()
             }
+            } <span class="comment">// $cfg_no_atomic_cas_or_amo32_or_8!
+            </span><span class="macro">cfg_no_atomic_cas_or_amo32!</span> {
             <span class="attr">#[inline]
             </span><span class="kw">pub fn </span>bit_set(<span class="kw-2">&amp;</span><span class="self">self</span>, bit: u32, order: Ordering) -&gt; bool
             <span class="kw">where
@@ -8869,7 +8982,8 @@ assert_eq!(foo.load(Ordering::Relaxed), 5);
             {
                 <span class="macro">unimplemented!</span>()
             }
-            <span class="attr">#[inline]
+            } <span class="comment">// cfg_no_atomic_cas_or_amo32!
+            </span><span class="attr">#[inline]
             </span><span class="kw">pub fn </span>fetch_neg(<span class="kw-2">&amp;</span><span class="self">self</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type
             </span><span class="kw">where
                 </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">Self</span>: HasFetchNeg,
@@ -8885,6 +8999,10 @@ assert_eq!(foo.load(Ordering::Relaxed), 5);
             }
         }
         } <span class="comment">// cfg_no_atomic_cas!
+        </span>$(
+            <span class="attr">#[<span class="macro-nonterminal">$cfg_float</span>]
+            </span><span class="macro">atomic_int!</span>(float, <span class="macro-nonterminal">$atomic_float_type</span>, <span class="macro-nonterminal">$float_type</span>, <span class="macro-nonterminal">$atomic_type</span>, <span class="macro-nonterminal">$int_type</span>, <span class="macro-nonterminal">$align</span>);
+        )<span class="question-mark">?
     </span>};
 
     <span class="comment">// AtomicF* impls
@@ -9069,7 +9187,7 @@ This type has the same in-memory representation as the underlying floating point
                 <span class="self">self</span>.inner.store(val, order)
             }
 
-            <span class="macro">cfg_has_atomic_cas!</span> {
+            <span class="macro">cfg_has_atomic_cas_or_amo32!</span> {
             <span class="doccomment">/// Stores a value into the atomic float, returning the previous value.
             ///
             /// `swap` takes an [`Ordering`] argument which describes the memory ordering
@@ -9082,6 +9200,7 @@ This type has the same in-memory representation as the underlying floating point
                 <span class="self">self</span>.inner.swap(val, order)
             }
 
+            <span class="macro">cfg_has_atomic_cas!</span> {
             <span class="doccomment">/// Stores a value into the atomic float if the current value is the same as
             /// the `current` value.
             ///
@@ -9265,8 +9384,9 @@ This type has the same in-memory representation as the underlying floating point
             </span><span class="kw">pub fn </span>fetch_min(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$float_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$float_type </span>{
                 <span class="self">self</span>.inner.fetch_min(val, order)
             }
+            } <span class="comment">// cfg_has_atomic_cas!
 
-            <span class="doccomment">/// Negates the current value, and sets the new value to the result.
+            </span><span class="doccomment">/// Negates the current value, and sets the new value to the result.
             ///
             /// Returns the previous value.
             ///
@@ -9294,7 +9414,7 @@ This type has the same in-memory representation as the underlying floating point
             </span><span class="kw">pub fn </span>fetch_abs(<span class="kw-2">&amp;</span><span class="self">self</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$float_type </span>{
                 <span class="self">self</span>.inner.fetch_abs(order)
             }
-            } <span class="comment">// cfg_has_atomic_cas!
+            } <span class="comment">// cfg_has_atomic_cas_or_amo32!
 
             </span><span class="attr">#[cfg(not(portable_atomic_no_const_raw_ptr_deref))]
             </span><span class="macro">doc_comment!</span> {
@@ -9351,6 +9471,7 @@ This is `const fn` on Rust 1.58+."</span>),
         <span class="attr">#[doc(hidden)]
         #[allow(unused_variables, clippy::unused_self)]
         </span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; <span class="macro-nonterminal">$atomic_type </span>{
+            <span class="macro">cfg_no_atomic_cas_or_amo32!</span> {
             <span class="attr">#[inline]
             </span><span class="kw">pub fn </span>swap(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$float_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$float_type
             </span><span class="kw">where
@@ -9358,7 +9479,8 @@ This is `const fn` on Rust 1.58+."</span>),
             {
                 <span class="macro">unimplemented!</span>()
             }
-            <span class="attr">#[inline]
+            } <span class="comment">// cfg_no_atomic_cas_or_amo32!
+            </span><span class="attr">#[inline]
             </span><span class="kw">pub fn </span>compare_exchange(
                 <span class="kw-2">&amp;</span><span class="self">self</span>,
                 current: <span class="macro-nonterminal">$float_type</span>,
@@ -9425,6 +9547,7 @@ This is `const fn` on Rust 1.58+."</span>),
             {
                 <span class="macro">unimplemented!</span>()
             }
+            <span class="macro">cfg_no_atomic_cas_or_amo32!</span> {
             <span class="attr">#[inline]
             </span><span class="kw">pub fn </span>fetch_neg(<span class="kw-2">&amp;</span><span class="self">self</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$float_type
             </span><span class="kw">where
@@ -9439,78 +9562,96 @@ This is `const fn` on Rust 1.58+."</span>),
             {
                 <span class="macro">unimplemented!</span>()
             }
-        }
+            } <span class="comment">// cfg_no_atomic_cas_or_amo32!
+        </span>}
         } <span class="comment">// cfg_no_atomic_cas!
     </span>};
 }
 
 <span class="macro">cfg_has_atomic_ptr!</span> {
     <span class="attr">#[cfg(target_pointer_width = <span class="string">"16"</span>)]
-    </span><span class="macro">atomic_int!</span>(AtomicIsize, isize, <span class="number">2</span>);
+    </span><span class="macro">atomic_int!</span>(AtomicIsize, isize, <span class="number">2</span>, cfg_has_atomic_cas_or_amo8, cfg_no_atomic_cas_or_amo8);
     <span class="attr">#[cfg(target_pointer_width = <span class="string">"16"</span>)]
-    </span><span class="macro">atomic_int!</span>(AtomicUsize, usize, <span class="number">2</span>);
+    </span><span class="macro">atomic_int!</span>(AtomicUsize, usize, <span class="number">2</span>, cfg_has_atomic_cas_or_amo8, cfg_no_atomic_cas_or_amo8);
     <span class="attr">#[cfg(target_pointer_width = <span class="string">"32"</span>)]
-    </span><span class="macro">atomic_int!</span>(AtomicIsize, isize, <span class="number">4</span>);
+    </span><span class="macro">atomic_int!</span>(AtomicIsize, isize, <span class="number">4</span>, cfg_has_atomic_cas_or_amo32, cfg_no_atomic_cas_or_amo32);
     <span class="attr">#[cfg(target_pointer_width = <span class="string">"32"</span>)]
-    </span><span class="macro">atomic_int!</span>(AtomicUsize, usize, <span class="number">4</span>);
+    </span><span class="macro">atomic_int!</span>(AtomicUsize, usize, <span class="number">4</span>, cfg_has_atomic_cas_or_amo32, cfg_no_atomic_cas_or_amo32);
     <span class="attr">#[cfg(target_pointer_width = <span class="string">"64"</span>)]
-    </span><span class="macro">atomic_int!</span>(AtomicIsize, isize, <span class="number">8</span>);
+    </span><span class="macro">atomic_int!</span>(AtomicIsize, isize, <span class="number">8</span>, cfg_has_atomic_cas_or_amo32, cfg_no_atomic_cas_or_amo32);
     <span class="attr">#[cfg(target_pointer_width = <span class="string">"64"</span>)]
-    </span><span class="macro">atomic_int!</span>(AtomicUsize, usize, <span class="number">8</span>);
+    </span><span class="macro">atomic_int!</span>(AtomicUsize, usize, <span class="number">8</span>, cfg_has_atomic_cas_or_amo32, cfg_no_atomic_cas_or_amo32);
     <span class="attr">#[cfg(target_pointer_width = <span class="string">"128"</span>)]
-    </span><span class="macro">atomic_int!</span>(AtomicIsize, isize, <span class="number">16</span>);
+    </span><span class="macro">atomic_int!</span>(AtomicIsize, isize, <span class="number">16</span>, cfg_has_atomic_cas_or_amo32, cfg_no_atomic_cas_or_amo32);
     <span class="attr">#[cfg(target_pointer_width = <span class="string">"128"</span>)]
-    </span><span class="macro">atomic_int!</span>(AtomicUsize, usize, <span class="number">16</span>);
+    </span><span class="macro">atomic_int!</span>(AtomicUsize, usize, <span class="number">16</span>, cfg_has_atomic_cas_or_amo32, cfg_no_atomic_cas_or_amo32);
 }
 
 <span class="macro">cfg_has_atomic_8!</span> {
-    <span class="macro">atomic_int!</span>(AtomicI8, i8, <span class="number">1</span>);
-    <span class="macro">atomic_int!</span>(AtomicU8, u8, <span class="number">1</span>);
+    <span class="macro">atomic_int!</span>(AtomicI8, i8, <span class="number">1</span>, cfg_has_atomic_cas_or_amo8, cfg_no_atomic_cas_or_amo8);
+    <span class="macro">atomic_int!</span>(AtomicU8, u8, <span class="number">1</span>, cfg_has_atomic_cas_or_amo8, cfg_no_atomic_cas_or_amo8);
 }
 <span class="macro">cfg_has_atomic_16!</span> {
-    <span class="macro">atomic_int!</span>(AtomicI16, i16, <span class="number">2</span>);
-    <span class="macro">atomic_int!</span>(AtomicU16, u16, <span class="number">2</span>);
-}
+    <span class="macro">atomic_int!</span>(AtomicI16, i16, <span class="number">2</span>, cfg_has_atomic_cas_or_amo8, cfg_no_atomic_cas_or_amo8);
+    <span class="macro">atomic_int!</span>(AtomicU16, u16, <span class="number">2</span>, cfg_has_atomic_cas_or_amo8, cfg_no_atomic_cas_or_amo8);
+        <span class="comment">// TODO: support once https://github.com/rust-lang/rust/issues/116909 stabilized.
+        // #[cfg(all(feature = "float", not(portable_atomic_no_f16)))] AtomicF16, f16);
+</span>}
 <span class="macro">cfg_has_atomic_32!</span> {
-    <span class="macro">atomic_int!</span>(AtomicI32, i32, <span class="number">4</span>);
-    <span class="macro">atomic_int!</span>(AtomicU32, u32, <span class="number">4</span>);
+    <span class="macro">atomic_int!</span>(AtomicI32, i32, <span class="number">4</span>, cfg_has_atomic_cas_or_amo32, cfg_no_atomic_cas_or_amo32);
+    <span class="macro">atomic_int!</span>(AtomicU32, u32, <span class="number">4</span>, cfg_has_atomic_cas_or_amo32, cfg_no_atomic_cas_or_amo32,
+        <span class="attr">#[cfg(feature = <span class="string">"float"</span>)] </span>AtomicF32, f32);
 }
 <span class="macro">cfg_has_atomic_64!</span> {
-    <span class="macro">atomic_int!</span>(AtomicI64, i64, <span class="number">8</span>);
-    <span class="macro">atomic_int!</span>(AtomicU64, u64, <span class="number">8</span>);
+    <span class="macro">atomic_int!</span>(AtomicI64, i64, <span class="number">8</span>, cfg_has_atomic_cas_or_amo32, cfg_no_atomic_cas_or_amo32);
+    <span class="macro">atomic_int!</span>(AtomicU64, u64, <span class="number">8</span>, cfg_has_atomic_cas_or_amo32, cfg_no_atomic_cas_or_amo32,
+        <span class="attr">#[cfg(feature = <span class="string">"float"</span>)] </span>AtomicF64, f64);
 }
 <span class="macro">cfg_has_atomic_128!</span> {
-    <span class="macro">atomic_int!</span>(AtomicI128, i128, <span class="number">16</span>);
-    <span class="macro">atomic_int!</span>(AtomicU128, u128, <span class="number">16</span>);
-}
+    <span class="macro">atomic_int!</span>(AtomicI128, i128, <span class="number">16</span>, cfg_has_atomic_cas_or_amo32, cfg_no_atomic_cas_or_amo32);
+    <span class="macro">atomic_int!</span>(AtomicU128, u128, <span class="number">16</span>, cfg_has_atomic_cas_or_amo32, cfg_no_atomic_cas_or_amo32);
+        <span class="comment">// TODO: support once https://github.com/rust-lang/rust/issues/116909 stabilized.
+        // #[cfg(all(feature = "float", not(portable_atomic_no_f128)))] AtomicF128, f128);
+</span>}
 
 <span class="comment">// See https://github.com/taiki-e/portable-atomic/issues/180
 </span><span class="attr">#[cfg(not(feature = <span class="string">"require-cas"</span>))]
 </span><span class="macro">cfg_no_atomic_cas!</span> {
+<span class="macro">cfg_no_atomic_cas_or_amo32!</span> {
 <span class="attr">#[cfg(feature = <span class="string">"float"</span>)]
 </span><span class="kw">use </span>diagnostic_helper::HasFetchAbs;
 <span class="kw">use </span>diagnostic_helper::{
-    HasAdd, HasAnd, HasBitClear, HasBitSet, HasBitToggle, HasCompareExchange,
-    HasCompareExchangeWeak, HasFetchAdd, HasFetchAnd, HasFetchByteAdd, HasFetchByteSub,
-    HasFetchMax, HasFetchMin, HasFetchNand, HasFetchNeg, HasFetchNot, HasFetchOr, HasFetchPtrAdd,
-    HasFetchPtrSub, HasFetchSub, HasFetchUpdate, HasFetchXor, HasNeg, HasNot, HasOr, HasSub,
-    HasSwap, HasXor,
+    HasAnd, HasBitClear, HasBitSet, HasBitToggle, HasFetchAnd, HasFetchByteAdd, HasFetchByteSub,
+    HasFetchNot, HasFetchOr, HasFetchPtrAdd, HasFetchPtrSub, HasFetchXor, HasNot, HasOr, HasXor,
+};
+} <span class="comment">// cfg_no_atomic_cas_or_amo32!
+</span><span class="macro">cfg_no_atomic_cas_or_amo8!</span> {
+<span class="kw">use </span>diagnostic_helper::{HasAdd, HasSub, HasSwap};
+} <span class="comment">// cfg_no_atomic_cas_or_amo8!
+</span><span class="attr">#[cfg_attr(not(feature = <span class="string">"float"</span>), allow(unused_imports))]
+</span><span class="kw">use </span>diagnostic_helper::{
+    HasCompareExchange, HasCompareExchangeWeak, HasFetchAdd, HasFetchMax, HasFetchMin,
+    HasFetchNand, HasFetchNeg, HasFetchSub, HasFetchUpdate, HasNeg,
 };
 <span class="attr">#[cfg_attr(
-    all(
-        portable_atomic_no_atomic_load_store,
-        not(any(
-            target_arch = <span class="string">"avr"</span>,
-            target_arch = <span class="string">"bpf"</span>,
-            target_arch = <span class="string">"msp430"</span>,
-            target_arch = <span class="string">"riscv32"</span>,
-            target_arch = <span class="string">"riscv64"</span>,
-            feature = <span class="string">"critical-section"</span>,
-        )),
+    any(
+        all(
+            portable_atomic_no_atomic_load_store,
+            not(any(
+                target_arch = <span class="string">"avr"</span>,
+                target_arch = <span class="string">"bpf"</span>,
+                target_arch = <span class="string">"msp430"</span>,
+                target_arch = <span class="string">"riscv32"</span>,
+                target_arch = <span class="string">"riscv64"</span>,
+                feature = <span class="string">"critical-section"</span>,
+            )),
+        ),
+        not(feature = <span class="string">"float"</span>),
     ),
     allow(dead_code, unreachable_pub)
 )]
 </span><span class="kw">mod </span>diagnostic_helper {
+    <span class="macro">cfg_no_atomic_cas_or_amo8!</span> {
     <span class="attr">#[doc(hidden)]
     #[cfg_attr(
         not(portable_atomic_no_diagnostic_namespace),
@@ -9522,7 +9663,8 @@ This is `const fn` on Rust 1.58+."</span>),
         </span>)
     )]
     </span><span class="kw">pub trait </span>HasSwap {}
-    <span class="attr">#[doc(hidden)]
+    } <span class="comment">// cfg_no_atomic_cas_or_amo8!
+    </span><span class="attr">#[doc(hidden)]
     #[cfg_attr(
         not(portable_atomic_no_diagnostic_namespace),
         diagnostic::on_unimplemented(
@@ -9555,6 +9697,7 @@ This is `const fn` on Rust 1.58+."</span>),
         </span>)
     )]
     </span><span class="kw">pub trait </span>HasFetchAdd {}
+    <span class="macro">cfg_no_atomic_cas_or_amo8!</span> {
     <span class="attr">#[doc(hidden)]
     #[cfg_attr(
         not(portable_atomic_no_diagnostic_namespace),
@@ -9566,7 +9709,8 @@ This is `const fn` on Rust 1.58+."</span>),
         </span>)
     )]
     </span><span class="kw">pub trait </span>HasAdd {}
-    <span class="attr">#[doc(hidden)]
+    } <span class="comment">// cfg_no_atomic_cas_or_amo8!
+    </span><span class="attr">#[doc(hidden)]
     #[cfg_attr(
         not(portable_atomic_no_diagnostic_namespace),
         diagnostic::on_unimplemented(
@@ -9577,6 +9721,7 @@ This is `const fn` on Rust 1.58+."</span>),
         </span>)
     )]
     </span><span class="kw">pub trait </span>HasFetchSub {}
+    <span class="macro">cfg_no_atomic_cas_or_amo8!</span> {
     <span class="attr">#[doc(hidden)]
     #[cfg_attr(
         not(portable_atomic_no_diagnostic_namespace),
@@ -9588,6 +9733,8 @@ This is `const fn` on Rust 1.58+."</span>),
         </span>)
     )]
     </span><span class="kw">pub trait </span>HasSub {}
+    } <span class="comment">// cfg_no_atomic_cas_or_amo8!
+    </span><span class="macro">cfg_no_atomic_cas_or_amo32!</span> {
     <span class="attr">#[doc(hidden)]
     #[cfg_attr(
         not(portable_atomic_no_diagnostic_namespace),
@@ -9654,7 +9801,8 @@ This is `const fn` on Rust 1.58+."</span>),
         </span>)
     )]
     </span><span class="kw">pub trait </span>HasAnd {}
-    <span class="attr">#[doc(hidden)]
+    } <span class="comment">// cfg_no_atomic_cas_or_amo32!
+    </span><span class="attr">#[doc(hidden)]
     #[cfg_attr(
         not(portable_atomic_no_diagnostic_namespace),
         diagnostic::on_unimplemented(
@@ -9665,6 +9813,7 @@ This is `const fn` on Rust 1.58+."</span>),
         </span>)
     )]
     </span><span class="kw">pub trait </span>HasFetchNand {}
+    <span class="macro">cfg_no_atomic_cas_or_amo32!</span> {
     <span class="attr">#[doc(hidden)]
     #[cfg_attr(
         not(portable_atomic_no_diagnostic_namespace),
@@ -9731,7 +9880,8 @@ This is `const fn` on Rust 1.58+."</span>),
         </span>)
     )]
     </span><span class="kw">pub trait </span>HasNot {}
-    <span class="attr">#[doc(hidden)]
+    } <span class="comment">// cfg_no_atomic_cas_or_amo32!
+    </span><span class="attr">#[doc(hidden)]
     #[cfg_attr(
         not(portable_atomic_no_diagnostic_namespace),
         diagnostic::on_unimplemented(
@@ -9753,6 +9903,7 @@ This is `const fn` on Rust 1.58+."</span>),
         </span>)
     )]
     </span><span class="kw">pub trait </span>HasNeg {}
+    <span class="macro">cfg_no_atomic_cas_or_amo32!</span> {
     <span class="attr">#[cfg(feature = <span class="string">"float"</span>)]
     #[cfg_attr(target_pointer_width = <span class="string">"16"</span>, allow(dead_code, unreachable_pub))]
     #[doc(hidden)]
@@ -9766,7 +9917,8 @@ This is `const fn` on Rust 1.58+."</span>),
         </span>)
     )]
     </span><span class="kw">pub trait </span>HasFetchAbs {}
-    <span class="attr">#[doc(hidden)]
+    } <span class="comment">// cfg_no_atomic_cas_or_amo32!
+    </span><span class="attr">#[doc(hidden)]
     #[cfg_attr(
         not(portable_atomic_no_diagnostic_namespace),
         diagnostic::on_unimplemented(
@@ -9799,6 +9951,7 @@ This is `const fn` on Rust 1.58+."</span>),
         </span>)
     )]
     </span><span class="kw">pub trait </span>HasFetchUpdate {}
+    <span class="macro">cfg_no_atomic_cas_or_amo32!</span> {
     <span class="attr">#[doc(hidden)]
     #[cfg_attr(
         not(portable_atomic_no_diagnostic_namespace),
@@ -9832,6 +9985,7 @@ This is `const fn` on Rust 1.58+."</span>),
         </span>)
     )]
     </span><span class="kw">pub trait </span>HasBitToggle {}
-}
+    } <span class="comment">// cfg_no_atomic_cas_or_amo32!
+</span>}
 } <span class="comment">// cfg_no_atomic_cas!
 </span></code></pre></div></section></main></body></html>

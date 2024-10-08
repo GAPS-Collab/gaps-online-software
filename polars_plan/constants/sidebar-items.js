@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["LEN","LITERAL_NAME","UNLIMITED_CACHE"],"static":["CSE_REPLACED","MAP_LIST_NAME"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["can_sum","estimated_bytes_size","sum","sum_primitive","sum_slice"],"trait":["Sum"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["convert_inner_type"],"mod":["default_arrays","list","null","slice","utf8"],"trait":["ListFromIter","PolarsArray"]};

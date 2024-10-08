@@ -1349,6 +1349,7 @@
 <a href="#1349" id="1349">1349</a>
 <a href="#1350" id="1350">1350</a>
 <a href="#1351" id="1351">1351</a>
+<a href="#1352" id="1352">1352</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Readoutboard binary event formats, former denoted as BLOB (binary large object)
 //! 
 //! The structure is the following
@@ -1382,6 +1383,7 @@
     u8_to_u16,
     Serialization,
     SerializationError,
+    search_for_u16,
     Packable,
     parse_u8,
     parse_u16,
@@ -1871,17 +1873,25 @@
     <span class="comment">//let ch_ids      = event.header.get_active_data_channels();
     </span><span class="kw">let </span>stream_len  = stream.len();
     <span class="kw">if </span>event.header.is_event_fragment() {
-      <span class="macro">error!</span>(<span class="string">"Fragmented event {} found! Disregarding channel data.."</span>, event.header.event_id);
-      <span class="kw">return </span><span class="prelude-val">Ok</span>(event);
+      <span class="macro">debug!</span>(<span class="string">"Fragmented event {} found!"</span>, event.header.event_id);
+      <span class="kw">let </span>tail_pos = search_for_u16(<span class="self">Self</span>::TAIL, stream, <span class="kw-2">*</span>pos)<span class="question-mark">?</span>;
+      * pos = tail_pos + <span class="number">2 </span><span class="kw">as </span>usize;
+      <span class="comment">// the event fragment won't have channel data, so 
+      // let's move on to the next TAIL marker:ta
+      </span><span class="kw">return </span><span class="prelude-val">Ok</span>(event);
     }
     <span class="kw">if </span>event.header.drs_lost_trigger() {
-      <span class="macro">error!</span>(<span class="string">"Event {} has lost trigger! Disregarding channel data.."</span>, event.header.event_id);
+      <span class="macro">debug!</span>(<span class="string">"Event {} has lost trigger!"</span>, event.header.event_id);
+      <span class="kw">let </span>tail_pos = search_for_u16(<span class="self">Self</span>::TAIL, stream, <span class="kw-2">*</span>pos)<span class="question-mark">?</span>;
+      * pos = tail_pos + <span class="number">2 </span><span class="kw">as </span>usize;
       <span class="kw">return </span><span class="prelude-val">Ok</span>(event);
     }
     <span class="kw">let </span><span class="kw-2">mut </span>decoded_ch = Vec::&lt;u8&gt;::new();
     <span class="kw">for </span>ch <span class="kw">in </span>event.header.get_channels().iter() {
       <span class="kw">if </span><span class="kw-2">*</span>pos + <span class="number">2</span><span class="kw-2">*</span>NWORDS &gt;= stream_len {
         <span class="macro">error!</span>(<span class="string">"The channel data for event {} ch {} seems corrupt! We want to get channels {:?}, but have decoded only {:?}, because the stream ends {} bytes too early!"</span>,event.header.event_id, ch, event.header.get_channels(), decoded_ch, <span class="kw-2">*</span>pos + <span class="number">2</span><span class="kw-2">*</span>NWORDS - stream_len);
+        <span class="kw">let </span>tail_pos = search_for_u16(<span class="self">Self</span>::TAIL, stream, <span class="kw-2">*</span>pos)<span class="question-mark">?</span>;
+        * pos = tail_pos + <span class="number">2 </span><span class="kw">as </span>usize;
         <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::WrongByteSize {})
       }
       decoded_ch.push(<span class="kw-2">*</span>ch);
@@ -1891,16 +1901,7 @@
       </span>event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = u8_to_u16(data);
       <span class="kw-2">*</span>pos += <span class="number">2</span><span class="kw-2">*</span>NWORDS;
     }
-    <span class="comment">//if event.header.has_ch9() {
-    //  if *pos + 2*NWORDS &gt;= stream_len {
-    //    error!("The channel data for ch 9 (calibration channel) seems corrupt!");
-    //    return Err(SerializationError::WrongByteSize {})
-    //  }
-    //  //let data = &amp;stream[*pos..*pos+2*NWORDS];
-    //  //event.ch9_adc = u8_to_u16(data);
-    //  //*pos += 2*NWORDS;
-    //}
-    </span><span class="kw">for _ in </span><span class="number">0</span>..n_hits {
+    <span class="kw">for _ in </span><span class="number">0</span>..n_hits {
       <span class="kw">match </span>TofHit::from_bytestream(stream, pos) {
         <span class="prelude-val">Err</span>(err) =&gt; {
           <span class="macro">error!</span>(<span class="string">"Can't read TofHit! Err {err}"</span>);
@@ -2590,6 +2591,7 @@
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Event ID  : {}"</span>, <span class="self">self</span>.event_id));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  RB        : {}"</span>, <span class="self">self</span>.rb_id));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Channel   : {}"</span>, <span class="self">self</span>.rb_channel));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Paddle ID : {}"</span>, <span class="self">self</span>.paddle_id));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Stop cell : {}"</span>, <span class="self">self</span>.stop_cell));
     <span class="kw">if </span><span class="self">self</span>.adc.len() &gt;= <span class="number">273 </span>{
       repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  adc [{}]      : .. {} {} {} .."</span>,<span class="self">self</span>.adc.len(), <span class="self">self</span>.adc[<span class="number">270</span>], <span class="self">self</span>.adc[<span class="number">271</span>], <span class="self">self</span>.adc[<span class="number">272</span>]));

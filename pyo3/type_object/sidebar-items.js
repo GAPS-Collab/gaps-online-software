@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"trait":["HasPyGilRef","PyLayout","PySizedLayout","PyTypeCheck","PyTypeInfo"]};

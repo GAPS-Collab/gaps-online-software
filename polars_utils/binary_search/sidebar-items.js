@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["find_first_ge_index","find_first_gt_index"]};

@@ -70,6 +70,13 @@
 <a href="#70" id="70">70</a>
 <a href="#71" id="71">71</a>
 <a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Tof dataclasses
 //!     
 //! This crate provides tof related dataclasses for 
@@ -94,7 +101,12 @@
 //! * database - access a data base for advanced paddle
 //!              mapping, readoutboard and ltb information etc.
 //!
-
+//! * caraspace - register TofPacket through the caraspace library
+//!               This allows to write TofPackets to frames, which 
+//!               will ultimatly allow them to write them to 
+//!               caraspace files
+//!
+//!
 </span><span class="kw">pub mod </span>events;
 <span class="kw">pub mod </span>packets;
 <span class="kw">pub mod </span>errors;
@@ -104,18 +116,18 @@
 <span class="kw">pub mod </span>threading;
 <span class="kw">pub mod </span>commands;
 <span class="kw">pub mod </span>monitoring;
-<span class="comment">//pub mod manifest;
-</span><span class="kw">pub mod </span>io;
+<span class="kw">pub mod </span>io;
 <span class="kw">pub mod </span>analysis;
 <span class="kw">pub mod </span>ipbus;
 <span class="kw">pub mod </span>series;
 <span class="kw">pub mod </span>heartbeats;
 <span class="kw">pub mod </span>config;
 <span class="kw">pub mod </span>version;
-<span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
-</span><span class="kw">extern crate </span>diesel;
+<span class="kw">pub mod </span>status;
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">pub mod </span>database;
+<span class="attr">#[cfg(feature=<span class="string">"caraspace-serial"</span>)]
+</span><span class="kw">pub mod </span>caraspace;
 
 <span class="kw">pub use </span>version::ProtocolVersion;
 
@@ -126,6 +138,8 @@
 <span class="doccomment">/// A type for the master trigger mappings
 /// Dsi -&gt; J -&gt; (RBID,RBCH)
 </span><span class="kw">pub type </span>DsiLtbRBMapping      = HashMap&lt;u8,HashMap&lt;u8,HashMap&lt;u8,(u8,u8)&gt;&gt;&gt;;
+
+<span class="kw">pub type </span>RbChPidMapping      = HashMap&lt;u8,HashMap&lt;u8,u8&gt;&gt;;
 
 <span class="doccomment">/// A type for the mappings of RB channels - paddle edn ids
 /// Paddle end ids are the paddle id + 1000 for A and 

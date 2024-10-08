@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["_update_gather_sorted_flag","check_bounds_ca","check_bounds_nulls"]};

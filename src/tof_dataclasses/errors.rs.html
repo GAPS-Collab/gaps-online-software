@@ -459,15 +459,15 @@
 
 <span class="comment">////////////////////////////////////////
 
-</span><span class="doccomment">/// This error shall be thrown whenver there
-/// is an issue in the de(serialization),
-/// e.g. the from_bytestream methods.
+</span><span class="doccomment">/// Indicate issues with (de)serialization
 </span><span class="attr">#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>SerializationError {
   <span class="comment">//HeaderNotFound,
   </span>TailInvalid,
   HeadInvalid,
+  TrackerDelimiterInvalid,
+  TofDelimiterInvalid,
   StreamTooShort,
   StreamTooLong,
   ValueNotFound,

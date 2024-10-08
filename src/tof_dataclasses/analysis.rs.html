@@ -597,7 +597,7 @@
       <span class="kw">return </span><span class="prelude-val">Ok</span>(n-<span class="number">1</span>);
     }
   }
-  <span class="macro">error!</span>(<span class="string">"Did not find a bin corresponding to the given time {}!"</span>, t_ns);
+  <span class="macro">debug!</span>(<span class="string">"Did not find a bin corresponding to the given time {}!"</span>, t_ns);
   <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::TimesTooSmall);
 }
 

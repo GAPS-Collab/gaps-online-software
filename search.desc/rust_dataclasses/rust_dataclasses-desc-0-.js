@@ -1,1 +1,0 @@
-searchState.loadedDescShard("rust_dataclasses", 0, "Returns the argument unchanged.\nMake a IPBus status query\nGet the next packet id, which is expected by the target\nCalls <code>U::from(self)</code>.\nSet the packet id to that what is expected from the targetr\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.")

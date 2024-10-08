@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"trait":["CustomIterTools","CustomIterToolsSized","FromTrustedLenIterator"]};
