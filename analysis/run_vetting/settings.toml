@@ -1,0 +1,1110 @@
+staging_dir = "/home/gaps/liftof-staging/"
+calibration_dir = "/tofdata/csbf-data/calib/latest/"
+db_path = "/srv/gaps/gaps-online-software/gaps-db/gaps_db/gaps_flight.db"
+runtime_sec = 900
+mtb_address = "10.0.1.10:50001"
+cpu_moni_interval_sec = 120
+rb_ignorelist_always = [
+    10,
+    12,
+    37,
+    38,
+    43,
+    45,
+    47,
+    48,
+    49,
+]
+rb_ignorelist_run = [
+    18,
+    21,
+]
+run_analysis_engine = true
+
+[mtb_settings]
+trigger_type = "TrackCentral"
+trigger_prescale = 0.10000000149011612
+poisson_trigger_rate = 0
+gaps_trigger_use_beta = true
+trace_suppression = true
+mtb_timeout_sec = 120
+mtb_moni_interval = 4
+rb_int_window = 1
+tiu_emulation_mode = false
+tofbot_webhook = "null"
+hb_send_interval = 5
+
+[event_builder_settings]
+cachesize = 100000
+n_mte_per_loop = 1
+n_rbe_per_loop = 1
+te_timeout_sec = 15
+sort_events = false
+build_strategy = "Adaptive"
+greediness = 3
+wait_nrb = 40
+hb_send_interval = 10
+
+[analysis_engine_settings]
+integration_start = 10.0
+integration_window = 190.0
+pedestal_thresh = 10.0
+pedestal_begin_bin = 700
+pedestal_win_bins = 200
+use_zscore = false
+find_pks_t_start = 10.0
+find_pks_t_window = 190.0
+min_peak_size = 10
+find_pks_thresh = 10.0
+max_peaks = 5
+cfd_fraction = 0.25
+
+[data_publisher_settings]
+data_dir = "/tofdata/csbf-data/"
+cali_dir = "/tofdata/csbf-data/calib"
+mbytes_per_file = 420
+fc_pub_address = "tcp://192.168.37.20:42000"
+send_mtb_event_packets = false
+send_rbwaveform_packets = false
+send_tof_summary_packets = true
+send_tof_event_packets = false
+hb_send_interval = 20
+
+[cmd_dispatcher_settings]
+cmd_log_path = "/home/gaps/log/"
+cc_server_address = "tcp://10.0.1.1:42000"
+fc_sub_address = "tcp://192.168.37.200:41662"
+cmd_listener_interval_sec = 1
+deny_all_requests = false
+
+[rb_settings]
+only_perfect_events = false
+calc_crc32 = false
+tof_op_mode = "Default"
+trigger_poisson_rate = 0
+trigger_fixed_rate = 0
+data_type = "Physics"
+rb_moni_interval = 10.0
+pb_moni_every_x = 2.0
+pa_moni_every_x = 2.0
+ltb_moni_every_x = 2.0
+
+[rb_settings.rb_buff_strategy]
+AdaptToRate = 2
+
+[rb_channel_mask]
+set_channel_mask = false
+set_strategy = "Board"
+
+[rb_channel_mask.rb_channel_mask]
+RB12 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB14 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB23 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB21 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB38 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB43 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB45 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB17 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB04 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB40 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB37 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB16 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB29 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB46 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB47 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB09 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB08 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB18 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB05 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB11 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB06 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB25 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB33 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB34 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB20 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB44 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB27 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB02 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB13 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB39 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB42 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB48 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB07 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB31 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB28 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB49 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB01 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB15 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB19 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB22 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB24 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB30 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB32 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB35 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB36 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB03 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB10 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB41 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+RB26 = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+]
+
+[preamp_settings]
+set_preamp_voltages = true
+set_strategy = "Board"
+
+[preamp_settings.rat_preamp_biases]
+RAT20 = [
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+]
+RAT02 = [
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.29999923706055,
+    58.0,
+    58.599998474121094,
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.29999923706055,
+    58.599998474121094,
+]
+RAT18 = [
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+]
+RAT03 = [
+    58.0,
+    58.599998474121094,
+    58.0,
+    58.29999923706055,
+    58.0,
+    58.29999923706055,
+    58.29999923706055,
+    58.0,
+    58.0,
+    58.599998474121094,
+    58.0,
+    57.599998474121094,
+    58.599998474121094,
+    58.29999923706055,
+    58.599998474121094,
+    58.0,
+]
+RAT08 = [
+    58.0,
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.0,
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+]
+RAT09 = [
+    58.0,
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+]
+RAT10 = [
+    58.0,
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    57.400001525878906,
+    57.400001525878906,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+]
+RAT13 = [
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    57.20000076293945,
+    56.5,
+    58.0,
+    58.0,
+]
+RAT16 = [
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    57.400001525878906,
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+]
+RAT19 = [
+    58.0,
+    58.0,
+    57.20000076293945,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    56.5,
+    56.5,
+    57.20000076293945,
+    57.20000076293945,
+    58.0,
+    58.0,
+    56.5,
+    57.20000076293945,
+]
+RAT12 = [
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.599998474121094,
+    58.599998474121094,
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.0,
+]
+RAT14 = [
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.29999923706055,
+    58.599998474121094,
+    58.0,
+    58.0,
+    57.400001525878906,
+    57.400001525878906,
+    57.400001525878906,
+    58.0,
+    58.400001525878906,
+]
+RAT15 = [
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.599998474121094,
+    58.599998474121094,
+    58.0,
+]
+RAT11 = [
+    58.0,
+    58.0,
+    57.20000076293945,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+]
+RAT17 = [
+    58.0,
+    58.0,
+    56.5,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+]
+RAT01 = [
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.0,
+    58.29999923706055,
+    58.0,
+    57.599998474121094,
+    58.0,
+    58.0,
+]
+RAT05 = [
+    58.0,
+    58.29999923706055,
+    58.0,
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    57.599998474121094,
+    58.599998474121094,
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.0,
+    57.599998474121094,
+    58.29999923706055,
+]
+RAT07 = [
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    56.5,
+    56.5,
+    58.0,
+    58.0,
+]
+RAT04 = [
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.0,
+    58.29999923706055,
+    58.29999923706055,
+    58.599998474121094,
+    58.599998474121094,
+    58.29999923706055,
+    58.599998474121094,
+    58.0,
+    58.0,
+    58.599998474121094,
+]
+RAT06 = [
+    58.0,
+    58.29999923706055,
+    58.29999923706055,
+    57.599998474121094,
+    58.0,
+    58.0,
+    58.0,
+    58.29999923706055,
+    58.0,
+    57.599998474121094,
+    58.0,
+    58.599998474121094,
+    58.0,
+    58.599998474121094,
+    58.0,
+    58.29999923706055,
+]
+
+[ltb_settings]
+set_ltb_thresholds = false
+set_strategy = "ControlServer"
+
+[ltb_settings.rat_ltb_thresholds]
+RAT14 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT01 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT08 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT13 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT18 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT11 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT15 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT17 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT02 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT09 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT12 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT04 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT20 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT05 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT16 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT07 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT06 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT03 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT19 = [
+    40.0,
+    32.0,
+    375.0,
+]
+RAT10 = [
+    40.0,
+    32.0,
+    375.0,
+]
