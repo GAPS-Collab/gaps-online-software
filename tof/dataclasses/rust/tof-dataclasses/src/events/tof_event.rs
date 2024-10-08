@@ -335,14 +335,6 @@ impl Serialization for TofEvent {
         }
       }
     }
-    //for k in 0..v_sizes.1 {
-    //  match RBMissingHit::from_bytestream(stream, pos) {
-    //    Err(err) => error!("Expected RBMissingHit {} of {}, but got serialization error {}!", k,  v_sizes.1, err),
-    //    Ok(miss) => {
-    //      event.missing_hits.push(miss);
-    //    }
-    //  }
-    //}
     let tail = parse_u16(stream, pos);
     if tail != Self::TAIL {
       error!("Decoding of TAIL failed! Got {} instead!", tail);

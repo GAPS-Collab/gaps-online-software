@@ -31,6 +31,7 @@ use crate::serialization::{
     u8_to_u16,
     Serialization,
     SerializationError,
+    search_for_u16,
     Packable,
     parse_u8,
     parse_u16,
@@ -520,17 +521,25 @@ impl Serialization for RBEvent {
     //let ch_ids      = event.header.get_active_data_channels();
     let stream_len  = stream.len();
     if event.header.is_event_fragment() {
-      error!("Fragmented event {} found! Disregarding channel data..", event.header.event_id);
+      debug!("Fragmented event {} found!", event.header.event_id);
+      let tail_pos = search_for_u16(Self::TAIL, stream, *pos)?;
+      * pos = tail_pos + 2 as usize;
+      // the event fragment won't have channel data, so 
+      // let's move on to the next TAIL marker:ta
       return Ok(event);
     }
     if event.header.drs_lost_trigger() {
-      error!("Event {} has lost trigger! Disregarding channel data..", event.header.event_id);
+      debug!("Event {} has lost trigger!", event.header.event_id);
+      let tail_pos = search_for_u16(Self::TAIL, stream, *pos)?;
+      * pos = tail_pos + 2 as usize;
       return Ok(event);
     }
     let mut decoded_ch = Vec::<u8>::new();
     for ch in event.header.get_channels().iter() {
       if *pos + 2*NWORDS >= stream_len {
         error!("The channel data for event {} ch {} seems corrupt! We want to get channels {:?}, but have decoded only {:?}, because the stream ends {} bytes too early!",event.header.event_id, ch, event.header.get_channels(), decoded_ch, *pos + 2*NWORDS - stream_len);
+        let tail_pos = search_for_u16(Self::TAIL, stream, *pos)?;
+        * pos = tail_pos + 2 as usize;
         return Err(SerializationError::WrongByteSize {})
       }
       decoded_ch.push(*ch);
@@ -540,15 +549,6 @@ impl Serialization for RBEvent {
       event.adc[*ch as usize] = u8_to_u16(data);
       *pos += 2*NWORDS;
     }
-    //if event.header.has_ch9() {
-    //  if *pos + 2*NWORDS >= stream_len {
-    //    error!("The channel data for ch 9 (calibration channel) seems corrupt!");
-    //    return Err(SerializationError::WrongByteSize {})
-    //  }
-    //  //let data = &stream[*pos..*pos+2*NWORDS];
-    //  //event.ch9_adc = u8_to_u16(data);
-    //  //*pos += 2*NWORDS;
-    //}
     for _ in 0..n_hits {
       match TofHit::from_bytestream(stream, pos) {
         Err(err) => {
