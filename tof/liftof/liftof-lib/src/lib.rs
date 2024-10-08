@@ -635,8 +635,9 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                        settings.find_pks_thresh  ,
                        settings.max_peaks      ) {
         Err(err) => {
-          error!("Unable to find peaks for RB{:02} ch {ch}! Ignoring this channel!", rb.rb_id);
-          error!("We won't be able to calculate timing information for this channel! Err {err}");
+          // FIXME - if this happens, most likely the channel is dead. 
+          debug!("Unable to find peaks for RB{:02} ch {ch}! Ignoring this channel!", rb.rb_id);
+          debug!("We won't be able to calculate timing information for this channel! Err {err}");
         },
         Ok(peaks)  => {
           //peaks = pks;

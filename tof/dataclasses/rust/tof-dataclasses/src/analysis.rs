@@ -126,7 +126,7 @@ pub fn time2bin(nanoseconds : &Vec<f32>,
       return Ok(n-1);
     }
   }
-  error!("Did not find a bin corresponding to the given time {}!", t_ns);
+  debug!("Did not find a bin corresponding to the given time {}!", t_ns);
   return Err(WaveformError::TimesTooSmall);
 }
 
