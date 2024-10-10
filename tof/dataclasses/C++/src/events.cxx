@@ -4,6 +4,7 @@
 #include<limits>
 #include<bitset>
 #include<cmath>
+#include <sstream>
 
 #include "events.h"
 #include "parsers.h"
@@ -1265,7 +1266,7 @@ TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream,
     //return Err(SerializationError::HeadInvalid);
   }
   u8 status_version_u8  = Gaps::parse_u8(stream, pos);
-  tes.status            = status_version_u8 & 0x3f;
+  tes.status            = static_cast<EventStatus>(status_version_u8 & 0x3f);
   tes.version           = (Gaps::ProtocolVersion)(status_version_u8 & 0xc0);
   tes.trigger_sources   = Gaps::parse_u16(stream, pos);
   tes.n_trigger_paddles = Gaps::parse_u8(stream, pos);
@@ -1306,9 +1307,12 @@ u64 TofEventSummary::get_timestamp48() const {
 }
 
 std::string TofEventSummary::to_string() const {
+  std::ostringstream oss;
+  oss << status;  // Use the << operator to stream the enum
+    
   std::string repr = "<TofEventSummary";
   //repr += std::format("\n  format test {:.2f}", get_time_a() );
-  repr += std::format("\n  Status             : {}", status);
+  repr += std::format("\n  Status             : {}", oss.str());
   repr += std::format("\n  Quality            : {}", quality);
   repr += std::format("\n  Trigger Sources    : {}", trigger_sources);
   repr += std::format("\n  N trig paddles     : {}", n_trigger_paddles);

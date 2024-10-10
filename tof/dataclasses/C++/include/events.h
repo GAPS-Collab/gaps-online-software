@@ -18,6 +18,7 @@
 
 #include <tuple>
 #include <array>
+#include <format>
 
 #include "tof_typedefs.h"
 #include "packets/monitoring.h"
@@ -91,6 +92,21 @@ enum class EventStatus : u8 {
 };
 
 std::ostream& operator<<(std::ostream& os, const EventStatus& status);
+
+template <>
+struct std::formatter<EventStatus> : std::formatter<std::string> {
+  // Parse format specifiers (default implementation)
+  constexpr auto parse(std::format_parse_context& ctx) {
+      return ctx.begin();
+  }
+  
+  auto format(const EventStatus& status, auto& ctx) {
+      std::ostringstream oss;
+      oss << status;  // Use the << operator to convert enum to string
+      return std::format_to(ctx.out(), "{}", oss.str());
+  }
+};
+
 
 /*********************************************************/
 
@@ -607,7 +623,7 @@ struct TofEventSummary {
   static const u16 TAIL = 0x5555;
 
   Gaps::ProtocolVersion version ;
-  u8          status            ; 
+  EventStatus status            ; 
   u8          quality           ; 
   u16         trigger_sources   ; 
   /// the number of triggered paddles coming
