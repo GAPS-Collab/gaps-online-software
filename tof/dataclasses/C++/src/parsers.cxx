@@ -194,3 +194,16 @@ f64 Gaps::parse_f64(const Vec<u8> &bytestream,
 }
 
 /***********************************************/
+
+std::string Gaps::parse_string(const Vec<u8> &bytestream,
+                               usize &pos) {
+  std::string result;
+  u16 size = Gaps::parse_u16(bytestream, pos);
+  Vec<u8> bytes = Gaps::slice(bytestream,pos,pos+size); 
+  //std::memcpy(&result, bytes.data(), sizeof(f64));
+  pos += 2;
+  pos += size;
+  return result;
+}
+
+
