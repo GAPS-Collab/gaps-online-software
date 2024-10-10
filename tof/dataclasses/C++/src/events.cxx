@@ -471,6 +471,46 @@ std::ostream& operator<<(std::ostream& os, const EventStatus& qual) {
        os << "Perfect>";
        break;
      }
+     case EventStatus::ChannelIDWrong : { 
+       os << "ChannelIDWrong>";
+       break;
+     }
+     case EventStatus::CellSyncErrors : {
+       os << "CellSyncErrors>";
+       break;
+     }
+     case EventStatus::ChnSyncErrors  : {
+       os << "ChnSyncErrors>";
+       break;
+     }
+     case EventStatus::CellAndChnSyncErrors : {
+       os << "CellAndChnSyncErrors>";
+       break;
+     }
+     case EventStatus::AnyDataMangling : {
+       os << "AnyDataMangling>";
+       break;
+     }
+     case EventStatus::IncompatibleData : {
+       os << "IncompleteData>";
+       break;
+     }
+     case EventStatus::EventTimeOut   : {
+       os << "EventTimeOut>";
+       break;
+     }
+     case EventStatus::GoodNoCRCOrErrBitCheck : {
+       os << "GoodNoCRCOrErrBitCheck>";
+       break;
+     }
+     case EventStatus::GoodNoCRCCheck : {
+       os << "GoodNoCRCCheck>";
+       break;
+     }
+     case EventStatus::GoodNoErrBitCheck : {
+       os << "GoodNoErrBitCheck>";
+       break;
+     }
    }
    return os;
 }
@@ -1030,9 +1070,9 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
    hit.charge_min_i  = Gaps::parse_u16(bytestream, pos); 
    hit.baseline_a    = Gaps::parse_f16(bytestream, pos);
    hit.baseline_a_rms = Gaps::parse_f16(bytestream, pos);
-   hit.phase         = Gaps::parse_f16(bytestream, pos);
+   hit.phase          = Gaps::parse_f16(bytestream, pos);
    pos += 1; // skip version
-   hit.baseline_b    = Gaps::parse_f16(bytestream, pos);
+   hit.baseline_b     = Gaps::parse_f16(bytestream, pos);
    hit.baseline_b_rms = Gaps::parse_f16(bytestream, pos);
    //hit.baseline         = Gaps::parse_u16(bytestream, pos); 
    //hit.t_average     = Gaps::parse_u16(bytestream, pos); 

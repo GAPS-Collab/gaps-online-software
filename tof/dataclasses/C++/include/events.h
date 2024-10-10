@@ -45,11 +45,21 @@ static const f32 C_LIGHT_PADDLE = 15.4;
 
 /*********************************************************/
   
-static const u8 EVENTSTATUS_UNKNOWN           =   0;
-static const u8 EVENTSTATUS_CRC32WRONG        =  10;
-static const u8 EVENTSTATUS_TAILWRONG         =  11;
-static const u8 EVENTSTATUS_INCOMPLETEREADOUT =  21;
-static const u8 EVENTSTATUS_PERFECT           =  42;
+static const u8 EVENTSTATUS_UNKNOWN                 =   0;
+static const u8 EVENTSTATUS_CRC32WRONG              =  10;
+static const u8 EVENTSTATUS_TAILWRONG               =  11;
+static const u8 EVENTSTATUS_CHIDWRONG               =  12;
+static const u8 EVENTSTATUS_CELLSYNCERR             =  13;
+static const u8 EVENTSTATUS_CHNSYNCERR              =  14;
+static const u8 EVENTSTATUS_CELLANDCHNSYNCERR       =  15;
+static const u8 EVENTSTATUS_ANYDATAMANGLING         =  16;
+static const u8 EVENTSTATUS_INCOMPLETEREADOUT       =  21;
+static const u8 EVENTSTATUS_INCOMPATIBLEDATA        =  22;
+static const u8 EVENTSTATUS_EVENTTIMEOUT            =  23;
+static const u8 EVENTSTATUS_GOODNOCRCORERRBITCHECK  =  39;
+static const u8 EVENTSTATUS_GOODNOCRCCHECK          =  40;
+static const u8 EVENTSTATUS_GOODNOERRBITCHECK       =  41;
+static const u8 EVENTSTATUS_PERFECT                 =  42;
 
 /**
  * The event status indicates if there are technical 
@@ -58,11 +68,26 @@ static const u8 EVENTSTATUS_PERFECT           =  42;
  * EventStatus::EVENTSTATUS_PERFECT (42)
  */
 enum class EventStatus : u8 {
-  Unknown           = EVENTSTATUS_UNKNOWN,
-  Crc32Wrong        = EVENTSTATUS_CRC32WRONG,
-  TailWrong         = EVENTSTATUS_TAILWRONG,
-  IncompleteReadout = EVENTSTATUS_INCOMPLETEREADOUT,
-  Perfect           = EVENTSTATUS_PERFECT,
+  Unknown                = EVENTSTATUS_UNKNOWN,
+  Crc32Wrong             = EVENTSTATUS_CRC32WRONG,
+  TailWrong              = EVENTSTATUS_TAILWRONG,
+  ChannelIDWrong         = EVENTSTATUS_CHIDWRONG, 
+  CellSyncErrors         = EVENTSTATUS_CELLSYNCERR,
+  ChnSyncErrors          = EVENTSTATUS_CHNSYNCERR,
+  CellAndChnSyncErrors   = EVENTSTATUS_CELLANDCHNSYNCERR,
+  AnyDataMangling        = EVENTSTATUS_ANYDATAMANGLING,
+  IncompatibleData       = EVENTSTATUS_INCOMPATIBLEDATA,
+  EventTimeOut           = EVENTSTATUS_EVENTTIMEOUT,
+  GoodNoCRCOrErrBitCheck = EVENTSTATUS_GOODNOCRCORERRBITCHECK,
+  /// The event status is good, but we did not 
+  /// perform any CRC32 check
+  GoodNoCRCCheck         = EVENTSTATUS_GOODNOCRCCHECK,
+  /// The event is good, but we did not perform
+  /// error checks
+  GoodNoErrBitCheck      = EVENTSTATUS_GOODNOERRBITCHECK,
+  IncompleteReadout      = EVENTSTATUS_INCOMPLETEREADOUT,
+  Perfect                = EVENTSTATUS_PERFECT,
+  
 };
 
 std::ostream& operator<<(std::ostream& os, const EventStatus& status);
