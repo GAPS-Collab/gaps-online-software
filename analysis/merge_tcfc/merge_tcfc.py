@@ -238,6 +238,20 @@ if __name__ == '__main__':
                     writer.add_frame(frame)
                     frames_written += 1
                     continue # get next telemetrypacket
+                
+                # check if there is an event in the tof_event_earlier buffer
+                if telly_ev.tof.event_id in tofevent_buffer_earlier:
+                    tpack = tofevent_buffer_earlier.pop(telly_ev.tof.event_id)
+                    frame.put_tofpacket(tofpack, str(tpack.packet_type))
+                    if args.reprocess:
+                        new_tofev = go.events.TofEvent()
+                        new_tofev.from_tofpacket(tpack)
+                        new_tofev = go.liftof.waveform_analysis(new_tofev, settings)
+                        new_tofpack = new_tofev.pack()
+                        frame.put_tofpacket(new_tofpack, str('TofEvent.reprocessed'))
+                    writer.add_frame(frame)
+                    frames_written += 1
+                    continue # get next telemetrypacket
 
 
                 if toffy_exhausted:
