@@ -3,6 +3,7 @@ var dir_4ea9def300436f25a0de94e5f281e146 =
     [ "events", "dir_fdd7c1104b817cc75292247a485f198b.html", "dir_fdd7c1104b817cc75292247a485f198b" ],
     [ "packets", "dir_0f69edfa25d8cf0b3215b8fc427c62df.html", "dir_0f69edfa25d8cf0b3215b8fc427c62df" ],
     [ "calibration.h", "calibration_8h_source.html", null ],
+    [ "caraspace.hpp", "caraspace_8hpp_source.html", null ],
     [ "commands.h", "commands_8h_source.html", null ],
     [ "database.h", "database_8h_source.html", null ],
     [ "events.h", "events_8h_source.html", null ],

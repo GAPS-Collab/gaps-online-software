@@ -100,6 +100,10 @@ $(document).ready(function(){initNavTree('namespaceGaps.html',''); initResizable
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGaps_1_1CRFrame.html">CRFrame</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGaps_1_1CRReader.html">CRReader</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGaps_1_1TofPaddle.html">TofPaddle</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGaps_1_1TofPacketReader.html">TofPacketReader</a></td></tr>
@@ -116,6 +120,11 @@ typedef spdlog::level::level_enum&#160;</td><td class="memItemRight" valign="bot
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
+<tr class="memitem:a8e2924b21458e93bc83a6ae981d47b57"><td class="memItemLeft" align="right" valign="top"><a id="a8e2924b21458e93bc83a6ae981d47b57"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><b>CRFrameObjectType</b> : u8 { <b>Unknown</b> = 0
+, <b>TofPacket</b> = 10
+, <b>TelemetryPacket</b> = 20
+ }</td></tr>
+<tr class="separator:a8e2924b21458e93bc83a6ae981d47b57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af99376041829a6c93b2b635455d73910"><td class="memItemLeft" align="right" valign="top"><a id="af99376041829a6c93b2b635455d73910"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><b>ProtocolVersion</b> : u8 { <b>Unknown</b> = PROTOCOLVERSION_UNKNOWN
 , <b>V1</b> = PROTOCOLVERSION_V1
 , <b>V2</b> = PROTOCOLVERSION_V2
@@ -171,6 +180,8 @@ f32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="names
 f64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#a75bc2048681872469a0e8164a07eb145">parse_f64</a> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
 <tr class="memdesc:a75bc2048681872469a0e8164a07eb145"><td class="mdescLeft">&#160;</td><td class="mdescRight">get a signed long float (64) from a vector of bytes, advancing pos by 8 <br /></td></tr>
 <tr class="separator:a75bc2048681872469a0e8164a07eb145"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abaf57ec43250a61eb58cc3fd3b68848a"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#abaf57ec43250a61eb58cc3fd3b68848a">parse_string</a> (const Vec&lt; u8 &gt; &amp;bytestream, usize &amp;pos)</td></tr>
+<tr class="separator:abaf57ec43250a61eb58cc3fd3b68848a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b7fccda874dd2f4275f12622fb6b3f1"><td class="memItemLeft" align="right" valign="top"><a id="a0b7fccda874dd2f4275f12622fb6b3f1"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>pversion_to_string</b> (ProtocolVersion version)</td></tr>
 <tr class="separator:a0b7fccda874dd2f4275f12622fb6b3f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -206,6 +217,35 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>pversion_to_st
 </div><div class="memdoc">
 <p>get a f16 ("half float") from a vector of bytes, advancing pos by 2</p>
 <p>NOTE - this will actually convert the result to the more common f32 directly </p>
+
+</div>
+</div>
+<a id="abaf57ec43250a61eb58cc3fd3b68848a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abaf57ec43250a61eb58cc3fd3b68848a">&#9670;&nbsp;</a></span>parse_string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string Gaps::parse_string </td>
+          <td>(</td>
+          <td class="paramtype">const Vec&lt; u8 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>bytestream</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">usize &amp;&#160;</td>
+          <td class="paramname"><em>pos</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>custom string parser. This is only used for <a class="el" href="structGaps_1_1CRFrame.html">CRFrame</a>'s index. The actual byte content of the string needs to be prefixed with its 16bit lenght </p>
 
 </div>
 </div>

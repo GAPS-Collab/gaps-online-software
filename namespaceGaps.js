@@ -1,9 +1,16 @@
 var namespaceGaps =
 [
+    [ "CRFrame", "structGaps_1_1CRFrame.html", "structGaps_1_1CRFrame" ],
+    [ "CRReader", "structGaps_1_1CRReader.html", "structGaps_1_1CRReader" ],
     [ "TofPaddle", "structGaps_1_1TofPaddle.html", "structGaps_1_1TofPaddle" ],
     [ "TofPacketReader", "classGaps_1_1TofPacketReader.html", "classGaps_1_1TofPacketReader" ],
     [ "FatalException", "classGaps_1_1FatalException.html", null ],
     [ "LOGLEVEL", "namespaceGaps.html#a7e7d9bb141f5f926934e44b33429a44c", null ],
+    [ "CRFrameObjectType", "namespaceGaps.html#a8e2924b21458e93bc83a6ae981d47b57", [
+      [ "Unknown", "namespaceGaps.html#a8e2924b21458e93bc83a6ae981d47b57a88183b946cc5f0e8c96b2e66e1c74a7e", null ],
+      [ "TofPacket", "namespaceGaps.html#a8e2924b21458e93bc83a6ae981d47b57a0a5f7d79c74b92d33255fc332e25b536", null ],
+      [ "TelemetryPacket", "namespaceGaps.html#a8e2924b21458e93bc83a6ae981d47b57aac967e66068a7e25b02b4b2e6bcc4504", null ]
+    ] ],
     [ "ProtocolVersion", "namespaceGaps.html#af99376041829a6c93b2b635455d73910", [
       [ "Unknown", "namespaceGaps.html#af99376041829a6c93b2b635455d73910a88183b946cc5f0e8c96b2e66e1c74a7e", null ],
       [ "V1", "namespaceGaps.html#af99376041829a6c93b2b635455d73910ab4daca084ad9eabfc8de231929477ed6", null ],
@@ -16,6 +23,7 @@ var namespaceGaps =
     [ "parse_f32", "namespaceGaps.html#aa324d073f3fec42714ed7f1dfa9528ce", null ],
     [ "parse_f64", "namespaceGaps.html#a75bc2048681872469a0e8164a07eb145", null ],
     [ "parse_i32", "namespaceGaps.html#a2fa35da8776bb053ebdb6f9da7ea245e", null ],
+    [ "parse_string", "namespaceGaps.html#abaf57ec43250a61eb58cc3fd3b68848a", null ],
     [ "parse_u16", "namespaceGaps.html#a8d5ee03930328391169c3f11a9b06e8e", null ],
     [ "parse_u32", "namespaceGaps.html#ac09d7b4a66f0df27a63af339dd6d7ea8", null ],
     [ "parse_u64", "namespaceGaps.html#aa913722aa6668823951e07f44b8698d6", null ],

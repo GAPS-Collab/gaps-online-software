@@ -1,8 +1,13 @@
 var hierarchy =
 [
     [ "CPUMoniData", "structCPUMoniData.html", null ],
+    [ "Gaps::CRFrame", "structGaps_1_1CRFrame.html", null ],
+    [ "Gaps::CRReader", "structGaps_1_1CRReader.html", null ],
     [ "std::exception", null, [
       [ "Gaps::FatalException", "classGaps_1_1FatalException.html", null ]
+    ] ],
+    [ "std::formatter", null, [
+      [ "std::formatter< EventStatus >", "structstd_1_1formatter_3_01EventStatus_01_4.html", null ]
     ] ],
     [ "FromTofPacket< Derived >", "structFromTofPacket.html", null ],
     [ "FromTofPacket< MtbMoniData >", "structFromTofPacket.html", [

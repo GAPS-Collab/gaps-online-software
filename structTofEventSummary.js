@@ -17,7 +17,7 @@ var structTofEventSummary =
     [ "primary_beta", "structTofEventSummary.html#aaaf4cf393a61aacf8e5e3e390f2ea474", null ],
     [ "primary_charge", "structTofEventSummary.html#a7254ca37addca5afb86310d1fc6e8b09", null ],
     [ "quality", "structTofEventSummary.html#a5002ecb7dd20fe0eb01af2d5c32c28cd", null ],
-    [ "status", "structTofEventSummary.html#a52d43bca39a8645fe991218a045af8fa", null ],
+    [ "status", "structTofEventSummary.html#a55ba9e6f8c2e00d8372a22924821b6da", null ],
     [ "timestamp16", "structTofEventSummary.html#ad55fcbc96aa27e9dee781472f7c16f3c", null ],
     [ "timestamp32", "structTofEventSummary.html#a971aaceb9e22a5a3011015f1ae0dcd33", null ],
     [ "tot_edep_cbe", "structTofEventSummary.html#a006d5f0754a9bce2a6e52f1189b2dcd9", null ],

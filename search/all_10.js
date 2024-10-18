@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['vcal_5fdata_85',['vcal_data',['../structRBCalibration.html#a7b2b7e4fd0b4e106a8ec53d0c019be3a',1,'RBCalibration']]],
-  ['voltages_86',['voltages',['../structRBCalibration.html#adfab387bd6bebb965be054e754076452',1,'RBCalibration']]]
+  ['vcal_5fdata_89',['vcal_data',['../structRBCalibration.html#a7b2b7e4fd0b4e106a8ec53d0c019be3a',1,'RBCalibration']]],
+  ['voltages_90',['voltages',['../structRBCalibration.html#adfab387bd6bebb965be054e754076452',1,'RBCalibration']]]
 ];
