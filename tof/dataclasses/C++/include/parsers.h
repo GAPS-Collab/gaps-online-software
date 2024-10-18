@@ -52,5 +52,12 @@ namespace Gaps {
   f64 parse_f64(const Vec<u8> &bytestream,
                 usize &pos);
   
+
+  /// custom string parser. This is only used for 
+  /// CRFrame's index. The actual byte content of 
+  /// the string needs to be prefixed with its 
+  /// 16bit lenght
+  std::string parse_string(const Vec<u8> &bytestream,
+                           usize &pos);
 }
 #endif
