@@ -396,6 +396,7 @@ impl PyTelemetryPacket {
 #[pyo3(name="TelemetryPacketReader")]
 pub struct PyTelemetryPacketReader {
   reader   : tel_io_api::TelemetryPacketReader,
+  //filelist : Vec<String>,
 }
 
 #[pymethods]
@@ -403,8 +404,15 @@ impl PyTelemetryPacketReader {
   #[new]
   #[pyo3(signature = (filename, filter=tel_api::TelemetryPacketType::Unknown,start=0, nevents=0))]
   fn new(filename : String, filter : tel_api::TelemetryPacketType, start : usize, nevents : usize) -> Self {
+    //if filenames.len() == 0 {
+    //  panic!("Filenames list arguments needs to have at least a single file!");
+    //}
+    //let first_filename = filenames[0];
+    //let new_fnames = Vec::<String>::new();
+    //let new_fnames = filenames[1..].to_vec();
     let mut reader_init = Self {
-      reader     : tel_io_api::TelemetryPacketReader::new(filename)
+      reader     : tel_io_api::TelemetryPacketReader::new(filename),
+      //filelist   : filenames
     };
     reader_init.reader.filter = filter;
     reader_init

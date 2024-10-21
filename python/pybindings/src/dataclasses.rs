@@ -749,6 +749,59 @@ impl PyRBCalibration {
 //  let pyarray = PyArray::from_vec2_bound(py, &data).unwrap();
 //  Ok(pyarray)
 //}
+#[pyclass]
+#[pyo3(name="PAMoniData")]
+pub struct PyPAMoniData {
+  moni : PAMoniData
+}
+
+#[pymethods]
+impl PyPAMoniData {
+  #[new]
+  fn new() -> Self {
+    Self {
+      moni : PAMoniData::new()
+    }
+  }
+  
+  #[getter]
+  fn board_id(&self) ->  u8 {
+    self.moni.board_id
+  }
+
+  /// The temperature for the 16 preamp channels 
+  #[getter]
+  fn temps(&self) -> [f32;16] {
+    self.moni.temps
+  }
+
+  /// Pramp bias voltages (mV) for the 16 channels
+  #[getter]
+  fn biases(&self) -> [f32;16] {
+    self.moni.biases
+  }
+  
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.moni)) 
+  }
+
+  fn keys(&self) -> Vec<&'static str> {
+    PAMoniData::keys()
+  }
+
+  /// Access the (data) members by name
+  fn get(&self, varname : &str) -> PyResult<f32> {
+    match self.moni.get(varname) {
+      None => {
+        let err_msg = format!("LTBMoniData does not have a key with name {}! See RBmoniData.keys() for a list of available keys!", varname);
+        return Err(PyKeyError::new_err(err_msg));
+      }
+      Some(val) => {
+        return Ok(val)
+      }
+    }
+  }
+}
 
 #[pyclass]
 #[pyo3(name="PAMoniSeries")]
@@ -781,6 +834,96 @@ impl PyPAMoniSeries {
       },
       Err(err) => {
         return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+}
+
+#[pyclass]
+#[pyo3(name="PBMoniData")]
+pub struct PyPBMoniData {
+  moni : PBMoniData,
+}
+
+#[pymethods]
+impl PyPBMoniData {
+  #[new]
+  fn new() -> Self {
+    Self {
+      moni : PBMoniData::new()
+    }
+  }
+  
+  #[getter]
+  fn board_id(&self) -> u8 {
+    self.moni.board_id
+  }
+
+  #[getter]
+  fn p3v6_preamp_vcp(&self) -> [f32; 3] {
+    self.moni.p3v6_preamp_vcp
+  }
+  
+  #[getter]
+  fn n1v6_preamp_vcp(&self) -> [f32; 3] {
+    self.moni.n1v6_preamp_vcp
+  }
+  
+  #[getter]
+  fn p3v4f_ltb_vcp(&self) -> [f32; 3] {
+    self.moni.p3v4f_ltb_vcp
+  }
+  
+  #[getter]
+  fn p3v4d_ltb_vcp(&self) -> [f32; 3] {
+    self.moni.p3v4d_ltb_vcp
+  }
+  
+  #[getter]
+  fn p3v6_ltb_vcp(&self) -> [f32; 3] {
+    self.moni.p3v6_ltb_vcp
+  }
+  
+  #[getter]
+  fn n1v6_ltb_vcp(&self) -> [f32; 3] {
+    self.moni.n1v6_ltb_vcp
+  }
+  
+  #[getter]
+  fn pds_temp(&self) -> f32 {  
+    self.moni.pds_temp
+  }
+  #[getter]
+  fn pas_temp(&self) -> f32 {
+    self.moni.pas_temp
+  }
+  #[getter]
+  fn nas_temp(&self) -> f32 {
+    self.moni.nas_temp
+  }
+
+  #[getter]
+  fn shv_temp(&self) -> f32 {
+    self.moni.shv_temp
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.moni)) 
+  }
+
+  fn keys(&self) -> Vec<&'static str> {
+    PBMoniData::keys()
+  }
+
+  /// Access the (data) members by name
+  fn get(&self, varname : &str) -> PyResult<f32> {
+    match self.moni.get(varname) {
+      None => {
+        let err_msg = format!("LTBMoniData does not have a key with name {}! See RBmoniData.keys() for a list of available keys!", varname);
+        return Err(PyKeyError::new_err(err_msg));
+      }
+      Some(val) => {
+        return Ok(val)
       }
     }
   }
@@ -859,7 +1002,7 @@ impl PyLTBMoniData {
   }
 
   fn keys(&self) -> Vec<&'static str> {
-    RBMoniData::keys()
+    LTBMoniData::keys()
   }
 
   /// Access the (data) members by name
@@ -1943,7 +2086,7 @@ impl PyTofEventSummary {
     let mut hits = Vec::<PyTofHit>::new();
     for h in &self.event.hits {
       let mut pyhit = PyTofHit::new();
-      pyhit.set_hit(h.clone());
+      pyhit.hit = h.clone();
       hits.push(pyhit);
     }
     hits
@@ -2047,7 +2190,7 @@ impl PyTofEvent {
     for ev in &self.event.rb_events {
       for h in &ev.hits {
         let mut pyhit = PyTofHit::new();
-        pyhit.set_hit(*h);
+        pyhit.hit = *h;
         hits.push(pyhit);
       }
     }
@@ -2210,12 +2353,6 @@ pub struct PyTofHit {
   hit : TofHit,
 }
 
-impl PyTofHit {
-  pub fn set_hit(&mut self, hit : TofHit) {
-    self.hit = hit;
-  }
-}
-
 #[pymethods]
 impl PyTofHit {
   #[new]
@@ -2224,7 +2361,14 @@ impl PyTofHit {
       hit : TofHit::new(),
     }
   }
-  
+ 
+  /// Set the length and cable length for the paddle
+  /// FIXME - take gaps_online.db.Paddle as argument
+  fn set_paddle(&mut self, plen : f32, clen : f32) {
+    self.hit.paddle_len = plen;
+    self.hit.cable_len  = clen;
+  }
+
   /// Reconstructed particle interaction time,
   /// calculated from the waveforms of the two
   /// different paddle ends

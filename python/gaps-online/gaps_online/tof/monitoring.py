@@ -9,6 +9,8 @@ try:
     LTBMoniSeries     = tdc.moni.LTBMoniSeries
     RBMoniData        = tdc.moni.RBMoniData
     MtbMoniData       = tdc.moni.MtbMoniData
+    PAMoniData        = tdc.moni.PAMoniData
+    PBMoniData        = tdc.moni.PBMoniData
     EVTBLDRHeartbeat  = tdc.commands.EVTBLDRHeartbeat
     MTBHeartbeat      = tdc.commands.MTBHeartbeat
     HeartbeatDataSink = tdc.commands.HeartbeatDataSink
