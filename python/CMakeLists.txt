@@ -11,6 +11,12 @@ else()
   message(STATUS "Please install a rust toolchain including cargo if you want to build liftof, and make sure cargo is in your $PATH!")
   option (BUILD_RUSTPYBINDINGS OFF)
 endif()
+  
+# make sure everything gets cleaned up so that cmake notices that 
+# there might be a change
+add_custom_target(cleanup_pybindings
+  COMMAND ${CMAKE_COMMAND} -E remove "${INSTALL_PYTHON_DIR}/go_pybindings.so"
+)
 
 if(BUILD_RUSTPYBINDINGS)
   # FXIME - assemble the featrues string prgromaatically
@@ -55,6 +61,9 @@ if(BUILD_RUSTPYBINDINGS)
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python/pybindings/
     )
   endif()
+  # add the cleanup process before compiling
+  add_dependencies(go-pybindings cleanup_pybindings)
+
   # documentation
   add_custom_target(
     go-pybindings-rust-doc
@@ -76,4 +85,5 @@ if(BUILD_RUSTPYBINDINGS)
             RENAME go_pybindings.so
     )
   endif(APPLE)
+
 endif(BUILD_RUSTPYBINDINGS)
