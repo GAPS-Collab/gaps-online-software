@@ -91,10 +91,15 @@ def get_ts_from_binfile(fname):
     ts = ts.replace(tzinfo=timezone.utc)
     return ts
 
-def get_tof_binaries(run_id : int, data_dir='') -> list[Path]:
+def get_tof_binaries(run_id : int, data_dir='' : str, ending='*.gaps') -> list[Path]:
     """
-    Get the binaries written directly by liftof on the the
-    TOF CPU disks.
+    This allows to get binary data written by either liftof
+    ('.tof.gaps') files or through the caraspace library
+    ('.gaps'). 
+    In case of data written by liftof, this is the data written 
+    in flight on the TOF CPU disks.
+    For caraspace data, this is typically data merged after the 
+    fact.
 
     # Arguments:
         * run_id    : TOF run id, as e.g. stated in the e-log
@@ -104,7 +109,7 @@ def get_tof_binaries(run_id : int, data_dir='') -> list[Path]:
                       run in it
     """
     datapath = Path(data_dir) / f'{run_id}'
-    files    = [f for f in datapath.glob('*.tof.gaps')]
+    files    = [f for f in datapath.glob(ending)]
     files    = sorted(files, key=get_ts_from_toffile)
     t_start  = get_ts_from_toffile(files[0])
     t_stop   = get_ts_from_toffile(files[-1])

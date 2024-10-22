@@ -25,3 +25,4 @@ if import_tl_success:
 
 if import_rtd_success:
     TofEvent = rtd.events.TofEvent
+    RBCalibration = rtd.events.RBCalibration
