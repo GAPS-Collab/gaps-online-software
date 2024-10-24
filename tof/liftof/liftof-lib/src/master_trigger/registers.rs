@@ -669,6 +669,30 @@ pub const LOST_TRIGGER_RATE : MTBRegister<'static> = MTBRegister {
   pulse : false
 };
 
+
+/// The lost trigger rate due to "tracker busy" signals
+/// received by the TIU
+/// TIU_LOST_TRIGGER_RATE 	0x24d 	0x934 	[23:0]
+pub const TIU_LOST_TRIGGER_RATE : MTBRegister<'static> = MTBRegister {
+  addr  : 0x24d,
+  mask  : 0x00ffffff,
+  descr : "Get tiu lost trigger rate in Hz",
+  rmw   : false,
+  ro    : true,
+  pulse : false
+};
+
+/// The lost trigger rate due to RB busy timeouts
+/// RB_LOST_TRIGGER_RATE 	0x24c 	0x930 	[23:0]
+pub const RB_LOST_TRIGGER_RATE : MTBRegister<'static> = MTBRegister {
+  addr  : 0x24c,
+  mask  : 0x00ffffff,
+  descr : "Get RB lost trigger rate in Hz",
+  rmw   : false,
+  ro    : true,
+  pulse : false
+};
+
 //Node  Adr     Adr8    Bits    Perm    Def     Description
 //HIT_THRESH    0x14    0x50    [29:28]     rw  0x0     Threshold for the hit bitmap. Threshold must be > this number.
 
