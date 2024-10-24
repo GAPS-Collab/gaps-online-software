@@ -1,9 +1,21 @@
+//! Event processing deals with the raw memory input
+//! from the buffers, send to it by the runner 
+//! when reading out the system memory
+//!
+//! Different modes are available, from sending
+//! TofPackets directly through the RBEventMemoryStreamer
+//! without any further parsing of the events (this has 
+//! to be done then on the TOF main computer) to doing 
+//! waveform analysis on the RBs directly
+
 use std::fs;
 use std::path::PathBuf;
 use std::sync::{
-    Arc,
-    Mutex,
+  Arc,
+  Mutex,
 };
+
+use std::time::Instant;
 
 use crossbeam_channel::{
   Sender,
@@ -12,24 +24,22 @@ use crossbeam_channel::{
 
 use tof_dataclasses::events::DataType;
 use tof_dataclasses::packets::{
-    TofPacket,
-    //PacketType
+  TofPacket,
 };
 use tof_dataclasses::io::RBEventMemoryStreamer;
 use tof_dataclasses::calibrations::RBCalibrations;
-//use tof_dataclasses::threading::ThreadControl;
 use tof_dataclasses::events::EventStatus;
 use tof_dataclasses::commands::{
-    //RBCommand,
-    TofOperationMode,
+  TofOperationMode,
 };
-//use tof_dataclasses::RBChannelPaddleEndIDMap;
 
 use liftof_lib::{
-    RunStatistics,
-    //waveform_analysis,
+  RunStatistics,
+  //waveform_analysis,
 };
 use liftof_lib::thread_control::ThreadControl;
+
+ use crate::control::get_deadtime;
 
 ///  Transforms raw bytestream to TofPackets
 ///
@@ -73,7 +83,9 @@ pub fn event_processing(board_id            : u8,
                         thread_control      : Arc<Mutex<ThreadControl>>,
                         stat                : Arc<Mutex<RunStatistics>>,
                         only_perfect_events : bool) {
+  
   let mut op_mode = TofOperationMode::Default;
+  let mut thread_ctrl_check_timer = Instant::now();
 
   // load calibration just in case?
   let mut cali_loaded = false;
@@ -96,31 +108,51 @@ pub fn event_processing(board_id            : u8,
     warn!("Calibration file not available!");
     cali_loaded = false;
   }
+  
   // FIXME - deprecate!
   let mut events_not_sent : u64 = 0;
   let mut data_type       : DataType   = DataType::Unknown;
-  //let one_milli           = Duration::from_millis(1);
+  // should we store drs deadtime instead of the FPGA temperature
+  let mut deadtime_instead_temp : bool = false;
+  
   let mut streamer        = RBEventMemoryStreamer::new();
   // FIXME
   streamer.check_channel_errors = true;
-  streamer.calc_crc32           = calc_crc32;
+  
+  match thread_control.lock() {
+    Ok(tc) => {
+      streamer.calc_crc32   = tc.liftof_settings.rb_settings.calc_crc32;
+      deadtime_instead_temp = tc.liftof_settings.rb_settings.drs_deadtime_instead_fpga_temp; 
+    },
+    Err(err) => {
+      trace!("Can't acquire lock! {err}");
+    },
+  }
+  
+  // loop variables
   // our cachesize is 50 events. This means each time we 
   // receive data over bs_recv, we have received 50 more 
   // events. This means we might want to wait for 50 MTE
   // events?
   let mut skipped_events : usize = 0;
   let mut n_events = 0usize;
+  
   'main : loop {
-    match thread_control.lock() {
-      Ok(tc) => {
-        if tc.stop_flag {
-          info!("Received stop signal. Will stop thread!");
-          break;
-        }
-      },
-      Err(err) => {
-        trace!("Can't acquire lock! {err}");
-      },
+    if thread_ctrl_check_timer.elapsed().as_secs() >= 1 {
+      match thread_control.lock() {
+        Ok(tc) => {
+          if tc.stop_flag {
+            info!("Received stop signal. Will stop thread!");
+            break;
+          }
+          streamer.calc_crc32   = tc.liftof_settings.rb_settings.calc_crc32;
+          deadtime_instead_temp = tc.liftof_settings.rb_settings.drs_deadtime_instead_fpga_temp; 
+        },
+        Err(err) => {
+          trace!("Can't acquire lock! {err}");
+        },
+      }
+      thread_ctrl_check_timer = Instant::now();
     }
 
     if !get_op_mode.is_empty() {
@@ -223,6 +255,20 @@ pub fn event_processing(board_id            : u8,
                   continue 'main;
                 },
                 Some(mut event) => {
+                  if deadtime_instead_temp {
+                    // in case we want to add the deadtime to the header, 
+                    // we have to do that here!
+                    event.header.deadtime_instead_temp = deadtime_instead_temp;
+                    match get_deadtime() {
+                      Err(err) => {
+                        error!("Unable to get DRS4 deadtime! {err}");
+                        event.header.drs_deadtime = u16::MAX;
+                      }
+                      Ok(d_time) => {
+                        event.header.drs_deadtime = d_time as u16;
+                      }
+                    }
+                  }
                   //println!("Got event id {}", event.header.event_id);
                   if last_event_id != 0 {
                     if event.header.event_id != last_event_id + 1 {
