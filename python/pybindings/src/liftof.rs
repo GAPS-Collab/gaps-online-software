@@ -13,6 +13,7 @@ pub use crate::liftof_dataclasses::PyIPBus;
 
 pub use crate::master_trigger::{
   PyMasterTrigger,
+  wrap_prescale_to_u32,
 };
 
 use tof_dataclasses::analysis::{

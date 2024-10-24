@@ -53,6 +53,7 @@ cfg_if::cfg_if! {
   if #[cfg(feature = "liftof")] {
     use crate::liftof::{
       py_waveform_analysis,
+      wrap_prescale_to_u32,
       wrap_calc_edep_simple,
       test_db,
       PyLiftofSettings,
@@ -174,6 +175,9 @@ fn tof_moni<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyCPUMoniSeries>()?;
   m.add_class::<PyLTBMoniSeries>()?;
   m.add_class::<PyRBMoniData>()?;
+  m.add_class::<PyPAMoniData>()?;
+  m.add_class::<PyPBMoniData>()?;
+  m.add_class::<PyLTBMoniData>()?;
   m.add_class::<PyMtbMoniData>()?;
   Ok(())
 }
@@ -246,6 +250,7 @@ cfg_if::cfg_if! {
       m.add_function(wrap_pyfunction!(py_waveform_analysis,m)?)?;
       m.add_function(wrap_pyfunction!(wrap_calc_edep_simple,m)?)?;
       m.add_function(wrap_pyfunction!(test_db,m)?)?;
+      m.add_function(wrap_pyfunction!(wrap_prescale_to_u32,m)?)?;
       m.add_class::<PyLiftofSettings>()?;
       m.add_class::<PyIPBus>()?;
       m.add_class::<PyMasterTrigger>()?;
