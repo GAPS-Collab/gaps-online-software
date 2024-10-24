@@ -61,129 +61,129 @@ cfg_if::cfg_if! {
 }
 
 
-/// Debug information for missing hits. 
-///
-/// These hits have been seen by the MTB, but we are unable to determine where 
-/// they are coming from, why they are there or we simply have lost the RB 
-/// information for these hits.
-#[deprecated(since = "0.10.0", note="feature was never really used")]
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub struct RBMissingHit {
-  pub event_id      : u32,
-  pub ltb_hit_index : u8,
-  pub ltb_id        : u8,
-  pub ltb_dsi       : u8,
-  pub ltb_j         : u8,
-  pub ltb_ch        : u8,
-  pub rb_id         : u8,
-  pub rb_ch         : u8,
-}
-
-#[allow(deprecated)]
-impl Serialization for RBMissingHit {
-  const HEAD               : u16    = 43690; //0xAAAA
-  const TAIL               : u16    = 21845; //0x5555
-  const SIZE               : usize  = 15; // bytes
-  
-  fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
-    -> Result<Self, SerializationError> {
-    Self::verify_fixed(stream, pos)?;
-    // verify_fixed already advances pos by 2
-    let mut miss = RBMissingHit::new();
-    miss.event_id      = parse_u32(stream, pos);
-    miss.ltb_hit_index = parse_u8(stream, pos);
-    miss.ltb_id        = parse_u8(stream, pos);
-    miss.ltb_dsi       = parse_u8(stream, pos);
-    miss.ltb_j         = parse_u8(stream, pos);
-    miss.ltb_ch        = parse_u8(stream, pos);
-    miss.rb_id         = parse_u8(stream, pos);
-    miss.rb_ch         = parse_u8(stream, pos);
-    *pos += 2; // account for header in verify_fixed
-    Ok(miss)
-  }
-
-  fn to_bytestream(&self) -> Vec<u8> {
-    let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
-    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
-    stream.extend_from_slice(&self.event_id.to_le_bytes());
-    stream.extend_from_slice(&self.ltb_hit_index.to_le_bytes());
-    stream.extend_from_slice(&self.ltb_id.to_le_bytes());
-    stream.extend_from_slice(&self.ltb_dsi.to_le_bytes());
-    stream.extend_from_slice(&self.ltb_j.to_le_bytes());
-    stream.extend_from_slice(&self.ltb_ch.to_le_bytes());
-    stream.extend_from_slice(&self.rb_id.to_le_bytes());
-    stream.extend_from_slice(&self.rb_ch.to_le_bytes());
-    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
-    stream
-  }
-}
-
-#[allow(deprecated)]
-impl RBMissingHit {
-
-  pub fn new() -> Self {
-    RBMissingHit {
-      event_id      : 0,
-      ltb_hit_index : 0,
-      ltb_id        : 0,
-      ltb_dsi       : 0,
-      ltb_j         : 0,
-      ltb_ch        : 0,
-      rb_id         : 0,
-      rb_ch         : 0,
-    }
-  }
-}
-
-#[allow(deprecated)]
-impl fmt::Display for RBMissingHit {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<RBMissingHit:
-           \t event ID    {},
-           \t LTB hit idx {}, 
-           \t LTB ID      {}, 
-           \t LTB DSI     {}, 
-           \t LTB J       {}, 
-           \t LTB CHN     {},   
-           \t RB ID       {}, 
-           \t RB CH {}>", 
-           self.event_id      ,
-           self.ltb_hit_index ,
-           self.ltb_id        ,
-           self.ltb_dsi       ,
-           self.ltb_j         ,
-           self.ltb_ch        ,
-           self.rb_id         ,
-           self.rb_ch         )
-  }
-}
-
-#[allow(deprecated)]
-impl Default for RBMissingHit {
-
-  fn default() -> Self {
-    Self::new()
-  }
-}
-
-#[cfg(feature = "random")]
-#[allow(deprecated)]
-impl FromRandom for RBMissingHit {
-    
-  fn from_random() -> Self {
-    let mut miss = Self::new();
-    let mut rng = rand::thread_rng();
-    miss.event_id      = rng.gen::<u32>();
-    miss.ltb_hit_index = rng.gen::<u8>();
-    miss.ltb_id        = rng.gen::<u8>();
-    miss.ltb_dsi       = rng.gen::<u8>();
-    miss.ltb_j         = rng.gen::<u8>();
-    miss.ltb_ch        = rng.gen::<u8>();
-    miss.rb_id         = rng.gen::<u8>();
-    miss.rb_ch         = rng.gen::<u8>();
-    miss
-  }
-}
+///// Debug information for missing hits. 
+/////
+///// These hits have been seen by the MTB, but we are unable to determine where 
+///// they are coming from, why they are there or we simply have lost the RB 
+///// information for these hits.
+//#[deprecated(since = "0.10.0", note="feature was never really used")]
+//#[derive(Debug, Copy, Clone, PartialEq)]
+//pub struct RBMissingHit {
+//  pub event_id      : u32,
+//  pub ltb_hit_index : u8,
+//  pub ltb_id        : u8,
+//  pub ltb_dsi       : u8,
+//  pub ltb_j         : u8,
+//  pub ltb_ch        : u8,
+//  pub rb_id         : u8,
+//  pub rb_ch         : u8,
+//}
+//
+//#[allow(deprecated)]
+//impl Serialization for RBMissingHit {
+//  const HEAD               : u16    = 43690; //0xAAAA
+//  const TAIL               : u16    = 21845; //0x5555
+//  const SIZE               : usize  = 15; // bytes
+//  
+//  fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
+//    -> Result<Self, SerializationError> {
+//    Self::verify_fixed(stream, pos)?;
+//    // verify_fixed already advances pos by 2
+//    let mut miss = RBMissingHit::new();
+//    miss.event_id      = parse_u32(stream, pos);
+//    miss.ltb_hit_index = parse_u8(stream, pos);
+//    miss.ltb_id        = parse_u8(stream, pos);
+//    miss.ltb_dsi       = parse_u8(stream, pos);
+//    miss.ltb_j         = parse_u8(stream, pos);
+//    miss.ltb_ch        = parse_u8(stream, pos);
+//    miss.rb_id         = parse_u8(stream, pos);
+//    miss.rb_ch         = parse_u8(stream, pos);
+//    *pos += 2; // account for header in verify_fixed
+//    Ok(miss)
+//  }
+//
+//  fn to_bytestream(&self) -> Vec<u8> {
+//    let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
+//    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
+//    stream.extend_from_slice(&self.event_id.to_le_bytes());
+//    stream.extend_from_slice(&self.ltb_hit_index.to_le_bytes());
+//    stream.extend_from_slice(&self.ltb_id.to_le_bytes());
+//    stream.extend_from_slice(&self.ltb_dsi.to_le_bytes());
+//    stream.extend_from_slice(&self.ltb_j.to_le_bytes());
+//    stream.extend_from_slice(&self.ltb_ch.to_le_bytes());
+//    stream.extend_from_slice(&self.rb_id.to_le_bytes());
+//    stream.extend_from_slice(&self.rb_ch.to_le_bytes());
+//    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
+//    stream
+//  }
+//}
+//
+//#[allow(deprecated)]
+//impl RBMissingHit {
+//
+//  pub fn new() -> Self {
+//    RBMissingHit {
+//      event_id      : 0,
+//      ltb_hit_index : 0,
+//      ltb_id        : 0,
+//      ltb_dsi       : 0,
+//      ltb_j         : 0,
+//      ltb_ch        : 0,
+//      rb_id         : 0,
+//      rb_ch         : 0,
+//    }
+//  }
+//}
+//
+//#[allow(deprecated)]
+//impl fmt::Display for RBMissingHit {
+//  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//    write!(f, "<RBMissingHit:
+//           \t event ID    {},
+//           \t LTB hit idx {}, 
+//           \t LTB ID      {}, 
+//           \t LTB DSI     {}, 
+//           \t LTB J       {}, 
+//           \t LTB CHN     {},   
+//           \t RB ID       {}, 
+//           \t RB CH {}>", 
+//           self.event_id      ,
+//           self.ltb_hit_index ,
+//           self.ltb_id        ,
+//           self.ltb_dsi       ,
+//           self.ltb_j         ,
+//           self.ltb_ch        ,
+//           self.rb_id         ,
+//           self.rb_ch         )
+//  }
+//}
+//
+//#[allow(deprecated)]
+//impl Default for RBMissingHit {
+//
+//  fn default() -> Self {
+//    Self::new()
+//  }
+//}
+//
+//#[cfg(feature = "random")]
+//#[allow(deprecated)]
+//impl FromRandom for RBMissingHit {
+//    
+//  fn from_random() -> Self {
+//    let mut miss = Self::new();
+//    let mut rng = rand::thread_rng();
+//    miss.event_id      = rng.gen::<u32>();
+//    miss.ltb_hit_index = rng.gen::<u8>();
+//    miss.ltb_id        = rng.gen::<u8>();
+//    miss.ltb_dsi       = rng.gen::<u8>();
+//    miss.ltb_j         = rng.gen::<u8>();
+//    miss.ltb_ch        = rng.gen::<u8>();
+//    miss.rb_id         = rng.gen::<u8>();
+//    miss.rb_ch         = rng.gen::<u8>();
+//    miss
+//  }
+//}
 
 
 /// Get the traces for a set of RBEvents
@@ -772,8 +772,9 @@ pub struct RBEventHeader {
   //pub dtap0              : u16  , 
   //pub drs4_temp          : u16  , 
   pub fpga_temp            : u16  , 
-  pub timestamp32          : u32  ,
-  pub timestamp16          : u16  ,
+  pub drs_deadtime         : u16,
+  pub timestamp32          : u32,
+  pub timestamp16          : u16,
   // channels (0-8)
   //pub channels             : Vec<u8>,
   //// fields which don't get serialized
@@ -799,6 +800,7 @@ impl RBEventHeader {
       //dtap0                : 0 ,  
       //drs4_temp            : 0 ,  
       fpga_temp            : 0,  
+      drs_deadtime         : 0,
       timestamp32          : 0,
       timestamp16          : 0,
       //channels             : Vec::<u8>::with_capacity(9),
@@ -879,17 +881,6 @@ impl RBEventHeader {
   pub fn parse_status(&mut self, status_bytes : u16) {
     // status byte is only 4bit really
     self.status_byte        = (status_bytes & 0xf) as u8;
-    //let mut status          = status_bytes;
-    //self.event_fragment     = status & 1 > 0;
-    //status                  = status >> 1;
-    //self.lost_trigger       = status & 1 > 0;
-    //status                  = status >> 1;
-    // FIXME - rename these fields
-    //self.lost_lock          = status & 1 > 0;
-    //status                  = status >> 1;
-    //self.lost_lock_last_sec = status & 1 > 0;
-    //status                  = status >> 1;
-    //self.fpga_temp = status;
     self.fpga_temp = status_bytes >> 4;
   }
 
@@ -899,77 +890,8 @@ impl RBEventHeader {
     zynq_temp
   }
 
-  /// Get the entire header from a full binary representation of
-  /// the raw RBEventMemoryView encoded in a binary stream
-  //pub fn extract_from_rbeventmemoryview(stream : &Vec<u8>, pos : &mut usize) 
-  //  -> Result<Self, SerializationError> {
-  //  let mut header = Self::new();
-  //  let start = *pos;
-  //  // we look for headers/tails from RBEventMemoryView, not header!
-  //  let head_pos   = search_for_u16(RBEvent::HEAD, stream, *pos)?; 
-  //  // At this state, this can be a header or a full event. Check here and
-  //  // proceed depending on the options
-  //  *pos = head_pos + 2;   
-  //  // parsing the 2 bytes which contain
-  //  // fpga_temp and status
-  //  let mut status = parse_u16(stream, pos);
-  //  header.parse_status(status);
-
-  //  header.has_ch9 = false; // we check for that later
-  //  // don't write packet len and roi to struct
-  //  let packet_len = parse_u16(stream, pos) as usize * 2;
-  //  let nwords     = parse_u16(stream, pos) as usize + 1; // the field will tell you the 
-  //                                               // max index instead of len
-  //  debug!("Got packet len of {} bytes, roi of {}", packet_len, nwords);
-  //  *pos += 8 + 2 + 1; // skip dna, fw hash and reserved part of rb_id
-  //  header.rb_id        = parse_u8(stream, pos);
-  //  header.channel_mask = parse_u8(stream, pos);
-  //  *pos += 1;
-  //  header.event_id     = parse_u32_for_16bit_words(stream, pos);
-  //  header.dtap0        = parse_u16(stream, pos);
-  //  header.drs4_temp    = parse_u16(stream, pos); 
-  //  
-  //  //header.timestamp_48 = parse_u48_for_16bit_words(stream,pos);
-  //  //let nchan = 8;
-  //  // 36 bytes before event payload
-  //  // 8 bytes after
-  //  let channel_packet_start = head_pos + 36;
-  //  let nchan_data = packet_len - 44;
-  //  let mut nchan = 0usize;
-  //  //println!("========================================");
-  //  //println!("{} {} {}", nchan, nwords, nchan_data);
-  //  //println!("========================================");
-  //  while nchan * (2*nwords + 6) < nchan_data {
-  //    nchan += 1;
-  //  }
-  //  if nchan * (2*nwords + 6) != nchan_data {
-  //    error!("NCHAN consistency check failed! nchan {} , nwords {}, packet_len {}", nchan, nwords, packet_len);
-  //  }
-  //  let mut ch_ids = Vec::<u8>::new();
-  //  *pos = channel_packet_start;
-  //  for _ in 0..nchan {
-  //    let this_ch_id = parse_u16(stream, pos) as u8;
-  //    if this_ch_id == 8 {
-  //      header.has_ch9 = true;
-  //    }
-  //    ch_ids.push(this_ch_id);
-  //    *pos += (nwords*2) as usize;
-  //    *pos += 4; // trailer
-  //  }
-  //  debug!("Got channel ids {:?}", ch_ids);
-  //  header.nwords               = nwords;
-  //  header.channel_packet_len   = nchan_data;
-  //  header.channel_packet_start = channel_packet_start as usize;
-  //  header.channel_packet_ids   = ch_ids;
-  //  header.stop_cell = parse_u16(stream, pos);
-  //  header.crc32     = parse_u32_for_16bit_words(stream, pos);
-  //  let tail         = parse_u16(stream, pos);
-  //  if tail != RBEventHeader::TAIL {
-  //    error!("No tail signature found {} bytes from the start! Found {} instead Will set broken flag in header!", *pos - start - 2, tail );  
-  //  }
-  //  Ok(header)
-  //}
-
+  /// Check if the channel 9 is present in the 
+  /// channel mask
   pub fn has_ch9(&self) -> bool {
     self.channel_mask & 256 > 0
   }
@@ -1020,6 +942,7 @@ impl fmt::Display for RBEventHeader {
     repr += &sine_field;
     //repr += &("\n  FPGA temp [\u{00B0}C]    ".to_owned() + &self.get_fpga_temp().to_string()); 
     repr += &(format!("\n  FPGA T [\u{00B0}C]    : {:.2}", self.get_fpga_temp()));
+    repr += &(format!("\n  DRS deadtime          : {:.2}", self.drs_deadtime));
     repr += &(format!("\n  timestamp32      {}", self.timestamp32            )); 
     repr += &(format!("\n  timestamp16      {}", self.timestamp16            )); 
     repr += &(format!("\n   |-> timestamp48 {}", self.get_timestamp48()      )); 
@@ -1069,10 +992,10 @@ impl Serialization for RBEventHeader {
     header.ch9_amp             = parse_u16(stream, pos);
     header.ch9_freq            = parse_u16(stream, pos);
     header.ch9_phase           = parse_u32(stream, pos);
-    //header.crc32               = parse_u32(stream , pos);  
-    //header.dtap0               = parse_u16(stream , pos);  
-    //header.drs4_temp           = parse_u16(stream , pos);  
-    header.fpga_temp           = parse_u16(stream , pos);  
+    //VERSION > 0.10.5 - we replace DRS temperature with 
+    //DRS DEADTIME
+    //header.fpga_temp           = parse_u16(stream , pos);  
+    header.drs_deadtime        = parse_u16(stream, pos);
     header.timestamp32         = parse_u32(stream, pos);
     header.timestamp16         = parse_u16(stream, pos);
     *pos += 2; // account for tail earlier 
@@ -1091,10 +1014,8 @@ impl Serialization for RBEventHeader {
     stream.extend_from_slice(&self.ch9_amp           .to_le_bytes());
     stream.extend_from_slice(&self.ch9_freq          .to_le_bytes());
     stream.extend_from_slice(&self.ch9_phase         .to_le_bytes());
-    //stream.extend_from_slice(&self.crc32             .to_le_bytes());
-    //stream.extend_from_slice(&self.dtap0             .to_le_bytes());
-    //stream.extend_from_slice(&self.drs4_temp         .to_le_bytes());
-    stream.extend_from_slice(&self.fpga_temp         .to_le_bytes());
+    //stream.extend_from_slice(&self.fpga_temp         .to_le_bytes());
+    stream.extend_from_slice(&self.drs_deadtime      .to_le_bytes());
     stream.extend_from_slice(&self.timestamp32       .to_le_bytes());
     stream.extend_from_slice(&self.timestamp16       .to_le_bytes());
     stream.extend_from_slice(&RBEventHeader::TAIL.to_le_bytes());
@@ -1117,10 +1038,9 @@ impl FromRandom for RBEventHeader {
     header.ch9_amp              = rng.gen::<u16>();
     header.ch9_freq             = rng.gen::<u16>();
     header.ch9_phase            = rng.gen::<u32>();
-    //header.crc32                = rng.gen::<u32>();   
-    //header.dtap0                = rng.gen::<u16>();   
-    //header.drs4_temp            = rng.gen::<u16>();   
-    header.fpga_temp            = rng.gen::<u16>();   
+    // Has been changed in V 0.10.5
+    //header.fpga_temp            = rng.gen::<u16>();  
+    header.drs_deadtime         = rng.gen::<u16>();
     header.timestamp32          = rng.gen::<u32>();
     header.timestamp16          = rng.gen::<u16>();
     header
