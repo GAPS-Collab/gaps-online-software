@@ -1941,9 +1941,6 @@ pub struct PyRBEventHeader {
 }
 
 impl PyRBEventHeader {
-  pub fn set_header(&mut self, header : RBEventHeader) {
-    self.header = header;
-  }
 
   //pub rb_id                : u8   ,    
   //pub event_id             : u32  , 
@@ -1985,14 +1982,14 @@ impl PyRBEventHeader {
     self.header.event_id
   }
   
-  #[getter]
-  fn status_byte(&self) -> u8 {
-    self.header.status_byte
-  }
+  //#[getter]
+  //fn status_byte(&self) -> u8 {
+  //  self.header.status_byte
+  //}
   
   #[getter]
   fn channel_mask(&self) -> u16 {
-    self.header.channel_mask
+    self.header.get_channel_mask()
   }
   
   #[getter]
@@ -2005,6 +2002,11 @@ impl PyRBEventHeader {
     self.header.get_fpga_temp()
   }
   
+  #[getter]
+  fn drs_deadtime(&self) -> u16 {
+    self.header.drs_deadtime 
+  }
+
   #[getter]
   fn timestamp32(&self) -> u32 {
     self.header.timestamp32
@@ -2356,7 +2358,7 @@ impl PyRBEvent {
   fn header(&self) -> PyRBEventHeader {
     let mut py_header = PyRBEventHeader::new();
     //let mut header = self.event.header;
-    py_header.set_header(self.event.header.clone());
+    py_header.header = self.event.header.clone();
     py_header
   }
   
