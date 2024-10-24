@@ -67,9 +67,6 @@ use liftof_lib::thread_control::ThreadControl;
 ///  * data_type           : If different from 0, do some processing
 ///                          on the data read from memory
 ///  * verbose             : More output to the console for debugging
-///  * calc_crc32          : Calucalate crc32 checksum for the channel
-///                          packet. Remember, this might impact 
-///                          performance
 ///  * only_perfect_events : Only transmit events with EventStatus::Perfect.
 ///                          This only applies when the op mode is not 
 ///                          RBHighThroughput
@@ -79,7 +76,6 @@ pub fn event_processing(board_id            : u8,
                         tp_sender           : &Sender<TofPacket>,
                         dtf_fr_runner       : &Receiver<DataType>,
                         verbose             : bool,
-                        calc_crc32          : bool,
                         thread_control      : Arc<Mutex<ThreadControl>>,
                         stat                : Arc<Mutex<RunStatistics>>,
                         only_perfect_events : bool) {
