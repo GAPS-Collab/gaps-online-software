@@ -764,6 +764,20 @@ impl PyPAMoniData {
     }
   }
   
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<PAMoniData>() {
+      Ok(moni) => {
+        self.moni = moni;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+  
   #[getter]
   fn board_id(&self) ->  u8 {
     self.moni.board_id
@@ -851,6 +865,20 @@ impl PyPBMoniData {
   fn new() -> Self {
     Self {
       moni : PBMoniData::new()
+    }
+  }
+  
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<PBMoniData>() {
+      Ok(moni) => {
+        self.moni = moni;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
     }
   }
   
@@ -1125,6 +1153,8 @@ impl PyRBMoniData {
   fn tmp_lis3mdltr    (&self)  -> f32 {
     self.moni.tmp_lis3mdltr
   }
+  
+  #[getter]
   fn tmp_bm280        (&self)  -> f32 {
     self.moni.tmp_bm280
   }
