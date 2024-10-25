@@ -13,6 +13,10 @@ namespace Gaps {
     TelemetryPacket   = 20,
   };
 
+  struct CRFrameObject {
+  };
+
+
   struct CRFrame {
     static const u16 HEAD = 0xAAAA;
     static const u16 TAIL = 0x5555;
