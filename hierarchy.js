@@ -2,6 +2,7 @@ var hierarchy =
 [
     [ "CPUMoniData", "structCPUMoniData.html", null ],
     [ "Gaps::CRFrame", "structGaps_1_1CRFrame.html", null ],
+    [ "Gaps::CRFrameObject", "structGaps_1_1CRFrameObject.html", null ],
     [ "Gaps::CRReader", "structGaps_1_1CRReader.html", null ],
     [ "std::exception", null, [
       [ "Gaps::FatalException", "classGaps_1_1FatalException.html", null ]

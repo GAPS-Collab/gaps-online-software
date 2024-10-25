@@ -2071,12 +2071,12 @@
     </span><span class="self">self</span>.pos += <span class="number">10</span>;
     <span class="self">self</span>.pos += <span class="number">1</span>; <span class="comment">// rb id first byte is rsvd
     </span>header.rb_id        = parse_u8(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
-    header.channel_mask = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos); 
+    header.set_channel_mask(parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos)); 
     <span class="kw">match </span>replace_channel_mask {
       <span class="prelude-val">None </span>=&gt; (),
       <span class="prelude-val">Some</span>(mask) =&gt; {
-        <span class="macro">println!</span>(<span class="string">"==&gt; Replacing ch mask {} with {}"</span>, header.channel_mask, mask);
-        header.channel_mask    = mask; 
+        <span class="macro">println!</span>(<span class="string">"==&gt; Replacing ch mask {} with {}"</span>, header.get_channel_mask(), mask);
+        header.set_channel_mask(mask); 
       }
     }
     <span class="kw">let </span>event_id0       = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);

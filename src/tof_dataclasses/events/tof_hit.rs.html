@@ -623,6 +623,48 @@
 <a href="#623" id="623">623</a>
 <a href="#624" id="624">624</a>
 <a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span>half::f16;
@@ -636,12 +678,16 @@
 };
 <span class="kw">use </span><span class="kw">crate</span>::ProtocolVersion;
 
-<span class="kw">use </span><span class="kw">crate</span>::constants::C_LIGHT_PADDLE;
+<span class="kw">use </span><span class="kw">crate</span>::constants::{
+  C_LIGHT_PADDLE,
+  C_LIGHT_CABLE
+};
 
 <span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
-</span><span class="kw">extern crate </span>rand;
-<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 </span><span class="kw">use </span>rand::Rng;
+
+<span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::database::Paddle;
 
 <span class="comment">///// We will save the values for the peak heigth, time and charge
 ///// as u16. The calculations yield f32 though. We need to convert
@@ -725,6 +771,15 @@
   <span class="kw">pub </span>peak_b         : f16,
   <span class="kw">pub </span>charge_a       : f16,
   <span class="kw">pub </span>charge_b       : f16,
+  
+  <span class="doccomment">/// The paddle length will not get serialized
+  /// and has to be set after the hit has been 
+  /// created
+  </span><span class="kw">pub </span>paddle_len     : f32,
+  <span class="doccomment">/// The Harting cable length to the RB will not get
+  /// serialized and has to be set after the hit has been 
+  /// created
+  </span><span class="kw">pub </span>cable_len      : f32,
 
   <span class="comment">// deprecated values (prior to V1 version)
   </span><span class="kw">pub </span>timestamp32    : u32,
@@ -757,7 +812,6 @@
   <span class="kw">pub </span>ftime_b        : f32,
   <span class="kw">pub </span>fpeak_a        : f32,
   <span class="kw">pub </span>fpeak_b        : f32,
-  <span class="kw">pub </span>paddle_len     : f32,
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>TofHit {
@@ -768,12 +822,19 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofHit {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">let </span><span class="kw-2">mut </span>paddle_info = String::from(<span class="string">""</span>);
+    <span class="kw">if </span><span class="self">self</span>.paddle_len == <span class="number">0.0 </span>{
+      paddle_info = String::from(<span class="string">"NOT SET!"</span>);
+    }
     <span class="macro">write!</span>(f, <span class="string">"&lt;TofHit (version : {}):
   Paddle ID       {}
   Peak:
     LE Time A/B   {:.2} {:.2}   
     Height  A/B   {:.2} {:.2}
     Charge  A/B   {:.2} {:.2}
+  ** paddle {} ** 
+    Length        {:.2}
+    Harting cable length {:.2}
   ** reconstructed interaction
     energy_dep    {:.2}   
     pos_across    {:.2}   
@@ -790,6 +851,9 @@
             <span class="self">self</span>.get_peak_b(),
             <span class="self">self</span>.get_charge_a(),
             <span class="self">self</span>.get_charge_b(),
+            paddle_info,
+            <span class="self">self</span>.paddle_len,
+            <span class="self">self</span>.cable_len,
             <span class="self">self</span>.get_edep(),
             <span class="self">self</span>.get_pos(),
             <span class="self">self</span>.get_t0(),
@@ -920,6 +984,9 @@
       peak_b         : f16::from_f32(<span class="number">0.0</span>),
       charge_a       : f16::from_f32(<span class="number">0.0</span>),
       charge_b       : f16::from_f32(<span class="number">0.0</span>),
+      paddle_len     : <span class="number">0.0</span>,
+      cable_len      : <span class="number">0.0</span>,
+      
       charge_min_i   : <span class="number">0</span>,
       <span class="comment">// deprecated  
       </span>pos_across     : <span class="number">0</span>,
@@ -941,10 +1008,14 @@
       ftime_b        : <span class="number">0.0</span>,
       fpeak_a        : <span class="number">0.0</span>,
       fpeak_b        : <span class="number">0.0</span>,
-      paddle_len     : <span class="number">0.0</span>,
     }
   }
-
+  
+  <span class="attr">#[cfg(features=<span class="string">"database"</span>)]
+  </span><span class="kw">pub fn </span>set_paddle(<span class="kw-2">&amp;mut </span><span class="self">self</span>, paddle : <span class="kw-2">&amp;</span>Paddle) {
+    <span class="self">self</span>.cable_len  = paddle.cable_len;
+    <span class="self">self</span>.paddle_len = paddle.length;
+  }
 
   <span class="doccomment">/// Get the (official) paddle id
   ///
@@ -998,16 +1069,31 @@
   ///
   /// **This will be measured from the A side**
   </span><span class="kw">pub fn </span>get_pos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
-    (<span class="self">self</span>.time_a.to_f32() - <span class="self">self</span>.get_t0())<span class="kw-2">*</span>C_LIGHT_PADDLE<span class="kw-2">*</span><span class="number">10.0 </span><span class="comment">// 10 for cm-&gt;mm 
-  </span>}
+    <span class="comment">//(self.time_a.to_f32() - self.get_t0())*C_LIGHT_PADDLE*10.0 // 10 for cm-&gt;mm 
+    // FIX - we are actually resetting the particle interaction time to 0 for this
+    //(self.time_a.to_f32() - self.get_t0())*C_LIGHT_PADDLE*10.0 // 10 for cm-&gt;mm
+    </span><span class="kw">if </span><span class="self">self</span>.time_a == <span class="self">self</span>.time_b {
+      <span class="kw">return </span><span class="number">0.5</span><span class="kw-2">*</span><span class="self">self</span>.paddle_len;
+    }
+    <span class="kw">if </span><span class="self">self</span>.time_a &lt; <span class="self">self</span>.time_b {
+      <span class="comment">// it is closer to A side
+      </span><span class="kw">return </span><span class="number">0.5</span><span class="kw-2">*</span><span class="self">self</span>.paddle_len - (<span class="self">self</span>.time_b.to_f32() - <span class="self">self</span>.time_a.to_f32())<span class="kw-2">*</span><span class="number">0.5</span><span class="kw-2">*</span>C_LIGHT_PADDLE<span class="kw-2">*</span><span class="number">10.0</span>;
+      <span class="comment">//return (self.time_b.to_f32() - self.time_a.to_f32())*C_LIGHT_PADDLE*10.0; 
+    </span>}
+    <span class="kw">else </span>{
+      <span class="kw">return </span><span class="self">self</span>.paddle_len<span class="kw-2">*</span><span class="number">0.5 </span>+ (<span class="self">self</span>.time_a.to_f32() - <span class="self">self</span>.time_b.to_f32())<span class="kw-2">*</span><span class="number">0.5</span><span class="kw-2">*</span>C_LIGHT_PADDLE<span class="kw-2">*</span><span class="number">10.0</span>;
+    }
+  }
 
   <span class="doccomment">/// Calculate the interaction time based on the peak timings measured 
   /// at the paddle ends A and B
   ///
-  /// That this works, the lenght of the paddle has to 
-  /// be set before.
+  /// That this works, the length of the paddle has to 
+  /// be set before (in mm).
+  /// This assumes that the cable on both sides of the paddle are 
+  /// the same length
   </span><span class="kw">pub fn </span>get_t0(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
-    <span class="number">0.5</span><span class="kw-2">*</span>(<span class="self">self</span>.time_a.to_f32() + <span class="self">self</span>.time_b.to_f32() - (<span class="self">self</span>.paddle_len/(<span class="number">10.0</span><span class="kw-2">*</span>C_LIGHT_PADDLE)))
+    <span class="number">0.5</span><span class="kw-2">*</span>(<span class="self">self</span>.time_a.to_f32() + <span class="self">self</span>.time_b.to_f32() - (<span class="self">self</span>.paddle_len/(<span class="number">10.0</span><span class="kw-2">*</span>C_LIGHT_PADDLE)) - ((<span class="self">self</span>.cable_len<span class="kw-2">*</span><span class="number">2.0</span>)/(<span class="number">10.0</span><span class="kw-2">*</span>C_LIGHT_CABLE)))
   }
 
   <span class="kw">pub fn </span>get_edep(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
@@ -1231,9 +1317,7 @@
     pp.baseline_b     = f16::from_f32(rng.gen::&lt;f32&gt;());
     pp.baseline_b_rms = f16::from_f32(rng.gen::&lt;f32&gt;());
     pp.phase          = f16::from_f32(rng.gen::&lt;f32&gt;());
-    <span class="comment">//pp.timestamp32  = rng.gen::&lt;u32&gt;();
-    //pp.timestamp16  = rng.gen::&lt;u16&gt;();
-    </span>pp
+    pp
   }
 }
 

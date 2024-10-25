@@ -1,5 +1,6 @@
 var namespaceGaps =
 [
+    [ "CRFrameObject", "structGaps_1_1CRFrameObject.html", null ],
     [ "CRFrame", "structGaps_1_1CRFrame.html", "structGaps_1_1CRFrame" ],
     [ "CRReader", "structGaps_1_1CRReader.html", "structGaps_1_1CRReader" ],
     [ "TofPaddle", "structGaps_1_1TofPaddle.html", "structGaps_1_1TofPaddle" ],

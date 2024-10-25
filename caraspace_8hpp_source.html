@@ -104,44 +104,49 @@ $(document).ready(function(){initNavTree('caraspace_8hpp_source.html',''); initR
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    TelemetryPacket   = 20,</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  };</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="structGaps_1_1CRFrame.html">   16</a></span>&#160;  <span class="keyword">struct </span><a class="code" href="structGaps_1_1CRFrame.html">CRFrame</a> {</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;      </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <a class="code" href="structGaps_1_1CRFrame.html">CRFrame</a>();</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="comment">//std::map&lt;std::string, usize&gt; get_index</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keyword">static</span> <a class="code" href="structGaps_1_1CRFrame.html">CRFrame</a> from_bytestream(Vec&lt;u8&gt; stream, usize &amp;pos);</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    std::map&lt;std::string, std::tuple&lt;u64, CRFrameObjectType&gt;&gt; index;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    Vec&lt;u8&gt; bytestorage;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    std::string to_string() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;      <span class="keyword">static</span> std::map&lt;std::string, std::tuple&lt;u64, CRFrameObjectType&gt;&gt; parse_index(Vec&lt;u8&gt; stream, usize &amp;pos);</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="comment">//pub fn get&lt;T : CRSerializeable + Frameable&gt;(&amp;self, name : String) -&gt; Result&lt;T, CRSerializationError&gt; {</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  };</div>
+<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="structGaps_1_1CRFrameObject.html">   16</a></span>&#160;  <span class="keyword">struct </span><a class="code" href="structGaps_1_1CRFrameObject.html">CRFrameObject</a> {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  };</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="structGaps_1_1CRFrame.html">   20</a></span>&#160;  <span class="keyword">struct </span><a class="code" href="structGaps_1_1CRFrame.html">CRFrame</a> {</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;      </div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <a class="code" href="structGaps_1_1CRFrame.html">CRFrame</a>();</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="comment">//std::map&lt;std::string, usize&gt; get_index</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keyword">static</span> <a class="code" href="structGaps_1_1CRFrame.html">CRFrame</a> from_bytestream(Vec&lt;u8&gt; stream, usize &amp;pos);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    std::map&lt;std::string, std::tuple&lt;u64, CRFrameObjectType&gt;&gt; index;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    Vec&lt;u8&gt; bytestorage;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    std::string to_string() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      <span class="keyword">static</span> std::map&lt;std::string, std::tuple&lt;u64, CRFrameObjectType&gt;&gt; parse_index(Vec&lt;u8&gt; stream, usize &amp;pos);</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="structGaps_1_1CRReader.html">   34</a></span>&#160;  <span class="keyword">struct </span><a class="code" href="structGaps_1_1CRReader.html">CRReader</a> {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="structGaps_1_1CRReader.html">CRReader</a>();</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="code" href="structGaps_1_1CRReader.html">CRReader</a>(std::string filename);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <a class="code" href="structGaps_1_1CRReader.html">CRReader</a>(<span class="keyword">const</span> <a class="code" href="structGaps_1_1CRReader.html">CRReader</a>&amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="structGaps_1_1CRReader.html#aaed4889eba26d597dc2f26eeefb14191">   41</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="structGaps_1_1CRReader.html#aaed4889eba26d597dc2f26eeefb14191">set_filename</a>(std:: string);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <a class="code" href="structGaps_1_1CRFrame.html">CRFrame</a> get_next_frame();</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    std::string get_filename() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="structGaps_1_1CRReader.html#a89296ec70baeae45e6bc82f7493a075f">   48</a></span>&#160;    <span class="keywordtype">bool</span>      <a class="code" href="structGaps_1_1CRReader.html#a89296ec70baeae45e6bc82f7493a075f">is_exhausted</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="structGaps_1_1CRReader.html#abf1e7af9a9f1c617b96e7d717512182b">   51</a></span>&#160;    <span class="keywordtype">bool</span>      <a class="code" href="structGaps_1_1CRReader.html#abf1e7af9a9f1c617b96e7d717512182b">n_packets_read</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keyword">private</span>:  </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordtype">bool</span>           exhausted_;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    usize          n_packets_read_;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    std::string    filename_;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    std::ifstream  stream_file_;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  };</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;}</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="comment">//pub fn get&lt;T : CRSerializeable + Frameable&gt;(&amp;self, name : String) -&gt; Result&lt;T, CRSerializationError&gt; {</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  };</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="structGaps_1_1CRReader.html">   38</a></span>&#160;  <span class="keyword">struct </span><a class="code" href="structGaps_1_1CRReader.html">CRReader</a> {</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="structGaps_1_1CRReader.html">CRReader</a>();</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="structGaps_1_1CRReader.html">CRReader</a>(std::string filename);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <a class="code" href="structGaps_1_1CRReader.html">CRReader</a>(<span class="keyword">const</span> <a class="code" href="structGaps_1_1CRReader.html">CRReader</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="structGaps_1_1CRReader.html#aaed4889eba26d597dc2f26eeefb14191">   45</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="structGaps_1_1CRReader.html#aaed4889eba26d597dc2f26eeefb14191">set_filename</a>(std:: string);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="structGaps_1_1CRFrame.html">CRFrame</a> get_next_frame();</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    std::string get_filename() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="structGaps_1_1CRReader.html#a89296ec70baeae45e6bc82f7493a075f">   52</a></span>&#160;    <span class="keywordtype">bool</span>      <a class="code" href="structGaps_1_1CRReader.html#a89296ec70baeae45e6bc82f7493a075f">is_exhausted</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="structGaps_1_1CRReader.html#abf1e7af9a9f1c617b96e7d717512182b">   55</a></span>&#160;    <span class="keywordtype">bool</span>      <a class="code" href="structGaps_1_1CRReader.html#abf1e7af9a9f1c617b96e7d717512182b">n_packets_read</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keyword">private</span>:  </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">bool</span>           exhausted_;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    usize          n_packets_read_;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    std::string    filename_;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    std::ifstream  stream_file_;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  };</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;}</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="anamespaceGaps_html"><div class="ttname"><a href="namespaceGaps.html">Gaps</a></div><div class="ttdoc">‍**</div><div class="ttdef"><b>Definition:</b> caraspace.hpp:8</div></div>
-<div class="ttc" id="astructGaps_1_1CRFrame_html"><div class="ttname"><a href="structGaps_1_1CRFrame.html">Gaps::CRFrame</a></div><div class="ttdef"><b>Definition:</b> caraspace.hpp:16</div></div>
-<div class="ttc" id="astructGaps_1_1CRReader_html"><div class="ttname"><a href="structGaps_1_1CRReader.html">Gaps::CRReader</a></div><div class="ttdef"><b>Definition:</b> caraspace.hpp:34</div></div>
+<div class="ttc" id="astructGaps_1_1CRFrameObject_html"><div class="ttname"><a href="structGaps_1_1CRFrameObject.html">Gaps::CRFrameObject</a></div><div class="ttdef"><b>Definition:</b> caraspace.hpp:16</div></div>
+<div class="ttc" id="astructGaps_1_1CRFrame_html"><div class="ttname"><a href="structGaps_1_1CRFrame.html">Gaps::CRFrame</a></div><div class="ttdef"><b>Definition:</b> caraspace.hpp:20</div></div>
+<div class="ttc" id="astructGaps_1_1CRReader_html"><div class="ttname"><a href="structGaps_1_1CRReader.html">Gaps::CRReader</a></div><div class="ttdef"><b>Definition:</b> caraspace.hpp:38</div></div>
 <div class="ttc" id="astructGaps_1_1CRReader_html_a89296ec70baeae45e6bc82f7493a075f"><div class="ttname"><a href="structGaps_1_1CRReader.html#a89296ec70baeae45e6bc82f7493a075f">Gaps::CRReader::is_exhausted</a></div><div class="ttdeci">bool is_exhausted() const</div></div>
 <div class="ttc" id="astructGaps_1_1CRReader_html_aaed4889eba26d597dc2f26eeefb14191"><div class="ttname"><a href="structGaps_1_1CRReader.html#aaed4889eba26d597dc2f26eeefb14191">Gaps::CRReader::set_filename</a></div><div class="ttdeci">void set_filename(std::string)</div></div>
 <div class="ttc" id="astructGaps_1_1CRReader_html_abf1e7af9a9f1c617b96e7d717512182b"><div class="ttname"><a href="structGaps_1_1CRReader.html#abf1e7af9a9f1c617b96e7d717512182b">Gaps::CRReader::n_packets_read</a></div><div class="ttdeci">bool n_packets_read() const</div></div>

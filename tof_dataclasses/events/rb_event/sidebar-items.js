@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["unpack_traces_f32","unpack_traces_f64"],"struct":["RBEvent","RBEventHeader","RBMissingHit","RBWaveform"]};
+window.SIDEBAR_ITEMS = {"fn":["unpack_traces_f32","unpack_traces_f64"],"struct":["RBEvent","RBEventHeader","RBWaveform"]};

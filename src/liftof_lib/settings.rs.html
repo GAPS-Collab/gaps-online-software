@@ -1011,6 +1011,9 @@
 <a href="#1011" id="1011">1011</a>
 <a href="#1012" id="1012">1012</a>
 <a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Aggregate settings for the TOF system
 //!
 //! Control the settings for the C&amp;C server
@@ -1324,19 +1327,19 @@
   <span class="doccomment">/// Don't send events if they have issues. Requires
   /// EventStatus::Perfect. This can not work in the
   /// OperationMode RBHighThroughput
-  </span><span class="kw">pub </span>only_perfect_events : bool,
+  </span><span class="kw">pub </span>only_perfect_events           : bool,
   <span class="doccomment">/// Calculate the crc32 sum for each channel and set
   /// the EventStatus flag accordingly.
-  </span><span class="kw">pub </span>calc_crc32          : bool,
+  </span><span class="kw">pub </span>calc_crc32                    : bool,
   <span class="doccomment">/// tof operation mode - either "StreamAny",
   /// "RequestReply" or "RBHighThroughput"
-  </span><span class="kw">pub </span>tof_op_mode         : TofOperationMode,
+  </span><span class="kw">pub </span>tof_op_mode                   : TofOperationMode,
   <span class="doccomment">/// if different from 0, activate RB self trigger
   /// in poisson mode
-  </span><span class="kw">pub </span>trigger_poisson_rate    : u32,
+  </span><span class="kw">pub </span>trigger_poisson_rate          : u32,
   <span class="doccomment">/// if different from 0, activate RB self trigger 
   /// with fixed rate setting
-  </span><span class="kw">pub </span>trigger_fixed_rate      : u32,
+  </span><span class="kw">pub </span>trigger_fixed_rate            : u32,
   <span class="comment">///// if different from 0, activate RB self trigger
   ///// in poisson mode
   //pub trigger_poisson_rate    : u32,
@@ -1346,7 +1349,7 @@
   </span><span class="doccomment">/// Either "Physics" or a calibration related 
   /// data type, e.g. "VoltageCalibration".
   /// &lt;div class="warning"&gt;This might get deprecated in a future version!&lt;/div&gt;
-  </span><span class="kw">pub </span>data_type               : DataType,
+  </span><span class="kw">pub </span>data_type                     : DataType,
   <span class="doccomment">/// This allows for different strategies on how to readout 
   /// the RB buffers. The following refers to the NEvent strategy.
   /// The value when the readout of the RB buffers is triggered.
@@ -1357,33 +1360,36 @@
   /// For RBBufferStrategy::AdaptToRate(k), readout (and switch) the buffers every
   /// k seconds. The size of the buffer will be determined
   /// automatically depending on the rate.
-  </span><span class="kw">pub </span>rb_buff_strategy        : RBBufferStrategy,
+  </span><span class="kw">pub </span>rb_buff_strategy               : RBBufferStrategy,
   <span class="doccomment">/// The general moni interval. Whenever this time in seconds has
   /// passed, the RB will send a RBMoniData packet
-  </span><span class="kw">pub </span>rb_moni_interval        : f32,
+  </span><span class="kw">pub </span>rb_moni_interval               : f32,
   <span class="doccomment">/// Powerboard monitoring. Do it every multiple of rb_moni_interval
-  </span><span class="kw">pub </span>pb_moni_every_x         : f32,
+  </span><span class="kw">pub </span>pb_moni_every_x                : f32,
   <span class="doccomment">/// Preamp monitoring. Do it every multiple of rb_moni_interval
-  </span><span class="kw">pub </span>pa_moni_every_x         : f32,
+  </span><span class="kw">pub </span>pa_moni_every_x                : f32,
   <span class="doccomment">/// LTB monitoring. Do it every multiple of rb_moni_interval
-  </span><span class="kw">pub </span>ltb_moni_every_x        : f32,
+  </span><span class="kw">pub </span>ltb_moni_every_x               : f32,
+  <span class="doccomment">/// Choose between drs deadtime or fpga 
+  </span><span class="kw">pub </span>drs_deadtime_instead_fpga_temp : bool
 }
 
 <span class="kw">impl </span>RBSettings {
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
-      only_perfect_events  : <span class="bool-val">false</span>,
-      calc_crc32           : <span class="bool-val">false</span>,
-      tof_op_mode          : TofOperationMode::Default,
-      trigger_fixed_rate   : <span class="number">0</span>,
-      trigger_poisson_rate : <span class="number">0</span>,
-      data_type            : DataType::Physics,
-      rb_buff_strategy     : RBBufferStrategy::AdaptToRate(<span class="number">5</span>),
-      rb_moni_interval     : <span class="number">0.0</span>,
-      pb_moni_every_x      : <span class="number">0.0</span>,
-      pa_moni_every_x      : <span class="number">0.0</span>,
-      ltb_moni_every_x     : <span class="number">0.0</span>,
-    }
+      only_perfect_events            : <span class="bool-val">false</span>,
+      calc_crc32                     : <span class="bool-val">false</span>,
+      tof_op_mode                    : TofOperationMode::Default,
+      trigger_fixed_rate             : <span class="number">0</span>,
+      trigger_poisson_rate           : <span class="number">0</span>,
+      data_type                      : DataType::Physics,
+      rb_buff_strategy               : RBBufferStrategy::AdaptToRate(<span class="number">5</span>),
+      rb_moni_interval               : <span class="number">0.0</span>,
+      pb_moni_every_x                : <span class="number">0.0</span>,
+      pa_moni_every_x                : <span class="number">0.0</span>,
+      ltb_moni_every_x               : <span class="number">0.0</span>,
+      drs_deadtime_instead_fpga_temp : <span class="bool-val">false
+    </span>}
   }
 
   <span class="kw">pub fn </span>get_runconfig(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RunConfig {

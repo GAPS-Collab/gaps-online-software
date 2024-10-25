@@ -1205,8 +1205,8 @@
     <span class="kw">let </span><span class="kw-2">mut </span>tpacket = TelemetryPacket::new();
     <span class="kw">let </span>header  = TelemetryHeader::from_bytestream(stream, pos)<span class="question-mark">?</span>;
     tpacket.header = header;
-    <span class="macro">println!</span>(<span class="string">"Found header {}"</span>, tpacket.header);
-    <span class="comment">// it seems the payload size is header.size
+    <span class="comment">//println!("Found header {}", tpacket.header);
+    // it seems the payload size is header.size
     // fix - the payload is either sizeof(header) + payload.len 
     </span>tpacket.payload = stream[<span class="kw-2">*</span>pos..<span class="kw-2">*</span>pos + header.length <span class="kw">as </span>usize - TelemetryHeader::SIZE].to_vec();
     <span class="prelude-val">Ok</span>(tpacket)
