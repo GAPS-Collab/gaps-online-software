@@ -481,12 +481,12 @@ impl RBEventMemoryStreamer {
     self.pos += 10;
     self.pos += 1; // rb id first byte is rsvd
     header.rb_id        = parse_u8(&self.stream, &mut self.pos);
-    header.channel_mask = parse_u16(&self.stream, &mut self.pos); 
+    header.set_channel_mask(parse_u16(&self.stream, &mut self.pos)); 
     match replace_channel_mask {
       None => (),
       Some(mask) => {
-        println!("==> Replacing ch mask {} with {}", header.channel_mask, mask);
-        header.channel_mask    = mask; 
+        println!("==> Replacing ch mask {} with {}", header.get_channel_mask(), mask);
+        header.set_channel_mask(mask); 
       }
     }
     let event_id0       = parse_u16(&self.stream, &mut self.pos);
