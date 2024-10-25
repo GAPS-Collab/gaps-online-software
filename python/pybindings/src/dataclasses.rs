@@ -1870,6 +1870,11 @@ impl PyMasterTriggerEvent {
     self.event.event_id
   }
 
+  #[getter]
+  fn status(&self) -> EventStatus {
+    self.event.event_status
+  }
+
   /// Get the RB link IDs according to the mask
   #[getter]
   pub fn rb_link_ids(&self) -> Vec<u8> {
