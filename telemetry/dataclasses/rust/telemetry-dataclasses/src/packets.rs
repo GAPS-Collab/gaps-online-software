@@ -111,7 +111,7 @@ impl TelemetryPacket {
     let mut tpacket = TelemetryPacket::new();
     let header  = TelemetryHeader::from_bytestream(stream, pos)?;
     tpacket.header = header;
-    println!("Found header {}", tpacket.header);
+    //println!("Found header {}", tpacket.header);
     // it seems the payload size is header.size
     // fix - the payload is either sizeof(header) + payload.len 
     tpacket.payload = stream[*pos..*pos + header.length as usize - TelemetryHeader::SIZE].to_vec();
