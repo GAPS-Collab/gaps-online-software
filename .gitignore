@@ -1,3 +1,5 @@
+
+
 # build artifacts
 *.so
 
@@ -13,6 +15,9 @@ Makefile
 
 # project files
 .idea/*
+
+# any kind of lock files
+*.lock
 
 # Poetry lock files
 poetry.lock

@@ -82,7 +82,9 @@ if __name__ == '__main__':
         settings = go.liftof.LiftofSettings()
         settings = settings.from_file('settings.toml')
 
-    cr_outdir = str(args.tof_dir / 'caraspace')
+    cr_outdir = args.tof_dir / 'caraspace' / f'{args.run_id}'
+    cr_outdir.mkdir(parents=True, exist_ok=True)
+    cr_outdir = str(cr_outdir)
 
     telemetry_files = go.io.get_telemetry_binaries(args.start_time, args.end_time,\
                                                    data_dir=args.telemetry_dir)

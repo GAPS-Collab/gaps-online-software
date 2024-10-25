@@ -88,6 +88,7 @@ rb_moni_interval = 10.0
 pb_moni_every_x = 2.0
 pa_moni_every_x = 2.0
 ltb_moni_every_x = 2.0
+drs_deadtime_instead_fpga_temp = false
 
 [rb_settings.rb_buff_strategy]
 AdaptToRate = 2

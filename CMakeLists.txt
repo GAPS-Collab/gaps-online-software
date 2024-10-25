@@ -30,7 +30,6 @@ set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20" FORCE)
 set(CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20" FORCE)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
-
 # -- pybindings with pybind11
 option(BUILD_CXXPYBINDINGS "build C++ pybindings with pybind11 (deprecated)" OFF)
 option(BUILD_RUSTTELEMETRY "builds Rust telemetry library and pybindings" OFF)
