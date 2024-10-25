@@ -91,7 +91,7 @@ def get_ts_from_binfile(fname):
     ts = ts.replace(tzinfo=timezone.utc)
     return ts
 
-def get_tof_binaries(run_id : int, data_dir='' : str, ending='*.gaps') -> list[Path]:
+def get_tof_binaries(run_id : int, data_dir='', ending='*.gaps') -> list[Path]:
     """
     This allows to get binary data written by either liftof
     ('.tof.gaps') files or through the caraspace library
