@@ -254,6 +254,7 @@ if __name__ == '__main__':
                     paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0 - paddle.length/2
                 case _:
                     raise ValueError("Can not parse {paddle_end_loc} for paddle end location!")
+            
             if k%2 != 0:
                 print (paddle)
                 # fix - there is a bug in the spreadsheet for paddle 108
@@ -317,42 +318,48 @@ if __name__ == '__main__':
                         normal = [-1,-1,0]
                     case 21 | 1315:
                         normal = [1,-1,0]
-            panel.normal_x = normal[0]
-            panel.normal_y = normal[1]
-            panel.normal_z = normal[2]
+                panel.normal_x = normal[0]
+                panel.normal_y = normal[1]
+                panel.normal_z = normal[2]
 
             paddles = m.Paddle.objects.filter(panel_id=panel.panel_id)
-            if not len (paddles):
-                raise ValueError("Need to create Paddle table first!")
-            paddles = sorted(paddles, key=lambda x: x.paddle_id) 
-            for k,pdl in enumerate(paddles):
-                match k:
-                    case 0:
-                        panel.paddle0 = pdl
-                    case 1:
-                        panel.paddle1 = pdl
-                    case 2:
-                        panel.paddle2 = pdl
-                    case 3:
-                        panel.paddle3 = pdl
-                    case 4:
-                        panel.paddle4 = pdl
-                    case 5:
-                        panel.paddle5 = pdl
-                    case 6:
-                        panel.paddle6 = pdl
-                    case 7:
-                        panel.paddle7 = pdl
-                    case 8:
-                        panel.paddle8 = pdl
-                    case 9:
-                        panel.paddle9 = pdl
-                    case 10:
-                        panel.paddle10 = pdl
-                    case 11:
-                        panel.paddle11 = pdl
-                    case _:
-                        ValueError("Too many paddles for this panel!")
+            if not args.teststand:
+                if not len (paddles):
+                    raise ValueError("Need to create Paddle table first!")
+                paddles = sorted(paddles, key=lambda x: x.paddle_id) 
+                for k,pdl in enumerate(paddles):
+                    pdl.normal_x = normal[0]
+                    pdl.normal_y = normal[1]
+                    pdl.normal_z = normal[2]
+                    if not args.dry_run:
+                        pdl.save()
+                    match k:
+                        case 0:
+                            panel.paddle0 = pdl
+                        case 1:
+                            panel.paddle1 = pdl
+                        case 2:
+                            panel.paddle2 = pdl
+                        case 3:
+                            panel.paddle3 = pdl
+                        case 4:
+                            panel.paddle4 = pdl
+                        case 5:
+                            panel.paddle5 = pdl
+                        case 6:
+                            panel.paddle6 = pdl
+                        case 7:
+                            panel.paddle7 = pdl
+                        case 8:
+                            panel.paddle8 = pdl
+                        case 9:
+                            panel.paddle9 = pdl
+                        case 10:
+                            panel.paddle10 = pdl
+                        case 11:
+                            panel.paddle11 = pdl
+                        case _:
+                            ValueError("Too many paddles for this panel!")
 
             print (panel)
             #print (panel.description, panel.normal_x, panel.normal_y, panel.normal_z)
