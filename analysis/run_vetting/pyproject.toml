@@ -18,6 +18,11 @@ dependencies = [
     "cmocean>=4.0.3",
     "pydashi>=2.0.0",
     "nbstripout>=0.7.1",
+    "uproot>=5.4.1",
+    "jinja2>=3.1.4",
+    "weasyprint>=62.3",
+    "pdfkit>=1.0.0",
+    "reportlab>=4.2.5",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

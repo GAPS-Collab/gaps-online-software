@@ -377,7 +377,7 @@ impl CRFrame {
         pos   = meta.0 as usize;
       }
     }
-    let cr_object =  CRFrameObject::deserialize(&self.bytestorage, &mut pos)?;
+    let cr_object = CRFrameObject::deserialize(&self.bytestorage, &mut pos)?;
     let result    = cr_object.extract::<T>()?;
     Ok(result)
   }

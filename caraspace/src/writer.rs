@@ -36,10 +36,10 @@ pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>) -> String {
   let fname : String;
   match rb_id {
     None => {
-      fname = format!("Run{run}_{subrun}.{ts}.tof.gaps");
+      fname = format!("Run{run}_{subrun}.{ts}.gaps");
     }
     Some(rbid) => {
-      fname = format!("Run{run}_{subrun}.{ts}.RB{rbid:02}.tof.gaps");
+      fname = format!("Run{run}_{subrun}.{ts}.RB{rbid:02}.gaps");
     }
   }
   fname
