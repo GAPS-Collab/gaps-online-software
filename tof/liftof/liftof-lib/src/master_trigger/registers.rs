@@ -11,6 +11,27 @@ use std::error::Error;
 use std::fmt;
 use tof_dataclasses::ipbus::IPBus;
 
+/// The prescale values are defined by a single u32
+/// This number represents 0 for trigger off and 
+/// 1.0 for 2**32 - 1 (which is u32::MAX)
+///
+/// The range for the prescale value is [0,1.0]. 
+/// If the given value is outside of the interval
+/// boundaries, it will be converted to the next 
+/// interval limit
+pub fn prescale_to_u32(mut prescale : f32) -> u32 {
+  if prescale > 1.0 {
+    warn!("Prescale value > 1.0 will be converted to 1.0!");
+    prescale = 1.0
+  }
+  if prescale < 0.0 {
+    prescale = 0.0
+  }
+  // converion
+  ((u32::MAX as f32) * prescale).floor() as u32
+}
+
+
 /// A single 32bit register on the MTB with an 
 /// associated mask to mask parts of ig
 pub struct MTBRegister<'a> {
@@ -367,6 +388,29 @@ pub const RB_READ_ALL_CHANNELS : MTBRegister<'static> = MTBRegister {
   pulse : false,
 };
 
+/// Set Readoutboard BUSY behaviour
+/// RB_BLOCK_IF_BUSY_31_TO_0 	0x24a 	0x928 	[31:0] 	rw 	0x0 	Bitmask to specify if a readout board is BUSY then do not trigger (RB slots 31:0)
+pub const RB_BLOCK_IF_BUSY_31_TO_0 : MTBRegister<'static> = MTBRegister {
+  addr  : 0x24a,
+  mask  : 0xffffffff,
+  descr : "Define if triggers should suppressed if RBs are busy. 1 bit per board",
+  rmw   : false,
+  ro    : false,
+  pulse : false,
+};
+
+/// Set Readoutboard BUSY behaviour
+/// RB_BLOCK_IF_BUSY_49_TO_32 	0x24b 	0x92c 	[17:0] 	rw 	0x0 	Bitmask to specify if a readout board is BUSY then do not trigger (RB slots 49:32)
+pub const RB_BLOCK_IF_BUSY_49_TO_32 : MTBRegister<'static> = MTBRegister {
+  addr  : 0x24b,
+  mask  : 0x0003ffff,
+  descr : "Define if triggers should suppressed if RBs are busy. 1 bit per board",
+  rmw   : false,
+  ro    : false,
+  pulse : false,
+};
+
+
 // MT.EVENT_QUEUE
 // DAQ Buffer
 
@@ -473,6 +517,16 @@ pub const TRACK_CENTRAL_PRESCALE : MTBRegister<'static> = MTBRegister {
   pulse : false
 };
 
+/// Prescale factor for the CENTRAL UMBRELLA TRACK trigger
+/// TRACK_UMB_CENTRAL_PRESCALE 	0x249 	0x924 	[31:0] 	rw 	0x0 	Prescale value for the Umbrella Center + Cube Top Track Trigger. 0 == 0% (off), 2**32-1 == 100%
+pub const TRACK_UMB_CENTRAL_PRESCALE : MTBRegister<'static> = MTBRegister {
+  addr  : 0x249,
+  mask  : 0xffffffff,
+  descr : "Set the umbrella central track trigger with a prescale factor. Prescale of 0 means disabled",
+  rmw   : false,
+  ro    : false,
+  pulse : false
+};
 
 //Implements various control and monitoring functions of the DRS Logic
 
@@ -2005,6 +2059,17 @@ pub const TRACK_CENTRAL_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
   addr  : 0xb,
   mask  : 0x4,
   descr : "1 makes the TRACK central read all paddles",
+  rmw   : true,
+  ro    : false,
+  pulse : false,
+};
+
+/// Add the umbrella central track trigger to all triggers
+/// TRACK_UMB_CENTRAL_IS_GLOBAL 	0xb 	0x2c 	3 	rw 	0x0 	1 makes the TRACK UMB central read all paddles.
+pub const TRACK_UMB_CENTRAL_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
+  addr  : 0xb,
+  mask  : 0x8,
+  descr : "1 makes the TRACK UMB CENTRAL trigger read all paddles",
   rmw   : true,
   ro    : false,
   pulse : false,

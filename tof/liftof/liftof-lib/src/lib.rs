@@ -565,12 +565,16 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     rb.calibration.nanoseconds(9,
                                event.header.stop_cell as usize,
                                &mut times);
-    let fit_result_amp      = fit_sine_sydney(&voltages,  &times).0; 
-    let fit_result_freq     = fit_sine_sydney(&voltages, &times).1;
-    let fit_result_phi      = fit_sine_sydney(&voltages, &times).2;
+    fit_result                = fit_sine_sydney(&voltages, &times);
+    let fit_result_amp        = fit_result.0;
+    let fit_result_freq       = fit_result.1;
+    let fit_result_phi        = fit_result.2;
+    //let fit_result_amp      = fit_sine_sydney(&voltages,  &times).0; 
+    //let fit_result_freq     = fit_sine_sydney(&voltages, &times).1;
+    //let fit_result_phi      = fit_sine_sydney(&voltages, &times).2;
 
     //println!("FIT RESULT = {:?}", fit_result);
-    fit_result = (fit_result_amp, fit_result_freq, fit_result_phi);
+    //fit_result = (fit_result_amp, fit_result_freq, fit_result_phi);
     event.header.set_sine_fit(fit_result);
   }
 

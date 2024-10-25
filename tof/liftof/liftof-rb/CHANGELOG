@@ -1,5 +1,9 @@
 # LELEWAA series
 
+## v0.10.2
+* allow to read out drs4 deadtime for every
+  event
+
 ## v0.10.1
 * set preamp bias voltages from config file
 * removes eventid testing from commandline 

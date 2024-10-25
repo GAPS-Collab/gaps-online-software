@@ -361,17 +361,18 @@ pub struct RBSettings {
 impl RBSettings {
   pub fn new() -> Self {
     Self {
-      only_perfect_events  : false,
-      calc_crc32           : false,
-      tof_op_mode          : TofOperationMode::Default,
-      trigger_fixed_rate   : 0,
-      trigger_poisson_rate : 0,
-      data_type            : DataType::Physics,
-      rb_buff_strategy     : RBBufferStrategy::AdaptToRate(5),
-      rb_moni_interval     : 0.0,
-      pb_moni_every_x      : 0.0,
-      pa_moni_every_x      : 0.0,
-      ltb_moni_every_x     : 0.0,
+      only_perfect_events            : false,
+      calc_crc32                     : false,
+      tof_op_mode                    : TofOperationMode::Default,
+      trigger_fixed_rate             : 0,
+      trigger_poisson_rate           : 0,
+      data_type                      : DataType::Physics,
+      rb_buff_strategy               : RBBufferStrategy::AdaptToRate(5),
+      rb_moni_interval               : 0.0,
+      pb_moni_every_x                : 0.0,
+      pa_moni_every_x                : 0.0,
+      ltb_moni_every_x               : 0.0,
+      drs_deadtime_instead_fpga_temp : false
     }
   }
 
