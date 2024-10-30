@@ -10,3 +10,4 @@ GAPS online software TOF part
 from .mapping import DsiJChRBMap
 from . import monitoring
 from . import calibrations
+from . import visual
