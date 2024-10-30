@@ -236,7 +236,7 @@ impl CPUTab {
             .title("Disk usage (/tpool)")
             .border_type(BorderType::Rounded)
           )
-          .gauge_style(
+          .filled_style(
             Style::default()
               .fg(fg_color)
               .bg(self.theme.bg1)

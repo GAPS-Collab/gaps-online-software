@@ -201,7 +201,8 @@ impl Serialization for TelemetryHeader {
   
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::new();
-    let head : u16 = 0x90eb;
+    //let head : u16 = 0x90eb;
+    // "SYNC" is the header signature
     stream.extend_from_slice(&self.sync.to_le_bytes());
     stream.extend_from_slice(&self.ptype.to_le_bytes());
     stream.extend_from_slice(&self.timestamp.to_le_bytes());
@@ -248,7 +249,7 @@ impl MergedEvent {
 
   pub fn new() -> Self {
     let mut tracker_oscillators = Vec::<u64>::new();
-    for k in 0..10 {
+    for _ in 0..10 {
       tracker_oscillators.push(0);
     }
     Self {
@@ -432,7 +433,7 @@ impl fmt::Display for MergedEvent {
       evids.dedup();
       }
     } else if self.version == 1 {
-      for h in &self.tracker_hitsv2 {
+      for _ in &self.tracker_hitsv2 {
         good_hits += 1;
       }
     }
@@ -544,7 +545,7 @@ pub struct TrackerHitV2 {
 }
 
 impl TrackerHitV2 {
-  const SIZE : usize = 18;
+  //const SIZE : usize = 18;
   
   pub fn new() -> Self {
     Self {

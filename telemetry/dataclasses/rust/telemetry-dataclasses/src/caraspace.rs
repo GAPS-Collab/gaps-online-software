@@ -18,7 +18,7 @@ impl CRSerializeable for TelemetryPacket {
   fn deserialize(stream : &Vec<u8>, pos : &mut usize)
   -> Result<Self, CRSerializationError> {
     match Self::from_bytestream(stream, pos) {
-      Err(err) => {
+      Err(_err) => {
         return Err(CRSerializationError::UnknownError);
       }
       Ok(obj) => {
