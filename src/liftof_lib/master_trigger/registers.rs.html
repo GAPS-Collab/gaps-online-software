@@ -2398,6 +2398,8 @@
 <a href="#2398" id="2398">2398</a>
 <a href="#2399" id="2399">2399</a>
 <a href="#2400" id="2400">2400</a>
+<a href="#2401" id="2401">2401</a>
+<a href="#2402" id="2402">2402</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard registers
 //!
 //! This should be the same as the reference
@@ -2472,8 +2474,10 @@
     <span class="kw">else </span>{
       <span class="self">self</span>.write(bus, value)<span class="question-mark">?</span>;
     }
-    <span class="kw">let </span>rv = <span class="self">self</span>.read_all(bus)<span class="question-mark">?</span>;
-    <span class="comment">//println!("Register reads {:x} {} {:x} after write ops!", self.addr, self.descr, rv);
+    <span class="comment">// this can be used for debugging
+    // (print back the value)
+    //let rv = self.read_all(bus)?;
+    //println!("Register reads {:x} {} {:x} after write ops!", self.addr, self.descr, rv);
     </span><span class="prelude-val">Ok</span>(())
   }
 
@@ -2789,7 +2793,7 @@
 };
 
 <span class="doccomment">/// Set Readoutboard BUSY behaviour
-/// RB_BLOCK_IF_BUSY_31_TO_0 	0x24a 	0x928 	[31:0] 	rw 	0x0 	Bitmask to specify if a readout board is BUSY then do not trigger (RB slots 31:0)
+/// RB_BLOCK_IF_BUSY_31_TO_0 	0x24a 	0x928 	\[31:0\] 	rw 	0x0 	Bitmask to specify if a readout board is BUSY then do not trigger (RB slots 31:0)
 </span><span class="kw">pub const </span>RB_BLOCK_IF_BUSY_31_TO_0 : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
   addr  : <span class="number">0x24a</span>,
   mask  : <span class="number">0xffffffff</span>,
@@ -2800,7 +2804,7 @@
 };
 
 <span class="doccomment">/// Set Readoutboard BUSY behaviour
-/// RB_BLOCK_IF_BUSY_49_TO_32 	0x24b 	0x92c 	[17:0] 	rw 	0x0 	Bitmask to specify if a readout board is BUSY then do not trigger (RB slots 49:32)
+/// RB_BLOCK_IF_BUSY_49_TO_32 	0x24b 	0x92c 	\[17:0\] 	rw 	0x0 	Bitmask to specify if a readout board is BUSY then do not trigger (RB slots 49:32)
 </span><span class="kw">pub const </span>RB_BLOCK_IF_BUSY_49_TO_32 : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
   addr  : <span class="number">0x24b</span>,
   mask  : <span class="number">0x0003ffff</span>,
@@ -2918,7 +2922,7 @@
 </span>};
 
 <span class="doccomment">/// Prescale factor for the CENTRAL UMBRELLA TRACK trigger
-/// TRACK_UMB_CENTRAL_PRESCALE 	0x249 	0x924 	[31:0] 	rw 	0x0 	Prescale value for the Umbrella Center + Cube Top Track Trigger. 0 == 0% (off), 2**32-1 == 100%
+/// TRACK_UMB_CENTRAL_PRESCALE 	0x249 	0x924 	\[31:0\] 	rw 	0x0 	Prescale value for the Umbrella Center + Cube Top Track Trigger. 0 == 0% (off), 2**32-1 == 100%
 </span><span class="kw">pub const </span>TRACK_UMB_CENTRAL_PRESCALE : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
   addr  : <span class="number">0x249</span>,
   mask  : <span class="number">0xffffffff</span>,
@@ -3126,7 +3130,7 @@
 
 <span class="doccomment">/// The lost trigger rate due to "tracker busy" signals
 /// received by the TIU
-/// TIU_LOST_TRIGGER_RATE 	0x24d 	0x934 	[23:0]
+/// TIU_LOST_TRIGGER_RATE 	0x24d 	0x934 	\[23:0\]
 </span><span class="kw">pub const </span>TIU_LOST_TRIGGER_RATE : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
   addr  : <span class="number">0x24d</span>,
   mask  : <span class="number">0x00ffffff</span>,
@@ -3137,7 +3141,7 @@
 </span>};
 
 <span class="doccomment">/// The lost trigger rate due to RB busy timeouts
-/// RB_LOST_TRIGGER_RATE 	0x24c 	0x930 	[23:0]
+/// RB_LOST_TRIGGER_RATE 	0x24c 	0x930 	\[23:0\]
 </span><span class="kw">pub const </span>RB_LOST_TRIGGER_RATE : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
   addr  : <span class="number">0x24c</span>,
   mask  : <span class="number">0x00ffffff</span>,

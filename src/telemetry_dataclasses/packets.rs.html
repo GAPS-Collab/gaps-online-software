@@ -1092,6 +1092,7 @@
 <a href="#1092" id="1092">1092</a>
 <a href="#1093" id="1093">1093</a>
 <a href="#1094" id="1094">1094</a>
+<a href="#1095" id="1095">1095</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Basic telemetry packets
 //!
 
@@ -1295,8 +1296,9 @@
   
   <span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>stream = Vec::&lt;u8&gt;::new();
-    <span class="kw">let </span>head : u16 = <span class="number">0x90eb</span>;
-    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.sync.to_le_bytes());
+    <span class="comment">//let head : u16 = 0x90eb;
+    // "SYNC" is the header signature
+    </span>stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.sync.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.ptype.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.timestamp.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.counter.to_le_bytes());
@@ -1342,7 +1344,7 @@
 
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="kw">let </span><span class="kw-2">mut </span>tracker_oscillators = Vec::&lt;u64&gt;::new();
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">10 </span>{
+    <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">10 </span>{
       tracker_oscillators.push(<span class="number">0</span>);
     }
     <span class="self">Self </span>{
@@ -1526,7 +1528,7 @@
       evids.dedup();
       }
     } <span class="kw">else if </span><span class="self">self</span>.version == <span class="number">1 </span>{
-      <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.tracker_hitsv2 {
+      <span class="kw">for _ in </span><span class="kw-2">&amp;</span><span class="self">self</span>.tracker_hitsv2 {
         good_hits += <span class="number">1</span>;
       }
     }
@@ -1638,9 +1640,9 @@
 }
 
 <span class="kw">impl </span>TrackerHitV2 {
-  <span class="kw">const </span>SIZE : usize = <span class="number">18</span>;
+  <span class="comment">//const SIZE : usize = 18;
   
-  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+  </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
       layer           : <span class="number">0</span>,
       row             : <span class="number">0</span>,

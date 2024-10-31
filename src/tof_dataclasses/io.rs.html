@@ -1588,7 +1588,9 @@
 <a href="#1588" id="1588">1588</a>
 <a href="#1589" id="1589">1589</a>
 <a href="#1590" id="1590">1590</a>
+<a href="#1591" id="1591">1591</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Dataio - readino/writing of different types
+//!
 //! of TOF data products.
 //!
 //! * TofPacketReader/Writer - sequentially read/write
@@ -2323,14 +2325,14 @@
 
 
 <span class="doccomment">/// Generics for packet reading (TofPacket, Telemetry packet,...)
+/// FIXME - not implemented yet
 </span><span class="kw">pub trait </span>PacketReader {
   <span class="doccomment">/// header bytes, e.g. 0xAAAA for TofPackets
   </span><span class="kw">const </span>HEADER0 : u8 = <span class="number">0</span>;
   <span class="kw">const </span>HEADER1 : u8 = <span class="number">0</span>;
 
   <span class="doccomment">/// Manage the internal cursor attribute
-  </span><span class="kw">fn </span>set_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pos : usize) {
-  }
+  </span><span class="kw">fn </span>set_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pos : usize);
 
   <span class="doccomment">/// Rewind the file, so it can be read again from the 
   /// beginning

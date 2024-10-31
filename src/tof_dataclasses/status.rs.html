@@ -219,6 +219,15 @@
 <a href="#219" id="219">219</a>
 <a href="#220" id="220">220</a>
 <a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Detector status indicators
 //!
 
@@ -406,8 +415,17 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofDetectorStatus {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span><span class="kw-2">mut </span>repr : String = String::from(<span class="string">"&lt;TofDetectorStatus"</span>);
-    <span class="comment">//repr += "\n
-    </span><span class="macro">write!</span>(f, <span class="string">"{}"</span>, repr)
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch 000 - 031 {:x}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.channels000_031));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch 032 - 063 {:x}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.channels032_063));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch 064 - 095 {:x}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.channels064_095));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch 096 - 127 {:x}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.channels096_127));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch 128 - 159 {:x}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.channels128_159));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch 160 - 191 {:x}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.channels160_191));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch 192 - 223 {:x}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.channels192_223));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch 224 - 255 {:x}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.channels224_255));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch 256 - 297 {:x}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.channels256_297));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch 298 - 319 {:x}&gt;"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.channels298_319));
+    <span class="macro">write!</span>(f, <span class="string">"{}"</span>, repr)
   }
 }
 

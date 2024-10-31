@@ -1400,9 +1400,6 @@
 <a href="#1400" id="1400">1400</a>
 <a href="#1401" id="1401">1401</a>
 <a href="#1402" id="1402">1402</a>
-<a href="#1403" id="1403">1403</a>
-<a href="#1404" id="1404">1404</a>
-<a href="#1405" id="1405">1405</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
 <span class="kw">pub mod </span>settings;
 <span class="kw">pub mod </span>constants;
@@ -1490,9 +1487,6 @@
 
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">use </span>tof_dataclasses::constants::NWORDS;
-<span class="comment">//#[cfg(feature="database")]
-</span><span class="attr">#[cfg(all(feature = <span class="string">"database"</span>, feature = <span class="string">"advanced-algorithms"</span>))]
-</span><span class="kw">use </span>tof_dataclasses::calibrations::find_zero_crossings;
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">use </span>tof_dataclasses::errors::AnalysisError;
 <span class="kw">use </span>tof_dataclasses::errors::SetError;
@@ -1971,10 +1965,10 @@
                                event.header.stop_cell <span class="kw">as </span>usize,
                                <span class="kw-2">&amp;mut </span>times);
     fit_result                = fit_sine_sydney(<span class="kw-2">&amp;</span>voltages, <span class="kw-2">&amp;</span>times);
-    <span class="kw">let </span>fit_result_amp        = fit_result.<span class="number">0</span>;
-    <span class="kw">let </span>fit_result_freq       = fit_result.<span class="number">1</span>;
-    <span class="kw">let </span>fit_result_phi        = fit_result.<span class="number">2</span>;
-    <span class="comment">//let fit_result_amp      = fit_sine_sydney(&amp;voltages,  &amp;times).0; 
+    <span class="comment">//let fit_result_amp        = fit_result.0;
+    //let fit_result_freq       = fit_result.1;
+    //let fit_result_phi        = fit_result.2;
+    //let fit_result_amp      = fit_sine_sydney(&amp;voltages,  &amp;times).0; 
     //let fit_result_freq     = fit_sine_sydney(&amp;voltages, &amp;times).1;
     //let fit_result_phi      = fit_sine_sydney(&amp;voltages, &amp;times).2;
 
@@ -2068,7 +2062,7 @@
             max_volts = <span class="kw-2">*</span>pk_height;
             <span class="kw">let </span>max_index = voltages.iter().position(|element| <span class="kw-2">*</span>element == max_volts).unwrap();
 
-            <span class="kw">let </span>(start_Qint, stop_Qint) = <span class="kw">if </span>max_index - <span class="number">40 </span>&lt; <span class="number">10 </span>{
+            <span class="kw">let </span>(start_q_int, stop_q_int) = <span class="kw">if </span>max_index - <span class="number">40 </span>&lt; <span class="number">10 </span>{
               (<span class="number">10</span>, <span class="number">210</span>)
             } <span class="kw">else </span>{
               (max_index - <span class="number">40</span>, max_index + <span class="number">160</span>)
@@ -2084,8 +2078,8 @@
                             //settings.integration_window,
                             //pk.0, 
                             //pk.1,
-                            </span>start_Qint,
-                            stop_Qint,
+                            </span>start_q_int,
+                            stop_q_int,
                             <span class="number">50.0</span>) {
               <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="macro">error!</span>(<span class="string">"Integration failed! Err {err}"</span>);

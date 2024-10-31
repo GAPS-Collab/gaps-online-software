@@ -73,7 +73,7 @@ var srcIndex = new Map(JSON.parse('[\
 ["encoding_index_tradchinese",["",[],["big5.rs","lib.rs"]]],\
 ["env_logger",["",[["filter",[],["mod.rs","regex.rs"]],["fmt",[["writer",[["buffer",[],["mod.rs","termcolor.rs"]]],["atty.rs","mod.rs"]]],["humantime.rs","mod.rs","style.rs"]]],["lib.rs","logger.rs"]]],\
 ["equivalent",["",[],["lib.rs"]]],\
-["fdeflate",["",[],["compress.rs","decompress.rs","lib.rs","tables.rs"]]],\
+["fdeflate",["",[],["compress.rs","decompress.rs","huffman.rs","lib.rs","tables.rs"]]],\
 ["flate2",["",[["deflate",[],["bufread.rs","mod.rs","read.rs","write.rs"]],["ffi",[],["mod.rs","rust.rs"]],["gz",[],["bufread.rs","mod.rs","read.rs","write.rs"]],["zlib",[],["bufread.rs","mod.rs","read.rs","write.rs"]]],["bufreader.rs","crc.rs","lib.rs","mem.rs","zio.rs"]]],\
 ["float_ord",["",[],["lib.rs"]]],\
 ["fnv",["",[],["lib.rs"]]],\
