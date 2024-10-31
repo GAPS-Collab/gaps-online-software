@@ -344,7 +344,7 @@ impl TofHit {
     }
   }
   
-  #[cfg(features="database")]
+  #[cfg(feature="database")]
   pub fn set_paddle(&mut self, paddle : &Paddle) {
     self.cable_len  = paddle.cable_len;
     self.paddle_len = paddle.length;

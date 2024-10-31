@@ -17,12 +17,11 @@ use std::sync::{
 
 use std::fs::create_dir_all;
 
-//extern crate crossbeam_channel;
 use crossbeam_channel::Receiver; 
 
-use colored::Colorize;
+//use colored::Colorize;
 
-use liftof_lib::settings::{self, DataPublisherSettings};
+use liftof_lib::settings::DataPublisherSettings;
 use tof_dataclasses::packets::{
     TofPacket,
     PacketType
@@ -101,12 +100,6 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
     },
   }
-  //let one_second          = Duration::from_millis(1000);
-  //let flight_address      = settings.fc_pub_address.clone();
-  //let write_stream_path   = settings.data_dir.clone(); 
-  //let mut write_stream_path = String::from("");
-  //let mbytes_per_file     = settings.mbytes_per_file;
-  let mut met_time_secs   = 0f32; // mission elapsed time
 
   let mut evid_check      = Vec::<u32>::new();
 
@@ -128,12 +121,6 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
 
   //let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
 
-  
-  let mut n_pack_sent       = 0;
-  //let mut last_evid       = 0u32;
-  let mut n_pack_write_disk = 0usize;
-  let mut bytes_sec_disk    = 0f64;
-
   // for debugging/profiling
   let mut timer      = Instant::now();
   let mut kill_timer = Instant::now();
@@ -146,12 +133,12 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   // run settings 
   let mut writer : Option<TofPacketWriter> = None;
   let mut write_stream  = false;
-  let mut runid : u32 = 0;
+  let mut runid : u32   = 0;
   let mut new_run_start = false;
-  let mut retire   = false;
-  let mut heartbeat = HeartBeatDataSink::new();
-  let mut hb_timer               = Instant::now(); 
-  let mut hb_interval         = Duration::from_secs(settings.hb_send_interval as u64);
+  let mut retire        = false;
+  let mut heartbeat     = HeartBeatDataSink::new();
+  let mut hb_timer      = Instant::now(); 
+  let hb_interval       = Duration::from_secs(settings.hb_send_interval as u64);
   loop {
     if retire {
       // take a long nap to give other threads 
@@ -210,14 +197,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         debug!("Got new tof packet {}", pack.packet_type);
         if writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(&pack);
-          //cfg_if::cfg_if!{
-            //if #[cfg(features="debug")] {
           heartbeat.n_pack_write_disk += 1;
           heartbeat.n_bytes_written += pack.payload.len() as u64;   
-            //}
-          //}
-          n_pack_write_disk += 1;
-          bytes_sec_disk    += pack.payload.len() as f64;
         }
         // yeah, this is it. 
         // catch RBCalibration packets here,
@@ -329,12 +310,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 }
                 Ok(_)    => {
                   //trace!("Event Summary for event id {} send!", evid);
-                  //cfg_if::cfg_if!{
-                  //  if #[cfg(features="debug")] {
                   heartbeat.n_packets_sent += 1;
-                    //}
-                  //}
-                  n_pack_sent += 1;
                 }
               }
             }
@@ -347,12 +323,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                   }
                   Ok(_)    => {
                     //trace!("RB waveform for event id {} send!", evid);
-                    //cfg_if::cfg_if!{
-                    //  if #[cfg(features="debug")] {
                     heartbeat.n_packets_sent += 1;
-                      //}
-                    //}
-                    n_pack_sent += 1;
                   }
                 }
               }
@@ -365,12 +336,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 }
                 Ok(_)    => {
                   //trace!("RB waveform for event id {} send!", evid);
-                  //cfg_if::cfg_if!{
-                  //  if #[cfg(features="debug")] {
                   heartbeat.n_packets_sent += 1;
-                  //  }
-                  //}
-                  n_pack_sent += 1;
                 }
               }
             }
@@ -380,12 +346,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
               Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
               Ok(_)    => {
                 trace!("TofPacket sent");
-                //cfg_if::cfg_if!{
-                //  if #[cfg(features="debug")] {
                 heartbeat.n_packets_sent += 1;
-                //  }
-                //}
-                n_pack_sent += 1;
               }
             } // end match
           }
@@ -394,12 +355,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
             Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
             Ok(_)    => {
               trace!("TofPacket sent");
-              //cfg_if::cfg_if!{
-              //  if #[cfg(features="debug")] {
               heartbeat.n_packets_sent += 1;
-              //  }
-              //}
-              n_pack_sent += 1;
             }
           } // end match
         }
@@ -409,9 +365,6 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
       //
 
       let evid_check_len = evid_check.len();
-      //println!("DEBUG .1.");
-      //let mut evid_test_missing = 0usize;
-      let evid_missing = 0;
     if timer.elapsed().as_secs() > 10 {
       // FIXME - might be too slow?
       if evid_check_len > 0 {

@@ -1,4 +1,5 @@
 //! Dataio - readino/writing of different types
+//!
 //! of TOF data products.
 //!
 //! * TofPacketReader/Writer - sequentially read/write
@@ -733,14 +734,14 @@ impl Iterator for RBEventMemoryStreamer {
 
 
 /// Generics for packet reading (TofPacket, Telemetry packet,...)
+/// FIXME - not implemented yet
 pub trait PacketReader {
   /// header bytes, e.g. 0xAAAA for TofPackets
   const HEADER0 : u8 = 0;
   const HEADER1 : u8 = 0;
 
   /// Manage the internal cursor attribute
-  fn set_cursor(&mut self, pos : usize) {
-  }
+  fn set_cursor(&mut self, pos : usize);
 
   /// Rewind the file, so it can be read again from the 
   /// beginning

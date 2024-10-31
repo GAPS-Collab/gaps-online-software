@@ -30,10 +30,13 @@ use crossbeam_channel::{
     Sender
 };
 
-use liftof_lib::master_trigger::registers::ANY_TRIG_PRESCALE;
+//use liftof_lib::master_trigger::registers::ANY_TRIG_PRESCALE;
 //use tof_dataclasses::threading::ThreadControl;
 use tof_dataclasses::config::{
-    AnalysisEngineConfig, RunConfig, TOFEventBuilderConfig, TriggerConfig
+  AnalysisEngineConfig,
+  RunConfig,
+  TOFEventBuilderConfig,
+  //TriggerConfig
 };
 use tof_dataclasses::constants::PAD_CMD_32BIT;
 use tof_dataclasses::commands::{
@@ -53,11 +56,11 @@ use tof_dataclasses::serialization::{
     //SerializationError
 };
 
-use tof_dataclasses::events::TriggerType;
+//use tof_dataclasses::events::TriggerType;
 
 use liftof_lib::settings::{
-    CommandDispatcherSettings,
-    LiftofSettings
+  CommandDispatcherSettings,
+  LiftofSettings
 };
 
 use liftof_lib::thread_control::ThreadControl;
@@ -591,42 +594,46 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                     } // end loop
                   }
                   TofCommandCode::SetMTConfig => {
-                    let mut prescale  : f32 = 0.0;
-                    let mut gaps_trigger_use_beta : bool = true;
-                    let mut tiu_emulation_mode : bool = false;
-                    let mut trigger_type : TriggerType = TriggerType::Unknown;
+                    // This needs to be fixed. It should be 
+                    // the thread control taking over the variables
+                    // from the MTConfig!
 
-                    //println!("= => ChangeTrigger Command Received (:");
-                    info!("Received change trigger command");
-                    match TriggerConfig::from_bytestream(&cmd.payload, &mut 0) {
-                      Err(err) => error!("Unable to decode TriggerConfig! {err}"),
-                      Ok(config) => {
-                        gaps_trigger_use_beta = config.gaps_trigger_use_beta;
-                        tiu_emulation_mode    = config.tiu_emulation_mode;
-                        prescale              = config.prescale;
-                        trigger_type          = config.trigger_type;
-                      }
-                    }
-                    let mut write_stream_path = String::from("");
-                    let mut config_from_tc = LiftofSettings::new(); 
-                    match thread_ctrl.lock() {
-                      Err(err) => {
-                        error!("Unable to lock thread control! {err}");
-                      }
-                      Ok(tc) => {
-                        //write_stream_path = tc.liftof_settings.mtb_settings.data_dir.clone();
-                        config_from_tc    = tc.liftof_settings.clone();
-                      }
-                    }
-                    match thread_ctrl.lock() {
-                      Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
-                      Ok(mut tc) => {
-                        gaps_trigger_use_beta = tc.liftof_settings.mtb_settings.gaps_trigger_use_beta;
-                        tiu_emulation_mode    = tc.liftof_settings.mtb_settings.tiu_emulation_mode;
-                        prescale              = tc.liftof_settings.mtb_settings.trigger_prescale;
-                        trigger_type          = tc.liftof_settings.mtb_settings.trigger_type;
-                      }
-                    }
+                    //let mut prescale              : f32 = 0.0;
+                    //let mut gaps_trigger_use_beta : bool = true;
+                    //let mut tiu_emulation_mode    : bool = false;
+                    //let mut trigger_type          : TriggerType = TriggerType::Unknown;
+
+                    ////println!("= => ChangeTrigger Command Received (:");
+                    //info!("Received change trigger command");
+                    //match TriggerConfig::from_bytestream(&cmd.payload, &mut 0) {
+                    //  Err(err) => error!("Unable to decode TriggerConfig! {err}"),
+                    //  Ok(config) => {
+                    //    gaps_trigger_use_beta = config.gaps_trigger_use_beta;
+                    //    tiu_emulation_mode    = config.tiu_emulation_mode;
+                    //    prescale              = config.prescale;
+                    //    trigger_type          = config.trigger_type;
+                    //  }
+                    //}
+                    //let mut write_stream_path = String::from("");
+                    //let mut config_from_tc = LiftofSettings::new(); 
+                    //match thread_ctrl.lock() {
+                    //  Err(err) => {
+                    //    error!("Unable to lock thread control! {err}");
+                    //  }
+                    //  Ok(tc) => {
+                    //    //write_stream_path = tc.liftof_settings.mtb_settings.data_dir.clone();
+                    //    config_from_tc    = tc.liftof_settings.clone();
+                    //  }
+                    //}
+                    //match thread_ctrl.lock() {
+                    //  Err(err)   => error!("Unable to acquire lock for thread ctrl! {err}"),
+                    //  Ok(tc) => {
+                    //    gaps_trigger_use_beta = tc.liftof_settings.mtb_settings.gaps_trigger_use_beta;
+                    //    tiu_emulation_mode    = tc.liftof_settings.mtb_settings.tiu_emulation_mode;
+                    //    prescale              = tc.liftof_settings.mtb_settings.trigger_prescale;
+                    //    trigger_type          = tc.liftof_settings.mtb_settings.trigger_type;
+                    //  }
+                    //}
                   }
                   TofCommandCode::SetAnalysisEngineConfig => {
                     match thread_ctrl.lock() {

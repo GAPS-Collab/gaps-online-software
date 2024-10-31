@@ -185,7 +185,16 @@ impl Packable for TofDetectorStatus {
 impl fmt::Display for TofDetectorStatus {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr : String = String::from("<TofDetectorStatus");
-    //repr += "\n
+    repr += &(format!("\n Ch 000 - 031 {:x}", &self.channels000_031));
+    repr += &(format!("\n Ch 032 - 063 {:x}", &self.channels032_063));
+    repr += &(format!("\n Ch 064 - 095 {:x}", &self.channels064_095));
+    repr += &(format!("\n Ch 096 - 127 {:x}", &self.channels096_127));
+    repr += &(format!("\n Ch 128 - 159 {:x}", &self.channels128_159));
+    repr += &(format!("\n Ch 160 - 191 {:x}", &self.channels160_191));
+    repr += &(format!("\n Ch 192 - 223 {:x}", &self.channels192_223));
+    repr += &(format!("\n Ch 224 - 255 {:x}", &self.channels224_255));
+    repr += &(format!("\n Ch 256 - 297 {:x}", &self.channels256_297));
+    repr += &(format!("\n Ch 298 - 319 {:x}>", &self.channels298_319));
     write!(f, "{}", repr)
   }
 }

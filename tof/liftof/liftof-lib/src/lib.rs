@@ -85,9 +85,6 @@ use tof_dataclasses::database::ReadoutBoard;
 
 #[cfg(feature="database")]
 use tof_dataclasses::constants::NWORDS;
-//#[cfg(feature="database")]
-#[cfg(all(feature = "database", feature = "advanced-algorithms"))]
-use tof_dataclasses::calibrations::find_zero_crossings;
 #[cfg(feature="database")]
 use tof_dataclasses::errors::AnalysisError;
 use tof_dataclasses::errors::SetError;
@@ -566,9 +563,9 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                                event.header.stop_cell as usize,
                                &mut times);
     fit_result                = fit_sine_sydney(&voltages, &times);
-    let fit_result_amp        = fit_result.0;
-    let fit_result_freq       = fit_result.1;
-    let fit_result_phi        = fit_result.2;
+    //let fit_result_amp        = fit_result.0;
+    //let fit_result_freq       = fit_result.1;
+    //let fit_result_phi        = fit_result.2;
     //let fit_result_amp      = fit_sine_sydney(&voltages,  &times).0; 
     //let fit_result_freq     = fit_sine_sydney(&voltages, &times).1;
     //let fit_result_phi      = fit_sine_sydney(&voltages, &times).2;
@@ -663,7 +660,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
             max_volts = *pk_height;
             let max_index = voltages.iter().position(|element| *element == max_volts).unwrap();
 
-            let (start_Qint, stop_Qint) = if max_index - 40 < 10 {
+            let (start_q_int, stop_q_int) = if max_index - 40 < 10 {
               (10, 210)
             } else {
               (max_index - 40, max_index + 160)
@@ -679,8 +676,8 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                             //settings.integration_window,
                             //pk.0, 
                             //pk.1,
-                            start_Qint,
-                            stop_Qint,
+                            start_q_int,
+                            stop_q_int,
                             50.0) {
               Err(err) => {
                 error!("Integration failed! Err {err}");

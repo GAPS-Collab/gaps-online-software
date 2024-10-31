@@ -1,6 +1,6 @@
 use pyo3::prelude::*;
 
-use std::collections::HashMap;
+//use std::collections::HashMap;
 use pyo3::exceptions::PyValueError;
 
 pub use crate::dataclasses::{
@@ -31,18 +31,18 @@ use tof_dataclasses::database::{
     connect_to_db,
 };
 
-use tof_dataclasses::events::{
-    //RBEvent, 
-    TofEvent
-};
+//use tof_dataclasses::events::{
+//    //RBEvent, 
+//    TofEvent
+//};
 
-use tof_dataclasses::packets::PacketType;
-use tof_dataclasses::io::TofPacketReader;
+//use tof_dataclasses::packets::PacketType;
+//use tof_dataclasses::io::TofPacketReader;
 //use tof_dataclasses::serialization::Serialization;
 
 use liftof_lib::waveform_analysis;
 use liftof_lib::settings::{
-  AnalysisEngineSettings,
+  //AnalysisEngineSettings,
   LiftofSettings
 };
 
@@ -149,7 +149,7 @@ pub fn py_waveform_analysis(event : &PyTofEvent,
   let pth          = settings.settings.db_path.clone();
   let mut conn     = connect_to_db(pth).expect("Check the DB path in the liftof settings!");
   let rbs          = ReadoutBoard::all(&mut conn).expect("Check DB");
-  let mut rb       = ReadoutBoard::new();
+  //let mut rb       = ReadoutBoard::new();
   let mut ev_new   = event.clone();
   let mut new_rb_evs = event.event.rb_events.clone();
   for rb_ev in new_rb_evs.iter_mut() {
@@ -168,80 +168,6 @@ pub fn py_waveform_analysis(event : &PyTofEvent,
   ev_new.event.rb_events = new_rb_evs;
   //match waveform_analysis(
   Ok(ev_new)
-}
-
-#[pyfunction]
-#[pyo3(name = "test_waveform_analysis")]
-fn test_waveform_analysis(filename : String) -> PyRBEvent {
-  let mut settings   = AnalysisEngineSettings::new();
-  settings.find_pks_t_start  = 60.0;
-  settings.find_pks_t_window = 300.0;
-  settings.min_peak_size     = 10;
-  //let rb         = ReadoutBoard::new();
-  let pth        = String::from("/srv/gaps/gaps-online-software/gaps-db/gaps_db/gaps_flight.db");
-  let mut conn   = connect_to_db(pth).unwrap();
-  let rbs        = ReadoutBoard::all(&mut conn).unwrap();
-  let mut rb_map = HashMap::<u8, ReadoutBoard>::new();
-  for mut rb in rbs {
-    rb.calib_file_path = String::from("/data0/gaps/nevis/calib/latest/"); 
-    match rb.load_latest_calibration() {
-      Err(_err) => {
-        // FIXME - come up with error thing
-        //error!("Unable to laod calibration data for ReadoutBoards!");
-      }
-      Ok(_) => ()
-    }
-    rb_map.insert(rb.rb_id, rb);
-  }
-  let mut reader  = TofPacketReader::new(filename);
-  let mut py_rbev = PyRBEvent::new();
-  //let mut n_ev    = 0u32;
-  loop {
-    match reader.next()  {
-      Some(tp) => {
-        match tp.packet_type {
-          PacketType::TofEvent => {
-            match tp.unpack::<TofEvent>() {
-            //match TofEvent::from_tofpacket(&tp) {
-              Err(_err) => {
-                //error!("Unable to unpack TofEvent!");
-              },
-              Ok(te) => {
-                //println!("{}", te);
-                if te.rb_events.is_empty() {
-                  continue;
-                }
-                for mut rbev in te.rb_events {
-                  let rb_id = rbev.header.rb_id;
-                  //println!("{}", rbev); 
-                  py_rbev.set_event(rbev.clone());
-                  match waveform_analysis(
-                    &mut rbev,
-                    &rb_map[&rb_id],
-                    settings.clone()
-                  ) {
-                    // FIXME!
-                    Err(_err) => (),
-                    Ok(_)     => ()
-                  }
-                  for h in rbev.hits {
-                    println!("{}", h);
-                  }
-                  return py_rbev;
-                  //break;
-                }
-              }
-            }
-          },
-          _ => ()      
-        }
-      },
-      None => {
-        break;
-      }
-    }
-  }
-  return py_rbev;
 }
 
 

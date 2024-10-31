@@ -72,7 +72,9 @@ impl MTBRegister<'_> {
     else {
       self.write(bus, value)?;
     }
-    let rv = self.read_all(bus)?;
+    // this can be used for debugging
+    // (print back the value)
+    //let rv = self.read_all(bus)?;
     //println!("Register reads {:x} {} {:x} after write ops!", self.addr, self.descr, rv);
     Ok(())
   }
@@ -389,7 +391,7 @@ pub const RB_READ_ALL_CHANNELS : MTBRegister<'static> = MTBRegister {
 };
 
 /// Set Readoutboard BUSY behaviour
-/// RB_BLOCK_IF_BUSY_31_TO_0 	0x24a 	0x928 	[31:0] 	rw 	0x0 	Bitmask to specify if a readout board is BUSY then do not trigger (RB slots 31:0)
+/// RB_BLOCK_IF_BUSY_31_TO_0 	0x24a 	0x928 	\[31:0\] 	rw 	0x0 	Bitmask to specify if a readout board is BUSY then do not trigger (RB slots 31:0)
 pub const RB_BLOCK_IF_BUSY_31_TO_0 : MTBRegister<'static> = MTBRegister {
   addr  : 0x24a,
   mask  : 0xffffffff,
@@ -400,7 +402,7 @@ pub const RB_BLOCK_IF_BUSY_31_TO_0 : MTBRegister<'static> = MTBRegister {
 };
 
 /// Set Readoutboard BUSY behaviour
-/// RB_BLOCK_IF_BUSY_49_TO_32 	0x24b 	0x92c 	[17:0] 	rw 	0x0 	Bitmask to specify if a readout board is BUSY then do not trigger (RB slots 49:32)
+/// RB_BLOCK_IF_BUSY_49_TO_32 	0x24b 	0x92c 	\[17:0\] 	rw 	0x0 	Bitmask to specify if a readout board is BUSY then do not trigger (RB slots 49:32)
 pub const RB_BLOCK_IF_BUSY_49_TO_32 : MTBRegister<'static> = MTBRegister {
   addr  : 0x24b,
   mask  : 0x0003ffff,
@@ -518,7 +520,7 @@ pub const TRACK_CENTRAL_PRESCALE : MTBRegister<'static> = MTBRegister {
 };
 
 /// Prescale factor for the CENTRAL UMBRELLA TRACK trigger
-/// TRACK_UMB_CENTRAL_PRESCALE 	0x249 	0x924 	[31:0] 	rw 	0x0 	Prescale value for the Umbrella Center + Cube Top Track Trigger. 0 == 0% (off), 2**32-1 == 100%
+/// TRACK_UMB_CENTRAL_PRESCALE 	0x249 	0x924 	\[31:0\] 	rw 	0x0 	Prescale value for the Umbrella Center + Cube Top Track Trigger. 0 == 0% (off), 2**32-1 == 100%
 pub const TRACK_UMB_CENTRAL_PRESCALE : MTBRegister<'static> = MTBRegister {
   addr  : 0x249,
   mask  : 0xffffffff,
@@ -726,7 +728,7 @@ pub const LOST_TRIGGER_RATE : MTBRegister<'static> = MTBRegister {
 
 /// The lost trigger rate due to "tracker busy" signals
 /// received by the TIU
-/// TIU_LOST_TRIGGER_RATE 	0x24d 	0x934 	[23:0]
+/// TIU_LOST_TRIGGER_RATE 	0x24d 	0x934 	\[23:0\]
 pub const TIU_LOST_TRIGGER_RATE : MTBRegister<'static> = MTBRegister {
   addr  : 0x24d,
   mask  : 0x00ffffff,
@@ -737,7 +739,7 @@ pub const TIU_LOST_TRIGGER_RATE : MTBRegister<'static> = MTBRegister {
 };
 
 /// The lost trigger rate due to RB busy timeouts
-/// RB_LOST_TRIGGER_RATE 	0x24c 	0x930 	[23:0]
+/// RB_LOST_TRIGGER_RATE 	0x24c 	0x930 	\[23:0\]
 pub const RB_LOST_TRIGGER_RATE : MTBRegister<'static> = MTBRegister {
   addr  : 0x24c,
   mask  : 0x00ffffff,

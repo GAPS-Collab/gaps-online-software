@@ -17,17 +17,6 @@ use crate::packets::{
   PacketType,
 };
 
-
-#[derive(Debug, Copy, Clone)]
-pub struct f8(u8);
-
-impl f8 {
-    // Convert from little-endian byte array to f8
-    pub fn from_le_bytes(bytes: [u8; 1]) -> Self {
-        f8(bytes[0])
-    }
-}
-
 /// Convert a vector of u16 into a vector of u8
 ///
 /// The resulting vector has twice the number
@@ -194,11 +183,11 @@ pub fn parse_u48_for_16bit_words(bs  : &Vec::<u8>,
   u64::from_le_bytes(raw_bytes_8)
 }
 
-pub fn parse_f8(bs: &Vec<u8>, pos: &mut usize) -> f8 {
-  let value = f8::from_le_bytes([bs[*pos]]);
-  *pos += 1;
-  value
-}
+//pub fn parse_f8(bs: &Vec<u8>, pos: &mut usize) -> f8 {
+//  let value = f8::from_le_bytes([bs[*pos]]);
+//  *pos += 1;
+//  value
+//}
 
 pub fn parse_f16(bs : &Vec::<u8>, pos : &mut usize) -> f16 {
   let value = f16::from_le_bytes([bs[*pos], bs[*pos+1]]);

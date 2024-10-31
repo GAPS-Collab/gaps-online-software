@@ -6,13 +6,13 @@ use pyo3::types::PyFunction;
 
 use std::fmt;
 
-extern crate pyo3_log;
+//extern crate pyo3_log;
 //extern crate rpy-tof-dataclasses;
 
 use telemetry_dataclasses::packets as tel_api;
 use telemetry_dataclasses::io as tel_io_api;
 use crate::dataclasses::{
-  PyTofHit,
+  //PyTofHit,
   PyTofEventSummary,
 };
 
@@ -131,23 +131,23 @@ impl PyMergedEvent {
 
 
 
-  /// Check if TOF/trackler data can be unpacked an no errors are thrown
+  /// Check if TOF/tracker data can be unpacked an no errors are thrown
   #[getter]
   fn broken(&self) -> bool {
     // since the tracker part is already deserialized, the check
     // is only relevant for the tof part
     match TofPacket::from_bytestream(&self.event.tof_data, &mut 0) {
-      Err(err) => {
+      Err(_) => {
         //error!("Unable to parse TofPacket! {err}");
         return true;
       }
       Ok(pack) => {
         match pack.unpack::<tof_api::TofEventSummary>() {
-          Err(err) => {
+          Err(_) => {
             return true;
             //error!("Unable to parse TofEventSummary! {err}");
           }
-          Ok(ts)    => {
+          Ok(_)    => {
             return false;
           }
         }
@@ -402,8 +402,11 @@ pub struct PyTelemetryPacketReader {
 #[pymethods]
 impl PyTelemetryPacketReader {
   #[new]
-  #[pyo3(signature = (filename, filter=tel_api::TelemetryPacketType::Unknown,start=0, nevents=0))]
-  fn new(filename : String, filter : tel_api::TelemetryPacketType, start : usize, nevents : usize) -> Self {
+  #[pyo3(signature = (filename, filter=tel_api::TelemetryPacketType::Unknown))]
+  fn new(filename : String, filter : tel_api::TelemetryPacketType) -> Self {
+    //#[pyo3(signature = (filename, filter=tel_api::TelemetryPacketType::Unknown,start=0, nevents=0))]
+    // FIXME add start and nevents  
+    //, start : usize, nevents : usize) -> Self {
     //if filenames.len() == 0 {
     //  panic!("Filenames list arguments needs to have at least a single file!");
     //}
@@ -448,7 +451,7 @@ impl PyTelemetryPacketReader {
       }
       println!(">");
     }
-    self.reader.rewind();
+    self.reader.rewind()?;
     Ok(idx)
   }
 
@@ -482,18 +485,21 @@ impl PyTelemetryPacketReader {
   }
 }
 
-#[pyfunction]
-fn get_gapsevents(fname : String) -> Vec<PyGapsEvent> {
-  let mut pyevents = Vec::<PyGapsEvent>::new();
-  let events = tel_io_api::get_gaps_events(fname);
-  for ev in events {
-    let mut pyev = PyGapsEvent::new();
-    pyev.set_tof(ev.tof.clone());
-    pyev.set_tracker(ev.tracker.clone());
-    pyevents.push(pyev);
-  }
-  pyevents
-}
+
+// FIXME - with the new style tracker hit, we might not 
+// need the gaps event anymore
+//#[pyfunction]
+//fn get_gapsevents(fname : String) -> Vec<PyGapsEvent> {
+//  let mut pyevents = Vec::<PyGapsEvent>::new();
+//  let events = tel_io_api::get_gaps_events(fname);
+//  for ev in events {
+//    let mut pyev = PyGapsEvent::new();
+//    pyev.set_tof(ev.tof.clone());
+//    pyev.set_tracker(ev.tracker.clone());
+//    pyevents.push(pyev);
+//  }
+//  pyevents
+//}
 
 
 #[pyclass]

@@ -19,7 +19,9 @@ impl CRSerializeable for TofPacket {
   fn deserialize(stream : &Vec<u8>, pos : &mut usize)
   -> Result<Self, CRSerializationError> {
     match Self::from_bytestream(stream, pos) {
-      Err(err) => {
+      Err(_err) => {
+        // FIXME - that should get better. Maybe we want
+        // to unify CRSerializationError and SerializationError?
         return Err(CRSerializationError::UnknownError);
       }
       Ok(obj) => {
