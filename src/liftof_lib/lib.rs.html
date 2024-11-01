@@ -1781,9 +1781,9 @@
   }
 }
 
-<span class="comment">//sydney's sine fit without libraries
-</span><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
-</span><span class="kw">fn </span>fit_sine_sydney(volts: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;, times: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;) -&gt; (f32, f32, f32) {
+<span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+</span><span class="doccomment">/// Sine fit without using external libraries
+</span><span class="kw">pub fn </span>fit_sine_sydney(volts: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;, times: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;) -&gt; (f32, f32, f32) {
   <span class="kw">let </span>start_bin = <span class="number">20</span>;
   <span class="kw">let </span>size_bin = <span class="number">900</span>;
   <span class="kw">let </span>pi = PI;
