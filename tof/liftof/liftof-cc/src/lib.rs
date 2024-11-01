@@ -26,9 +26,6 @@ use liftof_lib::settings::LiftofSettings;
 ///
 pub fn prepare_run(data_path : String,
                    config    : &LiftofSettings) -> Option<u32> {
-
-
-
   let stream_files_path = PathBuf::from(data_path);
   let paths = fs::read_dir(stream_files_path.clone()).unwrap();
   let mut used_runids = Vec::<u32>::new();
@@ -56,8 +53,8 @@ pub fn prepare_run(data_path : String,
     return None;
   } else {
     let new_run_id = max_run_id + 1;
-    let settings_fname = format!("{}/run{}.toml",stream_files_path.display(), new_run_id); 
-    println!("=> Writing data to {}!", stream_files_path.display());
+    let settings_fname = format!("{}/{}/run{}.toml",stream_files_path.display(), new_run_id, new_run_id); 
+    println!("=> Writing data to {}/{}!", stream_files_path.display(), new_run_id);
     println!("=> Writing settings to {}!", settings_fname);
     config.to_toml(settings_fname);
     return Some(new_run_id);
