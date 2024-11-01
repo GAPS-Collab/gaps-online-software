@@ -8,7 +8,7 @@
 
 use std::path::Path;
 use std::thread;
-use std::fs;
+//use std::fs;
 use std::sync::{
     Arc,
     Mutex,
@@ -405,6 +405,21 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       }
                     }
                     write_stream_path += run_id.to_string().as_str();
+                    // Now as we have the .toml file copied to our run location, we reload it
+                    // and reset the config settings in thread_control
+                    let cfg_file = format!("{}/run{}.toml", write_stream_path, run_id);
+                    let config : LiftofSettings;
+                    match LiftofSettings::from_toml(cfg_file) {
+                      Err(err) => {
+                        error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+                        panic!("Unable to parse config file!");
+                      }
+                      Ok(_cfg) => {
+                        config = _cfg;
+                      }
+                    }
+                    
+
                     //if let Ok(metadata) = fs::metadata(&write_stream_path) {
                     //  if metadata.is_dir() {
                     //    warn!("Directory {} for run number {} already consists and may contain files!", write_stream_path, run_id);
@@ -428,6 +443,7 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                         // operations
                         tc.write_data_to_disk        = true;
                         tc.new_run_start_flag        = true;
+                        tc.liftof_settings           = config.clone();
                       },
                       Err(err) => {
                         error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");

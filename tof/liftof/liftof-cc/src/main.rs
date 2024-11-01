@@ -218,7 +218,7 @@ fn main() {
   let one_second = time::Duration::from_millis(1000);
 
   // deal with command line arguments
-  let config          : LiftofSettings;
+  let mut config      : LiftofSettings;
   let nboards         : usize;
   let args              = LiftofCCArgs::parse();
   let verbose           = args.verbose;
@@ -270,7 +270,6 @@ fn main() {
     let bad_rb = rb_ignorelist_tmp[k];
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
-
 
   nboards = rb_list.len();
   println!("=> Will use {} readoutboards! Ignoring {:?} sicne they are mareked as 'ignore' in the config file!", rb_list.len(), rb_ignorelist );
@@ -374,7 +373,6 @@ fn main() {
     info!("=> Restarted liftof-rb on all RBs successfully!");
   }
 
-
   let mtb_link_id_map = get_linkid_rbid_map(&rb_list);
   // A global kill timer
   let program_start = Instant::now();
@@ -394,7 +392,30 @@ fn main() {
   // FIXME - ugly
   let mut stream_files_path = PathBuf::from(write_stream_path);
   stream_files_path.push(new_run_id.to_string().as_str());
-  
+ 
+  // Now as we have the .toml file copied to our run location, we reload it
+  // and reset the config settings in thread_control
+  let cfg_file = format!("{}/run{}.toml", stream_files_path.display(), new_run_id);
+  match LiftofSettings::from_toml(cfg_file) {
+    Err(err) => {
+      error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+      panic!("Unable to parse config file!");
+    }
+    Ok(_cfg) => {
+      config = _cfg;
+    }
+  }
+  // as well as upadte the shared memory
+  match thread_control.lock() {
+    Ok(mut tc) => {
+      tc.liftof_settings = config.clone();
+    },
+    Err(err) => {
+      error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+    },
+  }
+
+
   //if let Some(rid) = runid {
   //  println!("=> Overriding expected run id by '-r' option!"); 
   //  new_run_id = rid;
