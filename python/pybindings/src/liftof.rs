@@ -31,16 +31,11 @@ use tof_dataclasses::database::{
     connect_to_db,
 };
 
-//use tof_dataclasses::events::{
-//    //RBEvent, 
-//    TofEvent
-//};
+use liftof_lib::{
+  waveform_analysis,
+  fit_sine_sydney,
+};
 
-//use tof_dataclasses::packets::PacketType;
-//use tof_dataclasses::io::TofPacketReader;
-//use tof_dataclasses::serialization::Serialization;
-
-use liftof_lib::waveform_analysis;
 use liftof_lib::settings::{
   //AnalysisEngineSettings,
   LiftofSettings
@@ -134,6 +129,12 @@ impl PyLiftofSettings {
 #[pyo3(name="calc_edep_simple")]
 pub fn wrap_calc_edep_simple(peak_voltage : f32) -> f32 {
   calc_edep_simple(peak_voltage)
+}
+
+#[pyfunction]
+#[pyo3(name="fit_sine_sydney")]
+pub fn wrap_fit_sine_sydney(volts: Vec<f32>, times: Vec<f32>) -> (f32,f32,f32) {
+  fit_sine_sydney(&volts, &times)
 }
 
 #[pyfunction]

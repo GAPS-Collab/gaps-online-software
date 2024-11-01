@@ -379,9 +379,9 @@ impl fmt::Display for RunStatistics {
   }
 }
 
-//sydney's sine fit without libraries
 #[cfg(feature="database")]
-fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> (f32, f32, f32) {
+/// Sine fit without using external libraries
+pub fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> (f32, f32, f32) {
   let start_bin = 20;
   let size_bin = 900;
   let pi = PI;

@@ -55,6 +55,7 @@ cfg_if::cfg_if! {
       py_waveform_analysis,
       wrap_prescale_to_u32,
       wrap_calc_edep_simple,
+      wrap_fit_sine_sydney,
       test_db,
       PyLiftofSettings,
       PyIPBus,
@@ -251,6 +252,7 @@ cfg_if::cfg_if! {
       m.add_function(wrap_pyfunction!(wrap_calc_edep_simple,m)?)?;
       m.add_function(wrap_pyfunction!(test_db,m)?)?;
       m.add_function(wrap_pyfunction!(wrap_prescale_to_u32,m)?)?;
+      m.add_function(wrap_pyfunction!(wrap_fit_sine_sydney,m)?)?;
       m.add_class::<PyLiftofSettings>()?;
       m.add_class::<PyIPBus>()?;
       m.add_class::<PyMasterTrigger>()?;

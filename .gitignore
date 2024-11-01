@@ -18,6 +18,8 @@ gaps-db/resources/scripts/src/
 analysis/run_vetting/.ipynb_checkpoints/
 analysis/run_vetting/.python-version
 
+.ipynb_checkpoints/*
+
 # build artifacts
 *.so
 
