@@ -393,7 +393,8 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       }
                     }
                     if run_id == 0 {
-                      match prepare_run(write_stream_path.clone(), &config_from_tc) {
+                      // always write data to disk when run started remotly
+                      match prepare_run(write_stream_path.clone(), &config_from_tc, None, true) {
                         None => {
                           error!("Unable to assign new run id, falling back to 999!");
                         }
@@ -404,18 +405,18 @@ pub fn command_dispatcher(settings        : CommandDispatcherSettings,
                       }
                     }
                     write_stream_path += run_id.to_string().as_str();
-                    if let Ok(metadata) = fs::metadata(&write_stream_path) {
-                      if metadata.is_dir() {
-                        warn!("Directory {} for run number {} already consists and may contain files!", write_stream_path, run_id);
-                        // FILXME - in flight, we can not have interactivity.
-                        // But the whole system with the run ids might change 
-                      } 
-                    } else {
-                      match fs::create_dir(&write_stream_path) {
-                        Ok(())   => info!("=> Created {} to save stream data", write_stream_path),
-                        Err(err) => error!("Failed to create directory: {}! {}", write_stream_path, err),
-                      }
-                    }
+                    //if let Ok(metadata) = fs::metadata(&write_stream_path) {
+                    //  if metadata.is_dir() {
+                    //    warn!("Directory {} for run number {} already consists and may contain files!", write_stream_path, run_id);
+                    //    // FILXME - in flight, we can not have interactivity.
+                    //    // But the whole system with the run ids might change 
+                    //  } 
+                    //} else {
+                    //  match fs::create_dir(&write_stream_path) {
+                    //    Ok(())   => info!("=> Created {} to save stream data", write_stream_path),
+                    //    Err(err) => error!("Failed to create directory: {}! {}", write_stream_path, err),
+                    //  }
+                    //}
                     match thread_ctrl.lock() {
                       Ok(mut tc) => {
                         tc.thread_master_trg_active  = true;

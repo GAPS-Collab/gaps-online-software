@@ -25,7 +25,7 @@ use std::process::{
 };
 
 use std::{
-    fs,
+    //fs,
     thread,
     time
 };
@@ -380,8 +380,8 @@ fn main() {
   let program_start = Instant::now();
 
   // Prepare outputfiles
-  let mut new_run_id : u32;
-  match prepare_run(write_stream_path.clone(), &config) {
+  let new_run_id : u32;
+  match prepare_run(write_stream_path.clone(), &config, runid, write_stream) {
     None => {
       error!("Unable to assign new run id, falling back to 0!");
       new_run_id = 0;
@@ -391,36 +391,40 @@ fn main() {
       info!("Will use new run id {}!", new_run_id);
     }
   }
-  if let Some(rid) = runid {
-    println!("=> Overriding expected run id by '-r' option!"); 
-    new_run_id = rid;
-  }
-  println!("=> Will use run id {}!", new_run_id);
-
+  // FIXME - ugly
   let mut stream_files_path = PathBuf::from(write_stream_path);
-  if write_stream {
-    stream_files_path.push(new_run_id.to_string().as_str());
-    // Create directory if it does not exist
-    // Check if the directory exists
-    if let Ok(metadata) = fs::metadata(&stream_files_path) {
-      if metadata.is_dir() {
-        println!("=> Directory {} for run number {} already consists and may contain files!", stream_files_path.display(), new_run_id);
-        // FILXME - in flight, we can not have interactivity.
-        // But the whole system with the run ids might change 
-      } 
-    } else {
-      match fs::create_dir(&stream_files_path) {
-        Ok(())   => println!("=> Created {} to save stream data", stream_files_path.display()),
-        Err(err) => panic!("Failed to create directory: {}! {}", stream_files_path.display(), err),
-      }
-    }
-    // Write the settings to the directory where 
-    // we want to save the run to
-    let settings_fname = format!("{}/run{}.toml",stream_files_path.display(), new_run_id); 
-    println!("=> Writing data to {}!", stream_files_path.display());
-    println!("=> Writing settings to {}!", settings_fname);
-    config.to_toml(settings_fname);
-  }
+  stream_files_path.push(new_run_id.to_string().as_str());
+  
+  //if let Some(rid) = runid {
+  //  println!("=> Overriding expected run id by '-r' option!"); 
+  //  new_run_id = rid;
+  //}
+  //info!("=> Will use run id {}!", new_run_id);
+
+  //let mut stream_files_path = PathBuf::from(write_stream_path);
+  //if write_stream {
+  //  stream_files_path.push(new_run_id.to_string().as_str());
+  //  // Create directory if it does not exist
+  //  // Check if the directory exists
+  //  if let Ok(metadata) = fs::metadata(&stream_files_path) {
+  //    if metadata.is_dir() {
+  //      println!("=> Directory {} for run number {} already consists and may contain files!", stream_files_path.display(), new_run_id);
+  //      // FILXME - in flight, we can not have interactivity.
+  //      // But the whole system with the run ids might change 
+  //    } 
+  //  } else {
+  //    match fs::create_dir(&stream_files_path) {
+  //      Ok(())   => println!("=> Created {} to save stream data", stream_files_path.display()),
+  //      Err(err) => panic!("Failed to create directory: {}! {}", stream_files_path.display(), err),
+  //    }
+  //  }
+  //  // Write the settings to the directory where 
+  //  // we want to save the run to
+  //  let settings_fname = format!("{}/run{}.toml",stream_files_path.display(), new_run_id); 
+  //  println!("=> Writing data to {}!", stream_files_path.display());
+  //  println!("=> Writing settings to {}!", settings_fname);
+  //  config.to_toml(settings_fname);
+  //}
 
   /*******************************************************
    * Channels (crossbeam, unbounded) for inter-thread
