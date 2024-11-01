@@ -2,10 +2,16 @@
 analysis/merge_tcfc/.gitignore
 analysis/merge_tcfc/.python-version
 analysis/merge_tcfc/src/
+
+analysis/run_vetting/plots*
+analysis/run_vetting/src/*
+
 analysis/notebooks/.gitignore
 analysis/notebooks/.ipynb_checkpoints/
 analysis/notebooks/.python-version
 analysis/notebooks/README.md
+analysis/notebooks/achim_notebooks/.ipynb_checkpoints/*
+
 gaps-db/gaps_db/.gitignore
 gaps-db/gaps_db/.python-version
 gaps-db/gaps_db/README.md
@@ -21,6 +27,7 @@ analysis/run_vetting/.python-version
 .ipynb_checkpoints/*
 
 # build artifacts
+tof/liftof/build/*
 *.so
 
 # other files which might be in the repositor
@@ -40,7 +47,10 @@ Makefile
 *.lock
 
 # Poetry lock files
-poetry.lock
+*oetry.lock
+
+# lingering data files
+*.bin
 
 # Cargo lock files
 Cargo.lock

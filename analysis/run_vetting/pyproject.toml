@@ -23,6 +23,7 @@ dependencies = [
     "weasyprint>=62.3",
     "pdfkit>=1.0.0",
     "reportlab>=4.2.5",
+    "scikit-learn>=1.5.2",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
