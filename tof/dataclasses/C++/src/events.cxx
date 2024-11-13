@@ -1045,7 +1045,8 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
    return hit;
  }
  u8  version       = Gaps::parse_u8(bytestream, ver_pos) & 0xc0;
- hit.version       = (Gaps::ProtocolVersion) version;
+ // hit.version       = (Gaps::ProtocolVersion) version;
+ hit.version       = Gaps::ProtocolVersion::V1;
  hit.paddle_id     = bytestream[pos]; pos+=1;
  if (hit.version == Gaps::ProtocolVersion::Unknown) {
    hit.time_a        = Gaps::parse_u16(bytestream, pos); 
