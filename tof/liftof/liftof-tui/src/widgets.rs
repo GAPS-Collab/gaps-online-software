@@ -293,7 +293,7 @@ pub fn gauge(title : String,
         .title(title)
         .border_type(BorderType::Rounded)
       )
-      .gauge_style(
+      .filled_style(
         Style::default()
           .fg(theme.hc)
           .bg(theme.bg1)

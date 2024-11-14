@@ -25,7 +25,7 @@ use std::process::{
 };
 
 use std::{
-    fs,
+    //fs,
     thread,
     time
 };
@@ -218,7 +218,7 @@ fn main() {
   let one_second = time::Duration::from_millis(1000);
 
   // deal with command line arguments
-  let config          : LiftofSettings;
+  let mut config      : LiftofSettings;
   let nboards         : usize;
   let args              = LiftofCCArgs::parse();
   let verbose           = args.verbose;
@@ -270,7 +270,6 @@ fn main() {
     let bad_rb = rb_ignorelist_tmp[k];
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
-
 
   nboards = rb_list.len();
   println!("=> Will use {} readoutboards! Ignoring {:?} sicne they are mareked as 'ignore' in the config file!", rb_list.len(), rb_ignorelist );
@@ -374,14 +373,13 @@ fn main() {
     info!("=> Restarted liftof-rb on all RBs successfully!");
   }
 
-
   let mtb_link_id_map = get_linkid_rbid_map(&rb_list);
   // A global kill timer
   let program_start = Instant::now();
 
   // Prepare outputfiles
-  let mut new_run_id : u32;
-  match prepare_run(write_stream_path.clone(), &config) {
+  let new_run_id : u32;
+  match prepare_run(write_stream_path.clone(), &config, runid, write_stream) {
     None => {
       error!("Unable to assign new run id, falling back to 0!");
       new_run_id = 0;
@@ -391,36 +389,63 @@ fn main() {
       info!("Will use new run id {}!", new_run_id);
     }
   }
-  if let Some(rid) = runid {
-    println!("=> Overriding expected run id by '-r' option!"); 
-    new_run_id = rid;
-  }
-  println!("=> Will use run id {}!", new_run_id);
-
+  // FIXME - ugly
   let mut stream_files_path = PathBuf::from(write_stream_path);
-  if write_stream {
-    stream_files_path.push(new_run_id.to_string().as_str());
-    // Create directory if it does not exist
-    // Check if the directory exists
-    if let Ok(metadata) = fs::metadata(&stream_files_path) {
-      if metadata.is_dir() {
-        println!("=> Directory {} for run number {} already consists and may contain files!", stream_files_path.display(), new_run_id);
-        // FILXME - in flight, we can not have interactivity.
-        // But the whole system with the run ids might change 
-      } 
-    } else {
-      match fs::create_dir(&stream_files_path) {
-        Ok(())   => println!("=> Created {} to save stream data", stream_files_path.display()),
-        Err(err) => panic!("Failed to create directory: {}! {}", stream_files_path.display(), err),
-      }
+  stream_files_path.push(new_run_id.to_string().as_str());
+ 
+  // Now as we have the .toml file copied to our run location, we reload it
+  // and reset the config settings in thread_control
+  let cfg_file = format!("{}/run{}.toml", stream_files_path.display(), new_run_id);
+  match LiftofSettings::from_toml(cfg_file) {
+    Err(err) => {
+      error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+      panic!("Unable to parse config file!");
     }
-    // Write the settings to the directory where 
-    // we want to save the run to
-    let settings_fname = format!("{}/run{}.toml",stream_files_path.display(), new_run_id); 
-    println!("=> Writing data to {}!", stream_files_path.display());
-    println!("=> Writing settings to {}!", settings_fname);
-    config.to_toml(settings_fname);
+    Ok(_cfg) => {
+      config = _cfg;
+    }
   }
+  // as well as upadte the shared memory
+  match thread_control.lock() {
+    Ok(mut tc) => {
+      tc.liftof_settings = config.clone();
+    },
+    Err(err) => {
+      error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+    },
+  }
+
+
+  //if let Some(rid) = runid {
+  //  println!("=> Overriding expected run id by '-r' option!"); 
+  //  new_run_id = rid;
+  //}
+  //info!("=> Will use run id {}!", new_run_id);
+
+  //let mut stream_files_path = PathBuf::from(write_stream_path);
+  //if write_stream {
+  //  stream_files_path.push(new_run_id.to_string().as_str());
+  //  // Create directory if it does not exist
+  //  // Check if the directory exists
+  //  if let Ok(metadata) = fs::metadata(&stream_files_path) {
+  //    if metadata.is_dir() {
+  //      println!("=> Directory {} for run number {} already consists and may contain files!", stream_files_path.display(), new_run_id);
+  //      // FILXME - in flight, we can not have interactivity.
+  //      // But the whole system with the run ids might change 
+  //    } 
+  //  } else {
+  //    match fs::create_dir(&stream_files_path) {
+  //      Ok(())   => println!("=> Created {} to save stream data", stream_files_path.display()),
+  //      Err(err) => panic!("Failed to create directory: {}! {}", stream_files_path.display(), err),
+  //    }
+  //  }
+  //  // Write the settings to the directory where 
+  //  // we want to save the run to
+  //  let settings_fname = format!("{}/run{}.toml",stream_files_path.display(), new_run_id); 
+  //  println!("=> Writing data to {}!", stream_files_path.display());
+  //  println!("=> Writing settings to {}!", settings_fname);
+  //  config.to_toml(settings_fname);
+  //}
 
   /*******************************************************
    * Channels (crossbeam, unbounded) for inter-thread

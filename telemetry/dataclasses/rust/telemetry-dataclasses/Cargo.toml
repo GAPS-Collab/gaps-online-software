@@ -16,6 +16,7 @@ required-features = ["random"]
 [features]
 random=["rand"]
 pybindings=["pyo3"]
+caraspace-serial=["caraspace"]
 #database=["sqlite"]
 
 [dev-dependencies]
@@ -29,6 +30,7 @@ criterion = "0.4"
 # logging
 log  = "0.4"
 tof-dataclasses = {version = "0.10", path = "../../../../tof/dataclasses/rust/tof-dataclasses/", features=["database"]}
+caraspace = {version = "0.10", path = "../../../../caraspace", optional = true }
 rand            = {version = "0.8", optional = true}
 serde           = {version = "1.0", features=["derive"]}
 serde_json      = "1.0"

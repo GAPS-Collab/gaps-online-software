@@ -1,4 +1,33 @@
+# specific rye and jupyter notebook artefacts
+analysis/merge_tcfc/.gitignore
+analysis/merge_tcfc/.python-version
+analysis/merge_tcfc/src/
+
+analysis/run_vetting/plots*
+analysis/run_vetting/src/*
+
+analysis/notebooks/.gitignore
+analysis/notebooks/.ipynb_checkpoints/
+analysis/notebooks/.python-version
+analysis/notebooks/README.md
+analysis/notebooks/achim_notebooks/.ipynb_checkpoints/*
+
+gaps-db/gaps_db/.gitignore
+gaps-db/gaps_db/.python-version
+gaps-db/gaps_db/README.md
+gaps-db/gaps_db/pyproject.toml
+gaps-db/gaps_db/src/
+gaps-db/resources/scripts/.gitignore
+gaps-db/resources/scripts/.python-version
+gaps-db/resources/scripts/README.md
+gaps-db/resources/scripts/src/
+analysis/run_vetting/.ipynb_checkpoints/
+analysis/run_vetting/.python-version
+
+.ipynb_checkpoints/*
+
 # build artifacts
+tof/liftof/build/*
 *.so
 
 # other files which might be in the repositor
@@ -14,8 +43,14 @@ Makefile
 # project files
 .idea/*
 
+# any kind of lock files
+*.lock
+
 # Poetry lock files
-poetry.lock
+*oetry.lock
+
+# lingering data files
+*.bin
 
 # Cargo lock files
 Cargo.lock
@@ -44,6 +79,7 @@ tof/liftof/liftof-rb/target/*
 tof/liftof/liftof-cc/target/*
 tof/liftof/liftof-tui/target/*
 tof/liftof/liftof-lib/target/*
+caraspace/target/*
 build/*
 
 

@@ -11,7 +11,8 @@ pub mod liftof;
 pub mod liftof_dataclasses;
 #[cfg(feature="liftof")]
 pub mod master_trigger;
-
+#[cfg(feature="caraspace-serial")]
+pub mod caraspace;
 #[cfg(feature="telemetry")]
 use telemetry_dataclasses::packets as tel_api;
 
@@ -22,6 +23,7 @@ cfg_if::cfg_if! {
       PyTelemetryPacketReader,
       PyMergedEvent,
       PyTrackerHit,
+      PyTrackerHitV2,
       PyTrackerEvent,
       PyTrackerPacket,
       PyTrackerTempLeakPacket,
@@ -34,10 +36,26 @@ cfg_if::cfg_if! {
 }
 
 cfg_if::cfg_if! {
+  if #[cfg(feature = "caraspace-serial")] {
+    use crate::caraspace::{
+      py_parse_u8,
+      py_parse_u16,
+      py_parse_u32,
+      py_parse_u64,
+      PyCRFrame,
+      PyCRReader,
+      PyCRWriter,
+    };
+  }
+}
+
+cfg_if::cfg_if! {
   if #[cfg(feature = "liftof")] {
     use crate::liftof::{
       py_waveform_analysis,
+      wrap_prescale_to_u32,
       wrap_calc_edep_simple,
+      wrap_fit_sine_sydney,
       test_db,
       PyLiftofSettings,
       PyIPBus,
@@ -48,6 +66,9 @@ cfg_if::cfg_if! {
 
 use pyo3::prelude::*;
 use pyo3::wrap_pymodule;
+use pyo3::exceptions::{
+    PyIOError,
+};
 
 use crate::analysis::*;
 use crate::dataclasses::*;
@@ -57,6 +78,79 @@ use crate::io::*;
 use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::commands::TofCommandCode;
 use tof_dataclasses::events::master_trigger::LTBThreshold;
+// additionally, let's add this functionality
+use tof_dataclasses::database::{
+  get_dsi_j_ch_pid_map,
+  DsiJChPidMapping,
+  RbChPidMapping,
+  get_rb_ch_pid_map,
+  Paddle,
+  connect_to_db
+};
+
+/// Create a map from the database which allows to map
+/// DSI,J,LTB channel for a connected LTB to the respective
+/// Paddle ID
+///
+/// This will query the database and then create a map
+/// structure, which can then be used for further queries
+///
+/// # Arguments:
+///     db_path : Path to the gaps_flight.db (or similar 
+///               db with paddle information)
+#[pyfunction]
+#[pyo3(name="create_mtb_connection_to_pid_map")]
+fn py_create_mtb_connection_to_pid_map(db_path : String) -> PyResult<DsiJChPidMapping> {
+  match connect_to_db(db_path) {
+    Err(err) => {
+      return Err(PyIOError::new_err(err.to_string()));
+    }
+    Ok(mut conn) => {
+      match Paddle::all(&mut conn) {
+        None => {
+          return Err(PyIOError::new_err("Unable to retrieve paddle information from DB!"));
+        }
+        Some(paddles) => {
+          let mapping = get_dsi_j_ch_pid_map(&paddles);
+          Ok(mapping)
+        }
+      }
+    }
+  }
+}
+
+/// Create a map from the database which allows to map
+/// DSI,J,LTB channel for a connected LTB to the respective
+/// Paddle ID
+///
+/// This will query the database and then create a map
+/// structure, which can then be used for further queries
+///
+/// # Arguments:
+///     db_path : Path to the gaps_flight.db (or similar 
+///               db with paddle information)
+#[pyfunction]
+#[pyo3(name="create_rb_ch_to_pid_map")]
+fn py_create_rb_ch_to_pid_map(db_path : String) -> PyResult<RbChPidMapping> {
+  match connect_to_db(db_path) {
+    Err(err) => {
+      return Err(PyIOError::new_err(err.to_string()));
+    }
+    Ok(mut conn) => {
+      match Paddle::all(&mut conn) {
+        None => {
+          return Err(PyIOError::new_err("Unable to retrieve paddle information from DB!"));
+        }
+        Some(paddles) => {
+          let mapping = get_rb_ch_pid_map(&paddles);
+          Ok(mapping)
+        }
+      }
+    }
+  }
+}
+
+
 
 #[pymodule]
 #[pyo3(name = "analysis")]
@@ -82,6 +176,9 @@ fn tof_moni<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyCPUMoniSeries>()?;
   m.add_class::<PyLTBMoniSeries>()?;
   m.add_class::<PyRBMoniData>()?;
+  m.add_class::<PyPAMoniData>()?;
+  m.add_class::<PyPBMoniData>()?;
+  m.add_class::<PyLTBMoniData>()?;
   m.add_class::<PyMtbMoniData>()?;
   Ok(())
 }
@@ -91,6 +188,8 @@ fn tof_moni<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 #[pymodule]
 #[pyo3(name = "io")]
 fn tof_io<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  m.add_function(wrap_pyfunction!(py_create_rb_ch_to_pid_map, m)?)?;
+  m.add_function(wrap_pyfunction!(py_create_mtb_connection_to_pid_map, m)?)?;
   m.add_class::<PyTofPacket>()?;
   m.add_class::<PyTofPacketReader>()?;
   m.add_class::<PacketType>()?;
@@ -127,6 +226,7 @@ cfg_if::cfg_if! {
       //m.add_class::<PyTofHit>()?;
       //m.add_class::<PyTofEventSummary>()?;
       m.add_class::<PyTrackerHit>()?;
+      m.add_class::<PyTrackerHitV2>()?;
       m.add_class::<PyTrackerEvent>()?;
       m.add_class::<PyTrackerPacket>()?;
       m.add_class::<PyTrackerTempLeakPacket>()?;
@@ -151,9 +251,29 @@ cfg_if::cfg_if! {
       m.add_function(wrap_pyfunction!(py_waveform_analysis,m)?)?;
       m.add_function(wrap_pyfunction!(wrap_calc_edep_simple,m)?)?;
       m.add_function(wrap_pyfunction!(test_db,m)?)?;
+      m.add_function(wrap_pyfunction!(wrap_prescale_to_u32,m)?)?;
+      m.add_function(wrap_pyfunction!(wrap_fit_sine_sydney,m)?)?;
       m.add_class::<PyLiftofSettings>()?;
       m.add_class::<PyIPBus>()?;
       m.add_class::<PyMasterTrigger>()?;
+      Ok(())
+    }
+  }
+}
+
+cfg_if::cfg_if! {
+  if #[cfg(feature = "caraspace-serial")] {
+    #[pymodule]
+    #[pyo3(name = "caraspace")]
+    fn py_caraspace<'_py> (m: &Bound<'_py, PyModule>) -> PyResult<()> {
+      m.add_function(wrap_pyfunction!(py_parse_u8, m)?)?;
+      m.add_function(wrap_pyfunction!(py_parse_u16, m)?)?;
+      m.add_function(wrap_pyfunction!(py_parse_u32, m)?)?;
+      m.add_function(wrap_pyfunction!(py_parse_u64, m)?)?;
+      //m.add_class::<tel_api::TelemetryPacketType>()?;
+      m.add_class::<PyCRFrame>()?;
+      m.add_class::<PyCRReader>()?;
+      m.add_class::<PyCRWriter>()?;
       Ok(())
     }
   }
@@ -192,5 +312,7 @@ fn go_pybindings<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { //: Python<
   m.add_wrapped(wrap_pymodule!(py_telemetry))?;
   #[cfg(feature="liftof")]
   m.add_wrapped(wrap_pymodule!(py_liftof))?;
+  #[cfg(feature="caraspace-serial")]
+  m.add_wrapped(wrap_pymodule!(py_caraspace))?;
   Ok(())
 }

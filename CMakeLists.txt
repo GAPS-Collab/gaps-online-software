@@ -30,11 +30,11 @@ set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20" FORCE)
 set(CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20" FORCE)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
-
 # -- pybindings with pybind11
 option(BUILD_CXXPYBINDINGS "build C++ pybindings with pybind11 (deprecated)" OFF)
 option(BUILD_RUSTTELEMETRY "builds Rust telemetry library and pybindings" OFF)
 option(BUILD_RUSTPYBINDINGS "build pybindings for the RUST code with py03 \\U+1F980 (better). Includes telemetry and liftof pybindings, if the respective options are selected." OFF)
+option(BUILD_CARASPACE "build the caraspace serialization library (useful)" OFF)
 
 if (BUILD_CXXPYBINDINGS)
   message(STATUS "Checking for pyoind11....")
@@ -48,7 +48,6 @@ if (BUILD_CXXPYBINDINGS)
     message(STATUS "-- found pybind11, building pybindings.")
   endif()
 endif(BUILD_CXXPYBINDINGS)
-
 
 ## do a release build by default
 if(NOT CMAKE_BUILD_TYPE)

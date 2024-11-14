@@ -6,13 +6,13 @@ use pyo3::types::PyFunction;
 
 use std::fmt;
 
-extern crate pyo3_log;
+//extern crate pyo3_log;
 //extern crate rpy-tof-dataclasses;
 
 use telemetry_dataclasses::packets as tel_api;
 use telemetry_dataclasses::io as tel_io_api;
 use crate::dataclasses::{
-  PyTofHit,
+  //PyTofHit,
   PyTofEventSummary,
 };
 
@@ -108,7 +108,18 @@ impl PyMergedEvent {
   }
 
   #[getter]
-  fn tracker(&self) -> PyResult<Vec<PyTrackerEvent>> {
+  fn tracker_v2(&self) -> PyResult<Vec<PyTrackerHitV2>> {
+    let mut hits = Vec::<PyTrackerHitV2>::new();
+    for h in &self.event.tracker_hitsv2 {
+      let mut pyhit = PyTrackerHitV2::new();
+      pyhit.set_hit(h.clone());
+      hits.push(pyhit);
+    }
+    Ok(hits)
+  }
+
+  #[getter]
+  fn tracker_v1(&self) -> PyResult<Vec<PyTrackerEvent>> {
     let mut events = Vec::<PyTrackerEvent>::new();
     for k in &self.event.tracker_events {
       let mut pytrk = PyTrackerEvent::new();
@@ -120,23 +131,23 @@ impl PyMergedEvent {
 
 
 
-  /// Check if TOF/trackler data can be unpacked an no errors are thrown
+  /// Check if TOF/tracker data can be unpacked an no errors are thrown
   #[getter]
   fn broken(&self) -> bool {
     // since the tracker part is already deserialized, the check
     // is only relevant for the tof part
     match TofPacket::from_bytestream(&self.event.tof_data, &mut 0) {
-      Err(err) => {
+      Err(_) => {
         //error!("Unable to parse TofPacket! {err}");
         return true;
       }
       Ok(pack) => {
         match pack.unpack::<tof_api::TofEventSummary>() {
-          Err(err) => {
+          Err(_) => {
             return true;
             //error!("Unable to parse TofEventSummary! {err}");
           }
-          Ok(ts)    => {
+          Ok(_)    => {
             return false;
           }
         }
@@ -317,8 +328,9 @@ impl PyTrackerPacket {
 #[pyclass]
 #[pyo3(name="TelemetryPacket")]
 pub struct PyTelemetryPacket {
-  packet : tel_api::TelemetryPacket,
+  pub packet : tel_api::TelemetryPacket,
 }
+
 
 impl PyTelemetryPacket {
   pub fn set_packet(&mut self, packet : tel_api::TelemetryPacket) {
@@ -329,7 +341,7 @@ impl PyTelemetryPacket {
 #[pymethods]
 impl PyTelemetryPacket {
   #[new]
-  fn new() -> Self {
+  pub fn new() -> Self {
     Self {
       packet : tel_api::TelemetryPacket::new(),
     }
@@ -384,15 +396,26 @@ impl PyTelemetryPacket {
 #[pyo3(name="TelemetryPacketReader")]
 pub struct PyTelemetryPacketReader {
   reader   : tel_io_api::TelemetryPacketReader,
+  //filelist : Vec<String>,
 }
 
 #[pymethods]
 impl PyTelemetryPacketReader {
   #[new]
-  #[pyo3(signature = (filename, filter=tel_api::TelemetryPacketType::Unknown,start=0, nevents=0))]
-  fn new(filename : String, filter : tel_api::TelemetryPacketType, start : usize, nevents : usize) -> Self {
+  #[pyo3(signature = (filename, filter=tel_api::TelemetryPacketType::Unknown))]
+  fn new(filename : String, filter : tel_api::TelemetryPacketType) -> Self {
+    //#[pyo3(signature = (filename, filter=tel_api::TelemetryPacketType::Unknown,start=0, nevents=0))]
+    // FIXME add start and nevents  
+    //, start : usize, nevents : usize) -> Self {
+    //if filenames.len() == 0 {
+    //  panic!("Filenames list arguments needs to have at least a single file!");
+    //}
+    //let first_filename = filenames[0];
+    //let new_fnames = Vec::<String>::new();
+    //let new_fnames = filenames[1..].to_vec();
     let mut reader_init = Self {
-      reader     : tel_io_api::TelemetryPacketReader::new(filename)
+      reader     : tel_io_api::TelemetryPacketReader::new(filename),
+      //filelist   : filenames
     };
     reader_init.reader.filter = filter;
     reader_init
@@ -428,7 +451,7 @@ impl PyTelemetryPacketReader {
       }
       println!(">");
     }
-    self.reader.rewind();
+    self.reader.rewind()?;
     Ok(idx)
   }
 
@@ -462,18 +485,21 @@ impl PyTelemetryPacketReader {
   }
 }
 
-#[pyfunction]
-fn get_gapsevents(fname : String) -> Vec<PyGapsEvent> {
-  let mut pyevents = Vec::<PyGapsEvent>::new();
-  let events = tel_io_api::get_gaps_events(fname);
-  for ev in events {
-    let mut pyev = PyGapsEvent::new();
-    pyev.set_tof(ev.tof.clone());
-    pyev.set_tracker(ev.tracker.clone());
-    pyevents.push(pyev);
-  }
-  pyevents
-}
+
+// FIXME - with the new style tracker hit, we might not 
+// need the gaps event anymore
+//#[pyfunction]
+//fn get_gapsevents(fname : String) -> Vec<PyGapsEvent> {
+//  let mut pyevents = Vec::<PyGapsEvent>::new();
+//  let events = tel_io_api::get_gaps_events(fname);
+//  for ev in events {
+//    let mut pyev = PyGapsEvent::new();
+//    pyev.set_tof(ev.tof.clone());
+//    pyev.set_tracker(ev.tracker.clone());
+//    pyevents.push(pyev);
+//  }
+//  pyevents
+//}
 
 
 #[pyclass]
@@ -605,6 +631,104 @@ impl fmt::Display for PyTrackerHit {
     write!(f, "{}", repr)
   }
 }
+
+////////////////////////////////////////////////////////////
+
+/// Updated representation of a TrackerHit 
+///
+/// A new-style tracker hit, which is not part 
+/// of a TrackerEvent anymore and can stand by 
+/// itself
+///
+/// Note that the values are u16, this is in 
+/// accordance with what is in bfsw
+#[pyclass]
+#[pyo3(name="TrackerHitV2")]
+#[derive(Debug, Clone)]
+pub struct PyTrackerHitV2 {
+  pub layer           : u16,
+  pub row             : u16,
+  pub module          : u16,
+  pub channel         : u16,
+  pub adc             : u16,
+  pub oscillator      : u64,
+}
+
+impl PyTrackerHitV2 {
+  pub fn set_hit(&mut self, th : tel_api::TrackerHitV2) {
+    self.layer           = th.layer;
+    self.row             = th.row;
+    self.module          = th.module;
+    self.channel         = th.channel;
+    self.adc             = th.adc;
+    self.oscillator      = th.oscillator;
+  }
+}
+
+#[pymethods]
+impl PyTrackerHitV2 {
+
+  #[new]
+  fn new() -> Self {
+    Self {
+      layer           : 0,
+      row             : 0,
+      module          : 0,
+      channel         : 0,
+      adc             : 0,
+      oscillator      : 0,
+    }
+  }
+
+  #[getter]
+  fn layer(&self) -> u16 {
+    self.layer
+  }
+
+  #[getter]
+  fn row(&self) -> u16 {
+    self.row
+  }
+
+  #[getter]
+  fn module(&self) -> u16 {
+    self.module
+  }
+
+  #[getter]
+  fn channel(&self) -> u16 {
+    self.channel
+  }
+
+  #[getter]
+  fn adc(&self) -> u16 {
+    self.adc
+  }
+
+  #[getter]
+  fn oscillator(&self) -> u64 {
+    self.oscillator
+  }
+  
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("{}", self))
+  }
+}
+
+impl fmt::Display for PyTrackerHitV2 {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<PyTrackerHitV2:");
+    repr += &(format!("\n  Layer         : {}" ,self.layer));
+    repr += &(format!("\n  Row           : {}" ,self.row));
+    repr += &(format!("\n  Module        : {}" ,self.module));
+    repr += &(format!("\n  Channel       : {}" ,self.channel));
+    repr += &(format!("\n  ADC           : {}" ,self.adc));
+    repr += &(format!("\n  Oscillator    : {}>",self.oscillator));
+    write!(f, "{}", repr)
+  }
+}
+
+
 
 //// Implement the AsRef<PyAny> trait
 //impl AsRef<PyAny> for PyTrackerHit {

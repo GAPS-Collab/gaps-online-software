@@ -7,7 +7,6 @@ use numpy::{
     //ndarray::Array,
 };
 
-//extern crate pyo3_polars;
 use pyo3_polars::{
     PyDataFrame,
     //PySeries
@@ -37,6 +36,8 @@ use tof_dataclasses::monitoring::{
     CPUMoniData,
     LTBMoniData,
 };
+
+use tof_dataclasses::status::TofDetectorStatus;
 
 use tof_dataclasses::series::{
     PAMoniDataSeries,
@@ -68,7 +69,7 @@ use tof_dataclasses::commands::{
 };
 use tof_dataclasses::calibrations::{
   RBCalibrations,
-  clean_spikes,
+  //clean_spikes,
   //spike_cleaning
 };
 use tof_dataclasses::config::{AnalysisEngineConfig, RunConfig, TOFEventBuilderConfig, BuildStrategy};
@@ -109,6 +110,95 @@ use tof_dataclasses::events::master_trigger::LTBThreshold;
 //    Ok(format!("<PyO3Wrapper: {}>", self.moni)) 
 //  }
 //
+
+#[pyclass]
+#[pyo3(name="TofDetectorStatus")]
+pub struct PyTofDetectorstatus {
+  pub status : TofDetectorStatus
+}
+
+#[pymethods]
+impl PyTofDetectorstatus {
+  #[new]
+  fn new() -> Self {
+    let status =  TofDetectorStatus::new();
+    Self {
+      status
+    }
+  }
+  //fn to_bytestream(&self) -> Vec<u8> {
+  //  self.config.to_bytestream()
+  //}
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<TofDetectorStatus>() {
+      Ok(status) => {
+        self.status = status;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+
+  #[getter]
+  fn channels000_031(&self) -> u32 {
+    self.status.channels000_031
+  }
+
+  #[getter]
+  fn channels032_063(&self) -> u32 { 
+    self.status.channels032_063
+  }
+
+  #[getter]
+  fn channels064_095(&self) -> u32 { 
+    self.status.channels064_095
+  }
+
+  #[getter]
+  fn channels096_127(&self) -> u32 { 
+    self.status.channels096_127
+  }  
+
+  #[getter]
+  fn channels128_159(&self) -> u32 { 
+    self.status.channels128_159
+  }
+
+  #[getter]
+  fn channels160_191(&self) -> u32 { 
+    self.status.channels160_191
+  }
+
+  #[getter]
+  fn channels192_223(&self) -> u32 { 
+    self.status.channels192_223
+  }
+
+  #[getter]
+  fn channels224_255(&self) -> u32 { 
+    self.status.channels224_255
+  }
+  
+  #[getter]
+  fn channels256_297(&self) -> u32 { 
+    self.status.channels256_297
+  }
+
+  #[getter]
+  fn channels298_319(&self) -> u32 { 
+    self.status.channels298_319
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.status)) 
+  }
+}
+
+
 #[pyclass]
 #[pyo3(name="RunConfig")]
 pub struct PyRunConfig {
@@ -659,6 +749,73 @@ impl PyRBCalibration {
 //  let pyarray = PyArray::from_vec2_bound(py, &data).unwrap();
 //  Ok(pyarray)
 //}
+#[pyclass]
+#[pyo3(name="PAMoniData")]
+pub struct PyPAMoniData {
+  moni : PAMoniData
+}
+
+#[pymethods]
+impl PyPAMoniData {
+  #[new]
+  fn new() -> Self {
+    Self {
+      moni : PAMoniData::new()
+    }
+  }
+  
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<PAMoniData>() {
+      Ok(moni) => {
+        self.moni = moni;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+  
+  #[getter]
+  fn board_id(&self) ->  u8 {
+    self.moni.board_id
+  }
+
+  /// The temperature for the 16 preamp channels 
+  #[getter]
+  fn temps(&self) -> [f32;16] {
+    self.moni.temps
+  }
+
+  /// Pramp bias voltages (mV) for the 16 channels
+  #[getter]
+  fn biases(&self) -> [f32;16] {
+    self.moni.biases
+  }
+  
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.moni)) 
+  }
+
+  fn keys(&self) -> Vec<&'static str> {
+    PAMoniData::keys()
+  }
+
+  /// Access the (data) members by name
+  fn get(&self, varname : &str) -> PyResult<f32> {
+    match self.moni.get(varname) {
+      None => {
+        let err_msg = format!("LTBMoniData does not have a key with name {}! See RBmoniData.keys() for a list of available keys!", varname);
+        return Err(PyKeyError::new_err(err_msg));
+      }
+      Some(val) => {
+        return Ok(val)
+      }
+    }
+  }
+}
 
 #[pyclass]
 #[pyo3(name="PAMoniSeries")]
@@ -691,6 +848,110 @@ impl PyPAMoniSeries {
       },
       Err(err) => {
         return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+}
+
+#[pyclass]
+#[pyo3(name="PBMoniData")]
+pub struct PyPBMoniData {
+  moni : PBMoniData,
+}
+
+#[pymethods]
+impl PyPBMoniData {
+  #[new]
+  fn new() -> Self {
+    Self {
+      moni : PBMoniData::new()
+    }
+  }
+  
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<PBMoniData>() {
+      Ok(moni) => {
+        self.moni = moni;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+  
+  #[getter]
+  fn board_id(&self) -> u8 {
+    self.moni.board_id
+  }
+
+  #[getter]
+  fn p3v6_preamp_vcp(&self) -> [f32; 3] {
+    self.moni.p3v6_preamp_vcp
+  }
+  
+  #[getter]
+  fn n1v6_preamp_vcp(&self) -> [f32; 3] {
+    self.moni.n1v6_preamp_vcp
+  }
+  
+  #[getter]
+  fn p3v4f_ltb_vcp(&self) -> [f32; 3] {
+    self.moni.p3v4f_ltb_vcp
+  }
+  
+  #[getter]
+  fn p3v4d_ltb_vcp(&self) -> [f32; 3] {
+    self.moni.p3v4d_ltb_vcp
+  }
+  
+  #[getter]
+  fn p3v6_ltb_vcp(&self) -> [f32; 3] {
+    self.moni.p3v6_ltb_vcp
+  }
+  
+  #[getter]
+  fn n1v6_ltb_vcp(&self) -> [f32; 3] {
+    self.moni.n1v6_ltb_vcp
+  }
+  
+  #[getter]
+  fn pds_temp(&self) -> f32 {  
+    self.moni.pds_temp
+  }
+  #[getter]
+  fn pas_temp(&self) -> f32 {
+    self.moni.pas_temp
+  }
+  #[getter]
+  fn nas_temp(&self) -> f32 {
+    self.moni.nas_temp
+  }
+
+  #[getter]
+  fn shv_temp(&self) -> f32 {
+    self.moni.shv_temp
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.moni)) 
+  }
+
+  fn keys(&self) -> Vec<&'static str> {
+    PBMoniData::keys()
+  }
+
+  /// Access the (data) members by name
+  fn get(&self, varname : &str) -> PyResult<f32> {
+    match self.moni.get(varname) {
+      None => {
+        let err_msg = format!("LTBMoniData does not have a key with name {}! See RBmoniData.keys() for a list of available keys!", varname);
+        return Err(PyKeyError::new_err(err_msg));
+      }
+      Some(val) => {
+        return Ok(val)
       }
     }
   }
@@ -769,7 +1030,7 @@ impl PyLTBMoniData {
   }
 
   fn keys(&self) -> Vec<&'static str> {
-    RBMoniData::keys()
+    LTBMoniData::keys()
   }
 
   /// Access the (data) members by name
@@ -892,6 +1153,8 @@ impl PyRBMoniData {
   fn tmp_lis3mdltr    (&self)  -> f32 {
     self.moni.tmp_lis3mdltr
   }
+  
+  #[getter]
   fn tmp_bm280        (&self)  -> f32 {
     self.moni.tmp_bm280
   }
@@ -1529,6 +1792,7 @@ impl PyLTBMoniSeries {
 
 #[pyclass]
 #[pyo3(name="TofPacket")]
+#[derive(Clone)]
 pub struct PyTofPacket {
   pub packet : TofPacket,
 }
@@ -1606,6 +1870,11 @@ impl PyMasterTriggerEvent {
     self.event.event_id
   }
 
+  #[getter]
+  fn status(&self) -> EventStatus {
+    self.event.event_status
+  }
+
   /// Get the RB link IDs according to the mask
   #[getter]
   pub fn rb_link_ids(&self) -> Vec<u8> {
@@ -1677,14 +1946,28 @@ pub struct PyRBEventHeader {
 }
 
 impl PyRBEventHeader {
-  pub fn set_header(&mut self, header : RBEventHeader) {
-    self.header = header;
-  }
 
-fn __repr__(&self) -> PyResult<String> {
-  Ok(format!("<PyO3Wrapper: {}>", self.header)) 
-  }
+  //pub rb_id                : u8   ,    
+  //pub event_id             : u32  , 
+  //pub status_byte          : u8   ,
+  //// FIXME - channel mask still has space
+  //// for the status_bytes, since it only
+  //// uses 9bits
+  //pub channel_mask         : u16  , 
+  //pub stop_cell            : u16  , 
+  //// we change this by keeping the byte
+  //// order the same to accomodate the sine 
+  //// values
+  //pub ch9_amp              : u16, 
+  //pub ch9_freq             : u16, 
+  //pub ch9_phase            : u32, 
+  ////pub crc32              : u32  , 
+  ////pub dtap0              : u16  , 
+  ////pub drs4_temp          : u16  , 
+  //pub fpga_temp            : u16  , 
+  //pub timestamp32          : u32  ,
 } 
+
 #[pymethods]
 impl PyRBEventHeader {
   #[new]
@@ -1704,14 +1987,14 @@ impl PyRBEventHeader {
     self.header.event_id
   }
   
-  #[getter]
-  fn status_byte(&self) -> u8 {
-    self.header.status_byte
-  }
+  //#[getter]
+  //fn status_byte(&self) -> u8 {
+  //  self.header.status_byte
+  //}
   
   #[getter]
   fn channel_mask(&self) -> u16 {
-    self.header.channel_mask
+    self.header.get_channel_mask()
   }
   
   #[getter]
@@ -1724,6 +2007,11 @@ impl PyRBEventHeader {
     self.header.get_fpga_temp()
   }
   
+  #[getter]
+  fn drs_deadtime(&self) -> u16 {
+    self.header.drs_deadtime 
+  }
+
   #[getter]
   fn timestamp32(&self) -> u32 {
     self.header.timestamp32
@@ -1740,6 +2028,41 @@ impl PyRBEventHeader {
 
   fn get_channels(&self) -> Vec<u8> {
     self.header.get_channels()
+  }
+
+  #[getter]
+  pub fn is_event_fragment(&self) -> bool {
+    self.header.is_event_fragment()
+  }
+
+  #[getter]
+  pub fn drs_lost_trigger(&self) -> bool {
+    self.header.drs_lost_trigger()
+  }
+
+  #[getter]
+  fn lost_lock(&self) -> bool {
+    self.header.lost_lock()
+  }
+
+  #[getter]
+  fn lost_lock_last_sec(&self) -> bool {
+    self.header.lost_lock_last_sec()
+  }
+
+  #[getter]
+  fn is_locked(&self) -> bool {
+    self.header.is_locked()
+  }
+
+  #[getter]
+  fn is_locked_last_sec(&self) -> bool {
+    self.header.is_locked_last_sec()
+  }
+
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.header)) 
   }
 
 }
@@ -1769,6 +2092,7 @@ impl PyTofEventSummary {
   fn event_id(&self) -> u32 {
     self.event.event_id
   }
+  
   #[getter]
   fn event_status(&self) -> EventStatus {
     self.event.status
@@ -1787,7 +2111,8 @@ impl PyTofEventSummary {
     Ok(self.event.get_trigger_hits())
   }
   
-  ///
+  /// The active triggers in this event. This can be more than one, 
+  /// if multiple trigger conditions are satisfied.
   #[getter]
   pub fn trigger_sources(&self) -> Vec<TriggerType> {
     self.event.get_trigger_sources()
@@ -1798,7 +2123,7 @@ impl PyTofEventSummary {
     let mut hits = Vec::<PyTofHit>::new();
     for h in &self.event.hits {
       let mut pyhit = PyTofHit::new();
-      pyhit.set_hit(h.clone());
+      pyhit.hit = h.clone();
       hits.push(pyhit);
     }
     hits
@@ -1829,6 +2154,7 @@ impl PyTofEventSummary {
     self.event.status
   }
 
+  /// Unpack a tofpacket
   fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
     let tp = packet.get_tp();
     match tp.unpack::<TofEventSummary>() {
@@ -1901,7 +2227,7 @@ impl PyTofEvent {
     for ev in &self.event.rb_events {
       for h in &ev.hits {
         let mut pyhit = PyTofHit::new();
-        pyhit.set_hit(*h);
+        pyhit.hit = *h;
         hits.push(pyhit);
       }
     }
@@ -1917,6 +2243,20 @@ impl PyTofEvent {
       wfs.push(pywf);
     }
     wfs
+  }
+
+  fn get_summary(&self) -> PyTofEventSummary {
+    let ts = self.event.get_summary();
+    let mut pyts = PyTofEventSummary::new();
+    pyts.set_event(ts);
+    return pyts;
+  }
+
+  fn pack(&self) -> PyTofPacket {
+    let packet   = self.event.pack();
+    let mut pytp = PyTofPacket::new();
+    pytp.set_tp(packet);
+    pytp
   }
 
   fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
@@ -2023,7 +2363,7 @@ impl PyRBEvent {
   fn header(&self) -> PyRBEventHeader {
     let mut py_header = PyRBEventHeader::new();
     //let mut header = self.event.header;
-    py_header.set_header(self.event.header.clone());
+    py_header.header = self.event.header.clone();
     py_header
   }
   
@@ -2050,12 +2390,6 @@ pub struct PyTofHit {
   hit : TofHit,
 }
 
-impl PyTofHit {
-  pub fn set_hit(&mut self, hit : TofHit) {
-    self.hit = hit;
-  }
-}
-
 #[pymethods]
 impl PyTofHit {
   #[new]
@@ -2064,7 +2398,14 @@ impl PyTofHit {
       hit : TofHit::new(),
     }
   }
-  
+ 
+  /// Set the length and cable length for the paddle
+  /// FIXME - take gaps_online.db.Paddle as argument
+  fn set_paddle(&mut self, plen : f32, clen : f32) {
+    self.hit.paddle_len = plen;
+    self.hit.cable_len  = clen;
+  }
+
   /// Reconstructed particle interaction time,
   /// calculated from the waveforms of the two
   /// different paddle ends

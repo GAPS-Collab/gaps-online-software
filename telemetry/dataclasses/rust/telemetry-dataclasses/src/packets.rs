@@ -106,6 +106,27 @@ impl TelemetryPacket {
       payload : Vec::<u8>::new()
     }
   }
+
+  pub fn from_bytestream(stream : &Vec<u8>, pos : &mut usize) -> Result<Self, SerializationError> {
+    let mut tpacket = TelemetryPacket::new();
+    let header  = TelemetryHeader::from_bytestream(stream, pos)?;
+    tpacket.header = header;
+    //println!("Found header {}", tpacket.header);
+    // it seems the payload size is header.size
+    // fix - the payload is either sizeof(header) + payload.len 
+    tpacket.payload = stream[*pos..*pos + header.length as usize - TelemetryHeader::SIZE].to_vec();
+    Ok(tpacket)
+  }
+
+  // FIXME - this needs to be a trait
+  pub fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::new();
+    let mut s_head = self.header.to_bytestream();
+    stream.append(&mut s_head);
+    stream.extend_from_slice(self.payload.as_slice());
+    //stream.append(&mut self.payload);
+    stream
+  }
 }
 
 impl fmt::Display for TelemetryPacket {
@@ -177,6 +198,20 @@ impl Serialization for TelemetryHeader {
     thead.checksum  = parse_u16(stream, pos);
     Ok(thead)
   }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::new();
+    //let head : u16 = 0x90eb;
+    // "SYNC" is the header signature
+    stream.extend_from_slice(&self.sync.to_le_bytes());
+    stream.extend_from_slice(&self.ptype.to_le_bytes());
+    stream.extend_from_slice(&self.timestamp.to_le_bytes());
+    stream.extend_from_slice(&self.counter.to_le_bytes());
+    stream.extend_from_slice(&self.length.to_le_bytes());
+    stream.extend_from_slice(&self.checksum.to_le_bytes());
+    stream
+  }
+
 }
 
 impl fmt::Display for TelemetryHeader {
@@ -194,30 +229,41 @@ impl fmt::Display for TelemetryHeader {
 
 pub struct MergedEvent {
   
-  pub header         : TelemetryHeader,
-  pub creation_time  : u64,
-  pub event_id       : u32,
-  pub tracker_events : Vec<TrackerEvent>,
-  pub tof_data       : Vec<u8>,
-  pub raw_data       : Vec<u8>,
-  pub flags0         : u8,
-  pub flags1         : u8,
-  pub version        : u8
+  pub header              : TelemetryHeader,
+  pub creation_time       : u64,
+  pub event_id            : u32,
+  pub tracker_events      : Vec<TrackerEvent>,
+  /// in case this is version 2, we don't have
+  /// tracker_events, but new-style tracker hits
+  /// (TrackerHitV2)
+  pub tracker_hitsv2      : Vec<TrackerHitV2>,
+  pub tracker_oscillators : Vec<u64>,
+  pub tof_data            : Vec<u8>,
+  pub raw_data            : Vec<u8>,
+  pub flags0              : u8,
+  pub flags1              : u8,
+  pub version             : u8
 }
 
 impl MergedEvent {
 
   pub fn new() -> Self {
+    let mut tracker_oscillators = Vec::<u64>::new();
+    for _ in 0..10 {
+      tracker_oscillators.push(0);
+    }
     Self {
-      header         : TelemetryHeader::new(),
-      creation_time  : 0,
-      event_id       : 0,
-      tracker_events : Vec::<TrackerEvent>::new(),
-      tof_data       : Vec::<u8>::new(),
-      raw_data       : Vec::<u8>::new(),
-      flags0         : 0,
-      flags1         : 1,
-      version        : 0, 
+      header              : TelemetryHeader::new(),
+      creation_time       : 0,
+      event_id            : 0,
+      tracker_events      : Vec::<TrackerEvent>::new(),
+      tracker_hitsv2      : Vec::<TrackerHitV2>::new(),
+      tracker_oscillators : tracker_oscillators,
+      tof_data            : Vec::<u8>::new(),
+      raw_data            : Vec::<u8>::new(),
+      flags0              : 0,
+      flags1              : 1,
+      version             : 0, 
     }
   }
 
@@ -248,6 +294,7 @@ impl MergedEvent {
     -> Result<Self, SerializationError> {
     let mut me        = MergedEvent::new();
     let version      = parse_u8(stream, pos);
+    me.version       = version;
     //println!("_version {}", _version);
     me.flags0         = parse_u8(stream, pos);
     // skip a bunch of Alex newly implemented things
@@ -277,38 +324,79 @@ impl MergedEvent {
     if trk_delim != 0xbb {
       return Err(SerializationError::HeadInvalid);
     }
-    let num_trk_bytes = parse_u16(stream, pos);
-    if (num_trk_bytes as usize + *pos - 2) > stream.len() {
-      return Err(SerializationError::StreamTooShort);
-    }
-    //println!("Num TRK bytes : {}", num_trk_bytes);
-    // for now, don't unpack tracker data
-    //*pos += num_trk_bytes as usize;
-    let max_pos = *pos + num_trk_bytes as usize;
-    loop {
-       //if *pos > max_pos {
-       //  //return Err(SerializationError::StreamTooLong);
-       //} 
-       if *pos >= max_pos {
-         break;
-       }
-       if *pos >= stream.len() {
-         break;
-       }
-       let mut te = TrackerEvent::from_bytestream(stream, pos)?;
-       //println!("{}",te);
-       te.event_id = me.event_id;
-       me.tracker_events.push(te);
-       //if(rc < 0)
-       //{
-       //   spdlog::info("DEBUG event.unpack rc = {}", rc);
-       //   return -9;
-       //}
-       //else
-       //{
-       //    tracker_events.push_back(std::move(event));
-       //    i += rc;
-       //}
+    if version == 1 {
+      let num_trk_hits = parse_u16(stream, pos);
+      if (*pos + (num_trk_hits as usize)*4 ) > stream.len() {
+        return Err(SerializationError::StreamTooShort);
+      }
+      for _ in 0..num_trk_hits { 
+        let mut hit = TrackerHitV2::new();
+        let strip_id = parse_u16(stream, pos);
+        let adc      = parse_u16(stream, pos);
+        hit.channel  = strip_id & 0b11111;
+        hit.module   = (strip_id >> 5) & 0b111;
+        hit.row      = (strip_id >> 8) & 0b111;
+        hit.layer    = (strip_id >> 11) & 0b1111;
+        hit.adc      = adc;
+        me.tracker_hitsv2.push(hit);
+      }
+      // oscillators
+      let oscillators_delimiter = parse_u8(stream, pos);
+      if oscillators_delimiter != 0xcc {
+        return Err(SerializationError::HeadInvalid);
+      }
+      let osc_flags = parse_u8(stream, pos);
+      let mut oscillator_idx = Vec::<u8>::new();
+      for j in 0..8 {
+        if (osc_flags >> j & 0b1) > 0 {
+          oscillator_idx.push(j)
+        }
+      }
+      if (*pos + oscillator_idx.len()*6) > stream.len() {
+        return Err(SerializationError::StreamTooShort);
+      }
+      for idx in oscillator_idx.iter() {
+        let lower = parse_u32(stream, pos);
+        let upper = parse_u16(stream, pos);
+        let osc : u64 = (upper as u64) << 32 | (lower as u64);
+        me.tracker_oscillators[*idx as usize] = osc;
+      }
+    } else if version == 0 {
+      let num_trk_bytes = parse_u16(stream, pos);
+      if (num_trk_bytes as usize + *pos - 2) > stream.len() {
+        return Err(SerializationError::StreamTooShort);
+      }
+      //println!("Num TRK bytes : {}", num_trk_bytes);
+      // for now, don't unpack tracker data
+      //*pos += num_trk_bytes as usize;
+      let max_pos = *pos + num_trk_bytes as usize;
+      loop {
+         //if *pos > max_pos {
+         //  //return Err(SerializationError::StreamTooLong);
+         //} 
+         if *pos >= max_pos {
+           break;
+         }
+         if *pos >= stream.len() {
+           break;
+         }
+         let mut te = TrackerEvent::from_bytestream(stream, pos)?;
+         //println!("{}",te);
+         te.event_id = me.event_id;
+         me.tracker_events.push(te);
+         //if(rc < 0)
+         //{
+         //   spdlog::info("DEBUG event.unpack rc = {}", rc);
+         //   return -9;
+         //}
+         //else
+         //{
+         //    tracker_events.push_back(std::move(event));
+         //    i += rc;
+         //}
+      }
+    } else {
+      error!("Unrecognized version {version}!");
     }
     Ok(me)
   }
@@ -333,23 +421,36 @@ impl fmt::Display for MergedEvent {
     }
     let mut good_hits = 0;
     let mut evids = Vec::<u32>::new();
-    for ev in &self.tracker_events {
-      evids.push(ev.event_id);
-      for h in &ev.hits { 
-        if h.adc != 0 {
-          good_hits += 1;
+    if self.version == 0 {
+      for ev in &self.tracker_events {
+        evids.push(ev.event_id);
+        for h in &ev.hits { 
+          if h.adc != 0 {
+            good_hits += 1;
+          }
         }
+      evids.sort();
+      evids.dedup();
+      }
+    } else if self.version == 1 {
+      for _ in &self.tracker_hitsv2 {
+        good_hits += 1;
       }
     }
-    evids.sort();
-    evids.dedup();
     repr += &(format!("  {}", self.header));
     repr += "\n  ** ** ** MERGED  ** ** **";
+    repr += &(format!("\n  version         {}", self.version));
     repr += &(format!("\n  event ID        {}", self.event_id));  
-    repr += &(format!("\n  -- TOF          {}", tof_evid));
-    repr += &(format!("\n  -- TRK          {:?}", evids));
+    if self.version == 0 {
+      repr += &(format!("\n  -- TOF          {}", tof_evid));
+      repr += &(format!("\n  -- TRK          {:?}", evids));
+    }
     repr += "\n  ** ** ** TRACKER ** ** **";
-    repr += &(format!("\n  N Trk events    {}", self.tracker_events.len()));
+    if self.version == 0 {
+      repr += &(format!("\n  N Trk events    {}", self.tracker_events.len()));
+    } else if self.version == 1 {
+      repr += &(format!("\n  Trk oscillators {:?}", self.tracker_oscillators)); 
+    }
     repr += &(format!("\n  N Good Trk Hits {}", good_hits));
     repr += &tof_str;
     write!(f,"{}", repr)
@@ -429,6 +530,44 @@ impl fmt::Display for TrackerEvent {
     for h in &self.hits {
       repr += &(format!("\n {}", h));
     }
+    write!(f, "{}", repr)
+  }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct TrackerHitV2 {
+  pub layer           : u16,
+  pub row             : u16,
+  pub module          : u16,
+  pub channel         : u16,
+  pub adc             : u16,
+  pub oscillator      : u64
+}
+
+impl TrackerHitV2 {
+  //const SIZE : usize = 18;
+  
+  pub fn new() -> Self {
+    Self {
+      layer           : 0,
+      row             : 0,
+      module          : 0,
+      channel         : 0,
+      adc             : 0,
+      oscillator      : 0,
+    }
+  }
+}
+
+impl fmt::Display for TrackerHitV2 {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerHitV2:");
+    repr += &(format!("\n  Layer         : {}" ,self.layer));
+    repr += &(format!("\n  Row           : {}" ,self.row));
+    repr += &(format!("\n  Module        : {}" ,self.module));
+    repr += &(format!("\n  Channel       : {}" ,self.channel));
+    repr += &(format!("\n  ADC           : {}" ,self.adc));
+    repr += &(format!("\n  Oscillator    : {}>",self.oscillator));
     write!(f, "{}", repr)
   }
 }

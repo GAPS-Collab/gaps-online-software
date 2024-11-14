@@ -25,16 +25,54 @@ try:
     TofPacketType   = rtd.io.PacketType
     TofPacket       = rtd.io.TofPacket
     TofPacketReader = rtd.io.TofPacketReader
-    rtd_unpack_success = True
+    try:
+        # let's see if we can get the mtb connection map
+        import os
+        db_path = os.environ["DATABASE_URL"]
+        dsi_j_pid_map = rtd.io.create_mtb_connection_to_pid_map(db_path)
+    except Exception as e:
+        print(f'-> Unable to create dsi_j_pid_map! {e}')
+    try:
+        rb_pid_map    = rtd.io.create_rb_ch_to_pid_map(db_path)
+    except Exception as e:
+        print(f'-> Unable to create dsi_j_pid_map! {e}')
+
+    rtd_import_success = True
 except ImportError as e:
     print(e)
     print('--> Pybindings for tof-dataclasses are missing!')
     print('--> Limited functionality available only!')
     print('--> If you want to mitigate this, check your build, e.g. with ccmake and make sure the respective features are turned ON')
 
+# check for the caraspace system
+try:
+    import go_pybindings as rtd
+    try:
+        CRReader = rtd.caraspace.CRReader
+        CRWriter = rtd.caraspace.CRWriter
+        CRFrame  = rtd.caraspace.CRFrame
+    except Exception as e:
+        print(f'-> Pybdingins for the caraspace serializaztion library are missing! {e}')
+        print('--> Limited functionality available only!')
+        print('--> If you want to mitigate this, check your build, e.g. with ccmake and make sure the respective features are turned ON')
+
+    rtd_import_success = True
+except ImportError as e:
+    print(e)
+    print('--> Pybindings are missing!')
+    print('--> Limited functionality available only!')
+    print('--> If you want to mitigate this, check your build, e.g. with ccmake and make sure the respective features (BUILD_PYBIDINGIS) are turned ON')
+
+
+##################################################################
+
+
 def get_ts_from_toffile(fname):
     """
-    Get the timestamp from a .gaps.tof file
+    Get the timestamp from a .tof.gaps file
+    
+    # Arguments:
+        fname : Filename of .tof.gaps file
     """
     pattern = re.compile('Run[0-9]*_[0-9]*.(?P<tdate>[0-9_]*)')
     ts = pattern.search(str(fname)).groupdict()['tdate']
@@ -53,10 +91,15 @@ def get_ts_from_binfile(fname):
     ts = ts.replace(tzinfo=timezone.utc)
     return ts
 
-def get_tof_binaries(run_id : int, data_dir='') -> list[Path]:
+def get_tof_binaries(run_id : int, data_dir='', ending='*.gaps') -> list[Path]:
     """
-    Get the binaries written directly by liftof on the the
-    TOF CPU disks.
+    This allows to get binary data written by either liftof
+    ('.tof.gaps') files or through the caraspace library
+    ('.gaps'). 
+    In case of data written by liftof, this is the data written 
+    in flight on the TOF CPU disks.
+    For caraspace data, this is typically data merged after the 
+    fact.
 
     # Arguments:
         * run_id    : TOF run id, as e.g. stated in the e-log
@@ -66,9 +109,17 @@ def get_tof_binaries(run_id : int, data_dir='') -> list[Path]:
                       run in it
     """
     datapath = Path(data_dir) / f'{run_id}'
-    files    = [f for f in datapath.glob('*.tof.gaps')]
+    files    = [f for f in datapath.glob(ending)]
     files    = sorted(files, key=get_ts_from_toffile)
-    print(f'-> Found {len(files)} files for run {run_id}!')
+    t_start  = get_ts_from_toffile(files[0])
+    t_stop   = get_ts_from_toffile(files[-1])
+    if files:
+        print(f'-> Found {len(files)} files for run {run_id}!')
+        print(f'-> Found {len(files)} files within range of {t_start} - {t_stop}')
+        print(f'--> Earliest file {files[0]}')
+        print(f'--> Latest file {files[-1]}')
+    else:
+        print(f'! No files have been found within {t_start} and {t_stop}!')
     #pattern = re.compile('Run(?P<runid>[0-9]*)_(?P<subrunid>[0-9]*).(?P<timestamp>[0-9_])UTC.tof.gaps')
     return files
 
@@ -86,10 +137,11 @@ def get_telemetry_binaries(unix_time_start, unix_time_stop,\
     """
     # file format is something like RAW240712_094325.bin
     t_start = datetime.fromtimestamp(unix_time_start, UTC)
-    t_stop = datetime.fromtimestamp(unix_time_stop, UTC)
+    t_stop  = datetime.fromtimestamp(unix_time_stop, UTC)
     all_files = sorted([k for k in Path(f'{data_dir}').glob('*.bin')])
     print(f'-> Found {len(all_files)} files in {data_dir}')
     ts = [get_ts_from_binfile(f) for f in all_files]
+    # FiXME - this might throw away 1 file
     files = [f for f, ts in zip(all_files, ts) if t_start <= ts <= t_stop]
     ts = [get_ts_from_binfile(f) for f in files]
     print(f'-> Run duration {ts[-1] - ts[0]}')
@@ -101,6 +153,8 @@ def get_telemetry_binaries(unix_time_start, unix_time_stop,\
         print(f'! No files have been found within {t_start} and {t_stop}!')
     return files
 
+# if telemetry is available, we add additional
+# functionality
 if rt_import_success:
     def safe_unpack_merged_event(pack : TelemetryPacket):
         """
@@ -119,7 +173,7 @@ if rt_import_success:
         """
         if pack.header.packet_type != TelemetryPacketType.MergedEvent:
             return None
-        ev = rt.MergedEvent()
+        ev = rt.telemetry.MergedEvent()
         try:
             ev.from_telemetrypacket(pack)
         except Exception:

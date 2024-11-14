@@ -40,6 +40,48 @@ endif(BUILD_ROOTCOMPONENTS)
 option(BUILD_LIFTOFPYBINDINGS "build pybindings for a part of liftof (flight software)" OFF)
 option(BUILD_CXXBINDINGS "build C++ language bindings for the rust project tof-dataclasses to provide an API to interface with downstream C++ written analysis" OFF)
 if(BUILD_CXXBINDINGS)
+
+    ##set(CMAKE_CXX_EXTENSIONS OFF)
+    #set(CMAKE_CXX_MODULE_CACHE "${CMAKE_BINARY_DIR}/module_cache")
+    #message(STATUS "CMAKE_CXX_MODULE_CACHE: ${CMAKE_CXX_MODULE_CACHE}")
+    #add_library(caraspace SHARED)
+    #message(STATUS "Will build C++ caraspace serialization library!")
+    ## buld the caraspace sub-library
+    ## Enable modules for the C++ compiler
+    #target_compile_features(caraspace PRIVATE cxx_std_20)
+   
+    #set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API ON) 
+    ## Set module properties for the module interface
+    #set_target_properties(caraspace PROPERTIES
+    #  CXX_MODULES ON
+    #  CXX_MODULE_HEADER_UNITS ON
+    #)
+
+    #target_sources(caraspace
+    #                 PRIVATE
+    #                   dataclasses/C++/include/caraspace.ixx
+    #                   dataclasses/C++/src/caraspace.cxx)
+    #
+
+    ## For GCC, enable modules with the fmodules-ts flag
+    #if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    #  message(STATUS "-- found GNU/GCC compiler, enabling modules")  
+    #  target_compile_options(caraspace PRIVATE -fmodules-ts)
+    #endif()
+    #
+    ## For Clang, enable experimental modules support
+    #if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    #    target_compile_options(caraspace PRIVATE -std=c++20 -fmodules)
+    #endif()
+    #
+    ## For MSVC, set module-specific flags
+    #if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    #    target_compile_options(caraspace PRIVATE /std:c++20 /experimental:module)
+    #endif()
+  if (BUILD_CARASPACE)
+    add_definitions( -DBUILD_CARASPACE)
+  endif() 
+  
   set(GAPSTOF_LIBRARY_SHARED GapsTof CACHE INTERNAL "GapsTof shared library" FORCE)
   add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
       dataclasses/C++/src/tof_packet.cxx
@@ -53,6 +95,7 @@ if(BUILD_CXXBINDINGS)
       dataclasses/C++/src/legacy.cxx
       dataclasses/C++/src/logging.cxx
       dataclasses/C++/src/version.cxx
+      $<$<BOOL:${BUILD_CARASPACE}>:dataclasses/C++/src/caraspace.cxx>
       $<$<BOOL:${BUILD_CXXDB}>:dataclasses/C++/src/database.cxx>
   )
   

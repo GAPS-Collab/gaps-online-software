@@ -1,10 +1,16 @@
+//! MasterTriggerBoard python interface
+//!
+//!
+//!
+//!
+
+
 use std::collections::HashMap;
 
 use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
 
 extern crate pyo3_log;
-//use numpy::PyArray1;
 
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
@@ -17,6 +23,16 @@ use liftof_lib::master_trigger::registers::*;
 use liftof_lib::master_trigger as mt_api;
 
 use crate::PyMasterTriggerEvent;
+
+#[pyfunction]
+#[pyo3(name="prescale_to_u32")]
+/// Convert a prescale value in range from 0-1.0 to 
+/// an u32 value so that it can be written to the 
+/// MTB registers
+pub fn wrap_prescale_to_u32(prescale : f32) -> u32 {
+  let mut _prescale = prescale;
+  prescale_to_u32(prescale)
+}
 
 #[pyclass]
 #[pyo3(name = "MasterTrigger")]
@@ -75,8 +91,9 @@ impl PyMasterTrigger {
     self.ipbus.pid
   }
  
+  #[getter]
   /// Get the global trigger rate in Hz
-  fn get_rate(&mut self) -> PyResult<u32> {
+  fn rate(&mut self) -> PyResult<u32> {
     match TRIGGER_RATE.get(&mut self.ipbus) {
       Ok(rate) => {
         return Ok(rate);
@@ -86,12 +103,53 @@ impl PyMasterTrigger {
       }
     }
   }
+  
+  #[getter]
+  /// Get the lost global trigger rate in Hz
+  ///
+  /// This is the rate of triggers which got 
+  /// dropped due to TIU BUSY signal + those which 
+  /// get dropped due to the RBs being busy
+  fn lost_rate(&mut self) -> PyResult<u32> {
+    match LOST_TRIGGER_RATE.get(&mut self.ipbus) {
+      Ok(rate) => {
+        return Ok(rate);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  
+  #[getter]
+  /// The lost rate which occured due to RB busy timeouts
+  fn rb_lost_rate(&mut self) -> PyResult<u32> {
+    match RB_LOST_TRIGGER_RATE.get(&mut self.ipbus) {
+      Ok(rate) => {
+        return Ok(rate);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
 
+  /// The lost rate which occured due to the tracker BUSY signal
+  #[getter]
+  fn tiu_lost_rate(&mut self) -> PyResult<u32> {
+    match TIU_LOST_TRIGGER_RATE.get(&mut self.ipbus) {
+      Ok(rate) => {
+        return Ok(rate);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  #[getter]
   /// Check if the TIU emulation mode is on
   ///
-  /// # Arguments:
-  ///
-  /// * bus : IPBus 
   fn get_tiu_emulation_mode(&mut self) -> PyResult<u32> {
     match TIU_EMULATION_MODE.get(&mut self.ipbus) {
       Ok(mode) => {
@@ -102,7 +160,7 @@ impl PyMasterTrigger {
       }
     }
   }
-  
+ 
   fn set_tiu_emulation_mode(&mut self, value : u32) -> PyResult<()> {
     match TIU_EMULATION_MODE.set(&mut self.ipbus, value) {
       Ok(_) => {
@@ -405,20 +463,6 @@ fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
     }
   }
 
-  /// Get the lost global trigger rate in Hz
-  ///
-  /// This is the rate of triggers which got 
-  /// dropped due to TIU BUSY signal
-  fn get_lost_rate(&mut self) -> PyResult<u32> {
-    match LOST_TRIGGER_RATE.get(&mut self.ipbus) {
-      Ok(rate) => {
-        return Ok(rate);
-      }
-      Err(err) => {
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-    }
-  }
 
   fn get_ltb_links_ready(&mut self) -> PyResult<HashMap<u8, u32>> {
     let registers = [LT_LINK_READY0, LT_LINK_READY1,

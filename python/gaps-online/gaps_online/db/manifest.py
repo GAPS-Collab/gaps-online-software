@@ -27,13 +27,13 @@ def get_HG_for_LG(dsi, j, ch):
     p_end = p_ends[0]
     return p_end.rb_id, p_end.rb_ch
 
-def get_paddle(rb_id, rb_ch):
-    """
-    Get information about a specific paddle end for 
-    a RB ID/Channel
-    """
-    rbs = m.RB.object.filter(rb_id=rb_id)
-    return rbs.get_channel(rb_ch)
+#def get_paddle(rb_id, rb_ch):
+#    """
+#    Get information about a specific paddle end for 
+#    a RB ID/Channel
+#    """
+#    rbs = m.ReadoutBoard.objects.filter(rb_id=rb_id)
+#    return rbs.get_channel(rb_ch)
 
 def get_tof_paddles(panel_id=None):
     """

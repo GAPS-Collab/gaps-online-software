@@ -11,6 +11,9 @@ try:
     import django
     django.setup()
     from . import db
+    import os
+    os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = '1'
+
 except Exception as e:
     print(f"Can't load django environment, gaps_db will not be available. {e}")
 
@@ -29,9 +32,10 @@ try:
 except ImportError as e:
     print(f"Can't load RUST API! {e}")
 
-
+# FIXME
 from . import tof
 from . import io
 from . import events
+from . import run
 
 __version__ = "0.10"

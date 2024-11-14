@@ -18,7 +18,7 @@ use tof_dataclasses::io::read_file;
 use tof_dataclasses::serialization::{
   search_for_u16,
   Serialization,
-  parse_u16,
+  //parse_u16,
   parse_u32,
 };
 

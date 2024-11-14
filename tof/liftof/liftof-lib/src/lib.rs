@@ -85,9 +85,6 @@ use tof_dataclasses::database::ReadoutBoard;
 
 #[cfg(feature="database")]
 use tof_dataclasses::constants::NWORDS;
-//#[cfg(feature="database")]
-#[cfg(all(feature = "database", feature = "advanced-algorithms"))]
-use tof_dataclasses::calibrations::find_zero_crossings;
 #[cfg(feature="database")]
 use tof_dataclasses::errors::AnalysisError;
 use tof_dataclasses::errors::SetError;
@@ -382,9 +379,9 @@ impl fmt::Display for RunStatistics {
   }
 }
 
-//sydney's sine fit without libraries
 #[cfg(feature="database")]
-fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> (f32, f32, f32) {
+/// Sine fit without using external libraries
+pub fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> (f32, f32, f32) {
   let start_bin = 20;
   let size_bin = 900;
   let pi = PI;
@@ -565,12 +562,16 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     rb.calibration.nanoseconds(9,
                                event.header.stop_cell as usize,
                                &mut times);
-    let fit_result_amp      = fit_sine_sydney(&voltages,  &times).0; 
-    let fit_result_freq     = fit_sine_sydney(&voltages, &times).1;
-    let fit_result_phi      = fit_sine_sydney(&voltages, &times).2;
+    fit_result                = fit_sine_sydney(&voltages, &times);
+    //let fit_result_amp        = fit_result.0;
+    //let fit_result_freq       = fit_result.1;
+    //let fit_result_phi        = fit_result.2;
+    //let fit_result_amp      = fit_sine_sydney(&voltages,  &times).0; 
+    //let fit_result_freq     = fit_sine_sydney(&voltages, &times).1;
+    //let fit_result_phi      = fit_sine_sydney(&voltages, &times).2;
 
     //println!("FIT RESULT = {:?}", fit_result);
-    fit_result = (fit_result_amp, fit_result_freq, fit_result_phi);
+    //fit_result = (fit_result_amp, fit_result_freq, fit_result_phi);
     event.header.set_sine_fit(fit_result);
   }
 
@@ -635,8 +636,9 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                        settings.find_pks_thresh  ,
                        settings.max_peaks      ) {
         Err(err) => {
-          error!("Unable to find peaks for RB{:02} ch {ch}! Ignoring this channel!", rb.rb_id);
-          error!("We won't be able to calculate timing information for this channel! Err {err}");
+          // FIXME - if this happens, most likely the channel is dead. 
+          debug!("Unable to find peaks for RB{:02} ch {ch}! Ignoring this channel!", rb.rb_id);
+          debug!("We won't be able to calculate timing information for this channel! Err {err}");
         },
         Ok(peaks)  => {
           //peaks = pks;
@@ -654,9 +656,17 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                 cfd_times.push(cfd);
               }
             }
-            // just do the first peak for now
             let pk_height = voltages[pk.0..pk.1].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
-            max_volts = *pk_height; 
+            max_volts = *pk_height;
+            let max_index = voltages.iter().position(|element| *element == max_volts).unwrap();
+
+            let (start_q_int, stop_q_int) = if max_index - 40 < 10 {
+              (10, 210)
+            } else {
+              (max_index - 40, max_index + 160)
+            };
+          
+
             //debug!("Check impedance value! Just using 50 [Ohm]");
             // Step 3 : charge integration
             // FIXME - make impedance a settings parameter
@@ -664,8 +674,10 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                             &times,
                             //settings.integration_start,
                             //settings.integration_window,
-                            pk.0, 
-                            pk.1,
+                            //pk.0, 
+                            //pk.1,
+                            start_q_int,
+                            stop_q_int,
                             50.0) {
               Err(err) => {
                 error!("Integration failed! Err {err}");
@@ -674,6 +686,23 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                 charge = chrg;
               }
             }
+            // // just do the first peak for now
+            // let pk_height = voltages[pk.0..pk.1].iter().max_by(|a,b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less)).unwrap(); 
+            // max_volts = *pk_height; 
+            // //debug!("Check impedance value! Just using 50 [Ohm]");
+            // // Step 3 : charge integration
+            // // FIXME - make impedance a settings parameter
+            // match integrate(&voltages,
+            //                 &times,
+            //                 //settings.integration_start,
+            //                 //settings.integration_window,
+            //                 pk.0, 
+            //                 pk.1,
+            //                 50.0) {
+            //   Err(err) => {
+            //     error!("Integration failed! Err {err}");
+            //   }
+              
             break;
           }
         }// end OK

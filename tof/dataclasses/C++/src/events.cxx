@@ -4,6 +4,7 @@
 #include<limits>
 #include<bitset>
 #include<cmath>
+#include <sstream>
 
 #include "events.h"
 #include "parsers.h"
@@ -469,6 +470,46 @@ std::ostream& operator<<(std::ostream& os, const EventStatus& qual) {
      }
      case EventStatus::Perfect : { 
        os << "Perfect>";
+       break;
+     }
+     case EventStatus::ChannelIDWrong : { 
+       os << "ChannelIDWrong>";
+       break;
+     }
+     case EventStatus::CellSyncErrors : {
+       os << "CellSyncErrors>";
+       break;
+     }
+     case EventStatus::ChnSyncErrors  : {
+       os << "ChnSyncErrors>";
+       break;
+     }
+     case EventStatus::CellAndChnSyncErrors : {
+       os << "CellAndChnSyncErrors>";
+       break;
+     }
+     case EventStatus::AnyDataMangling : {
+       os << "AnyDataMangling>";
+       break;
+     }
+     case EventStatus::IncompatibleData : {
+       os << "IncompleteData>";
+       break;
+     }
+     case EventStatus::EventTimeOut   : {
+       os << "EventTimeOut>";
+       break;
+     }
+     case EventStatus::GoodNoCRCOrErrBitCheck : {
+       os << "GoodNoCRCOrErrBitCheck>";
+       break;
+     }
+     case EventStatus::GoodNoCRCCheck : {
+       os << "GoodNoCRCCheck>";
+       break;
+     }
+     case EventStatus::GoodNoErrBitCheck : {
+       os << "GoodNoErrBitCheck>";
        break;
      }
    }
@@ -1030,9 +1071,9 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
    hit.charge_min_i  = Gaps::parse_u16(bytestream, pos); 
    hit.baseline_a    = Gaps::parse_f16(bytestream, pos);
    hit.baseline_a_rms = Gaps::parse_f16(bytestream, pos);
-   hit.phase         = Gaps::parse_f16(bytestream, pos);
+   hit.phase          = Gaps::parse_f16(bytestream, pos);
    pos += 1; // skip version
-   hit.baseline_b    = Gaps::parse_f16(bytestream, pos);
+   hit.baseline_b     = Gaps::parse_f16(bytestream, pos);
    hit.baseline_b_rms = Gaps::parse_f16(bytestream, pos);
    //hit.baseline         = Gaps::parse_u16(bytestream, pos); 
    //hit.t_average     = Gaps::parse_u16(bytestream, pos); 
@@ -1225,7 +1266,7 @@ TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream,
     //return Err(SerializationError::HeadInvalid);
   }
   u8 status_version_u8  = Gaps::parse_u8(stream, pos);
-  tes.status            = status_version_u8 & 0x3f;
+  tes.status            = static_cast<EventStatus>(status_version_u8 & 0x3f);
   tes.version           = (Gaps::ProtocolVersion)(status_version_u8 & 0xc0);
   tes.trigger_sources   = Gaps::parse_u16(stream, pos);
   tes.n_trigger_paddles = Gaps::parse_u8(stream, pos);
@@ -1266,9 +1307,12 @@ u64 TofEventSummary::get_timestamp48() const {
 }
 
 std::string TofEventSummary::to_string() const {
+  std::ostringstream oss;
+  oss << status;  // Use the << operator to stream the enum
+    
   std::string repr = "<TofEventSummary";
   //repr += std::format("\n  format test {:.2f}", get_time_a() );
-  repr += std::format("\n  Status             : {}", status);
+  repr += std::format("\n  Status             : {}", oss.str());
   repr += std::format("\n  Quality            : {}", quality);
   repr += std::format("\n  Trigger Sources    : {}", trigger_sources);
   repr += std::format("\n  N trig paddles     : {}", n_trigger_paddles);

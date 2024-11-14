@@ -311,19 +311,19 @@ pub struct RBSettings {
   /// Don't send events if they have issues. Requires
   /// EventStatus::Perfect. This can not work in the
   /// OperationMode RBHighThroughput
-  pub only_perfect_events : bool,
+  pub only_perfect_events           : bool,
   /// Calculate the crc32 sum for each channel and set
   /// the EventStatus flag accordingly.
-  pub calc_crc32          : bool,
+  pub calc_crc32                    : bool,
   /// tof operation mode - either "StreamAny",
   /// "RequestReply" or "RBHighThroughput"
-  pub tof_op_mode         : TofOperationMode,
+  pub tof_op_mode                   : TofOperationMode,
   /// if different from 0, activate RB self trigger
   /// in poisson mode
-  pub trigger_poisson_rate    : u32,
+  pub trigger_poisson_rate          : u32,
   /// if different from 0, activate RB self trigger 
   /// with fixed rate setting
-  pub trigger_fixed_rate      : u32,
+  pub trigger_fixed_rate            : u32,
   ///// if different from 0, activate RB self trigger
   ///// in poisson mode
   //pub trigger_poisson_rate    : u32,
@@ -333,7 +333,7 @@ pub struct RBSettings {
   /// Either "Physics" or a calibration related 
   /// data type, e.g. "VoltageCalibration".
   /// <div class="warning">This might get deprecated in a future version!</div>
-  pub data_type               : DataType,
+  pub data_type                     : DataType,
   /// This allows for different strategies on how to readout 
   /// the RB buffers. The following refers to the NEvent strategy.
   /// The value when the readout of the RB buffers is triggered.
@@ -344,32 +344,35 @@ pub struct RBSettings {
   /// For RBBufferStrategy::AdaptToRate(k), readout (and switch) the buffers every
   /// k seconds. The size of the buffer will be determined
   /// automatically depending on the rate.
-  pub rb_buff_strategy        : RBBufferStrategy,
+  pub rb_buff_strategy               : RBBufferStrategy,
   /// The general moni interval. Whenever this time in seconds has
   /// passed, the RB will send a RBMoniData packet
-  pub rb_moni_interval        : f32,
+  pub rb_moni_interval               : f32,
   /// Powerboard monitoring. Do it every multiple of rb_moni_interval
-  pub pb_moni_every_x         : f32,
+  pub pb_moni_every_x                : f32,
   /// Preamp monitoring. Do it every multiple of rb_moni_interval
-  pub pa_moni_every_x         : f32,
+  pub pa_moni_every_x                : f32,
   /// LTB monitoring. Do it every multiple of rb_moni_interval
-  pub ltb_moni_every_x        : f32,
+  pub ltb_moni_every_x               : f32,
+  /// Choose between drs deadtime or fpga 
+  pub drs_deadtime_instead_fpga_temp : bool
 }
 
 impl RBSettings {
   pub fn new() -> Self {
     Self {
-      only_perfect_events  : false,
-      calc_crc32           : false,
-      tof_op_mode          : TofOperationMode::Default,
-      trigger_fixed_rate   : 0,
-      trigger_poisson_rate : 0,
-      data_type            : DataType::Physics,
-      rb_buff_strategy     : RBBufferStrategy::AdaptToRate(5),
-      rb_moni_interval     : 0.0,
-      pb_moni_every_x      : 0.0,
-      pa_moni_every_x      : 0.0,
-      ltb_moni_every_x     : 0.0,
+      only_perfect_events            : false,
+      calc_crc32                     : false,
+      tof_op_mode                    : TofOperationMode::Default,
+      trigger_fixed_rate             : 0,
+      trigger_poisson_rate           : 0,
+      data_type                      : DataType::Physics,
+      rb_buff_strategy               : RBBufferStrategy::AdaptToRate(5),
+      rb_moni_interval               : 0.0,
+      pb_moni_every_x                : 0.0,
+      pa_moni_every_x                : 0.0,
+      ltb_moni_every_x               : 0.0,
+      drs_deadtime_instead_fpga_temp : false
     }
   }
 

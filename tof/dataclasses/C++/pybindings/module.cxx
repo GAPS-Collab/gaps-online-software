@@ -12,6 +12,9 @@
 #include "packets/monitoring.h"
 #include "events/tof_event_header.hpp"
 #include "version.h"
+#ifdef BUILD_CARASPACE
+#include "caraspace.hpp"
+#endif 
 
 #ifdef BUILD_CXXDB
 #include "database.h"
@@ -120,6 +123,33 @@ PYBIND11_MODULE(gaps_tof, m) {
     ;
     #endif
 
+    #ifdef BUILD_CARASPACE
+    py::class_<Gaps::CRFrame>(m, "CRFrame")
+      .def(py::init())
+      .def("__repr__",        [](const Gaps::CRFrame &f) {
+                                   return f.to_string();
+                                 })
+    ;
+    py::class_<Gaps::CRReader>(m, "CRReader")
+      .def(py::init<String>(), py::return_value_policy::take_ownership)  
+      .def("get_next_frame", &Gaps::CRReader::get_next_frame,
+              "iterate over the frame and get the next frame from the file",
+              py::return_value_policy::take_ownership)
+      .def_property_readonly("n_packets_read", &Gaps::CRReader::n_packets_read,
+                    "The number of TOF packets already read from the file")
+      .def_property_readonly("exhausted", &Gaps::CRReader::is_exhausted,
+                    "Indicates if the reader is exhausted and needs to be recreated") 
+      .def("__repr__", [](const Gaps::CRReader &reader) {
+                          if (reader.is_exhausted()) {
+                            return "<CRReader [exhausted!!] : " + reader.get_filename() + " - read " + 
+                            std::to_string(reader.n_packets_read()) +
+                            " CRFrames>";
+                          }
+                          return "<CRFrame : " + 
+                          reader.get_filename() + " - read " + std::to_string(reader.n_packets_read()) + " CRFrames>";
+                          })
+    ;
+    #endif
 
 
     py::class_<Gaps::TofPacketReader>(m, "TofPacketReader") 
