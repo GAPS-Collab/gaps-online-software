@@ -1,5 +1,9 @@
-(function() {var implementors = {
-"crossterm":[["impl PublicFlags for <a class=\"struct\" href=\"crossterm/event/struct.KeyEventState.html\" title=\"struct crossterm::event::KeyEventState\">KeyEventState</a>"],["impl PublicFlags for <a class=\"struct\" href=\"crossterm/event/struct.KeyModifiers.html\" title=\"struct crossterm::event::KeyModifiers\">KeyModifiers</a>"],["impl PublicFlags for <a class=\"struct\" href=\"crossterm/event/struct.KeyboardEnhancementFlags.html\" title=\"struct crossterm::event::KeyboardEnhancementFlags\">KeyboardEnhancementFlags</a>"]],
-"font_kit":[["impl PublicFlags for <a class=\"struct\" href=\"font_kit/outline/struct.PointFlags.html\" title=\"struct font_kit::outline::PointFlags\">PointFlags</a>"]],
-"ratatui":[["impl PublicFlags for <a class=\"struct\" href=\"ratatui/style/struct.Modifier.html\" title=\"struct ratatui::style::Modifier\">Modifier</a>"],["impl PublicFlags for <a class=\"struct\" href=\"ratatui/widgets/struct.Borders.html\" title=\"struct ratatui::widgets::Borders\">Borders</a>"]]
-};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {
+    var implementors = Object.fromEntries([["crossterm",[["impl PublicFlags for <a class=\"struct\" href=\"crossterm/event/struct.KeyEventState.html\" title=\"struct crossterm::event::KeyEventState\">KeyEventState</a>"],["impl PublicFlags for <a class=\"struct\" href=\"crossterm/event/struct.KeyModifiers.html\" title=\"struct crossterm::event::KeyModifiers\">KeyModifiers</a>"],["impl PublicFlags for <a class=\"struct\" href=\"crossterm/event/struct.KeyboardEnhancementFlags.html\" title=\"struct crossterm::event::KeyboardEnhancementFlags\">KeyboardEnhancementFlags</a>"]]],["font_kit",[["impl PublicFlags for <a class=\"struct\" href=\"font_kit/outline/struct.PointFlags.html\" title=\"struct font_kit::outline::PointFlags\">PointFlags</a>"]]],["ratatui",[["impl PublicFlags for <a class=\"struct\" href=\"ratatui/style/struct.Modifier.html\" title=\"struct ratatui::style::Modifier\">Modifier</a>"],["impl PublicFlags for <a class=\"struct\" href=\"ratatui/widgets/struct.Borders.html\" title=\"struct ratatui::widgets::Borders\">Borders</a>"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[534,171,303]}

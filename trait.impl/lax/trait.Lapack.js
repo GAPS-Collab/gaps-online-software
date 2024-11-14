@@ -1,4 +1,9 @@
-(function() {var implementors = {
-"lax":[],
-"ndarray_linalg":[]
-};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {
+    var implementors = Object.fromEntries([["lax",[]],["ndarray_linalg",[]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[10,22]}

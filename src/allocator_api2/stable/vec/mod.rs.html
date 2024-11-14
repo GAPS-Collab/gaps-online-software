@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/allocator-api2-0.2.18/src/stable/vec/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="allocator_api2" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/allocator-api2-0.2.20/src/stable/vec/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="allocator_api2" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -3230,62 +3230,6 @@
 <a href="#3230" id="3230">3230</a>
 <a href="#3231" id="3231">3231</a>
 <a href="#3232" id="3232">3232</a>
-<a href="#3233" id="3233">3233</a>
-<a href="#3234" id="3234">3234</a>
-<a href="#3235" id="3235">3235</a>
-<a href="#3236" id="3236">3236</a>
-<a href="#3237" id="3237">3237</a>
-<a href="#3238" id="3238">3238</a>
-<a href="#3239" id="3239">3239</a>
-<a href="#3240" id="3240">3240</a>
-<a href="#3241" id="3241">3241</a>
-<a href="#3242" id="3242">3242</a>
-<a href="#3243" id="3243">3243</a>
-<a href="#3244" id="3244">3244</a>
-<a href="#3245" id="3245">3245</a>
-<a href="#3246" id="3246">3246</a>
-<a href="#3247" id="3247">3247</a>
-<a href="#3248" id="3248">3248</a>
-<a href="#3249" id="3249">3249</a>
-<a href="#3250" id="3250">3250</a>
-<a href="#3251" id="3251">3251</a>
-<a href="#3252" id="3252">3252</a>
-<a href="#3253" id="3253">3253</a>
-<a href="#3254" id="3254">3254</a>
-<a href="#3255" id="3255">3255</a>
-<a href="#3256" id="3256">3256</a>
-<a href="#3257" id="3257">3257</a>
-<a href="#3258" id="3258">3258</a>
-<a href="#3259" id="3259">3259</a>
-<a href="#3260" id="3260">3260</a>
-<a href="#3261" id="3261">3261</a>
-<a href="#3262" id="3262">3262</a>
-<a href="#3263" id="3263">3263</a>
-<a href="#3264" id="3264">3264</a>
-<a href="#3265" id="3265">3265</a>
-<a href="#3266" id="3266">3266</a>
-<a href="#3267" id="3267">3267</a>
-<a href="#3268" id="3268">3268</a>
-<a href="#3269" id="3269">3269</a>
-<a href="#3270" id="3270">3270</a>
-<a href="#3271" id="3271">3271</a>
-<a href="#3272" id="3272">3272</a>
-<a href="#3273" id="3273">3273</a>
-<a href="#3274" id="3274">3274</a>
-<a href="#3275" id="3275">3275</a>
-<a href="#3276" id="3276">3276</a>
-<a href="#3277" id="3277">3277</a>
-<a href="#3278" id="3278">3278</a>
-<a href="#3279" id="3279">3279</a>
-<a href="#3280" id="3280">3280</a>
-<a href="#3281" id="3281">3281</a>
-<a href="#3282" id="3282">3282</a>
-<a href="#3283" id="3283">3283</a>
-<a href="#3284" id="3284">3284</a>
-<a href="#3285" id="3285">3285</a>
-<a href="#3286" id="3286">3286</a>
-<a href="#3287" id="3287">3287</a>
-<a href="#3288" id="3288">3288</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A contiguous growable array type with heap-allocated contents, written
 //! `Vec&lt;T&gt;`.
 //!
@@ -3351,7 +3295,7 @@
 </span><span class="kw">use </span>core::iter::FromIterator;
 <span class="kw">use </span>core::marker::PhantomData;
 <span class="kw">use </span>core::mem::{<span class="self">self</span>, size_of, ManuallyDrop, MaybeUninit};
-<span class="kw">use </span>core::ops::{<span class="self">self</span>, Bound, Index, IndexMut, Range, RangeBounds};
+<span class="kw">use </span>core::ops::{<span class="self">self</span>, Bound, Index, IndexMut, RangeBounds};
 <span class="kw">use </span>core::ptr::{<span class="self">self</span>, NonNull};
 <span class="kw">use </span>core::slice::{<span class="self">self</span>, SliceIndex};
 
@@ -4188,7 +4132,7 @@
     /// # Examples
     ///
     /// ```
-    /// use std::collections::TryReserveError;
+    /// use allocator_api2::collections::TryReserveError;
     ///
     /// fn process_data(data: &amp;[u32]) -&gt; Result&lt;Vec&lt;u32&gt;, TryReserveError&gt; {
     ///     let mut output = Vec::new();
@@ -4231,7 +4175,7 @@
     /// # Examples
     ///
     /// ```
-    /// use std::collections::TryReserveError;
+    /// use allocator_api2::collections::TryReserveError;
     ///
     /// fn process_data(data: &amp;[u32]) -&gt; Result&lt;Vec&lt;u32&gt;, TryReserveError&gt; {
     ///     let mut output = Vec::new();
@@ -4337,7 +4281,7 @@
             <span class="kw">let </span>me = ManuallyDrop::new(<span class="self">self</span>);
             <span class="kw">let </span>buf = ptr::read(<span class="kw-2">&amp;</span>me.buf);
             <span class="kw">let </span>len = me.len();
-            buf.into_box(len).assume_init()
+            Box::&lt;[mem::MaybeUninit&lt;T&gt;], A&gt;::assume_init(buf.into_box(len))
         }
     }
 
@@ -5830,62 +5774,6 @@
     </span><span class="attr">#[inline(always)]
     </span><span class="kw">pub fn </span>dedup(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.dedup_by(|a, b| a == b)
-    }
-}
-
-<span class="kw">trait </span>ExtendFromWithinSpec {
-    <span class="doccomment">/// # Safety
-    ///
-    /// - `src` needs to be valid index
-    /// - `self.capacity() - self.len()` must be `&gt;= src.len()`
-    </span><span class="kw">unsafe fn </span>spec_extend_from_within(<span class="kw-2">&amp;mut </span><span class="self">self</span>, src: Range&lt;usize&gt;);
-}
-
-<span class="comment">// impl&lt;T: Clone, A: Allocator&gt; ExtendFromWithinSpec for Vec&lt;T, A&gt; {
-//     default unsafe fn spec_extend_from_within(&amp;mut self, src: Range&lt;usize&gt;) {
-//         // SAFETY:
-//         // - len is increased only after initializing elements
-//         let (this, spare, len) = unsafe { self.split_at_spare_mut_with_len() };
-
-//         // SAFETY:
-//         // - caller guarantees that src is a valid index
-//         let to_clone = unsafe { this.get_unchecked(src) };
-
-//         iter::zip(to_clone, spare)
-//             .map(|(src, dst)| dst.write(src.clone()))
-//             // Note:
-//             // - Element was just initialized with `MaybeUninit::write`, so it's ok to increase len
-//             // - len is increased after each element to prevent leaks (see issue #82533)
-//             .for_each(|_| *len += 1);
-//     }
-// }
-
-</span><span class="kw">impl</span>&lt;T: Copy, A: Allocator&gt; ExtendFromWithinSpec <span class="kw">for </span>Vec&lt;T, A&gt; {
-    <span class="attr">#[inline(always)]
-    </span><span class="kw">unsafe fn </span>spec_extend_from_within(<span class="kw-2">&amp;mut </span><span class="self">self</span>, src: Range&lt;usize&gt;) {
-        <span class="kw">let </span>count = src.len();
-        {
-            <span class="kw">let </span>(init, spare) = <span class="self">self</span>.split_at_spare_mut();
-
-            <span class="comment">// SAFETY:
-            // - caller guarantees that `src` is a valid index
-            </span><span class="kw">let </span>source = <span class="kw">unsafe </span>{ init.get_unchecked(src) };
-
-            <span class="comment">// SAFETY:
-            // - Both pointers are created from unique slice references (`&amp;mut [_]`)
-            //   so they are valid and do not overlap.
-            // - Elements are :Copy so it's OK to copy them, without doing
-            //   anything with the original values
-            // - `count` is equal to the len of `source`, so source is valid for
-            //   `count` reads
-            // - `.reserve(count)` guarantees that `spare.len() &gt;= count` so spare
-            //   is valid for `count` writes
-            </span><span class="kw">unsafe </span>{ ptr::copy_nonoverlapping(source.as_ptr(), spare.as_mut_ptr() <span class="kw">as _</span>, count) };
-        }
-
-        <span class="comment">// SAFETY:
-        // - The elements were just initialized by `copy_nonoverlapping`
-        </span><span class="self">self</span>.len += count;
     }
 }
 

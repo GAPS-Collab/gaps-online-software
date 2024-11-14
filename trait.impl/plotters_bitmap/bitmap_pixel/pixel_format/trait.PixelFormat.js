@@ -1,4 +1,9 @@
-(function() {var implementors = {
-"plotters":[],
-"plotters_bitmap":[]
-};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {
+    var implementors = Object.fromEntries([["plotters",[]],["plotters_bitmap",[]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[15,23]}

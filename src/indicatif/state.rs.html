@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.8/src/state.rs`."><title>state.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0 (eeb90cda1 2024-09-04)" data-channel="1.81.0" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.9/src/state.rs`."><title>state.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -800,6 +800,22 @@
 <a href="#800" id="800">800</a>
 <a href="#801" id="801">801</a>
 <a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::io;
 <span class="kw">use </span>std::sync::Arc;
@@ -807,9 +823,9 @@
 <span class="attr">#[cfg(not(target_arch = <span class="string">"wasm32"</span>))]
 </span><span class="kw">use </span>std::time::Instant;
 
-<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
-</span><span class="kw">use </span>instant::Instant;
 <span class="kw">use </span>portable_atomic::{AtomicU64, AtomicU8, Ordering};
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
+</span><span class="kw">use </span>web_time::Instant;
 
 <span class="kw">use </span><span class="kw">crate</span>::draw_target::ProgressDrawTarget;
 <span class="kw">use </span><span class="kw">crate</span>::style::ProgressStyle;
@@ -896,6 +912,11 @@
         <span class="kw">if </span>tick {
             <span class="self">self</span>.tick(now);
         }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>unset_length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, now: Instant) {
+        <span class="self">self</span>.state.len = <span class="prelude-val">None</span>;
+        <span class="self">self</span>.update_estimate_and_draw(now);
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, now: Instant, len: u64) {
@@ -1339,7 +1360,7 @@
         }
 
         <span class="kw">let </span><span class="kw-2">mut </span>capacity = <span class="self">self</span>.capacity.load(Ordering::Acquire);
-        <span class="comment">// `prev` is the number of ms after `self.started` we last returned `true`, in ns
+        <span class="comment">// `prev` is the number of ns after `self.started` we last returned `true`
         </span><span class="kw">let </span>prev = <span class="self">self</span>.prev.load(Ordering::Acquire);
         <span class="comment">// `elapsed` is the number of ns since `self.started`
         </span><span class="kw">let </span>elapsed = (now - <span class="self">self</span>.start).as_nanos() <span class="kw">as </span>u64;
@@ -1353,10 +1374,10 @@
             <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="comment">// We now calculate `new`, the number of ms, in ns, since we last returned `true`,
-        // and `remainder`, which represents a number of ns less than 1ms which we cannot
+        <span class="comment">// We now calculate `new`, the number of INTERVALs since we last returned `true`,
+        // and `remainder`, which represents a number of ns less than INTERVAL which we cannot
         // convert into capacity now, so we're saving it for later. We do this by
-        // substracting this from `elapsed` before storing it into `self.prev`.
+        // subtracting this from `elapsed` before storing it into `self.prev`.
         </span><span class="kw">let </span>(new, remainder) = ((diff / INTERVAL), (diff % INTERVAL));
         <span class="comment">// We add `new` to `capacity`, subtract one for returning `true` from here,
         // then make sure it does not exceed a maximum of `MAX_BURST`.
@@ -1370,7 +1391,7 @@
 
     <span class="kw">fn </span>reset(<span class="kw-2">&amp;</span><span class="self">self</span>, now: Instant) {
         <span class="self">self</span>.set(<span class="number">0</span>);
-        <span class="kw">let </span>elapsed = (now.saturating_duration_since(<span class="self">self</span>.start)).as_millis() <span class="kw">as </span>u64;
+        <span class="kw">let </span>elapsed = (now.saturating_duration_since(<span class="self">self</span>.start)).as_nanos() <span class="kw">as </span>u64;
         <span class="self">self</span>.prev.store(elapsed, Ordering::Release);
     }
 
@@ -1600,6 +1621,17 @@
         <span class="kw">let </span>later = atomic_position.start + Duration::from_nanos(INTERVAL * u64::from(u8::MAX));
         <span class="comment">// Should not panic.
         </span>atomic_position.allow(later);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_atomic_position_reset() {
+        <span class="kw">const </span>ELAPSE_TIME: Duration = Duration::from_millis(<span class="number">20</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>pos = AtomicPosition::new();
+        pos.reset(pos.start + ELAPSE_TIME);
+
+        <span class="comment">// prev should be exactly ELAPSE_TIME after reset
+        </span><span class="macro">assert_eq!</span>(<span class="kw-2">*</span>pos.pos.get_mut(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>pos.prev.get_mut(), ELAPSE_TIME.as_nanos() <span class="kw">as </span>u64);
     }
 }
 </code></pre></div></section></main></body></html>

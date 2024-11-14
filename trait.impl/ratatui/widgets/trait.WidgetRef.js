@@ -1,4 +1,9 @@
-(function() {var implementors = {
-"ratatui":[],
-"tui_popup":[["impl&lt;W: <a class=\"trait\" href=\"ratatui/widgets/trait.WidgetRef.html\" title=\"trait ratatui::widgets::WidgetRef\">WidgetRef</a> + <a class=\"trait\" href=\"https://doc.rust-lang.org/1.81.0/core/fmt/trait.Debug.html\" title=\"trait core::fmt::Debug\">Debug</a>&gt; <a class=\"trait\" href=\"ratatui/widgets/trait.WidgetRef.html\" title=\"trait ratatui::widgets::WidgetRef\">WidgetRef</a> for <a class=\"struct\" href=\"tui_popup/struct.SizedWrapper.html\" title=\"struct tui_popup::SizedWrapper\">SizedWrapper</a>&lt;W&gt;"],["impl&lt;W: <a class=\"trait\" href=\"tui_popup/trait.SizedWidgetRef.html\" title=\"trait tui_popup::SizedWidgetRef\">SizedWidgetRef</a>&gt; <a class=\"trait\" href=\"ratatui/widgets/trait.WidgetRef.html\" title=\"trait ratatui::widgets::WidgetRef\">WidgetRef</a> for <a class=\"struct\" href=\"tui_popup/struct.Popup.html\" title=\"struct tui_popup::Popup\">Popup</a>&lt;'_, W&gt;"]]
-};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {
+    var implementors = Object.fromEntries([["ratatui",[]],["tui_popup",[["impl&lt;W: <a class=\"trait\" href=\"ratatui/widgets/trait.WidgetRef.html\" title=\"trait ratatui::widgets::WidgetRef\">WidgetRef</a> + <a class=\"trait\" href=\"https://doc.rust-lang.org/1.82.0/core/fmt/trait.Debug.html\" title=\"trait core::fmt::Debug\">Debug</a>&gt; <a class=\"trait\" href=\"ratatui/widgets/trait.WidgetRef.html\" title=\"trait ratatui::widgets::WidgetRef\">WidgetRef</a> for <a class=\"struct\" href=\"tui_popup/struct.SizedWrapper.html\" title=\"struct tui_popup::SizedWrapper\">SizedWrapper</a>&lt;W&gt;"],["impl&lt;W: <a class=\"trait\" href=\"tui_popup/trait.SizedWidgetRef.html\" title=\"trait tui_popup::SizedWidgetRef\">SizedWidgetRef</a>&gt; <a class=\"trait\" href=\"ratatui/widgets/trait.WidgetRef.html\" title=\"trait ratatui::widgets::WidgetRef\">WidgetRef</a> for <a class=\"struct\" href=\"tui_popup/struct.Popup.html\" title=\"struct tui_popup::Popup\">Popup</a>&lt;'_, W&gt;"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[14,933]}
