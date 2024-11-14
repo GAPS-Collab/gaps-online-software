@@ -14,13 +14,15 @@ import re
 import shutil
 from pathlib import Path
 from datetime import datetime
-import glob
+from glob import glob
 import charmingbeauty as cb
 import charmingbeauty.layout as lo
 
 cb.visual.set_style_present()
 import dashi as d
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import tqdm
 
@@ -133,12 +135,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-
+    print(go.__file__)
     # read in calibration data
     # cali = go.tof.calibrations.load_calibrations_rapi(args.calibration)
     pattern = re.compile(r'RB(\d+)_\d{6}_\d{6}UTC\.cali\.tof\.gaps')
     calibrations = glob(f'{args.calibration}/*.cali.tof.gaps')
-
     calib = {}
 
     for fname in calibrations:
@@ -194,9 +195,9 @@ if __name__ == '__main__':
     nhit_distr  = []
 
     for f in runfiles:
-        event_reader = go.rust_api.io.TofPacketReader(f, filter=go.rust_api.io.PacketType.TofEvent)
+        event_reader = go.io.TofPacketReader(str(f), filter=go.io.TofPacketType.TofEvent)
         print('-> Creating packet index...')
-        pi = event_reader.get_packet_index()
+        pi = event_reader.packet_index
         print ('--- ---')
         for k in pi:
             print (f'  {k}\t : {pi[k]}')
@@ -212,7 +213,9 @@ if __name__ == '__main__':
             status = ev.mastertriggerevent.status
             event_status.append(status)
             for wf in ev.waveforms:
-                wf.calibrate(calib[wf.rb_id])
+               #print("rbid:" + str(wf.rb_id))
+                rbid = int(wf.rb_id)
+                wf.calibrate(calib[rbid])
                 nwfs_cali += 1
                 if wf.rb_channel == 8:
                     continue
