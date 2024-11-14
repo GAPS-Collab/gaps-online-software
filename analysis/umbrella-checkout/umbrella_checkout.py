@@ -14,7 +14,7 @@ import re
 import shutil
 from pathlib import Path
 from datetime import datetime
-
+import glob
 import charmingbeauty as cb
 import charmingbeauty.layout as lo
 
@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import tqdm
 
 import gaps_online as go
+import go_pybindings as gop 
 
 d.visual()
 
@@ -134,7 +135,21 @@ if __name__ == '__main__':
 
 
     # read in calibration data
-    cali = go.tof.calibrations.load_calibrations_rapi(args.calibration)
+    # cali = go.tof.calibrations.load_calibrations_rapi(args.calibration)
+    pattern = re.compile(r'RB(\d+)_\d{6}_\d{6}UTC\.cali\.tof\.gaps')
+    calibrations = glob(f'{args.calibration}/*.cali.tof.gaps')
+
+    calib = {}
+
+    for fname in calibrations:
+        match = pattern.search(fname)
+        if match:
+            rbid = match.group(1)
+            cali = gop.events.RBCalibration()
+            cali.from_file(fname)  # Modify the instance
+            calib[int(rbid)] = cali      # Store the modified instance
+        else:
+            print("No match found for:", fname)
     if os.path.isfile(args.rundir):
         runfiles = [args.rundir]
     else:
@@ -191,13 +206,13 @@ if __name__ == '__main__':
         rbmoni       = rbmoni.from_file(f)
         print(rbmoni)
         for pack in tqdm.tqdm(event_reader, desc='Reading packets', total = pi[21]):
-            ev = go.rust_api.events.TofEvent()
+            ev = go.events.TofEvent()
             ev.from_tofpacket(pack)
             nevents_tot += 1
-            for rbev in ev.rbevents:
-                event_status.append(rbev.header.status_byte)
+            status = ev.mastertriggerevent.status
+            event_status.append(status)
             for wf in ev.waveforms:
-                wf.calibrate(cali[wf.rb_id])
+                wf.calibrate(calib[wf.rb_id])
                 nwfs_cali += 1
                 if wf.rb_channel == 8:
                     continue
