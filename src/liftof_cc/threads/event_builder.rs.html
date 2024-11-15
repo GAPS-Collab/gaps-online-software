@@ -1281,10 +1281,10 @@
             // event has isuses
             </span>n_rbe_per_te  += ev_to_send.rb_events.len();
             heartbeat.data_mangled_ev = <span class="number">0</span>;
-            <span class="kw">let </span>_ev_status  = ev_to_send.mt_event.event_status;
+            <span class="kw">let </span><span class="kw-2">mut </span>ev_status  = ev_to_send.mt_event.event_status;
             <span class="kw">for </span>ev <span class="kw">in </span><span class="kw-2">&amp;</span>ev_to_send.rb_events {
               <span class="kw">if </span>ev.status == EventStatus::CellSyncErrors || ev.status == EventStatus::ChnSyncErrors {
-                ev_to_send.mt_event.event_status = EventStatus::AnyDataMangling {
+                ev_status = EventStatus::AnyDataMangling {
                 };
                 heartbeat.data_mangled_ev += <span class="number">1</span>;
               }

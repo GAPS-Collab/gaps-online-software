@@ -1,5 +1,6 @@
 var NAVTREEINDEX0 =
 {
+"":[1,0,1],
 "CommandPacket_8h_source.html":[3,0,0,0,0,0,1,0],
 "annotated.html":[2,0],
 "calibration_8h_source.html":[3,0,0,0,0,0,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "structRBEventHeader.html#a79b8dafe9479549fb52338e9e23eba8c":[2,0,12,5],
 "structRBEventHeader.html#a824de6e619d8ccb6fa71fa7a73d4017b":[2,0,12,8],
 "structRBEventHeader.html#a83dfb3ab40a6ca3fca361300cb2c13b6":[2,0,12,17],
-"structRBEventHeader.html#a8ed52a1f69611dc57a9cb831ba6becb8":[2,0,12,24],
-"structRBEventHeader.html#a926db438fb32917b80b17485d7f0f011":[2,0,12,16]
+"structRBEventHeader.html#a8ed52a1f69611dc57a9cb831ba6becb8":[2,0,12,24]
 };
