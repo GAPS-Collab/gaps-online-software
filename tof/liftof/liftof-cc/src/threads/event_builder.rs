@@ -609,10 +609,10 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             // event has isuses
             n_rbe_per_te  += ev_to_send.rb_events.len();
             heartbeat.data_mangled_ev = 0;
-            let _ev_status  = ev_to_send.mt_event.event_status;
+            let mut ev_status  = ev_to_send.mt_event.event_status;
             for ev in &ev_to_send.rb_events {
               if ev.status == EventStatus::CellSyncErrors || ev.status == EventStatus::ChnSyncErrors {
-                ev_to_send.mt_event.event_status = EventStatus::AnyDataMangling {
+                ev_status = EventStatus::AnyDataMangling {
                 };
                 heartbeat.data_mangled_ev += 1;
               }
