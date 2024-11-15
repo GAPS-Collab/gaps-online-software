@@ -28,6 +28,7 @@ use schema::tof_db_dsicard::dsl::*;
 use crate::calibrations::RBCalibrations;
 //use crate::constants::HUMAN_TIMESTAMP_FORMAT;
 use crate::DsiLtbRBMapping;
+pub use crate::RbChPidMapping;
 
 // FIXME - probably we should make this nicer
 pub type DsiJChPidMapping = DsiLtbRBMapping; 
@@ -82,6 +83,27 @@ pub fn get_dsi_j_ch_pid_map(paddles : &Vec<Paddle>) -> DsiJChPidMapping {
     mapping.get_mut(&dsi).unwrap().get_mut(&j).unwrap().insert(ch_b,(pid, panel_id));
   }
   return mapping;
+}
+
+pub fn get_rb_ch_pid_map(paddles : &Vec<Paddle>) -> RbChPidMapping {
+  let mut mapping = RbChPidMapping::new();
+  for rbid  in 1..51 {
+    let mut chmap = HashMap::<u8, u8>::new();
+    for ch in 1..9 {
+      chmap.insert(ch,0);
+    }
+    mapping.insert(rbid,chmap);
+  }
+  for pdl in paddles {
+    let rb_id = pdl.rb_id  as u8;
+    let ch_a  = pdl.rb_chA as u8;
+    let ch_b  = pdl.rb_chB as u8;
+    let pid   = pdl.paddle_id as u8;
+    //println!("rb_id {rb_id}, chA {ch_a}, chB {ch_b}");
+    *mapping.get_mut(&rb_id).unwrap().get_mut(&ch_a).unwrap() = pid;
+    *mapping.get_mut(&rb_id).unwrap().get_mut(&ch_b).unwrap() = pid;
+  }
+  mapping
 }
 
 /// A representation of a run 

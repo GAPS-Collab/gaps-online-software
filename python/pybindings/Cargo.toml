@@ -1,0 +1,41 @@
+[package]
+name = "go-pybindings"
+version = "0.10.0"
+edition = "2021"
+rust-version = "1.77" # require something fairly new
+                      # use rustup update to update 
+                      # rust toolchain
+
+[lib]
+# The name of the native library. This is the name which will be used in Python to import the
+# library (i.e. `import string_sum`). If you change this, you must also change the name of the
+# `#[pymodule]` in `src/lib.rs`.
+name = "go_pybindings"
+path = "src/lib.rs"
+
+# "cdylib" is necessary to produce a shared library for Python to import from.
+#
+# Downstream Rust code (including code in `bin/`, `examples/`, and `tests/`) will not be able
+# to `use string_sum;` unless the "rlib" or "lib" crate type is also included, e.g.:
+# crate-type = ["cdylib", "rlib"]
+crate-type = ["cdylib", "lib"]
+
+[features]
+liftof    = ["liftof-lib"]
+telemetry = ["telemetry-dataclasses"]
+caraspace-serial = ["caraspace", "tof-dataclasses/caraspace-serial", "telemetry-dataclasses/caraspace-serial"]
+
+[dependencies]
+cfg-if                = "1.0"
+tof-dataclasses       = { version = "0.10", path = "../../tof/dataclasses/rust/tof-dataclasses", features = ["polars", "database", "advanced-algorithms","pybindings"] } 
+telemetry-dataclasses = { path = "../../telemetry/dataclasses/rust/telemetry-dataclasses", optional = true , features=["pybindings"]}
+#caraspace             = { version = "0.10", path = "../../caraspace", features = ["pybindings"], optional = true }
+#caraspace             = { version = "0.10", path = "../../caraspace", optional = true }
+caraspace             = { version = "0.10", path = "../../caraspace", features = ["pybindings"], optional = true}
+# somehow pyo3 is very picky with the version
+liftof-lib            = { version = "0.10", optional = true, path = '../../tof/liftof/liftof-lib', features = ["database"] }
+pyo3                  = { version = "0.21", features = ["extension-module"] }
+pyo3-log              = "0.10"
+pyo3-polars           = "0.15"
+numpy                 = "0.21"
+comfy-table           = "7.1"

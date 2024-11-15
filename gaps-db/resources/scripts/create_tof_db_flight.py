@@ -27,6 +27,9 @@ if __name__ == '__main__':
                         help='Input XLS spreadsheet')
     parser.add_argument('--coordinates', type=str,\
                         help='XLS spreadsheet with paddle coordinates (from Erik)')
+    parser.add_argument('--teststand', \
+                        action='store_true', default=False,\
+                        help='Set this flag if creating a db for teststand purposes. This will have less strict error checking.')
     parser.add_argument('--volid-map', default="",\
                         help=".json file with mapping pid->volid")
     #parser.add_argument('--level0-geo', default="",\
@@ -190,7 +193,8 @@ if __name__ == '__main__':
             paddle.dsi                 = int(r[10]) 
             paddle.j_ltb               = int(r[11][1])
             paddle.j_rb                = int(r[12][1])
-            paddle.mtb_link_id         = int(r[18]) 
+            if not args.teststand:
+                paddle.mtb_link_id         = int(r[18]) 
             #l0_coord = level0_geo[str(paddle.volume_id)]
             x,y,z                      = coords['X'][pid_q], coords['Y'][pid_q], coords['Z'][pid_q]
             length, width, height      = coords['Length'][pid_q], coords['Width'][pid_q], coords['Thickness'][pid_q]
@@ -210,33 +214,67 @@ if __name__ == '__main__':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0 + paddle.length/2 
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
+                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0 - paddle.length/2 
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0
                 case '-X':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0 - paddle.length/2 
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
+                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0 + paddle.length/2 
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0
                 case '+Y':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0  
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0 + paddle.length/2
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
+                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0  
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0 - paddle.length/2
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0
                 case '-Y':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0 
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0 - paddle.length/2
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
+                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0 
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0 + paddle.length/2
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0
                 case '+Z':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0  
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0 + paddle.length/2
+                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0  
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0 - paddle.length/2
                 case '-Z':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0  
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0 + paddle.length/2
+                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0  
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0 - paddle.length/2
                 case _:
                     raise ValueError("Can not parse {paddle_end_loc} for paddle end location!")
+            
             if k%2 != 0:
                 print (paddle)
+                # fix - there is a bug in the spreadsheet for paddle 108
+                if paddle.paddle_id == 108:
+                    if paddle.global_pos_y_l0 == 0:
+                        paddle.global_pos_y_l0 = -85.4
+                        paddle.global_pos_y_l0_A = paddle.global_pos_y_l0 - paddle.length/2
+                        paddle.global_pos_y_l0_B = paddle.global_pos_y_l0 + paddle.length/2
+                    if paddle.global_pos_x_l0 == 118.31:
+                        paddle.global_pos_x_l0 = 167.40
+                        paddle.global_pos_x_l0_A = paddle.global_pos_x_l0
+                        paddle.global_pos_x_l0_B = paddle.global_pos_x_l0
+                    if paddle.global_pos_z_l0 == 140.93:
+                        paddle.global_pos_z_l0 = 209.91
+                        paddle.global_pos_z_l0_A = paddle.global_pos_z_l0
+                        paddle.global_pos_z_l0_B = paddle.global_pos_z_l0
                 if not args.dry_run:
                     paddle.save()
-    
+
+
     if args.create_panel_table:
         print ('-- Creating panel table!')
         try:
@@ -280,42 +318,48 @@ if __name__ == '__main__':
                         normal = [-1,-1,0]
                     case 21 | 1315:
                         normal = [1,-1,0]
-            panel.normal_x = normal[0]
-            panel.normal_y = normal[1]
-            panel.normal_z = normal[2]
+                panel.normal_x = normal[0]
+                panel.normal_y = normal[1]
+                panel.normal_z = normal[2]
 
             paddles = m.Paddle.objects.filter(panel_id=panel.panel_id)
-            if not len (paddles):
-                raise ValueError("Need to create Paddle table first!")
-            paddles = sorted(paddles, key=lambda x: x.paddle_id) 
-            for k,pdl in enumerate(paddles):
-                match k:
-                    case 0:
-                        panel.paddle0 = pdl
-                    case 1:
-                        panel.paddle1 = pdl
-                    case 2:
-                        panel.paddle2 = pdl
-                    case 3:
-                        panel.paddle3 = pdl
-                    case 4:
-                        panel.paddle4 = pdl
-                    case 5:
-                        panel.paddle5 = pdl
-                    case 6:
-                        panel.paddle6 = pdl
-                    case 7:
-                        panel.paddle7 = pdl
-                    case 8:
-                        panel.paddle8 = pdl
-                    case 9:
-                        panel.paddle9 = pdl
-                    case 10:
-                        panel.paddle10 = pdl
-                    case 11:
-                        panel.paddle11 = pdl
-                    case _:
-                        ValueError("Too many paddles for this panel!")
+            if not args.teststand:
+                if not len (paddles):
+                    raise ValueError("Need to create Paddle table first!")
+                paddles = sorted(paddles, key=lambda x: x.paddle_id) 
+                for k,pdl in enumerate(paddles):
+                    pdl.normal_x = normal[0]
+                    pdl.normal_y = normal[1]
+                    pdl.normal_z = normal[2]
+                    if not args.dry_run:
+                        pdl.save()
+                    match k:
+                        case 0:
+                            panel.paddle0 = pdl
+                        case 1:
+                            panel.paddle1 = pdl
+                        case 2:
+                            panel.paddle2 = pdl
+                        case 3:
+                            panel.paddle3 = pdl
+                        case 4:
+                            panel.paddle4 = pdl
+                        case 5:
+                            panel.paddle5 = pdl
+                        case 6:
+                            panel.paddle6 = pdl
+                        case 7:
+                            panel.paddle7 = pdl
+                        case 8:
+                            panel.paddle8 = pdl
+                        case 9:
+                            panel.paddle9 = pdl
+                        case 10:
+                            panel.paddle10 = pdl
+                        case 11:
+                            panel.paddle11 = pdl
+                        case _:
+                            ValueError("Too many paddles for this panel!")
 
             print (panel)
             #print (panel.description, panel.normal_x, panel.normal_y, panel.normal_z)
@@ -324,16 +368,23 @@ if __name__ == '__main__':
 
 
     if args.create_rb_table:
+        if args.teststand:
+            RB_IGNORELIST = [k for k in range(49)]
         # The readoutboard table can be generated completely from 
         # a list of eligible RBs and the paddle table
         rb_ids = [k for k in range(1,51) if not k in RB_IGNORELIST]
-        print('-- creating RB table for ids {rb_ids}')
+        #rb_ids = [49,50]
+        print(f'-- creating RB table for ids {rb_ids}')
         for rid in rb_ids:
             rb = m.ReadoutBoard()
             paddles = m.Paddle.objects.filter(rb_id = rid)
-            assert len(paddles) == 4
+            if not args.teststand:
+                assert len(paddles) == 4
             dsi = set([pdl.dsi for pdl in paddles])
-            assert len(dsi) == 1
+            if not args.teststand:
+                assert len(dsi) == 1
+            else:
+                print (paddles)
             dsi = list(dsi)[0]
             j   = set([pdl.j_rb for pdl in paddles])
             assert len(j) == 1
@@ -396,7 +447,8 @@ if __name__ == '__main__':
                 ltb.j   = dsi.get_j(ltb.rat)
             # for later
             paddles = m.Paddle.objects.filter(ltb_id = ltb.board_id)
-            assert len(paddles) == 8
+            if not args.teststand:
+                assert len(paddles) == 8
             paddles = sorted([k for k in paddles], key=lambda x : x.ltb_chA)  
             for k,pdl in enumerate(paddles):
                 match k:
@@ -420,7 +472,8 @@ if __name__ == '__main__':
             ltbs[ltb.board_id]  = ltb
 
         for k in ltbs:
-            print (ltbs[k])
+            if not args.teststand:
+                print (ltbs[k])
             if not args.dry_run:
                 ltbs[k].save()
 

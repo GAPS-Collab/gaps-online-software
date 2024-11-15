@@ -36,6 +36,7 @@ use crate::serialization::{
     parse_u32
 };
 
+
 //use std::error::Error;
 use crate::errors::{
     SerializationError,
@@ -170,6 +171,7 @@ impl TofPacket {
     self.creation_time.elapsed().as_secs()
   }
 }
+
 
 #[cfg(feature="random")]
 impl FromRandom for TofPacket {

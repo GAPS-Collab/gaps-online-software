@@ -130,7 +130,7 @@ pub trait MoniSeries<T>
         }
       }
     }
-    let series = Series::new(varname, data);
+    let series = Series::new(varname.into(), data);
     Some(series)
   }
 

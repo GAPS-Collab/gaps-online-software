@@ -98,5 +98,5 @@ pub const MT_LINK_ID   : u32 = 0x104;
 // RB DEADTIME
 //
 //
-///DRS_DEADTIME 	0x1e 	0x78 	[15:0] 	r 		Measured last deadtime of the DRS in clock cycles
+///DRS_DEADTIME 	0x1e 	0x78 	\[15:0\] 	r 		Measured last deadtime of the DRS in clock cycles
 pub const DRS_DEADTIME : u32 = 0x78;

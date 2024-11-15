@@ -1,11 +1,21 @@
+"""
+Calibration related convenience functions
+"""
 
-cxx_api_loaded = False
+cxx_api_loaded  = False
+rust_api_loaded = False
 try:
     import gaps_tof as gt
     cxx_api_loaded = True
 except ImportError as err:
     print(f"Unable to load CXX API! {err}")
-import rpy_tof_dataclasses as rust_api
+
+try:
+    import go_pybindings as go
+    RBCalibration = go.events.RBCalibration
+    rust_api_loaded = True
+except ImportError as err:
+    print (f'Unable to load RUST API! {err}')
 
 import matplotlib.pyplot as p
 import numpy as np
@@ -132,36 +142,7 @@ if cxx_api_loaded:
     gt.RBCalibration.plot_dips    = plot_dips
     gt.RBCalibration.plot_incs    = plot_incs
     gt.RBCalibration.plot_tbins   = plot_tbins
-    RBCalibration = gt.RBCalibration
-
-## convenience functions
-def load_calibrations_rapi(cali_dir : Path, load_event_data = False):
-    """
-    Load all calibrations stored in a certain directory and
-    return a dictionary rbid -> RBCalibration
-
-    # Arguments:
-
-        * load_event_data : if True, also load the associated events
-                            which went into the calculation of the
-                            calibration constants.
-    """
-    pattern = re.compile('RB(?P<rb_id>[0-9]*)_')
-    calib_files = [k for k in cali_dir.glob("*.tof.gaps")]
-    calibs = dict()
-    for fname in tqdm.tqdm(calib_files, desc="Loading calibration files"):
-        fname = str(fname)
-        try:
-            rb_id = int(pattern.search(fname).groupdict()['rb_id'])
-        except Exception as e:
-            print(f'Failed to get RB ID from file {fname}')   
-            continue
-        cali = rust_api.events.RBCalibration()
-        cali.from_file(fname)
-        calibs[rb_id] = cali
-    
-    return calibs
-
+    RBCalibration_cxx = gt.RBCalibration
 
 ## convenience functions
 def load_calibrations(cali_dir : Path, load_event_data = False):
@@ -185,6 +166,38 @@ def load_calibrations(cali_dir : Path, load_event_data = False):
         except Exception as e:
             print(f'Failed to get RB ID from file {fname}')   
             continue
-        calibs[rb_id] = RBCalibration.from_file(fname)
+        cali = RBCalibration()
+        cali.from_file(fname)
+        calibs[rb_id] = cali
+    
+    return calibs
+
+
+## convenience functions
+def load_calibrations_cxx(cali_dir : Path, load_event_data = False):
+    """
+    DEPRECATED - this function is deprecated and we discourage using 
+                 the CXX/pybind11 API! Use the RUST API instead!
+
+    Load all calibrations stored in a certain directory and
+    return a dictionary rbid -> RBCalibration
+
+    # Arguments:
+
+        * load_event_data : if True, also load the associated events
+                            which went into the calculation of the
+                            calibration constants.
+    """
+    pattern = re.compile('RB(?P<rb_id>[0-9]*)_')
+    calib_files = [k for k in cali_dir.glob("*.tof.gaps")]
+    calibs = dict()
+    for fname in tqdm.tqdm(calib_files, desc="Loading calibration files"):
+        fname = str(fname)
+        try:
+            rb_id = int(pattern.search(fname).groupdict()['rb_id'])
+        except Exception as e:
+            print(f'Failed to get RB ID from file {fname}')   
+            continue
+        calibs[rb_id] = RBCalibration_cxx.from_file(fname)
     
     return calibs

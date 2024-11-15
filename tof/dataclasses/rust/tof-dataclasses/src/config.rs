@@ -30,7 +30,6 @@ use crate::events::TriggerType;
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
     use crate::FromRandom;
-    extern crate rand;
     use rand::Rng;
   }
 }

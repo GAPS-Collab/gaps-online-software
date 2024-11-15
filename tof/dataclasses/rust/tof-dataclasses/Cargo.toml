@@ -1,6 +1,6 @@
 [package]
 name = "tof-dataclasses"
-version = "0.10.4"
+version = "0.10.5"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -11,15 +11,17 @@ harness = false
 
 [[test]]
 name = "test"
-required-features = ["random"]
+required-features  = ["random"]
 
 [features]
-random             =["rand"]
+random              = ["rand"]
 #database=["sqlite", "diesel"]
-database           =["diesel"]
-tofcontrol         =["tof-control"]
-advanced-algorithms=["smoothed_z_score"]
-pybindings         =["pyo3"]
+database            = ["diesel"]
+tofcontrol          = ["tof-control"]
+advanced-algorithms = ["smoothed_z_score"]
+#pybindings          = ["pyo3", "caraspace/pybindings"]
+pybindings          = ["pyo3"]
+caraspace-serial    = ["caraspace"]
 #polars=["polars"] # automatically added?
 
 [dev-dependencies]
@@ -43,8 +45,11 @@ indicatif         = "0.17" # TODO  - maybe this might go away or we introduce
 colored           = "2.0"  #         a debugging feature  
 crossbeam-channel = "0.5"
 statistical       = "1.0"  # FIXME - replace this with our own implementation
-polars            = { version = "0.39", features = ["lazy"], optional = true }
+polars            = { version = "0.41", features = ["lazy"], optional = true }
 pyo3              = { version = "0.21", features = ["extension-module"], optional = true }
+# serialization library
+caraspace         = { version = "0.10", path = "../../../../caraspace", optional = true }
+
 
 # for testing / features
 rand   = { version = "0.8", optional = true}

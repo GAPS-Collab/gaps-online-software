@@ -11,12 +11,16 @@ use crate::serialization::{
 };
 use crate::ProtocolVersion;
 
-use crate::constants::C_LIGHT_PADDLE;
+use crate::constants::{
+  C_LIGHT_PADDLE,
+  C_LIGHT_CABLE
+};
 
 #[cfg(feature="random")]
-extern crate rand;
-#[cfg(feature="random")]
 use rand::Rng;
+
+#[cfg(feature="database")]
+use crate::database::Paddle;
 
 ///// We will save the values for the peak heigth, time and charge
 ///// as u16. The calculations yield f32 though. We need to convert
@@ -100,6 +104,15 @@ pub struct TofHit {
   pub peak_b         : f16,
   pub charge_a       : f16,
   pub charge_b       : f16,
+  
+  /// The paddle length will not get serialized
+  /// and has to be set after the hit has been 
+  /// created
+  pub paddle_len     : f32,
+  /// The Harting cable length to the RB will not get
+  /// serialized and has to be set after the hit has been 
+  /// created
+  pub cable_len      : f32,
 
   // deprecated values (prior to V1 version)
   pub timestamp32    : u32,
@@ -132,7 +145,6 @@ pub struct TofHit {
   pub ftime_b        : f32,
   pub fpeak_a        : f32,
   pub fpeak_b        : f32,
-  pub paddle_len     : f32,
 }
 
 impl Default for TofHit {
@@ -143,12 +155,19 @@ impl Default for TofHit {
 
 impl fmt::Display for TofHit {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut paddle_info = String::from("");
+    if self.paddle_len == 0.0 {
+      paddle_info = String::from("NOT SET!");
+    }
     write!(f, "<TofHit (version : {}):
   Paddle ID       {}
   Peak:
     LE Time A/B   {:.2} {:.2}   
     Height  A/B   {:.2} {:.2}
     Charge  A/B   {:.2} {:.2}
+  ** paddle {} ** 
+    Length        {:.2}
+    Harting cable length {:.2}
   ** reconstructed interaction
     energy_dep    {:.2}   
     pos_across    {:.2}   
@@ -165,6 +184,9 @@ impl fmt::Display for TofHit {
             self.get_peak_b(),
             self.get_charge_a(),
             self.get_charge_b(),
+            paddle_info,
+            self.paddle_len,
+            self.cable_len,
             self.get_edep(),
             self.get_pos(),
             self.get_t0(),
@@ -295,6 +317,9 @@ impl TofHit {
       peak_b         : f16::from_f32(0.0),
       charge_a       : f16::from_f32(0.0),
       charge_b       : f16::from_f32(0.0),
+      paddle_len     : 0.0,
+      cable_len      : 0.0,
+      
       charge_min_i   : 0,
       // deprecated  
       pos_across     : 0,
@@ -316,10 +341,14 @@ impl TofHit {
       ftime_b        : 0.0,
       fpeak_a        : 0.0,
       fpeak_b        : 0.0,
-      paddle_len     : 0.0,
     }
   }
-
+  
+  #[cfg(feature="database")]
+  pub fn set_paddle(&mut self, paddle : &Paddle) {
+    self.cable_len  = paddle.cable_len;
+    self.paddle_len = paddle.length;
+  }
 
   /// Get the (official) paddle id
   ///
@@ -373,16 +402,31 @@ impl TofHit {
   ///
   /// **This will be measured from the A side**
   pub fn get_pos(&self) -> f32 {
-    (self.time_a.to_f32() - self.get_t0())*C_LIGHT_PADDLE*10.0 // 10 for cm->mm 
+    //(self.time_a.to_f32() - self.get_t0())*C_LIGHT_PADDLE*10.0 // 10 for cm->mm 
+    // FIX - we are actually resetting the particle interaction time to 0 for this
+    //(self.time_a.to_f32() - self.get_t0())*C_LIGHT_PADDLE*10.0 // 10 for cm->mm
+    if self.time_a == self.time_b {
+      return 0.5*self.paddle_len;
+    }
+    if self.time_a < self.time_b {
+      // it is closer to A side
+      return 0.5*self.paddle_len - (self.time_b.to_f32() - self.time_a.to_f32())*0.5*C_LIGHT_PADDLE*10.0;
+      //return (self.time_b.to_f32() - self.time_a.to_f32())*C_LIGHT_PADDLE*10.0; 
+    }
+    else {
+      return self.paddle_len*0.5 + (self.time_a.to_f32() - self.time_b.to_f32())*0.5*C_LIGHT_PADDLE*10.0;
+    }
   }
 
   /// Calculate the interaction time based on the peak timings measured 
   /// at the paddle ends A and B
   ///
-  /// That this works, the lenght of the paddle has to 
-  /// be set before.
+  /// That this works, the length of the paddle has to 
+  /// be set before (in mm).
+  /// This assumes that the cable on both sides of the paddle are 
+  /// the same length
   pub fn get_t0(&self) -> f32 {
-    0.5*(self.time_a.to_f32() + self.time_b.to_f32() - (self.paddle_len/(10.0*C_LIGHT_PADDLE)))
+    0.5*(self.time_a.to_f32() + self.time_b.to_f32() - (self.paddle_len/(10.0*C_LIGHT_PADDLE)) - ((self.cable_len*2.0)/(10.0*C_LIGHT_CABLE)))
   }
 
   pub fn get_edep(&self) -> f32 {
@@ -606,8 +650,6 @@ impl TofHit {
     pp.baseline_b     = f16::from_f32(rng.gen::<f32>());
     pp.baseline_b_rms = f16::from_f32(rng.gen::<f32>());
     pp.phase          = f16::from_f32(rng.gen::<f32>());
-    //pp.timestamp32  = rng.gen::<u32>();
-    //pp.timestamp16  = rng.gen::<u16>();
     pp
   }
 }

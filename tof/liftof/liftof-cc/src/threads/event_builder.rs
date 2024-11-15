@@ -95,7 +95,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut seen_rbevents      = HashMap::<u8, usize>::new();
   let mut too_early_rbevents = HashMap::<u8, usize>::new(); 
   // 10, 12, 37,38, 43, 45 don't exist
-  for k in 1..47 {
+  for k in 1..51 {
     if k == 10 || k ==12 || k == 37 || k == 38 || k == 43 || k == 45 {
       continue;
     } else {
@@ -334,7 +334,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       //    debug!("Heartbeat sent <3 <3 <3");
       //  }
       //}
-      //println!("{}", heartbeat);
+      println!("{}", heartbeat);
       //hb_timer = Instant::now();
 
       ////while hb_timer.elapsed() < hb_interval {};
@@ -541,22 +541,19 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         },
         Some(ev) => {
           let ev_timed_out = ev.age() >= settings.te_timeout_sec as u64;
+          // timed out events hsould be sent in any case
+          let mut ready_to_send = ev_timed_out;
           //let cache_it : bool;
           if ev_timed_out {
             if !ev.is_complete() {
               heartbeat.n_timed_out += 1;
             }
-          }
-          // always ready when the event is timed out
-          let mut ready_to_send = ev_timed_out;
-          if !ev_timed_out {
+          } else {
             // we are earlier than our time out, maybe the 
             // event is already complete
             match settings.build_strategy {
               BuildStrategy::WaitForNBoards => {
                 // we will always wait for the expected number of boards, 
-                // FIXME - make this a member of settings
-                let _wait_nrb : usize = 40;
                 // except the event times out
                 if ev.rb_events.len() as u8 == settings.wait_nrb {
                   ready_to_send = true;

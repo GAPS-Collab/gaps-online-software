@@ -1,0 +1,43 @@
+[project]
+name = "run-vetting"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Achim Stoessl", email = "achim.stoessl@gmail.com" }
+]
+dependencies = [
+    "matplotlib>=3.9.2",
+    "hermes-py>=0.2.0",
+    "scipy>=1.14.1",
+    "ipython>=8.27.0",
+    "django>=5.1.1",
+    "charmingbeauty>=0.1.4",
+    "polars>=1.7.1",
+    "jupyter>=1.1.1",
+    "vtk>=9.3.1",
+    "cmocean>=4.0.3",
+    "pydashi>=2.0.0",
+    "nbstripout>=0.7.1",
+    "uproot>=5.4.1",
+    "jinja2>=3.1.4",
+    "weasyprint>=62.3",
+    "pdfkit>=1.0.0",
+    "reportlab>=4.2.5",
+    "scikit-learn>=1.5.2",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/run_vetting"]

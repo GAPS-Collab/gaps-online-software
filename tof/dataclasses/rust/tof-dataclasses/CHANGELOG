@@ -1,5 +1,13 @@
 # LELEWAA series
 
+## v0.10.5
+* change fpga_temp in RBEventHeader to drs_deadtime. We have the 
+  fpga temp also in the RBMoniData packets, and so we don't need 
+  to change the format. This behaviour can be switched off by 
+  a flag to restore previous behaviour (store fpga temp)
+* remove RBMissingHit which is marked as deprecated and had not 
+  been used
+
 ## v0.10.4
 * change MtbMoniData to iunclude last busy time, etc instead of 
   empty fields

@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
 option(BUILD_CXXDB "Build C++ bindings to access GAPS DB" OFF) 
 if(BUILD_CXXDB)
   find_package(SQLite3 REQUIRED)
-  if(SQLite3_FOUND)
+   if(SQLite3_FOUND)
     message(STATUS "-- found SQLite3 libary")
     message(STATUS "-- -- will use sqlite library ${SQLite3_LIBRARIES}")
     add_definitions( -DBUILD_CXXDB)
@@ -37,9 +37,51 @@ if(BUILD_ROOTCOMPONENTS)
   endif(ROOT_FOUND)
 endif(BUILD_ROOTCOMPONENTS)
 
-
+option(BUILD_LIFTOFPYBINDINGS "build pybindings for a part of liftof (flight software)" OFF)
 option(BUILD_CXXBINDINGS "build C++ language bindings for the rust project tof-dataclasses to provide an API to interface with downstream C++ written analysis" OFF)
 if(BUILD_CXXBINDINGS)
+
+    ##set(CMAKE_CXX_EXTENSIONS OFF)
+    #set(CMAKE_CXX_MODULE_CACHE "${CMAKE_BINARY_DIR}/module_cache")
+    #message(STATUS "CMAKE_CXX_MODULE_CACHE: ${CMAKE_CXX_MODULE_CACHE}")
+    #add_library(caraspace SHARED)
+    #message(STATUS "Will build C++ caraspace serialization library!")
+    ## buld the caraspace sub-library
+    ## Enable modules for the C++ compiler
+    #target_compile_features(caraspace PRIVATE cxx_std_20)
+   
+    #set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API ON) 
+    ## Set module properties for the module interface
+    #set_target_properties(caraspace PROPERTIES
+    #  CXX_MODULES ON
+    #  CXX_MODULE_HEADER_UNITS ON
+    #)
+
+    #target_sources(caraspace
+    #                 PRIVATE
+    #                   dataclasses/C++/include/caraspace.ixx
+    #                   dataclasses/C++/src/caraspace.cxx)
+    #
+
+    ## For GCC, enable modules with the fmodules-ts flag
+    #if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    #  message(STATUS "-- found GNU/GCC compiler, enabling modules")  
+    #  target_compile_options(caraspace PRIVATE -fmodules-ts)
+    #endif()
+    #
+    ## For Clang, enable experimental modules support
+    #if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    #    target_compile_options(caraspace PRIVATE -std=c++20 -fmodules)
+    #endif()
+    #
+    ## For MSVC, set module-specific flags
+    #if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    #    target_compile_options(caraspace PRIVATE /std:c++20 /experimental:module)
+    #endif()
+  if (BUILD_CARASPACE)
+    add_definitions( -DBUILD_CARASPACE)
+  endif() 
+  
   set(GAPSTOF_LIBRARY_SHARED GapsTof CACHE INTERNAL "GapsTof shared library" FORCE)
   add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
       dataclasses/C++/src/tof_packet.cxx
@@ -53,6 +95,7 @@ if(BUILD_CXXBINDINGS)
       dataclasses/C++/src/legacy.cxx
       dataclasses/C++/src/logging.cxx
       dataclasses/C++/src/version.cxx
+      $<$<BOOL:${BUILD_CARASPACE}>:dataclasses/C++/src/caraspace.cxx>
       $<$<BOOL:${BUILD_CXXDB}>:dataclasses/C++/src/database.cxx>
   )
   
@@ -110,14 +153,15 @@ execute_process(
   OUTPUT_QUIET
 )
 
-if (BUILD_LIFTOF OR BUILD_RUSTPYBINDINGS)
+#if (BUILD_LIFTOF OR BUILD_RUSTPYBINDINGS)
+if (BUILD_LIFTOF)
   if(CARGO_RESULT EQUAL 0)
-    message(STATUS "-- found `cargo` - will be able to build liftof!")
+      message(STATUS "Found `cargo` - will be able to build liftof!")
   else()
     message(WARNING "-- `cargo` NOT found! Unable to build liftof.")
     message(STATUS "Please install a rust toolchain including cargo if you want to build liftof, and make sure cargo is in your $PATH!")
     option (BUILD_LIFTOF OFF)
-    option (BUILD_RUSTPYBINDINGS OFF)
+    #option (BUILD_RUSTPYBINDINGS OFF)
   endif()
 endif()
 
@@ -131,12 +175,12 @@ if (BUILD_LIFTOF)
       COMMAND cargo doc 
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof
   )
-  add_custom_target(
-    rust-pybindings
-      ALL
-      COMMAND ${RUST_BUILD_COMMAND} 
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python 
-  )
+  #add_custom_target(
+  #  rust-pybindings
+  #    ALL
+  #    COMMAND ${RUST_BUILD_COMMAND} 
+  #    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python 
+  #)
 if (UNIX AND NOT APPLE)
   add_custom_target(
     liftof-cc
@@ -167,40 +211,79 @@ if (UNIX AND NOT APPLE)
   install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-tui
       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   )
-  install(FILES ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/librust_dataclasses.so
-      DESTINATION ${INSTALL_PYTHON_DIR}/
-      RENAME rust_dataclasses.so
-  )
 endif(BUILD_LIFTOF)
 
-if(BUILD_RUSTPYBINDINGS)
-  # Define the command to build your Rust project
-  message(STATUS "building Rust \\U1F980 pybindings wiut pyO3...")
-  set(RUST_BUILD_COMMAND cargo build --release --all-features)
-  add_custom_target(
-    tof-pydataclasses-rust
-      ALL
-      COMMAND ${RUST_BUILD_COMMAND} 
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings
-  )
-  add_custom_target(
-    tof-pydataclasses-rust-doc
-      COMMAND cargo doc 
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings
-  )
-  #install(TARGETS tof-pydataclasses-rust
-  #    EXPORT GAPSTargets         
-  #    LIBRARY DESTINATION ${INSTALL_PYTHON_DIR}
-  #    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
-  #    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
-  #)
-  install(FILES
-          "${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librpy_tof_dataclasses.so"
-          DESTINATION ${INSTALL_PYTHON_DIR}
-          RENAME rpy_tof_dataclasses.so
-  )
-
-endif(BUILD_RUSTPYBINDINGS)
+#if(BUILD_RUSTPYBINDINGS)
+#  # Define the command to build your Rust project
+#  message(STATUS "building Rust \\U1F980 pybindings wiut pyO3...")
+#  set(RUST_BUILD_COMMAND cargo build --release --all-features)
+#  add_custom_target(
+#    tof-pydataclasses-rust
+#      ALL
+#      COMMAND ${RUST_BUILD_COMMAND} 
+#      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings
+#  )
+#  add_custom_target(
+#    tof-pydataclasses-rust-doc
+#      COMMAND cargo doc 
+#      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings
+#  )
+#  #install(TARGETS tof-pydataclasses-rust
+#  #    EXPORT GAPSTargets         
+#  #    LIBRARY DESTINATION ${INSTALL_PYTHON_DIR}
+#  #    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
+#  #    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
+#  #)
+#  if(APPLE) 
+#    install(FILES
+#            "${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librpy_tof_dataclasses.dylib"
+#            DESTINATION ${INSTALL_PYTHON_DIR}
+#            RENAME rpy_tof_dataclasses.so
+#    )
+#   elseif(UNIX)
+#    install(FILES
+#            "${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librpy_tof_dataclasses.so"
+#            DESTINATION ${INSTALL_PYTHON_DIR}
+#            RENAME rpy_tof_dataclasses.so
+#    )
+#
+#   endif(APPLE)
+#endif(BUILD_RUSTPYBINDINGS)
+#
+#if(BUILD_LIFTOFPYBINDINGS)
+#  message(STATUS "building Rust \\U1F980 pybindings wiut pyO3 for LIFTOF...")
+#  set(RUST_BUILD_COMMAND cargo build --release --all-features)
+#  add_custom_target(
+#    tof-liftof-rust
+#      ALL
+#      COMMAND ${RUST_BUILD_COMMAND} 
+#      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python
+#  )
+#  add_custom_target(
+#    tof-pyliftof-rust-doc
+#      COMMAND cargo doc 
+#      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-python
+#  )
+#  #install(TARGETS tof-pydataclasses-rust
+#  #    EXPORT GAPSTargets         
+#  #    LIBRARY DESTINATION ${INSTALL_PYTHON_DIR}
+#  #    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
+#  #    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
+#  #)
+#  if (APPLE)
+#    install(FILES
+#            "${CMAKE_SOURCE_DIR}/tof/liftof/target/release/libliftof.dylib"
+#            DESTINATION ${INSTALL_PYTHON_DIR}
+#            RENAME liftof.so
+#    )
+#  elseif(UNIX)
+#    install(FILES
+#            "${CMAKE_SOURCE_DIR}/tof/liftof/target/release/libliftof.so"
+#            DESTINATION ${INSTALL_PYTHON_DIR}
+#            RENAME liftof.so
+#    )
+#  endif(APPLE)
+#endif(BUILD_LIFTOFPYBINDINGS)
 
 #################################################
 # installation
@@ -439,7 +522,4 @@ if (BUILD_EXAMPLES)
 
   endif(BUILD_ROOTCOMPONENTS)
 endif()
-
-
-
 

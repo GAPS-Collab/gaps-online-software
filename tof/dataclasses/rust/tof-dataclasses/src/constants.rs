@@ -14,6 +14,11 @@ pub static HUMAN_TIMESTAMP_FORMAT : &str = "%y%m%d_%H%M%S%Z";
 /// This value is in cm/ns
 pub const C_LIGHT_PADDLE : f32 = 15.4; 
 
+/// Speed of light in the harting cables
+/// (divine number from the TOF team)
+/// This value is in cm/ns
+pub const C_LIGHT_CABLE : f32 = 24.6;
+
 /// Number of AVAILABLE slots for LocalTriggerBoards
 pub const N_LTBS : usize = 25;
 

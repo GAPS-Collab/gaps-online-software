@@ -10,8 +10,6 @@
 
 namespace fs = std::filesystem;
 
-
-
 /***************************************************/
 
 Vec<RBEventHeader> get_rbeventheaders(const String &filename, bool is_headers) {

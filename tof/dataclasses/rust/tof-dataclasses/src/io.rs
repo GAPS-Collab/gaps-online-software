@@ -1,4 +1,5 @@
 //! Dataio - readino/writing of different types
+//!
 //! of TOF data products.
 //!
 //! * TofPacketReader/Writer - sequentially read/write
@@ -32,7 +33,7 @@ const ALGO : crc::Algorithm<u32> = crc::Algorithm {
 
 use std::fmt;
 
-extern crate crc;
+//extern crate crc;
 use crc::Crc;
 
 use std::path::Path;
@@ -481,12 +482,12 @@ impl RBEventMemoryStreamer {
     self.pos += 10;
     self.pos += 1; // rb id first byte is rsvd
     header.rb_id        = parse_u8(&self.stream, &mut self.pos);
-    header.channel_mask = parse_u16(&self.stream, &mut self.pos); 
+    header.set_channel_mask(parse_u16(&self.stream, &mut self.pos)); 
     match replace_channel_mask {
       None => (),
       Some(mask) => {
-        println!("==> Replacing ch mask {} with {}", header.channel_mask, mask);
-        header.channel_mask    = mask; 
+        println!("==> Replacing ch mask {} with {}", header.get_channel_mask(), mask);
+        header.set_channel_mask(mask); 
       }
     }
     let event_id0       = parse_u16(&self.stream, &mut self.pos);
@@ -733,14 +734,14 @@ impl Iterator for RBEventMemoryStreamer {
 
 
 /// Generics for packet reading (TofPacket, Telemetry packet,...)
+/// FIXME - not implemented yet
 pub trait PacketReader {
   /// header bytes, e.g. 0xAAAA for TofPackets
   const HEADER0 : u8 = 0;
   const HEADER1 : u8 = 0;
 
   /// Manage the internal cursor attribute
-  fn set_cursor(&mut self, pos : usize) {
-  }
+  fn set_cursor(&mut self, pos : usize);
 
   /// Rewind the file, so it can be read again from the 
   /// beginning

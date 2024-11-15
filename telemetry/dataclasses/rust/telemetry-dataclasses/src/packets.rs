@@ -16,43 +16,70 @@ use tof_dataclasses::serialization::{
 use tof_dataclasses::events::TofEventSummary;
 use tof_dataclasses::packets::TofPacket;
 
+#[cfg(feature = "pybindings")]
+use pyo3::pyclass;
+
+/// Recreate 48bit timestamp from u32 and u16
+pub fn make_systime(lower : u32, upper : u16) -> u64 {
+  (upper as u64) << 32 | lower as u64
+}
+
+
 #[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature = "pybindings", pyclass)]
 #[repr(u8)]
 pub enum TelemetryPacketType {
-  Unknown          = 0,
-  RBWaveform  = 91,
-  Tracker     = 80,
-  MergedEvent = 90,
-  AnyTofHK    = 92,
-  InterestingEvent = 190,
-  Command          = 200,       
-  CardHKP          = 30,
-  TmP33       = 33,
-  TmP34       = 34,
-  TmP37       = 37,
-  TmP38       = 38,
-  TmP40       = 40,
-  TmP50       = 50,
-  TmP55       = 55,
-  TmP64       = 64,
-  Tmp81       = 81,
-  TmP83       = 83,
-  //TmP92       = 92,
-  TmP96       = 96,
-  TmP214      = 214,
-  TmP255      = 255
+  Unknown           = 0,
+  CardHKP           = 30,
+  CoolingHK         = 40,
+  PDUHK             = 50,
+  Tracker           = 80,
+  TrackerDAQCntr    = 81,
+  GPS               = 82,
+  TrkTempLeak       = 83,
+  MergedEvent       = 90,
+  RBWaveform        = 91,
+  AnyTofHK          = 92,
+  GcuEvtBldSettings = 93,
+  LabJackHK         = 100,
+  MagHK             = 108,
+  GcuMon            = 110,
+  InterestingEvent  = 190,
+  Ack               = 200,     
+  AnyTrackerHK      = 255,
+  // unknown/unused stuff
+  TmP33            = 33,
+  TmP34            = 34,
+  TmP37            = 37,
+  TmP38            = 38,
+  TmP55            = 55,
+  TmP64            = 64,
+  //TmP92          = 92,
+  TmP96            = 96,
+  TmP214           = 214,
 }
 
 impl From<u8> for TelemetryPacketType {
   fn from(value: u8) -> Self {
     match value {
-      0u8   => TelemetryPacketType::Unknown,
-      80u8  => TelemetryPacketType::Tracker,
-      90u8  => TelemetryPacketType::MergedEvent,
-      91u8  => TelemetryPacketType::RBWaveform,
-      92u8  => TelemetryPacketType::AnyTofHK,
-      190u8 => TelemetryPacketType::InterestingEvent,
-      200u8 => TelemetryPacketType::Command,
+      0     => TelemetryPacketType::Unknown,
+      30    => TelemetryPacketType::CardHKP,
+      40    => TelemetryPacketType::CoolingHK,
+      50    => TelemetryPacketType::PDUHK,
+      80    => TelemetryPacketType::Tracker,
+      81    => TelemetryPacketType::TrackerDAQCntr,
+      82    => TelemetryPacketType::GPS,
+      83    => TelemetryPacketType::TrkTempLeak,
+      90    => TelemetryPacketType::MergedEvent,
+      91    => TelemetryPacketType::RBWaveform,
+      92    => TelemetryPacketType::AnyTofHK,
+      93    => TelemetryPacketType::GcuEvtBldSettings,
+      100   => TelemetryPacketType::LabJackHK,
+      108   => TelemetryPacketType::MagHK,
+      110   => TelemetryPacketType::GcuMon,
+      190   => TelemetryPacketType::InterestingEvent,
+      200   => TelemetryPacketType::Ack,
+      255   => TelemetryPacketType::AnyTrackerHK,
       _     => TelemetryPacketType::Unknown,
     }
   }
@@ -78,6 +105,27 @@ impl TelemetryPacket {
       header  : TelemetryHeader::new(),
       payload : Vec::<u8>::new()
     }
+  }
+
+  pub fn from_bytestream(stream : &Vec<u8>, pos : &mut usize) -> Result<Self, SerializationError> {
+    let mut tpacket = TelemetryPacket::new();
+    let header  = TelemetryHeader::from_bytestream(stream, pos)?;
+    tpacket.header = header;
+    //println!("Found header {}", tpacket.header);
+    // it seems the payload size is header.size
+    // fix - the payload is either sizeof(header) + payload.len 
+    tpacket.payload = stream[*pos..*pos + header.length as usize - TelemetryHeader::SIZE].to_vec();
+    Ok(tpacket)
+  }
+
+  // FIXME - this needs to be a trait
+  pub fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::new();
+    let mut s_head = self.header.to_bytestream();
+    stream.append(&mut s_head);
+    stream.extend_from_slice(self.payload.as_slice());
+    //stream.append(&mut self.payload);
+    stream
   }
 }
 
@@ -150,6 +198,20 @@ impl Serialization for TelemetryHeader {
     thead.checksum  = parse_u16(stream, pos);
     Ok(thead)
   }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::new();
+    //let head : u16 = 0x90eb;
+    // "SYNC" is the header signature
+    stream.extend_from_slice(&self.sync.to_le_bytes());
+    stream.extend_from_slice(&self.ptype.to_le_bytes());
+    stream.extend_from_slice(&self.timestamp.to_le_bytes());
+    stream.extend_from_slice(&self.counter.to_le_bytes());
+    stream.extend_from_slice(&self.length.to_le_bytes());
+    stream.extend_from_slice(&self.checksum.to_le_bytes());
+    stream
+  }
+
 }
 
 impl fmt::Display for TelemetryHeader {
@@ -167,29 +229,41 @@ impl fmt::Display for TelemetryHeader {
 
 pub struct MergedEvent {
   
-  pub header         : TelemetryHeader,
-  pub creation_time  : u64,
-  pub event_id       : u32,
-  pub tracker_events : Vec<TrackerEvent>,
-  pub tof_data       : Vec<u8>,
-  pub raw_data       : Vec<u8>,
-  pub flags0         : u8,
-  pub flags1         : u8,
+  pub header              : TelemetryHeader,
+  pub creation_time       : u64,
+  pub event_id            : u32,
+  pub tracker_events      : Vec<TrackerEvent>,
+  /// in case this is version 2, we don't have
+  /// tracker_events, but new-style tracker hits
+  /// (TrackerHitV2)
+  pub tracker_hitsv2      : Vec<TrackerHitV2>,
+  pub tracker_oscillators : Vec<u64>,
+  pub tof_data            : Vec<u8>,
+  pub raw_data            : Vec<u8>,
+  pub flags0              : u8,
+  pub flags1              : u8,
+  pub version             : u8
 }
 
 impl MergedEvent {
 
   pub fn new() -> Self {
+    let mut tracker_oscillators = Vec::<u64>::new();
+    for _ in 0..10 {
+      tracker_oscillators.push(0);
+    }
     Self {
-      header         : TelemetryHeader::new(),
-      creation_time  : 0,
-      event_id       : 0,
-      tracker_events : Vec::<TrackerEvent>::new(),
-      tof_data       : Vec::<u8>::new(),
-      raw_data       : Vec::<u8>::new(),
-      flags0         : 0,
-      flags1         : 1,
-    
+      header              : TelemetryHeader::new(),
+      creation_time       : 0,
+      event_id            : 0,
+      tracker_events      : Vec::<TrackerEvent>::new(),
+      tracker_hitsv2      : Vec::<TrackerHitV2>::new(),
+      tracker_oscillators : tracker_oscillators,
+      tof_data            : Vec::<u8>::new(),
+      raw_data            : Vec::<u8>::new(),
+      flags0              : 0,
+      flags1              : 1,
+      version             : 0, 
     }
   }
 
@@ -219,12 +293,17 @@ impl MergedEvent {
                          pos    : &mut usize)
     -> Result<Self, SerializationError> {
     let mut me        = MergedEvent::new();
-    let _version      = parse_u8(stream, pos);
+    let version      = parse_u8(stream, pos);
+    me.version       = version;
     //println!("_version {}", _version);
     me.flags0         = parse_u8(stream, pos);
     // skip a bunch of Alex newly implemented things
     // FIXME
-    *pos += 8;
+    if version == 0 {
+      me.flags1      = parse_u8(stream, pos);
+    } else {
+      *pos += 8;
+    }
 
     me.event_id       = parse_u32(stream, pos);
     //println!("EVENT ID {}", me.event_id);
@@ -245,38 +324,79 @@ impl MergedEvent {
     if trk_delim != 0xbb {
       return Err(SerializationError::HeadInvalid);
     }
-    let num_trk_bytes = parse_u16(stream, pos);
-    if (num_trk_bytes as usize + *pos - 2) > stream.len() {
-      return Err(SerializationError::StreamTooShort);
-    }
-    //println!("Num TRK bytes : {}", num_trk_bytes);
-    // for now, don't unpack tracker data
-    //*pos += num_trk_bytes as usize;
-    let max_pos = *pos + num_trk_bytes as usize;
-    loop {
-       //if *pos > max_pos {
-       //  //return Err(SerializationError::StreamTooLong);
-       //} 
-       if *pos >= max_pos {
-         break;
-       }
-       if *pos >= stream.len() {
-         break;
-       }
-       let mut te = TrackerEvent::from_bytestream(stream, pos)?;
-       //println!("{}",te);
-       te.event_id = me.event_id;
-       me.tracker_events.push(te);
-       //if(rc < 0)
-       //{
-       //   spdlog::info("DEBUG event.unpack rc = {}", rc);
-       //   return -9;
-       //}
-       //else
-       //{
-       //    tracker_events.push_back(std::move(event));
-       //    i += rc;
-       //}
+    if version == 1 {
+      let num_trk_hits = parse_u16(stream, pos);
+      if (*pos + (num_trk_hits as usize)*4 ) > stream.len() {
+        return Err(SerializationError::StreamTooShort);
+      }
+      for _ in 0..num_trk_hits { 
+        let mut hit = TrackerHitV2::new();
+        let strip_id = parse_u16(stream, pos);
+        let adc      = parse_u16(stream, pos);
+        hit.channel  = strip_id & 0b11111;
+        hit.module   = (strip_id >> 5) & 0b111;
+        hit.row      = (strip_id >> 8) & 0b111;
+        hit.layer    = (strip_id >> 11) & 0b1111;
+        hit.adc      = adc;
+        me.tracker_hitsv2.push(hit);
+      }
+      // oscillators
+      let oscillators_delimiter = parse_u8(stream, pos);
+      if oscillators_delimiter != 0xcc {
+        return Err(SerializationError::HeadInvalid);
+      }
+      let osc_flags = parse_u8(stream, pos);
+      let mut oscillator_idx = Vec::<u8>::new();
+      for j in 0..8 {
+        if (osc_flags >> j & 0b1) > 0 {
+          oscillator_idx.push(j)
+        }
+      }
+      if (*pos + oscillator_idx.len()*6) > stream.len() {
+        return Err(SerializationError::StreamTooShort);
+      }
+      for idx in oscillator_idx.iter() {
+        let lower = parse_u32(stream, pos);
+        let upper = parse_u16(stream, pos);
+        let osc : u64 = (upper as u64) << 32 | (lower as u64);
+        me.tracker_oscillators[*idx as usize] = osc;
+      }
+    } else if version == 0 {
+      let num_trk_bytes = parse_u16(stream, pos);
+      if (num_trk_bytes as usize + *pos - 2) > stream.len() {
+        return Err(SerializationError::StreamTooShort);
+      }
+      //println!("Num TRK bytes : {}", num_trk_bytes);
+      // for now, don't unpack tracker data
+      //*pos += num_trk_bytes as usize;
+      let max_pos = *pos + num_trk_bytes as usize;
+      loop {
+         //if *pos > max_pos {
+         //  //return Err(SerializationError::StreamTooLong);
+         //} 
+         if *pos >= max_pos {
+           break;
+         }
+         if *pos >= stream.len() {
+           break;
+         }
+         let mut te = TrackerEvent::from_bytestream(stream, pos)?;
+         //println!("{}",te);
+         te.event_id = me.event_id;
+         me.tracker_events.push(te);
+         //if(rc < 0)
+         //{
+         //   spdlog::info("DEBUG event.unpack rc = {}", rc);
+         //   return -9;
+         //}
+         //else
+         //{
+         //    tracker_events.push_back(std::move(event));
+         //    i += rc;
+         //}
+      }
+    } else {
+      error!("Unrecognized version {version}!");
     }
     Ok(me)
   }
@@ -301,23 +421,36 @@ impl fmt::Display for MergedEvent {
     }
     let mut good_hits = 0;
     let mut evids = Vec::<u32>::new();
-    for ev in &self.tracker_events {
-      evids.push(ev.event_id);
-      for h in &ev.hits { 
-        if h.adc != 0 {
-          good_hits += 1;
+    if self.version == 0 {
+      for ev in &self.tracker_events {
+        evids.push(ev.event_id);
+        for h in &ev.hits { 
+          if h.adc != 0 {
+            good_hits += 1;
+          }
         }
+      evids.sort();
+      evids.dedup();
+      }
+    } else if self.version == 1 {
+      for _ in &self.tracker_hitsv2 {
+        good_hits += 1;
       }
     }
-    evids.sort();
-    evids.dedup();
     repr += &(format!("  {}", self.header));
     repr += "\n  ** ** ** MERGED  ** ** **";
+    repr += &(format!("\n  version         {}", self.version));
     repr += &(format!("\n  event ID        {}", self.event_id));  
-    repr += &(format!("\n  -- TOF          {}", tof_evid));
-    repr += &(format!("\n  -- TRK          {:?}", evids));
+    if self.version == 0 {
+      repr += &(format!("\n  -- TOF          {}", tof_evid));
+      repr += &(format!("\n  -- TRK          {:?}", evids));
+    }
     repr += "\n  ** ** ** TRACKER ** ** **";
-    repr += &(format!("\n  N Trk events    {}", self.tracker_events.len()));
+    if self.version == 0 {
+      repr += &(format!("\n  N Trk events    {}", self.tracker_events.len()));
+    } else if self.version == 1 {
+      repr += &(format!("\n  Trk oscillators {:?}", self.tracker_oscillators)); 
+    }
     repr += &(format!("\n  N Good Trk Hits {}", good_hits));
     repr += &tof_str;
     write!(f,"{}", repr)
@@ -344,6 +477,22 @@ impl TrackerEvent {
       event_time : 0,
       hits       : Vec::<TrackerHit>::new(),
     }
+  }
+
+  /// Loop over the filtered hits, returning only those satisfying a condition
+  ///
+  /// # Arguments:
+  /// 
+  /// * filter : filter function - take input hit and decide if it should be 
+  ///            returned
+  pub fn filter_hits(&self, filter : fn(&TrackerHit) -> bool) -> Vec<TrackerHit> {
+    let mut filtered_hits = Vec::<TrackerHit>::new();
+    for h in &self.hits {
+      if filter(h) {
+        filtered_hits.push(*h);
+      }
+    }
+    filtered_hits
   }
 
   pub fn from_bytestream(stream : &Vec<u8>,
@@ -381,6 +530,44 @@ impl fmt::Display for TrackerEvent {
     for h in &self.hits {
       repr += &(format!("\n {}", h));
     }
+    write!(f, "{}", repr)
+  }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct TrackerHitV2 {
+  pub layer           : u16,
+  pub row             : u16,
+  pub module          : u16,
+  pub channel         : u16,
+  pub adc             : u16,
+  pub oscillator      : u64
+}
+
+impl TrackerHitV2 {
+  //const SIZE : usize = 18;
+  
+  pub fn new() -> Self {
+    Self {
+      layer           : 0,
+      row             : 0,
+      module          : 0,
+      channel         : 0,
+      adc             : 0,
+      oscillator      : 0,
+    }
+  }
+}
+
+impl fmt::Display for TrackerHitV2 {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerHitV2:");
+    repr += &(format!("\n  Layer         : {}" ,self.layer));
+    repr += &(format!("\n  Row           : {}" ,self.row));
+    repr += &(format!("\n  Module        : {}" ,self.module));
+    repr += &(format!("\n  Channel       : {}" ,self.channel));
+    repr += &(format!("\n  ADC           : {}" ,self.adc));
+    repr += &(format!("\n  Oscillator    : {}>",self.oscillator));
     write!(f, "{}", repr)
   }
 }
@@ -479,7 +666,9 @@ impl TrackerHeader {
     h.packet_id   = parse_u8 (stream, pos);
     h.length      = parse_u16(stream, pos);
     h.daq_count   = parse_u16(stream, pos);
-    h.sys_time    = parse_u64(stream, pos);
+    let lower     = parse_u32(stream, pos);
+    let upper     = parse_u16(stream, pos);
+    h.sys_time    = make_systime(lower, upper);
     h.version     = parse_u8 (stream, pos);
     Ok(h)
   }
@@ -495,6 +684,52 @@ impl fmt::Display for TrackerHeader {
     repr    += &(format!("\n  DAQ Cnt  : {}", self.daq_count));
     repr    += &(format!("\n  Sys Time : {}", self.sys_time));
     repr    += &(format!("\n  Version  : {}>", self.version));
+    write!(f, "{}", repr)
+  }
+}
+
+
+pub struct GPSPacket {
+  pub telemetry_header : TelemetryHeader,
+  pub tracker_header   : TrackerHeader,
+  pub utc_time         : u32,
+  pub gps_info         : u8
+}
+
+impl GPSPacket {
+  pub fn new() -> Self {
+    Self {
+      telemetry_header : TelemetryHeader::new(),
+      tracker_header   : TrackerHeader::new(),
+      utc_time         : 0,
+      gps_info         : 0,
+    }
+  }
+  
+  pub fn from_bytestream(stream: &Vec<u8>,
+                         pos: &mut usize)
+    -> Result<Self, SerializationError> {
+    let mut gps_p       = GPSPacket::new();
+    gps_p.tracker_header   = TrackerHeader::from_bytestream(stream, pos)?;
+    if stream.len() == *pos as usize {
+      error!("Packet contains only header!");
+      return Ok(gps_p);
+    }
+    gps_p.utc_time = parse_u32(stream, pos);
+    gps_p.gps_info = parse_u8(stream, pos);
+    Ok(gps_p)
+  }
+}
+
+impl fmt::Display for GPSPacket {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<GPSPacket");
+    repr    += &(format!("\n {}", self.telemetry_header));
+    repr    += &(format!("\n {}", self.tracker_header));
+    repr    += "\n*** GPS TIME ***";
+    repr    += &(format!("\n UTC TIME (32bit) {}", self.utc_time));
+    repr    += &(format!("\n GSP INFO (8bit)  {}", self.gps_info));
+    repr    += ">";
     write!(f, "{}", repr)
   }
 }
@@ -533,7 +768,6 @@ impl TrackerPacket {
                          pos: &mut usize)
     -> Result<Self, SerializationError> {
     let mut tp          = TrackerPacket::new();
-    //tp.telemetry_header = TelemetryHeader::from_bytestream(stream, pos)?;
     tp.tracker_header   = TrackerHeader::from_bytestream(stream, pos)?;
     if stream.len() == *pos as usize {
       error!("Packet contains only header!");
@@ -584,6 +818,246 @@ impl TrackerPacket {
     Ok(tp)
   }
 }
+      
+pub struct TrackerTempLeakPacket {
+  pub telemetry_header : TelemetryHeader,
+  pub tracker_header   : TrackerHeader,
+  pub row_offset       : u8,
+  pub templeak         : [[u32;6];6],
+  pub seu              : [[u32;6];6]
+}
+
+impl fmt::Display for TrackerTempLeakPacket {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerTempLeakPacket");
+    repr    += &(format!("\n {}", self.telemetry_header));
+    repr    += &(format!("\n {}", self.tracker_header));
+    repr    += &(format!("\n ROW OFFSET {}", self.row_offset));
+    repr    += "\n*** TEMPLEAK ***";
+    for k in 0..6 {
+      repr  += &(format!("\n {:?}", self.templeak[k]));
+    }
+    repr    += "\n*** SEU ***";
+    for k in 0..6 {
+      repr  += &(format!("\n {:?}", self.seu[k]));
+    }
+    repr    += ">";
+    write!(f, "{}", repr)
+  }
+}
+
+impl TrackerTempLeakPacket {
+  pub fn new() -> Self {
+    Self {
+      telemetry_header : TelemetryHeader::new(),
+      tracker_header   : TrackerHeader::new(),
+      row_offset       : 0,
+      templeak         : [[0;6];6],
+      seu              : [[0;6];6]
+    }
+  }
+  
+  pub fn from_bytestream(stream: &Vec<u8>,
+                         pos: &mut usize)
+    -> Result<Self, SerializationError> {
+    let mut tp          = TrackerTempLeakPacket::new();
+    tp.tracker_header   = TrackerHeader::from_bytestream(stream, pos)?;
+    if stream.len() == *pos as usize {
+      error!("Packet contains only header!");
+      return Ok(tp);
+    }
+    if stream.len() - *pos < (36*3 + 1) {
+      return Err(SerializationError::StreamTooShort);
+    }
+    let row_info = parse_u8(stream, pos);
+    tp.row_offset = row_info & 0x7;
+    for row in 0..6 {
+      for module in 0..6 {
+        let b0 = parse_u8(stream, pos) as u32;
+        let b1 = parse_u8(stream, pos) as u32;
+        let b2 = parse_u8(stream, pos) as u32;
+        let seu_ : u32 = b2 >> 1;
+        let mut templeak_ : u32 = (b2 << 10) | (b1 << 2)  | (b0 >> 6);
+        templeak_ &= 0x7ff;
+        tp.templeak[row][module] = templeak_;
+        tp.seu[row][module] = seu_;
+      }
+    }
+    Ok(tp)
+  }
+}
+
+pub struct TrackerDAQTempPacket {
+  pub telemetry_header : TelemetryHeader,
+  pub tracker_header   : TrackerHeader,
+  pub rom_id           : [u64;256],
+  pub temp             : [u16;256]
+}
+
+impl fmt::Display for TrackerDAQTempPacket {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerDAQTempPacket");
+    repr    += &(format!("\n {}", self.telemetry_header));
+    repr    += &(format!("\n {}", self.tracker_header));
+    repr    += "\n*** ROM ID ***";
+    repr  += &(format!("\n {:?}", self.rom_id));
+    repr    += "\n*** TEMP ***";
+    repr  += &(format!("\n {:?}>", self.temp));
+    write!(f, "{}", repr)
+  }
+}
+
+impl TrackerDAQTempPacket {
+  pub fn new() -> Self {
+    Self {
+      telemetry_header : TelemetryHeader::new(),
+      tracker_header   : TrackerHeader::new(),
+      rom_id           : [0;256],
+      temp             : [0;256]
+    }
+  }
+  
+  pub fn from_bytestream(stream: &Vec<u8>,
+                         pos: &mut usize)
+    -> Result<Self, SerializationError> {
+    let mut tp          = TrackerDAQTempPacket::new();
+    tp.tracker_header   = TrackerHeader::from_bytestream(stream, pos)?;
+    if tp.tracker_header.packet_id != 0x09 {
+      error!("This is not a TrackerDAQTempPacket, but has packet_id {} instead!", tp.tracker_header.packet_id);
+      return Err(SerializationError::IncorrectPacketType);
+    }
+    println!("tracker header {}", tp.tracker_header);
+    if stream.len() == *pos as usize {
+      error!("Packet contains only header!");
+      return Ok(tp);
+    }
+    //if stream.len() - *pos < (36*3 + 1) {
+    //  return Err(SerializationError::StreamTooShort);
+    //}
+    // this is hack, since the TreckerHeader in this packet does not have a 
+    // version (-> Alex) 
+    *pos -= 1;
+    let dummy64 = 0u64;
+    let dummy16 = 0u16;
+    error!("{}", tp.tracker_header);
+    error!("Expected of the packet {}", (tp.tracker_header.length as usize)/2);
+    for k in 0..256usize {
+      if k < (tp.tracker_header.length as usize)/2 {
+        tp.rom_id[k] = parse_u64(stream, pos);
+        tp.temp[k]   = parse_u16(stream, pos);
+      } else {
+        tp.rom_id[k] = dummy64;
+        tp.temp[k]   = dummy16;
+      }
+    }
+    Ok(tp)
+  }
+}
+
+pub struct TrackerDAQHSKPacket {
+  pub telemetry_header : TelemetryHeader,
+  pub tracker_header   : TrackerHeader,
+  pub temp             : [u16;12],
+}
+
+impl fmt::Display for TrackerDAQHSKPacket {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerDAQHSKPacket");
+    repr    += &(format!("\n {}", self.telemetry_header));
+    repr    += &(format!("\n {}", self.tracker_header));
+    repr    += "\n*** TEMP ***";
+    repr    += &(format!("\n {:?}>", self.temp));
+    write!(f, "{}", repr)
+  }
+}
+
+impl TrackerDAQHSKPacket {
+  pub fn new() -> Self {
+    Self {
+      telemetry_header : TelemetryHeader::new(),
+      tracker_header   : TrackerHeader::new(),
+      temp             : [0;12]
+    }
+  }
+  
+  pub fn from_bytestream(stream: &Vec<u8>,
+                         pos: &mut usize)
+    -> Result<Self, SerializationError> {
+    let mut tp          = TrackerDAQHSKPacket::new();
+    tp.tracker_header   = TrackerHeader::from_bytestream(stream, pos)?;
+    if tp.tracker_header.packet_id != 0xff {
+      error!("This is not a TrackerDAQHSKPacket, but has packet_id {} instead!", tp.tracker_header.packet_id);
+      return Err(SerializationError::IncorrectPacketType);
+    }
+    if stream.len() == *pos as usize {
+      error!("Packet contains only header!");
+      return Ok(tp);
+    }
+    //if stream.len() - *pos < (36*3 + 1) {
+    //  return Err(SerializationError::StreamTooShort);
+    //}
+    // this is hack, since the TreckerHeader in this packet does not have a 
+    // version (-> Alex) 
+    *pos += 193; // skip a bunch of other stuff right now (Alex)
+    for k in 0..12usize {
+      tp.temp[k]   = parse_u16(stream, pos);
+    }
+    Ok(tp)
+  }
+}
+
+pub struct TrackerEventIDEchoPacket {
+  pub telemetry_header : TelemetryHeader,
+  pub tracker_header   : TrackerHeader,
+  pub temp             : [u16;12],
+  pub event_id         : u32,
+  pub event_id_errors  : u16,
+}
+
+impl fmt::Display for TrackerEventIDEchoPacket {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerEventIDEchoPacket");
+    repr    += &(format!("\n {}", self.telemetry_header));
+    repr    += &(format!("\n {}", self.tracker_header));
+    repr    += "\n*** TEMP ***";
+    repr    += &(format!("\n {:?}>", self.temp));
+    write!(f, "{}", repr)
+  }
+}
+
+impl TrackerEventIDEchoPacket {
+  pub fn new() -> Self {
+    Self {
+      telemetry_header : TelemetryHeader::new(),
+      tracker_header   : TrackerHeader::new(),
+      temp             : [0;12],
+      event_id         : 0,
+      event_id_errors  : 0,
+    }
+  }
+  
+  pub fn from_bytestream(stream: &Vec<u8>,
+                         pos: &mut usize)
+    -> Result<Self, SerializationError> {
+    let mut tp          = TrackerEventIDEchoPacket::new();
+    tp.tracker_header   = TrackerHeader::from_bytestream(stream, pos)?;
+    if tp.tracker_header.packet_id != 0x03 {
+      error!("This is not a TrackerEventIDEchoPacket, but has packet_id {} instead!", tp.tracker_header.packet_id);
+      return Err(SerializationError::IncorrectPacketType);
+    }
+    if stream.len() == *pos as usize {
+      error!("Packet contains only header!");
+      return Ok(tp);
+    }
+    //if stream.len() - *pos < (36*3 + 1) {
+    //  return Err(SerializationError::StreamTooShort);
+    //}
+    tp.event_id        = parse_u32(stream, pos);
+    tp.event_id_errors = parse_u16(stream, pos);
+    Ok(tp)
+  }
+}
+
 
 /// This is mine :) Not telemetry
 pub struct GapsTracker {

@@ -225,7 +225,6 @@ fn main() {
       }
     } // end Some
   }
-  let calc_crc32            = config.rb_settings.calc_crc32;
   if config.rb_settings.only_perfect_events {
     error!("Currently we are not supporting the only_perfect_events setting. See issue #57");
   }
@@ -272,7 +271,7 @@ fn main() {
     // preamp bias settings
     cfg_if::cfg_if!{
       if #[cfg(feature="database")] {
-        let preamp_cfg = config.preamp_settings;
+        let preamp_cfg = config.preamp_settings.clone();
         if preamp_cfg.set_strategy == ParameterSetStrategy::Board 
           && preamp_cfg.set_preamp_voltages {
           match connect_to_db(db_path) {
@@ -410,7 +409,9 @@ fn main() {
   let one_sec     = Duration::from_secs(1);  
 
   // setting up inter-thread comms
-  let thread_control : Arc<Mutex<ThreadControl>> = Arc::new(Mutex::new(ThreadControl::new())); 
+  let mut tc = ThreadControl::new();
+  tc.liftof_settings = config.clone();
+  let thread_control : Arc<Mutex<ThreadControl>> = Arc::new(Mutex::new(tc)); 
 
   let (rc_to_runner, rc_from_cmdr)      : 
       (Sender<RunConfig>, Receiver<RunConfig>)                = unbounded();
@@ -486,7 +487,6 @@ fn main() {
                             &tp_to_pub_ev,
                             &dtf_from_runner,
                             args.verbose,
-                            calc_crc32,
                             proc_control,
                             ev_stats,
                             only_perfect_events)

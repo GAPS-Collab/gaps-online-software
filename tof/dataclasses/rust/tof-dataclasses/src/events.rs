@@ -66,6 +66,8 @@ pub enum EventStatus {
   /// This can be used if there is a version
   /// missmatch and we have to hack something
   IncompatibleData       = 22u8,
+  /// The TofEvent timed out while waiting for more Readoutboards
+  EventTimeOut           = 23u8,
   GoodNoCRCOrErrBitCheck = 39u8,
   /// The event status is good, but we did not 
   /// perform any CRC32 check
@@ -117,6 +119,9 @@ impl EventStatus {
       EventStatus::IncompatibleData => {
         return 22;
       }
+      EventStatus::EventTimeOut => {
+        return 23;
+      }
       EventStatus::GoodNoCRCOrErrBitCheck => {
         return 39;
       }
@@ -136,20 +141,21 @@ impl EventStatus {
 impl From<u8> for EventStatus {
   fn from(value: u8) -> Self {
     match value {
-      0u8  => EventStatus::Unknown,
-      10u8 => EventStatus::CRC32Wrong,
-      11u8 => EventStatus::TailWrong,
-      12u8 => EventStatus::ChannelIDWrong,
-      13u8 => EventStatus::CellSyncErrors,
-      14u8 => EventStatus::ChnSyncErrors,
-      15u8 => EventStatus::CellAndChnSyncErrors,
-      16u8 => EventStatus::AnyDataMangling,
-      21u8 => EventStatus::IncompleteReadout,
-      22u8 => EventStatus::IncompatibleData,
-      39u8 => EventStatus::GoodNoCRCOrErrBitCheck,
-      40u8 => EventStatus::GoodNoCRCCheck,
-      41u8 => EventStatus::GoodNoErrBitCheck,
-      42u8 => EventStatus::Perfect,
+      0  => EventStatus::Unknown,
+      10 => EventStatus::CRC32Wrong,
+      11 => EventStatus::TailWrong,
+      12 => EventStatus::ChannelIDWrong,
+      13 => EventStatus::CellSyncErrors,
+      14 => EventStatus::ChnSyncErrors,
+      15 => EventStatus::CellAndChnSyncErrors,
+      16 => EventStatus::AnyDataMangling,
+      21 => EventStatus::IncompleteReadout,
+      22 => EventStatus::IncompatibleData,
+      23 => EventStatus::EventTimeOut,
+      39 => EventStatus::GoodNoCRCOrErrBitCheck,
+      40 => EventStatus::GoodNoCRCCheck,
+      41 => EventStatus::GoodNoErrBitCheck,
+      42 => EventStatus::Perfect,
       _    => EventStatus::Unknown
     }
   }
@@ -170,6 +176,7 @@ impl FromRandom for EventStatus {
       EventStatus::AnyDataMangling,
       EventStatus::IncompleteReadout,
       EventStatus::IncompatibleData,
+      EventStatus::EventTimeOut,
       EventStatus::GoodNoCRCOrErrBitCheck,
       EventStatus::GoodNoCRCCheck,
       EventStatus::GoodNoErrBitCheck,

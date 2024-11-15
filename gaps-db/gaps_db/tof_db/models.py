@@ -3,6 +3,17 @@ Building blocks of the TOF
 """
 
 from django.db import models
+import numpy as np
+import matplotlib.pyplot as plt
+
+from matplotlib.patches import Rectangle
+
+vtk_import_success = False
+try:
+    import vtk
+    vtk_import_success = True
+except  ImportError as e:
+    print('[gaps-db] Unable to import vtk, plotting options might be limited!')
 
 class RAT(models.Model):
     """
@@ -102,6 +113,8 @@ class Paddle(models.Model):
     A single TOF paddle with 2 ends 
     comnected
     """
+    # this is to cache the points for plotting
+    points   = None
     paddle_id                 = models.PositiveSmallIntegerField(
                                     unique=True,
                                     primary_key=True,
@@ -182,6 +195,18 @@ class Paddle(models.Model):
     length                     = models.FloatField(null=False,
                                                    default=0.0,
                                                    help_text="(Local) length of the paddle")
+    normal_x                   = models.FloatField(null=False,
+                                                   default=0.0,
+                                                   help_text="Normal vector x component (SiPM pointing) in global coordinate system")
+    normal_y                   = models.FloatField(null=False,
+                                                   default=0.0,
+                                                   help_text="Normal vector y component (SiPM pointing) in global coordinate system")
+    normal_z                   = models.FloatField(null=False,
+                                                   default=0.0,
+                                                   help_text="Normal vector z component (SiPM pointing) in global coordinate system")
+    
+
+
     global_pos_x_l0            = models.FloatField(
                                      null=False,
                                      default=0.0,
@@ -206,6 +231,282 @@ class Paddle(models.Model):
                                      null=False,
                                      default=0.0,
                                      help_text="Global X (L0) position of the A side")
+    global_pos_x_l0_B          = models.FloatField(
+                                     null=False,
+                                     default=0.0,
+                                     help_text="Global X (L0) position of the B side")
+    global_pos_y_l0_B          = models.FloatField(
+                                     null=False,
+                                     default=0.0,
+                                     help_text="Global X (L0) position of the B side")
+    global_pos_z_l0_B          = models.FloatField(
+                                     null=False,
+                                     default=0.0,
+                                     help_text="Global X (L0) position of the B side")
+    @property 
+    def principal(self):
+        """
+        Return the vector along the longest axis
+        """
+        pr = (self.global_pos_x_l0_A - self.global_pos_x_l0,
+              self.global_pos_y_l0_A - self.global_pos_y_l0,
+              self.global_pos_z_l0_A - self.global_pos_z_l0)
+        pr = np.array(pr)
+        length    = np.sqrt((pr[0]**2 + pr[1]**2 + pr[2]**2))
+        pr = pr/length
+        return pr
+
+    @property
+    def normal(self):
+        """
+        Return the normal vector of the paddle
+        """
+        nrm = (self.normal_x, self.normal_y, self.normal_z)
+        nrm = np.array(nrm)
+        return nrm
+
+    def _create_box(self):
+
+        # we can kind of cheat and do a cheap transform
+        # the principal is either x, y or z axis, no mix-ins
+        pr = self.principal
+        norm = self.normal
+        cube = vtk.vtkCubeSource()
+        edgepaddle = False
+        if (pr == np.array([1,0,0])).all() or (pr == np.array([-1,0,0])).all():
+            cube.SetXLength(self.length)  # Width in X
+            if (norm == np.array([0,1,0])).all() or (norm == np.array([0,-1,0])).all():
+                cube.SetYLength(self.height)
+                cube.SetZLength(self.width)
+            elif (norm == np.array([0,0,1])).all() or (norm == np.array([0,0,-1])).all():
+                cube.SetZLength(self.height)
+                cube.SetYLength(self.width)
+            else:
+                raise ValueError
+        elif (pr == np.array([0,1,0])).all() or (pr == np.array([0,-1,0])).all():
+            cube.SetYLength(self.length)  # Width in X
+            if (norm == np.array([1,0,0])).all() or (norm == np.array([-1,0,0])).all():
+                cube.SetZLength(self.width)
+                cube.SetXLength(self.height)
+            elif (norm == np.array([0,0,1])).all() or (norm == np.array([0,0,-1])).all():
+                cube.SetXLength(self.width)
+                cube.SetZLength(self.height)
+            else:
+                raise ValueError
+        elif (pr == np.array([0,0,1])).all() or (pr == np.array([0,0,-1])).all():
+            cube.SetZLength(self.length)
+            # set the other two and then we have to rotat by 45 deg
+            cube.SetXLength(self.height)
+            cube.SetYLength(self.width)
+            edgepaddle = True
+            #transform_filter = vtk.vtkTransformPolyDataFilter()
+            #transform_filter.SetInputData(cube.GetOutput())
+            #transform_filter.SetTransform(trafo)
+            #transform_filter.Update()
+        else:
+            ValueError(f'Unexpected principal axes {pr}')
+        cube.Update()
+        transform = vtk.vtkTransform()
+        transform.Translate(self.global_pos_x_l0, self.global_pos_y_l0, self.global_pos_z_l0)
+        if edgepaddle:
+            transform.RotateWXYZ(45, [0,0,1])  # angle, (x, y, z) axis to rotate around
+        transform_filter = vtk.vtkTransformPolyDataFilter()
+        transform_filter.SetInputData(cube.GetOutput())
+        transform_filter.SetTransform(transform)
+        transform_filter.Update()
+        #print (cube)
+        # Extract the transformed points
+        points = transform_filter.GetOutput().GetPoints()
+        num_points = points.GetNumberOfPoints()
+        transformed_points = np.array([points.GetPoint(i) for i in range(num_points)])
+        return transformed_points
+        #if vtk_import_success:
+        #    # Use vtkCubeSource to create a cube (or box)
+        #    cube.SetXLength(self.length)  # Width in X
+        #    cube.SetYLength(self.width)  # Height in Y
+        #    cube.SetZLength(self.height)  # Depth in Z
+        #    cube.Update()         # Update the cube geometry
+        #    return cube
+        #else:
+        #    raise NotImplementedError('This requires vtk to be available on your system!')
+
+    def _apply_transform(self, box, trafo):
+        # Apply the transformation to the cube
+        transform_filter = vtk.vtkTransformPolyDataFilter()
+        transform_filter.SetInputData(box.GetOutput())
+        transform_filter.SetTransform(trafo)
+        transform_filter.Update()
+
+        # Extract the transformed points
+        points = transform_filter.GetOutput().GetPoints()
+        num_points = points.GetNumberOfPoints()
+        transformed_points = np.array([points.GetPoint(i) for i in range(num_points)])
+        return transformed_points
+
+    def _create_transform(self):
+        if not vtk_import_success:
+            raise NotImplementedError('This requires vtk to be available on your system!')
+        else:   
+            # Create a transformation object
+            transform = vtk.vtkTransform()
+            # Calculate the axis of rotation (cross product of x-axis and principal vector)
+            principal_vector = self.principal
+            normal_vector    = self.normal
+            x_axis = np.array([1,0,0])
+            # the normal axis is in th 
+            rotation_axis = np.cross(x_axis, principal_vector)
+            # Calculate the angle of rotation (dot product and arccos)
+            cos_angle = np.dot(x_axis, principal_vector)
+            angle = np.degrees(np.arccos(cos_angle))
+
+
+            # Apply the rotation (angle in degrees)
+            transform.Translate(self.global_pos_x_l0, self.global_pos_y_l0, self.global_pos_z_l0)
+            transform.RotateWXYZ(angle, rotation_axis)  # angle, (x, y, z) axis to rotate around
+            #transform.RotateWXYZ(ang2, rot_ax2)  # angle, (x, y, z) axis to rotate around
+            #normal_vector = np.array([1,0,0])
+            
+            #normal_vector = normal_vector / np.sqrt(normal_vector[0]**2 + normal_vector[1]**2 + normal_vector[2]**2)
+            #rot_ax2  = np.cross(np.array([0,0,1]), normal_vector)
+            ##rot_ax2  = np.cross(principal_vector, normal_vector) 
+            #cos_ang2 = np.dot(np.array([0,0,1]), normal_vector) 
+            ##normal_vector ist x, principal y um y 90deg
+
+            #ang2     = np.degrees(np.arccos(cos_ang2))
+            #print (f'Performing normal adjustment, {ang2}, {principal_vector} {normal_vector} {rot_ax2}')
+            #transform.RotateWXYZ(ang2, rot_ax2)  # angle, (x, y, z) axis to rotate around
+                        
+            #normal_transform = vtk.vtkTransform()
+            # Get the rotation vector
+            #rotvec = np.array([0,0,0])
+            #for j,k in enumerate(self.normal):
+            #    if self.normal[k] > 0:
+
+            #    if j == 2:
+            #        continue
+            #    if k > 0:
+            #        if j == 0:
+            #            normal_transform.RotateWXYZ(90, [0,1,0])
+            #        if j == 1:
+            #            normal_transform.RotateWXYZ(90, [
+            # Apply the transformation to the box
+            return transform
+            #transform_filter = vtk.vtkTransformPolyDataFilter()
+            #transform_filter.SetTransform(transform)
+            #transform_filter.SetInputData(box_polydata)
+            #transform_filter.Update()
+
+    def _create_transform2(self, shortest_axis):
+        # Create a transformation object
+        transform = vtk.vtkTransform()
+        # Calculate the axis of rotation (cross product of x-axis and principal vector)
+        principal_vector = newaxis
+        normal_vector    = self.normal
+        z_axis = np.array([0,0,1])
+        # the normal axis is in th 
+        rotation_axis = np.cross(z_axis, shortest_axis)
+        # Calculate the angle of rotation (dot product and arccos)
+        cos_angle = np.dot(x_axis, principal_vector)
+        angle = np.degrees(np.arccos(cos_angle))
+
+
+        # Apply the rotation (angle in degrees)
+        transform.Translate(self.global_pos_x_l0, self.global_pos_y_l0, self.global_pos_z_l0)
+        transform.RotateWXYZ(angle, rotation_axis)  # angle, (x, y, z) axis to rotate around
+        return transform 
+            #return transform_filter.GetOutput()
+
+    def calculate_principal_axes(transformed_points):
+        # The box has 8 corner points; they represent the transformed box in 3D.
+        # The first corner can be used as a reference, and we can calculate the principal axes 
+        # by computing vectors between the first corner and others.
+        
+        origin = transformed_points[0]  # Reference point (first corner)
+        
+        # Find points along the X, Y, and Z axes relative to the origin
+        x_axis_vector = transformed_points[1] - origin  # X-axis aligned point
+        y_axis_vector = transformed_points[3] - origin  # Y-axis aligned point
+        z_axis_vector = transformed_points[4] - origin  # Z-axis aligned point
+    
+        # Normalize the vectors to get the direction of the principal axes
+        new_x_axis = x_axis_vector / np.linalg.norm(x_axis_vector)
+        new_y_axis = y_axis_vector / np.linalg.norm(y_axis_vector)
+        new_z_axis = z_axis_vector / np.linalg.norm(z_axis_vector)
+        
+        # Also return the lengths of the axes (dimensions)
+        x_length = np.linalg.norm(x_axis_vector)
+        y_length = np.linalg.norm(y_axis_vector)
+        z_length = np.linalg.norm(z_axis_vector)
+        return new_x_axis, new_y_axis, new_z_axis, x_length, y_length, z_length
+
+    def get_shortest_dimension_vector(x_axis, y_axis, z_axis, x_length, y_length, z_length):
+        lengths = np.array([x_length, y_length, z_length])
+        vectors = [x_axis, y_axis, z_axis]
+    
+        # Find the shortest dimension and corresponding vector
+        min_index = np.argmin(lengths)
+        shortest_vector = vectors[min_index]
+        shortest_length = lengths[min_index]
+    
+        return shortest_vector, shortest_length
+
+    def get_projections(self):
+        """
+        Returns xy, xz, yz projections to be plotted with 
+        python matplotlib
+        """
+        if self.points is None:
+            self._cache_box_points()
+        xy_points = self.points[:, :2]
+        xy_patch  = Rectangle(xy_points.min(axis=0), *(xy_points.max(axis=0) - xy_points.min(axis=0)),
+                              fill=None, edgecolor='r')
+        #xz_points = self.points[:, 1:]
+        xz_points = self.points[:, [0,2]]
+        xz_patch  = Rectangle(xz_points.min(axis=0), *(xz_points.max(axis=0) - xz_points.min(axis=0)),
+                              fill=None, edgecolor='r')
+        yz_points = self.points[:, 1:]
+        yz_patch  = Rectangle(yz_points.min(axis=0), *(yz_points.max(axis=0) - yz_points.min(axis=0)),
+                              fill=None, edgecolor='r')
+
+        return xy_patch, xz_patch, yz_patch
+
+
+    def _cache_box_points(self):
+        if self.points is None:
+            box    = self._create_box()
+            self.points = box
+            
+    def draw_xy(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) -> Rectangle:
+        """
+        Draw a matplotlib patch for xy projection
+        """
+        self._cache_box_points()
+        xy_points = self.points[:, :2]
+        xy_patch  = Rectangle(xy_points.min(axis=0), *(xy_points.max(axis=0) - xy_points.min(axis=0)),
+                              fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
+        return xy_patch
+    
+    def draw_xz(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) -> Rectangle:
+        """
+        Draw a matplotlib patch for xy projection
+        """
+        self._cache_box_points()
+        xz_points = self.points[:, [0,2]]
+        xz_patch  = Rectangle(xz_points.min(axis=0), *(xz_points.max(axis=0) - xz_points.min(axis=0)),
+                              fill=fill, edgecolor=edgecolor, facecolor=facecolor, alpha=alpha, lw=lw)
+        return xz_patch
+
+    def draw_yz(self, fill=False, lw=0.8, edgecolor='b',facecolor='b', alpha=0.7) -> Rectangle:
+        """
+        Draw a matplotlib patch for xy projection
+        """
+        self._cache_box_points()
+        yz_points = self.points[:, 1:]
+        yz_patch  = Rectangle(yz_points.min(axis=0), *(yz_points.max(axis=0) - yz_points.min(axis=0)),
+                              fill=fill, edgecolor=edgecolor, facecolor=facecolor, alpha=alpha, lw=lw)
+        return yz_patch
+
+
     @property
     def lt_slot(self) -> int:
         """
@@ -252,12 +553,16 @@ class Paddle(models.Model):
         _repr += f'\n    \u21B3 {self.cable_len}'
         _repr += f'\n    (Harting -> RB)'
         _repr += f'\n  ** Coordinates (L0) & dimensions **'
-        _repr += f'\n   length, width, height [mm]'
+        _repr += f'\n   length, width, height [cm]'
         _repr += f'\n    \u21B3 [{self.length:.2f}, {self.width:.2f}, {self.height:.2f}]'
+        _repr += f'\n   normal vector (global) (SiPM pointing direction)'
+        _repr += f'\n    \u21B3 [{self.normal_x:.2f}, {self.normal_y:.2f}, {self.normal_z:.2f}]'
         _repr += f'\n   center [mm]:'
         _repr += f'\n    \u21B3 [{self.global_pos_x_l0:.2f}, {self.global_pos_y_l0:.2f}, {self.global_pos_z_l0:.2f}]'
         _repr += f'\n   A-side [mm]:'
         _repr += f'\n    \u21B3 [{self.global_pos_x_l0_A:.2f}, {self.global_pos_y_l0_A:.2f}, {self.global_pos_z_l0_A:.2f}]>'
+        _repr += f'\n   B-side [mm]:'
+        _repr += f'\n    \u21B3 [{self.global_pos_x_l0_B:.2f}, {self.global_pos_y_l0_B:.2f}, {self.global_pos_z_l0_B:.2f}]>'
         return _repr
 
     def __str__(self):

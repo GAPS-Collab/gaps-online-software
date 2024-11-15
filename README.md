@@ -135,4 +135,4 @@ Please see the README.md in the individual subfolders.
 
 * A. Stoessl <stoessl@hawaii.edu>
 
-* P. Lazzaroni <paolo.lazzaroni@unibg.it>
+* G. Tytus <gtytus@hawaii.it>
