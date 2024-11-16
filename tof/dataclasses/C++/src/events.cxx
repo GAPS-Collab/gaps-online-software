@@ -1047,12 +1047,12 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
  u8  version        = Gaps::parse_u8(bytestream, ver_pos) & 0xc0;
  hit.version        = (Gaps::ProtocolVersion) version;
  hit.paddle_id      = bytestream[pos]; pos+=1;
- hit.time_a_f16     = Gaps::parse_f16(bytestream, pos); 
- hit.time_b_f16     = Gaps::parse_f16(bytestream, pos); 
- hit.peak_a_f16     = Gaps::parse_f16(bytestream, pos); 
- hit.peak_b_f16     = Gaps::parse_f16(bytestream, pos); 
- hit.charge_a_f16   = Gaps::parse_f16(bytestream, pos); 
- hit.charge_b_f16   = Gaps::parse_f16(bytestream, pos); 
+ hit.time_a_f32     = Gaps::parse_f16(bytestream, pos); 
+ hit.time_b_f32     = Gaps::parse_f16(bytestream, pos); 
+ hit.peak_a_f32     = Gaps::parse_f16(bytestream, pos); 
+ hit.peak_b_f32     = Gaps::parse_f16(bytestream, pos); 
+ hit.charge_a_f32   = Gaps::parse_f16(bytestream, pos); 
+ hit.charge_b_f32   = Gaps::parse_f16(bytestream, pos); 
  hit.charge_min_i   = Gaps::parse_u16(bytestream, pos); 
  hit.baseline_a     = Gaps::parse_f16(bytestream, pos);
  hit.baseline_a_rms = Gaps::parse_f16(bytestream, pos);
