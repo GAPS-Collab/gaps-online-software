@@ -4,6 +4,9 @@
 use std::collections::HashMap;
 use std::fmt;
 
+#[cfg(feature = "database")]
+use tof_dataclasses::database::ReadoutBoard;
+
 use crate::settings::LiftofSettings;
 
 /// Send runtime information 
@@ -38,7 +41,10 @@ pub struct ThreadControl {
   pub run_id                     : u32,
   /// The number of boards available
   pub n_rbs                      : u32,
-  /// Write data to disk
+  #[cfg(feature = "database")]
+  /// The active readoutboards in the Tof
+  pub rb_list                    : Vec<ReadoutBoard>,
+  /// Decide if data is actually written to disk
   pub write_data_to_disk         : bool,
   /// indicator that a new 
   /// run has started
@@ -66,6 +72,8 @@ impl ThreadControl {
       thread_signal_hdlr_active  : true,
       run_id                     : 0,
       n_rbs                      : 0,
+      #[cfg(feature = "database")]
+      rb_list                    : Vec::<ReadoutBoard>::new(),
       write_data_to_disk         : false,
       new_run_start_flag         : false,
       reset_mtb_daq              : false,
