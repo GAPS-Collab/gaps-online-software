@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wide-0.7.28/src/f64x2_.rs`."><title>f64x2_.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wide" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wide-0.7.30/src/f64x2_.rs`."><title>f64x2_.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wide" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1648,15 +1648,6 @@
 <a href="#1648" id="1648">1648</a>
 <a href="#1649" id="1649">1649</a>
 <a href="#1650" id="1650">1650</a>
-<a href="#1651" id="1651">1651</a>
-<a href="#1652" id="1652">1652</a>
-<a href="#1653" id="1653">1653</a>
-<a href="#1654" id="1654">1654</a>
-<a href="#1655" id="1655">1655</a>
-<a href="#1656" id="1656">1656</a>
-<a href="#1657" id="1657">1657</a>
-<a href="#1658" id="1658">1658</a>
-<a href="#1659" id="1659">1659</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="macro">pick!</span> {
@@ -1716,7 +1707,8 @@
 
 <span class="macro">macro_rules!</span> const_f64_as_f64x2 {
   (<span class="macro-nonterminal">$i</span>:ident, <span class="macro-nonterminal">$f</span>:expr) =&gt; {
-    <span class="kw">pub const </span><span class="macro-nonterminal">$i</span>: f64x2 =
+    <span class="attr">#[allow(non_upper_case_globals)]
+    </span><span class="kw">pub const </span><span class="macro-nonterminal">$i</span>: f64x2 =
       <span class="kw">unsafe </span>{ ConstUnionHack128bit { f64a2: [<span class="macro-nonterminal">$f</span>; <span class="number">2</span>] }.f64x2 };
   };
 }
@@ -2386,8 +2378,7 @@
     (<span class="self">self </span>&amp; magnitude_mask) | (sign &amp; <span class="self">Self</span>::from(-<span class="number">0.0</span>))
   }
 
-  <span class="attr">#[allow(non_upper_case_globals)]
-  #[inline]
+  <span class="attr">#[inline]
   </span><span class="kw">pub fn </span>asin_acos(<span class="self">self</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2478,8 +2469,7 @@
     (asin, acos)
   }
 
-  <span class="attr">#[allow(non_upper_case_globals)]
-  #[inline]
+  <span class="attr">#[inline]
   </span><span class="kw">pub fn </span>acos(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2565,8 +2555,7 @@
     acos
   }
 
-  <span class="attr">#[allow(non_upper_case_globals)]
-  #[inline]
+  <span class="attr">#[inline]
   </span><span class="kw">pub fn </span>asin(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2652,8 +2641,7 @@
     asin
   }
 
-  <span class="attr">#[allow(non_upper_case_globals)]
-  #[inline]
+  <span class="attr">#[inline]
   </span><span class="kw">pub fn </span>atan(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2709,8 +2697,7 @@
     re
   }
 
-  <span class="attr">#[allow(non_upper_case_globals)]
-  #[inline]
+  <span class="attr">#[inline]
   </span><span class="kw">pub fn </span>atan2(<span class="self">self</span>, x: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2792,7 +2779,6 @@
 
   <span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>sin_cos(<span class="self">self</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2954,7 +2940,6 @@
   }
 
   <span class="attr">#[inline]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">fn </span>vm_pow2n(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="macro">const_f64_as_f64x2!</span>(pow2_52, <span class="number">4503599627370496.0</span>);
     <span class="macro">const_f64_as_f64x2!</span>(bias, <span class="number">1023.0</span>);
@@ -2966,7 +2951,6 @@
   <span class="doccomment">/// Calculate the exponent of a packed `f64x2`
   </span><span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>exp(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="macro">const_f64_as_f64x2!</span>(P2, <span class="number">1.0 </span>/ <span class="number">2.0</span>);
     <span class="macro">const_f64_as_f64x2!</span>(P3, <span class="number">1.0 </span>/ <span class="number">6.0</span>);
@@ -2997,7 +2981,6 @@
   }
 
   <span class="attr">#[inline]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">fn </span>exponent(<span class="self">self</span>) -&gt; f64x2 {
     <span class="macro">const_f64_as_f64x2!</span>(pow2_52, <span class="number">4503599627370496.0</span>);
     <span class="macro">const_f64_as_f64x2!</span>(bias, <span class="number">1023.0</span>);
@@ -3010,7 +2993,6 @@
   }
 
   <span class="attr">#[inline]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">fn </span>fraction_2(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>t1 = cast::&lt;<span class="kw">_</span>, u64x2&gt;(<span class="self">self</span>);
     <span class="kw">let </span>t2 = cast::&lt;<span class="kw">_</span>, u64x2&gt;(
@@ -3069,7 +3051,6 @@
 
   <span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>ln(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="macro">const_f64_as_f64x2!</span>(P0, <span class="number">7.70838733755885391666E0</span>);
     <span class="macro">const_f64_as_f64x2!</span>(P1, <span class="number">1.79368678507819816313E1</span>);
@@ -3130,7 +3111,6 @@
 
   <span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>pow_f64x2(<span class="self">self</span>, y: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
     <span class="macro">const_f64_as_f64x2!</span>(ln2d_hi, <span class="number">0.693145751953125</span>);
     <span class="macro">const_f64_as_f64x2!</span>(ln2d_lo, <span class="number">1.42860682030941723212E-6</span>);
@@ -3268,7 +3248,8 @@
     cast_mut(<span class="self">self</span>)
   }
 
-  <span class="doccomment">/// Converts the lower two `i32` lanes to two `f64` lanes (and dropping the higher two `i32` lanes)
+  <span class="doccomment">/// Converts the lower two `i32` lanes to two `f64` lanes (and dropping the
+  /// higher two `i32` lanes)
   </span><span class="attr">#[inline]
   </span><span class="kw">pub fn </span>from_i32x4_lower2(v: i32x4) -&gt; <span class="self">Self </span>{
     <span class="macro">pick!</span> {
@@ -3289,7 +3270,8 @@
 }
 
 <span class="kw">impl </span>From&lt;i32x4&gt; <span class="kw">for </span>f64x2 {
-  <span class="doccomment">/// Converts the lower two `i32` lanes to two `f64` lanes (and dropping the higher two `i32` lanes)
+  <span class="doccomment">/// Converts the lower two `i32` lanes to two `f64` lanes (and dropping the
+  /// higher two `i32` lanes)
   </span><span class="attr">#[inline]
   </span><span class="kw">fn </span>from(v: i32x4) -&gt; <span class="self">Self </span>{
     <span class="self">Self</span>::from_i32x4_lower2(v)

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wide-0.7.28/src/f32x8_.rs`."><title>f32x8_.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wide" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wide-0.7.30/src/f32x8_.rs`."><title>f32x8_.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wide" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1445,17 +1445,6 @@
 <a href="#1445" id="1445">1445</a>
 <a href="#1446" id="1446">1446</a>
 <a href="#1447" id="1447">1447</a>
-<a href="#1448" id="1448">1448</a>
-<a href="#1449" id="1449">1449</a>
-<a href="#1450" id="1450">1450</a>
-<a href="#1451" id="1451">1451</a>
-<a href="#1452" id="1452">1452</a>
-<a href="#1453" id="1453">1453</a>
-<a href="#1454" id="1454">1454</a>
-<a href="#1455" id="1455">1455</a>
-<a href="#1456" id="1456">1456</a>
-<a href="#1457" id="1457">1457</a>
-<a href="#1458" id="1458">1458</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="macro">pick!</span> {
@@ -1472,7 +1461,8 @@
 
 <span class="macro">macro_rules!</span> const_f32_as_f32x8 {
   (<span class="macro-nonterminal">$i</span>:ident, <span class="macro-nonterminal">$f</span>:expr) =&gt; {
-    <span class="kw">pub const </span><span class="macro-nonterminal">$i</span>: f32x8 =
+    <span class="attr">#[allow(non_upper_case_globals)]
+    </span><span class="kw">pub const </span><span class="macro-nonterminal">$i</span>: f32x8 =
       <span class="kw">unsafe </span>{ ConstUnionHack256bit { f32a8: [<span class="macro-nonterminal">$f</span>; <span class="number">8</span>] }.f32x8 };
   };
 }
@@ -2138,8 +2128,7 @@
     (<span class="self">self </span>&amp; magnitude_mask) | (sign &amp; <span class="self">Self</span>::from(-<span class="number">0.0</span>))
   }
 
-  <span class="attr">#[allow(non_upper_case_globals)]
-  #[inline]
+  <span class="attr">#[inline]
   </span><span class="kw">pub fn </span>asin_acos(<span class="self">self</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2180,7 +2169,6 @@
 
   <span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>asin(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2216,7 +2204,6 @@
 
   <span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>acos(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2250,8 +2237,7 @@
     acos
   }
 
-  <span class="attr">#[allow(non_upper_case_globals)]
-  #[inline]
+  <span class="attr">#[inline]
   </span><span class="kw">pub fn </span>atan(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2289,8 +2275,7 @@
     re
   }
 
-  <span class="attr">#[allow(non_upper_case_globals)]
-  #[inline]
+  <span class="attr">#[inline]
   </span><span class="kw">pub fn </span>atan2(<span class="self">self</span>, x: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2348,7 +2333,6 @@
 
   <span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>sin_cos(<span class="self">self</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2511,7 +2495,6 @@
   }
 
   <span class="attr">#[inline]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">fn </span>vm_pow2n(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="macro">const_f32_as_f32x8!</span>(pow2_23, <span class="number">8388608.0</span>);
     <span class="macro">const_f32_as_f32x8!</span>(bias, <span class="number">127.0</span>);
@@ -2523,7 +2506,6 @@
   <span class="doccomment">/// Calculate the exponent of a packed `f32x8`
   </span><span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>exp(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="macro">const_f32_as_f32x8!</span>(P0, <span class="number">1.0 </span>/ <span class="number">2.0</span>);
     <span class="macro">const_f32_as_f32x8!</span>(P1, <span class="number">1.0 </span>/ <span class="number">6.0</span>);
@@ -2549,7 +2531,6 @@
   }
 
   <span class="attr">#[inline]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">fn </span>exponent(<span class="self">self</span>) -&gt; f32x8 {
     <span class="macro">const_f32_as_f32x8!</span>(pow2_23, <span class="number">8388608.0</span>);
     <span class="macro">const_f32_as_f32x8!</span>(bias, <span class="number">127.0</span>);
@@ -2562,7 +2543,6 @@
   }
 
   <span class="attr">#[inline]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">fn </span>fraction_2(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>t1 = cast::&lt;<span class="kw">_</span>, u32x8&gt;(<span class="self">self</span>);
     <span class="kw">let </span>t2 = cast::&lt;<span class="kw">_</span>, u32x8&gt;(
@@ -2621,7 +2601,6 @@
   <span class="doccomment">/// Natural log (ln(x))
   </span><span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>ln(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="macro">const_f32_as_f32x8!</span>(HALF, <span class="number">0.5</span>);
     <span class="macro">const_f32_as_f32x8!</span>(P0, <span class="number">3.3333331174E-1</span>);
@@ -2677,7 +2656,6 @@
 
   <span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>pow_f32x8(<span class="self">self</span>, y: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
     <span class="macro">const_f32_as_f32x8!</span>(ln2f_hi, <span class="number">0.693359375</span>);
     <span class="macro">const_f32_as_f32x8!</span>(ln2f_lo, -<span class="number">2.12194440e-4</span>);
