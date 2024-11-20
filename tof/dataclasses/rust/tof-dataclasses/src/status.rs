@@ -136,6 +136,12 @@ impl TofDetectorStatus {
   }
 }
 
+impl Default for TofDetectorStatus {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
 impl Serialization for TofDetectorStatus {
   const HEAD : u16   = 0xAAAA;
   const TAIL : u16   = 0x5555;
