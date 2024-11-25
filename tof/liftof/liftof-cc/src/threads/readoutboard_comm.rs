@@ -5,35 +5,35 @@
 //    Path,
 //    PathBuf,
 //};
+use std::collections::HashMap;
 
 use std::sync::{
-    Arc,
-    Mutex,
+  Arc,
+  Mutex,
 };
+
 use std::time::{
-    Instant,
-    //Duration,
+  Instant,
+  //Duration,
 };
-
-//use tof_dataclasses::threading::{
-//    ThreadControl,
-//};
-
 
 use crossbeam_channel::Sender;
 
 use tof_dataclasses::database::ReadoutBoard;
 use tof_dataclasses::events::RBEvent;
 use tof_dataclasses::packets::{
-    TofPacket,
-    PacketType
+  TofPacket,
+  PacketType
 };
+
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::commands::TofResponse;
+use tof_dataclasses::calibrations::RBCalibrations;
 
 use liftof_lib::{
-    waveform_analysis,
+  waveform_analysis,
 };
+
 use liftof_lib::thread_control::ThreadControl;
 
 use liftof_lib::settings::AnalysisEngineSettings;
@@ -64,12 +64,24 @@ use liftof_lib::settings::AnalysisEngineSettings;
 /// * ack_sender          : Intercept acknowledgement packets and forward them to elswhere
 pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                                  tp_to_sink          : Sender<TofPacket>,
-                                 rb                  : ReadoutBoard,
+                                 mut rb              : ReadoutBoard,
                                  print_packets       : bool,
                                  run_analysis_engine : bool,
                                  ae_settings         : AnalysisEngineSettings,
                                  ack_sender          : Sender<TofResponse>,
                                  thread_control      : Arc<Mutex<ThreadControl>>) {
+
+  let mut this_status = HashMap::<u16, bool>::new();
+  for k in 1..321 {
+    this_status.insert(k,false);
+  }
+  match rb.load_latest_calibration() {
+    Err(err) => warn!("Unable to load calibration for RB {}! {}", rb.rb_id, err),
+    Ok(_)    => {
+      info!("Loaded calibration for board {} successfully!", rb.rb_id);
+    }
+  }
+
   let zmq_ctx = zmq::Context::new();
   let board_id = rb.rb_id; //rb.id.unwrap();
   info!("initializing RB thread for board {}!", board_id);
@@ -95,6 +107,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
    Ok(_)    => info!("Subscribed to {:?}!", topic),
   }
   let mut tc_timer = Instant::now();
+  let mut verification_active = false;
   loop {
     if tc_timer.elapsed().as_secs_f32() > 0.9 {
       match thread_control.try_lock() {
@@ -104,6 +117,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
             //println!("= => [rbcomm] initiate ending thread for RB {}!", board_id);
             break;
           }
+          verification_active = tc.verification_active;
         },
         Err(err) => {
           error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -146,7 +160,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
               PacketType::RBEvent | PacketType::RBEventMemoryView => {
                 let mut event = RBEvent::from(&tp);
                 if event.hits.len() == 0 {
-                  if run_analysis_engine {
+                  if run_analysis_engine   {
                     match waveform_analysis(&mut event, 
                                             &rb,
                                             ae_settings) {
@@ -156,22 +170,57 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                       }
                     }
                   }
-                };
-                match ev_to_builder.send(event) {
-                  Ok(_) => (),
-                  Err(err) => {
-                    error!("Unable to send event! Err {err}");
+                }
+                if verification_active {
+                  for h in &event.hits {
+                    // average charge/peak hit
+                    let verification_charge_threshhold = 10.0f32;
+                    if h.get_charge_a() >= verification_charge_threshhold {
+                      //this_statusi.
+                    }
+                    if h.get_charge_b() >= verification_charge_threshhold {
+                    }
+                  }
+                }
+                if !verification_active {
+                  match ev_to_builder.send(event) {
+                    Ok(_) => (),
+                    Err(err) => {
+                      error!("Unable to send event! Err {err}");
+                    }
                   }
                 }
                 //n_events += 1;
                 n_chunk += 1;
-              }, 
+              } 
+              PacketType::RBCalibration => {
+                match tp.unpack::<RBCalibrations>() {
+                  Ok(cali) => {
+  
+                    //println!("= => [rb_comm] Received RBCalibration!");
+                    match thread_control.lock() {
+                      Ok(mut tc) => {
+                        tc.calibrations.insert(board_id, cali.clone()); 
+                        *tc.finished_calibrations.get_mut(&board_id).unwrap() = true; 
+                        rb.calibration = cali;
+                      }
+                      Err(err) => {
+                        error!("Can't acquire lock for ThreadControl!! {err}");
+                      },
+                    }
+                  }
+                  Err(err) => {
+                    error!("Received calibration package, but got error when unpacking! {err}");
+                  }
+                }
+                match tp_to_sink.send(tp) {
+                  Err(err) => error!("Can not send tof packet to data sink! Err {err}"),
+                  Ok(_)    => debug!("Packet sent"),
+                }
+              }
               _ => {
                 // Currently, we will just forward all other packets
                 // directly to the data sink
-                if tp.packet_type == PacketType::RBCalibration {
-                  println!("= => [rb_comm] Received RBCalibration!");
-                }
                 match tp_to_sink.send(tp) {
                   Err(err) => error!("Can not send tof packet to data sink! Err {err}"),
                   Ok(_)    => debug!("Packet sent"),

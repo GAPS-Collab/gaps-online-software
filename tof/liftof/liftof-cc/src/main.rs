@@ -8,103 +8,105 @@
 #[macro_use] extern crate log;
 
 use std::sync::{
-    Arc,
-    Mutex,
+  Arc,
+  Mutex,
 };
 
 use std::time::{
-    Instant,
-    Duration,
+  Instant,
+  Duration,
 };
 //use std::collections::HashMap;
 //use std::io::Write;
 use std::process::{
-    Command,
-    Child,
-    exit
+  Command,
+  Child,
+  exit
 };
 
 use std::{
-    //fs,
-    thread,
-    time
+  //fs,
+  thread,
+  time
 };
 
 use std::path::{
-    //Path,
-    PathBuf,
+  //Path,
+  PathBuf,
 };
 
 use clap::{
-    arg,
-    command,
-    Parser
+  arg,
+  command,
+  Parser
 };
 
 use crossbeam_channel::{
-    Sender,
-    Receiver,
-    unbounded,
+  Sender,
+  Receiver,
+  unbounded,
 };
 
 //use colored::Colorize;
-extern crate indicatif;
+//extern crate indicatif;
 use indicatif::{
-    ProgressBar,
-    ProgressStyle,
+  ProgressBar,
+  ProgressStyle,
 };
 
 use tof_dataclasses::events::{
-    MasterTriggerEvent,
-    RBEvent
+  MasterTriggerEvent,
+  RBEvent
 };
 
 //use tof_dataclasses::threading::{
 //    ThreadControl,
 //};
 use tof_dataclasses::serialization::{
-    Serialization,
-    Packable
+  Serialization,
+  Packable
 };
 
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::database::{
-    connect_to_db,
-    get_linkid_rbid_map,
-    ReadoutBoard,
+  connect_to_db,
+  get_linkid_rbid_map,
+  ReadoutBoard,
 };
 
 use tof_dataclasses::constants::PAD_CMD_32BIT;
 use tof_dataclasses::commands::{
-    TofCommand,
-    //TofCommandCode,
-    TofResponse,
+  TofCommand,
+  //TofCommandCode,
+  TofResponse,
 };
 
 use liftof_lib::{
-    signal_handler,
-    init_env_logger,
-    //color_log,
-    LIFTOF_LOGO_SHOW,
-    master_trigger,
-    LiftofSettings,
-    CommandCC,
+  signal_handler,
+  init_env_logger,
+  //color_log,
+  LIFTOF_LOGO_SHOW,
+  master_trigger,
+  LiftofSettings,
+  CommandCC,
 };
 use liftof_lib::thread_control::ThreadControl;
 use liftof_lib::constants::{
-    DEFAULT_CALIB_VOLTAGE,
-    DEFAULT_RB_ID,
-    DEFAULT_CALIB_EXTRA
+  DEFAULT_RB_ID,
 };
 
-use liftof_cc::prepare_run;
-use liftof_cc::threads::{
-    event_builder,
-    //flight_cpu_listener,
-    command_dispatcher,
-    global_data_sink,
-    readoutboard_communicator
+use liftof_cc::{
+  prepare_run,
+  calibrate_tof,
 };
+use liftof_cc::threads::{
+  event_builder,
+  //flight_cpu_listener,
+  command_dispatcher,
+  global_data_sink,
+  readoutboard_communicator
+};
+
 #[cfg(feature="tof-ctrl")]
 use liftof_cc::threads::monitor_cpu;
 
@@ -204,7 +206,12 @@ fn main() {
   //debug!("debug");
   //trace!("trace");
   // global thread control
+  
+
+  // program execution control
   let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
+  let mut end_program   = false;
+
   // there seems to be now way to create handles without thread
   //let mut evtbldr_handle   : thread::JoinHandle<_> = thread::spawn(||{});
   //let mut data_sink_handle : thread::JoinHandle<_> = thread::spawn(||{});
@@ -256,7 +263,7 @@ fn main() {
   let mtb_settings          = config.mtb_settings.clone();
   let mut gds_settings      = config.data_publisher_settings.clone();
   let run_analysis_engine   = config.run_analysis_engine;
-  
+  let pre_run_calibration   = config.pre_run_calibration; 
   let mut conn              = connect_to_db(db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
   // if this call does not go through, we might as well fail early.
   let mut rb_list           = ReadoutBoard::all(&mut conn).expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
@@ -266,6 +273,7 @@ fn main() {
     let bad_rb = rb_ignorelist[k];
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
+
   for k in 0..rb_ignorelist_tmp.len() {
     let bad_rb = rb_ignorelist_tmp[k];
     rb_list.retain(|x| x.rb_id != bad_rb);
@@ -283,7 +291,8 @@ fn main() {
       }
       tc.n_rbs = rb_list.len() as u32;
       tc.thread_data_sink_active = true;
-      tc.liftof_settings = config.clone();
+      tc.liftof_settings         = config.clone();
+      //tc.rb_list                 = rb_list.clone(); 
     },
     Err(err) => {
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -378,74 +387,49 @@ fn main() {
   let program_start = Instant::now();
 
   // Prepare outputfiles
-  let new_run_id : u32;
-  match prepare_run(write_stream_path.clone(), &config, runid, write_stream) {
-    None => {
-      error!("Unable to assign new run id, falling back to 0!");
-      new_run_id = 0;
-    }
-    Some(_rid) => {
-      new_run_id = _rid;
-      info!("Will use new run id {}!", new_run_id);
-    }
-  }
-  // FIXME - ugly
-  let mut stream_files_path = PathBuf::from(write_stream_path);
-  stream_files_path.push(new_run_id.to_string().as_str());
+  let mut new_run_id = 0u32;
+  let mut stream_files_path = PathBuf::from(write_stream_path.clone());
+  match args.command { 
+    CommandCC::Run => {
+      if write_stream {
+        match prepare_run(write_stream_path.clone(), &config, runid, write_stream) {
+          None => {
+            error!("Unable to assign new run id, falling back to 0!");
+          }
+          Some(_rid) => {
+            new_run_id = _rid;
+            info!("Will use new run id {}!", new_run_id);
+          }
+        }
+        // FIXME - ugly
+        stream_files_path.push(new_run_id.to_string().as_str());
  
-  // Now as we have the .toml file copied to our run location, we reload it
-  // and reset the config settings in thread_control
-  let cfg_file = format!("{}/run{}.toml", stream_files_path.display(), new_run_id);
-  match LiftofSettings::from_toml(cfg_file) {
-    Err(err) => {
-      error!("CRITICAL! Unable to parse .toml settings file! {}", err);
-      panic!("Unable to parse config file!");
+        // Now as we have the .toml file copied to our run location, we reload it
+        // and reset the config settings in thread_control
+        let cfg_file = format!("{}/run{}.toml", stream_files_path.display(), new_run_id);
+        match LiftofSettings::from_toml(cfg_file) {
+          Err(err) => {
+            error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+            panic!("Unable to parse config file!");
+          }
+          Ok(_cfg) => {
+            config = _cfg;
+          }
+        }
+        // as well as upadte the shared memory
+        match thread_control.lock() {
+          Ok(mut tc) => {
+            tc.liftof_settings = config.clone();
+          },
+          Err(err) => {
+            error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+          },
+        }
+      }
     }
-    Ok(_cfg) => {
-      config = _cfg;
-    }
-  }
-  // as well as upadte the shared memory
-  match thread_control.lock() {
-    Ok(mut tc) => {
-      tc.liftof_settings = config.clone();
-    },
-    Err(err) => {
-      error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-    },
+    _ => ()
   }
 
-
-  //if let Some(rid) = runid {
-  //  println!("=> Overriding expected run id by '-r' option!"); 
-  //  new_run_id = rid;
-  //}
-  //info!("=> Will use run id {}!", new_run_id);
-
-  //let mut stream_files_path = PathBuf::from(write_stream_path);
-  //if write_stream {
-  //  stream_files_path.push(new_run_id.to_string().as_str());
-  //  // Create directory if it does not exist
-  //  // Check if the directory exists
-  //  if let Ok(metadata) = fs::metadata(&stream_files_path) {
-  //    if metadata.is_dir() {
-  //      println!("=> Directory {} for run number {} already consists and may contain files!", stream_files_path.display(), new_run_id);
-  //      // FILXME - in flight, we can not have interactivity.
-  //      // But the whole system with the run ids might change 
-  //    } 
-  //  } else {
-  //    match fs::create_dir(&stream_files_path) {
-  //      Ok(())   => println!("=> Created {} to save stream data", stream_files_path.display()),
-  //      Err(err) => panic!("Failed to create directory: {}! {}", stream_files_path.display(), err),
-  //    }
-  //  }
-  //  // Write the settings to the directory where 
-  //  // we want to save the run to
-  //  let settings_fname = format!("{}/run{}.toml",stream_files_path.display(), new_run_id); 
-  //  println!("=> Writing data to {}!", stream_files_path.display());
-  //  println!("=> Writing settings to {}!", settings_fname);
-  //  config.to_toml(settings_fname);
-  //}
 
   /*******************************************************
    * Channels (crossbeam, unbounded) for inter-thread
@@ -555,11 +539,11 @@ fn main() {
   for n in 0..nboards {
     let mut this_rb           = rb_list[n].clone();
     let this_tp_to_sink_clone = tp_to_sink.clone();
-    this_rb.calib_file_path   = calib_file_path.clone();
-    match this_rb.load_latest_calibration() {
-      Err(err) => panic!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
-      Ok(_)    => ()
-    }
+    this_rb.calib_file_path   = calib_file_path.clone() + "latest";
+    //match this_rb.load_latest_calibration() {
+    //  Err(err) => panic!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
+    //  Ok(_)    => ()
+    //}
     debug!("Starting RB thread for {}", this_rb.rb_id);
     let ev_to_builder_c = ev_to_builder.clone();
     let thread_name     = format!("rb-comms-{}", this_rb.rb_id);
@@ -620,11 +604,6 @@ fn main() {
   //  3) Run - we just immediatly start a run.
   // 
 
-  // possible progress bar
-  let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
-  let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
-  let mut bar    = ProgressBar::hidden();
-
   // default  behavriour is to stop
   // when we are done
   let mut dont_stop = false;
@@ -651,58 +630,18 @@ fn main() {
       .expect("Failed to spawn cpu-monitoring thread!");
     },
     CommandCC::Calibration => {
-      let voltage_level = DEFAULT_CALIB_VOLTAGE;
-      let rb_id         = DEFAULT_RB_ID;
-      let extra         = DEFAULT_CALIB_EXTRA;
-      println!("=> Received calibration default command! Will init calibration run of all RBs...");
-      let cmd_payload: u32
-        = (voltage_level as u32) << 16 | (rb_id as u32) << 8 | (extra as u32);
-      let default_calib = TofCommand::DefaultCalibration(cmd_payload);
-      let tp = default_calib.pack();
-      let mut payload  = String::from("BRCT").into_bytes();
-      payload.append(&mut tp.to_bytestream());
-      
-      // open 0MQ socket here
-      let ctx = zmq::Context::new();
-      let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-      let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
-      cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
-      println!("=> Give the RBs a chance to connect and wait a bit..");
-      thread::sleep(10*one_second);
-
-      match cmd_sender.send(&payload, 0) {
-        Err(err) => {
-          error!("Unable to send command, error{err}");
-          exit(1);
-        },
-        Ok(_) => {
-          println!("=> Calibration  initialized!");
-        }
-      }
-      println!("=> .. now we need to wait until the calibration is finished!");
-      let bar_label  = String::from("Acquiring RB calibration data");
-
-      bar = ProgressBar::new(rb_list.len() as u64); 
-      bar.set_position(0);
-      bar.set_message (bar_label);
-      bar.set_prefix  ("\u{2699}\u{1F4D0}");
-      bar.set_style   (bar_style);
-      // if that is successful, we need to wait
-      match thread_control.lock() {
-        Ok(mut tc) => {
-          // deactivate the master trigger thread
-          tc.thread_master_trg_active =false;
-          tc.calibration_active = true;
-        },
-        Err(err) => {
-          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-        },
-      }
+     let tc_cali = thread_control.clone();
+     calibrate_tof(tc_cali, &rb_list, true);
+     end_program = true;
     },
     CommandCC::Staging => {
       error!("Staging sequence not implemented!");
     }
     CommandCC::Run => {
+      if pre_run_calibration {
+       let tc_cali = thread_control.clone();
+       calibrate_tof(tc_cali, &rb_list, true);
+      }
       // in this scenario, we want to end
       // after we are done
       dont_stop = false;
@@ -786,17 +725,9 @@ fn main() {
   // 
 
 
-  // a counter for the number 
-  // or RBCalibrations we have
-  // received
-  let mut end_program   = false;
-  // a counter for number of RBCalibrations
-  // received to understand when a calibration 
-  // procedure is finished
-  let mut cali_received  = 0u64;
   loop {
     // take out the heat a bit
-    thread::sleep(1*one_second);
+    thread::sleep(5*one_second);
 
     if end_program {
       println!("=> Ending program!");
@@ -935,39 +866,9 @@ fn main() {
     // for everything
 
     match thread_control.try_lock() {
-      Ok(mut tc) => {
+      Ok(tc) => {
         if tc.stop_flag {
           end_program = true;
-        }
-        if tc.calibration_active && !listen {
-          for rbid in &rb_list {
-            // the global data sink sets these flags
-            let mut finished_keys = Vec::<u8>::new();
-            if tc.finished_calibrations[&rbid.rb_id] {
-              cali_received += 1;
-              bar.set_position(cali_received);
-              finished_keys.push(rbid.rb_id);
-            }
-            for rbid in &finished_keys {
-              *tc.finished_calibrations.get_mut(&rbid).unwrap() = false; 
-            }
-          }
-          // FIXME - this or a timer
-          if cali_received as usize == rb_list.len() {
-            cali_received = 0;
-            // if we want to redo a calibration, 
-            // somebody else has to set this 
-            // flag again.
-            tc.calibration_active = false;
-            // reset the counters
-            for rbid in &rb_list {
-              *tc.finished_calibrations.get_mut(&rbid.rb_id).unwrap() = false; 
-            }
-            bar.finish_with_message("Done");
-            if !dont_stop {
-              end_program = true;
-            }
-          }
         }
       }
       Err(err) => {
