@@ -101,8 +101,10 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
     info!("Writing calibration to {}", local_file.display() );
     file_on_disk = OpenOptions::new().create(true).write(true).open(local_file).ok()
   } else {
-    info!("Writing to local file {}!", fname );
-    file_on_disk = OpenOptions::new().append(true).create(true).open(datafile_output_file).ok()
+    if write_to_disk {
+      info!("Writing to local file {}!", fname );
+      file_on_disk = OpenOptions::new().append(true).create(true).open(datafile_output_file).ok()
+    }
   }
  
   let board_id     = get_board_id().unwrap_or(0) as u8;

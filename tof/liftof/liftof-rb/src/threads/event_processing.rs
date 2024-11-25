@@ -114,11 +114,12 @@ pub fn event_processing(board_id            : u8,
   let mut streamer        = RBEventMemoryStreamer::new();
   // FIXME
   streamer.check_channel_errors = true;
-  
+  let mut trace_suppressed      = false;  
   match thread_control.lock() {
     Ok(tc) => {
       streamer.calc_crc32   = tc.liftof_settings.rb_settings.calc_crc32;
       deadtime_instead_temp = tc.liftof_settings.rb_settings.drs_deadtime_instead_fpga_temp; 
+      trace_suppressed      = tc.liftof_settings.mtb_settings.trace_suppression;
     },
     Err(err) => {
       trace!("Can't acquire lock! {err}");
@@ -269,7 +270,9 @@ pub fn event_processing(board_id            : u8,
                   if last_event_id != 0 {
                     if event.header.event_id != last_event_id + 1 {
                       if event.header.event_id > last_event_id {
+                        if !trace_suppressed {
                           skipped_events += (event.header.event_id - last_event_id -1) as usize;
+                        }
                       } else {
                         error!("Something with the event counter is messed up. Got event id {}, but the last event id was {}", event.header.event_id, last_event_id);
                       }

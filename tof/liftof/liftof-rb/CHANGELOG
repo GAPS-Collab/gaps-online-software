@@ -1,5 +1,13 @@
 # LELEWAA series
 
+## v0.10.4
+
+## v0.10.3
+* suppress error about skipped events when we are in 
+  trace suppression mode (skipped events are a feature then)
+* removes annoying creation of 'Unknown.tof.gaps' in case 
+  we don't write any data
+
 ## v0.10.2
 * allow to read out drs4 deadtime for every
   event

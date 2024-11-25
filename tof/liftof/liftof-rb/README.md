@@ -1,5 +1,5 @@
 # Readoutboard software - liftof-rb
-_Current version 0.8.x - NIUHI_
+_Current version 0.10.x - LELEWAA_
 
 TOF data acquisition/slow control for the TOF Readoutboards (RB)
 
