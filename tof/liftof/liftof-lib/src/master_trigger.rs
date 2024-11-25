@@ -106,6 +106,8 @@ pub struct MTBSettings {
   pub mtb_moni_interval  : u64,
   pub rb_int_window      : u8,
   pub tiu_emulation_mode : bool,
+  pub tiu_ignore_busy : bool,
+
   pub tofbot_webhook     : String,
   pub hb_send_interval   : u8,
 }
@@ -122,6 +124,7 @@ impl MTBSettings {
       mtb_moni_interval       : 30,
       rb_int_window           : 1,
       tiu_emulation_mode      : false,
+      tiu_ignore_busy         : false,
       tofbot_webhook          : String::from(""),
       hb_send_interval        : 30,
     }

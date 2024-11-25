@@ -548,10 +548,18 @@ pub struct DataPublisherSettings {
   /// The data written on disk gets divided into 
   /// files of a fixed size. 
   pub mbytes_per_file           : usize,
-
   /// The address the flight computer should subscribe 
   /// to to get tof packets
   pub fc_pub_address            : String,
+  /// Mark a certain fraction of events as to be discarded, 
+  /// that is not to be stored on disk
+  /// 1 = Throw away all events, 0 = throw away no events
+  pub discard_event_fraction    : f32,
+  ///// Don't save events which are non-interesting
+  //pub discard_non_interesting   : bool,
+  //pub filter_interesting_numb   : u8,
+  //pub filter_interesting_ncbe   : u8,
+  //pub filter_interesting_n
   /// Send also MastertriggerPackets (this should be 
   /// turned off in flight - only useful if 
   /// send_flight_packets is true, otherwise
@@ -562,6 +570,8 @@ pub struct DataPublisherSettings {
   pub send_rbwaveform_packets   : bool,
   pub send_tof_summary_packets  : bool,
   pub send_tof_event_packets    : bool,
+  /// Send the RBCalibration to ground
+  pub send_cali_packets         : bool,
   pub hb_send_interval          : u8,
 }
 
@@ -572,10 +582,12 @@ impl DataPublisherSettings {
       cali_dir                  : String::from(""),
       mbytes_per_file           : 420,
       fc_pub_address            : String::from(""),
+      discard_event_fraction    : 0.0,
       send_mtb_event_packets    : false,
       send_rbwaveform_packets   : false,
       send_tof_summary_packets  : true,
       send_tof_event_packets    : false,
+      send_cali_packets         : true,
       hb_send_interval          : 30,
     }
   }
@@ -620,6 +632,15 @@ pub struct LiftofSettings {
   pub rb_ignorelist_run          : Vec<u8>,
   /// Should TofHits be generated?
   pub run_analysis_engine        : bool,
+  /// Run a full RB calibration before run 
+  /// start?
+  pub pre_run_calibration        : bool,
+  /// Do a verification run before each run? The purpose 
+  /// of the verification run is to generate a "DetectorStatus"
+  /// packet. If a verification run is desired, change this 
+  /// number to the number of seconds to do the verification 
+  /// run
+  pub verification_runtime_sec   : u32,
   /// Settings to control the MTB
   pub mtb_settings               : MTBSettings,
   /// Settings for the TOF event builder
@@ -653,6 +674,8 @@ impl LiftofSettings {
       rb_ignorelist_always      : Vec::<u8>::new(),
       rb_ignorelist_run         : Vec::<u8>::new(),
       run_analysis_engine       : true,
+      pre_run_calibration       : false,
+      verification_runtime_sec  : 0, // no verification run per default
       mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),
