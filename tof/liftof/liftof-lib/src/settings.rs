@@ -541,10 +541,6 @@ impl Default for TofEventBuilderSettings {
 pub struct DataPublisherSettings {
   /// location to store data on TOF computer
   pub data_dir                  : String,
-  /// location to store RBCalibration data on the TOF computer
-  /// Individual calibration runs will be stored in
-  /// folders named with the data
-  pub cali_dir                  : String,
   /// The data written on disk gets divided into 
   /// files of a fixed size. 
   pub mbytes_per_file           : usize,
@@ -579,7 +575,6 @@ impl DataPublisherSettings {
   pub fn new() -> Self {
     Self {
       data_dir                  : String::from(""),
-      cali_dir                  : String::from(""),
       mbytes_per_file           : 420,
       fc_pub_address            : String::from(""),
       discard_event_fraction    : 0.0,
