@@ -92,7 +92,6 @@ pub struct PaddleTab<'a> {
   pub charge_a           : HashMap<u8, VecDeque<f64>>,
   pub charge_b           : HashMap<u8, VecDeque<f64>>, 
 
-
   // list for the paddle selector
   pub all_paddles        : HashMap<u8, Paddle>,
   pub pdl_state          : ListState,
@@ -122,7 +121,8 @@ impl PaddleTab<'_> {
     let mut bl_ch_b    = HashMap::<u8, Hist1D<Uniform<f32>>>::new();
     let mut blrms_ch_a = HashMap::<u8, Hist1D<Uniform<f32>>>::new();
     let mut blrms_ch_b = HashMap::<u8, Hist1D<Uniform<f32>>>::new();
-    let bins_bl    = Uniform::new(50, -2.0, 2.0);
+    let bins_bl        = Uniform::new(20, -2.0, 2.0);
+    let bins_lb_rms    = Uniform::new(20, 0.0, 2.0); 
     for pid in 1..161 {
       charge_a.insert(pid, VecDeque::<f64>::new());
       charge_b.insert(pid, VecDeque::<f64>::new());
@@ -212,11 +212,21 @@ impl PaddleTab<'_> {
             if self.charge_b.get_mut(&(h.paddle_id as u8)).unwrap().len() > self.queue_size {
               self.charge_b.get_mut(&(h.paddle_id as u8)).unwrap().pop_front();
             }
-            self.baseline_ch_a.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_a());
+            let ch_a_bl = h.get_bl_a();
+            let ch_b_bl = h.get_bl_b();
+            let ch_a_bl_rms = h.get_bl_a_rms();
+            let ch_b_bl_rms = h.get_bl_b_rms();
+            // cut on the range
+            if -2.0 < ch_a_bl && ch_b_bl < 2.0 {
+              self.baseline_ch_a.get_mut(&(h.paddle_id as u8)).unwrap().fill(&ch_a_bl);
+            }
+            if -2.0 < ch_b_bl && ch_b_bl < 2.0 {
+              self.baseline_ch_b.get_mut(&(h.paddle_id as u8)).unwrap().fill(&ch_b_bl);
+            }
+            //self.baseline_ch_a.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_a());
             self.baseline_rms_ch_a.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_a_rms());
-            self.baseline_ch_b.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_b());
+            //self.baseline_ch_b.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_b());
             self.baseline_rms_ch_b.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_b_rms());
-          
         }
         let mut bl_a  : f32;
         let mut bl_b  : f32;
@@ -472,14 +482,14 @@ impl PaddleTab<'_> {
             //ctx.draw(&xaxis);
             //ctx.draw(&yaxis);
           })
-          .x_bounds([0.0, 30.0])
-          .y_bounds([0.0, 30.0]);
+          .x_bounds([0.0, 200.0])
+          .y_bounds([0.0, 200.0]);
        
       // baseline histos
       //println!("{:?}", self.baseline_ch_a.get(&(self.current_paddle.paddle_id as u8)).unwrap());
-      let bl_a_labels = create_labels(&self.baseline_ch_a.get(&(self.current_paddle.paddle_id as u8)).unwrap());
-      let bl_a_data   = prep_data(&self.baseline_ch_a.get(&(self.current_paddle.paddle_id as u8)).unwrap(), &bl_a_labels, 1, false); 
-      let bl_a_chart  = histogram(bl_a_data, String::from("Baseline Side A [mV]"), 2, 0, &self.theme);
+      let bl_a_labels     = create_labels(&self.baseline_ch_a.get(&(self.current_paddle.paddle_id as u8)).unwrap());
+      let bl_a_data       = prep_data(&self.baseline_ch_a.get(&(self.current_paddle.paddle_id as u8)).unwrap(), &bl_a_labels, 1, false); 
+      let bl_a_chart      = histogram(bl_a_data, String::from("Baseline Side A [mV]"), 2, 0, &self.theme);
       frame.render_widget(bl_a_chart, bla_lo[0]);
       
       let bl_a_rms_data   = prep_data(&self.baseline_rms_ch_a.get(&(self.current_paddle.paddle_id as u8)).unwrap(), &bl_a_labels, 1, false); 

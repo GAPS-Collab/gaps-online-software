@@ -1,5 +1,8 @@
 # LELEWAA series
 
+##v0.10.4
+* fixes baseline and 2d charge plot for Paddle display
+
 ##v0.10.3
 * new command line flag --allow-commands. If this is not 
   set, then commands will not be able to get send and the 
