@@ -1014,6 +1014,29 @@
 <a href="#1014" id="1014">1014</a>
 <a href="#1015" id="1015">1015</a>
 <a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Aggregate settings for the TOF system
 //!
 //! Control the settings for the C&amp;C server
@@ -1564,11 +1587,19 @@
   <span class="doccomment">/// The data written on disk gets divided into 
   /// files of a fixed size. 
   </span><span class="kw">pub </span>mbytes_per_file           : usize,
-
   <span class="doccomment">/// The address the flight computer should subscribe 
   /// to to get tof packets
   </span><span class="kw">pub </span>fc_pub_address            : String,
-  <span class="doccomment">/// Send also MastertriggerPackets (this should be 
+  <span class="doccomment">/// Mark a certain fraction of events as to be discarded, 
+  /// that is not to be stored on disk
+  /// 1 = Throw away all events, 0 = throw away no events
+  </span><span class="kw">pub </span>discard_event_fraction    : f32,
+  <span class="comment">///// Don't save events which are non-interesting
+  //pub discard_non_interesting   : bool,
+  //pub filter_interesting_numb   : u8,
+  //pub filter_interesting_ncbe   : u8,
+  //pub filter_interesting_n
+  </span><span class="doccomment">/// Send also MastertriggerPackets (this should be 
   /// turned off in flight - only useful if 
   /// send_flight_packets is true, otherwise
   /// MTB events will get sent as part of TofEvents
@@ -1578,6 +1609,8 @@
   </span><span class="kw">pub </span>send_rbwaveform_packets   : bool,
   <span class="kw">pub </span>send_tof_summary_packets  : bool,
   <span class="kw">pub </span>send_tof_event_packets    : bool,
+  <span class="doccomment">/// Send the RBCalibration to ground
+  </span><span class="kw">pub </span>send_cali_packets         : bool,
   <span class="kw">pub </span>hb_send_interval          : u8,
 }
 
@@ -1588,10 +1621,12 @@
       cali_dir                  : String::from(<span class="string">""</span>),
       mbytes_per_file           : <span class="number">420</span>,
       fc_pub_address            : String::from(<span class="string">""</span>),
+      discard_event_fraction    : <span class="number">0.0</span>,
       send_mtb_event_packets    : <span class="bool-val">false</span>,
       send_rbwaveform_packets   : <span class="bool-val">false</span>,
       send_tof_summary_packets  : <span class="bool-val">true</span>,
       send_tof_event_packets    : <span class="bool-val">false</span>,
+      send_cali_packets         : <span class="bool-val">true</span>,
       hb_send_interval          : <span class="number">30</span>,
     }
   }
@@ -1636,6 +1671,15 @@
   </span><span class="kw">pub </span>rb_ignorelist_run          : Vec&lt;u8&gt;,
   <span class="doccomment">/// Should TofHits be generated?
   </span><span class="kw">pub </span>run_analysis_engine        : bool,
+  <span class="doccomment">/// Run a full RB calibration before run 
+  /// start?
+  </span><span class="kw">pub </span>pre_run_calibration        : bool,
+  <span class="doccomment">/// Do a verification run before each run? The purpose 
+  /// of the verification run is to generate a "DetectorStatus"
+  /// packet. If a verification run is desired, change this 
+  /// number to the number of seconds to do the verification 
+  /// run
+  </span><span class="kw">pub </span>verification_runtime_sec   : u32,
   <span class="doccomment">/// Settings to control the MTB
   </span><span class="kw">pub </span>mtb_settings               : MTBSettings,
   <span class="doccomment">/// Settings for the TOF event builder
@@ -1669,7 +1713,9 @@
       rb_ignorelist_always      : Vec::&lt;u8&gt;::new(),
       rb_ignorelist_run         : Vec::&lt;u8&gt;::new(),
       run_analysis_engine       : <span class="bool-val">true</span>,
-      mtb_settings              : MTBSettings::new(),
+      pre_run_calibration       : <span class="bool-val">false</span>,
+      verification_runtime_sec  : <span class="number">0</span>, <span class="comment">// no verification run per default
+      </span>mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),
       data_publisher_settings   : DataPublisherSettings::new(),
