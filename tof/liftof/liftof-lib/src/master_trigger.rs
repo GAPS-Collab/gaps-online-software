@@ -557,7 +557,7 @@ pub fn master_trigger(mt_address     : String,
   let mut is_active              = true;
   loop {
     // Check thread control and what to do
-    if tc_timer.elapsed().as_secs_f32() > 1.5 {
+    if tc_timer.elapsed().as_secs_f32() > 2.5 {
       match thread_control.try_lock() {
         Ok(mut tc) => {
           if tc.thread_master_trg_active || tc.stop_flag {

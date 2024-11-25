@@ -8,14 +8,9 @@ use constants::{
     DEFAULT_CALIB_VOLTAGE,
     DEFAULT_CALIB_EXTRA,
     DEFAULT_RB_ID,
-    //DEFAULT_PB_ID,
     DEFAULT_LTB_ID,
-    DEFAULT_PREAMP_ID,
-    DEFAULT_PREAMP_BIAS,
-    //DEFAULT_POWER_STATUS,
     DEFAULT_RUN_TYPE,
     DEFAULT_RUN_EVENT_NO,
-    //DEFAULT_RUN_TIME,
     PREAMP_MIN_BIAS,
     PREAMP_MAX_BIAS
 };
@@ -57,10 +52,6 @@ use std::io::{
     Write,
 };
 use std::collections::HashMap;
-//use std::net::IpAddr;
-//use std::net::Ipv4Addr;
-//use crossbeam_channel::Receiver;
-//use zmq;
 use colored::{
     Colorize,
     ColoredString
@@ -75,8 +66,8 @@ extern crate env_logger;
 
 use signal_hook::iterator::Signals;
 use signal_hook::consts::signal::{
-    SIGTERM,
-    SIGINT
+  SIGTERM,
+  SIGINT
 };
 
 use tof_dataclasses::DsiLtbRBMapping;
@@ -91,19 +82,19 @@ use tof_dataclasses::errors::SetError;
 //use tof_dataclasses::serialization::Serialization;
 #[cfg(feature="database")]
 use tof_dataclasses::events::{
-    RBEvent,
-    TofHit,
+  RBEvent,
+  TofHit,
 };
 use tof_dataclasses::events::tof_hit::Peak;
 
 #[cfg(feature="database")]
 use tof_dataclasses::analysis::{
-    calculate_pedestal,
-    integrate,
-    cfd_simple,
-    find_peaks,
-    //get_paddle_t0,
-    //pos_across
+  calculate_pedestal,
+  integrate,
+  cfd_simple,
+  find_peaks,
+  //get_paddle_t0,
+  //pos_across
 };
 
 use tof_dataclasses::RBChannelPaddleEndIDMap;
@@ -118,10 +109,6 @@ use clap::{arg,
   Args,
   Subcommand
 };
-
-//extern crate ssh2;
-//use ssh2::Session;
-//use std::net::TcpStream;
 
 pub const MT_MAX_PACKSIZE   : usize = 512;
 pub const DATAPORT          : u32   = 42000;
@@ -147,38 +134,6 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
           ==> API docs https://gaps-collab.github.io/gaps-online-software/
 
   ";
-
-//pub fn restart_liftof_rb_clients() {
-//  for k in 0..50 {
-//    address = format!("10.0.1.1{k:02}:22");
-//    match TcpStream::connect(&address) {
-//      Err(err) => error!("Unable to connect to {}", address);
-//      Ok(tcp)  => {
-//          // Create a new SSH session
-//        //let mut sess = Session::new().unwrap();
-//        //sess.handshake(&tcp).unwrap();
-//
-//        //// Path to the private key file
-//        //let private_key_path = Path::new("/path/to/private/key");
-//        //sess.userauth_pubkey_file("username", None, private_key_path, None).unwrap();
-//        //assert!(sess.authenticated());
-//        //let mut channel = sess.channel_session().unwrap();
-//        //channel.exec("ls -l").unwrap();
-//        //let mut s = String::new();
-//        //channel.read_to_string(&mut s).unwrap();
-//        //println!("{}", s);
-//        //channel.send_eof().unwrap();
-//        //channel.wait_close().unwrap();
-//        //println!("Exit Status: {}", channel.exit_status().unwrap());
-//      }
-//    }
-//  }
-//}
-
-/// check on liftof-rb clients
-pub fn check_liftof_rb_status() {
-}
-
 
 /// Routine to end the liftof-cc program, finish up with current run 
 /// and clean up
@@ -292,27 +247,6 @@ pub fn init_env_logger() {
       )
     }).init();
 }
-
-/// Nicer output for thread "heartbeats" to terminal
-pub fn heartbeat_printer(strings: Vec<String>) {
-    // Determine the maximum length of the strings to ensure consistent length
-    let max_length = strings.iter().map(|s| s.len()).max().unwrap_or(0);
-    // Calculate total width including ">>" and "<<" markers
-    let total_width = max_length + 4; // 4 extra characters for ">>" and "<<"
-
-    for s in strings {
-        // Use the calculated total_width for consistent formatting
-        println!(">>{: <width$}<<", s, width = total_width - 4);
-    }
-}
-
-/// Common settings for apps, e.g. liftof-tui
-#[derive(Debug, Clone)]
-pub struct AppSettings {
-  pub cali_master_path : String,
-}
-
-
 
 /// Keep track of run related statistics, errors
 #[derive(Debug, Copy, Clone)]
@@ -748,17 +682,17 @@ pub fn waveform_analysis(event         : &mut RBEvent,
 //
 
 
-/// construct a request string which can be broadcast over 0MQ to all the boards
-/// ///
-/// /// Boards will only send paddle information when this request string is received
-pub fn construct_event_request(rb_id : u8) -> String {
-  let mut request = String::from("RB");
-  if rb_id < 10 {
-    request += "0";
-  }
-  request += &rb_id.to_string();
-  request
-}
+///// construct a request string which can be broadcast over 0MQ to all the boards
+///// ///
+///// /// Boards will only send paddle information when this request string is received
+//pub fn construct_event_request(rb_id : u8) -> String {
+//  let mut request = String::from("RB");
+//  if rb_id < 10 {
+//    request += "0";
+//  }
+//  request += &rb_id.to_string();
+//  request
+//}
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
@@ -867,82 +801,6 @@ pub fn to_board_id_string(rb_id: u32) -> String {
 }
 
 /**********************************************************/
-/// Command Enums and stucts
-#[derive(Debug, Parser, PartialEq)]
-pub enum CommandCC {
-  /// Listen for flight CPU commands.
-  Listen,
-  /// Staging mode - work through all .toml files
-  /// in the staging area
-  Staging,
-  /// Ping a TOF sub-system.
-  Ping,
-  /// Monitor a TOF sub-system.
-  Moni(MoniCmd),
-  /// Restart RB systemd
-  SystemdReboot(SystemdRebootCmd),
-  /// Power control of TOF sub-systems.
-  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
-  Calibration,
-  /// Start/stop data taking run.
-  Run
-}
-
-
-
-
-#[derive(Debug, Args, PartialEq)]
-pub struct MoniCmd {
-  /// Component to target
-  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
-          TofComponent::TofCpu,
-          TofComponent::MT,
-          TofComponent::RB,
-          TofComponent::LTB
-        ]),
-        required = true)]
-  pub component: TofComponent,
-  /// Component ID
-  #[arg(required = true)]
-  pub id: u8
-}
-
-#[derive(Debug, Args, PartialEq)]
-pub struct SystemdRebootCmd {
-  /// RB ID
-  #[arg(required = true)]
-  pub id: u8
-}
-
-#[derive(Debug, Clone, Subcommand, PartialEq)]
-pub enum SetCmd {
-  /// Set MT configuration (WHAT SHOULD I DO WITH THIS TODO)
-  //MTConfig(MTConfigOpts),
-  /// Set threshold level on all LTBs or a single LTB
-  LtbThreshold(LtbThresholdOpts),
-  /// Set bias level on all preamps or a single preamp
-  PreampBias(PreampBiasOpts)
-}
-
-// #[derive(Debug, Args, PartialEq)]
-// pub struct MTConfigOpts {
-//   /// RB to target in voltage calibration run.
-//   #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
-//   pub id: u8,
-//   /// Theshold level to be set
-//   #[arg(required = true, 
-//         value_parser = clap::value_parser!(i64).range(PREAMP_MIN_BIAS..=PREAMP_MAX_BIAS))]
-//   pub bias: u16
-// }
-
-// impl MTConfigOpts {
-//   pub fn new(id: u8, bias: u16) -> Self {
-//     Self { 
-//       id,
-//       bias
-//     }
-//   }
-// }
 
 #[derive(Debug, Clone, Args, PartialEq)]
 pub struct LtbThresholdOpts {
@@ -1122,41 +980,6 @@ impl TimingOpts {
 }
 /// END Calibration cmds ================================================
 
-/// Power cmds ====================================================
-#[derive(Debug, Subcommand, PartialEq)]
-pub enum PowerCmd {
-  /// Power up everything (LTB + preamps + MT)
-  All(PowerStatus),
-  /// Power up MT alone
-  MT(PowerStatus),
-  /// Power up everything but MT (LTB + preamps)
-  AllButMT(PowerStatus),
-  /// Power up all or specific LTBs (changes threshold)
-  LTB(LTBPowerOpts),
-  /// Power up all or specific preamp (changes bias)
-  Preamp(PreampPowerOpts)
-}
-
-#[derive(Debug, Args, PartialEq)]
-pub struct PowerStatus {
-  /// Which power status one wants to achieve
-  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
-          PowerStatusEnum::OFF,
-          PowerStatusEnum::ON,
-          PowerStatusEnum::Cycle
-        ]),
-        required = true)]
-  pub status: PowerStatusEnum
-}
-
-impl PowerStatus {
-  pub fn new(status: PowerStatusEnum) -> Self {
-    Self { 
-      status
-    }
-  }
-}
-
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
 #[repr(u8)]
 pub enum TofComponent {
@@ -1220,137 +1043,6 @@ impl From<TofComponent> for clap::builder::Str {
   }
 }
 
-// repr is u16 in order to leave room for preamp bias
-#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
-#[repr(u8)]
-pub enum PowerStatusEnum {
-  Unknown   = 0u8,
-  OFF       = 10u8,
-  ON        = 20u8,
-  Cycle     = 30u8
-}
-
-impl fmt::Display for PowerStatusEnum {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = serde_json::to_string(self).unwrap_or(
-      String::from("Error: cannot unwrap this PowerStatusEnum"));
-    write!(f, "<PowerStatusEnum: {}>", r)
-  }
-}
-
-impl From<u8> for PowerStatusEnum {
-  fn from(value: u8) -> Self {
-    match value {
-      0u8  => PowerStatusEnum::Unknown,
-      10u8 => PowerStatusEnum::OFF,
-      20u8 => PowerStatusEnum::ON,
-      30u8 => PowerStatusEnum::Cycle,
-      _    => PowerStatusEnum::Unknown
-    }
-  }
-}
-
-impl From<PowerStatusEnum> for clap::builder::Str {
-  fn from(value: PowerStatusEnum) -> Self {
-    match value {
-      PowerStatusEnum::Unknown => clap::builder::Str::from("Unknown"),
-      PowerStatusEnum::OFF     => clap::builder::Str::from("OFF"),
-      PowerStatusEnum::ON      => clap::builder::Str::from("ON"),
-      PowerStatusEnum::Cycle   => clap::builder::Str::from("Cycle")
-    }
-  }
-}
-
-#[derive(Debug, Args, PartialEq)]
-pub struct PBPowerOpts {
-  /// Which power status one wants to achieve
-  #[arg(long)]
-  pub status: PowerStatusEnum,
-  /// ID of the PB to be powered up
-  #[arg(long)]
-  pub id: u8
-}
-
-impl PBPowerOpts {
-  pub fn new(status: PowerStatusEnum, id: u8) -> Self {
-    Self { 
-      status,
-      id
-    }
-  }
-}
-
-#[derive(Debug, Args, PartialEq)]
-pub struct RBPowerOpts {
-  /// Which power status one wants to achieve
-  #[arg(short, long)]
-  pub status: PowerStatusEnum,
-  /// ID of the RB to be powered up
-  #[arg(short, long)]
-  pub id: u8
-}
-
-impl RBPowerOpts {
-  pub fn new(status: PowerStatusEnum, id: u8) -> Self {
-    Self {
-      status,
-      id
-    }
-  }
-}
-
-#[derive(Debug, Args, PartialEq)]
-pub struct LTBPowerOpts {
-  /// Which power status one wants to achieve
-  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
-          PowerStatusEnum::OFF,
-          PowerStatusEnum::ON,
-          PowerStatusEnum::Cycle
-        ]),
-        required = true)]
-  pub status: PowerStatusEnum,
-  /// ID of the LTB to be powered up
-  #[arg(short, long, default_value_t = DEFAULT_LTB_ID)]
-  pub id: u8
-}
-
-impl LTBPowerOpts {
-  pub fn new(status: PowerStatusEnum, id: u8) -> Self {
-    Self {
-      status,
-      id
-    }
-  }
-}
-
-#[derive(Debug, Args, PartialEq)]
-pub struct PreampPowerOpts {
-  /// Which power status one wants to achieve
-  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
-          PowerStatusEnum::OFF,
-          PowerStatusEnum::ON,
-          PowerStatusEnum::Cycle
-        ]),
-        required = true)]
-  pub status: PowerStatusEnum,
-  /// ID of the preamp to be powered up
-  #[arg(short, long, default_value_t = DEFAULT_PREAMP_ID)]
-  pub id: u8,
-  /// Turn on bias of the preamp specified
-  #[arg(short, long, default_value_t = DEFAULT_PREAMP_BIAS)]
-  pub bias: u16
-}
-
-impl PreampPowerOpts {
-  pub fn new(status: PowerStatusEnum, id: u8, bias: u16) -> Self {
-    Self {
-      status,
-      id,
-      bias
-    }
-  }
-}
-/// END Power cmds ================================================
 
 /// Run cmds ======================================================
 #[derive(Debug, Clone, Subcommand, PartialEq)]

@@ -65,7 +65,7 @@ impl MTBRegister<'_> {
   /// Set the register to desired value
   pub fn set(&self, bus : &mut IPBus, value : u32) 
     -> Result<(), Box<dyn Error>> {
-    println!("Settting {}", self);
+    //println!("Settting {}", self);
     if self.rmw {
       self.rmw(bus, value)?;
     }

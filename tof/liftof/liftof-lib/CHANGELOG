@@ -1,5 +1,8 @@
 # LELEWAA series
 
+## v0.10.2
+* massive decluttering effort
+
 ## v0.10.1
 * adds preamp voltage configuration to config file
 * signal_handler is now its own thread and moved 
