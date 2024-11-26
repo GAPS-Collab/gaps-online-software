@@ -186,6 +186,14 @@ pub fn set_central_track_trigger(bus : &mut IPBus, prescale : f32)
   Ok(())
 }
 
+pub fn set_track_umb_central_trigger(bus : &mut IPBus, prescale : f32)
+    -> Result<(), Box<dyn Error>> {
+    let prescale_val = (u32::MAX as f32 * prescale).floor() as u32;
+    info!("Setting TRACK UMB CENTRAL trigger with prescale {}!", prescale);
+    bus.write(0x249, prescale_val)?;
+    Ok(())
+  }
+
 
 /// Disable all triggers
 pub fn unset_all_triggers(bus : &mut IPBus) 
@@ -205,6 +213,7 @@ pub fn unset_all_triggers(bus : &mut IPBus)
   TRACK_TRIG_IS_GLOBAL.set(bus, 0)?; 
   ANY_TRIG_IS_GLOBAL.set(bus, 0)?;
   TRACK_CENTRAL_IS_GLOBAL.set(bus, 0)?;
+  set_track_umb_central_trigger(bus, 0.0)?;
   Ok(())
 }
 

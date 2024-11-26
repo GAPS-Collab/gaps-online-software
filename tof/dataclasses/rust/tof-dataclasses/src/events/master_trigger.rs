@@ -116,28 +116,29 @@ pub const LTB_CHANNELS : [u16;8] = [
 pub enum TriggerType {
   Unknown      = 0u8,
   /// -> 1-10 "pysics" triggers
-  Any          = 1u8,
-  Track        = 2u8,
-  TrackCentral = 3u8,
-  Gaps         = 4u8,
-  Gaps633      = 5u8, 
-  Gaps422      = 6u8,
-  Gaps211      = 7u8,
+  Any             = 1u8,
+  Track           = 2u8,
+  TrackCentral    = 3u8,
+  Gaps            = 4u8,
+  Gaps633         = 5u8, 
+  Gaps422         = 6u8,
+  Gaps211         = 7u8,
+  TrackUmbCentral = 8u8,
   /// -> 20+ "Philip's triggers"
   /// Any paddle HIT in UMB  + any paddle HIT in CUB
-  UmbCube      = 21u8,
+  UmbCube         = 21u8,
   /// Any paddle HIT in UMB + any paddle HIT in CUB top
-  UmbCubeZ     = 22u8,
+  UmbCubeZ        = 22u8,
   /// Any paddle HIT in UMB + any paddle hit in COR + any paddle hit in CUB 
-  UmbCorCube   = 23u8,
+  UmbCorCube      = 23u8,
   /// Any paddle HIT in COR + any paddle HIT in CUB SIDES
-  CorCubeSide  = 24u8,
+  CorCubeSide     = 24u8,
   /// Any paddle hit in UMB + any three paddles HIT in CUB
-  Umb3Cube     = 25u8,
+  Umb3Cube        = 25u8,
   /// > 100 -> Debug triggers
-  Poisson      = 100u8,
-  Forced       = 101u8,
-  FixedRate    = 102u8,
+  Poisson         = 100u8,
+  Forced          = 101u8,
+  FixedRate       = 102u8,
   /// > 200 -> These triggers can not be set, they are merely
   /// the result of what we read out from the trigger mask of 
   /// the ltb
@@ -188,6 +189,9 @@ impl TriggerType {
       TriggerType::Gaps211 => {
         return 7;
       }
+      TriggerType::TrackUmbCentral => {
+        return 8;
+      }
       TriggerType::UmbCube => {
         return 21;
       }
@@ -224,6 +228,7 @@ impl From<u8> for TriggerType {
       5   => TriggerType::Gaps633,
       6   => TriggerType::Gaps422,
       7   => TriggerType::Gaps211,
+      8   => TriggerType::TrackUmbCentral,
       21  => TriggerType::UmbCube,
       22  => TriggerType::UmbCubeZ,
       23  => TriggerType::UmbCorCube,
@@ -251,6 +256,7 @@ impl FromRandom for TriggerType {
       TriggerType::Gaps633,
       TriggerType::Gaps422,
       TriggerType::Gaps211,
+      TriggerType::TrackUmbCentral,
       TriggerType::UmbCube,
       TriggerType::UmbCubeZ,
       TriggerType::UmbCorCube,
@@ -532,6 +538,10 @@ impl MasterTriggerEvent {
   /// types
   pub fn get_trigger_sources(&self) -> Vec<TriggerType> {
     let mut t_types    = Vec::<TriggerType>::new();
+    let track_umb_central_trigger = self.trigger_source >> 4 & 0x1 == 1;
+    if track_umb_central_trigger {
+      t_types.push(TriggerType::TrackUmbCentral);
+    }
     let gaps_trigger   = self.trigger_source >> 5 & 0x1 == 1;
     if gaps_trigger {
       t_types.push(TriggerType::Gaps);
@@ -540,6 +550,7 @@ impl MasterTriggerEvent {
     // if gaps_trigger_633 {
     //   t_types.push(TriggerType::Gaps633);
     // }
+    
     let any_trigger    = self.trigger_source >> 6 & 0x1 == 1;
     if any_trigger {
       t_types.push(TriggerType::Any);
@@ -570,6 +581,11 @@ impl MasterTriggerEvent {
   /// be operated in conjuction with the set trigger
   pub fn get_global_trigger_soures(&self) -> Vec<TriggerType> {
     let mut t_types = Vec::<TriggerType>::new();
+
+    let track_umb_central_trigger = self.trigger_source >> 11 & 0x1 == 1;
+    if track_umb_central_trigger{
+      t_types.push(TriggerType::TrackUmbCentral);
+    }
     let central_track_trigger
                        = self.trigger_source >> 13 & 0x1 == 1;
     if central_track_trigger {
@@ -584,6 +600,11 @@ impl MasterTriggerEvent {
       t_types.push(TriggerType::Any);
     }
     t_types
+  }
+
+  pub fn is_trace_suppressed(&self) -> bool {
+    let is_trace_suppressed = self.trigger_source >> 12 & 0x1 == 1;
+    is_trace_suppressed
   }
 }
 
