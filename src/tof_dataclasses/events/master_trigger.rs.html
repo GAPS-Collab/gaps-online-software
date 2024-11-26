@@ -775,6 +775,27 @@
 <a href="#775" id="775">775</a>
 <a href="#776" id="776">776</a>
 <a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerEvent
 </span><span class="attr">#[cfg(feature = <span class="string">"pybindings"</span>)]
 </span><span class="kw">use </span>pyo3::pyclass;
@@ -893,28 +914,29 @@
 </span><span class="kw">pub enum </span>TriggerType {
   Unknown      = <span class="number">0u8</span>,
   <span class="doccomment">/// -&gt; 1-10 "pysics" triggers
-  </span>Any          = <span class="number">1u8</span>,
-  Track        = <span class="number">2u8</span>,
-  TrackCentral = <span class="number">3u8</span>,
-  Gaps         = <span class="number">4u8</span>,
-  Gaps633      = <span class="number">5u8</span>, 
-  Gaps422      = <span class="number">6u8</span>,
-  Gaps211      = <span class="number">7u8</span>,
+  </span>Any             = <span class="number">1u8</span>,
+  Track           = <span class="number">2u8</span>,
+  TrackCentral    = <span class="number">3u8</span>,
+  Gaps            = <span class="number">4u8</span>,
+  Gaps633         = <span class="number">5u8</span>, 
+  Gaps422         = <span class="number">6u8</span>,
+  Gaps211         = <span class="number">7u8</span>,
+  TrackUmbCentral = <span class="number">8u8</span>,
   <span class="doccomment">/// -&gt; 20+ "Philip's triggers"
   /// Any paddle HIT in UMB  + any paddle HIT in CUB
-  </span>UmbCube      = <span class="number">21u8</span>,
+  </span>UmbCube         = <span class="number">21u8</span>,
   <span class="doccomment">/// Any paddle HIT in UMB + any paddle HIT in CUB top
-  </span>UmbCubeZ     = <span class="number">22u8</span>,
+  </span>UmbCubeZ        = <span class="number">22u8</span>,
   <span class="doccomment">/// Any paddle HIT in UMB + any paddle hit in COR + any paddle hit in CUB 
-  </span>UmbCorCube   = <span class="number">23u8</span>,
+  </span>UmbCorCube      = <span class="number">23u8</span>,
   <span class="doccomment">/// Any paddle HIT in COR + any paddle HIT in CUB SIDES
-  </span>CorCubeSide  = <span class="number">24u8</span>,
+  </span>CorCubeSide     = <span class="number">24u8</span>,
   <span class="doccomment">/// Any paddle hit in UMB + any three paddles HIT in CUB
-  </span>Umb3Cube     = <span class="number">25u8</span>,
+  </span>Umb3Cube        = <span class="number">25u8</span>,
   <span class="doccomment">/// &gt; 100 -&gt; Debug triggers
-  </span>Poisson      = <span class="number">100u8</span>,
-  Forced       = <span class="number">101u8</span>,
-  FixedRate    = <span class="number">102u8</span>,
+  </span>Poisson         = <span class="number">100u8</span>,
+  Forced          = <span class="number">101u8</span>,
+  FixedRate       = <span class="number">102u8</span>,
   <span class="doccomment">/// &gt; 200 -&gt; These triggers can not be set, they are merely
   /// the result of what we read out from the trigger mask of 
   /// the ltb
@@ -965,6 +987,9 @@
       TriggerType::Gaps211 =&gt; {
         <span class="kw">return </span><span class="number">7</span>;
       }
+      TriggerType::TrackUmbCentral =&gt; {
+        <span class="kw">return </span><span class="number">8</span>;
+      }
       TriggerType::UmbCube =&gt; {
         <span class="kw">return </span><span class="number">21</span>;
       }
@@ -1001,6 +1026,7 @@
       <span class="number">5   </span>=&gt; TriggerType::Gaps633,
       <span class="number">6   </span>=&gt; TriggerType::Gaps422,
       <span class="number">7   </span>=&gt; TriggerType::Gaps211,
+      <span class="number">8   </span>=&gt; TriggerType::TrackUmbCentral,
       <span class="number">21  </span>=&gt; TriggerType::UmbCube,
       <span class="number">22  </span>=&gt; TriggerType::UmbCubeZ,
       <span class="number">23  </span>=&gt; TriggerType::UmbCorCube,
@@ -1028,6 +1054,7 @@
       TriggerType::Gaps633,
       TriggerType::Gaps422,
       TriggerType::Gaps211,
+      TriggerType::TrackUmbCentral,
       TriggerType::UmbCube,
       TriggerType::UmbCubeZ,
       TriggerType::UmbCorCube,
@@ -1309,6 +1336,10 @@
   /// types
   </span><span class="kw">pub fn </span>get_trigger_sources(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;TriggerType&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>t_types    = Vec::&lt;TriggerType&gt;::new();
+    <span class="kw">let </span>track_umb_central_trigger = <span class="self">self</span>.trigger_source &gt;&gt; <span class="number">4 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
+    <span class="kw">if </span>track_umb_central_trigger {
+      t_types.push(TriggerType::TrackUmbCentral);
+    }
     <span class="kw">let </span>gaps_trigger   = <span class="self">self</span>.trigger_source &gt;&gt; <span class="number">5 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
     <span class="kw">if </span>gaps_trigger {
       t_types.push(TriggerType::Gaps);
@@ -1317,6 +1348,7 @@
     // if gaps_trigger_633 {
     //   t_types.push(TriggerType::Gaps633);
     // }
+    
     </span><span class="kw">let </span>any_trigger    = <span class="self">self</span>.trigger_source &gt;&gt; <span class="number">6 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
     <span class="kw">if </span>any_trigger {
       t_types.push(TriggerType::Any);
@@ -1347,6 +1379,11 @@
   /// be operated in conjuction with the set trigger
   </span><span class="kw">pub fn </span>get_global_trigger_soures(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;TriggerType&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>t_types = Vec::&lt;TriggerType&gt;::new();
+
+    <span class="kw">let </span>track_umb_central_trigger = <span class="self">self</span>.trigger_source &gt;&gt; <span class="number">11 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
+    <span class="kw">if </span>track_umb_central_trigger{
+      t_types.push(TriggerType::TrackUmbCentral);
+    }
     <span class="kw">let </span>central_track_trigger
                        = <span class="self">self</span>.trigger_source &gt;&gt; <span class="number">13 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
     <span class="kw">if </span>central_track_trigger {
@@ -1361,6 +1398,11 @@
       t_types.push(TriggerType::Any);
     }
     t_types
+  }
+
+  <span class="kw">pub fn </span>is_trace_suppressed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="kw">let </span>is_trace_suppressed = <span class="self">self</span>.trigger_source &gt;&gt; <span class="number">12 </span>&amp; <span class="number">0x1 </span>== <span class="number">1</span>;
+    is_trace_suppressed
   }
 }
 

@@ -563,6 +563,15 @@
 <a href="#563" id="563">563</a>
 <a href="#564" id="564">564</a>
 <a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Master trigger board control
 //!
 //! Set registers and enable/disable features,
@@ -751,6 +760,14 @@
   <span class="prelude-val">Ok</span>(())
 }
 
+<span class="kw">pub fn </span>set_track_umb_central_trigger(bus : <span class="kw-2">&amp;mut </span>IPBus, prescale : f32)
+    -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
+    <span class="kw">let </span>prescale_val = (u32::MAX <span class="kw">as </span>f32 * prescale).floor() <span class="kw">as </span>u32;
+    <span class="macro">info!</span>(<span class="string">"Setting TRACK UMB CENTRAL trigger with prescale {}!"</span>, prescale);
+    bus.write(<span class="number">0x249</span>, prescale_val)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(())
+  }
+
 
 <span class="doccomment">/// Disable all triggers
 </span><span class="kw">pub fn </span>unset_all_triggers(bus : <span class="kw-2">&amp;mut </span>IPBus) 
@@ -770,6 +787,7 @@
   TRACK_TRIG_IS_GLOBAL.set(bus, <span class="number">0</span>)<span class="question-mark">?</span>; 
   ANY_TRIG_IS_GLOBAL.set(bus, <span class="number">0</span>)<span class="question-mark">?</span>;
   TRACK_CENTRAL_IS_GLOBAL.set(bus, <span class="number">0</span>)<span class="question-mark">?</span>;
+  set_track_umb_central_trigger(bus, <span class="number">0.0</span>)<span class="question-mark">?</span>;
   <span class="prelude-val">Ok</span>(())
 }
 
