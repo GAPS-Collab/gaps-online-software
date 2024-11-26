@@ -48,10 +48,8 @@ use crossbeam_channel::{
 };
 
 //use colored::Colorize;
-//extern crate indicatif;
 use indicatif::{
   ProgressBar,
-  ProgressStyle,
 };
 
 use tof_dataclasses::events::{
@@ -59,9 +57,6 @@ use tof_dataclasses::events::{
   RBEvent
 };
 
-//use tof_dataclasses::threading::{
-//    ThreadControl,
-//};
 use tof_dataclasses::serialization::{
   Serialization,
   Packable
@@ -88,8 +83,8 @@ use liftof_lib::{
   LIFTOF_LOGO_SHOW,
   master_trigger,
   LiftofSettings,
-  CommandCC,
 };
+
 use liftof_lib::thread_control::ThreadControl;
 use liftof_lib::constants::{
   DEFAULT_RB_ID,
@@ -98,10 +93,12 @@ use liftof_lib::constants::{
 use liftof_cc::{
   prepare_run,
   calibrate_tof,
+  verification_run,
+  restart_liftof_rb,
 };
+
 use liftof_cc::threads::{
   event_builder,
-  //flight_cpu_listener,
   command_dispatcher,
   global_data_sink,
   readoutboard_communicator
@@ -112,23 +109,14 @@ use liftof_cc::threads::monitor_cpu;
 
 /*************************************/
 
-/// Command line arguments for calling 
-/// liftof-cc directly from the command line
 #[derive(Debug, Parser, PartialEq)]
-pub enum CommandLineCommand {
+pub enum CommandCC {
   /// Listen for flight CPU commands.
   Listen,
   /// Staging mode - work through all .toml files
   /// in the staging area
   Staging,
-  /// Ping a TOF sub-system.
-  Ping,
-  ///// Monitor a TOF sub-system.
-  //Moni(MoniCmd),
-  ///// Restart RB systemd
-  //SystemdReboot(SystemdRebootCmd),
-  /// Power control of TOF sub-systems.
-  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
+  /// Run full Readoutboard calibration.
   Calibration,
   /// Start/stop data taking run.
   Run
@@ -164,13 +152,6 @@ struct LiftofCCArgs {
 }
 
 /*************************************/
-
-/// Deal with the "result" of the command
-/// inquiry
-//use liftof_lib::{
-//    StartRunOpts,
-//    DefaultOpts,
-//};
 
 /// Little helper, just makes sure that all the 
 /// channels are of same type
@@ -264,6 +245,7 @@ fn main() {
   let mut gds_settings      = config.data_publisher_settings.clone();
   let run_analysis_engine   = config.run_analysis_engine;
   let pre_run_calibration   = config.pre_run_calibration; 
+  let verification_rt_sec   = config.verification_runtime_sec;
   let mut conn              = connect_to_db(db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
   // if this call does not go through, we might as well fail early.
   let mut rb_list           = ReadoutBoard::all(&mut conn).expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
@@ -326,7 +308,6 @@ fn main() {
       Ok(status) => {
         if status.success() {
           info!("Copied config to RB {} successfully!", rb_child.0);
-          //println!("=> Restarted liftof-rb on {} successfully \u{1F389}!", rb_child.0)
         } else {
           error!("Copy config to RB {} failed with exit code {:?}!", rb_child.0, status.code());
           issues.push(rb_child.0);
@@ -338,49 +319,50 @@ fn main() {
     println!("=> Copied config to all RBs successfully \u{1F389}!");
     info!("Copied config to all RBs successfully!");
   }
-  
+ 
+  restart_liftof_rb(&rb_list); 
   // FIXME - this needs to be a function
   // copy the current config file on all RBs
-  rb_handles.clear();
-  println!("=> Restarting liftof-rb clients on all RBs!");
-  let mut children = Vec::<(u8,Child)>::new();
-  for rb in &rb_list {
-    // also populate the rb thread nandles
-    rb_handles.push(thread::spawn(||{}));
-    
-    let rb_address = format!("tof-rb{:02}", rb.rb_id);
-    match Command::new("ssh")
-      .args([&rb_address, "sudo", "systemctl", "restart", "liftof"])
-      .spawn() {
-      Err(err) => {
-        error!("Unable to spawn ssh process to restart liftoof-rb on RB {}! {}", rb.rb_id, err);
-      }
-      Ok(child) => {
-        children.push((rb.rb_id,child));
-      }
-    }
-  }
-  let mut issues = Vec::<u8>::new();
-  for rb_child in &mut children {
-    match rb_child.1.wait() {
-      Err(err) => {
-        error!("Child process failed with stderr {:?}! {}", rb_child.1.stderr, err);
-      }
-      Ok(status) => {
-        if status.success() {
-          info!("Restarted liftof-rb on {} successfully!", rb_child.0);
-          //println!("=> Restarted liftof-rb on {} successfully \u{1F389}!", rb_child.0)
-        } else {
-          error!("Restart of liftof-rb on {} failed with exit code {:?}!", rb_child.0, status.code());
-          issues.push(rb_child.0);
-        }
-      }
-    }
-  }
-  if issues.len() == 0 {
-    println!("=> Restarted liftof-rb on all RBs successfully \u{1F389}!");
-    info!("=> Restarted liftof-rb on all RBs successfully!");
-  }
+  //rb_handles.clear();
+  //println!("=> Restarting liftof-rb clients on all RBs!");
+  //let mut children = Vec::<(u8,Child)>::new();
+  //for rb in &rb_list {
+  //  // also populate the rb thread nandles
+  //  rb_handles.push(thread::spawn(||{}));
+  //  
+  //  let rb_address = format!("tof-rb{:02}", rb.rb_id);
+  //  match Command::new("ssh")
+  //    .args([&rb_address, "sudo", "systemctl", "restart", "liftof"])
+  //    .spawn() {
+  //    Err(err) => {
+  //      error!("Unable to spawn ssh process to restart liftoof-rb on RB {}! {}", rb.rb_id, err);
+  //    }
+  //    Ok(child) => {
+  //      children.push((rb.rb_id,child));
+  //    }
+  //  }
+  //}
+  //let mut issues = Vec::<u8>::new();
+  //for rb_child in &mut children {
+  //  match rb_child.1.wait() {
+  //    Err(err) => {
+  //      error!("Child process failed with stderr {:?}! {}", rb_child.1.stderr, err);
+  //    }
+  //    Ok(status) => {
+  //      if status.success() {
+  //        info!("Restarted liftof-rb on {} successfully!", rb_child.0);
+  //        //println!("=> Restarted liftof-rb on {} successfully \u{1F389}!", rb_child.0)
+  //      } else {
+  //        error!("Restart of liftof-rb on {} failed with exit code {:?}!", rb_child.0, status.code());
+  //        issues.push(rb_child.0);
+  //      }
+  //    }
+  //  }
+  //}
+  //if issues.len() == 0 {
+  //  println!("=> Restarted liftof-rb on all RBs successfully \u{1F389}!");
+  //  info!("=> Restarted liftof-rb on all RBs successfully!");
+  //}
 
   let mtb_link_id_map = get_linkid_rbid_map(&rb_list);
   // A global kill timer
@@ -419,7 +401,9 @@ fn main() {
         // as well as upadte the shared memory
         match thread_control.lock() {
           Ok(mut tc) => {
-            tc.liftof_settings = config.clone();
+            tc.liftof_settings    = config.clone();
+            tc.run_id             = new_run_id;
+            tc.new_run_start_flag = true;
           },
           Err(err) => {
             error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -483,9 +467,8 @@ fn main() {
     .name("data-sink".into())
     .spawn(move || {
       global_data_sink(&tp_from_threads,
-                       false,
                        thread_control_gds, 
-                        dp_settings);
+                       dp_settings);
     })
     .expect("Failed to spawn data-sink thread!");
   debug!("Data sink thread started!");
@@ -604,16 +587,16 @@ fn main() {
   //  3) Run - we just immediatly start a run.
   // 
 
-  // default  behavriour is to stop
+  let mut bar = ProgressBar::hidden();
+
+  // default  behaviour is to stop
   // when we are done
   let mut dont_stop = false;
-  let mut listen    = false;
   
   let mut command_socket : Option<zmq::Socket> = None;
   match args.command {
     CommandCC::Listen => {
       dont_stop = true;
-      listen    = true;
       // start command dispatcher thread
       let tc = Arc::clone(&thread_control);
       let ts = tp_to_sink.clone();
@@ -639,9 +622,16 @@ fn main() {
     }
     CommandCC::Run => {
       if pre_run_calibration {
-       let tc_cali = thread_control.clone();
-       calibrate_tof(tc_cali, &rb_list, true);
+        let tc_cali = thread_control.clone();
+        calibrate_tof(tc_cali, &rb_list, true);
+        restart_liftof_rb(&rb_list);
       }
+      if verification_rt_sec > 0 {
+        let tc_verification = thread_control.clone();
+        verification_run(verification_rt_sec, tc_verification);
+        restart_liftof_rb(&rb_list);
+      }
+      thread::sleep(5*one_second);
       // in this scenario, we want to end
       // after we are done
       dont_stop = false;
@@ -712,9 +702,6 @@ fn main() {
       // move the socket out of here for further use
       command_socket = Some(cmd_sender);
     }
-    _ => {
-      panic!("Unable to execute request for this command!");
-    }
   }
 
   //---------------------------------------------------------
@@ -730,6 +717,7 @@ fn main() {
     thread::sleep(5*one_second);
 
     if end_program {
+      bar.finish();
       println!("=> Ending program!");
       println!("=> Sending run termination command to the RBs");
       let cmd          = TofCommand::DataRunStop(DEFAULT_RB_ID as u32);

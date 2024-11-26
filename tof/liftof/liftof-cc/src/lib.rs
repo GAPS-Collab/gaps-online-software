@@ -11,6 +11,11 @@ use std::sync::{
   Mutex,
 };
 
+use std::process::{
+  Command,
+  Child,
+};
+
 use std::thread;
 use std::fs::create_dir_all;
 
@@ -27,9 +32,11 @@ use indicatif::{
 use liftof_lib::constants::{
   DEFAULT_CALIB_VOLTAGE,
   DEFAULT_RB_ID,
-  DEFAULT_CALIB_EXTRA
+  DEFAULT_CALIB_EXTRA,
+  //PAD_CMD_32BIT
 };
 
+use tof_dataclasses::constants::PAD_CMD_32BIT;
 use tof_dataclasses::serialization::{
   Serialization,
   Packable
@@ -167,6 +174,72 @@ pub fn run(with_calibration : bool, verification : bool) {
   }
 }
 
+/// Trigger a general command on the Readoutboards 
+/// remotly through ssh.
+///
+/// Ssh keys and aliases (e.g. tof-rb02) must be 
+/// set up for this to work
+///
+/// # Arguments:
+///
+///   * rb_list : The list of ReadoutBoards the commands
+///               will get executed
+///   * cmd     : The actual command without 'ssh <ip>'
+fn ssh_command_rbs(rb_list : &Vec<ReadoutBoard>,
+                   cmd     : Vec<String>) {
+  let mut rb_handles       = Vec::<thread::JoinHandle<_>>::new();
+  println!("=> Executing ssh command {:?} on {} RBs!", cmd, rb_list.len());
+  let mut children = Vec::<(u8,Child)>::new();
+  for rb in rb_list {
+    // also populate the rb thread nandles
+    rb_handles.push(thread::spawn(||{}));
+    let rb_address   = format!("tof-rb{:02}", rb.rb_id);
+    let mut ssh_args = vec![rb_address];
+    let mut thisrb_cmd = cmd.clone();
+    ssh_args.append(&mut thisrb_cmd);
+    match Command::new("ssh")
+      //.args([&rb_address, "sudo", "systemctl", "restart", "liftof"])
+      .args(ssh_args)
+      .spawn() {
+      Err(err) => {
+        error!("Unable to spawn ssh process on RB {}! {}", rb.rb_id, err);
+      }
+      Ok(child) => {
+        children.push((rb.rb_id,child));
+      }
+    }
+  }
+  let mut issues = Vec::<u8>::new();
+  for rb_child in &mut children {
+    match rb_child.1.wait() {
+      Err(err) => {
+        error!("Child process failed with stderr {:?}! {}", rb_child.1.stderr, err);
+      }
+      Ok(status) => {
+        if status.success() {
+          info!("Execution of command on {} successful!", rb_child.0);
+        } else {
+          error!("Execution of command on {} failed with exit code {:?}!", rb_child.0, status.code());
+          issues.push(rb_child.0);
+        }
+      }
+    }
+  }
+  if issues.len() == 0 {
+    println!("=> Executing ssh command {:?} on {} RBs successful!", cmd, rb_list.len());
+  }
+}
+
+/// Restart liftof-rb on RBs
+pub fn restart_liftof_rb(rb_list : &Vec<ReadoutBoard>) {
+  let command = vec![String::from("sudo"),
+                     String::from("systemctl"),
+                     String::from("restart"),
+                     String::from("liftof")];
+  println!("=> Restarting liftof-rb on RBs!");
+  ssh_command_rbs(rb_list, command);
+}
+
 /// A "verification" run describes an any trigger/track trigger
 /// run which should iluminate the entire tof so that we can do 
 /// a working channel inventory. 
@@ -174,7 +247,92 @@ pub fn run(with_calibration : bool, verification : bool) {
 /// A verification run will not safe data to disk, but instead 
 /// run it through a small analysis engine and count the active 
 /// channels
-pub fn verification_run(timeout : u32) {
+pub fn verification_run(timeout : u32,
+                        thread_control : Arc<Mutex<ThreadControl>>) {
+  let mut write_state : bool = true; // when in doubt, write data to disk
+  let mut config      = LiftofSettings::new();
+  match thread_control.lock() {
+    Ok(mut tc) => {
+      write_state = tc.write_data_to_disk;
+      tc.write_data_to_disk       = false;
+      tc.verification_active      = true;
+      tc.thread_master_trg_active = true;
+      tc.calibration_active       = false;
+      tc.thread_event_bldr_active = true;
+      config = tc.liftof_settings.clone();
+    }
+    Err(err) => {
+      error!("Can't acquire lock for ThreadControl! {err}");
+    },
+  }
+  let one_second  = Duration::from_millis(1000);
+  let runtime     = Instant::now();
+  // technically, it is run_typ, rb_id, event number
+  // all to the max means run start for all
+  // We don't need this - just need to make sure it gets broadcasted
+  let cmd_payload: u32 =  PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
+  let cmd          = TofCommand::DataRunStart(cmd_payload);
+  let packet       = cmd.pack();
+  let mut payload  = String::from("BRCT").into_bytes();
+  payload.append(&mut packet.to_bytestream());
+  
+  // open 0MQ socket here
+  let ctx = zmq::Context::new();
+  let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+  let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
+  cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+  // after we opened the socket, give the RBs a chance to connect
+  println!("=> Give the RBs a chance to connect and wait a bit..");
+  thread::sleep(10*one_second);
+  println!("=> Initializing Run Start!");
+  match cmd_sender.send(&payload, 0) {
+    Err(err) => {
+      error!("Unable to send command, error{err}");
+    },
+    Ok(_) => {
+      debug!("We sent {:?}", payload);
+    }
+  }
+  
+  println!("=> Verification run initialized!");
+  // just wait until the run is finisehd
+  loop {
+    if runtime.elapsed().as_secs() > timeout as u64 {
+      break;
+    }
+    thread::sleep(5*one_second);
+  }
+  
+  println!("=> Sending run termination command to the RBs");
+  let cmd          = TofCommand::DataRunStop(DEFAULT_RB_ID as u32);
+  let packet       = cmd.pack();
+  let mut payload  = String::from("BRCT").into_bytes();
+  payload.append(&mut packet.to_bytestream());
+  
+  warn!("=> No command socket available! Can not shut down RBs..!");
+  // after we opened the socket, give the RBs a chance to connect
+  println!("=> Give the RBs a chance to connect and wait a bit..");
+  thread::sleep(10*one_second);
+  match cmd_sender.send(&payload, 0) {
+    Err(err) => {
+      error!("Unable to send command! {err}");
+    },
+    Ok(_) => {
+      debug!("We sent {:?}", payload);
+    }
+  }
+  
+
+  // move the socket out of here for further use
+  match thread_control.lock() {
+    Ok(mut tc) => {
+      tc.write_data_to_disk = write_state;
+      tc.verification_active = false;
+    },
+    Err(err) => {
+      error!("Can't acquire lock for ThreadControl! {err}");
+    },
+  }
 }
 
 
@@ -214,7 +372,8 @@ pub fn calibrate_tof(thread_control : Arc<Mutex<ThreadControl>>,
         tc.finished_calibrations.insert(rb.rb_id,false); 
       }
       cali_base_dir = tc.liftof_settings.calibration_dir.clone();
-      cc_pub_addr = tc.liftof_settings.cmd_dispatcher_settings.cc_server_address.clone();
+      cc_pub_addr   = tc.liftof_settings.cmd_dispatcher_settings.cc_server_address.clone();
+      tc.write_data_to_disk = true;
     },
     Err(err) => {
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
