@@ -15,8 +15,6 @@ use std::sync::{
     Mutex,
 };
 
-//use std::fs::create_dir_all;
-
 use crossbeam_channel::Receiver; 
 
 //use colored::Colorize;
@@ -25,16 +23,6 @@ use liftof_lib::settings::DataPublisherSettings;
 use tof_dataclasses::packets::{
     TofPacket,
     PacketType
-};
-
-//use tof_dataclasses::threading::{
-//    ThreadControl,
-//};
-
-use tof_dataclasses::monitoring::{
-    RBMoniData,
-    MtbMoniData,
-    CPUMoniData
 };
 
 //use tof_dataclasses::events::TofEvent;
@@ -46,15 +34,12 @@ use tof_dataclasses::serialization::{
 use tof_dataclasses::io::{
     TofPacketWriter,
     FileType,
-    //get_utc_timestamp
 };
 
 use tof_dataclasses::events::TofEvent;
 
-//#[cfg(features="debug")]
 use tof_dataclasses::heartbeats::HeartBeatDataSink;
 
-//use liftof_lib::settings::DataPublisherSettings;
 use liftof_lib::thread_control::ThreadControl;
 
 /// Manages "outgoing" 0MQ PUB socket and writing
@@ -67,10 +52,8 @@ use liftof_lib::thread_control::ThreadControl;
 ///
 /// * incoming           : incoming connection for TofPackets from 
 ///                        other threads
-/// * print_moni_packets : print monitoring packets to the terminal
 /// * thread_control     : start/stop thread, calibration information
 pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
-                        print_moni_packets : bool,
                         thread_control     : Arc<Mutex<ThreadControl>>,
                         settings           : DataPublisherSettings) {
   // when the thread starts, we need to wait a bit
@@ -79,7 +62,6 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut flight_address           = String::from("");
   let mut mbytes_per_file          = 420usize;
   let mut write_stream_path        = String::from("");
-  //let mut cali_dir                 = String::from("");
   let mut send_tof_summary_packets = false;
   let mut send_rbwaveform_packets  = false;
   let mut send_mtb_event_packets   = false;
@@ -88,15 +70,14 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   match thread_control.lock() {
     Ok(mut tc) => {
       tc.thread_data_sink_active = true; 
-      flight_address    = tc.liftof_settings.data_publisher_settings.fc_pub_address.clone();
-      mbytes_per_file   = tc.liftof_settings.data_publisher_settings.mbytes_per_file; 
-      write_stream_path = tc.liftof_settings.data_publisher_settings.data_dir.clone();
-      write_stream             = tc.write_data_to_disk;
-      //cali_dir = tc.liftof_settings.data_publisher_settings.cali_dir.clone();
-      send_tof_summary_packets = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
-      send_rbwaveform_packets  = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
-      send_mtb_event_packets   = tc.liftof_settings.data_publisher_settings.send_mtb_event_packets;
-      send_tof_event_packets   = tc.liftof_settings.data_publisher_settings.send_tof_event_packets;
+      flight_address             = tc.liftof_settings.data_publisher_settings.fc_pub_address.clone();
+      mbytes_per_file            = tc.liftof_settings.data_publisher_settings.mbytes_per_file; 
+      write_stream_path          = tc.liftof_settings.data_publisher_settings.data_dir.clone();
+      write_stream               = tc.write_data_to_disk;
+      send_tof_summary_packets   = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
+      send_rbwaveform_packets    = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
+      send_mtb_event_packets     = tc.liftof_settings.data_publisher_settings.send_mtb_event_packets;
+      send_tof_event_packets     = tc.liftof_settings.data_publisher_settings.send_tof_event_packets;
     },
     Err(err) => {
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -124,14 +105,9 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   //let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
 
   // for debugging/profiling
-  let mut timer      = Instant::now();
-  let mut kill_timer = Instant::now();
+  let mut timer                = Instant::now();
+  let mut check_settings_timer = Instant::now();
 
-  //let mut cali_expected    = 40;
-  //let mut cali_dir_created = false;
-  //let mut cali_output_dir  = String::from("");
-  //let mut cali_completed   = 0;
- 
   // run settings 
   let mut writer : Option<TofPacketWriter> = None;
   let mut runid : u32   = 0;
@@ -152,7 +128,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
     // even though this is called kill timer, check
     // the settings in general, since they might have
     // changed due to remote access.
-    if kill_timer.elapsed().as_secs_f32() > 0.11 {
+    if check_settings_timer.elapsed().as_secs_f32() > 1.5 {
       match thread_control.try_lock() {
         Ok(mut tc) => {
           //println!("== ==> [global_data_sink] tc lock acquired!");
@@ -179,11 +155,9 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
           error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
         },
       }
-      kill_timer = Instant::now();
+      check_settings_timer = Instant::now();
     }
     if write_stream && new_run_start {
-      //mut streamfile_name = write_stream_path + "/run_";
-      //streamfile_name += &runid.to_string();
       let file_type = FileType::RunFile(runid as u32);
       //println!("==> Writing stream to file with prefix {}", streamfile_name);
       writer = Some(TofPacketWriter::new(write_stream_path.clone(), file_type));
@@ -200,83 +174,6 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
           writer.as_mut().unwrap().add_tof_packet(&pack);
           heartbeat.n_pack_write_disk += 1;
           heartbeat.n_bytes_written += pack.payload.len() as u64;   
-        }
-        // yeah, this is it. 
-        // catch RBCalibration packets here,
-        // they will end up automatically in 
-        // the stream, but if we catch them 
-        // and expose them to an arc mutex,
-        // the waveform processing could 
-        // access them directly. 
-        match pack.packet_type {
-          //PacketType::RBCalibration => {
-          //  let cali_rb_id = pack.payload[2]; 
-          //  info!("Received RBCalibration packet for board {}!", cali_rb_id);
-          //  // we notify the other threads that we got this specific packet, 
-          //  // so we know how long we still have to wait
-          //  match thread_control.lock() {
-          //    Ok(mut tc) => {
-          //      // FIXME - unwrap (for bad packets)
-          //      *tc.finished_calibrations.get_mut(&cali_rb_id).unwrap() = true; 
-          //      cali_expected = tc.n_rbs;
-          //      cali_completed += 1;
-          //      //println!("Changed tc {}", tc);
-          //      info!("{} of {} calibrattions completed!", cali_completed, cali_expected);
-          //    },
-          //    Err(err) => {
-          //      error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-          //    },
-          //  }
-          //  
-          //  // See RBCalibration reference
-          //  let file_type  = FileType::CalibrationFile(cali_rb_id);
-          //  //println!("==> Writing stream to file with prefix {}", streamfile_name);
-          //  //let mut cali_writer = TofPacketWriter::new(write_stream_path.clone(), file_type);
-          //  if !cali_dir_created {
-          //    let today           = get_utc_timestamp();
-          //    cali_output_dir = format!("{}/{}", cali_dir.clone(), today);
-          //    match create_dir_all(cali_output_dir.clone()) {
-          //      Ok(_)    => info!("Created {} for calibration data!", cali_output_dir),
-          //      Err(err) => error!("Unable to create {} for calibration data! {}", cali_output_dir, err)
-          //    }
-          //    cali_dir_created = true;
-          //  }
-          //  if cali_completed == cali_expected {
-          //    cali_completed = 0;
-          //    cali_dir_created = false;
-          //  }
-          //  let mut cali_writer = TofPacketWriter::new(cali_output_dir.clone(), file_type);
-          //  cali_writer.add_tof_packet(&pack);
-          //  drop(cali_writer);
-          //}
-          _ => ()
-        }
-        if print_moni_packets {
-          // some output to the console
-          match pack.packet_type {
-            PacketType::RBMoniData => {
-              //let moni : Result<RBMoniData, SerializationError> = pack.unpack(); 
-              match pack.unpack::<RBMoniData>() {
-              //match moni {
-                Ok(data) => {
-                  debug!("Sending RBMoniData {}", data);
-                },
-                Err(err) => error!("Can not unpack RBMoniData! {err}")
-              }
-            }, 
-            PacketType::CPUMoniData => {
-              match pack.unpack::<CPUMoniData>() {
-                Ok(data) => {println!("{}", data);},
-                Err(err) => error!("Can not unpack TofCmpData! {err}")}
-              },
-            PacketType::MonitorMtb => {
-              //let moni = MtbMoniData::from_bytestream(&pack.payload, &mut pos);
-              match pack.unpack::<MtbMoniData>() {
-                Ok(data) => {println!("{}", data);},
-                Err(err) => error!("Can not unpack MtbMoniData! {err}")}
-              },
-            _ => ()
-          } // end match 
         }
         
         // FIXME - disentangle network and disk I/O?

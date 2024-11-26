@@ -53,9 +53,6 @@ use colored::Colorize;
 // TOF specific crates
 use tof_control::helper::rb_type::RBInfo;
 
-//use tof_dataclasses::threading::{
-//    ThreadControl,
-//};
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::commands::{
     TofOperationMode
