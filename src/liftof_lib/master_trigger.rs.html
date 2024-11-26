@@ -786,6 +786,12 @@
 <a href="#786" id="786">786</a>
 <a href="#787" id="787">787</a>
 <a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard communications
 //!
 //! The MTB (MasterTriggerBoard) is currently
@@ -1193,6 +1199,12 @@
       <span class="kw">match </span>set_central_track_trigger(<span class="kw-2">&amp;mut </span>bus, settings.trigger_prescale) {
         <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set the CENTRAL TRACK trigger! {err}"</span>),
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+      }
+    }
+    TriggerType::TrackUmbCentral  =&gt; {
+      <span class="kw">match </span>set_track_umb_central_trigger(<span class="kw-2">&amp;mut </span>bus, settings.trigger_prescale) {
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set the TRACK UMB CENTRAL trigger! {err}"</span>),
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)   =&gt; ()
       }
     }
     TriggerType::Gaps    =&gt; {
