@@ -290,109 +290,6 @@
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
 <a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
-<a href="#364" id="364">364</a>
-<a href="#365" id="365">365</a>
-<a href="#366" id="366">366</a>
-<a href="#367" id="367">367</a>
-<a href="#368" id="368">368</a>
-<a href="#369" id="369">369</a>
-<a href="#370" id="370">370</a>
-<a href="#371" id="371">371</a>
-<a href="#372" id="372">372</a>
-<a href="#373" id="373">373</a>
-<a href="#374" id="374">374</a>
-<a href="#375" id="375">375</a>
-<a href="#376" id="376">376</a>
-<a href="#377" id="377">377</a>
-<a href="#378" id="378">378</a>
-<a href="#379" id="379">379</a>
-<a href="#380" id="380">380</a>
-<a href="#381" id="381">381</a>
-<a href="#382" id="382">382</a>
-<a href="#383" id="383">383</a>
-<a href="#384" id="384">384</a>
-<a href="#385" id="385">385</a>
-<a href="#386" id="386">386</a>
-<a href="#387" id="387">387</a>
-<a href="#388" id="388">388</a>
-<a href="#389" id="389">389</a>
-<a href="#390" id="390">390</a>
-<a href="#391" id="391">391</a>
-<a href="#392" id="392">392</a>
-<a href="#393" id="393">393</a>
-<a href="#394" id="394">394</a>
-<a href="#395" id="395">395</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Communication with the flight computer
 //!
 //! Using two dedicated 0MQ wires - one for 
@@ -410,8 +307,6 @@
     Mutex,
 };
 
-<span class="kw">use </span>std::fs::create_dir_all;
-
 <span class="kw">use </span>crossbeam_channel::Receiver; 
 
 <span class="comment">//use colored::Colorize;
@@ -420,16 +315,6 @@
 <span class="kw">use </span>tof_dataclasses::packets::{
     TofPacket,
     PacketType
-};
-
-<span class="comment">//use tof_dataclasses::threading::{
-//    ThreadControl,
-//};
-
-</span><span class="kw">use </span>tof_dataclasses::monitoring::{
-    RBMoniData,
-    MtbMoniData,
-    CPUMoniData
 };
 
 <span class="comment">//use tof_dataclasses::events::TofEvent;
@@ -441,16 +326,13 @@
 <span class="kw">use </span>tof_dataclasses::io::{
     TofPacketWriter,
     FileType,
-    get_utc_timestamp
 };
 
 <span class="kw">use </span>tof_dataclasses::events::TofEvent;
 
-<span class="comment">//#[cfg(features="debug")]
-</span><span class="kw">use </span>tof_dataclasses::heartbeats::HeartBeatDataSink;
+<span class="kw">use </span>tof_dataclasses::heartbeats::HeartBeatDataSink;
 
-<span class="comment">//use liftof_lib::settings::DataPublisherSettings;
-</span><span class="kw">use </span>liftof_lib::thread_control::ThreadControl;
+<span class="kw">use </span>liftof_lib::thread_control::ThreadControl;
 
 <span class="doccomment">/// Manages "outgoing" 0MQ PUB socket and writing
 /// data to disk
@@ -462,10 +344,8 @@
 ///
 /// * incoming           : incoming connection for TofPackets from 
 ///                        other threads
-/// * print_moni_packets : print monitoring packets to the terminal
 /// * thread_control     : start/stop thread, calibration information
 </span><span class="kw">pub fn </span>global_data_sink(incoming           : <span class="kw-2">&amp;</span>Receiver&lt;TofPacket&gt;,
-                        print_moni_packets : bool,
                         thread_control     : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;,
                         settings           : DataPublisherSettings) {
   <span class="comment">// when the thread starts, we need to wait a bit
@@ -474,22 +354,22 @@
   <span class="kw">let </span><span class="kw-2">mut </span>flight_address           = String::from(<span class="string">""</span>);
   <span class="kw">let </span><span class="kw-2">mut </span>mbytes_per_file          = <span class="number">420usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>write_stream_path        = String::from(<span class="string">""</span>);
-  <span class="kw">let </span><span class="kw-2">mut </span>cali_dir                 = String::from(<span class="string">""</span>);
   <span class="kw">let </span><span class="kw-2">mut </span>send_tof_summary_packets = <span class="bool-val">false</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>send_rbwaveform_packets  = <span class="bool-val">false</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>send_mtb_event_packets   = <span class="bool-val">false</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>send_tof_event_packets   = <span class="bool-val">false</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>write_stream             = <span class="bool-val">false</span>;
   <span class="kw">match </span>thread_control.lock() {
     <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
       tc.thread_data_sink_active = <span class="bool-val">true</span>; 
-      flight_address    = tc.liftof_settings.data_publisher_settings.fc_pub_address.clone();
-      mbytes_per_file   = tc.liftof_settings.data_publisher_settings.mbytes_per_file; 
-      write_stream_path = tc.liftof_settings.data_publisher_settings.data_dir.clone();
-      cali_dir = tc.liftof_settings.data_publisher_settings.cali_dir.clone();
-      send_tof_summary_packets = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
-      send_rbwaveform_packets  = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
-      send_mtb_event_packets   = tc.liftof_settings.data_publisher_settings.send_mtb_event_packets;
-      send_tof_event_packets   = tc.liftof_settings.data_publisher_settings.send_tof_event_packets;
+      flight_address             = tc.liftof_settings.data_publisher_settings.fc_pub_address.clone();
+      mbytes_per_file            = tc.liftof_settings.data_publisher_settings.mbytes_per_file; 
+      write_stream_path          = tc.liftof_settings.data_publisher_settings.data_dir.clone();
+      write_stream               = tc.write_data_to_disk;
+      send_tof_summary_packets   = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
+      send_rbwaveform_packets    = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
+      send_mtb_event_packets     = tc.liftof_settings.data_publisher_settings.send_mtb_event_packets;
+      send_tof_event_packets     = tc.liftof_settings.data_publisher_settings.send_tof_event_packets;
     },
     <span class="prelude-val">Err</span>(err) =&gt; {
       <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}"</span>);
@@ -517,17 +397,11 @@
   <span class="comment">//let mut event_cache = Vec::&lt;TofPacket&gt;::with_capacity(100); 
 
   // for debugging/profiling
-  </span><span class="kw">let </span><span class="kw-2">mut </span>timer      = Instant::now();
-  <span class="kw">let </span><span class="kw-2">mut </span>kill_timer = Instant::now();
+  </span><span class="kw">let </span><span class="kw-2">mut </span>timer                = Instant::now();
+  <span class="kw">let </span><span class="kw-2">mut </span>check_settings_timer = Instant::now();
 
-  <span class="kw">let </span><span class="kw-2">mut </span>cali_expected    = <span class="number">40</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>cali_dir_created = <span class="bool-val">false</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>cali_output_dir  = String::from(<span class="string">""</span>);
-  <span class="kw">let </span><span class="kw-2">mut </span>cali_completed   = <span class="number">0</span>;
- 
   <span class="comment">// run settings 
   </span><span class="kw">let </span><span class="kw-2">mut </span>writer : <span class="prelude-ty">Option</span>&lt;TofPacketWriter&gt; = <span class="prelude-val">None</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>write_stream  = <span class="bool-val">false</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>runid : u32   = <span class="number">0</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>new_run_start = <span class="bool-val">false</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>retire        = <span class="bool-val">false</span>;
@@ -546,7 +420,7 @@
     <span class="comment">// even though this is called kill timer, check
     // the settings in general, since they might have
     // changed due to remote access.
-    </span><span class="kw">if </span>kill_timer.elapsed().as_secs_f32() &gt; <span class="number">0.11 </span>{
+    </span><span class="kw">if </span>check_settings_timer.elapsed().as_secs_f32() &gt; <span class="number">1.5 </span>{
       <span class="kw">match </span>thread_control.try_lock() {
         <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
           <span class="comment">//println!("== ==&gt; [global_data_sink] tc lock acquired!");
@@ -573,12 +447,10 @@
           <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}"</span>);
         },
       }
-      kill_timer = Instant::now();
+      check_settings_timer = Instant::now();
     }
     <span class="kw">if </span>write_stream &amp;&amp; new_run_start {
-      <span class="comment">//mut streamfile_name = write_stream_path + "/run_";
-      //streamfile_name += &amp;runid.to_string();
-      </span><span class="kw">let </span>file_type = FileType::RunFile(runid <span class="kw">as </span>u32);
+      <span class="kw">let </span>file_type = FileType::RunFile(runid <span class="kw">as </span>u32);
       <span class="comment">//println!("==&gt; Writing stream to file with prefix {}", streamfile_name);
       </span>writer = <span class="prelude-val">Some</span>(TofPacketWriter::new(write_stream_path.clone(), file_type));
       writer.as_mut().unwrap().mbytes_per_file = mbytes_per_file <span class="kw">as </span>usize;
@@ -595,83 +467,6 @@
           heartbeat.n_pack_write_disk += <span class="number">1</span>;
           heartbeat.n_bytes_written += pack.payload.len() <span class="kw">as </span>u64;   
         }
-        <span class="comment">// yeah, this is it. 
-        // catch RBCalibration packets here,
-        // they will end up automatically in 
-        // the stream, but if we catch them 
-        // and expose them to an arc mutex,
-        // the waveform processing could 
-        // access them directly. 
-        </span><span class="kw">match </span>pack.packet_type {
-          PacketType::RBCalibration =&gt; {
-            <span class="kw">let </span>cali_rb_id = pack.payload[<span class="number">2</span>]; 
-            <span class="macro">info!</span>(<span class="string">"Received RBCalibration packet for board {}!"</span>, cali_rb_id);
-            <span class="comment">// we notify the other threads that we got this specific packet, 
-            // so we know how long we still have to wait
-            </span><span class="kw">match </span>thread_control.lock() {
-              <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
-                <span class="comment">// FIXME - unwrap (for bad packets)
-                </span><span class="kw-2">*</span>tc.finished_calibrations.get_mut(<span class="kw-2">&amp;</span>cali_rb_id).unwrap() = <span class="bool-val">true</span>; 
-                cali_expected = tc.n_rbs;
-                cali_completed += <span class="number">1</span>;
-                <span class="comment">//println!("Changed tc {}", tc);
-                </span><span class="macro">info!</span>(<span class="string">"{} of {} calibrattions completed!"</span>, cali_completed, cali_expected);
-              },
-              <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}"</span>);
-              },
-            }
-            
-            <span class="comment">// See RBCalibration reference
-            </span><span class="kw">let </span>file_type  = FileType::CalibrationFile(cali_rb_id);
-            <span class="comment">//println!("==&gt; Writing stream to file with prefix {}", streamfile_name);
-            //let mut cali_writer = TofPacketWriter::new(write_stream_path.clone(), file_type);
-            </span><span class="kw">if </span>!cali_dir_created {
-              <span class="kw">let </span>today           = get_utc_timestamp();
-              cali_output_dir = <span class="macro">format!</span>(<span class="string">"{}/{}"</span>, cali_dir.clone(), today);
-              <span class="kw">match </span>create_dir_all(cali_output_dir.clone()) {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Created {} for calibration data!"</span>, cali_output_dir),
-                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to create {} for calibration data! {}"</span>, cali_output_dir, err)
-              }
-              cali_dir_created = <span class="bool-val">true</span>;
-            }
-            <span class="kw">if </span>cali_completed == cali_expected {
-              cali_completed = <span class="number">0</span>;
-              cali_dir_created = <span class="bool-val">false</span>;
-            }
-            <span class="kw">let </span><span class="kw-2">mut </span>cali_writer = TofPacketWriter::new(cali_output_dir.clone(), file_type);
-            cali_writer.add_tof_packet(<span class="kw-2">&amp;</span>pack);
-            drop(cali_writer);
-          }
-          <span class="kw">_ </span>=&gt; ()
-        }
-        <span class="kw">if </span>print_moni_packets {
-          <span class="comment">// some output to the console
-          </span><span class="kw">match </span>pack.packet_type {
-            PacketType::RBMoniData =&gt; {
-              <span class="comment">//let moni : Result&lt;RBMoniData, SerializationError&gt; = pack.unpack(); 
-              </span><span class="kw">match </span>pack.unpack::&lt;RBMoniData&gt;() {
-              <span class="comment">//match moni {
-                </span><span class="prelude-val">Ok</span>(data) =&gt; {
-                  <span class="macro">debug!</span>(<span class="string">"Sending RBMoniData {}"</span>, data);
-                },
-                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not unpack RBMoniData! {err}"</span>)
-              }
-            }, 
-            PacketType::CPUMoniData =&gt; {
-              <span class="kw">match </span>pack.unpack::&lt;CPUMoniData&gt;() {
-                <span class="prelude-val">Ok</span>(data) =&gt; {<span class="macro">println!</span>(<span class="string">"{}"</span>, data);},
-                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not unpack TofCmpData! {err}"</span>)}
-              },
-            PacketType::MonitorMtb =&gt; {
-              <span class="comment">//let moni = MtbMoniData::from_bytestream(&amp;pack.payload, &amp;mut pos);
-              </span><span class="kw">match </span>pack.unpack::&lt;MtbMoniData&gt;() {
-                <span class="prelude-val">Ok</span>(data) =&gt; {<span class="macro">println!</span>(<span class="string">"{}"</span>, data);},
-                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not unpack MtbMoniData! {err}"</span>)}
-              },
-            <span class="kw">_ </span>=&gt; ()
-          } <span class="comment">// end match 
-        </span>}
         
         <span class="comment">// FIXME - disentangle network and disk I/O?
         </span><span class="kw">if </span>pack.packet_type == PacketType::TofEvent {
@@ -683,8 +478,7 @@
             // of TofPackets?
             </span><span class="kw">let </span>ev_to_send : TofEvent;
             <span class="kw">match </span>pack.unpack::&lt;TofEvent&gt;() {
-            <span class="comment">//match TofEvent::from_bytestream(&amp;pack.payload, &amp;mut pos) {
-              </span><span class="prelude-val">Err</span>(err) =&gt; {
+              <span class="prelude-val">Err</span>(err) =&gt; {
                 <span class="macro">error!</span>(<span class="string">"Unable to unpack TofEvent! {err}"</span>);
                 <span class="kw">continue</span>;
               },
@@ -759,7 +553,7 @@
       //
       //
 
-      </span><span class="kw">let </span>evid_check_len = evid_check.len();
+    </span><span class="kw">let </span>evid_check_len = evid_check.len();
     <span class="kw">if </span>timer.elapsed().as_secs() &gt; <span class="number">10 </span>{
       <span class="comment">// FIXME - might be too slow?
       </span><span class="kw">if </span>evid_check_len &gt; <span class="number">0 </span>{

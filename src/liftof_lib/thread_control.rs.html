@@ -113,6 +113,19 @@
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Thread control structures
 //! FIXME - this should go to liftof-lib
 
@@ -121,6 +134,9 @@
 
 <span class="attr">#[cfg(feature = <span class="string">"database"</span>)]
 </span><span class="kw">use </span>tof_dataclasses::database::ReadoutBoard;
+
+<span class="kw">use </span>tof_dataclasses::status::TofDetectorStatus;
+<span class="kw">use </span>tof_dataclasses::calibrations::RBCalibrations;
 
 <span class="kw">use </span><span class="kw">crate</span>::settings::LiftofSettings;
 
@@ -136,6 +152,8 @@
   <span class="doccomment">/// Keep track on how many calibration 
   /// packets we have received
   </span><span class="kw">pub </span>finished_calibrations      : HashMap&lt;u8,bool&gt;,
+  <span class="doccomment">/// Hold the actual calibration data
+  </span><span class="kw">pub </span>calibrations               : HashMap&lt;u8, RBCalibrations&gt;,
   <span class="doccomment">/// alive indicator for cmd dispatch thread
   </span><span class="kw">pub </span>thread_cmd_dispatch_active : bool,
   <span class="doccomment">/// alive indicator for data sink thread
@@ -159,6 +177,10 @@
   <span class="attr">#[cfg(feature = <span class="string">"database"</span>)]
   </span><span class="doccomment">/// The active readoutboards in the Tof
   </span><span class="kw">pub </span>rb_list                    : Vec&lt;ReadoutBoard&gt;,
+  <span class="doccomment">/// Verification run currently active
+  </span><span class="kw">pub </span>verification_active        : bool,
+  <span class="doccomment">/// TOF Detector status - which channels are active?
+  </span><span class="kw">pub </span>detector_status            : TofDetectorStatus,
   <span class="doccomment">/// Decide if data is actually written to disk
   </span><span class="kw">pub </span>write_data_to_disk         : bool,
   <span class="doccomment">/// indicator that a new 
@@ -176,6 +198,7 @@
       stop_flag                  : <span class="bool-val">false</span>,
       calibration_active         : <span class="bool-val">false</span>,
       finished_calibrations      : HashMap::&lt;u8,bool&gt;::new(),
+      calibrations               : HashMap::&lt;u8, RBCalibrations&gt;::new(),
       thread_cmd_dispatch_active : <span class="bool-val">false</span>,
       thread_data_sink_active    : <span class="bool-val">false</span>,
       thread_runner_active       : <span class="bool-val">false</span>,
@@ -189,6 +212,8 @@
       n_rbs                      : <span class="number">0</span>,
       <span class="attr">#[cfg(feature = <span class="string">"database"</span>)]
       </span>rb_list                    : Vec::&lt;ReadoutBoard&gt;::new(),
+      verification_active        : <span class="bool-val">false</span>,
+      detector_status            : TofDetectorStatus::new(),
       write_data_to_disk         : <span class="bool-val">false</span>,
       new_run_start_flag         : <span class="bool-val">false</span>,
       reset_mtb_daq              : <span class="bool-val">false</span>,
@@ -208,6 +233,7 @@
     <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.finished_calibrations.keys() {
       repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  -- finished  {}  : {}"</span>, k, <span class="self">self</span>.finished_calibrations.get(k).unwrap()));       
     }
+    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n    -- verification run: {}"</span>, <span class="self">self</span>.verification_active));
     repr        += <span class="string">"\n    -- program status:"</span>;
     repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  stop flag : {}"</span>, <span class="self">self</span>.stop_flag));
     repr        += <span class="string">"\n    -- reported thread activity:"</span>;

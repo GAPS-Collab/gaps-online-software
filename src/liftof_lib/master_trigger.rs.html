@@ -1345,7 +1345,7 @@
   </span><span class="kw">let </span><span class="kw-2">mut </span>is_active              = <span class="bool-val">true</span>;
   <span class="kw">loop </span>{
     <span class="comment">// Check thread control and what to do
-    </span><span class="kw">if </span>tc_timer.elapsed().as_secs_f32() &gt; <span class="number">1.5 </span>{
+    </span><span class="kw">if </span>tc_timer.elapsed().as_secs_f32() &gt; <span class="number">2.5 </span>{
       <span class="kw">match </span>thread_control.try_lock() {
         <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
           <span class="kw">if </span>tc.thread_master_trg_active || tc.stop_flag {

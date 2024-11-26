@@ -2467,8 +2467,8 @@
   <span class="doccomment">/// Set the register to desired value
   </span><span class="kw">pub fn </span>set(<span class="kw-2">&amp;</span><span class="self">self</span>, bus : <span class="kw-2">&amp;mut </span>IPBus, value : u32) 
     -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
-    <span class="macro">println!</span>(<span class="string">"Settting {}"</span>, <span class="self">self</span>);
-    <span class="kw">if </span><span class="self">self</span>.rmw {
+    <span class="comment">//println!("Settting {}", self);
+    </span><span class="kw">if </span><span class="self">self</span>.rmw {
       <span class="self">self</span>.rmw(bus, value)<span class="question-mark">?</span>;
     }
     <span class="kw">else </span>{
@@ -2528,16 +2528,16 @@
   </span><span class="kw">fn </span>rmw(<span class="kw-2">&amp;</span><span class="self">self</span>, bus : <span class="kw-2">&amp;mut </span>IPBus, value : u32)
     -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>data = <span class="self">self</span>.read_all(bus)<span class="question-mark">?</span>;
-    <span class="macro">println!</span>(<span class="string">"step 1 ..{}"</span>,data);
-    <span class="comment">// leave everything else the same, but zero out
+    <span class="comment">//println!("step 1 ..{}",data);
+    // leave everything else the same, but zero out
     // the masked part
     </span>data         = data &amp; !<span class="self">self</span>.mask;
-    <span class="macro">println!</span>(<span class="string">"step 2 ..{}"</span>,data);
-    <span class="comment">// reset the masked part and write again
-    </span><span class="macro">println!</span>(<span class="string">"step 3 ..{}"</span>, value &lt;&lt; <span class="self">self</span>.mask.trailing_zeros());
-    data         = data | (value &lt;&lt; <span class="self">self</span>.mask.trailing_zeros()); 
-    <span class="macro">println!</span>(<span class="string">"step 4 ..{}"</span>,data);
-    <span class="prelude-val">Ok</span>(bus.write(<span class="self">self</span>.addr, data)<span class="question-mark">?</span>)
+    <span class="comment">//println!("step 2 ..{}",data);
+    // reset the masked part and write again
+    //println!("step 3 ..{}", value &lt;&lt; self.mask.trailing_zeros());
+    </span>data         = data | (value &lt;&lt; <span class="self">self</span>.mask.trailing_zeros()); 
+    <span class="comment">//println!("step 4 ..{}",data);
+    </span><span class="prelude-val">Ok</span>(bus.write(<span class="self">self</span>.addr, data)<span class="question-mark">?</span>)
   }
 }
 

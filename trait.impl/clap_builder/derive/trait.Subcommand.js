@@ -1,9 +1,9 @@
 (function() {
-    var implementors = Object.fromEntries([["clap",[]],["clap_builder",[]],["liftof_lib",[["impl <a class=\"trait\" href=\"clap_builder/derive/trait.Subcommand.html\" title=\"trait clap_builder::derive::Subcommand\">Subcommand</a> for <a class=\"enum\" href=\"liftof_lib/enum.CommandCC.html\" title=\"enum liftof_lib::CommandCC\">CommandCC</a>"],["impl <a class=\"trait\" href=\"clap_builder/derive/trait.Subcommand.html\" title=\"trait clap_builder::derive::Subcommand\">Subcommand</a> for <a class=\"enum\" href=\"liftof_lib/enum.PowerCmd.html\" title=\"enum liftof_lib::PowerCmd\">PowerCmd</a>"],["impl <a class=\"trait\" href=\"clap_builder/derive/trait.Subcommand.html\" title=\"trait clap_builder::derive::Subcommand\">Subcommand</a> for <a class=\"enum\" href=\"liftof_lib/enum.RunCmd.html\" title=\"enum liftof_lib::RunCmd\">RunCmd</a>"],["impl <a class=\"trait\" href=\"clap_builder/derive/trait.Subcommand.html\" title=\"trait clap_builder::derive::Subcommand\">Subcommand</a> for <a class=\"enum\" href=\"liftof_lib/enum.SetCmd.html\" title=\"enum liftof_lib::SetCmd\">SetCmd</a>"]]]]);
+    var implementors = Object.fromEntries([["clap",[]],["clap_builder",[]]]);
     if (window.register_implementors) {
         window.register_implementors(implementors);
     } else {
         window.pending_implementors = implementors;
     }
 })()
-//{"start":57,"fragment_lengths":[11,20,1020]}
+//{"start":57,"fragment_lengths":[11,20]}

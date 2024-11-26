@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["prepare_run"],"mod":["constants","threads"]};
+window.SIDEBAR_ITEMS = {"fn":["calibrate_tof","prepare_run","restart_liftof_rb","run","ssh_commands_rbs","verification_run"],"mod":["constants","threads"]};

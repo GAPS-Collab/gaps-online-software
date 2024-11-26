@@ -534,6 +534,16 @@
 <a href="#534" id="534">534</a>
 <a href="#535" id="535">535</a>
 <a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{
     HashMap,
     VecDeque,
@@ -628,7 +638,6 @@
   </span><span class="kw">pub </span>charge_a           : HashMap&lt;u8, VecDeque&lt;f64&gt;&gt;,
   <span class="kw">pub </span>charge_b           : HashMap&lt;u8, VecDeque&lt;f64&gt;&gt;, 
 
-
   <span class="comment">// list for the paddle selector
   </span><span class="kw">pub </span>all_paddles        : HashMap&lt;u8, Paddle&gt;,
   <span class="kw">pub </span>pdl_state          : ListState,
@@ -658,7 +667,8 @@
     <span class="kw">let </span><span class="kw-2">mut </span>bl_ch_b    = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>blrms_ch_a = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>blrms_ch_b = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
-    <span class="kw">let </span>bins_bl    = Uniform::new(<span class="number">50</span>, -<span class="number">2.0</span>, <span class="number">2.0</span>);
+    <span class="kw">let </span>bins_bl        = Uniform::new(<span class="number">20</span>, -<span class="number">2.0</span>, <span class="number">2.0</span>);
+    <span class="kw">let </span>bins_lb_rms    = Uniform::new(<span class="number">20</span>, <span class="number">0.0</span>, <span class="number">2.0</span>); 
     <span class="kw">for </span>pid <span class="kw">in </span><span class="number">1</span>..<span class="number">161 </span>{
       charge_a.insert(pid, VecDeque::&lt;f64&gt;::new());
       charge_b.insert(pid, VecDeque::&lt;f64&gt;::new());
@@ -748,11 +758,21 @@
             <span class="kw">if </span><span class="self">self</span>.charge_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().len() &gt; <span class="self">self</span>.queue_size {
               <span class="self">self</span>.charge_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().pop_front();
             }
-            <span class="self">self</span>.baseline_ch_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>h.get_bl_a());
-            <span class="self">self</span>.baseline_rms_ch_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>h.get_bl_a_rms());
-            <span class="self">self</span>.baseline_ch_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>h.get_bl_b());
-            <span class="self">self</span>.baseline_rms_ch_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>h.get_bl_b_rms());
-          
+            <span class="kw">let </span>ch_a_bl = h.get_bl_a();
+            <span class="kw">let </span>ch_b_bl = h.get_bl_b();
+            <span class="kw">let </span>ch_a_bl_rms = h.get_bl_a_rms();
+            <span class="kw">let </span>ch_b_bl_rms = h.get_bl_b_rms();
+            <span class="comment">// cut on the range
+            </span><span class="kw">if </span>-<span class="number">2.0 </span>&lt; ch_a_bl &amp;&amp; ch_b_bl &lt; <span class="number">2.0 </span>{
+              <span class="self">self</span>.baseline_ch_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>ch_a_bl);
+            }
+            <span class="kw">if </span>-<span class="number">2.0 </span>&lt; ch_b_bl &amp;&amp; ch_b_bl &lt; <span class="number">2.0 </span>{
+              <span class="self">self</span>.baseline_ch_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>ch_b_bl);
+            }
+            <span class="comment">//self.baseline_ch_a.get_mut(&amp;(h.paddle_id as u8)).unwrap().fill(&amp;h.get_bl_a());
+            </span><span class="self">self</span>.baseline_rms_ch_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>h.get_bl_a_rms());
+            <span class="comment">//self.baseline_ch_b.get_mut(&amp;(h.paddle_id as u8)).unwrap().fill(&amp;h.get_bl_b());
+            </span><span class="self">self</span>.baseline_rms_ch_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>h.get_bl_b_rms());
         }
         <span class="kw">let </span><span class="kw-2">mut </span>bl_a  : f32;
         <span class="kw">let </span><span class="kw-2">mut </span>bl_b  : f32;
@@ -1008,14 +1028,14 @@
             <span class="comment">//ctx.draw(&amp;xaxis);
             //ctx.draw(&amp;yaxis);
           </span>})
-          .x_bounds([<span class="number">0.0</span>, <span class="number">30.0</span>])
-          .y_bounds([<span class="number">0.0</span>, <span class="number">30.0</span>]);
+          .x_bounds([<span class="number">0.0</span>, <span class="number">200.0</span>])
+          .y_bounds([<span class="number">0.0</span>, <span class="number">200.0</span>]);
        
       <span class="comment">// baseline histos
       //println!("{:?}", self.baseline_ch_a.get(&amp;(self.current_paddle.paddle_id as u8)).unwrap());
-      </span><span class="kw">let </span>bl_a_labels = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_ch_a.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap());
-      <span class="kw">let </span>bl_a_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_ch_a.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
-      <span class="kw">let </span>bl_a_chart  = histogram(bl_a_data, String::from(<span class="string">"Baseline Side A [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+      </span><span class="kw">let </span>bl_a_labels     = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_ch_a.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap());
+      <span class="kw">let </span>bl_a_data       = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_ch_a.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
+      <span class="kw">let </span>bl_a_chart      = histogram(bl_a_data, String::from(<span class="string">"Baseline Side A [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
       frame.render_widget(bl_a_chart, bla_lo[<span class="number">0</span>]);
       
       <span class="kw">let </span>bl_a_rms_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_rms_ch_a.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 

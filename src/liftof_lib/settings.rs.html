@@ -1032,11 +1032,6 @@
 <a href="#1032" id="1032">1032</a>
 <a href="#1033" id="1033">1033</a>
 <a href="#1034" id="1034">1034</a>
-<a href="#1035" id="1035">1035</a>
-<a href="#1036" id="1036">1036</a>
-<a href="#1037" id="1037">1037</a>
-<a href="#1038" id="1038">1038</a>
-<a href="#1039" id="1039">1039</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Aggregate settings for the TOF system
 //!
 //! Control the settings for the C&amp;C server
@@ -1580,10 +1575,6 @@
 </span><span class="kw">pub struct </span>DataPublisherSettings {
   <span class="doccomment">/// location to store data on TOF computer
   </span><span class="kw">pub </span>data_dir                  : String,
-  <span class="doccomment">/// location to store RBCalibration data on the TOF computer
-  /// Individual calibration runs will be stored in
-  /// folders named with the data
-  </span><span class="kw">pub </span>cali_dir                  : String,
   <span class="doccomment">/// The data written on disk gets divided into 
   /// files of a fixed size. 
   </span><span class="kw">pub </span>mbytes_per_file           : usize,
@@ -1618,7 +1609,6 @@
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
       data_dir                  : String::from(<span class="string">""</span>),
-      cali_dir                  : String::from(<span class="string">""</span>),
       mbytes_per_file           : <span class="number">420</span>,
       fc_pub_address            : String::from(<span class="string">""</span>),
       discard_event_fraction    : <span class="number">0.0</span>,

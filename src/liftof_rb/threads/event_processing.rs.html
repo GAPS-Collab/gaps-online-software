@@ -354,6 +354,9 @@
 <a href="#354" id="354">354</a>
 <a href="#355" id="355">355</a>
 <a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Event processing deals with the raw memory input
 //! from the buffers, send to it by the runner 
 //! when reading out the system memory
@@ -470,11 +473,12 @@
   <span class="kw">let </span><span class="kw-2">mut </span>streamer        = RBEventMemoryStreamer::new();
   <span class="comment">// FIXME
   </span>streamer.check_channel_errors = <span class="bool-val">true</span>;
-  
+  <span class="kw">let </span><span class="kw-2">mut </span>trace_suppressed      = <span class="bool-val">false</span>;  
   <span class="kw">match </span>thread_control.lock() {
     <span class="prelude-val">Ok</span>(tc) =&gt; {
       streamer.calc_crc32   = tc.liftof_settings.rb_settings.calc_crc32;
       deadtime_instead_temp = tc.liftof_settings.rb_settings.drs_deadtime_instead_fpga_temp; 
+      trace_suppressed      = tc.liftof_settings.mtb_settings.trace_suppression;
     },
     <span class="prelude-val">Err</span>(err) =&gt; {
       <span class="macro">trace!</span>(<span class="string">"Can't acquire lock! {err}"</span>);
@@ -625,7 +629,9 @@
                   </span><span class="kw">if </span>last_event_id != <span class="number">0 </span>{
                     <span class="kw">if </span>event.header.event_id != last_event_id + <span class="number">1 </span>{
                       <span class="kw">if </span>event.header.event_id &gt; last_event_id {
+                        <span class="kw">if </span>!trace_suppressed {
                           skipped_events += (event.header.event_id - last_event_id -<span class="number">1</span>) <span class="kw">as </span>usize;
+                        }
                       } <span class="kw">else </span>{
                         <span class="macro">error!</span>(<span class="string">"Something with the event counter is messed up. Got event id {}, but the last event id was {}"</span>, event.header.event_id, last_event_id);
                       }

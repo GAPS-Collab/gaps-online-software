@@ -191,6 +191,55 @@
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
 <a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Routines for RB commiunication and data reception 
 
 </span><span class="comment">//use std::time::{SystemTime, UNIX_EPOCH};
@@ -198,35 +247,35 @@
 //    Path,
 //    PathBuf,
 //};
+</span><span class="kw">use </span>std::collections::HashMap;
 
-</span><span class="kw">use </span>std::sync::{
-    Arc,
-    Mutex,
+<span class="kw">use </span>std::sync::{
+  Arc,
+  Mutex,
 };
+
 <span class="kw">use </span>std::time::{
-    Instant,
-    <span class="comment">//Duration,
+  Instant,
+  <span class="comment">//Duration,
 </span>};
 
-<span class="comment">//use tof_dataclasses::threading::{
-//    ThreadControl,
-//};
-
-
-</span><span class="kw">use </span>crossbeam_channel::Sender;
+<span class="kw">use </span>crossbeam_channel::Sender;
 
 <span class="kw">use </span>tof_dataclasses::database::ReadoutBoard;
 <span class="kw">use </span>tof_dataclasses::events::RBEvent;
 <span class="kw">use </span>tof_dataclasses::packets::{
-    TofPacket,
-    PacketType
+  TofPacket,
+  PacketType
 };
+
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
 <span class="kw">use </span>tof_dataclasses::commands::TofResponse;
+<span class="kw">use </span>tof_dataclasses::calibrations::RBCalibrations;
 
 <span class="kw">use </span>liftof_lib::{
-    waveform_analysis,
+  waveform_analysis,
 };
+
 <span class="kw">use </span>liftof_lib::thread_control::ThreadControl;
 
 <span class="kw">use </span>liftof_lib::settings::AnalysisEngineSettings;
@@ -257,12 +306,24 @@
 /// * ack_sender          : Intercept acknowledgement packets and forward them to elswhere
 </span><span class="kw">pub fn </span>readoutboard_communicator(ev_to_builder       : Sender&lt;RBEvent&gt;,
                                  tp_to_sink          : Sender&lt;TofPacket&gt;,
-                                 rb                  : ReadoutBoard,
+                                 <span class="kw-2">mut </span>rb              : ReadoutBoard,
                                  print_packets       : bool,
                                  run_analysis_engine : bool,
                                  ae_settings         : AnalysisEngineSettings,
                                  ack_sender          : Sender&lt;TofResponse&gt;,
                                  thread_control      : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;) {
+
+  <span class="kw">let </span><span class="kw-2">mut </span>this_status = HashMap::&lt;u16, bool&gt;::new();
+  <span class="kw">for </span>k <span class="kw">in </span><span class="number">1</span>..<span class="number">321 </span>{
+    this_status.insert(k,<span class="bool-val">false</span>);
+  }
+  <span class="kw">match </span>rb.load_latest_calibration() {
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">"Unable to load calibration for RB {}! {}"</span>, rb.rb_id, err),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+      <span class="macro">info!</span>(<span class="string">"Loaded calibration for board {} successfully!"</span>, rb.rb_id);
+    }
+  }
+
   <span class="kw">let </span>zmq_ctx = zmq::Context::new();
   <span class="kw">let </span>board_id = rb.rb_id; <span class="comment">//rb.id.unwrap();
   </span><span class="macro">info!</span>(<span class="string">"initializing RB thread for board {}!"</span>, board_id);
@@ -288,6 +349,7 @@
    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Subscribed to {:?}!"</span>, topic),
   }
   <span class="kw">let </span><span class="kw-2">mut </span>tc_timer = Instant::now();
+  <span class="kw">let </span><span class="kw-2">mut </span>verification_active = <span class="bool-val">false</span>;
   <span class="kw">loop </span>{
     <span class="kw">if </span>tc_timer.elapsed().as_secs_f32() &gt; <span class="number">0.9 </span>{
       <span class="kw">match </span>thread_control.try_lock() {
@@ -297,6 +359,7 @@
             <span class="comment">//println!("= =&gt; [rbcomm] initiate ending thread for RB {}!", board_id);
             </span><span class="kw">break</span>;
           }
+          verification_active = tc.verification_active;
         },
         <span class="prelude-val">Err</span>(err) =&gt; {
           <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}"</span>);
@@ -339,7 +402,7 @@
               PacketType::RBEvent | PacketType::RBEventMemoryView =&gt; {
                 <span class="kw">let </span><span class="kw-2">mut </span>event = RBEvent::from(<span class="kw-2">&amp;</span>tp);
                 <span class="kw">if </span>event.hits.len() == <span class="number">0 </span>{
-                  <span class="kw">if </span>run_analysis_engine {
+                  <span class="kw">if </span>run_analysis_engine   {
                     <span class="kw">match </span>waveform_analysis(<span class="kw-2">&amp;mut </span>event, 
                                             <span class="kw-2">&amp;</span>rb,
                                             ae_settings) {
@@ -349,23 +412,58 @@
                       }
                     }
                   }
-                };
-                <span class="kw">match </span>ev_to_builder.send(event) {
-                  <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
-                  <span class="prelude-val">Err</span>(err) =&gt; {
-                    <span class="macro">error!</span>(<span class="string">"Unable to send event! Err {err}"</span>);
+                }
+                <span class="kw">if </span>verification_active {
+                  <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;</span>event.hits {
+                    <span class="comment">// average charge/peak hit
+                    </span><span class="kw">let </span>verification_charge_threshhold = <span class="number">10.0f32</span>;
+                    <span class="kw">if </span>h.get_charge_a() &gt;= verification_charge_threshhold {
+                      <span class="comment">//this_statusi.
+                    </span>}
+                    <span class="kw">if </span>h.get_charge_b() &gt;= verification_charge_threshhold {
+                    }
+                  }
+                }
+                <span class="kw">if </span>!verification_active {
+                  <span class="kw">match </span>ev_to_builder.send(event) {
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+                    <span class="prelude-val">Err</span>(err) =&gt; {
+                      <span class="macro">error!</span>(<span class="string">"Unable to send event! Err {err}"</span>);
+                    }
                   }
                 }
                 <span class="comment">//n_events += 1;
                 </span>n_chunk += <span class="number">1</span>;
-              }, 
+              } 
+              PacketType::RBCalibration =&gt; {
+                <span class="kw">match </span>tp.unpack::&lt;RBCalibrations&gt;() {
+                  <span class="prelude-val">Ok</span>(cali) =&gt; {
+  
+                    <span class="comment">//println!("= =&gt; [rb_comm] Received RBCalibration!");
+                    </span><span class="kw">match </span>thread_control.lock() {
+                      <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
+                        tc.calibrations.insert(board_id, cali.clone()); 
+                        <span class="kw-2">*</span>tc.finished_calibrations.get_mut(<span class="kw-2">&amp;</span>board_id).unwrap() = <span class="bool-val">true</span>; 
+                        rb.calibration = cali;
+                      }
+                      <span class="prelude-val">Err</span>(err) =&gt; {
+                        <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl!! {err}"</span>);
+                      },
+                    }
+                  }
+                  <span class="prelude-val">Err</span>(err) =&gt; {
+                    <span class="macro">error!</span>(<span class="string">"Received calibration package, but got error when unpacking! {err}"</span>);
+                  }
+                }
+                <span class="kw">match </span>tp_to_sink.send(tp) {
+                  <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not send tof packet to data sink! Err {err}"</span>),
+                  <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">debug!</span>(<span class="string">"Packet sent"</span>),
+                }
+              }
               <span class="kw">_ </span>=&gt; {
                 <span class="comment">// Currently, we will just forward all other packets
                 // directly to the data sink
-                </span><span class="kw">if </span>tp.packet_type == PacketType::RBCalibration {
-                  <span class="macro">println!</span>(<span class="string">"= =&gt; [rb_comm] Received RBCalibration!"</span>);
-                }
-                <span class="kw">match </span>tp_to_sink.send(tp) {
+                </span><span class="kw">match </span>tp_to_sink.send(tp) {
                   <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not send tof packet to data sink! Err {err}"</span>),
                   <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">debug!</span>(<span class="string">"Packet sent"</span>),
                 }

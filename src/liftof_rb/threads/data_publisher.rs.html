@@ -200,8 +200,6 @@
 <a href="#200" id="200">200</a>
 <a href="#201" id="201">201</a>
 <a href="#202" id="202">202</a>
-<a href="#203" id="203">203</a>
-<a href="#204" id="204">204</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::env;
 <span class="kw">use </span>std::path::Path;
 <span class="kw">use </span>std::fs;
@@ -219,16 +217,13 @@
 
 <span class="kw">use </span>tof_dataclasses::packets::{TofPacket,
                                PacketType};
-<span class="comment">//use local_ip_address::local_ip;
-</span><span class="kw">use </span>tof_dataclasses::events::{RBEvent,
+<span class="kw">use </span>tof_dataclasses::events::{RBEvent,
                               DataType};
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
-<span class="comment">//use tof_dataclasses::threading::ThreadControl;
-</span><span class="kw">use </span>liftof_lib::thread_control::ThreadControl;
+<span class="kw">use </span>liftof_lib::thread_control::ThreadControl;
 
 <span class="kw">use </span><span class="kw">crate</span>::api::{
-    <span class="comment">//prefix_board_id,
-    </span>prefix_board_id_noquery,
+    prefix_board_id_noquery,
     prefix_local,
 };
 <span class="kw">use </span><span class="kw">crate</span>::control::get_board_id;
@@ -262,8 +257,7 @@
   data_socket.bind(<span class="kw-2">&amp;</span>address).expect(<span class="string">"Unable to bind to data (PUB) socket {data_adress}"</span>);
   <span class="macro">info!</span>(<span class="string">"0MQ PUB socket bound to address {address}"</span>);
 
-  <span class="kw">let </span><span class="kw-2">mut </span>file_on_disk : <span class="prelude-ty">Option</span>&lt;File&gt;;<span class="comment">//let mut output = File::create(path)?;
-  //if write_to_disk {
+  <span class="kw">let </span><span class="kw-2">mut </span>file_on_disk : <span class="prelude-ty">Option</span>&lt;File&gt; = <span class="prelude-val">None</span>;<span class="comment">//let mut output = File::create(path)?;
   </span><span class="kw">let </span>fname : String;
   <span class="kw">let </span>write_to_disk;
   <span class="kw">match </span>output_fname {
@@ -305,8 +299,10 @@
     <span class="macro">info!</span>(<span class="string">"Writing calibration to {}"</span>, local_file.display() );
     file_on_disk = OpenOptions::new().create(<span class="bool-val">true</span>).write(<span class="bool-val">true</span>).open(local_file).ok()
   } <span class="kw">else </span>{
-    <span class="macro">info!</span>(<span class="string">"Writing to local file {}!"</span>, fname );
-    file_on_disk = OpenOptions::new().append(<span class="bool-val">true</span>).create(<span class="bool-val">true</span>).open(datafile_output_file).ok()
+    <span class="kw">if </span>write_to_disk {
+      <span class="macro">info!</span>(<span class="string">"Writing to local file {}!"</span>, fname );
+      file_on_disk = OpenOptions::new().append(<span class="bool-val">true</span>).create(<span class="bool-val">true</span>).open(datafile_output_file).ok()
+    }
   }
  
   <span class="kw">let </span>board_id     = get_board_id().unwrap_or(<span class="number">0</span>) <span class="kw">as </span>u8;
