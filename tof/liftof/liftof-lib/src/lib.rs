@@ -5,14 +5,7 @@ pub mod thread_control;
 pub mod sine_fitter;
 
 use constants::{
-    DEFAULT_CALIB_VOLTAGE,
-    DEFAULT_CALIB_EXTRA,
-    DEFAULT_RB_ID,
     DEFAULT_LTB_ID,
-    DEFAULT_RUN_TYPE,
-    DEFAULT_RUN_EVENT_NO,
-    PREAMP_MIN_BIAS,
-    PREAMP_MAX_BIAS
 };
 
 use std::thread;
@@ -40,17 +33,14 @@ pub use settings::{
     AnalysisEngineSettings,
 };
 
-use std::error::Error;
 use std::fmt;
 
-use std::fs::File;
 use std::path::PathBuf;
 use std::fs::read_to_string;
 use std::io::{
-    self,
-    Read,
     Write,
 };
+
 use std::collections::HashMap;
 use colored::{
     Colorize,
@@ -79,13 +69,11 @@ use tof_dataclasses::constants::NWORDS;
 #[cfg(feature="database")]
 use tof_dataclasses::errors::AnalysisError;
 use tof_dataclasses::errors::SetError;
-//use tof_dataclasses::serialization::Serialization;
 #[cfg(feature="database")]
 use tof_dataclasses::events::{
   RBEvent,
   TofHit,
 };
-use tof_dataclasses::events::tof_hit::Peak;
 
 #[cfg(feature="database")]
 use tof_dataclasses::analysis::{
@@ -93,8 +81,6 @@ use tof_dataclasses::analysis::{
   integrate,
   cfd_simple,
   find_peaks,
-  //get_paddle_t0,
-  //pos_across
 };
 
 use tof_dataclasses::RBChannelPaddleEndIDMap;
@@ -102,12 +88,7 @@ use tof_dataclasses::RBChannelPaddleEndIDMap;
 use crate::thread_control::ThreadControl;
 
 use clap::{arg,
-  //value_parser,
-  //ArgAction,
-  //Command,
-  Parser,
   Args,
-  Subcommand
 };
 
 pub const MT_MAX_PACKSIZE   : usize = 512;
@@ -135,31 +116,31 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
 
   ";
 
-/// Routine to end the liftof-cc program, finish up with current run 
-/// and clean up
-///
-/// FIXME - maybe this should go to liftof-cc
-pub fn end_liftof_cc(thread_control     : Arc<Mutex<ThreadControl>>) {
-  match thread_control.try_lock() {
-    Ok(mut tc) => {
-      //println!("== ==> [signal_handler] acquired thread_control lock!");
-      //println!("Tread control {:?}", tc);
-      if !tc.thread_cmd_dispatch_active 
-      && !tc.thread_data_sink_active
-      && !tc.thread_event_bldr_active 
-      && !tc.thread_master_trg_active  {
-        println!(">> So long and thanks for all the \u{1F41F} <<"); 
-        exit(0);
-      }
-      tc.stop_flag = true;
-      println!("== ==> [signal_handler] Stop flag is set, we are waiting for threads to finish...");
-      //println!("{}", tc);
-    }
-    Err(err) => {
-      error!("Can't acquire lock for ThreadControl! {err}");
-    }
-  }
-}
+///// Routine to end the liftof-cc program, finish up with current run 
+///// and clean up
+/////
+///// FIXME - maybe this should go to liftof-cc
+//pub fn end_liftof_cc(thread_control     : Arc<Mutex<ThreadControl>>) {
+//  match thread_control.try_lock() {
+//    Ok(mut tc) => {
+//      //println!("== ==> [signal_handler] acquired thread_control lock!");
+//      //println!("Tread control {:?}", tc);
+//      if !tc.thread_cmd_dispatch_active 
+//      && !tc.thread_data_sink_active
+//      && !tc.thread_event_bldr_active 
+//      && !tc.thread_master_trg_active  {
+//        println!(">> So long and thanks for all the \u{1F41F} <<"); 
+//        exit(0);
+//      }
+//      tc.stop_flag = true;
+//      println!("== ==> [signal_handler] Stop flag is set, we are waiting for threads to finish...");
+//      //println!("{}", tc);
+//    }
+//    Err(err) => {
+//      error!("Can't acquire lock for ThreadControl! {err}");
+//    }
+//  }
+//}
 
 /// Handle incoming POSIX signals
 pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
@@ -400,15 +381,15 @@ pub fn fit_sine_sydney(volts: &Vec<f32>, times: &Vec<f32>) -> (f32, f32, f32) {
 // I/O - read/write (general purpose) files
 //
 //
-pub fn read_value_from_file(file_path: &str) -> io::Result<u32> {
-  let mut file = File::open(file_path)?;
-  let mut contents = String::new();
-  file.read_to_string(&mut contents)?;
-  let value: u32 = contents.trim().parse().map_err(|err| {
-    io::Error::new(io::ErrorKind::InvalidData, err)
-  })?;
-  Ok(value)
-}
+//pub fn read_value_from_file(file_path: &str) -> io::Result<u32> {
+//  let mut file = File::open(file_path)?;
+//  let mut contents = String::new();
+//  file.read_to_string(&mut contents)?;
+//  let value: u32 = contents.trim().parse().map_err(|err| {
+//    io::Error::new(io::ErrorKind::InvalidData, err)
+//  })?;
+//  Ok(value)
+//}
 
 /**************************************************/
 
@@ -425,15 +406,6 @@ pub fn build_tcp_from_ip(ip: String, port: String) -> String {
 //
 // Analysis
 //
-
-/// Extract peaks from waveforms
-///
-/// Helper for waveform analysis
-pub fn get_peaks() -> Vec<Peak> {
-  let peaks = Vec::<Peak>::new();
-  peaks
-}
-
 
 /// Waveform analysis engine - identify waveform variables
 ///
@@ -497,15 +469,8 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                                event.header.stop_cell as usize,
                                &mut times);
     fit_result                = fit_sine_sydney(&voltages, &times);
-    //let fit_result_amp        = fit_result.0;
-    //let fit_result_freq       = fit_result.1;
-    //let fit_result_phi        = fit_result.2;
-    //let fit_result_amp      = fit_sine_sydney(&voltages,  &times).0; 
-    //let fit_result_freq     = fit_sine_sydney(&voltages, &times).1;
-    //let fit_result_phi      = fit_sine_sydney(&voltages, &times).2;
 
     //println!("FIT RESULT = {:?}", fit_result);
-    //fit_result = (fit_result_amp, fit_result_freq, fit_result_phi);
     event.header.set_sine_fit(fit_result);
   }
 
@@ -677,41 +642,6 @@ pub fn waveform_analysis(event         : &mut RBEvent,
 }
 
 //**********************************************
-//
-// Subsystem communication
-//
-
-
-///// construct a request string which can be broadcast over 0MQ to all the boards
-///// ///
-///// /// Boards will only send paddle information when this request string is received
-//pub fn construct_event_request(rb_id : u8) -> String {
-//  let mut request = String::from("RB");
-//  if rb_id < 10 {
-//    request += "0";
-//  }
-//  request += &rb_id.to_string();
-//  request
-//}
-
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
-#[repr(u8)]
-pub enum ReadoutBoardError {
-  NoConnectionInfo,
-  NoResponse,
-}
-
-impl fmt::Display for ReadoutBoardError {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = serde_json::to_string(self).unwrap_or(
-      String::from("Error: cannot unwrap this ReadoutBoardError"));
-    write!(f, "<ReadoutBoardError: {}>", r)
-  }
-}
-
-impl Error for ReadoutBoardError {
-}
-
 
 /// Load the rb channel vs paddle end id mapping
 ///
@@ -869,117 +799,6 @@ impl From<u8> for LTBThresholdName {
   }
 }
 
-#[derive(Debug, Clone, Args, PartialEq)]
-pub struct PreampBiasOpts {
-  /// RB to target in voltage calibration run.
-  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
-  pub id: u8,
-  /// Theshold level to be set
-  #[arg(required = true, 
-        value_parser = clap::value_parser!(i64).range(PREAMP_MIN_BIAS..=PREAMP_MAX_BIAS))]
-  pub bias: u16
-}
-
-impl PreampBiasOpts {
-  pub fn new(id: u8, bias: u16) -> Self {
-    Self { 
-      id,
-      bias
-    }
-  }
-}
-/// END Set cmds ================================================
-
-
-#[derive(Debug, Clone, Args, PartialEq)]
-pub struct DefaultOpts {
-  /// Voltage level to be set in default calibration run.
-  #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
-  pub level: u16,
-  /// ID of the RB to target in default calibration run.
-  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
-  pub id: u8,
-  /// Extra arguments in default calibration run (not implemented).
-  #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
-  pub extra: u8,
-}
-
-impl DefaultOpts {
-  pub fn new(level: u16, id: u8, extra: u8) -> Self {
-    Self { 
-      level,
-      id,
-      extra
-    }
-  }
-}
-
-#[derive(Debug, Clone, Args, PartialEq)]
-pub struct NoiOpts {
-  /// ID of the RB to target in no input calibration run.
-  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
-  pub id: u8,
-  /// Extra arguments in no input calibration run (not implemented).
-  #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
-  pub extra: u8,
-}
-
-impl NoiOpts {
-  pub fn new(id: u8, extra: u8) -> Self {
-    Self { 
-      id,
-      extra
-    }
-  }
-}
-
-#[derive(Debug, Copy, Clone, Args, PartialEq)]
-pub struct VoltageOpts {
-  /// Voltage level to be set in voltage calibration run.
-  #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
-  pub level: u16,
-  /// RB to target in voltage calibration run.
-  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
-  pub id: u8,
-  /// Extra arguments in voltage calibration run (not implemented).
-  #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
-  pub extra: u8,
-}
-
-impl VoltageOpts {
-  pub fn new(level: u16, id: u8, extra: u8) -> Self {
-    Self { 
-      level,
-      id,
-      extra
-    }
-  }
-}
-
-#[derive(Debug, Copy, Clone, Args, PartialEq)]
-pub struct TimingOpts {
-  /// Voltage level to be set in voltage calibration run.
-  #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
-  pub level: u16,
-  /// RB to target in voltage calibration run.
-  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
-  pub id: u8,
-  /// Extra arguments in voltage calibration run (not implemented).
-  #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
-  pub extra: u8,
-}
-
-impl TimingOpts {
-  pub fn new(level: u16, id: u8, extra: u8) -> Self {
-    Self { 
-      level,
-      id,
-      extra
-    }
-  }
-}
-/// END Calibration cmds ================================================
-
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
 #[repr(u8)]
 pub enum TofComponent {
@@ -1042,53 +861,4 @@ impl From<TofComponent> for clap::builder::Str {
     }
   }
 }
-
-
-/// Run cmds ======================================================
-#[derive(Debug, Clone, Subcommand, PartialEq)]
-pub enum RunCmd {
-  /// Start data taking
-  Start(StartRunOpts),
-  /// Stop data taking
-  Stop(StopRunOpts)
-}
-
-#[derive(Debug, Clone, Args, PartialEq)]
-pub struct StartRunOpts {
-  /// Which kind of run is to be launched
-  #[arg(short, long, default_value_t = DEFAULT_RUN_TYPE)]
-  pub run_type: u8,
-  /// ID of the RB where to run data taking
-  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
-  pub id: u8,
-  /// Number of events in the run
-  #[arg(short, long, default_value_t = DEFAULT_RUN_EVENT_NO)]
-  pub no: u8
-}
-
-impl StartRunOpts {
-  pub fn new(run_type: u8, id: u8, no: u8) -> Self {
-    Self {
-      run_type,
-      id,
-      no
-    }
-  }
-}
-
-#[derive(Debug, Clone, Args, PartialEq)]
-pub struct StopRunOpts {
-  /// ID of the RB where to run data taking
-  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
-  pub id: u8
-}
-
-impl StopRunOpts {
-  pub fn new(id: u8) -> Self {
-    Self {
-      id
-    }
-  }
-}
-
 
