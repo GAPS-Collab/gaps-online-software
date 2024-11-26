@@ -408,6 +408,10 @@ pub fn master_trigger(mt_address     : String,
       }
     }
     TriggerType::TrackUmbCentral  => {
+      match unset_all_triggers(&mut bus) {
+        Err(err)  => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)   => ()
+      }
       match set_track_umb_central_trigger(&mut bus, settings.trigger_prescale) {
         Err(err) => error!("Unable to set the TRACK UMB CENTRAL trigger! {err}"),
         Ok(_)   => ()
