@@ -792,6 +792,10 @@
 <a href="#792" id="792">792</a>
 <a href="#793" id="793">793</a>
 <a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard communications
 //!
 //! The MTB (MasterTriggerBoard) is currently
@@ -1202,6 +1206,10 @@
       }
     }
     TriggerType::TrackUmbCentral  =&gt; {
+      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
+        <span class="prelude-val">Err</span>(err)  =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)   =&gt; ()
+      }
       <span class="kw">match </span>set_track_umb_central_trigger(<span class="kw-2">&amp;mut </span>bus, settings.trigger_prescale) {
         <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set the TRACK UMB CENTRAL trigger! {err}"</span>),
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)   =&gt; ()
