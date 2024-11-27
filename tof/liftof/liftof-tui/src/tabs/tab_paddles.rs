@@ -15,7 +15,7 @@ use crossbeam_channel::{
 use ratatui::prelude::*;
 use ratatui::symbols::Marker;
 
-use ratatui::terminal::Frame;
+use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::widgets::{
     Block,

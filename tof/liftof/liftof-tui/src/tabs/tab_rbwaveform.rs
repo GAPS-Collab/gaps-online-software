@@ -17,7 +17,7 @@ use ndhistogram::axis::{
     Uniform,
 };
 
-use ratatui::terminal::Frame;
+use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::prelude::*;
 use ratatui::widgets::{

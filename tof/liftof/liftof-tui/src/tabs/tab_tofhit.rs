@@ -20,7 +20,8 @@ use ratatui::widgets::{
     ListState,
 };
 
-use ratatui::terminal::Frame;
+//use ratatui::terminal::Frame;
+use ratatui::Frame;
 use ratatui::layout::Rect;
 
 use ndhistogram::{

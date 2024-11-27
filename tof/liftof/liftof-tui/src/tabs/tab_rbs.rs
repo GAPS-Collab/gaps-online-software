@@ -24,7 +24,8 @@ use ndhistogram::axis::{
 
 use ratatui::{
     //backend::CrosstermBackend,
-    terminal::Frame,
+    //terminal::Frame,
+    Frame,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{
         Modifier,

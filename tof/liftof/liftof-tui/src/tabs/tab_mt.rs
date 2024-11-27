@@ -19,7 +19,8 @@ use ratatui::{
         //Modifier,
         Style},
     text::Span,
-    terminal::Frame,
+    Frame,
+    //terminal::Frame,
     widgets::{
         Block,
         Dataset,
@@ -298,23 +299,23 @@ impl MTTab {
     let t_max = *self.met_queue.back().unwrap_or(&0.0)  as u64;
     let t_spacing = (t_max - t_min)/5;
 
-    let t_labels = vec![t_min.to_string(),
-                       (t_min + t_spacing).to_string(),
-                       (t_min + 2*t_spacing).to_string(),
-                       (t_min + 3*t_spacing).to_string(),
-                       (t_min + 4*t_spacing).to_string(),
-                       (t_min + 5*t_spacing).to_string()];
+    let t_labels = vec![Span::from(t_min.to_string()),
+                        Span::from((t_min + t_spacing).to_string()),
+                        Span::from((t_min + 2*t_spacing).to_string()),
+                        Span::from((t_min + 3*t_spacing).to_string()),
+                        Span::from((t_min + 4*t_spacing).to_string()),
+                        Span::from((t_min + 5*t_spacing).to_string())];
     
      let rate_only : Vec::<i64> = self.rate_queue.iter().map(|z| z.1.round() as i64).collect();
      let r_max = *rate_only.iter().max().unwrap_or(&0) + 5;
      let r_min = *rate_only.iter().min().unwrap_or(&0) - 5;
      let rate_spacing = (r_max - r_min)/5;
-     let rate_labels = vec![r_min.to_string(),
-                            (r_min + rate_spacing).to_string(),
-                            (r_min + 2*rate_spacing).to_string(),
-                            (r_min + 3*rate_spacing).to_string(),
-                            (r_min + 4*rate_spacing).to_string(),
-                            (r_min + 5*rate_spacing).to_string()];
+     let rate_labels = vec![Span::from(r_min.to_string()),
+                            Span::from((r_min + rate_spacing).to_string()),
+                            Span::from((r_min + 2*rate_spacing).to_string()),
+                            Span::from((r_min + 3*rate_spacing).to_string()),
+                            Span::from((r_min + 4*rate_spacing).to_string()),
+                            Span::from((r_min + 5*rate_spacing).to_string())];
      
      let rate_dataset = vec![Dataset::default()
          .name("MTB Rate")
@@ -337,13 +338,17 @@ impl MTTab {
         .style(Style::default().patch(self.theme.style()))
         .bounds([t_min as f64, t_max as f64])
         //.bounds([0.0, 1000.0])
-        .labels(t_labels.clone().iter().cloned().map(Span::from).collect()))
+        //.labels(t_labels.clone().iter().cloned().map(Span::from).collect()))
+        .labels(t_labels.clone())
+      )
       .y_axis(Axis::default()
         .title(Span::styled("Hz", Style::default().patch(self.theme.style())))
         .style(Style::default().patch(self.theme.style()))
         .bounds([r_min as f64, r_max as f64])
         //.bounds([0.0,1000.0])
-        .labels(rate_labels.clone().iter().cloned().map(Span::from).collect()))
+        //.labels(rate_labels.clone().iter().cloned().map(Span::from).collect()))
+        .labels(rate_labels.clone())
+      )
       .style(self.theme.style()); 
      
     // NChannel distribution
@@ -375,12 +380,12 @@ impl MTTab {
     let tmp_max = *tmp_only.iter().max().unwrap_or(&0) + 5;
     let tmp_min = *tmp_only.iter().min().unwrap_or(&0) - 5;
     let tmp_spacing = (tmp_max - tmp_min)/5;
-    let tmp_labels = vec![tmp_min.to_string(),
-                         (tmp_min + tmp_spacing).to_string(),
-                         (tmp_min + 2*tmp_spacing).to_string(),
-                         (tmp_min + 3*tmp_spacing).to_string(),
-                         (tmp_min + 4*tmp_spacing).to_string(),
-                         (tmp_min + 5*tmp_spacing).to_string()];
+    let tmp_labels = vec![Span::from(tmp_min.to_string()),
+                          Span::from((tmp_min + tmp_spacing).to_string()),
+                          Span::from((tmp_min + 2*tmp_spacing).to_string()),
+                          Span::from((tmp_min + 3*tmp_spacing).to_string()),
+                          Span::from((tmp_min + 4*tmp_spacing).to_string()),
+                          Span::from((tmp_min + 5*tmp_spacing).to_string())];
     let fpga_temp_dataset = vec![Dataset::default()
         .name("FPGA T")
         .marker(symbols::Marker::Braille)
@@ -400,12 +405,16 @@ impl MTTab {
         .title(Span::styled("MET [s]", Style::default().fg(Color::White)))
         .style(Style::default().patch(self.theme.style()))
         .bounds([t_min as f64, t_max as f64])
-        .labels(t_labels.clone().iter().cloned().map(Span::from).collect()))
+        //.labels(t_labels.clone().iter().cloned().map(Span::from).collect()))
+        .labels(t_labels.clone())
+      )
       .y_axis(Axis::default()
         //.title(Span::styled("T [\u{00B0}C]", Style::default().fg(Color::White)))
         .style(self.theme.style())
         .bounds([tmp_min as f64, tmp_max as f64])
-        .labels(tmp_labels.clone().iter().cloned().map(Span::from).collect()))
+        //.labels(tmp_labels.clone().iter().cloned().map(Span::from).collect()))
+        .labels(tmp_labels.clone())
+      )
       .style(self.theme.style());
     
     let last_event = self.event_queue.back();

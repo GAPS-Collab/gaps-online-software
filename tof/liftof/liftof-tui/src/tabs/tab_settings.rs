@@ -163,6 +163,14 @@ impl SettingsTab<'_> {
             ].as_ref()
         )
         .split(main_rows[1]);
+    let sub_rows1 = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints(
+            [Constraint::Percentage(50),
+             Constraint::Percentage(50)
+            ].as_ref()
+        )
+        .split(main_cols1[1]);
       let par_title_string = String::from("Apply Color Theme");
       let (first, rest) = par_title_string.split_at(1);
       let par_title = Line::from(vec![
@@ -221,6 +229,17 @@ impl SettingsTab<'_> {
         .borders(Borders::ALL)
         .border_type(BorderType::Rounded),
     );
+  
+    let par_wf_fixed_y_title = String::from("Fix Waveform y-scale");
+    let wf_fixed_y_view = Paragraph::new(content)
+    .style(self.theme.style())
+    .alignment(Alignment::Center)
+    .block(
+      Block::default()
+        .title(par_wf_fixed_y_title)
+        .borders(Borders::ALL)
+        .border_type(BorderType::Rounded),
+    );
 
     let stream : String = String::from("");
     let side_view = Paragraph::new(stream)
@@ -234,13 +253,14 @@ impl SettingsTab<'_> {
     );
     frame.render_widget(main_view, main_cols1[1]);
     frame.render_widget(side_view, main_cols0[0]);
-    frame.render_widget(refresh_view, sub_rows0[1]);
+    frame.render_widget(refresh_view, sub_rows1[0]);
     frame.render_stateful_widget(color_theme_list, sub_rows0[0], &mut self.ctl_state );
+    frame.render_widget(wf_fixed_y_view, sub_rows1[1]);
     if self.colortheme_popup {
       let popup = Popup::new("Any key to continue!")
         .title("New color theme selected!")
         .style(self.theme.style());
-      frame.render_widget(&popup, frame.size());
+      frame.render_widget(&popup, frame.area());
     }
   }
 }
