@@ -1,13 +1,5 @@
 use ratatui::prelude::*;
 
-//use ratatui::symbols;
-//use ratatui::text::Span;
-//use ratatui::terminal::Frame;
-//use ratatui::layout::Rect;
-//use ratatui::style::{
-//    Color,
-//    Style,
-//};
 use ratatui::widgets::{
 //    Axis,
     Block,
@@ -137,67 +129,60 @@ impl SettingsTab<'_> {
       )
       .split(*main_window);
 
-    let main_cols0 = Layout::default()
+    let cols_row0 = Layout::default()
         .direction(Direction::Vertical)
         .constraints(
             [Constraint::Percentage(50), 
-             Constraint::Percentage(50)
+             Constraint::Percentage(50),
             ].as_ref()
         )
         .split(main_rows[0]);
 
-    let sub_rows0 = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints(
-            [Constraint::Percentage(50),
-             Constraint::Percentage(50)
-            ].as_ref()
-        )
-        .split(main_cols0[1]);
-
-    let main_cols1 = Layout::default()
+    let cols_row1 = Layout::default()
         .direction(Direction::Vertical)
         .constraints(
             [Constraint::Percentage(50), 
-             Constraint::Percentage(50)
+             Constraint::Percentage(50),
             ].as_ref()
         )
         .split(main_rows[1]);
-    let sub_rows1 = Layout::default()
+
+    let rows_cols_row1 = Layout::default()
         .direction(Direction::Horizontal)
         .constraints(
             [Constraint::Percentage(50),
              Constraint::Percentage(50)
             ].as_ref()
         )
-        .split(main_cols1[1]);
-      let par_title_string = String::from("Apply Color Theme");
-      let (first, rest) = par_title_string.split_at(1);
-      let par_title = Line::from(vec![
-        Span::styled(
-            first,
-            Style::default()
-                .fg(self.theme.hc)
-                .add_modifier(Modifier::UNDERLINED)
-                .add_modifier(Modifier::BOLD),
-        ),
-        Span::styled(rest, self.theme.style()),
-      ]);
+        .split(cols_row1[1]);
 
-      let rbs = Block::default()
-        .borders(Borders::ALL)
-        .style(self.theme.style())
-        .title(par_title)
-        .border_type(BorderType::Plain);
+    let par_title_string = String::from("Apply Color Theme");
+    let (first, rest) = par_title_string.split_at(1);
+    let par_title = Line::from(vec![
+      Span::styled(
+          first,
+          Style::default()
+              .fg(self.theme.hc)
+              .add_modifier(Modifier::UNDERLINED)
+              .add_modifier(Modifier::BOLD),
+      ),
+      Span::styled(rest, self.theme.style()),
+    ]);
 
-     let color_theme_list = List::new(self.ctl_items.clone()).block(rbs)
-        .highlight_style(self.theme.highlight().add_modifier(Modifier::BOLD))
-        .highlight_symbol(">>")
-        .repeat_highlight_symbol(true);
-      match self.ctl_state.selected() {
-        None => self.ctl_state.select(Some(1)),
-        Some(_) => (),
-      }
+    let rbs = Block::default()
+      .borders(Borders::ALL)
+      .style(self.theme.style())
+      .title(par_title)
+      .border_type(BorderType::Plain);
+
+    let color_theme_list = List::new(self.ctl_items.clone()).block(rbs)
+      .highlight_style(self.theme.highlight().add_modifier(Modifier::BOLD))
+      .highlight_symbol(">>")
+      .repeat_highlight_symbol(true);
+    match self.ctl_state.selected() {
+      None => self.ctl_state.select(Some(1)),
+      Some(_) => (),
+    }
     let content = "Settings (WIP)"; 
     let main_view = Paragraph::new(content)
     .style(self.theme.style())
@@ -241,21 +226,10 @@ impl SettingsTab<'_> {
         .border_type(BorderType::Rounded),
     );
 
-    let stream : String = String::from("");
-    let side_view = Paragraph::new(stream)
-    .style(self.theme.style())
-    .alignment(Alignment::Left)
-    .block(
-      Block::default()
-        .borders(Borders::ALL)
-        .border_type(BorderType::Rounded)
-        //.title("Stream")
-    );
-    frame.render_widget(main_view, main_cols1[1]);
-    frame.render_widget(side_view, main_cols0[0]);
-    frame.render_widget(refresh_view, sub_rows1[0]);
-    frame.render_stateful_widget(color_theme_list, sub_rows0[0], &mut self.ctl_state );
-    frame.render_widget(wf_fixed_y_view, sub_rows1[1]);
+    frame.render_widget(main_view, cols_row0[0]);
+    frame.render_stateful_widget(color_theme_list, cols_row1[0], &mut self.ctl_state );
+    frame.render_widget(refresh_view,    rows_cols_row1[0]);
+    frame.render_widget(wf_fixed_y_view, rows_cols_row1[1]);
     if self.colortheme_popup {
       let popup = Popup::new("Any key to continue!")
         .title("New color theme selected!")
