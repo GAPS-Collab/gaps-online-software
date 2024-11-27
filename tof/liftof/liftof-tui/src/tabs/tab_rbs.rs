@@ -162,7 +162,7 @@ impl RBTab<'_>  {
       //ch_data.push(Vec::<(f64,f64)>::new());
       ch_data.push(tmp_vec);
     }
-    let bins = Uniform::new(50,-0.5,49.5);
+    let bins = Uniform::new(50,-0.5,49.5).unwrap();
     let mut rbl_state    = ListState::default();
     rbl_state.select(Some(1));
     let mut ltbl_state   = ListState::default();
@@ -219,7 +219,7 @@ impl RBTab<'_>  {
   pub fn receive_packet(&mut self) -> Result<(), SerializationError> {
     let met    = self.timer.elapsed().as_secs_f64();
     let mut ev = RBEvent::new();
-    let bins   = Uniform::new(50,-0.5,49.5);
+    let bins   = Uniform::new(50,-0.5,49.5).unwrap();
     //info!("Receive packet!"); 
     if self.rb_changed {
       info!("RB change detectod!");

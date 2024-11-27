@@ -97,13 +97,13 @@ pub struct TofHitTab<'a> {
 
 impl TofHitTab<'_> {
   pub fn new(th_recv : Receiver<TofHit>, theme : ColorTheme) -> TofHitTab<'static> {
-    let bins_ph    = Uniform::new(50, 0.0, 200.0);
-    let bins_pt    = Uniform::new(50, 0.0, 400.0);
-    let bins_pc    = Uniform::new(30, 0.0, 30.0);
-    let bins_pa    = Uniform::new(90, 0.0, 1800.0);
-    let bins_t0    = Uniform::new(50, 0.0, 200.0);
-    let bins_pid   = Uniform::new(160,1.0, 161.0);
-    let bins_edep  = Uniform::new(50,0.0,100.0);
+    let bins_ph    = Uniform::new(50, 0.0, 200.0).unwrap();
+    let bins_pt    = Uniform::new(50, 0.0, 400.0).unwrap();
+    let bins_pc    = Uniform::new(30, 0.0, 30.0).unwrap();
+    let bins_pa    = Uniform::new(90, 0.0, 1800.0).unwrap();
+    let bins_t0    = Uniform::new(50, 0.0, 200.0).unwrap();
+    let bins_pid   = Uniform::new(160,1.0, 161.0).unwrap();
+    let bins_edep  = Uniform::new(50,0.0,100.0).unwrap();
     let mut paddle_select_items = Vec::<ListItem>::new();
     let all_pdl = String::from("  All paddles");
     paddle_select_items.push(ListItem::new(Line::from(all_pdl)));
@@ -137,12 +137,12 @@ impl TofHitTab<'_> {
   }
 
   pub fn init_histos(&mut self) {
-    let bins_ph     = Uniform::new(50, 0.0, 200.0);
-    let bins_pt     = Uniform::new(50, 0.0, 400.0);
-    let bins_pc     = Uniform::new(30, 0.0, 30.0);
-    let bins_pa     = Uniform::new(90, 0.0, 1800.0);
-    let bins_t0     = Uniform::new(50, 0.0, 200.0);
-    let bins_edep   = Uniform::new(50,0.0,100.0);
+    let bins_ph     = Uniform::new(50, 0.0, 200.0).unwrap();
+    let bins_pt     = Uniform::new(50, 0.0, 400.0).unwrap();
+    let bins_pc     = Uniform::new(30, 0.0, 30.0).unwrap();
+    let bins_pa     = Uniform::new(90, 0.0, 1800.0).unwrap();
+    let bins_t0     = Uniform::new(50, 0.0, 200.0).unwrap();
+    let bins_edep   = Uniform::new(50,0.0,100.0).unwrap();
     self.pha_histo  = ndhistogram!(bins_ph.clone());
     self.pta_histo  = ndhistogram!(bins_pt.clone());
     self.pca_histo  = ndhistogram!(bins_pc.clone());

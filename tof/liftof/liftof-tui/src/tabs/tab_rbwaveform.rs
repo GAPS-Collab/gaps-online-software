@@ -73,7 +73,7 @@ impl RBWaveformTab {
   pub fn new(rbw_recv : Receiver<TofPacket>,
              rbs      : HashMap<u8, ReadoutBoard>,
              theme    : ColorTheme) -> Self {
-    let bins_rb  = Uniform::new(50, 1.0, 51.0);
+    let bins_rb  = Uniform::new(50, 1.0, 51.0).unwrap();
     // FIXME check if there are calibrations
     let mut cali_loaded = false;
     if rbs.len() > 0 {

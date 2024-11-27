@@ -80,7 +80,7 @@ impl TofSummaryTab {
   pub fn new(ts_receiver : Receiver<TofEventSummary>,
              theme       : ColorTheme) -> Self {
     
-    let bins          = Uniform::new(25, 0.0, 25.0);
+    let bins          = Uniform::new(25, 0.0, 25.0).unwrap();
     Self {
         ts_receiver     : ts_receiver,
         summary_queue   : VecDeque::<TofEventSummary>::new(),

@@ -103,9 +103,9 @@ impl MTTab {
              mapping      : DsiJChPidMapping,
              mtlink_rb_map: HashMap<u8,u8>,
              theme        : ColorTheme) -> MTTab {
-    let bins          = Uniform::new(50, 0.0, 50.0);
-    let mtb_link_bins = Uniform::new(50, 0.0, 50.0);
-    let panel_bins    = Uniform::new(22, 1.0, 22.0);
+    let bins          = Uniform::new(50, 0.0, 50.0).unwrap();
+    let mtb_link_bins = Uniform::new(50, 0.0, 50.0).unwrap();
+    let panel_bins    = Uniform::new(22, 1.0, 22.0).unwrap();
     Self {
       event_queue    : VecDeque::<MasterTriggerEvent>::with_capacity(1000),
       moni_queue     : VecDeque::<MtbMoniData>::with_capacity(1000),
