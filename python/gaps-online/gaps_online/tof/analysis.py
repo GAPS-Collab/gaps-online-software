@@ -40,11 +40,11 @@ def create_occupancy_dict(events, normalize=True, use_trigger_hits=False):
     # events can be TofEventSummary or TofEvent
     ev0 = events[0]
     is_tes = False
-    if hasattr(ev0,trigger_hits):
+    if hasattr(ev0,'trigger_hits'):
         is_tes = True
 
     is_merged_event = False
-    if hasattr(ev0.tof):
+    if hasattr(ev0,'tof'):
         is_merged_event = True
 
     occu_per_paddle = {k : 0 for k in range(1,161)}
