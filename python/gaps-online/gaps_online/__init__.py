@@ -37,5 +37,6 @@ from . import tof
 from . import io
 from . import events
 from . import run
+from . import commands
 
 __version__ = "0.10"
