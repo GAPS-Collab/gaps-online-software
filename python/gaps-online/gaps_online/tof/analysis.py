@@ -30,15 +30,33 @@ def find_paddle(hit, paddles):
     print (f'No paddle found for {hit}')
 
 
-def create_occupancy_dict(events, normalize=True, use_trigger_hits=False):
+def create_occupancy_dict(reader=None, events=[], normalize=True, use_trigger_hits=False):
     """
     Create a dictionary of paddle id vs nhits
+
+    This can either accept a reader or a list of events.
+    Use reader when memory is sparse and events when time is
+    of the essence
+    
+    # Arguments:
+        * reader - either TofPacket or TelemetryPacketReader. The reader should be primed in a way
+                   that it only spits out MergedEvents, TofEventSummary or TofEvents
     """
+
+    if reader is not None and events:
+        raise ValueError("Unable to use both, reader and events!")
+
     if use_trigger_hits:
         paddles = db.get_tof_paddles()
 
-    # events can be TofEventSummary or TofEvent
-    ev0 = events[0]
+    if reader is not None:
+        for ev in reader:
+            ev0 = ev
+            break;
+    else:
+        # events can be TofEventSummary or TofEvent
+        ev0 = events[0]
+
     is_tes = False
     if hasattr(ev0,'trigger_hits'):
         is_tes = True
@@ -48,6 +66,8 @@ def create_occupancy_dict(events, normalize=True, use_trigger_hits=False):
         is_merged_event = True
 
     occu_per_paddle = {k : 0 for k in range(1,161)}
+    if reader is not None:
+        events = reader
     for ev in tqdm.tqdm(events, desc='Getting TOF occupancy data!'):
         if use_trigger_hits:
             if is_tes:

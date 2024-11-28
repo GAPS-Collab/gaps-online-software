@@ -495,6 +495,7 @@ fn main() {
   if calibration {
     match rb_calibration(&rc_to_runner_cal, 
                          &tp_to_pub_cal,
+                         config.save_cali_wf,
                          ip_address) {
       Ok(_) => (),
       Err(err) => {
