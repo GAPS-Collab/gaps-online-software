@@ -167,6 +167,25 @@ impl TelemetryHeader {
     }
   }
 
+  /// A re-implementation of make_packet_stub
+  pub fn forge(packet_type : u8) -> Self {
+    let mut header = Self::new();
+    header.sync  = 0x90EB;
+    header.ptype   = packet_type;
+    header
+  }
+
+//{
+//   std::vector<uint8_t> bytes(13,0);
+//   *reinterpret_cast<uint16_t*>(&bytes[0]) = 0x90EB;
+//   bytes[2] = type;
+//   if(timestamp == 0)
+//      timestamp = bfsw::timestamp_64ms();
+//   *reinterpret_cast<uint32_t*>(&bytes[3]) = timestamp;
+//   *reinterpret_cast<uint16_t*>(&bytes[7]) = counter;
+//   *reinterpret_cast<uint16_t*>(&bytes[9]) = length;
+//   *reinterpret_cast<uint16_t*>(&bytes[11]) = 0;
+//   return bytes;
   /// This is a reimplementation of bfsw's timestamp_to_double
   pub fn get_gcutime(&self) -> f64 {
     (self.timestamp as f64) * 0.064 + 1631030675.0
@@ -224,6 +243,29 @@ impl fmt::Display for TelemetryHeader {
     repr += &(format!("\n  Length      : {}",self.length));
     repr += &(format!("\n  Checksum    : {}>",self.checksum));
     write!(f, "{}", repr)
+  }
+}
+
+
+/// The acknowledgement packet used within the 
+/// bfsw code
+pub struct AckBfsw {
+  pub header    : TelemetryHeader,
+  pub ack_type  : u8,
+  pub ret_code1 : u8,
+  pub ret_code2 : u8,
+  pub body      : Vec<u8>
+}
+
+impl AckBfsw {
+  pub fn new() -> Self {
+    Self {
+      header    : TelemetryHeader::new(),
+      ack_type  : 1,
+      ret_code1 : 0,
+      ret_code2 : 0,
+      body      : Vec::<u8>::new()
+    }
   }
 }
 
