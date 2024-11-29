@@ -603,7 +603,7 @@ impl RBTab<'_>  {
         ch_chunks.append(&mut ch_chunks_2);
         // the waveform plots
         for ch in 0..9 {
-          let label          = format!("Ch{}", ch);
+          let label          = format!("Ch{}", ch + 1);
           let ch_tc_theme    = self.theme.clone();
           let mut ch_ts_data = VecDeque::from(self.ch_data[ch].clone());
           let ch_ts = timeseries(&mut ch_ts_data,
