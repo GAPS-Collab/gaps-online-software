@@ -120,6 +120,10 @@ def create_occupancy_dict(reader           = None,
         max_val = max(occu_per_paddle.values())
         for k in occu_per_paddle.keys():
             occu_per_paddle[k] = occu_per_paddle[k]/max_val
+    if mark_0_as_bad:
+        for k in occu_per_paddle.keys():
+            if occu_per_paddle[k] == 0.0:
+                occu_per_paddle[k] = np.nan
     return occu_per_paddle
 
 
