@@ -808,7 +808,7 @@ def plot_ltb_threshold_timeseries(times, ltb_hk, savename = None):
 ###############################################
 
 
-def plot_paddle charge2d(reader      = None,\
+def plot_paddle_charge2d(reader      = None,\
                          charge_a    = [],\
                          charge_b    = [],\
                          paddle_id   = 0,\
