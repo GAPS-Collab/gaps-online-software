@@ -30,7 +30,13 @@ def find_paddle(hit, paddles):
     print (f'No paddle found for {hit}')
 
 
-def create_occupancy_dict(reader=None, events=[], normalize=True, use_trigger_hits=False):
+def create_occupancy_dict(reader           = None,
+                          events           = [],
+                          normalize        = True,
+                          use_trigger_hits = False,
+                          mark_0_as_bad    = False,
+                          cbe_side         = True,
+                          cor_side         = True):
     """
     Create a dictionary of paddle id vs nhits
 
@@ -39,8 +45,14 @@ def create_occupancy_dict(reader=None, events=[], normalize=True, use_trigger_hi
     of the essence
     
     # Arguments:
-        * reader - either TofPacket or TelemetryPacketReader. The reader should be primed in a way
-                   that it only spits out MergedEvents, TofEventSummary or TofEvents
+        * reader           - either TofPacket or TelemetryPacketReader. The reader should be primed in a way
+                             that it only spits out MergedEvents, TofEventSummary or TofEvents
+    
+        * use_trigger_hits - instead of plotting TofHits, just use the triggered hits for the occupancy
+        * cbe_side         - add the CBE sides to the occupancy dictionary. It might make sense to exclude 
+                             them for normalization reasons
+        * cor_side         - add the COR sides to the occupancy dictionary. It might make sense to exclude 
+                             them for normalization reasons
     """
 
     if reader is not None and events:
@@ -96,6 +108,13 @@ def create_occupancy_dict(reader=None, events=[], normalize=True, use_trigger_hi
         else:
             for h in ev.hits:
                 occu_per_paddle[h.paddle_id] += 1
+
+    if not cbe_side:
+        for pid in range(25, 61):
+            occu_per_paddle.pop(pid)
+    if not cor_side:
+        for pid in range(109, 161):
+            occu_per_paddle.pop(pid)
     # normalize it
     if normalize:
         max_val = max(occu_per_paddle.values())
