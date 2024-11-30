@@ -21,21 +21,24 @@
 //!
 
 use std::fmt;
-
+use std::collections::HashMap;
 use colored::Colorize;
 
-use crate::packets::{TofPacket, PacketType};
+use crate::packets::{
+  TofPacket,
+  PacketType
+};
 use crate::events::TofHit;
 use crate::constants::{NWORDS, NCHN};
 use crate::serialization::{
-    u8_to_u16,
-    Serialization,
-    SerializationError,
-    search_for_u16,
-    Packable,
-    parse_u8,
-    parse_u16,
-    parse_u32,
+  u8_to_u16,
+  Serialization,
+  SerializationError,
+  search_for_u16,
+  Packable,
+  parse_u8,
+  parse_u16,
+  parse_u32,
 };
 
 use crate::events::{
@@ -52,6 +55,9 @@ use crate::calibrations::{
     clean_spikes,
 };
 
+#[cfg(feature="database")]
+use crate::database::ReadoutBoard;
+
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
     use crate::FromRandom;
@@ -60,6 +66,202 @@ cfg_if::cfg_if! {
   }
 }
 
+/// Squeze the rb channel - paddle mapping into 5 bytes
+/// for a single RB
+pub struct RBPaddleID {
+  /// Paddle connected to RB channel 1/2
+  pub paddle_12     : u8,
+  /// Paddle connected to RB channel 3/4
+  pub paddle_34     : u8,
+  /// Paddle connected to RB channel 5/6
+  pub paddle_56     : u8,
+  /// Paddle connected to RB channel 7/8
+  pub paddle_78     : u8,
+  /// Order - 1 if the smaller channel is the 
+  /// A side, 2, if the smaller channel is the 
+  /// B side
+  pub channel_order : u8
+}
+
+impl Default for RBPaddleID {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for RBPaddleID {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<RBPaddleID:");
+    for k in 1..9 {
+      let pid = self.get_paddle_id(k);
+    }
+    //repr += &(format!(" {}", 
+    write!(f, "{}", 1)
+  }
+}
+
+impl RBPaddleID {
+  pub fn new() -> Self {
+    RBPaddleID {
+      paddle_12     : 0,
+      paddle_34     : 0,
+      paddle_56     : 0,
+      paddle_78     : 0,
+      channel_order : 0
+    }
+  }
+
+  pub fn to_u64(&self) -> u64 {
+    let val : u64 = (self.channel_order as u64) << 32 | (self.paddle_78 as u64) << 24 | (self.paddle_56 as u64) << 16 | (self.paddle_34 as u64) << 8 |  self.paddle_12 as u64;
+    val
+  }
+
+  /// Typically, the A-side will be connected to a lower channel id
+  ///
+  /// If the order is flipped, the lower channel will be connected to 
+  /// the B-side
+  ///
+  /// # Arguments
+  /// * channel : RB channel (1-8)
+  pub fn get_order_flipped(&self, channel : u8) -> bool {
+    match channel {
+      1 | 2 => {
+        return (self.channel_order & 0x1) == 1;
+      }
+      3 | 4 => {
+        return (self.channel_order & 0x2) == 1;
+      }
+      5 | 6 => {
+        return (self.channel_order & 0x4) == 1;
+      }
+      7 | 8 => {
+        return (self.channel_order & 0x8) == 1;
+      }
+      _ => {
+        error!("{} is not a valid RB channel!", channel);
+        return false;
+      }
+    }
+  }
+
+  pub fn get_order_str(&self, channel : u8) -> String {
+    if self.get_order_flipped(channel) {
+      return String::from("BA");
+    } else {
+      return String::from("AB");
+    }
+  }
+
+  pub fn is_a(&self, channel : u8) -> bool {
+    match channel {
+      1 => {
+        if self.get_order_flipped(channel) {
+          return false;
+        } else {
+          return true
+        }
+      }
+      2 => {
+        if self.get_order_flipped(channel) {
+          return true;
+        } else {
+          return false
+        }
+      }
+      3 => {
+        if self.get_order_flipped(channel) {
+          return false;
+        } else {
+          return true
+        }
+      }
+      4 => {
+        if self.get_order_flipped(channel) {
+          return true;
+        } else {
+          return false
+        }
+      }
+      5 => {
+        if self.get_order_flipped(channel) {
+          return false;
+        } else {
+          return true
+        }
+      }
+      6 => {
+        if self.get_order_flipped(channel) {
+          return true;
+        } else {
+          return false
+        }
+      }
+      7 => {
+        if self.get_order_flipped(channel) {
+          return false;
+        } else {
+          return true
+        }
+      }
+      8 => {
+        if self.get_order_flipped(channel) {
+          return true;
+        } else {
+          return false
+        }
+      }
+      _ => {
+        error!("{} is not a valid RB channel!", channel);
+        return false;
+      }
+    }
+  }
+
+  pub fn from_u64(val : u64) -> Self {
+    let paddle_12     : u8 = ((val & 0xFF)) as u8;
+    let paddle_34     : u8 = ((val & 0xFF00) >> 8) as u8;
+    let paddle_56     : u8 = ((val & 0xFF0000) >> 16) as u8;
+    let paddle_78     : u8 = ((val & 0xFF000000) >> 24) as u8; 
+    let channel_order : u8 = ((val & 0xFF00000000) >> 32) as u8;
+    Self {
+      paddle_12,
+      paddle_34,
+      paddle_56,
+      paddle_78,
+      channel_order,
+    }
+  }
+
+  #[cfg(feature="database")]
+  pub fn from_rb(&self, rb : ReadoutBoard) {
+  }
+
+  /// Get the paddle id together with the information 
+  /// if this is the A side
+  ///
+  /// channel in rb channels (starts at 1)
+  pub fn get_paddle_id(&self, channel : u8) -> (u8, bool) {
+    let flipped = self.get_order_flipped(channel);
+    match channel {
+      1 | 2 => {
+        return (self.paddle_12, flipped); 
+      }
+      3 | 4 => {
+        return (self.paddle_34, flipped); 
+      }
+      5 | 6 => {
+        return (self.paddle_56, flipped); 
+      }
+      7 | 8 => {
+        return (self.paddle_78, flipped); 
+      }
+      _ => {
+        error!("{} is not a valid RB channel!", channel);
+        return (0,false);
+      }
+    }
+  }
+}
 
 ///// Debug information for missing hits. 
 /////
@@ -284,17 +486,17 @@ impl RBEvent {
   /// Deconstruct the RBEvent to form RBWaveforms
   pub fn get_rbwaveforms(&self) -> Vec<RBWaveform> {
     let mut waveforms = Vec::<RBWaveform>::new();
-    for ch in self.header.get_channels() {
-      let mut wf     = RBWaveform::new();
-      wf.rb_id       = self.header.rb_id;
-      wf.rb_channel  = ch;
-      wf.event_id    = self.header.event_id;
-      wf.stop_cell   = self.header.stop_cell;
-      // FIXME - can we move this somehow instead of 
-      // cloning?
-      wf.adc         = self.adc[ch as usize].clone();
-      waveforms.push(wf);
-    }
+    //for ch in self.header.get_channels() {
+    //  let mut wf     = RBWaveform::new();
+    //  wf.rb_id       = self.header.rb_id;
+    //  wf.rb_channel  = ch;
+    //  wf.event_id    = self.header.event_id;
+    //  wf.stop_cell   = self.header.stop_cell;
+    //  // FIXME - can we move this somehow instead of 
+    //  // cloning?
+    //  wf.adc         = self.adc[ch as usize].clone();
+    //  waveforms.push(wf);
+    //}
     waveforms
   }
 
@@ -781,9 +983,19 @@ pub struct RBEventHeader {
   /// Store the drs_deadtime instead 
   /// of the fpga temperature
   pub deadtime_instead_temp : bool,
+  /// the mapping of rb_channel to paddle_id
+  /// This will not get serialized, since it is redundant 
+  /// information
+  /// This is for the a side
+  pub channel_pid_a_map       : Option<HashMap<u8,u8>>,
+  /// the mapping of rb_channel to paddle_id
+  /// This will not get serialized, since it is redundant 
+  /// information
+  /// This is for the b side
+  pub channel_pid_b_map       : Option<HashMap<u8,u8>>,
   /// The status byte contains information about lsos of lock
   /// and event fragments and needs to be decoded
-  status_byte              : u8   ,
+  status_byte               : u8,
   /// The channel mask is 9bit for the 9 channels.
   /// This leaves 7 bits of space so we actually 
   /// hijack that for the version information 
@@ -793,7 +1005,8 @@ pub struct RBEventHeader {
   ///
   /// FIXME - make this proper and use ProtocolVersion 
   ///         instead
-  channel_mask             : u16  , 
+  channel_mask             : u16, 
+
 }
 
 impl RBEventHeader {
@@ -813,6 +1026,8 @@ impl RBEventHeader {
       timestamp32           : 0,
       timestamp16           : 0,
       deadtime_instead_temp : false,
+      channel_pid_a_map     : None,
+      channel_pid_b_map     : None,
     }
   }
 
@@ -1103,33 +1318,38 @@ impl FromRandom for RBEventHeader {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct RBWaveform {
-  pub event_id    : u32,
-  pub rb_id       : u8,
+  pub event_id      : u32,
+  pub rb_id         : u8,
   /// FIXME - this is form 0-8, but should it be from 1-9?
-  pub rb_channel  : u8,
+  pub rb_channel_a  : u8,
+  pub rb_channel_b  : u8,
   /// DRS4 stop cell
-  pub stop_cell   : u16,
-  pub adc         : Vec<u16>,
-  pub paddle_id   : u8,
-  pub voltages    : Vec<f32>,
-  pub nanoseconds : Vec<f32>
+  pub stop_cell     : u16,
+  pub adc_a         : Vec<u16>,
+  pub adc_b         : Vec<u16>,
+  pub paddle_id     : u8,
+  pub voltages_a    : Vec<f32>,
+  pub nanoseconds_a : Vec<f32>,
+  pub voltages_b    : Vec<f32>,
+  pub nanoseconds_b : Vec<f32>
 }
 
 impl RBWaveform {
   
   pub fn new() -> Self {
     Self {
-      event_id    : 0,
-      rb_id       : 0,
-      rb_channel  : 0,
-      stop_cell   : 0,
-      paddle_id   : 0,
-      // FIXME - we should think about this
-      // I guess adc should be an array 
-      // because it needs to be initialized
-      adc         : Vec::<u16>::new(),
-      voltages    : Vec::<f32>::new(),
-      nanoseconds : Vec::<f32>::new()
+      event_id       : 0,
+      rb_id          : 0,
+      rb_channel_a   : 0,
+      rb_channel_b   : 0,
+      stop_cell      : 0,
+      paddle_id      : 0,
+      adc_a          : Vec::<u16>::new(),
+      voltages_a     : Vec::<f32>::new(),
+      nanoseconds_a  : Vec::<f32>::new(),
+      adc_b          : Vec::<u16>::new(),
+      voltages_b     : Vec::<f32>::new(),
+      nanoseconds_b  : Vec::<f32>::new()
     }
   }
 
@@ -1140,21 +1360,31 @@ impl RBWaveform {
     }
     let mut voltages = vec![0.0f32;1024];
     let mut nanosecs = vec![0.0f32;1024];
-    cali.voltages(self.rb_channel as usize + 1,
+    cali.voltages(self.rb_channel_a as usize + 1,
                   self.stop_cell as usize,
-                  &self.adc,
+                  &self.adc_a,
                   &mut voltages);
-    self.voltages = voltages;
-    cali.nanoseconds(self.rb_channel as usize + 1,
+    self.voltages_a = voltages.clone();
+    cali.nanoseconds(self.rb_channel_a as usize + 1,
                      self.stop_cell as usize,
                      &mut nanosecs);
-    self.nanoseconds = nanosecs;
+    self.nanoseconds_a = nanosecs.clone();
+    cali.voltages(self.rb_channel_b as usize + 1,
+                  self.stop_cell as usize,
+                  &self.adc_b,
+                  &mut voltages);
+    self.voltages_b = voltages;
+    cali.nanoseconds(self.rb_channel_b as usize + 1,
+                     self.stop_cell as usize,
+                     &mut nanosecs);
+    self.nanoseconds_b = nanosecs;
     Ok(())
   }
 
   /// Apply Jamie's simple spike filter to the calibrated voltages
   pub fn apply_spike_filter(&mut self) {
-    clean_spikes(&mut self.voltages, true);
+    clean_spikes(&mut self.voltages_a, true);
+    clean_spikes(&mut self.voltages_b, true);
   }
 }
 
@@ -1175,13 +1405,17 @@ impl Serialization for RBWaveform {
     }
     wf.event_id          = parse_u32(stream, pos);
     wf.rb_id             = parse_u8 (stream, pos);
-    wf.rb_channel        = parse_u8 (stream, pos);
+    wf.rb_channel_a      = parse_u8 (stream, pos);
+    wf.rb_channel_b      = parse_u8 (stream, pos);
     wf.stop_cell         = parse_u16(stream, pos);
     if stream.len() < *pos+2*NWORDS {
       return Err(SerializationError::StreamTooShort);
     }
-    let data             = &stream[*pos..*pos+2*NWORDS];
-    wf.adc               = u8_to_u16(data);
+    let data_a           = &stream[*pos..*pos+2*NWORDS];
+    wf.adc_a             = u8_to_u16(data_a);
+    *pos += 2*NWORDS;
+    let data_b           = &stream[*pos..*pos+2*NWORDS];
+    wf.adc_b             = u8_to_u16(data_b);
     *pos += 2*NWORDS;
     if parse_u16(stream, pos) != Self::TAIL {
       error!("The given position {} does not point to a tail signature of {}", pos, Self::TAIL);
@@ -1195,11 +1429,17 @@ impl Serialization for RBWaveform {
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.extend_from_slice(&self.event_id.to_le_bytes());
     stream.extend_from_slice(&self.rb_id.to_le_bytes());
-    stream.extend_from_slice(&self.rb_channel.to_le_bytes());
+    stream.extend_from_slice(&self.rb_channel_a.to_le_bytes());
+    stream.extend_from_slice(&self.rb_channel_b.to_le_bytes());
     stream.extend_from_slice(&self.stop_cell.to_le_bytes());
-    if self.adc.len() != 0 {
+    if self.adc_a.len() != 0 {
       for k in 0..NWORDS {
-        stream.extend_from_slice(&self.adc[k].to_le_bytes());  
+        stream.extend_from_slice(&self.adc_a[k].to_le_bytes());  
+      }
+    }
+    if self.adc_b.len() != 0 {
+      for k in 0..NWORDS {
+        stream.extend_from_slice(&self.adc_b[k].to_le_bytes());  
       }
     }
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
@@ -1212,11 +1452,17 @@ impl fmt::Display for RBWaveform {
     let mut repr = String::from("<RBWaveform:");
     repr += &(format!("\n  Event ID  : {}", self.event_id));
     repr += &(format!("\n  RB        : {}", self.rb_id));
-    repr += &(format!("\n  Channel   : {}", self.rb_channel));
+    repr += &(format!("\n  ChannelA  : {}", self.rb_channel_a));
+    repr += &(format!("\n  ChannelB  : {}", self.rb_channel_b));
     repr += &(format!("\n  Paddle ID : {}", self.paddle_id));
     repr += &(format!("\n  Stop cell : {}", self.stop_cell));
-    if self.adc.len() >= 273 {
-      repr += &(format!("\n  adc [{}]      : .. {} {} {} ..",self.adc.len(), self.adc[270], self.adc[271], self.adc[272]));
+    if self.adc_a.len() >= 273 {
+      repr += &(format!("\n  adc [{}]      : .. {} {} {} ..",self.adc_a.len(), self.adc_a[270], self.adc_a[271], self.adc_a[272]));
+    } else {
+      repr += &(String::from("\n  adc [EMPTY]"));
+    }
+    if self.adc_b.len() >= 273 {
+      repr += &(format!("\n  adc [{}]      : .. {} {} {} ..",self.adc_b.len(), self.adc_b[270], self.adc_b[271], self.adc_b[272]));
     } else {
       repr += &(String::from("\n  adc [EMPTY]"));
     }
@@ -1228,14 +1474,17 @@ impl fmt::Display for RBWaveform {
 impl FromRandom for RBWaveform {
     
   fn from_random() -> Self {
-    let mut wf    = Self::new();
-    let mut rng   = rand::thread_rng();
-    wf.event_id   = rng.gen::<u32>();
-    wf.rb_id      = rng.gen::<u8>();
-    wf.rb_channel = rng.gen::<u8>();
-    wf.stop_cell  = rng.gen::<u16>();
-    let random_numbers: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
-    wf.adc        = random_numbers;
+    let mut wf      = Self::new();
+    let mut rng     = rand::thread_rng();
+    wf.event_id     = rng.gen::<u32>();
+    wf.rb_id        = rng.gen::<u8>();
+    wf.rb_channel_a = rng.gen::<u8>();
+    wf.rb_channel_b = rng.gen::<u8>();
+    wf.stop_cell    = rng.gen::<u16>();
+    let random_numbers_a: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
+    wf.adc_a        = random_numbers_a;
+    let random_numbers_b: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
+    wf.adc_b        = random_numbers_b;
     wf
   }
 }

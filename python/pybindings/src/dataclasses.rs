@@ -2276,7 +2276,7 @@ impl PyTofEvent {
     let mut wfs = Vec::<PyRBWaveform>::new();
     for wf in &self.event.get_rbwaveforms() {
       let mut pywf = PyRBWaveform::new();
-      pywf.set_wf(wf.clone());
+      pywf.wf = wf.clone();
       wfs.push(pywf);
     }
     wfs
@@ -2409,7 +2409,7 @@ impl PyRBEvent {
     let mut wfs = Vec::<PyRBWaveform>::new();
     for wf in &self.event.get_rbwaveforms() {
       let mut pywf = PyRBWaveform::new();
-      pywf.set_wf(wf.clone());
+      pywf.wf - wf.clone());
       wfs.push(pywf);
     }
     wfs
@@ -2535,14 +2535,14 @@ impl PyTofHit {
 #[pyclass]
 #[pyo3(name="RBWaveform")]
 pub struct PyRBWaveform {
-  wf : RBWaveform,
+  pub wf : RBWaveform,
 }
 
-impl PyRBWaveform {
-  pub fn set_wf(&mut self, wf : RBWaveform) {
-    self.wf = wf;
-  }
-}
+//impl PyRBWaveform {
+//  pub fn set_wf(&mut self, wf : RBWaveform) {
+//    self.wf = wf;
+//  }
+//}
 
 #[pymethods]
 impl PyRBWaveform {
