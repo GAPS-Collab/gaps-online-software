@@ -21,6 +21,8 @@ use tof_dataclasses::packets::{
   TofPacket,
   PacketType
 };
+use tof_dataclasses::database::DsiJChPidMapping;
+
 
 use tof_dataclasses::heartbeats::HeartBeatDataSink;
 use tof_dataclasses::heartbeats::MTBHeartbeat;
@@ -2214,6 +2216,10 @@ impl PyTofEvent {
     }
   }
 
+  fn get_missing_paddles_hg(&self, mapping : DsiJChPidMapping) -> Vec<u8> {
+    self.event.get_missing_paddles_hg(mapping)
+  }
+
   #[getter]
   fn event_id(&self) -> u32 {
     self.event.header.event_id
@@ -2244,6 +2250,13 @@ impl PyTofEvent {
   #[getter]
   pub fn trigger_hits(&self) -> PyResult<Vec<(u8, u8, (u8, u8), LTBThreshold)>> {
     Ok(self.event.mt_event.get_trigger_hits())
+  }
+  
+  /// RB Link IDS (not RB ids) which fall into the 
+  /// trigger window
+  #[getter]
+  fn rb_link_ids(&self) -> Vec<u8> {
+    self.event.mt_event.get_rb_link_ids()
   }
 
   #[getter]
@@ -2409,7 +2422,7 @@ impl PyRBEvent {
     let mut wfs = Vec::<PyRBWaveform>::new();
     for wf in &self.event.get_rbwaveforms() {
       let mut pywf = PyRBWaveform::new();
-      pywf.wf - wf.clone());
+      pywf.wf = wf.clone();
       wfs.push(pywf);
     }
     wfs
