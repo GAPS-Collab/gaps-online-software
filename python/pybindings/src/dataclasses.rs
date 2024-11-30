@@ -18,8 +18,8 @@ use pyo3::Python;
 use tof_dataclasses::ProtocolVersion;
 use tof_dataclasses::io::TofPacketReader;
 use tof_dataclasses::packets::{
-    TofPacket,
-    PacketType
+  TofPacket,
+  PacketType
 };
 
 use tof_dataclasses::heartbeats::HeartBeatDataSink;
@@ -27,45 +27,46 @@ use tof_dataclasses::heartbeats::MTBHeartbeat;
 use tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
 
 use tof_dataclasses::monitoring::{
-    MoniData,
-    MoniSeries,
-    PAMoniData,
-    PBMoniData,
-    RBMoniData,
-    MtbMoniData, 
-    CPUMoniData,
-    LTBMoniData,
+  MoniData,
+  MoniSeries,
+  PAMoniData,
+  PBMoniData,
+  RBMoniData,
+  MtbMoniData, 
+  CPUMoniData,
+  LTBMoniData,
 };
 
 use tof_dataclasses::status::TofDetectorStatus;
 
 use tof_dataclasses::series::{
-    PAMoniDataSeries,
-    PBMoniDataSeries,
-    RBMoniDataSeries,
-    MtbMoniDataSeries,
-    CPUMoniDataSeries,
-    LTBMoniDataSeries,
+  PAMoniDataSeries,
+  PBMoniDataSeries,
+  RBMoniDataSeries,
+  MtbMoniDataSeries,
+  CPUMoniDataSeries,
+  LTBMoniDataSeries,
 };
 
 use tof_dataclasses::events::{
-    TofEvent,
-    TofEventSummary,
-    EventStatus,
-    TofHit,
-    MasterTriggerEvent,
-    RBEvent,
-    RBEventHeader,
-    RBWaveform
+  TofEvent,
+  TofEventHeader,
+  TofEventSummary,
+  EventStatus,
+  TofHit,
+  MasterTriggerEvent,
+  RBEvent,
+  RBEventHeader,
+  RBWaveform
 };
 
 use tof_dataclasses::serialization::{
-    Serialization,
-    Packable
+  Serialization,
+  Packable
 };
 use tof_dataclasses::commands::{
-    TofCommandV2,
-    TofCommandCode
+  TofCommandV2,
+  TofCommandCode
 };
 use tof_dataclasses::calibrations::{
   RBCalibrations,
@@ -77,9 +78,9 @@ use tof_dataclasses::config::{AnalysisEngineConfig, RunConfig, TOFEventBuilderCo
 
 use pyo3::prelude::*;
 use pyo3::exceptions::{
-    PyKeyError,
-    PyValueError,
-    PyIOError,
+  PyKeyError,
+  PyValueError,
+  PyIOError,
 };
 
 use tof_dataclasses::config::TriggerConfig;
@@ -606,6 +607,9 @@ impl PyTofCommand {
     pytp
   }
 
+  fn change_next_runconfig(&mut self, key_values : Vec<String>) {
+    self.command = TofCommandV2::forge_changerunconfig(key_values);
+  }
 
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.command)) 
@@ -2175,6 +2179,19 @@ impl PyTofEventSummary {
 }
 
 #[pyclass]
+#[pyo3(name="TofEventHeader")]
+#[derive(Debug, Clone)]
+pub struct PyTofEventHeader {
+  pub header : TofEventHeader
+}
+
+impl PyTofEventHeader {
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.header)) 
+  }
+}
+
+#[pyclass]
 #[pyo3(name="TofEvent")]
 #[derive(Debug, Clone)]
 pub struct PyTofEvent {
@@ -2202,11 +2219,31 @@ impl PyTofEvent {
     self.event.header.event_id
   }
 
+  //#[getter]
+  //fn header(&self) -> Py
+
   #[getter]
   fn mastertriggerevent(&self) ->  PyMasterTriggerEvent {
     let mut mte = PyMasterTriggerEvent::new();
     mte.set_event(self.event.mt_event.clone());
     mte
+  }
+  
+  /// Get the combination of triggered DSI/J/CH on 
+  /// the MTB which formed the trigger. This does 
+  /// not include further hits which fall into the 
+  /// integration window. For those, se rb_link_mask
+  ///
+  /// The returned values follow the TOF convention
+  /// to start with 1, so that we can use them to 
+  /// look up LTB ids in the db.
+  ///
+  /// # Returns
+  ///
+  ///   Vec<(hit)> where hit is (DSI, J, (CH, CH), LTBThreshold) 
+  #[getter]
+  pub fn trigger_hits(&self) -> PyResult<Vec<(u8, u8, (u8, u8), LTBThreshold)>> {
+    Ok(self.event.mt_event.get_trigger_hits())
   }
 
   #[getter]
@@ -2546,8 +2583,13 @@ impl PyRBWaveform {
   }
   
   #[getter]
-  fn rb_channel(&self) -> u8 {
-    self.wf.rb_channel
+  fn rb_channel_a(&self) -> u8 {
+    self.wf.rb_channel_a
+  }
+  
+  #[getter]
+  fn rb_channel_b(&self) -> u8 {
+    self.wf.rb_channel_b
   }
   
   #[getter]
@@ -2556,22 +2598,43 @@ impl PyRBWaveform {
   }
   
   #[getter]
-  fn adc<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<u16>>> {
-    let wf  = self.wf.adc.clone();
+  fn adc_a<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<u16>>> {
+    let wf  = self.wf.adc_a.clone();
     let arr = PyArray1::<u16>::from_vec_bound(py, wf);
     Ok(arr)
   }
   
   #[getter]
-  fn voltages<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<f32>>> {
-    let wf  = self.wf.voltages.clone();
+  fn adc_b<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<u16>>> {
+    let wf  = self.wf.adc_b.clone();
+    let arr = PyArray1::<u16>::from_vec_bound(py, wf);
+    Ok(arr)
+  }
+  
+  #[getter]
+  fn voltages_a<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<f32>>> {
+    let wf  = self.wf.voltages_a.clone();
     let arr = PyArray1::<f32>::from_vec_bound(py, wf);
     Ok(arr)
   }
 
   #[getter]
-  fn times<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<f32>>> {
-    let times  = self.wf.nanoseconds.clone();
+  fn times_a<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<f32>>> {
+    let times  = self.wf.nanoseconds_a.clone();
+    let arr    = PyArray1::<f32>::from_vec_bound(py, times);
+    Ok(arr)
+  }
+
+  #[getter]
+  fn voltages_b<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<f32>>> {
+    let wf  = self.wf.voltages_b.clone();
+    let arr = PyArray1::<f32>::from_vec_bound(py, wf);
+    Ok(arr)
+  }
+
+  #[getter]
+  fn times_b<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<f32>>> {
+    let times  = self.wf.nanoseconds_b.clone();
     let arr    = PyArray1::<f32>::from_vec_bound(py, times);
     Ok(arr)
   }
