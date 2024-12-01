@@ -68,6 +68,7 @@ cfg_if::cfg_if! {
 
 /// Squeze the rb channel - paddle mapping into 5 bytes
 /// for a single RB
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBPaddleID {
   /// Paddle connected to RB channel 1/2
   pub paddle_12     : u8,
@@ -94,9 +95,11 @@ impl fmt::Display for RBPaddleID {
     let mut repr = String::from("<RBPaddleID:");
     for k in 1..9 {
       let pid = self.get_paddle_id(k);
+      let ord = self.get_order_str(k);
+      repr += &(format!("\n  {k} -> {} ({ord})", pid.0)) 
     }
-    //repr += &(format!(" {}", 
-    write!(f, "{}", 1)
+    repr += ">";
+    write!(f, "{}", repr)
   }
 }
 
@@ -233,7 +236,27 @@ impl RBPaddleID {
   }
 
   #[cfg(feature="database")]
-  pub fn from_rb(&self, rb : ReadoutBoard) {
+  pub fn from_rb( rb : &ReadoutBoard) -> Self {
+    let mut rb_pid = RBPaddleID::new();
+    rb_pid.paddle_12 = rb.paddle12.paddle_id as u8;    
+    rb_pid.paddle_34 = rb.paddle34.paddle_id as u8;    
+    rb_pid.paddle_56 = rb.paddle56.paddle_id as u8;    
+    rb_pid.paddle_78 = rb.paddle78.paddle_id as u8;    
+    let mut flipped  = 0u8 ;
+    if rb.paddle12_chA != 1 {
+      flipped = flipped | 0x1;
+    }
+    if rb.paddle34_chA != 3 {
+      flipped = flipped | 0x2;
+    }
+    if rb.paddle56_chA != 5 {
+      flipped = flipped | 0x4;
+    }
+    if rb.paddle78_chA != 7 {
+      flipped = flipped | 0x8;
+    }
+    rb_pid.channel_order = flipped;
+    rb_pid
   }
 
   /// Get the paddle id together with the information 
@@ -263,6 +286,20 @@ impl RBPaddleID {
   }
 }
 
+#[cfg(feature = "random")]
+impl FromRandom for RBPaddleID {
+    
+  fn from_random() -> Self {
+    let mut rb_pid  = Self::new();
+    let mut rng = rand::thread_rng();
+    rb_pid.paddle_12   = rng.gen::<u8>();
+    rb_pid.paddle_34   = rng.gen::<u8>();
+    rb_pid.paddle_56   = rng.gen::<u8>();
+    rb_pid.paddle_78   = rng.gen::<u8>();
+    rb_pid.channel_order = rng.gen::<u8>();
+    rb_pid
+  }
+}
 ///// Debug information for missing hits. 
 /////
 ///// These hits have been seen by the MTB, but we are unable to determine where 
@@ -1499,6 +1536,60 @@ fn pack_rbwaveform() {
   }
 }
 
+#[test]
+#[cfg(feature = "random")]
+fn pack_rbpaddleid() {
+  for _ in 0..100 {
+    let pid = RBPaddleID::from_random();
+    let test = pid.to_u64();
+    let pid_back = RBPaddleID::from_u64(test);
+    assert_eq!(pid, pid_back);
+  }
+}
+
+#[test]
+fn rbpaddleid_from_rb() {
+let mut rng = rand::thread_rng();
+  let channels = vec![1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 7u8];
+  for _ in 0..100 {
+    let mut rb = ReadoutBoard::new();
+    rb.paddle12.paddle_id   = rng.gen::<u8>() as i16;
+    let mut idx = rng.gen_range(0..2);
+    rb.paddle12_chA         = channels[idx];
+    idx = rng.gen_range(2..4);
+    rb.paddle34.paddle_id   = rng.gen::<u8>() as i16;
+    rb.paddle34_chA         = channels[idx];
+    idx = rng.gen_range(4..6);
+    rb.paddle56.paddle_id   = rng.gen::<u8>() as i16;
+    rb.paddle56_chA         = channels[idx];
+    idx = rng.gen_range(6..8);
+    rb.paddle78.paddle_id   = rng.gen::<u8>() as i16;
+    rb.paddle78_chA         = channels[idx];
+
+    let pid                 = RBPaddleID::from_rb(&rb);
+    assert_eq!(pid.paddle_12, rb.paddle12.paddle_id as u8);
+    assert_eq!(pid.paddle_34, rb.paddle34.paddle_id as u8);
+    assert_eq!(pid.paddle_56, rb.paddle56.paddle_id as u8);
+    assert_eq!(pid.paddle_78, rb.paddle78.paddle_id as u8);
+    for ch in &channels {
+      if pid.get_order_flipped(*ch) {
+        if *ch == 1 || *ch == 2 {
+          assert_eq!(rb.paddle12_chA,2);
+        }
+        if *ch == 3 || *ch == 4 {
+          assert_eq!(rb.paddle12_chA,4);
+        }
+        if *ch == 5 || *ch == 6 {
+          assert_eq!(rb.paddle12_chA,6);
+        }
+        if *ch == 7 || *ch == 8 {
+          assert_eq!(rb.paddle12_chA,8);
+        }
+      }
+    }
+  }
+}
+
 #[cfg(all(test,feature = "random"))]
 mod test_rbevents {
   use crate::serialization::Serialization;
@@ -1576,5 +1667,4 @@ mod test_rbevents {
       //}
     }
   }
-  
 }
