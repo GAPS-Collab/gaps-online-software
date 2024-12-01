@@ -66,17 +66,19 @@ use tof_dataclasses::serialization::{
   Serialization,
   Packable
 };
+
 use tof_dataclasses::commands::{
   TofCommandV2,
   TofCommandCode
 };
+
 use tof_dataclasses::calibrations::{
   RBCalibrations,
   //clean_spikes,
   //spike_cleaning
 };
-use tof_dataclasses::config::{AnalysisEngineConfig, RunConfig, TOFEventBuilderConfig, BuildStrategy};
 
+use tof_dataclasses::config::{AnalysisEngineConfig, RunConfig, TOFEventBuilderConfig, BuildStrategy};
 
 use pyo3::prelude::*;
 use pyo3::exceptions::{
@@ -88,6 +90,8 @@ use pyo3::exceptions::{
 use tof_dataclasses::config::TriggerConfig;
 use tof_dataclasses::events::TriggerType;
 use tof_dataclasses::events::master_trigger::LTBThreshold;
+use tof_dataclasses::events::rb_event::RBPaddleID;
+
 //trait<T> Wrapper {
 //  where T : Packable
 //
@@ -115,6 +119,55 @@ use tof_dataclasses::events::master_trigger::LTBThreshold;
 //
 
 #[pyclass]
+#[pyo3(name="RBPaddleID")]
+pub struct PyRBPaddleID {
+  pub pid : RBPaddleID
+}
+
+#[pymethods]
+impl PyRBPaddleID {
+
+  #[new]
+  fn new() -> Self { 
+    Self {
+      pid : RBPaddleID::new()    
+    }
+  }
+ 
+  fn to_u64(&self) -> u64 {
+    self.pid.to_u64()
+  }
+  
+  fn get_order_flipped(&self, channel : u8) -> bool {
+    self.pid.get_order_flipped(channel)
+  }
+  
+  fn get_order_str(&self, channel : u8) -> String {
+    self.pid.get_order_str(channel)
+  }
+  
+  fn is_a(&self, channel : u8) -> bool {
+    self.pid.is_a(channel)
+  }
+  
+  fn from_u64(&self, val : u64) -> Self {
+    let pid = RBPaddleID::from_u64(val);
+    Self {
+      pid
+    }
+  }
+
+  //fn from_rb(
+  fn get_paddle_id(&self, channel : u8) -> (u8, bool) {  
+    self.pid.get_paddle_id(channel)
+  }
+  
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.pid)) 
+  }
+}
+
+#[pyclass]
 #[pyo3(name="TofDetectorStatus")]
 pub struct PyTofDetectorstatus {
   pub status : TofDetectorStatus
@@ -122,6 +175,7 @@ pub struct PyTofDetectorstatus {
 
 #[pymethods]
 impl PyTofDetectorstatus {
+  
   #[new]
   fn new() -> Self {
     let status =  TofDetectorStatus::new();
