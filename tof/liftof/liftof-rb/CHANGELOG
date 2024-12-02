@@ -1,5 +1,8 @@
 # LELEWAA series
 
+## v0.10.5
+* send RBEvents which have the RBPaddleID populated
+
 ## v0.10.4
 * allow to do RBCalibrations without the wf data 
   saved
