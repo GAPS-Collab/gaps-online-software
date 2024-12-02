@@ -1121,7 +1121,7 @@ impl RBEventHeader {
     pid                    
   }
   
-  pub fn set_rbpaddleid(&mut self, pid : RBPaddleID) {
+  pub fn set_rbpaddleid(&mut self, pid : &RBPaddleID) {
     self.pid_ch12     = pid.paddle_12;
     self.pid_ch12     = pid.paddle_34;
     self.pid_ch12     = pid.paddle_56;
