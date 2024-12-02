@@ -2,6 +2,7 @@
 
 ## v0.10.2
 * massive decluttering effort
+* adds tiu_ignore_busy to configfile
 
 ## v0.10.1
 * adds preamp voltage configuration to config file

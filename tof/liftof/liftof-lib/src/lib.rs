@@ -471,7 +471,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     fit_result                = fit_sine_sydney(&voltages, &times);
 
     //println!("FIT RESULT = {:?}", fit_result);
-    event.header.set_sine_fit(fit_result);
+    //event.header.set_sine_fit(fit_result);
   }
 
   // structure to store final result
