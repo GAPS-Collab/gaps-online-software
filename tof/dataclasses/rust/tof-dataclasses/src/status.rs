@@ -65,7 +65,7 @@ impl TofDetectorStatus {
   /// RB communication threads of liftof-cc
   pub fn update_from_map(&mut self, paddles : HashMap<u16,bool>) {
     for k in 0..320 {
-      if let Some(val) = paddles.get(&k) {
+      if let Some(val) = paddles.get(&(&k + 1)) {
         if k < 32 && *val {
           self.channels000_031 = self.channels000_031 | (k as u32) ;
         } else if k < 64 && *val  {
