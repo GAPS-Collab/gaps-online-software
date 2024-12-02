@@ -1,5 +1,9 @@
 # LELEWAA series
 
+## v0.10.6
+* removes broken sinus fit variables from RBEventHeader and 
+  replace it with a rbpaddle identifier instead
+
 ## v0.10.5
 * change fpga_temp in RBEventHeader to drs_deadtime. We have the 
   fpga temp also in the RBMoniData packets, and so we don't need 

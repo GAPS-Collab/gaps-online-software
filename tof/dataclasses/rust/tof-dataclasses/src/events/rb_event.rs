@@ -21,7 +21,7 @@
 //!
 
 use std::fmt;
-use std::collections::HashMap;
+//use std::collections::HashMap;
 use colored::Colorize;
 
 use crate::packets::{
@@ -521,7 +521,6 @@ impl RBEvent {
   /// Deconstruct the RBEvent to form RBWaveforms
   pub fn get_rbwaveforms(&self) -> Vec<RBWaveform> {
     // FIXME - fix it, this drives me crazy
-    let pid             = self.header.get_rbpaddleid();
     let mut waveforms   = Vec::<RBWaveform>::new();
     // at max, we can have 4 waveform packets
     let active_channels = self.header.get_channels();
@@ -1112,15 +1111,22 @@ impl RBEventHeader {
     self.channel_mask & 256 > 0
   }
 
-  /// Get the RBPaddleID identifier
   pub fn get_rbpaddleid(&self) -> RBPaddleID {
     let mut pid = RBPaddleID::new();
     pid.paddle_12     = self.pid_ch12;
-    pid.paddle_34     = self.pid_ch12;
-    pid.paddle_56     = self.pid_ch12;
-    pid.paddle_78     = self.pid_ch12;
+    pid.paddle_34     = self.pid_ch34;
+    pid.paddle_56     = self.pid_ch56;
+    pid.paddle_78     = self.pid_ch78;
     pid.channel_order = self.pid_ch_order;
     pid                    
+  }
+  
+  pub fn set_rbpaddleid(&mut self, pid : RBPaddleID) {
+    self.pid_ch12     = pid.paddle_12;
+    self.pid_ch12     = pid.paddle_34;
+    self.pid_ch12     = pid.paddle_56;
+    self.pid_ch12     = pid.paddle_78;
+    self.pid_ch_order = pid.channel_order;
   }
 
   /// Decode the channel mask into channel ids.
