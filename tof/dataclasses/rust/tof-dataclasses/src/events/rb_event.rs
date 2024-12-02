@@ -499,7 +499,6 @@ pub struct RBEvent {
   pub status       : EventStatus,
   pub header       : RBEventHeader,
   pub adc          : Vec<Vec<u16>>,
-  //pub ch9_adc      : Vec<u16>,
   pub hits         : Vec<TofHit>,
 }
 
@@ -515,25 +514,83 @@ impl RBEvent {
       status       : EventStatus::Unknown,
       header       : RBEventHeader::new(),
       adc          : adc,
-      //ch9_adc      : Vec::<u16>::new(),
       hits         : Vec::<TofHit>::new(),
     }
   }
 
   /// Deconstruct the RBEvent to form RBWaveforms
   pub fn get_rbwaveforms(&self) -> Vec<RBWaveform> {
-    let mut waveforms = Vec::<RBWaveform>::new();
-    //for ch in self.header.get_channels() {
-    //  let mut wf     = RBWaveform::new();
-    //  wf.rb_id       = self.header.rb_id;
-    //  wf.rb_channel  = ch;
-    //  wf.event_id    = self.header.event_id;
-    //  wf.stop_cell   = self.header.stop_cell;
-    //  // FIXME - can we move this somehow instead of 
-    //  // cloning?
-    //  wf.adc         = self.adc[ch as usize].clone();
-    //  waveforms.push(wf);
-    //}
+    // FIXME - fix it, this drives me crazy
+    let pid             = self.header.get_rbpaddleid();
+    let mut waveforms   = Vec::<RBWaveform>::new();
+    // at max, we can have 4 waveform packets
+    let active_channels = self.header.get_channels();
+    let pid             = self.header.get_rbpaddleid();
+    if active_channels.contains(&0) || active_channels.contains(&1) {
+      let paddle_id  = pid.get_paddle_id(1);
+      let mut wf     = RBWaveform::new();
+      wf.rb_id       = self.header.rb_id;
+      wf.event_id    = self.header.event_id;
+      wf.stop_cell   = self.header.stop_cell;
+      wf.paddle_id   = paddle_id.0;
+      if paddle_id.1 {
+        // then b is channel 1 (or 0)
+        wf.adc_b   = self.adc[0].clone();
+        wf.adc_a   = self.adc[1].clone();
+      } else {
+        wf.adc_a   = self.adc[0].clone();
+        wf.adc_b   = self.adc[1].clone();
+      }
+      waveforms.push(wf);
+    }
+    if active_channels.contains(&2) || active_channels.contains(&3) {
+      let paddle_id  = pid.get_paddle_id(3);
+      let mut wf     = RBWaveform::new();
+      wf.rb_id       = self.header.rb_id;
+      wf.event_id    = self.header.event_id;
+      wf.stop_cell   = self.header.stop_cell;
+      wf.paddle_id   = paddle_id.0;
+      if paddle_id.1 {
+        // channel order flipped!
+        wf.adc_b   = self.adc[2].clone();
+        wf.adc_a   = self.adc[3].clone();
+      } else {
+        wf.adc_a   = self.adc[2].clone();
+        wf.adc_b   = self.adc[3].clone();
+      }
+    }
+    if active_channels.contains(&4) || active_channels.contains(&5) {
+      let paddle_id  = pid.get_paddle_id(5);
+      let mut wf     = RBWaveform::new();
+      wf.rb_id       = self.header.rb_id;
+      wf.event_id    = self.header.event_id;
+      wf.stop_cell   = self.header.stop_cell;
+      wf.paddle_id   = paddle_id.0;
+      if paddle_id.1 {
+        // then b is channel 1 (or 0)
+        wf.adc_b   = self.adc[4].clone();
+        wf.adc_a   = self.adc[5].clone();
+      } else {
+        wf.adc_a   = self.adc[4].clone();
+        wf.adc_b   = self.adc[5].clone();
+      }
+    }
+    if active_channels.contains(&6) || active_channels.contains(&7) {
+      let paddle_id  = pid.get_paddle_id(7);
+      let mut wf     = RBWaveform::new();
+      wf.rb_id       = self.header.rb_id;
+      wf.event_id    = self.header.event_id;
+      wf.stop_cell   = self.header.stop_cell;
+      wf.paddle_id   = paddle_id.0;
+      if paddle_id.1 {
+        // then b is channel 1 (or 0)
+        wf.adc_b   = self.adc[6].clone();
+        wf.adc_a   = self.adc[7].clone();
+      } else {
+        wf.adc_a   = self.adc[6].clone();
+        wf.adc_b   = self.adc[7].clone();
+      }
+    }
     waveforms
   }
 
@@ -631,110 +688,12 @@ impl RBEvent {
   }
 
   pub fn get_channel_by_label(&self, ch : u8) -> Result<&Vec::<u16>, UserError>  {
-    //let mut ch_adc = Vec::<u16>::new();
     if ch == 0 || ch > 9 {
       error!("channel_by_label expects numbers from 1-9!");
       return Err(UserError::IneligibleChannelLabel)
     }
-    //if ch == 9 {
-    //  if self.header.has_ch9 {
-    //    return Ok(&self.ch9_adc);
-    //  } else {
-    //    error!("No channel 9 data for this event!");
-    //    return Err(UserError::NoChannel9Data);
-    //  }
-    //}
     Ok(&self.adc[ch as usize -1])
   }
-
-  //pub fn get_adcs(&self) -> &Vec<Vec<u16>> {
-  //  self.adc
-  //  //let mut adcs = Vec::<&Vec<u16>>::new();
-  //  //for v in self.adc.iter() {
-  //  //  adcs.push(&v);
-  //  //}
-  //  //if self.header.has_ch9 {
-  //  //  adcs.push(&self.ch9_adc);
-  //  //}
-  //  adcs
-  //}
-
-  // If we know that the stream contains an RBEventMemeoryView, 
-  // we can convert the stream directly to a RBEvent.
-  //pub fn extract_from_rbeventmemoryview(stream : &Vec<u8>,
-  //                                      pos    : &mut usize) 
-  //  -> Result<Self, SerializationError> {
-  //  let mut event  = Self::new();
-  //  let header     = RBEventHeader::extract_from_rbeventmemoryview(stream, pos)?;
- 
-  //  /// calculate crc32 sums
-  //  const CUSTOM_ALG: crc::Algorithm<u32> = crc::Algorithm {
-  //                     width   : 32u8,
-  //                     init    : 0xFFFFFFFF,
-  //                     poly    : 0xEDB88320,
-  //                     refin   : true,
-  //                     refout  : true,
-  //                     xorout  : 0xFFFFFFFF,
-  //                     check   : 1,
-  //                     residue : 1,
-  //                     //check   : 0xcbf43926,
-  //                     //residue : 0xdebb20e3,
-  //                   };
-
-  //  //let crc        = Crc::<u32>::new(&crc::CRC_32_ISO_HDLC);
-  //  let crc          = Crc::<u32>::new(&CUSTOM_ALG);
-  //  //let crc        = Crc::<u32>::new(&crc::CRC_32_BZIP2);
-  //  let mut ch_crc       : u32;
-  //  let mut ch_crc_check : u32;
-  //  //if header.broken {
-  //  //  error!("Broken event {}! This won't have any channel data, since the event end markes is not at the expected position. Treat the header values with caution!", &header.event_id);
-  //  //  event.header   = header;
-  //  //  return Ok(event);
-  //  //}
-  //  //let mut active_channels = header.get_active_data_channels();
-  //  //let mut nchan = active_channels.len();
-  //  event.header = header;
-  //  // set the position marker to the start of the channel
-  //  // adc data field
-  //  *pos = event.header.channel_packet_start; 
-  //  if stream.len() < event.header.channel_packet_len + 44 {
-  //    error!("The header says there is channel data, but the event is corrupt!");
-  //    return Err(SerializationError::StreamTooShort);
-  //  }
-
-  //  for ch in event.header.channel_packet_ids.iter() {
-  //    let mut dig    = crc.digest_with_initial(0);
-  //    *pos += 2; // ch id
-  //    if ch > &9 {
-  //      error!("Channel ID is messed up. Not sure if this event can be saved!");
-  //      *pos += 2*event.header.nwords;
-  //      *pos += 4;
-  //    } else {
-  //      //ch_crc_check = crc.checksum(&stream[*pos..*pos+2*event.header.nwords]); 
-  //      //let mut crc_test = Crc::new();
-  //      //crc_test.update(&stream[*pos..*pos+2*event.header.nwords]);
-  //      //let ch_crc_check = crc_test.sum();
-  //      let mut this_ch_adc = Vec::<u16>::with_capacity(event.header.nwords);
-  //      for _ in 0..event.header.nwords {  
-  //        //let this_bytes = [stream[*pos ], stream[*pos + 1]]; 
-  //        let this_word  = [stream[*pos+1], stream[*pos]];
-  //        
-  //        this_ch_adc.push(0x3FFF & parse_u16(stream, pos));
-  //        dig.update(&this_word);
-  //      }
-  //      if ch < &8 {
-  //        event.adc.push(this_ch_adc);  
-  //      } else {
-  //        event.ch9_adc = this_ch_adc;
-  //      }
-  //      ch_crc = parse_u32_for_16bit_words(stream, pos);
-  //      ch_crc_check = dig.finalize();
-  //      //println!("==> Calculated crc32 {}, expected crc32 {}", ch_crc_check, ch_crc);
-  //      //*pos += 4; // trailer
-  //    }
-  //  }
-  //  Ok(event)
-  //}
 }
 
 impl Packable for RBEvent {
@@ -1003,12 +962,22 @@ pub struct RBEventHeader {
   /// The DRS stop cell. This is vital information which is
   /// needed for the calibration
   pub stop_cell            : u16  , 
-  // we change this by keeping the byte
-  // order the same to accomodate the sine 
-  // values
-  pub ch9_amp               : u16,
-  pub ch9_freq              : u16,
-  pub ch9_phase             : u32,
+  /// RBPaddleID - component 
+  pub pid_ch12             : u8,
+  /// RBPaddleID - component
+  pub pid_ch34             : u8,
+  /// RBPaddleID - component
+  pub pid_ch56             : u8,
+  /// RBPaddleID - component
+  pub pid_ch78             : u8,
+  /// RBPaddleID - component
+  pub pid_ch_order         : u8,
+  /// Reserved
+  pub rsvd1                : u8,
+  /// Reserved
+  pub rsvd2                : u8,
+  /// Reserved
+  pub rsvd3                : u8,
   /// The adc value for the temperature
   /// of the FPGA
   pub fpga_temp             : u16, 
@@ -1020,16 +989,6 @@ pub struct RBEventHeader {
   /// Store the drs_deadtime instead 
   /// of the fpga temperature
   pub deadtime_instead_temp : bool,
-  /// the mapping of rb_channel to paddle_id
-  /// This will not get serialized, since it is redundant 
-  /// information
-  /// This is for the a side
-  pub channel_pid_a_map       : Option<HashMap<u8,u8>>,
-  /// the mapping of rb_channel to paddle_id
-  /// This will not get serialized, since it is redundant 
-  /// information
-  /// This is for the b side
-  pub channel_pid_b_map       : Option<HashMap<u8,u8>>,
   /// The status byte contains information about lsos of lock
   /// and event fragments and needs to be decoded
   status_byte               : u8,
@@ -1043,7 +1002,6 @@ pub struct RBEventHeader {
   /// FIXME - make this proper and use ProtocolVersion 
   ///         instead
   channel_mask             : u16, 
-
 }
 
 impl RBEventHeader {
@@ -1055,16 +1013,19 @@ impl RBEventHeader {
       event_id              : 0,  
       channel_mask          : 0,  
       stop_cell             : 0,  
-      ch9_amp               : 0,
-      ch9_freq              : 0,
-      ch9_phase             : 0,
+      pid_ch12              : 0,
+      pid_ch34              : 0,
+      pid_ch56              : 0,
+      pid_ch78              : 0,
+      pid_ch_order          : 0,
+      rsvd1                 : 0,
+      rsvd2                 : 0,
+      rsvd3                 : 0,
       fpga_temp             : 0,  
       drs_deadtime          : 0,
       timestamp32           : 0,
       timestamp16           : 0,
       deadtime_instead_temp : false,
-      channel_pid_a_map     : None,
-      channel_pid_b_map     : None,
     }
   }
 
@@ -1098,40 +1059,6 @@ impl RBEventHeader {
       = ch_mask >> 15 == 1;
     channel_mask = ch_mask & 0x1ff;
     (deadtime_instead_temp, channel_mask)
-  }
-
-  pub fn set_sine_fit(&mut self, input : (f32, f32, f32)) {
-    // we have to squeze 3 f32 into 64 bit, to 
-    // fit into the dataformat (we don't want to 
-    // change anything. 
-    // let's use an arbitrary precision for a 
-    // range of -10 to 10 
-    let mut amp   = (input.0 + 1090.0)*(u16::MAX as f32 / 2000.0);
-    let mut freq  = (input.1 + 1090.0)*(u16::MAX as f32 / 2000.0);
-    let mut phase = (input.2 + 1090.0)*(u32::MAX as f32 / 2000.0);
-
-    if amp < 0.0 {
-      warn!("amp out of range!");
-      amp = 0.0;
-    }
-    if freq < 0.0 {
-      warn!("freq out of range!");
-      freq = 0.0;
-    }
-    if phase < 0.0 {
-      warn!("phase out of range!");
-      phase = 0.0;
-    }
-    self.ch9_amp   = amp   as u16;  
-    self.ch9_freq  = freq  as u16;
-    self.ch9_phase = phase as u32;
-  }
-  
-  pub fn get_sine_fit(&self) -> (f32, f32, f32) {
-    let amp    = (2000.0 * self.ch9_amp   as f32)/(u16::MAX as f32) - 1000.0;
-    let freq   = (2000.0 * self.ch9_freq  as f32)/(u16::MAX as f32) - 1000.0;
-    let phase  = (2000.0 * self.ch9_phase as f32)/(u16::MAX as f32) - 1000.0;
-    (amp, freq, phase)
   }
 
   /// Only get the eventid from a binary stream
@@ -1185,6 +1112,17 @@ impl RBEventHeader {
     self.channel_mask & 256 > 0
   }
 
+  /// Get the RBPaddleID identifier
+  pub fn get_rbpaddleid(&self) -> RBPaddleID {
+    let mut pid = RBPaddleID::new();
+    pid.paddle_12     = self.pid_ch12;
+    pid.paddle_34     = self.pid_ch12;
+    pid.paddle_56     = self.pid_ch12;
+    pid.paddle_78     = self.pid_ch12;
+    pid.channel_order = self.pid_ch_order;
+    pid                    
+  }
+
   /// Decode the channel mask into channel ids.
   ///
   /// The channel ids inside the memory representation
@@ -1199,6 +1137,38 @@ impl RBEventHeader {
       }
     }
     channels
+  }
+
+  /// Get the active paddles
+  pub fn get_active_paddles(&self) -> Vec<(u8,bool)> {
+    // FIXME - help. Make this nicer. My brain is fried 
+    // at this point. Please. I'll be thankful.
+    let mut active_paddles = Vec::<(u8,bool)>::new();
+    let active_channels = self.get_channels();
+    let pid             = self.get_rbpaddleid();
+    let mut ch0_pair_done = false;
+    let mut ch2_pair_done = false;
+    let mut ch4_pair_done = false;
+    let mut ch6_pair_done = false;
+    for ch in active_channels {
+      if (ch == 0 || ch == 1) && !ch0_pair_done {
+        active_paddles.push(pid.get_paddle_id(ch));
+        ch0_pair_done = true;
+      }
+      if (ch == 2 || ch == 3) && !ch2_pair_done {
+        active_paddles.push(pid.get_paddle_id(ch));
+        ch2_pair_done = true;
+      }
+      if (ch == 4 || ch == 5) && !ch4_pair_done {
+        active_paddles.push(pid.get_paddle_id(ch));
+        ch4_pair_done = true;
+      }
+      if (ch == 6 || ch == 7) && !ch6_pair_done {
+        active_paddles.push(pid.get_paddle_id(ch));
+        ch6_pair_done = true;
+      }
+    }
+    active_paddles
   }
 
   /// Get the number of data channels + 1 for ch9
@@ -1220,16 +1190,12 @@ impl Default for RBEventHeader {
 
 impl fmt::Display for RBEventHeader {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let sfit = self.get_sine_fit();
     let mut repr = String::from("<RBEventHeader:");
-    let sine_field = format!("\n    --> online fit AMP {:3} FREQ {:3} PHASE {:3}", sfit.0, sfit.1, sfit.2);
     repr += &(format!("\n  RB ID            {}",self.rb_id               )); 
     repr += &(format!("\n  event id         {}",self.event_id            ));  
     repr += &(format!("\n  ch mask          {}",self.channel_mask        ));  
     repr += &(format!("\n  has ch9          {}",self.has_ch9()           )); 
-    //repr += &("\n  DRS4 temp [C]    ".to_owned() + &self.drs4_temp.to_string());  
-    repr += &sine_field;
-    //repr += &("\n  FPGA temp [\u{00B0}C]    ".to_owned() + &self.get_fpga_temp().to_string()); 
+    repr += &(format!("\n  ch mapping       {}",self.get_rbpaddleid()    ));
     if self.deadtime_instead_temp {
       repr += &(format!("\n  DRS deadtime          : {:.2}", self.drs_deadtime));
     } else {
@@ -1285,9 +1251,14 @@ impl Serialization for RBEventHeader {
     header.set_channel_mask(channel_mask);
     header.status_byte         = parse_u8 (stream, pos);
     header.stop_cell             = parse_u16(stream, pos);  
-    header.ch9_amp               = parse_u16(stream, pos);
-    header.ch9_freq              = parse_u16(stream, pos);
-    header.ch9_phase             = parse_u32(stream, pos);
+    header.pid_ch12              = parse_u8(stream, pos);
+    header.pid_ch34              = parse_u8(stream, pos);
+    header.pid_ch56              = parse_u8(stream, pos);
+    header.pid_ch78              = parse_u8(stream, pos);
+    header.pid_ch_order          = parse_u8(stream, pos);
+    header.rsvd1                 = parse_u8(stream, pos);
+    header.rsvd2                 = parse_u8(stream, pos);
+    header.rsvd3                 = parse_u8(stream, pos);
     if deadtime_instead_temp {
       header.drs_deadtime        = parse_u16(stream, pos);
     } else {
@@ -1309,9 +1280,14 @@ impl Serialization for RBEventHeader {
     stream.extend_from_slice(&ch_mask                .to_le_bytes());
     stream.extend_from_slice(&self.status_byte       .to_le_bytes());
     stream.extend_from_slice(&self.stop_cell         .to_le_bytes());
-    stream.extend_from_slice(&self.ch9_amp           .to_le_bytes());
-    stream.extend_from_slice(&self.ch9_freq          .to_le_bytes());
-    stream.extend_from_slice(&self.ch9_phase         .to_le_bytes());
+    stream.push(self.pid_ch12    );
+    stream.push(self.pid_ch34    );
+    stream.push(self.pid_ch56    );
+    stream.push(self.pid_ch78    );
+    stream.push(self.pid_ch_order);
+    stream.push(self.rsvd1       );
+    stream.push(self.rsvd2       );
+    stream.push(self.rsvd3       );
     if self.deadtime_instead_temp {
       stream.extend_from_slice(&self.drs_deadtime    .to_le_bytes());
     } else {
@@ -1335,9 +1311,14 @@ impl FromRandom for RBEventHeader {
     header.event_id              = rng.gen::<u32>();   
     header.status_byte           = rng.gen::<u8>();    
     header.stop_cell             = rng.gen::<u16>();   
-    header.ch9_amp               = rng.gen::<u16>();
-    header.ch9_freq              = rng.gen::<u16>();
-    header.ch9_phase             = rng.gen::<u32>();
+    header.pid_ch12              = rng.gen::<u8>();
+    header.pid_ch34              = rng.gen::<u8>();
+    header.pid_ch56              = rng.gen::<u8>();
+    header.pid_ch78              = rng.gen::<u8>();
+    header.pid_ch_order          = rng.gen::<u8>();
+    header.rsvd1                 = rng.gen::<u8>();
+    header.rsvd2                 = rng.gen::<u8>();
+    header.rsvd3                 = rng.gen::<u8>();
     header.deadtime_instead_temp = rng.gen::<bool>();
     if header.deadtime_instead_temp {
       header.drs_deadtime          = rng.gen::<u16>();
