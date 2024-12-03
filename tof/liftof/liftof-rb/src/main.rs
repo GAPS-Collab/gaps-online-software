@@ -60,6 +60,7 @@ use tof_dataclasses::commands::{
 
 use tof_dataclasses::events::DataType;
 use tof_dataclasses::config::RunConfig;
+use tof_dataclasses::events::rb_event::RBPaddleID;
 
 #[cfg(feature="database")]
 use tof_control::helper::pa_type::PASetBias;
@@ -231,6 +232,8 @@ fn main() {
   #[cfg(feature="database")]
   let db_path               = config.db_path.clone();
 
+  let mut rbpaddleid        : RBPaddleID;
+
   cfg_if::cfg_if!{
     if #[cfg(feature="database")] {
       // Query the db for this RBs information
@@ -248,9 +251,11 @@ fn main() {
               panic!("Without RB information, we won't be able to perform the RB Id/MTB Link Id check!");
             }
             Some(rbs) => {
-              for rb  in rbs {
+              rbpaddleid = RBPaddleID::new();
+              for rb in rbs {
                 if rb.rb_id == rb_info.board_id {
                   rb_expected_link_id = rb.mtb_link_id;
+                  rbpaddleid = RBPaddleID::from_rb(&rb);
                   break;
                 }
               }
@@ -260,6 +265,7 @@ fn main() {
       }
       println!("=> We found a MTB Link ID {} for this RB (RB ID {}) in the database!", rb_expected_link_id, rb_info.board_id);
     } else {
+      rbpaddleid = RBPaddleID::new();
       warn!("Not build with database feature! Currently unable to perform MTB LINK ID check!!");
     }
   }
@@ -479,6 +485,7 @@ fn main() {
     .spawn(move || {
            event_processing(
                             rb_id,
+                            rbpaddleid,
                             &bs_recv,
                             &opmode_from_runner, 
                             &tp_to_pub_ev,
@@ -495,6 +502,7 @@ fn main() {
   if calibration {
     match rb_calibration(&rc_to_runner_cal, 
                          &tp_to_pub_cal,
+                         config.save_cali_wf,
                          ip_address) {
       Ok(_) => (),
       Err(err) => {

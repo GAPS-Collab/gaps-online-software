@@ -41,7 +41,8 @@ use crossbeam_channel::{unbounded,
 
 use ratatui::{
     backend::CrosstermBackend,
-    terminal::Frame,
+    //terminal::Frame,
+    Frame,
     layout::{
         Constraint,
         Direction,
@@ -829,7 +830,7 @@ impl<'a> TabbedInterface<'a> {
       let popup = Popup::new("Quit liftof-tui?")
         .title("Press Y to confirm, any key to abort")
         .style(self.home_tab.theme.style());
-      frame.render_widget(&popup, frame.size());
+      frame.render_widget(&popup, frame.area());
     }
   }
 
@@ -1618,7 +1619,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               Err(err) => error!("Unable to get lock on shared tabbed interface! {err}"),
               Ok(mut tabs) => {
                 match terminal.draw(|frame| {
-                  let size           = frame.size();
+                  let size           = frame.area();
                   let mut main_lo    = MasterLayout::new(size); 
                   let w_logs         = render_logs(color_theme.clone());
                   frame.render_widget(w_logs, main_lo.rect[2]);

@@ -19,7 +19,7 @@ use std::collections::HashMap;
 use tof_dataclasses::config::BuildStrategy;
 
 
-extern crate toml;
+//extern crate toml;
 //use tof_dataclasses::events::master_trigger::TriggerType;
 use tof_dataclasses::events::DataType;
 #[cfg(feature="database")]
@@ -564,6 +564,9 @@ pub struct DataPublisherSettings {
   /// switch off waveform sending (in case of we 
   /// are sending flight packets)
   pub send_rbwaveform_packets   : bool,
+  /// send only a fraction of all RBWaveform packets
+  /// 1 = all events, 1000 = every 1/1000 event
+  pub send_rbwf_every_x_event   : u32,
   pub send_tof_summary_packets  : bool,
   pub send_tof_event_packets    : bool,
   /// Send the RBCalibration to ground
@@ -580,6 +583,7 @@ impl DataPublisherSettings {
       discard_event_fraction    : 0.0,
       send_mtb_event_packets    : false,
       send_rbwaveform_packets   : false,
+      send_rbwf_every_x_event   : 1,
       send_tof_summary_packets  : true,
       send_tof_event_packets    : false,
       send_cali_packets         : true,
@@ -630,6 +634,9 @@ pub struct LiftofSettings {
   /// Run a full RB calibration before run 
   /// start?
   pub pre_run_calibration        : bool,
+  /// Should the waveforms which go into te calibration 
+  /// be saved in the package?
+  pub save_cali_wf               : bool,
   /// Do a verification run before each run? The purpose 
   /// of the verification run is to generate a "DetectorStatus"
   /// packet. If a verification run is desired, change this 
@@ -670,6 +677,7 @@ impl LiftofSettings {
       rb_ignorelist_run         : Vec::<u8>::new(),
       run_analysis_engine       : true,
       pre_run_calibration       : false,
+      save_cali_wf              : false,
       verification_runtime_sec  : 0, // no verification run per default
       mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),

@@ -85,6 +85,8 @@ pub fn get_dsi_j_ch_pid_map(paddles : &Vec<Paddle>) -> DsiJChPidMapping {
   return mapping;
 }
 
+/// Create a map for rbid, ch -> paddle id. This is for both sides
+/// and will always return a paddle id independent of A or B
 pub fn get_rb_ch_pid_map(paddles : &Vec<Paddle>) -> RbChPidMapping {
   let mut mapping = RbChPidMapping::new();
   for rbid  in 1..51 {
@@ -101,6 +103,49 @@ pub fn get_rb_ch_pid_map(paddles : &Vec<Paddle>) -> RbChPidMapping {
     let pid   = pdl.paddle_id as u8;
     //println!("rb_id {rb_id}, chA {ch_a}, chB {ch_b}");
     *mapping.get_mut(&rb_id).unwrap().get_mut(&ch_a).unwrap() = pid;
+    *mapping.get_mut(&rb_id).unwrap().get_mut(&ch_b).unwrap() = pid;
+  }
+  mapping
+}
+
+/// Create a map for rbid, ch -> paddle id. This is only for the A 
+/// side and will not have an entry in case the given RB channel
+/// is connected to the B side of the paddle
+pub fn get_rb_ch_pid_a_map(paddles : &Vec<Paddle>) -> RbChPidMapping {
+  let mut mapping = RbChPidMapping::new();
+  for rbid  in 1..51 {
+    let mut chmap = HashMap::<u8, u8>::new();
+    for ch in 1..9 {
+      chmap.insert(ch,0);
+    }
+    mapping.insert(rbid,chmap);
+  }
+  for pdl in paddles {
+    let rb_id = pdl.rb_id  as u8;
+    let ch_a  = pdl.rb_chA as u8;
+    let pid   = pdl.paddle_id as u8;
+    *mapping.get_mut(&rb_id).unwrap().get_mut(&ch_a).unwrap() = pid;
+  }
+  mapping
+}
+
+
+/// Create a map for rbid, ch -> paddle id. This is only for the B 
+/// side and will not have an entry in case the given RB channel
+/// is connected to the A side of the paddle
+pub fn get_rb_ch_pid_b_map(paddles : &Vec<Paddle>) -> RbChPidMapping {
+  let mut mapping = RbChPidMapping::new();
+  for rbid  in 1..51 {
+    let mut chmap = HashMap::<u8, u8>::new();
+    for ch in 1..9 {
+      chmap.insert(ch,0);
+    }
+    mapping.insert(rbid,chmap);
+  }
+  for pdl in paddles {
+    let rb_id = pdl.rb_id  as u8;
+    let ch_b  = pdl.rb_chB as u8;
+    let pid   = pdl.paddle_id as u8;
     *mapping.get_mut(&rb_id).unwrap().get_mut(&ch_b).unwrap() = pid;
   }
   mapping

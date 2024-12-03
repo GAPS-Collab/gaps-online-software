@@ -546,11 +546,6 @@ impl MasterTriggerEvent {
     if gaps_trigger {
       t_types.push(TriggerType::Gaps);
     }
-    // let gaps_trigger_633 = self.trigger_source >> 6 & 0x1 == 1;
-    // if gaps_trigger_633 {
-    //   t_types.push(TriggerType::Gaps633);
-    // }
-    
     let any_trigger    = self.trigger_source >> 6 & 0x1 == 1;
     if any_trigger {
       t_types.push(TriggerType::Any);

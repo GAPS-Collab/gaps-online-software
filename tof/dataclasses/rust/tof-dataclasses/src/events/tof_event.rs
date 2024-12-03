@@ -17,36 +17,39 @@ cfg_if::cfg_if! {
   }
 }
 
-//use crate::DsiLtbRBMapping;
 use crate::serialization::{
-    Serialization,
-    Packable,
-    parse_u8,
-    parse_u16,
-    parse_u32,
-    parse_u64,
-    parse_f32,
-    search_for_u16
+  Serialization,
+  Packable,
+  parse_u8,
+  parse_u16,
+  parse_u32,
+  parse_u64,
+  parse_f32,
+  search_for_u16
 };
+
 use crate::packets::PacketType;
 use crate::errors::SerializationError;
 
 use crate::events::{
-    MasterTriggerEvent,
-    RBEvent,
-    TofHit,
-    RBWaveform,
-    //RBMissingHit,
-    TriggerType,
-    EventStatus,
+  MasterTriggerEvent,
+  RBEvent,
+  TofHit,
+  RBWaveform,
+  //RBMissingHit,
+  TriggerType,
+  EventStatus,
 };
 
 use crate::events::master_trigger::{
-    LTBThreshold,
-    LTB_CHANNELS
+  LTBThreshold,
+  LTB_CHANNELS
 };
 
 use crate::ProtocolVersion;
+
+#[cfg(feature ="database")]
+use crate::database::DsiJChPidMapping;
 
 // This looks like a TODO
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -157,6 +160,33 @@ impl TofEvent {
       creation_time     : creation_time,
       valid             : true,
     }
+  }
+
+  /// Compare the MasterTriggerEvent::trigger_hits with 
+  /// the actual hits to determine from which paddles
+  /// we should have received HG hits (from waveforms)
+  /// but we did not get them
+  ///
+  /// WARNING: THe current implementation of this is 
+  /// rather slow and not fit for production use
+  /// FIXME - rewrite as a closure
+  #[cfg(feature="database")]
+  pub fn get_missing_paddles_hg(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
+    let mut missing = Vec::<u8>::new();
+    for th in self.mt_event.get_trigger_hits() {
+      let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
+      let mut found = false;
+      for h in self.get_hits() {
+        if h.paddle_id == pid {
+          found = true;
+          break
+        }
+      }
+      if !found {
+        missing.push(pid);
+      }
+    }
+    missing
   }
 
   pub fn extract_event_id_from_stream(stream : &Vec<u8>) 

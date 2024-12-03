@@ -33,13 +33,16 @@ use tof_dataclasses::commands::{
   TofOperationMode,
 };
 
+use tof_dataclasses::events::rb_event::RBPaddleID;
+
 use liftof_lib::{
   RunStatistics,
   //waveform_analysis,
 };
+
 use liftof_lib::thread_control::ThreadControl;
 
- use crate::control::get_deadtime;
+use crate::control::get_deadtime;
 
 ///  Transforms raw bytestream to TofPackets
 ///
@@ -71,6 +74,7 @@ use liftof_lib::thread_control::ThreadControl;
 ///                          This only applies when the op mode is not 
 ///                          RBHighThroughput
 pub fn event_processing(board_id            : u8,
+                        rbpaddleid          : RBPaddleID,
                         bs_recv             : &Receiver<Vec<u8>>,
                         get_op_mode         : &Receiver<TofOperationMode>, 
                         tp_sender           : &Sender<TofPacket>,
@@ -135,7 +139,9 @@ pub fn event_processing(board_id            : u8,
   let mut n_events = 0usize;
   
   'main : loop {
-    if thread_ctrl_check_timer.elapsed().as_secs() >= 1 {
+    // FIXME - this whole loop needs to be faster, and there 
+    // is no interactive commanding anymore.
+    if thread_ctrl_check_timer.elapsed().as_secs() >= 6 {
       match thread_control.lock() {
         Ok(tc) => {
           if tc.stop_flag {
@@ -252,6 +258,7 @@ pub fn event_processing(board_id            : u8,
                   continue 'main;
                 },
                 Some(mut event) => {
+                  event.header.set_rbpaddleid(&rbpaddleid);
                   if deadtime_instead_temp {
                     // in case we want to add the deadtime to the header, 
                     // we have to do that here!

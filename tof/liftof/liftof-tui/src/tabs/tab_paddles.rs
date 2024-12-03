@@ -15,7 +15,7 @@ use crossbeam_channel::{
 use ratatui::prelude::*;
 use ratatui::symbols::Marker;
 
-use ratatui::terminal::Frame;
+use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::widgets::{
     Block,
@@ -121,8 +121,8 @@ impl PaddleTab<'_> {
     let mut bl_ch_b    = HashMap::<u8, Hist1D<Uniform<f32>>>::new();
     let mut blrms_ch_a = HashMap::<u8, Hist1D<Uniform<f32>>>::new();
     let mut blrms_ch_b = HashMap::<u8, Hist1D<Uniform<f32>>>::new();
-    let bins_bl        = Uniform::new(20, -2.0, 2.0);
-    let bins_lb_rms    = Uniform::new(20, 0.0, 2.0); 
+    let bins_bl        = Uniform::new(20, -2.0, 2.0).unwrap();
+    let bins_bl_rms    = Uniform::new(20, 0.0, 2.0).unwrap(); 
     for pid in 1..161 {
       charge_a.insert(pid, VecDeque::<f64>::new());
       charge_b.insert(pid, VecDeque::<f64>::new());
@@ -130,8 +130,8 @@ impl PaddleTab<'_> {
       wf_ch_b.insert(pid, VecDeque::<RBWaveform>::new());
       bl_ch_a.insert(pid, ndhistogram!(bins_bl.clone()));
       bl_ch_b.insert(pid, ndhistogram!(bins_bl.clone()));
-      blrms_ch_a.insert(pid, ndhistogram!(bins_bl.clone()));
-      blrms_ch_b.insert(pid, ndhistogram!(bins_bl.clone()));
+      blrms_ch_a.insert(pid, ndhistogram!(bins_bl_rms.clone()));
+      blrms_ch_b.insert(pid, ndhistogram!(bins_bl_rms.clone()));
     }
 
 
@@ -214,8 +214,8 @@ impl PaddleTab<'_> {
             }
             let ch_a_bl = h.get_bl_a();
             let ch_b_bl = h.get_bl_b();
-            let ch_a_bl_rms = h.get_bl_a_rms();
-            let ch_b_bl_rms = h.get_bl_b_rms();
+            //let ch_a_bl_rms = h.get_bl_a_rms();
+            //let ch_b_bl_rms = h.get_bl_b_rms();
             // cut on the range
             if -2.0 < ch_a_bl && ch_b_bl < 2.0 {
               self.baseline_ch_a.get_mut(&(h.paddle_id as u8)).unwrap().fill(&ch_a_bl);

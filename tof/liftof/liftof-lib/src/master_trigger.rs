@@ -339,12 +339,21 @@ pub fn master_trigger(mt_address     : String,
     }
   }
 
+  let tiu_ignore_busy    = settings.tiu_ignore_busy;
+  match TIU_BUSY_IGNORE.set(&mut bus, tiu_ignore_busy as u32) {
+    Err(err) => error!("Unable to change tiu busy ignore settint! {err}"),
+    Ok(_)    => {
+      warn!("Ignroing TIU since tiu_busy_ignore is set in the config file!");
+      println!("Ignroing TIU since tiu_busy_ignore is set in the config file!");
+    }
+  }
+
   let tiu_emulation_mode = settings.tiu_emulation_mode;
   match set_tiu_emulation_mode(&mut bus, tiu_emulation_mode) {
     Err(err) => error!("Unable to change tiu emulation mode! {err}"),
     Ok(_) => {
       if tiu_emulation_mode {
-        println!("==> Setting TIU emulation mode! This setting is useful if the TIU is NOT connected!");
+        println!("==> Setting TIU emulation mode! This setting is only useful if the TIU is NOT connected!");
       } else {
         println!("==> Not setting TIU emulation mode! TIU needs to be active and connectected!");
       }

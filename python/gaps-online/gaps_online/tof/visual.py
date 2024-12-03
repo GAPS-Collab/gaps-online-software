@@ -805,6 +805,35 @@ def plot_ltb_threshold_timeseries(times, ltb_hk, savename = None):
                                savename = savename)
     return fig
 
+###############################################
 
+
+def plot_paddle_charge2d(reader      = None,\
+                         charge_a    = [],\
+                         charge_b    = [],\
+                         paddle_id   = 0,\
+                         charge_bins = np.linspace(0,100,70),
+                         plot_dir    = None):
+    """
+    Plot the paddle charge (from the TofHits) in a symmetric 
+    2d histogram
+    """
+    if reader is not None:
+        raise NotImplementedError("Feature not yet implemented! Use charge_a, charge_b instead")
+    fig = plt.figure(figsize=lo.FIGSIZE_A4_SQUARE)
+    ax  = fig.gca()
+    h   = d.factory.hist2d((charge_a,charge_b), (charge_bins, charge_bins))
+    h.imshow(cmap=matplotlib.colormaps['coolwarm'])
+    ax.set_ylim(bottom=0)
+    ax.set_xlim(left=0)
+    ax.set_title(f'Charge A vs B Paddle {paddle_id}', loc='right')
+    #ax.set_yscale('symlog')
+    ax.set_ylabel('Charge (B) in pC', loc='top')
+    ax.set_xlabel('Charge (A) in pC', loc='right')
+    ax.spines['top'].set_visible(True)
+    ax.spines['right'].set_visible(True)
+    if plot_dir is not None:
+        fig.savefig(f'{plot_dir}/charge_a_vs_b_{k}.webp')
+    return fig
 
 

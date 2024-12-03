@@ -5,7 +5,8 @@ use ratatui::widgets::Tabs;
 use ratatui::text::{Span, Line};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::widgets::{Block, Borders};
-use ratatui::terminal::Frame;
+//use ratatui::terminal::Frame;
+use ratatui::Frame;
 use ratatui::layout::Rect;
 
 use crate::colors::{
@@ -104,6 +105,9 @@ pub enum UIMenuItem {
   EventBuilderHB,
   TriggerHB,
   DataSenderHB,
+  // Selection
+  Yes,
+  No
 }
 
 impl UIMenuItem {
@@ -141,7 +145,9 @@ impl UIMenuItem {
       UIMenuItem::EventBuilderHB => String::from("EventBuilderHB"),
       UIMenuItem::TriggerHB      => String::from("TriggerHB"),
       UIMenuItem::DataSenderHB   => String::from("DataSenderHB"),
-     // _ => String::from("Unknown"),
+      UIMenuItem::Yes            => String::from("Yes"),
+      UIMenuItem::No             => String::from("No")
+    // _ => String::from("Unknown"),
     } 
   }
 }
@@ -635,105 +641,6 @@ impl  MoniMenu<'_> {
 
 //============================================
 
-#[derive(Debug, Clone)]
-pub struct MainMenu {
-  pub theme : ColorTheme,
-  pub active_menu_item : MenuItem,
-}
-
-impl MainMenu {
-
-  pub fn new(theme : ColorTheme) -> MainMenu {
-    MainMenu {
-      theme,
-      active_menu_item : MenuItem::Home,
-    }
-  }
-
-  pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
-    let menu_titles  = vec!["Home", "TofEvents", "TofSummary", "RBWaveform", "TofHits",  "ReadoutBoards", "MasterTrigger", "CPUMoniData", "Telemetry" , "Settings", "Quit" ];
-    let menu : Vec<Line> = menu_titles
-               .iter()
-               .map(|t| {
-                 if t == &"TofSummary" {
-                   // none of these handpicked strings has 0 len
-                   let (rest, last) = t.split_at(t.len() - 1);
-                   Line::from(vec![
-                     Span::styled(rest, self.theme.style()),
-                     Span::styled(
-                         last,
-                         Style::default()
-                             .fg(self.theme.hc)
-                             .add_modifier(Modifier::UNDERLINED),
-                     ),
-                   ])
-                 } else if t == &"RBWaveform" {
-                   // none of these handpicked strings has 0 len
-                   let (a, b) = t.split_at(2);
-                   let (highlight, c) = b.split_at(1);
-                   Line::from(vec![
-                     Span::styled(a, self.theme.style()),
-                     Span::styled(
-                         highlight,
-                         Style::default()
-                             .fg(self.theme.hc)
-                             .add_modifier(Modifier::UNDERLINED),
-                     ),
-                     Span::styled(c, self.theme.style()),
-                   ])
-                 } else if t == &"TofHits" {
-                   // none of these handpicked strings has 0 len
-                   let (a, b) = t.split_at(2);
-                   let (highlight, c) = b.split_at(1);
-                   Line::from(vec![
-                     Span::styled(a, self.theme.style()),
-                     Span::styled(
-                         highlight,
-                         Style::default()
-                             .fg(self.theme.hc)
-                             .add_modifier(Modifier::UNDERLINED),
-                     ),
-                     Span::styled(c, self.theme.style()),
-                   ])
-                 } else if t == &"Telemetry" {
-                   // none of these handpicked strings has 0 len
-                   let (a, b) = t.split_at(1);
-                   let (highlight, c) = b.split_at(1);
-                   Line::from(vec![
-                     Span::styled(a, self.theme.style()),
-                     Span::styled(
-                         highlight,
-                         Style::default()
-                             .fg(self.theme.hc)
-                             .add_modifier(Modifier::UNDERLINED),
-                     ),
-                     Span::styled(c, self.theme.style()),
-                   ])
-                 } else {
-                   let (first, rest) = t.split_at(1);
-                   Line::from(vec![
-                     Span::styled(
-                         first,
-                         Style::default()
-                             .fg(self.theme.hc)
-                             .add_modifier(Modifier::UNDERLINED),
-                     ),
-                     Span::styled(rest, self.theme.style()),
-                   ])
-                 }
-               })
-               .collect();
-
-    let tabs = Tabs::new(menu)
-        .select(self.active_menu_item.into())
-        .block(Block::default().title("Menu").borders(Borders::ALL))
-        .style(self.theme.style())
-        .highlight_style(self.theme.highlight())
-        .divider(Span::raw("|"));
-    frame.render_widget(tabs, *main_window);
-  }
-}
-
 ///////////////////////////////////////////
 
 #[derive(Debug, Copy, Clone)]
@@ -751,48 +658,6 @@ impl From<MTMenuItem> for usize {
   }
 }
 
-#[derive(Debug, Clone)]
-pub struct MTMenu {
-  pub theme : ColorTheme,
-  pub active_menu_item : MTMenuItem,
-}
-
-impl MTMenu {
-
-  pub fn new(theme : ColorTheme) -> Self  {
-    Self {
-      theme,
-      active_menu_item : MTMenuItem::Home,
-    }
-  }
-
-  pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
-    let menu_titles : Vec<&str> = vec!["Home", "Quit" ];
-    let menu : Vec<Line> = menu_titles
-               .iter()
-               .map(|t| {
-                 let (first, rest) = t.split_at(1);
-                 Line::from(vec![
-                   Span::styled(
-                       first,
-                       Style::default()
-                           .fg(self.theme.hc)
-                           .add_modifier(Modifier::UNDERLINED),
-                   ),
-                   Span::styled(rest, self.theme.style()),
-                 ])
-               })
-               .collect();
-
-    let tabs = Tabs::new(menu)
-        .select(self.active_menu_item.into())
-        .block(Block::default().title("Menu").borders(Borders::ALL))
-        .style(self.theme.style())
-        .highlight_style(self.theme.highlight())
-        .divider(Span::raw("|"));
-    frame.render_widget(tabs, *main_window);
-  }
-}
 
 ///////////////////////////////////////////
 
@@ -812,48 +677,6 @@ impl From<TEMenuItem> for usize {
   }
 }
 
-#[derive(Debug, Clone)]
-pub struct TEMenu {
-  pub theme : ColorTheme,
-  pub active_menu_item : TEMenuItem,
-}
-
-impl TEMenu {
-
-  pub fn new(theme : ColorTheme) -> Self  {
-    Self {
-      theme,
-      active_menu_item : TEMenuItem::Home,
-    }
-  }
-
-  pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
-    let menu_titles : Vec<&str> = vec!["Home", "Quit" ];
-    let menu : Vec<Line> = menu_titles
-               .iter()
-               .map(|t| {
-                 let (first, rest) = t.split_at(1);
-                 Line::from(vec![
-                   Span::styled(
-                       first,
-                       Style::default()
-                           .fg(self.theme.hc)
-                           .add_modifier(Modifier::UNDERLINED),
-                   ),
-                   Span::styled(rest, self.theme.style()),
-                 ])
-               })
-               .collect();
-
-    let tabs = Tabs::new(menu)
-        .select(self.active_menu_item.into())
-        .block(Block::default().title("Menu").borders(Borders::ALL))
-        .style(self.theme.style())
-        .highlight_style(self.theme.highlight())
-        .divider(Span::raw("|"));
-    frame.render_widget(tabs, *main_window);
-  }
-}
 
 ///////////////////////////////////////////
 
@@ -953,7 +776,7 @@ impl PAMoniMenu {
                .collect();
 
     let tabs = Tabs::new(menu)
-        .select(self.active_menu_item.into())
+        .select(usize::from(self.active_menu_item))
         .block(Block::default().title("Menu").borders(Borders::ALL))
         .style(self.theme.style())
         .highlight_style(self.theme.highlight())
@@ -1009,7 +832,7 @@ impl  RBMenu {
                .collect();
 
     let tabs = Tabs::new(menu)
-        .select(self.active_menu_item.into())
+        .select(usize::from(self.active_menu_item))
         .block(Block::default().title("Menu").borders(Borders::ALL))
         .style(self.theme.style())
         .highlight_style(self.theme.highlight())
@@ -1069,7 +892,7 @@ impl  SettingsMenu {
                .collect();
 
     let tabs = Tabs::new(menu)
-        .select(self.active_menu_item.into())
+        .select(usize::from(self.active_menu_item))
         .block(Block::default().title("Menu").borders(Borders::ALL))
         .style(self.theme.style())
         .highlight_style(self.theme.highlight())
@@ -1129,7 +952,7 @@ impl TSMenu {
                .collect();
 
     let tabs = Tabs::new(menu)
-        .select(self.active_menu_item.into())
+        .select(usize::from(self.active_menu_item))
         .block(Block::default().title("Menu").borders(Borders::ALL))
         .style(self.theme.style())
         .highlight_style(self.theme.highlight())
@@ -1189,7 +1012,7 @@ impl RWMenu {
                .collect();
 
     let tabs = Tabs::new(menu)
-        .select(self.active_menu_item.into())
+        .select(usize::from(self.active_menu_item))
         .block(Block::default().title("Menu").borders(Borders::ALL))
         .style(self.theme.style())
         .highlight_style(self.theme.highlight())
@@ -1270,7 +1093,7 @@ impl THMenu {
                .collect();
 
     let tabs = Tabs::new(menu)
-        .select(self.active_menu_item.into())
+        .select(usize::from(self.active_menu_item))
         .block(Block::default().title("Menu").borders(Borders::ALL))
         .style(self.theme.style())
         .highlight_style(self.theme.highlight())

@@ -1,5 +1,8 @@
 # LELEWAA series
 
+##v0.10.5
+* upgrade to ratatui v0.29
+
 ##v0.10.4
 * fixes baseline and 2d charge plot for Paddle display
 

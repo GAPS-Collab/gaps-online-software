@@ -9,7 +9,7 @@ import sys
 if sys.version_info.minor <= 10:
     from datetime import datetime, timezone
     UTC = timezone.utc
-elxe:
+else:
     from datetime import datetime, UTC, timezone
 from pathlib import Path
 
