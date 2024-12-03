@@ -27,7 +27,6 @@ use std::time::{
   Duration,
   Instant
 };
-use std::fmt;
 use std::thread;
 use crossbeam_channel::Sender;
 use serde_json::json;
@@ -35,8 +34,8 @@ use serde_json::json;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::events::MasterTriggerEvent;
-
 use tof_dataclasses::events::master_trigger::TriggerType;
+
 use tof_dataclasses::errors::{
     MasterTriggerError
 };
@@ -45,9 +44,13 @@ use tof_dataclasses::ipbus::{
     //IPBusPacketType,
 };
 
-use crate::thread_control::ThreadControl;
 use tof_dataclasses::heartbeats::MTBHeartbeat;
 use tof_dataclasses::serialization::Packable;
+
+use crate::thread_control::ThreadControl;
+// make this public to not brake liftof-cc
+pub use crate::settings::MTBSettings;
+
 /// The DAQ packet from the MTB has a flexible size, but it will
 /// be at least this number of words long.
 const MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = 11; 
@@ -64,86 +67,6 @@ fn remove_from_word(s: String, word: &str) -> String {
 }
 
 
-/// Configure the trigger
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct MTBSettings {
-  /// Select the trigger type for this run
-  pub trigger_type           : TriggerType,
-  /// Select the prescale factor for a run. The
-  /// prescale factor is between 0 (no events)
-  /// and 1.0 (all events). E.g. 0.1 means allow 
-  /// only 10% of the events
-  /// THIS DOES NOT APPLY TO THE GAPS OR POISSON 
-  /// TRIGGER!
-  pub trigger_prescale               : f32,
-  /// in case trigger_type = "Poisson", set rate here
-  pub poisson_trigger_rate           : u32,
-  /// in case trigger_type = "Gaps", set if we want to use 
-  /// beta
-  pub gaps_trigger_use_beta     : bool,
-  /// In case we are running the fixed rate trigger, set the
-  /// desired rate here
-  /// not sure
-  //pub gaps_trigger_inner_thresh : u32,
-  ///// not sure
-  //pub gaps_trigger_outer_thresh : u32, 
-  ///// not sure
-  //pub gaps_trigger_total_thresh : u32, 
-  ///// not sure
-  //pub gaps_trigger_hit_thresh   : u32,
-  /// Enable trace suppression on the MTB. If enabled, 
-  /// only those RB which hits will read out waveforms.
-  /// In case it is disabled, ALL RBs will readout events
-  /// ALL the time. For this, we need also the eventbuilder
-  /// strategy "WaitForNBoards(40)"
-  pub trace_suppression  : bool,
-  /// The number of seconds we want to wait
-  /// without hearing from the MTB before
-  /// we attempt a reconnect
-  pub mtb_timeout_sec    : u64,
-  /// Time in seconds between housekkeping 
-  /// packets
-  pub mtb_moni_interval  : u64,
-  pub rb_int_window      : u8,
-  pub tiu_emulation_mode : bool,
-  pub tiu_ignore_busy : bool,
-
-  pub tofbot_webhook     : String,
-  pub hb_send_interval   : u8,
-}
-
-impl MTBSettings {
-  pub fn new() -> Self {
-    Self {
-      trigger_type            : TriggerType::Unknown,
-      trigger_prescale        : 0.0,
-      poisson_trigger_rate    : 0,
-      gaps_trigger_use_beta   : true,
-      trace_suppression       : true,
-      mtb_timeout_sec         : 60,
-      mtb_moni_interval       : 30,
-      rb_int_window           : 1,
-      tiu_emulation_mode      : false,
-      tiu_ignore_busy         : false,
-      tofbot_webhook          : String::from(""),
-      hb_send_interval        : 30,
-    }
-  }
-}
-
-impl fmt::Display for MTBSettings {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let disp = toml::to_string(self).unwrap_or(
-      String::from("-- DESERIALIZATION ERROR! --"));
-    write!(f, "<MTBSettings :\n{}>", disp)
-  }
-}
-
-impl Default for MTBSettings {
-  fn default() -> Self {
-    Self::new()
-  }
-}
 
 
 
