@@ -9,17 +9,36 @@
 //! * start/stop liftof process
 //! * scedule run queue
 //!
+//! Run flow/staging:
+//!
+//! There are 3 directories in the staging directory:
+//! - current - the configuration which is run currently
+//! - next    - the configuration which shall be run next. 
+//!             This configuration can be edited until the 
+//!             next run start.
+//! - queue   - config files in here will get assesed and 
+//!             sorted every new run cycle and the one with 
+//!             the highest priority (number) will get 
+//!             executed first.
+//!
 //!
 
 #[macro_use] extern crate log;
 
+use std::fs;
 use std::fs::{
   OpenOptions,
+  rename,
+  //create_dir,
 };
 
-use std::path::Path;
 use std::thread;
 use std::io::Write;
+
+use std::path::{
+  PathBuf,
+  Path
+};
 
 use chrono::Utc;
 
@@ -50,6 +69,8 @@ use tof_dataclasses::packets::{
   TofPacket
 };
 
+use telemetry_dataclasses::packets::AckBfsw;
+
 use liftof_cc::manage_liftof_cc_service;
 
 #[derive(Parser, Debug)]
@@ -60,17 +81,74 @@ struct LiftofSchedArgs {
   config      : Option<String>,
 }
 
+/// Get the files in the queue and sort them by number
+fn get_queue(dir_path : &String) -> Vec<String> {
+  let mut entries = fs::read_dir(dir_path)
+    .expect("Directory might not exist!")
+    .map(|entry| entry.unwrap().path())
+    .collect::<Vec<PathBuf>>();
+  entries.sort_by(|a, b| {
+    let meta_a = fs::metadata(a).unwrap();
+    let meta_b = fs::metadata(b).unwrap();
+    meta_a.modified().unwrap().cmp(&meta_b.modified().unwrap())
+  });
+  entries.iter()
+    .map(|path| path.to_str().unwrap().to_string())
+    .collect()
+}
+
+fn move_file_with_name(old_path: &str, new_dir: &str) -> Result<(), std::io::Error> {
+  let old_path  = Path::new(old_path);
+  let file_name = old_path.file_name().unwrap().to_str().unwrap(); // Extract filename
+  let new_path  = Path::new(new_dir).join(file_name); // Combine new directory with filename
+  fs::rename(old_path, new_path) // Move the file
+}
+
+fn move_file_rename_liftof(old_path: &str, new_dir: &str) -> Result<(), std::io::Error> {
+  let old_path  = Path::new(old_path);
+  let file_name = old_path.file_name().unwrap().to_str().unwrap(); // Extract filename
+  let new_path  = Path::new(new_dir).join("liftof-config.toml"); // Combine new directory with filename
+  fs::rename(old_path, new_path) // Move the file
+}
+
+fn copy_file(old_path: &str, new_dir: &str) -> Result<u64, std::io::Error> {
+  let old_path  = Path::new(old_path);
+  let file_name = old_path.file_name().unwrap().to_str().unwrap(); // Extract filename
+  let new_path  = Path::new(new_dir).join(file_name); // Combine new directory with filename
+  fs::copy(old_path, new_path) 
+}
+
+fn copy_file_rename_liftof(old_path: &str, new_dir: &str) -> Result<u64, std::io::Error> {
+  let old_path  = Path::new(old_path);
+  let file_name = old_path.file_name().unwrap().to_str().unwrap(); // Extract filename
+  let new_path  = Path::new(new_dir).join("liftof-config.toml"); // Combine new directory with filename
+  fs::copy(old_path, new_path) 
+}
+
+fn delete_file(file_path: &str) -> Result<(), std::io::Error> {
+  let path = Path::new(file_path);
+  fs::remove_file(path) // Attempts to delete the file at the given path
+}
+
+/// Copy a config file from the queue to the current and 
+/// next directories and restart liftof-cc. 
+///
+/// As soon as the run is started, prepare the next run
+fn run_cycler() {
+}
+
+
 fn main() {
   init_env_logger();
 
   // welcome banner!
   println!("{}", LIFTOF_LOGO_SHOW);
   println!("-----------------------------------------------");
-  println!(" >> Welcome to liftof-cc \u{1F680} \u{1F388} ");
+  println!(" >> Welcome to liftof-scheduler \u{1F680} \u{1F388} ");
   println!(" >> liftof is a software suite for the time-of-flight detector (TOF) ");
   println!(" >> for the GAPS experiment \u{1F496}");
-  println!(" >> This is the Command&Control server");
-  println!(" >> It connects to the MasterTriggerBoard and the ReadoutBoards");
+  println!(" >> This is the run scheduler (liftof-scheduler)");
+  println!(" >> It starts/stops the liftof-cc service and manages run configurations");
   println!("-----------------------------------------------\n\n");
   
   let args            = LiftofSchedArgs::parse();
@@ -93,13 +171,30 @@ fn main() {
   } // end match
 
   let timer = Instant::now();
-  
+
+  //let subdirs = vec!["current", "next", "queue"]
+  let staging_dir = config.staging_dir; 
+  //if let Ok(metadata) = fs::metadata(&staging_dir) {
+  //  if metadata.is_dir() {
+  //  } 
+  //} else {
+  //  match fs::create_dir(&stream_files_path) {
+  //    Ok(())   => println!("=> Created {} to save stream data", stream_files_path.display()),
+  //    Err(err) => panic!("Failed to create directory: {}! {}", stream_files_path.display(), err),
+  //  }
+  //}
+
+  let queue_dir   = format!("{}/queue", staging_dir);
+  let next_dir    = format!("{}/next",  staging_dir);
+  let current_dir = format!("{}/current", staging_dir);
+
   let sleep_time  = Duration::from_secs(config.cmd_dispatcher_settings.cmd_listener_interval_sec);
-  let locked      = config.cmd_dispatcher_settings.deny_all_requests; // do not allow the reception of commands if true
+  //let locked      = config.cmd_dispatcher_settings.deny_all_requests; // do not allow the reception of commands if true
   
   let fc_sub_addr = config.cmd_dispatcher_settings.fc_sub_address.clone();
   let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
   let ctx = zmq::Context::new();
+  
   
   // socket to receive commands
   info!("Connecting to flight computer at {}", fc_sub_addr);
@@ -141,7 +236,7 @@ fn main() {
     let mut cmd_packet = TofPacket::new();
     match cmd_receiver.recv_bytes(zmq::DONTWAIT) {
       Err(err)   => {
-        error!("ZMQ socket receiving error! {err}");
+        trace!("ZMQ socket receiving error! {err}");
         continue;
       }
       Ok(buffer) => {
@@ -153,7 +248,7 @@ fn main() {
           // strip away the GAPS header!  
           continue;
         } 
-        match TofPacket::from_bytestream(&buffer, &mut 8) {
+        match TofPacket::from_bytestream(&buffer, &mut 0) {
           Err(err) => {
             error!("Unable to decode bytestream for command ! {:?}", err);
             continue;  
@@ -162,8 +257,7 @@ fn main() {
             cmd_packet = packet;
           }
         }
-        //let mut resp = TofResponse::Unknown;
-        
+        let mut ack = AckBfsw::new(); 
         debug!("Got packet {}!", cmd_packet);
         match cmd_packet.packet_type {
           PacketType::TofCommandV2 => {
@@ -197,9 +291,63 @@ fn main() {
                 println!("= => Received DataRunStop!");
                 manage_liftof_cc_service(String::from("stop"));
               },
+
               TofCommandCode::DataRunStart  => {
                 println!("= => Received DataRunStart!");
-                manage_liftof_cc_service(String::from("start"));
+                let queue   = get_queue(&queue_dir);
+                let current = get_queue(&current_dir);
+                let next    = get_queue(&next_dir); 
+                
+                if current.len() == 0 {
+                  // we are f***ed
+                  error!("We don't have a current configuration. This is BAD!");
+                  continue;
+                }
+
+                println!("= => Found {} files in run queue!", queue.len());
+                if next.len() == 0 && queue.len() == 0 {
+                  println!("= => Nothing staged, will jusr repeat current run setting!");
+                  //manage_liftof_cc_service(String::from("restart"));
+                  continue;
+                }
+                if next.len() == 0 && queue.len() != 0 {
+                  error!("Empty next directory, but we have files in the queue!");
+                  match copy_file_rename_liftof(&queue[0], &next_dir) {
+                    Ok(_) => (),
+                    Err(err) => {
+                      error!("Unable to copy {} to {}! {}", next[0], next_dir, err);
+                    }
+                  }
+                  match move_file_rename_liftof(&queue[0], &current_dir) {
+                    Ok(_) => (),
+                    Err(err) => {
+                      error!("Unable to copy {} to {}! {}", queue[0], current_dir, err);
+                    }
+                  }
+                }
+                if next.len() != 0  {
+                  match delete_file(&current[0]) {
+                    Ok(_)    => (),
+                    Err(err) => {
+                      error!("Unable to delete {}! {}", current[0], err);
+                    }
+                  }
+                  match move_file_rename_liftof(&next[0], &current_dir) {
+                    Ok(_) => (),
+                    Err(err) => {
+                      error!("Unable to copy {} to {}! {}", next[0], current_dir, err);
+                    }
+                  }
+                  if queue.len() != 0 {
+                    match move_file_with_name(&queue[0], &next_dir) {
+                      Ok(_) => (),
+                      Err(err) => {
+                        error!("Unable to move {} to {}! {}", queue[0], next_dir, err);
+                      }
+                    }
+                  }
+                  //manage_liftof_cc_service(String::from("restart"));
+                }
               },
               _ => {
                 error!("Dealing with command code {} has not been implemented yet!", cmd.command_code);
