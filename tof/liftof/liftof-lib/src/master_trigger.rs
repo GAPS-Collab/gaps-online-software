@@ -13,20 +13,22 @@
 //! The data is encoded in IPBus packets.
 //! [see docs here](https://ipbus.web.cern.ch/doc/user/html/)
 //! 
+
 pub mod control;
 pub mod registers;
 
 use control::*;
 use registers::*;
 use std::sync::{
-    Arc,
-    Mutex,
+  Arc,
+  Mutex,
 };
 
 use std::time::{
   Duration,
   Instant
 };
+
 use std::thread;
 use crossbeam_channel::Sender;
 use serde_json::json;
@@ -37,17 +39,19 @@ use tof_dataclasses::events::MasterTriggerEvent;
 use tof_dataclasses::events::master_trigger::TriggerType;
 
 use tof_dataclasses::errors::{
-    MasterTriggerError
+  MasterTriggerError
 };
+
 use tof_dataclasses::ipbus::{
-    IPBus,
-    //IPBusPacketType,
+  IPBus,
+  //IPBusPacketType,
 };
 
 use tof_dataclasses::heartbeats::MTBHeartbeat;
 use tof_dataclasses::serialization::Packable;
 
 use crate::thread_control::ThreadControl;
+
 // make this public to not brake liftof-cc
 pub use crate::settings::MTBSettings;
 
@@ -65,10 +69,6 @@ fn remove_from_word(s: String, word: &str) -> String {
     s
   }
 }
-
-
-
-
 
 /// Read the complete event of the MTB
 ///
@@ -459,9 +459,55 @@ pub fn master_trigger(mt_address     : String,
       error!("Trigger conditions unknown!");
     }
   }
+    
+  // global trigger type
+  if settings.use_combo_trigger {
+    let global_prescale = settings.global_trigger_prescale;
+    let prescale_val    = (u32::MAX as f32 * global_prescale as f32).floor() as u32;
 
-  //TIU_BUSY_IGNORE.set(&mut bus, 1);
-
+    match settings.global_trigger_type {
+      TriggerType::Any             => {
+        match ANY_TRIG_IS_GLOBAL.set(&mut bus, 1) {
+          Ok(_)    => (),
+          Err(err) => error!("Settting the any trigger to global failed! {err}") 
+        }
+        match ANY_TRIG_PRESCALE.set(&mut bus, prescale_val) {
+          Ok(_)    => (),
+          Err(err) => error!("Settting the prescale {} for the any trigger failed! {err}", prescale_val) 
+        }
+      }
+      TriggerType::Track           => {
+        match TRACK_TRIG_IS_GLOBAL.set(&mut bus, 1) {
+          Ok(_)    => (),
+          Err(err) => error!("Setting the track trigger to global failed! {err}")
+        }
+      }
+      TriggerType::TrackCentral    => {
+        match TRACK_CENTRAL_IS_GLOBAL.set(&mut bus, 1) {
+          Ok(_)    => (),
+          Err(err) => error!("Setting the central track trigger to global failed! {err}")
+        }
+        match TRACK_CENTRAL_PRESCALE.set(&mut bus, prescale_val) {
+          Ok(_)    => (),
+          Err(err) => error!("Settting the prescale {} for the track central trigger failed! {err}", prescale_val) 
+        }
+      }
+      TriggerType::TrackUmbCentral => {
+        match TRACK_UMB_CENTRAL_IS_GLOBAL.set(&mut bus, 1) {
+          Ok(_)    => (),
+          Err(err) => error!("Setting the umbrealla central (super cewntral) trigger to global failed! {err}")
+        }
+        match TRACK_UMB_CENTRAL_PRESCALE.set(&mut bus, prescale_val) {
+          Ok(_)    => (),
+          Err(err) => error!("Settting the prescale {} for the track umb central trigger failed! {err}", prescale_val) 
+        }
+      }
+      _ => {
+        error!("Unable to set {} as a global trigger type!", settings.global_trigger_type);
+      }
+    }
+  }
+  
   // reset the DAQ event queue before start
   match reset_daq(&mut bus) {//, &mt_address) {
     Err(err) => error!("Can not reset DAQ! {err}"),

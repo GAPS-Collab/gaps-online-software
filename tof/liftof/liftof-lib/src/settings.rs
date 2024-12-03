@@ -69,6 +69,14 @@ pub struct MTBSettings {
   /// THIS DOES NOT APPLY TO THE GAPS OR POISSON 
   /// TRIGGER!
   pub trigger_prescale               : f32,
+  /// Set to true if we want a combo trigger run
+  pub use_combo_trigger              : bool,
+  /// Set the global trigger type. This has to be less 
+  /// strict than the trigger type   
+  pub global_trigger_type            : TriggerType,
+  /// Set the gloabl trigger prescale
+  pub global_trigger_prescale        : f32,
+
   /// in case trigger_type = "Poisson", set rate here
   pub poisson_trigger_rate           : u32,
   /// in case trigger_type = "Gaps", set if we want to use 
@@ -120,6 +128,9 @@ impl MTBSettings {
       tiu_ignore_busy         : false,
       tofbot_webhook          : String::from(""),
       hb_send_interval        : 30,
+      use_combo_trigger       : false,
+      global_trigger_type     : TriggerType::Unknown,
+      global_trigger_prescale : 1.0,
     }
   }
 }

@@ -1,5 +1,11 @@
 # LELEWAA series
 
+## v0.10.3
+* move MTBSettings to settings.rs
+* adds global trigger settings to settings
+  and allow to set multiple triggers from 
+  the config file
+
 ## v0.10.2
 * massive decluttering effort
 * adds tiu_ignore_busy to configfile
