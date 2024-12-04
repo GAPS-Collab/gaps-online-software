@@ -283,10 +283,12 @@ impl TofEvent {
     // go elsewhere
     summary.version           = ProtocolVersion::V1;
     //let status                = self.header.status;
-    let mt_timestamp          = self.mt_event.get_timestamp_abs48();
-    
+    let mt_timestamp          = (self.mt_event.get_timestamp_abs48() as f64/1000.0).floor()  as u64; 
+    //println!("DEBUGGING {}", mt_timestamp);
     summary.timestamp32       = (mt_timestamp  & 0x00000000ffffffff ) as u32;
+    //println!("DEBUGGING {}", summary.timestamp32);
     summary.timestamp16       = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
+    //println!("DEBUGGING  {}", summary.timestamp16);
     summary.primary_beta      = self.header.primary_beta; 
     summary.primary_charge    = self.header.primary_charge; 
     summary.dsi_j_mask        = self.mt_event.dsi_j_mask;

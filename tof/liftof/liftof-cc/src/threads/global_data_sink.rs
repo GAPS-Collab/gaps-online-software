@@ -67,6 +67,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut send_mtb_event_packets   = false;
   let mut send_tof_event_packets   = false;
   let mut write_stream             = false;
+  let mut send_rbwf_every_x_event = 1;
   match thread_control.lock() {
     Ok(mut tc) => {
       tc.thread_data_sink_active = true; 
@@ -78,10 +79,16 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
       send_rbwaveform_packets    = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
       send_mtb_event_packets     = tc.liftof_settings.data_publisher_settings.send_mtb_event_packets;
       send_tof_event_packets     = tc.liftof_settings.data_publisher_settings.send_tof_event_packets;
+      send_rbwf_every_x_event    = tc.liftof_settings.data_publisher_settings.send_rbwf_every_x_event;
     },
     Err(err) => {
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
     },
+  }
+  
+  if send_rbwf_every_x_event == 0 {
+    error!("0 is not a reasonable value for send_rbwf_every_x_event!. We will switch of the sending of RBWaveforms instead!");
+    send_rbwaveform_packets = false;
   }
 
   let mut evid_check      = Vec::<u32>::new();
@@ -116,6 +123,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut heartbeat     = HeartBeatDataSink::new();
   let mut hb_timer      = Instant::now(); 
   let hb_interval       = Duration::from_secs(settings.hb_send_interval as u64);
+  let mut rbwf_ctr      = 0u32;
   loop {
     if retire {
       // take a long nap to give other threads 
@@ -178,8 +186,9 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         
         // FIXME - disentangle network and disk I/O?
         if pack.packet_type == PacketType::TofEvent {
+          rbwf_ctr += 1;
           if send_tof_summary_packets ||
-             send_rbwaveform_packets {
+            send_rbwaveform_packets {
             // unfortunatly we have to do this unnecessary step
             // I have to think about fast tracking these.
             // maybe sending TofEvents over the channel instead
@@ -211,7 +220,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 }
               }
             }
-            if send_rbwaveform_packets {
+            if send_rbwaveform_packets && rbwf_ctr == send_rbwf_every_x_event {
               for rbwave in ev_to_send.get_rbwaveforms() {
                 let pack = TofPacket::from(&rbwave);
                 match data_socket.send(pack.to_bytestream(),0) {
@@ -224,6 +233,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                   }
                 }
               }
+              rbwf_ctr = 0;
             }
             if send_mtb_event_packets {
               let pack = TofPacket::from(&ev_to_send.mt_event);

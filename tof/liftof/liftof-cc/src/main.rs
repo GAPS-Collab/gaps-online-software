@@ -144,6 +144,7 @@ struct LiftofCCArgs {
   verbose     : bool,
   /// Configuration of liftof-cc. Configure analysis engine,
   /// event builder and general settings.
+  //#[arg(short, long, default_value_t = Some("/home/gaps/staging/current/liftof-config.toml"))]
   #[arg(short, long)]
   config      : Option<String>,
   /// List of possible commands
@@ -208,8 +209,8 @@ fn main() {
   // deal with command line arguments
   let mut config      : LiftofSettings;
   let nboards         : usize;
-  let args              = LiftofCCArgs::parse();
-  let verbose           = args.verbose;
+  let args            = LiftofCCArgs::parse();
+  let verbose         = args.verbose;
   let cfg_file_str   : String; 
   match args.config {
     None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
@@ -321,49 +322,6 @@ fn main() {
   }
  
   restart_liftof_rb(&rb_list); 
-  // FIXME - this needs to be a function
-  // copy the current config file on all RBs
-  //rb_handles.clear();
-  //println!("=> Restarting liftof-rb clients on all RBs!");
-  //let mut children = Vec::<(u8,Child)>::new();
-  //for rb in &rb_list {
-  //  // also populate the rb thread nandles
-  //  rb_handles.push(thread::spawn(||{}));
-  //  
-  //  let rb_address = format!("tof-rb{:02}", rb.rb_id);
-  //  match Command::new("ssh")
-  //    .args([&rb_address, "sudo", "systemctl", "restart", "liftof"])
-  //    .spawn() {
-  //    Err(err) => {
-  //      error!("Unable to spawn ssh process to restart liftoof-rb on RB {}! {}", rb.rb_id, err);
-  //    }
-  //    Ok(child) => {
-  //      children.push((rb.rb_id,child));
-  //    }
-  //  }
-  //}
-  //let mut issues = Vec::<u8>::new();
-  //for rb_child in &mut children {
-  //  match rb_child.1.wait() {
-  //    Err(err) => {
-  //      error!("Child process failed with stderr {:?}! {}", rb_child.1.stderr, err);
-  //    }
-  //    Ok(status) => {
-  //      if status.success() {
-  //        info!("Restarted liftof-rb on {} successfully!", rb_child.0);
-  //        //println!("=> Restarted liftof-rb on {} successfully \u{1F389}!", rb_child.0)
-  //      } else {
-  //        error!("Restart of liftof-rb on {} failed with exit code {:?}!", rb_child.0, status.code());
-  //        issues.push(rb_child.0);
-  //      }
-  //    }
-  //  }
-  //}
-  //if issues.len() == 0 {
-  //  println!("=> Restarted liftof-rb on all RBs successfully \u{1F389}!");
-  //  info!("=> Restarted liftof-rb on all RBs successfully!");
-  //}
-
   let mtb_link_id_map = get_linkid_rbid_map(&rb_list);
   // A global kill timer
   let program_start = Instant::now();
@@ -401,9 +359,11 @@ fn main() {
         // as well as upadte the shared memory
         match thread_control.lock() {
           Ok(mut tc) => {
-            tc.liftof_settings    = config.clone();
-            tc.run_id             = new_run_id;
-            tc.new_run_start_flag = true;
+            tc.thread_master_trg_active = true;
+            tc.thread_event_bldr_active = true;
+            tc.liftof_settings          = config.clone();
+            tc.run_id                   = new_run_id;
+            tc.new_run_start_flag       = true;
           },
           Err(err) => {
             error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -627,9 +587,12 @@ fn main() {
         restart_liftof_rb(&rb_list);
       }
       if verification_rt_sec > 0 {
+        println!("=> Starting verification run!");
         let tc_verification = thread_control.clone();
-        verification_run(verification_rt_sec, tc_verification);
+        let tp_sender_veri  = tp_to_sink.clone();
+        verification_run(verification_rt_sec, tp_sender_veri, tc_verification);
         restart_liftof_rb(&rb_list);
+        println!("=> Verification run finished!");
       }
       thread::sleep(5*one_second);
       // in this scenario, we want to end

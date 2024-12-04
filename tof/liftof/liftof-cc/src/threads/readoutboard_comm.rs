@@ -1,10 +1,5 @@
 //! Routines for RB commiunication and data reception 
 
-//use std::time::{SystemTime, UNIX_EPOCH};
-//use std::path::{
-//    Path,
-//    PathBuf,
-//};
 use std::collections::HashMap;
 
 use std::sync::{
@@ -109,15 +104,18 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
   let mut tc_timer = Instant::now();
   let mut verification_active = false;
   loop {
-    if tc_timer.elapsed().as_secs_f32() > 0.9 {
+    if tc_timer.elapsed().as_secs_f32() > 2.1 {
       match thread_control.try_lock() {
-        Ok(tc) => {
+        Ok(mut tc) => {
           //println!("== ==> [rbcomm] tc lock acquired!");
           if tc.stop_flag {
             //println!("= => [rbcomm] initiate ending thread for RB {}!", board_id);
             break;
           }
           verification_active = tc.verification_active;
+          if verification_active {
+            tc.detector_status.update_from_map(this_status.clone());
+          }
         },
         Err(err) => {
           error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -176,9 +174,18 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                     // average charge/peak hit
                     let verification_charge_threshhold = 10.0f32;
                     if h.get_charge_a() >= verification_charge_threshhold {
-                      //this_statusi.
+                      let status_key = h.paddle_id as u16;
+                      match this_status.insert(status_key, true) {
+                        Some(_) => (),
+                        None => error!("Unknown paddle id! {}", h.paddle_id)
+                      }
                     }
                     if h.get_charge_b() >= verification_charge_threshhold {
+                      let status_key = (h.paddle_id as u16) + 160;
+                      match this_status.insert(status_key, true) {
+                        Some(_) => (),
+                        None => error!("Unknown paddle id! {}", h.paddle_id)
+                      }
                     }
                   }
                 }

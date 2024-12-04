@@ -24,6 +24,8 @@ use std::time::{
   Instant,
 };
 
+use crossbeam_channel::Sender;
+
 use indicatif::{
   ProgressBar,
   ProgressStyle
@@ -43,27 +45,25 @@ use tof_dataclasses::serialization::{
 };
 
 use tof_dataclasses::commands::{
-    TofCommand,
-    //TofCommandCode,
-    //TofResponse,
+  TofCommand,
+  //TofCommandCode,
+  //TofResponse,
 };
+
+use tof_dataclasses::status::TofDetectorStatus;
+use tof_dataclasses::packets::TofPacket;
 
 use tof_dataclasses::io::{
     TofPacketWriter,
     FileType,
     get_utc_timestamp
 };
-//use tof_dataclasses::calibrations::RBCalibrations;
 
 use liftof_lib::settings::LiftofSettings;
 
 use liftof_lib::thread_control::ThreadControl;
 
 use tof_dataclasses::database::ReadoutBoard;
-
-pub fn ssh_commands_rbs() {
-}
-
 
 /// Prepare a new folder with the run id
 ///
@@ -163,16 +163,37 @@ pub fn prepare_run(data_path  : String,
 }
 
 
-/// Taka a data run. This can be either verification or physcis
-pub fn run(with_calibration : bool, verification : bool) {
-  //prepare_run(data_path  : String,
-  //                 config     : &LiftofSettings,
-  //                 run_id     : Option<u32>,
-  //                 create_dir : bool) -> Option<u32> {
-  if with_calibration {
-    //calibrate_tof()
+///// Taka a data run. This can be either verification or physcis
+//pub fn run(with_calibration : bool, verification : bool) {
+//  //prepare_run(data_path  : String,
+//  //                 config     : &LiftofSettings,
+//  //                 run_id     : Option<u32>,
+//  //                 create_dir : bool) -> Option<u32> {
+//  if with_calibration {
+//    //calibrate_tof()
+//  }
+//}
+
+/// Trigger a restart of liftof-cc and start a new run
+///
+///
+/// # Arguments
+///
+///  * mode : The argument given to the systemd service 
+///           - either "start", "stop", "restart", etc.
+pub fn manage_liftof_cc_service(mode : String) {
+  match Command::new("sudo")
+    .args(["systemctl", &mode, "liftof"])
+    .spawn() {
+    Err(err) => {
+      error!("Unable to execute sudo systemctl {} liftof! {}", mode, err);
+    }
+    Ok(child) => {
+      println!("=> Executed sudo systemctl {} liftof", mode);
+    }
   }
 }
+
 
 /// Trigger a general command on the Readoutboards 
 /// remotly through ssh.
@@ -247,7 +268,8 @@ pub fn restart_liftof_rb(rb_list : &Vec<ReadoutBoard>) {
 /// A verification run will not safe data to disk, but instead 
 /// run it through a small analysis engine and count the active 
 /// channels
-pub fn verification_run(timeout : u32,
+pub fn verification_run(timeout        : u32,
+                        tp_to_sink     : Sender<TofPacket>,
                         thread_control : Arc<Mutex<ThreadControl>>) {
   let mut write_state : bool = true; // when in doubt, write data to disk
   let mut config      = LiftofSettings::new();
@@ -284,7 +306,6 @@ pub fn verification_run(timeout : u32,
   // after we opened the socket, give the RBs a chance to connect
   println!("=> Give the RBs a chance to connect and wait a bit..");
   thread::sleep(10*one_second);
-  println!("=> Initializing Run Start!");
   match cmd_sender.send(&payload, 0) {
     Err(err) => {
       error!("Unable to send command, error{err}");
@@ -303,6 +324,7 @@ pub fn verification_run(timeout : u32,
     thread::sleep(5*one_second);
   }
   
+  println!("=> Ending verification run!");
   println!("=> Sending run termination command to the RBs");
   let cmd          = TofCommand::DataRunStop(DEFAULT_RB_ID as u32);
   let packet       = cmd.pack();
@@ -321,17 +343,25 @@ pub fn verification_run(timeout : u32,
       debug!("We sent {:?}", payload);
     }
   }
-  
 
   // move the socket out of here for further use
+  let mut detector_status = TofDetectorStatus::new();
   match thread_control.lock() {
     Ok(mut tc) => {
       tc.write_data_to_disk = write_state;
       tc.verification_active = false;
+      detector_status = tc.detector_status.clone();
     },
     Err(err) => {
       error!("Can't acquire lock for ThreadControl! {err}");
     },
+  }
+  println!("=> Acquired TofDetectorStatus!");
+  println!("{}", detector_status);
+  let pack = detector_status.pack();
+  match tp_to_sink.send(pack) {
+    Err(err) => error!("Unable to send TofDetectorStatus to data sink! {err}"),
+    Ok(_)    => ()
   }
 }
 
