@@ -516,6 +516,7 @@ impl MasterTriggerEvent {
       timestamp += u32::MAX as u64 + 1;
     }
     let gps_mult = match 100_000_000u64.checked_mul(gps) {
+    //let gps_mult = match 100_000u64.checked_mul(gps) {
       Some(result) => result,
       None => {
           // Handle overflow case here

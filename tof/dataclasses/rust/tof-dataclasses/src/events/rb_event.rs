@@ -300,130 +300,6 @@ impl FromRandom for RBPaddleID {
     rb_pid
   }
 }
-///// Debug information for missing hits. 
-/////
-///// These hits have been seen by the MTB, but we are unable to determine where 
-///// they are coming from, why they are there or we simply have lost the RB 
-///// information for these hits.
-//#[deprecated(since = "0.10.0", note="feature was never really used")]
-//#[derive(Debug, Copy, Clone, PartialEq)]
-//pub struct RBMissingHit {
-//  pub event_id      : u32,
-//  pub ltb_hit_index : u8,
-//  pub ltb_id        : u8,
-//  pub ltb_dsi       : u8,
-//  pub ltb_j         : u8,
-//  pub ltb_ch        : u8,
-//  pub rb_id         : u8,
-//  pub rb_ch         : u8,
-//}
-//
-//#[allow(deprecated)]
-//impl Serialization for RBMissingHit {
-//  const HEAD               : u16    = 43690; //0xAAAA
-//  const TAIL               : u16    = 21845; //0x5555
-//  const SIZE               : usize  = 15; // bytes
-//  
-//  fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
-//    -> Result<Self, SerializationError> {
-//    Self::verify_fixed(stream, pos)?;
-//    // verify_fixed already advances pos by 2
-//    let mut miss = RBMissingHit::new();
-//    miss.event_id      = parse_u32(stream, pos);
-//    miss.ltb_hit_index = parse_u8(stream, pos);
-//    miss.ltb_id        = parse_u8(stream, pos);
-//    miss.ltb_dsi       = parse_u8(stream, pos);
-//    miss.ltb_j         = parse_u8(stream, pos);
-//    miss.ltb_ch        = parse_u8(stream, pos);
-//    miss.rb_id         = parse_u8(stream, pos);
-//    miss.rb_ch         = parse_u8(stream, pos);
-//    *pos += 2; // account for header in verify_fixed
-//    Ok(miss)
-//  }
-//
-//  fn to_bytestream(&self) -> Vec<u8> {
-//    let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
-//    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
-//    stream.extend_from_slice(&self.event_id.to_le_bytes());
-//    stream.extend_from_slice(&self.ltb_hit_index.to_le_bytes());
-//    stream.extend_from_slice(&self.ltb_id.to_le_bytes());
-//    stream.extend_from_slice(&self.ltb_dsi.to_le_bytes());
-//    stream.extend_from_slice(&self.ltb_j.to_le_bytes());
-//    stream.extend_from_slice(&self.ltb_ch.to_le_bytes());
-//    stream.extend_from_slice(&self.rb_id.to_le_bytes());
-//    stream.extend_from_slice(&self.rb_ch.to_le_bytes());
-//    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
-//    stream
-//  }
-//}
-//
-//#[allow(deprecated)]
-//impl RBMissingHit {
-//
-//  pub fn new() -> Self {
-//    RBMissingHit {
-//      event_id      : 0,
-//      ltb_hit_index : 0,
-//      ltb_id        : 0,
-//      ltb_dsi       : 0,
-//      ltb_j         : 0,
-//      ltb_ch        : 0,
-//      rb_id         : 0,
-//      rb_ch         : 0,
-//    }
-//  }
-//}
-//
-//#[allow(deprecated)]
-//impl fmt::Display for RBMissingHit {
-//  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//    write!(f, "<RBMissingHit:
-//           \t event ID    {},
-//           \t LTB hit idx {}, 
-//           \t LTB ID      {}, 
-//           \t LTB DSI     {}, 
-//           \t LTB J       {}, 
-//           \t LTB CHN     {},   
-//           \t RB ID       {}, 
-//           \t RB CH {}>", 
-//           self.event_id      ,
-//           self.ltb_hit_index ,
-//           self.ltb_id        ,
-//           self.ltb_dsi       ,
-//           self.ltb_j         ,
-//           self.ltb_ch        ,
-//           self.rb_id         ,
-//           self.rb_ch         )
-//  }
-//}
-//
-//#[allow(deprecated)]
-//impl Default for RBMissingHit {
-//
-//  fn default() -> Self {
-//    Self::new()
-//  }
-//}
-//
-//#[cfg(feature = "random")]
-//#[allow(deprecated)]
-//impl FromRandom for RBMissingHit {
-//    
-//  fn from_random() -> Self {
-//    let mut miss = Self::new();
-//    let mut rng = rand::thread_rng();
-//    miss.event_id      = rng.gen::<u32>();
-//    miss.ltb_hit_index = rng.gen::<u8>();
-//    miss.ltb_id        = rng.gen::<u8>();
-//    miss.ltb_dsi       = rng.gen::<u8>();
-//    miss.ltb_j         = rng.gen::<u8>();
-//    miss.ltb_ch        = rng.gen::<u8>();
-//    miss.rb_id         = rng.gen::<u8>();
-//    miss.rb_ch         = rng.gen::<u8>();
-//    miss
-//  }
-//}
-
 
 /// Get the traces for a set of RBEvents
 ///
@@ -536,9 +412,13 @@ impl RBEvent {
         // then b is channel 1 (or 0)
         wf.adc_b   = self.adc[0].clone();
         wf.adc_a   = self.adc[1].clone();
+        wf.rb_channel_b = 0;
+        wf.rb_channel_a = 1;
       } else {
         wf.adc_a   = self.adc[0].clone();
         wf.adc_b   = self.adc[1].clone();
+        wf.rb_channel_b = 1;
+        wf.rb_channel_a = 0;
       }
       waveforms.push(wf);
     }
@@ -553,9 +433,13 @@ impl RBEvent {
         // channel order flipped!
         wf.adc_b   = self.adc[2].clone();
         wf.adc_a   = self.adc[3].clone();
+        wf.rb_channel_b = 2;
+        wf.rb_channel_a = 3;
       } else {
         wf.adc_a   = self.adc[2].clone();
         wf.adc_b   = self.adc[3].clone();
+        wf.rb_channel_b = 3;
+        wf.rb_channel_a = 2;
       }
     }
     if active_channels.contains(&4) || active_channels.contains(&5) {
@@ -569,9 +453,13 @@ impl RBEvent {
         // then b is channel 1 (or 0)
         wf.adc_b   = self.adc[4].clone();
         wf.adc_a   = self.adc[5].clone();
+        wf.rb_channel_b = 4;
+        wf.rb_channel_a = 5;
       } else {
         wf.adc_a   = self.adc[4].clone();
         wf.adc_b   = self.adc[5].clone();
+        wf.rb_channel_b = 5;
+        wf.rb_channel_a = 4;
       }
     }
     if active_channels.contains(&6) || active_channels.contains(&7) {
@@ -585,9 +473,13 @@ impl RBEvent {
         // then b is channel 1 (or 0)
         wf.adc_b   = self.adc[6].clone();
         wf.adc_a   = self.adc[7].clone();
+        wf.rb_channel_b = 6;
+        wf.rb_channel_a = 7;
       } else {
         wf.adc_a   = self.adc[6].clone();
         wf.adc_b   = self.adc[7].clone();
+        wf.rb_channel_b = 6;
+        wf.rb_channel_a = 7;
       }
     }
     waveforms
@@ -674,16 +566,6 @@ impl RBEvent {
       return Err(UserError::IneligibleChannelLabel)
     }
     return Ok(&self.adc[ch]);
-    //if ch < 8 {
-    //  return Ok(&self.adc[ch]);
-    //} else {
-    //  if self.header.has_ch9 {
-    //    return Ok(&self.ch9_adc);
-    //  } else {
-    //    error!("No channel 9 data for this event!");
-    //    return Err(UserError::NoChannel9Data);
-    //  }
-    //}
   }
 
   pub fn get_channel_by_label(&self, ch : u8) -> Result<&Vec::<u16>, UserError>  {
