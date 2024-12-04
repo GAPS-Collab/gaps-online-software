@@ -346,7 +346,8 @@ fn main() {
                       }
                     }
                   }
-                  //manage_liftof_cc_service(String::from("restart"));
+                  println!("=> Restarting liftof-cc!");
+                  manage_liftof_cc_service(String::from("restart"));
                 }
               },
               _ => {

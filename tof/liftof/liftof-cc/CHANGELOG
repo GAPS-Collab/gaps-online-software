@@ -1,5 +1,10 @@
 # LELEWAA series
 
+# v0.10.6
+* verification run automatically at run start
+* allow to set global triggers/combo triggers from 
+  config file
+
 # v0.10.5
 * allow sending of RBWaveforms with a prescale factor
 
