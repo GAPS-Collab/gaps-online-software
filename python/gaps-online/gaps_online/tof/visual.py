@@ -836,4 +836,54 @@ def plot_paddle_charge2d(reader      = None,\
         fig.savefig(f'{plot_dir}/charge_a_vs_b_{k}.webp')
     return fig
 
+###############################################
+
+def mtb_rate_plot(reader            = None,
+                  mtbmonidata       = [],
+                  use_gcutime       = False,
+                  mtb_moni_interval = 10,
+                  plot_dir          = None):
+    """
+
+    # Arguments
+
+        * reader
+        
+    """
+    if reader is not None and mtbmonidata:
+        raise ValueError("Giving a reader and a list of MTBMoniData is confusng, since we don't know which one to use!")
+    
+    xlabel = 'MET [s] (gcu)'
+    
+    if not use_gcutime:
+        print(f'Will plot {len(mtbmonidata)} MrbMoniData rates')
+        met = np.array(range(len(mtbmonidata)))*mtb_moni_interval/3600 + mtb_moni_interval
+        xlabel  = 'MET [h] (monitime)'
+        rates   = np.array([k.rate for k in mtbmonidata])
+        l_rates = np.array([k.lost_rate for k in mtbmonidata])
+        
+    fig = plt.figure(figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT)
+    ax  = fig.gca()
+    ax.set_ylabel('Hz', loc='top')
+    ax.set_xlabel(xlabel, loc='right')#, loc='right')
+
+    #times   = np.array([j[0] for j in mtbmoni])
+    #times  -= times[0]
+    #rates   = np.array([j[1].rate for j in mtbmoni])
+    #l_rates = np.array([j[1].lost_rate for j in mtbmoni])
+    #print (times[l_rates<500][-1])
+    #print(f'-> Avg MTB rate {rates.mean():4.2f}')
+    #print(f'-> Avg Lost rate {l_rates.mean():4.2f}')
+    ax.plot(met, rates,   lw=0.8, alpha=0.7, label=f'rate (avg {int(rates.mean())} Hz)', color='tab:blue')
+    ax.plot(met, l_rates, lw=0.8, alpha=0.7, label=f'lost rate (avg {int(l_rates.mean())} Hz)', color='tab:red')
+    ax.legend(loc='upper right', frameon=False,\
+              ncol=2, bbox_to_anchor=(0.65,1.05),\
+              bbox_transform=fig.transFigure, 
+              fontsize=8)
+    ax.set_title(f'MTB rates', loc='right')
+    cb.visual.adjust_minor_ticks(ax, which='both')
+    if plot_dir is not None:
+        fig.savefig(f'{plot_dir}/mtb_rates.webp')
+    return fig
+
 
