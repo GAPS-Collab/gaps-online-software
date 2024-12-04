@@ -138,7 +138,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       match thread_control.try_lock() {
         Ok(mut tc) => {
           //println!("= => [evt_builder] {}", tc);
-          if (!tc.thread_event_bldr_active) || tc.stop_flag {
+          if tc.stop_flag {
             // end myself
             println!("= => [evt_builder] shutting down...");
             retire = true;
