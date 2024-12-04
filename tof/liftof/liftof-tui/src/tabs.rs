@@ -4,7 +4,7 @@ pub mod tab_rbs;
 pub mod tab_settings;
 pub mod tab_events;
 pub mod tab_cpu;
-pub mod tab_rbwaveform;
+//pub mod tab_rbwaveform;
 pub mod tab_tofsummary;
 pub mod tab_tofhit;
 pub mod tab_telemetry;
@@ -31,7 +31,7 @@ pub use crate::tab_telemetry::{
 };
 
 
-pub use crate::tab_rbwaveform::RBWaveformTab;
+//pub use crate::tab_rbwaveform::RBWaveformTab;
 pub use crate::tab_tofsummary::TofSummaryTab;
 
 pub use crate::tab_tofhit::{

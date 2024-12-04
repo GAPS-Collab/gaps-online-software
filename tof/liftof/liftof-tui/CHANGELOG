@@ -1,5 +1,12 @@
 # LELEWAA series
 
+##v-.10.6
+* updates to new RWWaveform
+* retires RBWaveform Tab. This is replaced
+  by the Paddle tab. We just need to make sure
+  that the Paddle tab can receive RBWaveforms 
+  as well
+
 ##v0.10.5
 * upgrade to ratatui v0.29
 

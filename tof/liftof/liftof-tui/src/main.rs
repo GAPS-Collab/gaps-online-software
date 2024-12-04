@@ -124,7 +124,7 @@ use liftof_tui::{
     RBTabView,
     MTTab,
     CPUTab,
-    RBWaveformTab,
+    //RBWaveformTab,
     TofSummaryTab, 
     TelemetryTab,
     CommandTab,
@@ -602,7 +602,7 @@ pub struct TabbedInterface<'a> {
 
   pub th_tab        : TofHitTab<'a>,
   // flight packets
-  pub rbwf_tab      : RBWaveformTab,
+  //pub rbwf_tab      : RBWaveformTab,
   pub ts_tab        : TofSummaryTab,
   
   // telemetry 
@@ -639,7 +639,7 @@ impl<'a> TabbedInterface<'a> {
              home_tab     : HomeTab,
              event_tab    : EventTab,
              th_tab       : TofHitTab<'a>,
-             rbwf_tab     : RBWaveformTab,
+             //rbwf_tab     : RBWaveformTab,
              ts_tab       : TofSummaryTab,
              te_tab       : TelemetryTab,
              cmd_tab      : CommandTab<'a>,
@@ -666,7 +666,7 @@ impl<'a> TabbedInterface<'a> {
       home_tab    , 
       event_tab   , 
       th_tab      ,
-      rbwf_tab    ,
+      //rbwf_tab    ,
       ts_tab      ,
       te_tab      ,
       cmd_tab     ,
@@ -706,10 +706,10 @@ impl<'a> TabbedInterface<'a> {
       Err(err) => error!("Can not receive TofPackets for TofHitTab! {err}"),
       Ok(_)    => ()
     }
-    match self.rbwf_tab.receive_packet() {
-      Err(err) => error!("Can not receive RBWaveforms for RBWaveformTab! {err}"),
-      Ok(_)    => ()
-    }
+    //match self.rbwf_tab.receive_packet() {
+    //  Err(err) => error!("Can not receive RBWaveforms! {err}"),
+    //  Ok(_)    => ()
+    //}
     match self.ts_tab.receive_packet() {
       Err(err) => error!("Can not receive TofEventSummaries for TofEventSummaryTab! {err}"),
       Ok(_)    => ()
@@ -742,7 +742,7 @@ impl<'a> TabbedInterface<'a> {
     self.settings_tab.theme.update(&cs);
     self.cpu_tab     .theme.update(&cs);
     self.th_tab      .theme.update(&cs);
-    self.rbwf_tab    .theme.update(&cs);
+    //self.rbwf_tab    .theme.update(&cs);
     self.ts_tab      .theme.update(&cs);
     self.te_tab      .theme.update(&cs);
     self.cmd_tab     .theme.update(&cs);
@@ -844,10 +844,10 @@ impl<'a> TabbedInterface<'a> {
     self.ts_tab.render(&master_lo.rect[1], frame);
   }
   
-  pub fn render_rbwaveformtab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.te_menu.render(&master_lo.rect[0], frame);
-    self.rbwf_tab.render(&master_lo.rect[1], frame);
-  }
+  //pub fn render_rbwaveformtab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+  //  self.te_menu.render(&master_lo.rect[0], frame);
+  //  self.rbwf_tab.render(&master_lo.rect[1], frame);
+  //}
 
   //pub fn render_pamonidatatab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
   //  self.pa_menu.render(&master_lo.rect[0], frame);
@@ -926,7 +926,7 @@ impl<'a> TabbedInterface<'a> {
             self.render_tofhittab(master_lo, frame);
           }
           UIMenuItem::RBWaveform => {
-            self.render_rbwaveformtab(master_lo, frame);
+            //self.render_rbwaveformtab(master_lo, frame);
           }
           UIMenuItem::Back => {
             self.render_events(master_lo, frame);
@@ -1524,9 +1524,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let home_tab        = HomeTab::new(color_theme.clone(), home_streamer, packet_map_home);
   let event_tab       = EventTab::new(ev_pack_recv, mte_send, rbe_send, th_send, te_send, color_theme);
   let hit_tab         = TofHitTab::new(th_recv,color_theme.clone());
-  let rbwf_tab        = RBWaveformTab::new(rbwf_pack_recv,
-                                           readoutboards,
-                                           color_theme.clone());
+  //let rbwf_tab        = RBWaveformTab::new(rbwf_pack_recv,
+  //                                         readoutboards,
+  //                                         color_theme.clone());
   let ts_tab          = TofSummaryTab::new(ts_recv, color_theme.clone());
   let te_tab          : TelemetryTab;
   if args.from_telemetry {
@@ -1564,7 +1564,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                              home_tab,
                                              event_tab,
                                              hit_tab,
-                                             rbwf_tab,
+                                             //rbwf_tab,
                                              ts_tab,
                                              te_tab,
                                              cmd_tab,

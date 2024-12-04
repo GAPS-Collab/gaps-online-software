@@ -1,15 +1,20 @@
+//! Paddle overview - waveforms, 2d charge plot 
+//! as well as baselines and baseline rms from
+//! TofHits
+//!
+
 use std::collections::{
-    HashMap,
-    VecDeque,
+  HashMap,
+  VecDeque,
 };
 use std::sync::{
-    Arc,
-    Mutex,
+  Arc,
+  Mutex,
 };
 
 use crossbeam_channel::{
-    Receiver,
-    //Sender,
+  Receiver,
+  //Sender,
 };
 
 use ratatui::prelude::*;
@@ -18,24 +23,24 @@ use ratatui::symbols::Marker;
 use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::widgets::{
-    Block,
-    BorderType,
-    Borders,
-    Paragraph,
-    List,
-    ListItem,
-    ListState,
-    canvas::{
-        Canvas,
-        //Circle,
-        //Rectangle,
-        Points},
+  Block,
+  BorderType,
+  Borders,
+  Paragraph,
+  List,
+  ListItem,
+  ListState,
+  canvas::{
+      Canvas,
+      //Circle,
+      //Rectangle,
+      Points},
 };
 
 use ndhistogram::{
-    ndhistogram,
-    Histogram,
-    Hist1D,
+  ndhistogram,
+  Histogram,
+  Hist1D,
 };
 use ndhistogram::axis::{
     Uniform,
@@ -45,12 +50,12 @@ use ndhistogram::axis::{
 use tof_dataclasses::errors::SerializationError;
 //use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::{
-    //RBEvent,
-    TofEvent,
-    //TofHit,
-    //TofEventHeader,
-    //MasterTriggerEvent,
-    RBWaveform,
+  //RBEvent,
+  TofEvent,
+  //TofHit,
+  //TofEventHeader,
+  //MasterTriggerEvent,
+  RBWaveform,
 };
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::database::Paddle;
@@ -58,16 +63,16 @@ use tof_dataclasses::analysis::calculate_pedestal;
 
 use crate::colors::ColorTheme;
 use crate::menu::{
-    PaddleMenu,
-    UIMenu,
-    UIMenuItem
+  PaddleMenu,
+  UIMenu,
+  UIMenuItem
 };
 
 use crate::widgets::{
-    prep_data,
-    create_labels,
-    histogram,
-    timeseries,
+  prep_data,
+  create_labels,
+  histogram,
+  timeseries,
 };
 
 #[derive(Debug, Clone)]
@@ -77,10 +82,13 @@ pub struct PaddleTab<'a> {
   pub event_queue        : VecDeque<TofEvent>,
   pub queue_size         : usize,
   pub menu               : PaddleMenu<'a>,
-  pub wf_ch_a            : HashMap<u8, VecDeque<RBWaveform>>,
-  pub wf_ch_b            : HashMap<u8, VecDeque<RBWaveform>>,
+  //pub wf_ch_a            : HashMap<u8, VecDeque<RBWaveform>>,
+  //pub wf_ch_b            : HashMap<u8, VecDeque<RBWaveform>>,
+  pub wf                 : HashMap<u8, VecDeque<RBWaveform>>,
   pub last_wf_ch_a       : VecDeque<(f64, f64)>,
   pub last_wf_ch_b       : VecDeque<(f64, f64)>,
+  pub wf_label_a         : String,
+  pub wf_label_b         : String,
   // baseline histograms
   pub calibrations       : Arc<Mutex<HashMap<u8, RBCalibrations>>>,
   pub baseline_ch_a      : HashMap<u8, Hist1D<Uniform<f32>>>,
@@ -115,8 +123,9 @@ impl PaddleTab<'_> {
     }
     let mut charge_a   = HashMap::<u8, VecDeque<f64>>::new();
     let mut charge_b   = HashMap::<u8, VecDeque<f64>>::new();
-    let mut wf_ch_a    = HashMap::<u8, VecDeque<RBWaveform>>::new();
-    let mut wf_ch_b    = HashMap::<u8, VecDeque<RBWaveform>>::new();
+    //let mut wf_ch_a    = HashMap::<u8, VecDeque<RBWaveform>>::new();
+    //let mut wf_ch_b    = HashMap::<u8, VecDeque<RBWaveform>>::new();
+    let mut wf         = HashMap::<u8, VecDeque<RBWaveform>>::new();
     let mut bl_ch_a    = HashMap::<u8, Hist1D<Uniform<f32>>>::new();
     let mut bl_ch_b    = HashMap::<u8, Hist1D<Uniform<f32>>>::new();
     let mut blrms_ch_a = HashMap::<u8, Hist1D<Uniform<f32>>>::new();
@@ -126,14 +135,14 @@ impl PaddleTab<'_> {
     for pid in 1..161 {
       charge_a.insert(pid, VecDeque::<f64>::new());
       charge_b.insert(pid, VecDeque::<f64>::new());
-      wf_ch_a.insert(pid, VecDeque::<RBWaveform>::new());
-      wf_ch_b.insert(pid, VecDeque::<RBWaveform>::new());
+      //wf_ch_a.insert(pid, VecDeque::<RBWaveform>::new());
+      //wf_ch_b.insert(pid, VecDeque::<RBWaveform>::new());
+      wf.insert(pid, VecDeque::<RBWaveform>::new());
       bl_ch_a.insert(pid, ndhistogram!(bins_bl.clone()));
       bl_ch_b.insert(pid, ndhistogram!(bins_bl.clone()));
       blrms_ch_a.insert(pid, ndhistogram!(bins_bl_rms.clone()));
       blrms_ch_b.insert(pid, ndhistogram!(bins_bl_rms.clone()));
     }
-
 
     Self {
       theme,
@@ -141,8 +150,11 @@ impl PaddleTab<'_> {
       event_queue       : VecDeque::<TofEvent>::new(),
       queue_size        : 1000,
       menu              : PaddleMenu::new(theme_c),
-      wf_ch_a,
-      wf_ch_b,
+      wf                : wf,
+      wf_label_a        : String::from("A"),
+      wf_label_b        : String::from("B"),
+      //wf_ch_a,
+      //wf_ch_b,
       last_wf_ch_a      : VecDeque::<(f64, f64)>::new(),
       last_wf_ch_b      : VecDeque::<(f64, f64)>::new(),
       calibrations,
@@ -174,7 +186,6 @@ impl PaddleTab<'_> {
       None => 0,
     };
     self.pdl_state.select(Some(i));
-    //info!("Selecting {}", i);
   }
 
   pub fn prev_pd(&mut self) {
@@ -201,33 +212,34 @@ impl PaddleTab<'_> {
         return Ok(());
       },
       Ok(ev)    => {
-        let wfs  = ev.get_rbwaveforms();
         let hits = ev.get_hits();
+        // FIXME - get baselines from hits
         for h in hits {
-            self.charge_a.get_mut(&(h.paddle_id as u8)).unwrap().push_back(h.get_charge_a() as f64);
-            self.charge_b.get_mut(&(h.paddle_id as u8)).unwrap().push_back(h.get_charge_b() as f64);
-            if self.charge_a.get_mut(&(h.paddle_id as u8)).unwrap().len() > self.queue_size {
-              self.charge_a.get_mut(&(h.paddle_id as u8)).unwrap().pop_front();
-            }
-            if self.charge_b.get_mut(&(h.paddle_id as u8)).unwrap().len() > self.queue_size {
-              self.charge_b.get_mut(&(h.paddle_id as u8)).unwrap().pop_front();
-            }
-            let ch_a_bl = h.get_bl_a();
-            let ch_b_bl = h.get_bl_b();
-            //let ch_a_bl_rms = h.get_bl_a_rms();
-            //let ch_b_bl_rms = h.get_bl_b_rms();
-            // cut on the range
-            if -2.0 < ch_a_bl && ch_b_bl < 2.0 {
-              self.baseline_ch_a.get_mut(&(h.paddle_id as u8)).unwrap().fill(&ch_a_bl);
-            }
-            if -2.0 < ch_b_bl && ch_b_bl < 2.0 {
-              self.baseline_ch_b.get_mut(&(h.paddle_id as u8)).unwrap().fill(&ch_b_bl);
-            }
-            //self.baseline_ch_a.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_a());
-            self.baseline_rms_ch_a.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_a_rms());
-            //self.baseline_ch_b.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_b());
-            self.baseline_rms_ch_b.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_b_rms());
+          self.charge_a.get_mut(&(h.paddle_id as u8)).unwrap().push_back(h.get_charge_a() as f64);
+          self.charge_b.get_mut(&(h.paddle_id as u8)).unwrap().push_back(h.get_charge_b() as f64);
+          if self.charge_a.get_mut(&(h.paddle_id as u8)).unwrap().len() > self.queue_size {
+            self.charge_a.get_mut(&(h.paddle_id as u8)).unwrap().pop_front();
+          }
+          if self.charge_b.get_mut(&(h.paddle_id as u8)).unwrap().len() > self.queue_size {
+            self.charge_b.get_mut(&(h.paddle_id as u8)).unwrap().pop_front();
+          }
+          let ch_a_bl = h.get_bl_a();
+          let ch_b_bl = h.get_bl_b();
+          //let ch_a_bl_rms = h.get_bl_a_rms();
+          //let ch_b_bl_rms = h.get_bl_b_rms();
+          // cut on the range
+          if -2.0 < ch_a_bl && ch_b_bl < 2.0 {
+            self.baseline_ch_a.get_mut(&(h.paddle_id as u8)).unwrap().fill(&ch_a_bl);
+          }
+          if -2.0 < ch_b_bl && ch_b_bl < 2.0 {
+            self.baseline_ch_b.get_mut(&(h.paddle_id as u8)).unwrap().fill(&ch_b_bl);
+          }
+          //self.baseline_ch_a.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_a());
+          self.baseline_rms_ch_a.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_a_rms());
+          //self.baseline_ch_b.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_b());
+          self.baseline_rms_ch_b.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_b_rms());
         }
+        let wfs  = ev.get_rbwaveforms();
         let mut bl_a  : f32;
         let mut bl_b  : f32;
         let rms_a = 0f32;
@@ -249,31 +261,37 @@ impl PaddleTab<'_> {
                 }
               }
             }
-            let rb_channel = wf.rb_channel + 1;
+            let rb_channel_a = wf.rb_channel_a + 1;
+            let rb_channel_b = wf.rb_channel_b + 1;
+            if wf.paddle_id == self.current_paddle.paddle_id as u8 {
+              // FIXME: double check the channel assignment
+              if (rb_channel_a != self.current_paddle.rb_chA as u8 ) 
+                 || (rb_channel_b != self.current_paddle.rb_chB as u8 ) {
+                error!("Inconsistent paddle RB channels! Maybe A and B are switched!");
+              }
+            } else {
+              continue;
+            }
             // FiXME = empty vector check
             //let bl = calculate_pedestal(&wf.voltages, 1000.0, 850, 950);
-            if rb_channel  == self.current_paddle.rb_chA as u8 {
-              if wf.voltages.len() > 0 {
-                let ped = calculate_pedestal(&wf.voltages, 10.0, 850, 100);
-                bl_a  = ped.0;
-                self.baseline_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_a);
-                self.baseline_rms_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&rms_a);
-              }
-              self.wf_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().push_back(wf);
-              if self.wf_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().len() > self.queue_size {
-                self.wf_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().pop_front();
-              }
-            } else if rb_channel == self.current_paddle.rb_chB as u8 {
-              if wf.voltages.len() > 0 {
-                bl_b = calculate_pedestal(&wf.voltages, 10.0, 850, 100).0;
-                self.baseline_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_b);
-                self.baseline_rms_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&rms_b);
-              }
-              self.wf_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().push_back(wf);
-              if self.wf_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().len() > self.queue_size {
-                self.wf_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().pop_front();
-              }
+            //if rb_channel_a  == self.current_paddle.rb_chA as u8 {
+            if wf.voltages_a.len() > 0 {
+              let ped = calculate_pedestal(&wf.voltages_a, 10.0, 850, 100);
+              bl_a  = ped.0;
+              self.baseline_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_a);
+              self.baseline_rms_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&rms_a);
             }
+            //} else if rb_channel_b == self.current_paddle.rb_chB as u8 {
+            if wf.voltages_b.len() > 0 {
+              bl_b = calculate_pedestal(&wf.voltages_b, 10.0, 850, 100).0;
+              self.baseline_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_b);
+              self.baseline_rms_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&rms_b);
+            }
+            self.wf.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().push_back(wf);
+            if self.wf.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().len() > self.queue_size {
+              self.wf.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().pop_front();
+            }
+            //}
           }
         }
         return Ok(());
@@ -386,44 +404,35 @@ impl PaddleTab<'_> {
 
         let mut wf_data_a = VecDeque::<(f64, f64)>::new();    
         let mut wf_data_b = VecDeque::<(f64, f64)>::new();  
-        let mut label_a   = String::from("N.A");
-        let mut label_b   = String::from("N.A");
+        //let mut label_a   = String::from("");
+        //let mut label_b   = String::from("");
         let wf_theme      = self.theme.clone();
-        match self.wf_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().pop_front() {
+        match self.wf.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().pop_front() {
           None => {
             //for (i,k) in wf.adc.iter().enumerate() {
             //  wf_data_a.push_back((i as f64, *k as f64));
             //}
           }
           Some(wf) => {
-            label_a  = format!("Paddle {}A, RB {}-{}",self.current_paddle.paddle_id, wf.rb_id, wf.rb_channel + 1);
-            if wf.voltages.len() == 0 {
-              for (i,k) in wf.adc.iter().enumerate() {
+            //label_a  = format!("Paddle {}A, RB {}-{}",self.current_paddle.paddle_id, wf.rb_id, wf.rb_channel_a + 1);
+            if wf.voltages_a.len() == 0 {
+              for (i,k) in wf.adc_a.iter().enumerate() {
                 wf_data_a.push_back((i as f64, *k as f64));
               }
             } else {
-              for k in 0..wf.nanoseconds.len() {
-                wf_data_a.push_back((wf.nanoseconds[k] as f64, wf.voltages[k] as f64));
+              for k in 0..wf.nanoseconds_a.len() {
+                wf_data_a.push_back((wf.nanoseconds_a[k] as f64, wf.voltages_a[k] as f64));
               }
             }
             self.last_wf_ch_a = wf_data_a.clone();
-          }
-        }
-        match self.wf_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().pop_front() {
-          None => {
-            //for (i,k) in wf.adc.iter().enumerate() {
-            //  wf_data_a.push_back((i as f64, *k as f64));
-            //}
-          }
-          Some(wf) => {
-            label_b  = format!("Paddle {}B, RB {}-{}",self.current_paddle.paddle_id, wf.rb_id, wf.rb_channel + 1);
-            if wf.voltages.len() == 0 {
-              for (i,k) in wf.adc.iter().enumerate() {
+            //label_b  = format!("Paddle {}B, RB {}-{}",self.current_paddle.paddle_id, wf.rb_id, wf.rb_channel_b + 1);
+            if wf.voltages_b.len() == 0 {
+              for (i,k) in wf.adc_b.iter().enumerate() {
                 wf_data_b.push_back((i as f64, *k as f64));
               }
             } else {
-              for k in 0..wf.nanoseconds.len() {
-                wf_data_b.push_back((wf.nanoseconds[k] as f64, wf.voltages[k] as f64));
+              for k in 0..wf.nanoseconds_b.len() {
+                wf_data_b.push_back((wf.nanoseconds_b[k] as f64, wf.voltages_b[k] as f64));
               }
             }
             self.last_wf_ch_b = wf_data_b.clone();
@@ -435,17 +444,17 @@ impl PaddleTab<'_> {
         }
         let wf_theme_a = wf_theme.clone();
         let wf_chart_a = timeseries(&mut wf_data_a,
-                                  label_a.clone(),
-                                  label_a.clone(),
-                                  &wf_theme_a);
+                                    self.wf_label_a.clone(),
+                                    self.wf_label_a.clone(),
+                                    &wf_theme_a);
         if wf_data_b.len() == 0 {
           wf_data_b = self.last_wf_ch_b.clone();
         }
         let wf_theme_b = wf_theme.clone();
         let wf_chart_b = timeseries(&mut wf_data_b,
-                                  label_b.clone(),
-                                  label_b.clone(),
-                                  &wf_theme_b);
+                                    self.wf_label_b.clone(),
+                                    self.wf_label_b.clone(),
+                                    &wf_theme_b);
         frame.render_widget(wf_chart_a, wf_lo[0]);
         frame.render_widget(wf_chart_b, wf_lo[1]);
         
