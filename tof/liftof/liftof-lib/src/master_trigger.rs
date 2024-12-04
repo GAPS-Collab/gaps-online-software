@@ -464,7 +464,7 @@ pub fn master_trigger(mt_address     : String,
   if settings.use_combo_trigger {
     let global_prescale = settings.global_trigger_prescale;
     let prescale_val    = (u32::MAX as f32 * global_prescale as f32).floor() as u32;
-
+    println!("=> Setting a global trigger - using combo mode. Using prescale of {prescale_val}");
     match settings.global_trigger_type {
       TriggerType::Any             => {
         match ANY_TRIG_IS_GLOBAL.set(&mut bus, 1) {
@@ -480,6 +480,10 @@ pub fn master_trigger(mt_address     : String,
         match TRACK_TRIG_IS_GLOBAL.set(&mut bus, 1) {
           Ok(_)    => (),
           Err(err) => error!("Setting the track trigger to global failed! {err}")
+        }
+        match TRACK_TRIG_PRESCALE.set(&mut bus, prescale_val) {
+          Ok(_)    => (),
+          Err(err) => error!("Settting the prescale {} for the any trigger failed! {err}", prescale_val) 
         }
       }
       TriggerType::TrackCentral    => {

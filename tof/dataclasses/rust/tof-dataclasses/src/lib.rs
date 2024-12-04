@@ -76,4 +76,3 @@ pub trait FromRandom {
   fn from_random() -> Self;
 }
 
-
