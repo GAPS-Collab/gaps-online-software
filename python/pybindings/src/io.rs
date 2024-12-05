@@ -9,6 +9,17 @@ use tof_dataclasses::packets::PacketType;
 
 use crate::dataclasses::PyTofPacket;
 
+
+
+/// Remove the waveforms from a .tof.gaps 
+/// file and replace TofEvents with
+/// TofEventSummary
+#[pyfunction]
+#[pyo3(name="summarize_toffile")]
+pub fn py_summarize_toffile(fname : String) {
+  io_api::summarize_toffile(fname);
+}
+
 #[pyclass]
 #[pyo3(name="TofPacketReader")]
 pub struct PyTofPacketReader {

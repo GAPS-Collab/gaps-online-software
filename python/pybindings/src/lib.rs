@@ -237,6 +237,7 @@ fn tof_moni<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyPBMoniData>()?;
   m.add_class::<PyLTBMoniData>()?;
   m.add_class::<PyMtbMoniData>()?;
+  m.add_class::<PyTofDetectorStatus>()?;
   Ok(())
 }
 
@@ -249,6 +250,7 @@ fn tof_io<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(py_create_rb_ch_to_pid_a_map, m)?)?;
   m.add_function(wrap_pyfunction!(py_create_rb_ch_to_pid_b_map, m)?)?;
   m.add_function(wrap_pyfunction!(py_create_mtb_connection_to_pid_map, m)?)?;
+  m.add_function(wrap_pyfunction!(py_summarize_toffile, m)?)?;
   m.add_class::<PyTofPacket>()?;
   m.add_class::<PyTofPacketReader>()?;
   m.add_class::<PacketType>()?;
