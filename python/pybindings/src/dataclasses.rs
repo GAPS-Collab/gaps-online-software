@@ -169,12 +169,12 @@ impl PyRBPaddleID {
 
 #[pyclass]
 #[pyo3(name="TofDetectorStatus")]
-pub struct PyTofDetectorstatus {
+pub struct PyTofDetectorStatus {
   pub status : TofDetectorStatus
 }
 
 #[pymethods]
-impl PyTofDetectorstatus {
+impl PyTofDetectorStatus {
   
   #[new]
   fn new() -> Self {
