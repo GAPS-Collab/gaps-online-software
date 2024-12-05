@@ -167,7 +167,7 @@ impl TofEvent {
   /// we should have received HG hits (from waveforms)
   /// but we did not get them
   ///
-  /// WARNING: THe current implementation of this is 
+  /// WARNING: The current implementation of this is 
   /// rather slow and not fit for production use
   /// FIXME - rewrite as a closure
   #[cfg(feature="database")]
@@ -667,6 +667,34 @@ impl TofEventSummary {
       hits              : Vec::<TofHit>::new(),
     }
   }
+
+  /// Compare the MasterTriggerEvent::trigger_hits with 
+  /// the actual hits to determine from which paddles
+  /// we should have received HG hits (from waveforms)
+  /// but we did not get them
+  ///
+  /// WARNING: The current implementation of this is 
+  /// rather slow and not fit for production use
+  /// FIXME - rewrite as a closure
+  #[cfg(feature="database")]
+  pub fn get_missing_paddles_hg(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
+    let mut missing = Vec::<u8>::new();
+    for th in self.get_trigger_hits() {
+      let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
+      let mut found = false;
+      for h in &self.hits {
+        if h.paddle_id == pid {
+          found = true;
+          break
+        }
+      }
+      if !found {
+        missing.push(pid);
+      }
+    }
+    missing
+  }
+
   /// Get the RB link IDs according to the mask
   pub fn get_rb_link_ids(&self) -> Vec<u8> {
     let mut links = Vec::<u8>::new();
@@ -677,8 +705,6 @@ impl TofEventSummary {
     }
     links
   }
-  
-
 
   /// Get the combination of triggered DSI/J/CH on 
   /// the MTB which formed the trigger. This does 

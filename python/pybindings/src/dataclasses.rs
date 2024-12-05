@@ -2157,6 +2157,10 @@ impl PyTofEventSummary {
   fn event_status(&self) -> EventStatus {
     self.event.status
   }
+  
+  fn get_missing_paddles_hg(&self, mapping : DsiJChPidMapping) -> Vec<u8> {
+    self.event.get_missing_paddles_hg(mapping)
+  }
 
   /// RB Link IDS (not RB ids) which fall into the 
   /// trigger window
