@@ -632,12 +632,6 @@ pub struct PyTofCommand {
   pub command : TofCommandV2
 }
 
-impl PyTofCommand {
-  pub fn set_command(&mut self, cmd : TofCommandV2) {
-    self.command = cmd;
-  }
-}
-
 #[pymethods]
 impl PyTofCommand {
   #[new]
@@ -648,12 +642,37 @@ impl PyTofCommand {
     }
   }
 
+  //#[getter]
+  //fn get_command_code(&self) -> PyResult<u32> {
+  //  Ok(self.commands.command_code)
+  //}
+  //
+  //#[setter]
+  //fn set_command_code(&mut self, cmd_code: TofCommandCode) -> PyResult<()> {
+  //  self.commands.command_code = cmd_code;
+  //  Ok(())
+  //}
+
   fn set_command_code(&mut self, command_code : TofCommandCode) {
     self.command.command_code = command_code;
   }
 
   fn to_bytestream(&self) -> Vec<u8> {
     self.command.to_bytestream()
+  }
+  
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<TofCommandV2>() {
+      Ok(cmd) => {
+        self.command = cmd;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
   }
 
   fn pack(&self) -> PyTofPacket {
@@ -693,6 +712,7 @@ impl PyRBCalibration {
       cali,
     }
   }
+
 
   #[getter]
   fn rb_id(&self) -> u8 {
