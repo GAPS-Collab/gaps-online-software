@@ -1,5 +1,19 @@
 # LELEWAA series
 
+# v0.10.6
+* verification run automatically at run start
+* allow to set global triggers/combo triggers from 
+  config file
+
+# v0.10.5
+* allow sending of RBWaveforms with a prescale factor
+
+# v0.10.4
+* big refactoring efforts - make calibration a function of it's own
+* stores calibration in runfiles additioally to calibration files
+* run calibration automatically prior to run
+* set tiu_busy_ignore from config file
+
 # v0.10.3
 * automatically restart liftof-rb clients at run start
 * local run db on the tof flight computer

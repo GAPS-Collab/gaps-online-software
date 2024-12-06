@@ -13,21 +13,22 @@
 //! The data is encoded in IPBus packets.
 //! [see docs here](https://ipbus.web.cern.ch/doc/user/html/)
 //! 
+
 pub mod control;
 pub mod registers;
 
 use control::*;
 use registers::*;
 use std::sync::{
-    Arc,
-    Mutex,
+  Arc,
+  Mutex,
 };
 
 use std::time::{
   Duration,
   Instant
 };
-use std::fmt;
+
 use std::thread;
 use crossbeam_channel::Sender;
 use serde_json::json;
@@ -35,19 +36,25 @@ use serde_json::json;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::events::MasterTriggerEvent;
-
 use tof_dataclasses::events::master_trigger::TriggerType;
+
 use tof_dataclasses::errors::{
-    MasterTriggerError
-};
-use tof_dataclasses::ipbus::{
-    IPBus,
-    //IPBusPacketType,
+  MasterTriggerError
 };
 
-use crate::thread_control::ThreadControl;
+use tof_dataclasses::ipbus::{
+  IPBus,
+  //IPBusPacketType,
+};
+
 use tof_dataclasses::heartbeats::MTBHeartbeat;
 use tof_dataclasses::serialization::Packable;
+
+use crate::thread_control::ThreadControl;
+
+// make this public to not brake liftof-cc
+pub use crate::settings::MTBSettings;
+
 /// The DAQ packet from the MTB has a flexible size, but it will
 /// be at least this number of words long.
 const MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = 11; 
@@ -62,87 +69,6 @@ fn remove_from_word(s: String, word: &str) -> String {
     s
   }
 }
-
-
-/// Configure the trigger
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct MTBSettings {
-  /// Select the trigger type for this run
-  pub trigger_type           : TriggerType,
-  /// Select the prescale factor for a run. The
-  /// prescale factor is between 0 (no events)
-  /// and 1.0 (all events). E.g. 0.1 means allow 
-  /// only 10% of the events
-  /// THIS DOES NOT APPLY TO THE GAPS OR POISSON 
-  /// TRIGGER!
-  pub trigger_prescale               : f32,
-  /// in case trigger_type = "Poisson", set rate here
-  pub poisson_trigger_rate           : u32,
-  /// in case trigger_type = "Gaps", set if we want to use 
-  /// beta
-  pub gaps_trigger_use_beta     : bool,
-  /// In case we are running the fixed rate trigger, set the
-  /// desired rate here
-  /// not sure
-  //pub gaps_trigger_inner_thresh : u32,
-  ///// not sure
-  //pub gaps_trigger_outer_thresh : u32, 
-  ///// not sure
-  //pub gaps_trigger_total_thresh : u32, 
-  ///// not sure
-  //pub gaps_trigger_hit_thresh   : u32,
-  /// Enable trace suppression on the MTB. If enabled, 
-  /// only those RB which hits will read out waveforms.
-  /// In case it is disabled, ALL RBs will readout events
-  /// ALL the time. For this, we need also the eventbuilder
-  /// strategy "WaitForNBoards(40)"
-  pub trace_suppression  : bool,
-  /// The number of seconds we want to wait
-  /// without hearing from the MTB before
-  /// we attempt a reconnect
-  pub mtb_timeout_sec    : u64,
-  /// Time in seconds between housekkeping 
-  /// packets
-  pub mtb_moni_interval  : u64,
-  pub rb_int_window      : u8,
-  pub tiu_emulation_mode : bool,
-  pub tofbot_webhook     : String,
-  pub hb_send_interval   : u8,
-}
-
-impl MTBSettings {
-  pub fn new() -> Self {
-    Self {
-      trigger_type            : TriggerType::Unknown,
-      trigger_prescale        : 0.0,
-      poisson_trigger_rate    : 0,
-      gaps_trigger_use_beta   : true,
-      trace_suppression       : true,
-      mtb_timeout_sec         : 60,
-      mtb_moni_interval       : 30,
-      rb_int_window           : 1,
-      tiu_emulation_mode      : false,
-      tofbot_webhook          : String::from(""),
-      hb_send_interval        : 30,
-    }
-  }
-}
-
-impl fmt::Display for MTBSettings {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let disp = toml::to_string(self).unwrap_or(
-      String::from("-- DESERIALIZATION ERROR! --"));
-    write!(f, "<MTBSettings :\n{}>", disp)
-  }
-}
-
-impl Default for MTBSettings {
-  fn default() -> Self {
-    Self::new()
-  }
-}
-
-
 
 /// Read the complete event of the MTB
 ///
@@ -336,12 +262,21 @@ pub fn master_trigger(mt_address     : String,
     }
   }
 
+  let tiu_ignore_busy    = settings.tiu_ignore_busy;
+  match TIU_BUSY_IGNORE.set(&mut bus, tiu_ignore_busy as u32) {
+    Err(err) => error!("Unable to change tiu busy ignore settint! {err}"),
+    Ok(_)    => {
+      warn!("Ignroing TIU since tiu_busy_ignore is set in the config file!");
+      println!("Ignroing TIU since tiu_busy_ignore is set in the config file!");
+    }
+  }
+
   let tiu_emulation_mode = settings.tiu_emulation_mode;
   match set_tiu_emulation_mode(&mut bus, tiu_emulation_mode) {
     Err(err) => error!("Unable to change tiu emulation mode! {err}"),
     Ok(_) => {
       if tiu_emulation_mode {
-        println!("==> Setting TIU emulation mode! This setting is useful if the TIU is NOT connected!");
+        println!("==> Setting TIU emulation mode! This setting is only useful if the TIU is NOT connected!");
       } else {
         println!("==> Not setting TIU emulation mode! TIU needs to be active and connectected!");
       }
@@ -402,6 +337,16 @@ pub fn master_trigger(mt_address     : String,
       match set_central_track_trigger(&mut bus, settings.trigger_prescale) {
         Err(err) => error!("Unable to set the CENTRAL TRACK trigger! {err}"),
         Ok(_)    => ()
+      }
+    }
+    TriggerType::TrackUmbCentral  => {
+      match unset_all_triggers(&mut bus) {
+        Err(err)  => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)   => ()
+      }
+      match set_track_umb_central_trigger(&mut bus, settings.trigger_prescale) {
+        Err(err) => error!("Unable to set the TRACK UMB CENTRAL trigger! {err}"),
+        Ok(_)   => ()
       }
     }
     TriggerType::Gaps    => {
@@ -514,9 +459,59 @@ pub fn master_trigger(mt_address     : String,
       error!("Trigger conditions unknown!");
     }
   }
-
-  //TIU_BUSY_IGNORE.set(&mut bus, 1);
-
+    
+  // global trigger type
+  if settings.use_combo_trigger {
+    let global_prescale = settings.global_trigger_prescale;
+    let prescale_val    = (u32::MAX as f32 * global_prescale as f32).floor() as u32;
+    println!("=> Setting a global trigger - using combo mode. Using prescale of {prescale_val}");
+    match settings.global_trigger_type {
+      TriggerType::Any             => {
+        match ANY_TRIG_IS_GLOBAL.set(&mut bus, 1) {
+          Ok(_)    => (),
+          Err(err) => error!("Settting the any trigger to global failed! {err}") 
+        }
+        match ANY_TRIG_PRESCALE.set(&mut bus, prescale_val) {
+          Ok(_)    => (),
+          Err(err) => error!("Settting the prescale {} for the any trigger failed! {err}", prescale_val) 
+        }
+      }
+      TriggerType::Track           => {
+        match TRACK_TRIG_IS_GLOBAL.set(&mut bus, 1) {
+          Ok(_)    => (),
+          Err(err) => error!("Setting the track trigger to global failed! {err}")
+        }
+        match TRACK_TRIG_PRESCALE.set(&mut bus, prescale_val) {
+          Ok(_)    => (),
+          Err(err) => error!("Settting the prescale {} for the any trigger failed! {err}", prescale_val) 
+        }
+      }
+      TriggerType::TrackCentral    => {
+        match TRACK_CENTRAL_IS_GLOBAL.set(&mut bus, 1) {
+          Ok(_)    => (),
+          Err(err) => error!("Setting the central track trigger to global failed! {err}")
+        }
+        match TRACK_CENTRAL_PRESCALE.set(&mut bus, prescale_val) {
+          Ok(_)    => (),
+          Err(err) => error!("Settting the prescale {} for the track central trigger failed! {err}", prescale_val) 
+        }
+      }
+      TriggerType::TrackUmbCentral => {
+        match TRACK_UMB_CENTRAL_IS_GLOBAL.set(&mut bus, 1) {
+          Ok(_)    => (),
+          Err(err) => error!("Setting the umbrealla central (super cewntral) trigger to global failed! {err}")
+        }
+        match TRACK_UMB_CENTRAL_PRESCALE.set(&mut bus, prescale_val) {
+          Ok(_)    => (),
+          Err(err) => error!("Settting the prescale {} for the track umb central trigger failed! {err}", prescale_val) 
+        }
+      }
+      _ => {
+        error!("Unable to set {} as a global trigger type!", settings.global_trigger_type);
+      }
+    }
+  }
+  
   // reset the DAQ event queue before start
   match reset_daq(&mut bus) {//, &mt_address) {
     Err(err) => error!("Can not reset DAQ! {err}"),
@@ -554,7 +549,7 @@ pub fn master_trigger(mt_address     : String,
   let mut is_active              = true;
   loop {
     // Check thread control and what to do
-    if tc_timer.elapsed().as_secs_f32() > 1.5 {
+    if tc_timer.elapsed().as_secs_f32() > 2.5 {
       match thread_control.try_lock() {
         Ok(mut tc) => {
           if tc.thread_master_trg_active || tc.stop_flag {

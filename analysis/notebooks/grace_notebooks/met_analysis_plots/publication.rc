@@ -1,0 +1,19 @@
+text.usetex : True
+font.family : serif
+font.serif : astrosym
+font.size : 8
+axes.labelsize : 8
+savefig.bbox : tight
+savefig.format : pdf
+axes.linewidth : 0.5
+xtick.top : True
+xtick.direction : in
+xtick.major.width : 0.5
+xtick.minor.width : 0.3
+ytick.right : True
+ytick.direction : in
+ytick.minor.visible : True
+ytick.major.width : 0.5
+ytick.minor.width : 0.3
+lines.linewidth : 0.5
+axes.prop_cycle: cycler('color', ['785ef0', 'dC267f', '648fff', 'fe6100', 'ffb000'])

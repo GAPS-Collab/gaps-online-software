@@ -1,6 +1,6 @@
 [package]
 name = "liftof-tui"
-version = "0.10.3"
+version = "0.10.6"
 edition = "2021"
 
 [features]
@@ -18,11 +18,11 @@ crossbeam-channel = { workspace = true }
 chrono     = { version = "0.4", features = ["serde"] }
 
 # tui stuff
-ratatui    = { version = "0.27", features = ["all-widgets"]}
-tui-popup  = "0.4"
-tui-logger = "0.11"
+ratatui    = { version = "0.29", features = ["all-widgets"]}
+tui-popup  = "0.6"
+tui-logger = "0.14"
 
-crossterm  = { version = "0.23", features=["serde"]}
+crossterm  = { version = "0.28", features=["serde"]}
 
 tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["database","smoothed_z_score"], version = "0.10"} 
 
@@ -32,7 +32,8 @@ telemetry-dataclasses = { path = "../../../telemetry/dataclasses/rust/telemetry-
 
 # this is the "one and only" histogram 
 # crate in my opinion
-ndhistogram = "0.9.0"
+#ndhistogram  = "0.8"
+ndhistogram = "0.10"
 
 #num-traits = "0.2"
 

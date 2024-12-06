@@ -126,9 +126,11 @@ pub fn cmd_responder(cmd_server_address        : String,
   //  want to reopen it if its not reachable anymore (so like command-oriented)...
   //warn!("TODO: Heartbeat feature not yet implemented on C&C side");
   //let heartbeat_received = false;
+  let mut save_cali_wf = false;
   loop {
     match thread_control.lock() {
       Ok(tc) => {
+        save_cali_wf = tc.liftof_settings.save_cali_wf;
         if tc.stop_flag {
           info!("Received stop signal. Will stop thread!");
           break;
@@ -413,6 +415,7 @@ pub fn cmd_responder(cmd_server_address        : String,
                           // same time, then the nw might get too busy? 
                           match rb_calibration(&run_config_sender,
                                                &tp_to_pub,
+                                               save_cali_wf,
                                                address_for_cali.clone()) {
                             Ok(_) => {
                               println!("== ==> [cmd-responder] Calibration successful!");

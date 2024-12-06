@@ -29,6 +29,7 @@ use crate::api::rb_calibration;
 pub fn calibration(rc_to_runner   : &Sender<RunConfig>,
                    tp_to_pub      : &Sender<TofPacket>,
                    local_address  : String,
+                   save_cali_wf   : bool,
                    thread_control : Arc<Mutex<ThreadControl>>) { 
   let sleeptime = Duration::from_secs(1);
   let mut do_it = false;
@@ -50,7 +51,7 @@ pub fn calibration(rc_to_runner   : &Sender<RunConfig>,
     if do_it {
       // trigger calibration routine
       // this will block
-      rb_calibration(rc_to_runner, tp_to_pub, local_address.clone());
+      rb_calibration(rc_to_runner, tp_to_pub, save_cali_wf, local_address.clone());
       match thread_control.lock() {
         Ok(mut tc) => {
           // disable calibration flag

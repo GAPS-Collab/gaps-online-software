@@ -24,7 +24,8 @@ use ndhistogram::axis::{
 
 use ratatui::{
     //backend::CrosstermBackend,
-    terminal::Frame,
+    //terminal::Frame,
+    Frame,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{
         Modifier,
@@ -161,7 +162,7 @@ impl RBTab<'_>  {
       //ch_data.push(Vec::<(f64,f64)>::new());
       ch_data.push(tmp_vec);
     }
-    let bins = Uniform::new(50,-0.5,49.5);
+    let bins = Uniform::new(50,-0.5,49.5).unwrap();
     let mut rbl_state    = ListState::default();
     rbl_state.select(Some(1));
     let mut ltbl_state   = ListState::default();
@@ -218,7 +219,7 @@ impl RBTab<'_>  {
   pub fn receive_packet(&mut self) -> Result<(), SerializationError> {
     let met    = self.timer.elapsed().as_secs_f64();
     let mut ev = RBEvent::new();
-    let bins   = Uniform::new(50,-0.5,49.5);
+    let bins   = Uniform::new(50,-0.5,49.5).unwrap();
     //info!("Receive packet!"); 
     if self.rb_changed {
       info!("RB change detectod!");
@@ -602,7 +603,7 @@ impl RBTab<'_>  {
         ch_chunks.append(&mut ch_chunks_2);
         // the waveform plots
         for ch in 0..9 {
-          let label          = format!("Ch{}", ch);
+          let label          = format!("Ch{}", ch + 1);
           let ch_tc_theme    = self.theme.clone();
           let mut ch_ts_data = VecDeque::from(self.ch_data[ch].clone());
           let ch_ts = timeseries(&mut ch_ts_data,

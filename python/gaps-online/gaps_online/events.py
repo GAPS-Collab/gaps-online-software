@@ -24,5 +24,7 @@ if import_tl_success:
     MergedEvent = tl.MergedEvent
 
 if import_rtd_success:
-    TofEvent = rtd.events.TofEvent
-    RBCalibration = rtd.events.RBCalibration
+    TofEvent        = rtd.events.TofEvent
+    TofEventSummary = rtd.events.TofEventSummary
+    TofHit          = rtd.events.TofHit
+    RBCalibration   = rtd.events.RBCalibration

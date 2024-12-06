@@ -84,6 +84,8 @@ use tof_dataclasses::database::{
   DsiJChPidMapping,
   RbChPidMapping,
   get_rb_ch_pid_map,
+  get_rb_ch_pid_a_map,
+  get_rb_ch_pid_b_map,
   Paddle,
   connect_to_db
 };
@@ -119,9 +121,7 @@ fn py_create_mtb_connection_to_pid_map(db_path : String) -> PyResult<DsiJChPidMa
   }
 }
 
-/// Create a map from the database which allows to map
-/// DSI,J,LTB channel for a connected LTB to the respective
-/// Paddle ID
+/// Map RB ID/Ch to Paddle ID. A side exclusively.
 ///
 /// This will query the database and then create a map
 /// structure, which can then be used for further queries
@@ -150,6 +150,63 @@ fn py_create_rb_ch_to_pid_map(db_path : String) -> PyResult<RbChPidMapping> {
   }
 }
 
+/// Map RB ID/Ch to Paddle ID. A side exclusively.
+///
+/// This will query the database and then create a map
+/// structure, which can then be used for further queries
+///
+/// # Arguments:
+///     db_path : Path to the gaps_flight.db (or similar 
+///               db with paddle information)
+#[pyfunction]
+#[pyo3(name="create_rb_ch_to_pid_a_map")]
+fn py_create_rb_ch_to_pid_a_map(db_path : String) -> PyResult<RbChPidMapping> {
+  match connect_to_db(db_path) {
+    Err(err) => {
+      return Err(PyIOError::new_err(err.to_string()));
+    }
+    Ok(mut conn) => {
+      match Paddle::all(&mut conn) {
+        None => {
+          return Err(PyIOError::new_err("Unable to retrieve paddle information from DB!"));
+        }
+        Some(paddles) => {
+          let mapping = get_rb_ch_pid_a_map(&paddles);
+          Ok(mapping)
+        }
+      }
+    }
+  }
+}
+
+/// Map RB ID/Ch to Paddle ID. A side exclusively.
+///
+/// This will query the database and then create a map
+/// structure, which can then be used for further queries
+///
+/// # Arguments:
+///     db_path : Path to the gaps_flight.db (or similar 
+///               db with paddle information)
+#[pyfunction]
+#[pyo3(name="create_rb_ch_to_pid_b_map")]
+fn py_create_rb_ch_to_pid_b_map(db_path : String) -> PyResult<RbChPidMapping> {
+  match connect_to_db(db_path) {
+    Err(err) => {
+      return Err(PyIOError::new_err(err.to_string()));
+    }
+    Ok(mut conn) => {
+      match Paddle::all(&mut conn) {
+        None => {
+          return Err(PyIOError::new_err("Unable to retrieve paddle information from DB!"));
+        }
+        Some(paddles) => {
+          let mapping = get_rb_ch_pid_b_map(&paddles);
+          Ok(mapping)
+        }
+      }
+    }
+  }
+}
 
 
 #[pymodule]
@@ -180,6 +237,7 @@ fn tof_moni<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyPBMoniData>()?;
   m.add_class::<PyLTBMoniData>()?;
   m.add_class::<PyMtbMoniData>()?;
+  m.add_class::<PyTofDetectorStatus>()?;
   Ok(())
 }
 
@@ -189,7 +247,10 @@ fn tof_moni<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 #[pyo3(name = "io")]
 fn tof_io<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(py_create_rb_ch_to_pid_map, m)?)?;
+  m.add_function(wrap_pyfunction!(py_create_rb_ch_to_pid_a_map, m)?)?;
+  m.add_function(wrap_pyfunction!(py_create_rb_ch_to_pid_b_map, m)?)?;
   m.add_function(wrap_pyfunction!(py_create_mtb_connection_to_pid_map, m)?)?;
+  m.add_function(wrap_pyfunction!(py_summarize_toffile, m)?)?;
   m.add_class::<PyTofPacket>()?;
   m.add_class::<PyTofPacketReader>()?;
   m.add_class::<PacketType>()?;

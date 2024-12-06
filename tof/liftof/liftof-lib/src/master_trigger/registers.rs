@@ -65,7 +65,7 @@ impl MTBRegister<'_> {
   /// Set the register to desired value
   pub fn set(&self, bus : &mut IPBus, value : u32) 
     -> Result<(), Box<dyn Error>> {
-    println!("Settting {}", self);
+    //println!("Settting {}", self);
     if self.rmw {
       self.rmw(bus, value)?;
     }
@@ -126,15 +126,15 @@ impl MTBRegister<'_> {
   fn rmw(&self, bus : &mut IPBus, value : u32)
     -> Result<(), Box<dyn Error>> {
     let mut data = self.read_all(bus)?;
-    println!("step 1 ..{}",data);
+    //println!("step 1 ..{}",data);
     // leave everything else the same, but zero out
     // the masked part
     data         = data & !self.mask;
-    println!("step 2 ..{}",data);
+    //println!("step 2 ..{}",data);
     // reset the masked part and write again
-    println!("step 3 ..{}", value << self.mask.trailing_zeros());
+    //println!("step 3 ..{}", value << self.mask.trailing_zeros());
     data         = data | (value << self.mask.trailing_zeros()); 
-    println!("step 4 ..{}",data);
+    //println!("step 4 ..{}",data);
     Ok(bus.write(self.addr, data)?)
   }
 }

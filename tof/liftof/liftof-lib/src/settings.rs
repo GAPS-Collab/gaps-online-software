@@ -17,9 +17,8 @@ use std::fmt;
 use std::collections::HashMap;
 
 use tof_dataclasses::config::BuildStrategy;
+use tof_dataclasses::events::master_trigger::TriggerType;
 
-
-extern crate toml;
 //use tof_dataclasses::events::master_trigger::TriggerType;
 use tof_dataclasses::events::DataType;
 #[cfg(feature="database")]
@@ -39,7 +38,6 @@ use tof_dataclasses::config::PreampBiasConfig;
 use tof_dataclasses::config::LTBThresholdConfig;
 #[cfg(feature="database")]
 use tof_dataclasses::config::RBChannelMaskConfig;
-use crate::master_trigger::MTBSettings;
 
 use tof_dataclasses::serialization::{
   parse_u8,
@@ -57,6 +55,98 @@ use tof_dataclasses::serialization::Packable;
 pub enum ParameterSetStrategy {
   ControlServer,
   Board
+}
+
+/// Configure the trigger
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct MTBSettings {
+  /// Select the trigger type for this run
+  pub trigger_type           : TriggerType,
+  /// Select the prescale factor for a run. The
+  /// prescale factor is between 0 (no events)
+  /// and 1.0 (all events). E.g. 0.1 means allow 
+  /// only 10% of the events
+  /// THIS DOES NOT APPLY TO THE GAPS OR POISSON 
+  /// TRIGGER!
+  pub trigger_prescale               : f32,
+  /// Set to true if we want a combo trigger run
+  pub use_combo_trigger              : bool,
+  /// Set the global trigger type. This has to be less 
+  /// strict than the trigger type   
+  pub global_trigger_type            : TriggerType,
+  /// Set the gloabl trigger prescale
+  pub global_trigger_prescale        : f32,
+
+  /// in case trigger_type = "Poisson", set rate here
+  pub poisson_trigger_rate           : u32,
+  /// in case trigger_type = "Gaps", set if we want to use 
+  /// beta
+  pub gaps_trigger_use_beta     : bool,
+  /// In case we are running the fixed rate trigger, set the
+  /// desired rate here
+  /// not sure
+  //pub gaps_trigger_inner_thresh : u32,
+  ///// not sure
+  //pub gaps_trigger_outer_thresh : u32, 
+  ///// not sure
+  //pub gaps_trigger_total_thresh : u32, 
+  ///// not sure
+  //pub gaps_trigger_hit_thresh   : u32,
+  /// Enable trace suppression on the MTB. If enabled, 
+  /// only those RB which hits will read out waveforms.
+  /// In case it is disabled, ALL RBs will readout events
+  /// ALL the time. For this, we need also the eventbuilder
+  /// strategy "WaitForNBoards(40)"
+  pub trace_suppression  : bool,
+  /// The number of seconds we want to wait
+  /// without hearing from the MTB before
+  /// we attempt a reconnect
+  pub mtb_timeout_sec    : u64,
+  /// Time in seconds between housekkeping 
+  /// packets
+  pub mtb_moni_interval  : u64,
+  pub rb_int_window      : u8,
+  pub tiu_emulation_mode : bool,
+  pub tiu_ignore_busy : bool,
+
+  pub tofbot_webhook     : String,
+  pub hb_send_interval   : u8,
+}
+
+impl MTBSettings {
+  pub fn new() -> Self {
+    Self {
+      trigger_type            : TriggerType::Unknown,
+      trigger_prescale        : 0.0,
+      poisson_trigger_rate    : 0,
+      gaps_trigger_use_beta   : true,
+      trace_suppression       : true,
+      mtb_timeout_sec         : 60,
+      mtb_moni_interval       : 30,
+      rb_int_window           : 1,
+      tiu_emulation_mode      : false,
+      tiu_ignore_busy         : false,
+      tofbot_webhook          : String::from(""),
+      hb_send_interval        : 30,
+      use_combo_trigger       : false,
+      global_trigger_type     : TriggerType::Unknown,
+      global_trigger_prescale : 1.0,
+    }
+  }
+}
+
+impl fmt::Display for MTBSettings {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = toml::to_string(self).unwrap_or(
+      String::from("-- DESERIALIZATION ERROR! --"));
+    write!(f, "<MTBSettings :\n{}>", disp)
+  }
+}
+
+impl Default for MTBSettings {
+  fn default() -> Self {
+    Self::new()
+  }
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -541,17 +631,21 @@ impl Default for TofEventBuilderSettings {
 pub struct DataPublisherSettings {
   /// location to store data on TOF computer
   pub data_dir                  : String,
-  /// location to store RBCalibration data on the TOF computer
-  /// Individual calibration runs will be stored in
-  /// folders named with the data
-  pub cali_dir                  : String,
   /// The data written on disk gets divided into 
   /// files of a fixed size. 
   pub mbytes_per_file           : usize,
-
   /// The address the flight computer should subscribe 
   /// to to get tof packets
   pub fc_pub_address            : String,
+  /// Mark a certain fraction of events as to be discarded, 
+  /// that is not to be stored on disk
+  /// 1 = Throw away all events, 0 = throw away no events
+  pub discard_event_fraction    : f32,
+  ///// Don't save events which are non-interesting
+  //pub discard_non_interesting   : bool,
+  //pub filter_interesting_numb   : u8,
+  //pub filter_interesting_ncbe   : u8,
+  //pub filter_interesting_n
   /// Send also MastertriggerPackets (this should be 
   /// turned off in flight - only useful if 
   /// send_flight_packets is true, otherwise
@@ -560,8 +654,13 @@ pub struct DataPublisherSettings {
   /// switch off waveform sending (in case of we 
   /// are sending flight packets)
   pub send_rbwaveform_packets   : bool,
+  /// send only a fraction of all RBWaveform packets
+  /// 1 = all events, 1000 = every 1/1000 event
+  pub send_rbwf_every_x_event   : u32,
   pub send_tof_summary_packets  : bool,
   pub send_tof_event_packets    : bool,
+  /// Send the RBCalibration to ground
+  pub send_cali_packets         : bool,
   pub hb_send_interval          : u8,
 }
 
@@ -569,13 +668,15 @@ impl DataPublisherSettings {
   pub fn new() -> Self {
     Self {
       data_dir                  : String::from(""),
-      cali_dir                  : String::from(""),
       mbytes_per_file           : 420,
       fc_pub_address            : String::from(""),
+      discard_event_fraction    : 0.0,
       send_mtb_event_packets    : false,
       send_rbwaveform_packets   : false,
+      send_rbwf_every_x_event   : 1,
       send_tof_summary_packets  : true,
       send_tof_event_packets    : false,
+      send_cali_packets         : true,
       hb_send_interval          : 30,
     }
   }
@@ -620,6 +721,18 @@ pub struct LiftofSettings {
   pub rb_ignorelist_run          : Vec<u8>,
   /// Should TofHits be generated?
   pub run_analysis_engine        : bool,
+  /// Run a full RB calibration before run 
+  /// start?
+  pub pre_run_calibration        : bool,
+  /// Should the waveforms which go into te calibration 
+  /// be saved in the package?
+  pub save_cali_wf               : bool,
+  /// Do a verification run before each run? The purpose 
+  /// of the verification run is to generate a "DetectorStatus"
+  /// packet. If a verification run is desired, change this 
+  /// number to the number of seconds to do the verification 
+  /// run
+  pub verification_runtime_sec   : u32,
   /// Settings to control the MTB
   pub mtb_settings               : MTBSettings,
   /// Settings for the TOF event builder
@@ -653,6 +766,9 @@ impl LiftofSettings {
       rb_ignorelist_always      : Vec::<u8>::new(),
       rb_ignorelist_run         : Vec::<u8>::new(),
       run_analysis_engine       : true,
+      pre_run_calibration       : false,
+      save_cali_wf              : false,
+      verification_runtime_sec  : 0, // no verification run per default
       mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),

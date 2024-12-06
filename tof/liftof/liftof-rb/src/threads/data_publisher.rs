@@ -15,15 +15,12 @@ use crossbeam_channel::Receiver;
 
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
-//use local_ip_address::local_ip;
 use tof_dataclasses::events::{RBEvent,
                               DataType};
 use tof_dataclasses::serialization::Serialization;
-//use tof_dataclasses::threading::ThreadControl;
 use liftof_lib::thread_control::ThreadControl;
 
 use crate::api::{
-    //prefix_board_id,
     prefix_board_id_noquery,
     prefix_local,
 };
@@ -58,8 +55,7 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
   data_socket.bind(&address).expect("Unable to bind to data (PUB) socket {data_adress}");
   info!("0MQ PUB socket bound to address {address}");
 
-  let mut file_on_disk : Option<File>;//let mut output = File::create(path)?;
-  //if write_to_disk {
+  let mut file_on_disk : Option<File> = None;//let mut output = File::create(path)?;
   let fname : String;
   let write_to_disk;
   match output_fname {
@@ -101,8 +97,10 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
     info!("Writing calibration to {}", local_file.display() );
     file_on_disk = OpenOptions::new().create(true).write(true).open(local_file).ok()
   } else {
-    info!("Writing to local file {}!", fname );
-    file_on_disk = OpenOptions::new().append(true).create(true).open(datafile_output_file).ok()
+    if write_to_disk {
+      info!("Writing to local file {}!", fname );
+      file_on_disk = OpenOptions::new().append(true).create(true).open(datafile_output_file).ok()
+    }
   }
  
   let board_id     = get_board_id().unwrap_or(0) as u8;

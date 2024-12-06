@@ -219,6 +219,7 @@ pub fn wait_while_run_active(n_errors     : u32,
 ///                     to the runner thread
 /// * tp_to_publisher : send calibration packets (wrapped 
 ///                     in TofPacket) to publisher thread
+/// * save_waveforms  : save te waveforms wit the calibration
 /// * address         : the publisher's data address
 ///                     We use a trick to get the event
 ///                     packets for the calibration:
@@ -226,6 +227,7 @@ pub fn wait_while_run_active(n_errors     : u32,
 ///                     socket of the publisher
 pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
                       tp_to_publisher : &Sender<TofPacket>,
+                      save_waveforms  : bool,
                       address         : String)
 -> Result<(), CalibrationError> {
   warn!("Commencing full RB calibration routine! This will take the board out of datataking for a few minutes!");
@@ -259,7 +261,7 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     }
   }
   let mut calibration = RBCalibrations::new(board_id);
-  calibration.serialize_event_data = true;
+  calibration.serialize_event_data = save_waveforms;
 
   let ctx = zmq::Context::new();
   let socket : zmq::Socket; 

@@ -23,7 +23,10 @@ def get_version(binary):
     """
     Get the version from the -V argument
     """
-    os.chdir(f'{binary}')
+    if binary == 'liftof-scheduler':
+        os.chdir('liftof-cc')
+    else:
+        os.chdir(f'{binary}')
     print('=> Running build command..')
     build_cmd = f"cargo build -j 24 --all-features --bin={binary}"
     result = sub.run([build_cmd], shell=True)
@@ -36,12 +39,19 @@ def get_version(binary):
     return version
 
 def build_for_muslx86_64(binary, njobs=24):
-    os.chdir(f'{binary}')
+    if binary == 'liftof-scheduler':
+        os.chdir('liftof-cc')
+    else:
+        os.chdir(f'{binary}')
     sub.run(["cargo clean"], shell=True)
     build_cmd = f'CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build -j {njobs} --target=x86_64-unknown-linux-musl --bin {binary} --release --all-features'
     result = sub.run([build_cmd], shell=True)
     shutil.move(f'../target/x86_64-unknown-linux-musl/release/{binary}', '../build/')
     os.chdir('..')
+    version_cmd = f"build/{binary} -V | tail -n 1"
+    result = sub.run([version_cmd], shell=True, capture_output=True, text=True)
+    version = result.stdout.split()[1]
+    shutil.copy(f'build/{binary}', f'releases/{binary}.musl.x86.{version}')
 
 def build_for_arm32(binary, njobs=24):
     """
@@ -133,6 +143,7 @@ if __name__ == '__main__':
         except Exception as e:
             print ('not deleting build directory...{e}')
         os.makedirs('build', exist_ok=True)
+        os.makedirs('releases', exist_ok=True)
         if args.binary == 'liftof-rb':
             build_for_arm32(args.binary)
 #bui    ld_for_muslx86_64('liftof-cc')

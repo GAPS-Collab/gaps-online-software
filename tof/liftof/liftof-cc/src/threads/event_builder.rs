@@ -138,7 +138,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       match thread_control.try_lock() {
         Ok(mut tc) => {
           //println!("= => [evt_builder] {}", tc);
-          if (!tc.thread_event_bldr_active) || tc.stop_flag {
+          if tc.stop_flag {
             // end myself
             println!("= => [evt_builder] shutting down...");
             retire = true;
@@ -608,12 +608,9 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             // (optionally) produced tof event summary if the 
             // event has isuses
             n_rbe_per_te  += ev_to_send.rb_events.len();
-            heartbeat.data_mangled_ev = 69;
-            let _ev_satus  = ev_to_send.mt_event.event_status;
             for ev in &ev_to_send.rb_events {
               if ev.status == EventStatus::CellSyncErrors || ev.status == EventStatus::ChnSyncErrors {
-                ev_to_send.mt_event.event_status = EventStatus::AnyDataMangling {
-                };
+                ev_to_send.mt_event.event_status = EventStatus::AnyDataMangling;
                 heartbeat.data_mangled_ev += 1;
               }
             }

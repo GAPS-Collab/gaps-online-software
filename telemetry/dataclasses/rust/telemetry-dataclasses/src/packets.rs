@@ -29,34 +29,36 @@ pub fn make_systime(lower : u32, upper : u16) -> u64 {
 #[cfg_attr(feature = "pybindings", pyclass)]
 #[repr(u8)]
 pub enum TelemetryPacketType {
-  Unknown           = 0,
-  CardHKP           = 30,
-  CoolingHK         = 40,
-  PDUHK             = 50,
-  Tracker           = 80,
-  TrackerDAQCntr    = 81,
-  GPS               = 82,
-  TrkTempLeak       = 83,
-  MergedEvent       = 90,
-  RBWaveform        = 91,
-  AnyTofHK          = 92,
-  GcuEvtBldSettings = 93,
-  LabJackHK         = 100,
-  MagHK             = 108,
-  GcuMon            = 110,
-  InterestingEvent  = 190,
-  Ack               = 200,     
-  AnyTrackerHK      = 255,
+  Unknown            = 0,
+  CardHKP            = 30,
+  CoolingHK          = 40,
+  PDUHK              = 50,
+  Tracker            = 80,
+  TrackerDAQCntr     = 81,
+  GPS                = 82,
+  TrkTempLeak        = 83,
+  BoringEvent        = 90,
+  RBWaveform         = 91,
+  AnyTofHK           = 92,
+  GcuEvtBldSettings  = 93,
+  LabJackHK          = 100,
+  MagHK              = 108,
+  GcuMon             = 110,
+  InterestingEvent   = 190,
+  NoGapsTriggerEvent = 191,
+  NoTofDataEvent     = 192,
+  Ack                = 200,     
+  AnyTrackerHK       = 255,
   // unknown/unused stuff
-  TmP33            = 33,
-  TmP34            = 34,
-  TmP37            = 37,
-  TmP38            = 38,
-  TmP55            = 55,
-  TmP64            = 64,
-  //TmP92          = 92,
-  TmP96            = 96,
-  TmP214           = 214,
+  TmP33              = 33,
+  TmP34              = 34,
+  TmP37              = 37,
+  TmP38              = 38,
+  TmP55              = 55,
+  TmP64              = 64,
+  //TmP92            = 92,
+  TmP96              = 96,
+  TmP214             = 214,
 }
 
 impl From<u8> for TelemetryPacketType {
@@ -70,7 +72,7 @@ impl From<u8> for TelemetryPacketType {
       81    => TelemetryPacketType::TrackerDAQCntr,
       82    => TelemetryPacketType::GPS,
       83    => TelemetryPacketType::TrkTempLeak,
-      90    => TelemetryPacketType::MergedEvent,
+      90    => TelemetryPacketType::BoringEvent,
       91    => TelemetryPacketType::RBWaveform,
       92    => TelemetryPacketType::AnyTofHK,
       93    => TelemetryPacketType::GcuEvtBldSettings,
@@ -78,6 +80,8 @@ impl From<u8> for TelemetryPacketType {
       108   => TelemetryPacketType::MagHK,
       110   => TelemetryPacketType::GcuMon,
       190   => TelemetryPacketType::InterestingEvent,
+      191   => TelemetryPacketType::NoGapsTriggerEvent,
+      192   => TelemetryPacketType::NoTofDataEvent,
       200   => TelemetryPacketType::Ack,
       255   => TelemetryPacketType::AnyTrackerHK,
       _     => TelemetryPacketType::Unknown,
@@ -167,6 +171,25 @@ impl TelemetryHeader {
     }
   }
 
+  /// A re-implementation of make_packet_stub
+  pub fn forge(packet_type : u8) -> Self {
+    let mut header = Self::new();
+    header.sync  = 0x90EB;
+    header.ptype   = packet_type;
+    header
+  }
+
+//{
+//   std::vector<uint8_t> bytes(13,0);
+//   *reinterpret_cast<uint16_t*>(&bytes[0]) = 0x90EB;
+//   bytes[2] = type;
+//   if(timestamp == 0)
+//      timestamp = bfsw::timestamp_64ms();
+//   *reinterpret_cast<uint32_t*>(&bytes[3]) = timestamp;
+//   *reinterpret_cast<uint16_t*>(&bytes[7]) = counter;
+//   *reinterpret_cast<uint16_t*>(&bytes[9]) = length;
+//   *reinterpret_cast<uint16_t*>(&bytes[11]) = 0;
+//   return bytes;
   /// This is a reimplementation of bfsw's timestamp_to_double
   pub fn get_gcutime(&self) -> f64 {
     (self.timestamp as f64) * 0.064 + 1631030675.0
@@ -224,6 +247,29 @@ impl fmt::Display for TelemetryHeader {
     repr += &(format!("\n  Length      : {}",self.length));
     repr += &(format!("\n  Checksum    : {}>",self.checksum));
     write!(f, "{}", repr)
+  }
+}
+
+
+/// The acknowledgement packet used within the 
+/// bfsw code
+pub struct AckBfsw {
+  pub header    : TelemetryHeader,
+  pub ack_type  : u8,
+  pub ret_code1 : u8,
+  pub ret_code2 : u8,
+  pub body      : Vec<u8>
+}
+
+impl AckBfsw {
+  pub fn new() -> Self {
+    Self {
+      header    : TelemetryHeader::new(),
+      ack_type  : 1,
+      ret_code1 : 0,
+      ret_code2 : 0,
+      body      : Vec::<u8>::new()
+    }
   }
 }
 

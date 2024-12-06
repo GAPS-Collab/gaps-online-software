@@ -14,17 +14,20 @@ import re
 import shutil
 from pathlib import Path
 from datetime import datetime
-
+from glob import glob
 import charmingbeauty as cb
 import charmingbeauty.layout as lo
 
 cb.visual.set_style_present()
 import dashi as d
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import tqdm
 
 import gaps_online as go
+import go_pybindings as gop 
 
 d.visual()
 
@@ -132,9 +135,22 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-
+    print(go.__file__)
     # read in calibration data
-    cali = go.tof.calibrations.load_calibrations_rapi(args.calibration)
+    # cali = go.tof.calibrations.load_calibrations_rapi(args.calibration)
+    pattern = re.compile(r'RB(\d+)_\d{6}_\d{6}UTC\.cali\.tof\.gaps')
+    calibrations = glob(f'{args.calibration}/*.cali.tof.gaps')
+    calib = {}
+
+    for fname in calibrations:
+        match = pattern.search(fname)
+        if match:
+            rbid = match.group(1)
+            cali = gop.events.RBCalibration()
+            cali.from_file(fname)  # Modify the instance
+            calib[int(rbid)] = cali      # Store the modified instance
+        else:
+            print("No match found for:", fname)
     if os.path.isfile(args.rundir):
         runfiles = [args.rundir]
     else:
@@ -179,9 +195,9 @@ if __name__ == '__main__':
     nhit_distr  = []
 
     for f in runfiles:
-        event_reader = go.rust_api.io.TofPacketReader(f, filter=go.rust_api.io.PacketType.TofEvent)
+        event_reader = go.io.TofPacketReader(str(f), filter=go.io.TofPacketType.TofEvent)
         print('-> Creating packet index...')
-        pi = event_reader.get_packet_index()
+        pi = event_reader.packet_index
         print ('--- ---')
         for k in pi:
             print (f'  {k}\t : {pi[k]}')
@@ -191,13 +207,15 @@ if __name__ == '__main__':
         rbmoni       = rbmoni.from_file(f)
         print(rbmoni)
         for pack in tqdm.tqdm(event_reader, desc='Reading packets', total = pi[21]):
-            ev = go.rust_api.events.TofEvent()
+            ev = go.events.TofEvent()
             ev.from_tofpacket(pack)
             nevents_tot += 1
-            for rbev in ev.rbevents:
-                event_status.append(rbev.header.status_byte)
+            status = ev.mastertriggerevent.status
+            event_status.append(status)
             for wf in ev.waveforms:
-                wf.calibrate(cali[wf.rb_id])
+               #print("rbid:" + str(wf.rb_id))
+                rbid = int(wf.rb_id)
+                wf.calibrate(calib[rbid])
                 nwfs_cali += 1
                 if wf.rb_channel == 8:
                     continue

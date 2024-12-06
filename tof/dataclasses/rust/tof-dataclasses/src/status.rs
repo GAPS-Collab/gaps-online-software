@@ -2,6 +2,7 @@
 //!
 
 use std::fmt;
+use std::collections::HashMap;
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
@@ -22,10 +23,12 @@ use crate::packets::PacketType;
 /// Report dead channels/non-active detectors
 /// for the TOF system
 ///
-/// The reporting system is based on the 
-/// "MTBChannel". This includes 10 masks
-/// of u32, each reporting activity of 
-/// as single channel by an indicator bit
+/// This is a very simple approach
+/// A channels are the paddle_id - 1
+/// while B channels are encoded as paddle_id - 159
+///
+/// Dead channels will be 0, active channels 
+/// will be 1
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct TofDetectorStatus {
   pub channels000_031 : u32,
@@ -57,17 +60,69 @@ impl TofDetectorStatus {
     }
   }
 
-  //#[cfg(feature = "database")]
-  //pub fn get_inactive_channels(&self) -> MTBChannel {
-  //}
+  /// Update the dead channel list form a HashMap with 
+  /// paddle information as it is created in the 
+  /// RB communication threads of liftof-cc
+  pub fn update_from_map(&mut self, paddles : HashMap<u16,bool>) {
+    for k in 0..320 {
+      if let Some(val) = paddles.get(&(&k + 1)) {
+        if k < 32 && *val {
+          self.channels000_031 = self.channels000_031 | (k as u32) ;
+        } else if k < 64 && *val  {
+          self.channels032_063 = self.channels032_063 | (k as u32) - 32;
+        } else if k < 96 && *val  {
+          self.channels064_095 = self.channels064_095 | (k as u32) - 64;
+        } else if k < 128 && *val {
+          self.channels096_127 = self.channels096_127 | (k as u32) - 96;
+        } else if k < 160 && *val {
+          self.channels128_159 = self.channels128_159 | (k as u32) - 125;
+        } else if k < 192 && *val {
+          self.channels160_191 = self.channels160_191 | (k as u32) - 160;
+        } else if k < 224 && *val {
+          self.channels192_223 = self.channels192_223 | (k as u32) - 192;
+        } else if k < 256 && *val {
+          self.channels224_255 = self.channels224_255 | (k as u32) - 224;
+        } else if k < 298 && *val {
+          self.channels256_297 = self.channels256_297 | (k as u32) - 256;
+        } else if k < 320 && *val {
+          self.channels298_319 = self.channels298_319 | (k as u32) - 298;
+        }
+      } else {
+        error!("No entry in paddle status map for channel {}", k);
+        continue;
+      }
+    }
+  }
 
-  //#[cfg(feature = "database")]
-  //pub fn get_active_channels(&self) -> MTBChannel {
-  //}
+  /// Get all paddle ids which have dead 
+  /// channels on the A-side
+  pub fn get_dead_paddles_a(&self) -> Vec<u8> {
+    let mut dead_a = Vec::<u8>::new();
+    let inactive = self.get_inactive_channels_idx();
+    for k in inactive.iter() {
+      if *k < 160 {
+        dead_a.push(*k as u8);
+      }
+    }
+    dead_a
+  }
+
+  /// Get all paddle ids which have dead 
+  /// channels on the B-side
+  pub fn get_dead_paddles_b(&self) -> Vec<u8> {
+    let mut dead_b = Vec::<u8>::new();
+    let inactive = self.get_inactive_channels_idx();
+    for k in inactive.iter() {
+      if *k >= 160 {
+        dead_b.push((*k-159) as u8);
+      }
+    }
+    dead_b
+  }
 
   /// Index of inactive channels in the range of 
   /// 0-319. These indizes are MTBChannel numbers
-  pub fn get_inactive_channels_idx(&self) -> Vec<u16> {
+  fn get_inactive_channels_idx(&self) -> Vec<u16> {
     let mut channels = Vec::<u16>::new();
     for k in 0..10 {
       if (self.channels000_031 >> k & 0x1) == 1 {
@@ -122,17 +177,23 @@ impl TofDetectorStatus {
     channels
   }
 
-  /// Index of inactive channels in the range of 
-  /// 0-319. These indizes are MTBChannel numbers
-  pub fn get_active_channels_idx(&self) -> Vec<u16> {
-    let inactive_channels   = self.get_inactive_channels_idx();
-    let mut active_channels = Vec::<u16>::new();
-    for ch in 0..329 {
-      if !inactive_channels.contains(&ch) {
-        active_channels.push(ch);
-      }
-    }
-    active_channels
+  ///// Index of inactive channels in the range of 
+  ///// 0-319. These indizes are MTBChannel numbers
+  //fn get_active_channels_idx(&self) -> Vec<u16> {
+  //  let inactive_channels   = self.get_inactive_channels_idx();
+  //  let mut active_channels = Vec::<u16>::new();
+  //  for ch in 0..329 {
+  //    if !inactive_channels.contains(&ch) {
+  //      active_channels.push(ch);
+  //    }
+  //  }
+  //  active_channels
+  //}
+}
+
+impl Default for TofDetectorStatus {
+  fn default() -> Self {
+    Self::new()
   }
 }
 

@@ -1044,45 +1044,23 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
    //std::cout << "stream too short! " << ver_pos << " " << bytestream.size() << std::endl;
    return hit;
  }
- u8  version       = Gaps::parse_u8(bytestream, ver_pos) & 0xc0;
- hit.version       = (Gaps::ProtocolVersion) version;
- hit.paddle_id     = bytestream[pos]; pos+=1;
- if (hit.version == Gaps::ProtocolVersion::Unknown) {
-   hit.time_a        = Gaps::parse_u16(bytestream, pos); 
-   hit.time_b        = Gaps::parse_u16(bytestream, pos); 
-   //std::cout << " " << time_a << " " << time_b << " " << charge_a << " " << charge_b << std::endl;
-   hit.peak_a        = Gaps::parse_u16(bytestream, pos); 
-   hit.peak_b        = Gaps::parse_u16(bytestream, pos); 
-   hit.charge_a      = Gaps::parse_u16(bytestream, pos); 
-   hit.charge_b      = Gaps::parse_u16(bytestream, pos); 
-   hit.charge_min_i  = Gaps::parse_u16(bytestream, pos); 
-   hit.x_pos         = Gaps::parse_u16(bytestream, pos); 
-   hit.t_average     = Gaps::parse_u16(bytestream, pos); 
-   hit.ctr_etx = bytestream[pos]; pos+=1;
-   hit.timestamp32 = Gaps::parse_u32(bytestream, pos);
-   hit.timestamp16 = Gaps::parse_u16(bytestream, pos);
- } else {
-   hit.time_a_f32    = Gaps::parse_f16(bytestream, pos); 
-   hit.time_b_f32    = Gaps::parse_f16(bytestream, pos); 
-   hit.peak_a_f32    = Gaps::parse_f16(bytestream, pos); 
-   hit.peak_b_f32    = Gaps::parse_f16(bytestream, pos); 
-   hit.charge_a_f32  = Gaps::parse_f16(bytestream, pos); 
-   hit.charge_b_f32  = Gaps::parse_f16(bytestream, pos); 
-   hit.charge_min_i  = Gaps::parse_u16(bytestream, pos); 
-   hit.baseline_a    = Gaps::parse_f16(bytestream, pos);
-   hit.baseline_a_rms = Gaps::parse_f16(bytestream, pos);
-   hit.phase          = Gaps::parse_f16(bytestream, pos);
-   pos += 1; // skip version
-   hit.baseline_b     = Gaps::parse_f16(bytestream, pos);
-   hit.baseline_b_rms = Gaps::parse_f16(bytestream, pos);
-   //hit.baseline         = Gaps::parse_u16(bytestream, pos); 
-   //hit.t_average     = Gaps::parse_u16(bytestream, pos); 
-   //hit.ctr_etx       = bytestream[pos]; pos+=1;
-   //hit.timestamp32   = Gaps::parse_u32(bytestream, pos);
-   //hit.timestamp16   = Gaps::parse_u16(bytestream, pos);
- }
+ u8  version        = Gaps::parse_u8(bytestream, ver_pos) & 0xc0;
+ hit.version        = (Gaps::ProtocolVersion) version;
+ hit.paddle_id      = bytestream[pos]; pos+=1;
+ hit.time_a_f32     = Gaps::parse_f16(bytestream, pos); 
+ hit.time_b_f32     = Gaps::parse_f16(bytestream, pos); 
+ hit.peak_a_f32     = Gaps::parse_f16(bytestream, pos); 
+ hit.peak_b_f32     = Gaps::parse_f16(bytestream, pos); 
+ hit.charge_a_f32   = Gaps::parse_f16(bytestream, pos); 
+ hit.charge_b_f32   = Gaps::parse_f16(bytestream, pos); 
+ hit.charge_min_i   = Gaps::parse_u16(bytestream, pos); 
+ hit.baseline_a     = Gaps::parse_f16(bytestream, pos);
+ hit.baseline_a_rms = Gaps::parse_f16(bytestream, pos);
+ hit.phase          = Gaps::parse_f16(bytestream, pos);
+ pos += 1; // skip version
+ hit.baseline_b     = Gaps::parse_f16(bytestream, pos);
+ hit.baseline_b_rms = Gaps::parse_f16(bytestream, pos);
  
-
  // FIXME checks - packetlength, checksum ?
  u16 tail = Gaps::parse_u16(bytestream, pos);
  if (tail != TAIL) {

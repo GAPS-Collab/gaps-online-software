@@ -1,5 +1,18 @@
 # LELEWAA series
 
+## v0.10.5
+* send RBEvents which have the RBPaddleID populated
+
+## v0.10.4
+* allow to do RBCalibrations without the wf data 
+  saved
+
+## v0.10.3
+* suppress error about skipped events when we are in 
+  trace suppression mode (skipped events are a feature then)
+* removes annoying creation of 'Unknown.tof.gaps' in case 
+  we don't write any data
+
 ## v0.10.2
 * allow to read out drs4 deadtime for every
   event

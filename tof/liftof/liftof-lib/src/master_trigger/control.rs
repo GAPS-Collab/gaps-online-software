@@ -9,7 +9,7 @@
 
 use std::error::Error;
 use tof_dataclasses::ipbus::{
-    IPBus,
+  IPBus,
 };
 
 use crate::master_trigger::registers::*;
@@ -106,7 +106,7 @@ pub fn get_tiu_emu_busy_cnt(bus : &mut IPBus)
 pub fn get_gaps_trigger_prescale(bus : &mut IPBus)
   -> Result<f32, Box<dyn Error>> {
     let prescale_bus = GAPS_TRIG_PRESCALE.get(bus)?;
-    let prescale_val = (u32::MAX as f32 * prescale_bus as f32).floor() as f32;
+    let prescale_val = (prescale_bus as f32)/f32::MAX;
     return Ok(prescale_val)
   }
 
@@ -186,6 +186,14 @@ pub fn set_central_track_trigger(bus : &mut IPBus, prescale : f32)
   Ok(())
 }
 
+pub fn set_track_umb_central_trigger(bus : &mut IPBus, prescale : f32)
+    -> Result<(), Box<dyn Error>> {
+    let prescale_val = (u32::MAX as f32 * prescale).floor() as u32;
+    info!("Setting TRACK UMB CENTRAL trigger with prescale {}!", prescale);
+    bus.write(0x249, prescale_val)?;
+    Ok(())
+  }
+
 
 /// Disable all triggers
 pub fn unset_all_triggers(bus : &mut IPBus) 
@@ -205,6 +213,7 @@ pub fn unset_all_triggers(bus : &mut IPBus)
   TRACK_TRIG_IS_GLOBAL.set(bus, 0)?; 
   ANY_TRIG_IS_GLOBAL.set(bus, 0)?;
   TRACK_CENTRAL_IS_GLOBAL.set(bus, 0)?;
+  set_track_umb_central_trigger(bus, 0.0)?;
   Ok(())
 }
 

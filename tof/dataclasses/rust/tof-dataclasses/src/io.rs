@@ -77,6 +77,7 @@ use crate::constants::{
 };
 use crate::serialization::{
     Serialization,
+    Packable,
     //SerializationError,
     u8_to_u16_14bit,
     u8_to_u16_err_check,
@@ -86,13 +87,19 @@ use crate::serialization::{
     parse_u32,
 };
 
+use crate::events::TofEvent;
+
 /// Types of files
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 pub enum FileType {
   Unknown,
   /// Calibration file for specific RB with id
   CalibrationFile(u8),
+  /// A regular run file with TofEvents
   RunFile(u32),
+  /// A file created from a file with TofEvents which 
+  /// contains only TofEventSummary
+  SummaryFile(String),
 }
 
 /// Get a human readable timestamp
@@ -173,6 +180,51 @@ pub fn read_file(filename: &Path) -> io::Result<Vec<u8>> {
   Ok(buffer)
 }
 
+/// Take a .tof.gaps file with TofEvents and keep all packets, 
+/// but reduce the TofEvents to TofEventSuammry to conserve space.
+pub fn summarize_toffile(fname : String) {
+  let mut reader    = TofPacketReader::new(fname.clone());
+  let outfile       = fname.replace(".tof.", ".tofsum."); 
+  let outfile_type  = FileType::SummaryFile(fname.clone());
+  let mut writer    = TofPacketWriter::new(outfile,outfile_type); 
+  let mut n_errors  = 0u32;
+  let npack : usize = reader.get_packet_index().unwrap_or(HashMap::<u8,usize>::new()).values().cloned().collect::<Vec<usize>>().iter().sum();
+  let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
+  let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
+  let bar_label  = String::from("Reading events");
+  let bar = ProgressBar::new(npack as u64);
+  bar.set_position(0);
+  bar.set_message (bar_label);
+  bar.set_prefix  ("\u{2728}");
+  bar.set_style   (bar_style);
+  let mut npack = 0u64;
+  for pack in reader {
+    npack += 1;
+    bar.set_position(npack);
+    match pack.packet_type {
+      PacketType::TofEvent => {
+        match pack.unpack::<TofEvent>() {
+          Err(err) => {
+            debug!("Can't unpack TofEvent! {err}");
+            n_errors += 1;
+          }
+          Ok(te) => {
+            let ts = te.get_summary();
+            let tp = ts.pack();
+            writer.add_tof_packet(&tp); 
+          }
+        }
+      }
+      _ => {
+        writer.add_tof_packet(&pack);
+      }
+    }
+  }
+  bar.finish_with_message("Done!");
+  if n_errors > 0 {
+    error!("Unpacking TofEvents from {} failed {} times!", n_errors, fname);
+  }
+}
 
 /// Emit RBEvents from a stream of bytes
 /// from RBMemory
@@ -1133,6 +1185,13 @@ impl TofPacketWriter {
         file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
         file_name = filename;
       }
+      FileType::SummaryFile(ref fname) => {
+        let filename = fname.replace(".tof.", ".tofsum.");
+        let path     = Path::new(&filename);
+        info!("Writing to file {filename}");
+        file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+        file_name = filename;
+      }
     }
     Self {
       file,
@@ -1149,7 +1208,7 @@ impl TofPacketWriter {
 
   pub fn get_file(&self) -> File { 
     let file : File;
-    match self.file_type {
+    match &self.file_type {
       FileType::Unknown => {
         let filename = self.file_path.clone() + "Data.tof.gaps";
         let path     = Path::new(&filename); 
@@ -1157,7 +1216,7 @@ impl TofPacketWriter {
         file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
       }
       FileType::RunFile(runid) => {
-        let filename = format!("{}{}", self.file_path, get_runfilename(runid, self.file_id as u64, None));
+        let filename = format!("{}{}", self.file_path, get_runfilename(*runid, self.file_id as u64, None));
         //let filename = self.file_path.clone() + &get_runfilename(runid,self.file_id as u64, None);
         let path     = Path::new(&filename); 
         info!("Writing to file {filename}");
@@ -1165,8 +1224,14 @@ impl TofPacketWriter {
       }
       FileType::CalibrationFile(rbid) => {
         //let filename = self.file_path.clone() + &get_califilename(rbid,false);
-        let filename = format!("{}{}", self.file_path, get_califilename(rbid, false));
+        let filename = format!("{}{}", self.file_path, get_califilename(*rbid, false));
         let path     = Path::new(&filename); 
+        info!("Writing to file {filename}");
+        file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+      }
+      FileType::SummaryFile(fname) => {
+        let filename = fname.replace(".tof.", ".tofsum.");
+        let path     = Path::new(&filename);
         info!("Writing to file {filename}");
         file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
       }

@@ -109,7 +109,10 @@ pub enum TofCommandCode {
   NoSendRBWaveforms       = 93u8,
   /// Enable RB Channel Masks
   SetRBChannelMask        = 99u8,
-
+  /// Shutdown RB - send shutdown now to RB
+  ShutdownRB              = 100u8,
+  /// Change the config file for the next run
+  ChangeNextRunConfig     = 101u8,
 }
 
 impl fmt::Display for TofCommandCode {
@@ -123,31 +126,33 @@ impl fmt::Display for TofCommandCode {
 impl From<u8> for TofCommandCode {
   fn from(value: u8) -> Self {
     match value {
-      0u8  => TofCommandCode::Unknown,
-      1u8  => TofCommandCode::Ping,
-      2u8  => TofCommandCode::Moni,
-      4u8  => TofCommandCode::Kill,
-      21u8 => TofCommandCode::SetLTBThresholds,
-      22u8 => TofCommandCode::SetMTConfig,
-      28u8 => TofCommandCode::SetPreampBias,
-      29u8 => TofCommandCode::SetTOFEventBuilderConfig,
-      30u8 => TofCommandCode::DataRunStop,
-      31u8 => TofCommandCode::DataRunStart,
-      32u8 => TofCommandCode::StartValidationRun,
-      41u8 => TofCommandCode::GetFullWaveforms,
-      53u8 => TofCommandCode::RBCalibration,
-      44u8 => TofCommandCode::UnspoolEventCache,
-      23u8 => TofCommandCode::SetRBDataBufSize,
-      60u8 => TofCommandCode::RestartLiftofRBClients,
-      70u8 => TofCommandCode::Listen,
-      71u8 => TofCommandCode::Staging,
-      80u8 => TofCommandCode::Lock,
-      81u8 => TofCommandCode::Unlock,
-      90u8 => TofCommandCode::SendTofEvents,
-      91u8 => TofCommandCode::NoSendTofEvents,
-      92u8 => TofCommandCode::SendRBWaveforms,
-      93u8 => TofCommandCode::NoSendRBWaveforms,
-      _    => TofCommandCode::Unknown
+      0u8   => TofCommandCode::Unknown,
+      1u8   => TofCommandCode::Ping,
+      2u8   => TofCommandCode::Moni,
+      4u8   => TofCommandCode::Kill,
+      21u8  => TofCommandCode::SetLTBThresholds,
+      22u8  => TofCommandCode::SetMTConfig,
+      28u8  => TofCommandCode::SetPreampBias,
+      29u8  => TofCommandCode::SetTOFEventBuilderConfig,
+      30u8  => TofCommandCode::DataRunStop,
+      31u8  => TofCommandCode::DataRunStart,
+      32u8  => TofCommandCode::StartValidationRun,
+      41u8  => TofCommandCode::GetFullWaveforms,
+      53u8  => TofCommandCode::RBCalibration,
+      44u8  => TofCommandCode::UnspoolEventCache,
+      23u8  => TofCommandCode::SetRBDataBufSize,
+      60u8  => TofCommandCode::RestartLiftofRBClients,
+      70u8  => TofCommandCode::Listen,
+      71u8  => TofCommandCode::Staging,
+      80u8  => TofCommandCode::Lock,
+      81u8  => TofCommandCode::Unlock,
+      90u8  => TofCommandCode::SendTofEvents,
+      91u8  => TofCommandCode::NoSendTofEvents,
+      92u8  => TofCommandCode::SendRBWaveforms,
+      93u8  => TofCommandCode::NoSendRBWaveforms,
+      100u8 => TofCommandCode::ShutdownRB,
+      101u8 => TofCommandCode::ChangeNextRunConfig,
+      _     => TofCommandCode::Unknown
     }
   }
 }
@@ -180,10 +185,128 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::SendRBWaveforms,
       TofCommandCode::NoSendRBWaveforms,
       TofCommandCode::Kill,
+      TofCommandCode::ShutdownRB,
+      TofCommandCode::ChangeNextRunConfig,
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
     choices[idx]
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+/// A general command class with an arbitrary payload
+///
+/// Since the commands should in general be small
+/// the maixmal payload size is limited to 256 bytes
+///
+/// All commands will get broadcasted and the 
+/// receiver has to figure out if they have 
+/// to rect to that command
+#[derive(Debug, Clone, PartialEq)]
+pub struct TofCommandV2 {
+  pub command_code : TofCommandCode,
+  pub payload      : Vec<u8>,
+}
+
+impl TofCommandV2 {
+  pub fn new() -> Self {
+    Self {
+      command_code : TofCommandCode::Unknown,
+      payload      : Vec::<u8>::new(),
+    }
+  }
+
+  pub fn forge_changerunconfig(key_value : Vec<String>) -> TofCommandV2 {
+    let mut cmd = TofCommandV2::new();
+    cmd.command_code = TofCommandCode::ChangeNextRunConfig;
+    if key_value.len() == 0 {
+      error!("Empty command!");
+      return cmd;
+    }
+    let mut payload_string = String::from("");
+    for k in 0..key_value.len() - 1 {
+      payload_string += &format!("{}::", k);
+    }
+    payload_string += key_value.last().unwrap();
+    let mut payload = Vec::<u8>::new();
+    payload.extend_from_slice(payload_string.as_bytes());
+    cmd.payload = payload;
+    cmd
+  }
+}
+
+impl Packable for TofCommandV2 {
+  const PACKET_TYPE : PacketType = PacketType::TofCommandV2;
+}
+
+impl Serialization for TofCommandV2 {
+  
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+
+  fn from_bytestream(stream    : &Vec<u8>, 
+                     pos       : &mut usize) 
+    -> Result<Self, SerializationError>{
+    let mut command = TofCommandV2::new();
+    if parse_u16(stream, pos) != Self::HEAD {
+      error!("The given position {} does not point to a valid header signature of {}", pos, Self::HEAD);
+      return Err(SerializationError::HeadInvalid {});
+    }
+    command.command_code = TofCommandCode::from(parse_u8(stream, pos));
+    let payload_size     = parse_u8(stream, pos);
+    let payload          = stream[*pos..*pos + payload_size as usize].to_vec();
+    command.payload      = payload;
+    *pos += payload_size as usize;
+    let tail = parse_u16(stream, pos);
+    if tail != Self::TAIL {
+      error!("After parsing the event, we found an invalid tail signature {}", tail);
+      return Err(SerializationError::TailInvalid);
+    }
+    Ok(command)
+  }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::with_capacity(9);
+    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
+    stream.push(self.command_code as u8);
+    stream.push(self.payload.len() as u8);
+    stream.extend_from_slice(self.payload.as_slice());
+    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
+    stream
+  }
+}
+
+impl Default for TofCommandV2 {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for TofCommandV2 {
+  fn from_random() -> Self {
+    let mut rng      = rand::thread_rng();
+    let command_code = TofCommandCode::from_random();
+    let payload_size = rng.gen::<u8>();
+    let mut payload  = Vec::<u8>::with_capacity(payload_size as usize);
+    for _ in 0..payload_size {
+      payload.push(rng.gen::<u8>());
+    }
+    Self {
+      command_code : command_code,
+      payload      : payload
+    }
+  }
+}
+
+impl fmt::Display for TofCommandV2 {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    //let cc = RBCommand::command_code_to_string(self.command_code);
+    let mut repr = String::from("<TofCommandV2");
+    repr += &(format!("\n  cmd code : {}>", self.command_code)); 
+    write!(f, "{}", repr)
   }
 }
 
@@ -348,101 +471,6 @@ impl FromRandom for TofOperationMode {
   }
 }
 
-/// A general command class with an arbitrary payload
-///
-/// Since the commands should in general be small
-/// the maixmal payload size is limited to 256 bytes
-///
-/// All commands will get broadcasted and the 
-/// receiver has to figure out if they have 
-/// to rect to that command
-#[derive(Debug, Clone, PartialEq)]
-pub struct TofCommandV2 {
-  pub command_code : TofCommandCode,
-  pub payload      : Vec<u8>,
-}
-
-impl TofCommandV2 {
-  pub fn new() -> Self {
-    Self {
-      command_code : TofCommandCode::Unknown,
-      payload      : Vec::<u8>::new(),
-    }
-  }
-}
-
-impl Packable for TofCommandV2 {
-  const PACKET_TYPE : PacketType = PacketType::TofCommandV2;
-}
-
-impl Serialization for TofCommandV2 {
-  
-  const HEAD : u16 = 0xAAAA;
-  const TAIL : u16 = 0x5555;
-
-  fn from_bytestream(stream    : &Vec<u8>, 
-                     pos       : &mut usize) 
-    -> Result<Self, SerializationError>{
-    let mut command = TofCommandV2::new();
-    if parse_u16(stream, pos) != Self::HEAD {
-      error!("The given position {} does not point to a valid header signature of {}", pos, Self::HEAD);
-      return Err(SerializationError::HeadInvalid {});
-    }
-    command.command_code = TofCommandCode::from(parse_u8(stream, pos));
-    let payload_size     = parse_u8(stream, pos);
-    let payload          = stream[*pos..*pos + payload_size as usize].to_vec();
-    command.payload      = payload;
-    *pos += payload_size as usize;
-    let tail = parse_u16(stream, pos);
-    if tail != Self::TAIL {
-      error!("After parsing the event, we found an invalid tail signature {}", tail);
-      return Err(SerializationError::TailInvalid);
-    }
-    Ok(command)
-  }
-
-  fn to_bytestream(&self) -> Vec<u8> {
-    let mut stream = Vec::<u8>::with_capacity(9);
-    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
-    stream.push(self.command_code as u8);
-    stream.push(self.payload.len() as u8);
-    stream.extend_from_slice(self.payload.as_slice());
-    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
-    stream
-  }
-}
-
-impl Default for TofCommandV2 {
-  fn default() -> Self {
-    Self::new()
-  }
-}
-
-#[cfg(feature = "random")]
-impl FromRandom for TofCommandV2 {
-  fn from_random() -> Self {
-    let mut rng      = rand::thread_rng();
-    let command_code = TofCommandCode::from_random();
-    let payload_size = rng.gen::<u8>();
-    let mut payload  = Vec::<u8>::with_capacity(payload_size as usize);
-    for _ in 0..payload_size {
-      payload.push(rng.gen::<u8>());
-    }
-    Self {
-      command_code : command_code,
-      payload      : payload
-    }
-  }
-}
-
-impl fmt::Display for TofCommandV2 {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    //let cc = RBCommand::command_code_to_string(self.command_code);
-    let mut repr = String::from("<TofCommandV2");
-    repr += &(format!("\n  cmd code : {}>", self.command_code)); 
-    write!(f, "{}", repr)
-  }
-}
 //
 //
 //  pub fn command_code_to_string(cc : u8) -> String {

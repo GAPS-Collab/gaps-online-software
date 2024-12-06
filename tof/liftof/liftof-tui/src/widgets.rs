@@ -201,10 +201,10 @@ pub fn timeseries<'a>(data        : &'a mut VecDeque<(f64,f64)>,
   }
   t_max += (0.05*t_max as f64).round() as u64;
   let t_spacing = (t_max - t_min)/10;
-  let mut t_labels = Vec::<String>::new();
+  let mut t_labels = Vec::<Span>::new();
   for k in 0..10 {
     let _label = format!("{}", (t_min + t_spacing * k as u64));
-    t_labels.push(_label);
+    t_labels.push(Span::from(_label));
   }
 
   let y_only : Vec::<f64> = data.iter().map(|z| z.1).collect();
@@ -225,7 +225,7 @@ pub fn timeseries<'a>(data        : &'a mut VecDeque<(f64,f64)>,
   y_max += f64::abs(y_max)*0.05;
   y_min -= f64::abs(y_min)*0.05;
   let y_spacing = f64::abs(y_max - y_min)/5.0;
-  let mut y_labels = Vec::<String>::new() ;
+  let mut y_labels = Vec::<Span>::new() ;
   let mut precision = 0u8;
   if f64::abs(y_max - y_min) <= 10.0 {
     precision = 1;
@@ -237,15 +237,15 @@ pub fn timeseries<'a>(data        : &'a mut VecDeque<(f64,f64)>,
     match precision {
       0 => {
         let _label = format!("{}", (y_min + y_spacing * k as f64).round() as i64);
-        y_labels.push(_label);
+        y_labels.push(Span::from(_label));
       },
       1 => {
         let _label = format!("{:.1}", (y_min + y_spacing * k as f64));
-        y_labels.push(_label);
+        y_labels.push(Span::from(_label));
       },
       2 => {
         let _label = format!("{:.2}", (y_min + y_spacing * k as f64));
-        y_labels.push(_label);
+        y_labels.push(Span::from(_label));
       },
       _ => (),
     }
@@ -269,12 +269,16 @@ pub fn timeseries<'a>(data        : &'a mut VecDeque<(f64,f64)>,
       .title(Span::styled("MET [s]", Style::default().fg(Color::White)))
       .style(theme.style())
       .bounds([t_min as f64, t_max as f64])
-      .labels(t_labels.clone().iter().cloned().map(Span::from).collect()))
+      //.labels(t_labels.clone().iter().cloned().map(Span::from).collect()))
+      .labels(t_labels.clone())
+    )
     .y_axis(Axis::default()
       //.title(Span::styled("T [\u{00B0}C]", Style::default().fg(Color::White)))
       .style(theme.style())
       .bounds([y_min as f64, y_max as f64])
-      .labels(y_labels.clone().iter().cloned().map(Span::from).collect()))
+      //.labels(y_labels.clone().iter().cloned().map(Span::from).collect()))
+      .labels(y_labels.clone())
+    )
     .style(theme.style());
     chart
 }

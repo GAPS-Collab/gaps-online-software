@@ -17,36 +17,39 @@ cfg_if::cfg_if! {
   }
 }
 
-//use crate::DsiLtbRBMapping;
 use crate::serialization::{
-    Serialization,
-    Packable,
-    parse_u8,
-    parse_u16,
-    parse_u32,
-    parse_u64,
-    parse_f32,
-    search_for_u16
+  Serialization,
+  Packable,
+  parse_u8,
+  parse_u16,
+  parse_u32,
+  parse_u64,
+  parse_f32,
+  search_for_u16
 };
+
 use crate::packets::PacketType;
 use crate::errors::SerializationError;
 
 use crate::events::{
-    MasterTriggerEvent,
-    RBEvent,
-    TofHit,
-    RBWaveform,
-    //RBMissingHit,
-    TriggerType,
-    EventStatus,
+  MasterTriggerEvent,
+  RBEvent,
+  TofHit,
+  RBWaveform,
+  //RBMissingHit,
+  TriggerType,
+  EventStatus,
 };
 
 use crate::events::master_trigger::{
-    LTBThreshold,
-    LTB_CHANNELS
+  LTBThreshold,
+  LTB_CHANNELS
 };
 
 use crate::ProtocolVersion;
+
+#[cfg(feature ="database")]
+use crate::database::DsiJChPidMapping;
 
 // This looks like a TODO
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -159,6 +162,33 @@ impl TofEvent {
     }
   }
 
+  /// Compare the MasterTriggerEvent::trigger_hits with 
+  /// the actual hits to determine from which paddles
+  /// we should have received HG hits (from waveforms)
+  /// but we did not get them
+  ///
+  /// WARNING: The current implementation of this is 
+  /// rather slow and not fit for production use
+  /// FIXME - rewrite as a closure
+  #[cfg(feature="database")]
+  pub fn get_missing_paddles_hg(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
+    let mut missing = Vec::<u8>::new();
+    for th in self.mt_event.get_trigger_hits() {
+      let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
+      let mut found = false;
+      for h in self.get_hits() {
+        if h.paddle_id == pid {
+          found = true;
+          break
+        }
+      }
+      if !found {
+        missing.push(pid);
+      }
+    }
+    missing
+  }
+
   pub fn extract_event_id_from_stream(stream : &Vec<u8>) 
     -> Result<u32, SerializationError> {
     // 2 + 2 + 2 + 2 + 4
@@ -253,10 +283,12 @@ impl TofEvent {
     // go elsewhere
     summary.version           = ProtocolVersion::V1;
     //let status                = self.header.status;
-    let mt_timestamp          = self.mt_event.get_timestamp_abs48();
-    
+    let mt_timestamp          = (self.mt_event.get_timestamp_abs48() as f64/1000.0).floor()  as u64; 
+    //println!("DEBUGGING {}", mt_timestamp);
     summary.timestamp32       = (mt_timestamp  & 0x00000000ffffffff ) as u32;
+    //println!("DEBUGGING {}", summary.timestamp32);
     summary.timestamp16       = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
+    //println!("DEBUGGING  {}", summary.timestamp16);
     summary.primary_beta      = self.header.primary_beta; 
     summary.primary_charge    = self.header.primary_charge; 
     summary.dsi_j_mask        = self.mt_event.dsi_j_mask;
@@ -635,6 +667,34 @@ impl TofEventSummary {
       hits              : Vec::<TofHit>::new(),
     }
   }
+
+  /// Compare the MasterTriggerEvent::trigger_hits with 
+  /// the actual hits to determine from which paddles
+  /// we should have received HG hits (from waveforms)
+  /// but we did not get them
+  ///
+  /// WARNING: The current implementation of this is 
+  /// rather slow and not fit for production use
+  /// FIXME - rewrite as a closure
+  #[cfg(feature="database")]
+  pub fn get_missing_paddles_hg(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
+    let mut missing = Vec::<u8>::new();
+    for th in self.get_trigger_hits() {
+      let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
+      let mut found = false;
+      for h in &self.hits {
+        if h.paddle_id == pid {
+          found = true;
+          break
+        }
+      }
+      if !found {
+        missing.push(pid);
+      }
+    }
+    missing
+  }
+
   /// Get the RB link IDs according to the mask
   pub fn get_rb_link_ids(&self) -> Vec<u8> {
     let mut links = Vec::<u8>::new();
@@ -645,8 +705,6 @@ impl TofEventSummary {
     }
     links
   }
-  
-
 
   /// Get the combination of triggered DSI/J/CH on 
   /// the MTB which formed the trigger. This does 

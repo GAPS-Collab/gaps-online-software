@@ -5,8 +5,65 @@ pub mod threads;
 
 use std::fs;
 use std::path::PathBuf;
+use std::os::unix::fs::symlink;
+use std::sync::{
+  Arc,
+  Mutex,
+};
+
+use std::process::{
+  Command,
+  Child,
+};
+
+use std::thread;
+use std::fs::create_dir_all;
+
+use std::time::{
+  Duration,
+  Instant,
+};
+
+use crossbeam_channel::Sender;
+
+use indicatif::{
+  ProgressBar,
+  ProgressStyle
+};
+
+use liftof_lib::constants::{
+  DEFAULT_CALIB_VOLTAGE,
+  DEFAULT_RB_ID,
+  DEFAULT_CALIB_EXTRA,
+  //PAD_CMD_32BIT
+};
+
+use tof_dataclasses::constants::PAD_CMD_32BIT;
+use tof_dataclasses::serialization::{
+  Serialization,
+  Packable
+};
+
+use tof_dataclasses::commands::{
+  TofCommand,
+  //TofCommandCode,
+  //TofResponse,
+};
+
+use tof_dataclasses::status::TofDetectorStatus;
+use tof_dataclasses::packets::TofPacket;
+
+use tof_dataclasses::io::{
+    TofPacketWriter,
+    FileType,
+    get_utc_timestamp
+};
 
 use liftof_lib::settings::LiftofSettings;
+
+use liftof_lib::thread_control::ThreadControl;
+
+use tof_dataclasses::database::ReadoutBoard;
 
 /// Prepare a new folder with the run id
 ///
@@ -106,3 +163,385 @@ pub fn prepare_run(data_path  : String,
 }
 
 
+///// Taka a data run. This can be either verification or physcis
+//pub fn run(with_calibration : bool, verification : bool) {
+//  //prepare_run(data_path  : String,
+//  //                 config     : &LiftofSettings,
+//  //                 run_id     : Option<u32>,
+//  //                 create_dir : bool) -> Option<u32> {
+//  if with_calibration {
+//    //calibrate_tof()
+//  }
+//}
+
+/// Trigger a restart of liftof-cc and start a new run
+///
+///
+/// # Arguments
+///
+///  * mode : The argument given to the systemd service 
+///           - either "start", "stop", "restart", etc.
+pub fn manage_liftof_cc_service(mode : String) {
+  match Command::new("sudo")
+    .args(["systemctl", &mode, "liftof"])
+    .spawn() {
+    Err(err) => {
+      error!("Unable to execute sudo systemctl {} liftof! {}", mode, err);
+    }
+    Ok(child) => {
+      println!("=> Executed sudo systemctl {} liftof", mode);
+    }
+  }
+}
+
+
+/// Trigger a general command on the Readoutboards 
+/// remotly through ssh.
+///
+/// Ssh keys and aliases (e.g. tof-rb02) must be 
+/// set up for this to work
+///
+/// # Arguments:
+///
+///   * rb_list : The list of ReadoutBoards the commands
+///               will get executed
+///   * cmd     : The actual command without 'ssh <ip>'
+fn ssh_command_rbs(rb_list : &Vec<ReadoutBoard>,
+                   cmd     : Vec<String>) {
+  let mut rb_handles       = Vec::<thread::JoinHandle<_>>::new();
+  println!("=> Executing ssh command {:?} on {} RBs!", cmd, rb_list.len());
+  let mut children = Vec::<(u8,Child)>::new();
+  for rb in rb_list {
+    // also populate the rb thread nandles
+    rb_handles.push(thread::spawn(||{}));
+    let rb_address   = format!("tof-rb{:02}", rb.rb_id);
+    let mut ssh_args = vec![rb_address];
+    let mut thisrb_cmd = cmd.clone();
+    ssh_args.append(&mut thisrb_cmd);
+    match Command::new("ssh")
+      //.args([&rb_address, "sudo", "systemctl", "restart", "liftof"])
+      .args(ssh_args)
+      .spawn() {
+      Err(err) => {
+        error!("Unable to spawn ssh process on RB {}! {}", rb.rb_id, err);
+      }
+      Ok(child) => {
+        children.push((rb.rb_id,child));
+      }
+    }
+  }
+  let mut issues = Vec::<u8>::new();
+  for rb_child in &mut children {
+    match rb_child.1.wait() {
+      Err(err) => {
+        error!("Child process failed with stderr {:?}! {}", rb_child.1.stderr, err);
+      }
+      Ok(status) => {
+        if status.success() {
+          info!("Execution of command on {} successful!", rb_child.0);
+        } else {
+          error!("Execution of command on {} failed with exit code {:?}!", rb_child.0, status.code());
+          issues.push(rb_child.0);
+        }
+      }
+    }
+  }
+  if issues.len() == 0 {
+    println!("=> Executing ssh command {:?} on {} RBs successful!", cmd, rb_list.len());
+  }
+}
+
+/// Restart liftof-rb on RBs
+pub fn restart_liftof_rb(rb_list : &Vec<ReadoutBoard>) {
+  let command = vec![String::from("sudo"),
+                     String::from("systemctl"),
+                     String::from("restart"),
+                     String::from("liftof")];
+  println!("=> Restarting liftof-rb on RBs!");
+  ssh_command_rbs(rb_list, command);
+}
+
+/// A "verification" run describes an any trigger/track trigger
+/// run which should iluminate the entire tof so that we can do 
+/// a working channel inventory. 
+///
+/// A verification run will not safe data to disk, but instead 
+/// run it through a small analysis engine and count the active 
+/// channels
+pub fn verification_run(timeout        : u32,
+                        tp_to_sink     : Sender<TofPacket>,
+                        thread_control : Arc<Mutex<ThreadControl>>) {
+  let mut write_state : bool = true; // when in doubt, write data to disk
+  let mut config      = LiftofSettings::new();
+  match thread_control.lock() {
+    Ok(mut tc) => {
+      write_state = tc.write_data_to_disk;
+      tc.write_data_to_disk       = false;
+      tc.verification_active      = true;
+      tc.thread_master_trg_active = true;
+      tc.calibration_active       = false;
+      tc.thread_event_bldr_active = true;
+      config = tc.liftof_settings.clone();
+    }
+    Err(err) => {
+      error!("Can't acquire lock for ThreadControl! {err}");
+    },
+  }
+  let one_second  = Duration::from_millis(1000);
+  let runtime     = Instant::now();
+  // technically, it is run_typ, rb_id, event number
+  // all to the max means run start for all
+  // We don't need this - just need to make sure it gets broadcasted
+  let cmd_payload: u32 =  PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
+  let cmd          = TofCommand::DataRunStart(cmd_payload);
+  let packet       = cmd.pack();
+  let mut payload  = String::from("BRCT").into_bytes();
+  payload.append(&mut packet.to_bytestream());
+  
+  // open 0MQ socket here
+  let ctx = zmq::Context::new();
+  let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+  let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
+  cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+  // after we opened the socket, give the RBs a chance to connect
+  println!("=> Give the RBs a chance to connect and wait a bit..");
+  thread::sleep(10*one_second);
+  match cmd_sender.send(&payload, 0) {
+    Err(err) => {
+      error!("Unable to send command, error{err}");
+    },
+    Ok(_) => {
+      debug!("We sent {:?}", payload);
+    }
+  }
+  
+  println!("=> Verification run initialized!");
+  // just wait until the run is finisehd
+  loop {
+    if runtime.elapsed().as_secs() > timeout as u64 {
+      break;
+    }
+    thread::sleep(5*one_second);
+  }
+  
+  println!("=> Ending verification run!");
+  println!("=> Sending run termination command to the RBs");
+  let cmd          = TofCommand::DataRunStop(DEFAULT_RB_ID as u32);
+  let packet       = cmd.pack();
+  let mut payload  = String::from("BRCT").into_bytes();
+  payload.append(&mut packet.to_bytestream());
+  
+  warn!("=> No command socket available! Can not shut down RBs..!");
+  // after we opened the socket, give the RBs a chance to connect
+  println!("=> Give the RBs a chance to connect and wait a bit..");
+  thread::sleep(10*one_second);
+  match cmd_sender.send(&payload, 0) {
+    Err(err) => {
+      error!("Unable to send command! {err}");
+    },
+    Ok(_) => {
+      debug!("We sent {:?}", payload);
+    }
+  }
+
+  // move the socket out of here for further use
+  let mut detector_status = TofDetectorStatus::new();
+  match thread_control.lock() {
+    Ok(mut tc) => {
+      tc.write_data_to_disk = write_state;
+      tc.verification_active = false;
+      detector_status = tc.detector_status.clone();
+    },
+    Err(err) => {
+      error!("Can't acquire lock for ThreadControl! {err}");
+    },
+  }
+  println!("=> Acquired TofDetectorStatus!");
+  println!("{}", detector_status);
+  let pack = detector_status.pack();
+  match tp_to_sink.send(pack) {
+    Err(err) => error!("Unable to send TofDetectorStatus to data sink! {err}"),
+    Ok(_)    => ()
+  }
+}
+
+
+/// Run a full tof calibration - RBCalibration
+/// 
+/// The purpose of the RB calibration to is to create a 
+/// relationship between the adc/timing bins and voltages
+/// and nanoseconds
+///
+/// This function is blocking, until a certain (configurable)
+/// timeout is expired. The timeout can be set in the configuration
+/// file
+///
+/// # Argumeents:
+///
+///   * thread_control : general shared memory to hold configuration
+///                      settings, program st ate
+///   * rb_list        : List of active readoutboards
+///   * show_progress  : if true, it will show a progressbar with 
+///                      indicatif
+///
+pub fn calibrate_tof(thread_control : Arc<Mutex<ThreadControl>>,
+                     rb_list        : &Vec<ReadoutBoard>,
+                     show_progress  : bool) {
+
+  let one_second               = Duration::from_millis(1000);
+  let mut cc_pub_addr          = String::from("");
+  let calibration_timeout_fail = Duration::from_secs(300); // in seconds
+ 
+  let mut cali_dir_created = false;
+  let mut cali_output_dir  = String::from("");
+  let mut cali_base_dir        = String::from("");
+
+  match thread_control.lock() {
+    Ok(mut tc) => {
+      for rb in rb_list {
+        tc.finished_calibrations.insert(rb.rb_id,false); 
+      }
+      cali_base_dir = tc.liftof_settings.calibration_dir.clone();
+      cc_pub_addr   = tc.liftof_settings.cmd_dispatcher_settings.cc_server_address.clone();
+      tc.write_data_to_disk = true;
+    },
+    Err(err) => {
+      error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+    },
+  }
+
+  let voltage_level = DEFAULT_CALIB_VOLTAGE;
+  let rb_id         = DEFAULT_RB_ID;
+  let extra         = DEFAULT_CALIB_EXTRA;
+  println!("=> Received calibration default command! Will init calibration run of all RBs...");
+  let cmd_payload: u32
+    = (voltage_level as u32) << 16 | (rb_id as u32) << 8 | (extra as u32);
+  let default_calib = TofCommand::DefaultCalibration(cmd_payload);
+  let tp = default_calib.pack();
+  let mut payload  = String::from("BRCT").into_bytes();
+  payload.append(&mut tp.to_bytestream());
+  // open 0MQ socket here
+  let ctx = zmq::Context::new();
+  let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+
+  cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+  println!("=> Give the RBs a chance to connect and wait a bit..");
+  thread::sleep(10*one_second);
+  match cmd_sender.send(&payload, 0) { Err(err) => {
+      error!("Unable to send command, error{err}");
+    },
+    Ok(_) => {
+      println!("=> Calibration  initialized!");
+    }
+  }
+  match thread_control.lock() {
+    Ok(mut tc) => {
+      // deactivate the master trigger thread
+      tc.thread_master_trg_active =false;
+      tc.calibration_active = true;
+    },
+    Err(err) => {
+      error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+    },
+  }
+
+  let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
+  let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
+  let mut bar    = ProgressBar::hidden();
+  
+  println!("=> .. now we need to wait until the calibration is finished!");
+  if show_progress {
+    bar = ProgressBar::new(rb_list.len() as u64); 
+    bar.set_position(0);
+    let bar_label  = String::from("Acquiring RB calibration data");
+    bar.set_message (bar_label);
+    bar.set_prefix  ("\u{2699}\u{1F4D0}");
+    bar.set_style   (bar_style);
+  }
+
+  // now block until the calibrations are done or we time outu
+  // FIXME - set timeout parameter in settings
+  let timeout = Instant::now();
+  let mut cali_received = 0;
+  'main: loop {
+    thread::sleep(10*one_second);
+    if timeout.elapsed() > calibration_timeout_fail {
+      error!("Calibration timeout! Calibrations might not be complete!");
+      break;
+    }
+    //let mut rbcali = RBCalibrations::new();
+    match thread_control.lock() {
+      Ok(mut tc) => {
+        for rbid in rb_list {
+          // the global data sink sets these flags
+          let mut finished_keys = Vec::<u8>::new();
+          if tc.stop_flag {
+            println!("Stop signal received, exiting calibration routine!");
+            break 'main;
+          }
+          if tc.finished_calibrations[&rbid.rb_id] {
+            cali_received += 1;
+            let rbcali = tc.calibrations.get(&rbid.rb_id).expect("We got the signal tat this calibration is ready but it is not!");
+            let pack   = rbcali.pack();
+            // See RBCalibration reference
+            let file_type  = FileType::CalibrationFile(rbid.rb_id);
+            //println!("==> Writing stream to file with prefix {}", streamfile_name);
+            //let mut cali_writer = TofPacketWriter::new(write_stream_path.clone(), file_type);
+            if !cali_dir_created {
+              let today           = get_utc_timestamp();
+              cali_output_dir     = format!("{}/{}", cali_base_dir.clone(), today);
+              match create_dir_all(cali_output_dir.clone()) {
+                Ok(_)    => info!("Created {} for calibration data!", cali_output_dir),
+                Err(err) => error!("Unable to create {} for calibration data! {}", cali_output_dir, err)
+              }
+              cali_dir_created = true;
+            }
+            let mut cali_writer = TofPacketWriter::new(cali_output_dir.clone(), file_type);
+            cali_writer.add_tof_packet(&pack);
+            drop(cali_writer);
+
+            bar.set_position(cali_received);
+            finished_keys.push(rbid.rb_id);
+          }
+          for rbid in &finished_keys {
+            *tc.finished_calibrations.get_mut(&rbid).unwrap() = false; 
+          }
+        }
+        // FIXME - this or a timer
+        if cali_received as usize == rb_list.len() {
+          // cali_received = 0;
+          // if we want to redo a calibration, 
+          // somebody else has to set this 
+          // flag again.
+          tc.calibration_active = false;
+          // reset the counters
+          for rbid in rb_list {
+            *tc.finished_calibrations.get_mut(&rbid.rb_id).unwrap() = false; 
+          }
+          if show_progress {
+            bar.finish_with_message("Done");
+          }
+          break;
+        }
+      }
+      Err(err) => {
+        error!("Can't acquire lock for ThreadControl at this time! Unable to set calibration mode! {err}");
+      }
+    }
+  } // end loop
+  // The last step is to create te symlink
+  let cali_link_dir = cali_base_dir.clone() + "latest";
+  match fs::remove_file(cali_link_dir.clone()) {
+    Ok(_) => {
+      println!("=> Symlink {} removed!", cali_link_dir);
+    },
+    Err(err) => {
+      error!("Unable to remove symlink to latest calibrations! {err}");
+    }
+  }
+  println!("=> Will create symlink {}", cali_link_dir);
+  match symlink(cali_output_dir, cali_link_dir) {
+    Err(err) => error!("Unable to create symlink for calibration data! {err}"),
+    Ok(_)    => ()
+  }
+}

@@ -33,13 +33,16 @@ use tof_dataclasses::commands::{
   TofOperationMode,
 };
 
+use tof_dataclasses::events::rb_event::RBPaddleID;
+
 use liftof_lib::{
   RunStatistics,
   //waveform_analysis,
 };
+
 use liftof_lib::thread_control::ThreadControl;
 
- use crate::control::get_deadtime;
+use crate::control::get_deadtime;
 
 ///  Transforms raw bytestream to TofPackets
 ///
@@ -71,6 +74,7 @@ use liftof_lib::thread_control::ThreadControl;
 ///                          This only applies when the op mode is not 
 ///                          RBHighThroughput
 pub fn event_processing(board_id            : u8,
+                        rbpaddleid          : RBPaddleID,
                         bs_recv             : &Receiver<Vec<u8>>,
                         get_op_mode         : &Receiver<TofOperationMode>, 
                         tp_sender           : &Sender<TofPacket>,
@@ -114,11 +118,12 @@ pub fn event_processing(board_id            : u8,
   let mut streamer        = RBEventMemoryStreamer::new();
   // FIXME
   streamer.check_channel_errors = true;
-  
+  let mut trace_suppressed      = false;  
   match thread_control.lock() {
     Ok(tc) => {
       streamer.calc_crc32   = tc.liftof_settings.rb_settings.calc_crc32;
       deadtime_instead_temp = tc.liftof_settings.rb_settings.drs_deadtime_instead_fpga_temp; 
+      trace_suppressed      = tc.liftof_settings.mtb_settings.trace_suppression;
     },
     Err(err) => {
       trace!("Can't acquire lock! {err}");
@@ -134,7 +139,9 @@ pub fn event_processing(board_id            : u8,
   let mut n_events = 0usize;
   
   'main : loop {
-    if thread_ctrl_check_timer.elapsed().as_secs() >= 1 {
+    // FIXME - this whole loop needs to be faster, and there 
+    // is no interactive commanding anymore.
+    if thread_ctrl_check_timer.elapsed().as_secs() >= 6 {
       match thread_control.lock() {
         Ok(tc) => {
           if tc.stop_flag {
@@ -251,6 +258,7 @@ pub fn event_processing(board_id            : u8,
                   continue 'main;
                 },
                 Some(mut event) => {
+                  event.header.set_rbpaddleid(&rbpaddleid);
                   if deadtime_instead_temp {
                     // in case we want to add the deadtime to the header, 
                     // we have to do that here!
@@ -269,7 +277,9 @@ pub fn event_processing(board_id            : u8,
                   if last_event_id != 0 {
                     if event.header.event_id != last_event_id + 1 {
                       if event.header.event_id > last_event_id {
+                        if !trace_suppressed {
                           skipped_events += (event.header.event_id - last_event_id -1) as usize;
+                        }
                       } else {
                         error!("Something with the event counter is messed up. Got event id {}, but the last event id was {}", event.header.event_id, last_event_id);
                       }

@@ -4,6 +4,12 @@
 use std::collections::HashMap;
 use std::fmt;
 
+#[cfg(feature = "database")]
+use tof_dataclasses::database::ReadoutBoard;
+
+use tof_dataclasses::status::TofDetectorStatus;
+use tof_dataclasses::calibrations::RBCalibrations;
+
 use crate::settings::LiftofSettings;
 
 /// Send runtime information 
@@ -18,6 +24,8 @@ pub struct ThreadControl {
   /// Keep track on how many calibration 
   /// packets we have received
   pub finished_calibrations      : HashMap<u8,bool>,
+  /// Hold the actual calibration data
+  pub calibrations               : HashMap<u8, RBCalibrations>,
   /// alive indicator for cmd dispatch thread
   pub thread_cmd_dispatch_active : bool,
   /// alive indicator for data sink thread
@@ -38,7 +46,14 @@ pub struct ThreadControl {
   pub run_id                     : u32,
   /// The number of boards available
   pub n_rbs                      : u32,
-  /// Write data to disk
+  #[cfg(feature = "database")]
+  /// The active readoutboards in the Tof
+  pub rb_list                    : Vec<ReadoutBoard>,
+  /// Verification run currently active
+  pub verification_active        : bool,
+  /// TOF Detector status - which channels are active?
+  pub detector_status            : TofDetectorStatus,
+  /// Decide if data is actually written to disk
   pub write_data_to_disk         : bool,
   /// indicator that a new 
   /// run has started
@@ -55,6 +70,7 @@ impl ThreadControl {
       stop_flag                  : false,
       calibration_active         : false,
       finished_calibrations      : HashMap::<u8,bool>::new(),
+      calibrations               : HashMap::<u8, RBCalibrations>::new(),
       thread_cmd_dispatch_active : false,
       thread_data_sink_active    : false,
       thread_runner_active       : false,
@@ -66,6 +82,10 @@ impl ThreadControl {
       thread_signal_hdlr_active  : true,
       run_id                     : 0,
       n_rbs                      : 0,
+      #[cfg(feature = "database")]
+      rb_list                    : Vec::<ReadoutBoard>::new(),
+      verification_active        : false,
+      detector_status            : TofDetectorStatus::new(),
       write_data_to_disk         : false,
       new_run_start_flag         : false,
       reset_mtb_daq              : false,
@@ -85,6 +105,7 @@ impl fmt::Display for ThreadControl {
     for k in self.finished_calibrations.keys() {
       repr        += &(format!("\n  -- finished  {}  : {}", k, self.finished_calibrations.get(k).unwrap()));       
     }
+    repr        += &(format!("\n    -- verification run: {}", self.verification_active));
     repr        += "\n    -- program status:";
     repr        += &(format!("\n  stop flag : {}", self.stop_flag));
     repr        += "\n    -- reported thread activity:";
