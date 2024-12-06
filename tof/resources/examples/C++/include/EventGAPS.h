@@ -19,8 +19,12 @@
 
 // Just some variables that we will use later. Should make more robust
 // Need 1 larger to account for no "zero" cube paddle
-#define NCUBE 61  
+#define NCUBT 61  
+#define NUMBT 48  
+#define NCUBC 12  
 #define NUMBC 12
+#define NCUBS  8
+#define NCORT 10
 
 // Types of Thresholds to use in determining timing
 enum THRTYPE { CONSTANT, CFD_ELEC, CFD_SIMPLE, PCONSTANT, PCFD };
@@ -165,7 +169,12 @@ private:
   TH1I    *NPaddlesUmbrella;
   TH1I    *NPaddlesCortina;
 
-  TH1F    *H_Offset[NCUBE][NUMBC];  // 60 Cube paddles, 12 Umb-Center paddles
+  TH1F    *H_OffCube[NCUBT][NUMBC]; // 60 Cube, 12 Umb-Center paddles
+  TH1F    *H_OffUmb[NUMBT][NCUBC];  // 48 Umb, 12 Cube-Center(Top) paddles
+  TH1F    *H_OffCorN[NCORT][NCUBS]; // 8 Cube, 10 Cortina paddles
+  TH1F    *H_OffCorE[NCORT][NCUBS]; // 8 Cube, 10 Cortina paddles
+  TH1F    *H_OffCorS[NCORT][NCUBS]; // 8 Cube, 10 Cortina paddles
+  TH1F    *H_OffCorW[NCORT][NCUBS]; // 8 Cube, 10 Cortina paddles
   
   // MEMBER FUNCTIONS
   void    Message(const char *s);           // Print out messages as needed

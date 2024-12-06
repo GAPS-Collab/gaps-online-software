@@ -33,7 +33,8 @@ int main(int argc, char *argv[]){
   cxxopts::Options options("unpack-tofpackets", "Unpack example for .tof.gaps files with TofPackets.");
   options.add_options()
   ("h,help", "Print help")
-  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/home/gaps/nevis-data/tofdata/calibration/latest/"))
+    //("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/home/gaps/nevis-data/tofdata/calibration/latest/"))
+  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value(""))
   ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
   ("f,files", "List of Files", cxxopts::value<bool>()->default_value("false"))
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
@@ -254,10 +255,15 @@ int main(int argc, char *argv[]){
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
 	if (verbose) {
-          std::cout << ev << std::endl;
+          //std::cout << ev << std::endl;
 	}
        //printf("Event %ld: RBs -", evt_ctr);
 	//printf("%ld.", evt_ctr);
+	//if ( evt_ctr>39411809 && evt_ctr<41564676 ) {
+	//std::cout << "Type " << p.packet_type;
+	// printf(" %ld %ld %d %d\n", evt_ctr, evt_ctr,
+	//	 ev.header.timestamp32, ev.header.n_paddles);
+	  //}
 	/*for (int k=0;k<NRB;k++) {
 	  if (k%9==0) printf("\n");
 	  int n = ev.rb_events[k].header.rb_id;
@@ -280,9 +286,32 @@ int main(int argc, char *argv[]){
 	  usize ch_start = (rbid-1)*NCH; // first RB is #1
 	  // Let's also store the channel mask to use later. 
  	  int ch_mask = rb_event.header.channel_mask;
+
 	  if (verbose) {
-	    //std::cout << rb_event << std::endl;
+	      std::cout << rb_event << std::endl;
           }
+
+	  if (0 && evt_ctr>39411809 && evt_ctr<41564676 ) {
+	    //std::cout << "Type " << p.packet_type;
+	    //printf(" %d %d %d %d\n", hdr->counter, mev.event_id,
+	    //       hdr->timestamp, rb_event.n_trigger_paddles);
+	    //printf(" %ld %ld %d %ld\n", evt_ctr, evt_ctr,
+	    //	   ev.header.timestamp32, rb_event.hits.size());
+	    auto sfit = rb_event.header.get_sine_fit();
+	    //for (int j=0; j<3; j++) printf(" %7.4f",sfit[j]); printf("\n");
+	    for (int i=0; i<rb_event.hits.size(); i++) {
+                printf("%3d",rb_event.hits[i].paddle_id);
+                printf(" %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f",
+                  rb_event.hits[i].get_time_a(), rb_event.hits[i].get_time_b(),
+                  rb_event.hits[i].get_peak_a(), rb_event.hits[i].get_peak_b(),
+                  rb_event.hits[i].get_charge_a(),rb_event.hits[i].get_charge_b());
+                printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
+		       sfit[2], rb_event.hits[i].baseline_a,
+                  rb_event.hits[i].baseline_b, rb_event.hits[i].baseline_a_rms,
+                  rb_event.hits[i].baseline_b_rms);
+	      }
+	}
+
 	  Vec<Vec<f32>> volts;
 	  Vec<Vec<f32>> times;
 	  //if ((calname != "") && cali.rb_id == rbid ){
@@ -300,7 +329,16 @@ int main(int argc, char *argv[]){
 	    // Before making waveforms, lets calculate the ch9
 	    // phase. For now, if we have ch9 data for this RB, we
 	    // want to analyze it.
+	    if (0) {
+	      printf("Phase: %d %d(%d) %u %u %u %d - ",
+		     rb_event.header.event_id, rbid,
+		     rb_event.header.rb_id,
+		     rb_event.header.ch9_amp,
+		     rb_event.header.ch9_freq, rb_event.header.ch9_phase,
+		     rb_event.header.stop_cell);
+	    }
 	    Phi[rbid] = FitSine(ch9_volts,ch9_times);
+	    //printf("Fhase: %d - %7.4f\n", rbid, Phi[rbid]);
 	    // Now, initialize the ch9 Waveform for this RB. 
 	    wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),
 					    ch9_times.data(), rbid,0);
@@ -337,6 +375,7 @@ int main(int argc, char *argv[]){
 	}
 	//printf("\n");
 
+	//if ( evt_ctr>2989817 && evt_ctr<2989917 ) {
 	// Now that we have the waveforms in place, analyze the event.
 	Event.InitializeVariables(evt_ctr);
 	Event.InitializeWaveforms(wave, wch9);
@@ -362,7 +401,7 @@ int main(int argc, char *argv[]){
 	Event.FillChannelHistos(0);
 	Event.FillPaddleHistos();
 	Event.FillOffsetHistos();
-
+	//}
 	Event.UnsetWaveforms();
 	for (int i=0;i<NTOT;i++) 
 	  if ( wave[i] != NULL ) { delete wave[i]; wave[i] = NULL; }
@@ -542,7 +581,7 @@ double FitSine(std::vector<double> volts, std::vector<double> times)
   double a;
   double b;
   //if you want to get all fit params
-  //double c;
+  double c;
   double p[3]; // product of fitting equation
   double XiYi = 0.0;
   double XiZi = 0.0;
@@ -633,11 +672,13 @@ double FitSine(std::vector<double> volts, std::vector<double> times)
   //c = X[0][2] * p[0] + X[1][2] * p[1] + X[2][2] * p[2];
   
   double phi = atan2(a,b);
-  
-  return phi;
 
   //amplitude parameter
-  //double amp2 = pow(a,2)+pow(b,2);
+  double amp2 = pow(a,2)+pow(b,2);
+
+  //printf(" %.4f %.4f %.4f\n", sqrt(amp2), 0.020,  phi);
+  return phi;
+
   
   //return all three params
   //std::vector<double> v;
