@@ -9,7 +9,6 @@
 use std::time::Instant;
 use std::fmt;
 
-
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
     use crate::FromRandom;
@@ -39,6 +38,7 @@ use crate::events::{
   //RBMissingHit,
   TriggerType,
   EventStatus,
+  transcode_trigger_sources,
 };
 
 use crate::events::master_trigger::{
@@ -777,31 +777,8 @@ impl TofEventSummary {
   }
   
   /// Get the trigger sources from trigger source byte
-  /// FIXME! (Does not return anything)
   pub fn get_trigger_sources(&self) -> Vec<TriggerType> {
-    let mut t_types    = Vec::<TriggerType>::new();
-    let gaps_trigger   = self.trigger_sources >> 5 & 0x1 == 1;
-    if gaps_trigger {
-      t_types.push(TriggerType::Gaps);
-    }
-    let any_trigger    = self.trigger_sources >> 6 & 0x1 == 1;
-    if any_trigger {
-      t_types.push(TriggerType::Any);
-    }
-    let forced_trigger = self.trigger_sources >> 7 & 0x1 == 1;
-    if forced_trigger {
-      t_types.push(TriggerType::Forced);
-    }
-    let track_trigger  = self.trigger_sources >> 8 & 0x1 == 1;
-    if track_trigger {
-      t_types.push(TriggerType::Track);
-    }
-    let central_track_trigger
-                       = self.trigger_sources >> 9 & 0x1 == 1;
-    if central_track_trigger {
-      t_types.push(TriggerType::TrackCentral);
-    }
-    t_types
+    transcode_trigger_sources(self.trigger_sources)
   }
   
   pub fn get_timestamp48(&self) -> u64 {

@@ -12,13 +12,13 @@ pub mod data_type;
 pub mod tof_hit;
 
 pub use master_trigger::{
-    MasterTriggerEvent,
-    TriggerType,
+  MasterTriggerEvent,
+  TriggerType,
 };
 pub use tof_event::{
-    TofEvent,
-    TofEventHeader,
-    TofEventSummary
+  TofEvent,
+  TofEventHeader,
+  TofEventSummary
 };
 pub use tof_hit::TofHit;
 pub use data_type::DataType;
@@ -187,6 +187,35 @@ impl FromRandom for EventStatus {
     choices[idx]
   }
 }
+
+/// Get the trigger sources from trigger source byte
+/// FIXME! (Does not return anything)
+pub fn transcode_trigger_sources(trigger_sources : u16) -> Vec<TriggerType> {
+  let mut t_types    = Vec::<TriggerType>::new();
+  let gaps_trigger   = trigger_sources >> 5 & 0x1 == 1;
+  if gaps_trigger {
+    t_types.push(TriggerType::Gaps);
+  }
+  let any_trigger    = trigger_sources >> 6 & 0x1 == 1;
+  if any_trigger {
+    t_types.push(TriggerType::Any);
+  }
+  let forced_trigger = trigger_sources >> 7 & 0x1 == 1;
+  if forced_trigger {
+    t_types.push(TriggerType::Forced);
+  }
+  let track_trigger  = trigger_sources >> 8 & 0x1 == 1;
+  if track_trigger {
+    t_types.push(TriggerType::Track);
+  }
+  let central_track_trigger
+                     = trigger_sources >> 9 & 0x1 == 1;
+  if central_track_trigger {
+    t_types.push(TriggerType::TrackCentral);
+  }
+  t_types
+}
+
 
 #[test]
 #[cfg(feature = "random")]

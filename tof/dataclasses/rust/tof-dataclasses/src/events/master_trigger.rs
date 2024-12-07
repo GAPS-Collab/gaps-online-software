@@ -31,8 +31,9 @@ use crate::packets::{
 
 //use crate::DsiLtbRBMapping;
 use crate::events::{
-    EventStatus,
-    TofEventSummary,
+  EventStatus,
+  TofEventSummary,
+  transcode_trigger_sources,
 };
 
 // A comment about the GAPS (antiparticle) trigger
@@ -40,7 +41,7 @@ use crate::events::{
 //  The default values used where thus:
 //  INNER_TOF_THRESH = 3
 //  OUTER_TOF_THRESH = 3
-//  TOTAL_TOF_THRESH =8
+//  TOTAL_TOF_THRESH = 8
 //  REQUIRE_BETA =1
 //
 //  so this corresponds to the BETA being set (required) and the loose settings for the number of hits.
@@ -114,7 +115,7 @@ pub const LTB_CHANNELS : [u16;8] = [
 #[repr(u8)]
 #[cfg_attr(feature = "pybindings", pyclass)]
 pub enum TriggerType {
-  Unknown      = 0u8,
+  Unknown         = 0u8,
   /// -> 1-10 "pysics" triggers
   Any             = 1u8,
   Track           = 2u8,
@@ -538,37 +539,7 @@ impl MasterTriggerEvent {
   /// MTB does not know about these triggers as individual
   /// types
   pub fn get_trigger_sources(&self) -> Vec<TriggerType> {
-    let mut t_types    = Vec::<TriggerType>::new();
-    let track_umb_central_trigger = self.trigger_source >> 4 & 0x1 == 1;
-    if track_umb_central_trigger {
-      t_types.push(TriggerType::TrackUmbCentral);
-    }
-    let gaps_trigger   = self.trigger_source >> 5 & 0x1 == 1;
-    if gaps_trigger {
-      t_types.push(TriggerType::Gaps);
-    }
-    let any_trigger    = self.trigger_source >> 6 & 0x1 == 1;
-    if any_trigger {
-      t_types.push(TriggerType::Any);
-    }
-    let forced_trigger = self.trigger_source >> 7 & 0x1 == 1;
-    if forced_trigger {
-      t_types.push(TriggerType::Forced);
-    }
-    let track_trigger  = self.trigger_source >> 8 & 0x1 == 1;
-    if track_trigger {
-      t_types.push(TriggerType::Track);
-    }
-    let central_track_trigger
-                       = self.trigger_source >> 9 & 0x1 == 1;
-    if central_track_trigger {
-      t_types.push(TriggerType::TrackCentral);
-    }
-    let conf_trigger   = self.trigger_source >> 10 & 0x1 == 1;
-    if conf_trigger {
-      t_types.push(TriggerType::ConfigurableTrigger);
-    }
-    t_types
+    transcode_trigger_sources(self.trigger_source)
   }
 
   /// Returns the trigger types which have to be defined as "global"
