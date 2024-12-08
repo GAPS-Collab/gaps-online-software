@@ -6,6 +6,8 @@
   by the Paddle tab. We just need to make sure
   that the Paddle tab can receive RBWaveforms 
   as well
+* performance improvement of the paddle waveform
+  display
 
 ##v0.10.5
 * upgrade to ratatui v0.29

@@ -82,8 +82,6 @@ pub struct PaddleTab<'a> {
   pub event_queue        : VecDeque<TofEvent>,
   pub queue_size         : usize,
   pub menu               : PaddleMenu<'a>,
-  //pub wf_ch_a            : HashMap<u8, VecDeque<RBWaveform>>,
-  //pub wf_ch_b            : HashMap<u8, VecDeque<RBWaveform>>,
   pub wf                 : HashMap<u8, VecDeque<RBWaveform>>,
   pub last_wf_ch_a       : VecDeque<(f64, f64)>,
   pub last_wf_ch_b       : VecDeque<(f64, f64)>,
@@ -123,8 +121,6 @@ impl PaddleTab<'_> {
     }
     let mut charge_a   = HashMap::<u8, VecDeque<f64>>::new();
     let mut charge_b   = HashMap::<u8, VecDeque<f64>>::new();
-    //let mut wf_ch_a    = HashMap::<u8, VecDeque<RBWaveform>>::new();
-    //let mut wf_ch_b    = HashMap::<u8, VecDeque<RBWaveform>>::new();
     let mut wf         = HashMap::<u8, VecDeque<RBWaveform>>::new();
     let mut bl_ch_a    = HashMap::<u8, Hist1D<Uniform<f32>>>::new();
     let mut bl_ch_b    = HashMap::<u8, Hist1D<Uniform<f32>>>::new();
@@ -135,8 +131,6 @@ impl PaddleTab<'_> {
     for pid in 1..161 {
       charge_a.insert(pid, VecDeque::<f64>::new());
       charge_b.insert(pid, VecDeque::<f64>::new());
-      //wf_ch_a.insert(pid, VecDeque::<RBWaveform>::new());
-      //wf_ch_b.insert(pid, VecDeque::<RBWaveform>::new());
       wf.insert(pid, VecDeque::<RBWaveform>::new());
       bl_ch_a.insert(pid, ndhistogram!(bins_bl.clone()));
       bl_ch_b.insert(pid, ndhistogram!(bins_bl.clone()));
@@ -148,13 +142,12 @@ impl PaddleTab<'_> {
       theme,
       te_receiver,
       event_queue       : VecDeque::<TofEvent>::new(),
-      queue_size        : 1000,
+      queue_size        : 100, // short queue for waveforms so that we don't see 
+                               // all the old stuff
       menu              : PaddleMenu::new(theme_c),
       wf                : wf,
       wf_label_a        : String::from("A"),
       wf_label_b        : String::from("B"),
-      //wf_ch_a,
-      //wf_ch_b,
       last_wf_ch_a      : VecDeque::<(f64, f64)>::new(),
       last_wf_ch_b      : VecDeque::<(f64, f64)>::new(),
       calibrations,
@@ -245,53 +238,32 @@ impl PaddleTab<'_> {
         let rms_a = 0f32;
         let rms_b = 0f32;
         for mut wf in wfs {
-          if wf.rb_id == self.current_paddle.rb_id as u8 {
-            match self.calibrations.lock() {
-              Err(_err) => error!("Unable to get lock on rbcalibrations!"),
-              Ok(cali) => {
-                match cali.get(&wf.rb_id) {
-                  None => error!("RBCalibrations for board {} not available!", wf.rb_id),
-                  Some(rbcal) => {
-                    match wf.calibrate(rbcal) {
-                      Err(err) => error!("Calibration error! {err}"),
-                      Ok(_) => ()
-                    }
-                    //println!("{}", wf);
+          // FIXME - this is an incpmplete cosistency check and 
+          // should be removed soon
+          if wf.paddle_id == self.current_paddle.paddle_id as u8 {
+            let rb_channel_a = wf.rb_channel_a + 1;
+            let rb_channel_b = wf.rb_channel_b + 1;
+            if (rb_channel_a != self.current_paddle.rb_chA as u8 ) 
+               || (rb_channel_b != self.current_paddle.rb_chB as u8 ) {
+              error!("Inconsistent paddle RB channels! Maybe A and B are switched!");
+            }
+          match self.calibrations.lock() {
+            Err(_err) => error!("Unable to get lock on rbcalibrations!"),
+            Ok(cali) => {
+              match cali.get(&wf.rb_id) {
+                None => error!("RBCalibrations for board {} not available!", wf.rb_id),
+                Some(rbcal) => {
+                  match wf.calibrate(rbcal) {
+                    Err(err) => error!("Calibration error! {err}"),
+                    Ok(_) => ()
                   }
                 }
               }
             }
-            let rb_channel_a = wf.rb_channel_a + 1;
-            let rb_channel_b = wf.rb_channel_b + 1;
-            if wf.paddle_id == self.current_paddle.paddle_id as u8 {
-              // FIXME: double check the channel assignment
-              if (rb_channel_a != self.current_paddle.rb_chA as u8 ) 
-                 || (rb_channel_b != self.current_paddle.rb_chB as u8 ) {
-                error!("Inconsistent paddle RB channels! Maybe A and B are switched!");
-              }
-            } else {
-              continue;
-            }
-            // FiXME = empty vector check
-            //let bl = calculate_pedestal(&wf.voltages, 1000.0, 850, 950);
-            //if rb_channel_a  == self.current_paddle.rb_chA as u8 {
-            if wf.voltages_a.len() > 0 {
-              let ped = calculate_pedestal(&wf.voltages_a, 10.0, 850, 100);
-              bl_a  = ped.0;
-              self.baseline_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_a);
-              self.baseline_rms_ch_a.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&rms_a);
-            }
-            //} else if rb_channel_b == self.current_paddle.rb_chB as u8 {
-            if wf.voltages_b.len() > 0 {
-              bl_b = calculate_pedestal(&wf.voltages_b, 10.0, 850, 100).0;
-              self.baseline_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&bl_b);
-              self.baseline_rms_ch_b.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().fill(&rms_b);
-            }
-            self.wf.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().push_back(wf);
-            if self.wf.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().len() > self.queue_size {
-              self.wf.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().pop_front();
-            }
-            //}
+          }
+          self.wf.get_mut(&(wf.paddle_id as u8)).unwrap().push_back(wf.clone());
+          if self.wf.get_mut(&(wf.paddle_id as u8)).unwrap().len() > self.queue_size {
+            self.wf.get_mut(&(wf.paddle_id as u8)).unwrap().pop_front();
           }
         }
         return Ok(());
@@ -407,7 +379,7 @@ impl PaddleTab<'_> {
         //let mut label_a   = String::from("");
         //let mut label_b   = String::from("");
         let wf_theme      = self.theme.clone();
-        match self.wf.get_mut(&(self.current_paddle.rb_id as u8)).unwrap().pop_front() {
+        match self.wf.get_mut(&(self.current_paddle.paddle_id as u8)).unwrap().pop_front() {
           None => {
             //for (i,k) in wf.adc.iter().enumerate() {
             //  wf_data_a.push_back((i as f64, *k as f64));
@@ -531,25 +503,5 @@ impl PaddleTab<'_> {
       }
       _ => ()
     } // end match
-    //let header      = TofEventHeader::new();
-    //let mut header_string = header.to_string();
-    //match self.event_queue.back() {
-    //  None => (),
-    //  Some(ev)   => {
-    //    header_string = ev.header.to_string();
-    //    let info_field = format!("\n --> NRBs {}\n --> Quality: {}\n CompressionLevel {}",
-    //                             ev.rb_events.len(), ev.quality, ev.compression_level);
-    //    header_string += &info_field;
-    //  }
-    //}
-    //let header_view = Paragraph::new(header_string)
-    //  .style(self.theme.style())
-    //  .alignment(Alignment::Left)
-    //  .block(
-    //    Block::default()
-    //      .borders(Borders::ALL)
-    //      .border_type(BorderType::Rounded)
-    //      .title("Last TofEvent")
-    //  );
   } 
 }
