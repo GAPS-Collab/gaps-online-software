@@ -16,6 +16,8 @@ pub mod caraspace;
 #[cfg(feature="telemetry")]
 use telemetry_dataclasses::packets as tel_api;
 
+use tof_dataclasses::events::EventStatus;
+
 cfg_if::cfg_if! {
   if #[cfg(feature = "telemetry")] {
     use crate::telemetry::{
@@ -270,6 +272,7 @@ fn tof_events<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyRBCalibration>()?;
   m.add_class::<PyTofEventSummary>()?;
   m.add_class::<LTBThreshold>()?;
+  m.add_class::<EventStatus>()?;
   Ok(())
 }
 

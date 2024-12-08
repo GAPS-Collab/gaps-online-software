@@ -189,6 +189,20 @@ impl TofEvent {
     missing
   }
 
+  /// Get the triggered paddle ids
+  ///
+  /// Warning, this might be a bit slow
+  #[cfg(feature="database")]
+  pub fn get_triggered_paddles(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
+    let mut paddles = Vec::<u8>::new();
+    for th in self.mt_event.get_trigger_hits() {
+      let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
+      paddles.push(pid);
+    }
+    paddles
+  }
+  
+
   pub fn extract_event_id_from_stream(stream : &Vec<u8>) 
     -> Result<u32, SerializationError> {
     // 2 + 2 + 2 + 2 + 4
@@ -693,6 +707,19 @@ impl TofEventSummary {
       }
     }
     missing
+  }
+  
+  /// Get the triggered paddle ids
+  ///
+  /// Warning, this might be a bit slow
+  #[cfg(feature="database")]
+  pub fn get_triggered_paddles(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
+    let mut paddles = Vec::<u8>::new();
+    for th in self.get_trigger_hits() {
+      let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
+      paddles.push(pid);
+    }
+    paddles
   }
 
   /// Get the RB link IDs according to the mask

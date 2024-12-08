@@ -319,7 +319,15 @@ pub const TIU_BUSY_LENGTH : MTBRegister<'static> = MTBRegister {
   pulse : false
 };
 
-
+/// Read out the whole register 0xf at once and then 
+pub const TIU_LT_AND_RB_MULT : MTBRegister<'static> = MTBRegister {
+  addr  : 0xf,
+  mask  : 0x3fff,
+  descr : "Aggregated TIU, LT and RB general information",
+  rmw   : false,
+  ro    : true,
+  pulse : false
+};
 
 /// Check if the TIU BUSY is stuck
 /// TIU_BUSY_STUCK 	0xf 	0x3c 	1 	r 		1 means the TIU has been stuck high for a long time
@@ -2104,7 +2112,7 @@ pub const ANY_TRIG_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
 /// 0xe     0x38    1   rw  0x0     1 to use J11; 0 to use J3
 pub const TIU_USE_AUX_LINK : MTBRegister<'static> = MTBRegister {
   addr  : 0xe,
-  mask  : 0x00000010,
+  mask  : 0x2,
   descr : "Choose between the 2 tiu links",
   rmw   : true,
   ro    : false,

@@ -2178,8 +2178,15 @@ impl PyTofEventSummary {
     self.event.status
   }
   
+  /// Compare the hg hits of the event with the triggered paddles and 
+  /// return the paddles which have at least a missing HG hit
   fn get_missing_paddles_hg(&self, mapping : DsiJChPidMapping) -> Vec<u8> {
     self.event.get_missing_paddles_hg(mapping)
+  }
+
+  /// Get all the paddle ids which have been triggered
+  fn get_triggered_paddles(&self, mapping : DsiJChPidMapping) -> Vec<u8> {
+    self.event.get_triggered_paddles(mapping)
   }
 
   /// RB Link IDS (not RB ids) which fall into the 

@@ -165,39 +165,44 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
   if data.len() < 4 {
     return Err(MasterTriggerError::BrokenPackage);
   }
-  let tiu_link_bad   = TIU_BAD.get(bus)?;
-  let tiu_busy_len   = TIU_BUSY_LENGTH.get(bus)?;
-  let tiu_aux_link   = (TIU_USE_AUX_LINK.get(bus)? != 0) as u8;
-  let tiu_emu_mode   = (TIU_EMULATION_MODE.get(bus)? != 0) as u8;
-  //let tiu_bad        = TIU_BAD.get(bus)? as u8;
-  let tiu_busy_stuck = (TIU_BUSY_STUCK.get(bus)? != 0) as u8;
-  let tiu_busy_ign   = (TIU_BUSY_IGNORE.get(bus)? != 0) as u8;
-  let mut tiu_status = 0u8;
-  tiu_status         = tiu_status | (tiu_emu_mode);
-  tiu_status         = tiu_status | (tiu_aux_link << 1);
-  tiu_status         = tiu_status | ((tiu_link_bad as u8) << 2);
-  tiu_status         = tiu_status | (tiu_busy_stuck << 3);
-  tiu_status         = tiu_status | (tiu_busy_ign << 4);
-  let daq_queue_len  = EVQ_NUM_EVENTS.get(bus)? as u16;
-  moni.tiu_status    = tiu_status;
-  moni.tiu_busy_len  = tiu_busy_len;
-  moni.daq_queue_len = daq_queue_len;
+  let tiu_busy_len    = TIU_BUSY_LENGTH.get(bus)?;
+  let tiu_aux_link    = (TIU_USE_AUX_LINK.get(bus)? != 0) as u8;
+  let tiu_emu_mode    = (TIU_EMULATION_MODE.get(bus)? != 0) as u8;
+  //let tiu_bad         = TIU_BAD.get(bus)? as u8;
+  //let tiu_busy_stuck  = (TIU_BUSY_STUCK.get(bus)? != 0) as u8;
+  //let tiu_link_bad    = TIU_BAD.get(bus)?;
+  //let tiu_busy_ign    = (TIU_BUSY_IGNORE.get(bus)? != 0) as u8;
+  let aggr_tiu        = TIU_LT_AND_RB_MULT.get(bus)?;
+  let tiu_link_bad    = (aggr_tiu & 0x1) as u8;
+  let tiu_busy_stuck  = (aggr_tiu & 0x2) as u8;
+  let tiu_busy_ign    = (aggr_tiu & 0x4) as u8;
+  let mut tiu_status  = 0u8;
+  tiu_status          = tiu_status | (tiu_emu_mode);
+  tiu_status          = tiu_status | (tiu_aux_link << 1);
+  tiu_status          = tiu_status | ((tiu_link_bad as u8) << 2);
+  tiu_status          = tiu_status | (tiu_busy_stuck << 3);
+  tiu_status          = tiu_status | (tiu_busy_ign << 4);
+  let daq_queue_len   = EVQ_NUM_EVENTS.get(bus)? as u16;
+  moni.tiu_status     = tiu_status;
+  moni.tiu_busy_len   = tiu_busy_len;
+  moni.daq_queue_len  = daq_queue_len;
   // sensors are 12 bit
-  let first_word   = 0x00000fff;
-  let second_word  = 0x0fff0000;
+  let first_word     = 0x00000fff;
+  let second_word    = 0x0fff0000;
   //println!("[get_mtbmonidata] => Received data from registers {:?} data", data);
-  moni.temp        = ( data[2] & first_word  ) as u16;  
-  moni.vccint      = ((data[2] & second_word ) >> 16) as u16;  
-  moni.vccaux      = ( data[3] & first_word  ) as u16;  
-  moni.vccbram     = ((data[3] & second_word ) >> 16) as u16;  
+  moni.temp          = ( data[2] & first_word  ) as u16;  
+  moni.vccint        = ((data[2] & second_word ) >> 16) as u16;  
+  moni.vccaux        = ( data[3] & first_word  ) as u16;  
+  moni.vccbram       = ((data[3] & second_word ) >> 16) as u16;  
  
-  let rate = bus.read_multiple(0x17, 2, true)?;
+  let rate           = bus.read_multiple(0x17, 2, true)?;
   // FIXME - technically, the rate is 24bit, however, we just
   // read out 16 here (if the rate is beyond ~65kHz, we don't need 
   // to know with precision
-  let mask        = 0x0000ffff;
-  moni.rate       = (rate[0] & mask) as u16;
-  moni.lost_rate  = (rate[1] & mask) as u16;
+  let mask           = 0x0000ffff;
+  moni.rate          = (rate[0] & mask) as u16;
+  moni.lost_rate     = (rate[1] & mask) as u16;
+  moni.rb_lost_rate  = RB_LOST_TRIGGER_RATE.get(bus)? as u16;
   Ok(moni)
 }
 
