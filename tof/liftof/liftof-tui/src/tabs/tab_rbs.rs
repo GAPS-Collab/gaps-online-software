@@ -728,9 +728,7 @@ impl RBTab<'_>  {
             error!("No rate data available for board {}", self.rb_selector);
           },
           Some(rdata) => {
-            if rate_ts.len() == 0 {
-              error!("We have 0 length rate data for board {}!", self.rb_selector);
-            } else {
+            if rdata.len() != 0 {
               for (k, time) in self.met_queue_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
                 rate_ts.push_back((*time, rdata[k] as f64));
               }

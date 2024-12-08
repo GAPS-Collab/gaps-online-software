@@ -925,9 +925,6 @@ impl<'a> TabbedInterface<'a> {
           UIMenuItem::TofHits => {
             self.render_tofhittab(master_lo, frame);
           }
-          UIMenuItem::RBWaveform => {
-            //self.render_rbwaveformtab(master_lo, frame);
-          }
           UIMenuItem::Back => {
             self.render_events(master_lo, frame);
           }
@@ -1276,7 +1273,7 @@ impl<'a> TabbedInterface<'a> {
         self.settings_tab.ctl_active = false;
       }
     }
-    info!("Returning false");
+    debug!("No exit command received, continuing");
     (false, tab_changed) // if we arrive here, we don't
                         // want to exit the app
   }

@@ -80,6 +80,7 @@ pub enum UIMenuItem {
   Telemetry,
   Commands,
   Settings,
+  Alerts,
   Quit,
   // rb menu
   Waveforms,
@@ -120,6 +121,7 @@ impl UIMenuItem {
       UIMenuItem::Events         => String::from("Events"        ),
       UIMenuItem::ReadoutBoards  => String::from("ReadoutBoards" ),
       UIMenuItem::Trigger        => String::from("Trigger"       ),
+      UIMenuItem::Alerts         => String::from("Alerts"        ),
       UIMenuItem::Monitoring     => String::from("Monitoring"    ),
       UIMenuItem::Telemetry      => String::from("Telemetry"     ),
       UIMenuItem::Settings       => String::from("Settings"      ),
@@ -431,10 +433,7 @@ impl UIMenu<'_> for EventMenu<'_> {
   
   fn get_items() -> Vec<UIMenuItem> {
     let items = vec![UIMenuItem::Back,
-                     UIMenuItem::TofSummary,
-                     UIMenuItem::TofHits,
-                     UIMenuItem::RBWaveform,
-                     UIMenuItem::Quit];
+                     UIMenuItem::TofSummary];
     items
   }
 
