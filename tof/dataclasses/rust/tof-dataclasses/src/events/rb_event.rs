@@ -441,6 +441,7 @@ impl RBEvent {
         wf.rb_channel_b = 3;
         wf.rb_channel_a = 2;
       }
+      waveforms.push(wf);
     }
     if active_channels.contains(&4) || active_channels.contains(&5) {
       let paddle_id  = pid.get_paddle_id(5);
@@ -461,6 +462,7 @@ impl RBEvent {
         wf.rb_channel_b = 5;
         wf.rb_channel_a = 4;
       }
+      waveforms.push(wf);
     }
     if active_channels.contains(&6) || active_channels.contains(&7) {
       let paddle_id  = pid.get_paddle_id(7);
@@ -481,6 +483,7 @@ impl RBEvent {
         wf.rb_channel_b = 6;
         wf.rb_channel_a = 7;
       }
+      waveforms.push(wf);
     }
     waveforms
   }
@@ -1005,9 +1008,9 @@ impl RBEventHeader {
   
   pub fn set_rbpaddleid(&mut self, pid : &RBPaddleID) {
     self.pid_ch12     = pid.paddle_12;
-    self.pid_ch12     = pid.paddle_34;
-    self.pid_ch12     = pid.paddle_56;
-    self.pid_ch12     = pid.paddle_78;
+    self.pid_ch34     = pid.paddle_34;
+    self.pid_ch56     = pid.paddle_56;
+    self.pid_ch78     = pid.paddle_78;
     self.pid_ch_order = pid.channel_order;
   }
 
@@ -1363,14 +1366,14 @@ impl fmt::Display for RBWaveform {
     repr += &(format!("\n  Paddle ID : {}", self.paddle_id));
     repr += &(format!("\n  Stop cell : {}", self.stop_cell));
     if self.adc_a.len() >= 273 {
-      repr += &(format!("\n  adc [{}]      : .. {} {} {} ..",self.adc_a.len(), self.adc_a[270], self.adc_a[271], self.adc_a[272]));
+      repr += &(format!("\n  adc [A] [{}]      : .. {} {} {} ..",self.adc_a.len(), self.adc_a[270], self.adc_a[271], self.adc_a[272]));
     } else {
-      repr += &(String::from("\n  adc [EMPTY]"));
+      repr += &(String::from("\n  adc [A] [EMPTY]"));
     }
     if self.adc_b.len() >= 273 {
-      repr += &(format!("\n  adc [{}]      : .. {} {} {} ..",self.adc_b.len(), self.adc_b[270], self.adc_b[271], self.adc_b[272]));
+      repr += &(format!("\n  adc [B] [{}]      : .. {} {} {} ..",self.adc_b.len(), self.adc_b[270], self.adc_b[271], self.adc_b[272]));
     } else {
-      repr += &(String::from("\n  adc [EMPTY]"));
+      repr += &(String::from("\n  adc [B] [EMPTY]"));
     }
     write!(f, "{}", repr)
   }
