@@ -429,8 +429,9 @@ impl TofHit {
     0.5*(self.time_a.to_f32() + self.time_b.to_f32() - (self.paddle_len/(10.0*C_LIGHT_PADDLE)) - ((self.cable_len*2.0)/(10.0*C_LIGHT_CABLE)))
   }
 
+  /// Philip's energy deposition based on peak height
   pub fn get_edep(&self) -> f32 {
-    0.0
+    (1.29/34.3)*(self.peak_a.to_f32() + self.peak_b.to_f32()) / 2.0
   }
 
   pub fn get_time_a(&self) -> f32 {
