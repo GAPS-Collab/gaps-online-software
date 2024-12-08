@@ -979,6 +979,7 @@ impl MoniData for RBMoniData {
       "mag_x"            => Some(self.mag_x            ), 
       "mag_y"            => Some(self.mag_y            ), 
       "mag_z"            => Some(self.mag_z            ), 
+      "mag_tot"          => Some(self.get_mag_tot()    ),
       "drs_dvdd_voltage" => Some(self.drs_dvdd_voltage ), 
       "drs_dvdd_current" => Some(self.drs_dvdd_current ), 
       "drs_dvdd_power"   => Some(self.drs_dvdd_power   ), 
