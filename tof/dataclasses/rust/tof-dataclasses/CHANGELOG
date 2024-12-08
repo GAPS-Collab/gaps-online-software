@@ -1,7 +1,11 @@
 # LELEWAA series
 
+## v0.10.7
+* Fix a bug in RBMoniSeries, where mag tot was not returned
+* Changes MtbMoniData - use VCCBRAM for RB_LOST_RATE.
+
 ## v0.10.6
-* removes broken sinus fit variables from RBEventHeader and 
+* removes broken sine fit variables from RBEventHeader and 
   replace it with a rbpaddle identifier instead
 
 ## v0.10.5

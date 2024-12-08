@@ -1388,8 +1388,6 @@ impl FromRandom for CPUMoniData {
 /// Monitoring the MTB
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct MtbMoniData {
-  //pub calibration  : u16, 
-  //pub vccpint      : u16, 
   pub tiu_busy_len : u32,
   /// tiu_status\[0\] = emu_mode
   /// tiu_status\[1\] = use_aux_link
@@ -1406,9 +1404,13 @@ pub struct MtbMoniData {
   pub temp         : u16, 
   pub vccint       : u16, 
   pub vccaux       : u16, 
-  pub vccbram      : u16, 
+  /// NEW rb_lost rate - replace vccbram
+  pub rb_lost_rate : u16,
   pub rate         : u16, 
   pub lost_rate    : u16, 
+  /// will not get serialized - only 
+  /// kept for compatibility reasons
+  pub vccbram      : u16, 
 }
 
 impl MtbMoniData {
@@ -1424,7 +1426,8 @@ impl MtbMoniData {
       vccaux        : u16::MAX,
       vccbram       : u16::MAX,
       rate          : u16::MAX,
-      lost_rate     : u16::MAX
+      lost_rate     : u16::MAX,
+      rb_lost_rate  : u16::MAX
     }
   }
 
@@ -1472,6 +1475,7 @@ impl fmt::Display for MtbMoniData {
     write!(f, "<MtbMoniData:
   MTB  EVT RATE  [Hz] {}
   LOST EVT RATE  [Hz] {}
+  LOST RB EVT R  [Hz] {}
   TIU BUSY CNT  [CLK] {}
   DAQ QUEUE LEN       {}
   PRESCALE        [%] {}
@@ -1484,10 +1488,11 @@ impl fmt::Display for MtbMoniData {
   --- --- --- --- --
   FPGA TEMP      [\u{00B0}C] {:.2}
   VCCINT          [V] {:.3}
-  VCCAUX          [V] {:.3}
-  VCCBRAM         [V] {:.3}>",
+  VCCAUX          [V] {:.3}>",
+  //VCCBRAM         [V] {:.3}>",
            self.rate,
            self.lost_rate,
+           self.rb_lost_rate,
            self.tiu_busy_len,
            self.daq_queue_len,
            self.prescale_pc,
@@ -1499,7 +1504,7 @@ impl fmt::Display for MtbMoniData {
            self.get_fpga_temp(),
            MtbMoniData::adc_vcc_conversion(self.vccint    ),
            MtbMoniData::adc_vcc_conversion(self.vccaux    ),
-           MtbMoniData::adc_vcc_conversion(self.vccbram   ),
+           //MtbMoniData::adc_vcc_conversion(self.vccbram   ),
            )
   }
 }
@@ -1524,7 +1529,8 @@ impl Serialization for MtbMoniData {
     stream.extend_from_slice(&self.temp       .to_le_bytes());
     stream.extend_from_slice(&self.vccint     .to_le_bytes()); 
     stream.extend_from_slice(&self.vccaux     .to_le_bytes()); 
-    stream.extend_from_slice(&self.vccbram    .to_le_bytes()); 
+    //stream.extend_from_slice(&self.vccbram    .to_le_bytes()); 
+    stream.extend_from_slice(&self.rb_lost_rate.to_le_bytes());
     stream.extend_from_slice(&self.rate       .to_le_bytes()); 
     stream.extend_from_slice(&self.lost_rate  .to_le_bytes());
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
@@ -1542,7 +1548,8 @@ impl Serialization for MtbMoniData {
     moni_data.temp          = parse_u16(&stream, pos);
     moni_data.vccint        = parse_u16(&stream, pos);
     moni_data.vccaux        = parse_u16(&stream, pos);
-    moni_data.vccbram       = parse_u16(&stream, pos);
+    //moni_data.vccbram       = parse_u16(&stream, pos);
+    moni_data.rb_lost_rate  = parse_u16(&stream, pos);
     moni_data.rate          = parse_u16(&stream, pos);
     moni_data.lost_rate     = parse_u16(&stream, pos);
     *pos += 2; // since we deserialized the tail earlier and 
@@ -1567,6 +1574,7 @@ impl MoniData for MtbMoniData {
       "vccint"       => Some(Self::adc_vcc_conversion(self.vccint)), 
       "vccaux"       => Some(Self::adc_vcc_conversion(self.vccaux)), 
       "vccbram"      => Some(Self::adc_vcc_conversion(self.vccbram)), 
+      "rb_lost_rate" => Some(self.rb_lost_rate as f32),
       "rate"         => Some(self.rate as f32), 
       "lost_rate"    => Some(self.lost_rate as f32), 
       _              => None
@@ -1579,11 +1587,12 @@ impl MoniData for MtbMoniData {
       "tiu_busy_len"  , 
       "tiu_status"    , 
       "daq_queue_len" , 
-      "temp"       , 
-      "vccint"     , 
-      "vccaux"     , 
-      "vccbram"    , 
-      "rate"       , 
+      "temp"          , 
+      "vccint"        , 
+      "vccaux"        , 
+      "vccbram"       , 
+      "rb_lost_rate"  ,
+      "rate"          , 
       "lost_rate"] 
   }
 }
@@ -1600,7 +1609,10 @@ impl FromRandom for MtbMoniData {
     moni.temp         = rng.gen::<u16>();
     moni.vccint       = rng.gen::<u16>();
     moni.vccaux       = rng.gen::<u16>();
-    moni.vccbram      = rng.gen::<u16>();
+    // don't randomize this, since we want to 
+    // test (de)serialization
+    //moni.vccbram      = rng.gen::<u16>();
+    moni.rb_lost_rate = rng.gen::<u16>();
     moni.rate         = rng.gen::<u16>();
     moni.lost_rate    = rng.gen::<u16>();
     moni
