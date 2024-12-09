@@ -2089,7 +2089,7 @@ pub const TRACK_UMB_CENTRAL_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
 /// TRACE_TRIG_IS_GLOBAL 0xb 0x2c 1 rw 0x0
 pub const TRACK_TRIG_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
   addr  : 0xb,
-  mask  : 0x00000001,
+  mask  : 0x2,
   descr : "1 makes the TRACK trigger read all paddles",
   rmw   : true,
   ro    : false,
@@ -2100,7 +2100,7 @@ pub const TRACK_TRIG_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
 /// ANY_TRIG_IS_GLOBAL 0xb 0x2c 0 rw 0x0
 pub const ANY_TRIG_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
   addr  : 0xb,
-  mask  : 0x00000000,
+  mask  : 0x1,
   descr : "1 makes the ANY trigger read all paddles",
   rmw   : true,
   ro    : false,
