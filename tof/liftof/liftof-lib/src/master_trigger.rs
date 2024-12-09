@@ -174,8 +174,8 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
   //let tiu_busy_ign    = (TIU_BUSY_IGNORE.get(bus)? != 0) as u8;
   let aggr_tiu        = TIU_LT_AND_RB_MULT.get(bus)?;
   let tiu_link_bad    = (aggr_tiu & 0x1) as u8;
-  let tiu_busy_stuck  = (aggr_tiu & 0x2) as u8;
-  let tiu_busy_ign    = (aggr_tiu & 0x4) as u8;
+  let tiu_busy_stuck  = ((aggr_tiu & 0x2) >> 1) as u8;
+  let tiu_busy_ign    = ((aggr_tiu & 0x4) >> 2) as u8;
   let mut tiu_status  = 0u8;
   tiu_status          = tiu_status | (tiu_emu_mode);
   tiu_status          = tiu_status | (tiu_aux_link << 1);
@@ -469,43 +469,44 @@ pub fn master_trigger(mt_address     : String,
   if settings.use_combo_trigger {
     let global_prescale = settings.global_trigger_prescale;
     let prescale_val    = (u32::MAX as f32 * global_prescale as f32).floor() as u32;
-    println!("=> Setting a global trigger - using combo mode. Using prescale of {prescale_val}");
+    println!("=> Setting an additonal trigger - using combo mode. Using prescale of {prescale_val}");
+    // FIXME - the "global" is wrong. We need to rename this at some point
     match settings.global_trigger_type {
       TriggerType::Any             => {
-        match ANY_TRIG_IS_GLOBAL.set(&mut bus, 1) {
-          Ok(_)    => (),
-          Err(err) => error!("Settting the any trigger to global failed! {err}") 
-        }
+        //match ANY_TRIG_IS_GLOBAL.set(&mut bus, 1) {
+        //  Ok(_)    => (),
+        //  Err(err) => error!("Settting the any trigger to global failed! {err}") 
+        //}
         match ANY_TRIG_PRESCALE.set(&mut bus, prescale_val) {
           Ok(_)    => (),
           Err(err) => error!("Settting the prescale {} for the any trigger failed! {err}", prescale_val) 
         }
       }
       TriggerType::Track           => {
-        match TRACK_TRIG_IS_GLOBAL.set(&mut bus, 1) {
-          Ok(_)    => (),
-          Err(err) => error!("Setting the track trigger to global failed! {err}")
-        }
+        //match TRACK_TRIG_IS_GLOBAL.set(&mut bus, 1) {
+        //  Ok(_)    => (),
+        //  Err(err) => error!("Setting the track trigger to global failed! {err}")
+        //}
         match TRACK_TRIG_PRESCALE.set(&mut bus, prescale_val) {
           Ok(_)    => (),
           Err(err) => error!("Settting the prescale {} for the any trigger failed! {err}", prescale_val) 
         }
       }
       TriggerType::TrackCentral    => {
-        match TRACK_CENTRAL_IS_GLOBAL.set(&mut bus, 1) {
-          Ok(_)    => (),
-          Err(err) => error!("Setting the central track trigger to global failed! {err}")
-        }
+        //match TRACK_CENTRAL_IS_GLOBAL.set(&mut bus, 1) {
+        //  Ok(_)    => (),
+        //  Err(err) => error!("Setting the central track trigger to global failed! {err}")
+        //}
         match TRACK_CENTRAL_PRESCALE.set(&mut bus, prescale_val) {
           Ok(_)    => (),
           Err(err) => error!("Settting the prescale {} for the track central trigger failed! {err}", prescale_val) 
         }
       }
       TriggerType::TrackUmbCentral => {
-        match TRACK_UMB_CENTRAL_IS_GLOBAL.set(&mut bus, 1) {
-          Ok(_)    => (),
-          Err(err) => error!("Setting the umbrealla central (super cewntral) trigger to global failed! {err}")
-        }
+        //match TRACK_UMB_CENTRAL_IS_GLOBAL.set(&mut bus, 1) {
+        //  Ok(_)    => (),
+        //  Err(err) => error!("Setting the umbrealla central (super cewntral) trigger to global failed! {err}")
+        //}
         match TRACK_UMB_CENTRAL_PRESCALE.set(&mut bus, prescale_val) {
           Ok(_)    => (),
           Err(err) => error!("Settting the prescale {} for the track umb central trigger failed! {err}", prescale_val) 
