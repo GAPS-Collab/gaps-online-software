@@ -247,6 +247,7 @@ impl PaddleTab<'_> {
                || (rb_channel_b != self.current_paddle.rb_chB as u8 ) {
               error!("Inconsistent paddle RB channels! Maybe A and B are switched!");
             }
+          }
           match self.calibrations.lock() {
             Err(_err) => error!("Unable to get lock on rbcalibrations!"),
             Ok(cali) => {
