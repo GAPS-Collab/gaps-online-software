@@ -2189,6 +2189,13 @@ impl PyTofEventSummary {
     self.event.get_triggered_paddles(mapping)
   }
 
+  /// The hits we were not able to read out because the DRS4 chip
+  /// on the RBs was busy
+  #[getter]
+  fn lost_hits(&self) -> u16 {
+    self.event.drs_dead_lost_hits
+  }
+
   /// RB Link IDS (not RB ids) which fall into the 
   /// trigger window
   #[getter]
@@ -2220,10 +2227,10 @@ impl PyTofEventSummary {
     hits
   }
 
-  #[getter]
-  fn beta(&self) -> f32 {
-    self.event.get_beta()
-  }
+  //#[getter]
+  //fn beta(&self) -> f32 {
+  //  self.event.get_beta()
+  //}
 
   #[getter]
   fn timestamp16(&self) -> u16 {
@@ -2462,7 +2469,12 @@ impl PyRBEvent {
       event : RBEvent::new(),
     }
   }
-  
+ 
+  #[getter]
+  fn status(&self) -> EventStatus {
+    self.event.status
+  }
+
   fn get_waveform<'_py>(&self, py: Python<'_py>, channel : usize) -> PyResult<Bound<'_py, PyArray1<u16>>> {  
     let wf  = self.event.get_channel_by_id(channel).unwrap().clone();
     let arr = PyArray1::<u16>::from_vec_bound(py, wf);
