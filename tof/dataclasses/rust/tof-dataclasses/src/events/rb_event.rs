@@ -47,6 +47,7 @@ use crate::events::{
 };
 use crate::errors::{
     UserError,
+    AnalysisError,
     CalibrationError,
 };
 use crate::io::RBEventMemoryStreamer;
@@ -392,6 +393,23 @@ impl RBEvent {
       adc          : adc,
       hits         : Vec::<TofHit>::new(),
     }
+  }
+
+  /// Check if we have all the channel data even as 
+  /// indicated by the header
+  pub fn self_check(&self) -> Result<(),AnalysisError>  {
+    let mut pass = false;
+    for ch in self.header.get_channels() {
+      if self.adc[ch as usize].len() == 0 {
+        error!("RB {} expects ch {} but it is empty!", self.header.rb_id, ch + 1);
+        println!("{}", self.header);
+        pass = false;
+      }
+    }
+    if !pass {
+      return Err(AnalysisError::MissingChannel);
+    }
+    Ok(())
   }
 
   /// Deconstruct the RBEvent to form RBWaveforms

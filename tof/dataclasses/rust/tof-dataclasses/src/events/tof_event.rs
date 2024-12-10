@@ -298,7 +298,7 @@ impl TofEvent {
     summary.dsi_j_mask         = self.mt_event.dsi_j_mask;
     summary.channel_mask       = self.mt_event.channel_mask.clone();
     summary.mtb_link_mask      = self.mt_event.mtb_link_mask;
-    summary.drs_dead_lost_hits = self.header.drs_dead_lost_hits;
+    summary.drs_dead_lost_hits = self.get_lost_hits();
     summary.hits               = Vec::<TofHit>::new();
     for ev in &self.rb_events {
       for hit in &ev.hits {
@@ -321,6 +321,22 @@ impl TofEvent {
       }
     }
     summary
+  }
+  
+  /// The number of hits we did not get 
+  /// becaue of the DRS busy
+  pub fn get_lost_hits(&self) -> u16 {
+    let mut lost_hits = 0u16;
+    for rbev in &self.rb_events {
+      if rbev.header.drs_lost_trigger() {
+        let mut nhits = rbev.header.get_nchan() as u16;
+        if nhits > 0 {
+          nhits -= 1;
+        }
+        lost_hits += nhits;
+      }
+    }
+    lost_hits
   }
 }
 
@@ -650,8 +666,7 @@ pub struct TofEventSummary {
   /// scalar number of hits missed in
   /// this event due to DRS on the RB
   /// being busy
-  pub drs_dead_lost_hits : u8, 
-  pub rsvd0              : u8,
+  pub drs_dead_lost_hits : u16, 
   pub dsi_j_mask         : u32,
   pub channel_mask       : Vec<u16>,
   pub mtb_link_mask      : u64,
@@ -689,7 +704,6 @@ impl TofEventSummary {
       primary_beta       : 0, 
       primary_charge     : 0, 
       drs_dead_lost_hits : 0,
-      rsvd0              : 0,
       dsi_j_mask         : 0,
       channel_mask       : Vec::<u16>::new(),
       mtb_link_mask      : 0,
@@ -874,8 +888,7 @@ impl Serialization for TofEventSummary {
     stream.extend_from_slice(&self.timestamp16.to_le_bytes());
     //stream.extend_from_slice(&self.primary_beta.to_le_bytes());
     stream.extend_from_slice(&self.run_id.to_le_bytes());
-    stream.push(self.drs_dead_lost_hits);
-    stream.push(self.rsvd0);
+    stream.extend_from_slice(&self.drs_dead_lost_hits.to_le_bytes());
     //stream.extend_from_slice(&self.primary_charge.to_le_bytes());
     stream.extend_from_slice(&self.dsi_j_mask.to_le_bytes());
     let n_channel_masks = self.channel_mask.len();
@@ -922,10 +935,7 @@ impl Serialization for TofEventSummary {
     summary.timestamp32        = parse_u32(stream, pos);
     summary.timestamp16        = parse_u16(stream, pos);
     summary.run_id             = parse_u16(stream, pos);
-    //summary.primary_beta      = parse_u16(stream, pos); 
-    //summary.primary_charge    = parse_u16(stream, pos); 
-    summary.drs_dead_lost_hits = parse_u8(stream, pos);
-    summary.rsvd0              = parse_u8(stream, pos); 
+    summary.drs_dead_lost_hits = parse_u16(stream, pos);
     summary.dsi_j_mask         = parse_u32(stream, pos);
     let n_channel_masks        = parse_u8(stream, pos);
     for _ in 0..n_channel_masks {
@@ -1011,9 +1021,7 @@ impl FromRandom for TofEventSummary {
     summary.event_id           = rng.gen::<u32>();
     summary.timestamp32        = rng.gen::<u32>();
     summary.timestamp16        = rng.gen::<u16>();
-    //summary.primary_beta      = rng.gen::<u16>(); 
-    //summary.primary_charge    = rng.gen::<u16>(); 
-    summary.drs_dead_lost_hits = rng.gen::<u8>();
+    summary.drs_dead_lost_hits = rng.gen::<u16>();
     summary.dsi_j_mask         = rng.gen::<u32>();
     let n_channel_masks        = rng.gen::<u8>();
     for _ in 0..n_channel_masks {
