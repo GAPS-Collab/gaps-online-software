@@ -68,6 +68,8 @@ pub enum EventStatus {
   IncompatibleData       = 22u8,
   /// The TofEvent timed out while waiting for more Readoutboards
   EventTimeOut           = 23u8,
+  /// A RB misses Ch9 data
+  NoChannel9             = 24u8,
   GoodNoCRCOrErrBitCheck = 39u8,
   /// The event status is good, but we did not 
   /// perform any CRC32 check
@@ -122,6 +124,9 @@ impl EventStatus {
       EventStatus::EventTimeOut => {
         return 23;
       }
+      EventStatus::NoChannel9 => {
+        return 24;
+      }
       EventStatus::GoodNoCRCOrErrBitCheck => {
         return 39;
       }
@@ -152,6 +157,7 @@ impl From<u8> for EventStatus {
       21 => EventStatus::IncompleteReadout,
       22 => EventStatus::IncompatibleData,
       23 => EventStatus::EventTimeOut,
+      24 => EventStatus::NoChannel9,
       39 => EventStatus::GoodNoCRCOrErrBitCheck,
       40 => EventStatus::GoodNoCRCCheck,
       41 => EventStatus::GoodNoErrBitCheck,
@@ -177,6 +183,7 @@ impl FromRandom for EventStatus {
       EventStatus::IncompleteReadout,
       EventStatus::IncompatibleData,
       EventStatus::EventTimeOut,
+      EventStatus::NoChannel9,
       EventStatus::GoodNoCRCOrErrBitCheck,
       EventStatus::GoodNoCRCCheck,
       EventStatus::GoodNoErrBitCheck,

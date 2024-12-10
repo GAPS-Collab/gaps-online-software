@@ -7,12 +7,12 @@
 use std::fmt;
 use colored::*;
 use crate::serialization::{
-    Serialization,
-    SerializationError,
-    Packable,
-    parse_u8,
-    parse_u64,
-    parse_usize,
+  Serialization,
+  SerializationError,
+  Packable,
+  parse_u8,
+  parse_u64,
+  parse_usize,
 };
 
 use crate::packets::PacketType;
@@ -507,41 +507,41 @@ pub fn get_incoming_vs_outgoing_mte(&self) -> f64 {
 pub fn to_string(&self) -> String {
   let mut repr = String::from("<EVTBLDRHearbeats");
   repr += &(format!("\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} "));
-  repr += &(format!("\n Num. events sent: \t\t\t{}", self.n_sent).bright_purple());
-  repr += &(format!("\n Size of event cache: \t\t\t{}", self.event_cache_size).bright_purple());
-  repr += &(format!("\n Size of event ID cache: \t\t{}", self.event_id_cache_size).bright_purple());
-  repr += &(format!("\n Num. events timed out \t\t{}", self.n_timed_out).bright_purple());
-  repr += &(format!("\n Percent events timed out: \t\t{:.2}%", self.get_timed_out_frac()*(100 as f64)).bright_purple());
-  if self.n_sent > 0 {
-    repr += &(format!("\n Percent events w/out event ID: \t{:.2}%", (((self.n_ev_wo_evid / self.n_sent) as f64)*(100 as f64))).bright_purple());
-  } else { 
-    repr += &(format!("\n Percent events w/out event ID: \tN/A").bright_purple());
+  repr += &(format!("\n Num. events sent          : {}", self.n_sent).bright_purple());
+  repr += &(format!("\n Size of event cache       : {}", self.event_cache_size).bright_purple());
+  repr += &(format!("\n Size of event ID cache    : {}", self.event_id_cache_size).bright_purple());
+  repr += &(format!("\n Num. events timed out     : {}", self.n_timed_out).bright_purple());
+  repr += &(format!("\n Percent events timed out  : {:.2}%", self.get_timed_out_frac()*(100 as f64)).bright_purple());
+  if self.n_sent > 0 && self.n_ev_wo_evid > 0 {
+    repr += &(format!("\n Percent events w/out event ID: {:.2}%", (((self.n_ev_wo_evid / self.n_sent) as f64)*(100 as f64))).bright_purple());
+  } else if self.n_ev_wo_evid > 0 { 
+    repr += &(format!("\n Percent events w/out event ID: N/A").bright_purple());
   }
-  if self.n_rbe_received_tot > 0{
+  if self.n_mte_received_tot > 0{ 
     repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-    repr += &(format!("\n Num. evts with data mangling: \t\t{}", self.data_mangled_ev));
-    repr += &(format!("\n Percent events with data mangling: \t\t\t {:.2}", ((self.data_mangled_ev as f64)/(self.n_rbe_received_tot as f64))*(100 as f64)));
+    repr += &(format!("\n Num. evts with ANY data mangling  : {}",    self.data_mangled_ev));
+    repr += &(format!("\n Percent events with data mangling : {:.2}", ((self.data_mangled_ev as f64)/(self.n_mte_received_tot as f64))*(100 as f64)));
   }
   else {repr += &(format!("\n Percent events with data mangling: unable to calculate"));}
   repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-  repr += &(format!("\n Received MTEvents: \t\t\t{}", self.n_mte_received_tot).bright_purple());
-  repr += &(format!("\n Skipped MTEvents: \t\t\t{}", self.n_mte_skipped).bright_purple());
-  repr += &(format!("\n Incoming/outgoing MTEvents fraction   {:.2}", self.get_incoming_vs_outgoing_mte()).bright_purple());
+  repr += &(format!("\n Received MTEvents                   : {}", self.n_mte_received_tot).bright_purple());
+  repr += &(format!("\n Skipped MTEvents                    : {}", self.n_mte_skipped).bright_purple());
+  repr += &(format!("\n Incoming/outgoing MTEvents fraction : {:.2}", self.get_incoming_vs_outgoing_mte()).bright_purple());
   repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-  repr += &(format!("\n Received RBEvents: \t\t\t{}", self.n_rbe_received_tot).bright_purple());
-  repr += &(format!("\n RBEvents Discarded: \t\t\t{}", self.n_rbe_discarded_tot).bright_purple());
-  repr += &(format!("\n Percent RBEvents discarded: \t\t{:.2}%", self.get_nrbe_discarded_frac()*(100 as f64)).bright_purple());
+  repr += &(format!("\n Received RBEvents                   : {}", self.n_rbe_received_tot).bright_purple());
+  repr += &(format!("\n RBEvents Discarded                  : {}", self.n_rbe_discarded_tot).bright_purple());
+  repr += &(format!("\n Percent RBEvents discarded          : {:.2}%", self.get_nrbe_discarded_frac()*(100 as f64)).bright_purple());
   repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
   if self.n_sent > 0 && self.n_mte_received_tot > 0 {
-      repr += &(format!("\n RBEvent/Evts sent       \t\t{:.2}", (self.n_rbe_received_tot as f64/ self.n_sent as f64)).bright_purple());
-      repr += &(format!("\n RBEvent/MTEvents       \t\t{:.2}", (self.n_rbe_received_tot as f64 / self.n_mte_received_tot as f64)).bright_purple()); }
-  repr += &(format!("\n Num. RBEvents with evid from past:  \t{}", self.n_rbe_from_past).bright_purple());
-  repr += &(format!("\n Num. orphan RBEvents: \t\t{}", self.n_rbe_orphan).bright_purple());
+      repr += &(format!("\n RBEvent/Evts sent               : {:.2}", (self.n_rbe_received_tot as f64/ self.n_sent as f64)).bright_purple());
+      repr += &(format!("\n RBEvent/MTEvents                : {:.2}", (self.n_rbe_received_tot as f64 / self.n_mte_received_tot as f64)).bright_purple()); }
+  repr += &(format!("\n Num. RBEvents with evid from past   : {}", self.n_rbe_from_past).bright_purple());
+  repr += &(format!("\n Num. orphan RBEvents : {}", self.n_rbe_orphan).bright_purple());
   repr += &(format!("\n\n Getting MTE from cache for RBEvent failed {} times :(", self.rbe_wo_mte).bright_blue());
   repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-  repr += &(format!("\n Ch. len MTE Receiver: \t\t{}", self.mte_receiver_cbc_len).bright_purple());
-  repr += &(format!("\n Ch. len RBE Reveiver: \t\t{}", self.rbe_receiver_cbc_len).bright_purple());
-  repr += &(format!("\n Ch. len TP Sender: \t\t\t{}", self.tp_sender_cbc_len).bright_purple());
+  repr += &(format!("\n Ch. len MTE Receiver : {}", self.mte_receiver_cbc_len).bright_purple());
+  repr += &(format!("\n Ch. len RBE Reveiver : {}", self.rbe_receiver_cbc_len).bright_purple());
+  repr += &(format!("\n Ch. len TP Sender    : {}", self.tp_sender_cbc_len).bright_purple());
   repr += &(format!("\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} END EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50}"));
   repr
   }
@@ -563,60 +563,61 @@ impl Serialization for EVTBLDRHeartbeat {
   const SIZE : usize = 156; //
 
   fn from_bytestream(stream : &Vec<u8>, 
-                       pos        : &mut usize)
-      -> Result<Self, SerializationError>{
-        Self::verify_fixed(stream,pos)?;
-        let mut hb = EVTBLDRHeartbeat::new();
-        hb.met_seconds          = parse_usize(stream,pos);
-        hb.n_mte_received_tot   = parse_usize(stream,pos);
-        hb.n_rbe_received_tot   = parse_usize(stream,pos);
-        hb.n_rbe_per_te         = parse_usize(stream,pos);
-        hb.n_rbe_discarded_tot  = parse_usize(stream,pos);
-        hb.n_mte_skipped        = parse_usize(stream,pos);
-        hb.n_timed_out          = parse_usize(stream,pos);
-        hb.n_sent               = parse_usize(stream,pos);
-        hb.delta_mte_rbe        = parse_usize(stream,pos);
-        hb.event_cache_size     = parse_usize(stream,pos);
-        hb.event_id_cache_size  = parse_usize(stream,pos);
-        hb.rbe_wo_mte           = parse_usize(stream,pos);
-        hb.mte_receiver_cbc_len = parse_usize(stream,pos);
-        hb.rbe_receiver_cbc_len = parse_usize(stream,pos);
-        hb.tp_sender_cbc_len    = parse_usize(stream,pos);
-        hb.n_ev_wo_evid         = parse_usize(stream,pos);
-        hb.n_rbe_from_past      = parse_usize(stream,pos);
-        hb.n_rbe_orphan         = parse_usize(stream,pos);
-        hb.data_mangled_ev      = parse_usize(stream,pos);
-        // hb.seen_rbevents        = HashMap::from(parse_u8(stream, pos));
-        *pos += 2;
-        Ok(hb)
-      }
-      fn to_bytestream(&self) -> Vec<u8> {
-          let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
-          bs.extend_from_slice(&Self::HEAD.to_le_bytes());
-          bs.extend_from_slice(&self.met_seconds.to_le_bytes());
-          bs.extend_from_slice(&self.n_mte_received_tot.to_le_bytes());
-          bs.extend_from_slice(&self.n_rbe_received_tot.to_le_bytes());
-          bs.extend_from_slice(&self.n_rbe_per_te.to_le_bytes());
-          bs.extend_from_slice(&self.n_rbe_discarded_tot.to_le_bytes());
-          bs.extend_from_slice(&self.n_mte_skipped.to_le_bytes());
-          bs.extend_from_slice(&self.n_timed_out.to_le_bytes());
-          bs.extend_from_slice(&self.n_sent.to_le_bytes());
-          bs.extend_from_slice(&self.delta_mte_rbe.to_le_bytes());
-          bs.extend_from_slice(&self.event_cache_size.to_le_bytes());
-          bs.extend_from_slice(&self.event_id_cache_size.to_le_bytes());
-          bs.extend_from_slice(&self.rbe_wo_mte.to_le_bytes());
-          bs.extend_from_slice(&self.mte_receiver_cbc_len.to_le_bytes());
-          bs.extend_from_slice(&self.rbe_receiver_cbc_len.to_le_bytes());
-          bs.extend_from_slice(&self.tp_sender_cbc_len.to_le_bytes());
-          bs.extend_from_slice(&self.n_ev_wo_evid.to_le_bytes());
-          bs.extend_from_slice(&self.n_rbe_from_past.to_le_bytes());
-          bs.extend_from_slice(&self.n_rbe_orphan.to_le_bytes());
-          bs.extend_from_slice(&self.data_mangled_ev.to_le_bytes());
-          // bs.push(self.seen_rbevents.to_u8());
-          bs.extend_from_slice(&Self::TAIL.to_le_bytes());
-          bs
-        }
-    }
+                     pos        : &mut usize)
+    -> Result<Self, SerializationError>{
+    Self::verify_fixed(stream,pos)?;
+    let mut hb = EVTBLDRHeartbeat::new();
+    hb.met_seconds          = parse_usize(stream,pos);
+    hb.n_mte_received_tot   = parse_usize(stream,pos);
+    hb.n_rbe_received_tot   = parse_usize(stream,pos);
+    hb.n_rbe_per_te         = parse_usize(stream,pos);
+    hb.n_rbe_discarded_tot  = parse_usize(stream,pos);
+    hb.n_mte_skipped        = parse_usize(stream,pos);
+    hb.n_timed_out          = parse_usize(stream,pos);
+    hb.n_sent               = parse_usize(stream,pos);
+    hb.delta_mte_rbe        = parse_usize(stream,pos);
+    hb.event_cache_size     = parse_usize(stream,pos);
+    hb.event_id_cache_size  = parse_usize(stream,pos);
+    hb.rbe_wo_mte           = parse_usize(stream,pos);
+    hb.mte_receiver_cbc_len = parse_usize(stream,pos);
+    hb.rbe_receiver_cbc_len = parse_usize(stream,pos);
+    hb.tp_sender_cbc_len    = parse_usize(stream,pos);
+    hb.n_ev_wo_evid         = parse_usize(stream,pos);
+    hb.n_rbe_from_past      = parse_usize(stream,pos);
+    hb.n_rbe_orphan         = parse_usize(stream,pos);
+    hb.data_mangled_ev      = parse_usize(stream,pos);
+    // hb.seen_rbevents        = HashMap::from(parse_u8(stream, pos));
+    *pos += 2;
+    Ok(hb)
+  }
+    
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
+    bs.extend_from_slice(&Self::HEAD.to_le_bytes());
+    bs.extend_from_slice(&self.met_seconds.to_le_bytes());
+    bs.extend_from_slice(&self.n_mte_received_tot.to_le_bytes());
+    bs.extend_from_slice(&self.n_rbe_received_tot.to_le_bytes());
+    bs.extend_from_slice(&self.n_rbe_per_te.to_le_bytes());
+    bs.extend_from_slice(&self.n_rbe_discarded_tot.to_le_bytes());
+    bs.extend_from_slice(&self.n_mte_skipped.to_le_bytes());
+    bs.extend_from_slice(&self.n_timed_out.to_le_bytes());
+    bs.extend_from_slice(&self.n_sent.to_le_bytes());
+    bs.extend_from_slice(&self.delta_mte_rbe.to_le_bytes());
+    bs.extend_from_slice(&self.event_cache_size.to_le_bytes());
+    bs.extend_from_slice(&self.event_id_cache_size.to_le_bytes());
+    bs.extend_from_slice(&self.rbe_wo_mte.to_le_bytes());
+    bs.extend_from_slice(&self.mte_receiver_cbc_len.to_le_bytes());
+    bs.extend_from_slice(&self.rbe_receiver_cbc_len.to_le_bytes());
+    bs.extend_from_slice(&self.tp_sender_cbc_len.to_le_bytes());
+    bs.extend_from_slice(&self.n_ev_wo_evid.to_le_bytes());
+    bs.extend_from_slice(&self.n_rbe_from_past.to_le_bytes());
+    bs.extend_from_slice(&self.n_rbe_orphan.to_le_bytes());
+    bs.extend_from_slice(&self.data_mangled_ev.to_le_bytes());
+    // bs.push(self.seen_rbevents.to_u8());
+    bs.extend_from_slice(&Self::TAIL.to_le_bytes());
+    bs
+  }
+}
 
 #[cfg(feature="random")]
 impl FromRandom for EVTBLDRHeartbeat {

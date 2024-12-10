@@ -395,6 +395,19 @@ impl RBEvent {
     }
   }
 
+  pub fn has_any_mangling_flag(&self) -> bool {
+    match self.status {
+      EventStatus::ChnSyncErrors 
+      | EventStatus::CellSyncErrors
+      | EventStatus::CellAndChnSyncErrors => {
+        return true;
+      }
+      _ => {
+        return false;
+      }
+    }
+  }
+
   /// Check if we have all the channel data even as 
   /// indicated by the header
   pub fn self_check(&self) -> Result<(),AnalysisError>  {

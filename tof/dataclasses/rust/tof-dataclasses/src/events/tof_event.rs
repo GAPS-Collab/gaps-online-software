@@ -279,9 +279,26 @@ impl TofEvent {
     hits
   }
 
+  /// Check if th eassociated RBEvents have any of their
+  /// mangling stati set
+  pub fn has_any_mangling(&self) -> bool {
+    for rbev in &self.rb_events {
+      if rbev.status == EventStatus::CellAndChnSyncErrors 
+      || rbev.status == EventStatus::CellSyncErrors 
+      || rbev.status == EventStatus::ChnSyncErrors {
+        return true;
+      }
+    }
+    false
+  }
+
   pub fn get_summary(&self) -> TofEventSummary {
-    let mut summary = TofEventSummary::new();
-    summary.status             = self.mt_event.event_status;
+    let mut summary         = TofEventSummary::new();
+    // generate an aggregate status from all the different stati
+    summary.status          = self.mt_event.event_status;
+    if self.has_any_mangling() {
+      summary.status = EventStatus::AnyDataMangling;
+    }
     // FIXME - this is not trigger paddles, but trigger hits!
     summary.trigger_sources    = self.mt_event.trigger_source;
     summary.n_trigger_paddles  = self.mt_event.get_trigger_hits().len() as u8;

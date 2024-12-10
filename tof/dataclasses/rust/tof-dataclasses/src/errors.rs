@@ -92,7 +92,7 @@ impl Error for RunError {
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum EventError {
-    EventIdMismatch
+  EventIdMismatch
 }
 
 impl fmt::Display for EventError {
@@ -266,7 +266,9 @@ impl Error for IPBusError {
 #[repr(u8)]
 pub enum AnalysisError {
   MissingChannel,
+  NoChannel9,
   InputBroken,
+  DataMangling
 }
 
 impl fmt::Display for AnalysisError {
