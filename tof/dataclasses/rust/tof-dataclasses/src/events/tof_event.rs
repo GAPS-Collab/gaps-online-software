@@ -281,34 +281,25 @@ impl TofEvent {
 
   pub fn get_summary(&self) -> TofEventSummary {
     let mut summary = TofEventSummary::new();
-    //let mut stati = Vec::<u8>::new();
-    //for k in &self.rb_events {
-    //  stati.push(k.status.to_u8());
-    //}
-    //summary.status          = self.header.status;
-    //summary.quality         = self.header.quality;
-    //summary.status            = self.header.event_status;
-    summary.status            = self.mt_event.event_status;
+    summary.status             = self.mt_event.event_status;
     // FIXME - this is not trigger paddles, but trigger hits!
-    summary.trigger_sources   = self.mt_event.trigger_source;
-    summary.n_trigger_paddles = self.mt_event.get_trigger_hits().len() as u8;
-    summary.event_id          = self.header.event_id;
+    summary.trigger_sources    = self.mt_event.trigger_source;
+    summary.n_trigger_paddles  = self.mt_event.get_trigger_hits().len() as u8;
+    summary.event_id           = self.header.event_id;
+    summary.run_id             = ((self.header.run_id & 0x0000ffff) >> 16) as u16;
     // FIXME we set the protocol version here, but that should propably 
     // go elsewhere
-    summary.version           = ProtocolVersion::V1;
-    //let status                = self.header.status;
-    let mt_timestamp          = (self.mt_event.get_timestamp_abs48() as f64/1000.0).floor()  as u64; 
-    //println!("DEBUGGING {}", mt_timestamp);
-    summary.timestamp32       = (mt_timestamp  & 0x00000000ffffffff ) as u32;
-    //println!("DEBUGGING {}", summary.timestamp32);
-    summary.timestamp16       = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
-    //println!("DEBUGGING  {}", summary.timestamp16);
-    summary.primary_beta      = self.header.primary_beta; 
-    summary.primary_charge    = self.header.primary_charge; 
-    summary.dsi_j_mask        = self.mt_event.dsi_j_mask;
-    summary.channel_mask      = self.mt_event.channel_mask.clone();
-    summary.mtb_link_mask     = self.mt_event.mtb_link_mask;
-    summary.hits              = Vec::<TofHit>::new();
+    summary.version            = ProtocolVersion::V1;
+    let mt_timestamp           = (self.mt_event.get_timestamp_abs48() as f64/1000.0).floor()  as u64; 
+    summary.timestamp32        = (mt_timestamp  & 0x00000000ffffffff ) as u32;
+    summary.timestamp16        = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
+    //summary.primary_beta       = self.header.primary_beta; 
+    //summary.primary_charge     = self.header.primary_charge; 
+    summary.dsi_j_mask         = self.mt_event.dsi_j_mask;
+    summary.channel_mask       = self.mt_event.channel_mask.clone();
+    summary.mtb_link_mask      = self.mt_event.mtb_link_mask;
+    summary.drs_dead_lost_hits = self.header.drs_dead_lost_hits;
+    summary.hits               = Vec::<TofHit>::new();
     for ev in &self.rb_events {
       for hit in &ev.hits {
         let h = hit.clone();
@@ -428,10 +419,14 @@ pub struct TofEventHeader  {
 
   pub run_id       : u32,
   pub event_id     : u32,
+  // lost hits insead of n_hit outer and n_hit inner tof
+  pub drs_dead_lost_hits  : u8,
+  pub rsvd0              : u8,
   // the timestamp shall be comging from the master trigger
   pub timestamp_32 : u32,
   pub timestamp_16 : u16, // -> 14 byres
   
+
   // reconstructed quantities
   pub primary_beta        : u16, 
   pub primary_beta_unc    : u16, 
@@ -444,10 +439,10 @@ pub struct TofEventHeader  {
   pub primary_inner_tof_y : u16, 
   pub primary_inner_tof_z : u16, //-> 20bytes primary 
 
-  pub nhit_outer_tof       : u8,  
+  //pub nhit_outer_tof       : u8,  
   // no need to save this, can be 
   // rereated from paddle_info.size() - nhit_outer_tof
-  pub nhit_inner_tof       : u8, 
+  //pub nhit_inner_tof       : u8, 
 
   pub trigger_info         : u8,
   pub ctr_etx              : u8,
@@ -459,6 +454,35 @@ pub struct TofEventHeader  {
   // of the expected bytestream.
   pub n_paddles           : u8, // we don't have more than 
                                // 256 paddles.
+}
+
+impl TofEventHeader {
+  
+  pub fn new() -> Self {
+    Self {
+      run_id               : 0,
+      event_id             : 0,
+      drs_dead_lost_hits   : 0,
+      rsvd0               : 0,
+      timestamp_32         : 0,
+      timestamp_16         : 0,
+      primary_beta         : 0, 
+      primary_beta_unc     : 0, 
+      primary_charge       : 0, 
+      primary_charge_unc   : 0, 
+      primary_outer_tof_x  : 0, 
+      primary_outer_tof_y  : 0, 
+      primary_outer_tof_z  : 0, 
+      primary_inner_tof_x  : 0, 
+      primary_inner_tof_y  : 0, 
+      primary_inner_tof_z  : 0,  
+      //nhit_outer_tof       : 0,  
+      //nhit_inner_tof       : 0, 
+      trigger_info         : 0,
+      ctr_etx              : 0,
+      n_paddles            : 0  
+    }
+  }
 }
 
 impl Serialization for TofEventHeader {
@@ -484,8 +508,10 @@ impl Serialization for TofEventHeader {
     event.primary_inner_tof_x = parse_u16(stream, pos);
     event.primary_inner_tof_y = parse_u16(stream, pos);
     event.primary_inner_tof_z = parse_u16(stream, pos); 
-    event.nhit_outer_tof      = parse_u8(stream, pos);
-    event.nhit_inner_tof      = parse_u8(stream, pos);
+    event.drs_dead_lost_hits  = parse_u8(stream, pos);
+    event.rsvd0              = parse_u8(stream, pos);
+    //event.nhit_outer_tof      = parse_u8(stream, pos);
+    //event.nhit_inner_tof      = parse_u8(stream, pos);
     event.trigger_info        = parse_u8(stream, pos);
     event.ctr_etx             = parse_u8(stream, pos);
     event.n_paddles           = parse_u8(stream, pos); 
@@ -510,8 +536,11 @@ impl Serialization for TofEventHeader {
     bytestream.extend_from_slice(&self.primary_inner_tof_x       .to_le_bytes());
     bytestream.extend_from_slice(&self.primary_inner_tof_y       .to_le_bytes());
     bytestream.extend_from_slice(&self.primary_inner_tof_z       .to_le_bytes());
-    bytestream.extend_from_slice(&self.nhit_outer_tof            .to_le_bytes());
-    bytestream.extend_from_slice(&self.nhit_inner_tof            .to_le_bytes());
+    //bytestream.extend_from_slice(&self.rb_events
+    //bytestream.extend_from_slice(&self.nhit_outer_tof            .to_le_bytes());
+    //bytestream.extend_from_slice(&self.nhit_inner_tof            .to_le_bytes());
+    bytestream.extend_from_slice(&self.drs_dead_lost_hits        .to_le_bytes());
+    bytestream.extend_from_slice(&self.rsvd0                    .to_le_bytes());
     bytestream.extend_from_slice(&self.trigger_info              .to_le_bytes());
     bytestream.extend_from_slice(&self.ctr_etx                   .to_le_bytes());
     bytestream.extend_from_slice(&self.n_paddles                 .to_le_bytes());
@@ -520,34 +549,6 @@ impl Serialization for TofEventHeader {
   }
 }
 
-impl TofEventHeader {
-  
-  pub const VERSION            : &'static str = "1.1";
-  
-  pub fn new() -> Self {
-    Self {
-      run_id               : 0,
-      event_id             : 0,
-      timestamp_32         : 0,
-      timestamp_16         : 0,
-      primary_beta         : 0, 
-      primary_beta_unc     : 0, 
-      primary_charge       : 0, 
-      primary_charge_unc   : 0, 
-      primary_outer_tof_x  : 0, 
-      primary_outer_tof_y  : 0, 
-      primary_outer_tof_z  : 0, 
-      primary_inner_tof_x  : 0, 
-      primary_inner_tof_y  : 0, 
-      primary_inner_tof_z  : 0,  
-      nhit_outer_tof       : 0,  
-      nhit_inner_tof       : 0, 
-      trigger_info         : 0,
-      ctr_etx              : 0,
-      n_paddles            : 0  
-    }
-  }
-}
 
 impl Default for TofEventHeader {
   fn default() -> Self {
@@ -572,6 +573,7 @@ impl fmt::Display for TofEventHeader {
     repr += &(format!("\n  Event ID          : {}", self.event_id            ));
     repr += &(format!("\n  Timestamp 32      : {}", self.timestamp_32        ));
     repr += &(format!("\n  Timestamp 16      : {}", self.timestamp_16        ));
+    repr += &(format!("\n  DRS LOST HITS     : {}", self.drs_dead_lost_hits  ));
     repr += &(format!("\n  Prim. Beta        : {}", self.primary_beta        ));
     repr += &(format!("\n  Prim. Beta Unc    : {}", self.primary_beta_unc    ));
     repr += &(format!("\n  Prim. Charge      : {}", self.primary_charge      ));
@@ -582,8 +584,8 @@ impl fmt::Display for TofEventHeader {
     repr += &(format!("\n  Prim. Inner Tof X : {}", self.primary_inner_tof_x ));
     repr += &(format!("\n  Prim. Inner Tof Y : {}", self.primary_inner_tof_y ));
     repr += &(format!("\n  Prim. Inner Tof Z : {}", self.primary_inner_tof_z ));
-    repr += &(format!("\n  NHit  Outer Tof   : {}", self.nhit_outer_tof      ));
-    repr += &(format!("\n  NHit  Inner Tof   : {}", self.nhit_inner_tof      ));
+    //repr += &(format!("\n  NHit  Outer Tof   : {}", self.nhit_outer_tof      ));
+    //repr += &(format!("\n  NHit  Inner Tof   : {}", self.nhit_inner_tof      ));
     repr += &(format!("\n  TriggerInfo       : {}", self.trigger_info        ));
     repr += &(format!("\n  Ctr ETX           : {}", self.ctr_etx             ));
     repr += &(format!("\n  NPaddles          : {}", self.n_paddles           ));
@@ -600,6 +602,8 @@ impl FromRandom for TofEventHeader {
     Self { 
       run_id               : rng.gen::<u32>(),
       event_id             : rng.gen::<u32>(),
+      drs_dead_lost_hits   : rng.gen::<u8>(),
+      rsvd0               : rng.gen::<u8>(),
       timestamp_32         : rng.gen::<u32>(),
       timestamp_16         : rng.gen::<u16>(),
       primary_beta         : rng.gen::<u16>(), 
@@ -612,8 +616,6 @@ impl FromRandom for TofEventHeader {
       primary_inner_tof_x  : rng.gen::<u16>(), 
       primary_inner_tof_y  : rng.gen::<u16>(), 
       primary_inner_tof_z  : rng.gen::<u16>(),  
-      nhit_outer_tof       : rng.gen::<u8>(),  
-      nhit_inner_tof       : rng.gen::<u8>(), 
       trigger_info         : rng.gen::<u8>(),
       ctr_etx              : rng.gen::<u8>(),
       n_paddles            : rng.gen::<u8>()  
@@ -628,57 +630,70 @@ pub struct TofEventSummary {
   pub version           : ProtocolVersion,
   pub quality           : u8,
   pub trigger_sources   : u16,
-  // a bunch of calculated variablels, used 
-  // for online interesting event search
-  // these will be only available in ProtocolVersion 1
-  pub n_hits_umb        : u8,
-  pub n_hits_cbe        : u8,
-  pub n_hits_cor        : u8,
-  pub tot_edep_umb      : f32,
-  pub tot_edep_cbe      : f32,
-  pub tot_edep_cor      : f32,
 
   /// the number of triggered paddles coming
   /// from the MTB directly. This might NOT be
   /// the same as the number of hits!
-  pub n_trigger_paddles : u8,
-  pub event_id          : u32,
-  pub timestamp32       : u32,
-  pub timestamp16       : u16,
+  pub n_trigger_paddles  : u8,
+  pub event_id           : u32,
+  /// NEW - uses the space for primary_beta,
+  /// which we won't have anyway
+  pub run_id             : u16,
+  pub timestamp32        : u32,
+  pub timestamp16        : u16,
+  /// DEPRECATED, won't get serialized
   /// reconstructed primary beta
-  pub primary_beta      : u16, 
+  pub primary_beta       : u16, 
+  /// DEPRECATED, won't get serialized
   /// reconstructed primary charge
-  pub primary_charge    : u16, 
-  pub dsi_j_mask        : u32,
-  pub channel_mask      : Vec<u16>,
-  pub mtb_link_mask     : u64,
-  pub hits              : Vec<TofHit>,
+  pub primary_charge     : u16, 
+  /// scalar number of hits missed in
+  /// this event due to DRS on the RB
+  /// being busy
+  pub drs_dead_lost_hits : u8, 
+  pub rsvd0              : u8,
+  pub dsi_j_mask         : u32,
+  pub channel_mask       : Vec<u16>,
+  pub mtb_link_mask      : u64,
+  pub hits               : Vec<TofHit>,
+  // a bunch of calculated variablels, used 
+  // for online interesting event search
+  // these will be only available in ProtocolVersion 1
+  pub n_hits_umb         : u8,
+  pub n_hits_cbe         : u8,
+  pub n_hits_cor         : u8,
+  pub tot_edep_umb       : f32,
+  pub tot_edep_cbe       : f32,
+  pub tot_edep_cor       : f32,
 }
 
 impl TofEventSummary {
 
   pub fn new() -> Self {
     Self {
-      status            : EventStatus::Unknown,
-      version           : ProtocolVersion::Unknown,
-      n_hits_umb        : 0,
-      n_hits_cbe        : 0,
-      n_hits_cor        : 0,
-      tot_edep_umb      : 0.0,
-      tot_edep_cbe      : 0.0,
-      tot_edep_cor      : 0.0,
-      quality           : 0,
-      trigger_sources   : 0,
-      n_trigger_paddles : 0,
-      event_id          : 0,
-      timestamp32       : 0,
-      timestamp16       : 0,
-      primary_beta      : 0, 
-      primary_charge    : 0, 
-      dsi_j_mask        : 0,
-      channel_mask      : Vec::<u16>::new(),
-      mtb_link_mask     : 0,
-      hits              : Vec::<TofHit>::new(),
+      status             : EventStatus::Unknown,
+      version            : ProtocolVersion::Unknown,
+      n_hits_umb         : 0,
+      n_hits_cbe         : 0,
+      n_hits_cor         : 0,
+      tot_edep_umb       : 0.0,
+      tot_edep_cbe       : 0.0,
+      tot_edep_cor       : 0.0,
+      quality            : 0,
+      trigger_sources    : 0,
+      n_trigger_paddles  : 0,
+      event_id           : 0,
+      run_id             : 0,
+      timestamp32        : 0,
+      timestamp16        : 0,
+      primary_beta       : 0, 
+      primary_charge     : 0, 
+      drs_dead_lost_hits : 0,
+      rsvd0              : 0,
+      dsi_j_mask         : 0,
+      channel_mask       : Vec::<u16>::new(),
+      mtb_link_mask      : 0,
+      hits               : Vec::<TofHit>::new(),
     }
   }
 
@@ -812,20 +827,20 @@ impl TofEventSummary {
     ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
   }
 
-  pub fn set_beta(&mut self, beta : f32) {
-    // expecting beta in range of 0-1. If larger
-    // than 1, we will save 1
-    if beta > 1.0 {
-      self.primary_beta = 1;
-    }
-    let pbeta = beta*(u16::MAX as f32).floor();
-    // safe, bc of multiplication with u16::MAX
-    self.primary_beta = pbeta as u16;
-  }
+  //pub fn set_beta(&mut self, beta : f32) {
+  //  // expecting beta in range of 0-1. If larger
+  //  // than 1, we will save 1
+  //  if beta > 1.0 {
+  //    self.primary_beta = 1;
+  //  }
+  //  let pbeta = beta*(u16::MAX as f32).floor();
+  //  // safe, bc of multiplication with u16::MAX
+  //  self.primary_beta = pbeta as u16;
+  //}
 
-  pub fn get_beta(&self) -> f32 {
-    self.primary_beta as f32/u32::MAX as f32 
-  }
+  //pub fn get_beta(&self) -> f32 {
+  //  self.primary_beta as f32/u32::MAX as f32 
+  //}
 }
 
 impl Packable for TofEventSummary {
@@ -857,8 +872,11 @@ impl Serialization for TofEventSummary {
     stream.extend_from_slice(&self.quality.to_le_bytes());
     stream.extend_from_slice(&self.timestamp32.to_le_bytes());
     stream.extend_from_slice(&self.timestamp16.to_le_bytes());
-    stream.extend_from_slice(&self.primary_beta.to_le_bytes());
-    stream.extend_from_slice(&self.primary_charge.to_le_bytes());
+    //stream.extend_from_slice(&self.primary_beta.to_le_bytes());
+    stream.extend_from_slice(&self.run_id.to_le_bytes());
+    stream.push(self.drs_dead_lost_hits);
+    stream.push(self.rsvd0);
+    //stream.extend_from_slice(&self.primary_charge.to_le_bytes());
     stream.extend_from_slice(&self.dsi_j_mask.to_le_bytes());
     let n_channel_masks = self.channel_mask.len();
     stream.push(n_channel_masks as u8);
@@ -900,13 +918,16 @@ impl Serialization for TofEventSummary {
       summary.tot_edep_cbe    = parse_f32(stream, pos); 
       summary.tot_edep_cor    = parse_f32(stream, pos); 
     }
-    summary.quality           = parse_u8(stream, pos);
-    summary.timestamp32       = parse_u32(stream, pos);
-    summary.timestamp16       = parse_u16(stream, pos);
-    summary.primary_beta      = parse_u16(stream, pos); 
-    summary.primary_charge    = parse_u16(stream, pos); 
-    summary.dsi_j_mask        = parse_u32(stream, pos);
-    let n_channel_masks       = parse_u8(stream, pos);
+    summary.quality            = parse_u8(stream, pos);
+    summary.timestamp32        = parse_u32(stream, pos);
+    summary.timestamp16        = parse_u16(stream, pos);
+    summary.run_id             = parse_u16(stream, pos);
+    //summary.primary_beta      = parse_u16(stream, pos); 
+    //summary.primary_charge    = parse_u16(stream, pos); 
+    summary.drs_dead_lost_hits = parse_u8(stream, pos);
+    summary.rsvd0              = parse_u8(stream, pos); 
+    summary.dsi_j_mask         = parse_u32(stream, pos);
+    let n_channel_masks        = parse_u8(stream, pos);
     for _ in 0..n_channel_masks {
       summary.channel_mask.push(parse_u16(stream, pos));
     }
@@ -933,15 +954,17 @@ impl Default for TofEventSummary {
 impl fmt::Display for TofEventSummary {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = format!("<TofEventSummary (version {})", self.version);
+    repr += &(format!("\n  EventID          : {}", self.event_id));
+    repr += &(format!("\n  RunID            : {}", self.run_id));
     repr += &(format!("\n  EventStatus      : {}", self.status));
     repr += &(format!("\n  TriggerSources   : {:?}", self.get_trigger_sources()));
     repr += &(format!("\n  NTrigPaddles     : {}", self.n_trigger_paddles));
-    repr += &(format!("\n  EventID          : {}", self.event_id));
+    repr += &(format!("\n  DRS dead hits    : {}", self.drs_dead_lost_hits));
     repr += &(format!("\n  timestamp32      : {}", self.timestamp32)); 
     repr += &(format!("\n  timestamp16      : {}", self.timestamp16)); 
     repr += &(format!("\n   |-> timestamp48 : {}", self.get_timestamp48())); 
-    repr += &(format!("\n  PrimaryBeta      : {}", self.get_beta())); 
-    repr += &(format!("\n  PrimaryCharge    : {}", self.primary_charge));
+    //repr += &(format!("\n  PrimaryBeta      : {}", self.get_beta())); 
+    //repr += &(format!("\n  PrimaryCharge    : {}", self.primary_charge));
     repr += &(format!("\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **", self.dsi_j_mask.count_ones()));
     for k in self.get_trigger_hits() {
       repr += &(format!("\n  => {}/{}/({},{}) ({}) ", k.0, k.1, k.2.0, k.2.1, k.3));
@@ -980,23 +1003,24 @@ impl FromRandom for TofEventSummary {
       summary.tot_edep_cor      = rng.gen::<f32>();
       summary.quality           = rng.gen::<u8>();
     }
-    summary.status            = status;
-    summary.version           = version;
+    summary.status             = status;
+    summary.version            = version;
     // variable packet for the FC
-    summary.trigger_sources   = rng.gen::<u16>();
-    summary.n_trigger_paddles = rng.gen::<u8>();
-    summary.event_id          = rng.gen::<u32>();
-    summary.timestamp32       = rng.gen::<u32>();
-    summary.timestamp16       = rng.gen::<u16>();
-    summary.primary_beta      = rng.gen::<u16>(); 
-    summary.primary_charge    = rng.gen::<u16>(); 
-    summary.dsi_j_mask        = rng.gen::<u32>();
-    let n_channel_masks       = rng.gen::<u8>();
+    summary.trigger_sources    = rng.gen::<u16>();
+    summary.n_trigger_paddles  = rng.gen::<u8>();
+    summary.event_id           = rng.gen::<u32>();
+    summary.timestamp32        = rng.gen::<u32>();
+    summary.timestamp16        = rng.gen::<u16>();
+    //summary.primary_beta      = rng.gen::<u16>(); 
+    //summary.primary_charge    = rng.gen::<u16>(); 
+    summary.drs_dead_lost_hits = rng.gen::<u8>();
+    summary.dsi_j_mask         = rng.gen::<u32>();
+    let n_channel_masks        = rng.gen::<u8>();
     for _ in 0..n_channel_masks {
       summary.channel_mask.push(rng.gen::<u16>());
     }
-    summary.mtb_link_mask     = rng.gen::<u64>();
-    let nhits             = rng.gen::<u8>();
+    summary.mtb_link_mask      = rng.gen::<u64>();
+    let nhits                  = rng.gen::<u8>();
     for _ in 0..nhits {
       summary.hits.push(TofHit::from_random());
     }
