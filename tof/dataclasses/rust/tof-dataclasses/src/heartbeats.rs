@@ -417,7 +417,9 @@ fn pack_mtbheartbeat() {
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct EVTBLDRHeartbeat {
+  /// Mission elapsed time in seconds
   pub met_seconds           : usize,
+  /// Total number of received MasterTriggerEvents (from MTB)
   pub n_mte_received_tot    : usize,
   pub n_rbe_received_tot    : usize,
   pub n_rbe_per_te          : usize,
@@ -427,17 +429,27 @@ pub struct EVTBLDRHeartbeat {
   pub n_sent                : usize,
   pub delta_mte_rbe         : usize,
   pub event_cache_size      : usize,
+  
+  // Per designe, the event_id cache and the 
+  // event_cache MUST have the same size. 
+  // I am just paranoid... 
+  // Let's repurpose this field for the 
+  // total number of lost hits due to DRS 
+  // deadtime
   pub event_id_cache_size   : usize, 
+  pub drs_bsy_lost_hg_hits  : usize,
   pub rbe_wo_mte            : usize,
   pub mte_receiver_cbc_len  : usize,
   pub rbe_receiver_cbc_len  : usize,
   pub tp_sender_cbc_len     : usize,
   pub n_rbe_from_past       : usize,
   pub n_rbe_orphan          : usize,
+  // let's deprecate this!
   pub n_ev_wo_evid          : usize,
   pub data_mangled_ev       : usize,
   // pub seen_rbevents         : HashMap<u8, usize>,
 }
+
 impl EVTBLDRHeartbeat {
   // pub fn new() -> Self {
   //   let mut seen_rbevents = HashMap::<u8, usize>::new();
@@ -461,6 +473,7 @@ impl EVTBLDRHeartbeat {
       delta_mte_rbe        : 0,
       event_cache_size     : 0,
       event_id_cache_size  : 0,
+      drs_bsy_lost_hg_hits : 0,
       rbe_wo_mte           : 0,
       mte_receiver_cbc_len : 0,
       rbe_receiver_cbc_len : 0,
@@ -471,79 +484,90 @@ impl EVTBLDRHeartbeat {
       data_mangled_ev      : 0,
       // seen_rbevents        : seen_rbevents, 
     }
- }
- pub fn get_average_rbe_te(&self) -> f64 {
-  if self.n_sent > 0 {
-    return self.n_rbe_per_te as f64 / self.n_sent as f64;
   }
-  0.0
-}
 
-pub fn get_timed_out_frac(&self) -> f64 {
-  if self.n_sent > 0 {
-    return self.n_timed_out as f64 / self.n_sent as f64;
+  pub fn get_average_rbe_te(&self) -> f64 {
+   if self.n_sent > 0 {
+     return self.n_rbe_per_te as f64 / self.n_sent as f64;
+   }
+   0.0
   }
-  0.0
-}
 
-// pub fn add_rbevent(&mut self, rb_id : u8) {
-//   *self.seen_rbevents.get_mut(&rb_id).unwrap() += 1;
-// }
+  pub fn get_timed_out_frac(&self) -> f64 {
+    if self.n_sent > 0 {
+      return self.n_timed_out as f64 / self.n_sent as f64;
+    }
+    0.0
+  }
 
-pub fn get_incoming_vs_outgoing_mte(&self) -> f64 {
-  if self.n_sent > 0 {
-    return self.n_mte_received_tot as f64 /  self.n_sent as f64;
+  // pub fn add_rbevent(&mut self, rb_id : u8) {
+  //   *self.seen_rbevents.get_mut(&rb_id).unwrap() += 1;
+  // }
+  
+  pub fn get_incoming_vs_outgoing_mte(&self) -> f64 {
+    if self.n_sent > 0 {
+      return self.n_mte_received_tot as f64 /  self.n_sent as f64;
+    }
+    0.0
   }
-  0.0
-}
 
- pub fn get_nrbe_discarded_frac(&self) -> f64 {
-   if self.n_rbe_received_tot > 0 {
-    return self.n_rbe_discarded_tot as f64 / self.n_rbe_received_tot as f64;
+  pub fn get_nrbe_discarded_frac(&self) -> f64 {
+    if self.n_rbe_received_tot > 0 {
+     return self.n_rbe_discarded_tot as f64 / self.n_rbe_received_tot as f64;
+   }
+   0.0
   }
-  0.0
- }
- 
-pub fn to_string(&self) -> String {
-  let mut repr = String::from("<EVTBLDRHearbeats");
-  repr += &(format!("\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} "));
-  repr += &(format!("\n Num. events sent          : {}", self.n_sent).bright_purple());
-  repr += &(format!("\n Size of event cache       : {}", self.event_cache_size).bright_purple());
-  repr += &(format!("\n Size of event ID cache    : {}", self.event_id_cache_size).bright_purple());
-  repr += &(format!("\n Num. events timed out     : {}", self.n_timed_out).bright_purple());
-  repr += &(format!("\n Percent events timed out  : {:.2}%", self.get_timed_out_frac()*(100 as f64)).bright_purple());
-  if self.n_sent > 0 && self.n_ev_wo_evid > 0 {
-    repr += &(format!("\n Percent events w/out event ID: {:.2}%", (((self.n_ev_wo_evid / self.n_sent) as f64)*(100 as f64))).bright_purple());
-  } else if self.n_ev_wo_evid > 0 { 
-    repr += &(format!("\n Percent events w/out event ID: N/A").bright_purple());
+
+  pub fn get_drs_lost_frac(&self) -> f64 {
+    if self.n_rbe_received_tot > 0 {
+      return self.drs_bsy_lost_hg_hits as f64 / self.n_rbe_received_tot as f64;
+    }
+    0.0
   }
-  if self.n_mte_received_tot > 0{ 
+
+  pub fn to_string(&self) -> String {
+    let mut repr = String::from("");
+    repr += &(format!("\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} "));
+    repr += &(format!("\n Mission elapsed time (MET) [s]  : {}", self.met_seconds).bright_purple());
+    repr += &(format!("\n Num. events sent                : {}", self.n_sent).bright_purple());
+    repr += &(format!("\n Size of event cache             : {}", self.event_cache_size).bright_purple());
+    //repr += &(format!("\n Size of event ID cache          : {}", self.event_id_cache_size).bright_purple());
+    repr += &(format!("\n Num. events timed out           : {}", self.n_timed_out).bright_purple());
+    repr += &(format!("\n Percent events timed out        : {:.2}%", self.get_timed_out_frac()*(100 as f64)).bright_purple());
+    //if self.n_sent > 0 && self.n_ev_wo_evid > 0 {
+    //  repr += &(format!("\n Percent events w/out event ID : {:.2}%", (((self.n_ev_wo_evid / self.n_sent) as f64)*(100 as f64))).bright_purple());
+    //} else if self.n_ev_wo_evid > 0 { 
+    //  repr += &(format!("\n Percent events w/out event ID : N/A").bright_purple());
+    //}
+    if self.n_mte_received_tot > 0{ 
+      repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
+      repr += &(format!("\n Num. evts with ANY data mangling : {}",    self.data_mangled_ev));
+      repr += &(format!("\n Per. evts with ANY data mangling : {:.2}%", ((self.data_mangled_ev as f64)/(self.n_mte_received_tot as f64))*(100 as f64)));
+    }
+    else {repr += &(format!("\n Percent events with data mangling: unable to calculate"));}
     repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-    repr += &(format!("\n Num. evts with ANY data mangling  : {}",    self.data_mangled_ev));
-    repr += &(format!("\n Percent events with data mangling : {:.2}", ((self.data_mangled_ev as f64)/(self.n_mte_received_tot as f64))*(100 as f64)));
-  }
-  else {repr += &(format!("\n Percent events with data mangling: unable to calculate"));}
-  repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-  repr += &(format!("\n Received MTEvents                   : {}", self.n_mte_received_tot).bright_purple());
-  repr += &(format!("\n Skipped MTEvents                    : {}", self.n_mte_skipped).bright_purple());
-  repr += &(format!("\n Incoming/outgoing MTEvents fraction : {:.2}", self.get_incoming_vs_outgoing_mte()).bright_purple());
-  repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-  repr += &(format!("\n Received RBEvents                   : {}", self.n_rbe_received_tot).bright_purple());
-  repr += &(format!("\n RBEvents Discarded                  : {}", self.n_rbe_discarded_tot).bright_purple());
-  repr += &(format!("\n Percent RBEvents discarded          : {:.2}%", self.get_nrbe_discarded_frac()*(100 as f64)).bright_purple());
-  repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-  if self.n_sent > 0 && self.n_mte_received_tot > 0 {
-      repr += &(format!("\n RBEvent/Evts sent               : {:.2}", (self.n_rbe_received_tot as f64/ self.n_sent as f64)).bright_purple());
-      repr += &(format!("\n RBEvent/MTEvents                : {:.2}", (self.n_rbe_received_tot as f64 / self.n_mte_received_tot as f64)).bright_purple()); }
-  repr += &(format!("\n Num. RBEvents with evid from past   : {}", self.n_rbe_from_past).bright_purple());
-  repr += &(format!("\n Num. orphan RBEvents : {}", self.n_rbe_orphan).bright_purple());
-  repr += &(format!("\n\n Getting MTE from cache for RBEvent failed {} times :(", self.rbe_wo_mte).bright_blue());
-  repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-  repr += &(format!("\n Ch. len MTE Receiver : {}", self.mte_receiver_cbc_len).bright_purple());
-  repr += &(format!("\n Ch. len RBE Reveiver : {}", self.rbe_receiver_cbc_len).bright_purple());
-  repr += &(format!("\n Ch. len TP Sender    : {}", self.tp_sender_cbc_len).bright_purple());
-  repr += &(format!("\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} END EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50}"));
-  repr
+    repr += &(format!("\n Received MTEvents                   : {}", self.n_mte_received_tot).bright_purple());
+    repr += &(format!("\n Skipped MTEvents                    : {}", self.n_mte_skipped).bright_purple());
+    repr += &(format!("\n Incoming/outgoing MTEvents fraction : {:.2}", self.get_incoming_vs_outgoing_mte()).bright_purple());
+    repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
+    repr += &(format!("\n Received RBEvents                   : {}", self.n_rbe_received_tot).bright_purple());
+    repr += &(format!("\n RBEvents Discarded                  : {}", self.n_rbe_discarded_tot).bright_purple());
+    repr += &(format!("\n Percent RBEvents discarded          : {:.2}%", self.get_nrbe_discarded_frac()*(100 as f64)).bright_purple());
+    repr += &(format!("\n DRS4 busy lost hits                 : {}", self.drs_bsy_lost_hg_hits).bright_purple());
+    repr += &(format!("\n RDS4 busy lost hits fraction        : {:.2}%", self.get_drs_lost_frac()*(100.0 as f64)).bright_purple());
+    repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
+    if self.n_sent > 0 && self.n_mte_received_tot > 0 {
+        repr += &(format!("\n RBEvent/Evts sent               : {:.2}", (self.n_rbe_received_tot as f64/ self.n_sent as f64)).bright_purple());
+        repr += &(format!("\n RBEvent/MTEvents                : {:.2}", (self.n_rbe_received_tot as f64 / self.n_mte_received_tot as f64)).bright_purple()); }
+    repr += &(format!("\n Num. RBEvents with evid from past   : {}", self.n_rbe_from_past).bright_purple());
+    repr += &(format!("\n Num. orphan RBEvents : {}", self.n_rbe_orphan).bright_purple());
+    repr += &(format!("\n\n Getting MTE from cache for RBEvent failed {} times :(", self.rbe_wo_mte).bright_blue());
+    repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
+    repr += &(format!("\n Ch. len MTE Receiver : {}", self.mte_receiver_cbc_len).bright_purple());
+    repr += &(format!("\n Ch. len RBE Reveiver : {}", self.rbe_receiver_cbc_len).bright_purple());
+    repr += &(format!("\n Ch. len TP Sender    : {}", self.tp_sender_cbc_len).bright_purple());
+    repr += &(format!("\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} END EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50}"));
+    repr
   }
 }
 
@@ -577,7 +601,8 @@ impl Serialization for EVTBLDRHeartbeat {
     hb.n_sent               = parse_usize(stream,pos);
     hb.delta_mte_rbe        = parse_usize(stream,pos);
     hb.event_cache_size     = parse_usize(stream,pos);
-    hb.event_id_cache_size  = parse_usize(stream,pos);
+    //hb.event_id_cache_size  = parse_usize(stream,pos);
+    hb.drs_bsy_lost_hg_hits = parse_usize(stream,pos);
     hb.rbe_wo_mte           = parse_usize(stream,pos);
     hb.mte_receiver_cbc_len = parse_usize(stream,pos);
     hb.rbe_receiver_cbc_len = parse_usize(stream,pos);
@@ -604,7 +629,8 @@ impl Serialization for EVTBLDRHeartbeat {
     bs.extend_from_slice(&self.n_sent.to_le_bytes());
     bs.extend_from_slice(&self.delta_mte_rbe.to_le_bytes());
     bs.extend_from_slice(&self.event_cache_size.to_le_bytes());
-    bs.extend_from_slice(&self.event_id_cache_size.to_le_bytes());
+    //bs.extend_from_slice(&self.event_id_cache_size.to_le_bytes());
+    bs.extend_from_slice(&self.drs_bsy_lost_hg_hits.to_le_bytes());
     bs.extend_from_slice(&self.rbe_wo_mte.to_le_bytes());
     bs.extend_from_slice(&self.mte_receiver_cbc_len.to_le_bytes());
     bs.extend_from_slice(&self.rbe_receiver_cbc_len.to_le_bytes());
@@ -633,7 +659,8 @@ impl FromRandom for EVTBLDRHeartbeat {
     let n_sent = rng.gen::<usize>();
     let delta_mte_rbe = rng.gen::<usize>();
     let event_cache_size = rng.gen::<usize>();
-    let event_id_cache_size = rng.gen::<usize>();
+    //let event_id_cache_size = rng.gen::<usize>();
+    let drs_bsy_lost_hg_hits  = rng.gen::<usize>();
     let rbe_wo_mte = rng.gen::<usize>();
     let mte_receiver_cbc_len = rng.gen::<usize>();
     let rbe_receiver_cbc_len = rng.gen::<usize>();
@@ -652,7 +679,10 @@ impl FromRandom for EVTBLDRHeartbeat {
       n_sent,
       delta_mte_rbe,
       event_cache_size,
-      event_id_cache_size,
+      // don't randomize this, since it 
+      // won't get serialized
+      event_id_cache_size : 0,
+      drs_bsy_lost_hg_hits,
       rbe_wo_mte,
       mte_receiver_cbc_len,
       rbe_receiver_cbc_len,
@@ -668,8 +698,9 @@ impl FromRandom for EVTBLDRHeartbeat {
 
 impl fmt::Display for EVTBLDRHeartbeat {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let repr = self.to_string();
-    write!(f, "{}", repr)
+    let mut repr = String::from("<EVTBLDRHearbeat:   ");
+    repr += &self.to_string();
+    write!(f, "{}>", repr)
   }
 }  
 
