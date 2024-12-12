@@ -84,6 +84,7 @@ pub enum UIMenuItem {
   Quit,
   // rb menu
   Waveforms,
+  GlobalRates,
   RBMoniData,
   PAMoniData,
   PBMoniData,
@@ -128,6 +129,7 @@ impl UIMenuItem {
       UIMenuItem::Commands       => String::from("Commands"      ),
       UIMenuItem::Quit           => String::from("Quit"          ),
       UIMenuItem::Waveforms      => String::from("Waveforms"     ),
+      UIMenuItem::GlobalRates    => String::from("GlobalRates"   ),
       UIMenuItem::RBMoniData     => String::from("RBMoniData"    ),
       UIMenuItem::PAMoniData     => String::from("PAMoniData"    ),
       UIMenuItem::PBMoniData     => String::from("PBMoniData"    ),
@@ -217,22 +219,22 @@ pub trait UIMenu<'a> {
 
 
 #[derive(Debug, Clone)]
-pub struct MainMenu2<'a> {
-  pub theme        : ColorTheme,
-  pub active_index : usize,
-  pub titles       : Vec<Line<'a>>,
-  pub active_menu_item : MenuItem,
+pub struct MainMenu<'a> {
+  pub theme             : ColorTheme,
+  pub active_index      : usize,
+  pub titles            : Vec<Line<'a>>,
+  pub active_menu_item  : MenuItem,
   pub active_menu_item2 : UIMenuItem,
 }
 
-impl UIMenu<'_> for MainMenu2<'_> {
+impl UIMenu<'_> for MainMenu<'_> {
   fn get_items() -> Vec<UIMenuItem> {
     let items = vec![UIMenuItem::Home,
                      UIMenuItem::Events,
                      UIMenuItem::ReadoutBoards,
                      UIMenuItem::Paddles,
                      UIMenuItem::Trigger,
-                     UIMenuItem::Monitoring,
+                     UIMenuItem::Alerts,
                      UIMenuItem::Heartbeats,
                      UIMenuItem::Telemetry,
                      UIMenuItem::Commands,
@@ -265,7 +267,7 @@ impl UIMenu<'_> for MainMenu2<'_> {
   }
 }
 
-impl MainMenu2<'_> {
+impl MainMenu<'_> {
   pub fn new(theme : ColorTheme) -> Self {
     let titles = Self::get_titles(theme);
     let theme_cl = theme.clone();
@@ -295,12 +297,12 @@ impl UIMenu<'_> for RBMenu2<'_> {
   fn get_items() -> Vec<UIMenuItem> {
     let items = vec![UIMenuItem::Back,
                      UIMenuItem::Waveforms,
+                     UIMenuItem::GlobalRates,
                      UIMenuItem::RBMoniData,
                      UIMenuItem::PBMoniData,
                      UIMenuItem::PAMoniData,
-                     UIMenuItem::LTBMoniData,
-                     //UIMenuItem::SelectBoard,
-                     UIMenuItem::Quit];
+                     UIMenuItem::LTBMoniData];
+                     //UIMenuItem::SelectBoard];
     items
   }
 
@@ -328,12 +330,13 @@ impl UIMenu<'_> for RBMenu2<'_> {
     match self.active_index {
       0 => UIMenuItem::Back,
       1 => UIMenuItem::Waveforms,
-      2 => UIMenuItem::RBMoniData,
-      3 => UIMenuItem::PAMoniData,
-      4 => UIMenuItem::PBMoniData,
-      5 => UIMenuItem::LTBMoniData,
-      6 => UIMenuItem::SelectBoard,
-      7 => UIMenuItem::Quit,
+      2 => UIMenuItem::GlobalRates,
+      3 => UIMenuItem::RBMoniData,
+      4 => UIMenuItem::PAMoniData,
+      5 => UIMenuItem::PBMoniData,
+      6 => UIMenuItem::LTBMoniData,
+      7 => UIMenuItem::SelectBoard,
+      8 => UIMenuItem::Quit,
       _ => UIMenuItem::Unknown
     }
   }
@@ -342,12 +345,13 @@ impl UIMenu<'_> for RBMenu2<'_> {
 impl  RBMenu2<'_> {
 
   pub fn new(theme : ColorTheme) -> Self {
-    let title_str  =  vec!["Back", "Waveforms",
+    let title_str  =  vec!["Back",
+                           "Waveforms",
+                           "GlobalRates",
                            "RBMoniData", 
                            "PBMoniData", "PAMoniData",
                            "LTBMoniData",
-                           "SelectBoards [LTB & RB]",
-                           "Quit"];
+                           "SelectBoards [LTB & RB]"];
 
     let titles : Vec<Line> = title_str
                 .iter()

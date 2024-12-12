@@ -91,7 +91,7 @@ use tof_dataclasses::calibrations::RBCalibrations;
 use liftof_tui::menu::{
     UIMenuItem,
     MenuItem,
-    MainMenu2,
+    MainMenu,
     TriggerMenu,
     EventMenu,
     MoniMenu,
@@ -577,7 +577,7 @@ fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
 // so that it can be put in an Arc(Mutex), so
 // we can multithread it
 pub struct TabbedInterface<'a> {
-  pub ui_menu       :  MainMenu2<'a>,
+  pub ui_menu       :  MainMenu<'a>,
   pub rb_menu       :  RBMenu2<'a>,
   pub mt_menu       :  TriggerMenu<'a>,
   pub st_menu       :  SettingsMenu,
@@ -620,7 +620,7 @@ pub struct TabbedInterface<'a> {
 } 
 
 impl<'a> TabbedInterface<'a> {
-  pub fn new(ui_menu      : MainMenu2<'a>,
+  pub fn new(ui_menu      : MainMenu<'a>,
              rb_menu      : RBMenu2<'a>,
              mt_menu      : TriggerMenu<'a>,
              st_menu      : SettingsMenu,
@@ -754,6 +754,11 @@ impl<'a> TabbedInterface<'a> {
   pub fn render_home(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
     self.ui_menu.render (&master_lo.rect[0], frame);
     self.home_tab.render(&master_lo.rect[1], frame);
+  }
+  
+  pub fn render_alerts(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+    self.ui_menu.render (&master_lo.rect[0], frame);
+    //self.alert_tab.render(&master_lo.rect[1], frame);
   }
 
   pub fn render_events(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
@@ -898,6 +903,9 @@ impl<'a> TabbedInterface<'a> {
           }
           UIMenuItem::Heartbeats => {
             self.render_heartbeats(master_lo, frame);
+          }
+          UIMenuItem::Alerts => {
+            self.render_alerts(master_lo, frame);
           }
           UIMenuItem::Quit => {
             self.render_quit(master_lo, frame);
@@ -1114,6 +1122,9 @@ impl<'a> TabbedInterface<'a> {
               UIMenuItem::LTBMoniData => {
                 self.wf_tab.view = RBTabView::LTBMoniData; 
               }
+              UIMenuItem::GlobalRates => {
+                self.wf_tab.view = RBTabView::GlobalRates;
+              }
               _ => ()
             }
           }
@@ -1174,6 +1185,9 @@ impl<'a> TabbedInterface<'a> {
               }
               UIMenuItem::LTBMoniData => {
                 self.wf_tab.view = RBTabView::LTBMoniData; 
+              }
+              UIMenuItem::GlobalRates => {
+                self.wf_tab.view = RBTabView::GlobalRates;
               }
               _ => ()
             }
@@ -1491,7 +1505,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //let mut color_set_bw    = 
   
   // The menus
-  let ui_menu         = MainMenu2::new(color_theme.clone());
+  let ui_menu         = MainMenu::new(color_theme.clone());
   let rb_menu         = RBMenu2::new(color_theme.clone());
   //let mt_menu         = MTMenu::new(color_theme.clone());
   let mt_menu         = TriggerMenu::new(color_theme.clone());

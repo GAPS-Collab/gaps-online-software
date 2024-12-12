@@ -7,67 +7,79 @@
 use std::time::Instant;
 use std::fs;
 use std::collections::{
-    VecDeque,
-    HashMap,
+  VecDeque,
+  HashMap,
 };
 
-//extern crate histo;
-//use histo::Histogram;
 use ndhistogram::{
-    Histogram,
-    Hist1D,
-    ndhistogram,
-};
-use ndhistogram::axis::{
-    Uniform,
+  Histogram,
+  Hist1D,
+  ndhistogram,
 };
 
+use ndhistogram::axis::{
+  Uniform,
+};
+
+use ratatui::prelude::Stylize;
 use ratatui::{
-    //backend::CrosstermBackend,
-    //terminal::Frame,
-    Frame,
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{
-        Modifier,
-        //Style
+  //backend::CrosstermBackend,
+  //terminal::Frame,
+  Frame,
+  layout::{Alignment, Constraint, Direction, Layout, Rect},
+  style::{
+    Modifier,
+    Style
+  },
+  text::{
+    //Span,
+    Line
+  },
+  widgets::{
+    Block,
+    BorderType,
+    Borders,
+    List,
+    ListItem,
+    ListState,
+    Paragraph,
+    Row,
+    Table,
     },
-    text::{
-        //Span,
-        Line
-    },
-    widgets::{
-        Block, BorderType, Borders, List, ListItem, ListState, Paragraph},
 };
 
 use crossbeam_channel::{
-    Receiver
+  Receiver
 };
 
 
 use tof_dataclasses::packets::{
-    TofPacket,
-    PacketType
+  TofPacket,
+  PacketType
 };
+
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::events::RBEvent;
 //use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::monitoring::{
-    RBMoniData,
-    LTBMoniData,
-    PAMoniData,
-    RBMoniDataSeries,
-    LTBMoniDataSeries,
-    PAMoniDataSeries,
+  RBMoniData,
+  LTBMoniData,
+  PAMoniData,
+  RBMoniDataSeries,
+  LTBMoniDataSeries,
+  PAMoniDataSeries,
 };
+
 use tof_dataclasses::series::MoniSeries;
 use tof_dataclasses::io::RBEventMemoryStreamer;
 use tof_dataclasses::database::ReadoutBoard;
 
 use crate::widgets::{
-    timeseries,
-    //histogram,
+  timeseries,
+  //histogram,
 };
+
 use crate::colors::{
   ColorTheme,
 };
@@ -86,6 +98,7 @@ pub enum RBTabView {
   PAMoniData,
   PBMoniData,
   LTBMoniData,
+  GlobalRates,
   SelectRB,
 }
 
@@ -94,12 +107,12 @@ pub struct RBTab<'a>  {
   pub tp_receiver        : Receiver<TofPacket>,
   pub rb_receiver        : Receiver<RBEvent>,
   pub rb_selector        : u8,
-  pub ltb_selector       : u8,
   pub rb_changed         : bool,
   pub rb_calibration     : RBCalibrations,
   pub cali_loaded        : bool,
   pub event_queue        : VecDeque<RBEvent>,
   pub moni_queue         : RBMoniDataSeries,
+  pub global_rates       : HashMap<u8, String>,
   pub ltb_moni_queue     : LTBMoniDataSeries,  
   pub pa_show_biases     : bool,
   pub pa_moni_queue      : PAMoniDataSeries,
@@ -132,10 +145,8 @@ pub struct RBTab<'a>  {
   pub rbl_state          : ListState,
   pub rbl_items          : Vec::<ListItem<'a>>,
   pub rbl_active         : bool,
-  // list for the ltb selector
-  pub ltbl_state         : ListState,
-  pub ltbl_items         : Vec::<ListItem<'a>>,
-  pub ltbl_active        : bool,
+  // FIXME - get this from the DB!
+  pub rb_to_rat          : HashMap<u8,u8>,
 }
 
 impl RBTab<'_>  {
@@ -144,15 +155,18 @@ impl RBTab<'_>  {
              rb_receiver  : Receiver<RBEvent>,
              rbs          : HashMap<u8, ReadoutBoard>,
              theme        : ColorTheme) -> RBTab<'static>  {
+    let rb_non_exist = vec![10,12,34,37,38,43,45,47,48,49];
     let mut rb_select_items = Vec::<ListItem>::new();
+    let mut global_rates    = HashMap::<u8,String>::new();
+    for k in 1..51 {
+      if rb_non_exist.contains(&k) {
+        continue;
+      }
+      global_rates.insert(k as u8, String::from("no data yet"));
+    }
     for k in 1..51 {
       let this_item = format!("  RB{:0>2}", k);
       rb_select_items.push(ListItem::new(Line::from(this_item)));
-    }
-    let mut ltb_select_items = Vec::<ListItem>::new();
-    for k in 1..21 {
-      let this_item = format!("  LTB{:0>2}", k);
-      ltb_select_items.push(ListItem::new(Line::from(this_item)));
     }
 
     let queue_size = 1000usize;
@@ -165,19 +179,60 @@ impl RBTab<'_>  {
     let bins = Uniform::new(50,-0.5,49.5).unwrap();
     let mut rbl_state    = ListState::default();
     rbl_state.select(Some(1));
-    let mut ltbl_state   = ListState::default();
-    ltbl_state.select(Some(1));
+    warn!("Using hardcoded values for the RB->RAT hashmap!");
+    // FIXME - get this from DB!
+    let mut rb_to_rat
+      = HashMap::<u8,u8>::from(
+      [(1, 10),
+       (2, 15),
+       (3,  1),
+       (4, 15),
+       (5, 20),
+       (6, 19),
+       (7, 17),
+       (8,  9),
+       (11,10),
+       (13, 4),
+       (14, 2),
+       (15, 1),
+       (16, 8),
+       (17,17),
+       (18,13),
+       (19, 7),
+       (20, 7),
+       (21, 5),
+       (22,11),
+       (23, 5),
+       (24, 6),
+       (25, 8),
+       (26,11),
+       (27, 6),
+       (28,20),
+       (29, 3),
+       (30, 9),
+       (31, 3),
+       (32, 2),
+       (33,18),
+       (34,18),
+       (35, 4),
+       (36,19),
+       (39,12),
+       (40,12),
+       (41,14),
+       (42,14),
+       (44,16),
+       (46,16)]);
     RBTab {
       tp_receiver        : tp_receiver,
       rb_receiver        : rb_receiver,
       rb_selector        : 0,
-      ltb_selector       : 9,
       rb_changed         : false,
       rb_calibration     : RBCalibrations::new(0),
       cali_loaded        : false,
       event_queue        : VecDeque::<RBEvent>::with_capacity(queue_size),
       //moni_queue         : VecDeque::<RBMoniData>::with_capacity(queue_size),
       moni_queue         : RBMoniDataSeries::new(),
+      global_rates       : global_rates,
       met_queue          : VecDeque::<f64>::with_capacity(queue_size),
       met_queue_moni     : HashMap::<u8, VecDeque<f64>>::new(),
       ltb_moni_queue     : LTBMoniDataSeries::new(),
@@ -210,9 +265,7 @@ impl RBTab<'_>  {
       rbl_items          : rb_select_items,
       rbl_active         : false,
       
-      ltbl_state         : ltbl_state,
-      ltbl_items         : ltb_select_items,
-      ltbl_active        : false,
+      rb_to_rat          : rb_to_rat
     }
   }
   
@@ -222,7 +275,7 @@ impl RBTab<'_>  {
     let bins   = Uniform::new(50,-0.5,49.5).unwrap();
     //info!("Receive packet!"); 
     if self.rb_changed {
-      info!("RB change detectod!");
+      debug!("RB change detectod!");
       // currently, only one RB at a time is supported
       //self.moni_queue.clear();
       self.event_queue.clear();
@@ -236,7 +289,7 @@ impl RBTab<'_>  {
           self.cali_loaded = false;
         }, 
         Some(_rb_id) => {
-          let cali_path = format!("calibrations/rb_{:02}.cali.tof.gaps", _rb_id + 1);
+          let cali_path = format!("calibrations/RB{:02}.cali.tof.gaps", _rb_id + 1);
           if fs::metadata(cali_path.clone()).is_ok() {
             match RBCalibrations::from_file(cali_path.clone(), true) {
               Err(err) => error!("Unable to load RBCalibration from file {}! {err}", cali_path),
@@ -268,7 +321,7 @@ impl RBTab<'_>  {
           debug!("Got next packet {}!", pack);
           match pack.packet_type {
             PacketType::PAMoniData => {
-              trace!("Received new PAMoniData!");
+              info!("Received new PAMoniData!");
               let moni : PAMoniData = pack.unpack()?;
               self.pa_moni_queue.add(moni);
               if !self.met_queue_pa_moni.contains_key(&moni.board_id) {
@@ -300,6 +353,8 @@ impl RBTab<'_>  {
               let moni : RBMoniData = pack.unpack()?;
               self.moni_queue.add(moni);
               self.n_moni += 1;
+              // capture the rate for the global rate window
+              self.global_rates.insert(moni.board_id, format!("{}",moni.rate));
               if !self.met_queue_moni.contains_key(&moni.board_id) {
                 // FIXME - make the 1000 (which is queue size) a member
                 self.met_queue_moni.insert(moni.board_id, VecDeque::<f64>::with_capacity(1000));
@@ -415,37 +470,6 @@ impl RBTab<'_>  {
     self.rbl_state.select(None);
   }
   
-  pub fn next_ltb(&mut self) {
-    let i = match self.ltbl_state.selected() {
-      Some(i) => {
-        if i >= self.ltbl_items.len() - 1 {
-          self.ltbl_items.len() - 1
-        } else {
-          i + 1
-        }
-      }
-      None => 0,
-    };
-    self.ltbl_state.select(Some(i));
-  }
-
-  pub fn previous_ltb(&mut self) {
-    let i = match self.ltbl_state.selected() {
-      Some(i) => {
-        if i == 0 {
-          0 
-        } else {
-          i - 1
-        }
-      }
-      None => 0,
-    };
-    self.ltbl_state.select(Some(i));
-  }
-
-  pub fn unselect_ltbl(&mut self) {
-    self.ltbl_state.select(None);
-  }
 
   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
     match self.view {
@@ -458,17 +482,6 @@ impl RBTab<'_>  {
                Constraint::Percentage(90)].as_ref(),
           )
           .split(*main_window);
-        //let par_rb_title_string = String::from("Select ReadoutBoard (RB)");
-        //let (first, rest) = par_title_string.split_at(1);
-        //let par_title = Line::from(vec![
-        //  Span::styled(
-        //      first,
-        //      Style::default()
-        //          .fg(self.theme.hc)
-        //          .add_modifier(Modifier::UNDERLINED),
-        //  ),
-        //  Span::styled(rest, self.theme.style()),
-        //]);
         let rbs = Block::default()
           .borders(Borders::ALL)
           .style(self.theme.style())
@@ -478,16 +491,6 @@ impl RBTab<'_>  {
           .highlight_style(self.theme.highlight().add_modifier(Modifier::BOLD))
           .highlight_symbol(">>")
           .repeat_highlight_symbol(true);
-        // No ltb selection right now
-        //let ltbs = Block::default()
-        //  .borders(Borders::ALL)
-        //  .style(self.theme.style())
-        //  .title("Select LocalTriggerBoard (LTB)")
-        //  .border_type(BorderType::Plain);
-        //let ltb_select_list = List::new(self.ltbl_items.clone()).block(ltbs)
-        //  .highlight_style(self.theme.highlight().add_modifier(Modifier::BOLD))
-        //  .highlight_symbol(">>")
-        //  .repeat_highlight_symbol(true);
         match self.list_focus {
           RBLTBListFocus::RBList => {
             match self.rbl_state.selected() {
@@ -512,23 +515,6 @@ impl RBTab<'_>  {
             }
           },
           _ => ()
-          // no ltb selection right now
-          //RBLTBListFocus::LTBList => {
-          //  match self.ltbl_state.selected() {
-          //    None    => {
-          //      let selector =  1;
-          //      if self.ltb_selector != selector {
-          //        self.ltb_selector = selector;
-          //      } 
-          //    },
-          //    Some(_ltbid) => {
-          //      let selector =  _ltbid as u8 + 1;
-          //      if self.ltb_selector != selector {
-          //        self.ltb_selector = selector;
-          //      }
-          //    },
-          //  }
-          //}
         }
         let view_string : String;
         match self.rbs.get(&self.rb_selector) {
@@ -536,7 +522,7 @@ impl RBTab<'_>  {
             view_string = format!("{}", _rb.to_summary_str());
           }
           None => {
-            view_string = format!("No information for RB {} in DBor DB not available!", self.rb_selector);
+            view_string = format!("No information for RB {} in DB \n or DB not available!", self.rb_selector);
           }
         }
         let rb_view = Paragraph::new(view_string)
@@ -553,7 +539,6 @@ impl RBTab<'_>  {
 
         frame.render_stateful_widget(rb_select_list,  main_lo[0], &mut self.rbl_state );
         frame.render_widget(rb_view, main_lo[1]);
-        //frame.render_stateful_widget(ltb_select_list, list_chunks[1], &mut self.ltbl_state );
       },
       RBTabView::Waveform => {
         // set up general layout
@@ -643,7 +628,7 @@ impl RBTab<'_>  {
             .border_type(BorderType::Rounded),
         );
         frame.render_widget(event_view, detail_and_ch9_chunks[1]);
-      }, // end Waveform
+      } // end Waveform
       RBTabView::RBMoniData => {
         // Have 4 columns a 4 plots each. We use col(0,0) for the RBMoniData string,
         // so this leaves us with 13 plots
@@ -1037,9 +1022,9 @@ impl RBTab<'_>  {
             )
             .split(columns[1]);
         
-        let last_ltb_moni = self.ltb_moni_queue.get_last_moni(self.ltb_selector);
-        let mut ltb_moni_str = format!("No data for board {}!", self.ltb_selector);
-        let mut ltb_thr_str  = format!("No data for board {}!", self.ltb_selector);
+        let last_ltb_moni    = self.ltb_moni_queue.get_last_moni(self.rb_selector);
+        let mut ltb_moni_str = format!("No data for board {}!", self.rb_selector);
+        let mut ltb_thr_str  = format!("No data for board {}!", self.rb_selector);
         match last_ltb_moni {
           None => (),
           Some(mon) => {
@@ -1076,15 +1061,15 @@ impl RBTab<'_>  {
 
         let tt_name   = String::from("Trenz Temp");
         let tt_title  = String::from("Trenz Temp [\u{00B0}C]");
-        let tt_data   = self.ltb_moni_queue.get_var_for_board("trenz_temp", &self.ltb_selector);
+        let tt_data   = self.ltb_moni_queue.get_var_for_board("trenz_temp", &self.rb_selector);
         let mut tt_ts = VecDeque::<(f64, f64)>::new(); 
         match tt_data {
           None => {
-            error!("No trenz temp data available for board {}", self.ltb_selector);
+            error!("No trenz temp data available for board {}", self.rb_selector);
           },
           Some(data) => {
             if data.len() != 0 {
-              for (k, time) in self.met_queue_ltb_moni.get(&self.ltb_selector).unwrap().iter().enumerate() {
+              for (k, time) in self.met_queue_ltb_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
                 tt_ts.push_back((*time, data[k] as f64));
               }
             }
@@ -1098,15 +1083,15 @@ impl RBTab<'_>  {
 
         let lt_name   = String::from("LTB Temperature");
         let lt_title  = String::from("LTB Temp. [\u{00B0}C]");
-        let lt_data      = self.ltb_moni_queue.get_var_for_board("ltb_temp", &self.ltb_selector);
+        let lt_data      = self.ltb_moni_queue.get_var_for_board("ltb_temp", &self.rb_selector);
         let mut lt_ts    = VecDeque::<(f64, f64)>::new(); 
         match lt_data {
           None => {
-            error!("No LTB temp data available for board {}", self.ltb_selector);
+            error!("No LTB temp data available for board {}", self.rb_selector);
           },
           Some(data) => {
             if data.len() != 0 {
-              for (k, time) in self.met_queue_ltb_moni.get(&self.ltb_selector).unwrap().iter().enumerate() {
+              for (k, time) in self.met_queue_ltb_moni.get(&self.rb_selector).unwrap().iter().enumerate() {
                 lt_ts.push_back((*time, data[k] as f64));
               }
             }
@@ -1239,7 +1224,7 @@ impl RBTab<'_>  {
         } else {
           // the temperature plots
           for k in 0..16 {
-            let identifier = format!("temp_{}", k+1);
+            let identifier = format!("temps{}", k+1);
             let name   = format!("Ch {} Temperature", k+1);
             let title  = format!("Ch {} Temp [\u{00B0}C]", k+1);
             let c_data = self.pa_moni_queue.get_var_for_board(&identifier, &self.rb_selector);
@@ -1270,12 +1255,76 @@ impl RBTab<'_>  {
               frame.render_widget(tc, col3[k-12]);
             }
           }
-
         }
-
       }
       RBTabView::PBMoniData => {
       }
+      RBTabView::GlobalRates => {
+        // this is just the simple example
+        let mut rows = Vec::<Row>::new();
+        // we have 40 rbs
+        let mut rbids = Vec::from_iter(&mut self.global_rates.keys());
+        rbids.sort();
+        let mut ncol = 0;
+        let mut this_row = Vec::<String>::new();
+        for k in rbids {
+          this_row.push(format!("RB {:02}", k));
+          if self.global_rates[k] == String::from("0") {
+            this_row.push(format!("\u{203c} {} Hz", self.global_rates[k]));
+          } else {
+            this_row.push(format!("\u{2714} {} Hz", self.global_rates[k]));
+          }
+          ncol += 1;
+          if ncol == 8 {
+            rows.push(Row::new(this_row.clone()));
+            this_row = Vec::<String>::new();
+            ncol = 0;
+          }
+          //let this_row = vec![format!("{}",k) , format!("{}", global_rates[k])];
+          //rows.push(this_row);
+        }
+        // Columns widths are constrained in the same way as Layout...
+        let widths = [
+          Constraint::Percentage(12),
+          Constraint::Percentage(12),
+          Constraint::Percentage(12),
+          Constraint::Percentage(12),
+          Constraint::Percentage(12),
+          Constraint::Percentage(12),
+          Constraint::Percentage(12),
+          Constraint::Percentage(16),
+        ];
+        let table = Table::new(rows, widths)
+          // ...and they can be separated by a fixed spacing.
+          .column_spacing(1)
+          // You can set the style of the entire Table.
+          .style(Style::new().blue())
+          // It has an optional header, which is simply a Row always visible at the top.
+          .header(
+            Row::new(vec!["RBs", "Rate", "RBs", "Rate", "RBs", "Rate", "RBs", "Rate"])
+              .style(self.theme.style())
+              // To add space between the header and the rest of the rows, specify the margin
+              .bottom_margin(1),
+          )
+          // It has an optional footer, which is simply a Row always visible at the bottom.
+          //.footer(Row::new(vec!["Updated on Dec 28"]))
+          // As any other widget, a Table can be wrapped in a Block.
+          .block(
+            Block::default()
+              .borders(Borders::ALL)
+              .style(self.theme.style())
+              .title("RB Trigger rates (scalar, from RBMoniData)")
+              .border_type(BorderType::Rounded),
+            )
+          // The selected row, column, cell and its content can also be styled.
+          .row_highlight_style(self.theme.style())
+          .column_highlight_style(self.theme.style())
+          .cell_highlight_style(self.theme.style());
+          // ...and potentially show a symbol in front of the selection.
+          //.highlight_symbol(">>");
+        frame.render_widget(table, *main_window); 
+      }
+      // This seems deprecated
       RBTabView::Info => {
         let main_view = Layout::default()
           .direction(Direction::Horizontal)

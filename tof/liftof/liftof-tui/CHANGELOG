@@ -1,13 +1,19 @@
 # LELEWAA series
 
 ##v-.10.6
-* updates to new RWWaveform
+* updated to use the new RWWaveform API
 * retires RBWaveform Tab. This is replaced
   by the Paddle tab. We just need to make sure
   that the Paddle tab can receive RBWaveforms 
   as well
 * performance improvement of the paddle waveform
   display
+* FEAATURE -  a new global rates tab that summarizes
+  all the trigger rates for all the RBs to easily 
+  allow to identify those which do not participate
+  in the trigger
+* FIX - fixes the LTBMoniData and PAMoniData (temperaturs)
+  displays
 
 ##v0.10.5
 * upgrade to ratatui v0.29
