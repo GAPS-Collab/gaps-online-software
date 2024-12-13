@@ -1548,6 +1548,7 @@ impl PyMTBHeartbeat {
 pub struct PyEVTBLDRHeartbeat {
   pub config : EVTBLDRHeartbeat 
 }
+
 impl PyEVTBLDRHeartbeat {
   pub fn set_config(&mut self, cfg : EVTBLDRHeartbeat) {
     self.config = cfg;
@@ -1557,9 +1558,9 @@ impl PyEVTBLDRHeartbeat {
 impl PyEVTBLDRHeartbeat {
   #[new]
   fn new () -> Self {
-    let cfg: EVTBLDRHeartbeat = EVTBLDRHeartbeat::new();
+    let hb: EVTBLDRHeartbeat = EVTBLDRHeartbeat::new();
     Self {
-      config : cfg
+      config : hb
     }
   }
   #[getter]
@@ -1605,6 +1606,10 @@ impl PyEVTBLDRHeartbeat {
   #[getter]
   fn get_rbe_wo_mte(&self) -> PyResult<usize> {
     Ok(self.config.rbe_wo_mte)
+  }
+  #[getter]
+  fn get_drs_bsy_lost_hg_hits(&self) -> PyResult<usize> {
+    Ok(self.config.drs_bsy_lost_hg_hits)
   }
   #[getter]
   fn get_mte_receiver_cbc_len(&self) -> PyResult<usize> {
