@@ -157,15 +157,17 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
               }
               PacketType::RBEvent | PacketType::RBEventMemoryView => {
                 let mut event = RBEvent::from(&tp);
-                if event.hits.len() == 0 {
-                  if run_analysis_engine   {
-                    match waveform_analysis(&mut event, 
-                                            &rb,
-                                            ae_settings) {
-                      Ok(_) => (),
-                      Err(err) => {
-                        error!("Unable to analyze waveforms for this event! {err}");
-                      }
+                // don't create the hits if the trigger is lost (the 
+                // waveform field will be empty)
+                if event.hits.len() == 0 
+                && !event.header.drs_lost_trigger() 
+                && run_analysis_engine {
+                  match waveform_analysis(&mut event, 
+                                          &rb,
+                                          ae_settings) {
+                    Ok(_) => (),
+                    Err(err) => {
+                      error!("Unable to analyze waveforms for this event! {err}");
                     }
                   }
                 }
