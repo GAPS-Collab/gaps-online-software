@@ -2,52 +2,53 @@ use std::collections::VecDeque;
 
 use crossbeam_channel::Receiver;
 
-extern crate ndhistogram;
+//extern crate ndhistogram;
 use ndhistogram::{
-    ndhistogram,
-    Histogram,
-    Hist1D,
+  ndhistogram,
+  Histogram,
+  Hist1D,
 };
 
 use ndhistogram::axis::{
-    Uniform,
+  Uniform,
 };
 
 use ratatui::{
-    //symbols,
-    layout::{
-        Alignment,
-        Constraint,
-        Direction,
-        Layout,
-        Rect
-    },
-    style::{
-        //Color,
-        //Modifier,
-        Style
-    },
-    //text::Span,
-    //terminal::Frame,
-    Frame,
-    widgets::{
-        Block,
-        //Dataset,
-        //Axis,
-        //GraphType,
-        BorderType,
-        //Chart,
-        //BarChart,
-        Sparkline,
-        Borders,
-        Paragraph
-    },
+  //symbols,
+  layout::{
+      Alignment,
+      Constraint,
+      Direction,
+      Layout,
+      Rect
+  },
+  style::{
+      //Color,
+      //Modifier,
+      Style
+  },
+  //text::Span,
+  //terminal::Frame,
+  Frame,
+  widgets::{
+      Block,
+      //Dataset,
+      //Axis,
+      //GraphType,
+      BorderType,
+      //Chart,
+      //BarChart,
+      Sparkline,
+      Borders,
+      Paragraph
+  },
 };
 
 //use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::TofEventSummary;
 use tof_dataclasses::errors::SerializationError;
 //use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::database::DsiJChPidMapping;
 
 use crate::colors::{
     ColorTheme,
@@ -68,30 +69,39 @@ pub struct TofSummaryTab {
   pub queue_size      : usize,
   pub n_trg_pdl_histo : Hist1D<Uniform<f32>>, 
   pub theme           : ColorTheme,
+
   // missing event analysis
   pub event_id_test   : Vec<u32>,
   pub evid_test_info  : String,
   pub evid_test_len   : usize,
   pub n_evid_test     : usize,
   pub evid_test_chnks : VecDeque<u64>,
+
+  // missing HG hit analysis
+  pub miss_hg_hits    : Hist1D<Uniform<f32>>,
+  pub pid_map         : DsiJChPidMapping,
 }
 
 impl TofSummaryTab {
-  pub fn new(ts_receiver : Receiver<TofEventSummary>,
-             theme       : ColorTheme) -> Self {
+  pub fn new(ts_receiver  : Receiver<TofEventSummary>,
+             dsijchpidmap : &DsiJChPidMapping,
+             theme        : ColorTheme) -> Self {
     
     let bins          = Uniform::new(25, 0.0, 25.0).unwrap();
+    let mhg_bins      = Uniform::new(160, 0.0, 160.0).unwrap();
     Self {
-        ts_receiver     : ts_receiver,
-        summary_queue   : VecDeque::<TofEventSummary>::new(),
-        queue_size      : 10000,
-        n_trg_pdl_histo : ndhistogram!(bins),
-        theme           : theme,
-        event_id_test   : Vec::<u32>::with_capacity(100000),
-        evid_test_info  : String::from("Missing event id analysis"),
-        evid_test_len   : 20000,
-        n_evid_test     : 0,
-        evid_test_chnks : VecDeque::<u64>::new(),
+      ts_receiver     : ts_receiver,
+      summary_queue   : VecDeque::<TofEventSummary>::new(),
+      queue_size      : 10000,
+      n_trg_pdl_histo : ndhistogram!(bins),
+      theme           : theme,
+      event_id_test   : Vec::<u32>::with_capacity(100000),
+      evid_test_info  : String::from("Missing event id analysis"),
+      evid_test_len   : 20000,
+      n_evid_test     : 0,
+      evid_test_chnks : VecDeque::<u64>::new(),
+      miss_hg_hits    : ndhistogram!(mhg_bins),
+      pid_map         : dsijchpidmap.clone(),
     }
   }
 
@@ -102,8 +112,13 @@ impl TofSummaryTab {
         trace!("Unable to receive new TofEventSummary!");
       },
       Ok(ts)    => {
-        //let ts = TofEventSummary::from_tofpacket(&tp)?;
+        // triggerd paddles histogram
         self.n_trg_pdl_histo.fill(&(ts.n_trigger_paddles as f32));
+        // missing hg hits for paddles histogram
+        let missing_hg = ts.get_missing_paddles_hg(&self.pid_map);
+        for pid in &missing_hg {
+            self.miss_hg_hits.fill(&(*pid as f32));
+        }
         if self.event_id_test.len() != self.evid_test_len {
           self.event_id_test.push(ts.event_id);
         } else {
@@ -199,7 +214,12 @@ impl TofSummaryTab {
     let th_data    = prep_data(&self.n_trg_pdl_histo, &th_labels, 5, true); 
     let th_chart   = histogram(th_data, String::from("N Trig Paddles"), 2, 0, &self.theme);
     frame.render_widget(th_chart, histo_view[0]); 
-    
+   
+    let mhg_labels = create_labels(&self.miss_hg_hits);
+    let mhg_data   = prep_data(&self.miss_hg_hits, &mhg_labels, 10, true);
+    let mhg_chart  = histogram(mhg_data, String::from("Missing HG hits"), 1, 0, &self.theme);
+    frame.render_widget(mhg_chart, histo_view[1]);
+
     let evid_test_data = Paragraph::new(self.evid_test_info.clone())
       .style(Style::default().fg(self.theme.fg0))
       .alignment(Alignment::Left)
