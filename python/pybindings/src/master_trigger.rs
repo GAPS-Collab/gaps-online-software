@@ -161,10 +161,35 @@ impl PyMasterTrigger {
     }
   }
  
+  #[setter]
   fn set_tiu_emulation_mode(&mut self, value : u32) -> PyResult<()> {
     match TIU_EMULATION_MODE.set(&mut self.ipbus, value) {
       Ok(_) => {
         return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  #[setter]
+  fn set_tiu_emulation_mode_bsy_cnt(&mut self,  cycles : u32) -> PyResult<()> {
+    match TIU_EMU_BUSY_CNT.set(&mut self.ipbus, cycles) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  
+  #[getter]
+  fn get_tiu_emulation_mode_bsy_cnt(&mut self) -> PyResult<(value)> {
+    match TIU_EMU_BUSY_CNT.get(&mut self.ipbus) {
+      Ok(value) => {
+        return Ok((value));
       }
       Err(err) => {
         return Err(PyValueError::new_err(err.to_string()));
@@ -1181,6 +1206,7 @@ fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
     }
   }
 
+  #[getter]
   fn get_tiu_busy_ignore(&mut self) -> PyResult<bool> {
     match TIU_BUSY_IGNORE.get(&mut self.ipbus) {
       Ok(bsy) => {
@@ -1193,6 +1219,7 @@ fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
     }
   }
   
+  #[setter]
   fn set_tiu_busy_ignore(&mut self, bsy : bool) -> PyResult<()> {
     match TIU_BUSY_IGNORE.set(&mut self.ipbus, bsy as u32) {
       Ok(_) => {
