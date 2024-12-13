@@ -208,8 +208,8 @@ pub const TIU_EMU_BUSY_CNT : MTBRegister<'static> = MTBRegister {
   addr  : 0xe,
   mask  : 0xffffc000,
   descr : "Read out emulated TIU busy time (in 10ns clock cycles)",
-  rmw   : false,
-  ro    : true,
+  rmw   : true,
+  ro    : false,
   pulse : false
 };
 
