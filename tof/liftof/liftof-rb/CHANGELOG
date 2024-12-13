@@ -1,5 +1,9 @@
 # LELEWAA series
 
+## v0.10.6
+* allows to set the LTB thresholds by the board from 
+  the config file
+
 ## v0.10.5
 * send RBEvents which have the RBPaddleID populated
 

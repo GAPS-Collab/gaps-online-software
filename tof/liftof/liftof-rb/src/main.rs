@@ -66,6 +66,9 @@ use tof_dataclasses::events::rb_event::RBPaddleID;
 use tof_control::helper::pa_type::PASetBias;
 
 #[cfg(feature="database")]
+use tof_control::ltb_control::ltb_threshold::set_threshold;
+
+#[cfg(feature="database")]
 use tof_dataclasses::database::{
     ReadoutBoard,
     connect_to_db,
@@ -277,7 +280,7 @@ fn main() {
         let preamp_cfg = config.preamp_settings.clone();
         if preamp_cfg.set_strategy == ParameterSetStrategy::Board 
           && preamp_cfg.set_preamp_voltages {
-          match connect_to_db(db_path) {
+          match connect_to_db(db_path.clone()) {
             Err(err) => error!("Unable to connect to db! Can not set preamp biases! {err}"),
             Ok(mut conn) => {
               match RAT::where_rb2id(&mut conn, rb_id) {
@@ -308,7 +311,47 @@ fn main() {
         }
       } 
     }
-  }
+  } // end if pb connected
+
+  if ltb_connected {
+    // ltb_threshold settings
+    cfg_if::cfg_if!{
+      if #[cfg(feature="database")] {
+        let ltb_cfg = config.ltb_settings.clone();
+        if ltb_cfg.set_strategy == ParameterSetStrategy::Board 
+          && ltb_cfg.set_ltb_thresholds {
+          match connect_to_db(db_path) {
+            Err(err) => error!("Unable to connect to db! Can not set LTB thresholds! {err}"),
+            Ok(mut conn) => {
+              match RAT::where_rb2id(&mut conn, rb_id) {
+                None => error!("Unable to set ltb thresholds! Not able to get board information from db!"),
+                Some(rat_list) => {
+                  if rat_list.len() != 1 {
+                    error!("Ambigious ltb mapping! {:?}", rat_list);
+                  } else {
+                    let key = format!("RAT{:02}", rat_list[0].rat_id);
+                    match ltb_cfg.rat_ltb_thresholds.get(&key) {
+                      None => error!("Unable to set LTB thresholds! Entry for {} not found in the settings!", key),
+                      Some(thresholds) => {
+                        for ch in 0..2 {
+                          match set_threshold(ch, thresholds[ch as usize]) {
+                            Err(_err) => error!("Unable to set thresholds!"),
+                            Ok(_)    => println!("=> LTB thresholds set! {:?}", thresholds)
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } 
+    }
+  } // end if pb connected
+
+
   // FIXME - instead of passing the run config around,
   // just offer it through a mutex
   //let mut global_run_config = Arc::new(Mutex::new(run_config));
