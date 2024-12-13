@@ -95,6 +95,7 @@ use liftof_cc::{
   calibrate_tof,
   verification_run,
   restart_liftof_rb,
+  run_cycler,
 };
 
 use liftof_cc::threads::{
@@ -111,14 +112,19 @@ use liftof_cc::threads::monitor_cpu;
 
 #[derive(Debug, Parser, PartialEq)]
 pub enum CommandCC {
-  /// Listen for flight CPU commands.
+  /// Listen for flight CPU commands. This will NOT
+  /// immediatly start a run, but just idle and 
+  /// liston until it gets a RunStart command.
   Listen,
   /// Staging mode - work through all .toml files
-  /// in the staging area
+  /// in the staging area. This will start the run 
+  /// for the given .toml file immediatly, but then 
+  /// work through the ones in the staging area
   Staging,
-  /// Run full Readoutboard calibration.
+  /// Run full Readoutboard calibration and quit
   Calibration,
-  /// Start/stop data taking run.
+  /// Start the run as described in the toml file,
+  /// and then quit
   Run
 }
 
@@ -144,7 +150,6 @@ struct LiftofCCArgs {
   verbose     : bool,
   /// Configuration of liftof-cc. Configure analysis engine,
   /// event builder and general settings.
-  //#[arg(short, long, default_value_t = Some("/home/gaps/staging/current/liftof-config.toml"))]
   #[arg(short, long)]
   config      : Option<String>,
   /// List of possible commands
@@ -247,6 +252,7 @@ fn main() {
   let run_analysis_engine   = config.run_analysis_engine;
   let pre_run_calibration   = config.pre_run_calibration; 
   let verification_rt_sec   = config.verification_runtime_sec;
+  let staging_dir           = config.staging_dir.clone();
   let mut conn              = connect_to_db(db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
   // if this call does not go through, we might as well fail early.
   let mut rb_list           = ReadoutBoard::all(&mut conn).expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
@@ -264,8 +270,6 @@ fn main() {
 
   nboards = rb_list.len();
   println!("=> Will use {} readoutboards! Ignoring {:?} sicne they are mareked as 'ignore' in the config file!", rb_list.len(), rb_ignorelist );
-  //debug!("--> Following RBs are expected:");
-  // init thread control
   match thread_control.lock() {
     Ok(mut tc) => {
       for rb in &rb_list {
@@ -330,7 +334,7 @@ fn main() {
   let mut new_run_id = 0u32;
   let mut stream_files_path = PathBuf::from(write_stream_path.clone());
   match args.command { 
-    CommandCC::Run => {
+    CommandCC::Run | CommandCC::Staging => {
       if write_stream {
         match prepare_run(write_stream_path.clone(), &config, runid, write_stream) {
           None => {
@@ -576,11 +580,8 @@ fn main() {
      let tc_cali = thread_control.clone();
      calibrate_tof(tc_cali, &rb_list, true);
      end_program = true;
-    },
-    CommandCC::Staging => {
-      error!("Staging sequence not implemented!");
     }
-    CommandCC::Run => {
+    CommandCC::Run | CommandCC::Staging => {
       if pre_run_calibration {
         let tc_cali = thread_control.clone();
         calibrate_tof(tc_cali, &rb_list, true);
@@ -697,7 +698,7 @@ fn main() {
           let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
           cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
           // after we opened the socket, give the RBs a chance to connect
-          println!("=> Give the RBs a chance to connect and wait a bit..");
+          println!("=> Sending run stop command to all RBs...");
           thread::sleep(10*one_second);
           match cmd_sender.send(&payload, 0) {
             Err(err) => {
@@ -719,11 +720,18 @@ fn main() {
           }
         }
       }
-      println!("=> Give the RBs a chance to connect and wait a bit..");
+      println!("=> Waiting for the RBs to stop taking data..");
       thread::sleep(10*one_second);
-
-      // for now, we end brutally
-      // FIXME
+      match args.command {
+        CommandCC::Staging => {
+          println!("=> We are in staging mode! So we will prepare for the next run!");
+          match run_cycler(staging_dir.clone(),true) {
+            Err(err) => error!("Run cycler failed to prepare the next run! {err}"),
+            Ok(_) => println!("Run cycler successful! Next run should be set up as desired!")
+          }
+        }
+        _ => ()
+      }
       println!(">> So long and thanks for all the \u{1F41F} <<"); 
       exit(0);
     

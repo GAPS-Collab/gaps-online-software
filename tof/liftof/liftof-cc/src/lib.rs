@@ -4,7 +4,11 @@ pub mod constants;
 pub mod threads;
 
 use std::fs;
-use std::path::PathBuf;
+use std::path::{
+  PathBuf,
+  Path
+};
+
 use std::os::unix::fs::symlink;
 use std::sync::{
   Arc,
@@ -44,6 +48,8 @@ use tof_dataclasses::serialization::{
   Packable
 };
 
+use tof_dataclasses::errors::StagingError;
+
 use tof_dataclasses::commands::{
   TofCommand,
   //TofCommandCode,
@@ -52,6 +58,7 @@ use tof_dataclasses::commands::{
 
 use tof_dataclasses::status::TofDetectorStatus;
 use tof_dataclasses::packets::TofPacket;
+use tof_dataclasses::database::ReadoutBoard;
 
 use tof_dataclasses::io::{
     TofPacketWriter,
@@ -60,10 +67,129 @@ use tof_dataclasses::io::{
 };
 
 use liftof_lib::settings::LiftofSettings;
-
 use liftof_lib::thread_control::ThreadControl;
 
-use tof_dataclasses::database::ReadoutBoard;
+/// Get the files in the queue and sort them by number
+pub fn get_queue(dir_path : &String) -> Vec<String> {
+  let mut entries = fs::read_dir(dir_path)
+    .expect("Directory might not exist!")
+    .map(|entry| entry.unwrap().path())
+    .collect::<Vec<PathBuf>>();
+  entries.sort_by(|a, b| {
+    let meta_a = fs::metadata(a).unwrap();
+    let meta_b = fs::metadata(b).unwrap();
+    meta_a.modified().unwrap().cmp(&meta_b.modified().unwrap())
+  });
+  entries.iter()
+    .map(|path| path.to_str().unwrap().to_string())
+    .collect()
+}
+
+pub fn move_file_with_name(old_path: &str, new_dir: &str) -> Result<(), std::io::Error> {
+  let old_path  = Path::new(old_path);
+  let file_name = old_path.file_name().unwrap().to_str().unwrap(); // Extract filename
+  let new_path  = Path::new(new_dir).join(file_name); // Combine new directory with filename
+  fs::rename(old_path, new_path) // Move the file
+}
+
+pub fn move_file_rename_liftof(old_path: &str, new_dir: &str) -> Result<(), std::io::Error> {
+  let old_path  = Path::new(old_path);
+  let file_name = old_path.file_name().unwrap().to_str().unwrap(); // Extract filename
+  let new_path  = Path::new(new_dir).join("liftof-config.toml"); // Combine new directory with filename
+  fs::rename(old_path, new_path) // Move the file
+}
+
+pub fn copy_file(old_path: &str, new_dir: &str) -> Result<u64, std::io::Error> {
+  let old_path  = Path::new(old_path);
+  let file_name = old_path.file_name().unwrap().to_str().unwrap(); // Extract filename
+  let new_path  = Path::new(new_dir).join(file_name); // Combine new directory with filename
+  fs::copy(old_path, new_path) 
+}
+
+pub fn copy_file_rename_liftof(old_path: &str, new_dir: &str) -> Result<u64, std::io::Error> {
+  let old_path  = Path::new(old_path);
+  let file_name = old_path.file_name().unwrap().to_str().unwrap(); // Extract filename
+  let new_path  = Path::new(new_dir).join("liftof-config.toml"); // Combine new directory with filename
+  fs::copy(old_path, new_path) 
+}
+
+pub fn delete_file(file_path: &str) -> Result<(), std::io::Error> {
+  let path = Path::new(file_path);
+  fs::remove_file(path) // Attempts to delete the file at the given path
+}
+
+/// Copy a config file from the queue to the current and 
+/// next directories and restart liftof-cc. 
+///
+/// As soon as the run is started, prepare the next run
+pub fn run_cycler(staging_dir : String, dry_run : bool) -> Result<(),StagingError> {
+  let queue_dir   = format!("{}/queue", staging_dir);
+  let next_dir    = format!("{}/next",  staging_dir);
+  let current_dir = format!("{}/current", staging_dir);
+
+  let queue   = get_queue(&queue_dir);
+  let current = get_queue(&current_dir);
+  let next    = get_queue(&next_dir); 
+  
+  if current.len() == 0 {
+    // we are f***ed
+    error!("We don't have a current configuration. This is BAD!");
+    return Err(StagingError::NoCurrentConfig);
+  }
+  
+  println!("= => Found {} files in run queue!", queue.len());
+  if next.len() == 0 && queue.len() == 0 {
+    println!("= => Nothing staged, will jusr repeat current run setting!");
+    if !dry_run {
+      manage_liftof_cc_service(String::from("restart"));
+    }
+    thread::sleep(Duration::from_secs(20));
+    return Ok(());
+  }
+  if next.len() == 0 && queue.len() != 0 {
+    error!("Empty next directory, but we have files in the queue!");
+    match copy_file_rename_liftof(&queue[0], &next_dir) {
+      Ok(_) => (),
+      Err(err) => {
+        error!("Unable to copy {} to {}! {}", next[0], next_dir, err);
+      }
+    }
+    match move_file_rename_liftof(&queue[0], &current_dir) {
+      Ok(_) => (),
+      Err(err) => {
+        error!("Unable to copy {} to {}! {}", queue[0], current_dir, err);
+      }
+    }
+  }
+  if next.len() != 0  {
+    match delete_file(&current[0]) {
+      Ok(_)    => (),
+      Err(err) => {
+        error!("Unable to delete {}! {}", current[0], err);
+      }
+    }
+    match move_file_rename_liftof(&next[0], &current_dir) {
+      Ok(_) => (),
+      Err(err) => {
+        error!("Unable to copy {} to {}! {}", next[0], current_dir, err);
+      }
+    }
+    if queue.len() != 0 {
+      match move_file_with_name(&queue[0], &next_dir) {
+        Ok(_) => (),
+        Err(err) => {
+          error!("Unable to move {} to {}! {}", queue[0], next_dir, err);
+        }
+      }
+    }
+    println!("=> Restarting liftof-cc!");
+    if !dry_run {
+      manage_liftof_cc_service(String::from("restart"));
+    }
+    thread::sleep(Duration::from_secs(20));
+  }
+  Ok(())
+}
 
 /// Prepare a new folder with the run id
 ///
