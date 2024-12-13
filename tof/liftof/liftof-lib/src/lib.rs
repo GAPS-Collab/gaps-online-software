@@ -431,15 +431,17 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                          rb            : &ReadoutBoard,
                          settings      : AnalysisEngineSettings)
 -> Result<(), AnalysisError> {
-  //if event.status != EventStatus::Perfect {
-  //if event.header.broken {
-  //  // just return the analysis error, there 
-  //  // is probably nothing else we can do?
-  //  return Err(AnalysisError::InputBroken);
-  //}
-  // ch -> pid
-  // pid -> (ch, ch) (for the two paddle ends)
-  //let mut pid_vs_chs = HashMap::<u8, (PaddleEndIdentifier,[u8;2])>::new();
+  // Don't do analysis for mangled events!
+  if event.has_any_mangling_flag() {
+    error!("Event for RB {} has data mangling! Not doing analysis!", rb.rb_id);
+    return Err(AnalysisError::DataMangling);
+  }
+  match event.self_check() {
+    Err(_err) => {
+      // Phlip want to ahve all hits even if they are broken
+    },
+    Ok(_)    => ()
+  }
   let active_channels = event.header.get_channels();
   // will become a parameter
   let fit_sinus       = true;
@@ -452,6 +454,8 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   if fit_sinus {
     if !active_channels.contains(&8) {
       error!("RB {} does not have ch9 data!", rb.rb_id);
+      println!("{}", event.header);
+      return Err(AnalysisError::NoChannel9);
     }
     rb.calibration.voltages(9,
                             event.header.stop_cell as usize,
