@@ -652,6 +652,22 @@ impl PyTofCommand {
     self.command.command_code = command_code;
   }
 
+  /// Pack myself nicely in a TofPacket and 
+  /// serialize myself
+  ///
+  /// Can be used to interface with BFSW/GSE
+  /// systems
+  fn wrap_n_pack(&self) -> Vec<u8> {
+    self.pack().to_bytestream()
+  }
+
+  /// An explicit getter for the 
+  /// command code, to interface 
+  /// with BFSW/GSE systems
+  fn get_cc_u8(&self) -> u8 {
+    self.command.command_code as u8
+  }
+
   fn to_bytestream(&self) -> Vec<u8> {
     self.command.to_bytestream()
   }
