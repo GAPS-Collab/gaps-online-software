@@ -517,6 +517,13 @@ impl EVTBLDRHeartbeat {
    }
    0.0
   }
+  
+  pub fn get_mangled_frac(&self) -> f64 {
+    if self.n_mte_received_tot > 0 {
+     return self.data_mangled_ev as f64 / self.n_mte_received_tot as f64;
+   }
+   0.0
+  }
 
   pub fn get_drs_lost_frac(&self) -> f64 {
     if self.n_rbe_received_tot > 0 {
@@ -528,12 +535,12 @@ impl EVTBLDRHeartbeat {
   pub fn to_string(&self) -> String {
     let mut repr = String::from("");
     repr += &(format!("\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} "));
-    repr += &(format!("\n Mission elapsed time (MET) [s]  : {}", self.met_seconds).bright_purple());
-    repr += &(format!("\n Num. events sent                : {}", self.n_sent).bright_purple());
-    repr += &(format!("\n Size of event cache             : {}", self.event_cache_size).bright_purple());
-    //repr += &(format!("\n Size of event ID cache          : {}", self.event_id_cache_size).bright_purple());
-    repr += &(format!("\n Num. events timed out           : {}", self.n_timed_out).bright_purple());
-    repr += &(format!("\n Percent events timed out        : {:.2}%", self.get_timed_out_frac()*(100 as f64)).bright_purple());
+    repr += &(format!("\n Mission elapsed time (MET) [s]      : {}", self.met_seconds).bright_purple());
+    repr += &(format!("\n Num. events sent                    : {}", self.n_sent).bright_purple());
+    repr += &(format!("\n Size of event cache                 : {}", self.event_cache_size).bright_purple());
+    //repr += &(format!("\n Size of event ID cache              : {}", self.event_id_cache_size).bright_purple());
+    repr += &(format!("\n Num. events timed out               : {}", self.n_timed_out).bright_purple());
+    repr += &(format!("\n Percent events timed out            : {:.2}%", self.get_timed_out_frac()*(100 as f64)).bright_purple());
     //if self.n_sent > 0 && self.n_ev_wo_evid > 0 {
     //  repr += &(format!("\n Percent events w/out event ID : {:.2}%", (((self.n_ev_wo_evid / self.n_sent) as f64)*(100 as f64))).bright_purple());
     //} else if self.n_ev_wo_evid > 0 { 
@@ -541,8 +548,8 @@ impl EVTBLDRHeartbeat {
     //}
     if self.n_mte_received_tot > 0{ 
       repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-      repr += &(format!("\n Num. evts with ANY data mangling : {}",    self.data_mangled_ev));
-      repr += &(format!("\n Per. evts with ANY data mangling : {:.2}%", ((self.data_mangled_ev as f64)/(self.n_mte_received_tot as f64))*(100 as f64)));
+      repr += &(format!("\n Num. evts with ANY data mangling  : {}"     , self.data_mangled_ev));
+      repr += &(format!("\n Per. evts with ANY data mangling  : {:.2}%" , self.get_mangled_frac()*(100 as f64)));
     }
     else {repr += &(format!("\n Percent events with data mangling: unable to calculate"));}
     repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
@@ -563,9 +570,9 @@ impl EVTBLDRHeartbeat {
     repr += &(format!("\n Num. orphan RBEvents : {}", self.n_rbe_orphan).bright_purple());
     repr += &(format!("\n\n Getting MTE from cache for RBEvent failed {} times :(", self.rbe_wo_mte).bright_blue());
     repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-    repr += &(format!("\n Ch. len MTE Receiver : {}", self.mte_receiver_cbc_len).bright_purple());
-    repr += &(format!("\n Ch. len RBE Reveiver : {}", self.rbe_receiver_cbc_len).bright_purple());
-    repr += &(format!("\n Ch. len TP Sender    : {}", self.tp_sender_cbc_len).bright_purple());
+    repr += &(format!("\n Ch. len MTE Receiver                : {}", self.mte_receiver_cbc_len).bright_purple());
+    repr += &(format!("\n Ch. len RBE Reveiver                : {}", self.rbe_receiver_cbc_len).bright_purple());
+    repr += &(format!("\n Ch. len TP Sender                   : {}", self.tp_sender_cbc_len).bright_purple());
     repr += &(format!("\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} END EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50}"));
     repr
   }
