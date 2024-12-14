@@ -2186,7 +2186,7 @@ impl PyTofEventSummary {
   /// Compare the hg hits of the event with the triggered paddles and 
   /// return the paddles which have at least a missing HG hit
   fn get_missing_paddles_hg(&self, mapping : DsiJChPidMapping) -> Vec<u8> {
-    self.event.get_missing_paddles_hg(mapping)
+    self.event.get_missing_paddles_hg(&mapping)
   }
 
   /// Get all the paddle ids which have been triggered
@@ -2314,7 +2314,7 @@ impl PyTofEvent {
   }
 
   fn get_missing_paddles_hg(&self, mapping : DsiJChPidMapping) -> Vec<u8> {
-    self.event.get_missing_paddles_hg(mapping)
+    self.event.get_missing_paddles_hg(&mapping)
   }
 
   #[getter]
