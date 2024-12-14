@@ -186,7 +186,7 @@ impl PyMasterTrigger {
   }
   
   #[getter]
-  fn get_tiu_emulation_mode_bsy_cnt(&mut self) -> PyResult<(value)> {
+  fn get_tiu_emulation_mode_bsy_cnt(&mut self) -> PyResult<u32> {
     match TIU_EMU_BUSY_CNT.get(&mut self.ipbus) {
       Ok(value) => {
         return Ok((value));
