@@ -642,17 +642,12 @@ impl PyTofCommand {
     }
   }
 
-  //#[getter]
-  //fn get_command_code(&self) -> PyResult<u32> {
-  //  Ok(self.commands.command_code)
-  //}
-  //
-  //#[setter]
-  //fn set_command_code(&mut self, cmd_code: TofCommandCode) -> PyResult<()> {
-  //  self.commands.command_code = cmd_code;
-  //  Ok(())
-  //}
-
+  #[getter]
+  fn get_command_code(&mut self) -> TofCommandCode {
+    self.command.command_code
+  }
+  
+  #[setter]
   fn set_command_code(&mut self, command_code : TofCommandCode) {
     self.command.command_code = command_code;
   }
