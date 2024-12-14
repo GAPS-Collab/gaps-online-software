@@ -3,6 +3,7 @@
 pub mod analysis;
 pub mod io;
 pub mod dataclasses;
+pub mod command_factory;
 #[cfg(feature="telemetry")]
 pub mod telemetry;
 #[cfg(feature="liftof")]
@@ -75,6 +76,7 @@ use pyo3::exceptions::{
 use crate::analysis::*;
 use crate::dataclasses::*;
 use crate::io::*;
+use crate::command_factory::*;
 
 // these are already wrapped in a pyclass (enum)
 use tof_dataclasses::packets::PacketType;
@@ -343,6 +345,19 @@ cfg_if::cfg_if! {
   }
 }
 
+#[pymodule]
+#[pyo3(name = "factory")]
+fn tof_command_factory<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  m.add_function(wrap_pyfunction!(py_get_rbratmap_hardcoded, m)?)?;
+  m.add_function(wrap_pyfunction!(py_get_ratrbmap_hardcoded, m)?)?;
+  m.add_function(wrap_pyfunction!(py_get_ratpdumap_hardcoded, m)?)?;
+  m.add_function(wrap_pyfunction!(py_shutdown_rb, m)?)?;
+  m.add_function(wrap_pyfunction!(py_shutdown_rat, m)?)?;
+  m.add_function(wrap_pyfunction!(py_shutdown_ratpair, m)?)?;
+  Ok(())
+}
+
+
 /// Commands for the whole TOF system
 #[pymodule]
 #[pyo3(name = "commands")]
@@ -355,6 +370,7 @@ fn tof_commands<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyHeartBeatDataSink>()?;
   m.add_class::<PyMTBHeartbeat>()?;
   m.add_class::<PyEVTBLDRHeartbeat>()?;
+  m.add_wrapped(wrap_pymodule!(tof_command_factory))?;
   Ok(())
 }
 
