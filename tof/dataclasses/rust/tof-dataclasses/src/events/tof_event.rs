@@ -171,7 +171,7 @@ impl TofEvent {
   /// rather slow and not fit for production use
   /// FIXME - rewrite as a closure
   #[cfg(feature="database")]
-  pub fn get_missing_paddles_hg(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
+  pub fn get_missing_paddles_hg(&self, pid_map : &DsiJChPidMapping) -> Vec<u8> {
     let mut missing = Vec::<u8>::new();
     for th in self.mt_event.get_trigger_hits() {
       let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
@@ -737,7 +737,7 @@ impl TofEventSummary {
   /// rather slow and not fit for production use
   /// FIXME - rewrite as a closure
   #[cfg(feature="database")]
-  pub fn get_missing_paddles_hg(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
+  pub fn get_missing_paddles_hg(&self, pid_map :   &DsiJChPidMapping) -> Vec<u8> {
     let mut missing = Vec::<u8>::new();
     for th in self.get_trigger_hits() {
       let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
