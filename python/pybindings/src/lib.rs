@@ -354,6 +354,11 @@ fn tof_command_factory<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(py_shutdown_rb, m)?)?;
   m.add_function(wrap_pyfunction!(py_shutdown_rat, m)?)?;
   m.add_function(wrap_pyfunction!(py_shutdown_ratpair, m)?)?;
+  m.add_function(wrap_pyfunction!(py_shutdown_tofcpu, m)?)?;
+  m.add_function(wrap_pyfunction!(py_restart_liftofrb, m)?)?;
+  m.add_function(wrap_pyfunction!(py_start_run, m)?)?;
+  m.add_function(wrap_pyfunction!(py_stop_run, m)?)?;
+  m.add_function(wrap_pyfunction!(py_rb_calibration, m)?)?;
   Ok(())
 }
 

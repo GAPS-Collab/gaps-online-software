@@ -10,6 +10,7 @@ use crate::commands::{
   TofCommandCode
 };
 
+/// A hardwired map of RB -> RAT
 pub fn get_rbratmap_hardcoded() ->  HashMap<u8,u8> {
   warn!("Using hardcoded rbratmap!");
   let mapping = HashMap::<u8,u8>::from(
@@ -55,6 +56,7 @@ pub fn get_rbratmap_hardcoded() ->  HashMap<u8,u8> {
   mapping
 }
 
+/// A hardwired map of RAT -> (RB1, RB2)
 pub fn get_ratrbmap_hardcoded() ->  HashMap<u8,(u8,u8)> {
   warn!("Using hardcoded ratrb map!");
   let mapping = HashMap::<u8,(u8,u8)>::from(
@@ -81,6 +83,10 @@ pub fn get_ratrbmap_hardcoded() ->  HashMap<u8,(u8,u8)> {
   mapping
 }
 
+/// A hardwired map of PDU #id PDUCHANNEL #id to (RAT,RAT)
+///
+/// Can be used to synchronize powering down proces for 
+/// RATs
 pub fn get_ratpdumap_hardcoded() ->  HashMap<u8,HashMap::<u8, (u8,u8)>> {
   warn!("Using hardcoded rat-pdu map!");
   let mut mapping = HashMap::<u8,HashMap::<u8,(u8,u8)>>::new();
@@ -96,6 +102,10 @@ pub fn get_ratpdumap_hardcoded() ->  HashMap<u8,HashMap::<u8, (u8,u8)>> {
 }
 
 /// Send the 'sudo shutdown now' command to a single RB
+///
+/// # Arguements:
+///   * rb :  The RB id of the RB to be shutdown 
+///           (NOT RAT)
 pub fn shutdown_rb(rb : u8) -> Option<TofCommandV2> {
   let code = TofCommandCode::ShutdownRB;
   let mut cmd  = TofCommandV2::new();
@@ -105,6 +115,10 @@ pub fn shutdown_rb(rb : u8) -> Option<TofCommandV2> {
 }
 
 /// Send the 'sudo shutdown now' command to all RBs in a RAT
+///
+/// # Arguments:
+///   * rat : The RAT id for the rat the RBs to be 
+///           shutdown live in 
 pub fn shutdown_rat(rat : u8) -> Option<TofCommandV2> {
   let code = TofCommandCode::ShutdownRAT;
   let mut cmd  = TofCommandV2::new();
@@ -125,6 +139,13 @@ pub fn shutdown_rat(rat : u8) -> Option<TofCommandV2> {
 }
 
 /// Send the 'sudo shutdown now' command to all RBs in a RAT
+/// 
+/// This will prepare the shutdown command for the RBs in the 
+/// RATs which are connected to a specific pdu channel
+///
+/// # Arguments:
+///   * pdu        : PDU ID (0-3)
+///   * pduchannel : PDU Channel (0-7)
 pub fn shutdown_ratpair(pdu : u8, pduchannel : u8) -> Option<TofCommandV2> {
   let code     = TofCommandCode::ShutdownRATPair;
   let mut cmd  = TofCommandV2::new();
@@ -169,5 +190,58 @@ pub fn shutdown_ratpair(pdu : u8, pduchannel : u8) -> Option<TofCommandV2> {
     }
   }
   Some(cmd)
+}
+
+
+/// Send the 'sudo shutdown now command to
+/// the TOF main computer ("TOFCPU")
+pub fn shutdown_tofcpu() -> Option<TofCommandV2> {
+  Some(TofCommandV2 {
+    command_code : TofCommandCode::ShutdownCPU,
+    payload      : Vec::<u8>::new()
+  })
+}
+
+/// Restart the liftof-rb clients on the given boards
+///
+/// # Arguments
+///   * rbs: restart the client on the given rb ids, 
+///          if empty, restart on all of them
+pub fn restart_liftofrb(rbs : &Vec<u8>) -> Option<TofCommandV2> {
+  Some(TofCommandV2 {
+    command_code : TofCommandCode::RestartLiftofRBClients,
+    payload      : rbs.clone()
+  })
+}
+
+/// Trigger the start of a new data run with 
+/// the next active config
+pub fn start_run() -> Option<TofCommandV2> {
+  Some(TofCommandV2 {
+    command_code : TofCommandCode::DataRunStart,
+    payload      : Vec::<u8>::new(),
+  })
+}
+
+/// Stop the current active run and idle
+pub fn stop_run() -> Option<TofCommandV2> {
+  Some(TofCommandV2 {
+    command_code : TofCommandCode::DataRunStop,
+    payload      : Vec::<u8>::new(),
+  })
+}
+
+/// Run a calibration of all RBs
+///
+/// # Arguments:
+///   * send_packetes  : Send the RBCalibration packets
+///   * save_events    : Save the events to the RBCalibration
+///                      packets
+pub fn rb_calibration(send_packets : bool, save_events : bool) -> Option<TofCommandV2> {
+  let payload = vec![send_packets as u8, save_events as u8];
+  Some(TofCommandV2 {
+    command_code : TofCommandCode::RBCalibration,
+    payload      : payload,
+  })
 }
 

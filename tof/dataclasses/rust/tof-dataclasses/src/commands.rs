@@ -24,7 +24,7 @@
 //! consists of a class, `TofResponse` together with a 32bit response code.
 //!
 
-pub mod actual;
+pub mod factory;
 
 use std::fmt;
 
@@ -53,7 +53,7 @@ cfg_if::cfg_if! {
   }
 }
 
-pub use actual::*;
+pub use factory::*;
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[cfg_attr(feature = "pybindings", pyclass)]
@@ -92,7 +92,6 @@ pub enum TofCommandCode {
   /// technically, this does not change the size, but sets 
   /// a different value for trip
   SetRBDataBufSize        = 23u8,
-
   /// command code for restarting systemd
   RestartLiftofRBClients  = 60u8,
   /// command code for putting liftof-cc in listening mode
@@ -122,6 +121,8 @@ pub enum TofCommandCode {
   /// Shutdown a pair of RATs (as always two of them are hooked up to the 
   /// same PDU channel)
   ShutdownRATPair         = 103u8,
+  /// Shutdown the TOF CPU
+  ShutdownCPU             = 104u8,
 }
 
 impl fmt::Display for TofCommandCode {
@@ -163,6 +164,7 @@ impl From<u8> for TofCommandCode {
       101u8 => TofCommandCode::ChangeNextRunConfig,
       102u8 => TofCommandCode::ShutdownRAT,
       103u8 => TofCommandCode::ShutdownRATPair,
+      104u8 => TofCommandCode::ShutdownCPU,
       _     => TofCommandCode::Unknown
     }
   }
@@ -200,6 +202,7 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::ChangeNextRunConfig,
       TofCommandCode::ShutdownRAT,
       TofCommandCode::ShutdownRATPair,
+      TofCommandCode::ShutdownCPU
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());

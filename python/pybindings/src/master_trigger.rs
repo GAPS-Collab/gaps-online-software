@@ -189,7 +189,7 @@ impl PyMasterTrigger {
   fn get_tiu_emulation_mode_bsy_cnt(&mut self) -> PyResult<u32> {
     match TIU_EMU_BUSY_CNT.get(&mut self.ipbus) {
       Ok(value) => {
-        return Ok((value));
+        return Ok(value);
       }
       Err(err) => {
         return Err(PyValueError::new_err(err.to_string()));
