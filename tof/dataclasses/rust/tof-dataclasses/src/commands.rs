@@ -53,7 +53,7 @@ cfg_if::cfg_if! {
   }
 }
 
-use actual::*;
+pub use actual::*;
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[cfg_attr(feature = "pybindings", pyclass)]
