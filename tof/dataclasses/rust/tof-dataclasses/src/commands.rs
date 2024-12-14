@@ -24,6 +24,8 @@
 //! consists of a class, `TofResponse` together with a 32bit response code.
 //!
 
+pub mod actual;
+
 use std::fmt;
 
 #[cfg(feature = "pybindings")]
@@ -50,6 +52,8 @@ cfg_if::cfg_if! {
     use rand::Rng;
   }
 }
+
+use actual::*;
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[cfg_attr(feature = "pybindings", pyclass)]
@@ -113,6 +117,11 @@ pub enum TofCommandCode {
   ShutdownRB              = 100u8,
   /// Change the config file for the next run
   ChangeNextRunConfig     = 101u8,
+  /// Shutdown RAT - send shutdown command to 2RBs in the same RAT
+  ShutdownRAT             = 102u8,
+  /// Shutdown a pair of RATs (as always two of them are hooked up to the 
+  /// same PDU channel)
+  ShutdownRATPair         = 103u8,
 }
 
 impl fmt::Display for TofCommandCode {
@@ -152,6 +161,8 @@ impl From<u8> for TofCommandCode {
       93u8  => TofCommandCode::NoSendRBWaveforms,
       100u8 => TofCommandCode::ShutdownRB,
       101u8 => TofCommandCode::ChangeNextRunConfig,
+      102u8 => TofCommandCode::ShutdownRAT,
+      103u8 => TofCommandCode::ShutdownRATPair,
       _     => TofCommandCode::Unknown
     }
   }
@@ -187,6 +198,8 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::Kill,
       TofCommandCode::ShutdownRB,
       TofCommandCode::ChangeNextRunConfig,
+      TofCommandCode::ShutdownRAT,
+      TofCommandCode::ShutdownRATPair,
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
@@ -211,7 +224,8 @@ pub struct TofCommandV2 {
 }
 
 impl TofCommandV2 {
-  pub fn new() -> Self {
+ // BFSW command header 144, 235, 86, 248, 70, 41, 7, 15,
+ pub fn new() -> Self {
     Self {
       command_code : TofCommandCode::Unknown,
       payload      : Vec::<u8>::new(),
@@ -305,7 +319,17 @@ impl fmt::Display for TofCommandV2 {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     //let cc = RBCommand::command_code_to_string(self.command_code);
     let mut repr = String::from("<TofCommandV2");
-    repr += &(format!("\n  cmd code : {}>", self.command_code)); 
+    repr += &(format!("\n  cmd code : {}", self.command_code)); 
+    match self.command_code {
+      TofCommandCode::ShutdownRB 
+      | TofCommandCode::ShutdownRAT 
+      | TofCommandCode::ShutdownRATPair => {
+        repr += &(format!("\n Sending shutdown command to RBs {:?}>", self.payload));
+      }
+      _ => {
+        repr += ">";
+      }
+    }
     write!(f, "{}", repr)
   }
 }
