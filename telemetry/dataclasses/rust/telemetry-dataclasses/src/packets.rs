@@ -11,10 +11,14 @@ use tof_dataclasses::serialization::{
   parse_u32,
   parse_u64,
   Serialization,
+  Packable
 };
 
 use tof_dataclasses::events::TofEventSummary;
-use tof_dataclasses::packets::TofPacket;
+use tof_dataclasses::packets::{
+  TofPacket,
+  PacketType
+};
 
 #[cfg(feature = "pybindings")]
 use pyo3::pyclass;
@@ -203,7 +207,7 @@ impl Serialization for TelemetryHeader {
   const SIZE : usize = 13; 
 
   fn from_bytestream(stream : &Vec<u8>,
-                    pos    : &mut usize)
+                     pos    : &mut usize)
     -> Result<Self, SerializationError> {
     if stream.len() < *pos + Self::SIZE {
       return Err(SerializationError::StreamTooShort);
@@ -263,6 +267,8 @@ pub struct AckBfsw {
 
 impl AckBfsw {
   pub fn new() -> Self {
+    //let mut header = TelemetryHeader::new(),
+
     Self {
       header    : TelemetryHeader::new(),
       ack_type  : 1,
@@ -270,6 +276,60 @@ impl AckBfsw {
       ret_code2 : 0,
       body      : Vec::<u8>::new()
     }
+  }
+  
+  //pub fn to_bytestream(&self) -> Vec<u8> {
+  //  let mut stream = Vec::<u8>::new();
+  //  let mut s_head = self.header.to_bytestream();
+  //  stream.append(&mut s_head);
+  //  stream.extend_from_slice(self.payload.as_slice());
+  //  //stream.append(&mut self.payload);
+  //  stream
+  //}
+}
+
+impl Serialization for AckBfsw {
+  
+  const HEAD : u16 = 0x90eb;
+  const TAIL : u16 = 0x0000; // there is no tail for telemetry packets
+  const SIZE : usize = 13; 
+
+  fn from_bytestream(stream : &Vec<u8>,
+                     pos    : &mut usize)
+    -> Result<Self, SerializationError> {
+    if stream.len() < *pos + 3 {
+      return Err(SerializationError::StreamTooShort);
+    }
+    let mut ack   = AckBfsw::new();
+    ack.ack_type  = parse_u8(stream, pos);
+    ack.ret_code1 = parse_u8(stream, pos);
+    ack.ret_code2 = parse_u8(stream, pos);
+    Ok(ack)
+  }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::new();
+    stream.push(self.ack_type);
+    stream.push(self.ret_code1);
+    stream.push(self.ret_code2);
+    stream
+  }
+}
+
+impl Packable for AckBfsw {
+  const PACKET_TYPE : PacketType = PacketType::BfswAckPacket;
+}
+
+impl fmt::Display for AckBfsw {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<AckBfsw:");
+    //repr += &(format!("\n  Header      : {}" ,self.sync));
+    //repr += &(format!("\n  Packet Type : {}" ,self.ptype));
+    //repr += &(format!("\n  Timestamp   : {}" ,self.timestamp));
+    repr += &(format!("\n  Ack Type    : {}" ,self.ack_type));
+    repr += &(format!("\n  Ret Code1   : {}" ,self.ret_code1));
+    repr += &(format!("\n  Ret Code2   : {}>",self.ret_code2));
+    write!(f, "{}", repr)
   }
 }
 
