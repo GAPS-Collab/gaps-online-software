@@ -25,8 +25,6 @@ use crate::commands::TofOperationMode;
 
 use crate::events::TriggerType;
 
-
-
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
     use crate::FromRandom;
@@ -83,6 +81,7 @@ impl BuildStrategy {
     }
   }
 }
+
 impl From<u8> for BuildStrategy {
   fn from(value: u8) -> Self {
     match value {
@@ -96,6 +95,7 @@ impl From<u8> for BuildStrategy {
     }
   }
 }
+
 #[cfg(feature = "random")]
 impl FromRandom for BuildStrategy {
   
@@ -206,6 +206,7 @@ fn pack_preampbiasconfig() {
     assert_eq!(cfg, test);
   }
 }
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct RBChannelMaskConfig {
   pub rb_id       : u8,
@@ -220,11 +221,13 @@ impl RBChannelMaskConfig {
     }
   }
 }
+
 impl Default for RBChannelMaskConfig {
   fn default() -> Self {
     Self::new()
   }
 }
+
 impl fmt::Display for RBChannelMaskConfig {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<RBCHannelMaskConfig");
@@ -233,6 +236,7 @@ impl fmt::Display for RBChannelMaskConfig {
     write!(f, "{}", repr)
   }
 }
+
 impl Packable for RBChannelMaskConfig {
   const PACKET_TYPE : PacketType = PacketType::RBChannelMaskConfig;
 }
@@ -267,6 +271,7 @@ impl Serialization for RBChannelMaskConfig {
     bs
   }
 } 
+
 #[cfg(feature = "random")]
 impl FromRandom for RBChannelMaskConfig {
   fn from_random() -> Self {
@@ -550,21 +555,35 @@ fn pack_runconfig() {
     assert_eq!(cfg, test_json);
   }
 }
+
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct TriggerConfig{
-  pub gaps_trigger_use_beta : bool, //1
-  pub tiu_emulation_mode : bool, //1
-  pub prescale : f32, //4
-  pub trigger_type : TriggerType //1 
+  pub gaps_trigger_use_beta  : bool, //1
+  pub prescale               : f32, //4
+  pub trigger_type           : TriggerType, //1 
+  pub use_combo_trigger      : bool,
+  pub combo_trigger_type     : TriggerType,
+  pub combo_trigger_prescale : f32,
+  pub trace_suppression      : bool,
+  pub mtb_moni_interval      : u16,
+  pub tiu_ignore_busy        : bool,
+  pub hb_send_interval       : u8,
 }
 
 impl TriggerConfig {
   pub fn new() -> Self { 
     Self {
       gaps_trigger_use_beta   : true,
-      tiu_emulation_mode  : false,
-      prescale : 0.0,
-      trigger_type : TriggerType::Unknown
+      prescale                : 0.0,
+      trigger_type            : TriggerType::Unknown,
+      use_combo_trigger       : false,
+      combo_trigger_type      : TriggerType::Unknown,
+      combo_trigger_prescale  : 0.0,
+      trace_suppression       : true,
+      mtb_moni_interval       : 10,
+      tiu_ignore_busy         : false,
+      hb_send_interval        : 20
     }
   }
 }
@@ -579,15 +598,20 @@ impl fmt::Display for TriggerConfig {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<TriggerConfig");
     repr += &(format!("\n  Beta is used by trigger      : {}", self.gaps_trigger_use_beta)); 
-    repr += &(format!("\n  TIU Emulation Mode : {}", self.tiu_emulation_mode));
-    repr += &(format!("\n  Prescale : {:.3}", self.prescale));
-    repr += &(format!("\n  Trigger type : {}", self.trigger_type));
+    repr += &(format!("\n  Prescale           : {:.3}", self.prescale));
+    repr += &(format!("\n  Trigger type       : {}",    self.trigger_type));
+    if self.use_combo_trigger {
+      repr += &(format!("\n  Combo Prescale     : {:.3}", self.combo_trigger_prescale));
+      repr += &(format!("\n  Combo Trigger type : {}",    self.combo_trigger_type));
+    }
+    repr += &(format!("\n  trace_suppression       : {}", self.trace_suppression));
+    repr += &(format!("\n  mtb_moni_interval       : {}", self.mtb_moni_interval));
+    repr += &(format!("\n  tiu_ignore_busy         : {}", self.tiu_ignore_busy));
+    repr += &(format!("\n  hb_send_interval        : {}", self.hb_send_interval));
+    repr += ">";
     write!(f, "{}", repr)
   }
 }
-
-
-
 
 impl Packable for TriggerConfig {
   const PACKET_TYPE : PacketType = PacketType::TriggerConfig;
@@ -597,28 +621,40 @@ impl Serialization for TriggerConfig {
   
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
-  const SIZE : usize = 11; 
+  const SIZE : usize = 21; 
   
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
     -> Result<Self, SerializationError>{
     Self::verify_fixed(stream, pos)?;  
     let mut cfg = TriggerConfig::new();
-      cfg.gaps_trigger_use_beta = parse_bool(stream, pos);
-      cfg.tiu_emulation_mode = parse_bool(stream, pos);
-      cfg.prescale = parse_f32 (stream, pos);
-      cfg.trigger_type = TriggerType::from(parse_u8(stream, pos));
-    
+    cfg.gaps_trigger_use_beta  = parse_bool(stream, pos);
+    cfg.prescale               = parse_f32 (stream, pos);
+    cfg.trigger_type           = TriggerType::from(parse_u8(stream, pos));
+    cfg.use_combo_trigger      = parse_bool(stream, pos);
+    cfg.combo_trigger_type     = TriggerType::from(parse_u8(stream, pos));
+    cfg.combo_trigger_prescale = parse_f32(stream, pos);
+    cfg.trace_suppression      = parse_bool(stream, pos);
+    cfg.mtb_moni_interval      = parse_u16(stream, pos);
+    cfg.tiu_ignore_busy        = parse_bool(stream, pos);
+    cfg.hb_send_interval       = parse_u8(stream, pos);
     *pos += 2;
     Ok(cfg)
   }
+
   fn to_bytestream(&self) -> Vec<u8> {
     let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
     bs.extend_from_slice(&Self::HEAD.to_le_bytes());
     bs.push(self.gaps_trigger_use_beta as u8);
-    bs.push(self.tiu_emulation_mode as u8);
     bs.extend_from_slice(&self.prescale.to_le_bytes());
     bs.push(self.trigger_type.to_u8());
+    bs.push(self.use_combo_trigger as u8);
+    bs.push(self.combo_trigger_type as u8);
+    bs.extend_from_slice(&self.combo_trigger_prescale.to_le_bytes());
+    bs.push(self.trace_suppression as u8);
+    bs.extend_from_slice(&self.mtb_moni_interval.to_le_bytes());
+    bs.push(self.tiu_ignore_busy as u8);
+    bs.extend_from_slice(&self.hb_send_interval.to_le_bytes());
     bs.extend_from_slice(&Self::TAIL.to_le_bytes());
     bs
   }
@@ -627,12 +663,18 @@ impl Serialization for TriggerConfig {
 #[cfg(feature = "random")]
 impl FromRandom for TriggerConfig {
   fn from_random() -> Self {
-    let mut cfg  = TriggerConfig::new();
-    let mut rng      = rand::thread_rng();
-    cfg.gaps_trigger_use_beta  = rng.gen::<bool>();
-    cfg.tiu_emulation_mode = rng.gen::<bool>();
-    cfg.prescale = rng.gen::<f32>();
-    cfg.trigger_type = TriggerType::from_random();
+    let mut cfg                 = TriggerConfig::new();
+    let mut rng                 = rand::thread_rng();
+    cfg.gaps_trigger_use_beta   = rng.gen::<bool>();
+    cfg.prescale                = rng.gen::<f32>();
+    cfg.trigger_type            = TriggerType::from_random();
+    cfg.use_combo_trigger       = rng.gen::<bool>();
+    cfg.combo_trigger_type      = TriggerType::from_random();
+    cfg.combo_trigger_prescale  = rng.gen::<f32>();
+    cfg.trace_suppression       = rng.gen::<bool>();
+    cfg.mtb_moni_interval       = rng.gen::<u16>();
+    cfg.tiu_ignore_busy         = rng.gen::<bool>();
+    cfg.hb_send_interval        = rng.gen::<u8>();
     cfg
   }
 }
@@ -741,6 +783,7 @@ impl Serialization for AnalysisEngineConfig {
     *pos += 2;
     Ok(cfg)
   }
+
   fn to_bytestream(&self) -> Vec<u8> {
     let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
     bs.extend_from_slice(&Self::HEAD.to_le_bytes());
