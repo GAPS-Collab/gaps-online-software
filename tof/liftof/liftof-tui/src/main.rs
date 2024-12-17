@@ -39,6 +39,7 @@ use crossbeam_channel::{unbounded,
                         Receiver};
 
 
+use ratatui::prelude::Alignment;
 use ratatui::{
     backend::CrosstermBackend,
     //terminal::Frame,
@@ -54,6 +55,7 @@ use ratatui::{
         Style,
     },
     widgets::{
+        Paragraph,
         Block,
         Borders,
     },
@@ -262,9 +264,9 @@ struct Args {
   /// Adjust the rendering rate for the application in Hz
   /// The higher the rate, the more strenous on the 
   /// system, but the more responsive it gets.
-  /// On a decent system 1kHz should be ok.
   /// If screen flickering appears, try to change
   /// this parameter. 
+  /// Default value is 100 Hz
   #[arg(short, long, default_value_t = 10.0)]
   refresh_rate: f32,
   /// Get the TofData not from the TOF stream, 
@@ -312,13 +314,17 @@ fn render_logs<'a>(theme : ColorTheme) -> TuiLoggerWidget<'a> {
 }
 
 #[derive(Debug, Clone)]
-pub struct MasterLayout {
-  pub rect : Vec<Rect>
+pub struct MainLayout {
+  pub menu : Rect,
+  pub main : Rect,
+  pub log  : Rect,
+  pub help : Rect
+  //pub rect : Vec<Rect>
 }
 
-impl MasterLayout {
+impl MainLayout {
 
-  fn new(size : Rect) -> MasterLayout {
+  fn new(size : Rect) -> MainLayout {
     let chunks = Layout::default()
     .direction(Direction::Vertical)
     //.margin(1)
@@ -331,8 +337,21 @@ impl MasterLayout {
       .as_ref(),
     )
     .split(size);
-    MasterLayout {
-      rect : chunks.to_vec()
+    // logs and help
+    let logs_n_help = Layout::default()
+    .direction(Direction::Horizontal)
+    .constraints(
+      [Constraint::Percentage(80),
+       Constraint::Percentage(20)]
+       .as_ref(),
+    )
+    .split(chunks[2]);  
+    MainLayout {
+      //rect : chunks.to_vec()
+      menu : chunks[0],
+      main : chunks[1],
+      log  : logs_n_help[0],
+      help : logs_n_help[1],
     }
   }
 }
@@ -751,86 +770,20 @@ impl<'a> TabbedInterface<'a> {
     self.color_set = cs;
   }
   
-  pub fn render_home(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.ui_menu.render (&master_lo.rect[0], frame);
-    self.home_tab.render(&master_lo.rect[1], frame);
+  pub fn render_home(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
+    self.ui_menu.render (&main_lo.menu, frame);
+    self.home_tab.render(&main_lo.main, frame);
+    if self.quit_request {
+      let popup = Popup::new("Quit liftof-tui?")
+        .title("Press Y to confirm, any key to abort")
+        .style(self.home_tab.theme.style());
+      frame.render_widget(&popup, frame.area());
+    }
   }
   
-  pub fn render_alerts(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.ui_menu.render (&master_lo.rect[0], frame);
+  pub fn render_alerts(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
+    self.ui_menu.render (&main_lo.menu, frame);
     //self.alert_tab.render(&master_lo.rect[1], frame);
-  }
-
-  pub fn render_events(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.te_menu.render  (&master_lo.rect[0], frame);
-    self.event_tab.render(&master_lo.rect[1], frame);
-  }
-
-  pub fn render_monitoring(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.mo_menu.render(&master_lo.rect[0], frame);
-    self.home_tab.render(&master_lo.rect[1], frame);
-  }
-
-  //pub fn render_cpu(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-  //  self.ui_menu.render(&master_lo.rect[0], frame);
-  //  self.cpu_tab.render(&master_lo.rect[1], frame);
-  //}
-  
-  pub fn render_mt(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.ui_menu.render(&master_lo.rect[0], frame);
-    self.mt_tab.render (&master_lo.rect[1], frame);
-  }
-  
-  pub fn render_rbs(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    match self.active_menu {
-      ActiveMenu::RBMenu => {
-        self.rb_menu.render(&master_lo.rect[0], frame);
-        self.wf_tab.render (&master_lo.rect[1], frame);
-      }
-      _ => {
-        self.ui_menu.render(&master_lo.rect[0], frame);
-        self.wf_tab.render (&master_lo.rect[1], frame);
-      }
-    }
-  }
-  
-  pub fn render_paddles(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    match self.active_menu {
-      ActiveMenu::Paddles => {
-        self.pd_tab.menu.render(&master_lo.rect[0], frame);
-        self.pd_tab.render (&master_lo.rect[1], frame);
-      }
-      _ => {
-        self.ui_menu.render(&master_lo.rect[0], frame);
-        self.pd_tab.render (&master_lo.rect[1], frame);
-      }
-    }
-  }
-
-  pub fn render_heartbeats(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    match self.active_menu {
-      ActiveMenu::Heartbeats => {
-        self.hb_menu.render(&master_lo.rect[0], frame);
-      }
-      _ => {
-        self.ui_menu.render(&master_lo.rect[0], frame);
-      }
-    }
-    self.hb_tab.render(&master_lo.rect[1], frame);
-  }
-
-  pub fn render_commands(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.ui_menu.render(&master_lo.rect[0], frame);
-    self.cmd_tab.render(&master_lo.rect[1], frame);
-  }
-
-  pub fn render_settings(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.ui_menu.render     (&master_lo.rect[0], frame);
-    self.settings_tab.render(&master_lo.rect[1], frame);
-  }
-   
-  pub fn render_quit(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.ui_menu.render(&master_lo.rect[0], frame);
     if self.quit_request {
       let popup = Popup::new("Quit liftof-tui?")
         .title("Press Y to confirm, any key to abort")
@@ -839,102 +792,231 @@ impl<'a> TabbedInterface<'a> {
     }
   }
 
-  pub fn render_tofhittab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.th_menu.render(&master_lo.rect[0], frame);
-    self.th_tab.render(&master_lo.rect[1], frame);
+  pub fn render_events(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
+    self.te_menu.render  (&main_lo.menu, frame);
+    self.event_tab.render(&main_lo.main, frame);
+    if self.quit_request {
+      let popup = Popup::new("Quit liftof-tui?")
+        .title("Press Y to confirm, any key to abort")
+        .style(self.home_tab.theme.style());
+      frame.render_widget(&popup, frame.area());
+    }
   }
 
-  pub fn render_tofsummarytab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
-    self.te_menu.render(&master_lo.rect[0], frame);
-    self.ts_tab.render(&master_lo.rect[1], frame);
+  pub fn render_monitoring(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
+    self.mo_menu.render(&main_lo.menu, frame);
+    self.home_tab.render(&main_lo.main, frame);
+    if self.quit_request {
+      let popup = Popup::new("Quit liftof-tui?")
+        .title("Press Y to confirm, any key to abort")
+        .style(self.home_tab.theme.style());
+      frame.render_widget(&popup, frame.area());
+    }
+  }
+
+  //pub fn render_cpu(&mut self, master_lo : &mut MainLayout, frame : &mut Frame) {
+  //  self.ui_menu.render(&master_lo.rect[0], frame);
+  //  self.cpu_tab.render(&master_lo.rect[1], frame);
+  //}
+  
+  pub fn render_mt(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
+    self.ui_menu.render(&main_lo.menu, frame);
+    self.mt_tab.render (&main_lo.main, frame);
+    if self.quit_request {
+      let popup = Popup::new("Quit liftof-tui?")
+        .title("Press Y to confirm, any key to abort")
+        .style(self.home_tab.theme.style());
+      frame.render_widget(&popup, frame.area());
+    }
   }
   
-  //pub fn render_rbwaveformtab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+  pub fn render_rbs(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
+    match self.active_menu {
+      ActiveMenu::RBMenu => {
+        self.rb_menu.render(&main_lo.menu, frame);
+        self.wf_tab.render (&main_lo.main, frame);
+      }
+      _ => {
+        self.ui_menu.render(&main_lo.menu, frame);
+        self.wf_tab.render (&main_lo.main, frame);
+      }
+    }
+    if self.quit_request {
+      let popup = Popup::new("Quit liftof-tui?")
+        .title("Press Y to confirm, any key to abort")
+        .style(self.home_tab.theme.style());
+      frame.render_widget(&popup, frame.area());
+    }
+  }
+  
+  pub fn render_paddles(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
+    match self.active_menu {
+      ActiveMenu::Paddles => {
+        self.pd_tab.menu.render(&main_lo.menu, frame);
+        self.pd_tab.render (&main_lo.main, frame);
+      }
+      _ => {
+        self.ui_menu.render(&main_lo.menu, frame);
+        self.pd_tab.render (&main_lo.main, frame);
+      }
+    }
+    if self.quit_request {
+      let popup = Popup::new("Quit liftof-tui?")
+        .title("Press Y to confirm, any key to abort")
+        .style(self.home_tab.theme.style());
+      frame.render_widget(&popup, frame.area());
+    }
+  }
+
+  pub fn render_heartbeats(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
+    match self.active_menu {
+      ActiveMenu::Heartbeats => {
+        self.hb_menu.render(&main_lo.menu, frame);
+      }
+      _ => {
+        self.ui_menu.render(&main_lo.menu, frame);
+      }
+    }
+    self.hb_tab.render(&main_lo.main, frame);
+    if self.quit_request {
+      let popup = Popup::new("Quit liftof-tui?")
+        .title("Press Y to confirm, any key to abort")
+        .style(self.home_tab.theme.style());
+      frame.render_widget(&popup, frame.area());
+    }
+  }
+
+  pub fn render_commands(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
+    self.ui_menu.render(&main_lo.menu, frame);
+    self.cmd_tab.render(&main_lo.main, frame);
+    if self.quit_request {
+      let popup = Popup::new("Quit liftof-tui?")
+        .title("Press Y to confirm, any key to abort")
+        .style(self.home_tab.theme.style());
+      frame.render_widget(&popup, frame.area());
+    }
+  }
+
+  pub fn render_settings(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
+    self.ui_menu.render     (&main_lo.menu, frame);
+    self.settings_tab.render(&main_lo.main, frame);
+    if self.quit_request {
+      let popup = Popup::new("Quit liftof-tui?")
+        .title("Press Y to confirm, any key to abort")
+        .style(self.home_tab.theme.style());
+      frame.render_widget(&popup, frame.area());
+    }
+  }
+   
+  pub fn render_quit(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
+    self.ui_menu.render(&main_lo.menu, frame);
+    if self.quit_request {
+      let popup = Popup::new("Quit liftof-tui?")
+        .title("Press Y to confirm, any key to abort")
+        .style(self.home_tab.theme.style());
+      frame.render_widget(&popup, frame.area());
+    }
+  }
+
+  pub fn render_tofhittab(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
+    self.th_menu.render(&main_lo.menu, frame);
+    self.th_tab.render(&main_lo.main, frame);
+    if self.quit_request {
+      let popup = Popup::new("Quit liftof-tui?")
+        .title("Press Y to confirm, any key to abort")
+        .style(self.home_tab.theme.style());
+      frame.render_widget(&popup, frame.area());
+    }
+  }
+
+  pub fn render_tofsummarytab(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
+    self.te_menu.render(&main_lo.menu, frame);
+    self.ts_tab.render(&main_lo.main, frame);
+  }
+  
+  //pub fn render_rbwaveformtab(&mut self, master_lo : &mut MainLayout, frame : &mut Frame) {
   //  self.te_menu.render(&master_lo.rect[0], frame);
   //  self.rbwf_tab.render(&master_lo.rect[1], frame);
   //}
 
-  //pub fn render_pamonidatatab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+  //pub fn render_pamonidatatab(&mut self, master_lo : &mut MainLayout, frame : &mut Frame) {
   //  self.pa_menu.render(&master_lo.rect[0], frame);
   //  self.wf_tab.render(&master_lo.rect[1], frame);
   //}
   
-  pub fn render_telemetrytab(&mut self, master_lo : &mut MasterLayout, frame : &mut Frame) {
+  pub fn render_telemetrytab(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
     //self.ts_menu.render(&master_lo.rect[0], frame);
-    self.ui_menu.render(&master_lo.rect[0], frame);
-    self.te_tab.render(&master_lo.rect[1], frame);
+    self.ui_menu.render(&main_lo.menu, frame);
+    self.te_tab.render(&main_lo.main, frame);
   }
 
   pub fn render(&mut self,
-                master_lo : &mut MasterLayout,
-                frame     : &mut Frame) {
+                main_lo : &mut MainLayout,
+                frame   : &mut Frame) {
     
 
     match self.active_menu {
       ActiveMenu::MainMenu => {
         match self.ui_menu.get_active_menu_item() {
           UIMenuItem::Home => {
-            self.render_home(master_lo, frame);
+            self.render_home(main_lo, frame);
           }
           UIMenuItem::Events => {
-            self.render_home(master_lo, frame);
+            self.render_home(main_lo, frame);
           },
           UIMenuItem::ReadoutBoards => {
             self.wf_tab.view = RBTabView::SelectRB;
-            self.render_rbs(master_lo, frame);
+            self.render_rbs(main_lo, frame);
           }
           UIMenuItem::Trigger => {
-            self.render_mt(master_lo, frame);
+            self.render_mt(main_lo, frame);
           }
           UIMenuItem::Monitoring => {
-            self.render_home(master_lo, frame);
+            self.render_home(main_lo, frame);
           }
           UIMenuItem::Telemetry => {
-            self.render_telemetrytab(master_lo, frame);
+            self.render_telemetrytab(main_lo, frame);
           }
           UIMenuItem::Commands => {
-            self.render_commands(master_lo, frame);
+            self.render_commands(main_lo, frame);
           }
           UIMenuItem::Settings => {
-            self.render_settings(master_lo, frame);
+            self.render_settings(main_lo, frame);
           }
           UIMenuItem::Paddles => {
-            self.render_paddles(master_lo, frame);
+            self.render_paddles(main_lo, frame);
           }
           UIMenuItem::Heartbeats => {
-            self.render_heartbeats(master_lo, frame);
+            self.render_heartbeats(main_lo, frame);
           }
           UIMenuItem::Alerts => {
-            self.render_alerts(master_lo, frame);
+            self.render_alerts(main_lo, frame);
           }
           UIMenuItem::Quit => {
-            self.render_quit(master_lo, frame);
+            self.render_quit(main_lo, frame);
           }
           _ => ()
         }
       }
       ActiveMenu::RBMenu => {
-        self.render_rbs(master_lo, frame);
+        self.render_rbs(main_lo, frame);
       }
       ActiveMenu::Paddles => {
-        self.render_paddles(master_lo, frame);
+        self.render_paddles(main_lo, frame);
       }
       ActiveMenu::Heartbeats => {
-        self.render_heartbeats(master_lo, frame);
+        self.render_heartbeats(main_lo, frame);
       }
-      //ActiveMenu::Trigger => {
-      //  self.render_mt(master_lo, frame);
-      //}
       ActiveMenu::Events => {
         match self.te_menu.active_menu_item {
           UIMenuItem::TofSummary => {
-            self.render_tofsummarytab(master_lo, frame);
+            self.render_tofsummarytab(main_lo, frame);
           }
           UIMenuItem::TofHits => {
-            self.render_tofhittab(master_lo, frame);
+            self.render_tofhittab(main_lo, frame);
           }
           UIMenuItem::Back => {
-            self.render_events(master_lo, frame);
+            self.render_events(main_lo, frame);
           }
           _ => ()
         }
@@ -942,7 +1024,7 @@ impl<'a> TabbedInterface<'a> {
       ActiveMenu::Monitoring => {
         match self.mo_menu.active_menu_item {
           UIMenuItem::Back => {
-            self.render_monitoring(master_lo, frame);
+            self.render_monitoring(main_lo, frame);
           }
           UIMenuItem::PreampBias => {
           }
@@ -984,6 +1066,10 @@ impl<'a> TabbedInterface<'a> {
     }
 
     match key_code {
+      KeyCode::Char('q') | KeyCode::Char('Q') 
+      => {
+        self.quit_request = true;
+      }
       KeyCode::Char('a') => {
         if self.ui_menu.get_active_menu_item() == UIMenuItem::Settings {
           self.settings_tab.ctl_active = true;
@@ -1289,7 +1375,7 @@ impl<'a> TabbedInterface<'a> {
     }
     debug!("No exit command received, continuing");
     (false, tab_changed) // if we arrive here, we don't
-                        // want to exit the app
+                         // want to exit the app
   }
 }
 
@@ -1507,7 +1593,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   // The menus
   let ui_menu         = MainMenu::new(color_theme.clone());
   let rb_menu         = RBMenu2::new(color_theme.clone());
-  //let mt_menu         = MTMenu::new(color_theme.clone());
   let mt_menu         = TriggerMenu::new(color_theme.clone());
   let st_menu         = SettingsMenu::new(color_theme.clone());
   let th_menu         = THMenu::new(color_theme.clone());
@@ -1520,7 +1605,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   // The tabs
   let mt_tab          = MTTab::new(mt_pack_recv,
                                    mte_recv,
-                                   dsijch_paddle_map,
+                                   &dsijch_paddle_map,
                                    mtlink_rb_map,
                                    color_theme.clone());
  
@@ -1538,7 +1623,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //let rbwf_tab        = RBWaveformTab::new(rbwf_pack_recv,
   //                                         readoutboards,
   //                                         color_theme.clone());
-  let ts_tab          = TofSummaryTab::new(ts_recv, color_theme.clone());
+  let ts_tab          = TofSummaryTab::new(ts_recv,
+                                           &dsijch_paddle_map,
+                                           color_theme.clone());
   let te_tab          : TelemetryTab;
   if args.from_telemetry {
     te_tab            = TelemetryTab::new(Some(tp_to_distrib),
@@ -1631,10 +1718,19 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               Ok(mut tabs) => {
                 match terminal.draw(|frame| {
                   let size           = frame.area();
-                  let mut main_lo    = MasterLayout::new(size); 
+                  let mut main_lo    = MainLayout::new(size); 
                   let w_logs         = render_logs(color_theme.clone());
-                  frame.render_widget(w_logs, main_lo.rect[2]);
+                  let help_text = "Navigate with \u{2190} \u{2191} \u{2192} \u{2193}\n 'Enter' to confirm \n 'q' to quit";
+                  let help_view = Paragraph::new(help_text)
+                    .style(color_theme.style())
+                    .alignment(Alignment::Center)
+                    .block(
+                     Block::default()
+                       .borders(Borders::ALL)
+                  );
+                  frame.render_widget(w_logs, main_lo.log);
                   tabs.render(&mut main_lo, frame);
+                  frame.render_widget(help_view, main_lo.help);
                 }) {
                   Err(err) => error!("Can't render terminal! {err}"),
                   Ok(_)    => () ,
