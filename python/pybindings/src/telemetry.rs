@@ -769,7 +769,7 @@ impl PyTrackerEvent {
   ///            returned.
   ///            E.g, this can be something like 
   ///            .filter_hits(lambda h : h.asic_event_code == 0 or h.asic_event_code ==2)
-  pub fn filter_hits(&self, filter : &PyFunction) -> PyResult<Vec<PyTrackerHit>> {
+  pub fn filter_hits(&self, filter : &Bound<'_,PyFunction>) -> PyResult<Vec<PyTrackerHit>> {
     let mut filtered_hits = Vec::<PyTrackerHit>::new();
     for h in self.hits() {
       //let hit_ref = h.as_ref(py);
