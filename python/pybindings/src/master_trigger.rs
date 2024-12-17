@@ -10,7 +10,7 @@ use std::collections::HashMap;
 use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
 
-extern crate pyo3_log;
+//extern crate pyo3_log;
 
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
@@ -1224,6 +1224,30 @@ fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
     match TIU_BUSY_IGNORE.set(&mut self.ipbus, bsy as u32) {
       Ok(_) => {
         return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  #[getter]
+  fn get_tiu_busy_stuck(&mut self) -> PyResult<bool> {
+    match TIU_BUSY_STUCK.get(&mut self.ipbus) {
+      Ok(value) => {
+        return Ok(value > 0);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  #[getter]
+  fn get_tiu_bad(&mut self) -> PyResult<bool> {
+    match TIU_BAD.get(&mut self.ipbus) {
+      Ok(value) => {
+        return Ok(value > 0);
       }
       Err(err) => {
         return Err(PyValueError::new_err(err.to_string()));
