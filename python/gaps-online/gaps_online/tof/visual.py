@@ -886,4 +886,69 @@ def mtb_rate_plot(reader            = None,
         fig.savefig(f'{plot_dir}/mtb_rates.webp')
     return fig
 
+###############################################
 
+def plot_hg_lg_hits(reader   = None,
+                    events   = [],
+                    plot_dir = None,
+                    split_by_threshold = False):
+    """
+    Plot the HG vs the LG (trigger) hits
+    """
+    if reader is not None and events:
+        raise ValueError("If reader and events are both given, we don't know which one to use!")
+    
+    if reader:
+        pass 
+    if events:
+        hits = [(len(ev.hits),\
+                 len(ev.trigger_hits),\
+                 len(ev.rb_link_ids),\
+                 ev.rb_link_ids) for ev in tqdm.tqdm(events, desc='Getting hits...')]
+
+    #print(f'-> We found {len(nthits)} LG and {len(nhits)} HG hits!'
+    no_hitmissing    = 0
+    one_hitmissing   = 0
+    lttwo_hitmissing = 0
+    for k in hits:
+        if k[0] == k[1]:
+            no_hitmissing += 1
+        elif abs(k[0] - k[1]) == 1:
+            one_hitmissing += 1
+        else:
+            lttwo_hitmissing += 1
+            
+    textbox  = f'NHits : {len(hits):.2e}\n'
+    textbox += f'{100*no_hitmissing/len(hits):.2f} \% for N(LG) == N(HG)\n'
+    textbox += f'{100*one_hitmissing/len(hits):.2f}\% for abs(N(LG) - N(HG)) = 1\n'
+    textbox += f'{100*lttwo_hitmissing/len(hits):.2f}\% for abs(N(LG) - N(HG)) $>=$ 2'
+    fig = plt.figure(figsize=lo.FIGSIZE_A4_LANDSCAPE)
+    ax  = plt.gca()
+    nhits        = [k[0] for k in hits]
+    nthits       = np.array([k[1] for k in hits])
+    rblinkids    = np.array([k[2] for k in hits])
+    all_expected = nthits + rblinkids
+    h   = d.factory.hist1d(nhits, np.arange(-0.5,30.5,1))
+    h2  = d.factory.hist1d(nthits, np.arange(-0.5,30.5,1))
+    h3  = d.factory.hist1d(rblinkids, np.arange(-0.5,30.5,1))
+    h.line(filled=True, alpha=0.7, color='tab:blue', label='HG')
+    h2.line(color='tab:blue', label='LG')
+    h3.line(color='tab:red', label='RB LINK ID')
+    ax.set_yscale('log')
+    ax.set_xlabel('TOF hits', loc='right')
+    ax.set_ylabel('events', loc='top')
+    ax.set_title('TOF HG (readout) vs LG (data) hits', loc='right')
+    ax.text(0.5, 0.7, textbox, transform=fig.transFigure, fontsize=10)
+    ax.legend(frameon=False, fontsize=8, ncol=3, bbox_to_anchor=(0.45,1.01),\
+              bbox_transform=fig.transFigure)
+    return fig, hits
+
+###############################################
+
+def eventbld_hb_plots(reader = None, 
+                      heartbeats = []):
+    """
+    Plot the relevant quantities from the event
+    builder heartbeats
+    """
+    pass
