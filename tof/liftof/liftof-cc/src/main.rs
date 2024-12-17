@@ -74,6 +74,8 @@ use tof_dataclasses::commands::{
   TofCommand,
   //TofCommandCode,
   TofResponse,
+  get_rbratmap_hardcoded,
+  get_ratrbmap_hardcoded,
 };
 
 use liftof_lib::{
@@ -95,6 +97,7 @@ use liftof_cc::{
   calibrate_tof,
   verification_run,
   restart_liftof_rb,
+  ssh_command_rbs,
   run_cycler,
 };
 
@@ -112,10 +115,10 @@ use liftof_cc::threads::monitor_cpu;
 
 #[derive(Debug, Parser, PartialEq)]
 pub enum CommandCC {
-  /// Listen for flight CPU commands. This will NOT
-  /// immediatly start a run, but just idle and 
-  /// liston until it gets a RunStart command.
-  Listen,
+  ///// Listen for flight CPU commands. This will NOT
+  ///// immediatly start a run, but just idle and 
+  ///// liston until it gets a RunStart command.
+  //Listen,
   /// Staging mode - work through all .toml files
   /// in the staging area. This will start the run 
   /// for the given .toml file immediatly, but then 
@@ -125,7 +128,11 @@ pub enum CommandCC {
   Calibration,
   /// Start the run as described in the toml file,
   /// and then quit
-  Run
+  Run,
+  /// Check the status of a certain liftof component
+  Status,
+  /// Soft reboot an entire RAT or a RB
+  SoftReboot,
 }
 
 /*************************************/
@@ -152,6 +159,10 @@ struct LiftofCCArgs {
   /// event builder and general settings.
   #[arg(short, long)]
   config      : Option<String>,
+  /// RAT ID - this only makes sense for the Shutdown/Status 
+  /// command. this is the rat to check in on or to soft 
+  /// reboot
+  rat_id      : Option<u8>,
   /// List of possible commands
   #[command(subcommand)]
   command     : CommandCC,
@@ -170,6 +181,48 @@ fn init_channels<T>() -> (Sender<T>, Receiver<T>) {
 
 fn main() {
   init_env_logger();
+  
+  let args = LiftofCCArgs::parse();
+
+  // capture the status and soft reboot options already here, 
+  // before we do anything else
+  match args.command {
+    CommandCC::Status => {
+      let mut rb_list    = Vec::<u8>::new();
+      if let Some(rat_id) = args.rat_id {
+        match get_ratrbmap_hardcoded().get(&rat_id) {
+          None => error!("RAT {} does not exist!", rat_id),
+          Some(rbs) => {
+            rb_list = vec![rbs.0, rbs.1];
+          }
+        }
+      } else {
+        // check on all rats
+        rb_list = get_rbratmap_hardcoded().keys().cloned().collect();
+      }
+      match ssh_command_rbs(&rb_list, vec![String::from("date")]) {
+        Err(err) => {
+          error!("Connecting to RBs over ssh failed! {}",  err);
+        }
+        Ok(issues) => {
+          if issues.len() == 0 {
+            println!("-- -- Status summary -- --");
+            println!("\u{2714} All RBs are healthy! \u{1f389}");
+          } else {
+            println!("   -- Unfortunatly, {} RBs are not ok!", issues.len());
+            for problem in issues {
+              println!("\u{274c} RB {} health is not ok!", problem);
+            }
+          }
+        }
+      } 
+      exit(0);
+    }
+    CommandCC::SoftReboot => {
+      exit(0);
+    }
+    _ => () // digest the other commands later
+  }
 
   // welcome banner!
   println!("{}", LIFTOF_LOGO_SHOW);
@@ -214,7 +267,6 @@ fn main() {
   // deal with command line arguments
   let mut config      : LiftofSettings;
   let nboards         : usize;
-  let args            = LiftofCCArgs::parse();
   let verbose         = args.verbose;
   let cfg_file_str   : String; 
   match args.config {
@@ -286,6 +338,53 @@ fn main() {
     },
   }
   
+  /*******************************************************
+   * Channels (crossbeam, unbounded) for inter-thread
+   * communications.
+   *
+   * FIXME - do we need to use bounded channels
+   * just in case?
+   *
+   */ 
+
+  // all threads who send TofPackets to the global data sink, can clone this receiver
+  let (tp_to_sink, tp_from_threads)   = init_channels::<TofPacket>();
+
+  // master thread -> event builder MasterTriggerEvent transmission
+  let (master_ev_send, master_ev_rec) = init_channels::<MasterTriggerEvent>(); 
+  
+  // readout boards -> event builder RBEvent transmission 
+  let (ev_to_builder, ev_from_rb)     = init_channels::<RBEvent>();
+  let (ack_to_cmd_disp, ack_from_rb)  = init_channels::<TofResponse>();   
+  
+  // FIXME Order of threads
+  debug!("Starting data sink thread!");
+  let thread_control_gds = Arc::clone(&thread_control);
+  let dp_settings      = config.data_publisher_settings.clone();
+  let _data_sink_handle = thread::Builder::new()
+    .name("data-sink".into())
+    .spawn(move || {
+      global_data_sink(&tp_from_threads,
+                       thread_control_gds, 
+                       dp_settings);
+    })
+    .expect("Failed to spawn data-sink thread!");
+  debug!("Data sink thread started!");
+  
+  let tc = Arc::clone(&thread_control);
+  let ts = tp_to_sink.clone();
+  let _cmd_handle = thread::Builder::new()
+    .name("command-dispatcher".into())
+    .spawn(move || {
+      command_dispatcher(
+        cmd_dispatch_settings,
+        tc,
+        ts,
+        ack_from_rb
+      )
+    })
+  .expect("Failed to spawn cpu-monitoring thread!");
+  
   println!("=> Copying config to all RBs!");
   let mut children = Vec::<(u8,Child)>::new();
   for rb in &rb_list {
@@ -306,16 +405,43 @@ fn main() {
   }
   let mut issues = Vec::<u8>::new();
   for rb_child in &mut children {
-    match rb_child.1.wait() {
+    let timeout = Duration::from_secs(5);
+    let kill_t  = Instant::now();
+    loop {
+      if kill_t.elapsed() > timeout {
+        error!("SCP process for board {} timed out!", rb_child.0);
+        // Duuu hast aber einen schöönen Ball! [M. eine Stadt sucht einen Moerder]
+        match rb_child.1.kill() {
+          Err(err) => {
+            error!("Unable to kill the SSH process for RB {}", rb_child.0);
+          }
+          Ok(_) => {
+            error!("Killed SSH process for for RB {}", rb_child.0);
+          }
+        }
+        issues.push(rb_child.0);
+        // FIXME
+        break
+      }
+    }
+    match rb_child.1.try_wait() {
+      Ok(None) => {
+        thread::sleep(Duration::from_secs(1));
+        continue;
+      }
+
       Err(err) => {
         error!("Child process failed with stderr {:?}! {}", rb_child.1.stderr, err);
+        break
       }
-      Ok(status) => {
+      Ok(Some(status)) => {
         if status.success() {
           info!("Copied config to RB {} successfully!", rb_child.0);
+          break
         } else {
           error!("Copy config to RB {} failed with exit code {:?}!", rb_child.0, status.code());
           issues.push(rb_child.0);
+          break
         }
       }
     }
@@ -324,8 +450,12 @@ fn main() {
     println!("=> Copied config to all RBs successfully \u{1F389}!");
     info!("Copied config to all RBs successfully!");
   }
- 
-  restart_liftof_rb(&rb_list); 
+  
+  let mut rb_id_list = Vec::<u8>::new();
+  for k in &rb_list {
+    rb_id_list.push(k.rb_id);
+  }
+  restart_liftof_rb(&rb_id_list); 
   let mtb_link_id_map = get_linkid_rbid_map(&rb_list);
   // A global kill timer
   let program_start = Instant::now();
@@ -379,24 +509,6 @@ fn main() {
   }
 
 
-  /*******************************************************
-   * Channels (crossbeam, unbounded) for inter-thread
-   * communications.
-   *
-   * FIXME - do we need to use bounded channels
-   * just in case?
-   *
-   */ 
-
-  // all threads who send TofPackets to the global data sink, can clone this receiver
-  let (tp_to_sink, tp_from_threads)   = init_channels::<TofPacket>();
-
-  // master thread -> event builder MasterTriggerEvent transmission
-  let (master_ev_send, master_ev_rec) = init_channels::<MasterTriggerEvent>(); 
-  
-  // readout boards -> event builder RBEvent transmission 
-  let (ev_to_builder, ev_from_rb)     = init_channels::<RBEvent>();
-  let (ack_to_cmd_disp, ack_from_rb)  = init_channels::<TofResponse>();   
 
   //let one_minute = time::Duration::from_millis(60000);
 
@@ -424,18 +536,6 @@ fn main() {
   write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
   gds_settings.data_dir = write_stream_path;
 
-  debug!("Starting data sink thread!");
-  let thread_control_gds = Arc::clone(&thread_control);
-  let dp_settings      = config.data_publisher_settings.clone();
-  let _data_sink_handle = thread::Builder::new()
-    .name("data-sink".into())
-    .spawn(move || {
-      global_data_sink(&tp_from_threads,
-                       thread_control_gds, 
-                       dp_settings);
-    })
-    .expect("Failed to spawn data-sink thread!");
-  debug!("Data sink thread started!");
   let thread_control_sh = Arc::clone(&thread_control);
   let _sig_handle = thread::Builder::new()
     .name("signal_handler".into())
@@ -559,23 +659,9 @@ fn main() {
   
   let mut command_socket : Option<zmq::Socket> = None;
   match args.command {
-    CommandCC::Listen => {
-      dont_stop = true;
-      // start command dispatcher thread
-      let tc = Arc::clone(&thread_control);
-      let ts = tp_to_sink.clone();
-      let _cmd_handle = thread::Builder::new()
-        .name("command-dispatcher".into())
-        .spawn(move || {
-          command_dispatcher(
-            cmd_dispatch_settings,
-            tc,
-            ts,
-            ack_from_rb
-          )
-        })
-      .expect("Failed to spawn cpu-monitoring thread!");
-    },
+    //CommandCC::Listen => {
+    //  dont_stop = true;
+    //},
     CommandCC::Calibration => {
      let tc_cali = thread_control.clone();
      calibrate_tof(tc_cali, &rb_list, true);
@@ -585,14 +671,14 @@ fn main() {
       if pre_run_calibration {
         let tc_cali = thread_control.clone();
         calibrate_tof(tc_cali, &rb_list, true);
-        restart_liftof_rb(&rb_list);
+        restart_liftof_rb(&rb_id_list);
       }
       if verification_rt_sec > 0 {
         println!("=> Starting verification run!");
         let tc_verification = thread_control.clone();
         let tp_sender_veri  = tp_to_sink.clone();
         verification_run(verification_rt_sec, tp_sender_veri, tc_verification);
-        restart_liftof_rb(&rb_list);
+        restart_liftof_rb(&rb_id_list);
         println!("=> Verification run finished!");
       }
       thread::sleep(5*one_second);
@@ -641,24 +727,24 @@ fn main() {
           debug!("We sent {:?}", payload);
         }
       }
-      let run_start_timeout  = Instant::now();
-      // let's wait 20 seconds here
-      let mut n_rb_ack_rcved = 0;
-      while run_start_timeout.elapsed().as_secs() < 20 {
-        //println!("{}", run_start_timeout.elapsed().as_secs());
-        match ack_from_rb.try_recv() {
-          Err(_) => {
-            continue;
-          }
-          Ok(_ack_pack) => {
-            //FIXME - do something with it
-            n_rb_ack_rcved += 1;
-          }
-        }
-        if n_rb_ack_rcved == rb_list.len() {
-          break; 
-        }
-      }
+      //let run_start_timeout  = Instant::now();
+      //// let's wait 20 seconds here
+      //let mut n_rb_ack_rcved = 0;
+      //while run_start_timeout.elapsed().as_secs() < 20 {
+      //  //println!("{}", run_start_timeout.elapsed().as_secs());
+      //  match ack_from_rb.try_recv() {
+      //    Err(_) => {
+      //      continue;
+      //    }
+      //    Ok(_ack_pack) => {
+      //      //FIXME - do something with it
+      //      n_rb_ack_rcved += 1;
+      //    }
+      //  }
+      //  if n_rb_ack_rcved == rb_list.len() {
+      //    break; 
+      //  }
+      //}
       println!("Run initialized!");
       bar = ProgressBar::new_spinner();
       bar.enable_steady_tick(Duration::from_secs(1));
@@ -666,6 +752,7 @@ fn main() {
       // move the socket out of here for further use
       command_socket = Some(cmd_sender);
     }
+    _ => ()
   }
 
   //---------------------------------------------------------
