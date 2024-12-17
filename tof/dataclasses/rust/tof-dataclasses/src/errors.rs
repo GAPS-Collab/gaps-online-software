@@ -10,6 +10,25 @@ use std::fmt;
 
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
+pub enum TofError {
+  CanNotConnect,
+}
+
+impl fmt::Display for TofError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this SensorError"));
+    write!(f, "<TofError : {}>", disp)
+  }
+}
+
+impl Error for TofError {
+}
+
+////////////////////////////////////////
+
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum StagingError {
   NoCurrentConfig,
   QueEmpty,
