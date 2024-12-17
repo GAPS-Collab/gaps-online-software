@@ -1,15 +1,16 @@
 use std::collections::{
-    //HashMap,
-    VecDeque,
+  //HashMap,
+  VecDeque,
 };
+
 //use std::sync::{
 //    Arc,
 //    Mutex,
 //};
 
 use crossbeam_channel::{
-    Receiver,
-    Sender,
+  Receiver,
+  Sender,
 };
 
 use ratatui::prelude::*;
@@ -17,21 +18,21 @@ use ratatui::prelude::*;
 use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::widgets::{
-    Block,
-    BorderType,
-    Borders,
-    Paragraph,
+  Block,
+  BorderType,
+  Borders,
+  Paragraph,
 };
 
 //use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::{
-    RBEvent,
-    TofEvent,
-    TofHit,
-    TofEventHeader,
-    MasterTriggerEvent,
+  RBEvent,
+  TofEvent,
+  TofHit,
+  TofEventHeader,
+  MasterTriggerEvent,
 };
 
 use crate::colors::ColorTheme;
@@ -114,7 +115,6 @@ impl EventTab {
     }
   }
 
-  // Color::Blue was nice for background
   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
     
     // as usual, layout first

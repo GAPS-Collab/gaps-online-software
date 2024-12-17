@@ -3,12 +3,12 @@
 //! Show current data from the master trigger
 
 use std::collections::{
-    VecDeque,
-    HashMap
+  VecDeque,
+  HashMap
 };
 
 use std::time::{
-    Instant
+  Instant
 };
 
 use ratatui::{
@@ -100,7 +100,7 @@ impl MTTab {
 
   pub fn new(tp_receiver  : Receiver<TofPacket>,
              mte_receiver : Receiver<MasterTriggerEvent>,
-             mapping      : DsiJChPidMapping,
+             mapping      : &DsiJChPidMapping,
              mtlink_rb_map: HashMap<u8,u8>,
              theme        : ColorTheme) -> MTTab {
     let bins          = Uniform::new(50, 0.0, 50.0).unwrap();
@@ -124,7 +124,7 @@ impl MTTab {
       mtb_link_histo : ndhistogram!(mtb_link_bins),
       panel_histo    : ndhistogram!(panel_bins),
       theme          : theme,
-      mapping        : mapping,
+      mapping        : mapping.clone(),
       mtlink_rb_map  : mtlink_rb_map,
       problem_hits   : Vec::<(u8, u8, (u8, u8), LTBThreshold)>::new(),
       timer          : Instant::now(),

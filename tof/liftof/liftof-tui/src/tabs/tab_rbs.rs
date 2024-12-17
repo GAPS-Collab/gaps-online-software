@@ -162,7 +162,7 @@ impl RBTab<'_>  {
       if rb_non_exist.contains(&k) {
         continue;
       }
-      global_rates.insert(k as u8, String::from("no data yet"));
+      global_rates.insert(k as u8, String::from("\u{203c} no data yet"));
     }
     for k in 1..51 {
       let this_item = format!("  RB{:0>2}", k);
@@ -181,7 +181,7 @@ impl RBTab<'_>  {
     rbl_state.select(Some(1));
     warn!("Using hardcoded values for the RB->RAT hashmap!");
     // FIXME - get this from DB!
-    let mut rb_to_rat
+    let rb_to_rat
       = HashMap::<u8,u8>::from(
       [(1, 10),
        (2, 15),
@@ -222,7 +222,8 @@ impl RBTab<'_>  {
        (42,14),
        (44,16),
        (46,16)]);
-    RBTab {
+
+RBTab {
       tp_receiver        : tp_receiver,
       rb_receiver        : rb_receiver,
       rb_selector        : 0,
@@ -1274,7 +1275,7 @@ impl RBTab<'_>  {
           } else {
             this_row.push(format!("\u{2714} {} Hz", self.global_rates[k]));
           }
-          ncol += 1;
+          ncol += 2;
           if ncol == 8 {
             rows.push(Row::new(this_row.clone()));
             this_row = Vec::<String>::new();

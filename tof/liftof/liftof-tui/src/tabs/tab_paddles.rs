@@ -59,7 +59,6 @@ use tof_dataclasses::events::{
 };
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::database::Paddle;
-use tof_dataclasses::analysis::calculate_pedestal;
 
 use crate::colors::ColorTheme;
 use crate::menu::{
@@ -233,10 +232,6 @@ impl PaddleTab<'_> {
           self.baseline_rms_ch_b.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_bl_b_rms());
         }
         let wfs  = ev.get_rbwaveforms();
-        let mut bl_a  : f32;
-        let mut bl_b  : f32;
-        let rms_a = 0f32;
-        let rms_b = 0f32;
         for mut wf in wfs {
           // FIXME - this is an incpmplete cosistency check and 
           // should be removed soon

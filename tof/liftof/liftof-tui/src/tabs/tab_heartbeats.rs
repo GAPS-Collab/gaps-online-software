@@ -47,9 +47,9 @@ pub struct HeartBeatTab {
   pub theme      : ColorTheme,
   // FIXME - we don't seemt to need this queues, 
   // apparently 
-  pub evb_queue  : VecDeque<EVTBLDRHeartbeat>,
-  pub mtb_queue  : VecDeque<MTBHeartbeat>,
-  pub gds_queue  : VecDeque<HeartBeatDataSink>,
+  //pub evb_queue  : VecDeque<EVTBLDRHeartbeat>,
+  //pub mtb_queue  : VecDeque<MTBHeartbeat>,
+  //pub gds_queue  : VecDeque<HeartBeatDataSink>,
   pub pkt_recv   : Receiver<TofPacket>,
   last_evb       : Option<EVTBLDRHeartbeat>,
   last_mtb       : Option<MTBHeartbeat>,
@@ -74,9 +74,9 @@ impl HeartBeatTab{
 
     HeartBeatTab {
       theme   ,
-      evb_queue  : VecDeque::<EVTBLDRHeartbeat>::new(),
-      mtb_queue  : VecDeque::<MTBHeartbeat>::new(),
-      gds_queue  : VecDeque::<HeartBeatDataSink>::new(),
+      //evb_queue  : VecDeque::<EVTBLDRHeartbeat>::new(),
+      //mtb_queue  : VecDeque::<MTBHeartbeat>::new(),
+      //gds_queue  : VecDeque::<HeartBeatDataSink>::new(),
       last_evb   : None,
       last_mtb   : None,
       last_gds   : None,
@@ -104,17 +104,18 @@ impl HeartBeatTab{
         match pack.packet_type {
           PacketType::MTBHeartbeat=> {
             let hb : MTBHeartbeat = pack.unpack()?;
-            self.mtb_queue.push_back(hb);
-            if self.mtb_queue.len() > self.queue_size {
-              self.mtb_queue.pop_front(); 
-            }
+            //self.mtb_queue.push_back(hb);
+            //if self.mtb_queue.len() > self.queue_size {
+            //  self.mtb_queue.pop_front(); 
+            //}
+            self.last_mtb = Some(hb);
           },
           PacketType::EVTBLDRHeartbeat   => {
             let hb : EVTBLDRHeartbeat = pack.unpack()?;
-            self.evb_queue.push_back(hb);
-            if self.evb_queue.len() > self.queue_size {
-              self.evb_queue.pop_front(); 
-            }
+            //self.evb_queue.push_back(hb);
+            //if self.evb_queue.len() > self.queue_size {
+            //  self.evb_queue.pop_front(); 
+            //}
             self.ev_c_q    .push_back((hb.met_seconds as f64,hb.event_cache_size as f64));
             if self.ev_c_q.len() > self.queue_size {
               self.ev_c_q.pop_front(); 
@@ -143,13 +144,15 @@ impl HeartBeatTab{
             if self.ch_len_rbe.len() > self.queue_size {
               self.ch_len_rbe.pop_front(); 
             }
+            self.last_evb = Some(hb);
           }
           PacketType::HeartBeatDataSink => {
             let hb : HeartBeatDataSink = pack.unpack()?;
-            self.gds_queue.push_back(hb);
-            if self.gds_queue.len() > self.queue_size {
-              self.gds_queue.pop_front(); 
-            }
+            //self.gds_queue.push_back(hb);
+            //if self.gds_queue.len() > self.queue_size {
+            //  self.gds_queue.pop_front(); 
+            //}
+            self.last_gds = Some(hb);
           }
           _ => () // we don't care
         }
@@ -161,7 +164,7 @@ impl HeartBeatTab{
   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
 
     let main_lo = Layout::default()
-      .direction(Direction::Vertical)
+      .direction(Direction::Horizontal)
       .constraints(
           [Constraint::Percentage(50),
            Constraint::Percentage(50)].as_ref(),
@@ -169,9 +172,9 @@ impl HeartBeatTab{
       .split(*main_window);
 
     let mut view_string = String::from("HB QUEUE EMPTY!");
-    self.last_evb = self.evb_queue.back().copied();
-    self.last_mtb = self.mtb_queue.back().copied();
-    self.last_gds = self.gds_queue.back().copied();
+    //self.last_evb = self.evb_queue.back().copied();
+    //self.last_mtb = self.mtb_queue.back().copied();
+    //self.last_gds = self.gds_queue.back().copied();
 
     match self.view {
       HeartBeatView::EventBuilder => {
@@ -192,6 +195,7 @@ impl HeartBeatTab{
                Constraint::Percentage(50)].as_ref(),
           )
           .split(main_lo[1]);
+        
         let hb_ev_rows_left = Layout::default()
           .direction(Direction::Vertical)
           .constraints(
