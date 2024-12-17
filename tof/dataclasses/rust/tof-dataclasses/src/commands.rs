@@ -25,6 +25,7 @@
 //!
 
 pub mod factory;
+pub mod config;
 
 use std::fmt;
 
@@ -123,6 +124,8 @@ pub enum TofCommandCode {
   ShutdownRATPair         = 103u8,
   /// Shutdown the TOF CPU
   ShutdownCPU             = 104u8,
+  /// Upload a new config file
+  UploadConfig            = 105u8,
 }
 
 impl fmt::Display for TofCommandCode {
@@ -165,6 +168,7 @@ impl From<u8> for TofCommandCode {
       102u8 => TofCommandCode::ShutdownRAT,
       103u8 => TofCommandCode::ShutdownRATPair,
       104u8 => TofCommandCode::ShutdownCPU,
+      105u8 => TofCommandCode::UploadConfig,
       _     => TofCommandCode::Unknown
     }
   }
@@ -202,7 +206,8 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::ChangeNextRunConfig,
       TofCommandCode::ShutdownRAT,
       TofCommandCode::ShutdownRATPair,
-      TofCommandCode::ShutdownCPU
+      TofCommandCode::ShutdownCPU,
+      TofCommandCode::UploadConfig,
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
@@ -235,7 +240,20 @@ impl TofCommandV2 {
     }
   }
 
-  pub fn forge_changerunconfig(key_value : Vec<String>) -> TofCommandV2 {
+  //pub fn from_config(cfg_file : String) -> Self {
+  //  let mut cmd = TofCommandV2::new();
+  //  cmd.command_code = TofCommandCode::UploadConfig:
+
+  //}
+
+  /// In case the command is supposed to change the next run configuration
+  /// we can create it with this function
+  ///
+  /// # Arguments
+  ///
+  ///   * key_value :  a list of keys and a single value (last item of the 
+  ///                  list
+  pub fn forge_changerunconfig(key_value : &Vec<String>) -> Self {
     let mut cmd = TofCommandV2::new();
     cmd.command_code = TofCommandCode::ChangeNextRunConfig;
     if key_value.len() == 0 {
@@ -244,13 +262,35 @@ impl TofCommandV2 {
     }
     let mut payload_string = String::from("");
     for k in 0..key_value.len() - 1 {
-      payload_string += &format!("{}::", k);
+      payload_string += &format!("{}::", key_value[k]);
     }
     payload_string += key_value.last().unwrap();
     let mut payload = Vec::<u8>::new();
     payload.extend_from_slice(payload_string.as_bytes());
     cmd.payload = payload;
     cmd
+  }
+
+  /// After the command has been unpackt, reconstruct the 
+  /// key/value string
+  pub fn extract_changerunconfig(&self) -> Option<Vec<String>> {
+    if self.command_code != TofCommandCode::ChangeNextRunConfig {
+      error!("Unable to extract configuration file changes from {}", self);
+      return None;
+    }
+    let mut liftof_config = Vec::<String>::new();
+    match String::from_utf8(self.payload.clone()) {
+      Err(err) => {
+        error!("Unable to extract the String payload! {err}");
+      }
+      Ok(concat_string) => {
+        let foo = concat_string.split("::").collect::<Vec<&str>>().into_iter();
+        for k in foo {
+          liftof_config.push(String::from(k));
+        }
+      }
+    }
+    Some(liftof_config)
   }
 }
 
@@ -981,4 +1021,10 @@ fn pack_tofcommandv2() {
   }
 }
 
-
+#[test]
+fn forge_and_extract_tofcommandv2() {
+  let input  = vec![String::from("foo"), String::from("bar"), String::from("baz")];
+  let cmd    = TofCommandV2::forge_changerunconfig(&input);
+  let output = cmd.extract_changerunconfig().unwrap();
+  assert_eq!(input, output);
+}

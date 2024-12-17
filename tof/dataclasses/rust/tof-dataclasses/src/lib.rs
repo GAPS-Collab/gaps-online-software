@@ -42,7 +42,6 @@ pub mod analysis;
 pub mod ipbus;
 pub mod series;
 pub mod heartbeats;
-pub mod config;
 pub mod version;
 pub mod status;
 #[cfg(feature="database")]

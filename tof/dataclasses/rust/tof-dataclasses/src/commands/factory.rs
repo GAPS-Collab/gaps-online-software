@@ -10,6 +10,12 @@ use crate::commands::{
   TofCommandCode
 };
 
+use crate::commands::config::{
+  TriggerConfig,
+};
+
+use crate::serialization::Serialization;
+
 /// A hardwired map of RB -> RAT
 pub fn get_rbratmap_hardcoded() ->  HashMap<u8,u8> {
   warn!("Using hardcoded rbratmap!");
@@ -244,4 +250,15 @@ pub fn rb_calibration(send_packets : bool, save_events : bool) -> Option<TofComm
     payload      : payload,
   })
 }
+
+/// Change the MTBSettings in the config file with relevant trigger settings
+pub fn change_triggerconfig(cfg : TriggerConfig) -> Option<TofCommandV2> {
+  let payload = cfg.to_bytestream();
+  Some(TofCommandV2 {
+    command_code : TofCommandCode::SetMTConfig,
+    payload      : payload,
+  })
+}
+
+
 

@@ -559,31 +559,38 @@ fn pack_runconfig() {
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct TriggerConfig{
-  pub gaps_trigger_use_beta  : bool, //1
-  pub prescale               : f32, //4
-  pub trigger_type           : TriggerType, //1 
-  pub use_combo_trigger      : bool,
-  pub combo_trigger_type     : TriggerType,
-  pub combo_trigger_prescale : f32,
-  pub trace_suppression      : bool,
-  pub mtb_moni_interval      : u16,
-  pub tiu_ignore_busy        : bool,
-  pub hb_send_interval       : u8,
+  /// When we create the LiftofConfig from 
+  /// the TriggerCOnfig, this allows us to 
+  /// deactivate fields, so we would can 
+  /// only change a single field
+  pub active_fields          : u32,
+  /// Shall the gaps trigger use beta?
+  pub gaps_trigger_use_beta  : Option<bool>, //1
+  pub prescale               : Option<f32>, //4
+  pub trigger_type           : Option<TriggerType>, //1 
+  pub use_combo_trigger      : Option<bool>,
+  pub combo_trigger_type     : Option<TriggerType>,
+  pub combo_trigger_prescale : Option<f32>,
+  pub trace_suppression      : Option<bool>,
+  pub mtb_moni_interval      : Option<u16>,
+  pub tiu_ignore_busy        : Option<bool>,
+  pub hb_send_interval       : Option<u16>,
 }
 
 impl TriggerConfig {
   pub fn new() -> Self { 
     Self {
-      gaps_trigger_use_beta   : true,
-      prescale                : 0.0,
-      trigger_type            : TriggerType::Unknown,
-      use_combo_trigger       : false,
-      combo_trigger_type      : TriggerType::Unknown,
-      combo_trigger_prescale  : 0.0,
-      trace_suppression       : true,
-      mtb_moni_interval       : 10,
-      tiu_ignore_busy         : false,
-      hb_send_interval        : 20
+      active_fields           : 0,
+      gaps_trigger_use_beta   : None,
+      prescale                : None,
+      trigger_type            : None,
+      use_combo_trigger       : None,
+      combo_trigger_type      : None,
+      combo_trigger_prescale  : None,
+      trace_suppression       : None,
+      mtb_moni_interval       : None,
+      tiu_ignore_busy         : None,
+      hb_send_interval        : None,
     }
   }
 }
@@ -596,18 +603,40 @@ impl Default for TriggerConfig {
 
 impl fmt::Display for TriggerConfig {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let mut repr = String::from("<TriggerConfig");
-    repr += &(format!("\n  Beta is used by trigger      : {}", self.gaps_trigger_use_beta)); 
-    repr += &(format!("\n  Prescale           : {:.3}", self.prescale));
-    repr += &(format!("\n  Trigger type       : {}",    self.trigger_type));
-    if self.use_combo_trigger {
-      repr += &(format!("\n  Combo Prescale     : {:.3}", self.combo_trigger_prescale));
-      repr += &(format!("\n  Combo Trigger type : {}",    self.combo_trigger_type));
+    let mut repr = String::from("<TriggerConfig: ");
+    repr += &(format!("(active fields {:x})", self.active_fields));
+    if self. gaps_trigger_use_beta.is_some() {
+        repr += &(format!("\n  Beta is used by trigger      : {}", self.gaps_trigger_use_beta.unwrap())); 
     }
-    repr += &(format!("\n  trace_suppression       : {}", self.trace_suppression));
-    repr += &(format!("\n  mtb_moni_interval       : {}", self.mtb_moni_interval));
-    repr += &(format!("\n  tiu_ignore_busy         : {}", self.tiu_ignore_busy));
-    repr += &(format!("\n  hb_send_interval        : {}", self.hb_send_interval));
+    if self. prescale.is_some() {
+      repr += &(format!("\n  Prescale           : {:.3}", self.prescale.unwrap()));
+    }
+    if self.trigger_type.is_some() {
+      repr += &(format!("\n  Trigger type       : {}",    self.trigger_type.unwrap()));
+    }
+    if self.use_combo_trigger.is_some() {
+      if self.use_combo_trigger.unwrap() {
+        repr += &(format!("\n  -- using combo trigger!"));
+      } 
+    }
+    if self.combo_trigger_prescale.is_some() {
+      repr += &(format!("\n  -- -- Combo Prescale     : {:.3}", self.combo_trigger_prescale.unwrap()));
+    }
+    if self.combo_trigger_type.is_some() { 
+      repr += &(format!("\n  -- -- Combo Trigger type : {}",    self.combo_trigger_type.unwrap()));
+    }
+    if self. trace_suppression.is_some() {
+      repr += &(format!("\n  trace_suppression       : {}", self.trace_suppression.unwrap()));
+    }
+    if self.mtb_moni_interval.is_some() {
+      repr += &(format!("\n  mtb_moni_interval       : {}", self.mtb_moni_interval.unwrap()));
+    }
+    if self.tiu_ignore_busy.is_some() {
+      repr += &(format!("\n  tiu_ignore_busy         : {}", self.tiu_ignore_busy.unwrap()));
+    }
+    if self.hb_send_interval.is_some() {
+      repr += &(format!("\n  hb_send_interval        : {}", self.hb_send_interval.unwrap()));
+    }
     repr += ">";
     write!(f, "{}", repr)
   }
@@ -621,40 +650,74 @@ impl Serialization for TriggerConfig {
   
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
-  const SIZE : usize = 21; 
+  const SIZE : usize = 26; 
   
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
     -> Result<Self, SerializationError>{
     Self::verify_fixed(stream, pos)?;  
     let mut cfg = TriggerConfig::new();
-    cfg.gaps_trigger_use_beta  = parse_bool(stream, pos);
-    cfg.prescale               = parse_f32 (stream, pos);
-    cfg.trigger_type           = TriggerType::from(parse_u8(stream, pos));
-    cfg.use_combo_trigger      = parse_bool(stream, pos);
-    cfg.combo_trigger_type     = TriggerType::from(parse_u8(stream, pos));
-    cfg.combo_trigger_prescale = parse_f32(stream, pos);
-    cfg.trace_suppression      = parse_bool(stream, pos);
-    cfg.mtb_moni_interval      = parse_u16(stream, pos);
-    cfg.tiu_ignore_busy        = parse_bool(stream, pos);
-    cfg.hb_send_interval       = parse_u8(stream, pos);
+    cfg.active_fields          = parse_u32(stream, pos);
+    cfg.gaps_trigger_use_beta  = Some(parse_bool(stream, pos));
+    cfg.prescale               = Some(parse_f32 (stream, pos));
+    cfg.trigger_type           = Some(TriggerType::from(parse_u8(stream, pos)));
+    cfg.use_combo_trigger      = Some(parse_bool(stream, pos));
+    cfg.combo_trigger_type     = Some(TriggerType::from(parse_u8(stream, pos)));
+    cfg.combo_trigger_prescale = Some(parse_f32(stream, pos));
+    cfg.trace_suppression      = Some(parse_bool(stream, pos));
+    cfg.mtb_moni_interval      = Some(parse_u16(stream, pos));
+    cfg.tiu_ignore_busy        = Some(parse_bool(stream, pos));
+    cfg.hb_send_interval       = Some(parse_u16(stream, pos));
+    // disable fields which where not explicitly marked as 
+    // active
+    if cfg.active_fields & 0x1 != 1 {
+      cfg.gaps_trigger_use_beta = None;
+    }
+    if cfg.active_fields & 0x2 != 1 {
+      cfg.prescale = None;
+    }
+    if cfg.active_fields & 0x4 != 1 {
+      cfg.trigger_type = None;
+    }
+    if cfg.active_fields & 0x8 != 1 {
+      cfg.use_combo_trigger = None;
+    }
+    if cfg.active_fields & 0x16 != 1 {
+      cfg.combo_trigger_type = None;
+    }
+    if cfg.active_fields & 0x32 != 1 {
+      cfg.combo_trigger_prescale = None;
+    }
+    if cfg.active_fields & 0x64 != 1 {
+      cfg.trace_suppression = None;
+    }
+    if cfg.active_fields & 0x128 != 1 {
+      cfg.mtb_moni_interval = None;
+    }
+    if cfg.active_fields & 0x256 != 1 {
+      cfg.tiu_ignore_busy   = None;
+    }
+    if cfg.active_fields & 0x512 != 1 {
+      cfg.hb_send_interval  = None;
+    }
     *pos += 2;
     Ok(cfg)
   }
 
   fn to_bytestream(&self) -> Vec<u8> {
     let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
-    bs.extend_from_slice(&Self::HEAD.to_le_bytes());
-    bs.push(self.gaps_trigger_use_beta as u8);
-    bs.extend_from_slice(&self.prescale.to_le_bytes());
-    bs.push(self.trigger_type.to_u8());
-    bs.push(self.use_combo_trigger as u8);
-    bs.push(self.combo_trigger_type as u8);
-    bs.extend_from_slice(&self.combo_trigger_prescale.to_le_bytes());
-    bs.push(self.trace_suppression as u8);
-    bs.extend_from_slice(&self.mtb_moni_interval.to_le_bytes());
-    bs.push(self.tiu_ignore_busy as u8);
-    bs.extend_from_slice(&self.hb_send_interval.to_le_bytes());
+    bs.extend_from_slice(&Self::HEAD        .to_le_bytes());
+    bs.extend_from_slice(&self.active_fields.to_le_bytes());
+    bs.push             (self.gaps_trigger_use_beta.unwrap_or(false) as u8);
+    bs.extend_from_slice(&self.prescale.unwrap_or(0.0)     .to_le_bytes());
+    bs.push             (self.trigger_type.unwrap_or(TriggerType::Unknown)  .to_u8());
+    bs.push             (self.use_combo_trigger.unwrap_or(false) as u8);
+    bs.push             (self.combo_trigger_type.unwrap_or(TriggerType::Unknown) as u8);
+    bs.extend_from_slice(&self.combo_trigger_prescale.unwrap_or(0.0).to_le_bytes());
+    bs.push             (self.trace_suppression.unwrap_or(false) as u8);
+    bs.extend_from_slice(&self.mtb_moni_interval.unwrap_or(30).to_le_bytes());
+    bs.push             (self.tiu_ignore_busy.unwrap_or(false) as u8);
+    bs.extend_from_slice(&self.hb_send_interval.unwrap_or(30).to_le_bytes());
     bs.extend_from_slice(&Self::TAIL.to_le_bytes());
     bs
   }
@@ -665,16 +728,58 @@ impl FromRandom for TriggerConfig {
   fn from_random() -> Self {
     let mut cfg                 = TriggerConfig::new();
     let mut rng                 = rand::thread_rng();
-    cfg.gaps_trigger_use_beta   = rng.gen::<bool>();
-    cfg.prescale                = rng.gen::<f32>();
-    cfg.trigger_type            = TriggerType::from_random();
-    cfg.use_combo_trigger       = rng.gen::<bool>();
-    cfg.combo_trigger_type      = TriggerType::from_random();
-    cfg.combo_trigger_prescale  = rng.gen::<f32>();
-    cfg.trace_suppression       = rng.gen::<bool>();
-    cfg.mtb_moni_interval       = rng.gen::<u16>();
-    cfg.tiu_ignore_busy         = rng.gen::<bool>();
-    cfg.hb_send_interval        = rng.gen::<u8>();
+    let active_fields           = rng.gen::<u32>();
+    cfg.active_fields           = active_fields;
+    if active_fields & 0x1 == 1 {
+      cfg.gaps_trigger_use_beta   = Some(rng.gen::<bool>());
+    } else {
+      cfg.gaps_trigger_use_beta = None;
+    }
+    if active_fields & 0x2 == 1 {
+      cfg.prescale                = Some(rng.gen::<f32>());
+    } else {
+      cfg.prescale = None;
+    }
+    if active_fields & 0x4 == 1 {
+      cfg.trigger_type            = Some(TriggerType::from_random());
+    } else {
+      cfg.trigger_type = None;
+    }
+    if active_fields & 0x8 == 1 {
+      cfg.use_combo_trigger       = Some(rng.gen::<bool>());
+    } else {
+      cfg.use_combo_trigger = None;
+    }
+    if active_fields & 0x16 == 1 {
+      cfg.combo_trigger_type      = Some(TriggerType::from_random());
+    } else {
+      cfg.combo_trigger_type = None;
+    }
+    if active_fields & 0x32 == 1 {
+      cfg.combo_trigger_prescale  = Some(rng.gen::<f32>());
+    } else {
+      cfg.combo_trigger_prescale = None;
+    }
+    if active_fields & 0x64 == 1 {
+      cfg.trace_suppression       = Some(rng.gen::<bool>());
+    } else {
+      cfg.trace_suppression = None;
+    }
+    if active_fields & 0x128 == 1 {
+      cfg.mtb_moni_interval       = Some(rng.gen::<u16>());
+    } else {
+      cfg.mtb_moni_interval = None;
+    }
+    if active_fields & 0x256 == 1 {
+      cfg.tiu_ignore_busy         = Some(rng.gen::<bool>());
+    } else {
+      cfg.tiu_ignore_busy = None;
+    }
+    if active_fields & 0x512 == 1 {
+      cfg.hb_send_interval        = Some(rng.gen::<u16>());
+    } else {
+      cfg.hb_send_interval = None;
+    }
     cfg
   }
 }
