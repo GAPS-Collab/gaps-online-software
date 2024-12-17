@@ -48,7 +48,10 @@ use tof_dataclasses::serialization::{
   Packable
 };
 
-use tof_dataclasses::errors::StagingError;
+use tof_dataclasses::errors::{
+  StagingError,
+  TofError
+};
 
 use tof_dataclasses::commands::{
   TofCommand,
@@ -329,18 +332,22 @@ pub fn manage_liftof_cc_service(mode : String) {
 ///
 /// # Arguments:
 ///
-///   * rb_list : The list of ReadoutBoards the commands
+///   * rb_list : The list of ReadoutBoard ids the commands
 ///               will get executed
 ///   * cmd     : The actual command without 'ssh <ip>'
-fn ssh_command_rbs(rb_list : &Vec<ReadoutBoard>,
-                   cmd     : Vec<String>) {
+///
+/// # Returns:
+///
+///   * A list of rb ids where the process failed
+pub fn ssh_command_rbs(rb_list : &Vec<u8>,
+                       cmd     : Vec<String>) -> Result<Vec<u8>, TofError> {
   let mut rb_handles       = Vec::<thread::JoinHandle<_>>::new();
   println!("=> Executing ssh command {:?} on {} RBs!", cmd, rb_list.len());
   let mut children = Vec::<(u8,Child)>::new();
   for rb in rb_list {
     // also populate the rb thread nandles
     rb_handles.push(thread::spawn(||{}));
-    let rb_address   = format!("tof-rb{:02}", rb.rb_id);
+    let rb_address   = format!("tof-rb{:02}", rb);
     let mut ssh_args = vec![rb_address];
     let mut thisrb_cmd = cmd.clone();
     ssh_args.append(&mut thisrb_cmd);
@@ -349,25 +356,56 @@ fn ssh_command_rbs(rb_list : &Vec<ReadoutBoard>,
       .args(ssh_args)
       .spawn() {
       Err(err) => {
-        error!("Unable to spawn ssh process on RB {}! {}", rb.rb_id, err);
+        error!("Unable to spawn ssh process on RB {}! {}", rb, err);
       }
       Ok(child) => {
-        children.push((rb.rb_id,child));
+        children.push((*rb,child));
       }
     }
   }
   let mut issues = Vec::<u8>::new();
   for rb_child in &mut children {
-    match rb_child.1.wait() {
-      Err(err) => {
-        error!("Child process failed with stderr {:?}! {}", rb_child.1.stderr, err);
+    // this is not optimal, since this will take as much 
+    // time as the slowest child, but at the moment we 
+    // have bigger fish to fry.
+    let timeout = Duration::from_secs(5);
+    let kill_t  = Instant::now();
+    loop {
+      if kill_t.elapsed() > timeout {
+        error!("SSH process for board {} timed out!", rb_child.0);
+        // Duuu hast aber einen schöönen Ball! [M. eine Stadt sucht einen Moerder]
+        match rb_child.1.kill() {
+          Err(err) => {
+            error!("Unable to kill the SSH process for RB {}", rb_child.0);
+          }
+          Ok(_) => {
+            error!("Killed SSH process for for RB {}", rb_child.0);
+          }
+        }
+        issues.push(rb_child.0);
+        // FIXME
+        break
       }
-      Ok(status) => {
-        if status.success() {
-          info!("Execution of command on {} successful!", rb_child.0);
-        } else {
-          error!("Execution of command on {} failed with exit code {:?}!", rb_child.0, status.code());
-          issues.push(rb_child.0);
+      // non-blocking
+      match rb_child.1.try_wait() {
+        Ok(None) => {
+          // the child is still busy
+          thread::sleep(Duration::from_secs(1));
+          continue;
+        }
+        Ok(Some(status)) => {
+          if status.success() {
+            info!("Execution of command on {} successful!", rb_child.0);
+            break;
+          } else {
+            error!("Execution of command on {} failed with exit code {:?}!", rb_child.0, status.code());
+            issues.push(rb_child.0);
+            break;
+          }
+        }
+        Err(err) => {
+          error!("Unable to wait for the SSH process! {err}");
+          break;
         }
       }
     }
@@ -375,10 +413,11 @@ fn ssh_command_rbs(rb_list : &Vec<ReadoutBoard>,
   if issues.len() == 0 {
     println!("=> Executing ssh command {:?} on {} RBs successful!", cmd, rb_list.len());
   }
+  Ok(issues)
 }
 
 /// Restart liftof-rb on RBs
-pub fn restart_liftof_rb(rb_list : &Vec<ReadoutBoard>) {
+pub fn restart_liftof_rb(rb_list : &Vec<u8>) {
   let command = vec![String::from("sudo"),
                      String::from("systemctl"),
                      String::from("restart"),

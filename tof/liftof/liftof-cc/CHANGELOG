@@ -1,5 +1,14 @@
 # LELEWAA series
 
+# v0.10.7
+* more commands for liftof-scheduler!
+* fixes critical bug and times out ssh 
+  connections to the rbs
+* allows to restart RATs/RBs from the 
+  command line `liftof soft-reboot`
+* allows to query tof status from the 
+  command line  `liftof status`
+
 # v0.10.6
 * verification run automatically at run start
 * allow to set global triggers/combo triggers from 

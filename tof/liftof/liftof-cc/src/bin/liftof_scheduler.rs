@@ -25,19 +25,20 @@
 
 #[macro_use] extern crate log;
 
+use std::fs;
 use std::fs::{
   OpenOptions,
 };
 
 use std::thread;
 use std::io::Write;
-
+use std::process::Command;
 use std::path::{
   Path
 };
 
 use chrono::Utc;
-
+use toml::Table;
 use clap::{
   arg,
   command,
@@ -64,15 +65,18 @@ use tof_dataclasses::packets::{
   PacketType,
   TofPacket
 };
+use tof_dataclasses::database::{
+  connect_to_db,
+  ReadoutBoard,
+};
 
 use telemetry_dataclasses::packets::AckBfsw;
 
 use liftof_cc::{
   manage_liftof_cc_service,
+  ssh_command_rbs,
   run_cycler,
 };
-
-
 
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
@@ -83,8 +87,6 @@ struct LiftofSchedArgs {
   #[arg(long, default_value_t = false)]
   dry_run : bool,
 }
-
-
 
 fn main() {
   init_env_logger();
@@ -121,17 +123,25 @@ fn main() {
 
   let timer = Instant::now();
 
-  //let subdirs = vec!["current", "next", "queue"]
-  let staging_dir = config.staging_dir; 
-  //if let Ok(metadata) = fs::metadata(&staging_dir) {
-  //  if metadata.is_dir() {
-  //  } 
-  //} else {
-  //  match fs::create_dir(&stream_files_path) {
-  //    Ok(())   => println!("=> Created {} to save stream data", stream_files_path.display()),
-  //    Err(err) => panic!("Failed to create directory: {}! {}", stream_files_path.display(), err),
-  //  }
-  //}
+  let staging_dir           = config.staging_dir; 
+  let db_path               = config.db_path.clone();
+  let mut conn              = connect_to_db(db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
+  // if this call does not go through, we might as well fail early.
+  let mut rb_list           = ReadoutBoard::all(&mut conn).expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
+  let rb_ignorelist         = config.rb_ignorelist_always.clone();
+  let rb_ignorelist_tmp     = config.rb_ignorelist_run.clone();
+  for k in 0..rb_ignorelist.len() {
+    let bad_rb = rb_ignorelist[k];
+    rb_list.retain(|x| x.rb_id != bad_rb);
+  }
+
+  for k in 0..rb_ignorelist_tmp.len() {
+    let bad_rb = rb_ignorelist_tmp[k];
+    rb_list.retain(|x| x.rb_id != bad_rb);
+  }
+
+  let nboards = rb_list.len();
+  println!("=> Will use {} readoutboards! Ignoring {:?} sicne they are mareked as 'ignore' in the config file!", rb_list.len(), rb_ignorelist );
 
 
   let sleep_time  = Duration::from_secs(config.cmd_dispatcher_settings.cmd_listener_interval_sec);
@@ -140,7 +150,6 @@ fn main() {
   let fc_sub_addr = config.cmd_dispatcher_settings.fc_sub_address.clone();
   let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
   let ctx = zmq::Context::new();
-  
   
   // socket to receive commands
   info!("Connecting to flight computer at {}", fc_sub_addr);
@@ -186,15 +195,20 @@ fn main() {
         trace!("ZMQ socket receiving error! {err}");
         continue;
       }
-      Ok(mut buffer) => {
+      Ok(buffer) => {
         info!("Received bytes {:?}", buffer);
         // identfiy if we have a GAPS packet
+        if buffer.len() < 2 {
+          error!("The received bytestring does not even have 2 bnytes for a header!");
+          continue
+        }
         if buffer[0] == 0xeb && buffer[1] == 0x90 && buffer[4] == 0x46 { //0x5a?
           // We have a GAPS packet -> FIXME:
           info!("Received command sent through BFSW system!");
         } 
         if buffer.len() < 8 {
           error!("Received command is too short! (Smaller than 8 bytes) {:?}", buffer);
+          continue;
         }
         match TofPacket::from_bytestream(&buffer, &mut 8) {
           Err(err) => {
@@ -241,12 +255,84 @@ fn main() {
                   manage_liftof_cc_service(String::from("stop"));
                 }
               },
-
               TofCommandCode::DataRunStart  => {
-                println!("= => Received DataRunStart!");
+                info!("Received DataRunStart!");
+                // FIXME - factor out manage_liftof_cc_service here, otherwise
+                // it gets really confusing
                 match run_cycler(staging_dir.clone(), dry_run) {
                   Err(err) => error!("= => Run cycler had an issue! {err}"),
                   Ok(_)    => ()
+                }
+              }
+              TofCommandCode::ShutdownRB => {
+                let cmd_rb_list  = cmd.payload.clone();
+                info!("Received Shutdown RB command for RBs {:?}", cmd_rb_list);
+                let cmd_args     = vec![String::from("sudo"),
+                                        String::from("shutdown"),
+                                        String::from("now")]; 
+                match ssh_command_rbs(&cmd_rb_list, cmd_args) {
+                  Err(err) => error!("SSh-ing into RBs {:?} failed! {err}", cmd_rb_list),
+                  Ok(_)    => ()
+                }
+              }
+              TofCommandCode::ShutdownRAT => {
+                let cmd_rb_list  = cmd.payload.clone();
+                info!("Received Shutdown RAT command for RBs {:?}", cmd_rb_list);
+                let cmd_args     = vec![String::from("sudo"),
+                                        String::from("shutdown"),
+                                        String::from("now")]; 
+                ssh_command_rbs(&cmd_rb_list, cmd_args);
+              }
+              TofCommandCode::ShutdownCPU => {
+                let cmd_args     = vec![String::from("shutdown"),
+                                        String::from("now")]; 
+                info!("Received Shutdown command for CPU");
+                if !args.dry_run {
+                  match Command::new("sudo")
+                    //.args([&rb_address, "sudo", "systemctl", "restart", "liftof"])
+                    .args(cmd_args)
+                    .spawn() {
+                    Err(err) => {
+                      error!("Unable to spawn shutdown process on TofCPU!");
+                    }
+                    // FIXME - timeout with try wait
+                    Ok(mut child) => {
+                      match child.wait() {
+                        Err(err) => error!("Waiting for the shutdown process failed! {err}", err),
+                        Ok(_)    => ()
+                      }
+                    }
+                  }
+                }
+              }
+              TofCommandCode::ChangeNextRunConfig => {
+                let cfg_file = format!("{}/next/lfitof-config.toml", staging_dir.clone());
+                // first check if the command is valid
+                match cmd.extract_changerunconfig() {
+                  None => error!("Unable to understand this command which is supposed to change the next run configuration!"),
+                  Some(keys_val) => {
+                    match fs::read_to_string(cfg_file.clone()) {
+                      Err(err) => error!("Unable to read {}! {err}", cfg_file),
+                      Ok(content) => {
+                        let toml_table = content.parse::<Table>().unwrap();
+                        let value = keys_val.back();
+                        for k in 0..keys_val.len() - 1 {
+                           let key = key_val[k];
+                        }
+                      }
+                    }
+                    //match LiftofSettings::from_toml(cfg_file) {
+                    //  Err(err) => {
+                    //    error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+                    //    //panic!("Unable to parse config file!");
+                    //    continue;
+                    //  }
+                    //  Ok(mut config) => {
+
+                    //    }
+                    //  }
+                    //}   
+                  }
                 }
               }
               _ => {
