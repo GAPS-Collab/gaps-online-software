@@ -16,7 +16,10 @@ use std::io::{
 use std::fmt;
 use std::collections::HashMap;
 
-use tof_dataclasses::config::BuildStrategy;
+use tof_dataclasses::commands::config::{
+  BuildStrategy,
+  TriggerConfig,
+};
 use tof_dataclasses::events::master_trigger::TriggerType;
 
 //use tof_dataclasses::events::master_trigger::TriggerType;
@@ -29,15 +32,15 @@ use tof_dataclasses::commands::TofCommandV2;
 #[cfg(feature="database")]
 use tof_dataclasses::commands::TofCommandCode;
 
-use tof_dataclasses::config::RunConfig;
+use tof_dataclasses::commands::config::RunConfig;
 #[cfg(feature="database")]
 use tof_dataclasses::database::RAT;
 #[cfg(feature="database")]
-use tof_dataclasses::config::PreampBiasConfig;
+use tof_dataclasses::commands::config::PreampBiasConfig;
 #[cfg(feature="database")]
-use tof_dataclasses::config::LTBThresholdConfig;
+use tof_dataclasses::commands::config::LTBThresholdConfig;
 #[cfg(feature="database")]
-use tof_dataclasses::config::RBChannelMaskConfig;
+use tof_dataclasses::commands::config::RBChannelMaskConfig;
 
 use tof_dataclasses::serialization::{
   parse_u8,
@@ -56,6 +59,18 @@ pub enum ParameterSetStrategy {
   ControlServer,
   Board
 }
+
+//pub trait ToPacketString {
+//  pub fn to_packed_string(&self) { 
+//    match toml::to_string(&self) {
+//      Err(err) => {
+//        error!("Unable to serialize toml! {err}");
+//      }
+//      Ok(toml_string) => {
+//      }
+//    }
+//  }
+//}
 
 /// Configure the trigger
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -107,10 +122,9 @@ pub struct MTBSettings {
   pub mtb_moni_interval  : u64,
   pub rb_int_window      : u8,
   pub tiu_emulation_mode : bool,
-  pub tiu_ignore_busy : bool,
-
+  pub tiu_ignore_busy    : bool,
   pub tofbot_webhook     : String,
-  pub hb_send_interval   : u8,
+  pub hb_send_interval   : u64,
 }
 
 impl MTBSettings {
@@ -131,6 +145,39 @@ impl MTBSettings {
       use_combo_trigger       : false,
       global_trigger_type     : TriggerType::Unknown,
       global_trigger_prescale : 1.0,
+    }
+  }
+ 
+  pub fn from_triggerconfig(&mut self, cfg : &TriggerConfig) {
+    if cfg.gaps_trigger_use_beta.is_some() {
+      self.gaps_trigger_use_beta   = cfg.gaps_trigger_use_beta.unwrap() ;
+    }
+    if cfg.prescale.is_some() {
+      self.trigger_prescale        = cfg.prescale.unwrap()              ;
+    }
+    if cfg.trigger_type.is_some() {
+      self.trigger_type            = cfg.trigger_type.unwrap()          ; 
+    }
+    if cfg.use_combo_trigger.is_some() {
+      self.use_combo_trigger       = cfg.use_combo_trigger.unwrap()     ;
+    }
+    if cfg.combo_trigger_type.is_some() {
+      self.global_trigger_type     = cfg.combo_trigger_type.unwrap()    ;
+    }
+    if cfg.combo_trigger_prescale.is_some() {
+      self.global_trigger_prescale = cfg.combo_trigger_prescale.unwrap();
+    }
+    if cfg.trace_suppression.is_some() {
+      self.trace_suppression       = cfg.trace_suppression.unwrap()     ;
+    }
+    if cfg.mtb_moni_interval.is_some() {
+      self.mtb_moni_interval       = cfg.mtb_moni_interval.unwrap() as u64;
+    }
+    if cfg.tiu_ignore_busy.is_some() {
+      self.tiu_ignore_busy         = cfg.tiu_ignore_busy.unwrap()       ;
+    }
+    if cfg.hb_send_interval.is_some() {
+      self.hb_send_interval        = cfg.hb_send_interval.unwrap()  as u64;
     }
   }
 }
@@ -779,6 +826,59 @@ impl LiftofSettings {
       preamp_settings           : PreampSettings::new(),
       ltb_settings              : LTBThresholdSettings::new(),
     }
+  }  
+  
+  /// Change a value by giving the specific key as 
+  /// a string, the value then will be parsed 
+  /// accordingly
+  pub fn set_by_key(&mut self, key : &str, value : String) {
+    match key {
+      "runtime_sec"               => {
+        if let Ok(val) = value.parse::<u64>() {
+          self.runtime_sec = val;
+        } else {
+          error!("Unable to parse {value}!");
+        }
+      }
+      "cpu_moni_interval_sec"     => {
+        if let Ok(val) = value.parse::<u64>() {
+          self.cpu_moni_interval_sec = val;
+        } else {
+          error!("Unable to parse {value}!");
+        }
+      }
+      "rb_ignorelist_run"         => {
+      }
+      "run_analysis_engine"       => {
+        if let Ok(val) = value.parse::<bool>() {
+          self.run_analysis_engine = val;
+        } else {
+          error!("Unable to parse {value}!");
+        }
+      }
+      "pre_run_calibration"       => {
+        if let Ok(val) = value.parse::<bool>() {
+          self.pre_run_calibration = val;
+        } else {
+          error!("Unable to parse {value}!");
+        }
+      }
+      "save_cali_wf"              => {
+        if let Ok(val) = value.parse::<bool>() {
+          self.save_cali_wf = val;
+        } else {
+          error!("Unable to parse {value}!");
+        }
+      }
+      "verification_runtime_sec"  => {
+        if let Ok(val) = value.parse::<u32>() {
+          self.verification_runtime_sec = val;
+        } else {
+          error!("Unable to parse {value}!");
+        }
+      }
+      _ => error!("Set by key for {} is not implemented!", key)
+    }
   }
 
   /// Write the settings to a toml file
@@ -907,8 +1007,6 @@ pub struct LiftofRBConfig {
 }
 
 impl LiftofRBConfig {
-
-  pub const VERSION            : &'static str = "1.5";
 
   pub fn new() -> Self {
     Self {
