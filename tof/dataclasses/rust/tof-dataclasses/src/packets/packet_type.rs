@@ -63,7 +63,9 @@ pub enum PacketType {
   LiftofRBBinary        = 202u8,
   LiftofBinaryService   = 203u8,
   LiftofCCBinary        = 204u8,
-
+  /// A klude which allows us to send bfsw ack packets
+  /// through the TOF system
+  BfswAckPacket         = 205u8,
   /// a MultiPacket consists of other TofPackets
   MultiPacket           = 255u8,
 }
@@ -113,6 +115,7 @@ impl From<u8> for PacketType {
       202 => PacketType::LiftofRBBinary,
       203 => PacketType::LiftofBinaryService,
       204 => PacketType::LiftofCCBinary,
+      205 => PacketType::BfswAckPacket,
       255 => PacketType::MultiPacket,
       _     => PacketType::Unknown
     }
@@ -158,6 +161,7 @@ impl FromRandom for PacketType {
       PacketType::LiftofRBBinary,
       PacketType::LiftofBinaryService,
       PacketType::LiftofCCBinary,
+      PacketType::BfswAckPacket
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
@@ -202,6 +206,7 @@ fn test_packet_types() {
   type_codes.push(PacketType::LiftofCCBinary as u8);
   type_codes.push(PacketType::LiftofRBBinary as u8);
   type_codes.push(PacketType::LiftofBinaryService as u8);
+  type_codes.push(PacketType::BfswAckPacket as u8);
   for tc in type_codes.iter() {
     assert_eq!(*tc,PacketType::try_from(*tc).unwrap() as u8);  
   }
