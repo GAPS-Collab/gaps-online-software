@@ -59,7 +59,7 @@ use tof_dataclasses::commands::{
 };
 
 use tof_dataclasses::events::DataType;
-use tof_dataclasses::config::RunConfig;
+use tof_dataclasses::commands::config::RunConfig;
 use tof_dataclasses::events::rb_event::RBPaddleID;
 
 #[cfg(feature="database")]

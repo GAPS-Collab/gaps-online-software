@@ -21,12 +21,15 @@ use tof_dataclasses::commands::{
     TofResponse,
     TofResponseCode,
 };
-use tof_dataclasses::config::PreampBiasConfig;
+
+use tof_dataclasses::commands::config::{
+  PreampBiasConfig,
+  RunConfig,  
+};
 
 use tof_dataclasses::errors::CmdError;
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
-use tof_dataclasses::config::RunConfig;
 use tof_dataclasses::heartbeats::RBPing;
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::serialization::Packable;
@@ -175,6 +178,15 @@ pub fn cmd_responder(cmd_server_address        : String,
           },
           Ok(tp) => {
             match tp.packet_type {
+              // Not sure about that yet
+              //PacketType::BfswAckPacket => {
+              //  // just forward this for now
+              //  match tp_to_pub.send(tp) {
+              //    Err(err) => error!("Unable to forward Bfsw Ack packet! {err}"),
+              //    Ok(_) => ()
+              //  }
+              //  //return_val   = Ok(TofCommandCode::Ping);
+              //}
               PacketType::TofCommandV2 => {
                 let cmd : TofCommandV2;
                 match tp.unpack::<TofCommandV2>() {
