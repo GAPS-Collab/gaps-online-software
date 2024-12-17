@@ -81,7 +81,11 @@ use crate::command_factory::*;
 // these are already wrapped in a pyclass (enum)
 use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::commands::TofCommandCode;
-use tof_dataclasses::events::master_trigger::LTBThreshold;
+use tof_dataclasses::events::master_trigger::{
+  LTBThreshold,
+  TriggerType
+};
+
 // additionally, let's add this functionality
 use tof_dataclasses::database::{
   get_dsi_j_ch_pid_map,
@@ -275,6 +279,7 @@ fn tof_events<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyTofEventSummary>()?;
   m.add_class::<LTBThreshold>()?;
   m.add_class::<EventStatus>()?;
+  m.add_class::<TriggerType>()?;
   Ok(())
 }
 

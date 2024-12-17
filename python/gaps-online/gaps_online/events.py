@@ -28,3 +28,4 @@ if import_rtd_success:
     TofEventSummary = rtd.events.TofEventSummary
     TofHit          = rtd.events.TofHit
     RBCalibration   = rtd.events.RBCalibration
+    TriggerType     = rtd.events.TriggerType
