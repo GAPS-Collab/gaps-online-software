@@ -14,7 +14,6 @@ use pyo3_polars::{
 
 use pyo3::Python;
 
-
 use tof_dataclasses::ProtocolVersion;
 use tof_dataclasses::io::TofPacketReader;
 use tof_dataclasses::packets::{
@@ -22,7 +21,6 @@ use tof_dataclasses::packets::{
   PacketType
 };
 use tof_dataclasses::database::DsiJChPidMapping;
-
 
 use tof_dataclasses::heartbeats::HeartBeatDataSink;
 use tof_dataclasses::heartbeats::MTBHeartbeat;
@@ -78,7 +76,13 @@ use tof_dataclasses::calibrations::{
   //spike_cleaning
 };
 
-use tof_dataclasses::config::{AnalysisEngineConfig, RunConfig, TOFEventBuilderConfig, BuildStrategy};
+use tof_dataclasses::commands::config::{
+  AnalysisEngineConfig,
+  RunConfig,
+  TriggerConfig,
+  TOFEventBuilderConfig,
+  BuildStrategy
+};
 
 use pyo3::prelude::*;
 use pyo3::exceptions::{
@@ -87,7 +91,6 @@ use pyo3::exceptions::{
   PyIOError,
 };
 
-use tof_dataclasses::config::TriggerConfig;
 use tof_dataclasses::events::TriggerType;
 use tof_dataclasses::events::master_trigger::LTBThreshold;
 use tof_dataclasses::events::rb_event::RBPaddleID;
@@ -304,12 +307,6 @@ pub struct PyTriggerConfig {
   pub config : TriggerConfig
 }
 
-impl PyTriggerConfig {
-  pub fn set_config(&mut self, cfg : TriggerConfig) {
-    self.config = cfg;
-  }
-}
-
 #[pymethods]
 impl PyTriggerConfig {
   #[new]
@@ -319,51 +316,176 @@ impl PyTriggerConfig {
       config : cfg
     }
   }
-  //prescale
+
   #[getter] 
-  fn get_prescale(&self) -> PyResult<f32> {
-    Ok(self.config.prescale)
+  fn get_prescale(&self) -> Option<f32> {
+    self.config.prescale
   }
   
   #[setter]
-  fn set_prescale(&mut self, prescale: f32) -> PyResult<()> {
+  fn set_prescale(&mut self, prescale: Option<f32>) -> PyResult<()> {
     self.config.prescale = prescale;
     Ok(())
   }
-  //trigger use beta?
+
   #[getter] 
-  fn get_gaps_trigger_use_beta(&self) -> PyResult<bool> {
-    Ok(self.config.gaps_trigger_use_beta)
+  fn get_gaps_trigger_use_beta(&self) -> Option<bool> {
+    self.config.gaps_trigger_use_beta
   }
+  
   #[setter]
-  fn set_gaps_trigger_use_beta(&mut self, gaps_trigger_use_beta: bool) -> PyResult<()> {
+  fn set_gaps_trigger_use_beta(&mut self, gaps_trigger_use_beta: Option<bool>) -> PyResult<()> {
     self.config.gaps_trigger_use_beta = gaps_trigger_use_beta;
     Ok(())
   }
 
-  //tiu emulation mode?
   #[getter] 
-  fn get_tiu_emulation_mode(&self) -> PyResult<bool> {
-    Ok(self.config.tiu_emulation_mode)
+  fn get_trigger_type(&self) -> Option<TriggerType> {
+    self.config.trigger_type
   }
 
   #[setter]
-  fn set_tiu_emulation_mode(&mut self, tiu_emulation_mode: bool) -> PyResult<()> {
-    self.config.tiu_emulation_mode = tiu_emulation_mode;
-    Ok(())
-  }
-//trigger type
-  #[getter] 
-  fn get_trigger_type(&self) -> PyResult<TriggerType> {
-    Ok(self.config.trigger_type)
-  }
-
-  #[setter]
-  fn set_trigger_type(&mut self, trigger_type: TriggerType) -> PyResult<()> {
+  fn set_trigger_type(&mut self, trigger_type: Option<TriggerType>) -> PyResult<()> {
     self.config.trigger_type = trigger_type;
     Ok(())
   }
+  
+  #[getter]
+  fn get_use_combo_trigger(&self) -> Option<bool> {
+    self.config.use_combo_trigger 
+  }
+  #[setter]
+  fn set_use_combo_trigger(&mut self, combo : Option<bool>) {
+    self.config.use_combo_trigger = combo;
+  }
+  #[getter]
+  fn get_combo_trigger_type(&self) -> Option<TriggerType> {
+    self.config.combo_trigger_type
+  }
+  #[setter]
+  fn set_combo_trigger_type(&mut self, combo_trigger_type : Option<TriggerType>) {
+    self.config.combo_trigger_type = combo_trigger_type;
+  }
+  #[getter]
+  fn get_combo_trigger_prescale(&self) -> Option<f32> {
+    self.config.combo_trigger_prescale
+  }
+  #[setter]
+  fn set_combo_trigger_prescale(&mut self, prescale : Option<f32>) {
+    self.config.combo_trigger_prescale = prescale;
+  }
+  #[getter]
+  fn get_trace_suppression(&self) -> Option<bool> {
+    self.config.trace_suppression
+  }
+  #[setter]
+  fn set_trace_suppression(&mut self, tsup : Option<bool>) {
+    self.config.trace_suppression = tsup;
+  }
+  #[getter]
+  fn get_mtb_moni_interval(&mut self) -> Option<u16> {
+    self.config.mtb_moni_interval
+  }
+  #[setter]
+  fn set_mtb_moni_interval(&mut self, moni_int : Option<u16>) {
+    self.config.mtb_moni_interval = moni_int;
+  }
+  #[getter]
+  fn get_tiu_ignore_busy(&self) -> Option<bool> {
+    self.config.tiu_ignore_busy
+  }
+  #[setter]
+  fn set_tiu_ignore_busy(&mut self, ignore_busy : Option<bool>) {
+    self.config.tiu_ignore_busy = ignore_busy;
+  }
+  #[getter]
+  fn get_hb_send_interval(&self) -> Option<u16> {
+    self.config.hb_send_interval
+  }
+  #[setter]
+  fn set_hb_send_interval(&mut self, hb_int :  Option<u16>) {
+    self.config.hb_send_interval = hb_int;
+  }
+
+  fn __getitem__(&self, py: Python, key: &str) -> PyResult<Option<PyObject>> {  
+    match key {
+      "gaps_trigger_use_beta"  => Ok(Some(self.config.gaps_trigger_use_beta.into_py(py))),
+      "prescale"               => Ok(Some(self.config.prescale.into_py(py))),
+      "trigger_type"           => Ok(Some(self.config.trigger_type.into_py(py))),
+      "use_combo_trigger"      => Ok(Some(self.config.use_combo_trigger.into_py(py))),
+      "combo_trigger_type"     => Ok(Some(self.config.combo_trigger_type.into_py(py))),
+      "combo_trigger_prescale" => Ok(Some(self.config.combo_trigger_prescale.into_py(py))),
+      "trace_suppression"      => Ok(Some(self.config.trace_suppression.into_py(py))),
+      "mtb_moni_interval"      => Ok(Some(self.config.mtb_moni_interval.into_py(py))),
+      "tiu_ignore_busy"        => Ok(Some(self.config.tiu_ignore_busy.into_py(py))),
+      "hb_send_interval"       => Ok(Some(self.config.hb_send_interval.into_py(py))),
+      _     => Err(PyKeyError::new_err(format!("Key '{}' not found", key)))
+    }
+  }
+
+  fn __setitem__(&mut self, key: &str, value: &Bound<'_, PyAny>) -> PyResult<()> {
+    match key {
+      "gaps_trigger_use_beta" => {
+          self.config.active_fields |= 0x1;
+          self.config.gaps_trigger_use_beta = Some(value.extract::<bool>()?);
+          Ok(())
+      }
+      "prescale" => {
+          self.config.active_fields |= 0x2;
+          self.config.prescale = Some(value.extract::<f32>()?);
+          Ok(())
+      }
+      "trigger_type" => {
+          self.config.active_fields |= 0x4;
+          self.config.trigger_type = Some(value.extract::<TriggerType>()?);
+          Ok(())
+      }
+      "use_combo_trigger" => {
+          self.config.active_fields |= 0x8;
+          self.config.use_combo_trigger = Some(value.extract::<bool>()?);
+          Ok(())
+      }
+      "combo_trigger_type" => {
+          self.config.active_fields |= 0x16;
+          self.config.combo_trigger_type = Some(value.extract::<TriggerType>()?);
+          Ok(())
+      }
+      "combo_trigger_prescale" => {
+          self.config.active_fields |= 0x32;
+          self.config.combo_trigger_prescale = Some(value.extract::<f32>()?);
+          Ok(())
+      }
+      "trace_suppression" => {
+          self.config.active_fields |= 0x64;
+          self.config.trace_suppression = Some(value.extract::<bool>()?);
+          Ok(())
+      }
+      "mtb_moni_interval" => {
+          self.config.active_fields |= 0x128;
+          self.config.mtb_moni_interval = Some(value.extract::<u16>()?);
+          Ok(())
+      }
+      "tiu_ignore_busy" => {
+          self.config.active_fields |= 0x256;
+          self.config.tiu_ignore_busy = Some(value.extract::<bool>()?);
+          Ok(())
+      }
+      "hb_send_interval" => {
+          self.config.active_fields |= 0x512;
+          self.config.hb_send_interval = Some(value.extract::<u16>()?);
+          Ok(())
+      }
+      _ => Err(PyKeyError::new_err(format!("Key '{}' not found", key))),
+    }
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.config)) 
+  }
+
 }
+
+
 #[pyclass]
 #[pyo3(name="TOFEventBuilderConfig")]
 
@@ -693,9 +815,9 @@ impl PyTofCommand {
     pytp
   }
 
-  fn change_next_runconfig(&mut self, key_values : Vec<String>) {
-    self.command = TofCommandV2::forge_changerunconfig(key_values);
-  }
+  //fn change_next_runconfig(&mut self, key_values : Vec<String>) {
+  //  self.command = TofCommandV2::forge_changerunconfig(key_values);
+  //}
 
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.command)) 
