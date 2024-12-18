@@ -67,6 +67,8 @@ pub enum TofCommandCode {
   Moni                     = 2u8,
   /// Kill myself
   Kill                     = 4u8, // Shi!
+  /// command code to configure the data publisher thread
+  SetDataPublisherConfig   = 20u8,
   /// command code for "Set LTB Thresholds"
   SetLTBThresholds         = 21u8,         
   /// command code for "Configure MTB"
@@ -143,6 +145,7 @@ impl From<u8> for TofCommandCode {
       1u8   => TofCommandCode::Ping,
       2u8   => TofCommandCode::Moni,
       4u8   => TofCommandCode::Kill,
+      20u8  => TofCommandCode::SetDataPublisherConfig,
       21u8  => TofCommandCode::SetLTBThresholds,
       22u8  => TofCommandCode::SetMTConfig,
       28u8  => TofCommandCode::SetPreampBias,
@@ -181,6 +184,7 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::Unknown,
       TofCommandCode::Ping,
       TofCommandCode::Moni,
+      TofCommandCode::SetDataPublisherConfig,
       TofCommandCode::SetLTBThresholds,
       TofCommandCode::SetMTConfig,
       TofCommandCode::SetTOFEventBuilderConfig,

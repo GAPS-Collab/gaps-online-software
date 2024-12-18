@@ -114,6 +114,8 @@ impl FromRandom for BuildStrategy {
   }
 }
 
+//////////////////////////////////////////////////
+
 /// Set preamp voltages
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct PreampBiasConfig {
@@ -197,15 +199,7 @@ impl FromRandom for PreampBiasConfig {
   }
 }
 
-#[cfg(feature = "random")]
-#[test]
-fn pack_preampbiasconfig() {
-  for _ in 0..100 {
-    let cfg  = PreampBiasConfig::from_random();
-    let test : PreampBiasConfig = cfg.pack().unpack().unwrap();
-    assert_eq!(cfg, test);
-  }
-}
+/////////////////////////////////////////////////////
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct RBChannelMaskConfig {
@@ -285,15 +279,8 @@ impl FromRandom for RBChannelMaskConfig {
   }
 }
 
-#[cfg(feature = "random")]
-#[test]
-fn pack_rb_channel_mask_config() {
-  for _ in 0..100 {
-    let cfg   = RBChannelMaskConfig::from_random();
-    let test : RBChannelMaskConfig = cfg.pack().unpack().unwrap();
-    assert_eq!(cfg, test);
-  }
-}
+///////////////////////////////////////////////////////
+
 
 /// Set ltb thresholds
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -377,15 +364,6 @@ impl FromRandom for LTBThresholdConfig {
   }
 }
 
-#[cfg(feature = "random")]
-#[test]
-fn pack_ltbthresholdconfig() {
-  for _ in 0..100 {
-    let cfg   = LTBThresholdConfig::from_random();
-    let test : LTBThresholdConfig = cfg.pack().unpack().unwrap();
-    assert_eq!(cfg, test);
-  }
-}
 
 /// Readoutboard configuration for a specific run
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -421,8 +399,6 @@ pub struct RunConfig {
 }
 
 impl RunConfig {
-
-  pub const VERSION            : &'static str = "1.5";
 
   pub fn new() -> Self {
     Self {
@@ -539,22 +515,6 @@ impl FromRandom for RunConfig {
   }
 }
 
-/// Configuring the trigger during flight
-#[cfg(feature = "random")]
-#[test]
-fn pack_runconfig() {
-  for _ in 0..100 {
-    let cfg  = RunConfig::from_random();
-    let test = cfg.pack().unpack().unwrap();
-    //let test = RunConfig::from_bytestream(&cfg.to_bytestream(), &mut 0).unwrap();
-    assert_eq!(cfg, test);
-
-    let cfg_json = serde_json::to_string(&cfg).unwrap();
-    let test_json 
-      = serde_json::from_str::<RunConfig>(&cfg_json).unwrap();
-    assert_eq!(cfg, test_json);
-  }
-}
 
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -784,20 +744,202 @@ impl FromRandom for TriggerConfig {
   }
 }
 
-#[cfg(feature = "random")]
-#[test]
-fn pack_triggerconfig() {
-  for _ in 0..100 {
-    let cfg  = TriggerConfig::from_random();
-    let test : TriggerConfig = cfg.pack().unpack().unwrap();
-    assert_eq!(cfg, test);
+
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct DataPublisherConfig {
+  pub active_fields            : u32,
+  pub mbytes_per_file          : Option<u16>,
+  pub discard_event_fraction   : Option<f32>, 
+  pub send_mtb_event_packets   : Option<bool>,
+  pub send_rbwaveform_packets  : Option<bool>,
+  pub send_rbwf_every_x_event  : Option<u32>,
+  pub send_tof_summary_packets : Option<bool>,
+  pub send_tof_event_packets   : Option<bool>,
+  pub hb_send_interval         : Option<u16>,
+}
+
+impl DataPublisherConfig {
+  pub fn new() -> Self {
+    Self {
+      active_fields            : 0,
+      mbytes_per_file          : None, 
+      discard_event_fraction   : None, 
+      send_mtb_event_packets   : None, 
+      send_rbwaveform_packets  : None, 
+      send_rbwf_every_x_event  : None, 
+      send_tof_summary_packets : None, 
+      send_tof_event_packets   : None, 
+      hb_send_interval         : None, 
+    }
   }
 }
+
+impl Default for DataPublisherConfig {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for DataPublisherConfig {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<DataPublisherConfig: ");
+    repr += &(format!("(active fields {:x})", self.active_fields));
+    if self.mbytes_per_file.is_some() {
+      repr += &(format!("\n  MBytes/FIle        : {}", self.mbytes_per_file.unwrap())); 
+    }
+    if self.discard_event_fraction.is_some() {
+      repr += &(format!("\n  DIsc. event frac   : {}", self.discard_event_fraction.unwrap())); 
+    }
+    if self.send_mtb_event_packets.is_some() {
+      repr += &(format!("\n  Send MTBPack       : {}", self.send_mtb_event_packets.unwrap())); 
+    }
+    if self.send_rbwaveform_packets.is_some() {
+      repr += &(format!("\n  Send RBWfPack      : {}", self.send_rbwaveform_packets.unwrap())); 
+    }
+    if self.send_rbwf_every_x_event.is_some() {
+      repr += &(format!("\n  RBWf every x event : {}", self.send_rbwf_every_x_event.unwrap())); 
+    }
+    if self.send_tof_summary_packets.is_some() {
+      repr += &(format!("\n  Send TofSum        : {}", self.send_tof_summary_packets.unwrap())); 
+    }
+    if self.send_tof_event_packets.is_some() {
+      repr += &(format!("\n  Send TOfEvent      : {}", self.send_tof_event_packets.unwrap())); 
+    }
+    if self.hb_send_interval.is_some() {
+      repr += &(format!("\n  HeartBeat send int  : {}", self.hb_send_interval.unwrap())); 
+    }
+    repr += ">";
+    write!(f, "{}", repr)
+  }
+}
+
+impl Packable for DataPublisherConfig {
+  const PACKET_TYPE : PacketType = PacketType::DataPublisherConfig;
+}
+
+impl Serialization for DataPublisherConfig {
+  
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  const SIZE : usize = 24; 
+  
+  fn from_bytestream(stream    : &Vec<u8>, 
+                     pos       : &mut usize) 
+    -> Result<Self, SerializationError>{
+    Self::verify_fixed(stream, pos)?;  
+    let mut cfg                = DataPublisherConfig::new();
+    cfg.active_fields          = parse_u32(stream, pos);
+    cfg.mbytes_per_file          = Some(parse_u16 (stream, pos));
+    cfg.discard_event_fraction   = Some(parse_f32 (stream, pos));
+    cfg.send_mtb_event_packets   = Some(parse_bool(stream, pos));
+    cfg.send_rbwaveform_packets  = Some(parse_bool(stream, pos));
+    cfg.send_rbwf_every_x_event  = Some(parse_u32 (stream, pos));
+    cfg.send_tof_summary_packets = Some(parse_bool(stream, pos));
+    cfg.send_tof_event_packets   = Some(parse_bool(stream, pos));
+    cfg.hb_send_interval         = Some(parse_u16 (stream, pos));
+    // disable fields which where not explicitly marked as 
+    // active
+    if cfg.active_fields & 0x1 != 1 {
+      cfg.mbytes_per_file = None;
+    }
+    if cfg.active_fields & 0x2 != 1 {
+      cfg.discard_event_fraction = None;
+    }
+    if cfg.active_fields & 0x4 != 1 {
+      cfg.send_mtb_event_packets = None;
+    }
+    if cfg.active_fields & 0x8 != 1 {
+      cfg.send_rbwaveform_packets = None;
+    }
+    if cfg.active_fields & 0x16 != 1 {
+      cfg.send_rbwf_every_x_event = None;
+    }
+    if cfg.active_fields & 0x32 != 1 {
+      cfg.send_tof_summary_packets = None;
+    }
+    if cfg.active_fields & 0x64 != 1 {
+      cfg.send_tof_event_packets = None;
+    }
+    if cfg.active_fields & 0x128 != 1 {
+      cfg.hb_send_interval = None;
+    }
+    *pos += 2;
+    Ok(cfg)
+  }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
+    bs.extend_from_slice(&Self::HEAD        .to_le_bytes());
+    bs.extend_from_slice(&self.active_fields.to_le_bytes());
+    bs.extend_from_slice(&self.mbytes_per_file.unwrap_or(0).to_le_bytes());
+    bs.extend_from_slice(&self.discard_event_fraction.unwrap_or(0.0).to_le_bytes());
+    bs.push             (self .send_mtb_event_packets.unwrap_or(false)  as u8);
+    bs.push             (self .send_rbwaveform_packets.unwrap_or(false) as u8);
+    bs.extend_from_slice(&self.send_rbwf_every_x_event.unwrap_or(0).to_le_bytes());
+    bs.push             (self.send_tof_summary_packets.unwrap_or(false) as u8);
+    bs.push             (self .send_tof_event_packets.unwrap_or(false) as u8);
+    bs.extend_from_slice(&self.hb_send_interval.unwrap_or(30).to_le_bytes());
+    bs.extend_from_slice(&Self::TAIL.to_le_bytes());
+    bs
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for DataPublisherConfig {
+  fn from_random() -> Self {
+    let mut cfg                 = DataPublisherConfig::new();
+    let mut rng                 = rand::thread_rng();
+    let active_fields           = rng.gen::<u32>();
+    cfg.active_fields           = active_fields;
+    if active_fields & 0x1 == 1 {
+      cfg.mbytes_per_file   = Some(rng.gen::<u16>());
+    } else {
+      cfg.mbytes_per_file = None;
+    }
+    if active_fields & 0x2 == 1 {
+      cfg.discard_event_fraction = Some(rng.gen::<f32>());
+    } else {
+      cfg.discard_event_fraction = None;
+    }
+    if active_fields & 0x4 == 1 {
+      cfg.send_mtb_event_packets = Some(rng.gen::<bool>());
+    } else {
+      cfg.send_mtb_event_packets = None;
+    }
+    if active_fields & 0x8 == 1 {
+      cfg.send_rbwaveform_packets = Some(rng.gen::<bool>());
+    } else {
+      cfg.send_rbwaveform_packets = None;
+    }
+    if active_fields & 0x16 == 1 {
+      cfg.send_rbwf_every_x_event = Some(rng.gen::<u32>());
+    } else {
+      cfg.send_rbwf_every_x_event = None;
+    }
+    if active_fields & 0x32 == 1 {
+      cfg.send_tof_summary_packets  = Some(rng.gen::<bool>());
+    } else {
+      cfg.send_tof_summary_packets = None;
+    }
+    if active_fields & 0x64 == 1 {
+      cfg.send_tof_event_packets       = Some(rng.gen::<bool>());
+    } else {
+      cfg.send_tof_event_packets = None;
+    }
+    if active_fields & 0x128 == 1 {
+      cfg.hb_send_interval       = Some(rng.gen::<u16>());
+    } else {
+      cfg.hb_send_interval = None;
+    }
+    cfg
+  }
+}
+
+
 
 ///Analysis Engine Config
 /// Settings to change the configuration of the analysis engine 
 /// (pulse extraction)
-
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct AnalysisEngineConfig{
   pub integration_start : f32, //4
@@ -1097,36 +1239,96 @@ impl FromRandom for TOFEventBuilderConfig {
     let mut rng             = rand::thread_rng();
     cfg.active_fields       = rng.gen::<u32>();
     if cfg.active_fields & 0x1 == 1 {
-      cfg.cachesize           = rng.gen::<u32>();
+      cfg.cachesize         = Some(rng.gen::<u32>());
     }
     if cfg.active_fields & 0x2 == 1 {
-      cfg.n_mte_per_loop      = rng.gen::<u32>();
+      cfg.n_mte_per_loop      = Some(rng.gen::<u32>());
     }
     if cfg.active_fields & 0x4 == 1 {
-      cfg.n_rbe_per_loop      = rng.gen::<u32>();
+      cfg.n_rbe_per_loop      = Some(rng.gen::<u32>());
     }
     if cfg.active_fields & 0x8 == 1 {
-      cfg.te_timeout_sec      = rng.gen::<u32>();
+      cfg.te_timeout_sec      = Some(rng.gen::<u32>());
     }
     if cfg.active_fields & 0x16 == 1 {
-      cfg.sort_events         = rng.gen::<bool>();
+      cfg.sort_events         = Some(rng.gen::<bool>());
     }
     if cfg.active_fields & 0x32 == 1 {
-      cfg.build_strategy      = BuildStrategy::from_random();
+      cfg.build_strategy      = Some(BuildStrategy::from_random());
     }
     if cfg.active_fields & 0x64 == 1 {
-      cfg.wait_nrb = rng.gen::<u8>();
+      cfg.wait_nrb = Some(rng.gen::<u8>());
     }
     if cfg.active_fields & 0x128 == 1 {
-      cfg.greediness = rng.gen::<u8>();
+      cfg.greediness = Some(rng.gen::<u8>());
     }
     if cfg.active_fields & 0x256 == 1 {
-      cfg.hb_send_interval = rng.gen::<u16>();
+      cfg.hb_send_interval = Some(rng.gen::<u16>());
     }
     cfg
   }
 }
 
+
+//////////////////////////////////////////
+// TESTS
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_preampbiasconfig() {
+  for _ in 0..100 {
+    let cfg  = PreampBiasConfig::from_random();
+    let test : PreampBiasConfig = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_rb_channel_mask_config() {
+  for _ in 0..100 {
+    let cfg   = RBChannelMaskConfig::from_random();
+    let test : RBChannelMaskConfig = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}
+
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_ltbthresholdconfig() {
+  for _ in 0..100 {
+    let cfg   = LTBThresholdConfig::from_random();
+    let test : LTBThresholdConfig = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_runconfig() {
+  for _ in 0..100 {
+    let cfg  = RunConfig::from_random();
+    let test = cfg.pack().unpack().unwrap();
+    //let test = RunConfig::from_bytestream(&cfg.to_bytestream(), &mut 0).unwrap();
+    assert_eq!(cfg, test);
+
+    let cfg_json = serde_json::to_string(&cfg).unwrap();
+    let test_json 
+      = serde_json::from_str::<RunConfig>(&cfg_json).unwrap();
+    assert_eq!(cfg, test_json);
+  }
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_triggerconfig() {
+  for _ in 0..100 {
+    let cfg  = TriggerConfig::from_random();
+    let test : TriggerConfig = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}
 
 #[cfg(feature = "random")]
 #[test]
@@ -1134,6 +1336,16 @@ fn pack_tofeventbuilderconfig() {
   for _ in 0..100 {
     let cfg  = TOFEventBuilderConfig::from_random();
     let test : TOFEventBuilderConfig = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_datapublisherconfig() {
+  for _ in 0..100 {
+    let cfg  = DataPublisherConfig::from_random();
+    let test : DataPublisherConfig = cfg.pack().unpack().unwrap();
     assert_eq!(cfg, test);
   }
 }
