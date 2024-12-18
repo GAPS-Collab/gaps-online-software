@@ -942,29 +942,35 @@ fn pack_analysisengineconfig() {
 
 /// TOF Event Builder Settings
 /// Configuring the TOF event builder during flight
+/// If a setting is set to None, it will keep the 
+/// previous setting
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct TOFEventBuilderConfig{
-  pub cachesize : usize, //8
-  pub n_mte_per_loop : usize, //8
-  pub n_rbe_per_loop : usize, //8
-  pub te_timeout_sec : u32, //4
-  pub sort_events    : bool, //1
-  pub build_strategy : BuildStrategy, //1
-  pub wait_nrb       : u8, //1
-  pub greediness     : u8, //1
+  pub active_fields    : u32, // supports up to 32 active components
+  pub cachesize        : Option<u32>, 
+  pub n_mte_per_loop   : Option<u32>, 
+  pub n_rbe_per_loop   : Option<u32>, 
+  pub te_timeout_sec   : Option<u32>, 
+  pub sort_events      : Option<bool>,
+  pub build_strategy   : Option<BuildStrategy>, 
+  pub wait_nrb         : Option<u8>, 
+  pub greediness       : Option<u8>, 
+  pub hb_send_interval : Option<u16>
 }
 
 impl TOFEventBuilderConfig {
   pub fn new() -> Self { 
     Self {
-      cachesize           : 100000,
-      n_mte_per_loop      : 1,
-      n_rbe_per_loop      : 40,
-      te_timeout_sec      : 30,
-      sort_events         : false,
-      build_strategy      : BuildStrategy::Adaptive,
-      wait_nrb            : 40, 
-      greediness          : 3,  
+      active_fields       : 0,
+      cachesize           : None,
+      n_mte_per_loop      : None,
+      n_rbe_per_loop      : None,
+      te_timeout_sec      : None,
+      sort_events         : None,
+      build_strategy      : None,
+      wait_nrb            : None, 
+      greediness          : None,  
+      hb_send_interval    : None
     }
   }
 }
@@ -978,18 +984,33 @@ impl Default for TOFEventBuilderConfig {
 impl fmt::Display for TOFEventBuilderConfig {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<TOFEventBuilderConfig");
-    repr += &(format!("\n Cache size                              : {}", self.cachesize)); 
-    repr += &(format!("\n Num. master trigger events per loop     : {}", self.n_mte_per_loop));
-    repr += &(format!("\n Num. readout board events per loop      : {}", self.n_rbe_per_loop));
-    repr += &(format!("\n TOF Event timeout window [sec]          : {:.3}", self.te_timeout_sec));
-    repr += &(format!("\n Sort events by ID (high resource load!) : {}", self.sort_events));
-    repr += &(format!("\n Build strategy                          : {}", self.build_strategy));
-    
-    if self.build_strategy == BuildStrategy::AdaptiveGreedy {
-      repr += &(format!("\n Additional RBs considered (greediness)  : {}", self.greediness));
+    repr += &(format!(" (active_fields {:x}", self.active_fields)); 
+    if self.cachesize.is_some() {
+      repr += &(format!("\n Cache size                              : {}", self.cachesize.unwrap())); 
     }
-    else if self.build_strategy == BuildStrategy::WaitForNBoards {
-      repr += &(format!("\n Waiting for {} boards", self.wait_nrb))
+    if self.n_mte_per_loop.is_some() {
+      repr += &(format!("\n Num. master trigger events per loop     : {}", self.n_mte_per_loop.unwrap()));
+    }
+    if self.n_rbe_per_loop.is_some() {
+      repr += &(format!("\n Num. readout board events per loop      : {}", self.n_rbe_per_loop.unwrap()));
+    }
+    if self.te_timeout_sec.is_some() {
+      repr += &(format!("\n TOF Event timeout window [sec]          : {:.3}", self.te_timeout_sec.unwrap()));
+    }
+    if self.sort_events.is_some() {
+      repr += &(format!("\n Sort events by ID (high resource load!) : {}", self.sort_events.unwrap()));
+    }
+    if self.build_strategy.is_some() {
+      repr += &(format!("\n Build strategy                          : {}", self.build_strategy.unwrap()));
+      if self.build_strategy.unwrap() == BuildStrategy::AdaptiveGreedy {
+        if self.greediness.is_some() {
+          repr += &(format!("\n Additional RBs considered (greediness)  : {}", self.greediness.unwrap()));
+        }
+      } else if self.build_strategy.unwrap() == BuildStrategy::WaitForNBoards {
+        if self.wait_nrb.is_some() {
+          repr += &(format!("\n Waiting for {} boards", self.wait_nrb.unwrap()))
+        }
+      }
     }
     write!(f, "{}", repr)
   }
@@ -1003,34 +1024,50 @@ impl Serialization for TOFEventBuilderConfig {
   
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
-  const SIZE : usize = 36; 
+  const SIZE : usize = 30; 
   
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
     -> Result<Self, SerializationError> {
     Self::verify_fixed(stream, pos)?;  
     let mut cfg = TOFEventBuilderConfig::new();
-      cfg.cachesize = parse_usize(stream, pos);
-      cfg.n_mte_per_loop = parse_usize(stream, pos);
-      cfg.n_rbe_per_loop = parse_usize(stream, pos);
-      cfg.te_timeout_sec = parse_u32(stream, pos);
-      cfg.sort_events = parse_bool(stream, pos);
-      cfg.build_strategy = BuildStrategy::from(parse_u8(stream, pos));
-      match cfg.build_strategy {
-        BuildStrategy::AdaptiveGreedy => {
-            cfg.greediness = parse_u8(stream, pos);
-            cfg.wait_nrb = 0;
-        },
-        BuildStrategy::WaitForNBoards => {
-            cfg.wait_nrb = parse_u8(stream, pos);
-            cfg.greediness = 0;
-        },
-        _ => {
-            // For any other BuildStrategy variant, set default or empty values
-            cfg.greediness = 0; // Default to 0 for greediness
-            cfg.wait_nrb = 0;   // Default to 0 for wait_nrb
-      }
-    }  
+    cfg.active_fields    = parse_u32(stream, pos);
+    cfg.cachesize        = Some(parse_u32(stream, pos));
+    cfg.n_mte_per_loop   = Some(parse_u32(stream, pos));
+    cfg.n_rbe_per_loop   = Some(parse_u32(stream, pos));
+    cfg.te_timeout_sec   = Some(parse_u32(stream, pos));
+    cfg.sort_events      = Some(parse_bool(stream, pos));
+    cfg.build_strategy   = Some(BuildStrategy::from(parse_u8(stream, pos)));
+    cfg.wait_nrb         = Some(parse_u8(stream, pos));
+    cfg.greediness       = Some(parse_u8(stream, pos));
+    cfg.hb_send_interval = Some(parse_u16(stream, pos));
+    if cfg.active_fields & 0x1 != 1 {
+      cfg.cachesize      = None;
+    }
+    if cfg.active_fields & 0x2 != 1 {
+      cfg.n_mte_per_loop = None;
+    }
+    if cfg.active_fields & 0x4 != 1 {
+      cfg.n_rbe_per_loop = None;
+    }
+    if cfg.active_fields & 0x8 != 1 {
+      cfg.te_timeout_sec = None;
+    }
+    if cfg.active_fields & 0x16 != 1 {
+      cfg.sort_events    = None;
+    }
+    if cfg.active_fields & 0x32 != 1 {
+      cfg.build_strategy = None;
+    }
+    if cfg.active_fields & 0x64 != 1 {
+      cfg.wait_nrb       = None;
+    }
+    if cfg.active_fields & 0x128 != 1 {
+      cfg.greediness     = None;
+    }
+    if cfg.active_fields & 0x256 != 1 {
+      cfg.hb_send_interval = None;
+    }
     *pos += 2;
     Ok(cfg)
   }
@@ -1038,24 +1075,16 @@ impl Serialization for TOFEventBuilderConfig {
   fn to_bytestream(&self) -> Vec<u8> {
     let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
     bs.extend_from_slice(&Self::HEAD.to_le_bytes());
-    bs.extend_from_slice(&self.cachesize.to_le_bytes());
-    bs.extend_from_slice(&self.n_mte_per_loop.to_le_bytes());
-    bs.extend_from_slice(&self.n_rbe_per_loop.to_le_bytes());
-    bs.extend_from_slice(&self.te_timeout_sec.to_le_bytes());
-    bs.push(self.sort_events as u8);
-    bs.push(self.build_strategy.to_u8());
-    match self.build_strategy {
-      BuildStrategy::AdaptiveGreedy => {
-          bs.push(self.greediness as u8);
-          bs.push(0);
-      },
-      BuildStrategy::WaitForNBoards => {
-          bs.push(self.wait_nrb as u8);
-          bs.push(0);
-      },
-      _ => {bs.push(0);
-            bs.push(0);} 
-    }
+    bs.extend_from_slice(&self.active_fields.to_le_bytes());
+    bs.extend_from_slice(&self.cachesize.unwrap_or(0).to_le_bytes());
+    bs.extend_from_slice(&self.n_mte_per_loop.unwrap_or(0).to_le_bytes());
+    bs.extend_from_slice(&self.n_rbe_per_loop.unwrap_or(0).to_le_bytes());
+    bs.extend_from_slice(&self.te_timeout_sec.unwrap_or(0).to_le_bytes());
+    bs.push(self.sort_events.unwrap_or(false) as u8);
+    bs.push(self.build_strategy.unwrap_or(BuildStrategy::Unknown).to_u8());
+    bs.push(self.wait_nrb.unwrap_or(0));
+    bs.push(self.greediness.unwrap_or(0));
+    bs.extend_from_slice(&self.hb_send_interval.unwrap_or(0).to_le_bytes());
     bs.extend_from_slice(&Self::TAIL.to_le_bytes());
     bs
   }
@@ -1064,31 +1093,36 @@ impl Serialization for TOFEventBuilderConfig {
 #[cfg(feature = "random")]
 impl FromRandom for TOFEventBuilderConfig {
   fn from_random() -> Self {
-    let mut cfg  = TOFEventBuilderConfig::new();
-    let mut rng      = rand::thread_rng();
-    cfg.cachesize  = rng.gen::<usize>();
-    cfg.n_mte_per_loop= rng.gen::<usize>();
-    cfg.n_rbe_per_loop = rng.gen::<usize>();
-    cfg.te_timeout_sec = rng.gen::<u32>();
-    cfg.sort_events = rng.gen::<bool>();
-    cfg.build_strategy = BuildStrategy::from_random();
-    match cfg.build_strategy {
-      BuildStrategy::AdaptiveGreedy => {
-        cfg.greediness = rng.gen::<u8>();
-        cfg.wait_nrb = 0;
-      },
-      BuildStrategy::WaitForNBoards => { 
-        cfg.wait_nrb = rng.gen::<u8>();
-        cfg.greediness = 0;
-      },
-      _ => {
-        cfg.greediness = 0;
-        cfg.wait_nrb =  0;
-      },
-    };
-    // cfg.greediness = rng.gen::<u8>();
-    // cfg.wait_nrb = rng.gen::<u8>(); <-- works, but in packing test, doesn't match and causes panic
-    // current iteration aims to fix that but has {} errors :((
+    let mut cfg             = TOFEventBuilderConfig::new();
+    let mut rng             = rand::thread_rng();
+    cfg.active_fields       = rng.gen::<u32>();
+    if cfg.active_fields & 0x1 == 1 {
+      cfg.cachesize           = rng.gen::<u32>();
+    }
+    if cfg.active_fields & 0x2 == 1 {
+      cfg.n_mte_per_loop      = rng.gen::<u32>();
+    }
+    if cfg.active_fields & 0x4 == 1 {
+      cfg.n_rbe_per_loop      = rng.gen::<u32>();
+    }
+    if cfg.active_fields & 0x8 == 1 {
+      cfg.te_timeout_sec      = rng.gen::<u32>();
+    }
+    if cfg.active_fields & 0x16 == 1 {
+      cfg.sort_events         = rng.gen::<bool>();
+    }
+    if cfg.active_fields & 0x32 == 1 {
+      cfg.build_strategy      = BuildStrategy::from_random();
+    }
+    if cfg.active_fields & 0x64 == 1 {
+      cfg.wait_nrb = rng.gen::<u8>();
+    }
+    if cfg.active_fields & 0x128 == 1 {
+      cfg.greediness = rng.gen::<u8>();
+    }
+    if cfg.active_fields & 0x256 == 1 {
+      cfg.hb_send_interval = rng.gen::<u16>();
+    }
     cfg
   }
 }
