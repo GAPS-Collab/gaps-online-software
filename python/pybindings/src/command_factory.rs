@@ -11,7 +11,11 @@ use pyo3::exceptions::PyValueError;
 
 use tof_dataclasses::commands::factory::*;
 
-use crate::PyTofCommand;
+use crate::{
+  PyTofCommand,
+  PyTriggerConfig,
+  PyTOFEventBuilderConfig,
+};
 
 /// A hardwired map of RB -> RAT
 #[pyfunction]
@@ -175,13 +179,51 @@ pub fn py_stop_run() -> PyResult<PyTofCommand> {
 /// Run a calibration of all RBs
 ///
 /// # Arguments:
-///   * send_packetes  : Send the RBCalibration packets
-///   * save_events    : Save the events to the RBCalibration
-///                      packets
+///   * pre_run_calibration : Run the RBCalibration routine before 
+///                           every run start
+///   * send_packetes       : Send the RBCalibration packets
+///   * save_events         : Save the events to the RBCalibration
+///                           packets
 #[pyfunction]
 #[pyo3(name="rb_calibration")]
-pub fn py_rb_calibration(send_packets : bool, save_events : bool) -> PyResult<PyTofCommand> {
-  match rb_calibration(send_packets, save_events) {
+pub fn py_rb_calibration(pre_run_calibration : bool, send_packets : bool, save_events : bool) -> PyResult<PyTofCommand> {
+  match rb_calibration(pre_run_calibration,send_packets, save_events) {
+    None => {
+      return Err(PyValueError::new_err(format!("You encounterd a dragon \u{1f409}! We don't know what's going on either.")));
+    }
+    Some(cmd) => {
+      let pycmd = PyTofCommand { 
+       command : cmd
+      };
+      return Ok(pycmd);
+    }
+  }
+}
+
+
+/// Change the MTBSettings in the config file with relevant trigger settings
+#[pyfunction]
+#[pyo3(name="change_triggerconfig")]
+pub fn py_change_triggerconfig(cfg : &PyTriggerConfig) -> PyResult<PyTofCommand> {
+  match change_triggerconfig(&cfg.config) {
+    None => {
+      return Err(PyValueError::new_err(format!("You encounterd a dragon \u{1f409}! We don't know what's going on either.")));
+    }
+    Some(cmd) => {
+      let pycmd = PyTofCommand { 
+       command : cmd
+      };
+      return Ok(pycmd);
+    }
+  }
+}
+
+
+/// Change the TOFEventBuilderSettings in the config
+#[pyfunction]
+#[pyo3(name="change_tofeventbuilderconfig")]
+pub fn py_change_tofeventbuilderconfig(cfg : &PyTOFEventBuilderConfig) -> PyResult<PyTofCommand> {
+  match change_tofeventbuilderconfig(&cfg.config) {
     None => {
       return Err(PyValueError::new_err(format!("You encounterd a dragon \u{1f409}! We don't know what's going on either.")));
     }

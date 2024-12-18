@@ -498,6 +498,7 @@ impl PyTOFEventBuilderConfig {
     self.config = cfg;
   }
 }
+
 #[pymethods]
 impl PyTOFEventBuilderConfig{
   #[new]
@@ -507,87 +508,171 @@ impl PyTOFEventBuilderConfig{
       config : cfg
     }
   }
-  // greediness
+  
   #[getter]
-  fn get_greediness(&self) -> PyResult<u8> {
-    Ok(self.config.greediness)
+  fn get_greediness(&self) -> Option<u8> {
+    self.config.greediness
   }
+
   #[setter]
   fn set_greediness(&mut self, greediness: u8) -> PyResult<()> {
-    self.config.greediness = greediness;
+    self.config.greediness = Some(greediness);
     Ok(())
   }
+  
   // wait for num. RB
   #[getter]
-  fn get_wait_nrb(&self) -> PyResult<u8> {
-    Ok(self.config.wait_nrb)
+  fn get_wait_nrb(&self) -> Option<u8> {
+    self.config.wait_nrb
   }
   #[setter]
   fn set_wait_nrb(&mut self, wait_nrb: u8) -> PyResult<()> {
-    self.config.wait_nrb = wait_nrb;
+    self.config.wait_nrb = Some(wait_nrb);
     Ok(())
   }
   // Cache size
   #[getter]
-  fn get_cachesize(&self) -> PyResult<usize> {
-    Ok(self.config.cachesize)
+  fn get_cachesize(&self) -> Option<u32> {
+    self.config.cachesize
   }
   #[setter]
-  fn set_cachesize(&mut self, cachesize: usize) -> PyResult<()> {
-    self.config.cachesize = cachesize;
+  fn set_cachesize(&mut self, cachesize: u32) -> PyResult<()> {
+    self.config.cachesize = Some(cachesize);
     Ok(())
   }
   // Num. MTB events per loop
   #[getter]
-  fn get_n_mte_per_loop(&self) -> PyResult<usize> {
-    Ok(self.config.n_mte_per_loop)
+  fn get_n_mte_per_loop(&self) -> Option<u32> {
+    self.config.n_mte_per_loop
   }
   #[setter]
-  fn set_n_mte_per_loop(&mut self, n_mte_per_loop: usize) -> PyResult<()> {
-    self.config.n_mte_per_loop = n_mte_per_loop;
+  fn set_n_mte_per_loop(&mut self, n_mte_per_loop: u32) -> PyResult<()> {
+    self.config.n_mte_per_loop = Some(n_mte_per_loop);
     Ok(())
   }
   // Num. RB events per loop
   #[getter]
-  fn get_n_rbe_per_loop(&self) -> PyResult<usize> {
-    Ok(self.config.n_rbe_per_loop)
+  fn get_n_rbe_per_loop(&self) -> Option<u32> {
+    self.config.n_rbe_per_loop
   }
   #[setter]
-  fn set_n_rbe_per_loop(&mut self, n_rbe_per_loop: usize) -> PyResult<()> {
-    self.config.n_rbe_per_loop = n_rbe_per_loop;
+  fn set_n_rbe_per_loop(&mut self, n_rbe_per_loop: u32) -> PyResult<()> {
+    self.config.n_rbe_per_loop = Some(n_rbe_per_loop);
     Ok(())
   }  
   // TOF Event timescale window
   #[getter]
-  fn get_te_timeout_sec(&self) -> PyResult<u32> {
-    Ok(self.config.te_timeout_sec)
+  fn get_te_timeout_sec(&self) -> Option<u32> {
+    self.config.te_timeout_sec
   }
   #[setter]
   fn set_te_timeout_sec(&mut self, te_timeout_sec: u32) -> PyResult<()> {
-    self.config.te_timeout_sec = te_timeout_sec;
+    self.config.te_timeout_sec = Some(te_timeout_sec);
     Ok(())
   }
   // Sort events
   #[getter]
-  fn get_sort_events(&self) -> PyResult<bool> {
-    Ok(self.config.sort_events)
+  fn get_sort_events(&self) -> Option<bool> {
+    self.config.sort_events
   }
   #[setter]
   fn set_sort_events(&mut self, sort_events: bool) -> PyResult<()> {
-    self.config.sort_events = sort_events;
+    self.config.sort_events = Some(sort_events);
     Ok(())
   }
   // build strategy
   #[getter] 
-  fn get_build_strategy(&self) -> PyResult<BuildStrategy> {
-    Ok(self.config.build_strategy)
+  fn get_build_strategy(&self) -> Option<BuildStrategy> {
+    self.config.build_strategy
   }
 
   #[setter]
   fn set_build_strategy(&mut self, build_strategy: BuildStrategy) -> PyResult<()> {
-    self.config.build_strategy = build_strategy;
+    self.config.build_strategy = Some(build_strategy);
     Ok(())
   }
+  
+  #[getter] 
+  fn get_hb_send_interval(&self) -> Option<u16> {
+    self.config.hb_send_interval
+  }
+
+  #[setter]
+  fn set_hb_send_interval(&mut self, hb_send_interval: u16) -> PyResult<()> {
+    self.config.hb_send_interval = Some(hb_send_interval);
+    Ok(())
+  }
+ 
+  fn __getitem__(&self, py: Python, key: &str) -> PyResult<Option<PyObject>> {  
+    match key {
+      "cachesize"        => Ok(Some(self.config.cachesize.into_py(py))),
+      "n_mte_per_loop"   => Ok(Some(self.config.n_mte_per_loop.into_py(py))),
+      "n_rbe_per_loop"   => Ok(Some(self.config.n_rbe_per_loop.into_py(py))),
+      "te_timeout_sec"   => Ok(Some(self.config.te_timeout_sec.into_py(py))),
+      "sort_events"      => Ok(Some(self.config.sort_events.into_py(py))),
+      "build_strategy"   => Ok(Some(self.config.build_strategy.into_py(py))),
+      "wait_nrb"         => Ok(Some(self.config.wait_nrb.into_py(py))),
+      "greediness"       => Ok(Some(self.config.greediness.into_py(py))),
+      "hb_send_interval" => Ok(Some(self.config.hb_send_interval.into_py(py))),
+      _     => Err(PyKeyError::new_err(format!("Key '{}' not found", key)))
+    }
+  }
+
+  fn __setitem__(&mut self, key: &str, value: &Bound<'_, PyAny>) -> PyResult<()> {
+    match key {
+      "cachesize" => {
+          self.config.active_fields |= 0x1;
+          self.config.cachesize = Some(value.extract::<u32>()?);
+          Ok(())
+      }
+      "n_mte_per_loop" => {
+          self.config.active_fields |= 0x2;
+          self.config.n_mte_per_loop = Some(value.extract::<u32>()?);
+          Ok(())
+      }
+      "n_rbe_per_loop" => {
+          self.config.active_fields |= 0x4;
+          self.config.n_rbe_per_loop = Some(value.extract::<u32>()?);
+          Ok(())
+      }
+      "te_timeout_sec" => {
+          self.config.active_fields |= 0x8;
+          self.config.te_timeout_sec = Some(value.extract::<u32>()?);
+          Ok(())
+      }
+      "sort_events" => {
+          self.config.active_fields |= 0x16;
+          self.config.sort_events = Some(value.extract::<bool>()?);
+          Ok(())
+      }
+      "build_strategy" => {
+          self.config.active_fields |= 0x32;
+          self.config.build_strategy = Some(value.extract::<BuildStrategy>()?);
+          Ok(())
+      }
+      "wait_nrb" => {
+          self.config.active_fields |= 0x64;
+          self.config.wait_nrb = Some(value.extract::<u8>()?);
+          Ok(())
+      }
+      "greediness" => {
+          self.config.active_fields |= 0x128;
+          self.config.greediness = Some(value.extract::<u8>()?);
+          Ok(())
+      }
+      "hb_send_interval" => {
+          self.config.active_fields |= 0x512;
+          self.config.hb_send_interval = Some(value.extract::<u16>()?);
+          Ok(())
+      }
+      _ => Err(PyKeyError::new_err(format!("Key '{}' not found", key))),
+    }
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.config)) 
+  }
+
 }
 
 #[pyclass]
@@ -745,6 +830,10 @@ impl PyAnalysisEngineConfig {
   fn set_max_peaks(&mut self, max_peaks: usize) -> PyResult<()> {
     self.config.max_peaks = max_peaks;
     Ok(())
+  }
+  
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.config)) 
   }
 }
 
