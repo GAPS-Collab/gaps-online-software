@@ -12,6 +12,7 @@ use crate::commands::{
 
 use crate::commands::config::{
   TriggerConfig,
+  TOFEventBuilderConfig,
 };
 
 use crate::serialization::Serialization;
@@ -240,11 +241,13 @@ pub fn stop_run() -> Option<TofCommandV2> {
 /// Run a calibration of all RBs
 ///
 /// # Arguments:
-///   * send_packetes  : Send the RBCalibration packets
-///   * save_events    : Save the events to the RBCalibration
-///                      packets
-pub fn rb_calibration(send_packets : bool, save_events : bool) -> Option<TofCommandV2> {
-  let payload = vec![send_packets as u8, save_events as u8];
+///   * pre_run_calibration : Run the RBCalibration routine before 
+///                           every run start
+///   * send_packetes       : Send the RBCalibration packets
+///   * save_events         : Save the events to the RBCalibration
+///                           packets
+pub fn rb_calibration(pre_run_calibration : bool, send_packets : bool, save_events : bool) -> Option<TofCommandV2> {
+  let payload = vec![pre_run_calibration as u8, send_packets as u8, save_events as u8];
   Some(TofCommandV2 {
     command_code : TofCommandCode::RBCalibration,
     payload      : payload,
@@ -252,7 +255,7 @@ pub fn rb_calibration(send_packets : bool, save_events : bool) -> Option<TofComm
 }
 
 /// Change the MTBSettings in the config file with relevant trigger settings
-pub fn change_triggerconfig(cfg : TriggerConfig) -> Option<TofCommandV2> {
+pub fn change_triggerconfig(cfg : &TriggerConfig) -> Option<TofCommandV2> {
   let payload = cfg.to_bytestream();
   Some(TofCommandV2 {
     command_code : TofCommandCode::SetMTConfig,
@@ -260,5 +263,13 @@ pub fn change_triggerconfig(cfg : TriggerConfig) -> Option<TofCommandV2> {
   })
 }
 
+/// Change the EventBuilderSettings in the config file
+pub fn change_tofeventbuilderconfig(cfg : &TOFEventBuilderConfig) -> Option<TofCommandV2> {
+  let payload = cfg.to_bytestream();
+  Some(TofCommandV2 {
+    command_code : TofCommandCode::SetTOFEventBuilderConfig,
+    payload      : payload,
+  })
+}
 
 
