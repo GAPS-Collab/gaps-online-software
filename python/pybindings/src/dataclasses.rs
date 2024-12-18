@@ -419,42 +419,42 @@ impl PyDataPublisherConfig {
   fn __setitem__(&mut self, key: &str, value: &Bound<'_, PyAny>) -> PyResult<()> {
     match key {
       "mbytes_per_file" => {
-          self.config.active_fields |= 0x1;
+          self.config.active_fields |= 1;
           self.config.mbytes_per_file = Some(value.extract::<u16>()?);
           Ok(())
       }
       "discard_event_fraction" => {
-          self.config.active_fields |= 0x2;
+          self.config.active_fields |= 2;
           self.config.discard_event_fraction = Some(value.extract::<f32>()?);
           Ok(())
       }
       "send_mtb_event_packets" => {
-          self.config.active_fields |= 0x4;
+          self.config.active_fields |= 4;
           self.config.send_mtb_event_packets = Some(value.extract::<bool>()?);
           Ok(())
       }
       "send_rbwaveform_packets" => {
-          self.config.active_fields |= 0x8;
+          self.config.active_fields |= 8;
           self.config.send_rbwaveform_packets = Some(value.extract::<bool>()?);
           Ok(())
       }
       "send_rbwf_every_x_event" => {
-          self.config.active_fields |= 0x16;
+          self.config.active_fields |= 16;
           self.config.send_rbwf_every_x_event = Some(value.extract::<u32>()?);
           Ok(())
       }
       "send_tof_summary_packets" => {
-          self.config.active_fields |= 0x32;
+          self.config.active_fields |= 32;
           self.config.send_tof_summary_packets = Some(value.extract::<bool>()?);
           Ok(())
       }
       "send_tof_event_packets" => {
-          self.config.active_fields |= 0x64;
+          self.config.active_fields |= 64;
           self.config.send_tof_event_packets = Some(value.extract::<bool>()?);
           Ok(())
       }
       "hb_send_interval" => {
-          self.config.active_fields |= 0x512;
+          self.config.active_fields |= 128;
           self.config.hb_send_interval = Some(value.extract::<u16>()?);
           Ok(())
       }
@@ -598,52 +598,52 @@ impl PyTriggerConfig {
   fn __setitem__(&mut self, key: &str, value: &Bound<'_, PyAny>) -> PyResult<()> {
     match key {
       "gaps_trigger_use_beta" => {
-          self.config.active_fields |= 0x1;
+          self.config.active_fields |= 1;
           self.config.gaps_trigger_use_beta = Some(value.extract::<bool>()?);
           Ok(())
       }
       "prescale" => {
-          self.config.active_fields |= 0x2;
+          self.config.active_fields |= 2;
           self.config.prescale = Some(value.extract::<f32>()?);
           Ok(())
       }
       "trigger_type" => {
-          self.config.active_fields |= 0x4;
+          self.config.active_fields |= 4;
           self.config.trigger_type = Some(value.extract::<TriggerType>()?);
           Ok(())
       }
       "use_combo_trigger" => {
-          self.config.active_fields |= 0x8;
+          self.config.active_fields |= 8;
           self.config.use_combo_trigger = Some(value.extract::<bool>()?);
           Ok(())
       }
       "combo_trigger_type" => {
-          self.config.active_fields |= 0x16;
+          self.config.active_fields |= 16;
           self.config.combo_trigger_type = Some(value.extract::<TriggerType>()?);
           Ok(())
       }
       "combo_trigger_prescale" => {
-          self.config.active_fields |= 0x32;
+          self.config.active_fields |= 32;
           self.config.combo_trigger_prescale = Some(value.extract::<f32>()?);
           Ok(())
       }
       "trace_suppression" => {
-          self.config.active_fields |= 0x64;
+          self.config.active_fields |= 64;
           self.config.trace_suppression = Some(value.extract::<bool>()?);
           Ok(())
       }
       "mtb_moni_interval" => {
-          self.config.active_fields |= 0x128;
+          self.config.active_fields |= 128;
           self.config.mtb_moni_interval = Some(value.extract::<u16>()?);
           Ok(())
       }
       "tiu_ignore_busy" => {
-          self.config.active_fields |= 0x256;
+          self.config.active_fields |= 256;
           self.config.tiu_ignore_busy = Some(value.extract::<bool>()?);
           Ok(())
       }
       "hb_send_interval" => {
-          self.config.active_fields |= 0x512;
+          self.config.active_fields |= 512;
           self.config.hb_send_interval = Some(value.extract::<u16>()?);
           Ok(())
       }
@@ -797,47 +797,47 @@ impl PyTOFEventBuilderConfig{
   fn __setitem__(&mut self, key: &str, value: &Bound<'_, PyAny>) -> PyResult<()> {
     match key {
       "cachesize" => {
-          self.config.active_fields |= 0x1;
+          self.config.active_fields |= 1;
           self.config.cachesize = Some(value.extract::<u32>()?);
           Ok(())
       }
       "n_mte_per_loop" => {
-          self.config.active_fields |= 0x2;
+          self.config.active_fields |= 2;
           self.config.n_mte_per_loop = Some(value.extract::<u32>()?);
           Ok(())
       }
       "n_rbe_per_loop" => {
-          self.config.active_fields |= 0x4;
+          self.config.active_fields |= 4;
           self.config.n_rbe_per_loop = Some(value.extract::<u32>()?);
           Ok(())
       }
       "te_timeout_sec" => {
-          self.config.active_fields |= 0x8;
+          self.config.active_fields |= 8;
           self.config.te_timeout_sec = Some(value.extract::<u32>()?);
           Ok(())
       }
       "sort_events" => {
-          self.config.active_fields |= 0x16;
+          self.config.active_fields |= 16;
           self.config.sort_events = Some(value.extract::<bool>()?);
           Ok(())
       }
       "build_strategy" => {
-          self.config.active_fields |= 0x32;
+          self.config.active_fields |= 32;
           self.config.build_strategy = Some(value.extract::<BuildStrategy>()?);
           Ok(())
       }
       "wait_nrb" => {
-          self.config.active_fields |= 0x64;
+          self.config.active_fields |= 64;
           self.config.wait_nrb = Some(value.extract::<u8>()?);
           Ok(())
       }
       "greediness" => {
-          self.config.active_fields |= 0x128;
+          self.config.active_fields |= 128;
           self.config.greediness = Some(value.extract::<u8>()?);
           Ok(())
       }
       "hb_send_interval" => {
-          self.config.active_fields |= 0x512;
+          self.config.active_fields |= 256;
           self.config.hb_send_interval = Some(value.extract::<u16>()?);
           Ok(())
       }

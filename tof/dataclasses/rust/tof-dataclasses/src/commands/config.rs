@@ -555,52 +555,52 @@ impl TriggerConfig {
   }
 
   pub fn set_gaps_trigger_use_beta(&mut self, use_it : bool) {
-    self.active_fields |= 0x1;
+    self.active_fields |= 1;
     self.gaps_trigger_use_beta = Some(use_it);
   }
 
   pub fn set_prescale(&mut self, prescale : f32) {
-    self.active_fields |= 0x2;
+    self.active_fields |= 2;
     self.prescale = Some(prescale);
   }
 
   pub fn set_trigger_type(&mut self, ttype : TriggerType) {
-    self.active_fields |= 0x4;
+    self.active_fields |= 4;
     self.trigger_type = Some(ttype);
   }
 
   pub fn set_use_combo_trigger(&mut self, combo : bool) {
-    self.active_fields |= 0x8;
+    self.active_fields |= 8;
     self.use_combo_trigger = Some(combo);
   }
 
   pub fn set_combo_trigger_type(&mut self, ttype : TriggerType) {
-    self.active_fields |= 0x16;
+    self.active_fields |= 16;
     self.combo_trigger_type = Some(ttype)
   }
 
   pub fn set_combo_trigger_prescale(&mut self, prescale : f32) {
-    self.active_fields |= 0x32;
+    self.active_fields |= 32;
     self.combo_trigger_prescale = Some(prescale);
   }
 
   pub fn set_trace_suppression(&mut self, tsup : bool) {
-    self.active_fields |= 0x64;
+    self.active_fields |= 64;
     self.trace_suppression = Some(tsup);
   }
 
   pub fn set_mtb_moni_interval(&mut self, interval : u16) {
-    self.active_fields |= 0x128;
+    self.active_fields |= 128;
     self.mtb_moni_interval = Some(interval);
   }
 
   pub fn set_tiu_ignore_busy(&mut self, busy : bool) {
-    self.active_fields |= 0x256;
+    self.active_fields |= 256;
     self.tiu_ignore_busy = Some(busy);
   }
 
   pub fn set_hb_send_interval(&mut self, interval : u16) {
-    self.active_fields |= 0x512;
+    self.active_fields |= 512;
     self.hb_send_interval = Some(interval);
   }
 }
@@ -680,34 +680,34 @@ impl Serialization for TriggerConfig {
     cfg.hb_send_interval       = Some(parse_u16(stream, pos));
     // disable fields which where not explicitly marked as 
     // active
-    if cfg.active_fields & 0x1 != 1 {
+    if cfg.active_fields & 1 != 1 {
       cfg.gaps_trigger_use_beta = None;
     }
-    if cfg.active_fields & 0x2 != 2 {
+    if cfg.active_fields & 2 != 2 {
       cfg.prescale = None;
     }
-    if cfg.active_fields & 0x4 != 4 {
+    if cfg.active_fields & 4 != 4 {
       cfg.trigger_type = None;
     }
-    if cfg.active_fields & 0x8 != 8 {
+    if cfg.active_fields & 8 != 8 {
       cfg.use_combo_trigger = None;
     }
-    if cfg.active_fields & 0x16 != 16 {
+    if cfg.active_fields & 16 != 16 {
       cfg.combo_trigger_type = None;
     }
-    if cfg.active_fields & 0x32 != 32 {
+    if cfg.active_fields & 32 != 32 {
       cfg.combo_trigger_prescale = None;
     }
-    if cfg.active_fields & 0x64 != 64 {
+    if cfg.active_fields & 64 != 64 {
       cfg.trace_suppression = None;
     }
-    if cfg.active_fields & 0x128 != 128 {
+    if cfg.active_fields & 128 != 128 {
       cfg.mtb_moni_interval = None;
     }
-    if cfg.active_fields & 0x256 != 256 {
+    if cfg.active_fields & 256 != 256 {
       cfg.tiu_ignore_busy   = None;
     }
-    if cfg.active_fields & 0x512 != 512 {
+    if cfg.active_fields & 512 != 512 {
       cfg.hb_send_interval  = None;
     }
     *pos += 2;
@@ -740,52 +740,52 @@ impl FromRandom for TriggerConfig {
     let mut rng                 = rand::thread_rng();
     let active_fields           = rng.gen::<u32>();
     cfg.active_fields           = active_fields;
-    if active_fields & 0x1 == 1 {
+    if active_fields & 1 == 1 {
       cfg.gaps_trigger_use_beta   = Some(rng.gen::<bool>());
     } else {
       cfg.gaps_trigger_use_beta = None;
     }
-    if active_fields & 0x2 == 1 {
+    if active_fields & 2 == 2 {
       cfg.prescale                = Some(rng.gen::<f32>());
     } else {
       cfg.prescale = None;
     }
-    if active_fields & 0x4 == 1 {
+    if active_fields & 4 == 4 {
       cfg.trigger_type            = Some(TriggerType::from_random());
     } else {
       cfg.trigger_type = None;
     }
-    if active_fields & 0x8 == 1 {
+    if active_fields & 8 == 8 {
       cfg.use_combo_trigger       = Some(rng.gen::<bool>());
     } else {
       cfg.use_combo_trigger = None;
     }
-    if active_fields & 0x16 == 1 {
+    if active_fields & 16 == 16 {
       cfg.combo_trigger_type      = Some(TriggerType::from_random());
     } else {
       cfg.combo_trigger_type = None;
     }
-    if active_fields & 0x32 == 1 {
+    if active_fields & 32 == 32 {
       cfg.combo_trigger_prescale  = Some(rng.gen::<f32>());
     } else {
       cfg.combo_trigger_prescale = None;
     }
-    if active_fields & 0x64 == 1 {
+    if active_fields & 64 == 64 {
       cfg.trace_suppression       = Some(rng.gen::<bool>());
     } else {
       cfg.trace_suppression = None;
     }
-    if active_fields & 0x128 == 1 {
+    if active_fields & 128 == 128 {
       cfg.mtb_moni_interval       = Some(rng.gen::<u16>());
     } else {
       cfg.mtb_moni_interval = None;
     }
-    if active_fields & 0x256 == 1 {
+    if active_fields & 256 == 256 {
       cfg.tiu_ignore_busy         = Some(rng.gen::<bool>());
     } else {
       cfg.tiu_ignore_busy = None;
     }
-    if active_fields & 0x512 == 1 {
+    if active_fields & 512 == 512 {
       cfg.hb_send_interval        = Some(rng.gen::<u16>());
     } else {
       cfg.hb_send_interval = None;
@@ -889,28 +889,28 @@ impl Serialization for DataPublisherConfig {
     cfg.hb_send_interval         = Some(parse_u16 (stream, pos));
     // disable fields which where not explicitly marked as 
     // active
-    if cfg.active_fields & 0x1 != 1 {
+    if cfg.active_fields & 1 != 1 {
       cfg.mbytes_per_file = None;
     }
-    if cfg.active_fields & 0x2 != 2 {
+    if cfg.active_fields & 2 != 2 {
       cfg.discard_event_fraction = None;
     }
-    if cfg.active_fields & 0x4 != 4 {
+    if cfg.active_fields & 4 != 4 {
       cfg.send_mtb_event_packets = None;
     }
-    if cfg.active_fields & 0x8 != 8 {
+    if cfg.active_fields & 8 != 8 {
       cfg.send_rbwaveform_packets = None;
     }
-    if cfg.active_fields & 0x16 != 16 {
+    if cfg.active_fields & 16 != 16 {
       cfg.send_rbwf_every_x_event = None;
     }
-    if cfg.active_fields & 0x32 != 32 {
+    if cfg.active_fields & 32 != 32 {
       cfg.send_tof_summary_packets = None;
     }
-    if cfg.active_fields & 0x64 != 64 {
+    if cfg.active_fields & 64 != 64 {
       cfg.send_tof_event_packets = None;
     }
-    if cfg.active_fields & 0x128 != 128 {
+    if cfg.active_fields & 128 != 128 {
       cfg.hb_send_interval = None;
     }
     *pos += 2;
@@ -941,42 +941,42 @@ impl FromRandom for DataPublisherConfig {
     let mut rng                 = rand::thread_rng();
     let active_fields           = rng.gen::<u32>();
     cfg.active_fields           = active_fields;
-    if active_fields & 0x1 == 1 {
+    if active_fields & 1 == 1 {
       cfg.mbytes_per_file   = Some(rng.gen::<u16>());
     } else {
       cfg.mbytes_per_file = None;
     }
-    if active_fields & 0x2 == 1 {
+    if active_fields & 2 == 2 {
       cfg.discard_event_fraction = Some(rng.gen::<f32>());
     } else {
       cfg.discard_event_fraction = None;
     }
-    if active_fields & 0x4 == 1 {
+    if active_fields & 4 == 4 {
       cfg.send_mtb_event_packets = Some(rng.gen::<bool>());
     } else {
       cfg.send_mtb_event_packets = None;
     }
-    if active_fields & 0x8 == 1 {
+    if active_fields & 8 == 8 {
       cfg.send_rbwaveform_packets = Some(rng.gen::<bool>());
     } else {
       cfg.send_rbwaveform_packets = None;
     }
-    if active_fields & 0x16 == 1 {
+    if active_fields & 16 == 16 {
       cfg.send_rbwf_every_x_event = Some(rng.gen::<u32>());
     } else {
       cfg.send_rbwf_every_x_event = None;
     }
-    if active_fields & 0x32 == 1 {
+    if active_fields & 32 == 32 {
       cfg.send_tof_summary_packets  = Some(rng.gen::<bool>());
     } else {
       cfg.send_tof_summary_packets = None;
     }
-    if active_fields & 0x64 == 1 {
+    if active_fields & 64 == 64 {
       cfg.send_tof_event_packets       = Some(rng.gen::<bool>());
     } else {
       cfg.send_tof_event_packets = None;
     }
-    if active_fields & 0x128 == 1 {
+    if active_fields & 128 == 128 {
       cfg.hb_send_interval       = Some(rng.gen::<u16>());
     } else {
       cfg.hb_send_interval = None;
@@ -1233,31 +1233,31 @@ impl Serialization for TOFEventBuilderConfig {
     cfg.wait_nrb         = Some(parse_u8(stream, pos));
     cfg.greediness       = Some(parse_u8(stream, pos));
     cfg.hb_send_interval = Some(parse_u16(stream, pos));
-    if cfg.active_fields & 0x1 != 1 {
+    if cfg.active_fields & 1 != 1 {
       cfg.cachesize      = None;
     }
-    if cfg.active_fields & 0x2 != 2 {
+    if cfg.active_fields & 2 != 2 {
       cfg.n_mte_per_loop = None;
     }
-    if cfg.active_fields & 0x4 != 4 {
+    if cfg.active_fields & 4 != 4 {
       cfg.n_rbe_per_loop = None;
     }
-    if cfg.active_fields & 0x8 != 8 {
+    if cfg.active_fields & 8 != 8 {
       cfg.te_timeout_sec = None;
     }
-    if cfg.active_fields & 0x16 != 16 {
+    if cfg.active_fields & 16 != 16 {
       cfg.sort_events    = None;
     }
-    if cfg.active_fields & 0x32 != 32 {
+    if cfg.active_fields & 32 != 32 {
       cfg.build_strategy = None;
     }
-    if cfg.active_fields & 0x64 != 64 {
+    if cfg.active_fields & 64 != 64 {
       cfg.wait_nrb       = None;
     }
-    if cfg.active_fields & 0x128 != 128 {
+    if cfg.active_fields & 128 != 128 {
       cfg.greediness     = None;
     }
-    if cfg.active_fields & 0x256 != 256 {
+    if cfg.active_fields & 256 != 256 {
       cfg.hb_send_interval = None;
     }
     *pos += 2;
@@ -1288,31 +1288,31 @@ impl FromRandom for TOFEventBuilderConfig {
     let mut cfg             = TOFEventBuilderConfig::new();
     let mut rng             = rand::thread_rng();
     cfg.active_fields       = rng.gen::<u32>();
-    if cfg.active_fields & 0x1 == 1 {
+    if cfg.active_fields & 1 == 1 {
       cfg.cachesize         = Some(rng.gen::<u32>());
     }
-    if cfg.active_fields & 0x2 == 2 {
+    if cfg.active_fields & 2 == 2 {
       cfg.n_mte_per_loop      = Some(rng.gen::<u32>());
     }
-    if cfg.active_fields & 0x4 == 4 {
+    if cfg.active_fields & 4 == 4 {
       cfg.n_rbe_per_loop      = Some(rng.gen::<u32>());
     }
-    if cfg.active_fields & 0x8 == 8 {
+    if cfg.active_fields & 8 == 8 {
       cfg.te_timeout_sec      = Some(rng.gen::<u32>());
     }
-    if cfg.active_fields & 0x16 == 16 {
+    if cfg.active_fields & 16 == 16 {
       cfg.sort_events         = Some(rng.gen::<bool>());
     }
-    if cfg.active_fields & 0x32 == 32 {
+    if cfg.active_fields & 32 == 32 {
       cfg.build_strategy      = Some(BuildStrategy::from_random());
     }
-    if cfg.active_fields & 0x64 == 64 {
+    if cfg.active_fields & 64 == 64 {
       cfg.wait_nrb = Some(rng.gen::<u8>());
     }
-    if cfg.active_fields & 0x128 == 128 {
+    if cfg.active_fields & 128 == 128 {
       cfg.greediness = Some(rng.gen::<u8>());
     }
-    if cfg.active_fields & 0x256 == 256 {
+    if cfg.active_fields & 256 == 256 {
       cfg.hb_send_interval = Some(rng.gen::<u16>());
     }
     cfg
