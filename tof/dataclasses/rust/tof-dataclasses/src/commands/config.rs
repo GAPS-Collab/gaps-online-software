@@ -1165,6 +1165,51 @@ impl TOFEventBuilderConfig {
       hb_send_interval    : None
     }
   }
+      
+  pub fn set_cachesize(&mut self, csize : u32) {
+    self.active_fields |= 1;
+    self.cachesize = Some(csize);
+  }
+  
+  pub fn set_n_mte_per_loop(&mut self, n : u32) {
+    self.active_fields |= 2;
+    self.n_mte_per_loop = Some(n);
+  }
+
+  pub fn set_n_rbe_per_loop(&mut self, n : u32) {
+    self.active_fields |= 4;
+    self.n_rbe_per_loop = Some(n);
+  }
+
+  pub fn set_te_timeout_sec(&mut self, te : u32) {
+    self.active_fields |= 8;
+    self.te_timeout_sec = Some(te);
+  }
+
+  pub fn set_sort_events(&mut self, sort : bool) {
+    self.active_fields |= 16;
+    self.sort_events = Some(sort);
+  }
+
+  pub fn set_build_strategy(&mut self, bs : BuildStrategy) {
+    self.active_fields |= 32;
+    self.build_strategy = Some(bs);
+  }
+
+  pub fn set_wait_nrb(&mut self, nrb : u8) {
+    self.active_fields |= 64;
+    self.wait_nrb = Some(nrb);
+  }
+
+  pub fn set_greediness(&mut self, greed : u8) {
+    self.active_fields |= 128;
+    self.greediness = Some(greed);
+  }
+
+  pub fn set_hb_send_interval(&mut self, interval : u16) {
+    self.active_fields |= 256;
+    self.hb_send_interval = Some(interval);
+  }
 }
 
 impl Default for TOFEventBuilderConfig {

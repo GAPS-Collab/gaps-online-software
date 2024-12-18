@@ -665,11 +665,11 @@ pub struct PyTOFEventBuilderConfig{
   pub config : TOFEventBuilderConfig
 }
 
-impl PyTOFEventBuilderConfig {
-  pub fn set_config(&mut self, cfg : TOFEventBuilderConfig) {
-    self.config = cfg;
-  }
-}
+//impl PyTOFEventBuilderConfig {
+//  pub fn set_config(&mut self, cfg : TOFEventBuilderConfig) {
+//    self.config = cfg;
+//  }
+//}
 
 #[pymethods]
 impl PyTOFEventBuilderConfig{
@@ -688,7 +688,7 @@ impl PyTOFEventBuilderConfig{
 
   #[setter]
   fn set_greediness(&mut self, greediness: u8) -> PyResult<()> {
-    self.config.greediness = Some(greediness);
+    self.config.set_greediness(greediness);
     Ok(())
   }
   
@@ -699,7 +699,7 @@ impl PyTOFEventBuilderConfig{
   }
   #[setter]
   fn set_wait_nrb(&mut self, wait_nrb: u8) -> PyResult<()> {
-    self.config.wait_nrb = Some(wait_nrb);
+    self.config.set_wait_nrb(wait_nrb);
     Ok(())
   }
   // Cache size
@@ -709,7 +709,7 @@ impl PyTOFEventBuilderConfig{
   }
   #[setter]
   fn set_cachesize(&mut self, cachesize: u32) -> PyResult<()> {
-    self.config.cachesize = Some(cachesize);
+    self.config.set_cachesize(cachesize);
     Ok(())
   }
   // Num. MTB events per loop
@@ -719,7 +719,7 @@ impl PyTOFEventBuilderConfig{
   }
   #[setter]
   fn set_n_mte_per_loop(&mut self, n_mte_per_loop: u32) -> PyResult<()> {
-    self.config.n_mte_per_loop = Some(n_mte_per_loop);
+    self.config.set_n_mte_per_loop(n_mte_per_loop);
     Ok(())
   }
   // Num. RB events per loop
@@ -729,7 +729,7 @@ impl PyTOFEventBuilderConfig{
   }
   #[setter]
   fn set_n_rbe_per_loop(&mut self, n_rbe_per_loop: u32) -> PyResult<()> {
-    self.config.n_rbe_per_loop = Some(n_rbe_per_loop);
+    self.config.set_n_rbe_per_loop(n_rbe_per_loop);
     Ok(())
   }  
   // TOF Event timescale window
@@ -739,7 +739,7 @@ impl PyTOFEventBuilderConfig{
   }
   #[setter]
   fn set_te_timeout_sec(&mut self, te_timeout_sec: u32) -> PyResult<()> {
-    self.config.te_timeout_sec = Some(te_timeout_sec);
+    self.config.set_te_timeout_sec(te_timeout_sec);
     Ok(())
   }
   // Sort events
@@ -749,7 +749,7 @@ impl PyTOFEventBuilderConfig{
   }
   #[setter]
   fn set_sort_events(&mut self, sort_events: bool) -> PyResult<()> {
-    self.config.sort_events = Some(sort_events);
+    self.config.set_sort_events(sort_events);
     Ok(())
   }
   // build strategy
@@ -760,7 +760,7 @@ impl PyTOFEventBuilderConfig{
 
   #[setter]
   fn set_build_strategy(&mut self, build_strategy: BuildStrategy) -> PyResult<()> {
-    self.config.build_strategy = Some(build_strategy);
+    self.config.set_build_strategy(build_strategy);
     Ok(())
   }
   
@@ -771,7 +771,7 @@ impl PyTOFEventBuilderConfig{
 
   #[setter]
   fn set_hb_send_interval(&mut self, hb_send_interval: u16) -> PyResult<()> {
-    self.config.hb_send_interval = Some(hb_send_interval);
+    self.config.set_hb_send_interval(hb_send_interval);
     Ok(())
   }
 
