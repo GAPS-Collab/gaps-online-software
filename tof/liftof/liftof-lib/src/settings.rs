@@ -19,6 +19,8 @@ use std::collections::HashMap;
 use tof_dataclasses::commands::config::{
   BuildStrategy,
   TriggerConfig,
+  TOFEventBuilderConfig, 
+  DataPublisherConfig,
 };
 use tof_dataclasses::events::master_trigger::TriggerType;
 
@@ -629,9 +631,9 @@ impl Default for AnalysisEngineSettings {
 /// Settings to change the configuration of the TOF Eventbuilder
 #[derive(Debug, Copy, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TofEventBuilderSettings {
-  pub cachesize           : usize,
-  pub n_mte_per_loop      : usize,
-  pub n_rbe_per_loop      : usize,
+  pub cachesize           : u32,
+  pub n_mte_per_loop      : u32,
+  pub n_rbe_per_loop      : u32,
   /// The timeout parameter for the TofEvent. If not
   /// complete after this time, send it onwards anyway
   pub te_timeout_sec      : u32,
@@ -640,7 +642,7 @@ pub struct TofEventBuilderSettings {
   pub build_strategy      : BuildStrategy,
   pub greediness          : u8,
   pub wait_nrb            : u8,
-  pub hb_send_interval    : u8,
+  pub hb_send_interval    : u16,
 }
 
 impl TofEventBuilderSettings {
@@ -655,6 +657,36 @@ impl TofEventBuilderSettings {
       greediness          : 3,
       wait_nrb            : 40,
       hb_send_interval    : 30,
+    }
+  }
+
+  pub fn from_tofeventbuilderconfig(&mut self, cfg : &TOFEventBuilderConfig) {
+    if cfg.cachesize.is_some() {
+      self.cachesize = cfg.cachesize.unwrap();
+    }
+    if cfg.n_mte_per_loop.is_some() {
+      self.n_mte_per_loop = cfg.n_mte_per_loop.unwrap();
+    }
+    if cfg.n_rbe_per_loop.is_some() {
+      self.n_rbe_per_loop = cfg.n_rbe_per_loop.unwrap();
+    }
+    if cfg.te_timeout_sec.is_some() {
+      self.te_timeout_sec = cfg.te_timeout_sec.unwrap();
+    }
+    if cfg.sort_events.is_some() {
+      self.sort_events = cfg.sort_events.unwrap();
+    }
+    if cfg.build_strategy.is_some() {
+      self.build_strategy = cfg.build_strategy.unwrap();
+    }
+    if cfg.greediness.is_some() {
+      self.greediness = cfg.greediness.unwrap();
+    }
+    if cfg.wait_nrb.is_some() {
+      self.wait_nrb = cfg.wait_nrb.unwrap();
+    }
+    if cfg.hb_send_interval.is_some() {
+      self.hb_send_interval = cfg.hb_send_interval.unwrap();
     }
   }
 }
@@ -708,7 +740,7 @@ pub struct DataPublisherSettings {
   pub send_tof_event_packets    : bool,
   /// Send the RBCalibration to ground
   pub send_cali_packets         : bool,
-  pub hb_send_interval          : u8,
+  pub hb_send_interval          : u16,
 }
 
 impl DataPublisherSettings {
@@ -725,6 +757,33 @@ impl DataPublisherSettings {
       send_tof_event_packets    : false,
       send_cali_packets         : true,
       hb_send_interval          : 30,
+    }
+  }
+  
+  pub fn from_datapublisherconfig(&mut self, cfg : &DataPublisherConfig) {
+    if cfg.mbytes_per_file.is_some() {
+      self.mbytes_per_file = cfg.mbytes_per_file.unwrap() as usize;
+    }
+    if cfg.discard_event_fraction.is_some() {
+      self.discard_event_fraction = cfg.discard_event_fraction.unwrap();
+    }
+    if cfg.send_mtb_event_packets.is_some() {
+      self.send_mtb_event_packets = cfg.send_mtb_event_packets.unwrap();
+    }
+    if cfg.send_rbwaveform_packets.is_some() {
+      self.send_rbwaveform_packets = cfg.send_rbwaveform_packets.unwrap();
+    }
+    if cfg.send_rbwf_every_x_event.is_some() {
+      self.send_rbwf_every_x_event = cfg.send_rbwf_every_x_event.unwrap();
+    }
+    if cfg.send_tof_summary_packets.is_some() {
+      self.send_tof_summary_packets = cfg.send_tof_summary_packets.unwrap();
+    }
+    if cfg.send_tof_event_packets.is_some() {
+      self.send_tof_event_packets = cfg.send_tof_event_packets.unwrap();
+    }
+    if cfg.hb_send_interval.is_some() {
+      self.hb_send_interval = cfg.hb_send_interval.unwrap();
     }
   }
 }
