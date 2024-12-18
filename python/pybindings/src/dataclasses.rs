@@ -489,8 +489,8 @@ impl PyTriggerConfig {
   }
   
   #[setter]
-  fn set_prescale(&mut self, prescale: Option<f32>) -> PyResult<()> {
-    self.config.prescale = prescale;
+  fn set_prescale(&mut self, prescale: f32) -> PyResult<()> {
+    self.config.set_prescale (prescale);
     Ok(())
   }
 
@@ -500,8 +500,8 @@ impl PyTriggerConfig {
   }
   
   #[setter]
-  fn set_gaps_trigger_use_beta(&mut self, gaps_trigger_use_beta: Option<bool>) -> PyResult<()> {
-    self.config.gaps_trigger_use_beta = gaps_trigger_use_beta;
+  fn set_gaps_trigger_use_beta(&mut self, gaps_trigger_use_beta: bool) -> PyResult<()> {
+    self.config.set_gaps_trigger_use_beta(gaps_trigger_use_beta);
     Ok(())
   }
 
@@ -511,8 +511,8 @@ impl PyTriggerConfig {
   }
 
   #[setter]
-  fn set_trigger_type(&mut self, trigger_type: Option<TriggerType>) -> PyResult<()> {
-    self.config.trigger_type = trigger_type;
+  fn set_trigger_type(&mut self, trigger_type: TriggerType) -> PyResult<()> {
+    self.config.set_trigger_type(trigger_type);
     Ok(())
   }
   
@@ -521,48 +521,49 @@ impl PyTriggerConfig {
     self.config.use_combo_trigger 
   }
   #[setter]
-  fn set_use_combo_trigger(&mut self, combo : Option<bool>) {
-    self.config.use_combo_trigger = combo;
+  fn set_use_combo_trigger(&mut self, combo : bool) {
+    self.config.set_use_combo_trigger(combo);
   }
   #[getter]
   fn get_combo_trigger_type(&self) -> Option<TriggerType> {
     self.config.combo_trigger_type
   }
   #[setter]
-  fn set_combo_trigger_type(&mut self, combo_trigger_type : Option<TriggerType>) {
-    self.config.combo_trigger_type = combo_trigger_type;
+  fn set_combo_trigger_type(&mut self, combo_trigger_type : TriggerType) {
+    self.config.set_combo_trigger_type(combo_trigger_type);
   }
   #[getter]
   fn get_combo_trigger_prescale(&self) -> Option<f32> {
     self.config.combo_trigger_prescale
   }
   #[setter]
-  fn set_combo_trigger_prescale(&mut self, prescale : Option<f32>) {
-    self.config.combo_trigger_prescale = prescale;
+  fn set_combo_trigger_prescale(&mut self, prescale : f32) {
+    self.config.set_combo_trigger_prescale(prescale);
   }
   #[getter]
   fn get_trace_suppression(&self) -> Option<bool> {
     self.config.trace_suppression
   }
   #[setter]
-  fn set_trace_suppression(&mut self, tsup : Option<bool>) {
-    self.config.trace_suppression = tsup;
+  fn set_trace_suppression(&mut self, tsup : bool) {
+    self.config.set_trace_suppression(tsup);
   }
   #[getter]
   fn get_mtb_moni_interval(&mut self) -> Option<u16> {
     self.config.mtb_moni_interval
   }
   #[setter]
-  fn set_mtb_moni_interval(&mut self, moni_int : Option<u16>) {
-    self.config.mtb_moni_interval = moni_int;
+  fn set_mtb_moni_interval(&mut self, moni_int : u16) {
+    self.config.set_mtb_moni_interval(moni_int);
   }
   #[getter]
   fn get_tiu_ignore_busy(&self) -> Option<bool> {
     self.config.tiu_ignore_busy
   }
+
   #[setter]
-  fn set_tiu_ignore_busy(&mut self, ignore_busy : Option<bool>) {
-    self.config.tiu_ignore_busy = ignore_busy;
+  fn set_tiu_ignore_busy(&mut self, ignore_busy : bool) {
+    self.config.set_tiu_ignore_busy(ignore_busy);
   }
   #[getter]
   fn get_hb_send_interval(&self) -> Option<u16> {

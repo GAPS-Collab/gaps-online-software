@@ -553,6 +553,56 @@ impl TriggerConfig {
       hb_send_interval        : None,
     }
   }
+
+  pub fn set_gaps_trigger_use_beta(&mut self, use_it : bool) {
+    self.active_fields |= 0x1;
+    self.gaps_trigger_use_beta = Some(use_it);
+  }
+
+  pub fn set_prescale(&mut self, prescale : f32) {
+    self.active_fields |= 0x2;
+    self.prescale = Some(prescale);
+  }
+
+  pub fn set_trigger_type(&mut self, ttype : TriggerType) {
+    self.active_fields |= 0x4;
+    self.trigger_type = Some(ttype);
+  }
+
+  pub fn set_use_combo_trigger(&mut self, combo : bool) {
+    self.active_fields |= 0x8;
+    self.use_combo_trigger = Some(combo);
+  }
+
+  pub fn set_combo_trigger_type(&mut self, ttype : TriggerType) {
+    self.active_fields |= 0x16;
+    self.combo_trigger_type = Some(ttype)
+  }
+
+  pub fn set_combo_trigger_prescale(&mut self, prescale : f32) {
+    self.active_fields |= 0x32;
+    self.combo_trigger_prescale = Some(prescale);
+  }
+
+  pub fn set_trace_suppression(&mut self, tsup : bool) {
+    self.active_fields |= 0x64;
+    self.trace_suppression = Some(tsup);
+  }
+
+  pub fn set_mtb_moni_interval(&mut self, interval : u16) {
+    self.active_fields |= 0x128;
+    self.mtb_moni_interval = Some(interval);
+  }
+
+  pub fn set_tiu_ignore_busy(&mut self, busy : bool) {
+    self.active_fields |= 0x256;
+    self.tiu_ignore_busy = Some(busy);
+  }
+
+  pub fn set_hb_send_interval(&mut self, interval : u16) {
+    self.active_fields |= 0x512;
+    self.hb_send_interval = Some(interval);
+  }
 }
 
 impl Default for TriggerConfig {
