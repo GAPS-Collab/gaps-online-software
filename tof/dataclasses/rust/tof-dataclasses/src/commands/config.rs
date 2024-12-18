@@ -520,7 +520,7 @@ impl FromRandom for RunConfig {
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct TriggerConfig{
   /// When we create the LiftofConfig from 
-  /// the TriggerCOnfig, this allows us to 
+  /// the TriggerConfig, this allows us to 
   /// deactivate fields, so we would can 
   /// only change a single field
   pub active_fields          : u32,
@@ -683,31 +683,31 @@ impl Serialization for TriggerConfig {
     if cfg.active_fields & 0x1 != 1 {
       cfg.gaps_trigger_use_beta = None;
     }
-    if cfg.active_fields & 0x2 != 1 {
+    if cfg.active_fields & 0x2 != 2 {
       cfg.prescale = None;
     }
-    if cfg.active_fields & 0x4 != 1 {
+    if cfg.active_fields & 0x4 != 4 {
       cfg.trigger_type = None;
     }
-    if cfg.active_fields & 0x8 != 1 {
+    if cfg.active_fields & 0x8 != 8 {
       cfg.use_combo_trigger = None;
     }
-    if cfg.active_fields & 0x16 != 1 {
+    if cfg.active_fields & 0x16 != 16 {
       cfg.combo_trigger_type = None;
     }
-    if cfg.active_fields & 0x32 != 1 {
+    if cfg.active_fields & 0x32 != 32 {
       cfg.combo_trigger_prescale = None;
     }
-    if cfg.active_fields & 0x64 != 1 {
+    if cfg.active_fields & 0x64 != 64 {
       cfg.trace_suppression = None;
     }
-    if cfg.active_fields & 0x128 != 1 {
+    if cfg.active_fields & 0x128 != 128 {
       cfg.mtb_moni_interval = None;
     }
-    if cfg.active_fields & 0x256 != 1 {
+    if cfg.active_fields & 0x256 != 256 {
       cfg.tiu_ignore_busy   = None;
     }
-    if cfg.active_fields & 0x512 != 1 {
+    if cfg.active_fields & 0x512 != 512 {
       cfg.hb_send_interval  = None;
     }
     *pos += 2;
@@ -892,25 +892,25 @@ impl Serialization for DataPublisherConfig {
     if cfg.active_fields & 0x1 != 1 {
       cfg.mbytes_per_file = None;
     }
-    if cfg.active_fields & 0x2 != 1 {
+    if cfg.active_fields & 0x2 != 2 {
       cfg.discard_event_fraction = None;
     }
-    if cfg.active_fields & 0x4 != 1 {
+    if cfg.active_fields & 0x4 != 4 {
       cfg.send_mtb_event_packets = None;
     }
-    if cfg.active_fields & 0x8 != 1 {
+    if cfg.active_fields & 0x8 != 8 {
       cfg.send_rbwaveform_packets = None;
     }
-    if cfg.active_fields & 0x16 != 1 {
+    if cfg.active_fields & 0x16 != 16 {
       cfg.send_rbwf_every_x_event = None;
     }
-    if cfg.active_fields & 0x32 != 1 {
+    if cfg.active_fields & 0x32 != 32 {
       cfg.send_tof_summary_packets = None;
     }
-    if cfg.active_fields & 0x64 != 1 {
+    if cfg.active_fields & 0x64 != 64 {
       cfg.send_tof_event_packets = None;
     }
-    if cfg.active_fields & 0x128 != 1 {
+    if cfg.active_fields & 0x128 != 128 {
       cfg.hb_send_interval = None;
     }
     *pos += 2;
@@ -1236,28 +1236,28 @@ impl Serialization for TOFEventBuilderConfig {
     if cfg.active_fields & 0x1 != 1 {
       cfg.cachesize      = None;
     }
-    if cfg.active_fields & 0x2 != 1 {
+    if cfg.active_fields & 0x2 != 2 {
       cfg.n_mte_per_loop = None;
     }
-    if cfg.active_fields & 0x4 != 1 {
+    if cfg.active_fields & 0x4 != 4 {
       cfg.n_rbe_per_loop = None;
     }
-    if cfg.active_fields & 0x8 != 1 {
+    if cfg.active_fields & 0x8 != 8 {
       cfg.te_timeout_sec = None;
     }
-    if cfg.active_fields & 0x16 != 1 {
+    if cfg.active_fields & 0x16 != 16 {
       cfg.sort_events    = None;
     }
-    if cfg.active_fields & 0x32 != 1 {
+    if cfg.active_fields & 0x32 != 32 {
       cfg.build_strategy = None;
     }
-    if cfg.active_fields & 0x64 != 1 {
+    if cfg.active_fields & 0x64 != 64 {
       cfg.wait_nrb       = None;
     }
-    if cfg.active_fields & 0x128 != 1 {
+    if cfg.active_fields & 0x128 != 128 {
       cfg.greediness     = None;
     }
-    if cfg.active_fields & 0x256 != 1 {
+    if cfg.active_fields & 0x256 != 256 {
       cfg.hb_send_interval = None;
     }
     *pos += 2;
@@ -1291,28 +1291,28 @@ impl FromRandom for TOFEventBuilderConfig {
     if cfg.active_fields & 0x1 == 1 {
       cfg.cachesize         = Some(rng.gen::<u32>());
     }
-    if cfg.active_fields & 0x2 == 1 {
+    if cfg.active_fields & 0x2 == 2 {
       cfg.n_mte_per_loop      = Some(rng.gen::<u32>());
     }
-    if cfg.active_fields & 0x4 == 1 {
+    if cfg.active_fields & 0x4 == 4 {
       cfg.n_rbe_per_loop      = Some(rng.gen::<u32>());
     }
-    if cfg.active_fields & 0x8 == 1 {
+    if cfg.active_fields & 0x8 == 8 {
       cfg.te_timeout_sec      = Some(rng.gen::<u32>());
     }
-    if cfg.active_fields & 0x16 == 1 {
+    if cfg.active_fields & 0x16 == 16 {
       cfg.sort_events         = Some(rng.gen::<bool>());
     }
-    if cfg.active_fields & 0x32 == 1 {
+    if cfg.active_fields & 0x32 == 32 {
       cfg.build_strategy      = Some(BuildStrategy::from_random());
     }
-    if cfg.active_fields & 0x64 == 1 {
+    if cfg.active_fields & 0x64 == 64 {
       cfg.wait_nrb = Some(rng.gen::<u8>());
     }
-    if cfg.active_fields & 0x128 == 1 {
+    if cfg.active_fields & 0x128 == 128 {
       cfg.greediness = Some(rng.gen::<u8>());
     }
-    if cfg.active_fields & 0x256 == 1 {
+    if cfg.active_fields & 0x256 == 256 {
       cfg.hb_send_interval = Some(rng.gen::<u16>());
     }
     cfg
