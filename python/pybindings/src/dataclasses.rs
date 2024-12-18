@@ -81,6 +81,7 @@ use tof_dataclasses::commands::config::{
   RunConfig,
   TriggerConfig,
   TOFEventBuilderConfig,
+  DataPublisherConfig,
   BuildStrategy
 };
 
@@ -302,6 +303,171 @@ impl PyRunConfig {
 }
 
 #[pyclass]
+#[pyo3(name="DataPublisherConfig")]
+pub struct PyDataPublisherConfig {
+  pub config : DataPublisherConfig
+}
+
+#[pymethods]
+impl PyDataPublisherConfig {
+  #[new]
+  fn new() -> Self {
+    let config =  DataPublisherConfig::new();
+    Self {
+      config
+    }
+  }
+
+  #[getter]
+  pub fn get_mbytes_per_file(&self) -> Option<u16> {
+    self.config.mbytes_per_file
+  }
+
+  #[setter]
+  pub fn set_mbytes_per_file(&mut self, mbytes : u16) {
+    self.config.mbytes_per_file = Some(mbytes);
+  }
+  
+  #[getter]
+  pub fn get_discard_event_fraction(&self) -> Option<f32> {
+    self.config.discard_event_fraction
+  }
+
+  #[setter]
+  pub fn set_discard_event_fraction(&mut self, frac : f32) {
+    self.config.discard_event_fraction = Some(frac);
+  }
+  
+  #[getter]
+  pub fn get_send_mtb_event_packets(&self) -> Option<bool> {
+    self.config.send_mtb_event_packets
+  }
+
+  #[setter]
+  pub fn set_send_mtb_event_packets(&mut self, send : bool ) {
+    self.config.send_mtb_event_packets = Some(send);
+  }
+  
+  #[getter]
+  pub fn get_send_rbwaveform_packets(&self) -> Option<bool> {
+    self.config.send_rbwaveform_packets
+  }
+
+  #[setter]
+  pub fn set_send_rbwaveform_packets(&mut self, send : bool ) {
+    self.config.send_rbwaveform_packets = Some(send);
+  }
+  
+  #[getter]
+  pub fn get_send_rbwf_every_x_event(&self) -> Option<u32> {
+    self.config.send_rbwf_every_x_event
+  }
+
+  #[setter]
+  pub fn set_send_rbwf_every_x_event(&mut self, nevent : u32) {
+    self.config.send_rbwf_every_x_event = Some(nevent);
+  }
+  
+  #[getter]
+  pub fn get_send_tof_summary_packets(&self) -> Option<bool> {
+    self.config.send_tof_summary_packets
+  }
+
+  #[setter]
+  pub fn set_send_tof_summary_packets(&mut self, send : bool ) {
+    self.config.send_tof_summary_packets = Some(send);
+  }
+  
+  #[getter]
+  pub fn get_send_tof_event_packets(&self) -> Option<bool> {
+    self.config.send_tof_event_packets
+  }
+
+  #[setter]
+  pub fn set_send_tof_event_packets(&mut self, send : bool ) {
+    self.config.send_tof_event_packets = Some(send);
+  }
+  
+  #[getter]
+  pub fn get_hb_send_interval(&self) -> Option<u16> {
+    self.config.hb_send_interval
+  }
+
+  #[setter]
+  pub fn set_hb_send_interfal(&mut self, interv : u16) {
+    self.config.hb_send_interval = Some(interv)
+  }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    self.config.to_bytestream()
+  }
+  
+  fn __getitem__(&self, py: Python, key: &str) -> PyResult<Option<PyObject>> {  
+    match key {
+      "mbytes_per_file"          => Ok(Some(self.config.mbytes_per_file.into_py(py))),
+      "discard_event_fraction"   => Ok(Some(self.config.discard_event_fraction.into_py(py))),
+      "send_mtb_event_packets"   => Ok(Some(self.config.send_mtb_event_packets.into_py(py))),
+      "send_rbwaveform_packets"  => Ok(Some(self.config.send_rbwaveform_packets.into_py(py))),
+      "send_rbwf_every_x_event"  => Ok(Some(self.config.send_rbwf_every_x_event.into_py(py))),
+      "send_tof_summary_packets" => Ok(Some(self.config.send_tof_summary_packets.into_py(py))),
+      "send_tof_event_packets"   => Ok(Some(self.config.send_tof_event_packets.into_py(py))),
+      "hb_send_interval"         => Ok(Some(self.config.hb_send_interval.into_py(py))),
+      _     => Err(PyKeyError::new_err(format!("Key '{}' not found", key)))
+    }
+  }
+
+  fn __setitem__(&mut self, key: &str, value: &Bound<'_, PyAny>) -> PyResult<()> {
+    match key {
+      "mbytes_per_file" => {
+          self.config.active_fields |= 0x1;
+          self.config.mbytes_per_file = Some(value.extract::<u16>()?);
+          Ok(())
+      }
+      "discard_event_fraction" => {
+          self.config.active_fields |= 0x2;
+          self.config.discard_event_fraction = Some(value.extract::<f32>()?);
+          Ok(())
+      }
+      "send_mtb_event_packets" => {
+          self.config.active_fields |= 0x4;
+          self.config.send_mtb_event_packets = Some(value.extract::<bool>()?);
+          Ok(())
+      }
+      "send_rbwaveform_packets" => {
+          self.config.active_fields |= 0x8;
+          self.config.send_rbwaveform_packets = Some(value.extract::<bool>()?);
+          Ok(())
+      }
+      "send_rbwf_every_x_event" => {
+          self.config.active_fields |= 0x16;
+          self.config.send_rbwf_every_x_event = Some(value.extract::<u32>()?);
+          Ok(())
+      }
+      "send_tof_summary_packets" => {
+          self.config.active_fields |= 0x32;
+          self.config.send_tof_summary_packets = Some(value.extract::<bool>()?);
+          Ok(())
+      }
+      "send_tof_event_packets" => {
+          self.config.active_fields |= 0x64;
+          self.config.send_tof_event_packets = Some(value.extract::<bool>()?);
+          Ok(())
+      }
+      "hb_send_interval" => {
+          self.config.active_fields |= 0x512;
+          self.config.hb_send_interval = Some(value.extract::<u16>()?);
+          Ok(())
+      }
+      _ => Err(PyKeyError::new_err(format!("Key '{}' not found", key))),
+    }
+  }
+  
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.config)) 
+  }
+}
+
+#[pyclass]
 #[pyo3(name="TriggerConfig")]
 pub struct PyTriggerConfig {
   pub config : TriggerConfig
@@ -402,6 +568,11 @@ impl PyTriggerConfig {
   fn get_hb_send_interval(&self) -> Option<u16> {
     self.config.hb_send_interval
   }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    self.config.to_bytestream()
+  }
+
   #[setter]
   fn set_hb_send_interval(&mut self, hb_int :  Option<u16>) {
     self.config.hb_send_interval = hb_int;
@@ -601,6 +772,10 @@ impl PyTOFEventBuilderConfig{
   fn set_hb_send_interval(&mut self, hb_send_interval: u16) -> PyResult<()> {
     self.config.hb_send_interval = Some(hb_send_interval);
     Ok(())
+  }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    self.config.to_bytestream()
   }
  
   fn __getitem__(&self, py: Python, key: &str) -> PyResult<Option<PyObject>> {  

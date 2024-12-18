@@ -18,6 +18,7 @@ pub mod caraspace;
 use telemetry_dataclasses::packets as tel_api;
 
 use tof_dataclasses::events::EventStatus;
+use tof_dataclasses::commands::config::BuildStrategy;
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "telemetry")] {
@@ -364,6 +365,9 @@ fn tof_command_factory<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(py_start_run, m)?)?;
   m.add_function(wrap_pyfunction!(py_stop_run, m)?)?;
   m.add_function(wrap_pyfunction!(py_rb_calibration, m)?)?;
+  m.add_function(wrap_pyfunction!(py_change_triggerconfig, m)?)?;
+  m.add_function(wrap_pyfunction!(py_change_datapublisherconfig, m)?)?;
+  m.add_function(wrap_pyfunction!(py_change_tofeventbuilderconfig, m)?)?;
   Ok(())
 }
 
@@ -374,9 +378,14 @@ fn tof_command_factory<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 fn tof_commands<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TofCommandCode>()?;
   m.add_class::<PyTofCommand>()?;
+  
+  m.add_class::<BuildStrategy>()?;
+
   m.add_class::<PyTriggerConfig>()?;
   m.add_class::<PyAnalysisEngineConfig>()?;
   m.add_class::<PyTOFEventBuilderConfig>()?;
+  m.add_class::<PyDataPublisherConfig>()?;
+
   m.add_class::<PyHeartBeatDataSink>()?;
   m.add_class::<PyMTBHeartbeat>()?;
   m.add_class::<PyEVTBLDRHeartbeat>()?;
