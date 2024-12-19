@@ -2,7 +2,7 @@
 Work with telemetry and .tof.gaps files
 """
 
-
+import numpy as np
 import re
 import sys
 
@@ -153,6 +153,42 @@ def get_telemetry_binaries(unix_time_start, unix_time_stop,\
     ts = [get_ts_from_binfile(f) for f in files]
     print(f'-> Run duration {ts[-1] - ts[0]}')
     if files:
+        print(f'-> Found {len(files)} files within range of {t_start} - {t_stop}')
+        print(f'--> Earliest file {files[0]}')
+        print(f'--> Latest file {files[-1]}')
+    else:
+        print(f'! No files have been found within {t_start} and {t_stop}!')
+    return files
+
+
+def grace_get_telemetry_binaries(unix_time_start, unix_time_stop,\
+                           data_dir='/gaps_binaries/live/raw/ethernet'):
+
+    # file format is something like RAW240712_094325.bin
+    t_start = datetime.fromtimestamp(unix_time_start, UTC)
+    t_stop  = datetime.fromtimestamp(unix_time_stop, UTC)
+    all_files = sorted([k for k in Path(f'{data_dir}').glob('*.bin')])
+    print(f'-> Found {len(all_files)} files in {data_dir}')
+    #ts = [get_ts_from_binfile(f) for f in all_files]
+    # FiXME - this might throw away 1 file
+    #files = [f for f, ts in zip(all_files, ts) if t_start <= ts <= t_stop]
+    #ts = [get_ts_from_binfile(f) for f in files]
+    time_stamps = [get_ts_from_binfile(f) for f in all_files]
+    # I think there is probably a more elegant way to do this with numpy sorting
+    # but dont know how it handles datetime object, ona  side note
+    # why tf are we using datetime objects instead of like floats...
+    sorted_inds = np.argsort(time_stamps)
+    sorted_files = np.array(all_files)[sorted_inds]
+    sorted_times = np.array(time_stamps)[sorted_inds]
+    i = np.argmin(np.abs(t_start-sorted_times))-1
+    j = np.argmin(np.abs(t_stop-sorted_times))+1
+    if i < 1:
+        i = 1
+    if j >= len(sorted_files):
+        j = len(sorted_files)-1
+    files = sorted_files[i-1:j+1]
+    print(f'-> Run duration {sorted_times[j] - sorted_times[i-1]}')
+    if len(files) > 0:
         print(f'-> Found {len(files)} files within range of {t_start} - {t_stop}')
         print(f'--> Earliest file {files[0]}')
         print(f'--> Latest file {files[-1]}')
