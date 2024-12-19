@@ -14,13 +14,13 @@ if import_rtd_success:
     HeartbeatDataSink     = rtd.commands.HeartbeatDataSink
     MTBHeartbeat          = rtd.commands.MTBHeartbeat
     TofCommand            = rtd.commands.TofCommand
+    TofCommandCode        = rtd.commands.TofCommandCode
     TOFEventBuilderConfig = rtd.commands.TOFEventBuilderConfig
     DataPublisherConfig   = rtd.commands.DataPublisherConfig
     TriggerConfig         = rtd.commands.TriggerConfig
     TofRunConfig          = rtd.commands.TofRunConfig
     TofRBConfig           = rtd.commands.TofRBConfig
     BuildStrategy         = rtd.commands.BuildStrategy
-
     # command factory
     factory               = rtd.commands.factory
     
