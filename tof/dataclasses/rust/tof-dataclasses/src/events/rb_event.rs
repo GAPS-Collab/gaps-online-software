@@ -130,16 +130,16 @@ impl RBPaddleID {
   pub fn get_order_flipped(&self, channel : u8) -> bool {
     match channel {
       1 | 2 => {
-        return (self.channel_order & 0x1) == 1;
+        return (self.channel_order & 1) == 1;
       }
       3 | 4 => {
-        return (self.channel_order & 0x2) == 1;
+        return (self.channel_order & 2) == 2;
       }
       5 | 6 => {
-        return (self.channel_order & 0x4) == 1;
+        return (self.channel_order & 4) == 4;
       }
       7 | 8 => {
-        return (self.channel_order & 0x8) == 1;
+        return (self.channel_order & 8) == 8;
       }
       _ => {
         error!("{} is not a valid RB channel!", channel);
@@ -245,16 +245,16 @@ impl RBPaddleID {
     rb_pid.paddle_78 = rb.paddle78.paddle_id as u8;    
     let mut flipped  = 0u8 ;
     if rb.paddle12_chA != 1 {
-      flipped = flipped | 0x1;
+      flipped |= 1;
     }
     if rb.paddle34_chA != 3 {
-      flipped = flipped | 0x2;
+      flipped |= 2;
     }
     if rb.paddle56_chA != 5 {
-      flipped = flipped | 0x4;
+      flipped |= 4;
     }
     if rb.paddle78_chA != 7 {
-      flipped = flipped | 0x8;
+      flipped |= 8;
     }
     rb_pid.channel_order = flipped;
     rb_pid
@@ -1480,13 +1480,13 @@ let mut rng = rand::thread_rng();
           assert_eq!(rb.paddle12_chA,2);
         }
         if *ch == 3 || *ch == 4 {
-          assert_eq!(rb.paddle12_chA,4);
+          assert_eq!(rb.paddle34_chA,4);
         }
         if *ch == 5 || *ch == 6 {
-          assert_eq!(rb.paddle12_chA,6);
+          assert_eq!(rb.paddle56_chA,6);
         }
         if *ch == 7 || *ch == 8 {
-          assert_eq!(rb.paddle12_chA,8);
+          assert_eq!(rb.paddle78_chA,8);
         }
       }
     }
