@@ -3,25 +3,6 @@
 //! the tof system.
 //!
 //!
-//! Here is a comprehensive list (Sydney)
-//! * Power on/off to PBs+RBs+LTBs+preamps (all at once) or MT
-//! * Power on/off to LTB or preamp < 2/day Command to power on/off various components (to TOF -> to RB) 5 B:
-//! * RBsetup ? Command to run rbsetup on a particular RB (to TOF -> to RBs) 8 B:
-//! * Set Thresholds < 3/day Command to set a threshold level on all LTBs (to TOF -> to RBs) 8 B:
-//! * Set MT Config 1/run, <10/day? Command to set MT trigger config (to TOF -> to MT) 4 B:
-//! * Start Validation Run 1/run, <10/day? Command to take a small amount of data (some number E events, I
-//! * 360xE full waveforms (from TOF)
-//! 
-//! * Start Data-Taking Run 1/run, <10/day? Command to take regular data (to TOF -> to RBs)
-//! * Reduced data packet (from Flight computer)
-//! * Stop Run < 1/run, < 10/day Command to stop a run (to TOF -> to RBs) 2 B = command name 6
-//! 
-//! * Voltage Calibration Runs 1/day Command to take 2 voltage calibration runs (to TOF -> to RBs) 12 B:
-//! * Timing Calibration Run 1/day Command to take a timing calibration run (to TOF -> to RBs) 8 B:
-//! * Create New Calibration File 1/day Command to create a new calibration file using data from the three
-//! 
-//! Each command will be answered by a specific response. The responses 
-//! consists of a class, `TofResponse` together with a 32bit response code.
 //!
 
 pub mod factory;
@@ -70,7 +51,7 @@ pub enum TofCommandCode {
   /// Reload a default (to be defined) config file
   ResetConfigWDefault      = 5u8,
   /// Make the current editable config the active config
-  ActivateConfig           = 6u8,
+  SubmitConfig           = 6u8,
   /// command code to configure the data publisher thread
   SetDataPublisherConfig   = 20u8,
   /// command code for "Set LTB Thresholds"
@@ -150,7 +131,7 @@ impl From<u8> for TofCommandCode {
       2   => TofCommandCode::Moni,
       4   => TofCommandCode::Kill,
       5   => TofCommandCode::ResetConfigWDefault,
-      6   => TofCommandCode::ActivateConfig,
+      6   => TofCommandCode::SubmitConfig,
       20  => TofCommandCode::SetDataPublisherConfig,
       21  => TofCommandCode::SetLTBThresholds,
       22  => TofCommandCode::SetMTConfig,
@@ -192,7 +173,7 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::Ping,
       TofCommandCode::Moni,
       TofCommandCode::ResetConfigWDefault,
-      TofCommandCode::ActivateConfig,
+      TofCommandCode::SubmitConfig,
       TofCommandCode::SetDataPublisherConfig,
       TofCommandCode::SetLTBThresholds,
       TofCommandCode::SetMTConfig,
