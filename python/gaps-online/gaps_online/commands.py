@@ -15,6 +15,7 @@ if import_rtd_success:
     MTBHeartbeat          = rtd.commands.MTBHeartbeat
     TofCommand            = rtd.commands.TofCommand
     TOFEventBuilderConfig = rtd.commands.TOFEventBuilderConfig
+    DataPublisherConfig   = rtd.commands.DataPublisherConfig
     TriggerConfig         = rtd.commands.TriggerConfig
     BuildStrategy         = rtd.commands.BuildStrategy
 

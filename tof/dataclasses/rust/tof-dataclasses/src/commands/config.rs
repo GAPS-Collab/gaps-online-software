@@ -794,6 +794,93 @@ impl FromRandom for TriggerConfig {
   }
 }
 
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct TofRunConfig {
+  pub active_fields            : u32,
+  pub runtime                  : Option<u32>, 
+}
+
+impl TofRunConfig {
+  pub fn new() -> Self {
+    Self {
+      active_fields : 0,
+      runtime       : None
+    }
+  }
+
+  pub fn set_runtime(&mut self, runtime : u32) {
+    self.active_fields |= 1;
+    self.runtime = Some(runtime);
+  }
+}
+
+impl Default for TofRunConfig {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for TofRunConfig {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TofRunConfig: ");
+    repr += &(format!("(active fields {:x})", self.active_fields));
+    if self.runtime.is_some() {
+      repr += &(format!("\n  Run time        : {} [s]", self.runtime.unwrap())); 
+    }
+    repr += ">";
+    write!(f, "{}", repr)
+  }
+}
+
+impl Packable for TofRunConfig {
+  const PACKET_TYPE : PacketType = PacketType::TofRunConfig;
+}
+
+impl Serialization for TofRunConfig {
+  
+  const HEAD : u16   = 0xAAAA;
+  const TAIL : u16   = 0x5555;
+  const SIZE : usize = 12; 
+  
+  fn from_bytestream(stream    : &Vec<u8>, 
+                     pos       : &mut usize) 
+    -> Result<Self, SerializationError>{
+    Self::verify_fixed(stream, pos)?;  
+    let mut cfg        = TofRunConfig::new();
+    cfg.active_fields  = parse_u32(stream, pos);
+    cfg.runtime        = Some(parse_u32 (stream, pos));
+    // disable fields which where not explicitly marked as 
+    // active
+    if cfg.active_fields & 1 != 1 {
+      cfg.runtime = None;
+    }
+    *pos += 2;
+    Ok(cfg)
+  }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
+    bs.extend_from_slice(&Self::HEAD        .to_le_bytes());
+    bs.extend_from_slice(&self.active_fields.to_le_bytes());
+    bs.extend_from_slice(&self.runtime.unwrap_or(0).to_le_bytes());
+    bs.extend_from_slice(&Self::TAIL.to_le_bytes());
+    bs
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for TofRunConfig {
+  fn from_random() -> Self {
+    let mut cfg                 = Self::new();
+    let mut rng                 = rand::thread_rng();
+    let active_fields           = rng.gen::<u32>();
+    cfg.active_fields           = active_fields;
+    if active_fields & 1 == 1 {
+      cfg.runtime   = Some(rng.gen::<u32>());
+    }
+    cfg
+  }
+}
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct DataPublisherConfig {
@@ -821,6 +908,46 @@ impl DataPublisherConfig {
       send_tof_event_packets   : None, 
       hb_send_interval         : None, 
     }
+  }
+      
+  pub fn set_mbytes_per_file(&mut self, mbytes : u16) {
+    self.active_fields |= 1;
+    self.mbytes_per_file = Some(mbytes);
+  }
+
+  pub fn set_discard_event_fraction(&mut self, frac : f32) {
+    self.active_fields |= 2;
+    self.discard_event_fraction = Some(frac);
+  }
+
+  pub fn set_send_mtb_event_packets(&mut self, send : bool) {
+    self.active_fields |= 4;
+    self.send_mtb_event_packets = Some(send);
+  }
+
+  pub fn set_send_rbwaveform_packets(&mut self, send : bool) {
+    self.active_fields |= 8;
+    self.send_rbwaveform_packets = Some(send);
+  }
+
+  pub fn set_send_rbwf_every_x_event(&mut self, x : u32) {
+    self.active_fields |= 16;
+    self.send_rbwf_every_x_event = Some(x);
+  }
+
+  pub fn set_send_tof_summary_packets(&mut self, send : bool) {
+    self.active_fields |= 32;
+    self.send_tof_summary_packets = Some(send);
+  }
+  
+  pub fn send_tof_event_packets(&mut self, send : bool) {
+    self.active_fields |= 64;
+    self.send_tof_event_packets = Some(send);
+  }
+
+  pub fn set_hb_send_interval(&mut self, interval : u16) {
+    self.active_fields |= 128;
+    self.hb_send_interval = Some(interval);
   }
 }
 
@@ -1441,6 +1568,16 @@ fn pack_datapublisherconfig() {
   for _ in 0..100 {
     let cfg  = DataPublisherConfig::from_random();
     let test : DataPublisherConfig = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_tofrunconfig() {
+  for _ in 0..100 {
+    let cfg  = TofRunConfig::from_random();
+    let test : TofRunConfig = cfg.pack().unpack().unwrap();
     assert_eq!(cfg, test);
   }
 }

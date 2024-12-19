@@ -20,6 +20,7 @@ use tof_dataclasses::commands::config::{
   BuildStrategy,
   TriggerConfig,
   TOFEventBuilderConfig, 
+  TofRunConfig,
   DataPublisherConfig,
 };
 use tof_dataclasses::events::master_trigger::TriggerType;
@@ -886,7 +887,13 @@ impl LiftofSettings {
       ltb_settings              : LTBThresholdSettings::new(),
     }
   }  
-  
+ 
+  pub fn from_tofrunconfig(&mut self, cfg : &TofRunConfig) {
+    if cfg.runtime.is_some() {
+      self.runtime_sec = cfg.runtime.unwrap() as u64;
+    }
+  }
+
   /// Change a value by giving the specific key as 
   /// a string, the value then will be parsed 
   /// accordingly

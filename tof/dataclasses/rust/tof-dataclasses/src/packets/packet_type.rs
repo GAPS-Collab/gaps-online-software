@@ -35,6 +35,7 @@ pub enum PacketType {
   RBEventHeader         = 70u8,    // needs to go away
   TOFEventBuilderConfig = 71u8,
   DataPublisherConfig   = 72u8,
+  TofRunConfig          = 73u8,
   CPUMoniData           = 80u8,
   MonitorMtb            = 90u8,
   RBMoniData            = 100u8,
@@ -96,6 +97,7 @@ impl From<u8> for PacketType {
       69  => PacketType::AnalysisEngineConfig,
       70  => PacketType::RBEventHeader,
       72  => PacketType::DataPublisherConfig,
+      73  => PacketType::TofRunConfig,
       80  => PacketType::CPUMoniData,
       90  => PacketType::MonitorMtb,
       100 => PacketType::RBMoniData,
@@ -146,6 +148,7 @@ impl FromRandom for PacketType {
       PacketType::TofResponse,
       PacketType::RBChannelMaskConfig,
       PacketType::DataPublisherConfig,
+      PacketType::TofRunConfig,
       PacketType::AnalysisEngineConfig,
       PacketType::RBCommand,
       PacketType::RBPing,
@@ -199,6 +202,7 @@ fn test_packet_types() {
   type_codes.push(PacketType::RBPing as u8);
   type_codes.push(PacketType::PreampBiasConfig as u8);
   type_codes.push(PacketType::RunConfig as u8);
+  type_codes.push(PacketType::TofRunConfig as u8);
   type_codes.push(PacketType::LTBThresholdConfig as u8);
   type_codes.push(PacketType::AnalysisEngineConfig as u8);
   type_codes.push(PacketType::DataPublisherConfig as u8);
