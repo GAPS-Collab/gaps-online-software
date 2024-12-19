@@ -14,6 +14,7 @@ use crate::commands::config::{
   TriggerConfig,
   TOFEventBuilderConfig,
   DataPublisherConfig,
+  TofRunConfig,
 };
 
 use crate::serialization::Serialization;
@@ -281,3 +282,13 @@ pub fn change_datapublisherconfig(cfg : &DataPublisherConfig) -> Option<TofComma
     payload      : payload,
   })
 }
+
+/// Change the data publisher config part of the config file
+pub fn change_tofrunconfig(cfg : &TofRunConfig) -> Option<TofCommandV2> {
+  let payload = cfg.to_bytestream();
+  Some(TofCommandV2 {
+    command_code : TofCommandCode::SetTofRunConfig,
+    payload      : payload,
+  })
+}
+
