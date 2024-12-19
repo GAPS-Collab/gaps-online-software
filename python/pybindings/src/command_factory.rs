@@ -257,7 +257,7 @@ pub fn py_change_datapublisherconfig(cfg : &PyDataPublisherConfig) -> PyResult<P
 
 /// Change the run config part of the config file
 #[pyfunction]
-#[pyo3(name="change_datapublisherconfig")]
+#[pyo3(name="change_tofrunconfig")]
 pub fn py_change_tofrunconfig(cfg : &PyTofRunConfig) -> PyResult<PyTofCommand> {
   match change_tofrunconfig(&cfg.config) {
     None => {
