@@ -17,6 +17,7 @@ use crate::{
   PyTOFEventBuilderConfig,
   PyDataPublisherConfig,
   PyTofRunConfig,
+  PyTofRBConfig,
 };
 
 /// A hardwired map of RB -> RAT
@@ -260,6 +261,23 @@ pub fn py_change_datapublisherconfig(cfg : &PyDataPublisherConfig) -> PyResult<P
 #[pyo3(name="change_tofrunconfig")]
 pub fn py_change_tofrunconfig(cfg : &PyTofRunConfig) -> PyResult<PyTofCommand> {
   match change_tofrunconfig(&cfg.config) {
+    None => {
+      return Err(PyValueError::new_err(format!("You encounterd a dragon \u{1f409}! We don't know what's going on either.")));
+    }
+    Some(cmd) => {
+      let pycmd = PyTofCommand { 
+       command : cmd
+      };
+      return Ok(pycmd);
+    }
+  }
+}
+
+/// Change the RB config part of the config file
+#[pyfunction]
+#[pyo3(name="change_tofrbconfig")]
+pub fn py_change_tofrbconfig(cfg : &PyTofRBConfig) -> PyResult<PyTofCommand> {
+  match change_tofrbconfig(&cfg.config) {
     None => {
       return Err(PyValueError::new_err(format!("You encounterd a dragon \u{1f409}! We don't know what's going on either.")));
     }

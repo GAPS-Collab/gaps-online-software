@@ -15,6 +15,7 @@ use crate::commands::config::{
   TOFEventBuilderConfig,
   DataPublisherConfig,
   TofRunConfig,
+  TofRBConfig,
 };
 
 use crate::serialization::Serialization;
@@ -288,6 +289,14 @@ pub fn change_tofrunconfig(cfg : &TofRunConfig) -> Option<TofCommandV2> {
   let payload = cfg.to_bytestream();
   Some(TofCommandV2 {
     command_code : TofCommandCode::SetTofRunConfig,
+    payload      : payload,
+  })
+}
+
+pub fn change_tofrbconfig(cfg : &TofRBConfig) -> Option<TofCommandV2> {
+  let payload = cfg.to_bytestream();
+  Some(TofCommandV2 {
+    command_code : TofCommandCode::SetTofRBConfig,
     payload      : payload,
   })
 }

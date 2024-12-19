@@ -369,6 +369,7 @@ fn tof_command_factory<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(py_change_datapublisherconfig, m)?)?;
   m.add_function(wrap_pyfunction!(py_change_tofeventbuilderconfig, m)?)?;
   m.add_function(wrap_pyfunction!(py_change_tofrunconfig, m)?)?;
+  m.add_function(wrap_pyfunction!(py_change_tofrbconfig, m)?)?;
   Ok(())
 }
 
@@ -387,6 +388,7 @@ fn tof_commands<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyTOFEventBuilderConfig>()?;
   m.add_class::<PyDataPublisherConfig>()?;
   m.add_class::<PyTofRunConfig>()?;
+  m.add_class::<PyTofRBConfig>()?;
  
   m.add_class::<PyHeartBeatDataSink>()?;
   m.add_class::<PyMTBHeartbeat>()?;

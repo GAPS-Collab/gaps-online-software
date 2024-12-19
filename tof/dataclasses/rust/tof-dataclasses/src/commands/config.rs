@@ -882,6 +882,174 @@ impl FromRandom for TofRunConfig {
   }
 }
 
+//////////////////////////////////////////
+
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct TofRBConfig {
+  pub active_fields                  : u32,
+  pub rb_moni_interval               : Option<u32>, 
+  pub pb_moni_every_x                : Option<u32>,
+  pub pa_moni_every_x                : Option<u32>,
+  pub ltb_moni_every_x               : Option<u32>,
+  pub drs_deadtime_instead_fpga_temp : Option<bool>,
+}
+
+impl TofRBConfig {
+  pub fn new() -> Self {
+    Self {
+     active_fields                 : 0,
+     rb_moni_interval               : None, 
+     pb_moni_every_x                : None,
+     pa_moni_every_x                : None,
+     ltb_moni_every_x               : None,
+     drs_deadtime_instead_fpga_temp : None,
+    }
+  }
+
+  pub fn set_rb_moni_interval(&mut self, interval : u32) {
+    self.active_fields |= 1;
+    self.rb_moni_interval = Some(interval);
+  }
+  
+  pub fn set_pb_moni_every_x(&mut self, interval : u32) {
+    self.active_fields |= 2;
+    self.pb_moni_every_x = Some(interval);
+  }
+  
+  pub fn set_pa_moni_every_x(&mut self, interval : u32) {
+    self.active_fields |= 4;
+    self.pa_moni_every_x = Some(interval);
+  }
+  
+  pub fn set_ltb_moni_every_x(&mut self, interval : u32) {
+    self.active_fields |= 8;
+    self.ltb_moni_every_x = Some(interval);
+  }
+  
+  pub fn set_drs_deadtime_instead_fpga_temp(&mut self, apply : bool) {
+    self.active_fields |= 16;
+    self.drs_deadtime_instead_fpga_temp = Some(apply);
+  }
+}
+
+impl Default for TofRBConfig {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for TofRBConfig {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TofRBConfig: ");
+    repr += &(format!("(active fields {:x})", self.active_fields));
+    if self.rb_moni_interval.is_some() {
+      repr += &(format!("\n  RBMoni interval : {} [s]", self.rb_moni_interval.unwrap())); 
+    }
+    if self.pa_moni_every_x.is_some() {
+      repr += &(format!("\n  PAMoni interval : {} [xRBMoni]", self.pa_moni_every_x.unwrap())); 
+    }
+    if self.pb_moni_every_x.is_some() {
+      repr += &(format!("\n  PBMoni interval : {} [xRBMoni]", self.pb_moni_every_x.unwrap())); 
+    }
+    if self.ltb_moni_every_x.is_some() {
+      repr += &(format!("\n  LTBMoni interval : {} [xRBMoni]", self.ltb_moni_every_x.unwrap())); 
+    }
+    if self.drs_deadtime_instead_fpga_temp.is_some() {
+      if self.drs_deadtime_instead_fpga_temp.unwrap() {
+        repr += &(format!("\n  -- using the fpga temp field to store drs deadtime values")); 
+      } 
+    }
+    repr += ">";
+    write!(f, "{}", repr)
+  }
+}
+
+impl Packable for TofRBConfig {
+  const PACKET_TYPE : PacketType = PacketType::TofRBConfig;
+}
+
+impl Serialization for TofRBConfig {
+  
+  const HEAD : u16   = 0xAAAA;
+  const TAIL : u16   = 0x5555;
+  const SIZE : usize = 25; 
+  
+  fn from_bytestream(stream    : &Vec<u8>, 
+                     pos       : &mut usize) 
+    -> Result<Self, SerializationError>{
+    Self::verify_fixed(stream, pos)?;  
+    let mut cfg          = Self::new();
+    cfg.active_fields    = parse_u32(stream, pos);
+    cfg.rb_moni_interval = Some(parse_u32 (stream, pos));
+    cfg.pa_moni_every_x = Some(parse_u32 (stream, pos));
+    cfg.pb_moni_every_x = Some(parse_u32 (stream, pos));
+    cfg.ltb_moni_every_x = Some(parse_u32 (stream, pos));
+    cfg.drs_deadtime_instead_fpga_temp = Some(parse_bool (stream, pos));
+    // disable fields which where not explicitly marked as 
+    // active
+    if cfg.active_fields & 1 != 1 {
+      cfg.rb_moni_interval = None;
+    }
+    if cfg.active_fields & 2 != 2 {
+      cfg.pa_moni_every_x = None;
+    }
+    if cfg.active_fields & 4 != 4 {
+      cfg.pb_moni_every_x = None;
+    }
+    if cfg.active_fields & 8 != 8 {
+      cfg.ltb_moni_every_x = None;
+    }
+    if cfg.active_fields & 16 != 16 {
+      cfg.drs_deadtime_instead_fpga_temp = None;
+    }
+    *pos += 2;
+    Ok(cfg)
+  }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
+    bs.extend_from_slice(&Self::HEAD        .to_le_bytes());
+    bs.extend_from_slice(&self.active_fields.to_le_bytes());
+    bs.extend_from_slice(&self.rb_moni_interval.unwrap_or(0).to_le_bytes());
+    bs.extend_from_slice(&self.pa_moni_every_x.unwrap_or(0).to_le_bytes());
+    bs.extend_from_slice(&self.pb_moni_every_x.unwrap_or(0).to_le_bytes());
+    bs.extend_from_slice(&self.ltb_moni_every_x.unwrap_or(0).to_le_bytes());
+    bs.push             (self.drs_deadtime_instead_fpga_temp.unwrap_or(false) as u8);
+    bs.extend_from_slice(&Self::TAIL.to_le_bytes());
+    bs
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for TofRBConfig {
+  fn from_random() -> Self {
+    let mut cfg          = Self::new();
+    let mut rng          = rand::thread_rng();
+    let active_fields    = rng.gen::<u32>();
+    cfg.active_fields    = active_fields;
+    if active_fields & 1 == 1 {
+      cfg.rb_moni_interval   = Some(rng.gen::<u32>());
+    }
+    if active_fields & 2 == 2 {
+      cfg.pa_moni_every_x   = Some(rng.gen::<u32>());
+    }
+    if active_fields & 4 == 4 {
+      cfg.pb_moni_every_x   = Some(rng.gen::<u32>());
+    }
+    if active_fields & 8 == 8 {
+      cfg.ltb_moni_every_x   = Some(rng.gen::<u32>());
+    }
+    if active_fields & 16 == 16 {
+      cfg.drs_deadtime_instead_fpga_temp  = Some(rng.gen::<bool>());
+    }
+    cfg
+  }
+}
+
+/////////////////////////////////////
+
+
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct DataPublisherConfig {
   pub active_fields            : u32,
@@ -1578,6 +1746,16 @@ fn pack_tofrunconfig() {
   for _ in 0..100 {
     let cfg  = TofRunConfig::from_random();
     let test : TofRunConfig = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_tofrbconfig() {
+  for _ in 0..100 {
+    let cfg  = TofRBConfig::from_random();
+    let test : TofRBConfig = cfg.pack().unpack().unwrap();
     assert_eq!(cfg, test);
   }
 }

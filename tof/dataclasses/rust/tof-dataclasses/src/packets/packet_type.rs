@@ -31,6 +31,7 @@ pub enum PacketType {
   MTBHeartbeat          = 62u8, 
   EVTBLDRHeartbeat      = 63u8,
   RBChannelMaskConfig   = 64u8,
+  TofRBConfig           = 68u8,
   AnalysisEngineConfig  = 69u8,
   RBEventHeader         = 70u8,    // needs to go away
   TOFEventBuilderConfig = 71u8,
@@ -94,6 +95,7 @@ impl From<u8> for PacketType {
       62  => PacketType::MTBHeartbeat,
       63  => PacketType::EVTBLDRHeartbeat,
       64  => PacketType::RBChannelMaskConfig,
+      68  => PacketType::TofRBConfig,
       69  => PacketType::AnalysisEngineConfig,
       70  => PacketType::RBEventHeader,
       72  => PacketType::DataPublisherConfig,
@@ -146,6 +148,7 @@ impl FromRandom for PacketType {
       PacketType::TofCommand,
       PacketType::TofCommandV2,
       PacketType::TofResponse,
+      PacketType::TofRBConfig,
       PacketType::RBChannelMaskConfig,
       PacketType::DataPublisherConfig,
       PacketType::TofRunConfig,
@@ -189,6 +192,7 @@ fn test_packet_types() {
   type_codes.push(PacketType::EVTBLDRHeartbeat as u8);
   type_codes.push(PacketType::RBEventHeader as u8);
   type_codes.push(PacketType::RBEvent as u8);
+  type_codes.push(PacketType::TofRBConfig as u8);
   type_codes.push(PacketType::RBEventMemoryView as u8);
   type_codes.push(PacketType::TofCommand as u8);
   type_codes.push(PacketType::TofCommandV2 as u8);

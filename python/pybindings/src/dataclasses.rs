@@ -83,6 +83,7 @@ use tof_dataclasses::commands::config::{
   TOFEventBuilderConfig,
   DataPublisherConfig,
   TofRunConfig,
+  TofRBConfig,
   BuildStrategy
 };
 
@@ -327,7 +328,7 @@ impl PyTofRunConfig {
 
   #[setter]
   pub fn set_runtime(&mut self, secs : u32) {
-    self.config.runtime = Some(secs);
+    self.config.set_runtime(secs);
   }
   
   fn to_bytestream(&self) -> Vec<u8> {
@@ -347,6 +348,124 @@ impl PyTofRunConfig {
           self.config.active_fields |= 1;
           self.config.runtime = Some(value.extract::<u32>()?);
           Ok(())
+      }
+      _ => Err(PyKeyError::new_err(format!("Key '{}' not found", key))),
+    }
+  }
+  
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.config)) 
+  }
+}
+
+#[pyclass]
+#[pyo3(name="TofRBConfig")]
+pub struct PyTofRBConfig {
+  pub config : TofRBConfig
+}
+
+#[pymethods]
+impl PyTofRBConfig {
+
+  #[new]
+  fn new() -> Self {
+    let config =  TofRBConfig::new();
+    Self {
+      config
+    }
+  }
+  
+  #[getter]
+  pub fn get_rb_moni_interval(&self) -> Option<u32> {
+    self.config.rb_moni_interval
+  }
+
+  #[setter]
+  pub fn set_rb_moni_interval(&mut self, secs : u32) {
+    self.config.set_rb_moni_interval(secs);
+  }
+  
+  #[getter]
+  pub fn get_pa_moni_every_x(&self) -> Option<u32> {
+    self.config.pa_moni_every_x
+  }
+
+  #[setter]
+  pub fn set_pa_moni_every_x(&mut self, secs : u32) {
+    self.config.set_pa_moni_every_x(secs);
+  }
+  
+  #[getter]
+  pub fn get_pb_moni_every_x(&self) -> Option<u32> {
+    self.config.pb_moni_every_x
+  }
+
+  #[setter]
+  pub fn set_pb_moni_every_x(&mut self, secs : u32) {
+    self.config.set_pb_moni_every_x(secs);
+  }
+  
+  #[getter]
+  pub fn get_ltb_moni_every_x(&self) -> Option<u32> {
+    self.config.ltb_moni_every_x
+  }
+
+  #[setter]
+  pub fn set_ltb_moni_every_x(&mut self, secs : u32) {
+    self.config.set_ltb_moni_every_x(secs);
+  }
+  
+  #[getter]
+  pub fn get_drs_deadtime_instead_fpga_temp(&self) -> Option<bool> {
+    self.config.drs_deadtime_instead_fpga_temp
+  }
+
+  #[setter]
+  pub fn set_drs_deadtime_instead_fpga_temp(&mut self, do_it : bool) {
+    self.config.set_drs_deadtime_instead_fpga_temp(do_it);
+  }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    self.config.to_bytestream()
+  }
+  
+  fn __getitem__(&self, py: Python, key: &str) -> PyResult<Option<PyObject>> {  
+    match key {
+      "rb_moni_interval"  => Ok(Some(self.config.rb_moni_interval.into_py(py))),
+      "pa_moni_every_x"   => Ok(Some(self.config.pa_moni_every_x.into_py(py))),
+      "pb_moni_every_x"   => Ok(Some(self.config.pb_moni_every_x.into_py(py))),
+      "ltb_moni_every_x"  => Ok(Some(self.config.ltb_moni_every_x.into_py(py))),
+      "drs_deadtime_instead_fpga_temp" => Ok(Some(self.config.drs_deadtime_instead_fpga_temp.into_py(py))),
+      _                   => Err(PyKeyError::new_err(format!("Key '{}' not found", key)))
+    }
+  }
+
+  fn __setitem__(&mut self, key: &str, value: &Bound<'_, PyAny>) -> PyResult<()> {
+    match key {
+      "rb_moni_interval" => {
+        self.config.active_fields |= 1;
+        self.config.rb_moni_interval = Some(value.extract::<u32>()?);
+        Ok(())
+      }
+      "pa_moni_every_x" => {
+        self.config.active_fields |= 2;
+        self.config.pa_moni_every_x = Some(value.extract::<u32>()?);
+        Ok(())
+      }
+      "pb_moni_every_x" => {
+        self.config.active_fields |= 4;
+        self.config.pb_moni_every_x = Some(value.extract::<u32>()?);
+        Ok(())
+      }
+      "ltb_moni_every_x" => {
+        self.config.active_fields |= 8;
+        self.config.ltb_moni_every_x = Some(value.extract::<u32>()?);
+        Ok(())
+      }
+      "drs_deadtime_instead_fpga_temp" => {
+        self.config.active_fields |= 16;
+        self.config.drs_deadtime_instead_fpga_temp = Some(value.extract::<bool>()?);
+        Ok(())
       }
       _ => Err(PyKeyError::new_err(format!("Key '{}' not found", key))),
     }

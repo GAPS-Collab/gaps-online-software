@@ -75,6 +75,8 @@ pub enum TofCommandCode {
   SetMTConfig              = 22u8,     
   /// command code for chaning general run parameters
   SetTofRunConfig          = 23u8,
+  /// command code for changing RB parameters
+  SetTofRBConfig           = 24u8,
   /// command code for AnalysisEngineConfig
   SetAnalysisEngineConfig  = 27u8,   
   /// command code for "Set preamp bias"
@@ -147,6 +149,7 @@ impl From<u8> for TofCommandCode {
       21u8  => TofCommandCode::SetLTBThresholds,
       22u8  => TofCommandCode::SetMTConfig,
       23u8  => TofCommandCode::SetTofRunConfig,
+      24u8  => TofCommandCode::SetTofRBConfig,
       28u8  => TofCommandCode::SetPreampBias,
       29u8  => TofCommandCode::SetTOFEventBuilderConfig,
       30u8  => TofCommandCode::DataRunStop,
@@ -186,6 +189,7 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::SetLTBThresholds,
       TofCommandCode::SetMTConfig,
       TofCommandCode::SetTofRunConfig,
+      TofCommandCode::SetTofRBConfig,
       TofCommandCode::SetTOFEventBuilderConfig,
       TofCommandCode::SetPreampBias,
       TofCommandCode::DataRunStop,

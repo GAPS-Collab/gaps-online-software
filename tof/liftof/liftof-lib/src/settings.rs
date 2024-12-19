@@ -21,6 +21,7 @@ use tof_dataclasses::commands::config::{
   TriggerConfig,
   TOFEventBuilderConfig, 
   TofRunConfig,
+  TofRBConfig,
   DataPublisherConfig,
 };
 use tof_dataclasses::events::master_trigger::TriggerType;
@@ -513,6 +514,24 @@ impl RBSettings {
       pa_moni_every_x                : 0.0,
       ltb_moni_every_x               : 0.0,
       drs_deadtime_instead_fpga_temp : false
+    }
+  }
+
+  pub fn from_tofrbconfig(&mut self, cfg : &TofRBConfig) {
+    if cfg.rb_moni_interval.is_some() {
+      self.rb_moni_interval = cfg.rb_moni_interval.unwrap() as f32;              
+    }
+    if cfg.rb_moni_interval.is_some() {
+      self.pb_moni_every_x  = cfg.pb_moni_every_x.unwrap() as f32;              
+    }
+    if cfg.rb_moni_interval.is_some() {
+      self.pa_moni_every_x  = cfg.pa_moni_every_x.unwrap() as f32;              
+    }
+    if cfg.rb_moni_interval.is_some() {
+      self.ltb_moni_every_x = cfg.ltb_moni_every_x.unwrap() as f32;              
+    }
+    if cfg.rb_moni_interval.is_some() {
+      self.drs_deadtime_instead_fpga_temp = cfg.drs_deadtime_instead_fpga_temp.unwrap(); 
     }
   }
 
