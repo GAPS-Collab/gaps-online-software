@@ -73,6 +73,8 @@ pub enum TofCommandCode {
   SetLTBThresholds         = 21u8,         
   /// command code for "Configure MTB"
   SetMTConfig              = 22u8,     
+  /// command code for chaning general run parameters
+  SetTofRunConfig          = 23u8,
   /// command code for AnalysisEngineConfig
   SetAnalysisEngineConfig  = 27u8,   
   /// command code for "Set preamp bias"
@@ -91,10 +93,6 @@ pub enum TofCommandCode {
   UnspoolEventCache        = 44u8,
   /// command code for "Run full calibration"
   RBCalibration            = 53u8, 
-  /// command code for setting the size of the rb buffers.
-  /// technically, this does not change the size, but sets 
-  /// a different value for trip
-  SetRBDataBufSize        = 23u8,
   /// command code for restarting systemd
   RestartLiftofRBClients  = 60u8,
   /// command code for putting liftof-cc in listening mode
@@ -148,6 +146,7 @@ impl From<u8> for TofCommandCode {
       20u8  => TofCommandCode::SetDataPublisherConfig,
       21u8  => TofCommandCode::SetLTBThresholds,
       22u8  => TofCommandCode::SetMTConfig,
+      23u8  => TofCommandCode::SetTofRunConfig,
       28u8  => TofCommandCode::SetPreampBias,
       29u8  => TofCommandCode::SetTOFEventBuilderConfig,
       30u8  => TofCommandCode::DataRunStop,
@@ -156,7 +155,6 @@ impl From<u8> for TofCommandCode {
       41u8  => TofCommandCode::GetFullWaveforms,
       53u8  => TofCommandCode::RBCalibration,
       44u8  => TofCommandCode::UnspoolEventCache,
-      23u8  => TofCommandCode::SetRBDataBufSize,
       60u8  => TofCommandCode::RestartLiftofRBClients,
       70u8  => TofCommandCode::Listen,
       71u8  => TofCommandCode::Staging,
@@ -187,6 +185,7 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::SetDataPublisherConfig,
       TofCommandCode::SetLTBThresholds,
       TofCommandCode::SetMTConfig,
+      TofCommandCode::SetTofRunConfig,
       TofCommandCode::SetTOFEventBuilderConfig,
       TofCommandCode::SetPreampBias,
       TofCommandCode::DataRunStop,
@@ -195,7 +194,6 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::GetFullWaveforms,
       TofCommandCode::RBCalibration,
       TofCommandCode::UnspoolEventCache,
-      TofCommandCode::SetRBDataBufSize,
       TofCommandCode::RestartLiftofRBClients,
       TofCommandCode::Listen,
       TofCommandCode::Staging,
@@ -581,7 +579,6 @@ pub enum TofCommand {
   TimingCalibration       (u32),
   DefaultCalibration      (u32),
   UnspoolEventCache       (u32),
-  SetRBDataBufSize        (u32),
   TriggerModeForced       (u32),
   TriggerModeForcedMTB    (u32),
   SystemdReboot           (u32),
@@ -625,7 +622,6 @@ impl TofCommand {
       TofCommand::TimingCalibration       (data) => { value = *data;},
       TofCommand::DefaultCalibration      (data) => { value = *data;},
       TofCommand::UnspoolEventCache       (data) => { value = *data;},
-      TofCommand::SetRBDataBufSize        (data) => { value = *data;},
       TofCommand::TriggerModeForced       (data) => { value = *data;},
       TofCommand::TriggerModeForcedMTB    (data) => { value = *data;},
       TofCommand::SystemdReboot           (data) => { value = *data;},
@@ -653,7 +649,6 @@ impl TofCommand {
       TofCommandCode::GetFullWaveforms        => TofCommand::GetFullWaveforms        (value),
       TofCommandCode::RBCalibration           => TofCommand::DefaultCalibration           (value),
       TofCommandCode::UnspoolEventCache       => TofCommand::UnspoolEventCache       (value),
-      TofCommandCode::SetRBDataBufSize        => TofCommand::SetRBDataBufSize        (value),
       TofCommandCode::RestartLiftofRBClients  => TofCommand::SystemdReboot           (value),
       TofCommandCode::Listen                  => TofCommand::Listen                  (value),
       TofCommandCode::Kill                    => TofCommand::Kill                    (value),
@@ -685,7 +680,6 @@ impl TofCommand {
       TofCommand::GetFullWaveforms        (_) => Some(TofCommandCode::GetFullWaveforms),
       TofCommand::DefaultCalibration      (_) => Some(TofCommandCode::RBCalibration),
       TofCommand::UnspoolEventCache       (_) => Some(TofCommandCode::UnspoolEventCache),
-      TofCommand::SetRBDataBufSize        (_) => Some(TofCommandCode::SetRBDataBufSize),
       TofCommand::SystemdReboot           (_) => Some(TofCommandCode::RestartLiftofRBClients),
       TofCommand::Listen                  (_) => Some(TofCommandCode::Listen),
       TofCommand::Kill                    (_) => Some(TofCommandCode::Kill),
@@ -755,7 +749,6 @@ impl FromRandom for TofCommand {
       TofCommand::TimingCalibration       (val),
       TofCommand::DefaultCalibration      (val),
       TofCommand::UnspoolEventCache       (val),
-      TofCommand::SetRBDataBufSize        (val),
       TofCommand::TriggerModeForced       (val),
       TofCommand::TriggerModeForcedMTB    (val),
       TofCommand::SystemdReboot           (val),

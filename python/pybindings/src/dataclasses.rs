@@ -78,10 +78,11 @@ use tof_dataclasses::calibrations::{
 
 use tof_dataclasses::commands::config::{
   AnalysisEngineConfig,
-  RunConfig,
+  RunConfig, // deprecated
   TriggerConfig,
   TOFEventBuilderConfig,
   DataPublisherConfig,
+  TofRunConfig,
   BuildStrategy
 };
 
@@ -295,6 +296,60 @@ impl PyRunConfig {
   
   fn to_bytestream(&self) -> Vec<u8> {
     self.config.to_bytestream()
+  }
+  
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.config)) 
+  }
+}
+
+#[pyclass]
+#[pyo3(name="TofRunConfig")]
+pub struct PyTofRunConfig {
+  pub config : TofRunConfig
+}
+
+#[pymethods]
+impl PyTofRunConfig {
+
+  #[new]
+  fn new() -> Self {
+    let config =  TofRunConfig::new();
+    Self {
+      config
+    }
+  }
+
+  #[getter]
+  pub fn get_runtime(&self) -> Option<u32> {
+    self.config.runtime
+  }
+
+  #[setter]
+  pub fn set_runtime(&mut self, secs : u32) {
+    self.config.runtime = Some(secs);
+  }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    self.config.to_bytestream()
+  }
+  
+  fn __getitem__(&self, py: Python, key: &str) -> PyResult<Option<PyObject>> {  
+    match key {
+      "runtime"          => Ok(Some(self.config.runtime.into_py(py))),
+      _     => Err(PyKeyError::new_err(format!("Key '{}' not found", key)))
+    }
+  }
+
+  fn __setitem__(&mut self, key: &str, value: &Bound<'_, PyAny>) -> PyResult<()> {
+    match key {
+      "runtime" => {
+          self.config.active_fields |= 1;
+          self.config.runtime = Some(value.extract::<u32>()?);
+          Ok(())
+      }
+      _ => Err(PyKeyError::new_err(format!("Key '{}' not found", key))),
+    }
   }
   
   fn __repr__(&self) -> PyResult<String> {
