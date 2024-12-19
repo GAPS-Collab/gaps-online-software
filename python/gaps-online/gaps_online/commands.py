@@ -17,6 +17,7 @@ if import_rtd_success:
     TOFEventBuilderConfig = rtd.commands.TOFEventBuilderConfig
     DataPublisherConfig   = rtd.commands.DataPublisherConfig
     TriggerConfig         = rtd.commands.TriggerConfig
+    TofRunConfig          = rtd.commands.TofRunConfig
     BuildStrategy         = rtd.commands.BuildStrategy
 
     # command factory

@@ -368,6 +368,7 @@ fn tof_command_factory<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(py_change_triggerconfig, m)?)?;
   m.add_function(wrap_pyfunction!(py_change_datapublisherconfig, m)?)?;
   m.add_function(wrap_pyfunction!(py_change_tofeventbuilderconfig, m)?)?;
+  m.add_function(wrap_pyfunction!(py_change_tofrunconfig, m)?)?;
   Ok(())
 }
 
