@@ -386,7 +386,8 @@ fn tof_commands<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<PyAnalysisEngineConfig>()?;
   m.add_class::<PyTOFEventBuilderConfig>()?;
   m.add_class::<PyDataPublisherConfig>()?;
-
+  m.add_class::<PyTofRunConfig>()?;
+ 
   m.add_class::<PyHeartBeatDataSink>()?;
   m.add_class::<PyMTBHeartbeat>()?;
   m.add_class::<PyEVTBLDRHeartbeat>()?;
