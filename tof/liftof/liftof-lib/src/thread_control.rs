@@ -19,6 +19,10 @@ use crate::settings::LiftofSettings;
 pub struct ThreadControl {
   /// Stop ALL threads
   pub stop_flag                  : bool,
+  /// Received INT signal        
+  pub sigint_recvd               : bool,
+  /// signal to end all rb thread activity
+  pub end_all_rb_threads         : bool,
   /// Trigger calibration thread
   pub calibration_active         : bool,
   /// Keep track on how many calibration 
@@ -71,6 +75,8 @@ impl ThreadControl {
       calibration_active         : false,
       finished_calibrations      : HashMap::<u8,bool>::new(),
       calibrations               : HashMap::<u8, RBCalibrations>::new(),
+      sigint_recvd               : false,
+      end_all_rb_threads         : false,
       thread_cmd_dispatch_active : false,
       thread_data_sink_active    : false,
       thread_runner_active       : false,
