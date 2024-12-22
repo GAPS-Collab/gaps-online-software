@@ -25,7 +25,6 @@
 
 #[macro_use] extern crate log;
 
-use std::fs;
 use std::fs::{
   OpenOptions,
 };
@@ -38,7 +37,6 @@ use std::path::{
 };
 
 use chrono::Utc;
-use toml::Table;
 use clap::{
   arg,
   command,
@@ -52,15 +50,18 @@ use liftof_lib::{
 };
 
 use std::time::{
-  Instant,
   Duration,
 };
 
 use tof_dataclasses::commands::{
   TofCommandV2,
-  TofCommandCode
+  TofCommandCode,
+  TofReturnCode
 };
-use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::serialization::{
+  Serialization,
+  Packable
+};
 use tof_dataclasses::packets::{
   PacketType,
   TofPacket
@@ -69,14 +70,24 @@ use tof_dataclasses::database::{
   connect_to_db,
   ReadoutBoard,
 };
+use tof_dataclasses::commands::config::{
+  TriggerConfig,
+  TOFEventBuilderConfig,
+  DataPublisherConfig,
+  TofRunConfig,
+  TofRBConfig
+};
 
 use telemetry_dataclasses::packets::AckBfsw;
 
 use liftof_cc::{
   manage_liftof_cc_service,
   ssh_command_rbs,
-  run_cycler,
+  copy_file_rename_liftof,
+  LIFTOF_HOTWIRE,
 };
+
+
 
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
@@ -84,9 +95,36 @@ use liftof_cc::{
 struct LiftofSchedArgs {
   #[arg(short, long)]
   config      : Option<String>,
+  /// Don't do anything, just tell us what 
+  /// would happen
   #[arg(long, default_value_t = false)]
   dry_run : bool,
+  /// Don't send ACK packets
+  #[arg(long, default_value_t = false)]
+  no_ack  : bool,
 }
+
+/// Send an ack packet to liftof-cc
+///
+/// Matroshka! Literally Ack in Pack, recursive packaging
+/// - I love this!
+///
+/// The purpose of this is to sneak an Bfsw ack packet 
+/// through the bfsw system. Well, that's how broken 
+/// we all are
+fn send_ack_packet(cc       : TofCommandCode,
+                   ret_code : TofReturnCode,
+                   socket   : &zmq::Socket) {
+  let mut ack = AckBfsw::new(); 
+  ack.ret_code1 = ret_code as u8;
+  ack.ret_code2 = cc as u8;
+  let tp = ack.pack();
+  match socket.send(tp.to_bytestream(), 0) {
+    Ok(_)    => (),
+    Err(err) => error!("Unable to send ACK! {err}")
+  }
+}
+
 
 fn main() {
   init_env_logger();
@@ -103,13 +141,13 @@ fn main() {
   
   let args            = LiftofSchedArgs::parse();
   let config          : LiftofSettings;
-  //let cfg_file_str    : String; 
   let dry_run         = args.dry_run;
+  let no_ack          = args.no_ack;
   match args.config {
     None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
     Some(cfg_file) => {
       //cfg_file_str = cfg_file.clone();
-      match LiftofSettings::from_toml(cfg_file) {
+      match LiftofSettings::from_toml(&cfg_file) {
         Err(err) => {
           error!("CRITICAL! Unable to parse .toml settings file! {}", err);
           panic!("Unable to parse config file!");
@@ -121,28 +159,20 @@ fn main() {
     } // end Some
   } // end match
 
-  let timer = Instant::now();
-
-  let staging_dir           = config.staging_dir; 
-  let db_path               = config.db_path.clone();
-  let mut conn              = connect_to_db(db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
+  let staging_dir = config.staging_dir; 
+  // This is the file we will edit 
+  let cfg_file         = format!("{}/next/liftof-config.toml", staging_dir.clone());
+  let next_dir         = format!("{}/next", staging_dir.clone());
+  let current_dir      = format!("{}/current", staging_dir.clone());
+  let default_cfg_file = format!("{}/default/liftof-config-default.toml", staging_dir.clone());
+  let db_path     = config.db_path.clone();
+  let mut conn    = connect_to_db(db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
   // if this call does not go through, we might as well fail early.
-  let mut rb_list           = ReadoutBoard::all(&mut conn).expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
-  let rb_ignorelist         = config.rb_ignorelist_always.clone();
-  let rb_ignorelist_tmp     = config.rb_ignorelist_run.clone();
-  for k in 0..rb_ignorelist.len() {
-    let bad_rb = rb_ignorelist[k];
-    rb_list.retain(|x| x.rb_id != bad_rb);
+  let rb_list     = ReadoutBoard::all(&mut conn).expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
+  let mut all_rb_ids  = Vec::<u8>::new();
+  for rb in rb_list {
+    all_rb_ids.push(rb.rb_id as u8);
   }
-
-  for k in 0..rb_ignorelist_tmp.len() {
-    let bad_rb = rb_ignorelist_tmp[k];
-    rb_list.retain(|x| x.rb_id != bad_rb);
-  }
-
-  let nboards = rb_list.len();
-  println!("=> Will use {} readoutboards! Ignoring {:?} sicne they are mareked as 'ignore' in the config file!", rb_list.len(), rb_ignorelist );
-
 
   let sleep_time  = Duration::from_secs(config.cmd_dispatcher_settings.cmd_listener_interval_sec);
   //let locked      = config.cmd_dispatcher_settings.deny_all_requests; // do not allow the reception of commands if true
@@ -161,8 +191,8 @@ fn main() {
   // socket to send commands on the RB network
   info!("Binding socket for command dispatching to rb network to {}", cc_pub_addr);
   let cmd_sender = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-  if !dry_run {
-    cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+  if !dry_run || no_ack {
+    cmd_sender.bind(LIFTOF_HOTWIRE).expect("Unable to bind to (PUB) socket!");
   }
   // open the logfile for commands
   let mut filename = config.cmd_dispatcher_settings.cmd_log_path.clone();
@@ -182,14 +212,16 @@ fn main() {
   loop {
     thread::sleep(sleep_time);
     //println!("=> Cmd responder loop iteration!");
+    let mut success = TofReturnCode::Unknown;
     match cmd_receiver.connect(&fc_sub_addr) {
       Ok(_)    => (),
       Err(err) => {
         error!("Unable to connect to {}! {}", fc_sub_addr, err);
+        continue;
       }
     }
     
-    let mut cmd_packet = TofPacket::new();
+    let cmd_packet : TofPacket;
     match cmd_receiver.recv_bytes(zmq::DONTWAIT) {
       Err(err)   => {
         trace!("ZMQ socket receiving error! {err}");
@@ -198,36 +230,63 @@ fn main() {
       Ok(buffer) => {
         info!("Received bytes {:?}", buffer);
         // identfiy if we have a GAPS packet
-        if buffer.len() < 2 {
-          error!("The received bytestring does not even have 2 bnytes for a header!");
+        if buffer.len() < 4 {
+          error!("Can't deal with commands shorter than 4 bytes@");
           continue
         }
-        if buffer[0] == 0xeb && buffer[1] == 0x90 && buffer[4] == 0x46 { //0x5a?
-          // We have a GAPS packet -> FIXME:
-          info!("Received command sent through BFSW system!");
-        } 
-        if buffer.len() < 8 {
-          error!("Received command is too short! (Smaller than 8 bytes) {:?}", buffer);
+        // check on the buffer
+        if buffer[0] == 0x90 && buffer[1] == 0xeb {
+          if buffer[4] != 0x46 { //0x5a?
+            // We have a GAPS packet -> FIXME:
+            info!("We received something, but it does not seem to be address to us! We are only listening to address {} right now!", 0x46);
+            continue;
+          } else {
+            info!("Received command sent through (Cra-)BFSW system!");
+            if buffer.len() < 8 {
+              error!("Received command is too short! (Smaller than 8 bytes) {:?}", buffer);
+              success = TofReturnCode::GarbledCommand;
+              send_ack_packet(TofCommandCode::Unknown, success, &cmd_sender);
+              continue;
+            }
+            match TofPacket::from_bytestream(&buffer, &mut 8) {
+              Err(err) => {
+                error!("Unable to decode bytestream {:?} for command ! {:?}", buffer, err);
+                success = TofReturnCode::GarbledCommand;
+                send_ack_packet(TofCommandCode::Unknown, success, &cmd_sender);
+                continue;  
+              },
+              Ok(packet) => {
+                cmd_packet = packet;
+              }
+            }
+          }
+        } else if  buffer[0] == 170 && buffer[1] == 170 {
+          info!("Got a TofPacket!");
+          match TofPacket::from_bytestream(&buffer, &mut 0) {
+            Err(err) => {
+              error!("Unable to decode bytestream {:?} for command ! {:?}", buffer, err);
+              success = TofReturnCode::GarbledCommand;
+              send_ack_packet(TofCommandCode::Unknown, success, &cmd_sender);
+              continue;  
+            },
+            Ok(packet) => {
+              cmd_packet = packet;
+            }
+          }
+        } else {
+          error!("Received bytestream, but don't know how to deal with it!");
           continue;
         }
-        match TofPacket::from_bytestream(&buffer, &mut 8) {
-          Err(err) => {
-            error!("Unable to decode bytestream {:?} for command ! {:?}", buffer, err);
-            continue;  
-          },
-          Ok(packet) => {
-            cmd_packet = packet;
-          }
-        }
-        let mut ack = AckBfsw::new(); 
         debug!("Got packet {}!", cmd_packet);
         match cmd_packet.packet_type {
           PacketType::TofCommandV2 => {
-            let mut cmd = TofCommandV2::new();
+            let cmd : TofCommandV2;
             match cmd_packet.unpack::<TofCommandV2>() {
               Ok(_cmd) => {cmd = _cmd;},
               Err(err) => {
                 error!("Unable to decode TofCommand! {err}");
+                success = TofReturnCode::GarbledCommand;
+                send_ack_packet(TofCommandCode::Unknown, success, &cmd_sender);
                 continue;
               }
             }
@@ -252,16 +311,14 @@ fn main() {
               TofCommandCode::DataRunStop  => {
                 println!("= => Received DataRunStop!");
                 if !dry_run { 
-                  manage_liftof_cc_service(String::from("stop"));
+                  success =  manage_liftof_cc_service("stop"); 
                 }
               },
               TofCommandCode::DataRunStart  => {
                 info!("Received DataRunStart!");
                 // FIXME - factor out manage_liftof_cc_service here, otherwise
-                // it gets really confusing
-                match run_cycler(staging_dir.clone(), dry_run) {
-                  Err(err) => error!("= => Run cycler had an issue! {err}"),
-                  Ok(_)    => ()
+                if !dry_run { 
+                  success =  manage_liftof_cc_service("restart");
                 }
               }
               TofCommandCode::ShutdownRB => {
@@ -270,9 +327,42 @@ fn main() {
                 let cmd_args     = vec![String::from("sudo"),
                                         String::from("shutdown"),
                                         String::from("now")]; 
-                match ssh_command_rbs(&cmd_rb_list, cmd_args) {
-                  Err(err) => error!("SSh-ing into RBs {:?} failed! {err}", cmd_rb_list),
-                  Ok(_)    => ()
+                if !args.dry_run {
+                  match ssh_command_rbs(&cmd_rb_list, cmd_args) {
+                    Err(err) => {
+                      error!("SSh-ing into RBs {:?} failed! {err}", cmd_rb_list);
+                      success = TofReturnCode::GeneralFail;
+                    }
+                    Ok(_)    => {
+                      success = TofReturnCode::Success;
+                    }
+                  }
+                }
+              }
+              TofCommandCode::ResetConfigWDefault => {
+                info!("Will reset {} with {}", cfg_file, default_cfg_file);
+                match copy_file_rename_liftof(&default_cfg_file, &next_dir) {
+                  Ok(_)    => {
+                    info!("Copy successful!");
+                    success = TofReturnCode::Success;
+                  }
+                  Err(err) => {
+                    error!("Unable to copy! {err}");
+                    success = TofReturnCode::GeneralFail;
+                  }
+                }
+              }
+              TofCommandCode::SubmitConfig => {
+                info!("Submitting the worked on config!");
+                match copy_file_rename_liftof(&cfg_file, &current_dir) {
+                  Ok(_)    => {
+                    info!("Copy successful!");
+                    success = TofReturnCode::Success;
+                  }
+                  Err(err) => { 
+                    error!("Unable to copy! {err}");
+                    success = TofReturnCode::GeneralFail;
+                  }
                 }
               }
               TofCommandCode::ShutdownRAT => {
@@ -281,7 +371,17 @@ fn main() {
                 let cmd_args     = vec![String::from("sudo"),
                                         String::from("shutdown"),
                                         String::from("now")]; 
-                ssh_command_rbs(&cmd_rb_list, cmd_args);
+                if !args.dry_run {
+                  match ssh_command_rbs(&cmd_rb_list, cmd_args) {
+                    Err(err) => {
+                      error!("SSh-ing into RBs {:?} failed! {err}", cmd_rb_list);
+                      success = TofReturnCode::GeneralFail;
+                    }
+                    Ok(_)    => {
+                      success = TofReturnCode::Success;
+                    }
+                  }
+                }
               }
               TofCommandCode::ShutdownCPU => {
                 let cmd_args     = vec![String::from("shutdown"),
@@ -293,51 +393,155 @@ fn main() {
                     .args(cmd_args)
                     .spawn() {
                     Err(err) => {
-                      error!("Unable to spawn shutdown process on TofCPU!");
+                      error!("Unable to spawn shutdown process on TofCPU! {err}");
+                      success = TofReturnCode::GeneralFail;
                     }
                     // FIXME - timeout with try wait
                     Ok(mut child) => {
                       match child.wait() {
-                        Err(err) => error!("Waiting for the shutdown process failed! {err}", err),
+                        Err(err) => error!("Waiting for the shutdown process failed! {err}"),
                         Ok(_)    => ()
                       }
                     }
                   }
                 }
               }
-              TofCommandCode::ChangeNextRunConfig => {
-                let cfg_file = format!("{}/next/lfitof-config.toml", staging_dir.clone());
-                // first check if the command is valid
-                match cmd.extract_changerunconfig() {
-                  None => error!("Unable to understand this command which is supposed to change the next run configuration!"),
-                  Some(keys_val) => {
-                    match fs::read_to_string(cfg_file.clone()) {
-                      Err(err) => error!("Unable to read {}! {err}", cfg_file),
-                      Ok(content) => {
-                        let toml_table = content.parse::<Table>().unwrap();
-                        let value = keys_val.back();
-                        for k in 0..keys_val.len() - 1 {
-                           let key = key_val[k];
-                        }
+              TofCommandCode::RBCalibration => {
+                info!("Received RBCalibration command!");
+                if cmd.payload.len() < 2 {
+                  error!("Broken RBCalibration command!");
+                  continue;
+                }
+                let save_waveforms = cmd.payload[1] != 0;
+                let send_packets   = cmd.payload[0] != 0;  
+                match LiftofSettings::from_toml(&cfg_file) {
+                  Err(err) => {
+                    error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+                    //panic!("Unable to parse config file!");
+                    success = TofReturnCode::GeneralFail;
+                  }
+                  Ok(mut config) => {
+                    config.data_publisher_settings.send_cali_packets = send_packets;
+                    config.save_cali_wf                              = save_waveforms;
+                    config.pre_run_calibration = true;
+                    config.to_toml(String::from(cfg_file.clone()));
+                    success = TofReturnCode::Success;
+                  }
+                }   
+              }
+              TofCommandCode::SetMTConfig => {
+                info!("Will change trigger config for next run!");
+                match TriggerConfig::from_bytestream(&cmd.payload, &mut 0) {
+                  Err(err) => error!("Unable to extract TriggerConfig from command! {err}"),
+                  Ok(tcf)  => {
+                    match LiftofSettings::from_toml(&cfg_file) {
+                      Err(err) => {
+                        error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+                        success = TofReturnCode::GeneralFail;
                       }
-                    }
-                    //match LiftofSettings::from_toml(cfg_file) {
-                    //  Err(err) => {
-                    //    error!("CRITICAL! Unable to parse .toml settings file! {}", err);
-                    //    //panic!("Unable to parse config file!");
-                    //    continue;
-                    //  }
-                    //  Ok(mut config) => {
-
-                    //    }
-                    //  }
-                    //}   
+                      Ok(mut config) => {
+                        println!("=> We received the following trigger config {}", tcf);
+                        config.mtb_settings.from_triggerconfig(&tcf);
+                        println!("=> We changed the mtb settings to be this {}",config.mtb_settings);
+                        config.to_toml(String::from(cfg_file.clone()));
+                        success = TofReturnCode::Success;
+                      }
+                    }   
+                  }
+                }
+              }
+              TofCommandCode::SetTOFEventBuilderConfig => {
+                info!("Will change tof event builder config for next run!");
+                match TOFEventBuilderConfig::from_bytestream(&cmd.payload, &mut 0) {
+                  Err(err) => error!("Unable to extract TofEventBuilderConfig from command! {err}"),
+                  Ok(tcf)  => {
+                    info!("Received config {}",tcf);
+                    match LiftofSettings::from_toml(&cfg_file) {
+                      Err(err) => {
+                        error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+                        success = TofReturnCode::GeneralFail;
+                      }
+                      Ok(mut config) => {
+                        config.event_builder_settings.from_tofeventbuilderconfig(&tcf);
+                        info!("We changed the event builder settings to be this {}",config.event_builder_settings);
+                        config.to_toml(String::from(cfg_file.clone()));
+                        success = TofReturnCode::Success;
+                      }
+                    }   
+                  }
+                }
+              }
+              TofCommandCode::SetTofRunConfig => {
+                info!("Will change tof run config for next run!");
+                match TofRunConfig::from_bytestream(&cmd.payload, &mut 0) {
+                  Err(err) => error!("Unable to extract TofEventBuilderConfig from command! {err}"),
+                  Ok(tcf)  => {
+                    info!("Received config {}",tcf);
+                    match LiftofSettings::from_toml(&cfg_file) {
+                      Err(err) => {
+                        error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+                        success = TofReturnCode::GeneralFail;
+                      }
+                      Ok(mut config) => {
+                        config.from_tofrunconfig(&tcf);
+                        info!("We changed the run config to be this {}",config);
+                        config.to_toml(String::from(cfg_file.clone()));
+                        success = TofReturnCode::Success;
+                      }
+                    }   
+                  }
+                }
+              }
+              TofCommandCode::SetTofRBConfig => {
+                info!("Will change tof rb config for next run!");
+                match TofRBConfig::from_bytestream(&cmd.payload, &mut 0) {
+                  Err(err) => error!("Unable to extract TofEventBuilderConfig from command! {err}"),
+                  Ok(tcf)  => {
+                    info!("Received config {}",tcf);
+                    match LiftofSettings::from_toml(&cfg_file) {
+                      Err(err) => {
+                        error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+                        success = TofReturnCode::GeneralFail;
+                      }
+                      Ok(mut config) => {
+                        config.rb_settings.from_tofrbconfig(&tcf);
+                        info!("We changed the run config to be this {}",config);
+                        config.to_toml(String::from(cfg_file.clone()));
+                        success = TofReturnCode::Success;
+                      }
+                    }   
+                  }
+                }
+              }
+              TofCommandCode::SetDataPublisherConfig => {
+                info!("Will change data publisher config for next run!");
+                let cfg_file = format!("{}/next/liftof-config.toml", staging_dir.clone());
+                match DataPublisherConfig::from_bytestream(&cmd.payload, &mut 0) {
+                  Err(err) => error!("Unable to extract TofEventBuilderConfig from command! {err}"),
+                  Ok(tcf)  => {
+                    info!("Received config {}",tcf);
+                    match LiftofSettings::from_toml(&cfg_file) {
+                      Err(err) => {
+                        error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+                        success = TofReturnCode::GeneralFail;
+                      }
+                      Ok(mut config) => {
+                        config.data_publisher_settings.from_datapublisherconfig(&tcf);
+                        info!("We changed the event builder settings to be this {}",config.data_publisher_settings);
+                        config.to_toml(String::from(cfg_file));
+                        success = TofReturnCode::Success;
+                      }
+                    }   
                   }
                 }
               }
               _ => {
                 error!("Dealing with command code {} has not been implemented yet!", cmd.command_code);
+                success = TofReturnCode::GeneralFail;
               }
+            }
+            if !args.no_ack {
+              send_ack_packet(cmd.command_code, success, &cmd_sender);
             }
           },
           _ => {
