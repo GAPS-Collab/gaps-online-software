@@ -1,5 +1,18 @@
 # LELEWAA series
 
+# v0.10.9
+* grand review & reordering of lifotf-cc
+  main code, introducing new sub commands
+  to better facilitate run start.
+
+# v0.10.8
+* fixes a critical bug in liftof-scheduler
+  where it was trying to interpret commands
+  not addressed to the tof
+* fixes a critical bug in liftof-scheduler
+  where it was actually not checking the 
+  bfsw header correctly
+
 # v0.10.7
 * more commands for liftof-scheduler!
 * fixes critical bug and times out ssh 
