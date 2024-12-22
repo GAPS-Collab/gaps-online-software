@@ -7,46 +7,40 @@
 //! Standalone, statically linked binary to be either run manually 
 //! or to be managed by systemd
 
-//use std::collections::HashMap;
-//use std::path::PathBuf;
-//use std::path::Path;
 use std::os::raw::c_int;
 use std::process::exit;
-use std::{
-    thread,
-};
+use std::thread;
 use std::sync::{
-    Arc,
-    Mutex,
+  Arc,
+  Mutex,
 };
 use std::time::{
-    Duration,
-    Instant,
+  Duration,
+  Instant,
 };
-//use std::io::Write;
 
 use signal_hook::iterator::Signals;
 use signal_hook::consts::signal::{
-    SIGTERM,
-    SIGINT
+  SIGTERM,
+  SIGINT
 };
 
 #[macro_use] extern crate log;
 
 use clap::{
-    arg,
-    command,
-    Parser
+  arg,
+  command,
+  Parser
 };
 
 // FIXME - think about using 
 // bounded channels to not 
 // create a memory leak
 use crossbeam_channel::{
-    unbounded,
-    //bounded,
-    Sender,
-    Receiver
+  unbounded,
+  //bounded,
+  Sender,
+  Receiver
 };
 use colored::Colorize;
 
@@ -55,7 +49,7 @@ use tof_control::helper::rb_type::RBInfo;
 
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::commands::{
-    TofOperationMode
+  TofOperationMode
 };
 
 use tof_dataclasses::events::DataType;
@@ -70,23 +64,23 @@ use tof_control::ltb_control::ltb_threshold::set_threshold;
 
 #[cfg(feature="database")]
 use tof_dataclasses::database::{
-    ReadoutBoard,
-    connect_to_db,
-    RAT
+  ReadoutBoard,
+  connect_to_db,
+  RAT
 };
 
 use tof_dataclasses::io::{
-    get_califilename,
-    get_runfilename
+  get_califilename,
+  get_runfilename
 };
 
 use liftof_lib::{
-    LIFTOF_LOGO_SHOW,
-    DATAPORT,
-    //color_log,
-    RunStatistics,
-    LiftofSettings,
-    init_env_logger,
+  LIFTOF_LOGO_SHOW,
+  DATAPORT,
+  //color_log,
+  RunStatistics,
+  LiftofSettings,
+  init_env_logger,
 };
 
 use liftof_lib::thread_control::ThreadControl;
@@ -95,12 +89,12 @@ use liftof_lib::thread_control::ThreadControl;
 use liftof_lib::settings::ParameterSetStrategy;
 
 use liftof_rb::threads::{
-    runner,
-    //calibration, 
-    cmd_responder,
-    event_processing,
-    monitoring,
-    data_publisher
+  runner,
+  //calibration, 
+  cmd_responder,
+  event_processing,
+  monitoring,
+  data_publisher
 };
 
 use liftof_rb::api::*;
@@ -215,7 +209,7 @@ fn main() {
   match args.config {
     None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
     Some(cfg_file) => {
-      match LiftofSettings::from_toml(cfg_file) {
+      match LiftofSettings::from_toml(&cfg_file) {
         Err(err) => {
           error!("CRITICAL! Unable to parse .toml settings file! {}", err);
           panic!("Unable to parse config file!");
