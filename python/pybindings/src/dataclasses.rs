@@ -2803,6 +2803,42 @@ impl PyTofEventSummary {
     }
     hits
   }
+  
+  /// Total energy depostion in the Umbrella
+  ///
+  /// Utilizes Philip's formula based on 
+  /// peak height
+  #[getter]
+  pub fn get_edep_umbrella(&self) -> f32 {
+    self.event.get_edep_umbrella()
+  }
+  
+  /// Total energy depostion in the Cube
+  ///
+  /// Utilizes Philip's formula based on 
+  /// peak height
+  #[getter]
+  pub fn get_edep_cube(&self) -> f32 {
+    self.event.get_edep_cube()
+  }
+  
+  /// Total energy depostion in the Cortina
+  ///
+  /// Utilizes Philip's formula based on 
+  /// peak height
+  #[getter]
+  pub fn get_edep_cortina(&self) -> f32 {
+    self.event.get_edep_cortina()
+  }
+
+  /// Ttotal energy depostion in the complete TOF
+  ///
+  /// Utilizes Philip's formula based on 
+  /// peak height
+  #[getter]
+  pub fn get_edep(&self) -> f32 {
+    self.event.get_edep()
+  }
 
   //#[getter]
   //fn beta(&self) -> f32 {
@@ -3212,6 +3248,11 @@ impl PyTofHit {
   #[getter]
   fn paddle_id(&self) -> u8 {
     self.hit.paddle_id
+  }
+
+  #[getter]
+  fn edep(&self) -> f32 {
+    self.hit.get_edep()
   }
 
   fn __repr__(&self) -> PyResult<String> {

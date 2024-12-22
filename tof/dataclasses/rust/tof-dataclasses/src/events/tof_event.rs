@@ -857,6 +857,63 @@ impl TofEventSummary {
   pub fn get_timestamp48(&self) -> u64 {
     ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
   }
+  
+  /// Ttotal energy depostion in the TOF - Umbrella
+  ///
+  /// Utilizes Philip's formula based on 
+  /// peak height
+  pub fn get_edep_umbrella(&self) -> f32 {
+    let mut tot_edep = 0.0f32;
+    for h in &self.hits {
+      if h.paddle_id < 61 || h.paddle_id > 108 {
+        continue;
+      }
+      tot_edep += h.get_edep();
+    }
+    tot_edep
+  }
+  
+  /// Ttotal energy depostion in the TOF - Umbrella
+  ///
+  /// Utilizes Philip's formula based on 
+  /// peak height
+  pub fn get_edep_cube(&self) -> f32 {
+    let mut tot_edep = 0.0f32;
+    for h in &self.hits {
+      if h.paddle_id > 60 {
+        continue;
+      }
+      tot_edep += h.get_edep();
+    }
+    tot_edep
+  }
+  
+  /// Ttotal energy depostion in the Cortina
+  ///
+  /// Utilizes Philip's formula based on 
+  /// peak height
+  pub fn get_edep_cortina(&self) -> f32 {
+    let mut tot_edep = 0.0f32;
+    for h in &self.hits {
+      if h.paddle_id < 109 {
+        continue;
+      }
+      tot_edep += h.get_edep();
+    }
+    tot_edep
+  }
+  
+  /// Ttotal energy depostion in the complete TOF
+  ///
+  /// Utilizes Philip's formula based on 
+  /// peak height
+  pub fn get_edep(&self) -> f32 {
+    let mut tot_edep = 0.0f32;
+    for h in &self.hits {
+      tot_edep += h.get_edep();
+    }
+    tot_edep
+  }
 
   //pub fn set_beta(&mut self, beta : f32) {
   //  // expecting beta in range of 0-1. If larger
