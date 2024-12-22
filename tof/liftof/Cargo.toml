@@ -24,8 +24,8 @@ signal-hook       = "0.3"
 
 # logging and command line parsing
 log =   "0.4"
-clap   = { version = "4.0", features = ["derive"] }
-chrono = { version ="0.4", features =["serde"] }
+clap   = { version = "4.5", features = ["derive"] }
+chrono = { version = "0.4", features =["serde"] }
 
 # own projects
 tof-dataclasses       = { path = "../dataclasses/rust/tof-dataclasses" , features = ["database", "tofcontrol", "advanced-algorithms"], version = "0.10"}
