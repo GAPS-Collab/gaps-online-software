@@ -122,7 +122,7 @@ pub struct TofEvent {
   
   // won't get serialized
   pub creation_time     : Instant,
-  pub valid             : bool, 
+  pub write_to_disk     : bool, 
 }
 
 impl fmt::Display for TofEvent {
@@ -158,7 +158,7 @@ impl TofEvent {
       rb_events         : Vec::<RBEvent>::new(),
       //missing_hits      : Vec::<RBMissingHit>::new(), 
       creation_time     : creation_time,
-      valid             : true,
+      write_to_disk     : true,
     }
   }
 
