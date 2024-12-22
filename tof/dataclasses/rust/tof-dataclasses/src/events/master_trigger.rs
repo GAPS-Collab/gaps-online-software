@@ -330,27 +330,6 @@ impl FromRandom for LTBThreshold {
 
 /////////////////////////////////////////////////
 
-/// Hold additional information about the status
-/// of the registers on the MTB
-/// FUTURE EXTENSION/WIP
-pub struct MTBInfo {
-  pub tiu_emulation_mode : bool,
-  pub tiu_bad            : bool,
-  pub dsi_status         : [bool;5],
-  pub rb_int_window      : u32,
-  pub read_all_rbchan    : bool,
-  pub gaps_trig_en       : bool,
-  pub require_beta       : bool,
-  pub trigger_rate       : bool,
-  pub lost_trigger_rate  : bool,
-  pub inner_tof_thresh   : u32,
-  pub outer_tof_thresh   : u32,
-  pub total_tof_thresh   : u32,
-  pub any_trig_is_glob   : bool,
-  pub track_trig_is_glob : bool
-}
-
-
 /// An event as observed by the MTB
 ///
 /// This is condensed to the most 
