@@ -235,7 +235,12 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
   let mask           = 0x0000ffff;
   moni.rate          = (rate[0] & mask) as u16;
   moni.lost_rate     = (rate[1] & mask) as u16;
-  moni.rb_lost_rate  = RB_LOST_TRIGGER_RATE.get(bus)? as u16;
+  let rb_lost_rate  = RB_LOST_TRIGGER_RATE.get(bus)?;
+  if rb_lost_rate > 255 {
+    moni.rb_lost_rate = 255;
+  } else {
+    moni.rb_lost_rate = rb_lost_rate as u8;
+  }
   Ok(moni)
 }
 
@@ -478,9 +483,6 @@ pub fn configure_mtb(mt_address : &str,
 ///
 /// * mt_sender         : push retrieved MasterTriggerEvents to 
 ///                       this channel
-/// * mtb_moni_interval : time in seconds when we 
-///                       are acquiring mtb moni data.
-///
 /// * mtb_timeout_sec   : reconnect to mtb when we don't
 ///                       see events in mtb_timeout seconds.
 ///
@@ -489,7 +491,6 @@ pub fn configure_mtb(mt_address : &str,
 pub fn master_trigger(mt_address     : &str,
                       mt_sender      : &Sender<MasterTriggerEvent>,
                       moni_sender    : &Sender<TofPacket>, 
-                      settings       : MTBSettings,
                       thread_control : Arc<Mutex<ThreadControl>>,
                       verbose        : bool) {
 
@@ -505,8 +506,54 @@ pub fn master_trigger(mt_address     : &str,
   let mut mtb_timeout    = Instant::now();
   let mut moni_interval  = Instant::now();
   let mut tc_timer       = Instant::now();
+  
+  let mut settings       : MTBSettings;
+  let mut cali_active    : bool;
+  loop {
+    match thread_control.lock() {
+      Ok(tc) => {
+        settings    = tc.liftof_settings.mtb_settings.clone();  
+        cali_active = tc.calibration_active; 
+      }
+      Err(err) => {
+        error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        return;
+      }
+    }
+    if !cali_active {
+      break;
+    } else {
+      thread::sleep(Duration::from_secs(5));
+    }
+    if moni_interval.elapsed().as_secs() > settings.mtb_moni_interval {
+      match IPBus::new(mt_address) {
+        Err(err) => {
+          debug!("Can't connect to MTB, will try again in 10 ms! {err}");
+          continue;
+        }
+        Ok(mut moni_bus) => {
+          match get_mtbmonidata(&mut moni_bus) { 
+            Err(err) => {
+              error!("Can not get MtbMoniData! {err}");
+            },
+            Ok(moni) => {
+              let tp = moni.pack();
+              match moni_sender.send(tp) {
+                Err(err) => {
+                  error!("Can not send MtbMoniData over channel! {err}");
+                },
+                Ok(_) => ()
+              }
+            }
+          }
+        }
+      }
+      moni_interval = Instant::now();
+    }
+  } 
   let mtb_timeout_sec    = settings.mtb_timeout_sec;
   let mtb_moni_interval  = settings.mtb_moni_interval;
+  
   // verbose, debugging
   let mut last_event_id           = 0u32;
   //let mut n_events                   = 0u64;
@@ -574,10 +621,11 @@ pub fn master_trigger(mt_address     : &str,
     if tc_timer.elapsed().as_secs_f32() > 2.5 {
       match thread_control.try_lock() {
         Ok(mut tc) => {
-          if !tc.thread_master_trg_active {
+          if tc.stop_flag || tc.sigint_recvd {
             tc.end_all_rb_threads = true;
             break;
           }
+        
         },
         Err(err) => {
           error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
