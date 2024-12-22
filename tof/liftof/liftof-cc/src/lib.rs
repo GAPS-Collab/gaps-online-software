@@ -9,6 +9,7 @@ use std::path::{
   Path
 };
 
+use std::collections::HashMap;
 use std::os::unix::fs::symlink;
 use std::sync::{
   Arc,
@@ -35,11 +36,18 @@ use indicatif::{
   ProgressStyle
 };
 
+use comfy_table::modifiers::{
+  UTF8_ROUND_CORNERS,
+  UTF8_SOLID_INNER_BORDERS,
+};
+
+use comfy_table::presets::UTF8_FULL;
+use comfy_table::*;
+
 use liftof_lib::constants::{
   DEFAULT_CALIB_VOLTAGE,
   DEFAULT_RB_ID,
   DEFAULT_CALIB_EXTRA,
-  //PAD_CMD_32BIT
 };
 
 use tof_dataclasses::constants::PAD_CMD_32BIT;
@@ -55,8 +63,8 @@ use tof_dataclasses::errors::{
 
 use tof_dataclasses::commands::{
   TofCommand,
+  TofReturnCode,
   //TofCommandCode,
-  //TofResponse,
 };
 
 use tof_dataclasses::status::TofDetectorStatus;
@@ -71,6 +79,155 @@ use tof_dataclasses::io::{
 
 use liftof_lib::settings::LiftofSettings;
 use liftof_lib::thread_control::ThreadControl;
+
+/// communicaton between liftof-scheduler and 
+/// liftof-cc
+pub const LIFTOF_HOTWIRE : &str = "tcp://127.0.0.1:54321";
+
+/// Produce a nicely formattable table with per RB information for scalar
+/// values
+pub fn rb_table(counters : &HashMap<u8, u64>, label_is_hz : bool) -> Table {
+  let mut unit = "";
+  if label_is_hz {
+    unit = "Hz"
+  }
+  let mut table = Table::new();
+  table
+    .load_preset(UTF8_FULL)
+    .apply_modifier(UTF8_ROUND_CORNERS)
+    .apply_modifier(UTF8_SOLID_INNER_BORDERS)
+    .set_content_arrangement(ContentArrangement::Dynamic)
+    .set_width(80)
+    //.set_header(vec!["Readoutboard Rates:"])
+    .add_row(vec![
+        Cell::new(&(format!("RB01 {:.1} {}", counters[&1], unit))),
+        Cell::new(&(format!("RB02 {:.1} {}", counters[&2], unit))),
+        Cell::new(&(format!("RB03 {:.1} {}", counters[&3], unit))),
+        Cell::new(&(format!("RB04 {:.1} {}", counters[&4], unit))),
+        Cell::new(&(format!("RB05 {:.1} {}", counters[&5], unit))),
+        //Cell::new("Center aligned").set_alignment(CellAlignment::Center),
+    ])
+    .add_row(vec![
+        Cell::new(&(format!("RB06 {:.1} {}", counters[&6], unit))),
+        Cell::new(&(format!("RB07 {:.1} {}", counters[&7], unit))),
+        Cell::new(&(format!("RB08 {:.1} {}", counters[&8], unit))),
+        Cell::new(&(format!("RB09 {:.1} {}", counters[&9], unit))),
+        Cell::new(&(format!("RB10 {}", "N.A."))),
+    ])
+    .add_row(vec![
+        Cell::new(&(format!("RB11 {:.1} Hz", counters[&11]))),
+        Cell::new(&(format!("RB12 {}", "N.A."))),
+        Cell::new(&(format!("RB13 {:.1} Hz", counters[&13]))),
+        Cell::new(&(format!("RB14 {:.1} Hz", counters[&14]))),
+        Cell::new(&(format!("RB15 {:.1} Hz", counters[&15]))),
+    ])
+    .add_row(vec![
+        Cell::new(&(format!("RB16 {:.1} Hz", counters[&16]))),
+        Cell::new(&(format!("RB17 {:.1} Hz", counters[&17]))),
+        Cell::new(&(format!("RB18 {:.1} Hz", counters[&18]))),
+        Cell::new(&(format!("RB19 {:.1} Hz", counters[&19]))),
+        Cell::new(&(format!("RB20 {:.1} Hz", counters[&20]))),
+    ])
+    .add_row(vec![
+        Cell::new(&(format!("RB21 {:.1} Hz", counters[&21]))),
+        Cell::new(&(format!("RB22 {:.1} Hz", counters[&22]))),
+        Cell::new(&(format!("RB23 {:.1} Hz", counters[&23]))),
+        Cell::new(&(format!("RB24 {:.1} Hz", counters[&24]))),
+        Cell::new(&(format!("RB25 {:.1} Hz", counters[&25]))),
+    ])
+    .add_row(vec![
+        Cell::new(&(format!("RB26 {:.1} Hz", counters[&26]))),
+        Cell::new(&(format!("RB27 {:.1} Hz", counters[&27]))),
+        Cell::new(&(format!("RB28 {:.1} Hz", counters[&28]))),
+        Cell::new(&(format!("RB29 {:.1} Hz", counters[&29]))),
+        Cell::new(&(format!("RB30 {:.1} Hz", counters[&30]))),
+    ])
+    .add_row(vec![
+        Cell::new(&(format!("RB31 {:.1} Hz", counters[&31]))),
+        Cell::new(&(format!("RB32 {:.1} Hz", counters[&32]))),
+        Cell::new(&(format!("RB33 {:.1} Hz", counters[&33]))),
+        Cell::new(&(format!("RB34 {:.1} Hz", counters[&34]))),
+        Cell::new(&(format!("RB35 {:.1} Hz", counters[&35]))),
+    ])
+    .add_row(vec![
+        Cell::new(&(format!("RB36 {:.1}", counters[&36]))),
+        Cell::new(&(format!("RB37 {}", "N.A."))),
+        Cell::new(&(format!("RB38 {}", "N.A."))),
+        Cell::new(&(format!("RB39 {:.1}", counters[&39]))),
+        Cell::new(&(format!("RB40 {:.1}", counters[&40]))),
+    ])
+    .add_row(vec![
+        Cell::new(&(format!("RB41 {:.1}", counters[&41]))),
+        Cell::new(&(format!("RB43 {:.1}", counters[&42]))),
+        Cell::new(&(format!("RB42 {}", "N.A."))),
+        Cell::new(&(format!("RB44 {:.1}", counters[&44]))),
+        Cell::new(&(format!("RB45 {}", "N.A."))),
+    ])
+    .add_row(vec![
+        Cell::new(&(format!("RB46 {:.1} Hz", counters[&46]))),
+        Cell::new(&(format!("{}", "N.A."))),
+        Cell::new(&(format!("{}", "N.A."))),
+        Cell::new(&(format!("{}", "N.A."))),
+        Cell::new(&(format!("{}", "N.A."))),
+    ]);
+  table
+}
+
+/// Regular run start sequence
+pub fn init_run_start(cc_pub_addr : &str) {
+  let one_second  = Duration::from_secs(1);
+  let cmd_payload = PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
+  let cmd         = TofCommand::DataRunStart(cmd_payload);
+  let packet      = cmd.pack();
+  let mut payload = String::from("BRCT").into_bytes();
+  payload.append(&mut packet.to_bytestream());
+  
+  // open 0MQ socket here
+  let ctx         = zmq::Context::new();
+  let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+  cmd_sender.bind(cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+  // after we opened the socket, give the RBs a chance to connect
+  println!("=> Sending run start command to RBs ..");
+  for _ in 0..10 {
+    thread::sleep(one_second);
+    print!("..");
+  }
+  print!("done!");
+  match cmd_sender.send(&payload, 0) {
+    Err(err) => {
+      error!("Unable to send command, error{err}");
+    },
+    Ok(_) => {
+      debug!("We sent {:?}", payload);
+    }
+  }
+}
+
+/// Regular run stop sequence
+pub fn end_run(cc_pub_addr : &str) {
+  let cmd          = TofCommand::DataRunStop(DEFAULT_RB_ID as u32);
+  let packet       = cmd.pack();
+  let mut payload  = String::from("BRCT").into_bytes();
+  payload.append(&mut packet.to_bytestream());
+  let ctx         = zmq::Context::new();
+  let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+  cmd_sender.bind(cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+  // after we opened the socket, give the RBs a chance to connect
+  println!("=> Sending run stop command to all RBs...");
+  match cmd_sender.send(&payload, 0) {
+    Err(err) => {
+      error!("Unable to send command! {err}");
+    },
+    Ok(_) => {
+      debug!("We sent {:?}", payload);
+    }
+  }
+  println!("=> Waiting for RBs to stoop data acquisition..");
+  for _ in 0..10 {
+    print!("..");
+  }
+  print!("..done!");
+}
 
 /// Get the files in the queue and sort them by number
 pub fn get_queue(dir_path : &String) -> Vec<String> {
@@ -97,7 +254,6 @@ pub fn move_file_with_name(old_path: &str, new_dir: &str) -> Result<(), std::io:
 
 pub fn move_file_rename_liftof(old_path: &str, new_dir: &str) -> Result<(), std::io::Error> {
   let old_path  = Path::new(old_path);
-  let file_name = old_path.file_name().unwrap().to_str().unwrap(); // Extract filename
   let new_path  = Path::new(new_dir).join("liftof-config.toml"); // Combine new directory with filename
   fs::rename(old_path, new_path) // Move the file
 }
@@ -111,7 +267,6 @@ pub fn copy_file(old_path: &str, new_dir: &str) -> Result<u64, std::io::Error> {
 
 pub fn copy_file_rename_liftof(old_path: &str, new_dir: &str) -> Result<u64, std::io::Error> {
   let old_path  = Path::new(old_path);
-  let file_name = old_path.file_name().unwrap().to_str().unwrap(); // Extract filename
   let new_path  = Path::new(new_dir).join("liftof-config.toml"); // Combine new directory with filename
   fs::copy(old_path, new_path) 
 }
@@ -144,7 +299,7 @@ pub fn run_cycler(staging_dir : String, dry_run : bool) -> Result<(),StagingErro
   if next.len() == 0 && queue.len() == 0 {
     println!("= => Nothing staged, will jusr repeat current run setting!");
     if !dry_run {
-      manage_liftof_cc_service(String::from("restart"));
+      manage_liftof_cc_service("restart");
     }
     thread::sleep(Duration::from_secs(20));
     return Ok(());
@@ -187,7 +342,7 @@ pub fn run_cycler(staging_dir : String, dry_run : bool) -> Result<(),StagingErro
     }
     println!("=> Restarting liftof-cc!");
     if !dry_run {
-      manage_liftof_cc_service(String::from("restart"));
+      manage_liftof_cc_service("restart");
     }
     thread::sleep(Duration::from_secs(20));
   }
@@ -308,17 +463,21 @@ pub fn prepare_run(data_path  : String,
 ///
 /// # Arguments
 ///
-///  * mode : The argument given to the systemd service 
-///           - either "start", "stop", "restart", etc.
-pub fn manage_liftof_cc_service(mode : String) {
+///   * mode     : The argument given to the systemd service 
+///                - either "start", "stop", "restart", etc.
+/// # Returns:
+///   * success : true for succes
+pub fn manage_liftof_cc_service(mode : &str) -> TofReturnCode {
   match Command::new("sudo")
-    .args(["systemctl", &mode, "liftof"])
+    .args(["systemctl", mode, "liftof"])
     .spawn() {
     Err(err) => {
       error!("Unable to execute sudo systemctl {} liftof! {}", mode, err);
+      TofReturnCode::GeneralFail
     }
-    Ok(child) => {
+    Ok(_) => {
       println!("=> Executed sudo systemctl {} liftof", mode);
+      TofReturnCode::Success
     }
   }
 }
@@ -368,7 +527,7 @@ pub fn ssh_command_rbs(rb_list : &Vec<u8>,
     // this is not optimal, since this will take as much 
     // time as the slowest child, but at the moment we 
     // have bigger fish to fry.
-    let timeout = Duration::from_secs(5);
+    let timeout = Duration::from_secs(10);
     let kill_t  = Instant::now();
     loop {
       if kill_t.elapsed() > timeout {
@@ -376,7 +535,7 @@ pub fn ssh_command_rbs(rb_list : &Vec<u8>,
         // Duuu hast aber einen schöönen Ball! [M. eine Stadt sucht einen Moerder]
         match rb_child.1.kill() {
           Err(err) => {
-            error!("Unable to kill the SSH process for RB {}", rb_child.0);
+            error!("Unable to kill the SSH process for RB {}! {err}", rb_child.0);
           }
           Ok(_) => {
             error!("Killed SSH process for for RB {}", rb_child.0);
@@ -423,7 +582,10 @@ pub fn restart_liftof_rb(rb_list : &Vec<u8>) {
                      String::from("restart"),
                      String::from("liftof")];
   println!("=> Restarting liftof-rb on RBs!");
-  ssh_command_rbs(rb_list, command);
+  match ssh_command_rbs(rb_list, command) {
+    Err(err) => error!("Restarting liftof-rb on all RBs failed! {err}"),
+    Ok(_)    => ()
+  }
 }
 
 /// A "verification" run describes an any trigger/track trigger
