@@ -1,5 +1,12 @@
 # LELEWAA series
 
+## v0.10.4
+* removes the possibility to set the 
+  tiu_emulation mode from the 
+  master trigger routine
+* refactoring efforts
+* slidht adjustments to signal handler
+
 ## v0.10.3
 * move MTBSettings to settings.rs
 * adds global trigger settings to settings

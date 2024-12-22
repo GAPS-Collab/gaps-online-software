@@ -17,8 +17,6 @@
 pub mod control;
 pub mod registers;
 
-use control::*;
-use registers::*;
 use std::sync::{
   Arc,
   Mutex,
@@ -54,6 +52,9 @@ use crate::thread_control::ThreadControl;
 
 // make this public to not brake liftof-cc
 pub use crate::settings::MTBSettings;
+
+use control::*;
+use registers::*;
 
 /// The DAQ packet from the MTB has a flexible size, but it will
 /// be at least this number of words long.
@@ -112,22 +113,37 @@ pub fn get_event(bus                     : &mut IPBus)
   let data = bus.read_multiple(0x11, n_daq_words as usize, false)?;  
   //println!("{}", data[0]);
   if data[0] != 0xAAAAAAAA {
-    error!("Got MTB data, but the header is incorrect {}", data[0]);
+    error!("Got MTB data, but the header is incorrect {:x}", data[0]);
     return Err(MasterTriggerError::PackageHeaderIncorrect);
   }
   let foot_pos = (n_daq_words - 1) as usize;
   if data.len() <= foot_pos {
-    error!("Got MTB data, but the header is incorrect");
-    return Err(MasterTriggerError::PackageHeaderIncorrect);
+    error!("Got MTB data, but the package ends too early!");
+    return Err(MasterTriggerError::DataTooShort);
+  }
+  if data.len() > foot_pos + 1 {
+    error!("The MTB event packets has {} fields, when {} are expected!", data.len(), n_daq_words);
   }
   if data[foot_pos] != 0x55555555 {
-    error!("Got MTB data, but the footer is incorrect {}", data[foot_pos]);
+    error!("Got MTB data, but the footer is incorrect {:x}", data[foot_pos]);
+    if data[foot_pos] == 0xAAAAAAAA {
+      println!("Found next header, printing the whole package!");
+      println!("N LTBs {} ({})", data[8].count_ones(), data[8]);
+      for k in data {
+        println!("-- {:x}", k);
+      }
+    }
     return Err(MasterTriggerError::PackageFooterIncorrect);
   }
 
   // Number of words which will be always there. 
   // Min event size is +1 word for hits
-  let n_hit_words = n_daq_words - MTB_DAQ_PACKET_FIXED_N_WORDS;
+  let n_hit_words    = n_daq_words - MTB_DAQ_PACKET_FIXED_N_WORDS;
+  //  this can happen when the subtraction above overflows
+  if n_hit_words > n_daq_words {
+    error!("N hit word calculation failed! Got {} hit words!", n_hit_words);
+    return Err(MasterTriggerError::BrokenPackage);
+  }
   //println!("We are expecting {}", n_hit_packets);
   mte.event_id       = data[1];
   mte.timestamp      = data[2];
@@ -139,16 +155,33 @@ pub fn get_event(bus                     : &mut IPBus)
   let rbmask = (data[7] as u64) << 32 | data[6] as u64; 
   mte.mtb_link_mask  = rbmask;
   mte.dsi_j_mask     = data[8];
-  //  this can happen when the subtraction above overflows
-  if n_hit_words > n_daq_words {
-    error!("N hit word calculation failed! Got {} hit words!", n_hit_words);
-    return Err(MasterTriggerError::BrokenPackage);
+  /*** NEW ***/
+  // we try ;)
+  let n_trig_boards  = data[8].count_ones();
+  let n_hit_fields   : u32;
+  let mut odd_boards = false;
+  if n_trig_boards % 2 == 0 {
+    n_hit_fields = n_trig_boards/2;
+  } else {
+    n_hit_fields = n_trig_boards/2 + 1;
+    odd_boards   = true;
   }
-  for k in 1..n_hit_words+1 {
-    let first  = ( data[8 + k as usize] & 0x0000ffff) as u16;
-    let second = ((data[8 + k as usize] & 0xffff0000) >> 16) as u16; 
+  for k in 9..9 + n_hit_fields {
+    let ltb_hits = data[k as usize];
+    // split them up
+    let first  =  (ltb_hits & 0x0000ffff) as u16;
+    let second = ((ltb_hits & 0xffff0000) >> 16) as u16;
+  //for k in 1..n_hit_words+1 {
+  //  let first  = ( data[8 + k as usize] & 0x0000ffff) as u16;
+  //  let second = ((data[8 + k as usize] & 0xffff0000) >> 16) as u16; 
     mte.channel_mask.push(first);
-    mte.channel_mask.push(second);
+    if !odd_boards {
+      mte.channel_mask.push(second);
+    } else {
+      if k != (9 + n_hit_fields - 1) {
+        mte.channel_mask.push(second);
+      }
+    }
   }
   //println!("{:?}", data);
   //println!("{:?}", mte.channel_mask);
@@ -206,47 +239,22 @@ pub fn get_mtbmonidata(bus : &mut IPBus)
   Ok(moni)
 }
 
-/// Communications with the master trigger over Udp
+/// Configure the MTB according to lifot settings.
 ///
-/// The master trigger can send packets over the network.
-/// These packets contain timestamps as well as the 
-/// eventid and a hitmaks to identify which LTBs have
-/// participated in the trigger.
-/// The packet format is described
-/// [here](https://gitlab.com/ucla-gaps-tof/firmware/-/tree/develop/)
-///
-/// # Arguments
-///
-/// * mt_address        : Udp address of the MasterTriggerBoard
-///
-/// * mt_sender         : push retrieved MasterTriggerEvents to 
-///                       this channel
-/// * mtb_moni_interval : time in seconds when we 
-///                       are acquiring mtb moni data.
-///
-/// * mtb_timeout_sec   : reconnect to mtb when we don't
-///                       see events in mtb_timeout seconds.
-///
-/// * verbose           : Print "heartbeat" output 
-///
-pub fn master_trigger(mt_address     : String,
-                      mt_sender      : &Sender<MasterTriggerEvent>,
-                      moni_sender    : &Sender<TofPacket>, 
-                      settings       : MTBSettings,
-                      thread_control : Arc<Mutex<ThreadControl>>,
-                      verbose        : bool) {
-
-  // missing event analysis - has to go away eventually
-  //let mut event_id_test = Vec::<u32>::new();
-
+/// # Arguments:
+///   * mt_address : udp address of the MTB
+///   * settings   : configure the MTB according
+///                  to these settings 
+pub fn configure_mtb(mt_address : &str,
+                     settings   : &MTBSettings) -> Result<(), MasterTriggerError> {
   let mut bus : IPBus;
-  match IPBus::new(mt_address.clone()) {
+  match IPBus::new(mt_address) {
     // if that doesn't work, then probably the 
     // configuration is wrong, wo we might as 
     // well panic
     Err(err) => {
       error!("Can't connect to MTB! {err}");
-      panic!("Without MTB, we can't proceed and might as well panic!");
+      return Err(MasterTriggerError::UdpTimeOut);
     }
     Ok(_bus) => {
       bus = _bus;
@@ -271,22 +279,25 @@ pub fn master_trigger(mt_address     : String,
   match TIU_BUSY_IGNORE.set(&mut bus, tiu_ignore_busy as u32) {
     Err(err) => error!("Unable to change tiu busy ignore settint! {err}"),
     Ok(_)    => {
-      warn!("Ignroing TIU since tiu_busy_ignore is set in the config file!");
-      println!("Ignroing TIU since tiu_busy_ignore is set in the config file!");
-    }
-  }
-
-  let tiu_emulation_mode = settings.tiu_emulation_mode;
-  match set_tiu_emulation_mode(&mut bus, tiu_emulation_mode) {
-    Err(err) => error!("Unable to change tiu emulation mode! {err}"),
-    Ok(_) => {
-      if tiu_emulation_mode {
-        println!("==> Setting TIU emulation mode! This setting is only useful if the TIU is NOT connected!");
-      } else {
-        println!("==> Not setting TIU emulation mode! TIU needs to be active and connectected!");
+      if tiu_ignore_busy {
+        warn!("Ignoring TIU since tiu_busy_ignore is set in the config file!");
+        println!("==> Ignroing TIU since tiu_busy_ignore is set in the config file!");
       }
     }
   }
+
+  // disable broken emulation mode!!
+  //let tiu_emulation_mode = settings.tiu_emulation_mode;
+  //match set_tiu_emulation_mode(&mut bus, tiu_emulation_mode) {
+  //  Err(err) => error!("Unable to change tiu emulation mode! {err}"),
+  //  Ok(_) => {
+  //    if tiu_emulation_mode {
+  //      println!("==> Setting TIU emulation mode! This will emulate a TIU. However, this is (usually) not a good run setting for taking data together with the tracker!");
+  //    } else {
+  //      println!("==> Not setting TIU emulation mode! Good setting for combined runs with tracker! \u{1F4AF}");
+  //    }
+  //  }
+  //}
   
   info!("Settting rb integration window!");
   let int_wind = settings.rb_int_window;
@@ -303,94 +314,92 @@ pub fn master_trigger(mt_address     : String,
     Ok(_)    => ()
   }
   
+  match unset_all_triggers(&mut bus) {
+    Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+    Ok(_)    => ()
+  }
   match settings.trigger_type {
     TriggerType::Poisson => {
-      match unset_all_triggers(&mut bus) {
-        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)    => ()
-      }
       match set_poisson_trigger(&mut bus,settings.poisson_trigger_rate) {
         Err(err) => error!("Unable to set the POISSON trigger! {err}"),
         Ok(_)    => ()
       }
     }
     TriggerType::Any     => {
-      match unset_all_triggers(&mut bus) {
-        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)    => ()
-      }
       match set_any_trigger(&mut bus,settings.trigger_prescale) {
         Err(err) => error!("Unable to set the ANY trigger! {err}"),
         Ok(_)    => ()
       }
     }
     TriggerType::Track   => {
-      match unset_all_triggers(&mut bus) {
-        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)    => ()
-      }
       match set_track_trigger(&mut bus, settings.trigger_prescale) {
         Err(err) => error!("Unable to set the TRACK trigger! {err}"),
         Ok(_)    => ()
       }
     }
     TriggerType::TrackCentral   => {
-      match unset_all_triggers(&mut bus) {
-        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)    => ()
-      }
       match set_central_track_trigger(&mut bus, settings.trigger_prescale) {
         Err(err) => error!("Unable to set the CENTRAL TRACK trigger! {err}"),
         Ok(_)    => ()
       }
     }
     TriggerType::TrackUmbCentral  => {
-      match unset_all_triggers(&mut bus) {
-        Err(err)  => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)   => ()
-      }
       match set_track_umb_central_trigger(&mut bus, settings.trigger_prescale) {
         Err(err) => error!("Unable to set the TRACK UMB CENTRAL trigger! {err}"),
         Ok(_)   => ()
       }
     }
     TriggerType::Gaps    => {
-      match unset_all_triggers(&mut bus) {
-        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)    => ()
-      }
       match set_gaps_trigger(&mut bus, settings.gaps_trigger_use_beta) {
         Err(err) => error!("Unable to set the GAPS trigger! {err}"),
         Ok(_)    => ()
       }
     }
     TriggerType::Gaps633    => {
-      match unset_all_triggers(&mut bus) {
-        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)    => ()
-      }
       match set_gaps633_trigger(&mut bus, settings.gaps_trigger_use_beta) {
         Err(err) => error!("Unable to set the GAPS trigger! {err}"),
         Ok(_)    => ()
       }
     }
     TriggerType::Gaps422    => {
-      match unset_all_triggers(&mut bus) {
-        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)    => ()
-      }
       match set_gaps422_trigger(&mut bus, settings.gaps_trigger_use_beta) {
         Err(err) => error!("Unable to set the GAPS trigger! {err}"),
         Ok(_)    => ()
       }
     }
     TriggerType::Gaps211    => {
-      match unset_all_triggers(&mut bus) {
-        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)    => ()
-      }
       match set_gaps211_trigger(&mut bus, settings.gaps_trigger_use_beta) {
         Err(err) => error!("Unable to set the GAPS trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
+    TriggerType::UmbCube => {
+      match set_umbcube_trigger(&mut bus) {
+        Err(err) => error!("Unable to set UmbCube trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
+    TriggerType::UmbCubeZ => {
+      match set_umbcubez_trigger(&mut bus) {
+        Err(err) => error!("Unable to set UmbCubeZ trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
+    TriggerType::UmbCorCube => {
+      match set_umbcorcube_trigger(&mut bus) {
+        Err(err) => error!("Unable to set UmbCorCube trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
+    TriggerType::CorCubeSide => {
+      match set_corcubeside_trigger(&mut bus) {
+        Err(err) => error!("Unable to set CorCubeSide trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
+    TriggerType::Umb3Cube => {
+      match set_umb3cube_trigger(&mut bus) {
+        Err(err) => error!("Unable to set Umb3Cube trigger! {err}"), 
         Ok(_)    => ()
       }
     }
@@ -399,64 +408,6 @@ pub fn master_trigger(mt_address     : String,
       warn!("Trigger condition undefined! Not setting anything!");
       error!("Trigger conditions unknown!");
     }
-    TriggerType::UmbCube => {
-      match unset_all_triggers(&mut bus) {
-        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)    => ()
-      }
-      match set_umbcube_trigger(&mut bus) {
-        Err(err) => error!("Unable to set UmbCube trigger! {err}"),
-        Ok(_)    => ()
-      }
-    }
-    TriggerType::UmbCubeZ => {
-      match unset_all_triggers(&mut bus) {
-        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)    => ()
-      }
-      match set_umbcubez_trigger(&mut bus) {
-        Err(err) => error!("Unable to set UmbCubeZ trigger! {err}"),
-        Ok(_)    => ()
-      }
-    }
-    TriggerType::UmbCorCube => {
-      match unset_all_triggers(&mut bus) {
-        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)    => ()
-      }
-      match set_umbcorcube_trigger(&mut bus) {
-        Err(err) => error!("Unable to set UmbCorCube trigger! {err}"),
-        Ok(_)    => ()
-      }
-    }
-    TriggerType::CorCubeSide => {
-      match unset_all_triggers(&mut bus) {
-        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)    => ()
-      }
-      match set_corcubeside_trigger(&mut bus) {
-        Err(err) => error!("Unable to set CorCubeSide trigger! {err}"),
-        Ok(_)    => ()
-      }
-    }
-    TriggerType::Umb3Cube => {
-      match unset_all_triggers(&mut bus) {
-        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-        Ok(_)    => ()
-      }
-      match set_umb3cube_trigger(&mut bus) {
-        Err(err) => error!("Unable to set Umb3Cube trigger! {err}"), 
-        Ok(_)    => ()
-      }
-    }
-
-    //TriggerType::FixedRate => {
-    //  match unset_all_triggers(&mut bus) {
-    //    Err(err) => error!("Unable to undo previous trigger settings! {err}"),
-    //    Ok(_)    => ()
-    //  }
-    //  error!("Fixed Rate trigger is currently not supported!");
-    //}
     _ => {
       error!("Trigger type {} not covered!", settings.trigger_type);
       println!("= => Not setting any trigger condition. You can set it through pico_hal.py");
@@ -473,40 +424,24 @@ pub fn master_trigger(mt_address     : String,
     // FIXME - the "global" is wrong. We need to rename this at some point
     match settings.global_trigger_type {
       TriggerType::Any             => {
-        //match ANY_TRIG_IS_GLOBAL.set(&mut bus, 1) {
-        //  Ok(_)    => (),
-        //  Err(err) => error!("Settting the any trigger to global failed! {err}") 
-        //}
         match ANY_TRIG_PRESCALE.set(&mut bus, prescale_val) {
           Ok(_)    => (),
           Err(err) => error!("Settting the prescale {} for the any trigger failed! {err}", prescale_val) 
         }
       }
       TriggerType::Track           => {
-        //match TRACK_TRIG_IS_GLOBAL.set(&mut bus, 1) {
-        //  Ok(_)    => (),
-        //  Err(err) => error!("Setting the track trigger to global failed! {err}")
-        //}
         match TRACK_TRIG_PRESCALE.set(&mut bus, prescale_val) {
           Ok(_)    => (),
           Err(err) => error!("Settting the prescale {} for the any trigger failed! {err}", prescale_val) 
         }
       }
       TriggerType::TrackCentral    => {
-        //match TRACK_CENTRAL_IS_GLOBAL.set(&mut bus, 1) {
-        //  Ok(_)    => (),
-        //  Err(err) => error!("Setting the central track trigger to global failed! {err}")
-        //}
         match TRACK_CENTRAL_PRESCALE.set(&mut bus, prescale_val) {
           Ok(_)    => (),
           Err(err) => error!("Settting the prescale {} for the track central trigger failed! {err}", prescale_val) 
         }
       }
       TriggerType::TrackUmbCentral => {
-        //match TRACK_UMB_CENTRAL_IS_GLOBAL.set(&mut bus, 1) {
-        //  Ok(_)    => (),
-        //  Err(err) => error!("Setting the umbrealla central (super cewntral) trigger to global failed! {err}")
-        //}
         match TRACK_UMB_CENTRAL_PRESCALE.set(&mut bus, prescale_val) {
           Ok(_)    => (),
           Err(err) => error!("Settting the prescale {} for the track umb central trigger failed! {err}", prescale_val) 
@@ -520,12 +455,49 @@ pub fn master_trigger(mt_address     : String,
   
   // reset the DAQ event queue before start
   match reset_daq(&mut bus) {//, &mt_address) {
-    Err(err) => error!("Can not reset DAQ! {err}"),
+    Err(err) => {
+      error!("Can not reset DAQ! {err}");
+    }
     Ok(_)    => ()
   }
+  Ok(())
+}
 
-  // step 2 - event loop
-  
+/// Communications with the master trigger over Udp
+///
+/// The master trigger can send packets over the network.
+/// These packets contain timestamps as well as the 
+/// eventid and a hitmaks to identify which LTBs have
+/// participated in the trigger.
+/// The packet format is described
+/// [here](https://gitlab.com/ucla-gaps-tof/firmware/-/tree/develop/)
+///
+/// # Arguments
+///
+/// * mt_address        : Udp address of the MasterTriggerBoard
+///
+/// * mt_sender         : push retrieved MasterTriggerEvents to 
+///                       this channel
+/// * mtb_moni_interval : time in seconds when we 
+///                       are acquiring mtb moni data.
+///
+/// * mtb_timeout_sec   : reconnect to mtb when we don't
+///                       see events in mtb_timeout seconds.
+///
+/// * verbose           : Print "heartbeat" output 
+///
+pub fn master_trigger(mt_address     : &str,
+                      mt_sender      : &Sender<MasterTriggerEvent>,
+                      moni_sender    : &Sender<TofPacket>, 
+                      settings       : MTBSettings,
+                      thread_control : Arc<Mutex<ThreadControl>>,
+                      verbose        : bool) {
+
+  // missing event analysis - has to go away eventually
+  //let mut event_id_test = Vec::<u32>::new();
+
+  let mut bus : IPBus;
+
   // timers - when to reconnect if no 
   // events have been received in a 
   // certain timeinterval
@@ -550,24 +522,60 @@ pub fn master_trigger(mt_address     : String,
   let mut n_iter_loop         = 0u64;
   let mut hb_timer            = Instant::now();
   let hb_interval             = Duration::from_secs(settings.hb_send_interval as u64);
-  // indicator if the thread is active (it can 
-  // sleep during calibrations)
-  let mut is_active              = true;
+
+  match configure_mtb(mt_address, &settings) {
+    Err(err) => error!("Configuring the MTB failed! {err}"),
+    Ok(())   => ()
+  }
+
+  let connection_timeout = Instant::now(); 
+  loop { 
+    match IPBus::new(mt_address) {
+      Err(err) => {
+        debug!("Can't connect to MTB, will try again in 10 ms! {err}");
+        //panic!("Without MTB, we can't proceed and might as well panic!");
+        thread::sleep(Duration::from_millis(10));
+      }
+      Ok(_bus) => {
+        bus = _bus;
+        break
+        //thread::sleep(Duration::from_micros(1000));
+      }
+    }
+    if connection_timeout.elapsed().as_secs() > 10 {
+      error!("Unable to connect to MTB after 10 seconds!");
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          tc.thread_master_trg_active = false;
+        }
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+        },
+      }
+      return;
+    }
+  }
+  
+  debug!("Resetting master trigger DAQ");
+  // We'll reset the pid as well
+  bus.pid = 0;
+  match bus.realign_packet_id() {
+    Err(err) => error!("Can not realign packet ID! {err}"),
+    Ok(_)    => ()
+  }
+  
+  match reset_daq(&mut bus) {//, &mt_address) {
+    Err(err) => error!("Can not reset DAQ! {err}"),
+    Ok(_)    => ()
+  }
   loop {
     // Check thread control and what to do
+    // Deactivate this for now
     if tc_timer.elapsed().as_secs_f32() > 2.5 {
       match thread_control.try_lock() {
         Ok(mut tc) => {
-          if tc.thread_master_trg_active || tc.stop_flag {
-            // if the thread is not supposed to be active, 
-            // idle
-            is_active = true;
-          }
           if !tc.thread_master_trg_active {
-            is_active = false;
-          }
-          if tc.stop_flag {
-            tc.thread_master_trg_active = false;
+            tc.end_all_rb_threads = true;
             break;
           }
         },
@@ -585,14 +593,15 @@ pub fn master_trigger(mt_address     : String,
       } else {
         println!("= => [master_trigger] reconnection requested");
       }
-      match IPBus::new(mt_address.clone()) {
+      match IPBus::new(mt_address) {
         Err(err) => {
           error!("Can't connect to MTB! {err}");
           //panic!("Without MTB, we can't proceed and might as well panic!");
+          continue; // try again
         }
         Ok(_bus) => {
           bus = _bus;
-          thread::sleep(Duration::from_micros(1000));
+          //thread::sleep(Duration::from_micros(1000));
           debug!("Resetting master trigger DAQ");
           // We'll reset the pid as well
           bus.pid = 0;
@@ -606,10 +615,10 @@ pub fn master_trigger(mt_address     : String,
           }
         }
       }
-      match bus.reconnect() {//, &mt_address) {
-        Err(err) => error!("Can not reconnect NTB! {err}"),
-        Ok(_)    => ()
-      }
+      //match bus.reconnect() {//, &mt_address) {
+      //  Err(err) => error!("Can not reconnect NTB! {err}"),
+      //  Ok(_)    => ()
+      //}
       mtb_timeout    = Instant::now();
     }
     if moni_interval.elapsed().as_secs() > mtb_moni_interval || first {
@@ -674,16 +683,12 @@ pub fn master_trigger(mt_address     : String,
       moni_interval = Instant::now();
     }
     
-    // if we ar not active, don't get events
-    if !is_active {
-      continue;
-    }
-
     match get_event(&mut bus){ //,
       Err(err) => {
         match err {
           MasterTriggerError::PackageFooterIncorrect
           | MasterTriggerError::PackageHeaderIncorrect 
+          | MasterTriggerError::DataTooShort
           | MasterTriggerError::BrokenPackage => {
             error!("MasterTriggerEventPackage not adhering to expected format! {err}");
             warn!("Resetting DAQ Event Queue!");
@@ -711,7 +716,8 @@ pub fn master_trigger(mt_address     : String,
         last_event_id = _ev.event_id;
         // we got an even successfully, so reset the 
         // connection timeout
-        mtb_timeout = Instant::now();
+        //mtb_timeout = Instant::now();
+        
         heartbeat.n_events += 1;
         match mt_sender.send(_ev) {
           Err(err) => {
@@ -780,7 +786,6 @@ pub fn master_trigger(mt_address     : String,
       }
       
       hb_timer = Instant::now();
-      
     } 
   }
 }

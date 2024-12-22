@@ -97,6 +97,14 @@ pub fn set_tiu_emulation_mode(bus : &mut IPBus, set_emulation_mode : bool)
     Ok(())
 }
 
+/// Set the busy count for the tiu emulation mode in 10ns clockcycles
+pub fn set_tiu_emulation_mode_bsy_cnt(bus : &mut IPBus, cycles : u32)
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting TIU Emulation mode bsy cnt to {} clock cycles (10ns each)", cycles);
+  TIU_EMU_BUSY_CNT.set(bus, cycles)?;
+  Ok(()) 
+}
+
 /// Get the number of clock cycles (1=10ns) that the emulator will remain busy
 pub fn get_tiu_emu_busy_cnt(bus : &mut IPBus) 
   -> Result<u32, Box<dyn Error>> {
