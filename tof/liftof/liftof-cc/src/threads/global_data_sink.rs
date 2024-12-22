@@ -1,45 +1,40 @@
-//! Communication with the flight computer
+//! Global data sink - a 'funnel' for all packets
+//! generated through the liftof system.
 //!
-//! Using two dedicated 0MQ wires - one for 
-//! data, the other for commands
-//!
+//! Each thread of liftof-cc can connect to the 
+//! data sink through a channel and it will 
+//! forward the tof packets to the designated
+//! zmq socket.
 //!
 
 use std::time::{
-    Instant,
-    Duration,
+  Instant,
+  Duration,
 };
 use std::thread::sleep;
 use std::sync::{
-    Arc,
-    Mutex,
+  Arc,
+  Mutex,
 };
 
 use crossbeam_channel::Receiver; 
 
-//use colored::Colorize;
-
-use liftof_lib::settings::DataPublisherSettings;
 use tof_dataclasses::packets::{
-    TofPacket,
-    PacketType
+  TofPacket,
+  PacketType
 };
 
-//use tof_dataclasses::events::TofEvent;
 use tof_dataclasses::serialization::{
   Serialization,
   Packable,
 };
 
 use tof_dataclasses::io::{
-    TofPacketWriter,
-    FileType,
+  TofPacketWriter,
+  FileType,
 };
 
-use tof_dataclasses::events::TofEvent;
-
 use tof_dataclasses::heartbeats::HeartBeatDataSink;
-
 use liftof_lib::thread_control::ThreadControl;
 
 /// Manages "outgoing" 0MQ PUB socket and writing
@@ -50,12 +45,13 @@ use liftof_lib::thread_control::ThreadControl;
 ///
 /// # Arguments
 ///
-/// * incoming           : incoming connection for TofPackets from 
-///                        other threads
-/// * thread_control     : start/stop thread, calibration information
-pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
-                        thread_control     : Arc<Mutex<ThreadControl>>,
-                        settings           : DataPublisherSettings) {
+///     * incoming       : incoming connection for TofPackets
+///                        from any source
+///     * thread_control : inter-thread communications,
+///                        start/stop signals.
+///                        Keeps global settings.
+pub fn global_data_sink(incoming       : &Receiver<TofPacket>,
+                        thread_control : Arc<Mutex<ThreadControl>>) {
   // when the thread starts, we need to wait a bit
   // till thread_control becomes usable
   sleep(Duration::from_secs(10));
@@ -64,10 +60,12 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut write_stream_path        = String::from("");
   let mut send_tof_summary_packets = false;
   let mut send_rbwaveform_packets  = false;
-  let mut send_mtb_event_packets   = false;
+  //let mut send_mtb_event_packets   = false;
   let mut send_tof_event_packets   = false;
   let mut write_stream             = false;
-  let mut send_rbwf_every_x_event = 1;
+  let mut send_rbwf_every_x_event  = 1;
+  // fixme - smaller hb interfal
+  let mut hb_interval              = Duration::from_secs(20u64);
   match thread_control.lock() {
     Ok(mut tc) => {
       tc.thread_data_sink_active = true; 
@@ -77,9 +75,9 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
       write_stream               = tc.write_data_to_disk;
       send_tof_summary_packets   = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
       send_rbwaveform_packets    = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
-      send_mtb_event_packets     = tc.liftof_settings.data_publisher_settings.send_mtb_event_packets;
       send_tof_event_packets     = tc.liftof_settings.data_publisher_settings.send_tof_event_packets;
       send_rbwf_every_x_event    = tc.liftof_settings.data_publisher_settings.send_rbwf_every_x_event;
+      hb_interval                = Duration::from_secs(tc.liftof_settings.data_publisher_settings.hb_send_interval as u64);
     },
     Err(err) => {
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -91,7 +89,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
     send_rbwaveform_packets = false;
   }
 
-  let mut evid_check      = Vec::<u32>::new();
+  let mut evid_check        = Vec::<u32>::new();
 
   let ctx = zmq::Context::new();
   // FIXME - should we just move to another socket if that one is not working?
@@ -122,8 +120,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
   let mut retire        = false;
   let mut heartbeat     = HeartBeatDataSink::new();
   let mut hb_timer      = Instant::now(); 
-  let hb_interval       = Duration::from_secs(settings.hb_send_interval as u64);
-  let mut rbwf_ctr      = 0u32;
+  //let mut rbwf_ctr      = 0u32;
   loop {
     if retire {
       // take a long nap to give other threads 
@@ -139,11 +136,9 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
     if check_settings_timer.elapsed().as_secs_f32() > 1.5 {
       match thread_control.try_lock() {
         Ok(mut tc) => {
-          //println!("== ==> [global_data_sink] tc lock acquired!");
           send_tof_event_packets   = tc.liftof_settings.data_publisher_settings.send_tof_event_packets;      
           send_tof_summary_packets = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
           send_rbwaveform_packets  = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
-          send_mtb_event_packets   = tc.liftof_settings.data_publisher_settings.send_mtb_event_packets;
     
           if tc.stop_flag {
             tc.thread_data_sink_active = false;
@@ -174,90 +169,36 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
     } else if !write_stream {
       writer = None;
     }
+    let mut send_this_packet = true;
     match incoming.recv() {
       Err(err) => trace!("No new packet, err {err}"),
       Ok(pack) => {
         debug!("Got new tof packet {}", pack.packet_type);
         if writer.is_some() {
-          writer.as_mut().unwrap().add_tof_packet(&pack);
-          heartbeat.n_pack_write_disk += 1;
-          heartbeat.n_bytes_written += pack.payload.len() as u64;   
+          match pack.packet_type {
+            PacketType::TofEventSummary 
+            | PacketType::RBWaveform => (),
+            _ => {
+              writer.as_mut().unwrap().add_tof_packet(&pack);
+              heartbeat.n_pack_write_disk += 1;
+              heartbeat.n_bytes_written += pack.payload.len() as u64;   
+            }
+          }
         }
         
-        // FIXME - disentangle network and disk I/O?
-        if pack.packet_type == PacketType::TofEvent {
-          rbwf_ctr += 1;
-          if send_tof_summary_packets ||
-            send_rbwaveform_packets {
-            // unfortunatly we have to do this unnecessary step
-            // I have to think about fast tracking these.
-            // maybe sending TofEvents over the channel instead
-            // of TofPackets?
-            let ev_to_send : TofEvent;
-            match pack.unpack::<TofEvent>() {
-              Err(err) => {
-                error!("Unable to unpack TofEvent! {err}");
-                continue;
-              },
-              Ok(_ev_to_send) => {
-                ev_to_send = _ev_to_send;
-              }
-            }
-            if send_tof_summary_packets {
-              let te_summary = ev_to_send.get_summary();
-              // debug
-              if evid_check.len() < 20000 {
-                evid_check.push(te_summary.event_id);
-              }
-              let pack = TofPacket::from(&te_summary);
-              match data_socket.send(pack.to_bytestream(),0) {
-                Err(err) => {
-                  error!("Packet sending failed! {err}");
-                }
-                Ok(_)    => {
-                  //trace!("Event Summary for event id {} send!", evid);
-                  heartbeat.n_packets_sent += 1;
-                }
-              }
-            }
-            if send_rbwaveform_packets && rbwf_ctr == send_rbwf_every_x_event {
-              for rbwave in ev_to_send.get_rbwaveforms() {
-                let pack = TofPacket::from(&rbwave);
-                match data_socket.send(pack.to_bytestream(),0) {
-                  Err(err) => {
-                    error!("Packet sending failed! {err}");
-                  }
-                  Ok(_)    => {
-                    //trace!("RB waveform for event id {} send!", evid);
-                    heartbeat.n_packets_sent += 1;
-                  }
-                }
-              }
-              rbwf_ctr = 0;
-            }
-            if send_mtb_event_packets {
-              let pack = TofPacket::from(&ev_to_send.mt_event);
-              match data_socket.send(pack.to_bytestream(),0) {
-                Err(err) => {
-                  error!("Packet sending failed! {err}");
-                }
-                Ok(_)    => {
-                  //trace!("RB waveform for event id {} send!", evid);
-                  heartbeat.n_packets_sent += 1;
-                }
-              }
-            }
+        match pack.packet_type {
+          PacketType::TofEvent =>  {
+            send_this_packet = send_tof_event_packets; 
           }
-          if send_tof_event_packets {
-            match data_socket.send(pack.to_bytestream(),0) {
-              Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
-              Ok(_)    => {
-                trace!("TofPacket sent");
-                heartbeat.n_packets_sent += 1;
-              }
-            } // end match
+          PacketType::RBWaveform => {
+            send_this_packet = send_rbwaveform_packets;
           }
-        } else {
+          PacketType::TofEventSummary => {
+            send_this_packet = send_tof_summary_packets;
+          }
+          _ => ()
+        }
+        if send_this_packet {
           match data_socket.send(pack.to_bytestream(),0) {
             Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
             Ok(_)    => {
