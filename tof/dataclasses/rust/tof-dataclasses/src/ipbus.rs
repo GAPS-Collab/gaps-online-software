@@ -126,7 +126,7 @@ pub struct IPBusPacket {
 #[derive(Debug)]
 pub struct IPBus {
   pub socket         : UdpSocket,
-  pub target_address : String,
+  //pub target_address : String,
   pub packet_type    : IPBusPacketType,
   /// IPBus Packet ID - this is then NEXT
   /// pid which will be sent
@@ -138,12 +138,12 @@ pub struct IPBus {
 
 impl IPBus {
   
-  pub fn new(target_address : String) 
+  pub fn new(target_address : &str) 
     -> io::Result<Self> {
-    let socket = Self::connect(&target_address)?;
+    let socket = Self::connect(target_address)?;
     let mut bus = Self {
       socket         : socket,
-      target_address : target_address,
+      //target_address : target_address,
       packet_type    : IPBusPacketType::Read,
       pid            : 0,
       expected_pid   : 0,
@@ -170,7 +170,7 @@ impl IPBus {
   /// * target_address  : IP/port of the target 
   ///                     probably some kind of
   ///                     FPGA
-  pub fn connect(target_address : &String) 
+  pub fn connect(target_address : &str) 
     ->io::Result<UdpSocket> {
     // provide a number of local ports to try
     let local_addrs = [
@@ -200,7 +200,7 @@ impl IPBus {
           Err(err) => error!("Can not set write timeout for Udp socket! {err}"),
           Ok(_)    => ()
         }
-        match socket.connect(&target_address) {
+        match socket.connect(target_address) {
           Err(err) => {
             error!("Can not connect to IPBus socket to target address {}! {}", target_address, err);
             return Err(err);
@@ -218,12 +218,12 @@ impl IPBus {
     } // end match
   }  
 
-  /// Reconnect to the same address after timeout
-  pub fn reconnect(&mut self) 
-    -> io::Result<()> {
-    self.socket = Self::connect(&self.target_address)?;
-    Ok(())
-  }
+  ///// Reconnect to the same address after timeout
+  //pub fn reconnect(&mut self) 
+  //  -> io::Result<()> {
+  //  self.socket = Self::connect(&self.target_address)?;
+  //  Ok(())
+  //}
 
 
   /// Get the next 12bit transaction ID. 
