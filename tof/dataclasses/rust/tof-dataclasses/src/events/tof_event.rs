@@ -303,7 +303,8 @@ impl TofEvent {
     summary.trigger_sources    = self.mt_event.trigger_source;
     summary.n_trigger_paddles  = self.mt_event.get_trigger_hits().len() as u8;
     summary.event_id           = self.header.event_id;
-    summary.run_id             = ((self.header.run_id & 0x0000ffff) >> 16) as u16;
+    // truncate the run id to u16
+    summary.run_id             = (self.header.run_id & 0x0000ffff) as u16;
     // FIXME we set the protocol version here, but that should propably 
     // go elsewhere
     summary.version            = ProtocolVersion::V1;
@@ -656,7 +657,11 @@ impl FromRandom for TofEventHeader {
   }
 }
 
-/// Smaller packet for in-flight telemetry stream
+/// De-facto the main event class
+///
+/// TofEventSummary provides a list of extracted
+/// hits from the ReadoutBoards as well as 
+/// information about the trigger system.
 #[derive(Debug, Clone, PartialEq)]
 pub struct TofEventSummary {
   pub status            : EventStatus,
