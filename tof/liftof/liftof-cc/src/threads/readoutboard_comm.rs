@@ -1,4 +1,5 @@
-//! Routines for RB commiunication and data reception 
+//! Readoutboard communication. Get events and 
+//! monitoring data
 
 use std::collections::HashMap;
 
@@ -22,7 +23,6 @@ use tof_dataclasses::packets::{
 };
 
 use tof_dataclasses::serialization::Serialization;
-use tof_dataclasses::commands::TofResponse;
 use tof_dataclasses::calibrations::RBCalibrations;
 
 use liftof_lib::{
@@ -30,7 +30,6 @@ use liftof_lib::{
 };
 
 use liftof_lib::thread_control::ThreadControl;
-
 use liftof_lib::settings::AnalysisEngineSettings;
 
 /*************************************/
@@ -52,18 +51,12 @@ use liftof_lib::settings::AnalysisEngineSettings;
 ///                         will be forwarded to the sink.
 /// * rb                  : ReadoutBoard instance, as loaded from the database. This will be used
 ///                         for readoutboard id as well as paddle assignment.
-/// * print_packets       : Increase verbosity and print incoming packets from the RB
 /// * run_analysis_engine : Extract TofHits from the waveforms and attach them to RBEvent
 /// * ae_settings         : Settings to configure peakfinding algorithms etc. 
 ///                         These can be configured with an external .toml file
-/// * ack_sender          : Intercept acknowledgement packets and forward them to elswhere
 pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                                  tp_to_sink          : Sender<TofPacket>,
                                  mut rb              : ReadoutBoard,
-                                 print_packets       : bool,
-                                 run_analysis_engine : bool,
-                                 ae_settings         : AnalysisEngineSettings,
-                                 ack_sender          : Sender<TofResponse>,
                                  thread_control      : Arc<Mutex<ThreadControl>>) {
 
   let mut this_status = HashMap::<u16, bool>::new();
@@ -71,7 +64,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
     this_status.insert(k,false);
   }
   match rb.load_latest_calibration() {
-    Err(err) => warn!("Unable to load calibration for RB {}! {}", rb.rb_id, err),
+    Err(err) => error!("Unable to load calibration for RB {}! {}", rb.rb_id, err),
     Ok(_)    => {
       info!("Loaded calibration for board {} successfully!", rb.rb_id);
     }
@@ -96,20 +89,47 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
   // no need to subscribe to a topic, since there 
   // is one port for each rb
   let topic = format!("RB{:02}", board_id);
-  //let topic = b"";
   match socket.set_subscribe(&topic.as_bytes()) {
    Err(err) => error!("Unable to subscribe to topic! {err}"),
    Ok(_)    => info!("Subscribed to {:?}!", topic),
   }
   let mut tc_timer = Instant::now();
   let mut verification_active = false;
+  
+  let ae_settings         : AnalysisEngineSettings; 
+  let run_analysis_engine : bool;
+  match thread_control.lock() {
+    Ok(tc) => {
+      ae_settings         = tc.liftof_settings.analysis_engine_settings.clone();
+      run_analysis_engine = tc.liftof_settings.run_analysis_engine;
+    }
+    Err(err) => {
+      error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+      error!("Ending thread, unable to acquire settings!");
+      return;
+    }
+  }
+  
+  // start continuous thread activity, read data from RB sockets,
+  // do analysis and pass them on.
   loop {
     if tc_timer.elapsed().as_secs_f32() > 2.1 {
       match thread_control.try_lock() {
         Ok(mut tc) => {
           //println!("== ==> [rbcomm] tc lock acquired!");
-          if tc.stop_flag {
+          if tc.end_all_rb_threads {
             //println!("= => [rbcomm] initiate ending thread for RB {}!", board_id);
+            tc.thread_rbcomm_active.insert(rb.rb_id,false);
+            // check if all threads have ended
+            let mut all_done = true;
+            for (_,value) in &tc.thread_rbcomm_active {
+              if *value {
+                all_done = false;
+              }
+            }
+            if all_done {
+              tc.thread_event_bldr_active = false;
+            }
             break;
           }
           verification_active = tc.verification_active;
@@ -139,22 +159,8 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
             continue;  
           },
           Ok(tp) => {
-            if print_packets {
-              println!("==> Got {} for RB {}", tp.packet_type, rb.rb_id); 
-            }
             //n_received += 1;
             match tp.packet_type {
-              PacketType::TofResponse => {
-                match tp.unpack::<TofResponse>() {
-                  Err(err)   => error!("Unable to send ACK packet! {err}"),
-                  Ok(tr)     => {
-                    match ack_sender.send(tr) {
-                      Err(err) => error!("Unable to send ACK packet! {err}"),
-                      Ok(_)    => ()
-                    }
-                  }
-                }
-              }
               PacketType::RBEvent | PacketType::RBEventMemoryView => {
                 let mut event = RBEvent::from(&tp);
                 // don't create the hits if the trigger is lost (the 
@@ -242,9 +248,6 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
     } // end match 
     debug!("Digested {n_chunk} chunks!");
     debug!("Noticed {n_errors} errors!");
-    //if n_received % 100000 == 0 {
-    //  println!("[RBCOM] => Received {n_received} packets!");
-    //}
   } // end loop
   println!("= => [rbcomm] thread for RB {} finished! (not recoverable)", board_id);
 } // end fun
