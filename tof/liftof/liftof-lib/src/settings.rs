@@ -1013,8 +1013,8 @@ impl LiftofSettings {
     }
   }
 
-  pub fn from_toml(filename : String) -> Result<LiftofSettings, SerializationError> {
-    match File::open(&filename) {
+  pub fn from_toml(filename : &str) -> Result<LiftofSettings, SerializationError> {
+    match File::open(filename) {
       Err(err) => {
         error!("Unable to open {}! {}", filename, err);
         return Err(SerializationError::TomlDecodingError);
