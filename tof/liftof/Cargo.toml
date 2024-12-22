@@ -6,7 +6,6 @@ members = [
   "liftof-rb",
   "liftof-cc", 
   "liftof-tui",  
-  "liftof-analysis",
 ]
 
 [workspace.dependencies]
