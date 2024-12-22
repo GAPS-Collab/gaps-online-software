@@ -1,11 +1,15 @@
+//! The Heart of lfitof-cc. The event builder assembles all 
+//! events coming from the Readoutboards in a single event
+
 use std::thread;
 use std::time::{
-    Instant,
-    Duration
+  Instant,
+  Duration
 };
+
 use std::sync::{
-    Arc,
-    Mutex
+  Arc,
+  Mutex
 };
 
 use std::collections::VecDeque;
@@ -13,46 +17,35 @@ use std::collections::HashMap;
 //use std::path::Path;
 //
 use crossbeam_channel::{
-    Receiver,
-    Sender,
+  Receiver,
+  Sender,
 };
 
-use comfy_table::modifiers::{
-    UTF8_ROUND_CORNERS,
-    UTF8_SOLID_INNER_BORDERS,
-};
-use comfy_table::presets::UTF8_FULL;
-use comfy_table::*;
 
 use tof_dataclasses::events::{
-    MasterTriggerEvent,
-    TofEvent,
-    RBEvent
+  MasterTriggerEvent,
+  TofEvent,
+  RBEvent
 };
 
 use tof_dataclasses::serialization::Packable;
 
 use tof_dataclasses::packets::TofPacket;
-//use tof_dataclasses::threading::ThreadControl;
 use tof_dataclasses::events::EventStatus;
-
-
 
 //use liftof_lib::heartbeat_printer;
 use liftof_lib::settings::{
-    TofEventBuilderSettings,
-    //BuildStrategy,
+  TofEventBuilderSettings,
 };
-use tof_dataclasses::config::BuildStrategy;
+use tof_dataclasses::commands::config::BuildStrategy;
 use liftof_lib::thread_control::ThreadControl;
 
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 
-use colored::{
-    Colorize,
-};
-
 use tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
+
+
+
 /// Events ... assemble! 
 ///
 /// The event_builder collects all available event information,
@@ -88,12 +81,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   // missing event analysis
   //let mut event_id_test = Vec::<u32>::new();
 
-
   // debug the number of rb events we have seen 
   // in production mode, these features should go away
   // FIXEM - add debug flags to features
-  let mut seen_rbevents      = HashMap::<u8, usize>::new();
-  let mut too_early_rbevents = HashMap::<u8, usize>::new(); 
+  let mut seen_rbevents      = HashMap::<u8, u64>::new();
+  let mut too_early_rbevents = HashMap::<u8, u64>::new(); 
   // 10, 12, 37,38, 43, 45 don't exist
   for k in 1..51 {
     if k == 10 || k ==12 || k == 37 || k == 38 || k == 43 || k == 45 {
@@ -108,12 +100,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut heartbeat            = EVTBLDRHeartbeat::new();
   let mut event_cache          = HashMap::<u32, TofEvent>::new();
   let mut event_id_cache       = VecDeque::<u32>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  //let mut idx_to_remove = Vec::<usize>::with_capacity(20);
-  //let mut event_id_cache_a    = VecDeque:
-  //let dsi_map                 = get_dsi_j_ltbch_vs_rbch_map(db_path.as_ref()); 
   let mut n_received           : usize;
-  //let mut clear_cache        = 0; // clear cache every 
-  //let mut event_sending      = 0;
   let mut n_mte_skipped        = 0u32;
   let mut first_evid           : u32;
   let mut last_evid            = 0;
@@ -122,14 +109,34 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut last_rb_evid         : u32;
   let mut n_rbe_per_te         = 0usize;
   let mut debug_timer          = Instant::now();
-  let met_seconds          = 0f64;  
+  let met_seconds              = 0f64;  
   //let mut n_receiving_errors  = 0;
   let mut check_tc_update      = Instant::now();
-  let daq_reset_cooldown   = Instant::now();
-  let reset_daq_flag       = false;
-  let mut retire           = false;
-  let mut hb_timer         = Instant::now(); 
-  let hb_interval          = Duration::from_secs(settings.hb_send_interval as u64);
+  let daq_reset_cooldown       = Instant::now();
+  let reset_daq_flag           = false;
+  let mut retire               = false;
+  let mut hb_timer             = Instant::now(); 
+  let hb_interval              = Duration::from_secs(settings.hb_send_interval as u64);
+  
+  // set up the event builder. Since we are now doing settings only at run 
+  // start, it is fine to do this outside of the loop
+  let mut send_tev_sum    = false;
+  let mut send_rbwaveform = false;
+  let mut send_rbwf_freq  = 0u32;
+  let mut rbwf_ctr        = 0u64;
+  // this can block it is fine bc it is only 
+  // happening once at init
+  match thread_control.lock() {
+    Ok(tc) => {
+      send_rbwaveform   = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
+      send_tev_sum      = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
+      send_rbwf_freq    = tc.liftof_settings.data_publisher_settings.send_rbwf_every_x_event;
+    }
+    Err(err) => {
+      error!("Can't acquire lock for ThreadControl! {err}");
+    }
+  }
+
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
       //println!("= => [evt_builder] checkling tc..");
@@ -137,6 +144,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       let mut cali_still_active = false;
       match thread_control.try_lock() {
         Ok(mut tc) => {
+          if tc.thread_event_bldr_active {
+            println!("= => [evt_builder] shutting down...");
+            tc.end_all_rb_threads = true;
+            break; 
+          }
           //println!("= => [evt_builder] {}", tc);
           if tc.stop_flag {
             // end myself
@@ -165,11 +177,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       }
     }
     if retire {
-      thread::sleep(Duration::from_secs(2));
+      //thread::sleep(Duration::from_secs(2));
       break;
     }
     n_received = 0;
-    while n_received < settings.n_mte_per_loop {
+    while n_received < settings.n_mte_per_loop as usize {
       // every iteration, we welcome a new master event
       match m_trig_ev.try_recv() {
         Err(_) => {
@@ -208,10 +220,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     first_evid = event_id_cache[0]; 
     // recycle that variable for the rb events as well
     n_received = 0;
-    //let mut attempts = 0usize;
-    'main: while !ev_from_rb.is_empty() && n_received < settings.n_rbe_per_loop {
-    // try to catch up
-    //while !ev_from_rb.is_empty() && last_rb_evid < last_evid {
+    'main: while !ev_from_rb.is_empty() && n_received < settings.n_rbe_per_loop as usize {
       match ev_from_rb.try_recv() {
         Err(err) => {
           error!("Can't receive RBEvent! Err {err}");
@@ -285,12 +294,12 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     }
     let av_rb_ev = n_rbe_per_te as f64 / n_sent as f64;
     if settings.build_strategy == BuildStrategy::Adaptive || 
-      settings.build_strategy == BuildStrategy::AdaptiveThorough {
-      settings.n_rbe_per_loop = av_rb_ev.ceil() as usize;
+      settings.build_strategy  == BuildStrategy::AdaptiveThorough {
+      settings.n_rbe_per_loop  = av_rb_ev.ceil() as u32;
       // if the rb in the pipeline get too long, catch up
       // and drain it a bit
       if ev_from_rb.len() > 1000 {
-        settings.n_rbe_per_loop = ev_from_rb.len() - 500;
+        settings.n_rbe_per_loop = ev_from_rb.len() as u32 - 500;
       }
       if settings.n_rbe_per_loop == 0 {
         // failsafe
@@ -298,7 +307,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       }
     }
     if let BuildStrategy::AdaptiveGreedy = settings.build_strategy {
-      settings.n_rbe_per_loop = av_rb_ev.ceil() as usize + settings.greediness as usize;
+      settings.n_rbe_per_loop = av_rb_ev.ceil() as u32 + settings.greediness as u32;
       if settings.n_rbe_per_loop == 0 {
         // failsafe
         settings.n_rbe_per_loop = 40;
@@ -307,233 +316,17 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     let debug_timer_elapsed = debug_timer.elapsed().as_secs_f64();
     //println!("Debug timer elapsed {}", debug_timer_elapsed);
     if debug_timer_elapsed > 35.0  {
-      // missing event id check
-      let mut evid_check = event_id_cache[0];
-      heartbeat.n_ev_wo_evid = 0usize;
-      for _ in 0..event_id_cache.len() {
-        if !event_id_cache.contains(&evid_check) {
-          heartbeat.n_ev_wo_evid += 1;
-        }
-        evid_check += 1;
-      }
-      heartbeat.met_seconds += debug_timer_elapsed as usize;
-      heartbeat.mte_receiver_cbc_len = m_trig_ev.len();
-      heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
-      heartbeat.tp_sender_cbc_len = data_sink.len();
-
-      //while hb_timer.elapsed() < hb_interval {};
-      //}
-
-      //while hb_timer.elapsed() >= hb_interval {
-      //let pack = heartbeat.pack();
-      //match data_sink.send(pack) {
-      //  Err(err) => {
-      //    error!("EVTBLDR Heartbeat sending failed! Err {}", err);
-      //  }
-      //  Ok(_)    => {
-      //    debug!("Heartbeat sent <3 <3 <3");
-      //  }
-      //}
-      println!("{}", heartbeat);
-      //hb_timer = Instant::now();
-
-      ////while hb_timer.elapsed() < hb_interval {};
-      //}
-      let mut counters = HashMap::<u8,f64>::new();
-      for k in seen_rbevents.keys() {
-        counters.insert(*k, seen_rbevents[&k] as f64/met_seconds as f64);
-      }
-      let mut table = Table::new();
-      table
-        .load_preset(UTF8_FULL)
-        .apply_modifier(UTF8_ROUND_CORNERS)
-        .apply_modifier(UTF8_SOLID_INNER_BORDERS)
-        .set_content_arrangement(ContentArrangement::Dynamic)
-        .set_width(80)
-        //.set_header(vec!["Readoutboard Rates:"])
-        .add_row(vec![
-            Cell::new(&(format!("RB01 {:.1} Hz", counters[&1]))),
-            Cell::new(&(format!("RB02 {:.1} Hz", counters[&2]))),
-            Cell::new(&(format!("RB03 {:.1} Hz", counters[&3]))),
-            Cell::new(&(format!("RB04 {:.1} Hz", counters[&4]))),
-            Cell::new(&(format!("RB05 {:.1} Hz", counters[&5]))),
-            //Cell::new("Center aligned").set_alignment(CellAlignment::Center),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB06 {:.1} Hz", counters[&6]))),
-            Cell::new(&(format!("RB07 {:.1} Hz", counters[&7]))),
-            Cell::new(&(format!("RB08 {:.1} Hz", counters[&8]))),
-            Cell::new(&(format!("RB09 {:.1} Hz", counters[&9]))),
-            Cell::new(&(format!("RB10 {}", "N.A."))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB11 {:.1} Hz", counters[&11]))),
-            Cell::new(&(format!("RB12 {}", "N.A."))),
-            Cell::new(&(format!("RB13 {:.1} Hz", counters[&13]))),
-            Cell::new(&(format!("RB14 {:.1} Hz", counters[&14]))),
-            Cell::new(&(format!("RB15 {:.1} Hz", counters[&15]))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB16 {:.1} Hz", counters[&16]))),
-            Cell::new(&(format!("RB17 {:.1} Hz", counters[&17]))),
-            Cell::new(&(format!("RB18 {:.1} Hz", counters[&18]))),
-            Cell::new(&(format!("RB19 {:.1} Hz", counters[&19]))),
-            Cell::new(&(format!("RB20 {:.1} Hz", counters[&20]))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB21 {:.1} Hz", counters[&21]))),
-            Cell::new(&(format!("RB22 {:.1} Hz", counters[&22]))),
-            Cell::new(&(format!("RB23 {:.1} Hz", counters[&23]))),
-            Cell::new(&(format!("RB24 {:.1} Hz", counters[&24]))),
-            Cell::new(&(format!("RB25 {:.1} Hz", counters[&25]))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB26 {:.1} Hz", counters[&26]))),
-            Cell::new(&(format!("RB27 {:.1} Hz", counters[&27]))),
-            Cell::new(&(format!("RB28 {:.1} Hz", counters[&28]))),
-            Cell::new(&(format!("RB29 {:.1} Hz", counters[&29]))),
-            Cell::new(&(format!("RB30 {:.1} Hz", counters[&30]))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB31 {:.1} Hz", counters[&31]))),
-            Cell::new(&(format!("RB32 {:.1} Hz", counters[&32]))),
-            Cell::new(&(format!("RB33 {:.1} Hz", counters[&33]))),
-            Cell::new(&(format!("RB34 {:.1} Hz", counters[&34]))),
-            Cell::new(&(format!("RB35 {:.1} Hz", counters[&35]))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB36 {:.1}", counters[&36]))),
-            Cell::new(&(format!("RB37 {}", "N.A."))),
-            Cell::new(&(format!("RB38 {}", "N.A."))),
-            Cell::new(&(format!("RB39 {:.1}", counters[&39]))),
-            Cell::new(&(format!("RB40 {:.1}", counters[&40]))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB41 {:.1}", counters[&41]))),
-            Cell::new(&(format!("RB43 {:.1}", counters[&42]))),
-            Cell::new(&(format!("RB42 {}", "N.A."))),
-            Cell::new(&(format!("RB44 {:.1}", counters[&44]))),
-            Cell::new(&(format!("RB45 {}", "N.A."))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB46 {:.1} Hz", counters[&46]))),
-            Cell::new(&(format!("{}", "N.A."))),
-            Cell::new(&(format!("{}", "N.A."))),
-            Cell::new(&(format!("{}", "N.A."))),
-            Cell::new(&(format!("{}", "N.A."))),
-        ]);
-
-      // Set the default alignment for the third column to right
-      //let column = table.column_mut(2).expect("Our table has three columns");
-      //column.set_cell_alignment(CellAlignment::Right);
-      println!("{table}");
-      println!("  {}",">> == == == == ==  END HEARTBEAT! == == == == == <<".bright_purple().bold());
-      let mut table = Table::new();
-      table
-        .load_preset(UTF8_FULL)
-        .apply_modifier(UTF8_ROUND_CORNERS)
-        .apply_modifier(UTF8_SOLID_INNER_BORDERS)
-        .set_content_arrangement(ContentArrangement::Dynamic)
-        .set_width(80)
-        //.set_header(vec!["Readoutboard Rates:"])
-        .add_row(vec![
-            Cell::new(&(format!("RB01 {:.1} Hz", too_early_rbevents[&1]))),
-            Cell::new(&(format!("RB02 {:.1} Hz", too_early_rbevents[&2]))),
-            Cell::new(&(format!("RB03 {:.1} Hz", too_early_rbevents[&3]))),
-            Cell::new(&(format!("RB04 {:.1} Hz", too_early_rbevents[&4]))),
-            Cell::new(&(format!("RB05 {:.1} Hz", too_early_rbevents[&5]))),
-            //Cell::new("Center aligned").set_alitoo_early_rbeventsgnment(CellAlignment::Center),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB06 {:.1} Hz", too_early_rbevents[&6]))),
-            Cell::new(&(format!("RB07 {:.1} Hz", too_early_rbevents[&7]))),
-            Cell::new(&(format!("RB08 {:.1} Hz", too_early_rbevents[&8]))),
-            Cell::new(&(format!("RB09 {:.1} Hz", too_early_rbevents[&9]))),
-            Cell::new(&(format!("RB10 {}", "N.A."))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB11 {:.1} Hz", too_early_rbevents[&11]))),
-            Cell::new(&(format!("RB12 {}", "N.A."))),
-            Cell::new(&(format!("RB13 {:.1} Hz", too_early_rbevents[&13]))),
-            Cell::new(&(format!("RB14 {:.1} Hz", too_early_rbevents[&14]))),
-            Cell::new(&(format!("RB15 {:.1} Hz", too_early_rbevents[&15]))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB16 {:.1} Hz", too_early_rbevents[&16]))),
-            Cell::new(&(format!("RB17 {:.1} Hz", too_early_rbevents[&17]))),
-            Cell::new(&(format!("RB18 {:.1} Hz", too_early_rbevents[&18]))),
-            Cell::new(&(format!("RB19 {:.1} Hz", too_early_rbevents[&19]))),
-            Cell::new(&(format!("RB20 {:.1} Hz", too_early_rbevents[&20]))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB21 {:.1} Hz", too_early_rbevents[&21]))),
-            Cell::new(&(format!("RB22 {:.1} Hz", too_early_rbevents[&22]))),
-            Cell::new(&(format!("RB23 {:.1} Hz", too_early_rbevents[&23]))),
-            Cell::new(&(format!("RB24 {:.1} Hz", too_early_rbevents[&24]))),
-            Cell::new(&(format!("RB25 {:.1} Hz", too_early_rbevents[&25]))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB26 {:.1} Hz", too_early_rbevents[&26]))),
-            Cell::new(&(format!("RB27 {:.1} Hz", too_early_rbevents[&27]))),
-            Cell::new(&(format!("RB28 {:.1} Hz", too_early_rbevents[&28]))),
-            Cell::new(&(format!("RB29 {:.1} Hz", too_early_rbevents[&29]))),
-            Cell::new(&(format!("RB30 {:.1} Hz", too_early_rbevents[&30]))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB31 {:.1} Hz", too_early_rbevents[&31]))),
-            Cell::new(&(format!("RB32 {:.1} Hz", too_early_rbevents[&32]))),
-            Cell::new(&(format!("RB33 {:.1} Hz", too_early_rbevents[&33]))),
-            Cell::new(&(format!("RB34 {:.1} Hz", too_early_rbevents[&34]))),
-            Cell::new(&(format!("RB35 {:.1} Hz", too_early_rbevents[&35]))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB36 {:.1}", too_early_rbevents[&36]))),
-            Cell::new(&(format!("RB37 {}", "N.A."))),
-            Cell::new(&(format!("RB38 {}", "N.A."))),
-            Cell::new(&(format!("RB39 {:.1}", too_early_rbevents[&39]))),
-            Cell::new(&(format!("RB40 {:.1}", too_early_rbevents[&40]))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB41 {:.1}", too_early_rbevents[&41]))),
-            Cell::new(&(format!("RB43 {:.1}", too_early_rbevents[&42]))),
-            Cell::new(&(format!("RB42 {}", "N.A."))),
-            Cell::new(&(format!("RB44 {:.1}", too_early_rbevents[&44]))),
-            Cell::new(&(format!("RB45 {}", "N.A."))),
-        ])
-        .add_row(vec![
-            Cell::new(&(format!("RB46 {:.1} Hz", too_early_rbevents[&46]))),
-            Cell::new(&(format!("{}", "N.A."))),
-            Cell::new(&(format!("{}", "N.A."))),
-            Cell::new(&(format!("{}", "N.A."))),
-            Cell::new(&(format!("{}", "N.A."))),
-        ]);
-
-      // Set the default alignment for the third column to right
-      //let column = table.column_mut(2).expect("Our table has three columns");
-      //column.set_cell_alignment(CellAlignment::Right);
-      println!("{table}");
-      //println!("[EVTBLDR] ==> Last RB evid {last_rb_evid}");
       debug_timer = Instant::now(); 
     }
     trace!("Debug timer RBE received! {:?}", debug_timer.elapsed());
     //if event_sending == send_every_x_event {
     let mut prior_ev_sent = 0u32;
     let mut first_ev_sent = false;
-    
+   
+
     for idx in 0..event_id_cache.len() {
       // if there wasn't a first element, size would be 0
       let evid = event_id_cache.pop_front().unwrap();
-      // this is an alternative approach, but it seems much slower
-      //let evid : u32;
-      //match event_id_cache.get(idx) {
-      //  None => {
-      //    error!("Unable to get index {} from event_id_cache with len {}", idx, event_id_cache.len());
-      //    continue;
-      //  },
-      //  Some(_evid) => {
-      //    evid = *_evid;
-      //  }
-      //}
       match event_cache.get(&evid) {
         None => {
           error!("Event id and event caches are misaligned for event id {}, idx {} and sizes {} {}! This is BAD and most likely a BUG!", evid, idx, event_cache.len(), event_id_cache.len());
@@ -541,9 +334,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         },
         Some(ev) => {
           let ev_timed_out = ev.age() >= settings.te_timeout_sec as u64;
-          // timed out events hsould be sent in any case
+          // timed out events should be sent in any case
           let mut ready_to_send = ev_timed_out;
-          //let cache_it : bool;
           if ev_timed_out {
             if !ev.is_complete() {
               heartbeat.n_timed_out += 1;
@@ -604,54 +396,91 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             // we should have an eye on performance though
             //idx_to_remove.push(idx);
             let mut ev_to_send = event_cache.remove(&evid).unwrap();
+            if ev_timed_out {
+              ev_to_send.mt_event.event_status = EventStatus::EventTimeOut;
+            }
             // update event status, so that we will also see in an 
             // (optionally) produced tof event summary if the 
             // event has isuses
             n_rbe_per_te  += ev_to_send.rb_events.len();
-            for ev in &ev_to_send.rb_events {
-              if ev.status == EventStatus::CellSyncErrors || ev.status == EventStatus::ChnSyncErrors {
-                ev_to_send.mt_event.event_status = EventStatus::AnyDataMangling;
-                heartbeat.data_mangled_ev += 1;
+            if ev_to_send.has_any_mangling() {
+              heartbeat.data_mangled_ev += 1;
+            }
+            // sum up lost hits due to drs4 deadtime
+            heartbeat.drs_bsy_lost_hg_hits += ev_to_send.get_lost_hits() as usize;
+
+            // always sent TofEvents, so they get written to disk! 
+            let pack = ev_to_send.pack();
+            match data_sink.send(pack) {
+              Err(err) => {
+                error!("Packet sending failed! Err {}", err);
+              }
+              Ok(_)    => {
+                debug!("Event with id {} sent!", evid);
+                n_sent += 1;
+                heartbeat.n_sent += 1;
               }
             }
-            // can we avoid unpacking and repacking?
             
-          //  while hb_timer.elapsed() < hb_interval {
-          //    // Do nothing, wait for the next heartbeat cycle
-          //}
-          let pack       = TofPacket::from(&ev_to_send);
-          match data_sink.send(pack) {
-            Err(err) => {
-              error!("Packet sending failed! Err {}", err);
+            if send_tev_sum {
+              let tes  = ev_to_send.get_summary();
+              let pack = tes.pack();
+              match data_sink.send(pack) {
+                Err(err) => {
+                  error!("Packet sending failed! Err {}", err);
+                }
+                Ok(_)    => {
+                  debug!("Event with id {} sent!", evid);
+                  n_sent += 1;
+                  heartbeat.n_sent += 1;
+                }
+              }
             }
-            Ok(_)    => {
-              debug!("Event with id {} sent!", evid);
-              n_sent += 1;
-              heartbeat.n_sent += 1;
+            if send_rbwaveform {
+              if rbwf_ctr == send_rbwf_freq as u64 {
+                for wf in ev_to_send.get_rbwaveforms() {
+                  let pack = wf.pack();
+                  match data_sink.send(pack) {
+                    Err(err) => {
+                      error!("Packet sending failed! Err {}", err);
+                    }
+                    Ok(_)    => {
+                      debug!("Event with id {} sent!", evid);
+                    }
+                  }
+                }
+                rbwf_ctr = 0;
+              }
+              rbwf_ctr += 1; // increase for every event, not wf
             }
-          }
-        } else {
+          // this happens when we are NOT ready to send -> cache it!
+          } else { 
             event_id_cache.push_front(evid);
           }
         }
       }
     } 
     // end loop over event_id_cache
-    // this is related to the above way to deal with the
-    // event_id_cache. But it might be too slow.
-    //let mut to_remove : usize;
-    //let mut idx_mod   = 0usize;
-    //for idx in &idx_to_remove {
-    //  to_remove = idx - idx_mod;
-    //  event_id_cache.remove(to_remove);
-    //  idx_mod += 1;
-    //}
-    //idx_to_remove.clear();
-    //event_sending = 0;
-    //event_cache.retain(|ev| ev.valid);
-    debug!("Debug timer! EVT SENDING {:?}", debug_timer.elapsed());
+    let met_elapsed = hb_timer.elapsed();
     if hb_timer.elapsed() >= hb_interval {
-      //let pack       = TofPacket::from(&ev_to_send);
+      heartbeat.mte_receiver_cbc_len = m_trig_ev.len();
+      heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
+      heartbeat.tp_sender_cbc_len    = data_sink.len();
+
+      println!("{}", heartbeat);
+      let mut counters = HashMap::<u8,u64>::new();
+      if met_seconds > 0.0 {
+        for k in seen_rbevents.keys() {
+          counters.insert(*k, (seen_rbevents[&k] as f64/met_seconds as f64).floor() as u64);
+        }
+      }
+      //let mut table = rb_table(&counters, true); 
+      //println!("{table}");
+      //
+      //table = rb_table(&too_early_rbevents, false);
+      //println!("{table}");
+      
+      heartbeat.met_seconds += met_elapsed.as_secs_f64() as usize;
       let pack         = heartbeat.pack();
       match data_sink.send(pack) {
         Err(err) => {
@@ -661,8 +490,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         }
       }
       hb_timer = Instant::now();
-      // Wait until the configured interval has passed
-      //while hb_timer.elapsed() < hb_interval {};
     } 
   } // end loop
 }  
