@@ -15,7 +15,6 @@ use std::sync::{
     Arc,
     Mutex,
 };
-use std::process::exit;
 
 #[cfg(feature="database")]
 use core::f32::consts::PI;
@@ -145,53 +144,26 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
 /// Handle incoming POSIX signals
 pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
   let sleep_time = Duration::from_millis(300);
-
-  let mut end_program = false;
   let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
   loop {
     thread::sleep(sleep_time);
-    match thread_control.try_lock() {
-      Ok(mut tc) => {
-        if !tc.thread_signal_hdlr_active {
-          //end myself
-          info!("Shutting down siganl handler thread!");
-          break;
-        }
-        //println!("== ==> [signal_handler] acquired thread_control lock!");
-        //println!("Tread control {:?}", tc);
-        if !tc.thread_cmd_dispatch_active 
-        && !tc.thread_data_sink_active
-        && !tc.thread_event_bldr_active 
-        && !tc.thread_master_trg_active  {
-          println!(">> So long and thanks for all the \u{1F41F} <<"); 
-          exit(0);
-        }
-        if end_program{
-            tc.stop_flag = true;
-            continue;
-        }
-        if tc.stop_flag {
-          println!("== ==> [signal_handler] Stop flag is set, we are waiting for threads to finish...");
-          println!("{}", tc);
-        }
-      }
-      Err(err) => {
-        error!("Can't acquire lock for ThreadControl! {err}");
-      },
-    }
 
     // check pending signals and handle
     // SIGTERM and SIGINT
     for signal in signals.pending() {
       match signal as c_int {
-        SIGTERM => {
-          println!("=> {}", String::from("SIGTERM received. Maybe Ctrl+C has been pressed!").red().bold());
-          end_program = true;
+        SIGTERM | SIGINT => {
+          println!("=> {}", String::from("SIGTERM or SIGINT received. Maybe Ctrl+C has been pressed! Commencing program shutdown!").red().bold());
+          match thread_control.lock() {
+            Ok(mut tc) => {
+              tc.sigint_recvd = true;
+            }
+            Err(err) => {
+              error!("Can't acquire lock for ThreadControl! {err}");
+            },
+          }
+          break; // now end myself
         } 
-        SIGINT => {
-          println!("=> {}", String::from("SIGINT received").red().bold());
-          end_program = true;
-        }
         _ => {
           error!("Received signal, but I don't have instructions what to do about it!");
         }
