@@ -11,6 +11,8 @@
 use std::fmt;
 //use std::collections::HashMap;
 
+//use half::f16;
+
 use crate::packets::PacketType;
 
 cfg_if::cfg_if! {
@@ -62,6 +64,7 @@ use crate::serialization::{
     parse_u8,
     parse_u16,
     parse_u32,
+    //parse_f16,
     parse_f32
 };
 
@@ -524,14 +527,14 @@ impl MoniData for PAMoniData {
 
   fn keys() -> Vec<&'static str> {
     vec!["board_id",
-         "temps1", "temps2", "temps3", "temps4",
-         "temps5", "temps6", "temps7", "temps8", 
-         "temps9", "temps10", "temps11", "temps12",
-         "temps13", "temps14", "temps15", "temps16",
-         "biases1", "biases2", "biases3", "biases4", 
-         "biases5", "biases6", "biases7", "biases8",
-         "biases9", "biases10", "biases11", "biases12",
-         "biases13", "biases14", "biases15", "biases16"]
+         "temps1"  , "temps2"  , "temps3"  , "temps4"  ,
+         "temps5"  , "temps6"  , "temps7"  , "temps8"  , 
+         "temps9"  , "temps10" , "temps11" , "temps12" ,
+         "temps13" , "temps14" , "temps15" , "temps16" ,
+         "biases1" , "biases2" , "biases3" , "biases4" , 
+         "biases5" , "biases6" , "biases7" , "biases8" ,
+         "biases9" , "biases10", "biases11", "biases12",
+         "biases13", "biases14", "biases15", "biases16" ]
   }
 
   fn get(&self, varname : &str) -> Option<f32> {
@@ -1395,22 +1398,22 @@ pub struct MtbMoniData {
   /// tiu_status\[3\] = bsy_stuck
   /// tiu_status\[4\] = ignore_bsy
   pub tiu_status   : u8,
-  /// Prescale factor in per cent
-  /// (might not be accurate)
-  pub prescale_pc  : u8,
+  ///// Prescale factor in per cent
+  ///// (might not be accurate)
+  //pub prescale     : f16,
+  //pub rsvd         : u8,
   pub daq_queue_len: u16,
   //pub vccpaux      : u16, 
   //pub vccoddr      : u16, 
   pub temp         : u16, 
-  pub vccint       : u16, 
-  pub vccaux       : u16, 
-  /// NEW rb_lost rate - replace vccbram
-  pub rb_lost_rate : u16,
+  /// Unfortunatly at this point we only have
+  /// a single byte left
+  pub rb_lost_rate : u8,
   pub rate         : u16, 
   pub lost_rate    : u16, 
-  /// will not get serialized - only 
-  /// kept for compatibility reasons
+  pub vccint       : u16, 
   pub vccbram      : u16, 
+  pub vccaux       : u16, 
 }
 
 impl MtbMoniData {
@@ -1419,7 +1422,8 @@ impl MtbMoniData {
     Self {
       tiu_busy_len  : u32::MAX,
       tiu_status    : u8::MAX,
-      prescale_pc   : u8::MAX,
+      //rsvd          : u8::MAX,
+      //prescale      : f16::MAX,
       daq_queue_len : u16::MAX,
       temp          : u16::MAX,
       vccint        : u16::MAX,
@@ -1427,7 +1431,7 @@ impl MtbMoniData {
       vccbram       : u16::MAX,
       rate          : u16::MAX,
       lost_rate     : u16::MAX,
-      rb_lost_rate  : u16::MAX
+      rb_lost_rate  : u8::MAX
     }
   }
 
@@ -1457,11 +1461,18 @@ impl MtbMoniData {
     self.temp as f32 * 503.975 / 4096.0 - 273.15
   }
   
-  // Convert ADC VCCINT from adc values to Voltage
+  /// Convert ADC VCCINT from adc values to Voltage
   fn adc_vcc_conversion(data : u16) -> f32 {
     3.0 * data as f32 / (2_u32.pow(12-1)) as f32
   }
 
+  //pub fn set_prescale(&mut self, prescale : f32) {
+  //  self.prescale = f16::from_f32(prescale);
+  //}
+
+  //pub fn get_prescale(&self) -> f32 {
+  //  self.prescale.to_f32()  
+  //}
 }
 
 impl Default for MtbMoniData {
@@ -1478,7 +1489,6 @@ impl fmt::Display for MtbMoniData {
   LOST RB EVT R  [Hz] {}
   TIU BUSY CNT  [CLK] {}
   DAQ QUEUE LEN       {}
-  PRESCALE        [%] {}
   --- TIU STATUS ---
     EMU MODE          {}
     USE AUX LINK      {}
@@ -1488,14 +1498,14 @@ impl fmt::Display for MtbMoniData {
   --- --- --- --- --
   FPGA TEMP      [\u{00B0}C] {:.2}
   VCCINT          [V] {:.3}
-  VCCAUX          [V] {:.3}>",
-  //VCCBRAM         [V] {:.3}>",
+  VCCAUX          [V] {:.3},
+  VCCBRAM         [V] {:.3}>",
            self.rate,
            self.lost_rate,
            self.rb_lost_rate,
            self.tiu_busy_len,
            self.daq_queue_len,
-           self.prescale_pc,
+           //self.get_prescale(),
            self.get_tiu_emulation_mode(),
            self.get_tiu_use_aux_link(),
            self.get_tiu_bad(),
@@ -1504,7 +1514,7 @@ impl fmt::Display for MtbMoniData {
            self.get_fpga_temp(),
            MtbMoniData::adc_vcc_conversion(self.vccint    ),
            MtbMoniData::adc_vcc_conversion(self.vccaux    ),
-           //MtbMoniData::adc_vcc_conversion(self.vccbram   ),
+           MtbMoniData::adc_vcc_conversion(self.vccbram   ),
            )
   }
 }
@@ -1524,13 +1534,15 @@ impl Serialization for MtbMoniData {
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.extend_from_slice(&self.tiu_busy_len.to_le_bytes());
     stream.extend_from_slice(&self.tiu_status .to_le_bytes());
-    stream.extend_from_slice(&self.prescale_pc.to_le_bytes());
+    //stream.extend_from_slice(&self.rsvd.to_le_bytes());
+    stream.extend_from_slice(&self.rb_lost_rate.to_le_bytes());
     stream.extend_from_slice(&self.daq_queue_len.to_le_bytes());
     stream.extend_from_slice(&self.temp       .to_le_bytes());
     stream.extend_from_slice(&self.vccint     .to_le_bytes()); 
     stream.extend_from_slice(&self.vccaux     .to_le_bytes()); 
-    //stream.extend_from_slice(&self.vccbram    .to_le_bytes()); 
-    stream.extend_from_slice(&self.rb_lost_rate.to_le_bytes());
+    stream.extend_from_slice(&self.vccbram    .to_le_bytes()); 
+    //stream.extend_from_slice(&self.prescale   .to_le_bytes());
+    //stream.extend_from_slice(&self.rb_lost_rate.to_le_bytes());
     stream.extend_from_slice(&self.rate       .to_le_bytes()); 
     stream.extend_from_slice(&self.lost_rate  .to_le_bytes());
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
@@ -1543,13 +1555,15 @@ impl Serialization for MtbMoniData {
     Self::verify_fixed(stream, pos)?;
     moni_data.tiu_busy_len  = parse_u32(&stream, pos);
     moni_data.tiu_status    = parse_u8(&stream, pos);
-    moni_data.prescale_pc   = parse_u8(&stream, pos);
+    //moni_data.rsvd          = parse_u8(&stream, pos);
+    moni_data.rb_lost_rate  = parse_u8(&stream, pos);
     moni_data.daq_queue_len = parse_u16(&stream, pos);
     moni_data.temp          = parse_u16(&stream, pos);
     moni_data.vccint        = parse_u16(&stream, pos);
+    //moni_data.prescale      = parse_f16(&stream, pos);
     moni_data.vccaux        = parse_u16(&stream, pos);
-    //moni_data.vccbram       = parse_u16(&stream, pos);
-    moni_data.rb_lost_rate  = parse_u16(&stream, pos);
+    moni_data.vccbram       = parse_u16(&stream, pos);
+    //moni_data.rb_lost_rate  = parse_u16(&stream, pos);
     moni_data.rate          = parse_u16(&stream, pos);
     moni_data.lost_rate     = parse_u16(&stream, pos);
     *pos += 2; // since we deserialized the tail earlier and 
@@ -1570,13 +1584,14 @@ impl MoniData for MtbMoniData {
       "tiu_busy_len" => Some(self.tiu_busy_len as f32), 
       "tiu_status"   => Some(self.tiu_status as f32), 
       "daq_queue_len"  => Some(self.daq_queue_len as f32), 
+      //"prescale"     => Some(self.get_prescale()),
       "temp"         => Some(self.get_fpga_temp()), 
       "vccint"       => Some(Self::adc_vcc_conversion(self.vccint)), 
       "vccaux"       => Some(Self::adc_vcc_conversion(self.vccaux)), 
       "vccbram"      => Some(Self::adc_vcc_conversion(self.vccbram)), 
-      "rb_lost_rate" => Some(self.rb_lost_rate as f32),
       "rate"         => Some(self.rate as f32), 
       "lost_rate"    => Some(self.lost_rate as f32), 
+      "rb_lost_rate" => Some(self.rb_lost_rate as f32), 
       _              => None
     }
   }
@@ -1604,15 +1619,13 @@ impl FromRandom for MtbMoniData {
     let mut rng       = rand::thread_rng();
     moni.tiu_busy_len = rng.gen::<u32>();
     moni.tiu_status   = rng.gen::<u8>();
-    moni.prescale_pc  = rng.gen::<u8>();
+    //moni.prescale     = f16::from_f32(rng.gen::<f32>());
     moni.daq_queue_len= rng.gen::<u16>();
     moni.temp         = rng.gen::<u16>();
     moni.vccint       = rng.gen::<u16>();
     moni.vccaux       = rng.gen::<u16>();
-    // don't randomize this, since we want to 
-    // test (de)serialization
-    //moni.vccbram      = rng.gen::<u16>();
-    moni.rb_lost_rate = rng.gen::<u16>();
+    moni.vccbram      = rng.gen::<u16>();
+    moni.rb_lost_rate = rng.gen::<u8>();
     moni.rate         = rng.gen::<u16>();
     moni.lost_rate    = rng.gen::<u16>();
     moni
