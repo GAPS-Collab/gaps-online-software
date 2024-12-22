@@ -444,10 +444,6 @@ pub fn cmd_responder(cmd_server_address        : String,
                           continue;
                         }
                       },
-                      TofCommand::SetRBDataBufSize   (_) => {
-                        warn!("Not implemented");
-                        return_val = Err(CmdError::NotImplementedError);
-                      },
                       TofCommand::TriggerModeForced  (_) => {
                         warn!("Not implemented");
                         return_val = Err(CmdError::NotImplementedError);
