@@ -9,10 +9,13 @@ use std::fmt;
 #[cfg(feature = "pybindings")]
 use pyo3::pyclass;
 
-/// Use the fisrt 3 bits (most significant) in 
-/// the event status field for conveyilng versio
-/// information
-/// This means all numbers have to be > 64
+/// The Protocol version is designed in such 
+/// a way that we can "hijack" an existing 
+/// field, using the most significant digits.
+///
+/// It uses the 2 most significant bit of an u8,
+/// so it should be possible to basically slap 
+/// this on to anyting
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 #[cfg_attr(feature = "pybindings", pyclass)]
@@ -53,11 +56,11 @@ impl ProtocolVersion {
 impl From<u8> for ProtocolVersion {
   fn from(value: u8) -> Self {
     match value {
-      0u8   => ProtocolVersion::Unknown,
-      64u8  => ProtocolVersion::V1,
-      128u8 => ProtocolVersion::V2,
-      192u8 => ProtocolVersion::V3,
-      _     => ProtocolVersion::Unknown
+        0 => ProtocolVersion::Unknown,
+       64 => ProtocolVersion::V1,
+      128 => ProtocolVersion::V2,
+      192 => ProtocolVersion::V3,
+      _   => ProtocolVersion::Unknown
     }
   }
 }
