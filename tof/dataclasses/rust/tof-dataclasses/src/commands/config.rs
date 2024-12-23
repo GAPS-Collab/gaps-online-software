@@ -1442,22 +1442,38 @@ pub struct TOFEventBuilderConfig{
   pub build_strategy   : Option<BuildStrategy>, 
   pub wait_nrb         : Option<u8>, 
   pub greediness       : Option<u8>, 
-  pub hb_send_interval : Option<u16>
+  pub hb_send_interval : Option<u16>,
+  // NEW - mark events as not to be sent!
+  pub only_save_interesting : Option<bool>,
+  pub thr_n_hits_umb        : Option<u8>,
+  pub thr_n_hits_cbe        : Option<u8>,
+  pub thr_n_hits_cor        : Option<u8>,
+  pub thr_tot_edep_umb      : Option<f32>,
+  pub thr_tot_edep_cbe      : Option<f32>,
+  pub thr_tot_edep_cor      : Option<f32>
+
 }
 
 impl TOFEventBuilderConfig {
   pub fn new() -> Self { 
     Self {
-      active_fields       : 0,
-      cachesize           : None,
-      n_mte_per_loop      : None,
-      n_rbe_per_loop      : None,
-      te_timeout_sec      : None,
-      sort_events         : None,
-      build_strategy      : None,
-      wait_nrb            : None, 
-      greediness          : None,  
-      hb_send_interval    : None
+      active_fields         : 0,
+      cachesize             : None,
+      n_mte_per_loop        : None,
+      n_rbe_per_loop        : None,
+      te_timeout_sec        : None,
+      sort_events           : None,
+      build_strategy        : None,
+      wait_nrb              : None, 
+      greediness            : None,  
+      hb_send_interval      : None,
+      only_save_interesting : None,
+      thr_n_hits_umb        : None,
+      thr_n_hits_cbe        : None,
+      thr_n_hits_cor        : None,
+      thr_tot_edep_umb      : None,
+      thr_tot_edep_cbe      : None,
+      thr_tot_edep_cor      : None,
     }
   }
       
@@ -1505,6 +1521,41 @@ impl TOFEventBuilderConfig {
     self.active_fields |= 256;
     self.hb_send_interval = Some(interval);
   }
+
+  pub fn set_only_save_interesting(&mut self, do_it : bool) {
+    self.active_fields |= 512;
+    self.only_save_interesting = Some(do_it);
+  }
+
+  pub fn thr_n_hits_umb(&mut self, nhit : u8) {
+    self.active_fields |= 1024;
+    self.thr_n_hits_umb = Some(nhit);
+  }
+  
+  pub fn thr_n_hits_cbe(&mut self, nhit : u8) {
+    self.active_fields |= 2048;
+    self.thr_n_hits_cbe = Some(nhit);
+  }
+  
+  pub fn thr_n_hits_cor(&mut self, nhit : u8) {
+    self.active_fields |= 2u32.pow(12);
+    self.thr_n_hits_cor = Some(nhit);
+  }
+  
+  pub fn thr_tot_edep_umb(&mut self, thr : f32) {
+    self.active_fields |= 2u32.pow(13);
+    self.thr_tot_edep_umb = Some(thr);
+  }
+  
+  pub fn thr_tot_edep_cbe(&mut self, thr : f32) {
+    self.active_fields |= 2u32.pow(14);
+    self.thr_tot_edep_cbe = Some(thr);
+  }
+  
+  pub fn thr_tot_edep_cor(&mut self, thr : f32) {
+    self.active_fields |= 2u32.pow(15);
+    self.thr_tot_edep_cor = Some(thr);
+  }
 }
 
 impl Default for TOFEventBuilderConfig {
@@ -1544,6 +1595,30 @@ impl fmt::Display for TOFEventBuilderConfig {
         }
       }
     }
+    if self.hb_send_interval.is_some() {
+      repr += &(format!("\n Heartbeat send interval : {}", self.hb_send_interval.unwrap()));
+    }
+    if self.only_save_interesting.is_some() {
+      repr += &(format!("\n Saving only interesting events : {}", self.only_save_interesting.unwrap()));
+    }
+    if self.thr_n_hits_umb.is_some() {
+      repr += &(format!("\n Interesting threshold for nhit umb : {}", self.thr_n_hits_umb.unwrap()));
+    }
+    if self.thr_n_hits_cbe.is_some() {
+      repr += &(format!("\n Interesting threshold for nhit cbe : {}", self.thr_n_hits_cbe.unwrap()));
+    }
+    if self.thr_n_hits_cor.is_some() {
+      repr += &(format!("\n Interesting threshold for nhit cor : {}", self.thr_n_hits_cor.unwrap()));
+    }
+    if self.thr_tot_edep_umb.is_some() {
+      repr += &(format!("\n Interesting threshold for tot edep umb : {}", self.thr_tot_edep_umb.unwrap()));
+    }
+    if self.thr_tot_edep_cbe.is_some() {
+      repr += &(format!("\n Interesting threshold for tot edep cbe : {}", self.thr_tot_edep_cbe.unwrap()));
+    }
+    if self.thr_tot_edep_cor.is_some() {
+      repr += &(format!("\n Interesting threshold for tot edep cor : {}", self.thr_tot_edep_cor.unwrap()));
+    }
     write!(f, "{}", repr)
   }
 }
@@ -1556,7 +1631,7 @@ impl Serialization for TOFEventBuilderConfig {
   
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
-  const SIZE : usize = 30; 
+  const SIZE : usize = 46; 
   
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
@@ -1573,6 +1648,15 @@ impl Serialization for TOFEventBuilderConfig {
     cfg.wait_nrb         = Some(parse_u8(stream, pos));
     cfg.greediness       = Some(parse_u8(stream, pos));
     cfg.hb_send_interval = Some(parse_u16(stream, pos));
+    // new stuff
+    cfg.only_save_interesting = Some(parse_bool(stream, pos));
+    cfg.thr_n_hits_umb = Some(parse_u8(stream, pos));
+    cfg.thr_n_hits_cbe = Some(parse_u8(stream, pos));
+    cfg.thr_n_hits_cor = Some(parse_u8(stream, pos));
+    cfg.thr_tot_edep_umb = Some(parse_f32(stream, pos));
+    cfg.thr_tot_edep_cbe = Some(parse_f32(stream, pos));
+    cfg.thr_tot_edep_cor = Some(parse_f32(stream, pos));
+    
     if cfg.active_fields & 1 != 1 {
       cfg.cachesize      = None;
     }
@@ -1600,6 +1684,27 @@ impl Serialization for TOFEventBuilderConfig {
     if cfg.active_fields & 256 != 256 {
       cfg.hb_send_interval = None;
     }
+    if cfg.active_fields & 512 != 512 {
+      cfg.only_save_interesting = None;
+    }
+    if cfg.active_fields & 1024 != 1024 {
+      cfg.thr_n_hits_umb = None;
+    }
+    if cfg.active_fields & 2048 != 2048 {
+      cfg.thr_n_hits_cbe = None;
+    }
+    if cfg.active_fields & 2u32.pow(12) != 2u32.pow(12) {
+      cfg.thr_n_hits_cor = None;
+    }
+    if cfg.active_fields & 2u32.pow(13) != 2u32.pow(13) {
+      cfg.thr_tot_edep_umb = None;
+    }
+    if cfg.active_fields & 2u32.pow(14) != 2u32.pow(14) {
+      cfg.thr_tot_edep_cbe = None;
+    }
+    if cfg.active_fields & 2u32.pow(15) != 2u32.pow(15) {
+      cfg.thr_tot_edep_cor = None;
+    }
     *pos += 2;
     Ok(cfg)
   }
@@ -1617,6 +1722,14 @@ impl Serialization for TOFEventBuilderConfig {
     bs.push(self.wait_nrb.unwrap_or(0));
     bs.push(self.greediness.unwrap_or(0));
     bs.extend_from_slice(&self.hb_send_interval.unwrap_or(0).to_le_bytes());
+    // new stuff
+    bs.push(self.only_save_interesting.unwrap_or(false) as u8);
+    bs.extend_from_slice(&self.thr_n_hits_umb.unwrap_or(0).to_le_bytes());
+    bs.extend_from_slice(&self.thr_n_hits_cbe.unwrap_or(0).to_le_bytes());
+    bs.extend_from_slice(&self.thr_n_hits_cor.unwrap_or(0).to_le_bytes());
+    bs.extend_from_slice(&self.thr_tot_edep_umb.unwrap_or(0.0).to_le_bytes());
+    bs.extend_from_slice(&self.thr_tot_edep_cbe.unwrap_or(0.0).to_le_bytes());
+    bs.extend_from_slice(&self.thr_tot_edep_cor.unwrap_or(0.0).to_le_bytes());
     bs.extend_from_slice(&Self::TAIL.to_le_bytes());
     bs
   }
@@ -1654,6 +1767,27 @@ impl FromRandom for TOFEventBuilderConfig {
     }
     if cfg.active_fields & 256 == 256 {
       cfg.hb_send_interval = Some(rng.gen::<u16>());
+    }
+    if cfg.active_fields & 512 == 512 {
+      cfg.only_save_interesting = Some(rng.gen::<bool>());
+    }
+    if cfg.active_fields & 1024 == 1024 {
+      cfg.thr_n_hits_umb = Some(rng.gen::<u8>());
+    }
+    if cfg.active_fields & 2048 == 2048 {
+      cfg.thr_n_hits_cbe = Some(rng.gen::<u8>());
+    }
+    if cfg.active_fields & 2u32.pow(12) == 2u32.pow(12) {
+      cfg.thr_n_hits_cor = Some(rng.gen::<u8>());
+    }
+    if cfg.active_fields & 2u32.pow(13) == 2u32.pow(13) {
+      cfg.thr_tot_edep_umb = Some(rng.gen::<f32>());
+    }
+    if cfg.active_fields & 2u32.pow(14) == 2u32.pow(14) {
+      cfg.thr_tot_edep_cbe = Some(rng.gen::<f32>());
+    }
+    if cfg.active_fields & 2u32.pow(15) == 2u32.pow(15) {
+      cfg.thr_tot_edep_cor = Some(rng.gen::<f32>());
     }
     cfg
   }
