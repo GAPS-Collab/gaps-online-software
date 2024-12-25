@@ -14,37 +14,40 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::Path;
 use std::fmt;
+use half::f16;
 use chrono::{
-    //DateTime,
-    Utc,
-    TimeZone,
-    LocalResult
+  //DateTime,
+  Utc,
+  TimeZone,
+  LocalResult
 };
-//extern crate streaming_stats;
-//use streaming_stats::{OnlineStats, OrderStats};
 
 use crate::constants::{NWORDS, NCHN};
 use crate::errors::{WaveformError,
                     CalibrationError};
-use crate::serialization::{Serialization,
-                           Packable,
-                           parse_bool,
-                           parse_u8,
-                           parse_u16,
-                           parse_u32,
-                           parse_f32,
-                           SerializationError};
+use crate::serialization::{
+  Serialization,
+  Packable,
+  parse_bool,
+  parse_u8,
+  parse_u16,
+  parse_u32,
+  parse_f16,
+  parse_f32,
+  SerializationError
+};
+
 use crate::events::RBEvent;
 use crate::events::rb_event::unpack_traces_f32;
 
 use crate::packets::{
-    PacketType,
-    TofPacket
+  PacketType,
+  TofPacket
 };
 
 use crate::io::{
-    read_file,
-    TofPacketReader,
+  read_file,
+  TofPacketReader,
 };
 
 cfg_if::cfg_if! {
@@ -56,9 +59,6 @@ cfg_if::cfg_if! {
 }
 
 extern crate statistical;
-
-// FIXME -fix the test!
-
 
 /***********************************/
 
@@ -513,6 +513,242 @@ fn roll<T: Clone>(vec: &mut Vec<T>, offset: isize) {
 
 /***********************************/
 
+/// smaller packet to bring through the gcu
+#[derive(Debug, Clone, PartialEq)]
+pub struct RBCalibrationsFlightT {
+  pub rb_id      : u8,
+  pub timestamp  : u32, // time the calibration was taken
+  pub tbin      : [[f16;NWORDS];NCHN], // cell width (ns)
+}
+
+impl RBCalibrationsFlightT {
+  pub fn new() -> Self {
+    Self {
+      rb_id     : 0,
+      timestamp : 0,
+      tbin      : [[f16::from_f32(0.0);NWORDS];NCHN],
+    }
+  }
+}
+
+impl Serialization for RBCalibrationsFlightT {
+  const SIZE            : usize = NCHN*NWORDS*2 + 4 + 1; 
+  const HEAD            : u16   = 0xAAAA; // 43690 
+  const TAIL            : u16   = 0x5555; // 21845 
+  
+  fn from_bytestream(bytestream : &Vec<u8>, 
+                     pos        : &mut usize)
+    -> Result<Self, SerializationError> { 
+    let mut rb_cal = Self::new();
+    if parse_u16(bytestream, pos) != Self::HEAD {
+      return Err(SerializationError::HeadInvalid {});
+    }
+    rb_cal.rb_id                = parse_u8(bytestream, pos);
+    rb_cal.timestamp            = parse_u32(bytestream, pos);
+    for ch in 0..NCHN {
+      for k in 0..NWORDS {
+        let value         = parse_f16(bytestream, pos);
+        rb_cal.tbin[ch][k]      = value;
+      }
+    }
+    *pos += 2;
+    Ok(rb_cal)
+  }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    
+    let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
+    bs.extend_from_slice(&Self::HEAD.to_le_bytes());
+    bs.extend_from_slice(&self.rb_id.to_le_bytes());
+    bs.extend_from_slice(&self.timestamp.to_le_bytes());
+    for ch in 0..NCHN {
+      for k in 0..NWORDS {
+        bs.extend_from_slice(&self.tbin[ch][k]     .to_le_bytes());
+      }
+    }
+    bs.extend_from_slice(&Self::TAIL.to_le_bytes());
+    bs
+  }
+}
+
+impl Packable for RBCalibrationsFlightT {
+  const PACKET_TYPE : PacketType = PacketType::RBCalibrationFlightT;
+}
+
+impl fmt::Display for RBCalibrationsFlightT {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut timestamp_str = String::from("?");
+    match Utc.timestamp_opt(self.timestamp.into(), 0) {
+      LocalResult::Single(datetime_utc) => {
+        timestamp_str = datetime_utc.format("%Y/%m/%d %H:%M:%S").to_string();
+      },
+      LocalResult::Ambiguous(_, _) => {
+        error!("The given timestamp is ambiguous.");
+      },
+      LocalResult::None => {
+        error!("The given timestamp is not valid.");
+      },
+    }
+
+    //let datetime_utc: DateTime<Utc> = Utc.timestamp_opt(self.timestamp as i64, 0).earliest().unwrap_or(DateTime::<Utc>::from_timestamp_millis(0).unwrap());
+    write!(f, 
+  "<ReadoutboardCalibrationsFlightT [{} UTC]:
+      RB             : {}
+      T Bins    [ch0]: .. {:?} {:?} ..>",
+      timestamp_str,
+      self.rb_id,
+      self.tbin[0][98],
+      self.tbin[0][99]
+    )
+  } 
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for RBCalibrationsFlightT {
+    
+  fn from_random() -> Self {
+    let mut cali   = Self::new();
+    let mut rng    = rand::thread_rng();
+    cali.rb_id     = rng.gen::<u8>();
+    cali.timestamp = rng.gen::<u32>();
+    for ch in 0..NCHN {
+      for n in 0..NWORDS { 
+        cali.tbin     [ch][n] = f16::from_f32(rng.gen::<f32>());
+      }
+    }
+    cali
+  }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct RBCalibrationsFlightV {
+  pub rb_id      : u8,
+  pub d_v        : f32, // input voltage difference between 
+                        // vcal_data and noi data
+  pub timestamp  : u32, // time the calibration was taken
+  pub v_offsets : [[f16;NWORDS];NCHN], // voltage offset
+  pub v_dips    : [[f16;NWORDS];NCHN], // voltage "dip" (time-dependent correction)
+  pub v_inc     : [[f16;NWORDS];NCHN], // voltage increment (mV/ADC unit)
+}
+
+impl RBCalibrationsFlightV {
+  pub fn new() -> Self {
+    Self {
+      rb_id     : 0,
+      d_v       : 0.9,
+      timestamp : 0,
+      v_offsets : [[f16::from_f32(0.0);NWORDS];NCHN],
+      v_dips    : [[f16::from_f32(0.0);NWORDS];NCHN],
+      v_inc     : [[f16::from_f32(0.0);NWORDS];NCHN],
+    }
+  }
+}
+
+impl Serialization for RBCalibrationsFlightV {
+  const SIZE            : usize = NCHN*NWORDS*2*3 + 4 + 4 + 1; 
+  const HEAD            : u16   = 0xAAAA; // 43690 
+  const TAIL            : u16   = 0x5555; // 21845 
+
+  fn from_bytestream(bytestream : &Vec<u8>, 
+                     pos        : &mut usize)
+    -> Result<Self, SerializationError> { 
+    let mut rb_cal = Self::new();
+    if parse_u16(bytestream, pos) != Self::HEAD {
+      return Err(SerializationError::HeadInvalid {});
+    }
+    rb_cal.rb_id                = parse_u8(bytestream, pos);
+    rb_cal.d_v                  = parse_f32(bytestream, pos);
+    rb_cal.timestamp            = parse_u32(bytestream, pos);
+    for ch in 0..NCHN {
+      for k in 0..NWORDS {
+        let mut value = parse_f16(bytestream, pos);
+        rb_cal.v_offsets[ch][k] = value;
+        value         = parse_f16(bytestream, pos);
+        rb_cal.v_dips[ch][k]    = value;
+        value         = parse_f16(bytestream, pos);
+        rb_cal.v_inc[ch][k]     = value;
+      }
+    }
+    *pos += 2;
+    Ok(rb_cal)
+  }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
+    bs.extend_from_slice(&Self::HEAD.to_le_bytes());
+    bs.extend_from_slice(&self.rb_id.to_le_bytes());
+    bs.extend_from_slice(&self.d_v.to_le_bytes());
+    bs.extend_from_slice(&self.timestamp.to_le_bytes());
+    for ch in 0..NCHN {
+      for k in 0..NWORDS {
+        bs.extend_from_slice(&self.v_offsets[ch][k].to_le_bytes());
+        bs.extend_from_slice(&self.v_dips[ch][k]   .to_le_bytes());
+        bs.extend_from_slice(&self.v_inc[ch][k]    .to_le_bytes());
+      }
+    }
+    bs.extend_from_slice(&Self::TAIL.to_le_bytes());
+    bs
+  }
+}
+
+impl Packable for RBCalibrationsFlightV {
+  const PACKET_TYPE : PacketType = PacketType::RBCalibrationFlightV;
+}
+
+impl fmt::Display for RBCalibrationsFlightV {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut timestamp_str = String::from("?");
+    match Utc.timestamp_opt(self.timestamp.into(), 0) {
+      LocalResult::Single(datetime_utc) => {
+        timestamp_str = datetime_utc.format("%Y/%m/%d %H:%M:%S").to_string();
+      },
+      LocalResult::Ambiguous(_, _) => {
+        error!("The given timestamp is ambiguous.");
+      },
+      LocalResult::None => {
+        error!("The given timestamp is not valid.");
+      },
+    }
+    write!(f, 
+  "<ReadoutboardCalibration [{} UTC]:
+      RB             : {}
+      V Offsets [ch0]: .. {:?} {:?} ..
+      V Incrmts [ch0]: .. {:?} {:?} ..
+      V Dips    [ch0]: .. {:?} {:?} ..>",
+      timestamp_str,
+      self.rb_id,
+      self.v_offsets[0][98],
+      self.v_offsets[0][99],
+      self.v_inc[0][98],
+      self.v_inc[0][99],
+      self.v_dips[0][98],
+      self.v_dips[0][99]
+    )
+  } 
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for RBCalibrationsFlightV {
+    
+  fn from_random() -> Self {
+    let mut cali     = Self::new();
+    let mut rng      = rand::thread_rng();
+    cali.rb_id       = rng.gen::<u8>();
+    cali.d_v       = rng.gen::<f32>();
+    cali.timestamp = rng.gen::<u32>();
+    for ch in 0..NCHN {
+      for n in 0..NWORDS { 
+        cali.v_offsets  [ch][n] = f16::from_f32(rng.gen::<f32>());
+        cali.v_dips     [ch][n] = f16::from_f32(rng.gen::<f32>());
+        cali.v_inc      [ch][n] = f16::from_f32(rng.gen::<f32>());
+      }
+    }
+    cali
+  }
+}
+
+/***********************************/
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct RBCalibrations {
   pub rb_id      : u8,
@@ -542,7 +778,34 @@ impl RBCalibrations {
   pub const NOMINALFREQ : f32   = 2.0; // nominal sampling frequency,
                                        // GHz
   pub const CALFREQ     : f32   = 0.025; // calibration sine wave frequency (25MHz)
+
+  pub fn emit_filghttcal(&self) -> RBCalibrationsFlightT {
+    let mut cal = RBCalibrationsFlightT::new();
+    cal.rb_id = self.rb_id;
+    cal.timestamp = self.timestamp;
+    for ch in 0..NCHN {
+      for n in 0..NWORDS { 
+        cal.tbin  [ch][n] = f16::from_f32(self.tbin[ch][n]);
+      }
+    }
+    cal
+  }
   
+  pub fn emit_filghtvcal(&self) -> RBCalibrationsFlightV {
+    let mut cal = RBCalibrationsFlightV::new();
+    cal.rb_id = self.rb_id;
+    cal.timestamp = self.timestamp;
+    cal.d_v   = self.d_v;
+    for ch in 0..NCHN {
+      for n in 0..NWORDS { 
+        cal.v_offsets  [ch][n] = f16::from_f32(self.v_offsets[ch][n]);
+        cal.v_dips     [ch][n] = f16::from_f32(self.v_dips[ch][n]);
+        cal.v_inc      [ch][n] = f16::from_f32(self.v_inc[ch][n]);
+      }
+    }
+    cal
+  }
+
   /// Remove events with invalid traces or event fragment bits set
   pub fn clean_input_data(&mut self) {
     self.vcal_data.retain(|x|  !x.header.drs_lost_trigger()
@@ -1148,6 +1411,17 @@ impl RBCalibrations {
     Err(SerializationError::StreamTooShort)
   }
 
+
+  /// Load a calibration from an asci file
+  /// This is deperacted and only kept for 
+  /// compatibility reasons with older data
+  ///
+  /// # Arguments:
+  ///
+  ///   * filename : human readable textfile
+  ///                with all calibraiton 
+  ///                constants
+  ///
   pub fn from_txtfile(filename : &Path) -> Self {
     let mut rb_cal = Self::new(0);
     rb_cal.get_id_from_filename(&filename);
@@ -1398,7 +1672,6 @@ impl fmt::Display for RBCalibrations {
       },
     }
 
-
     //let datetime_utc: DateTime<Utc> = Utc.timestamp_opt(self.timestamp as i64, 0).earliest().unwrap_or(DateTime::<Utc>::from_timestamp_millis(0).unwrap());
     write!(f, 
   "<ReadoutboardCalibration [{} UTC]:
@@ -1558,3 +1831,24 @@ fn serialization_rbcalibration_witheventpayload() {
 //        }
 //    }
 //}
+//
+#[cfg(feature = "random")]
+#[test]
+fn pack_rbcalibfilghtt() {
+  for _ in 0..100 {
+    let cfg  = RBCalibrationsFlightT::from_random();
+    let test : RBCalibrationsFlightT = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_rbcalibfilghtv() {
+  for _ in 0..100 {
+    let cfg  = RBCalibrationsFlightV::from_random();
+    let test : RBCalibrationsFlightV = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}
+
