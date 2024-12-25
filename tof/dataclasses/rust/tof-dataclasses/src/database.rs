@@ -275,6 +275,23 @@ impl RAT {
     }
     Some(result)
   }
+  
+  /// Get the RAT where rb1id (the rb id of rb"1" in the RAT) matched the argument
+  pub fn where_rb1id(conn: &mut SqliteConnection, rb2id : u8) -> Option<Vec<RAT>> {
+    let mut result = Vec::<RAT>::new();
+    match RAT::all(conn) {
+      Some(rats) => {
+        for rat in rats {
+          if rat.rb1_id == rb2id as i16 {
+            result.push(rat);
+          }
+        }
+        return Some(result);
+      }
+      None => ()
+    }
+    Some(result)
+  }
 
   pub fn all(conn: &mut SqliteConnection) -> Option<Vec<RAT>> {
     match tof_db_rat.load::<RAT>(conn) {
