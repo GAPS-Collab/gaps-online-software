@@ -2,7 +2,11 @@
 //!
 
 use std::fmt;
-use log::error;
+use log::{
+  //info,
+  debug,
+  error
+};
 
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::serialization::{
@@ -415,10 +419,14 @@ impl MergedEvent {
     //println!("EVENT ID {}", me.event_id);
     let _tof_delim    = parse_u8(stream, pos);
     //println!("TOF delim : {}", _tof_delim);
+    if stream.len() <= *pos + 2 {
+      error!("Not able to parse merged event!");
+      return Err(SerializationError::StreamTooShort);
+    }
     let num_tof_bytes = parse_u16(stream, pos);
     //println!("Num TOF bytes : {}", num_tof_bytes);
     if stream.len() < *pos+num_tof_bytes as usize {
-      println!("Not enough bytes for TOF packet! Expected {}, seen {}", *pos+num_tof_bytes as usize, stream.len());
+      error!("Not enough bytes for TOF packet! Expected {}, seen {}", *pos+num_tof_bytes as usize, stream.len());
       return Err(SerializationError::StreamTooShort); 
     }
     for _ in *pos..*pos+num_tof_bytes as usize {
@@ -917,7 +925,7 @@ impl TrackerPacket {
       }
       tp.events.push(event);
       if tp.events.len() > 170 {
-        println!(">170 events in this packet!");
+        error!(">170 events in this packet!");
         return Err(SerializationError::StreamTooLong);
       }
     }
@@ -1032,7 +1040,7 @@ impl TrackerDAQTempPacket {
       error!("This is not a TrackerDAQTempPacket, but has packet_id {} instead!", tp.tracker_header.packet_id);
       return Err(SerializationError::IncorrectPacketType);
     }
-    println!("tracker header {}", tp.tracker_header);
+    debug!("tracker header {}", tp.tracker_header);
     if stream.len() == *pos as usize {
       error!("Packet contains only header!");
       return Ok(tp);
