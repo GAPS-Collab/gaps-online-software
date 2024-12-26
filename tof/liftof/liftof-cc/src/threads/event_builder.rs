@@ -74,9 +74,7 @@ use tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
 pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                       ev_from_rb     : &Receiver<RBEvent>,
                       data_sink      : &Sender<TofPacket>,
-                      run_id         : u32,
                       mtb_link_map   : HashMap<u8,u8>,
-                      mut settings   : TofEventBuilderSettings,
                       thread_control : Arc<Mutex<ThreadControl>>) { 
   // missing event analysis
   //let mut event_id_test = Vec::<u32>::new();
@@ -95,6 +93,41 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       too_early_rbevents.insert(k as u8, 0);
     }
   }
+  
+  // set up the event builder. Since we are now doing settings only at run 
+  // start, it is fine to do this outside of the loop
+  let mut send_tev_sum    : bool;
+  let mut send_rbwaveform : bool;
+  let mut send_rbwf_freq  : u32;
+  let mut rbwf_ctr          = 0u64;
+  let mut settings          : TofEventBuilderSettings;
+  let mut run_id             : u32;
+  // this can block it is fine bc it is only 
+  // happening once at init
+  let mut cali_active : bool;
+  loop {
+    match thread_control.lock() {
+      Ok(tc) => {
+        send_rbwaveform   = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
+        send_tev_sum      = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
+        send_rbwf_freq    = tc.liftof_settings.data_publisher_settings.send_rbwf_every_x_event;
+        settings          = tc.liftof_settings.event_builder_settings.clone();
+        run_id            = tc.run_id;
+        cali_active       = tc.calibration_active;
+      }
+      Err(err) => {
+        error!("Can't acquire lock for ThreadControl! {err}");
+        error!("CRITICAL: Unable to configure event builder thread! Aborting!");
+        return;
+      }
+    }
+    if !cali_active {
+      break;
+    } else {
+      thread::sleep(Duration::from_secs(4));
+    }
+  }
+  info!("Will assign run id {} to events!", run_id);
 
   // event caches for assembled events
   let mut heartbeat            = EVTBLDRHeartbeat::new();
@@ -118,24 +151,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut hb_timer             = Instant::now(); 
   let hb_interval              = Duration::from_secs(settings.hb_send_interval as u64);
   
-  // set up the event builder. Since we are now doing settings only at run 
-  // start, it is fine to do this outside of the loop
-  let mut send_tev_sum    = false;
-  let mut send_rbwaveform = false;
-  let mut send_rbwf_freq  = 0u32;
-  let mut rbwf_ctr        = 0u64;
-  // this can block it is fine bc it is only 
-  // happening once at init
-  match thread_control.lock() {
-    Ok(tc) => {
-      send_rbwaveform   = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
-      send_tev_sum      = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
-      send_rbwf_freq    = tc.liftof_settings.data_publisher_settings.send_rbwf_every_x_event;
-    }
-    Err(err) => {
-      error!("Can't acquire lock for ThreadControl! {err}");
-    }
-  }
 
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
@@ -146,7 +161,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         Ok(mut tc) => {
           if tc.thread_event_bldr_active {
             println!("= => [evt_builder] shutting down...");
-            tc.end_all_rb_threads = true;
             break; 
           }
           //println!("= => [evt_builder] {}", tc);
@@ -409,21 +423,23 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             // sum up lost hits due to drs4 deadtime
             heartbeat.drs_bsy_lost_hg_hits += ev_to_send.get_lost_hits() as usize;
 
-            // always sent TofEvents, so they get written to disk! 
-            let pack = ev_to_send.pack();
-            match data_sink.send(pack) {
-              Err(err) => {
-                error!("Packet sending failed! Err {}", err);
-              }
-              Ok(_)    => {
-                debug!("Event with id {} sent!", evid);
-                n_sent += 1;
-                heartbeat.n_sent += 1;
-              }
-            }
-            
+            // This only works if we are sending TofEventSummary
+            // since it relies on quantities only calculated 
+            // in the TofEventSummary packet 
+            let mut save_to_disk = true;
             if send_tev_sum {
               let tes  = ev_to_send.get_summary();
+              if settings.only_save_interesting {
+                save_to_disk = false;
+                if tes.n_hits_umb   >= settings.thr_n_hits_umb 
+                && tes.n_hits_cbe   >= settings.thr_n_hits_cbe
+                && tes.n_hits_cor   >= settings.thr_n_hits_cor
+                && tes.tot_edep_umb >= settings.thr_tot_edep_umb
+                && tes.tot_edep_cbe >= settings.thr_tot_edep_cbe
+                && tes.tot_edep_cor >= settings.thr_tot_edep_cor {
+                  save_to_disk = true;
+                }
+              }
               let pack = tes.pack();
               match data_sink.send(pack) {
                 Err(err) => {
@@ -436,6 +452,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                 }
               }
             }
+
+            //if 
             if send_rbwaveform {
               if rbwf_ctr == send_rbwf_freq as u64 {
                 for wf in ev_to_send.get_rbwaveforms() {
@@ -453,6 +471,24 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               }
               rbwf_ctr += 1; // increase for every event, not wf
             }
+            
+            // always sent TofEvents, so they get written to disk.
+            // There is one exception though, in case we have 
+            // "interesting" event cuts in place, then this can 
+            // be restricted.
+            if save_to_disk {
+              let pack = ev_to_send.pack();
+              match data_sink.send(pack) {
+                Err(err) => {
+                  error!("Packet sending failed! Err {}", err);
+                }
+                Ok(_)    => {
+                  debug!("Event with id {} sent!", evid);
+                  n_sent += 1;
+                  heartbeat.n_sent += 1;
+                }
+              }
+            } 
           // this happens when we are NOT ready to send -> cache it!
           } else { 
             event_id_cache.push_front(evid);
@@ -467,7 +503,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
       heartbeat.tp_sender_cbc_len    = data_sink.len();
 
-      println!("{}", heartbeat);
+      //println!("{}", heartbeat);
       let mut counters = HashMap::<u8,u64>::new();
       if met_seconds > 0.0 {
         for k in seen_rbevents.keys() {

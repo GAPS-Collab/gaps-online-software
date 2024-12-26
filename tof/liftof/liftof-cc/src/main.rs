@@ -47,20 +47,12 @@ use crossbeam_channel::{
   unbounded,
 };
 
-//use colored::Colorize;
-use indicatif::{
-  ProgressBar,
-};
+use spinners::{Spinner, Spinners};
 
 use tof_dataclasses::events::{
   MasterTriggerEvent,
   RBEvent
 };
-
-//use tof_dataclasses::serialization::{
-//  Serialization,
-//  Packable
-//};
 
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::database::{
@@ -88,9 +80,6 @@ use liftof_lib::{
 };
 
 use liftof_lib::thread_control::ThreadControl;
-//use liftof_lib::constants::{
-//  DEFAULT_RB_ID,
-//};
 
 use liftof_cc::{
   prepare_run,
@@ -99,7 +88,7 @@ use liftof_cc::{
   restart_liftof_rb,
   ssh_command_rbs,
   get_queue,
-  run_cycler,
+  delete_file,
   init_run_start,
   end_run,
 };
@@ -180,6 +169,10 @@ struct LiftofCCArgs {
   /// reboot
   #[arg(long)]
   rat_id      : Option<u8>,
+  /// Together with the queing mode, define a directory with 
+  /// configfiles to be subsequently worked on
+  #[arg(long)]
+  queue_dir   : Option<String>,
   /// List of possible commands
   #[command(subcommand)]
   command     : CommandCC,
@@ -209,7 +202,7 @@ fn main() {
   
   let runid                 = args.run_id;
   let write_stream          = !args.no_write_to_disk;
-
+  let mut set_cali_active   = false;
   // capture the status and soft reboot options already here, 
   // before we do anything else
   // FIXME - use a crate for this
@@ -259,7 +252,17 @@ fn main() {
       cfg_file_str = format!("{}staging/current/liftof-config.toml", home);
     }
     CommandCC::Queue => {
-      let queue_dir = format!("{}/staging/queue/", home); 
+      let queue_dir : String;
+      match args.queue_dir {
+        None => {
+          queue_dir = format!("{}/staging/queue/", home); 
+          println!("=> Using default queue dir {}!", queue_dir);
+        }
+        Some(qdir) => {
+          queue_dir = qdir;
+          println!("=> Using queue dir {}!", queue_dir);
+        }
+      }
       let cfg_files = get_queue(&queue_dir);
       if cfg_files.len() > 0 {
         cfg_file_str = cfg_files[0].clone();
@@ -270,9 +273,18 @@ fn main() {
     CommandCC::Init => {
       cfg_file_str = format!("{}staging/init/liftof-init.toml", home);
     }
-    CommandCC::Run |
+    CommandCC::Run => {
+      // this will require a config file
+      match args.config {
+        None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
+        Some(cfg_file) => {
+          cfg_file_str = cfg_file.clone();
+        }
+      }
+    }
     CommandCC::Calibration => {
       // this will require a config file
+      set_cali_active = true;
       match args.config {
         None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
         Some(cfg_file) => {
@@ -311,7 +323,6 @@ fn main() {
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
   let nboards = rb_list.len();
-  
   // program execution control
   let thread_control  = Arc::new(Mutex::new(ThreadControl::new()));
   match thread_control.lock() {
@@ -322,6 +333,7 @@ fn main() {
       tc.n_rbs              = rb_list.len() as u32;
       tc.liftof_settings    = config.clone();
       tc.write_data_to_disk = write_stream;
+      tc.calibration_active = tc.liftof_settings.pre_run_calibration || set_cali_active;
     },
     Err(err) => {
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -346,7 +358,7 @@ fn main() {
   
   // send tofpackets to data sink
   let (tp_to_sink, tp_from_threads)   = init_channels::<TofPacket>();
-  
+ 
   let thread_control_sh = Arc::clone(&thread_control);
   let _sig_handle = thread::Builder::new()
     .name("signal_handler".into())
@@ -399,10 +411,9 @@ fn main() {
   #[cfg(feature="tof-ctrl")]
   let cpu_moni_interval     = config.cpu_moni_interval_sec;
   //let cmd_dispatch_settings = config.cmd_dispatcher_settings.clone();
-  let mtb_settings          = config.mtb_settings.clone();
   let pre_run_calibration   = config.pre_run_calibration; 
   let verification_rt_sec   = config.verification_runtime_sec;
-  let staging_dir           = config.staging_dir.clone();
+  //let staging_dir           = config.staging_dir.clone();
   
   /*******************************************************
    * Channels (crossbeam, unbounded) for inter-thread
@@ -600,7 +611,6 @@ fn main() {
   debug!("Starting event builder thread!");
   // master thread -> event builder MasterTriggerEvent transmission
   let (master_ev_send, master_ev_rec) = init_channels::<MasterTriggerEvent>(); 
-  let evb_settings      = config.event_builder_settings.clone();
   let thread_control_eb = Arc::clone(&thread_control);
   let tp_to_sink_c      = tp_to_sink.clone();
   let _evtbldr_handle = thread::Builder::new()
@@ -609,9 +619,7 @@ fn main() {
                     event_builder(&master_ev_rec,
                                   &ev_from_rb,
                                   &tp_to_sink_c,
-                                  new_run_id as u32,
                                   mtb_link_id_map,
-                                  evb_settings,
                                   thread_control_eb);
      })
     .expect("Failed to spawn event-builder thread!");
@@ -641,7 +649,7 @@ fn main() {
     rb_handles.push(rb_comm_thread);
     print!("..");
   } // end for loop over nboards
-  print!("..done!");
+  print!("..done!\n");
   thread::sleep(one_second);
 
   // master trigger
@@ -653,7 +661,6 @@ fn main() {
                     master_trigger(&mtb_address, 
                                    &master_ev_send,
                                    &mtb_moni_sender,
-                                   mtb_settings,
                                    thread_control_mt,
                                    // verbosity is currently too much 
                                    // output
@@ -663,44 +670,6 @@ fn main() {
   
   println!("=> All threads initialized!");
   
-  // Now we are ready. Let's decide what to do!
-  //pb.set_style(
-  //    ProgressStyle::with_template("{spinner:.blue} {msg}")
-  //        .unwrap()
-  //        // For more spinners check out the cli-spinners project:
-  //        // https://github.com/sindresorhus/cli-spinners/blob/master/spinners.json
-  //        .tick_strings(&[
-  //            "▹▹▹▹▹",
-  //            "▸▹▹▹▹",
-  //            "▹▸▹▹▹",
-  //            "▹▹▸▹▹",
-  //            "▹▹▹▸▹",
-  //            "▹▹▹▹▸",
-  //            "▪▪▪▪▪",
-  //        ]),
-  //);
- 
-  //----------------------------------------------------
-  //  Now we have a bunch of scenarios, depending on the 
-  //  input. Most of this might go away, but we keep it 
-  //  for now.
-  // 
-  //  1) If listening - we start the event builder and 
-  //     master trigger and cpu moni threads as 
-  //     well as the command dispatcher and continue 
-  //     to the main program loop
-  // 
-  //  2) Staging. This requires we load ANOTHER configuration
-  //     from the staging directory and work through them. 
-  //     We do have to kill/restart threads with updated settings.
-  //     TODO.
-  //     FIXME: When we are in staging mode, do we want the cmd 
-  //     dispatcher?
-  //  3) Run - we just immediatly start a run.
-  // 
-
-  let mut bar = ProgressBar::hidden();
-
   // default  behaviour is to stop
   // when we are done
   let mut dont_stop = false;
@@ -734,51 +703,6 @@ fn main() {
       dont_stop = false;
       let cc_pub_addr = &config.cmd_dispatcher_settings.cc_server_address;
       init_run_start(cc_pub_addr);
-      //let cmd_payload: u32 =  PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
-      //let cmd          = TofCommand::DataRunStart(cmd_payload);
-      //let packet       = cmd.pack();
-      //let mut payload  = String::from("BRCT").into_bytes();
-      //payload.append(&mut packet.to_bytestream());
-      //
-      //// open 0MQ socket here
-      //let ctx = zmq::Context::new();
-      //let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-      //let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
-      //cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
-      //// after we opened the socket, give the RBs a chance to connect
-      //println!("=> Give the RBs a chance to connect and wait a bit..");
-      //thread::sleep(10*one_second);
-      //println!("=> Initializing Run Start!");
-      //match thread_control.lock() {
-      //  Ok(mut tc) => {
-      //    // deactivate the master trigger thread
-      //    tc.thread_master_trg_active = true;
-      //    tc.calibration_active       = false;
-      //    tc.thread_event_bldr_active = true;
-      //    if write_stream {
-      //      tc.write_data_to_disk       = true;
-      //    }
-      //    tc.run_id                   = new_run_id as u32;
-      //    tc.new_run_start_flag       = true;
-      //  },
-      //  Err(err) => {
-      //    error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-      //  },
-      //}
-      //match cmd_sender.send(&payload, 0) {
-      //  Err(err) => {
-      //    error!("Unable to send command, error{err}");
-      //  },
-      //  Ok(_) => {
-      //    debug!("We sent {:?}", payload);
-      //  }
-      //}
-      //println!("Run initialized!");
-      bar = ProgressBar::new_spinner();
-      bar.enable_steady_tick(Duration::from_secs(1));
-      bar.set_message(".. acquiring data ..");
-      // move the socket out of here for further use
-      //command_socket = Some(cmd_sender);
     }
     _ => ()
   }
@@ -789,10 +713,10 @@ fn main() {
   // individual threads. Here we have to check for ongoing
   // calibrations
   // 
+  let mut spinner = Spinner::new(Spinners::Shark, "Acquiring data..".into());
   loop {
     // take out the heat a bit
     thread::sleep(one_second);
-    
     // 2 end conditions - CTRL+C/ systemd stop 
     // or end of runtime seconds
     //
@@ -819,155 +743,24 @@ fn main() {
     }
 
     if end_program {
-      bar.finish();
-      thread::sleep(5*one_second);
-      println!("=> Ending program! Finisihing run ...");
+      //bar.finish();
+      spinner.stop();
+      spinner = Spinner::new(Spinners::Star, "Ending program, finishing run ..".into());
       let cc_pub_addr = &config.cmd_dispatcher_settings.cc_server_address;
       end_run(cc_pub_addr);
-      println!(" ... command end seqeunce complete!");
       match args.command {
-        CommandCC::Staging => {
-          println!("=> We are in staging mode! So we will prepare for the next run!");
-          match run_cycler(staging_dir.clone(),true) {
-            Err(err) => error!("Run cycler failed to prepare the next run! {err}"),
-            Ok(_) => println!("Run cycler successful! Next run should be set up as desired!")
+        CommandCC::Queue => {
+          println!("=> Deleteing the current config file (no worris it has been copied to the run directory) so that the next iteration of the queue can pick up a new one!");
+          match delete_file(&cfg_file_str) {
+            Err(err) => error!("Unable to delete config file {}! Queuinng mode is not happening! The next run will be thte same as this one! Sorry :( ! {err}", &cfg_file_str),
+            Ok(_)    => info!("Completed {} and thus deleted!", &cfg_file_str),
           }
         }
         _ => ()
       }
+      spinner.stop();
       println!(">> So long and thanks for all the \u{1F41F} <<"); 
       exit(0);
-
-      // send command sequence to threads.
-
-      //println!("=> Sending run termination command to the RBs");
-      //let cmd          = TofCommand::DataRunStop(DEFAULT_RB_ID as u32);
-      //let packet       = cmd.pack();
-      //let mut payload  = String::from("BRCT").into_bytes();
-      //payload.append(&mut packet.to_bytestream());
-      //
-      //match command_socket {
-      //  None => {
-      //    warn!("=> No command socket available! Can not shut down RBs..!");
-      //    // open 0MQ socket here
-      //    let ctx = zmq::Context::new();
-      //    let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-      //    let cc_pub_addr = config.cmd_dispatcher_settings.cc_server_address.clone();
-      //    cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
-      //    // after we opened the socket, give the RBs a chance to connect
-      //    println!("=> Sending run stop command to all RBs...");
-      //    thread::sleep(10*one_second);
-      //    match cmd_sender.send(&payload, 0) {
-      //      Err(err) => {
-      //        error!("Unable to send command! {err}");
-      //      },
-      //      Ok(_) => {
-      //        debug!("We sent {:?}", payload);
-      //      }
-      //    }
-      //  }
-      //  Some(_sock) => {
-      //    match _sock.send(&payload, 0) {
-      //      Err(err) => {
-      //        error!("Unable to send command! {err}");
-      //      },
-      //      Ok(_) => {
-      //        debug!("We sent {:?}", payload);
-      //      }
-      //    }
-      //  }
-      //}
-      //println!("=> Waiting for the RBs to stop taking data..");
-      //thread::sleep(10*one_second);
-    
-      // FIXME - this all needs debugging. The goal is to shut down 
-      // the threads in order
-      //println!("=> Shutting down signal handler...");
-      //// event builder first, to avoid a lot of error messages
-      //match thread_control.lock() {
-      //  Ok(mut tc) => {
-      //    tc.thread_signal_hdlr_active = false;
-      //  }
-      //  Err(err) => {
-      //    error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-      //  }
-      //}
-      //let _ = sig_handle.join();
-      ////thread::sleep(2*one_second);
-    
-      //// end RB threads
-      //println!("=> Shutting down rb threads...");
-      //match thread_control.lock() {
-      //  Ok(mut tc) => {
-      //    for rb in &rb_list {
-      //      if tc.thread_rbcomm_active.contains_key(&rb.rb_id) {
-      //        *tc.thread_rbcomm_active.get_mut(&rb.rb_id).unwrap() = false;
-      //      }
-      //    }
-      //  }
-      //  Err(err) => {
-      //    error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-      //  }
-      //}
-
-      //for k in rb_handles {
-      //  let _ = k.join();
-      //}
-
-      //// event builder first, to avoid a lot of error messages
-      //println!("=> Shutting down event builder...");
-      //match thread_control.lock() {
-      //  Ok(mut tc) => {
-      //    tc.thread_event_bldr_active = false;
-      //    println!("tc {}", tc);
-      //  }
-      //  Err(err) => {
-      //    error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-      //  }
-      //} 
-      //println!("=> Waiting for event builder thread to finish up...");
-      //println!("=> evt builder thread is finsihed: {}", evtbldr_handle.is_finished());
-      //let _ = evtbldr_handle.join();
-      //println!("=> .. done!");
-
-      //match thread_control.lock() {
-      //  Ok(mut tc) => {
-      //    tc.stop_flag = true;
-      //  },
-      //  Err(err) => {
-      //    error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-      //  },
-      //}
-      //// wait actually until all threads have been finished
-      //let timeout = Instant::now();
-      //loop {
-      //  match thread_control.lock() {
-      //    Ok(mut tc) => {
-      //      tc.stop_flag = true;
-      //      // each thread will report here if
-      //      // it is done
-      //      if !tc.thread_cmd_dispatch_active 
-      //      && !tc.thread_data_sink_active
-      //      && !tc.thread_event_bldr_active 
-      //      && !tc.thread_master_trg_active {
-      //        break;
-      //      }
-      //    },
-      //    Err(err) => {
-      //      error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
-      //    },
-      //  }
-      //  // in any case, break after timeout
-      //  if timeout.elapsed() > 5*one_second {
-      //    break;
-      //  }
-      //}
-      //println!(">> So long and thanks for all the \u{1F41F} <<"); 
-      //exit(0);
     }
-
-    // check thread control - this is useful 
-    // for everything
-
   }
 }

@@ -19,11 +19,18 @@ use tof_dataclasses::database::ReadoutBoard;
 use tof_dataclasses::events::RBEvent;
 use tof_dataclasses::packets::{
   TofPacket,
-  PacketType
+  PacketType,
 };
 
-use tof_dataclasses::serialization::Serialization;
-use tof_dataclasses::calibrations::RBCalibrations;
+use tof_dataclasses::serialization::{
+  Serialization,
+  Packable
+};
+use tof_dataclasses::calibrations::{
+  RBCalibrations,
+  RBCalibrationsFlightT,
+  RBCalibrationsFlightV,
+  };
 
 use liftof_lib::{
   waveform_analysis,
@@ -51,7 +58,6 @@ use liftof_lib::settings::AnalysisEngineSettings;
 ///                         will be forwarded to the sink.
 /// * rb                  : ReadoutBoard instance, as loaded from the database. This will be used
 ///                         for readoutboard id as well as paddle assignment.
-/// * run_analysis_engine : Extract TofHits from the waveforms and attach them to RBEvent
 /// * ae_settings         : Settings to configure peakfinding algorithms etc. 
 ///                         These can be configured with an external .toml file
 pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
@@ -109,7 +115,13 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
       return;
     }
   }
-  
+  if run_analysis_engine {
+    info!("Will run analysis engine!");
+    //println!("Will use the following settings! {}", ae_settings);
+  } else {
+    warn!("Will not run analysis engine!");
+  }
+
   // start continuous thread activity, read data from RB sockets,
   // do analysis and pass them on.
   loop {
@@ -209,9 +221,13 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                 n_chunk += 1;
               } 
               PacketType::RBCalibration => {
+                let mut flight_v = RBCalibrationsFlightV::new();
+                let mut flight_t = RBCalibrationsFlightT::new(); 
+
                 match tp.unpack::<RBCalibrations>() {
                   Ok(cali) => {
-  
+                    flight_v = cali.emit_flightvcal();
+                    flight_t = cali.emit_flighttcal(); 
                     //println!("= => [rb_comm] Received RBCalibration!");
                     match thread_control.lock() {
                       Ok(mut tc) => {
@@ -227,6 +243,16 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                   Err(err) => {
                     error!("Received calibration package, but got error when unpacking! {err}");
                   }
+                }
+                let flight_v_tp = flight_v.pack();
+                let flight_t_tp = flight_t.pack();
+                match tp_to_sink.send(flight_v_tp) {
+                  Err(err) => error!("Can not send tof packet to data sink! Err {err}"),
+                  Ok(_)    => debug!("Packet sent"),
+                }
+                match tp_to_sink.send(flight_t_tp) {
+                  Err(err) => error!("Can not send tof packet to data sink! Err {err}"),
+                  Ok(_)    => debug!("Packet sent"),
                 }
                 match tp_to_sink.send(tp) {
                   Err(err) => error!("Can not send tof packet to data sink! Err {err}"),

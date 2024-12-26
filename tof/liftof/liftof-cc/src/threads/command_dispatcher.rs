@@ -79,7 +79,7 @@ pub fn command_dispatcher(thread_ctrl  : Arc<Mutex<ThreadControl>>,
     }
     match cmd_receiver.recv_bytes(zmq::DONTWAIT) {
       Err(err)   => {
-        error!("ZMQ socket receiving error! {err}");
+        trace!("ZMQ socket receiving error! {err}");
         continue;
       }
       Ok(buffer) => {

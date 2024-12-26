@@ -192,7 +192,7 @@ pub fn init_run_start(cc_pub_addr : &str) {
     thread::sleep(one_second);
     print!("..");
   }
-  print!("done!");
+  print!("done!\n");
   match cmd_sender.send(&payload, 0) {
     Err(err) => {
       error!("Unable to send command, error{err}");
@@ -226,7 +226,7 @@ pub fn end_run(cc_pub_addr : &str) {
   for _ in 0..10 {
     print!("..");
   }
-  print!("..done!");
+  print!("..done!\n");
 }
 
 /// Get the files in the queue and sort them by number
@@ -794,6 +794,17 @@ pub fn calibrate_tof(thread_control : Arc<Mutex<ThreadControl>>,
     thread::sleep(10*one_second);
     if timeout.elapsed() > calibration_timeout_fail {
       error!("Calibration timeout! Calibrations might not be complete!");
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          tc.calibration_active = false;
+        }
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl at this time! Unable to set calibration mode! {err}");
+        }
+      }
+      if show_progress {
+        bar.finish_with_message("Done");
+      }
       break;
     }
     //let mut rbcali = RBCalibrations::new();
