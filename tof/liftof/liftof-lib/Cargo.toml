@@ -21,6 +21,7 @@ log               = { workspace = true }
 signal-hook       = { workspace = true }
 # parse command line arguments
 clap              = { workspace = true }
+chrono            = { workspace = true }
 discord-rs        = { optional  = true, version = "0.1" }
 half              = "2.4"
 toml              = "0.8"

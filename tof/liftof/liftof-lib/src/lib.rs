@@ -16,6 +16,8 @@ use std::sync::{
     Mutex,
 };
 
+use chrono::Utc;
+
 #[cfg(feature="database")]
 use core::f32::consts::PI;
 
@@ -192,11 +194,12 @@ pub fn color_log(level : &Level) -> ColoredString {
 pub fn init_env_logger() {
   env_logger::builder()
     .format(|buf, record| {
-    writeln!( buf, "[{level}][{module_path}:{line}] {args}",
+    writeln!( buf, "[{ts} - {level}][{module_path}:{line}] {args}",
+      ts    = Utc::now().format("%Y/%m/%d-%H:%M:%SUTC"), 
       level = color_log(&record.level()),
       module_path = record.module_path().unwrap_or("<unknown>"),
-      line = record.line().unwrap_or(0),
-      args = record.args()
+      line  = record.line().unwrap_or(0),
+      args  = record.args()
       )
     }).init();
 }
