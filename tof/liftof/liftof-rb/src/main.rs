@@ -317,11 +317,12 @@ fn main() {
           match connect_to_db(db_path) {
             Err(err) => error!("Unable to connect to db! Can not set LTB thresholds! {err}"),
             Ok(mut conn) => {
-              match RAT::where_rb2id(&mut conn, rb_id) {
+              // LTB is connected to RB1
+              match RAT::where_rb1id(&mut conn, rb_id) {
                 None => error!("Unable to set ltb thresholds! Not able to get board information from db!"),
                 Some(rat_list) => {
                   if rat_list.len() != 1 {
-                    error!("Ambigious ltb mapping! {:?}", rat_list);
+                    error!("Ambigious ltb mapping for RB {}! {:?}",rb_id, rat_list);
                   } else {
                     let key = format!("RAT{:02}", rat_list[0].rat_id);
                     match ltb_cfg.rat_ltb_thresholds.get(&key) {
