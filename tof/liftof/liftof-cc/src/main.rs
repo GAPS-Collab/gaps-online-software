@@ -173,6 +173,11 @@ struct LiftofCCArgs {
   /// configfiles to be subsequently worked on
   #[arg(long)]
   queue_dir   : Option<String>,
+  /// Make sure no sharks are in the area
+  /// (will not display shark animation so 
+  ///  that the logs won't overflow)
+  #[arg(long, default_value_t = false)]
+  no_shark    : bool,
   /// List of possible commands
   #[command(subcommand)]
   command     : CommandCC,
@@ -713,7 +718,12 @@ fn main() {
   // individual threads. Here we have to check for ongoing
   // calibrations
   // 
-  let mut spinner = Spinner::new(Spinners::Shark, "Acquiring data..".into());
+  #[allow(unused_variables)]
+  let spinner : Spinner;
+  #[allow(unused_assignments)]
+  if !args.no_shark {
+    spinner = Spinner::new(Spinners::Shark, "Acquiring data..".into());
+  }
   loop {
     // take out the heat a bit
     thread::sleep(one_second);
@@ -744,8 +754,10 @@ fn main() {
 
     if end_program {
       //bar.finish();
-      spinner.stop();
-      spinner = Spinner::new(Spinners::Star, "Ending program, finishing run ..".into());
+      //if !args.no_shark {
+      //  spinner.stop();
+      //  spinner = Spinner::new(Spinners::Star, "Ending program, finishing run ..".into());
+      //}
       let cc_pub_addr = &config.cmd_dispatcher_settings.cc_server_address;
       end_run(cc_pub_addr);
       match args.command {
@@ -758,7 +770,9 @@ fn main() {
         }
         _ => ()
       }
-      spinner.stop();
+      //if !args.no_shark {
+      //  spinner.stop();
+      //}
       println!(">> So long and thanks for all the \u{1F41F} <<"); 
       exit(0);
     }
