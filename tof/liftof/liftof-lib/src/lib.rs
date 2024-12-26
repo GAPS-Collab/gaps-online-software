@@ -145,7 +145,7 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
 pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
   let sleep_time = Duration::from_millis(300);
   let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
-  loop {
+  'main: loop {
     thread::sleep(sleep_time);
 
     // check pending signals and handle
@@ -162,7 +162,7 @@ pub fn signal_handler(thread_control     : Arc<Mutex<ThreadControl>>) {
               error!("Can't acquire lock for ThreadControl! {err}");
             },
           }
-          break; // now end myself
+          break 'main; // now end myself
         } 
         _ => {
           error!("Received signal, but I don't have instructions what to do about it!");
@@ -405,7 +405,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
 -> Result<(), AnalysisError> {
   // Don't do analysis for mangled events!
   if event.has_any_mangling_flag() {
-    error!("Event for RB {} has data mangling! Not doing analysis!", rb.rb_id);
+    warn!("Event for RB {} has data mangling! Not doing analysis!", rb.rb_id);
     return Err(AnalysisError::DataMangling);
   }
   match event.self_check() {
@@ -426,7 +426,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   if fit_sinus {
     if !active_channels.contains(&8) {
       error!("RB {} does not have ch9 data!", rb.rb_id);
-      println!("{}", event.header);
+      //println!("{}", event.header);
       return Err(AnalysisError::NoChannel9);
     }
     rb.calibration.voltages(9,
