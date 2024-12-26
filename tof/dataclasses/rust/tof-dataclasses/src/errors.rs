@@ -93,6 +93,7 @@ pub enum CalibrationError {
   CanNotConnectToMyOwnZMQSocket,
   CalibrationFailed,
   WrongBoardId,
+  IncompatibleFlightCalibrations,
 }
 
 impl fmt::Display for CalibrationError {

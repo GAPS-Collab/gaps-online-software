@@ -778,8 +778,36 @@ impl RBCalibrations {
   pub const NOMINALFREQ : f32   = 2.0; // nominal sampling frequency,
                                        // GHz
   pub const CALFREQ     : f32   = 0.025; // calibration sine wave frequency (25MHz)
+ 
+  /// Re-assemble a RBCalibration from chopped up parts
+  pub fn assemble_from_flightcal(fcal_t : RBCalibrationsFlightT,
+                                 fcal_v : RBCalibrationsFlightV)
+    -> Result<Self, CalibrationError> {
+    if (fcal_t.timestamp != fcal_v.timestamp) || (fcal_t.rb_id != fcal_v.rb_id) {
+      error!("These calibrations do not match! {} , {}", fcal_t, fcal_v);
+      return Err(CalibrationError::IncompatibleFlightCalibrations);
+    }
+    let mut cal              = Self::new(fcal_t.rb_id);
+    cal.rb_id                = fcal_t.rb_id;
+    cal.timestamp            = fcal_t.timestamp;
+    cal.d_v                  = fcal_v.d_v;
+    cal.serialize_event_data = false;
+    for ch in 0..NCHN {
+      for k in 0..NWORDS {
+        cal.tbin     [ch][k] = f16::to_f32(fcal_t.tbin[ch][k]);
+        cal.v_offsets[ch][k] = f16::to_f32(fcal_v.v_offsets[ch][k]); 
+        cal.v_dips   [ch][k] = f16::to_f32(fcal_v.v_dips[ch][k]);
+        cal.v_inc    [ch][k] = f16::to_f32(fcal_v.v_inc[ch][k]); 
+      }
+    }
+    Ok(cal)
+  }
 
-  pub fn emit_filghttcal(&self) -> RBCalibrationsFlightT {
+  /// Return the timing part of the calibration in a 
+  /// package digestable by the flight computer.
+  ///
+  /// Additonal compression by using f16
+  pub fn emit_flighttcal(&self) -> RBCalibrationsFlightT {
     let mut cal = RBCalibrationsFlightT::new();
     cal.rb_id = self.rb_id;
     cal.timestamp = self.timestamp;
@@ -791,7 +819,11 @@ impl RBCalibrations {
     cal
   }
   
-  pub fn emit_filghtvcal(&self) -> RBCalibrationsFlightV {
+  /// Return the voltage part of the calibration in a 
+  /// package digestable by the flight computer.
+  ///
+  /// Additional compression by using f16
+  pub fn emit_flightvcal(&self) -> RBCalibrationsFlightV {
     let mut cal = RBCalibrationsFlightV::new();
     cal.rb_id = self.rb_id;
     cal.timestamp = self.timestamp;
@@ -1849,6 +1881,29 @@ fn pack_rbcalibfilghtv() {
     let cfg  = RBCalibrationsFlightV::from_random();
     let test : RBCalibrationsFlightV = cfg.pack().unpack().unwrap();
     assert_eq!(cfg, test);
+  }
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn assemble_flightcal() {
+  for _ in 0..10 {
+    let cal  = RBCalibrations::from_random();
+    let fct  = cal.emit_flighttcal();
+    let fcv  = cal.emit_flightvcal();
+    let test = RBCalibrations::assemble_from_flightcal(fct, fcv).unwrap();
+    assert_eq!(cal.rb_id, test.rb_id);
+    assert_eq!(cal.d_v  , test.d_v);
+    assert_eq!(cal.timestamp, test.timestamp);
+    assert_eq!(test.serialize_event_data, false);
+    for ch in 0..NCHN {
+      for k in 0..NWORDS {
+        assert_eq!(f16::from_f32(cal.tbin[ch][k]),     f16::from_f32(test.tbin[ch][k])); 
+        assert_eq!(f16::from_f32(cal.v_offsets[ch][k]),f16::from_f32(test.v_offsets[ch][k])); 
+        assert_eq!(f16::from_f32(cal.v_dips[ch][k]),   f16::from_f32(test.v_dips[ch][k])); 
+        assert_eq!(f16::from_f32(cal.v_inc[ch][k]),    f16::from_f32(test.v_inc[ch][k]));
+      }
+    }
   }
 }
 
