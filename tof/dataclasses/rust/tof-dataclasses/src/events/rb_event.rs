@@ -1348,6 +1348,7 @@ impl Serialization for RBWaveform {
     wf.rb_channel_a      = parse_u8 (stream, pos);
     wf.rb_channel_b      = parse_u8 (stream, pos);
     wf.stop_cell         = parse_u16(stream, pos);
+    wf.paddle_id         = parse_u8 (stream, pos);
     if stream.len() < *pos+2*NWORDS {
       return Err(SerializationError::StreamTooShort);
     }
@@ -1372,6 +1373,7 @@ impl Serialization for RBWaveform {
     stream.extend_from_slice(&self.rb_channel_a.to_le_bytes());
     stream.extend_from_slice(&self.rb_channel_b.to_le_bytes());
     stream.extend_from_slice(&self.stop_cell.to_le_bytes());
+    stream.push(self.paddle_id);
     if self.adc_a.len() != 0 {
       for k in 0..NWORDS {
         stream.extend_from_slice(&self.adc_a[k].to_le_bytes());  
@@ -1421,6 +1423,7 @@ impl FromRandom for RBWaveform {
     wf.rb_channel_a = rng.gen::<u8>();
     wf.rb_channel_b = rng.gen::<u8>();
     wf.stop_cell    = rng.gen::<u16>();
+    wf.paddle_id    = rng.gen::<u8>();
     let random_numbers_a: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
     wf.adc_a        = random_numbers_a;
     let random_numbers_b: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();

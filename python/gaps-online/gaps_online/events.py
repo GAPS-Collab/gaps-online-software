@@ -29,3 +29,5 @@ if import_rtd_success:
     TofHit          = rtd.events.TofHit
     RBCalibration   = rtd.events.RBCalibration
     TriggerType     = rtd.events.TriggerType
+    RBWaveform      = rtd.events.RBWaveform
+    EventStatus     = rtd.events.EventStatus
