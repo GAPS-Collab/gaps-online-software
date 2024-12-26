@@ -151,7 +151,29 @@ impl MTBSettings {
       global_trigger_prescale : 1.0,
     }
   }
- 
+
+  /// Emit a config, so that infomraiton can be transported
+  /// over the wire
+  pub fn emit_triggerconfig(&self) -> TriggerConfig {
+    let mut cfg = TriggerConfig::new();
+    // all fields should be active, since the settings file 
+    // contains all fields per definition. We can already 
+    // be future proof and just set all of them
+    cfg.active_fields          = u32::MAX;
+    cfg.gaps_trigger_use_beta  = Some(self.gaps_trigger_use_beta);
+    cfg.prescale               = Some(self.trigger_prescale);
+    cfg.trigger_type           = Some(self.trigger_type);
+    cfg.use_combo_trigger      = Some(self.use_combo_trigger);
+    cfg.combo_trigger_type     = Some(self.global_trigger_type);
+    cfg.combo_trigger_prescale = Some(self.global_trigger_prescale);
+    cfg.trace_suppression      = Some(self.trace_suppression);
+    cfg.mtb_moni_interval      = Some((self.mtb_moni_interval & 0xffff) as u16); 
+    cfg.tiu_ignore_busy        = Some(self.tiu_ignore_busy); 
+    cfg.hb_send_interval       = Some((self.hb_send_interval & 0xffff) as u16); 
+    cfg
+  }
+
+  /// Change seetings accordingly to config 
   pub fn from_triggerconfig(&mut self, cfg : &TriggerConfig) {
     if cfg.gaps_trigger_use_beta.is_some() {
       self.gaps_trigger_use_beta   = cfg.gaps_trigger_use_beta.unwrap() ;
@@ -663,20 +685,37 @@ pub struct TofEventBuilderSettings {
   pub greediness          : u8,
   pub wait_nrb            : u8,
   pub hb_send_interval    : u16,
+  /// Allows to restrict saving the event to disk
+  /// based on the interesting event parameters
+  /// (These are minimum values)
+  pub only_save_interesting : bool,
+  pub thr_n_hits_umb        : u8,
+  pub thr_n_hits_cbe        : u8,
+  pub thr_n_hits_cor        : u8,
+  pub thr_tot_edep_umb      : f32,
+  pub thr_tot_edep_cbe      : f32,
+  pub thr_tot_edep_cor      : f32,
 }
 
 impl TofEventBuilderSettings {
   pub fn new() -> TofEventBuilderSettings {
     TofEventBuilderSettings {
-      cachesize           : 100000,
-      n_mte_per_loop      : 1,
-      n_rbe_per_loop      : 40,
-      te_timeout_sec      : 30,
-      sort_events         : false,
-      build_strategy      : BuildStrategy::Adaptive,
-      greediness          : 3,
-      wait_nrb            : 40,
-      hb_send_interval    : 30,
+      cachesize             : 100000,
+      n_mte_per_loop        : 1,
+      n_rbe_per_loop        : 40,
+      te_timeout_sec        : 30,
+      sort_events           : false,
+      build_strategy        : BuildStrategy::Adaptive,
+      greediness            : 3,
+      wait_nrb              : 40,
+      hb_send_interval      : 30,
+      only_save_interesting : false,
+      thr_n_hits_umb        : 0,
+      thr_n_hits_cbe        : 0,
+      thr_n_hits_cor        : 0,
+      thr_tot_edep_umb      : 0.0,
+      thr_tot_edep_cbe      : 0.0,
+      thr_tot_edep_cor      : 0.0,
     }
   }
 
@@ -707,6 +746,27 @@ impl TofEventBuilderSettings {
     }
     if cfg.hb_send_interval.is_some() {
       self.hb_send_interval = cfg.hb_send_interval.unwrap();
+    }
+    if cfg.only_save_interesting.is_some() {
+      self.only_save_interesting = cfg.only_save_interesting.unwrap();
+    }
+    if cfg.thr_n_hits_umb.is_some() { 
+      self.thr_n_hits_umb = cfg.thr_n_hits_umb.unwrap();
+    }
+    if cfg.thr_n_hits_cbe.is_some() {      
+      self.thr_n_hits_cbe = cfg.thr_n_hits_cbe.unwrap();
+    }
+    if cfg.thr_n_hits_cor.is_some()   {
+      self.thr_n_hits_cor = cfg.thr_n_hits_cor.unwrap();
+    }
+    if cfg.thr_tot_edep_umb.is_some() {    
+      self.thr_tot_edep_umb = cfg.thr_tot_edep_umb.unwrap();
+    }
+    if cfg.thr_tot_edep_cbe.is_some() {    
+      self.thr_tot_edep_cbe = cfg.thr_tot_edep_cbe.unwrap();
+    }
+    if cfg.thr_tot_edep_cor.is_some() {    
+      self.thr_tot_edep_cor = cfg.thr_tot_edep_cor.unwrap();
     }
   }
 }
@@ -906,7 +966,9 @@ impl LiftofSettings {
       ltb_settings              : LTBThresholdSettings::new(),
     }
   }  
- 
+
+  /// Change the settings according to the ones in the 
+  /// given config 
   pub fn from_tofrunconfig(&mut self, cfg : &TofRunConfig) {
     if cfg.runtime.is_some() {
       self.runtime_sec = cfg.runtime.unwrap() as u64;
@@ -916,6 +978,7 @@ impl LiftofSettings {
   /// Change a value by giving the specific key as 
   /// a string, the value then will be parsed 
   /// accordingly
+  #[deprecated(since="0.10.0", note="This is a dev deadend and will be nuked!")]
   pub fn set_by_key(&mut self, key : &str, value : String) {
     match key {
       "runtime_sec"               => {
@@ -1313,3 +1376,60 @@ impl Default for ChannelMaskSettings {
     Self::new()
   }
 }
+
+#[cfg(feature="random")]
+#[test]
+fn mtb_config() {
+
+  use tof_dataclasses::FromRandom;
+  for _ in 0..100 {
+    let cfg  = TriggerConfig::from_random();
+    let mut settings = MTBSettings::new();
+    settings.from_triggerconfig(&cfg);
+    let test = settings.emit_triggerconfig();
+    if cfg.gaps_trigger_use_beta.is_some() {
+      assert_eq!(cfg.gaps_trigger_use_beta, test.gaps_trigger_use_beta);
+    }
+    if cfg.prescale.is_some() {
+      assert_eq!(cfg.prescale, test.prescale);
+    }
+    if cfg.trigger_type.is_some() {
+      assert_eq!(cfg.trigger_type, test.trigger_type);
+    }
+    if cfg.use_combo_trigger.is_some() {
+      assert_eq!(cfg.use_combo_trigger, test.use_combo_trigger);
+    }
+    if cfg.combo_trigger_type.is_some() {
+      assert_eq!(cfg.combo_trigger_type, test.combo_trigger_type);
+    }
+    if cfg.combo_trigger_prescale.is_some() {
+      assert_eq!(cfg.combo_trigger_prescale, test.combo_trigger_prescale);
+    }
+    if cfg.trace_suppression.is_some() {
+      assert_eq!(cfg.trace_suppression, test.trace_suppression);
+    }
+    if cfg.mtb_moni_interval.is_some() {
+      assert_eq!(cfg.mtb_moni_interval, test.mtb_moni_interval);
+    }
+    if cfg.tiu_ignore_busy.is_some() {
+      assert_eq!(cfg.tiu_ignore_busy, test.tiu_ignore_busy);
+    }
+    if cfg.hb_send_interval.is_some() {
+      assert_eq!(cfg.hb_send_interval, test.hb_send_interval);
+    }
+  }
+}
+
+#[test]
+fn write_config_file() {
+  let settings = LiftofSettings::new();
+  //println!("{}", settings);
+  settings.to_toml(String::from("liftof-config-test.toml"));
+}
+
+#[test]
+fn read_config_file() {
+  let _settings = LiftofSettings::from_toml("liftof-config-test.toml");
+}
+
+
