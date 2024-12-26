@@ -35,7 +35,7 @@ use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::events::MasterTriggerEvent;
 use tof_dataclasses::events::master_trigger::TriggerType;
-
+use tof_dataclasses::version::ProtocolVersion;
 use tof_dataclasses::errors::{
   MasterTriggerError
 };
@@ -802,6 +802,7 @@ pub fn master_trigger(mt_address     : &str,
           heartbeat.evq_num_events_avg = (evq_num_events as u64)/(n_iter_loop as u64);
         }
       }
+      
       heartbeat.total_elapsed += hb_timer.elapsed().as_secs() as u64;
       match TRIGGER_RATE.get(&mut bus) {
         Ok(trate) => {
@@ -820,7 +821,25 @@ pub fn master_trigger(mt_address     : &str,
           error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
         }
       }
+      match TRACK_TRIG_PRESCALE.get(&mut bus) {
+        Ok(ps) => {
+          heartbeat.prescale_track = (ps as f32) / (u32::MAX as f32) ;
+        }
       
+        Err(err) => {
+          error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
+        }
+      }
+      match GAPS_TRIG_PRESCALE.get(&mut bus) {
+        Ok(ps) => {
+          heartbeat.prescale_gaps = (ps as f32) / (u32::MAX as f32) ;
+        }
+      
+        Err(err) => {
+          error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
+        }
+      }
+      heartbeat.version = ProtocolVersion::V1; 
       if verbose {
         println!("{}", heartbeat);
       }
