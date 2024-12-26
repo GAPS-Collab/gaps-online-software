@@ -106,7 +106,7 @@ impl PyLiftofSettings {
   /// * filename : A .toml file with settings fro the 
   ///              liftof flight suite
   #[staticmethod]
-  fn from_file(filename : String) -> PyResult<Self> {
+  fn from_file(filename : &str) -> PyResult<Self> {
     let mut pysettings = PyLiftofSettings::new();
     match LiftofSettings::from_toml(filename) {
       Ok(settings) => {

@@ -99,6 +99,11 @@ use tof_dataclasses::database::{
   connect_to_db
 };
 
+///// Add the __repr__ function and 
+///// other common items
+//pub trait Pythonize {
+//}
+
 /// Create a map from the database which allows to map
 /// DSI,J,LTB channel for a connected LTB to the respective
 /// Paddle ID

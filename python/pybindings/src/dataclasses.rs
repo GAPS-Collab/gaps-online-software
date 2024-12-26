@@ -3266,12 +3266,6 @@ pub struct PyRBWaveform {
   pub wf : RBWaveform,
 }
 
-//impl PyRBWaveform {
-//  pub fn set_wf(&mut self, wf : RBWaveform) {
-//    self.wf = wf;
-//  }
-//}
-
 #[pymethods]
 impl PyRBWaveform {
   #[new]
@@ -3370,7 +3364,21 @@ impl PyRBWaveform {
   fn apply_spike_filter(&mut self) {
     self.wf.apply_spike_filter();
   }
-  
+ 
+  fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match tp.unpack::<RBWaveform>() {
+      Ok(wf) => {
+        self.wf = wf;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket of type {} ! {err}", packet.get_tp().packet_type);
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.wf)) 
   }

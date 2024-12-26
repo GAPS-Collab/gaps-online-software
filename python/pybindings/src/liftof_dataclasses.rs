@@ -14,7 +14,7 @@ pub struct PyIPBus {
 #[pymethods]
 impl PyIPBus {
   #[new]
-  fn new(target_address : String) -> Self {
+  fn new(target_address : &str) -> Self {
     let ipbus = api::ipbus::IPBus::new(target_address).expect("Unable to connect to {target_address}");
     Self {
       ipbus : ipbus,
