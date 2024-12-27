@@ -1453,6 +1453,8 @@ fn pack_rbpaddleid() {
   }
 }
 
+#[cfg(feature = "database")]
+#[cfg(feature = "random")]
 #[test]
 fn rbpaddleid_from_rb() {
 let mut rng = rand::thread_rng();
