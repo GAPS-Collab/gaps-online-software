@@ -347,7 +347,7 @@ impl TofHit {
   #[cfg(feature="database")]
   pub fn set_paddle(&mut self, paddle : &Paddle) {
     self.cable_len  = paddle.cable_len;
-    self.paddle_len = paddle.length;
+    self.paddle_len = paddle.length * 10.0; // stupid units!
   }
 
   /// Get the (official) paddle id
@@ -405,6 +405,7 @@ impl TofHit {
     //(self.time_a.to_f32() - self.get_t0())*C_LIGHT_PADDLE*10.0 // 10 for cm->mm 
     // FIX - we are actually resetting the particle interaction time to 0 for this
     //(self.time_a.to_f32() - self.get_t0())*C_LIGHT_PADDLE*10.0 // 10 for cm->mm
+    // FIX - paddle units!! 
     if self.time_a == self.time_b {
       return 0.5*self.paddle_len;
     }
