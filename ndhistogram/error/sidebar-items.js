@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["BinaryOperationError"]};
+window.SIDEBAR_ITEMS = {"enum":["AxisError","Error"],"struct":["BinaryOperationError"]};

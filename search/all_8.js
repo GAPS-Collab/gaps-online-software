@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['ltb_5fid_34',['ltb_id',['../structGaps_1_1TofPaddle.html#ab59fbe63cc69a3113cb5488c0b6d84d7',1,'Gaps::TofPaddle']]],
-  ['ltbmonidata_35',['LTBMoniData',['../structLTBMoniData.html',1,'']]]
+  ['is_5fexhausted_0',['is_exhausted',['../structGaps_1_1CRReader.html#a89296ec70baeae45e6bc82f7493a075f',1,'Gaps::CRReader::is_exhausted()'],['../classGaps_1_1TofPacketReader.html#a05d05259733a4cacd26045fa0844cd36',1,'Gaps::TofPacketReader::is_exhausted()']]]
 ];

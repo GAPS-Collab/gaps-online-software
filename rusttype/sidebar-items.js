@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Font"],"fn":["point","vector"],"struct":["Glyph","GlyphId","GlyphIter","HMetrics","LayoutIter","Point","PositionedGlyph","Rect","Scale","ScaledGlyph","VMetrics","Vector"],"trait":["IntoGlyphId","OutlineBuilder"]};

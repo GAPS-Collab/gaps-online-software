@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/systemstat-0.2.3/src/platform/linux.rs`."><title>linux.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="systemstat" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/systemstat-0.2.4/src/platform/linux.rs`."><title>linux.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="systemstat" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">systemstat/platform/</div>linux.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -834,7 +835,18 @@
 <a href="#834" id="834">834</a>
 <a href="#835" id="835">835</a>
 <a href="#836" id="836">836</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::common::<span class="kw-2">*</span>;
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a></pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::common::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">super</span>::unix;
 <span class="kw">use </span><span class="kw">crate</span>::data::<span class="kw-2">*</span>;
 <span class="kw">use </span>libc::statvfs;
@@ -903,8 +915,8 @@
     delimited(multispace0, inner, multispace0)
 }
 
-<span class="doccomment">/// Parse an unsigned integer out of a string, surrounded by whitespace
-</span><span class="kw">fn </span>usize_s(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, usize&gt; {
+<span class="doccomment">/// Parse a number out of a string, surrounded by whitespace
+</span><span class="kw">fn </span>num&lt;T: str::FromStr&gt;(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, T&gt; {
     map_res(
         map_res(map(ws(digit1), str::as_bytes), str::from_utf8),
         str::FromStr::from_str,
@@ -921,7 +933,7 @@
     map(
         preceded(
             ws(proc_stat_cpu_prefix),
-            tuple((usize_s, usize_s, usize_s, usize_s, usize_s, usize_s)),
+            tuple((num, num, num, num, num, num)),
         ),
         |(user, nice, system, idle, iowait, irq)| CpuTime {
             user,
@@ -1000,8 +1012,8 @@ softirq 81473629 1251347 8827732 10 325789 37 0 177903 43807896 2777 27080138
 <span class="comment">// Parse a `/proc/meminfo` line into (key, ByteSize)
 </span><span class="kw">fn </span>proc_meminfo_line(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, (<span class="kw-2">&amp;</span>str, ByteSize)&gt; {
     complete(map(
-        tuple((take_until(<span class="string">":"</span>), delimited(tag(<span class="string">":"</span>), usize_s, ws(tag(<span class="string">"kB"</span>))))),
-        |(key, value)| (key, ByteSize::kib(value <span class="kw">as </span>u64)),
+        tuple((take_until(<span class="string">":"</span>), delimited(tag(<span class="string">":"</span>), num, ws(tag(<span class="string">"kB"</span>))))),
+        |(key, value)| (key, ByteSize::kib(value)),
     ))(input)
 }
 
@@ -1201,9 +1213,9 @@ tmpfs /dev/shm tmpfs rw,nosuid,nodev,inode64 0 0
         preceded(
             not_line_ending,
             tuple((
-                preceded(ws(tag(<span class="string">"TCP: inuse"</span>)), usize_s),
-                delimited(ws(tag(<span class="string">"orphan"</span>)), usize_s, not_line_ending),
-                preceded(ws(tag(<span class="string">"UDP: inuse"</span>)), usize_s),
+                preceded(ws(tag(<span class="string">"TCP: inuse"</span>)), num),
+                delimited(ws(tag(<span class="string">"orphan"</span>)), num, not_line_ending),
+                preceded(ws(tag(<span class="string">"UDP: inuse"</span>)), num),
             )),
         ),
         |(tcp_in_use, tcp_orphaned, udp_in_use)| ProcNetSockStat {
@@ -1239,8 +1251,8 @@ FRAG: inuse 0 memory 0
 </span><span class="kw">fn </span>proc_net_sockstat6(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, ProcNetSockStat6&gt; {
     map(
         ws(tuple((
-            preceded(tag(<span class="string">"TCP6: inuse"</span>), usize_s),
-            preceded(tag(<span class="string">"UDP6: inuse"</span>), usize_s),
+            preceded(tag(<span class="string">"TCP6: inuse"</span>), num),
+            preceded(tag(<span class="string">"UDP6: inuse"</span>), num),
         ))),
         |(tcp_in_use, udp_in_use)| ProcNetSockStat6 {
             tcp_in_use,
@@ -1288,8 +1300,20 @@ FRAG6: inuse 0 memory 0
 </span><span class="kw">fn </span>proc_diskstats_line(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, BlockDeviceStats&gt; {
     map(
         ws(tuple((
-            usize_s, usize_s, word_s, usize_s, usize_s, usize_s, usize_s, usize_s, usize_s,
-            usize_s, usize_s, usize_s, usize_s, usize_s,
+            num::&lt;usize&gt;,
+            num::&lt;usize&gt;,
+            word_s,
+            num,
+            num,
+            num,
+            num,
+            num,
+            num,
+            num,
+            num,
+            num,
+            num,
+            num,
         ))),
         |(
             _major_number,

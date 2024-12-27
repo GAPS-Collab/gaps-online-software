@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["UTF_16BE_ENCODING","UTF_16LE_ENCODING"],"struct":["Big","Little","UTF16Decoder","UTF16Encoder","UTF16Encoding"],"type":["UTF16BEEncoding","UTF16LEEncoding"]};

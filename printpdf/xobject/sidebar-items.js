@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["FormType","GroupXObjectType","ImageFilter","OCGIntent","XObject"],"struct":["FormXObject","FormXObjectRef","GroupXObject","ImageXObject","ImageXObjectRef","OptionalContentGroup","PostScriptXObject","ReferenceXObject","SMask","XObjectList","XObjectRef"]};

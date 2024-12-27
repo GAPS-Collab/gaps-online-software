@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_tofsummary.rs`."><title>tab_tofsummary.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_tofsummary.rs`."><title>tab_tofsummary.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">liftof_tui/tabs/</div>tab_tofsummary.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -236,57 +237,79 @@
 <a href="#236" id="236">236</a>
 <a href="#237" id="237">237</a>
 <a href="#238" id="238">238</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::VecDeque;
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::VecDeque;
 
 <span class="kw">use </span>crossbeam_channel::Receiver;
 
-<span class="kw">extern crate </span>ndhistogram;
-<span class="kw">use </span>ndhistogram::{
-    ndhistogram,
-    Histogram,
-    Hist1D,
+<span class="comment">//extern crate ndhistogram;
+</span><span class="kw">use </span>ndhistogram::{
+  ndhistogram,
+  Histogram,
+  Hist1D,
 };
 
 <span class="kw">use </span>ndhistogram::axis::{
-    Uniform,
+  Uniform,
 };
 
 <span class="kw">use </span>ratatui::{
-    <span class="comment">//symbols,
-    </span>layout::{
-        Alignment,
-        Constraint,
-        Direction,
-        Layout,
-        Rect
-    },
-    style::{
-        <span class="comment">//Color,
-        //Modifier,
-        </span>Style
-    },
-    <span class="comment">//text::Span,
-    </span>terminal::Frame,
-    widgets::{
-        Block,
-        <span class="comment">//Dataset,
-        //Axis,
-        //GraphType,
-        </span>BorderType,
-        <span class="comment">//Chart,
-        //BarChart,
-        </span>Sparkline,
-        Borders,
-        Paragraph
-    },
+  <span class="comment">//symbols,
+  </span>layout::{
+      Alignment,
+      Constraint,
+      Direction,
+      Layout,
+      Rect
+  },
+  style::{
+      <span class="comment">//Color,
+      //Modifier,
+      </span>Style
+  },
+  <span class="comment">//text::Span,
+  //terminal::Frame,
+  </span>Frame,
+  widgets::{
+      Block,
+      <span class="comment">//Dataset,
+      //Axis,
+      //GraphType,
+      </span>BorderType,
+      <span class="comment">//Chart,
+      //BarChart,
+      </span>Sparkline,
+      Borders,
+      Paragraph
+  },
 };
 
 <span class="comment">//use tof_dataclasses::packets::TofPacket;
 </span><span class="kw">use </span>tof_dataclasses::events::TofEventSummary;
 <span class="kw">use </span>tof_dataclasses::errors::SerializationError;
 <span class="comment">//use tof_dataclasses::serialization::Serialization;
+</span><span class="kw">use </span>tof_dataclasses::database::DsiJChPidMapping;
 
-</span><span class="kw">use </span><span class="kw">crate</span>::colors::{
+<span class="kw">use </span><span class="kw">crate</span>::colors::{
     ColorTheme,
 };
 
@@ -305,30 +328,39 @@
   <span class="kw">pub </span>queue_size      : usize,
   <span class="kw">pub </span>n_trg_pdl_histo : Hist1D&lt;Uniform&lt;f32&gt;&gt;, 
   <span class="kw">pub </span>theme           : ColorTheme,
+
   <span class="comment">// missing event analysis
   </span><span class="kw">pub </span>event_id_test   : Vec&lt;u32&gt;,
   <span class="kw">pub </span>evid_test_info  : String,
   <span class="kw">pub </span>evid_test_len   : usize,
   <span class="kw">pub </span>n_evid_test     : usize,
   <span class="kw">pub </span>evid_test_chnks : VecDeque&lt;u64&gt;,
+
+  <span class="comment">// missing HG hit analysis
+  </span><span class="kw">pub </span>miss_hg_hits    : Hist1D&lt;Uniform&lt;f32&gt;&gt;,
+  <span class="kw">pub </span>pid_map         : DsiJChPidMapping,
 }
 
 <span class="kw">impl </span>TofSummaryTab {
-  <span class="kw">pub fn </span>new(ts_receiver : Receiver&lt;TofEventSummary&gt;,
-             theme       : ColorTheme) -&gt; <span class="self">Self </span>{
+  <span class="kw">pub fn </span>new(ts_receiver  : Receiver&lt;TofEventSummary&gt;,
+             dsijchpidmap : <span class="kw-2">&amp;</span>DsiJChPidMapping,
+             theme        : ColorTheme) -&gt; <span class="self">Self </span>{
     
-    <span class="kw">let </span>bins          = Uniform::new(<span class="number">25</span>, <span class="number">0.0</span>, <span class="number">25.0</span>);
+    <span class="kw">let </span>bins          = Uniform::new(<span class="number">25</span>, <span class="number">0.0</span>, <span class="number">25.0</span>).unwrap();
+    <span class="kw">let </span>mhg_bins      = Uniform::new(<span class="number">160</span>, <span class="number">0.0</span>, <span class="number">160.0</span>).unwrap();
     <span class="self">Self </span>{
-        ts_receiver     : ts_receiver,
-        summary_queue   : VecDeque::&lt;TofEventSummary&gt;::new(),
-        queue_size      : <span class="number">10000</span>,
-        n_trg_pdl_histo : <span class="macro">ndhistogram!</span>(bins),
-        theme           : theme,
-        event_id_test   : Vec::&lt;u32&gt;::with_capacity(<span class="number">100000</span>),
-        evid_test_info  : String::from(<span class="string">"Missing event id analysis"</span>),
-        evid_test_len   : <span class="number">20000</span>,
-        n_evid_test     : <span class="number">0</span>,
-        evid_test_chnks : VecDeque::&lt;u64&gt;::new(),
+      ts_receiver     : ts_receiver,
+      summary_queue   : VecDeque::&lt;TofEventSummary&gt;::new(),
+      queue_size      : <span class="number">10000</span>,
+      n_trg_pdl_histo : <span class="macro">ndhistogram!</span>(bins),
+      theme           : theme,
+      event_id_test   : Vec::&lt;u32&gt;::with_capacity(<span class="number">100000</span>),
+      evid_test_info  : String::from(<span class="string">"Missing event id analysis"</span>),
+      evid_test_len   : <span class="number">20000</span>,
+      n_evid_test     : <span class="number">0</span>,
+      evid_test_chnks : VecDeque::&lt;u64&gt;::new(),
+      miss_hg_hits    : <span class="macro">ndhistogram!</span>(mhg_bins),
+      pid_map         : dsijchpidmap.clone(),
     }
   }
 
@@ -339,8 +371,13 @@
         <span class="macro">trace!</span>(<span class="string">"Unable to receive new TofEventSummary!"</span>);
       },
       <span class="prelude-val">Ok</span>(ts)    =&gt; {
-        <span class="comment">//let ts = TofEventSummary::from_tofpacket(&amp;tp)?;
+        <span class="comment">// triggerd paddles histogram
         </span><span class="self">self</span>.n_trg_pdl_histo.fill(<span class="kw-2">&amp;</span>(ts.n_trigger_paddles <span class="kw">as </span>f32));
+        <span class="comment">// missing hg hits for paddles histogram
+        </span><span class="kw">let </span>missing_hg = ts.get_missing_paddles_hg(<span class="kw-2">&amp;</span><span class="self">self</span>.pid_map);
+        <span class="kw">for </span>pid <span class="kw">in </span><span class="kw-2">&amp;</span>missing_hg {
+            <span class="self">self</span>.miss_hg_hits.fill(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span>pid <span class="kw">as </span>f32));
+        }
         <span class="kw">if </span><span class="self">self</span>.event_id_test.len() != <span class="self">self</span>.evid_test_len {
           <span class="self">self</span>.event_id_test.push(ts.event_id);
         } <span class="kw">else </span>{
@@ -436,7 +473,12 @@
     <span class="kw">let </span>th_data    = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.n_trg_pdl_histo, <span class="kw-2">&amp;</span>th_labels, <span class="number">5</span>, <span class="bool-val">true</span>); 
     <span class="kw">let </span>th_chart   = histogram(th_data, String::from(<span class="string">"N Trig Paddles"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
     frame.render_widget(th_chart, histo_view[<span class="number">0</span>]); 
-    
+   
+    <span class="kw">let </span>mhg_labels = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.miss_hg_hits);
+    <span class="kw">let </span>mhg_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.miss_hg_hits, <span class="kw-2">&amp;</span>mhg_labels, <span class="number">10</span>, <span class="bool-val">true</span>);
+    <span class="kw">let </span>mhg_chart  = histogram(mhg_data, String::from(<span class="string">"Missing HG hits"</span>), <span class="number">1</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+    frame.render_widget(mhg_chart, histo_view[<span class="number">1</span>]);
+
     <span class="kw">let </span>evid_test_data = Paragraph::new(<span class="self">self</span>.evid_test_info.clone())
       .style(Style::default().fg(<span class="self">self</span>.theme.fg0))
       .alignment(Alignment::Left)

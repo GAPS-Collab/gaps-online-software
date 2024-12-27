@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["ascii","error","japanese","korean","simpchinese","singlebyte","tradchinese","utf_16","utf_8","whatwg"]};

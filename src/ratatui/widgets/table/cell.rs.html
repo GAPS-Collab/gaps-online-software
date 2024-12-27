@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/widgets/table/cell.rs`."><title>cell.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/widgets/table/cell.rs`."><title>cell.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/widgets/table/</div>cell.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -197,7 +198,42 @@
 <a href="#197" id="197">197</a>
 <a href="#198" id="198">198</a>
 <a href="#199" id="199">199</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, style::Styled};
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a></pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
+    buffer::Buffer,
+    layout::Rect,
+    style::{Style, Styled},
+    text::Text,
+    widgets::WidgetRef,
+};
 
 <span class="doccomment">/// A [`Cell`] contains the [`Text`] to be displayed in a [`Row`] of a [`Table`].
 ///
@@ -215,13 +251,17 @@
 /// ```rust
 /// use std::borrow::Cow;
 ///
-/// use ratatui::{prelude::*, widgets::*};
+/// use ratatui::{
+///     style::Stylize,
+///     text::{Line, Span, Text},
+///     widgets::Cell,
+/// };
 ///
 /// Cell::from("simple string");
 /// Cell::from(Span::from("span"));
 /// Cell::from(Line::from(vec![
-///     Span::raw("a vec of "),
-///     Span::styled("spans", Style::default().add_modifier(Modifier::BOLD)),
+///     Span::from("a vec of "),
+///     Span::from("spans").bold(),
 /// ]));
 /// Cell::from(Text::from("a text"));
 /// Cell::from(Text::from(Cow::Borrowed("hello")));
@@ -231,12 +271,14 @@
 /// to set the style of the cell concisely.
 ///
 /// ```rust
-/// use ratatui::{prelude::*, widgets::*};
+/// use ratatui::{style::Stylize, widgets::Cell};
+///
 /// Cell::new("Cell 1").red().italic();
 /// ```
 ///
-/// [`Row`]: super::Row
-/// [`Table`]: super::Table
+/// [`Row`]: crate::widgets::Row
+/// [`Table`]: crate::widgets::Table
+/// [`Stylize`]: crate::style::Stylize
 </span><span class="attr">#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
 </span><span class="kw">pub struct </span>Cell&lt;<span class="lifetime">'a</span>&gt; {
     content: Text&lt;<span class="lifetime">'a</span>&gt;,
@@ -251,12 +293,17 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{
+    ///     style::Stylize,
+    ///     text::{Line, Span, Text},
+    ///     widgets::Cell,
+    /// };
+    ///
     /// Cell::new("simple string");
     /// Cell::new(Span::from("span"));
     /// Cell::new(Line::from(vec![
     ///     Span::raw("a vec of "),
-    ///     Span::styled("spans", Style::default().add_modifier(Modifier::BOLD)),
+    ///     Span::from("spans").bold(),
     /// ]));
     /// Cell::new(Text::from("a text"));
     /// ```
@@ -279,12 +326,17 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{
+    ///     style::Stylize,
+    ///     text::{Line, Span, Text},
+    ///     widgets::Cell,
+    /// };
+    ///
     /// Cell::default().content("simple string");
     /// Cell::default().content(Span::from("span"));
     /// Cell::default().content(Line::from(vec![
     ///     Span::raw("a vec of "),
-    ///     Span::styled("spans", Style::new().bold()),
+    ///     Span::from("spans").bold(),
     /// ]));
     /// Cell::default().content(Text::from("a text"));
     /// ```
@@ -310,7 +362,11 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{
+    ///     style::{Style, Stylize},
+    ///     widgets::Cell,
+    /// };
+    ///
     /// Cell::new("Cell 1").style(Style::new().red().italic());
     /// ```
     ///
@@ -318,11 +374,14 @@
     /// the [`Stylize`] trait to set the style of the widget more concisely.
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{style::Stylize, widgets::Cell};
+    ///
     /// Cell::new("Cell 1").red().italic();
     /// ```
     ///
-    /// [`Row`]: super::Row
+    /// [`Row`]: crate::widgets::Row
+    /// [`Color`]: crate::style::Color
+    /// [`Stylize`]: crate::style::Stylize
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.style = style.into();
@@ -333,7 +392,7 @@
 <span class="kw">impl </span>Cell&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         buf.set_style(area, <span class="self">self</span>.style);
-        <span class="self">self</span>.content.clone().render(area, buf);
+        <span class="self">self</span>.content.render_ref(area, buf);
     }
 }
 
@@ -364,6 +423,7 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::style::{Color, Modifier, Stylize};
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>new() {

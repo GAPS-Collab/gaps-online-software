@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["ChunkType","DecodingBuffer","DecodingResult"],"fn":["fp_predict_f32","fp_predict_f64"],"mod":["ifd"],"struct":["Decoder","Limits"]};

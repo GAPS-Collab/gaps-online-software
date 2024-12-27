@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["Matrix2x2F","Transform2F"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["from_utf8"],"struct":["UTF8Decoder","UTF8Encoder","UTF8Encoding"]};

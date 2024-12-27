@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/layout/layout.rs`."><title>layout.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/layout/layout.rs`."><title>layout.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/layout/</div>layout.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2565,7 +2566,155 @@
 <a href="#2565" id="2565">2565</a>
 <a href="#2566" id="2566">2566</a>
 <a href="#2567" id="2567">2567</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::{cell::RefCell, collections::HashMap, iter, num::NonZeroUsize, rc::Rc, sync::OnceLock};
+<a href="#2568" id="2568">2568</a>
+<a href="#2569" id="2569">2569</a>
+<a href="#2570" id="2570">2570</a>
+<a href="#2571" id="2571">2571</a>
+<a href="#2572" id="2572">2572</a>
+<a href="#2573" id="2573">2573</a>
+<a href="#2574" id="2574">2574</a>
+<a href="#2575" id="2575">2575</a>
+<a href="#2576" id="2576">2576</a>
+<a href="#2577" id="2577">2577</a>
+<a href="#2578" id="2578">2578</a>
+<a href="#2579" id="2579">2579</a>
+<a href="#2580" id="2580">2580</a>
+<a href="#2581" id="2581">2581</a>
+<a href="#2582" id="2582">2582</a>
+<a href="#2583" id="2583">2583</a>
+<a href="#2584" id="2584">2584</a>
+<a href="#2585" id="2585">2585</a>
+<a href="#2586" id="2586">2586</a>
+<a href="#2587" id="2587">2587</a>
+<a href="#2588" id="2588">2588</a>
+<a href="#2589" id="2589">2589</a>
+<a href="#2590" id="2590">2590</a>
+<a href="#2591" id="2591">2591</a>
+<a href="#2592" id="2592">2592</a>
+<a href="#2593" id="2593">2593</a>
+<a href="#2594" id="2594">2594</a>
+<a href="#2595" id="2595">2595</a>
+<a href="#2596" id="2596">2596</a>
+<a href="#2597" id="2597">2597</a>
+<a href="#2598" id="2598">2598</a>
+<a href="#2599" id="2599">2599</a>
+<a href="#2600" id="2600">2600</a>
+<a href="#2601" id="2601">2601</a>
+<a href="#2602" id="2602">2602</a>
+<a href="#2603" id="2603">2603</a>
+<a href="#2604" id="2604">2604</a>
+<a href="#2605" id="2605">2605</a>
+<a href="#2606" id="2606">2606</a>
+<a href="#2607" id="2607">2607</a>
+<a href="#2608" id="2608">2608</a>
+<a href="#2609" id="2609">2609</a>
+<a href="#2610" id="2610">2610</a>
+<a href="#2611" id="2611">2611</a>
+<a href="#2612" id="2612">2612</a>
+<a href="#2613" id="2613">2613</a>
+<a href="#2614" id="2614">2614</a>
+<a href="#2615" id="2615">2615</a>
+<a href="#2616" id="2616">2616</a>
+<a href="#2617" id="2617">2617</a>
+<a href="#2618" id="2618">2618</a>
+<a href="#2619" id="2619">2619</a>
+<a href="#2620" id="2620">2620</a>
+<a href="#2621" id="2621">2621</a>
+<a href="#2622" id="2622">2622</a>
+<a href="#2623" id="2623">2623</a>
+<a href="#2624" id="2624">2624</a>
+<a href="#2625" id="2625">2625</a>
+<a href="#2626" id="2626">2626</a>
+<a href="#2627" id="2627">2627</a>
+<a href="#2628" id="2628">2628</a>
+<a href="#2629" id="2629">2629</a>
+<a href="#2630" id="2630">2630</a>
+<a href="#2631" id="2631">2631</a>
+<a href="#2632" id="2632">2632</a>
+<a href="#2633" id="2633">2633</a>
+<a href="#2634" id="2634">2634</a>
+<a href="#2635" id="2635">2635</a>
+<a href="#2636" id="2636">2636</a>
+<a href="#2637" id="2637">2637</a>
+<a href="#2638" id="2638">2638</a>
+<a href="#2639" id="2639">2639</a>
+<a href="#2640" id="2640">2640</a>
+<a href="#2641" id="2641">2641</a>
+<a href="#2642" id="2642">2642</a>
+<a href="#2643" id="2643">2643</a>
+<a href="#2644" id="2644">2644</a>
+<a href="#2645" id="2645">2645</a>
+<a href="#2646" id="2646">2646</a>
+<a href="#2647" id="2647">2647</a>
+<a href="#2648" id="2648">2648</a>
+<a href="#2649" id="2649">2649</a>
+<a href="#2650" id="2650">2650</a>
+<a href="#2651" id="2651">2651</a>
+<a href="#2652" id="2652">2652</a>
+<a href="#2653" id="2653">2653</a>
+<a href="#2654" id="2654">2654</a>
+<a href="#2655" id="2655">2655</a>
+<a href="#2656" id="2656">2656</a>
+<a href="#2657" id="2657">2657</a>
+<a href="#2658" id="2658">2658</a>
+<a href="#2659" id="2659">2659</a>
+<a href="#2660" id="2660">2660</a>
+<a href="#2661" id="2661">2661</a>
+<a href="#2662" id="2662">2662</a>
+<a href="#2663" id="2663">2663</a>
+<a href="#2664" id="2664">2664</a>
+<a href="#2665" id="2665">2665</a>
+<a href="#2666" id="2666">2666</a>
+<a href="#2667" id="2667">2667</a>
+<a href="#2668" id="2668">2668</a>
+<a href="#2669" id="2669">2669</a>
+<a href="#2670" id="2670">2670</a>
+<a href="#2671" id="2671">2671</a>
+<a href="#2672" id="2672">2672</a>
+<a href="#2673" id="2673">2673</a>
+<a href="#2674" id="2674">2674</a>
+<a href="#2675" id="2675">2675</a>
+<a href="#2676" id="2676">2676</a>
+<a href="#2677" id="2677">2677</a>
+<a href="#2678" id="2678">2678</a>
+<a href="#2679" id="2679">2679</a>
+<a href="#2680" id="2680">2680</a>
+<a href="#2681" id="2681">2681</a>
+<a href="#2682" id="2682">2682</a>
+<a href="#2683" id="2683">2683</a>
+<a href="#2684" id="2684">2684</a>
+<a href="#2685" id="2685">2685</a>
+<a href="#2686" id="2686">2686</a>
+<a href="#2687" id="2687">2687</a>
+<a href="#2688" id="2688">2688</a>
+<a href="#2689" id="2689">2689</a>
+<a href="#2690" id="2690">2690</a>
+<a href="#2691" id="2691">2691</a>
+<a href="#2692" id="2692">2692</a>
+<a href="#2693" id="2693">2693</a>
+<a href="#2694" id="2694">2694</a>
+<a href="#2695" id="2695">2695</a>
+<a href="#2696" id="2696">2696</a>
+<a href="#2697" id="2697">2697</a>
+<a href="#2698" id="2698">2698</a>
+<a href="#2699" id="2699">2699</a>
+<a href="#2700" id="2700">2700</a>
+<a href="#2701" id="2701">2701</a>
+<a href="#2702" id="2702">2702</a>
+<a href="#2703" id="2703">2703</a>
+<a href="#2704" id="2704">2704</a>
+<a href="#2705" id="2705">2705</a>
+<a href="#2706" id="2706">2706</a>
+<a href="#2707" id="2707">2707</a>
+<a href="#2708" id="2708">2708</a>
+<a href="#2709" id="2709">2709</a>
+<a href="#2710" id="2710">2710</a>
+<a href="#2711" id="2711">2711</a>
+<a href="#2712" id="2712">2712</a>
+<a href="#2713" id="2713">2713</a>
+<a href="#2714" id="2714">2714</a>
+<a href="#2715" id="2715">2715</a>
+<a href="#2716" id="2716">2716</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::{cell::RefCell, collections::HashMap, iter, num::NonZeroUsize, rc::Rc};
 
 <span class="kw">use </span>cassowary::{
     strength::REQUIRED,
@@ -2579,8 +2728,7 @@
     ALL_SEGMENT_GROW, FILL_GROW, GROW, LENGTH_SIZE_EQ, MAX_SIZE_EQ, MAX_SIZE_LE, MIN_SIZE_EQ,
     MIN_SIZE_GE, PERCENTAGE_SIZE_EQ, RATIO_SIZE_EQ, SPACER_SIZE_EQ, SPACE_GROW,
 };
-<span class="kw">use </span><span class="kw">super</span>::Flex;
-<span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::layout::{Constraint, Direction, Flex, Margin, Rect};
 
 <span class="kw">type </span>Rects = Rc&lt;[Rect]&gt;;
 <span class="kw">type </span>Segments = Rects;
@@ -2604,7 +2752,71 @@
 </span><span class="kw">const </span>FLOAT_PRECISION_MULTIPLIER: f64 = <span class="number">100.0</span>;
 
 <span class="macro">thread_local!</span> {
-    <span class="kw">static </span>LAYOUT_CACHE: OnceLock&lt;RefCell&lt;Cache&gt;&gt; = <span class="kw">const </span>{ OnceLock::new() };
+    <span class="kw">static </span>LAYOUT_CACHE: RefCell&lt;Cache&gt; = RefCell::new(Cache::new(
+        NonZeroUsize::new(Layout::DEFAULT_CACHE_SIZE).unwrap(),
+    ));
+}
+
+<span class="doccomment">/// Represents the spacing between segments in a layout.
+///
+/// The `Spacing` enum is used to define the spacing between segments in a layout. It can represent
+/// either positive spacing (space between segments) or negative spacing (overlap between segments).
+///
+/// # Variants
+///
+/// - `Space(u16)`: Represents positive spacing between segments. The value indicates the number of
+///   cells.
+/// - `Overlap(u16)`: Represents negative spacing, causing overlap between segments. The value
+///   indicates the number of overlapping cells.
+///
+/// # Default
+///
+/// The default value for `Spacing` is `Space(0)`, which means no spacing or no overlap between
+/// segments.
+///
+/// # Conversions
+///
+/// The `Spacing` enum can be created from different integer types:
+///
+/// - From `u16`: Directly converts the value to `Spacing::Space`.
+/// - From `i16`: Converts negative values to `Spacing::Overlap` and non-negative values to
+///   `Spacing::Space`.
+/// - From `i32`: Clamps the value to the range of `i16` and converts negative values to
+///   `Spacing::Overlap` and non-negative values to `Spacing::Space`.
+///
+/// See the [`Layout::spacing`] method for details on how to use this enum.
+</span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>Spacing {
+    Space(u16),
+    Overlap(u16),
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>Spacing {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Space(<span class="number">0</span>)
+    }
+}
+
+<span class="kw">impl </span>From&lt;i32&gt; <span class="kw">for </span>Spacing {
+    <span class="kw">fn </span>from(value: i32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from(value.clamp(i32::from(i16::MIN), i32::from(i16::MAX)) <span class="kw">as </span>i16)
+    }
+}
+
+<span class="kw">impl </span>From&lt;u16&gt; <span class="kw">for </span>Spacing {
+    <span class="kw">fn </span>from(value: u16) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Space(value)
+    }
+}
+
+<span class="kw">impl </span>From&lt;i16&gt; <span class="kw">for </span>Spacing {
+    <span class="kw">fn </span>from(value: i16) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>value &lt; <span class="number">0 </span>{
+            <span class="self">Self</span>::Overlap(value.unsigned_abs())
+        } <span class="kw">else </span>{
+            <span class="self">Self</span>::Space(value.unsigned_abs())
+        }
+    }
 }
 
 <span class="doccomment">/// A layout is a set of constraints that can be applied to a given area to split it into smaller
@@ -2652,7 +2864,11 @@
 /// # Example
 ///
 /// ```rust
-/// use ratatui::{prelude::*, widgets::*};
+/// use ratatui::{
+///     layout::{Constraint, Direction, Layout, Rect},
+///     widgets::Paragraph,
+///     Frame,
+/// };
 ///
 /// fn render(frame: &amp;mut Frame, area: Rect) {
 ///     let layout = Layout::new(
@@ -2672,14 +2888,14 @@
 /// example](https://camo.githubusercontent.com/77d22f3313b782a81e5e033ef82814bb48d786d2598699c27f8e757ccee62021/68747470733a2f2f7668732e636861726d2e73682f7668732d315a4e6f4e4c4e6c4c746b4a58706767396e435635652e676966)
 ///
 /// [`cassowary-rs`]: https://crates.io/crates/cassowary
-/// [Examples]: https://github.com/ratatui-org/ratatui/blob/main/examples/README.md
+/// [Examples]: https://github.com/ratatui/ratatui/blob/main/examples/README.md
 </span><span class="attr">#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
 </span><span class="kw">pub struct </span>Layout {
     direction: Direction,
     constraints: Vec&lt;Constraint&gt;,
     margin: Margin,
     flex: Flex,
-    spacing: u16,
+    spacing: Spacing,
 }
 
 <span class="kw">impl </span>Layout {
@@ -2706,7 +2922,8 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::layout::{Constraint, Direction, Layout};
+    ///
     /// Layout::new(
     ///     Direction::Horizontal,
     ///     [Constraint::Length(5), Constraint::Min(0)],
@@ -2739,7 +2956,8 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::layout::{Constraint, Layout};
+    ///
     /// let layout = Layout::vertical([Constraint::Length(5), Constraint::Min(0)]);
     /// ```
     </span><span class="kw">pub fn </span>vertical&lt;I&gt;(constraints: I) -&gt; <span class="self">Self
@@ -2758,7 +2976,8 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::layout::{Constraint, Layout};
+    ///
     /// let layout = Layout::horizontal([Constraint::Length(5), Constraint::Min(0)]);
     /// ```
     </span><span class="kw">pub fn </span>horizontal&lt;I&gt;(constraints: I) -&gt; <span class="self">Self
@@ -2776,22 +2995,9 @@
     /// that subsequent calls with the same parameters are faster. The cache is a `LruCache`, and
     /// grows until `cache_size` is reached.
     ///
-    /// Returns true if the cell's value was set by this call.
-    /// Returns false if the cell's value was not set by this call, this means that another thread
-    /// has set this value or that the cache size is already initialized.
-    ///
-    /// Note that a custom cache size will be set only if this function:
-    /// * is called before [`Layout::split()`] otherwise, the cache size is
-    ///   [`Self::DEFAULT_CACHE_SIZE`].
-    /// * is called for the first time, subsequent calls do not modify the cache size.
-    </span><span class="kw">pub fn </span>init_cache(cache_size: usize) -&gt; bool {
-        LAYOUT_CACHE
-            .with(|c| {
-                c.set(RefCell::new(LruCache::new(
-                    NonZeroUsize::new(cache_size).unwrap(),
-                )))
-            })
-            .is_ok()
+    /// By default, the cache size is [`Self::DEFAULT_CACHE_SIZE`].
+    </span><span class="kw">pub fn </span>init_cache(cache_size: NonZeroUsize) {
+        LAYOUT_CACHE.with_borrow_mut(|c| c.resize(cache_size));
     }
 
     <span class="doccomment">/// Set the direction of the layout.
@@ -2799,7 +3005,8 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::layout::{Constraint, Direction, Layout, Rect};
+    ///
     /// let layout = Layout::default()
     ///     .direction(Direction::Horizontal)
     ///     .constraints([Constraint::Length(5), Constraint::Min(0)])
@@ -2833,7 +3040,8 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::layout::{Constraint, Layout, Rect};
+    ///
     /// let layout = Layout::default()
     ///     .constraints([
     ///         Constraint::Percentage(20),
@@ -2877,7 +3085,8 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::layout::{Constraint, Layout, Rect};
+    ///
     /// let layout = Layout::default()
     ///     .constraints([Constraint::Min(0)])
     ///     .margin(2)
@@ -2898,7 +3107,8 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::layout::{Constraint, Layout, Rect};
+    ///
     /// let layout = Layout::default()
     ///     .constraints([Constraint::Min(0)])
     ///     .horizontal_margin(2)
@@ -2916,7 +3126,8 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::layout::{Constraint, Layout, Rect};
+    ///
     /// let layout = Layout::default()
     ///     .constraints([Constraint::Min(0)])
     ///     .vertical_margin(2)
@@ -2947,7 +3158,8 @@
     /// In this example, the items in the layout will be aligned to the start.
     ///
     /// ```rust
-    /// # use ratatui::layout::{Flex, Layout, Constraint::*};
+    /// use ratatui::layout::{Constraint::*, Flex, Layout};
+    ///
     /// let layout = Layout::horizontal([Length(20), Length(20), Length(20)]).flex(Flex::Start);
     /// ```
     ///
@@ -2955,7 +3167,8 @@
     /// space.
     ///
     /// ```rust
-    /// # use ratatui::layout::{Flex, Layout, Constraint::*};
+    /// use ratatui::layout::{Constraint::*, Flex, Layout};
+    ///
     /// let layout = Layout::horizontal([Length(20), Length(20), Length(20)]).flex(Flex::Legacy);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2967,25 +3180,39 @@
     <span class="doccomment">/// Sets the spacing between items in the layout.
     ///
     /// The `spacing` method sets the spacing between items in the layout. The spacing is applied
-    /// evenly between all items. The spacing value represents the number of cells between each
+    /// evenly between all segments. The spacing value represents the number of cells between each
     /// item.
+    ///
+    /// Spacing can be positive integers, representing gaps between segments; or negative integers
+    /// representing overlaps. Additionally, one of the variants of the [`Spacing`] enum can be
+    /// passed to this function. See the documentation of the [`Spacing`] enum for more information.
+    ///
+    /// Note that if the layout has only one segment, the spacing will not be applied.
+    /// Also, spacing will not be applied for [`Flex::SpaceAround`] and [`Flex::SpaceBetween`]
     ///
     /// # Examples
     ///
     /// In this example, the spacing between each item in the layout is set to 2 cells.
     ///
     /// ```rust
-    /// # use ratatui::layout::{Layout, Constraint::*};
+    /// use ratatui::layout::{Constraint::*, Layout};
+    ///
     /// let layout = Layout::horizontal([Length(20), Length(20), Length(20)]).spacing(2);
     /// ```
     ///
-    /// # Notes
+    /// In this example, the spacing between each item in the layout is set to -1 cells, i.e. the
+    /// three segments will have an overlapping border.
     ///
-    /// - If the layout has only one item, the spacing will not be applied.
-    /// - Spacing will not be applied for [`Flex::SpaceAround`] and [`Flex::SpaceBetween`]
+    /// ```rust
+    /// use ratatui::layout::{Constraint::*, Layout};
+    /// let layout = Layout::horizontal([Length(20), Length(20), Length(20)]).spacing(-1);
+    /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub const fn </span>spacing(<span class="kw-2">mut </span><span class="self">self</span>, spacing: u16) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.spacing = spacing;
+    </span><span class="kw">pub fn </span>spacing&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, spacing: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;Spacing&gt;,
+    {
+        <span class="self">self</span>.spacing = spacing.into();
         <span class="self">self
     </span>}
 
@@ -3004,9 +3231,10 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::{layout::{Layout, Constraint}, Frame};
+    ///
     /// # fn render(frame: &amp;mut Frame) {
-    /// let area = frame.size();
+    /// let area = frame.area();
     /// let layout = Layout::vertical([Constraint::Length(1), Constraint::Min(0)]);
     /// let [top, main] = layout.areas(area);
     ///
@@ -3036,9 +3264,10 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::{layout::{Layout, Constraint}, Frame};
+    ///
     /// # fn render(frame: &amp;mut Frame) {
-    /// let area = frame.size();
+    /// let area = frame.area();
     /// let layout = Layout::vertical([Constraint::Length(1), Constraint::Min(0)]);
     /// let [top, main] = layout.areas(area);
     /// let [before, inbetween, after] = layout.spacers(area);
@@ -3075,7 +3304,7 @@
     /// # Examples
     ///
     /// ```
-    /// # use ratatui::prelude::*;
+    /// use ratatui::layout::{Constraint, Direction, Layout, Rect};
     /// let layout = Layout::default()
     ///     .direction(Direction::Vertical)
     ///     .constraints([Constraint::Length(5), Constraint::Min(0)])
@@ -3092,7 +3321,7 @@
         <span class="self">self</span>.split_with_spacers(area).<span class="number">0
     </span>}
 
-    <span class="doccomment">/// Wrapper function around the cassowary-r solver that splits the given area into smaller ones
+    <span class="doccomment">/// Wrapper function around the cassowary-rs solver that splits the given area into smaller ones
     /// based on the preferred widths or heights and the direction, with the ability to include
     /// spacers between the areas.
     ///
@@ -3107,7 +3336,8 @@
     /// # Examples
     ///
     /// ```
-    /// # use ratatui::prelude::*;
+    /// use ratatui::layout::{Constraint, Direction, Layout, Rect};
+    ///
     /// let (areas, spacers) = Layout::default()
     ///     .direction(Direction::Vertical)
     ///     .constraints([Constraint::Length(5), Constraint::Min(0)])
@@ -3138,17 +3368,10 @@
     /// );
     /// ```
     </span><span class="kw">pub fn </span>split_with_spacers(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect) -&gt; (Segments, Spacers) {
-        LAYOUT_CACHE.with(|c| {
-            c.get_or_init(|| {
-                RefCell::new(LruCache::new(
-                    NonZeroUsize::new(<span class="self">Self</span>::DEFAULT_CACHE_SIZE).unwrap(),
-                ))
-            })
-            .borrow_mut()
-            .get_or_insert((area, <span class="self">self</span>.clone()), || {
-                <span class="self">self</span>.try_split(area).expect(<span class="string">"failed to split"</span>)
-            })
-            .clone()
+        LAYOUT_CACHE.with_borrow_mut(|c| {
+            <span class="kw">let </span>key = (area, <span class="self">self</span>.clone());
+            c.get_or_insert(key, || <span class="self">self</span>.try_split(area).expect(<span class="string">"failed to split"</span>))
+                .clone()
         })
     }
 
@@ -3188,7 +3411,7 @@
         };
 
         <span class="comment">// ```plain
-        // &lt;───────────────────────────────────area_width─────────────────────────────────&gt;
+        // &lt;───────────────────────────────────area_size──────────────────────────────────&gt;
         // ┌─area_start                                                          area_end─┐
         // V                                                                              V
         // ┌────┬───────────────────┬────┬─────variables─────┬────┬───────────────────┬────┐
@@ -3223,12 +3446,18 @@
             .collect_vec();
 
         <span class="kw">let </span>flex = <span class="self">self</span>.flex;
-        <span class="kw">let </span>spacing = <span class="self">self</span>.spacing;
+
+        <span class="kw">let </span>spacing = <span class="kw">match </span><span class="self">self</span>.spacing {
+            Spacing::Space(x) =&gt; x <span class="kw">as </span>i16,
+            Spacing::Overlap(x) =&gt; -(x <span class="kw">as </span>i16),
+        };
+
         <span class="kw">let </span>constraints = <span class="kw-2">&amp;</span><span class="self">self</span>.constraints;
 
         <span class="kw">let </span>area_size = Element::from((<span class="kw-2">*</span>variables.first().unwrap(), <span class="kw-2">*</span>variables.last().unwrap()));
         configure_area(<span class="kw-2">&amp;mut </span>solver, area_size, area_start, area_end)<span class="question-mark">?</span>;
-        configure_variable_constraints(<span class="kw-2">&amp;mut </span>solver, <span class="kw-2">&amp;</span>variables, area_size)<span class="question-mark">?</span>;
+        configure_variable_in_area_constraints(<span class="kw-2">&amp;mut </span>solver, <span class="kw-2">&amp;</span>variables, area_size)<span class="question-mark">?</span>;
+        configure_variable_constraints(<span class="kw-2">&amp;mut </span>solver, <span class="kw-2">&amp;</span>variables)<span class="question-mark">?</span>;
         configure_flex_constraints(<span class="kw-2">&amp;mut </span>solver, area_size, <span class="kw-2">&amp;</span>spacers, flex, spacing)<span class="question-mark">?</span>;
         configure_constraints(<span class="kw-2">&amp;mut </span>solver, area_size, <span class="kw-2">&amp;</span>segments, constraints, flex)<span class="question-mark">?</span>;
         configure_fill_constraints(<span class="kw-2">&amp;mut </span>solver, <span class="kw-2">&amp;</span>segments, constraints, flex)<span class="question-mark">?</span>;
@@ -3241,7 +3470,8 @@
 
         <span class="comment">// `solver.fetch_changes()` can only be called once per solve
         </span><span class="kw">let </span>changes: HashMap&lt;Variable, f64&gt; = solver.fetch_changes().iter().copied().collect();
-        <span class="comment">// debug_segments(&amp;segments, &amp;changes);
+        <span class="comment">// debug_elements(&amp;segments, &amp;changes);
+        // debug_elements(&amp;spacers, &amp;changes);
 
         </span><span class="kw">let </span>segment_rects = changes_to_rects(<span class="kw-2">&amp;</span>changes, <span class="kw-2">&amp;</span>segments, inner_area, <span class="self">self</span>.direction);
         <span class="kw">let </span>spacer_rects = changes_to_rects(<span class="kw-2">&amp;</span>changes, <span class="kw-2">&amp;</span>spacers, inner_area, <span class="self">self</span>.direction);
@@ -3261,7 +3491,7 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn </span>configure_variable_constraints(
+<span class="kw">fn </span>configure_variable_in_area_constraints(
     solver: <span class="kw-2">&amp;mut </span>Solver,
     variables: <span class="kw-2">&amp;</span>[Variable],
     area: Element,
@@ -3272,11 +3502,25 @@
         solver.add_constraint(variable | LE(REQUIRED) | area.end)<span class="question-mark">?</span>;
     }
 
-    <span class="comment">// all variables are in ascending order
-    </span><span class="kw">for </span>(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right) <span class="kw">in </span>variables.iter().tuple_windows() {
+    <span class="prelude-val">Ok</span>(())
+}
+
+<span class="kw">fn </span>configure_variable_constraints(
+    solver: <span class="kw-2">&amp;mut </span>Solver,
+    variables: <span class="kw-2">&amp;</span>[Variable],
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), AddConstraintError&gt; {
+    <span class="comment">// ┌────┬───────────────────┬────┬─────variables─────┬────┬───────────────────┬────┐
+    // │    │                   │    │                   │    │                   │    │
+    // v    v                   v    v                   v    v                   v    v
+    // ┌   ┐┌──────────────────┐┌   ┐┌──────────────────┐┌   ┐┌──────────────────┐┌   ┐
+    //      │     Max(20)      │     │      Max(20)     │     │      Max(20)     │
+    // └   ┘└──────────────────┘└   ┘└──────────────────┘└   ┘└──────────────────┘└   ┘
+    // ^    ^                   ^    ^                   ^    ^                   ^    ^
+    // └v0  └v1                 └v2  └v3                 └v4  └v5                 └v6  └v7
+
+    </span><span class="kw">for </span>(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right) <span class="kw">in </span>variables.iter().skip(<span class="number">1</span>).tuples() {
         solver.add_constraint(left | LE(REQUIRED) | right)<span class="question-mark">?</span>;
     }
-
     <span class="prelude-val">Ok</span>(())
 }
 
@@ -3287,35 +3531,35 @@
     constraints: <span class="kw-2">&amp;</span>[Constraint],
     flex: Flex,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(), AddConstraintError&gt; {
-    <span class="kw">for </span>(<span class="kw-2">&amp;</span>constraint, <span class="kw-2">&amp;</span>element) <span class="kw">in </span>constraints.iter().zip(segments.iter()) {
+    <span class="kw">for </span>(<span class="kw-2">&amp;</span>constraint, <span class="kw-2">&amp;</span>segment) <span class="kw">in </span>constraints.iter().zip(segments.iter()) {
         <span class="kw">match </span>constraint {
             Constraint::Max(max) =&gt; {
-                solver.add_constraint(element.has_max_size(max, MAX_SIZE_LE))<span class="question-mark">?</span>;
-                solver.add_constraint(element.has_int_size(max, MAX_SIZE_EQ))<span class="question-mark">?</span>;
+                solver.add_constraint(segment.has_max_size(max, MAX_SIZE_LE))<span class="question-mark">?</span>;
+                solver.add_constraint(segment.has_int_size(max, MAX_SIZE_EQ))<span class="question-mark">?</span>;
             }
             Constraint::Min(min) =&gt; {
-                solver.add_constraint(element.has_min_size(min, MIN_SIZE_GE))<span class="question-mark">?</span>;
+                solver.add_constraint(segment.has_min_size(min <span class="kw">as </span>i16, MIN_SIZE_GE))<span class="question-mark">?</span>;
                 <span class="kw">if </span>flex.is_legacy() {
-                    solver.add_constraint(element.has_int_size(min, MIN_SIZE_EQ))<span class="question-mark">?</span>;
+                    solver.add_constraint(segment.has_int_size(min, MIN_SIZE_EQ))<span class="question-mark">?</span>;
                 } <span class="kw">else </span>{
-                    solver.add_constraint(element.has_size(area, FILL_GROW))<span class="question-mark">?</span>;
+                    solver.add_constraint(segment.has_size(area, FILL_GROW))<span class="question-mark">?</span>;
                 }
             }
             Constraint::Length(length) =&gt; {
-                solver.add_constraint(element.has_int_size(length, LENGTH_SIZE_EQ))<span class="question-mark">?</span>;
+                solver.add_constraint(segment.has_int_size(length, LENGTH_SIZE_EQ))<span class="question-mark">?</span>;
             }
             Constraint::Percentage(p) =&gt; {
                 <span class="kw">let </span>size = area.size() * f64::from(p) / <span class="number">100.00</span>;
-                solver.add_constraint(element.has_size(size, PERCENTAGE_SIZE_EQ))<span class="question-mark">?</span>;
+                solver.add_constraint(segment.has_size(size, PERCENTAGE_SIZE_EQ))<span class="question-mark">?</span>;
             }
             Constraint::Ratio(num, den) =&gt; {
                 <span class="comment">// avoid division by zero by using 1 when denominator is 0
                 </span><span class="kw">let </span>size = area.size() * f64::from(num) / f64::from(den.max(<span class="number">1</span>));
-                solver.add_constraint(element.has_size(size, RATIO_SIZE_EQ))<span class="question-mark">?</span>;
+                solver.add_constraint(segment.has_size(size, RATIO_SIZE_EQ))<span class="question-mark">?</span>;
             }
             Constraint::Fill(<span class="kw">_</span>) =&gt; {
                 <span class="comment">// given no other constraints, this segment will grow as much as possible.
-                </span>solver.add_constraint(element.has_size(area, FILL_GROW))<span class="question-mark">?</span>;
+                </span>solver.add_constraint(segment.has_size(area, FILL_GROW))<span class="question-mark">?</span>;
             }
         }
     }
@@ -3327,7 +3571,7 @@
     area: Element,
     spacers: <span class="kw-2">&amp;</span>[Element],
     flex: Flex,
-    spacing: u16,
+    spacing: i16,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(), AddConstraintError&gt; {
     <span class="kw">let </span>spacers_except_first_and_last = spacers.get(<span class="number">1</span>..spacers.len() - <span class="number">1</span>).unwrap_or(<span class="kw-2">&amp;</span>[]);
     <span class="kw">let </span>spacing_f64 = f64::from(spacing) * FLOAT_PRECISION_MULTIPLIER;
@@ -3361,8 +3605,6 @@
             }
             <span class="kw">for </span>spacer <span class="kw">in </span>spacers_except_first_and_last {
                 solver.add_constraint(spacer.has_min_size(spacing, SPACER_SIZE_EQ))<span class="question-mark">?</span>;
-            }
-            <span class="kw">for </span>spacer <span class="kw">in </span>spacers_except_first_and_last {
                 solver.add_constraint(spacer.has_size(area, SPACE_GROW))<span class="question-mark">?</span>;
             }
             <span class="kw">if let </span>(<span class="prelude-val">Some</span>(first), <span class="prelude-val">Some</span>(last)) = (spacers.first(), spacers.last()) {
@@ -3422,7 +3664,7 @@
     constraints: <span class="kw-2">&amp;</span>[Constraint],
     flex: Flex,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(), AddConstraintError&gt; {
-    <span class="kw">for </span>((<span class="kw-2">&amp;</span>left_constraint, <span class="kw-2">&amp;</span>left_element), (<span class="kw-2">&amp;</span>right_constraint, <span class="kw-2">&amp;</span>right_element)) <span class="kw">in </span>constraints
+    <span class="kw">for </span>((<span class="kw-2">&amp;</span>left_constraint, <span class="kw-2">&amp;</span>left_segment), (<span class="kw-2">&amp;</span>right_constraint, <span class="kw-2">&amp;</span>right_segment)) <span class="kw">in </span>constraints
         .iter()
         .zip(segments.iter())
         .filter(|(c, <span class="kw">_</span>)| c.is_fill() || (!flex.is_legacy() &amp;&amp; c.is_min()))
@@ -3439,9 +3681,9 @@
             <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         };
         solver.add_constraint(
-            (right_scaling_factor * left_element.size())
+            (right_scaling_factor * left_segment.size())
                 | EQ(GROW)
-                | (left_scaling_factor * right_element.size()),
+                | (left_scaling_factor * right_segment.size()),
         )<span class="question-mark">?</span>;
     }
     <span class="prelude-val">Ok</span>(())
@@ -3483,15 +3725,18 @@
 <span class="doccomment">/// please leave this here as it's useful for debugging unit tests when we make any changes to
 /// layout code - we should replace this with tracing in the future.
 </span><span class="attr">#[allow(dead_code)]
-</span><span class="kw">fn </span>debug_segments(segments: <span class="kw-2">&amp;</span>[Element], changes: <span class="kw-2">&amp;</span>HashMap&lt;Variable, f64&gt;) {
-    <span class="kw">let </span>ends = <span class="macro">format!</span>(
+</span><span class="kw">fn </span>debug_elements(elements: <span class="kw-2">&amp;</span>[Element], changes: <span class="kw-2">&amp;</span>HashMap&lt;Variable, f64&gt;) {
+    <span class="kw">let </span>variables = <span class="macro">format!</span>(
         <span class="string">"{:?}"</span>,
-        segments
+        elements
             .iter()
-            .map(|e| changes.get(<span class="kw-2">&amp;</span>e.end).unwrap_or(<span class="kw-2">&amp;</span><span class="number">0.0</span>))
-            .collect::&lt;Vec&lt;<span class="kw-2">&amp;</span>f64&gt;&gt;()
+            .map(|e| (
+                changes.get(<span class="kw-2">&amp;</span>e.start).unwrap_or(<span class="kw-2">&amp;</span><span class="number">0.0</span>) / FLOAT_PRECISION_MULTIPLIER,
+                changes.get(<span class="kw-2">&amp;</span>e.end).unwrap_or(<span class="kw-2">&amp;</span><span class="number">0.0</span>) / FLOAT_PRECISION_MULTIPLIER,
+            ))
+            .collect::&lt;Vec&lt;(f64, f64)&gt;&gt;()
     );
-    <span class="macro">dbg!</span>(ends);
+    <span class="macro">dbg!</span>(variables);
 }
 
 <span class="doccomment">/// A container used by the solver inside split
@@ -3524,7 +3769,7 @@
         <span class="self">self</span>.size() | LE(strength) | (f64::from(size) * FLOAT_PRECISION_MULTIPLIER)
     }
 
-    <span class="kw">fn </span>has_min_size(<span class="kw-2">&amp;</span><span class="self">self</span>, size: u16, strength: f64) -&gt; cassowary::Constraint {
+    <span class="kw">fn </span>has_min_size(<span class="kw-2">&amp;</span><span class="self">self</span>, size: i16, strength: f64) -&gt; cassowary::Constraint {
         <span class="self">self</span>.size() | GE(strength) | (f64::from(size) * FLOAT_PRECISION_MULTIPLIER)
     }
 
@@ -3557,12 +3802,13 @@
 
 <span class="kw">mod </span>strengths {
     <span class="kw">use </span>cassowary::strength::{MEDIUM, REQUIRED, STRONG, WEAK};
+
     <span class="doccomment">/// The strength to apply to Spacers to ensure that their sizes are equal.
     ///
     /// ┌     ┐┌───┐┌     ┐┌───┐┌     ┐
     ///   ==x  │   │  ==x  │   │  ==x
     /// └     ┘└───┘└     ┘└───┘└     ┘
-    </span><span class="kw">pub const </span>SPACER_SIZE_EQ: f64 = REQUIRED - <span class="number">1.0</span>;
+    </span><span class="kw">pub const </span>SPACER_SIZE_EQ: f64 = REQUIRED / <span class="number">10.0</span>;
 
     <span class="doccomment">/// The strength to apply to Min inequality constraints.
     ///
@@ -3666,37 +3912,14 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>custom_cache_size() {
-        <span class="macro">assert!</span>(Layout::init_cache(<span class="number">10</span>));
-        <span class="macro">assert!</span>(!Layout::init_cache(<span class="number">15</span>));
-        LAYOUT_CACHE.with(|c| {
-            <span class="macro">assert_eq!</span>(c.get().unwrap().borrow().cap().get(), <span class="number">10</span>);
+    </span><span class="kw">fn </span>cache_size() {
+        LAYOUT_CACHE.with_borrow(|c| {
+            <span class="macro">assert_eq!</span>(c.cap().get(), Layout::DEFAULT_CACHE_SIZE);
         });
-    }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>default_cache_size() {
-        <span class="kw">let </span>target = Rect {
-            x: <span class="number">2</span>,
-            y: <span class="number">2</span>,
-            width: <span class="number">10</span>,
-            height: <span class="number">10</span>,
-        };
-
-        Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([
-                Constraint::Percentage(<span class="number">10</span>),
-                Constraint::Max(<span class="number">5</span>),
-                Constraint::Min(<span class="number">1</span>),
-            ])
-            .split(target);
-        <span class="macro">assert!</span>(!Layout::init_cache(<span class="number">15</span>));
-        LAYOUT_CACHE.with(|c| {
-            <span class="macro">assert_eq!</span>(
-                c.get().unwrap().borrow().cap().get(),
-                Layout::DEFAULT_CACHE_SIZE
-            );
+        Layout::init_cache(NonZeroUsize::new(<span class="number">10</span>).unwrap());
+        LAYOUT_CACHE.with_borrow(|c| {
+            <span class="macro">assert_eq!</span>(c.cap().get(), <span class="number">10</span>);
         });
     }
 
@@ -3709,7 +3932,7 @@
                 margin: Margin::new(<span class="number">0</span>, <span class="number">0</span>),
                 constraints: <span class="macro">vec!</span>[],
                 flex: Flex::default(),
-                spacing: <span class="number">0</span>,
+                spacing: Spacing::default(),
             }
         );
     }
@@ -3754,7 +3977,7 @@
                 margin: Margin::new(<span class="number">0</span>, <span class="number">0</span>),
                 constraints: <span class="macro">vec!</span>[Constraint::Min(<span class="number">0</span>)],
                 flex: Flex::default(),
-                spacing: <span class="number">0</span>,
+                spacing: Spacing::default(),
             }
         );
     }
@@ -3768,7 +3991,7 @@
                 margin: Margin::new(<span class="number">0</span>, <span class="number">0</span>),
                 constraints: <span class="macro">vec!</span>[Constraint::Min(<span class="number">0</span>)],
                 flex: Flex::default(),
-                spacing: <span class="number">0</span>,
+                spacing: Spacing::default(),
             }
         );
     }
@@ -3875,8 +4098,9 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>spacing() {
-        <span class="macro">assert_eq!</span>(Layout::default().spacing(<span class="number">10</span>).spacing, <span class="number">10</span>);
-        <span class="macro">assert_eq!</span>(Layout::default().spacing(<span class="number">0</span>).spacing, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(Layout::default().spacing(<span class="number">10</span>).spacing, Spacing::Space(<span class="number">10</span>));
+        <span class="macro">assert_eq!</span>(Layout::default().spacing(<span class="number">0</span>).spacing, Spacing::Space(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(Layout::default().spacing(-<span class="number">10</span>).spacing, Spacing::Overlap(<span class="number">10</span>));
     }
 
     <span class="doccomment">/// Tests for the `Layout::split()` function.
@@ -3897,13 +4121,16 @@
     /// - underflow: constraint is for less than the full space
     /// - overflow: constraint is for more than the full space
     </span><span class="kw">mod </span>split {
+        <span class="kw">use </span>std::ops::Range;
+
+        <span class="kw">use </span>itertools::Itertools;
         <span class="kw">use </span>pretty_assertions::assert_eq;
         <span class="kw">use </span>rstest::rstest;
 
         <span class="kw">use crate</span>::{
-            layout::flex::Flex,
-            prelude::{Constraint::<span class="kw-2">*</span>, <span class="kw-2">*</span>},
-            widgets::Paragraph,
+            buffer::Buffer,
+            layout::{Constraint, Constraint::<span class="kw-2">*</span>, Direction, Flex, Layout, Rect},
+            widgets::{Paragraph, Widget},
         };
 
         <span class="doccomment">/// Test that the given constraints applied to the given area result in the expected layout.
@@ -3923,9 +4150,9 @@
                 .flex(flex)
                 .split(area);
             <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(area);
-            <span class="kw">for </span>(i, c) <span class="kw">in </span>(<span class="string">'a'</span>..=<span class="string">'z'</span>).take(constraints.len()).enumerate() {
+            <span class="kw">for </span>(c, <span class="kw-2">&amp;</span>area) <span class="kw">in </span>(<span class="string">'a'</span>..=<span class="string">'z'</span>).take(constraints.len()).zip(layout.iter()) {
                 <span class="kw">let </span>s = c.to_string().repeat(area.width <span class="kw">as </span>usize);
-                Paragraph::new(s).render(layout[i], <span class="kw-2">&amp;mut </span>buffer);
+                Paragraph::new(s).render(area, <span class="kw-2">&amp;mut </span>buffer);
             }
             <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
         }
@@ -4455,7 +4682,7 @@
                 ])
                 .split(target);
 
-            <span class="macro">assert_eq!</span>(target.height, chunks.iter().map(|r| r.height).sum::&lt;u16&gt;());
+            <span class="macro">assert_eq!</span>(chunks.iter().map(|r| r.height).sum::&lt;u16&gt;(), target.height);
             chunks.windows(<span class="number">2</span>).for_each(|w| <span class="macro">assert!</span>(w[<span class="number">0</span>].y &lt;= w[<span class="number">1</span>].y));
         }
 
@@ -4496,7 +4723,7 @@
             );
 
             <span class="comment">// minimal bug from
-            // https://github.com/ratatui-org/ratatui/pull/404#issuecomment-1681850644
+            // https://github.com/ratatui/ratatui/pull/404#issuecomment-1681850644
             // TODO: check if this bug is now resolved?
             </span><span class="kw">let </span>layout = Layout::default()
                 .constraints([Min(<span class="number">1</span>), Length(<span class="number">0</span>), Min(<span class="number">1</span>)])
@@ -4528,303 +4755,305 @@
         }
 
         <span class="attr">#[rstest]
-        #[case::length_priority(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">100</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Min(<span class="number">100</span>)])]
-        <span class="attr">#[case::length_priority(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">75</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Min(<span class="number">0</span>)])]
-        <span class="attr">#[case::length_priority(<span class="macro">vec!</span>[<span class="number">100</span>, <span class="number">0</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Max(<span class="number">0</span>)])]
-        <span class="attr">#[case::length_priority(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">75</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Max(<span class="number">100</span>)])]
-        <span class="attr">#[case::length_priority(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">75</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Percentage(<span class="number">25</span>)])]
-        <span class="attr">#[case::length_priority(<span class="macro">vec!</span>[<span class="number">75</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Length(<span class="number">25</span>)])]
-        <span class="attr">#[case::length_priority(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">75</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Ratio(<span class="number">1</span>, <span class="number">4</span>)])]
-        <span class="attr">#[case::length_priority(<span class="macro">vec!</span>[<span class="number">75</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">4</span>), Length(<span class="number">25</span>)])]
-        <span class="attr">#[case::length_priority(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">75</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)])]
-        <span class="attr">#[case::excess_in_last_variable(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">50</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)])]
-        <span class="attr">#[case::excess_in_last_variable(<span class="macro">vec!</span>[<span class="number">15</span>, <span class="number">35</span>, <span class="number">50</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">15</span>), Length(<span class="number">35</span>), Length(<span class="number">25</span>)])]
-        <span class="attr">#[case::three_lengths(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">50</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)])]
-        <span class="kw">fn </span>constraint_length(<span class="attr">#[case] </span>expected: Vec&lt;u16&gt;, <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;) {
+        #[case::len_min1(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Min(<span class="number">100</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">0</span>,  <span class="number">0</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len_min2(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Min(<span class="number">0</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len_max1(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Max(<span class="number">0</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>, <span class="number">100</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len_max2(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Max(<span class="number">100</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len_perc(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Percentage(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::perc_len(<span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">75</span>, <span class="number">75</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len_ratio(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Ratio(<span class="number">1</span>, <span class="number">4</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::ratio_len(<span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">4</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">75</span>, <span class="number">75</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len_len(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len1(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len2(<span class="macro">vec!</span>[Length(<span class="number">15</span>), Length(<span class="number">35</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">15</span>, <span class="number">15</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len3(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>])]
+        <span class="kw">fn </span>constraint_length(
+            <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
+            <span class="attr">#[case] </span>expected: Vec&lt;Range&lt;u16&gt;&gt;,
+        ) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
-            <span class="kw">let </span>r = Layout::horizontal(constraints)
+            <span class="kw">let </span>ranges = Layout::horizontal(constraints)
                 .flex(Flex::Legacy)
                 .split(rect)
                 .iter()
-                .map(|r| r.width)
-                .collect::&lt;Vec&lt;u16&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
+                .map(|r| r.left()..r.right())
+                .collect_vec();
+            <span class="macro">assert_eq!</span>(ranges, expected);
         }
 
         <span class="attr">#[rstest]
-        #[case::table_length_test(<span class="macro">vec!</span>[Length(<span class="number">4</span>), Length(<span class="number">4</span>)]</span>, <span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">3</span>), (<span class="number">4</span>, <span class="number">3</span>)], <span class="number">7</span>)]
-        <span class="attr">#[case::table_length_test(<span class="macro">vec!</span>[Length(<span class="number">4</span>), Length(<span class="number">4</span>)]</span>, <span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">1</span>)], <span class="number">4</span>)]
+        #[case(<span class="number">7</span>, <span class="macro">vec!</span>[Length(<span class="number">4</span>), Length(<span class="number">4</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">3</span>, <span class="number">4</span>..<span class="number">7</span>])]
+        <span class="attr">#[case(<span class="number">4</span>, <span class="macro">vec!</span>[Length(<span class="number">4</span>), Length(<span class="number">4</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">2</span>, <span class="number">3</span>..<span class="number">4</span>])]
         <span class="kw">fn </span>table_length(
-            <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
-            <span class="attr">#[case] </span>expected: Vec&lt;(u16, u16)&gt;,
             <span class="attr">#[case] </span>width: u16,
+            <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
+            <span class="attr">#[case] </span>expected: Vec&lt;Range&lt;u16&gt;&gt;,
         ) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, width, <span class="number">1</span>);
-            <span class="kw">let </span>r = Layout::horizontal(constraints)
+            <span class="kw">let </span>ranges = Layout::horizontal(constraints)
                 .spacing(<span class="number">1</span>)
                 .flex(Flex::Start)
                 .split(rect)
                 .iter()
-                .map(|r| (r.x, r.width))
-                .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
+                .map(|r| r.left()..r.right())
+                .collect::&lt;Vec&lt;Range&lt;u16&gt;&gt;&gt;();
+            <span class="macro">assert_eq!</span>(ranges, expected);
         }
 
         <span class="attr">#[rstest]
-        #[case::length_is_higher_priority_than_min_max(<span class="macro">vec!</span>[<span class="number">50</span>, <span class="number">25</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Min(<span class="number">25</span>), Length(<span class="number">25</span>), Max(<span class="number">25</span>)])]
-        <span class="attr">#[case::length_is_higher_priority_than_min_max(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">50</span>]</span>, <span class="macro">vec!</span>[Max(<span class="number">25</span>), Length(<span class="number">25</span>), Min(<span class="number">25</span>)])]
-        <span class="attr">#[case::excess_in_lowest_priority(<span class="macro">vec!</span>[<span class="number">33</span>, <span class="number">33</span>, <span class="number">34</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">33</span>), Length(<span class="number">33</span>), Length(<span class="number">33</span>)])]
-        <span class="attr">#[case::excess_in_lowest_priority(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">50</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">50</span>]</span>, <span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Length(<span class="number">25</span>), Ratio(<span class="number">1</span>, <span class="number">4</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">50</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Ratio(<span class="number">1</span>, <span class="number">4</span>), Percentage(<span class="number">25</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">50</span>, <span class="number">25</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">4</span>), Length(<span class="number">25</span>), Percentage(<span class="number">25</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">50</span>, <span class="number">25</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">4</span>), Percentage(<span class="number">25</span>), Length(<span class="number">25</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">80</span>, <span class="number">0</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">100</span>), Length(<span class="number">1</span>), Min(<span class="number">20</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">20</span>, <span class="number">1</span>, <span class="number">79</span>]</span>, <span class="macro">vec!</span>[Min(<span class="number">20</span>), Length(<span class="number">1</span>), Length(<span class="number">100</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">45</span>, <span class="number">10</span>, <span class="number">45</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">30</span>, <span class="number">10</span>, <span class="number">60</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">2</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">18</span>, <span class="number">10</span>, <span class="number">72</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">4</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">15</span>, <span class="number">10</span>, <span class="number">75</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">5</span>)])]
-        <span class="attr">#[case::three_lengths_reference(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">50</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)])]
-        <span class="attr">#[case::previously_unstable_test(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">50</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)])]
+        #[case::min_len_max(<span class="macro">vec!</span>[Min(<span class="number">25</span>), Length(<span class="number">25</span>), Max(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">75</span>, <span class="number">75</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::max_len_min(<span class="macro">vec!</span>[Max(<span class="number">25</span>), Length(<span class="number">25</span>), Min(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len_len_len(<span class="macro">vec!</span>[Length(<span class="number">33</span>), Length(<span class="number">33</span>), Length(<span class="number">33</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">33</span>, <span class="number">33</span>..<span class="number">66</span>, <span class="number">66</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len_len_len_25(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::perc_len_ratio(<span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Length(<span class="number">25</span>), Ratio(<span class="number">1</span>, <span class="number">4</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len_ratio_perc(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Ratio(<span class="number">1</span>, <span class="number">4</span>), Percentage(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">75</span>, <span class="number">75</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::ratio_len_perc(<span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">4</span>), Length(<span class="number">25</span>), Percentage(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">75</span>, <span class="number">75</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::ratio_perc_len(<span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">4</span>), Percentage(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">75</span>, <span class="number">75</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len_len_min(<span class="macro">vec!</span>[Length(<span class="number">100</span>), Length(<span class="number">1</span>), Min(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::min_len_len(<span class="macro">vec!</span>[Min(<span class="number">20</span>), Length(<span class="number">1</span>), Length(<span class="number">100</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">20</span>, <span class="number">20</span>..<span class="number">21</span>, <span class="number">21</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::fill_len_fill(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">45</span>, <span class="number">45</span>..<span class="number">55</span>, <span class="number">55</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::fill_len_fill_2(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">2</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">30</span>, <span class="number">30</span>..<span class="number">40</span>, <span class="number">40</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::fill_len_fill_4(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">4</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">18</span>, <span class="number">18</span>..<span class="number">28</span>, <span class="number">28</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::fill_len_fill_5(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">5</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">15</span>, <span class="number">15</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::len_len_len_25(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::unstable_test(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>])]
         <span class="kw">fn </span>length_is_higher_priority(
-            <span class="attr">#[case] </span>expected: Vec&lt;u16&gt;,
             <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
+            <span class="attr">#[case] </span>expected: Vec&lt;Range&lt;u16&gt;&gt;,
         ) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
-            <span class="kw">let </span>r = Layout::horizontal(constraints)
+            <span class="kw">let </span>ranges = Layout::horizontal(constraints)
                 .flex(Flex::Legacy)
                 .split(rect)
                 .iter()
-                .map(|r| r.width)
-                .collect::&lt;Vec&lt;u16&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
+                .map(|r| r.left()..r.right())
+                .collect_vec();
+            <span class="macro">assert_eq!</span>(ranges, expected);
         }
 
         <span class="attr">#[rstest]
-        #[case::length_is_higher_priority_than_min_max(<span class="macro">vec!</span>[<span class="number">50</span>, <span class="number">25</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Min(<span class="number">25</span>), Length(<span class="number">25</span>), Max(<span class="number">25</span>)])]
-        <span class="attr">#[case::length_is_higher_priority_than_min_max(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">50</span>]</span>, <span class="macro">vec!</span>[Max(<span class="number">25</span>), Length(<span class="number">25</span>), Min(<span class="number">25</span>)])]
-        <span class="attr">#[case::excess_in_lowest_priority(<span class="macro">vec!</span>[<span class="number">33</span>, <span class="number">33</span>, <span class="number">33</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">33</span>), Length(<span class="number">33</span>), Length(<span class="number">33</span>)])]
-        <span class="attr">#[case::excess_in_lowest_priority(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Length(<span class="number">25</span>), Ratio(<span class="number">1</span>, <span class="number">4</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Ratio(<span class="number">1</span>, <span class="number">4</span>), Percentage(<span class="number">25</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">4</span>), Length(<span class="number">25</span>), Percentage(<span class="number">25</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">4</span>), Percentage(<span class="number">25</span>), Length(<span class="number">25</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">79</span>, <span class="number">1</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">100</span>), Length(<span class="number">1</span>), Min(<span class="number">20</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">20</span>, <span class="number">1</span>, <span class="number">79</span>]</span>, <span class="macro">vec!</span>[Min(<span class="number">20</span>), Length(<span class="number">1</span>), Length(<span class="number">100</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">45</span>, <span class="number">10</span>, <span class="number">45</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">30</span>, <span class="number">10</span>, <span class="number">60</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">2</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">18</span>, <span class="number">10</span>, <span class="number">72</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">4</span>)])]
-        <span class="attr">#[case::length_higher_priority(<span class="macro">vec!</span>[<span class="number">15</span>, <span class="number">10</span>, <span class="number">75</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">5</span>)])]
-        <span class="attr">#[case::previously_unstable_test(<span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)])]
+        #[case::min_len_max(<span class="macro">vec!</span>[Min(<span class="number">25</span>), Length(<span class="number">25</span>), Max(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">50</span>, <span class="number">25</span>, <span class="number">25</span>])]
+        <span class="attr">#[case::max_len_min(<span class="macro">vec!</span>[Max(<span class="number">25</span>), Length(<span class="number">25</span>), Min(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">50</span>])]
+        <span class="attr">#[case::len_len_len1(<span class="macro">vec!</span>[Length(<span class="number">33</span>), Length(<span class="number">33</span>), Length(<span class="number">33</span>)]</span>, <span class="macro">vec!</span>[<span class="number">33</span>, <span class="number">33</span>, <span class="number">33</span>])]
+        <span class="attr">#[case::len_len_len2(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">25</span>])]
+        <span class="attr">#[case::perc_len_ratio(<span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Length(<span class="number">25</span>), Ratio(<span class="number">1</span>, <span class="number">4</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">25</span>])]
+        <span class="attr">#[case::len_ratio_perc(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Ratio(<span class="number">1</span>, <span class="number">4</span>), Percentage(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">25</span>])]
+        <span class="attr">#[case::ratio_len_perc(<span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">4</span>), Length(<span class="number">25</span>), Percentage(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">25</span>])]
+        <span class="attr">#[case::ratio_perc_len(<span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">4</span>), Percentage(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">25</span>])]
+        <span class="attr">#[case::len_len_min(<span class="macro">vec!</span>[Length(<span class="number">100</span>), Length(<span class="number">1</span>), Min(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">79</span>, <span class="number">1</span>, <span class="number">20</span>])]
+        <span class="attr">#[case::min_len_len(<span class="macro">vec!</span>[Min(<span class="number">20</span>), Length(<span class="number">1</span>), Length(<span class="number">100</span>)]</span>, <span class="macro">vec!</span>[<span class="number">20</span>, <span class="number">1</span>, <span class="number">79</span>])]
+        <span class="attr">#[case::fill_len_fill1(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)]</span>, <span class="macro">vec!</span>[<span class="number">45</span>, <span class="number">10</span>, <span class="number">45</span>])]
+        <span class="attr">#[case::fill_len_fill2(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">2</span>)]</span>, <span class="macro">vec!</span>[<span class="number">30</span>, <span class="number">10</span>, <span class="number">60</span>])]
+        <span class="attr">#[case::fill_len_fill4(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">4</span>)]</span>, <span class="macro">vec!</span>[<span class="number">18</span>, <span class="number">10</span>, <span class="number">72</span>])]
+        <span class="attr">#[case::fill_len_fill5(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">5</span>)]</span>, <span class="macro">vec!</span>[<span class="number">15</span>, <span class="number">10</span>, <span class="number">75</span>])]
+        <span class="attr">#[case::len_len_len3(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>, <span class="number">25</span>, <span class="number">25</span>])]
         <span class="kw">fn </span>length_is_higher_priority_in_flex(
-            <span class="attr">#[case] </span>expected: Vec&lt;u16&gt;,
             <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
+            <span class="attr">#[case] </span>expected: Vec&lt;u16&gt;,
         ) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
-            <span class="kw">let </span>r = Layout::horizontal(<span class="kw-2">&amp;</span>constraints)
-                .flex(Flex::Start)
-                .split(rect)
-                .iter()
-                .map(|r| r.width)
-                .collect::&lt;Vec&lt;u16&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
-
-            <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
-            <span class="kw">let </span>r = Layout::horizontal(<span class="kw-2">&amp;</span>constraints)
-                .flex(Flex::Center)
-                .split(rect)
-                .iter()
-                .map(|r| r.width)
-                .collect::&lt;Vec&lt;u16&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
-
-            <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
-            <span class="kw">let </span>r = Layout::horizontal(<span class="kw-2">&amp;</span>constraints)
-                .flex(Flex::End)
-                .split(rect)
-                .iter()
-                .map(|r| r.width)
-                .collect::&lt;Vec&lt;u16&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
-
-            <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
-            <span class="kw">let </span>r = Layout::horizontal(<span class="kw-2">&amp;</span>constraints)
-                .flex(Flex::SpaceAround)
-                .split(rect)
-                .iter()
-                .map(|r| r.width)
-                .collect::&lt;Vec&lt;u16&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
-
-            <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
-            <span class="kw">let </span>r = Layout::horizontal(<span class="kw-2">&amp;</span>constraints)
-                .flex(Flex::SpaceBetween)
-                .split(rect)
-                .iter()
-                .map(|r| r.width)
-                .collect::&lt;Vec&lt;u16&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
+            <span class="kw">for </span>flex <span class="kw">in </span>[
+                Flex::Start,
+                Flex::End,
+                Flex::Center,
+                Flex::SpaceAround,
+                Flex::SpaceBetween,
+            ] {
+                <span class="kw">let </span>widths = Layout::horizontal(<span class="kw-2">&amp;</span>constraints)
+                    .flex(flex)
+                    .split(rect)
+                    .iter()
+                    .map(|r| r.width)
+                    .collect_vec();
+                <span class="macro">assert_eq!</span>(widths, expected);
+            }
         }
 
         <span class="attr">#[rstest]
-        #[case::excess_in_last_variable(<span class="macro">vec!</span>[<span class="number">13</span>, <span class="number">10</span>, <span class="number">27</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">2</span>)])]
-        <span class="attr">#[case::excess_in_last_variable(<span class="macro">vec!</span>[<span class="number">10</span>, <span class="number">27</span>, <span class="number">13</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Fill(<span class="number">2</span>), Fill(<span class="number">1</span>)])] <span class="comment">// might be unstable?
-        </span><span class="kw">fn </span>fixed_with_50_width(<span class="attr">#[case] </span>expected: Vec&lt;u16&gt;, <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;) {
+        #[case::fill_len_fill(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">2</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">13</span>, <span class="number">13</span>..<span class="number">23</span>, <span class="number">23</span>..<span class="number">50</span>])]
+        <span class="attr">#[case::len_fill_fill(<span class="macro">vec!</span>[Length(<span class="number">10</span>), Fill(<span class="number">2</span>), Fill(<span class="number">1</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">10</span>, <span class="number">10</span>..<span class="number">37</span>, <span class="number">37</span>..<span class="number">50</span>])] <span class="comment">// might be unstable?
+        </span><span class="kw">fn </span>fixed_with_50_width(
+            <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
+            <span class="attr">#[case] </span>expected: Vec&lt;Range&lt;u16&gt;&gt;,
+        ) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">50</span>, <span class="number">1</span>);
-            <span class="kw">let </span>r = Layout::horizontal(constraints)
+            <span class="kw">let </span>ranges = Layout::horizontal(constraints)
                 .flex(Flex::Legacy)
                 .split(rect)
                 .iter()
-                .map(|r| r.width)
-                .collect::&lt;Vec&lt;u16&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
+                .map(|r| r.left()..r.right())
+                .collect_vec();
+            <span class="macro">assert_eq!</span>(ranges, expected);
         }
 
         <span class="attr">#[rstest]
-        #[case::multiple_same_fill_are_same(<span class="macro">vec!</span>[<span class="number">20</span>, <span class="number">40</span>, <span class="number">20</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">2</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)])]
-        <span class="attr">#[case::incremental(<span class="macro">vec!</span>[<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">2</span>), Fill(<span class="number">3</span>), Fill(<span class="number">4</span>)])]
-        <span class="attr">#[case::decremental(<span class="macro">vec!</span>[<span class="number">40</span>, <span class="number">30</span>, <span class="number">20</span>, <span class="number">10</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">4</span>), Fill(<span class="number">3</span>), Fill(<span class="number">2</span>), Fill(<span class="number">1</span>)])]
-        <span class="attr">#[case::randomly_ordered(<span class="macro">vec!</span>[<span class="number">10</span>, <span class="number">30</span>, <span class="number">20</span>, <span class="number">40</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">3</span>), Fill(<span class="number">2</span>), Fill(<span class="number">4</span>)])]
-        <span class="attr">#[case::randomly_ordered(<span class="macro">vec!</span>[<span class="number">5</span>, <span class="number">15</span>, <span class="number">50</span>, <span class="number">10</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">3</span>), Length(<span class="number">50</span>), Fill(<span class="number">2</span>), Fill(<span class="number">4</span>)])]
-        <span class="attr">#[case::randomly_ordered(<span class="macro">vec!</span>[<span class="number">5</span>, <span class="number">15</span>, <span class="number">50</span>, <span class="number">10</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">3</span>), Length(<span class="number">50</span>), Fill(<span class="number">2</span>), Fill(<span class="number">4</span>)])]
-        <span class="attr">#[case::randomly_ordered(<span class="macro">vec!</span>[<span class="number">5</span>, <span class="number">15</span>, <span class="number">50</span>, <span class="number">10</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">3</span>), Percentage(<span class="number">50</span>), Fill(<span class="number">2</span>), Fill(<span class="number">4</span>)])]
-        <span class="attr">#[case::randomly_ordered(<span class="macro">vec!</span>[<span class="number">5</span>, <span class="number">15</span>, <span class="number">50</span>, <span class="number">10</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">3</span>), Min(<span class="number">50</span>), Fill(<span class="number">2</span>), Fill(<span class="number">4</span>)])]
-        <span class="attr">#[case::randomly_ordered(<span class="macro">vec!</span>[<span class="number">5</span>, <span class="number">15</span>, <span class="number">50</span>, <span class="number">10</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">3</span>), Max(<span class="number">50</span>), Fill(<span class="number">2</span>), Fill(<span class="number">4</span>)])]
-        <span class="attr">#[case::zero_width(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">100</span>, <span class="number">0</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Fill(<span class="number">1</span>), Fill(<span class="number">0</span>)])]
-        <span class="attr">#[case::zero_width(<span class="macro">vec!</span>[<span class="number">50</span>, <span class="number">1</span>, <span class="number">49</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Length(<span class="number">1</span>), Fill(<span class="number">0</span>)])]
-        <span class="attr">#[case::zero_width(<span class="macro">vec!</span>[<span class="number">50</span>, <span class="number">1</span>, <span class="number">49</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Length(<span class="number">1</span>), Fill(<span class="number">0</span>)])]
-        <span class="attr">#[case::zero_width(<span class="macro">vec!</span>[<span class="number">50</span>, <span class="number">1</span>, <span class="number">49</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Percentage(<span class="number">1</span>), Fill(<span class="number">0</span>)])]
-        <span class="attr">#[case::zero_width(<span class="macro">vec!</span>[<span class="number">50</span>, <span class="number">1</span>, <span class="number">49</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Min(<span class="number">1</span>), Fill(<span class="number">0</span>)])]
-        <span class="attr">#[case::zero_width(<span class="macro">vec!</span>[<span class="number">50</span>, <span class="number">1</span>, <span class="number">49</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Max(<span class="number">1</span>), Fill(<span class="number">0</span>)])]
-        <span class="attr">#[case::zero_width(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">67</span>, <span class="number">0</span>, <span class="number">33</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Fill(<span class="number">2</span>), Fill(<span class="number">0</span>), Fill(<span class="number">1</span>)])]
-        <span class="attr">#[case::space_filler(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">80</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Fill(<span class="number">2</span>), Percentage(<span class="number">20</span>)])]
-        <span class="attr">#[case::space_filler(<span class="macro">vec!</span>[<span class="number">40</span>, <span class="number">40</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Fill(<span class="number">0</span>), Percentage(<span class="number">20</span>)])]
-        <span class="attr">#[case::space_filler(<span class="macro">vec!</span>[<span class="number">80</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Ratio(<span class="number">1</span>, <span class="number">5</span>)])]
-        <span class="attr">#[case::space_filler(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">100</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Fill(u16::MAX)])]
-        <span class="attr">#[case::space_filler(<span class="macro">vec!</span>[<span class="number">100</span>, <span class="number">0</span>]</span>, <span class="macro">vec!</span>[Fill(u16::MAX), Fill(<span class="number">0</span>)])]
-        <span class="attr">#[case::space_filler(<span class="macro">vec!</span>[<span class="number">80</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Percentage(<span class="number">20</span>)])]
-        <span class="attr">#[case::space_filler(<span class="macro">vec!</span>[<span class="number">80</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Percentage(<span class="number">20</span>)])]
-        <span class="attr">#[case::space_filler(<span class="macro">vec!</span>[<span class="number">80</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(u16::MAX), Percentage(<span class="number">20</span>)])]
-        <span class="attr">#[case::space_filler(<span class="macro">vec!</span>[<span class="number">80</span>, <span class="number">0</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(u16::MAX), Fill(<span class="number">0</span>), Percentage(<span class="number">20</span>)])]
-        <span class="attr">#[case::space_filler(<span class="macro">vec!</span>[<span class="number">80</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Length(<span class="number">20</span>)])]
-        <span class="attr">#[case::space_filler(<span class="macro">vec!</span>[<span class="number">80</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Length(<span class="number">20</span>)])]
-        <span class="attr">#[case::space_filler(<span class="macro">vec!</span>[<span class="number">80</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Min(<span class="number">20</span>)])]
-        <span class="attr">#[case::space_filler(<span class="macro">vec!</span>[<span class="number">80</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">0</span>), Max(<span class="number">20</span>)])]
-        <span class="attr">#[case::fill_collapses_first(<span class="macro">vec!</span>[<span class="number">7</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">30</span>, <span class="number">50</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Min(<span class="number">30</span>), Length(<span class="number">50</span>)])]
-        <span class="attr">#[case::fill_collapses_first(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">50</span>, <span class="number">50</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Length(<span class="number">50</span>), Length(<span class="number">50</span>)])]
-        <span class="attr">#[case::fill_collapses_first(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">75</span>, <span class="number">25</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Length(<span class="number">75</span>), Length(<span class="number">50</span>)])]
-        <span class="attr">#[case::fill_collapses_first(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">50</span>, <span class="number">50</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Min(<span class="number">50</span>), Max(<span class="number">50</span>)])]
-        <span class="attr">#[case::fill_collapses_first(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Ratio(<span class="number">1</span>, <span class="number">1</span>)])]
-        <span class="attr">#[case::fill_collapses_first(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>]</span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Percentage(<span class="number">100</span>)])]
-        <span class="kw">fn </span>fill(<span class="attr">#[case] </span>expected: Vec&lt;u16&gt;, <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;) {
+        #[case::same_fill(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">2</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">20</span>, <span class="number">20</span>..<span class="number">60</span>, <span class="number">60</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::inc_fill(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">2</span>), Fill(<span class="number">3</span>), Fill(<span class="number">4</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">10</span>, <span class="number">10</span>..<span class="number">30</span>, <span class="number">30</span>..<span class="number">60</span>, <span class="number">60</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::dec_fill(<span class="macro">vec!</span>[Fill(<span class="number">4</span>), Fill(<span class="number">3</span>), Fill(<span class="number">2</span>), Fill(<span class="number">1</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">40</span>, <span class="number">40</span>..<span class="number">70</span>, <span class="number">70</span>..<span class="number">90</span>, <span class="number">90</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::rand_fill1(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">3</span>), Fill(<span class="number">2</span>), Fill(<span class="number">4</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">10</span>, <span class="number">10</span>..<span class="number">40</span>, <span class="number">40</span>..<span class="number">60</span>, <span class="number">60</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::rand_fill2(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">3</span>), Length(<span class="number">50</span>), Fill(<span class="number">2</span>), Fill(<span class="number">4</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">5</span>, <span class="number">5</span>..<span class="number">20</span>, <span class="number">20</span>..<span class="number">70</span>, <span class="number">70</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::rand_fill3(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">3</span>), Percentage(<span class="number">50</span>), Fill(<span class="number">2</span>), Fill(<span class="number">4</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">5</span>, <span class="number">5</span>..<span class="number">20</span>, <span class="number">20</span>..<span class="number">70</span>, <span class="number">70</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::rand_fill4(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">3</span>), Min(<span class="number">50</span>), Fill(<span class="number">2</span>), Fill(<span class="number">4</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">5</span>, <span class="number">5</span>..<span class="number">20</span>, <span class="number">20</span>..<span class="number">70</span>, <span class="number">70</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::rand_fill5(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">3</span>), Max(<span class="number">50</span>), Fill(<span class="number">2</span>), Fill(<span class="number">4</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">5</span>, <span class="number">5</span>..<span class="number">20</span>, <span class="number">20</span>..<span class="number">70</span>, <span class="number">70</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::zero_fill1(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Fill(<span class="number">1</span>), Fill(<span class="number">0</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">100</span>, <span class="number">100</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::zero_fill2(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Length(<span class="number">1</span>), Fill(<span class="number">0</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">51</span>, <span class="number">51</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::zero_fill3(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Percentage(<span class="number">1</span>), Fill(<span class="number">0</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">51</span>, <span class="number">51</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::zero_fill4(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Min(<span class="number">1</span>), Fill(<span class="number">0</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">51</span>, <span class="number">51</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::zero_fill5(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Max(<span class="number">1</span>), Fill(<span class="number">0</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">51</span>, <span class="number">51</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::zero_fill6(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Fill(<span class="number">2</span>), Fill(<span class="number">0</span>), Fill(<span class="number">1</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">67</span>, <span class="number">67</span>..<span class="number">67</span>, <span class="number">67</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::space_fill1(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Fill(<span class="number">2</span>), Percentage(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::space_fill2(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Fill(<span class="number">0</span>), Percentage(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">40</span>, <span class="number">40</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::space_fill3(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Ratio(<span class="number">1</span>, <span class="number">5</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::space_fill4(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Fill(u16::MAX)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::space_fill5(<span class="macro">vec!</span>[Fill(u16::MAX), Fill(<span class="number">0</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>, <span class="number">100</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::space_fill6(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Percentage(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::space_fill7(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Percentage(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::space_fill8(<span class="macro">vec!</span>[Fill(u16::MAX), Percentage(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::space_fill9(<span class="macro">vec!</span>[Fill(u16::MAX), Fill(<span class="number">0</span>), Percentage(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::space_fill10(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Length(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::space_fill11(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Min(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::space_fill12(<span class="macro">vec!</span>[Fill(<span class="number">0</span>), Max(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::fill_collapse1(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Min(<span class="number">30</span>), Length(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">7</span>, <span class="number">7</span>..<span class="number">13</span>, <span class="number">13</span>..<span class="number">20</span>, <span class="number">20</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::fill_collapse2(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Length(<span class="number">50</span>), Length(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::fill_collapse3(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Length(<span class="number">75</span>), Length(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">75</span>, <span class="number">75</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::fill_collapse4(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Min(<span class="number">50</span>), Max(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::fill_collapse5(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Ratio(<span class="number">1</span>, <span class="number">1</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::fill_collapse6(<span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Fill(<span class="number">1</span>), Percentage(<span class="number">100</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">100</span>])]
+        <span class="kw">fn </span>fill(<span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;, <span class="attr">#[case] </span>expected: Vec&lt;Range&lt;u16&gt;&gt;) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
-            <span class="kw">let </span>r = Layout::horizontal(constraints)
+            <span class="kw">let </span>ranges = Layout::horizontal(constraints)
                 .flex(Flex::Legacy)
                 .split(rect)
                 .iter()
-                .map(|r| r.width)
-                .collect::&lt;Vec&lt;u16&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
+                .map(|r| r.left()..r.right())
+                .collect_vec();
+            <span class="macro">assert_eq!</span>(ranges, expected);
         }
 
         <span class="attr">#[rstest]
-        #[case::min_percentage(<span class="macro">vec!</span>[<span class="number">80</span>, <span class="number">20</span>]</span>, <span class="macro">vec!</span>[Min(<span class="number">0</span>), Percentage(<span class="number">20</span>)])]
-        <span class="attr">#[case::max_percentage(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">100</span>]</span>, <span class="macro">vec!</span>[Max(<span class="number">0</span>), Percentage(<span class="number">20</span>)])]
+        #[case::min_percentage(<span class="macro">vec!</span>[Min(<span class="number">0</span>), Percentage(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">80</span>, <span class="number">80</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::max_percentage(<span class="macro">vec!</span>[Max(<span class="number">0</span>), Percentage(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">100</span>])]
         <span class="kw">fn </span>percentage_parameterized(
-            <span class="attr">#[case] </span>expected: Vec&lt;u16&gt;,
             <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
+            <span class="attr">#[case] </span>expected: Vec&lt;Range&lt;u16&gt;&gt;,
         ) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
-            <span class="kw">let </span>r = Layout::horizontal(constraints)
+            <span class="kw">let </span>ranges = Layout::horizontal(constraints)
                 .flex(Flex::Legacy)
                 .split(rect)
                 .iter()
-                .map(|r| r.width)
-                .collect::&lt;Vec&lt;u16&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
+                .map(|r| r.left()..r.right())
+                .collect_vec();
+            <span class="macro">assert_eq!</span>(ranges, expected);
         }
 
         <span class="attr">#[rstest]
-        #[case::min_max_priority(<span class="macro">vec!</span>[<span class="number">100</span>, <span class="number">0</span>]</span>, <span class="macro">vec!</span>[Max(<span class="number">100</span>), Min(<span class="number">0</span>)])]
-        <span class="attr">#[case::min_max_priority(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">100</span>]</span>, <span class="macro">vec!</span>[Min(<span class="number">0</span>), Max(<span class="number">100</span>)])]
-        <span class="attr">#[case::min_max_priority(<span class="macro">vec!</span>[<span class="number">90</span>, <span class="number">10</span>]</span>, <span class="macro">vec!</span>[Length(u16::MAX), Min(<span class="number">10</span>)])]
-        <span class="attr">#[case::min_max_priority(<span class="macro">vec!</span>[<span class="number">10</span>, <span class="number">90</span>]</span>, <span class="macro">vec!</span>[Min(<span class="number">10</span>), Length(u16::MAX)])]
-        <span class="attr">#[case::min_max_priority(<span class="macro">vec!</span>[<span class="number">90</span>, <span class="number">10</span>]</span>, <span class="macro">vec!</span>[Length(<span class="number">0</span>), Max(<span class="number">10</span>)])]
-        <span class="attr">#[case::min_max_priority(<span class="macro">vec!</span>[<span class="number">10</span>, <span class="number">90</span>]</span>, <span class="macro">vec!</span>[Max(<span class="number">10</span>), Length(<span class="number">0</span>)])]
-        <span class="kw">fn </span>min_max(<span class="attr">#[case] </span>expected: Vec&lt;u16&gt;, <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;) {
+        #[case::max_min(<span class="macro">vec!</span>[Max(<span class="number">100</span>), Min(<span class="number">0</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>, <span class="number">100</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::min_max(<span class="macro">vec!</span>[Min(<span class="number">0</span>), Max(<span class="number">100</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">0</span>, <span class="number">0</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::length_min(<span class="macro">vec!</span>[Length(u16::MAX), Min(<span class="number">10</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">90</span>, <span class="number">90</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::min_length(<span class="macro">vec!</span>[Min(<span class="number">10</span>), Length(u16::MAX)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">10</span>, <span class="number">10</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::length_max(<span class="macro">vec!</span>[Length(<span class="number">0</span>), Max(<span class="number">10</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">90</span>, <span class="number">90</span>..<span class="number">100</span>])]
+        <span class="attr">#[case::max_length(<span class="macro">vec!</span>[Max(<span class="number">10</span>), Length(<span class="number">0</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">10</span>, <span class="number">10</span>..<span class="number">100</span>])]
+        <span class="kw">fn </span>min_max(<span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;, <span class="attr">#[case] </span>expected: Vec&lt;Range&lt;u16&gt;&gt;) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
-            <span class="kw">let </span>r = Layout::horizontal(constraints)
+            <span class="kw">let </span>ranges = Layout::horizontal(constraints)
                 .flex(Flex::Legacy)
                 .split(rect)
                 .iter()
-                .map(|r| r.width)
-                .collect::&lt;Vec&lt;u16&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
+                .map(|r| r.left()..r.right())
+                .collect_vec();
+            <span class="macro">assert_eq!</span>(ranges, expected);
         }
 
         <span class="attr">#[rstest]
-        #[case::length(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">100</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">50</span>)], Flex::Legacy)]
-        <span class="attr">#[case::length(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">50</span>)], Flex::Start)]
-        <span class="attr">#[case::length(<span class="macro">vec!</span>[(<span class="number">50</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">50</span>)], Flex::End)]
-        <span class="attr">#[case::length(<span class="macro">vec!</span>[(<span class="number">25</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">50</span>)], Flex::Center)]
-        <span class="attr">#[case::ratio(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">100</span>)]</span>, <span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">2</span>)], Flex::Legacy)]
-        <span class="attr">#[case::ratio(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">2</span>)], Flex::Start)]
-        <span class="attr">#[case::ratio(<span class="macro">vec!</span>[(<span class="number">50</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">2</span>)], Flex::End)]
-        <span class="attr">#[case::ratio(<span class="macro">vec!</span>[(<span class="number">25</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">2</span>)], Flex::Center)]
-        <span class="attr">#[case::percent(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">100</span>)]</span>, <span class="macro">vec!</span>[Percentage(<span class="number">50</span>)], Flex::Legacy)]
-        <span class="attr">#[case::percent(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Percentage(<span class="number">50</span>)], Flex::Start)]
-        <span class="attr">#[case::percent(<span class="macro">vec!</span>[(<span class="number">50</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Percentage(<span class="number">50</span>)], Flex::End)]
-        <span class="attr">#[case::percent(<span class="macro">vec!</span>[(<span class="number">25</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Percentage(<span class="number">50</span>)], Flex::Center)]
-        <span class="attr">#[case::min(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">100</span>)]</span>, <span class="macro">vec!</span>[Min(<span class="number">50</span>)], Flex::Legacy)]
-        <span class="attr">#[case::min(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">100</span>)]</span>, <span class="macro">vec!</span>[Min(<span class="number">50</span>)], Flex::Start)]
-        <span class="attr">#[case::min(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">100</span>)]</span>, <span class="macro">vec!</span>[Min(<span class="number">50</span>)], Flex::End)]
-        <span class="attr">#[case::min(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">100</span>)]</span>, <span class="macro">vec!</span>[Min(<span class="number">50</span>)], Flex::Center)]
-        <span class="attr">#[case::max(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">100</span>)]</span>, <span class="macro">vec!</span>[Max(<span class="number">50</span>)], Flex::Legacy)]
-        <span class="attr">#[case::max(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Max(<span class="number">50</span>)], Flex::Start)]
-        <span class="attr">#[case::max(<span class="macro">vec!</span>[(<span class="number">50</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Max(<span class="number">50</span>)], Flex::End)]
-        <span class="attr">#[case::max(<span class="macro">vec!</span>[(<span class="number">25</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Max(<span class="number">50</span>)], Flex::Center)]
-        <span class="attr">#[case::spacebetween_becomes_stretch(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">100</span>)]</span>, <span class="macro">vec!</span>[Min(<span class="number">1</span>)], Flex::SpaceBetween)]
-        <span class="attr">#[case::spacebetween_becomes_stretch(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">100</span>)]</span>, <span class="macro">vec!</span>[Max(<span class="number">20</span>)], Flex::SpaceBetween)]
-        <span class="attr">#[case::spacebetween_becomes_stretch(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">100</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">20</span>)], Flex::SpaceBetween)]
-        <span class="attr">#[case::length(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">25</span>), (<span class="number">25</span>, <span class="number">75</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)], Flex::Legacy)]
-        <span class="attr">#[case::length(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">25</span>), (<span class="number">25</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)], Flex::Start)]
-        <span class="attr">#[case::length(<span class="macro">vec!</span>[(<span class="number">25</span>, <span class="number">25</span>), (<span class="number">50</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)], Flex::Center)]
-        <span class="attr">#[case::length(<span class="macro">vec!</span>[(<span class="number">50</span>, <span class="number">25</span>), (<span class="number">75</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)], Flex::End)]
-        <span class="attr">#[case::length(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">25</span>), (<span class="number">75</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)], Flex::SpaceBetween)]
-        <span class="attr">#[case::length(<span class="macro">vec!</span>[(<span class="number">17</span>, <span class="number">25</span>), (<span class="number">58</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)], Flex::SpaceAround)]
-        <span class="attr">#[case::percentage(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">25</span>), (<span class="number">25</span>, <span class="number">75</span>)]</span>, <span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Percentage(<span class="number">25</span>)], Flex::Legacy)]
-        <span class="attr">#[case::percentage(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">25</span>), (<span class="number">25</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Percentage(<span class="number">25</span>)], Flex::Start)]
-        <span class="attr">#[case::percentage(<span class="macro">vec!</span>[(<span class="number">25</span>, <span class="number">25</span>), (<span class="number">50</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Percentage(<span class="number">25</span>)], Flex::Center)]
-        <span class="attr">#[case::percentage(<span class="macro">vec!</span>[(<span class="number">50</span>, <span class="number">25</span>), (<span class="number">75</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Percentage(<span class="number">25</span>)], Flex::End)]
-        <span class="attr">#[case::percentage(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">25</span>), (<span class="number">75</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Percentage(<span class="number">25</span>)], Flex::SpaceBetween)]
-        <span class="attr">#[case::percentage(<span class="macro">vec!</span>[(<span class="number">17</span>, <span class="number">25</span>), (<span class="number">58</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Percentage(<span class="number">25</span>)], Flex::SpaceAround)]
-        <span class="attr">#[case::min(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">25</span>), (<span class="number">25</span>, <span class="number">75</span>)]</span>, <span class="macro">vec!</span>[Min(<span class="number">25</span>), Min(<span class="number">25</span>)], Flex::Legacy)]
-        <span class="attr">#[case::min(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">50</span>), (<span class="number">50</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Min(<span class="number">25</span>), Min(<span class="number">25</span>)], Flex::Start)]
-        <span class="attr">#[case::min(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">50</span>), (<span class="number">50</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Min(<span class="number">25</span>), Min(<span class="number">25</span>)], Flex::Center)]
-        <span class="attr">#[case::min(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">50</span>), (<span class="number">50</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Min(<span class="number">25</span>), Min(<span class="number">25</span>)], Flex::End)]
-        <span class="attr">#[case::min(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">50</span>), (<span class="number">50</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Min(<span class="number">25</span>), Min(<span class="number">25</span>)], Flex::SpaceBetween)]
-        <span class="attr">#[case::min(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">50</span>), (<span class="number">50</span>, <span class="number">50</span>)]</span>, <span class="macro">vec!</span>[Min(<span class="number">25</span>), Min(<span class="number">25</span>)], Flex::SpaceAround)]
-        <span class="attr">#[case::max(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">25</span>), (<span class="number">25</span>, <span class="number">75</span>)]</span>, <span class="macro">vec!</span>[Max(<span class="number">25</span>), Max(<span class="number">25</span>)], Flex::Legacy)]
-        <span class="attr">#[case::max(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">25</span>), (<span class="number">25</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Max(<span class="number">25</span>), Max(<span class="number">25</span>)], Flex::Start)]
-        <span class="attr">#[case::max(<span class="macro">vec!</span>[(<span class="number">25</span>, <span class="number">25</span>), (<span class="number">50</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Max(<span class="number">25</span>), Max(<span class="number">25</span>)], Flex::Center)]
-        <span class="attr">#[case::max(<span class="macro">vec!</span>[(<span class="number">50</span>, <span class="number">25</span>), (<span class="number">75</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Max(<span class="number">25</span>), Max(<span class="number">25</span>)], Flex::End)]
-        <span class="attr">#[case::max(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">25</span>), (<span class="number">75</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Max(<span class="number">25</span>), Max(<span class="number">25</span>)], Flex::SpaceBetween)]
-        <span class="attr">#[case::max(<span class="macro">vec!</span>[(<span class="number">17</span>, <span class="number">25</span>), (<span class="number">58</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Max(<span class="number">25</span>), Max(<span class="number">25</span>)], Flex::SpaceAround)]
-        <span class="attr">#[case::length_spaced_around(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">25</span>), (<span class="number">38</span>, <span class="number">25</span>), (<span class="number">75</span>, <span class="number">25</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)], Flex::SpaceBetween)]
+        #[case::length_legacy(<span class="macro">vec!</span>[Length(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>], Flex::Legacy)]
+        <span class="attr">#[case::length_start(<span class="macro">vec!</span>[Length(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>], Flex::Start)]
+        <span class="attr">#[case::length_end(<span class="macro">vec!</span>[Length(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">50</span>..<span class="number">100</span>], Flex::End)]
+        <span class="attr">#[case::length_center(<span class="macro">vec!</span>[Length(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>..<span class="number">75</span>], Flex::Center)]
+        <span class="attr">#[case::ratio_legacy(<span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">2</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>], Flex::Legacy)]
+        <span class="attr">#[case::ratio_start(<span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">2</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>], Flex::Start)]
+        <span class="attr">#[case::ratio_end(<span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">2</span>)]</span>, <span class="macro">vec!</span>[<span class="number">50</span>..<span class="number">100</span>], Flex::End)]
+        <span class="attr">#[case::ratio_center(<span class="macro">vec!</span>[Ratio(<span class="number">1</span>, <span class="number">2</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>..<span class="number">75</span>], Flex::Center)]
+        <span class="attr">#[case::percent_legacy(<span class="macro">vec!</span>[Percentage(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>], Flex::Legacy)]
+        <span class="attr">#[case::percent_start(<span class="macro">vec!</span>[Percentage(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>], Flex::Start)]
+        <span class="attr">#[case::percent_end(<span class="macro">vec!</span>[Percentage(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">50</span>..<span class="number">100</span>], Flex::End)]
+        <span class="attr">#[case::percent_center(<span class="macro">vec!</span>[Percentage(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>..<span class="number">75</span>], Flex::Center)]
+        <span class="attr">#[case::min_legacy(<span class="macro">vec!</span>[Min(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>], Flex::Legacy)]
+        <span class="attr">#[case::min_start(<span class="macro">vec!</span>[Min(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>], Flex::Start)]
+        <span class="attr">#[case::min_end(<span class="macro">vec!</span>[Min(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>], Flex::End)]
+        <span class="attr">#[case::min_center(<span class="macro">vec!</span>[Min(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>], Flex::Center)]
+        <span class="attr">#[case::max_legacy(<span class="macro">vec!</span>[Max(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>], Flex::Legacy)]
+        <span class="attr">#[case::max_start(<span class="macro">vec!</span>[Max(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>], Flex::Start)]
+        <span class="attr">#[case::max_end(<span class="macro">vec!</span>[Max(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">50</span>..<span class="number">100</span>], Flex::End)]
+        <span class="attr">#[case::max_center(<span class="macro">vec!</span>[Max(<span class="number">50</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>..<span class="number">75</span>], Flex::Center)]
+        <span class="attr">#[case::spacebetween_becomes_stretch1(<span class="macro">vec!</span>[Min(<span class="number">1</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>], Flex::SpaceBetween)]
+        <span class="attr">#[case::spacebetween_becomes_stretch2(<span class="macro">vec!</span>[Max(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>], Flex::SpaceBetween)]
+        <span class="attr">#[case::spacebetween_becomes_stretch3(<span class="macro">vec!</span>[Length(<span class="number">20</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">100</span>], Flex::SpaceBetween)]
+        <span class="attr">#[case::length_legacy2(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">100</span>], Flex::Legacy)]
+        <span class="attr">#[case::length_start2(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">50</span>], Flex::Start)]
+        <span class="attr">#[case::length_center2(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">75</span>], Flex::Center)]
+        <span class="attr">#[case::length_end2(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">50</span>..<span class="number">75</span>, <span class="number">75</span>..<span class="number">100</span>], Flex::End)]
+        <span class="attr">#[case::length_spacebetween(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">75</span>..<span class="number">100</span>], Flex::SpaceBetween)]
+        <span class="attr">#[case::length_spacearound(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">17</span>..<span class="number">42</span>, <span class="number">58</span>..<span class="number">83</span>], Flex::SpaceAround)]
+        <span class="attr">#[case::percentage_legacy(<span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Percentage(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">100</span>], Flex::Legacy)]
+        <span class="attr">#[case::percentage_start(<span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Percentage(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">50</span>], Flex::Start)]
+        <span class="attr">#[case::percentage_center(<span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Percentage(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">75</span>], Flex::Center)]
+        <span class="attr">#[case::percentage_end(<span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Percentage(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">50</span>..<span class="number">75</span>, <span class="number">75</span>..<span class="number">100</span>], Flex::End)]
+        <span class="attr">#[case::percentage_spacebetween(<span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Percentage(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">75</span>..<span class="number">100</span>], Flex::SpaceBetween)]
+        <span class="attr">#[case::percentage_spacearound(<span class="macro">vec!</span>[Percentage(<span class="number">25</span>), Percentage(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">17</span>..<span class="number">42</span>, <span class="number">58</span>..<span class="number">83</span>], Flex::SpaceAround)]
+        <span class="attr">#[case::min_legacy2(<span class="macro">vec!</span>[Min(<span class="number">25</span>), Min(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">100</span>], Flex::Legacy)]
+        <span class="attr">#[case::min_start2(<span class="macro">vec!</span>[Min(<span class="number">25</span>), Min(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>], Flex::Start)]
+        <span class="attr">#[case::min_center2(<span class="macro">vec!</span>[Min(<span class="number">25</span>), Min(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>], Flex::Center)]
+        <span class="attr">#[case::min_end2(<span class="macro">vec!</span>[Min(<span class="number">25</span>), Min(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>], Flex::End)]
+        <span class="attr">#[case::min_spacebetween(<span class="macro">vec!</span>[Min(<span class="number">25</span>), Min(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>], Flex::SpaceBetween)]
+        <span class="attr">#[case::min_spacearound(<span class="macro">vec!</span>[Min(<span class="number">25</span>), Min(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">100</span>], Flex::SpaceAround)]
+        <span class="attr">#[case::max_legacy2(<span class="macro">vec!</span>[Max(<span class="number">25</span>), Max(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">100</span>], Flex::Legacy)]
+        <span class="attr">#[case::max_start2(<span class="macro">vec!</span>[Max(<span class="number">25</span>), Max(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">25</span>..<span class="number">50</span>], Flex::Start)]
+        <span class="attr">#[case::max_center2(<span class="macro">vec!</span>[Max(<span class="number">25</span>), Max(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">25</span>..<span class="number">50</span>, <span class="number">50</span>..<span class="number">75</span>], Flex::Center)]
+        <span class="attr">#[case::max_end2(<span class="macro">vec!</span>[Max(<span class="number">25</span>), Max(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">50</span>..<span class="number">75</span>, <span class="number">75</span>..<span class="number">100</span>], Flex::End)]
+        <span class="attr">#[case::max_spacebetween(<span class="macro">vec!</span>[Max(<span class="number">25</span>), Max(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">75</span>..<span class="number">100</span>], Flex::SpaceBetween)]
+        <span class="attr">#[case::max_spacearound(<span class="macro">vec!</span>[Max(<span class="number">25</span>), Max(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">17</span>..<span class="number">42</span>, <span class="number">58</span>..<span class="number">83</span>], Flex::SpaceAround)]
+        <span class="attr">#[case::length_spaced_around(<span class="macro">vec!</span>[Length(<span class="number">25</span>), Length(<span class="number">25</span>), Length(<span class="number">25</span>)]</span>, <span class="macro">vec!</span>[<span class="number">0</span>..<span class="number">25</span>, <span class="number">38</span>..<span class="number">63</span>, <span class="number">75</span>..<span class="number">100</span>], Flex::SpaceBetween)]
         <span class="kw">fn </span>flex_constraint(
+            <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
+            <span class="attr">#[case] </span>expected: Vec&lt;Range&lt;u16&gt;&gt;,
+            <span class="attr">#[case] </span>flex: Flex,
+        ) {
+            <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
+            <span class="kw">let </span>ranges = Layout::horizontal(constraints)
+                .flex(flex)
+                .split(rect)
+                .iter()
+                .map(|r| r.left()..r.right())
+                .collect_vec();
+            <span class="macro">assert_eq!</span>(ranges, expected);
+        }
+
+        <span class="attr">#[rstest]
+        #[case::length_overlap1(<span class="macro">vec!</span>[(<span class="number">0  </span>, <span class="number">20</span>) , (<span class="number">20 </span>, <span class="number">20</span>) , (<span class="number">40 </span>, <span class="number">20</span>)] </span>, <span class="macro">vec!</span>[Length(<span class="number">20</span>) , Length(<span class="number">20</span>) , Length(<span class="number">20</span>)] , Flex::Start        , <span class="number">0</span>)]
+        <span class="attr">#[case::length_overlap2(<span class="macro">vec!</span>[(<span class="number">0  </span>, <span class="number">20</span>) , (<span class="number">19 </span>, <span class="number">20</span>) , (<span class="number">38 </span>, <span class="number">20</span>)] </span>, <span class="macro">vec!</span>[Length(<span class="number">20</span>) , Length(<span class="number">20</span>) , Length(<span class="number">20</span>)] , Flex::Start        , -<span class="number">1</span>)]
+        <span class="attr">#[case::length_overlap3(<span class="macro">vec!</span>[(<span class="number">21 </span>, <span class="number">20</span>) , (<span class="number">40 </span>, <span class="number">20</span>) , (<span class="number">59 </span>, <span class="number">20</span>)] </span>, <span class="macro">vec!</span>[Length(<span class="number">20</span>) , Length(<span class="number">20</span>) , Length(<span class="number">20</span>)] , Flex::Center       , -<span class="number">1</span>)]
+        <span class="attr">#[case::length_overlap4(<span class="macro">vec!</span>[(<span class="number">42 </span>, <span class="number">20</span>) , (<span class="number">61 </span>, <span class="number">20</span>) , (<span class="number">80 </span>, <span class="number">20</span>)] </span>, <span class="macro">vec!</span>[Length(<span class="number">20</span>) , Length(<span class="number">20</span>) , Length(<span class="number">20</span>)] , Flex::End          , -<span class="number">1</span>)]
+        <span class="attr">#[case::length_overlap5(<span class="macro">vec!</span>[(<span class="number">0  </span>, <span class="number">20</span>) , (<span class="number">19 </span>, <span class="number">20</span>) , (<span class="number">38 </span>, <span class="number">62</span>)] </span>, <span class="macro">vec!</span>[Length(<span class="number">20</span>) , Length(<span class="number">20</span>) , Length(<span class="number">20</span>)] , Flex::Legacy       , -<span class="number">1</span>)]
+        <span class="attr">#[case::length_overlap6(<span class="macro">vec!</span>[(<span class="number">0  </span>, <span class="number">20</span>) , (<span class="number">40 </span>, <span class="number">20</span>) , (<span class="number">80 </span>, <span class="number">20</span>)] </span>, <span class="macro">vec!</span>[Length(<span class="number">20</span>) , Length(<span class="number">20</span>) , Length(<span class="number">20</span>)] , Flex::SpaceBetween , -<span class="number">1</span>)]
+        <span class="attr">#[case::length_overlap7(<span class="macro">vec!</span>[(<span class="number">10 </span>, <span class="number">20</span>) , (<span class="number">40 </span>, <span class="number">20</span>) , (<span class="number">70 </span>, <span class="number">20</span>)] </span>, <span class="macro">vec!</span>[Length(<span class="number">20</span>) , Length(<span class="number">20</span>) , Length(<span class="number">20</span>)] , Flex::SpaceAround  , -<span class="number">1</span>)]
+        <span class="kw">fn </span>flex_overlap(
             <span class="attr">#[case] </span>expected: Vec&lt;(u16, u16)&gt;,
             <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
             <span class="attr">#[case] </span>flex: Flex,
+            <span class="attr">#[case] </span>spacing: i16,
         ) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
             <span class="kw">let </span>r = Layout::horizontal(constraints)
                 .flex(flex)
-                .split(rect)
+                .spacing(spacing)
+                .split(rect);
+            <span class="kw">let </span>result = r
                 .iter()
                 .map(|r| (r.x, r.width))
                 .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
+
+            <span class="macro">assert_eq!</span>(result, expected);
         }
 
         <span class="attr">#[rstest]
@@ -4839,7 +5068,7 @@
             <span class="attr">#[case] </span>expected: Vec&lt;(u16, u16)&gt;,
             <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
             <span class="attr">#[case] </span>flex: Flex,
-            <span class="attr">#[case] </span>spacing: u16,
+            <span class="attr">#[case] </span>spacing: i16,
         ) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
             <span class="kw">let </span>r = Layout::horizontal(constraints)
@@ -4850,7 +5079,7 @@
                 .iter()
                 .map(|r| (r.x, r.width))
                 .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, result);
+            <span class="macro">assert_eq!</span>(result, expected);
         }
 
         <span class="attr">#[rstest]
@@ -4882,7 +5111,7 @@
                 .iter()
                 .map(|r| (r.x, r.width))
                 .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
+            <span class="macro">assert_eq!</span>(r, expected);
         }
 
         <span class="attr">#[rstest]
@@ -4896,7 +5125,7 @@
             <span class="attr">#[case] </span>expected: Vec&lt;(u16, u16)&gt;,
             <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
             <span class="attr">#[case] </span>flex: Flex,
-            <span class="attr">#[case] </span>spacing: u16,
+            <span class="attr">#[case] </span>spacing: i16,
         ) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
             <span class="kw">let </span>r = Layout::horizontal(constraints)
@@ -4906,7 +5135,7 @@
                 .iter()
                 .map(|r| (r.x, r.width))
                 .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, r);
+            <span class="macro">assert_eq!</span>(r, expected);
         }
 
         <span class="attr">#[rstest]
@@ -4931,7 +5160,7 @@
                 .iter()
                 .map(|r| (r.x, r.width))
                 .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, result);
+            <span class="macro">assert_eq!</span>(result, expected);
         }
 
         <span class="attr">#[rstest]
@@ -4963,7 +5192,7 @@
             <span class="attr">#[case] </span>expected: Vec&lt;(u16, u16)&gt;,
             <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
             <span class="attr">#[case] </span>flex: Flex,
-            <span class="attr">#[case] </span>spacing: u16,
+            <span class="attr">#[case] </span>spacing: i16,
         ) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
             <span class="kw">let </span>r = Layout::horizontal(constraints)
@@ -4978,12 +5207,35 @@
         }
 
         <span class="attr">#[rstest]
-        #[case::flex_length10(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">10</span>), (<span class="number">90</span>, <span class="number">10</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::Center, <span class="number">80</span>)]
-        <span class="kw">fn </span>flex_spacing_lower_priority_than_user_spacing(
+        #[case::flex0_1(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">55</span>), (<span class="number">45 </span>, <span class="number">55</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)], Flex::Legacy , -<span class="number">10</span>)]
+        <span class="attr">#[case::flex0_2(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">50</span>), (<span class="number">50 </span>, <span class="number">50</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)], Flex::SpaceAround , -<span class="number">10</span>)]
+        <span class="attr">#[case::flex0_3(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">55</span>), (<span class="number">45 </span>, <span class="number">55</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)], Flex::SpaceBetween , -<span class="number">10</span>)]
+        <span class="attr">#[case::flex0_4(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">55</span>), (<span class="number">45 </span>, <span class="number">55</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)], Flex::Start , -<span class="number">10</span>)]
+        <span class="attr">#[case::flex0_5(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">55</span>), (<span class="number">45 </span>, <span class="number">55</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)], Flex::Center , -<span class="number">10</span>)]
+        <span class="attr">#[case::flex0_6(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">55</span>), (<span class="number">45 </span>, <span class="number">55</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)], Flex::End , -<span class="number">10</span>)]
+        <span class="attr">#[case::flex10_1(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">51</span>), (<span class="number">50 </span>, <span class="number">50</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)], Flex::Legacy , -<span class="number">1</span>)]
+        <span class="attr">#[case::flex10_2(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">51</span>), (<span class="number">50 </span>, <span class="number">50</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)], Flex::Start , -<span class="number">1</span>)]
+        <span class="attr">#[case::flex10_3(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">51</span>), (<span class="number">50 </span>, <span class="number">50</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)], Flex::Center , -<span class="number">1</span>)]
+        <span class="attr">#[case::flex10_4(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">51</span>), (<span class="number">50 </span>, <span class="number">50</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)], Flex::End , -<span class="number">1</span>)]
+        <span class="attr">#[case::flex10_5(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">50</span>), (<span class="number">50 </span>, <span class="number">50</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)], Flex::SpaceAround , -<span class="number">1</span>)]
+        <span class="attr">#[case::flex10_6(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">51</span>), (<span class="number">50 </span>, <span class="number">50</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Fill(<span class="number">1</span>)], Flex::SpaceBetween , -<span class="number">1</span>)]
+        <span class="attr">#[case::flex_length0_1(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">55</span>), (<span class="number">45</span>, <span class="number">10</span>), (<span class="number">45 </span>, <span class="number">55</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)], Flex::Legacy , -<span class="number">10</span>)]
+        <span class="attr">#[case::flex_length0_2(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">45</span>), (<span class="number">45</span>, <span class="number">10</span>), (<span class="number">55 </span>, <span class="number">45</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)], Flex::SpaceAround , -<span class="number">10</span>)]
+        <span class="attr">#[case::flex_length0_3(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">55</span>), (<span class="number">45</span>, <span class="number">10</span>), (<span class="number">45 </span>, <span class="number">55</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)], Flex::SpaceBetween , -<span class="number">10</span>)]
+        <span class="attr">#[case::flex_length0_4(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">55</span>), (<span class="number">45</span>, <span class="number">10</span>), (<span class="number">45 </span>, <span class="number">55</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)], Flex::Start , -<span class="number">10</span>)]
+        <span class="attr">#[case::flex_length0_5(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">55</span>), (<span class="number">45</span>, <span class="number">10</span>), (<span class="number">45 </span>, <span class="number">55</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)], Flex::Center , -<span class="number">10</span>)]
+        <span class="attr">#[case::flex_length0_6(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">55</span>), (<span class="number">45</span>, <span class="number">10</span>), (<span class="number">45 </span>, <span class="number">55</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)], Flex::End , -<span class="number">10</span>)]
+        <span class="attr">#[case::flex_length10_1(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">46</span>), (<span class="number">45</span>, <span class="number">10</span>), (<span class="number">54 </span>, <span class="number">46</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)], Flex::Legacy , -<span class="number">1</span>)]
+        <span class="attr">#[case::flex_length10_2(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">46</span>), (<span class="number">45</span>, <span class="number">10</span>), (<span class="number">54 </span>, <span class="number">46</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)], Flex::Start , -<span class="number">1</span>)]
+        <span class="attr">#[case::flex_length10_3(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">46</span>), (<span class="number">45</span>, <span class="number">10</span>), (<span class="number">54 </span>, <span class="number">46</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)], Flex::Center , -<span class="number">1</span>)]
+        <span class="attr">#[case::flex_length10_4(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">46</span>), (<span class="number">45</span>, <span class="number">10</span>), (<span class="number">54 </span>, <span class="number">46</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)], Flex::End , -<span class="number">1</span>)]
+        <span class="attr">#[case::flex_length10_5(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">45</span>), (<span class="number">45</span>, <span class="number">10</span>), (<span class="number">55 </span>, <span class="number">45</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)], Flex::SpaceAround , -<span class="number">1</span>)]
+        <span class="attr">#[case::flex_length10_6(<span class="macro">vec!</span>[(<span class="number">0 </span>, <span class="number">46</span>), (<span class="number">45</span>, <span class="number">10</span>), (<span class="number">54 </span>, <span class="number">46</span>)] </span>, <span class="macro">vec!</span>[Fill(<span class="number">1</span>), Length(<span class="number">10</span>), Fill(<span class="number">1</span>)], Flex::SpaceBetween , -<span class="number">1</span>)]
+        <span class="kw">fn </span>fill_overlap(
             <span class="attr">#[case] </span>expected: Vec&lt;(u16, u16)&gt;,
             <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
             <span class="attr">#[case] </span>flex: Flex,
-            <span class="attr">#[case] </span>spacing: u16,
+            <span class="attr">#[case] </span>spacing: i16,
         ) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
             <span class="kw">let </span>r = Layout::horizontal(constraints)
@@ -4994,7 +5246,27 @@
                 .iter()
                 .map(|r| (r.x, r.width))
                 .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, result);
+            <span class="macro">assert_eq!</span>(result, expected);
+        }
+
+        <span class="attr">#[rstest]
+        #[case::flex_length10(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">10</span>), (<span class="number">90</span>, <span class="number">10</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::Center, <span class="number">80</span>)]
+        <span class="kw">fn </span>flex_spacing_lower_priority_than_user_spacing(
+            <span class="attr">#[case] </span>expected: Vec&lt;(u16, u16)&gt;,
+            <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
+            <span class="attr">#[case] </span>flex: Flex,
+            <span class="attr">#[case] </span>spacing: i16,
+        ) {
+            <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
+            <span class="kw">let </span>r = Layout::horizontal(constraints)
+                .flex(flex)
+                .spacing(spacing)
+                .split(rect);
+            <span class="kw">let </span>result = r
+                .iter()
+                .map(|r| (r.x, r.width))
+                .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
+            <span class="macro">assert_eq!</span>(result, expected);
         }
 
         <span class="attr">#[rstest]
@@ -5018,7 +5290,7 @@
                 .iter()
                 .map(|r| (r.x, r.width))
                 .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, result);
+            <span class="macro">assert_eq!</span>(result, expected);
         }
 
         <span class="attr">#[rstest]
@@ -5032,7 +5304,7 @@
             <span class="attr">#[case] </span>expected: Vec&lt;(u16, u16)&gt;,
             <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
             <span class="attr">#[case] </span>flex: Flex,
-            <span class="attr">#[case] </span>spacing: u16,
+            <span class="attr">#[case] </span>spacing: i16,
         ) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
             <span class="kw">let </span>(<span class="kw">_</span>, s) = Layout::horizontal(<span class="kw-2">&amp;</span>constraints)
@@ -5048,17 +5320,17 @@
         }
 
         <span class="attr">#[rstest]
-        #[case::spacers(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>), (<span class="number">0</span>, <span class="number">100</span>), (<span class="number">100</span>, <span class="number">0</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::Legacy, <span class="number">200</span>)]
-        <span class="attr">#[case::spacers(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>), (<span class="number">0</span>, <span class="number">100</span>), (<span class="number">100</span>, <span class="number">0</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::SpaceBetween, <span class="number">200</span>)]
-        <span class="attr">#[case::spacers(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">33</span>), (<span class="number">33</span>, <span class="number">34</span>), (<span class="number">67</span>, <span class="number">33</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::SpaceAround, <span class="number">200</span>)]
-        <span class="attr">#[case::spacers(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>), (<span class="number">0</span>, <span class="number">100</span>), (<span class="number">100</span>, <span class="number">0</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::Start, <span class="number">200</span>)]
-        <span class="attr">#[case::spacers(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>), (<span class="number">0</span>, <span class="number">100</span>), (<span class="number">100</span>, <span class="number">0</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::Center, <span class="number">200</span>)]
-        <span class="attr">#[case::spacers(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>), (<span class="number">0</span>, <span class="number">100</span>), (<span class="number">100</span>, <span class="number">0</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::End, <span class="number">200</span>)]
-        <span class="kw">fn </span>split_with_spacers_and_too_much_spacing(
+        #[case::spacers_1(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>), (<span class="number">10</span>, <span class="number">0</span>), (<span class="number">100</span>, <span class="number">0</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::Legacy, -<span class="number">1</span>)]
+        <span class="attr">#[case::spacers_2(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>), (<span class="number">10</span>, <span class="number">80</span>), (<span class="number">100</span>, <span class="number">0</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::SpaceBetween, -<span class="number">1</span>)]
+        <span class="attr">#[case::spacers_3(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">27</span>), (<span class="number">37</span>, <span class="number">26</span>), (<span class="number">73</span>, <span class="number">27</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::SpaceAround, -<span class="number">1</span>)]
+        <span class="attr">#[case::spacers_4(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>), (<span class="number">10</span>, <span class="number">0</span>), (<span class="number">19</span>, <span class="number">81</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::Start, -<span class="number">1</span>)]
+        <span class="attr">#[case::spacers_5(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">41</span>), (<span class="number">51</span>, <span class="number">0</span>), (<span class="number">60</span>, <span class="number">40</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::Center, -<span class="number">1</span>)]
+        <span class="attr">#[case::spacers_6(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">81</span>), (<span class="number">91</span>, <span class="number">0</span>), (<span class="number">100</span>, <span class="number">0</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::End, -<span class="number">1</span>)]
+        <span class="kw">fn </span>split_with_spacers_and_overlap(
             <span class="attr">#[case] </span>expected: Vec&lt;(u16, u16)&gt;,
             <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
             <span class="attr">#[case] </span>flex: Flex,
-            <span class="attr">#[case] </span>spacing: u16,
+            <span class="attr">#[case] </span>spacing: i16,
         ) {
             <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
             <span class="kw">let </span>(<span class="kw">_</span>, s) = Layout::horizontal(<span class="kw-2">&amp;</span>constraints)
@@ -5070,7 +5342,33 @@
                 .iter()
                 .map(|r| (r.x, r.width))
                 .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, result);
+            <span class="macro">assert_eq!</span>(result, expected);
+        }
+
+        <span class="attr">#[rstest]
+        #[case::spacers(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>), (<span class="number">0</span>, <span class="number">100</span>), (<span class="number">100</span>, <span class="number">0</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::Legacy, <span class="number">200</span>)]
+        <span class="attr">#[case::spacers(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>), (<span class="number">0</span>, <span class="number">100</span>), (<span class="number">100</span>, <span class="number">0</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::SpaceBetween, <span class="number">200</span>)]
+        <span class="attr">#[case::spacers(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">33</span>), (<span class="number">33</span>, <span class="number">34</span>), (<span class="number">67</span>, <span class="number">33</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::SpaceAround, <span class="number">200</span>)]
+        <span class="attr">#[case::spacers(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>), (<span class="number">0</span>, <span class="number">100</span>), (<span class="number">100</span>, <span class="number">0</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::Start, <span class="number">200</span>)]
+        <span class="attr">#[case::spacers(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>), (<span class="number">0</span>, <span class="number">100</span>), (<span class="number">100</span>, <span class="number">0</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::Center, <span class="number">200</span>)]
+        <span class="attr">#[case::spacers(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>), (<span class="number">0</span>, <span class="number">100</span>), (<span class="number">100</span>, <span class="number">0</span>)]</span>, <span class="macro">vec!</span>[Length(<span class="number">10</span>), Length(<span class="number">10</span>)], Flex::End, <span class="number">200</span>)]
+        <span class="kw">fn </span>split_with_spacers_and_too_much_spacing(
+            <span class="attr">#[case] </span>expected: Vec&lt;(u16, u16)&gt;,
+            <span class="attr">#[case] </span>constraints: Vec&lt;Constraint&gt;,
+            <span class="attr">#[case] </span>flex: Flex,
+            <span class="attr">#[case] </span>spacing: i16,
+        ) {
+            <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">1</span>);
+            <span class="kw">let </span>(<span class="kw">_</span>, s) = Layout::horizontal(<span class="kw-2">&amp;</span>constraints)
+                .flex(flex)
+                .spacing(spacing)
+                .split_with_spacers(rect);
+            <span class="macro">assert_eq!</span>(s.len(), constraints.len() + <span class="number">1</span>);
+            <span class="kw">let </span>result = s
+                .iter()
+                .map(|r| (r.x, r.width))
+                .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
+            <span class="macro">assert_eq!</span>(result, expected);
         }
 
         <span class="attr">#[rstest]
@@ -5091,7 +5389,7 @@
                 .iter()
                 .map(|r| (r.x, r.width))
                 .collect::&lt;Vec&lt;(u16, u16)&gt;&gt;();
-            <span class="macro">assert_eq!</span>(expected, result);
+            <span class="macro">assert_eq!</span>(result, expected);
         }
     }
 

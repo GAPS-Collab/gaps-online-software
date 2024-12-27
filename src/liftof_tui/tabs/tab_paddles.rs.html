@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_paddles.rs`."><title>tab_paddles.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_paddles.rs`."><title>tab_paddles.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">liftof_tui/tabs/</div>tab_paddles.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -500,88 +501,49 @@
 <a href="#500" id="500">500</a>
 <a href="#501" id="501">501</a>
 <a href="#502" id="502">502</a>
-<a href="#503" id="503">503</a>
-<a href="#504" id="504">504</a>
-<a href="#505" id="505">505</a>
-<a href="#506" id="506">506</a>
-<a href="#507" id="507">507</a>
-<a href="#508" id="508">508</a>
-<a href="#509" id="509">509</a>
-<a href="#510" id="510">510</a>
-<a href="#511" id="511">511</a>
-<a href="#512" id="512">512</a>
-<a href="#513" id="513">513</a>
-<a href="#514" id="514">514</a>
-<a href="#515" id="515">515</a>
-<a href="#516" id="516">516</a>
-<a href="#517" id="517">517</a>
-<a href="#518" id="518">518</a>
-<a href="#519" id="519">519</a>
-<a href="#520" id="520">520</a>
-<a href="#521" id="521">521</a>
-<a href="#522" id="522">522</a>
-<a href="#523" id="523">523</a>
-<a href="#524" id="524">524</a>
-<a href="#525" id="525">525</a>
-<a href="#526" id="526">526</a>
-<a href="#527" id="527">527</a>
-<a href="#528" id="528">528</a>
-<a href="#529" id="529">529</a>
-<a href="#530" id="530">530</a>
-<a href="#531" id="531">531</a>
-<a href="#532" id="532">532</a>
-<a href="#533" id="533">533</a>
-<a href="#534" id="534">534</a>
-<a href="#535" id="535">535</a>
-<a href="#536" id="536">536</a>
-<a href="#537" id="537">537</a>
-<a href="#538" id="538">538</a>
-<a href="#539" id="539">539</a>
-<a href="#540" id="540">540</a>
-<a href="#541" id="541">541</a>
-<a href="#542" id="542">542</a>
-<a href="#543" id="543">543</a>
-<a href="#544" id="544">544</a>
-<a href="#545" id="545">545</a>
-<a href="#546" id="546">546</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{
-    HashMap,
-    VecDeque,
+<a href="#503" id="503">503</a></pre></div><pre class="rust"><code><span class="doccomment">//! Paddle overview - waveforms, 2d charge plot 
+//! as well as baselines and baseline rms from
+//! TofHits
+//!
+
+</span><span class="kw">use </span>std::collections::{
+  HashMap,
+  VecDeque,
 };
 <span class="kw">use </span>std::sync::{
-    Arc,
-    Mutex,
+  Arc,
+  Mutex,
 };
 
 <span class="kw">use </span>crossbeam_channel::{
-    Receiver,
-    <span class="comment">//Sender,
+  Receiver,
+  <span class="comment">//Sender,
 </span>};
 
 <span class="kw">use </span>ratatui::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>ratatui::symbols::Marker;
 
-<span class="kw">use </span>ratatui::terminal::Frame;
+<span class="kw">use </span>ratatui::Frame;
 <span class="kw">use </span>ratatui::layout::Rect;
 <span class="kw">use </span>ratatui::widgets::{
-    Block,
-    BorderType,
-    Borders,
-    Paragraph,
-    List,
-    ListItem,
-    ListState,
-    canvas::{
-        Canvas,
-        <span class="comment">//Circle,
-        //Rectangle,
-        </span>Points},
+  Block,
+  BorderType,
+  Borders,
+  Paragraph,
+  List,
+  ListItem,
+  ListState,
+  canvas::{
+      Canvas,
+      <span class="comment">//Circle,
+      //Rectangle,
+      </span>Points},
 };
 
 <span class="kw">use </span>ndhistogram::{
-    ndhistogram,
-    Histogram,
-    Hist1D,
+  ndhistogram,
+  Histogram,
+  Hist1D,
 };
 <span class="kw">use </span>ndhistogram::axis::{
     Uniform,
@@ -591,29 +553,28 @@
 </span><span class="kw">use </span>tof_dataclasses::errors::SerializationError;
 <span class="comment">//use tof_dataclasses::packets::TofPacket;
 </span><span class="kw">use </span>tof_dataclasses::events::{
-    <span class="comment">//RBEvent,
-    </span>TofEvent,
-    <span class="comment">//TofHit,
-    //TofEventHeader,
-    //MasterTriggerEvent,
-    </span>RBWaveform,
+  <span class="comment">//RBEvent,
+  </span>TofEvent,
+  <span class="comment">//TofHit,
+  //TofEventHeader,
+  //MasterTriggerEvent,
+  </span>RBWaveform,
 };
 <span class="kw">use </span>tof_dataclasses::calibrations::RBCalibrations;
 <span class="kw">use </span>tof_dataclasses::database::Paddle;
-<span class="kw">use </span>tof_dataclasses::analysis::calculate_pedestal;
 
 <span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme;
 <span class="kw">use </span><span class="kw">crate</span>::menu::{
-    PaddleMenu,
-    UIMenu,
-    UIMenuItem
+  PaddleMenu,
+  UIMenu,
+  UIMenuItem
 };
 
 <span class="kw">use </span><span class="kw">crate</span>::widgets::{
-    prep_data,
-    create_labels,
-    histogram,
-    timeseries,
+  prep_data,
+  create_labels,
+  histogram,
+  timeseries,
 };
 
 <span class="attr">#[derive(Debug, Clone)]
@@ -623,10 +584,11 @@
   <span class="kw">pub </span>event_queue        : VecDeque&lt;TofEvent&gt;,
   <span class="kw">pub </span>queue_size         : usize,
   <span class="kw">pub </span>menu               : PaddleMenu&lt;<span class="lifetime">'a</span>&gt;,
-  <span class="kw">pub </span>wf_ch_a            : HashMap&lt;u8, VecDeque&lt;RBWaveform&gt;&gt;,
-  <span class="kw">pub </span>wf_ch_b            : HashMap&lt;u8, VecDeque&lt;RBWaveform&gt;&gt;,
+  <span class="kw">pub </span>wf                 : HashMap&lt;u8, VecDeque&lt;RBWaveform&gt;&gt;,
   <span class="kw">pub </span>last_wf_ch_a       : VecDeque&lt;(f64, f64)&gt;,
   <span class="kw">pub </span>last_wf_ch_b       : VecDeque&lt;(f64, f64)&gt;,
+  <span class="kw">pub </span>wf_label_a         : String,
+  <span class="kw">pub </span>wf_label_b         : String,
   <span class="comment">// baseline histograms
   </span><span class="kw">pub </span>calibrations       : Arc&lt;Mutex&lt;HashMap&lt;u8, RBCalibrations&gt;&gt;&gt;,
   <span class="kw">pub </span>baseline_ch_a      : HashMap&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;,
@@ -661,34 +623,33 @@
     }
     <span class="kw">let </span><span class="kw-2">mut </span>charge_a   = HashMap::&lt;u8, VecDeque&lt;f64&gt;&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>charge_b   = HashMap::&lt;u8, VecDeque&lt;f64&gt;&gt;::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>wf_ch_a    = HashMap::&lt;u8, VecDeque&lt;RBWaveform&gt;&gt;::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>wf_ch_b    = HashMap::&lt;u8, VecDeque&lt;RBWaveform&gt;&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>wf         = HashMap::&lt;u8, VecDeque&lt;RBWaveform&gt;&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>bl_ch_a    = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>bl_ch_b    = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>blrms_ch_a = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>blrms_ch_b = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
-    <span class="kw">let </span>bins_bl        = Uniform::new(<span class="number">20</span>, -<span class="number">2.0</span>, <span class="number">2.0</span>);
-    <span class="kw">let </span>bins_lb_rms    = Uniform::new(<span class="number">20</span>, <span class="number">0.0</span>, <span class="number">2.0</span>); 
+    <span class="kw">let </span>bins_bl        = Uniform::new(<span class="number">20</span>, -<span class="number">2.0</span>, <span class="number">2.0</span>).unwrap();
+    <span class="kw">let </span>bins_bl_rms    = Uniform::new(<span class="number">20</span>, <span class="number">0.0</span>, <span class="number">2.0</span>).unwrap(); 
     <span class="kw">for </span>pid <span class="kw">in </span><span class="number">1</span>..<span class="number">161 </span>{
       charge_a.insert(pid, VecDeque::&lt;f64&gt;::new());
       charge_b.insert(pid, VecDeque::&lt;f64&gt;::new());
-      wf_ch_a.insert(pid, VecDeque::&lt;RBWaveform&gt;::new());
-      wf_ch_b.insert(pid, VecDeque::&lt;RBWaveform&gt;::new());
+      wf.insert(pid, VecDeque::&lt;RBWaveform&gt;::new());
       bl_ch_a.insert(pid, <span class="macro">ndhistogram!</span>(bins_bl.clone()));
       bl_ch_b.insert(pid, <span class="macro">ndhistogram!</span>(bins_bl.clone()));
-      blrms_ch_a.insert(pid, <span class="macro">ndhistogram!</span>(bins_bl.clone()));
-      blrms_ch_b.insert(pid, <span class="macro">ndhistogram!</span>(bins_bl.clone()));
+      blrms_ch_a.insert(pid, <span class="macro">ndhistogram!</span>(bins_bl_rms.clone()));
+      blrms_ch_b.insert(pid, <span class="macro">ndhistogram!</span>(bins_bl_rms.clone()));
     }
-
 
     <span class="self">Self </span>{
       theme,
       te_receiver,
       event_queue       : VecDeque::&lt;TofEvent&gt;::new(),
-      queue_size        : <span class="number">1000</span>,
-      menu              : PaddleMenu::new(theme_c),
-      wf_ch_a,
-      wf_ch_b,
+      queue_size        : <span class="number">100</span>, <span class="comment">// short queue for waveforms so that we don't see 
+                               // all the old stuff
+      </span>menu              : PaddleMenu::new(theme_c),
+      wf                : wf,
+      wf_label_a        : String::from(<span class="string">"A"</span>),
+      wf_label_b        : String::from(<span class="string">"B"</span>),
       last_wf_ch_a      : VecDeque::&lt;(f64, f64)&gt;::new(),
       last_wf_ch_b      : VecDeque::&lt;(f64, f64)&gt;::new(),
       calibrations,
@@ -720,8 +681,7 @@
       <span class="prelude-val">None </span>=&gt; <span class="number">0</span>,
     };
     <span class="self">self</span>.pdl_state.select(<span class="prelude-val">Some</span>(i));
-    <span class="comment">//info!("Selecting {}", i);
-  </span>}
+  }
 
   <span class="kw">pub fn </span>prev_pd(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
     <span class="kw">let </span>i = <span class="kw">match </span><span class="self">self</span>.pdl_state.selected() {
@@ -747,79 +707,62 @@
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       },
       <span class="prelude-val">Ok</span>(ev)    =&gt; {
-        <span class="kw">let </span>wfs  = ev.get_rbwaveforms();
         <span class="kw">let </span>hits = ev.get_hits();
-        <span class="kw">for </span>h <span class="kw">in </span>hits {
-            <span class="self">self</span>.charge_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().push_back(h.get_charge_a() <span class="kw">as </span>f64);
-            <span class="self">self</span>.charge_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().push_back(h.get_charge_b() <span class="kw">as </span>f64);
-            <span class="kw">if </span><span class="self">self</span>.charge_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().len() &gt; <span class="self">self</span>.queue_size {
-              <span class="self">self</span>.charge_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().pop_front();
-            }
-            <span class="kw">if </span><span class="self">self</span>.charge_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().len() &gt; <span class="self">self</span>.queue_size {
-              <span class="self">self</span>.charge_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().pop_front();
-            }
-            <span class="kw">let </span>ch_a_bl = h.get_bl_a();
-            <span class="kw">let </span>ch_b_bl = h.get_bl_b();
-            <span class="kw">let </span>ch_a_bl_rms = h.get_bl_a_rms();
-            <span class="kw">let </span>ch_b_bl_rms = h.get_bl_b_rms();
-            <span class="comment">// cut on the range
-            </span><span class="kw">if </span>-<span class="number">2.0 </span>&lt; ch_a_bl &amp;&amp; ch_b_bl &lt; <span class="number">2.0 </span>{
-              <span class="self">self</span>.baseline_ch_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>ch_a_bl);
-            }
-            <span class="kw">if </span>-<span class="number">2.0 </span>&lt; ch_b_bl &amp;&amp; ch_b_bl &lt; <span class="number">2.0 </span>{
-              <span class="self">self</span>.baseline_ch_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>ch_b_bl);
-            }
-            <span class="comment">//self.baseline_ch_a.get_mut(&amp;(h.paddle_id as u8)).unwrap().fill(&amp;h.get_bl_a());
-            </span><span class="self">self</span>.baseline_rms_ch_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>h.get_bl_a_rms());
-            <span class="comment">//self.baseline_ch_b.get_mut(&amp;(h.paddle_id as u8)).unwrap().fill(&amp;h.get_bl_b());
-            </span><span class="self">self</span>.baseline_rms_ch_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>h.get_bl_b_rms());
+        <span class="comment">// FIXME - get baselines from hits
+        </span><span class="kw">for </span>h <span class="kw">in </span>hits {
+          <span class="self">self</span>.charge_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().push_back(h.get_charge_a() <span class="kw">as </span>f64);
+          <span class="self">self</span>.charge_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().push_back(h.get_charge_b() <span class="kw">as </span>f64);
+          <span class="kw">if </span><span class="self">self</span>.charge_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().len() &gt; <span class="self">self</span>.queue_size {
+            <span class="self">self</span>.charge_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().pop_front();
+          }
+          <span class="kw">if </span><span class="self">self</span>.charge_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().len() &gt; <span class="self">self</span>.queue_size {
+            <span class="self">self</span>.charge_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().pop_front();
+          }
+          <span class="kw">let </span>ch_a_bl = h.get_bl_a();
+          <span class="kw">let </span>ch_b_bl = h.get_bl_b();
+          <span class="comment">//let ch_a_bl_rms = h.get_bl_a_rms();
+          //let ch_b_bl_rms = h.get_bl_b_rms();
+          // cut on the range
+          </span><span class="kw">if </span>-<span class="number">2.0 </span>&lt; ch_a_bl &amp;&amp; ch_b_bl &lt; <span class="number">2.0 </span>{
+            <span class="self">self</span>.baseline_ch_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>ch_a_bl);
+          }
+          <span class="kw">if </span>-<span class="number">2.0 </span>&lt; ch_b_bl &amp;&amp; ch_b_bl &lt; <span class="number">2.0 </span>{
+            <span class="self">self</span>.baseline_ch_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>ch_b_bl);
+          }
+          <span class="comment">//self.baseline_ch_a.get_mut(&amp;(h.paddle_id as u8)).unwrap().fill(&amp;h.get_bl_a());
+          </span><span class="self">self</span>.baseline_rms_ch_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>h.get_bl_a_rms());
+          <span class="comment">//self.baseline_ch_b.get_mut(&amp;(h.paddle_id as u8)).unwrap().fill(&amp;h.get_bl_b());
+          </span><span class="self">self</span>.baseline_rms_ch_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>h.get_bl_b_rms());
         }
-        <span class="kw">let </span><span class="kw-2">mut </span>bl_a  : f32;
-        <span class="kw">let </span><span class="kw-2">mut </span>bl_b  : f32;
-        <span class="kw">let </span>rms_a = <span class="number">0f32</span>;
-        <span class="kw">let </span>rms_b = <span class="number">0f32</span>;
+        <span class="kw">let </span>wfs  = ev.get_rbwaveforms();
         <span class="kw">for </span><span class="kw-2">mut </span>wf <span class="kw">in </span>wfs {
-          <span class="kw">if </span>wf.rb_id == <span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8 {
-            <span class="kw">match </span><span class="self">self</span>.calibrations.lock() {
-              <span class="prelude-val">Err</span>(_err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to get lock on rbcalibrations!"</span>),
-              <span class="prelude-val">Ok</span>(cali) =&gt; {
-                <span class="kw">match </span>cali.get(<span class="kw-2">&amp;</span>wf.rb_id) {
-                  <span class="prelude-val">None </span>=&gt; <span class="macro">error!</span>(<span class="string">"RBCalibrations for board {} not available!"</span>, wf.rb_id),
-                  <span class="prelude-val">Some</span>(rbcal) =&gt; {
-                    <span class="kw">match </span>wf.calibrate(rbcal) {
-                      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Calibration error! {err}"</span>),
-                      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
-                    }
-                    <span class="comment">//println!("{}", wf);
-                  </span>}
+          <span class="comment">// FIXME - this is an incpmplete cosistency check and 
+          // should be removed soon
+          </span><span class="kw">if </span>wf.paddle_id == <span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8 {
+            <span class="kw">let </span>rb_channel_a = wf.rb_channel_a + <span class="number">1</span>;
+            <span class="kw">let </span>rb_channel_b = wf.rb_channel_b + <span class="number">1</span>;
+            <span class="kw">if </span>(rb_channel_a != <span class="self">self</span>.current_paddle.rb_chA <span class="kw">as </span>u8 ) 
+               || (rb_channel_b != <span class="self">self</span>.current_paddle.rb_chB <span class="kw">as </span>u8 ) {
+              <span class="macro">error!</span>(<span class="string">"Inconsistent paddle RB channels! Maybe A and B are switched!"</span>);
+            }
+          }
+          <span class="kw">match </span><span class="self">self</span>.calibrations.lock() {
+            <span class="prelude-val">Err</span>(_err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to get lock on rbcalibrations!"</span>),
+            <span class="prelude-val">Ok</span>(cali) =&gt; {
+              <span class="kw">match </span>cali.get(<span class="kw-2">&amp;</span>wf.rb_id) {
+                <span class="prelude-val">None </span>=&gt; <span class="macro">error!</span>(<span class="string">"RBCalibrations for board {} not available!"</span>, wf.rb_id),
+                <span class="prelude-val">Some</span>(rbcal) =&gt; {
+                  <span class="kw">match </span>wf.calibrate(rbcal) {
+                    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Calibration error! {err}"</span>),
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
+                  }
                 }
               }
             }
-            <span class="kw">let </span>rb_channel = wf.rb_channel + <span class="number">1</span>;
-            <span class="comment">// FiXME = empty vector check
-            //let bl = calculate_pedestal(&amp;wf.voltages, 1000.0, 850, 950);
-            </span><span class="kw">if </span>rb_channel  == <span class="self">self</span>.current_paddle.rb_chA <span class="kw">as </span>u8 {
-              <span class="kw">if </span>wf.voltages.len() &gt; <span class="number">0 </span>{
-                <span class="kw">let </span>ped = calculate_pedestal(<span class="kw-2">&amp;</span>wf.voltages, <span class="number">10.0</span>, <span class="number">850</span>, <span class="number">100</span>);
-                bl_a  = ped.<span class="number">0</span>;
-                <span class="self">self</span>.baseline_ch_a.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>bl_a);
-                <span class="self">self</span>.baseline_rms_ch_a.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>rms_a);
-              }
-              <span class="self">self</span>.wf_ch_a.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().push_back(wf);
-              <span class="kw">if </span><span class="self">self</span>.wf_ch_a.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().len() &gt; <span class="self">self</span>.queue_size {
-                <span class="self">self</span>.wf_ch_a.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().pop_front();
-              }
-            } <span class="kw">else if </span>rb_channel == <span class="self">self</span>.current_paddle.rb_chB <span class="kw">as </span>u8 {
-              <span class="kw">if </span>wf.voltages.len() &gt; <span class="number">0 </span>{
-                bl_b = calculate_pedestal(<span class="kw-2">&amp;</span>wf.voltages, <span class="number">10.0</span>, <span class="number">850</span>, <span class="number">100</span>).<span class="number">0</span>;
-                <span class="self">self</span>.baseline_ch_b.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>bl_b);
-                <span class="self">self</span>.baseline_rms_ch_b.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>rms_b);
-              }
-              <span class="self">self</span>.wf_ch_b.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().push_back(wf);
-              <span class="kw">if </span><span class="self">self</span>.wf_ch_b.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().len() &gt; <span class="self">self</span>.queue_size {
-                <span class="self">self</span>.wf_ch_b.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().pop_front();
-              }
-            }
+          }
+          <span class="self">self</span>.wf.get_mut(<span class="kw-2">&amp;</span>(wf.paddle_id <span class="kw">as </span>u8)).unwrap().push_back(wf.clone());
+          <span class="kw">if </span><span class="self">self</span>.wf.get_mut(<span class="kw-2">&amp;</span>(wf.paddle_id <span class="kw">as </span>u8)).unwrap().len() &gt; <span class="self">self</span>.queue_size {
+            <span class="self">self</span>.wf.get_mut(<span class="kw-2">&amp;</span>(wf.paddle_id <span class="kw">as </span>u8)).unwrap().pop_front();
           }
         }
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
@@ -932,44 +875,35 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>wf_data_a = VecDeque::&lt;(f64, f64)&gt;::new();    
         <span class="kw">let </span><span class="kw-2">mut </span>wf_data_b = VecDeque::&lt;(f64, f64)&gt;::new();  
-        <span class="kw">let </span><span class="kw-2">mut </span>label_a   = String::from(<span class="string">"N.A"</span>);
-        <span class="kw">let </span><span class="kw-2">mut </span>label_b   = String::from(<span class="string">"N.A"</span>);
-        <span class="kw">let </span>wf_theme      = <span class="self">self</span>.theme.clone();
-        <span class="kw">match </span><span class="self">self</span>.wf_ch_a.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().pop_front() {
+        <span class="comment">//let mut label_a   = String::from("");
+        //let mut label_b   = String::from("");
+        </span><span class="kw">let </span>wf_theme      = <span class="self">self</span>.theme.clone();
+        <span class="kw">match </span><span class="self">self</span>.wf.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap().pop_front() {
           <span class="prelude-val">None </span>=&gt; {
             <span class="comment">//for (i,k) in wf.adc.iter().enumerate() {
             //  wf_data_a.push_back((i as f64, *k as f64));
             //}
           </span>}
           <span class="prelude-val">Some</span>(wf) =&gt; {
-            label_a  = <span class="macro">format!</span>(<span class="string">"Paddle {}A, RB {}-{}"</span>,<span class="self">self</span>.current_paddle.paddle_id, wf.rb_id, wf.rb_channel + <span class="number">1</span>);
-            <span class="kw">if </span>wf.voltages.len() == <span class="number">0 </span>{
-              <span class="kw">for </span>(i,k) <span class="kw">in </span>wf.adc.iter().enumerate() {
+            <span class="comment">//label_a  = format!("Paddle {}A, RB {}-{}",self.current_paddle.paddle_id, wf.rb_id, wf.rb_channel_a + 1);
+            </span><span class="kw">if </span>wf.voltages_a.len() == <span class="number">0 </span>{
+              <span class="kw">for </span>(i,k) <span class="kw">in </span>wf.adc_a.iter().enumerate() {
                 wf_data_a.push_back((i <span class="kw">as </span>f64, <span class="kw-2">*</span>k <span class="kw">as </span>f64));
               }
             } <span class="kw">else </span>{
-              <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..wf.nanoseconds.len() {
-                wf_data_a.push_back((wf.nanoseconds[k] <span class="kw">as </span>f64, wf.voltages[k] <span class="kw">as </span>f64));
+              <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..wf.nanoseconds_a.len() {
+                wf_data_a.push_back((wf.nanoseconds_a[k] <span class="kw">as </span>f64, wf.voltages_a[k] <span class="kw">as </span>f64));
               }
             }
             <span class="self">self</span>.last_wf_ch_a = wf_data_a.clone();
-          }
-        }
-        <span class="kw">match </span><span class="self">self</span>.wf_ch_b.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.rb_id <span class="kw">as </span>u8)).unwrap().pop_front() {
-          <span class="prelude-val">None </span>=&gt; {
-            <span class="comment">//for (i,k) in wf.adc.iter().enumerate() {
-            //  wf_data_a.push_back((i as f64, *k as f64));
-            //}
-          </span>}
-          <span class="prelude-val">Some</span>(wf) =&gt; {
-            label_b  = <span class="macro">format!</span>(<span class="string">"Paddle {}B, RB {}-{}"</span>,<span class="self">self</span>.current_paddle.paddle_id, wf.rb_id, wf.rb_channel + <span class="number">1</span>);
-            <span class="kw">if </span>wf.voltages.len() == <span class="number">0 </span>{
-              <span class="kw">for </span>(i,k) <span class="kw">in </span>wf.adc.iter().enumerate() {
+            <span class="comment">//label_b  = format!("Paddle {}B, RB {}-{}",self.current_paddle.paddle_id, wf.rb_id, wf.rb_channel_b + 1);
+            </span><span class="kw">if </span>wf.voltages_b.len() == <span class="number">0 </span>{
+              <span class="kw">for </span>(i,k) <span class="kw">in </span>wf.adc_b.iter().enumerate() {
                 wf_data_b.push_back((i <span class="kw">as </span>f64, <span class="kw-2">*</span>k <span class="kw">as </span>f64));
               }
             } <span class="kw">else </span>{
-              <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..wf.nanoseconds.len() {
-                wf_data_b.push_back((wf.nanoseconds[k] <span class="kw">as </span>f64, wf.voltages[k] <span class="kw">as </span>f64));
+              <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..wf.nanoseconds_b.len() {
+                wf_data_b.push_back((wf.nanoseconds_b[k] <span class="kw">as </span>f64, wf.voltages_b[k] <span class="kw">as </span>f64));
               }
             }
             <span class="self">self</span>.last_wf_ch_b = wf_data_b.clone();
@@ -981,17 +915,17 @@
         }
         <span class="kw">let </span>wf_theme_a = wf_theme.clone();
         <span class="kw">let </span>wf_chart_a = timeseries(<span class="kw-2">&amp;mut </span>wf_data_a,
-                                  label_a.clone(),
-                                  label_a.clone(),
-                                  <span class="kw-2">&amp;</span>wf_theme_a);
+                                    <span class="self">self</span>.wf_label_a.clone(),
+                                    <span class="self">self</span>.wf_label_a.clone(),
+                                    <span class="kw-2">&amp;</span>wf_theme_a);
         <span class="kw">if </span>wf_data_b.len() == <span class="number">0 </span>{
           wf_data_b = <span class="self">self</span>.last_wf_ch_b.clone();
         }
         <span class="kw">let </span>wf_theme_b = wf_theme.clone();
         <span class="kw">let </span>wf_chart_b = timeseries(<span class="kw-2">&amp;mut </span>wf_data_b,
-                                  label_b.clone(),
-                                  label_b.clone(),
-                                  <span class="kw-2">&amp;</span>wf_theme_b);
+                                    <span class="self">self</span>.wf_label_b.clone(),
+                                    <span class="self">self</span>.wf_label_b.clone(),
+                                    <span class="kw-2">&amp;</span>wf_theme_b);
         frame.render_widget(wf_chart_a, wf_lo[<span class="number">0</span>]);
         frame.render_widget(wf_chart_b, wf_lo[<span class="number">1</span>]);
         
@@ -1068,26 +1002,6 @@
       }
       <span class="kw">_ </span>=&gt; ()
     } <span class="comment">// end match
-    //let header      = TofEventHeader::new();
-    //let mut header_string = header.to_string();
-    //match self.event_queue.back() {
-    //  None =&gt; (),
-    //  Some(ev)   =&gt; {
-    //    header_string = ev.header.to_string();
-    //    let info_field = format!("\n --&gt; NRBs {}\n --&gt; Quality: {}\n CompressionLevel {}",
-    //                             ev.rb_events.len(), ev.quality, ev.compression_level);
-    //    header_string += &amp;info_field;
-    //  }
-    //}
-    //let header_view = Paragraph::new(header_string)
-    //  .style(self.theme.style())
-    //  .alignment(Alignment::Left)
-    //  .block(
-    //    Block::default()
-    //      .borders(Borders::ALL)
-    //      .border_type(BorderType::Rounded)
-    //      .title("Last TofEvent")
-    //  );
   </span>} 
 }
 </code></pre></div></section></main></body></html>

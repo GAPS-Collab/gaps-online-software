@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["Encoder","IntoStream","IntoVec"]};

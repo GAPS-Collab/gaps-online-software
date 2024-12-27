@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/master_trigger/registers.rs`."><title>registers.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/master_trigger/registers.rs`."><title>registers.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">liftof_lib/master_trigger/</div>registers.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2400,7 +2401,14 @@
 <a href="#2400" id="2400">2400</a>
 <a href="#2401" id="2401">2401</a>
 <a href="#2402" id="2402">2402</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard registers
+<a href="#2403" id="2403">2403</a>
+<a href="#2404" id="2404">2404</a>
+<a href="#2405" id="2405">2405</a>
+<a href="#2406" id="2406">2406</a>
+<a href="#2407" id="2407">2407</a>
+<a href="#2408" id="2408">2408</a>
+<a href="#2409" id="2409">2409</a>
+<a href="#2410" id="2410">2410</a></pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard registers
 //!
 //! This should be the same as the reference
 //! doucmentation on the [UCLA gitlab server](https://gitlab.com/ucla-gaps-tof/firmware/-/blob/master/regmap/mt_address_table.org?ref_type=heads)
@@ -2610,8 +2618,8 @@
   addr  : <span class="number">0xe</span>,
   mask  : <span class="number">0xffffc000</span>,
   descr : <span class="string">"Read out emulated TIU busy time (in 10ns clock cycles)"</span>,
-  rmw   : <span class="bool-val">false</span>,
-  ro    : <span class="bool-val">true</span>,
+  rmw   : <span class="bool-val">true</span>,
+  ro    : <span class="bool-val">false</span>,
   pulse : <span class="bool-val">false
 </span>};
 
@@ -2721,7 +2729,15 @@
   pulse : <span class="bool-val">false
 </span>};
 
-
+<span class="doccomment">/// Read out the whole register 0xf at once and then 
+</span><span class="kw">pub const </span>TIU_LT_AND_RB_MULT : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
+  addr  : <span class="number">0xf</span>,
+  mask  : <span class="number">0x3fff</span>,
+  descr : <span class="string">"Aggregated TIU, LT and RB general information"</span>,
+  rmw   : <span class="bool-val">false</span>,
+  ro    : <span class="bool-val">true</span>,
+  pulse : <span class="bool-val">false
+</span>};
 
 <span class="doccomment">/// Check if the TIU BUSY is stuck
 /// TIU_BUSY_STUCK 	0xf 	0x3c 	1 	r 		1 means the TIU has been stuck high for a long time
@@ -4483,7 +4499,7 @@
 /// TRACE_TRIG_IS_GLOBAL 0xb 0x2c 1 rw 0x0
 </span><span class="kw">pub const </span>TRACK_TRIG_IS_GLOBAL : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
   addr  : <span class="number">0xb</span>,
-  mask  : <span class="number">0x00000001</span>,
+  mask  : <span class="number">0x2</span>,
   descr : <span class="string">"1 makes the TRACK trigger read all paddles"</span>,
   rmw   : <span class="bool-val">true</span>,
   ro    : <span class="bool-val">false</span>,
@@ -4494,7 +4510,7 @@
 /// ANY_TRIG_IS_GLOBAL 0xb 0x2c 0 rw 0x0
 </span><span class="kw">pub const </span>ANY_TRIG_IS_GLOBAL : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
   addr  : <span class="number">0xb</span>,
-  mask  : <span class="number">0x00000000</span>,
+  mask  : <span class="number">0x1</span>,
   descr : <span class="string">"1 makes the ANY trigger read all paddles"</span>,
   rmw   : <span class="bool-val">true</span>,
   ro    : <span class="bool-val">false</span>,
@@ -4506,7 +4522,7 @@
 /// 0xe     0x38    1   rw  0x0     1 to use J11; 0 to use J3
 </span><span class="kw">pub const </span>TIU_USE_AUX_LINK : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
   addr  : <span class="number">0xe</span>,
-  mask  : <span class="number">0x00000010</span>,
+  mask  : <span class="number">0x2</span>,
   descr : <span class="string">"Choose between the 2 tiu links"</span>,
   rmw   : <span class="bool-val">true</span>,
   ro    : <span class="bool-val">false</span>,

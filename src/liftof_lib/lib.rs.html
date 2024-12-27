@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">liftof_lib/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -840,29 +841,7 @@
 <a href="#840" id="840">840</a>
 <a href="#841" id="841">841</a>
 <a href="#842" id="842">842</a>
-<a href="#843" id="843">843</a>
-<a href="#844" id="844">844</a>
-<a href="#845" id="845">845</a>
-<a href="#846" id="846">846</a>
-<a href="#847" id="847">847</a>
-<a href="#848" id="848">848</a>
-<a href="#849" id="849">849</a>
-<a href="#850" id="850">850</a>
-<a href="#851" id="851">851</a>
-<a href="#852" id="852">852</a>
-<a href="#853" id="853">853</a>
-<a href="#854" id="854">854</a>
-<a href="#855" id="855">855</a>
-<a href="#856" id="856">856</a>
-<a href="#857" id="857">857</a>
-<a href="#858" id="858">858</a>
-<a href="#859" id="859">859</a>
-<a href="#860" id="860">860</a>
-<a href="#861" id="861">861</a>
-<a href="#862" id="862">862</a>
-<a href="#863" id="863">863</a>
-<a href="#864" id="864">864</a>
-</pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
+<a href="#843" id="843">843</a></pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
 <span class="kw">pub mod </span>settings;
 <span class="kw">pub mod </span>constants;
 <span class="kw">pub mod </span>thread_control;
@@ -879,7 +858,8 @@
     Arc,
     Mutex,
 };
-<span class="kw">use </span>std::process::exit;
+
+<span class="kw">use </span>chrono::Utc;
 
 <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 </span><span class="kw">use </span>core::f32::consts::PI;
@@ -1009,53 +989,26 @@
 </span><span class="doccomment">/// Handle incoming POSIX signals
 </span><span class="kw">pub fn </span>signal_handler(thread_control     : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;) {
   <span class="kw">let </span>sleep_time = Duration::from_millis(<span class="number">300</span>);
-
-  <span class="kw">let </span><span class="kw-2">mut </span>end_program = <span class="bool-val">false</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>signals = Signals::new(<span class="kw-2">&amp;</span>[SIGTERM, SIGINT]).expect(<span class="string">"Unknown signals"</span>);
-  <span class="kw">loop </span>{
+  <span class="lifetime">'main</span>: <span class="kw">loop </span>{
     thread::sleep(sleep_time);
-    <span class="kw">match </span>thread_control.try_lock() {
-      <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
-        <span class="kw">if </span>!tc.thread_signal_hdlr_active {
-          <span class="comment">//end myself
-          </span><span class="macro">info!</span>(<span class="string">"Shutting down siganl handler thread!"</span>);
-          <span class="kw">break</span>;
-        }
-        <span class="comment">//println!("== ==&gt; [signal_handler] acquired thread_control lock!");
-        //println!("Tread control {:?}", tc);
-        </span><span class="kw">if </span>!tc.thread_cmd_dispatch_active 
-        &amp;&amp; !tc.thread_data_sink_active
-        &amp;&amp; !tc.thread_event_bldr_active 
-        &amp;&amp; !tc.thread_master_trg_active  {
-          <span class="macro">println!</span>(<span class="string">"&gt;&gt; So long and thanks for all the \u{1F41F} &lt;&lt;"</span>); 
-          exit(<span class="number">0</span>);
-        }
-        <span class="kw">if </span>end_program{
-            tc.stop_flag = <span class="bool-val">true</span>;
-            <span class="kw">continue</span>;
-        }
-        <span class="kw">if </span>tc.stop_flag {
-          <span class="macro">println!</span>(<span class="string">"== ==&gt; [signal_handler] Stop flag is set, we are waiting for threads to finish..."</span>);
-          <span class="macro">println!</span>(<span class="string">"{}"</span>, tc);
-        }
-      }
-      <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! {err}"</span>);
-      },
-    }
 
     <span class="comment">// check pending signals and handle
     // SIGTERM and SIGINT
     </span><span class="kw">for </span>signal <span class="kw">in </span>signals.pending() {
       <span class="kw">match </span>signal <span class="kw">as </span>c_int {
-        SIGTERM =&gt; {
-          <span class="macro">println!</span>(<span class="string">"=&gt; {}"</span>, String::from(<span class="string">"SIGTERM received. Maybe Ctrl+C has been pressed!"</span>).red().bold());
-          end_program = <span class="bool-val">true</span>;
-        } 
-        SIGINT =&gt; {
-          <span class="macro">println!</span>(<span class="string">"=&gt; {}"</span>, String::from(<span class="string">"SIGINT received"</span>).red().bold());
-          end_program = <span class="bool-val">true</span>;
-        }
+        SIGTERM | SIGINT =&gt; {
+          <span class="macro">println!</span>(<span class="string">"=&gt; {}"</span>, String::from(<span class="string">"SIGTERM or SIGINT received. Maybe Ctrl+C has been pressed! Commencing program shutdown!"</span>).red().bold());
+          <span class="kw">match </span>thread_control.lock() {
+            <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
+              tc.sigint_recvd = <span class="bool-val">true</span>;
+            }
+            <span class="prelude-val">Err</span>(err) =&gt; {
+              <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! {err}"</span>);
+            },
+          }
+          <span class="kw">break </span><span class="lifetime">'main</span>; <span class="comment">// now end myself
+        </span>} 
         <span class="kw">_ </span>=&gt; {
           <span class="macro">error!</span>(<span class="string">"Received signal, but I don't have instructions what to do about it!"</span>);
         }
@@ -1084,11 +1037,12 @@
 </span><span class="kw">pub fn </span>init_env_logger() {
   env_logger::builder()
     .format(|buf, record| {
-    <span class="macro">writeln!</span>( buf, <span class="string">"[{level}][{module_path}:{line}] {args}"</span>,
+    <span class="macro">writeln!</span>( buf, <span class="string">"[{ts} - {level}][{module_path}:{line}] {args}"</span>,
+      ts    = Utc::now().format(<span class="string">"%Y/%m/%d-%H:%M:%SUTC"</span>), 
       level = color_log(<span class="kw-2">&amp;</span>record.level()),
       module_path = record.module_path().unwrap_or(<span class="string">"&lt;unknown&gt;"</span>),
-      line = record.line().unwrap_or(<span class="number">0</span>),
-      args = record.args()
+      line  = record.line().unwrap_or(<span class="number">0</span>),
+      args  = record.args()
       )
     }).init();
 }
@@ -1295,16 +1249,18 @@
                          rb            : <span class="kw-2">&amp;</span>ReadoutBoard,
                          settings      : AnalysisEngineSettings)
 -&gt; <span class="prelude-ty">Result</span>&lt;(), AnalysisError&gt; {
-  <span class="comment">//if event.status != EventStatus::Perfect {
-  //if event.header.broken {
-  //  // just return the analysis error, there 
-  //  // is probably nothing else we can do?
-  //  return Err(AnalysisError::InputBroken);
-  //}
-  // ch -&gt; pid
-  // pid -&gt; (ch, ch) (for the two paddle ends)
-  //let mut pid_vs_chs = HashMap::&lt;u8, (PaddleEndIdentifier,[u8;2])&gt;::new();
-  </span><span class="kw">let </span>active_channels = event.header.get_channels();
+  <span class="comment">// Don't do analysis for mangled events!
+  </span><span class="kw">if </span>event.has_any_mangling_flag() {
+    <span class="macro">warn!</span>(<span class="string">"Event for RB {} has data mangling! Not doing analysis!"</span>, rb.rb_id);
+    <span class="kw">return </span><span class="prelude-val">Err</span>(AnalysisError::DataMangling);
+  }
+  <span class="kw">match </span>event.self_check() {
+    <span class="prelude-val">Err</span>(_err) =&gt; {
+      <span class="comment">// Phlip want to ahve all hits even if they are broken
+    </span>},
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+  }
+  <span class="kw">let </span>active_channels = event.header.get_channels();
   <span class="comment">// will become a parameter
   </span><span class="kw">let </span>fit_sinus       = <span class="bool-val">true</span>;
   <span class="comment">// allocate memory for the calbration results
@@ -1316,6 +1272,8 @@
   <span class="kw">if </span>fit_sinus {
     <span class="kw">if </span>!active_channels.contains(<span class="kw-2">&amp;</span><span class="number">8</span>) {
       <span class="macro">error!</span>(<span class="string">"RB {} does not have ch9 data!"</span>, rb.rb_id);
+      <span class="comment">//println!("{}", event.header);
+      </span><span class="kw">return </span><span class="prelude-val">Err</span>(AnalysisError::NoChannel9);
     }
     rb.calibration.voltages(<span class="number">9</span>,
                             event.header.stop_cell <span class="kw">as </span>usize,
@@ -1335,8 +1293,8 @@
     fit_result                = fit_sine_sydney(<span class="kw-2">&amp;</span>voltages, <span class="kw-2">&amp;</span>times);
 
     <span class="comment">//println!("FIT RESULT = {:?}", fit_result);
-    </span>event.header.set_sine_fit(fit_result);
-  }
+    //event.header.set_sine_fit(fit_result);
+  </span>}
 
   <span class="comment">// structure to store final result
   // extend with Vec&lt;TofHit&gt; in case

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/terminal/terminal.rs`."><title>terminal.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/terminal/terminal.rs`."><title>terminal.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/terminal/</div>terminal.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -496,9 +497,372 @@
 <a href="#496" id="496">496</a>
 <a href="#497" id="497">497</a>
 <a href="#498" id="498">498</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::io;
+<a href="#499" id="499">499</a>
+<a href="#500" id="500">500</a>
+<a href="#501" id="501">501</a>
+<a href="#502" id="502">502</a>
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
+<a href="#505" id="505">505</a>
+<a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
+<a href="#509" id="509">509</a>
+<a href="#510" id="510">510</a>
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::io;
 
-<span class="kw">use crate</span>::{backend::ClearType, prelude::<span class="kw-2">*</span>, CompletedFrame, TerminalOptions, Viewport};
+<span class="kw">use crate</span>::{
+    backend::{Backend, ClearType},
+    buffer::{Buffer, Cell},
+    layout::{Position, Rect, Size},
+    CompletedFrame, Frame, TerminalOptions, Viewport,
+};
 
 <span class="doccomment">/// An interface to interact and draw [`Frame`]s on the user's terminal.
 ///
@@ -528,14 +892,13 @@
 /// ```rust,no_run
 /// use std::io::stdout;
 ///
-/// use ratatui::{prelude::*, widgets::Paragraph};
+/// use ratatui::{backend::CrosstermBackend, widgets::Paragraph, Terminal};
 ///
 /// let backend = CrosstermBackend::new(stdout());
 /// let mut terminal = Terminal::new(backend)?;
 /// terminal.draw(|frame| {
-///     let area = frame.size();
+///     let area = frame.area();
 ///     frame.render_widget(Paragraph::new("Hello World!"), area);
-///     frame.set_cursor(0, 0);
 /// })?;
 /// # std::io::Result::Ok(())
 /// ```
@@ -564,11 +927,11 @@
     </span>viewport: Viewport,
     <span class="doccomment">/// Area of the viewport
     </span>viewport_area: Rect,
-    <span class="doccomment">/// Last known size of the terminal. Used to detect if the internal buffers have to be resized.
-    </span>last_known_size: Rect,
+    <span class="doccomment">/// Last known area of the terminal. Used to detect if the internal buffers have to be resized.
+    </span>last_known_area: Rect,
     <span class="doccomment">/// Last known position of the cursor. Used to find the new area when the viewport is inlined
     /// and the terminal resized.
-    </span>last_known_cursor_pos: (u16, u16),
+    </span>last_known_cursor_pos: Position,
     <span class="doccomment">/// Number of frames rendered up until current time.
     </span>frame_count: usize,
 }
@@ -603,8 +966,10 @@
     /// # Example
     ///
     /// ```rust,no_run
-    /// # use std::io::stdout;
-    /// # use ratatui::prelude::*;
+    /// use std::io::stdout;
+    ///
+    /// use ratatui::{backend::CrosstermBackend, Terminal};
+    ///
     /// let backend = CrosstermBackend::new(stdout());
     /// let terminal = Terminal::new(backend)?;
     /// # std::io::Result::Ok(())
@@ -623,22 +988,28 @@
     /// # Example
     ///
     /// ```rust
-    /// # use std::io::stdout;
-    /// # use ratatui::{prelude::*, backend::TestBackend, terminal::{Viewport, TerminalOptions}};
+    /// use std::io::stdout;
+    ///
+    /// use ratatui::{backend::CrosstermBackend, layout::Rect, Terminal, TerminalOptions, Viewport};
+    ///
     /// let backend = CrosstermBackend::new(stdout());
     /// let viewport = Viewport::Fixed(Rect::new(0, 0, 10, 10));
     /// let terminal = Terminal::with_options(backend, TerminalOptions { viewport })?;
     /// # std::io::Result::Ok(())
     /// ```
     </span><span class="kw">pub fn </span>with_options(<span class="kw-2">mut </span>backend: B, options: TerminalOptions) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>size = <span class="kw">match </span>options.viewport {
-            Viewport::Fullscreen | Viewport::Inline(<span class="kw">_</span>) =&gt; backend.size()<span class="question-mark">?</span>,
+        <span class="kw">let </span>area = <span class="kw">match </span>options.viewport {
+            Viewport::Fullscreen | Viewport::Inline(<span class="kw">_</span>) =&gt; {
+                Rect::from((Position::ORIGIN, backend.size()<span class="question-mark">?</span>))
+            }
             Viewport::Fixed(area) =&gt; area,
         };
         <span class="kw">let </span>(viewport_area, cursor_pos) = <span class="kw">match </span>options.viewport {
-            Viewport::Fullscreen =&gt; (size, (<span class="number">0</span>, <span class="number">0</span>)),
-            Viewport::Inline(height) =&gt; compute_inline_size(<span class="kw-2">&amp;mut </span>backend, height, size, <span class="number">0</span>)<span class="question-mark">?</span>,
-            Viewport::Fixed(area) =&gt; (area, (area.left(), area.top())),
+            Viewport::Fullscreen =&gt; (area, Position::ORIGIN),
+            Viewport::Inline(height) =&gt; {
+                compute_inline_size(<span class="kw-2">&amp;mut </span>backend, height, area.as_size(), <span class="number">0</span>)<span class="question-mark">?
+            </span>}
+            Viewport::Fixed(area) =&gt; (area, area.as_position()),
         };
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             backend,
@@ -647,7 +1018,7 @@
             hidden_cursor: <span class="bool-val">false</span>,
             viewport: options.viewport,
             viewport_area,
-            last_known_size: size,
+            last_known_area: area,
             last_known_cursor_pos: cursor_pos,
             frame_count: <span class="number">0</span>,
         })
@@ -686,31 +1057,36 @@
         <span class="kw">let </span>current_buffer = <span class="kw-2">&amp;</span><span class="self">self</span>.buffers[<span class="self">self</span>.current];
         <span class="kw">let </span>updates = previous_buffer.diff(current_buffer);
         <span class="kw">if let </span><span class="prelude-val">Some</span>((col, row, <span class="kw">_</span>)) = updates.last() {
-            <span class="self">self</span>.last_known_cursor_pos = (<span class="kw-2">*</span>col, <span class="kw-2">*</span>row);
+            <span class="self">self</span>.last_known_cursor_pos = Position { x: <span class="kw-2">*</span>col, y: <span class="kw-2">*</span>row };
         }
         <span class="self">self</span>.backend.draw(updates.into_iter())
     }
 
-    <span class="doccomment">/// Updates the Terminal so that internal buffers match the requested size.
+    <span class="doccomment">/// Updates the Terminal so that internal buffers match the requested area.
     ///
-    /// Requested size will be saved so the size can remain consistent when rendering. This leads
-    /// to a full clear of the screen.
-    </span><span class="kw">pub fn </span>resize(<span class="kw-2">&amp;mut </span><span class="self">self</span>, size: Rect) -&gt; io::Result&lt;()&gt; {
+    /// Requested area will be saved to remain consistent when rendering. This leads to a full clear
+    /// of the screen.
+    </span><span class="kw">pub fn </span>resize(<span class="kw-2">&amp;mut </span><span class="self">self</span>, area: Rect) -&gt; io::Result&lt;()&gt; {
         <span class="kw">let </span>next_area = <span class="kw">match </span><span class="self">self</span>.viewport {
-            Viewport::Fullscreen =&gt; size,
             Viewport::Inline(height) =&gt; {
                 <span class="kw">let </span>offset_in_previous_viewport = <span class="self">self
                     </span>.last_known_cursor_pos
-                    .<span class="number">1
-                    </span>.saturating_sub(<span class="self">self</span>.viewport_area.top());
-                compute_inline_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>.backend, height, size, offset_in_previous_viewport)<span class="question-mark">?</span>.<span class="number">0
+                    .y
+                    .saturating_sub(<span class="self">self</span>.viewport_area.top());
+                compute_inline_size(
+                    <span class="kw-2">&amp;mut </span><span class="self">self</span>.backend,
+                    height,
+                    area.as_size(),
+                    offset_in_previous_viewport,
+                )<span class="question-mark">?
+                </span>.<span class="number">0
             </span>}
-            Viewport::Fixed(area) =&gt; area,
+            Viewport::Fixed(<span class="kw">_</span>) | Viewport::Fullscreen =&gt; area,
         };
         <span class="self">self</span>.set_viewport_area(next_area);
         <span class="self">self</span>.clear()<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.last_known_size = size;
+        <span class="self">self</span>.last_known_area = area;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -724,47 +1100,152 @@
     </span><span class="kw">pub fn </span>autoresize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
         <span class="comment">// fixed viewports do not get autoresized
         </span><span class="kw">if </span><span class="macro">matches!</span>(<span class="self">self</span>.viewport, Viewport::Fullscreen | Viewport::Inline(<span class="kw">_</span>)) {
-            <span class="kw">let </span>size = <span class="self">self</span>.size()<span class="question-mark">?</span>;
-            <span class="kw">if </span>size != <span class="self">self</span>.last_known_size {
-                <span class="self">self</span>.resize(size)<span class="question-mark">?</span>;
+            <span class="kw">let </span>area = Rect::from((Position::ORIGIN, <span class="self">self</span>.size()<span class="question-mark">?</span>));
+            <span class="kw">if </span>area != <span class="self">self</span>.last_known_area {
+                <span class="self">self</span>.resize(area)<span class="question-mark">?</span>;
             }
         };
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Synchronizes terminal size, calls the rendering closure, flushes the current internal state
-    /// and prepares for the next draw call.
+    <span class="doccomment">/// Draws a single frame to the terminal.
     ///
-    /// This is the main entry point for drawing to the terminal.
+    /// Returns a [`CompletedFrame`] if successful, otherwise a [`std::io::Error`].
     ///
-    /// The changes drawn to the frame are applied only to the current [`Buffer`]. After the closure
-    /// returns, the current buffer is compared to the previous buffer and only the changes are
-    /// applied to the terminal.
+    /// If the render callback passed to this method can fail, use [`try_draw`] instead.
+    ///
+    /// Applications should call `draw` or [`try_draw`] in a loop to continuously render the
+    /// terminal. These methods are the main entry points for drawing to the terminal.
+    ///
+    /// [`try_draw`]: Terminal::try_draw
+    ///
+    /// This method will:
+    ///
+    /// - autoresize the terminal if necessary
+    /// - call the render callback, passing it a [`Frame`] reference to render to
+    /// - flush the current internal state by copying the current buffer to the backend
+    /// - move the cursor to the last known position if it was set during the rendering closure
+    /// - return a [`CompletedFrame`] with the current buffer and the area of the terminal
+    ///
+    /// The [`CompletedFrame`] returned by this method can be useful for debugging or testing
+    /// purposes, but it is often not used in regular applicationss.
+    ///
+    /// The render callback should fully render the entire frame when called, including areas that
+    /// are unchanged from the previous frame. This is because each frame is compared to the
+    /// previous frame to determine what has changed, and only the changes are written to the
+    /// terminal. If the render callback does not fully render the frame, the terminal will not be
+    /// in a consistent state.
     ///
     /// # Examples
     ///
-    /// ```rust,no_run
-    /// # use std::io::stdout;
-    /// # use ratatui::{prelude::*, widgets::Paragraph};
-    /// let backend = CrosstermBackend::new(stdout());
-    /// let mut terminal = Terminal::new(backend)?;
+    /// ```
+    /// # let backend = ratatui::backend::TestBackend::new(10, 10);
+    /// # let mut terminal = ratatui::Terminal::new(backend)?;
+    /// use ratatui::{layout::Position, widgets::Paragraph};
+    ///
+    /// // with a closure
     /// terminal.draw(|frame| {
-    ///     let area = frame.size();
+    ///     let area = frame.area();
     ///     frame.render_widget(Paragraph::new("Hello World!"), area);
-    ///     frame.set_cursor(0, 0);
+    ///     frame.set_cursor_position(Position { x: 0, y: 0 });
     /// })?;
+    ///
+    /// // or with a function
+    /// terminal.draw(render)?;
+    ///
+    /// fn render(frame: &amp;mut ratatui::Frame) {
+    ///     frame.render_widget(Paragraph::new("Hello World!"), frame.area());
+    /// }
     /// # std::io::Result::Ok(())
     /// ```
-    </span><span class="kw">pub fn </span>draw&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: F) -&gt; io::Result&lt;CompletedFrame&gt;
+    </span><span class="kw">pub fn </span>draw&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, render_callback: F) -&gt; io::Result&lt;CompletedFrame&gt;
     <span class="kw">where
         </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Frame),
+    {
+        <span class="self">self</span>.try_draw(|frame| {
+            render_callback(frame);
+            io::Result::Ok(())
+        })
+    }
+
+    <span class="doccomment">/// Tries to draw a single frame to the terminal.
+    ///
+    /// Returns [`Result::Ok`] containing a [`CompletedFrame`] if successful, otherwise
+    /// [`Result::Err`] containing the [`std::io::Error`] that caused the failure.
+    ///
+    /// This is the equivalent of [`Terminal::draw`] but the render callback is a function or
+    /// closure that returns a `Result` instead of nothing.
+    ///
+    /// Applications should call `try_draw` or [`draw`] in a loop to continuously render the
+    /// terminal. These methods are the main entry points for drawing to the terminal.
+    ///
+    /// [`draw`]: Terminal::draw
+    ///
+    /// This method will:
+    ///
+    /// - autoresize the terminal if necessary
+    /// - call the render callback, passing it a [`Frame`] reference to render to
+    /// - flush the current internal state by copying the current buffer to the backend
+    /// - move the cursor to the last known position if it was set during the rendering closure
+    /// - return a [`CompletedFrame`] with the current buffer and the area of the terminal
+    ///
+    /// The render callback passed to `try_draw` can return any [`Result`] with an error type that
+    /// can be converted into an [`std::io::Error`] using the [`Into`] trait. This makes it possible
+    /// to use the `?` operator to propagate errors that occur during rendering. If the render
+    /// callback returns an error, the error will be returned from `try_draw` as an
+    /// [`std::io::Error`] and the terminal will not be updated.
+    ///
+    /// The [`CompletedFrame`] returned by this method can be useful for debugging or testing
+    /// purposes, but it is often not used in regular applicationss.
+    ///
+    /// The render callback should fully render the entire frame when called, including areas that
+    /// are unchanged from the previous frame. This is because each frame is compared to the
+    /// previous frame to determine what has changed, and only the changes are written to the
+    /// terminal. If the render function does not fully render the frame, the terminal will not be
+    /// in a consistent state.
+    ///
+    /// # Examples
+    ///
+    /// ```should_panic
+    /// # use ratatui::layout::Position;;
+    /// # let backend = ratatui::backend::TestBackend::new(10, 10);
+    /// # let mut terminal = ratatui::Terminal::new(backend)?;
+    /// use std::io;
+    ///
+    /// use ratatui::widgets::Paragraph;
+    ///
+    /// // with a closure
+    /// terminal.try_draw(|frame| {
+    ///     let value: u8 = "not a number".parse().map_err(io::Error::other)?;
+    ///     let area = frame.area();
+    ///     frame.render_widget(Paragraph::new("Hello World!"), area);
+    ///     frame.set_cursor_position(Position { x: 0, y: 0 });
+    ///     io::Result::Ok(())
+    /// })?;
+    ///
+    /// // or with a function
+    /// terminal.try_draw(render)?;
+    ///
+    /// fn render(frame: &amp;mut ratatui::Frame) -&gt; io::Result&lt;()&gt; {
+    ///     let value: u8 = "not a number".parse().map_err(io::Error::other)?;
+    ///     frame.render_widget(Paragraph::new("Hello World!"), frame.area());
+    ///     Ok(())
+    /// }
+    /// # io::Result::Ok(())
+    /// ```
+    </span><span class="kw">pub fn </span>try_draw&lt;F, E&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, render_callback: F) -&gt; io::Result&lt;CompletedFrame&gt;
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Frame) -&gt; <span class="prelude-ty">Result</span>&lt;(), E&gt;,
+        E: Into&lt;io::Error&gt;,
     {
         <span class="comment">// Autoresize - otherwise we get glitches if shrinking or potential desync between widgets
         // and the terminal (if growing), which may OOB.
         </span><span class="self">self</span>.autoresize()<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>frame = <span class="self">self</span>.get_frame();
-        f(<span class="kw-2">&amp;mut </span>frame);
+
+        render_callback(<span class="kw-2">&amp;mut </span>frame).map_err(Into::into)<span class="question-mark">?</span>;
+
         <span class="comment">// We can't change the cursor position right away because we have to flush the frame to
         // stdout first. But we also can't keep the frame around, since it holds a &amp;mut to
         // Buffer. Thus, we're taking the important data out of the Frame and dropping it.
@@ -775,9 +1256,9 @@
 
         <span class="kw">match </span>cursor_position {
             <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.hide_cursor()<span class="question-mark">?</span>,
-            <span class="prelude-val">Some</span>((x, y)) =&gt; {
+            <span class="prelude-val">Some</span>(position) =&gt; {
                 <span class="self">self</span>.show_cursor()<span class="question-mark">?</span>;
-                <span class="self">self</span>.set_cursor(x, y)<span class="question-mark">?</span>;
+                <span class="self">self</span>.set_cursor_position(position)<span class="question-mark">?</span>;
             }
         }
 
@@ -788,7 +1269,7 @@
 
         <span class="kw">let </span>completed_frame = CompletedFrame {
             buffer: <span class="kw-2">&amp;</span><span class="self">self</span>.buffers[<span class="number">1 </span>- <span class="self">self</span>.current],
-            area: <span class="self">self</span>.last_known_size,
+            area: <span class="self">self</span>.last_known_area,
             count: <span class="self">self</span>.frame_count,
         };
 
@@ -816,14 +1297,30 @@
     ///
     /// This is the position of the cursor after the last draw call and is returned as a tuple of
     /// `(x, y)` coordinates.
+    </span><span class="attr">#[deprecated = <span class="string">"the method get_cursor_position indicates more clearly what about the cursor to get"</span>]
     </span><span class="kw">pub fn </span>get_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;(u16, u16)&gt; {
-        <span class="self">self</span>.backend.get_cursor()
+        <span class="kw">let </span>Position { x, y } = <span class="self">self</span>.get_cursor_position()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>((x, y))
     }
 
     <span class="doccomment">/// Sets the cursor position.
+    </span><span class="attr">#[deprecated = <span class="string">"the method set_cursor_position indicates more clearly what about the cursor to set"</span>]
     </span><span class="kw">pub fn </span>set_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u16, y: u16) -&gt; io::Result&lt;()&gt; {
-        <span class="self">self</span>.backend.set_cursor(x, y)<span class="question-mark">?</span>;
-        <span class="self">self</span>.last_known_cursor_pos = (x, y);
+        <span class="self">self</span>.set_cursor_position(Position { x, y })
+    }
+
+    <span class="doccomment">/// Gets the current cursor position.
+    ///
+    /// This is the position of the cursor after the last draw call.
+    </span><span class="kw">pub fn </span>get_cursor_position(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;Position&gt; {
+        <span class="self">self</span>.backend.get_cursor_position()
+    }
+
+    <span class="doccomment">/// Sets the cursor position.
+    </span><span class="kw">pub fn </span>set_cursor_position&lt;P: Into&lt;Position&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, position: P) -&gt; io::Result&lt;()&gt; {
+        <span class="kw">let </span>position = position.into();
+        <span class="self">self</span>.backend.set_cursor_position(position)<span class="question-mark">?</span>;
+        <span class="self">self</span>.last_known_cursor_pos = position;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -833,12 +1330,13 @@
             Viewport::Fullscreen =&gt; <span class="self">self</span>.backend.clear_region(ClearType::All)<span class="question-mark">?</span>,
             Viewport::Inline(<span class="kw">_</span>) =&gt; {
                 <span class="self">self</span>.backend
-                    .set_cursor(<span class="self">self</span>.viewport_area.left(), <span class="self">self</span>.viewport_area.top())<span class="question-mark">?</span>;
+                    .set_cursor_position(<span class="self">self</span>.viewport_area.as_position())<span class="question-mark">?</span>;
                 <span class="self">self</span>.backend.clear_region(ClearType::AfterCursor)<span class="question-mark">?</span>;
             }
-            Viewport::Fixed(area) =&gt; {
-                <span class="kw">for </span>row <span class="kw">in </span>area.top()..area.bottom() {
-                    <span class="self">self</span>.backend.set_cursor(<span class="number">0</span>, row)<span class="question-mark">?</span>;
+            Viewport::Fixed(<span class="kw">_</span>) =&gt; {
+                <span class="kw">let </span>area = <span class="self">self</span>.viewport_area;
+                <span class="kw">for </span>y <span class="kw">in </span>area.top()..area.bottom() {
+                    <span class="self">self</span>.backend.set_cursor_position(Position { x: <span class="number">0</span>, y })<span class="question-mark">?</span>;
                     <span class="self">self</span>.backend.clear_region(ClearType::AfterCursor)<span class="question-mark">?</span>;
                 }
             }
@@ -855,43 +1353,75 @@
     }
 
     <span class="doccomment">/// Queries the real size of the backend.
-    </span><span class="kw">pub fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;Rect&gt; {
+    </span><span class="kw">pub fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;Size&gt; {
         <span class="self">self</span>.backend.size()
     }
 
     <span class="doccomment">/// Insert some content before the current inline viewport. This has no effect when the
-    /// viewport is fullscreen.
+    /// viewport is not inline.
     ///
-    /// This function scrolls down the current viewport by the given height. The newly freed space
-    /// is then made available to the `draw_fn` closure through a writable `Buffer`.
+    /// The `draw_fn` closure will be called to draw into a writable `Buffer` that is `height`
+    /// lines tall. The content of that `Buffer` will then be inserted before the viewport.
+    ///
+    /// If the viewport isn't yet at the bottom of the screen, inserted lines will push it towards
+    /// the bottom. Once the viewport is at the bottom of the screen, inserted lines will scroll
+    /// the area of the screen above the viewport upwards.
     ///
     /// Before:
     /// ```ignore
-    /// +-------------------+
-    /// |                   |
-    /// |      viewport     |
-    /// |                   |
-    /// +-------------------+
+    /// +---------------------+
+    /// | pre-existing line 1 |
+    /// | pre-existing line 2 |
+    /// +---------------------+
+    /// |       viewport      |
+    /// +---------------------+
+    /// |                     |
+    /// |                     |
+    /// +---------------------+
     /// ```
     ///
-    /// After:
+    /// After inserting 2 lines:
     /// ```ignore
-    /// +-------------------+
-    /// |      buffer       |
-    /// +-------------------+
-    /// +-------------------+
-    /// |                   |
-    /// |      viewport     |
-    /// |                   |
-    /// +-------------------+
+    /// +---------------------+
+    /// | pre-existing line 1 |
+    /// | pre-existing line 2 |
+    /// |   inserted line 1   |
+    /// |   inserted line 2   |
+    /// +---------------------+
+    /// |       viewport      |
+    /// +---------------------+
+    /// +---------------------+
     /// ```
+    ///
+    /// After inserting 2 more lines:
+    /// ```ignore
+    /// +---------------------+
+    /// | pre-existing line 2 |
+    /// |   inserted line 1   |
+    /// |   inserted line 2   |
+    /// |   inserted line 3   |
+    /// |   inserted line 4   |
+    /// +---------------------+
+    /// |       viewport      |
+    /// +---------------------+
+    /// ```
+    ///
+    /// If more lines are inserted than there is space on the screen, then the top lines will go
+    /// directly into the terminal's scrollback buffer. At the limit, if the viewport takes up the
+    /// whole screen, all lines will be inserted directly into the scrollback buffer.
     ///
     /// # Examples
     ///
     /// ## Insert a single line before the current viewport
     ///
     /// ```rust
-    /// # use ratatui::{backend::TestBackend, prelude::*, widgets::*};
+    /// use ratatui::{
+    ///     backend::TestBackend,
+    ///     style::{Color, Style},
+    ///     text::{Line, Span},
+    ///     widgets::{Paragraph, Widget},
+    ///     Terminal,
+    /// };
     /// # let backend = TestBackend::new(10, 10);
     /// # let mut terminal = Terminal::new(backend).unwrap();
     /// terminal.insert_before(1, |buf| {
@@ -907,55 +1437,243 @@
     <span class="kw">where
         </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Buffer),
     {
-        <span class="kw">if </span>!<span class="macro">matches!</span>(<span class="self">self</span>.viewport, Viewport::Inline(<span class="kw">_</span>)) {
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+        <span class="kw">match </span><span class="self">self</span>.viewport {
+            <span class="attr">#[cfg(feature = <span class="string">"scrolling-regions"</span>)]
+            </span>Viewport::Inline(<span class="kw">_</span>) =&gt; <span class="self">self</span>.insert_before_scrolling_regions(height, draw_fn),
+            <span class="attr">#[cfg(not(feature = <span class="string">"scrolling-regions"</span>))]
+            </span>Viewport::Inline(<span class="kw">_</span>) =&gt; <span class="self">self</span>.insert_before_no_scrolling_regions(height, draw_fn),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(()),
         }
+    }
 
-        <span class="comment">// Clear the viewport off the screen
-        </span><span class="self">self</span>.clear()<span class="question-mark">?</span>;
-
-        <span class="comment">// Move the viewport by height, but don't move it past the bottom of the terminal
-        </span><span class="kw">let </span>viewport_at_bottom = <span class="self">self</span>.last_known_size.bottom() - <span class="self">self</span>.viewport_area.height;
-        <span class="self">self</span>.set_viewport_area(Rect {
-            y: <span class="self">self
-                </span>.viewport_area
-                .y
-                .saturating_add(height)
-                .min(viewport_at_bottom),
-            ..<span class="self">self</span>.viewport_area
-        });
-
-        <span class="comment">// Draw contents into buffer
+    <span class="doccomment">/// Implement `Self::insert_before` using standard backend capabilities.
+    </span><span class="attr">#[cfg(not(feature = <span class="string">"scrolling-regions"</span>))]
+    </span><span class="kw">fn </span>insert_before_no_scrolling_regions(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        height: u16,
+        draw_fn: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>Buffer),
+    ) -&gt; io::Result&lt;()&gt; {
+        <span class="comment">// The approach of this function is to first render all of the lines to insert into a
+        // temporary buffer, and then to loop drawing chunks from the buffer to the screen. drawing
+        // this buffer onto the screen.
         </span><span class="kw">let </span>area = Rect {
-            x: <span class="self">self</span>.viewport_area.left(),
+            x: <span class="number">0</span>,
             y: <span class="number">0</span>,
             width: <span class="self">self</span>.viewport_area.width,
             height,
         };
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(area);
         draw_fn(<span class="kw-2">&amp;mut </span>buffer);
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = buffer.content.as_slice();
 
-        <span class="comment">// Split buffer into screen-sized chunks and draw
-        </span><span class="kw">let </span>max_chunk_size = (<span class="self">self</span>.viewport_area.top() * area.width).into();
-        <span class="kw">for </span>buffer_content_chunk <span class="kw">in </span>buffer.content.chunks(max_chunk_size) {
-            <span class="kw">let </span>chunk_size = buffer_content_chunk.len() <span class="kw">as </span>u16 / area.width;
+        <span class="comment">// Use i32 variables so we don't have worry about overflowed u16s when adding, or about
+        // negative results when subtracting.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>drawn_height: i32 = <span class="self">self</span>.viewport_area.top().into();
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer_height: i32 = height.into();
+        <span class="kw">let </span>viewport_height: i32 = <span class="self">self</span>.viewport_area.height.into();
+        <span class="kw">let </span>screen_height: i32 = <span class="self">self</span>.last_known_area.height.into();
 
-            <span class="self">self</span>.backend
-                .append_lines(<span class="self">self</span>.viewport_area.height.saturating_sub(<span class="number">1</span>) + chunk_size)<span class="question-mark">?</span>;
-
-            <span class="kw">let </span>iter = buffer_content_chunk.iter().enumerate().map(|(i, c)| {
-                <span class="kw">let </span>(x, y) = buffer.pos_of(i);
-                (
-                    x,
-                    <span class="self">self</span>.viewport_area.top().saturating_sub(chunk_size) + y,
-                    c,
-                )
-            });
-            <span class="self">self</span>.backend.draw(iter)<span class="question-mark">?</span>;
-            <span class="self">self</span>.backend.flush()<span class="question-mark">?</span>;
-            <span class="self">self</span>.set_cursor(<span class="self">self</span>.viewport_area.left(), <span class="self">self</span>.viewport_area.top())<span class="question-mark">?</span>;
+        <span class="comment">// The algorithm here is to loop, drawing large chunks of text (up to a screen-full at a
+        // time), until the remainder of the buffer plus the viewport fits on the screen. We choose
+        // this loop condition because it guarantees that we can write the remainder of the buffer
+        // with just one call to Self::draw_lines().
+        </span><span class="kw">while </span>buffer_height + viewport_height &gt; screen_height {
+            <span class="comment">// We will draw as much of the buffer as possible on this iteration in order to make
+            // forward progress. So we have:
+            //
+            //     to_draw = min(buffer_height, screen_height)
+            //
+            // We may need to scroll the screen up to make room to draw. We choose the minimal
+            // possible scroll amount so we don't end up with the viewport sitting in the middle of
+            // the screen when this function is done. The amount to scroll by is:
+            //
+            //     scroll_up = max(0, drawn_height + to_draw - screen_height)
+            //
+            // We want `scroll_up` to be enough so that, after drawing, we have used the whole
+            // screen (drawn_height - scroll_up + to_draw = screen_height). However, there might
+            // already be enough room on the screen to draw without scrolling (drawn_height +
+            // to_draw &lt;= screen_height). In this case, we just don't scroll at all.
+            </span><span class="kw">let </span>to_draw = buffer_height.min(screen_height);
+            <span class="kw">let </span>scroll_up = <span class="number">0</span>.max(drawn_height + to_draw - screen_height);
+            <span class="self">self</span>.scroll_up(scroll_up <span class="kw">as </span>u16)<span class="question-mark">?</span>;
+            buffer = <span class="self">self</span>.draw_lines((drawn_height - scroll_up) <span class="kw">as </span>u16, to_draw <span class="kw">as </span>u16, buffer)<span class="question-mark">?</span>;
+            drawn_height += to_draw - scroll_up;
+            buffer_height -= to_draw;
         }
 
+        <span class="comment">// There is now enough room on the screen for the remaining buffer plus the viewport,
+        // though we may still need to scroll up some of the existing text first. It's possible
+        // that by this point we've drained the buffer, but we may still need to scroll up to make
+        // room for the viewport.
+        //
+        // We want to scroll up the exact amount that will leave us completely filling the screen.
+        // However, it's possible that the viewport didn't start on the bottom of the screen and
+        // the added lines weren't enough to push it all the way to the bottom. We deal with this
+        // case by just ensuring that our scroll amount is non-negative.
+        //
+        // We want:
+        //   screen_height = drawn_height - scroll_up + buffer_height + viewport_height
+        // Or, equivalently:
+        //   scroll_up = drawn_height + buffer_height + viewport_height - screen_height
+        </span><span class="kw">let </span>scroll_up = <span class="number">0</span>.max(drawn_height + buffer_height + viewport_height - screen_height);
+        <span class="self">self</span>.scroll_up(scroll_up <span class="kw">as </span>u16)<span class="question-mark">?</span>;
+        <span class="self">self</span>.draw_lines(
+            (drawn_height - scroll_up) <span class="kw">as </span>u16,
+            buffer_height <span class="kw">as </span>u16,
+            buffer,
+        )<span class="question-mark">?</span>;
+        drawn_height += buffer_height - scroll_up;
+
+        <span class="self">self</span>.set_viewport_area(Rect {
+            y: drawn_height <span class="kw">as </span>u16,
+            ..<span class="self">self</span>.viewport_area
+        });
+
+        <span class="comment">// Clear the viewport off the screen. We didn't clear earlier for two reasons. First, it
+        // wasn't necessary because the buffer we drew out of isn't sparse, so it overwrote
+        // whatever was on the screen. Second, there is a weird bug with tmux where a full screen
+        // clear plus immediate scrolling causes some garbage to go into the scrollback.
+        </span><span class="self">self</span>.clear()<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Implement `Self::insert_before` using scrolling regions.
+    ///
+    /// If a terminal supports scrolling regions, it means that we can define a subset of rows of
+    /// the screen, and then tell the terminal to scroll up or down just within that region. The
+    /// rows outside of the region are not affected.
+    ///
+    /// This function utilizes this feature to avoid having to redraw the viewport. This is done
+    /// either by splitting the screen at the top of the viewport, and then creating a gap by
+    /// either scrolling the viewport down, or scrolling the area above it up. The lines to insert
+    /// are then drawn into the gap created.
+    </span><span class="attr">#[cfg(feature = <span class="string">"scrolling-regions"</span>)]
+    </span><span class="kw">fn </span>insert_before_scrolling_regions(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        <span class="kw-2">mut </span>height: u16,
+        draw_fn: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>Buffer),
+    ) -&gt; io::Result&lt;()&gt; {
+        <span class="comment">// The approach of this function is to first render all of the lines to insert into a
+        // temporary buffer, and then to loop drawing chunks from the buffer to the screen. drawing
+        // this buffer onto the screen.
+        </span><span class="kw">let </span>area = Rect {
+            x: <span class="number">0</span>,
+            y: <span class="number">0</span>,
+            width: <span class="self">self</span>.viewport_area.width,
+            height,
+        };
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(area);
+        draw_fn(<span class="kw-2">&amp;mut </span>buffer);
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = buffer.content.as_slice();
+
+        <span class="comment">// Handle the special case where the viewport takes up the whole screen.
+        </span><span class="kw">if </span><span class="self">self</span>.viewport_area.height == <span class="self">self</span>.last_known_area.height {
+            <span class="comment">// "Borrow" the top line of the viewport. Draw over it, then immediately scroll it into
+            // scrollback. Do this repeatedly until the whole buffer has been put into scrollback.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
+            <span class="kw">while </span>!buffer.is_empty() {
+                buffer = <span class="kw">if </span>first {
+                    <span class="self">self</span>.draw_lines(<span class="number">0</span>, <span class="number">1</span>, buffer)<span class="question-mark">?
+                </span>} <span class="kw">else </span>{
+                    <span class="self">self</span>.draw_lines_over_cleared(<span class="number">0</span>, <span class="number">1</span>, buffer)<span class="question-mark">?
+                </span>};
+                first = <span class="bool-val">false</span>;
+                <span class="self">self</span>.backend.scroll_region_up(<span class="number">0</span>..<span class="number">1</span>, <span class="number">1</span>)<span class="question-mark">?</span>;
+            }
+
+            <span class="comment">// Redraw the top line of the viewport.
+            </span><span class="kw">let </span>width = <span class="self">self</span>.viewport_area.width <span class="kw">as </span>usize;
+            <span class="kw">let </span>top_line = <span class="self">self</span>.buffers[<span class="number">1 </span>- <span class="self">self</span>.current].content[<span class="number">0</span>..width].to_vec();
+            <span class="self">self</span>.draw_lines_over_cleared(<span class="number">0</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>top_line)<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+        }
+
+        <span class="comment">// Handle the case where the viewport isn't yet at the bottom of the screen.
+        </span>{
+            <span class="kw">let </span>viewport_top = <span class="self">self</span>.viewport_area.top();
+            <span class="kw">let </span>viewport_bottom = <span class="self">self</span>.viewport_area.bottom();
+            <span class="kw">let </span>screen_bottom = <span class="self">self</span>.last_known_area.bottom();
+            <span class="kw">if </span>viewport_bottom &lt; screen_bottom {
+                <span class="kw">let </span>to_draw = height.min(screen_bottom - viewport_bottom);
+                <span class="self">self</span>.backend
+                    .scroll_region_down(viewport_top..viewport_bottom + to_draw, to_draw)<span class="question-mark">?</span>;
+                buffer = <span class="self">self</span>.draw_lines_over_cleared(viewport_top, to_draw, buffer)<span class="question-mark">?</span>;
+                <span class="self">self</span>.set_viewport_area(Rect {
+                    y: viewport_top + to_draw,
+                    ..<span class="self">self</span>.viewport_area
+                });
+                height -= to_draw;
+            }
+        }
+
+        <span class="kw">let </span>viewport_top = <span class="self">self</span>.viewport_area.top();
+        <span class="kw">while </span>height &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>to_draw = height.min(viewport_top);
+            <span class="self">self</span>.backend.scroll_region_up(<span class="number">0</span>..viewport_top, to_draw)<span class="question-mark">?</span>;
+            buffer = <span class="self">self</span>.draw_lines_over_cleared(viewport_top - to_draw, to_draw, buffer)<span class="question-mark">?</span>;
+            height -= to_draw;
+        }
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Draw lines at the given vertical offset. The slice of cells must contain enough cells
+    /// for the requested lines. A slice of the unused cells are returned.
+    </span><span class="kw">fn </span>draw_lines&lt;<span class="lifetime">'a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        y_offset: u16,
+        lines_to_draw: u16,
+        cells: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Cell],
+    ) -&gt; io::Result&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Cell]&gt; {
+        <span class="kw">let </span>width: usize = <span class="self">self</span>.last_known_area.width.into();
+        <span class="kw">let </span>(to_draw, remainder) = cells.split_at(width * lines_to_draw <span class="kw">as </span>usize);
+        <span class="kw">if </span>lines_to_draw &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>iter = to_draw
+                .iter()
+                .enumerate()
+                .map(|(i, c)| ((i % width) <span class="kw">as </span>u16, y_offset + (i / width) <span class="kw">as </span>u16, c));
+            <span class="self">self</span>.backend.draw(iter)<span class="question-mark">?</span>;
+            <span class="self">self</span>.backend.flush()<span class="question-mark">?</span>;
+        }
+        <span class="prelude-val">Ok</span>(remainder)
+    }
+
+    <span class="doccomment">/// Draw lines at the given vertical offset, assuming that the lines they are replacing on the
+    /// screen are cleared. The slice of cells must contain enough cells for the requested lines. A
+    /// slice of the unused cells are returned.
+    </span><span class="attr">#[cfg(feature = <span class="string">"scrolling-regions"</span>)]
+    </span><span class="kw">fn </span>draw_lines_over_cleared&lt;<span class="lifetime">'a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        y_offset: u16,
+        lines_to_draw: u16,
+        cells: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Cell],
+    ) -&gt; io::Result&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Cell]&gt; {
+        <span class="kw">let </span>width: usize = <span class="self">self</span>.last_known_area.width.into();
+        <span class="kw">let </span>(to_draw, remainder) = cells.split_at(width * lines_to_draw <span class="kw">as </span>usize);
+        <span class="kw">if </span>lines_to_draw &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>area = Rect::new(<span class="number">0</span>, y_offset, width <span class="kw">as </span>u16, y_offset + lines_to_draw);
+            <span class="kw">let </span>old = Buffer::empty(area);
+            <span class="kw">let </span>new = Buffer {
+                area,
+                content: to_draw.to_vec(),
+            };
+            <span class="self">self</span>.backend.draw(old.diff(<span class="kw-2">&amp;</span>new).into_iter())<span class="question-mark">?</span>;
+            <span class="self">self</span>.backend.flush()<span class="question-mark">?</span>;
+        }
+        <span class="prelude-val">Ok</span>(remainder)
+    }
+
+    <span class="doccomment">/// Scroll the whole screen up by the given number of lines.
+    </span><span class="attr">#[cfg(not(feature = <span class="string">"scrolling-regions"</span>))]
+    </span><span class="kw">fn </span>scroll_up(<span class="kw-2">&amp;mut </span><span class="self">self</span>, lines_to_scroll: u16) -&gt; io::Result&lt;()&gt; {
+        <span class="kw">if </span>lines_to_scroll &gt; <span class="number">0 </span>{
+            <span class="self">self</span>.set_cursor_position(Position::new(
+                <span class="number">0</span>,
+                <span class="self">self</span>.last_known_area.height.saturating_sub(<span class="number">1</span>),
+            ))<span class="question-mark">?</span>;
+            <span class="self">self</span>.backend.append_lines(lines_to_scroll)<span class="question-mark">?</span>;
+        }
         <span class="prelude-val">Ok</span>(())
     }
 }
@@ -963,11 +1681,11 @@
 <span class="kw">fn </span>compute_inline_size&lt;B: Backend&gt;(
     backend: <span class="kw-2">&amp;mut </span>B,
     height: u16,
-    size: Rect,
+    size: Size,
     offset_in_previous_viewport: u16,
-) -&gt; io::Result&lt;(Rect, (u16, u16))&gt; {
-    <span class="kw">let </span>pos = backend.get_cursor()<span class="question-mark">?</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>row = pos.<span class="number">1</span>;
+) -&gt; io::Result&lt;(Rect, Position)&gt; {
+    <span class="kw">let </span>pos = backend.get_cursor_position()<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>row = pos.y;
 
     <span class="kw">let </span>max_height = size.height.min(height);
 

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/monitoring.rs`."><title>monitoring.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/monitoring.rs`."><title>monitoring.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">tof_dataclasses/</div>monitoring.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1728,7 +1729,32 @@
 <a href="#1728" id="1728">1728</a>
 <a href="#1729" id="1729">1729</a>
 <a href="#1730" id="1730">1730</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Tof housekeeping/monitoring
+<a href="#1731" id="1731">1731</a>
+<a href="#1732" id="1732">1732</a>
+<a href="#1733" id="1733">1733</a>
+<a href="#1734" id="1734">1734</a>
+<a href="#1735" id="1735">1735</a>
+<a href="#1736" id="1736">1736</a>
+<a href="#1737" id="1737">1737</a>
+<a href="#1738" id="1738">1738</a>
+<a href="#1739" id="1739">1739</a>
+<a href="#1740" id="1740">1740</a>
+<a href="#1741" id="1741">1741</a>
+<a href="#1742" id="1742">1742</a>
+<a href="#1743" id="1743">1743</a>
+<a href="#1744" id="1744">1744</a>
+<a href="#1745" id="1745">1745</a>
+<a href="#1746" id="1746">1746</a>
+<a href="#1747" id="1747">1747</a>
+<a href="#1748" id="1748">1748</a>
+<a href="#1749" id="1749">1749</a>
+<a href="#1750" id="1750">1750</a>
+<a href="#1751" id="1751">1751</a>
+<a href="#1752" id="1752">1752</a>
+<a href="#1753" id="1753">1753</a>
+<a href="#1754" id="1754">1754</a>
+<a href="#1755" id="1755">1755</a>
+<a href="#1756" id="1756">1756</a></pre></div><pre class="rust"><code><span class="doccomment">//! Tof housekeeping/monitoring
 //!
 //! Contains structs to hold monitoring
 //! information for the different parts
@@ -1740,6 +1766,8 @@
 
 </span><span class="kw">use </span>std::fmt;
 <span class="comment">//use std::collections::HashMap;
+
+//use half::f16;
 
 </span><span class="kw">use </span><span class="kw">crate</span>::packets::PacketType;
 
@@ -1792,7 +1820,8 @@
     parse_u8,
     parse_u16,
     parse_u32,
-    parse_f32
+    <span class="comment">//parse_f16,
+    </span>parse_f32
 };
 
 <span class="comment">// re-export
@@ -2254,14 +2283,14 @@
 
   <span class="kw">fn </span>keys() -&gt; Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
     <span class="macro">vec!</span>[<span class="string">"board_id"</span>,
-         <span class="string">"temps1"</span>, <span class="string">"temps2"</span>, <span class="string">"temps3"</span>, <span class="string">"temps4"</span>,
-         <span class="string">"temps5"</span>, <span class="string">"temps6"</span>, <span class="string">"temps7"</span>, <span class="string">"temps8"</span>, 
-         <span class="string">"temps9"</span>, <span class="string">"temps10"</span>, <span class="string">"temps11"</span>, <span class="string">"temps12"</span>,
-         <span class="string">"temps13"</span>, <span class="string">"temps14"</span>, <span class="string">"temps15"</span>, <span class="string">"temps16"</span>,
-         <span class="string">"biases1"</span>, <span class="string">"biases2"</span>, <span class="string">"biases3"</span>, <span class="string">"biases4"</span>, 
-         <span class="string">"biases5"</span>, <span class="string">"biases6"</span>, <span class="string">"biases7"</span>, <span class="string">"biases8"</span>,
-         <span class="string">"biases9"</span>, <span class="string">"biases10"</span>, <span class="string">"biases11"</span>, <span class="string">"biases12"</span>,
-         <span class="string">"biases13"</span>, <span class="string">"biases14"</span>, <span class="string">"biases15"</span>, <span class="string">"biases16"</span>]
+         <span class="string">"temps1"  </span>, <span class="string">"temps2"  </span>, <span class="string">"temps3"  </span>, <span class="string">"temps4"  </span>,
+         <span class="string">"temps5"  </span>, <span class="string">"temps6"  </span>, <span class="string">"temps7"  </span>, <span class="string">"temps8"  </span>, 
+         <span class="string">"temps9"  </span>, <span class="string">"temps10" </span>, <span class="string">"temps11" </span>, <span class="string">"temps12" </span>,
+         <span class="string">"temps13" </span>, <span class="string">"temps14" </span>, <span class="string">"temps15" </span>, <span class="string">"temps16" </span>,
+         <span class="string">"biases1" </span>, <span class="string">"biases2" </span>, <span class="string">"biases3" </span>, <span class="string">"biases4" </span>, 
+         <span class="string">"biases5" </span>, <span class="string">"biases6" </span>, <span class="string">"biases7" </span>, <span class="string">"biases8" </span>,
+         <span class="string">"biases9" </span>, <span class="string">"biases10"</span>, <span class="string">"biases11"</span>, <span class="string">"biases12"</span>,
+         <span class="string">"biases13"</span>, <span class="string">"biases14"</span>, <span class="string">"biases15"</span>, <span class="string">"biases16" </span>]
   }
 
   <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, varname : <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;f32&gt; {
@@ -2709,6 +2738,7 @@
       <span class="string">"mag_x"            </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.mag_x            ), 
       <span class="string">"mag_y"            </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.mag_y            ), 
       <span class="string">"mag_z"            </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.mag_z            ), 
+      <span class="string">"mag_tot"          </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.get_mag_tot()    ),
       <span class="string">"drs_dvdd_voltage" </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.drs_dvdd_voltage ), 
       <span class="string">"drs_dvdd_current" </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.drs_dvdd_current ), 
       <span class="string">"drs_dvdd_power"   </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.drs_dvdd_power   ), 
@@ -3117,27 +3147,29 @@
 </span><span class="doccomment">/// Monitoring the MTB
 </span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>MtbMoniData {
-  <span class="comment">//pub calibration  : u16, 
-  //pub vccpint      : u16, 
-  </span><span class="kw">pub </span>tiu_busy_len : u32,
+  <span class="kw">pub </span>tiu_busy_len : u32,
   <span class="doccomment">/// tiu_status\[0\] = emu_mode
   /// tiu_status\[1\] = use_aux_link
   /// tiu_status\[2\] = tiu_bad
   /// tiu_status\[3\] = bsy_stuck
   /// tiu_status\[4\] = ignore_bsy
   </span><span class="kw">pub </span>tiu_status   : u8,
-  <span class="doccomment">/// Prescale factor in per cent
-  /// (might not be accurate)
-  </span><span class="kw">pub </span>prescale_pc  : u8,
-  <span class="kw">pub </span>daq_queue_len: u16,
+  <span class="comment">///// Prescale factor in per cent
+  ///// (might not be accurate)
+  //pub prescale     : f16,
+  //pub rsvd         : u8,
+  </span><span class="kw">pub </span>daq_queue_len: u16,
   <span class="comment">//pub vccpaux      : u16, 
   //pub vccoddr      : u16, 
   </span><span class="kw">pub </span>temp         : u16, 
-  <span class="kw">pub </span>vccint       : u16, 
-  <span class="kw">pub </span>vccaux       : u16, 
-  <span class="kw">pub </span>vccbram      : u16, 
+  <span class="doccomment">/// Unfortunatly at this point we only have
+  /// a single byte left
+  </span><span class="kw">pub </span>rb_lost_rate : u8,
   <span class="kw">pub </span>rate         : u16, 
   <span class="kw">pub </span>lost_rate    : u16, 
+  <span class="kw">pub </span>vccint       : u16, 
+  <span class="kw">pub </span>vccbram      : u16, 
+  <span class="kw">pub </span>vccaux       : u16, 
 }
 
 <span class="kw">impl </span>MtbMoniData {
@@ -3146,14 +3178,16 @@
     <span class="self">Self </span>{
       tiu_busy_len  : u32::MAX,
       tiu_status    : u8::MAX,
-      prescale_pc   : u8::MAX,
-      daq_queue_len : u16::MAX,
+      <span class="comment">//rsvd          : u8::MAX,
+      //prescale      : f16::MAX,
+      </span>daq_queue_len : u16::MAX,
       temp          : u16::MAX,
       vccint        : u16::MAX,
       vccaux        : u16::MAX,
       vccbram       : u16::MAX,
       rate          : u16::MAX,
-      lost_rate     : u16::MAX
+      lost_rate     : u16::MAX,
+      rb_lost_rate  : u8::MAX
     }
   }
 
@@ -3183,12 +3217,19 @@
     <span class="self">self</span>.temp <span class="kw">as </span>f32 * <span class="number">503.975 </span>/ <span class="number">4096.0 </span>- <span class="number">273.15
   </span>}
   
-  <span class="comment">// Convert ADC VCCINT from adc values to Voltage
+  <span class="doccomment">/// Convert ADC VCCINT from adc values to Voltage
   </span><span class="kw">fn </span>adc_vcc_conversion(data : u16) -&gt; f32 {
     <span class="number">3.0 </span>* data <span class="kw">as </span>f32 / (<span class="number">2_u32</span>.pow(<span class="number">12</span>-<span class="number">1</span>)) <span class="kw">as </span>f32
   }
 
-}
+  <span class="comment">//pub fn set_prescale(&amp;mut self, prescale : f32) {
+  //  self.prescale = f16::from_f32(prescale);
+  //}
+
+  //pub fn get_prescale(&amp;self) -&gt; f32 {
+  //  self.prescale.to_f32()  
+  //}
+</span>}
 
 <span class="kw">impl </span>Default <span class="kw">for </span>MtbMoniData {
   <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
@@ -3201,9 +3242,9 @@
     <span class="macro">write!</span>(f, <span class="string">"&lt;MtbMoniData:
   MTB  EVT RATE  [Hz] {}
   LOST EVT RATE  [Hz] {}
+  LOST RB EVT R  [Hz] {}
   TIU BUSY CNT  [CLK] {}
   DAQ QUEUE LEN       {}
-  PRESCALE        [%] {}
   --- TIU STATUS ---
     EMU MODE          {}
     USE AUX LINK      {}
@@ -3213,14 +3254,15 @@
   --- --- --- --- --
   FPGA TEMP      [\u{00B0}C] {:.2}
   VCCINT          [V] {:.3}
-  VCCAUX          [V] {:.3}
+  VCCAUX          [V] {:.3},
   VCCBRAM         [V] {:.3}&gt;"</span>,
            <span class="self">self</span>.rate,
            <span class="self">self</span>.lost_rate,
+           <span class="self">self</span>.rb_lost_rate,
            <span class="self">self</span>.tiu_busy_len,
            <span class="self">self</span>.daq_queue_len,
-           <span class="self">self</span>.prescale_pc,
-           <span class="self">self</span>.get_tiu_emulation_mode(),
+           <span class="comment">//self.get_prescale(),
+           </span><span class="self">self</span>.get_tiu_emulation_mode(),
            <span class="self">self</span>.get_tiu_use_aux_link(),
            <span class="self">self</span>.get_tiu_bad(),
            <span class="self">self</span>.get_tiu_busy_stuck(),
@@ -3248,13 +3290,16 @@
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::HEAD.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tiu_busy_len.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tiu_status .to_le_bytes());
-    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.prescale_pc.to_le_bytes());
+    <span class="comment">//stream.extend_from_slice(&amp;self.rsvd.to_le_bytes());
+    </span>stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.rb_lost_rate.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.daq_queue_len.to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.temp       .to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.vccint     .to_le_bytes()); 
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.vccaux     .to_le_bytes()); 
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.vccbram    .to_le_bytes()); 
-    stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.rate       .to_le_bytes()); 
+    <span class="comment">//stream.extend_from_slice(&amp;self.prescale   .to_le_bytes());
+    //stream.extend_from_slice(&amp;self.rb_lost_rate.to_le_bytes());
+    </span>stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.rate       .to_le_bytes()); 
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.lost_rate  .to_le_bytes());
     stream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::TAIL.to_le_bytes());
     stream
@@ -3266,13 +3311,16 @@
     <span class="self">Self</span>::verify_fixed(stream, pos)<span class="question-mark">?</span>;
     moni_data.tiu_busy_len  = parse_u32(<span class="kw-2">&amp;</span>stream, pos);
     moni_data.tiu_status    = parse_u8(<span class="kw-2">&amp;</span>stream, pos);
-    moni_data.prescale_pc   = parse_u8(<span class="kw-2">&amp;</span>stream, pos);
+    <span class="comment">//moni_data.rsvd          = parse_u8(&amp;stream, pos);
+    </span>moni_data.rb_lost_rate  = parse_u8(<span class="kw-2">&amp;</span>stream, pos);
     moni_data.daq_queue_len = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
     moni_data.temp          = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
     moni_data.vccint        = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
-    moni_data.vccaux        = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
+    <span class="comment">//moni_data.prescale      = parse_f16(&amp;stream, pos);
+    </span>moni_data.vccaux        = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
     moni_data.vccbram       = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
-    moni_data.rate          = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
+    <span class="comment">//moni_data.rb_lost_rate  = parse_u16(&amp;stream, pos);
+    </span>moni_data.rate          = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
     moni_data.lost_rate     = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
     <span class="kw-2">*</span>pos += <span class="number">2</span>; <span class="comment">// since we deserialized the tail earlier and 
               // didn't account for it
@@ -3292,12 +3340,14 @@
       <span class="string">"tiu_busy_len" </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.tiu_busy_len <span class="kw">as </span>f32), 
       <span class="string">"tiu_status"   </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.tiu_status <span class="kw">as </span>f32), 
       <span class="string">"daq_queue_len"  </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.daq_queue_len <span class="kw">as </span>f32), 
-      <span class="string">"temp"         </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.get_fpga_temp()), 
+      <span class="comment">//"prescale"     =&gt; Some(self.get_prescale()),
+      </span><span class="string">"temp"         </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.get_fpga_temp()), 
       <span class="string">"vccint"       </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::adc_vcc_conversion(<span class="self">self</span>.vccint)), 
       <span class="string">"vccaux"       </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::adc_vcc_conversion(<span class="self">self</span>.vccaux)), 
       <span class="string">"vccbram"      </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::adc_vcc_conversion(<span class="self">self</span>.vccbram)), 
       <span class="string">"rate"         </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.rate <span class="kw">as </span>f32), 
       <span class="string">"lost_rate"    </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.lost_rate <span class="kw">as </span>f32), 
+      <span class="string">"rb_lost_rate" </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.rb_lost_rate <span class="kw">as </span>f32), 
       <span class="kw">_              </span>=&gt; <span class="prelude-val">None
     </span>}
   }
@@ -3308,11 +3358,12 @@
       <span class="string">"tiu_busy_len"  </span>, 
       <span class="string">"tiu_status"    </span>, 
       <span class="string">"daq_queue_len" </span>, 
-      <span class="string">"temp"       </span>, 
-      <span class="string">"vccint"     </span>, 
-      <span class="string">"vccaux"     </span>, 
-      <span class="string">"vccbram"    </span>, 
-      <span class="string">"rate"       </span>, 
+      <span class="string">"temp"          </span>, 
+      <span class="string">"vccint"        </span>, 
+      <span class="string">"vccaux"        </span>, 
+      <span class="string">"vccbram"       </span>, 
+      <span class="string">"rb_lost_rate"  </span>,
+      <span class="string">"rate"          </span>, 
       <span class="string">"lost_rate"</span>] 
   }
 }
@@ -3324,12 +3375,13 @@
     <span class="kw">let </span><span class="kw-2">mut </span>rng       = rand::thread_rng();
     moni.tiu_busy_len = rng.gen::&lt;u32&gt;();
     moni.tiu_status   = rng.gen::&lt;u8&gt;();
-    moni.prescale_pc  = rng.gen::&lt;u8&gt;();
-    moni.daq_queue_len= rng.gen::&lt;u16&gt;();
+    <span class="comment">//moni.prescale     = f16::from_f32(rng.gen::&lt;f32&gt;());
+    </span>moni.daq_queue_len= rng.gen::&lt;u16&gt;();
     moni.temp         = rng.gen::&lt;u16&gt;();
     moni.vccint       = rng.gen::&lt;u16&gt;();
     moni.vccaux       = rng.gen::&lt;u16&gt;();
     moni.vccbram      = rng.gen::&lt;u16&gt;();
+    moni.rb_lost_rate = rng.gen::&lt;u8&gt;();
     moni.rate         = rng.gen::&lt;u16&gt;();
     moni.lost_rate    = rng.gen::&lt;u16&gt;();
     moni

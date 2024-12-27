@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/backend.rs`."><title>backend.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/backend.rs`."><title>backend.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/</div>backend.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -337,7 +338,93 @@
 <a href="#337" id="337">337</a>
 <a href="#338" id="338">338</a>
 <a href="#339" id="339">339</a>
-</pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a></pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
 </span><span class="doccomment">//! This module provides the backend implementations for different terminal libraries.
 //!
 //! It defines the [`Backend`] trait which is used to abstract over the specific terminal library
@@ -366,7 +453,7 @@
 //! ```rust,no_run
 //! use std::io::stdout;
 //!
-//! use ratatui::prelude::*;
+//! use ratatui::{backend::CrosstermBackend, Terminal};
 //!
 //! let backend = CrosstermBackend::new(stdout());
 //! let mut terminal = Terminal::new(backend)?;
@@ -435,19 +522,22 @@
 //! [Crossterm]: https://crates.io/crates/crossterm
 //! [Termion]: https://crates.io/crates/termion
 //! [Termwiz]: https://crates.io/crates/termwiz
-//! [Examples]: https://github.com/ratatui-org/ratatui/tree/main/examples/README.md
+//! [Examples]: https://github.com/ratatui/ratatui/tree/main/examples/README.md
 //! [Backend Comparison]:
 //!     https://ratatui.rs/concepts/backends/comparison/
-//! [Ratatui Website]: https://ratatui-org.github.io/ratatui-book
+//! [Ratatui Website]: https://ratatui.rs
 </span><span class="kw">use </span>std::io;
 
 <span class="kw">use </span>strum::{Display, EnumString};
 
-<span class="kw">use crate</span>::{buffer::Cell, layout::Size, prelude::Rect};
+<span class="kw">use crate</span>::{
+    buffer::Cell,
+    layout::{Position, Size},
+};
 
-<span class="attr">#[cfg(feature = <span class="string">"termion"</span>)]
+<span class="attr">#[cfg(all(not(windows), feature = <span class="string">"termion"</span>))]
 </span><span class="kw">mod </span>termion;
-<span class="attr">#[cfg(feature = <span class="string">"termion"</span>)]
+<span class="attr">#[cfg(all(not(windows), feature = <span class="string">"termion"</span>))]
 </span><span class="kw">pub use </span><span class="self">self</span>::termion::TermionBackend;
 
 <span class="attr">#[cfg(feature = <span class="string">"crossterm"</span>)]
@@ -523,33 +613,35 @@
     /// # Example
     ///
     /// ```rust
-    /// # use ratatui::backend::{Backend, TestBackend};
+    /// # use ratatui::backend::{TestBackend};
     /// # let mut backend = TestBackend::new(80, 25);
+    /// use ratatui::backend::Backend;
+    ///
     /// backend.hide_cursor()?;
     /// // do something with hidden cursor
     /// backend.show_cursor()?;
     /// # std::io::Result::Ok(())
     /// ```
     ///
-    /// [`show_cursor`]: Backend::show_cursor
+    /// [`show_cursor`]: Self::show_cursor
     </span><span class="kw">fn </span>hide_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt;;
 
     <span class="doccomment">/// Show the cursor on the terminal screen.
     ///
     /// See [`hide_cursor`] for an example.
     ///
-    /// [`hide_cursor`]: Backend::hide_cursor
+    /// [`hide_cursor`]: Self::hide_cursor
     </span><span class="kw">fn </span>show_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt;;
 
     <span class="doccomment">/// Get the current cursor position on the terminal screen.
     ///
-    /// The returned tuple contains the x and y coordinates of the cursor. The origin
-    /// (0, 0) is at the top left corner of the screen.
+    /// The returned tuple contains the x and y coordinates of the cursor.
+    /// The origin (0, 0) is at the top left corner of the screen.
     ///
-    /// See [`set_cursor`] for an example.
+    /// See [`set_cursor_position`] for an example.
     ///
-    /// [`set_cursor`]: Backend::set_cursor
-    </span><span class="kw">fn </span>get_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;(u16, u16)&gt;;
+    /// [`set_cursor_position`]: Self::set_cursor_position
+    </span><span class="kw">fn </span>get_cursor_position(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;Position&gt;;
 
     <span class="doccomment">/// Set the cursor position on the terminal screen to the given x and y coordinates.
     ///
@@ -558,23 +650,43 @@
     /// # Example
     ///
     /// ```rust
-    /// # use ratatui::backend::{Backend, TestBackend};
+    /// # use ratatui::backend::{TestBackend};
     /// # let mut backend = TestBackend::new(80, 25);
-    /// backend.set_cursor(10, 20)?;
-    /// assert_eq!(backend.get_cursor()?, (10, 20));
+    /// use ratatui::{backend::Backend, layout::Position};
+    ///
+    /// backend.set_cursor_position(Position { x: 10, y: 20 })?;
+    /// assert_eq!(backend.get_cursor_position()?, Position { x: 10, y: 20 });
     /// # std::io::Result::Ok(())
     /// ```
+    </span><span class="kw">fn </span>set_cursor_position&lt;P: Into&lt;Position&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, position: P) -&gt; io::Result&lt;()&gt;;
+
+    <span class="doccomment">/// Get the current cursor position on the terminal screen.
     ///
-    /// [`get_cursor`]: Backend::get_cursor
-    </span><span class="kw">fn </span>set_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u16, y: u16) -&gt; io::Result&lt;()&gt;;
+    /// The returned tuple contains the x and y coordinates of the cursor. The origin
+    /// (0, 0) is at the top left corner of the screen.
+    </span><span class="attr">#[deprecated = <span class="string">"the method get_cursor_position indicates more clearly what about the cursor to get"</span>]
+    </span><span class="kw">fn </span>get_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;(u16, u16)&gt; {
+        <span class="kw">let </span>Position { x, y } = <span class="self">self</span>.get_cursor_position()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>((x, y))
+    }
+
+    <span class="doccomment">/// Set the cursor position on the terminal screen to the given x and y coordinates.
+    ///
+    /// The origin (0, 0) is at the top left corner of the screen.
+    </span><span class="attr">#[deprecated = <span class="string">"the method set_cursor_position indicates more clearly what about the cursor to set"</span>]
+    </span><span class="kw">fn </span>set_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u16, y: u16) -&gt; io::Result&lt;()&gt; {
+        <span class="self">self</span>.set_cursor_position(Position { x, y })
+    }
 
     <span class="doccomment">/// Clears the whole terminal screen
     ///
     /// # Example
     ///
     /// ```rust,no_run
-    /// # use ratatui::backend::{Backend, TestBackend};
+    /// # use ratatui::backend::{TestBackend};
     /// # let mut backend = TestBackend::new(80, 25);
+    /// use ratatui::backend::Backend;
+    ///
     /// backend.clear()?;
     /// # std::io::Result::Ok(())
     /// ```
@@ -589,8 +701,10 @@
     /// # Example
     ///
     /// ```rust,no_run
-    /// # use ratatui::{prelude::*, backend::{TestBackend, ClearType}};
+    /// # use ratatui::{backend::{TestBackend}};
     /// # let mut backend = TestBackend::new(80, 25);
+    /// use ratatui::backend::{Backend, ClearType};
+    ///
     /// backend.clear_region(ClearType::All)?;
     /// # std::io::Result::Ok(())
     /// ```
@@ -600,7 +714,7 @@
     /// This method will return an error if the terminal screen could not be cleared. It will also
     /// return an error if the `clear_type` is not supported by the backend.
     ///
-    /// [`clear`]: Backend::clear
+    /// [`clear`]: Self::clear
     </span><span class="kw">fn </span>clear_region(<span class="kw-2">&amp;mut </span><span class="self">self</span>, clear_type: ClearType) -&gt; io::Result&lt;()&gt; {
         <span class="kw">match </span>clear_type {
             ClearType::All =&gt; <span class="self">self</span>.clear(),
@@ -614,19 +728,21 @@
         }
     }
 
-    <span class="doccomment">/// Get the size of the terminal screen in columns/rows as a [`Rect`].
+    <span class="doccomment">/// Get the size of the terminal screen in columns/rows as a [`Size`].
     ///
-    /// The returned [`Rect`] contains the width and height of the terminal screen.
+    /// The returned [`Size`] contains the width and height of the terminal screen.
     ///
     /// # Example
     ///
-    /// ```rust,no_run
-    /// # use ratatui::{prelude::*, backend::TestBackend};
-    /// let backend = TestBackend::new(80, 25);
-    /// assert_eq!(backend.size()?, Rect::new(0, 0, 80, 25));
+    /// ```rust
+    /// # use ratatui::{backend::{TestBackend}};
+    /// # let backend = TestBackend::new(80, 25);
+    /// use ratatui::{backend::Backend, layout::Size};
+    ///
+    /// assert_eq!(backend.size()?, Size::new(80, 25));
     /// # std::io::Result::Ok(())
     /// ```
-    </span><span class="kw">fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;Rect&gt;;
+    </span><span class="kw">fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;Size&gt;;
 
     <span class="doccomment">/// Get the size of the terminal screen in columns/rows and pixels as a [`WindowSize`].
     ///
@@ -637,6 +753,64 @@
 
     <span class="doccomment">/// Flush any buffered content to the terminal screen.
     </span><span class="kw">fn </span>flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt;;
+
+    <span class="doccomment">/// Scroll a region of the screen upwards, where a region is specified by a (half-open) range
+    /// of rows.
+    ///
+    /// Each row in the region is replaced by the row `line_count` rows below it, except the bottom
+    /// `line_count` rows, which are replaced by empty rows. If `line_count` is equal to or larger
+    /// than the number of rows in the region, then all rows are replaced with empty rows.
+    ///
+    /// If the region includes row 0, then `line_count` rows are copied into the bottom of the
+    /// scrollback buffer. These rows are first taken from the old contents of the region, starting
+    /// from the top. If there aren't sufficient rows in the region, then the remainder are empty
+    /// rows.
+    ///
+    /// The position of the cursor afterwards is undefined.
+    ///
+    /// The behavior is designed to match what ANSI terminals do when scrolling regions are
+    /// established. With ANSI terminals, a scrolling region can be established with the "^[[X;Yr"
+    /// sequence, where X and Y define the lines of the region. The scrolling region can be reset
+    /// to be the whole screen with the "^[[r" sequence.
+    ///
+    /// When a scrolling region is established in an ANSI terminal, various operations' behaviors
+    /// are changed in such a way that the scrolling region acts like a "virtual screen". In
+    /// particular, the scrolling sequence "^[[NS", which scrolls lines up by a count of N.
+    ///
+    /// On an ANSI terminal, this method will probably translate to something like:
+    /// "^[[X;Yr^[[NS^[[r". That is, set the scrolling region, scroll up, then reset the scrolling
+    /// region.
+    ///
+    /// For examples of how this function is expected to work, refer to the tests for
+    /// [`TestBackend::scroll_region_up`].
+    </span><span class="attr">#[cfg(feature = <span class="string">"scrolling-regions"</span>)]
+    </span><span class="kw">fn </span>scroll_region_up(<span class="kw-2">&amp;mut </span><span class="self">self</span>, region: std::ops::Range&lt;u16&gt;, line_count: u16)
+        -&gt; io::Result&lt;()&gt;;
+
+    <span class="doccomment">/// Scroll a region of the screen downwards, where a region is specified by a (half-open) range
+    /// of rows.
+    ///
+    /// Each row in the region is replaced by the row `line_count` rows above it, except the top
+    /// `line_count` rows, which are replaced by empty rows. If `line_count` is equal to or larger
+    /// than the number of rows in the region, then all rows are replaced with empty rows.
+    ///
+    /// The position of the cursor afterwards is undefined.
+    ///
+    /// See the documentation for [`Self::scroll_region_down`] for more information about how this
+    /// is expected to be implemented for ANSI terminals. All of that applies, except the ANSI
+    /// sequence to scroll down is "^[[NT".
+    ///
+    /// This function is asymmetrical with regards to the scrollback buffer. The reason is that
+    /// this how terminals seem to implement things.
+    ///
+    /// For examples of how this function is expected to work, refer to the tests for
+    /// [`TestBackend::scroll_region_down`].
+    </span><span class="attr">#[cfg(feature = <span class="string">"scrolling-regions"</span>)]
+    </span><span class="kw">fn </span>scroll_region_down(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        region: std::ops::Range&lt;u16&gt;,
+        line_count: u16,
+    ) -&gt; io::Result&lt;()&gt;;
 }
 
 <span class="attr">#[cfg(test)]

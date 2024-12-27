@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["FallbackFont","FallbackResult"],"trait":["Loader"]};

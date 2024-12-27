@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["KeyPointWeight","SegmentValue"],"struct":["BoldPoints","DefaultFormatting","LightPoints","NoDefaultFormatting","SegmentedCoord"],"trait":["AsRangedCoord","DefaultValueFormatOption","DiscreteRanged","IntoSegmentedCoord","KeyPointHint","Ranged","ReversibleRanged","ValueFormatter"]};

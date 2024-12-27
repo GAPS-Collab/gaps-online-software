@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/layout/rect.rs`."><title>rect.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/layout/rect.rs`."><title>rect.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/layout/</div>rect.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -647,14 +648,13 @@
 <a href="#647" id="647">647</a>
 <a href="#648" id="648">648</a>
 <a href="#649" id="649">649</a>
-</pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
+<a href="#650" id="650">650</a></pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
 </span><span class="kw">use </span>std::{
     cmp::{max, min},
     fmt,
 };
 
-<span class="kw">use super</span>::{Position, Size};
-<span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::layout::{Margin, Position, Size};
 
 <span class="kw">mod </span>iter;
 <span class="kw">pub use </span>iter::<span class="kw-2">*</span>;
@@ -676,12 +676,13 @@
     </span><span class="kw">pub </span>height: u16,
 }
 
-<span class="doccomment">/// Amounts by which to move a [`Rect`](super::Rect).
+<span class="doccomment">/// Amounts by which to move a [`Rect`](crate::layout::Rect).
 ///
 /// Positive numbers move to the right/bottom and negative to the left/top.
 ///
 /// See [`Rect::offset`]
-</span><span class="attr">#[derive(Debug, Default, Clone, Copy)]
+</span><span class="attr">#[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = <span class="string">"serde"</span>, derive(serde::Serialize, serde::Deserialize))]
 </span><span class="kw">pub struct </span>Offset {
     <span class="doccomment">/// How much to move on the X axis
     </span><span class="kw">pub </span>x: i32,
@@ -704,32 +705,41 @@
         height: <span class="number">0</span>,
     };
 
-    <span class="doccomment">/// Creates a new `Rect`, with width and height limited to keep the area under max `u16`. If
-    /// clipped, aspect ratio will be preserved.
-    </span><span class="kw">pub fn </span>new(x: u16, y: u16, width: u16, height: u16) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>max_area = u16::MAX;
-        <span class="kw">let </span>(clipped_width, clipped_height) =
-            <span class="kw">if </span>u32::from(width) * u32::from(height) &gt; u32::from(max_area) {
-                <span class="kw">let </span>aspect_ratio = f64::from(width) / f64::from(height);
-                <span class="kw">let </span>max_area_f = f64::from(max_area);
-                <span class="kw">let </span>height_f = (max_area_f / aspect_ratio).sqrt();
-                <span class="kw">let </span>width_f = height_f * aspect_ratio;
-                (width_f <span class="kw">as </span>u16, height_f <span class="kw">as </span>u16)
-            } <span class="kw">else </span>{
-                (width, height)
-            };
+    <span class="doccomment">/// Creates a new `Rect`, with width and height limited to keep both bounds within `u16`.
+    ///
+    /// If the width or height would cause the right or bottom coordinate to be larger than the
+    /// maximum value of `u16`, the width or height will be clamped to keep the right or bottom
+    /// coordinate within `u16`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ratatui::layout::Rect;
+    ///
+    /// let rect = Rect::new(1, 2, 3, 4);
+    /// ```
+    </span><span class="kw">pub const fn </span>new(x: u16, y: u16, width: u16, height: u16) -&gt; <span class="self">Self </span>{
+        <span class="comment">// these calculations avoid using min so that this function can be const
+        </span><span class="kw">let </span>max_width = u16::MAX - x;
+        <span class="kw">let </span>max_height = u16::MAX - y;
+        <span class="kw">let </span>width = <span class="kw">if </span>width &gt; max_width { max_width } <span class="kw">else </span>{ width };
+        <span class="kw">let </span>height = <span class="kw">if </span>height &gt; max_height {
+            max_height
+        } <span class="kw">else </span>{
+            height
+        };
         <span class="self">Self </span>{
             x,
             y,
-            width: clipped_width,
-            height: clipped_height,
+            width,
+            height,
         }
     }
 
     <span class="doccomment">/// The area of the `Rect`. If the area is larger than the maximum value of `u16`, it will be
     /// clamped to `u16::MAX`.
-    </span><span class="kw">pub const fn </span>area(<span class="self">self</span>) -&gt; u16 {
-        <span class="self">self</span>.width.saturating_mul(<span class="self">self</span>.height)
+    </span><span class="kw">pub const fn </span>area(<span class="self">self</span>) -&gt; u32 {
+        (<span class="self">self</span>.width <span class="kw">as </span>u32) * (<span class="self">self</span>.height <span class="kw">as </span>u32)
     }
 
     <span class="doccomment">/// Returns true if the `Rect` has no area.
@@ -853,7 +863,8 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, layout::Position};
+    /// use ratatui::layout::{Position, Rect};
+    ///
     /// let rect = Rect::new(1, 2, 3, 4);
     /// assert!(rect.contains(Position { x: 1, y: 2 }));
     /// ````
@@ -882,9 +893,10 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::{layout::Rect, Frame};
+    ///
     /// # fn render(frame: &amp;mut Frame) {
-    /// let area = frame.size();
+    /// let area = frame.area();
     /// let rect = Rect::new(0, 0, 100, 100).clamp(area);
     /// # }
     /// ```
@@ -902,7 +914,8 @@
     /// # Example
     ///
     /// ```
-    /// # use ratatui::prelude::*;
+    /// use ratatui::{buffer::Buffer, layout::Rect, text::Line, widgets::Widget};
+    ///
     /// fn render(area: Rect, buf: &amp;mut Buffer) {
     ///     for row in area.rows() {
     ///         Line::raw("Hello, world!").render(row, buf);
@@ -918,7 +931,11 @@
     /// # Example
     ///
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{
+    ///     buffer::Buffer,
+    ///     layout::Rect,
+    ///     widgets::{Block, Borders, Widget},
+    /// };
     /// fn render(area: Rect, buf: &amp;mut Buffer) {
     ///     if let Some(left) = area.columns().next() {
     ///         Block::new().borders(Borders::LEFT).render(left, buf);
@@ -936,10 +953,11 @@
     /// # Example
     ///
     /// ```
-    /// # use ratatui::prelude::*;
+    /// use ratatui::{buffer::Buffer, layout::Rect};
+    ///
     /// fn render(area: Rect, buf: &amp;mut Buffer) {
     ///     for position in area.positions() {
-    ///         buf.get_mut(position.x, position.y).set_symbol("x");
+    ///         buf[(position.x, position.y)].set_symbol("x");
     ///     }
     /// }
     /// ```
@@ -952,7 +970,8 @@
     /// # Examples
     ///
     /// ```
-    /// # use ratatui::prelude::*;
+    /// use ratatui::layout::Rect;
+    ///
     /// let rect = Rect::new(1, 2, 3, 4);
     /// let position = rect.as_position();
     /// ````
@@ -1000,6 +1019,7 @@
     <span class="kw">use </span>rstest::rstest;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::layout::{Constraint, Layout};
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>to_string() {
@@ -1144,46 +1164,28 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>size_truncation() {
-        <span class="kw">for </span>width <span class="kw">in </span><span class="number">256u16</span>..<span class="number">300u16 </span>{
-            <span class="kw">for </span>height <span class="kw">in </span><span class="number">256u16</span>..<span class="number">300u16 </span>{
-                <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, width, height);
-                rect.area(); <span class="comment">// Should not panic.
-                </span><span class="macro">assert!</span>(rect.width &lt; width || rect.height &lt; height);
-                <span class="comment">// The target dimensions are rounded down so the math will not be too precise
-                // but let's make sure the ratios don't diverge crazily.
-                </span><span class="macro">assert!</span>(
-                    (f64::from(rect.width) / f64::from(rect.height)
-                        - f64::from(width) / f64::from(height))
-                    .abs()
-                        &lt; <span class="number">1.0
-                </span>);
-            }
-        }
-
-        <span class="comment">// One dimension below 255, one above. Area above max u16.
-        </span><span class="kw">let </span>width = <span class="number">900</span>;
-        <span class="kw">let </span>height = <span class="number">100</span>;
-        <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, width, height);
-        <span class="macro">assert_ne!</span>(rect.width, <span class="number">900</span>);
-        <span class="macro">assert_ne!</span>(rect.height, <span class="number">100</span>);
-        <span class="macro">assert!</span>(rect.width &lt; width || rect.height &lt; height);
+        <span class="macro">assert_eq!</span>(
+            Rect::new(u16::MAX - <span class="number">100</span>, u16::MAX - <span class="number">1000</span>, <span class="number">200</span>, <span class="number">2000</span>),
+            Rect {
+                x: u16::MAX - <span class="number">100</span>,
+                y: u16::MAX - <span class="number">1000</span>,
+                width: <span class="number">100</span>,
+                height: <span class="number">1000
+            </span>}
+        );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>size_preservation() {
-        <span class="kw">for </span>width <span class="kw">in </span><span class="number">0</span>..<span class="number">256u16 </span>{
-            <span class="kw">for </span>height <span class="kw">in </span><span class="number">0</span>..<span class="number">256u16 </span>{
-                <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, width, height);
-                rect.area(); <span class="comment">// Should not panic.
-                </span><span class="macro">assert_eq!</span>(rect.width, width);
-                <span class="macro">assert_eq!</span>(rect.height, height);
-            }
-        }
-
-        <span class="comment">// One dimension below 255, one above. Area below max u16.
-        </span><span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">300</span>, <span class="number">100</span>);
-        <span class="macro">assert_eq!</span>(rect.width, <span class="number">300</span>);
-        <span class="macro">assert_eq!</span>(rect.height, <span class="number">100</span>);
+        <span class="macro">assert_eq!</span>(
+            Rect::new(u16::MAX - <span class="number">100</span>, u16::MAX - <span class="number">1000</span>, <span class="number">100</span>, <span class="number">1000</span>),
+            Rect {
+                x: u16::MAX - <span class="number">100</span>,
+                y: u16::MAX - <span class="number">1000</span>,
+                width: <span class="number">100</span>,
+                height: <span class="number">1000
+            </span>}
+        );
     }
 
     <span class="attr">#[test]
@@ -1194,7 +1196,7 @@
             width: <span class="number">10</span>,
             height: <span class="number">10</span>,
         };
-        <span class="kw">const </span>_AREA: u16 = RECT.area();
+        <span class="kw">const </span>_AREA: u32 = RECT.area();
         <span class="kw">const </span>_LEFT: u16 = RECT.left();
         <span class="kw">const </span>_RIGHT: u16 = RECT.right();
         <span class="kw">const </span>_TOP: u16 = RECT.top();

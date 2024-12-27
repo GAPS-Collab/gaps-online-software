@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/master_trigger.rs`."><title>master_trigger.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/master_trigger.rs`."><title>master_trigger.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">liftof_lib/</div>master_trigger.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -796,7 +797,66 @@
 <a href="#796" id="796">796</a>
 <a href="#797" id="797">797</a>
 <a href="#798" id="798">798</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard communications
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a></pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard communications
 //!
 //! The MTB (MasterTriggerBoard) is currently
 //! (Jan 2023) connected to the ethernet 
@@ -811,21 +871,20 @@
 //! The data is encoded in IPBus packets.
 //! [see docs here](https://ipbus.web.cern.ch/doc/user/html/)
 //! 
+
 </span><span class="kw">pub mod </span>control;
 <span class="kw">pub mod </span>registers;
 
-<span class="kw">use </span>control::<span class="kw-2">*</span>;
-<span class="kw">use </span>registers::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::sync::{
-    Arc,
-    Mutex,
+  Arc,
+  Mutex,
 };
 
 <span class="kw">use </span>std::time::{
   Duration,
   Instant
 };
-<span class="kw">use </span>std::fmt;
+
 <span class="kw">use </span>std::thread;
 <span class="kw">use </span>crossbeam_channel::Sender;
 <span class="kw">use </span>serde_json::json;
@@ -833,19 +892,28 @@
 <span class="kw">use </span>tof_dataclasses::packets::TofPacket;
 <span class="kw">use </span>tof_dataclasses::monitoring::MtbMoniData;
 <span class="kw">use </span>tof_dataclasses::events::MasterTriggerEvent;
-
 <span class="kw">use </span>tof_dataclasses::events::master_trigger::TriggerType;
+<span class="kw">use </span>tof_dataclasses::version::ProtocolVersion;
 <span class="kw">use </span>tof_dataclasses::errors::{
-    MasterTriggerError
+  MasterTriggerError
 };
+
 <span class="kw">use </span>tof_dataclasses::ipbus::{
-    IPBus,
-    <span class="comment">//IPBusPacketType,
+  IPBus,
+  <span class="comment">//IPBusPacketType,
 </span>};
 
-<span class="kw">use </span><span class="kw">crate</span>::thread_control::ThreadControl;
 <span class="kw">use </span>tof_dataclasses::heartbeats::MTBHeartbeat;
 <span class="kw">use </span>tof_dataclasses::serialization::Packable;
+
+<span class="kw">use </span><span class="kw">crate</span>::thread_control::ThreadControl;
+
+<span class="comment">// make this public to not brake liftof-cc
+</span><span class="kw">pub use </span><span class="kw">crate</span>::settings::MTBSettings;
+
+<span class="kw">use </span>control::<span class="kw-2">*</span>;
+<span class="kw">use </span>registers::<span class="kw-2">*</span>;
+
 <span class="doccomment">/// The DAQ packet from the MTB has a flexible size, but it will
 /// be at least this number of words long.
 </span><span class="kw">const </span>MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = <span class="number">11</span>; 
@@ -860,90 +928,6 @@
     </span>s
   }
 }
-
-
-<span class="doccomment">/// Configure the trigger
-</span><span class="attr">#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-</span><span class="kw">pub struct </span>MTBSettings {
-  <span class="doccomment">/// Select the trigger type for this run
-  </span><span class="kw">pub </span>trigger_type           : TriggerType,
-  <span class="doccomment">/// Select the prescale factor for a run. The
-  /// prescale factor is between 0 (no events)
-  /// and 1.0 (all events). E.g. 0.1 means allow 
-  /// only 10% of the events
-  /// THIS DOES NOT APPLY TO THE GAPS OR POISSON 
-  /// TRIGGER!
-  </span><span class="kw">pub </span>trigger_prescale               : f32,
-  <span class="doccomment">/// in case trigger_type = "Poisson", set rate here
-  </span><span class="kw">pub </span>poisson_trigger_rate           : u32,
-  <span class="doccomment">/// in case trigger_type = "Gaps", set if we want to use 
-  /// beta
-  </span><span class="kw">pub </span>gaps_trigger_use_beta     : bool,
-  <span class="doccomment">/// In case we are running the fixed rate trigger, set the
-  /// desired rate here
-  /// not sure
-  </span><span class="comment">//pub gaps_trigger_inner_thresh : u32,
-  ///// not sure
-  //pub gaps_trigger_outer_thresh : u32, 
-  ///// not sure
-  //pub gaps_trigger_total_thresh : u32, 
-  ///// not sure
-  //pub gaps_trigger_hit_thresh   : u32,
-  </span><span class="doccomment">/// Enable trace suppression on the MTB. If enabled, 
-  /// only those RB which hits will read out waveforms.
-  /// In case it is disabled, ALL RBs will readout events
-  /// ALL the time. For this, we need also the eventbuilder
-  /// strategy "WaitForNBoards(40)"
-  </span><span class="kw">pub </span>trace_suppression  : bool,
-  <span class="doccomment">/// The number of seconds we want to wait
-  /// without hearing from the MTB before
-  /// we attempt a reconnect
-  </span><span class="kw">pub </span>mtb_timeout_sec    : u64,
-  <span class="doccomment">/// Time in seconds between housekkeping 
-  /// packets
-  </span><span class="kw">pub </span>mtb_moni_interval  : u64,
-  <span class="kw">pub </span>rb_int_window      : u8,
-  <span class="kw">pub </span>tiu_emulation_mode : bool,
-  <span class="kw">pub </span>tiu_ignore_busy : bool,
-
-  <span class="kw">pub </span>tofbot_webhook     : String,
-  <span class="kw">pub </span>hb_send_interval   : u8,
-}
-
-<span class="kw">impl </span>MTBSettings {
-  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-    <span class="self">Self </span>{
-      trigger_type            : TriggerType::Unknown,
-      trigger_prescale        : <span class="number">0.0</span>,
-      poisson_trigger_rate    : <span class="number">0</span>,
-      gaps_trigger_use_beta   : <span class="bool-val">true</span>,
-      trace_suppression       : <span class="bool-val">true</span>,
-      mtb_timeout_sec         : <span class="number">60</span>,
-      mtb_moni_interval       : <span class="number">30</span>,
-      rb_int_window           : <span class="number">1</span>,
-      tiu_emulation_mode      : <span class="bool-val">false</span>,
-      tiu_ignore_busy         : <span class="bool-val">false</span>,
-      tofbot_webhook          : String::from(<span class="string">""</span>),
-      hb_send_interval        : <span class="number">30</span>,
-    }
-  }
-}
-
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>MTBSettings {
-  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="kw">let </span>disp = toml::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">"-- DESERIALIZATION ERROR! --"</span>));
-    <span class="macro">write!</span>(f, <span class="string">"&lt;MTBSettings :\n{}&gt;"</span>, disp)
-  }
-}
-
-<span class="kw">impl </span>Default <span class="kw">for </span>MTBSettings {
-  <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-    <span class="self">Self</span>::new()
-  }
-}
-
-
 
 <span class="doccomment">/// Read the complete event of the MTB
 ///
@@ -987,22 +971,37 @@
   <span class="kw">let </span>data = bus.read_multiple(<span class="number">0x11</span>, n_daq_words <span class="kw">as </span>usize, <span class="bool-val">false</span>)<span class="question-mark">?</span>;  
   <span class="comment">//println!("{}", data[0]);
   </span><span class="kw">if </span>data[<span class="number">0</span>] != <span class="number">0xAAAAAAAA </span>{
-    <span class="macro">error!</span>(<span class="string">"Got MTB data, but the header is incorrect {}"</span>, data[<span class="number">0</span>]);
+    <span class="macro">error!</span>(<span class="string">"Got MTB data, but the header is incorrect {:x}"</span>, data[<span class="number">0</span>]);
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::PackageHeaderIncorrect);
   }
   <span class="kw">let </span>foot_pos = (n_daq_words - <span class="number">1</span>) <span class="kw">as </span>usize;
   <span class="kw">if </span>data.len() &lt;= foot_pos {
-    <span class="macro">error!</span>(<span class="string">"Got MTB data, but the header is incorrect"</span>);
-    <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::PackageHeaderIncorrect);
+    <span class="macro">error!</span>(<span class="string">"Got MTB data, but the package ends too early!"</span>);
+    <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::DataTooShort);
+  }
+  <span class="kw">if </span>data.len() &gt; foot_pos + <span class="number">1 </span>{
+    <span class="macro">error!</span>(<span class="string">"The MTB event packets has {} fields, when {} are expected!"</span>, data.len(), n_daq_words);
   }
   <span class="kw">if </span>data[foot_pos] != <span class="number">0x55555555 </span>{
-    <span class="macro">error!</span>(<span class="string">"Got MTB data, but the footer is incorrect {}"</span>, data[foot_pos]);
+    <span class="macro">error!</span>(<span class="string">"Got MTB data, but the footer is incorrect {:x}"</span>, data[foot_pos]);
+    <span class="kw">if </span>data[foot_pos] == <span class="number">0xAAAAAAAA </span>{
+      <span class="macro">println!</span>(<span class="string">"Found next header, printing the whole package!"</span>);
+      <span class="macro">println!</span>(<span class="string">"N LTBs {} ({})"</span>, data[<span class="number">8</span>].count_ones(), data[<span class="number">8</span>]);
+      <span class="kw">for </span>k <span class="kw">in </span>data {
+        <span class="macro">println!</span>(<span class="string">"-- {:x}"</span>, k);
+      }
+    }
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::PackageFooterIncorrect);
   }
 
   <span class="comment">// Number of words which will be always there. 
   // Min event size is +1 word for hits
-  </span><span class="kw">let </span>n_hit_words = n_daq_words - MTB_DAQ_PACKET_FIXED_N_WORDS;
+  </span><span class="kw">let </span>n_hit_words    = n_daq_words - MTB_DAQ_PACKET_FIXED_N_WORDS;
+  <span class="comment">//  this can happen when the subtraction above overflows
+  </span><span class="kw">if </span>n_hit_words &gt; n_daq_words {
+    <span class="macro">error!</span>(<span class="string">"N hit word calculation failed! Got {} hit words!"</span>, n_hit_words);
+    <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::BrokenPackage);
+  }
   <span class="comment">//println!("We are expecting {}", n_hit_packets);
   </span>mte.event_id       = data[<span class="number">1</span>];
   mte.timestamp      = data[<span class="number">2</span>];
@@ -1014,16 +1013,33 @@
   </span><span class="kw">let </span>rbmask = (data[<span class="number">7</span>] <span class="kw">as </span>u64) &lt;&lt; <span class="number">32 </span>| data[<span class="number">6</span>] <span class="kw">as </span>u64; 
   mte.mtb_link_mask  = rbmask;
   mte.dsi_j_mask     = data[<span class="number">8</span>];
-  <span class="comment">//  this can happen when the subtraction above overflows
-  </span><span class="kw">if </span>n_hit_words &gt; n_daq_words {
-    <span class="macro">error!</span>(<span class="string">"N hit word calculation failed! Got {} hit words!"</span>, n_hit_words);
-    <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::BrokenPackage);
+  <span class="comment">/*** NEW ***/
+  // we try ;)
+  </span><span class="kw">let </span>n_trig_boards  = data[<span class="number">8</span>].count_ones();
+  <span class="kw">let </span>n_hit_fields   : u32;
+  <span class="kw">let </span><span class="kw-2">mut </span>odd_boards = <span class="bool-val">false</span>;
+  <span class="kw">if </span>n_trig_boards % <span class="number">2 </span>== <span class="number">0 </span>{
+    n_hit_fields = n_trig_boards/<span class="number">2</span>;
+  } <span class="kw">else </span>{
+    n_hit_fields = n_trig_boards/<span class="number">2 </span>+ <span class="number">1</span>;
+    odd_boards   = <span class="bool-val">true</span>;
   }
-  <span class="kw">for </span>k <span class="kw">in </span><span class="number">1</span>..n_hit_words+<span class="number">1 </span>{
-    <span class="kw">let </span>first  = ( data[<span class="number">8 </span>+ k <span class="kw">as </span>usize] &amp; <span class="number">0x0000ffff</span>) <span class="kw">as </span>u16;
-    <span class="kw">let </span>second = ((data[<span class="number">8 </span>+ k <span class="kw">as </span>usize] &amp; <span class="number">0xffff0000</span>) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16; 
-    mte.channel_mask.push(first);
-    mte.channel_mask.push(second);
+  <span class="kw">for </span>k <span class="kw">in </span><span class="number">9</span>..<span class="number">9 </span>+ n_hit_fields {
+    <span class="kw">let </span>ltb_hits = data[k <span class="kw">as </span>usize];
+    <span class="comment">// split them up
+    </span><span class="kw">let </span>first  =  (ltb_hits &amp; <span class="number">0x0000ffff</span>) <span class="kw">as </span>u16;
+    <span class="kw">let </span>second = ((ltb_hits &amp; <span class="number">0xffff0000</span>) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;
+  <span class="comment">//for k in 1..n_hit_words+1 {
+  //  let first  = ( data[8 + k as usize] &amp; 0x0000ffff) as u16;
+  //  let second = ((data[8 + k as usize] &amp; 0xffff0000) &gt;&gt; 16) as u16; 
+    </span>mte.channel_mask.push(first);
+    <span class="kw">if </span>!odd_boards {
+      mte.channel_mask.push(second);
+    } <span class="kw">else </span>{
+      <span class="kw">if </span>k != (<span class="number">9 </span>+ n_hit_fields - <span class="number">1</span>) {
+        mte.channel_mask.push(second);
+      }
+    }
   }
   <span class="comment">//println!("{:?}", data);
   //println!("{:?}", mte.channel_mask);
@@ -1040,83 +1056,68 @@
   <span class="kw">if </span>data.len() &lt; <span class="number">4 </span>{
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::BrokenPackage);
   }
-  <span class="kw">let </span>tiu_link_bad   = TIU_BAD.get(bus)<span class="question-mark">?</span>;
-  <span class="kw">let </span>tiu_busy_len   = TIU_BUSY_LENGTH.get(bus)<span class="question-mark">?</span>;
-  <span class="kw">let </span>tiu_aux_link   = (TIU_USE_AUX_LINK.get(bus)<span class="question-mark">? </span>!= <span class="number">0</span>) <span class="kw">as </span>u8;
-  <span class="kw">let </span>tiu_emu_mode   = (TIU_EMULATION_MODE.get(bus)<span class="question-mark">? </span>!= <span class="number">0</span>) <span class="kw">as </span>u8;
-  <span class="comment">//let tiu_bad        = TIU_BAD.get(bus)? as u8;
-  </span><span class="kw">let </span>tiu_busy_stuck = (TIU_BUSY_STUCK.get(bus)<span class="question-mark">? </span>!= <span class="number">0</span>) <span class="kw">as </span>u8;
-  <span class="kw">let </span>tiu_busy_ign   = (TIU_BUSY_IGNORE.get(bus)<span class="question-mark">? </span>!= <span class="number">0</span>) <span class="kw">as </span>u8;
-  <span class="kw">let </span><span class="kw-2">mut </span>tiu_status = <span class="number">0u8</span>;
-  tiu_status         = tiu_status | (tiu_emu_mode);
-  tiu_status         = tiu_status | (tiu_aux_link &lt;&lt; <span class="number">1</span>);
-  tiu_status         = tiu_status | ((tiu_link_bad <span class="kw">as </span>u8) &lt;&lt; <span class="number">2</span>);
-  tiu_status         = tiu_status | (tiu_busy_stuck &lt;&lt; <span class="number">3</span>);
-  tiu_status         = tiu_status | (tiu_busy_ign &lt;&lt; <span class="number">4</span>);
-  <span class="kw">let </span>daq_queue_len  = EVQ_NUM_EVENTS.get(bus)<span class="question-mark">? </span><span class="kw">as </span>u16;
-  moni.tiu_status    = tiu_status;
-  moni.tiu_busy_len  = tiu_busy_len;
-  moni.daq_queue_len = daq_queue_len;
+  <span class="kw">let </span>tiu_busy_len    = TIU_BUSY_LENGTH.get(bus)<span class="question-mark">?</span>;
+  <span class="kw">let </span>tiu_aux_link    = (TIU_USE_AUX_LINK.get(bus)<span class="question-mark">? </span>!= <span class="number">0</span>) <span class="kw">as </span>u8;
+  <span class="kw">let </span>tiu_emu_mode    = (TIU_EMULATION_MODE.get(bus)<span class="question-mark">? </span>!= <span class="number">0</span>) <span class="kw">as </span>u8;
+  <span class="comment">//let tiu_bad         = TIU_BAD.get(bus)? as u8;
+  //let tiu_busy_stuck  = (TIU_BUSY_STUCK.get(bus)? != 0) as u8;
+  //let tiu_link_bad    = TIU_BAD.get(bus)?;
+  //let tiu_busy_ign    = (TIU_BUSY_IGNORE.get(bus)? != 0) as u8;
+  </span><span class="kw">let </span>aggr_tiu        = TIU_LT_AND_RB_MULT.get(bus)<span class="question-mark">?</span>;
+  <span class="kw">let </span>tiu_link_bad    = (aggr_tiu &amp; <span class="number">0x1</span>) <span class="kw">as </span>u8;
+  <span class="kw">let </span>tiu_busy_stuck  = ((aggr_tiu &amp; <span class="number">0x2</span>) &gt;&gt; <span class="number">1</span>) <span class="kw">as </span>u8;
+  <span class="kw">let </span>tiu_busy_ign    = ((aggr_tiu &amp; <span class="number">0x4</span>) &gt;&gt; <span class="number">2</span>) <span class="kw">as </span>u8;
+  <span class="kw">let </span><span class="kw-2">mut </span>tiu_status  = <span class="number">0u8</span>;
+  tiu_status          = tiu_status | (tiu_emu_mode);
+  tiu_status          = tiu_status | (tiu_aux_link &lt;&lt; <span class="number">1</span>);
+  tiu_status          = tiu_status | ((tiu_link_bad <span class="kw">as </span>u8) &lt;&lt; <span class="number">2</span>);
+  tiu_status          = tiu_status | (tiu_busy_stuck &lt;&lt; <span class="number">3</span>);
+  tiu_status          = tiu_status | (tiu_busy_ign &lt;&lt; <span class="number">4</span>);
+  <span class="kw">let </span>daq_queue_len   = EVQ_NUM_EVENTS.get(bus)<span class="question-mark">? </span><span class="kw">as </span>u16;
+  moni.tiu_status     = tiu_status;
+  moni.tiu_busy_len   = tiu_busy_len;
+  moni.daq_queue_len  = daq_queue_len;
   <span class="comment">// sensors are 12 bit
-  </span><span class="kw">let </span>first_word   = <span class="number">0x00000fff</span>;
-  <span class="kw">let </span>second_word  = <span class="number">0x0fff0000</span>;
+  </span><span class="kw">let </span>first_word     = <span class="number">0x00000fff</span>;
+  <span class="kw">let </span>second_word    = <span class="number">0x0fff0000</span>;
   <span class="comment">//println!("[get_mtbmonidata] =&gt; Received data from registers {:?} data", data);
-  </span>moni.temp        = ( data[<span class="number">2</span>] &amp; first_word  ) <span class="kw">as </span>u16;  
-  moni.vccint      = ((data[<span class="number">2</span>] &amp; second_word ) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;  
-  moni.vccaux      = ( data[<span class="number">3</span>] &amp; first_word  ) <span class="kw">as </span>u16;  
-  moni.vccbram     = ((data[<span class="number">3</span>] &amp; second_word ) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;  
+  </span>moni.temp          = ( data[<span class="number">2</span>] &amp; first_word  ) <span class="kw">as </span>u16;  
+  moni.vccint        = ((data[<span class="number">2</span>] &amp; second_word ) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;  
+  moni.vccaux        = ( data[<span class="number">3</span>] &amp; first_word  ) <span class="kw">as </span>u16;  
+  moni.vccbram       = ((data[<span class="number">3</span>] &amp; second_word ) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;  
  
-  <span class="kw">let </span>rate = bus.read_multiple(<span class="number">0x17</span>, <span class="number">2</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+  <span class="kw">let </span>rate           = bus.read_multiple(<span class="number">0x17</span>, <span class="number">2</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
   <span class="comment">// FIXME - technically, the rate is 24bit, however, we just
   // read out 16 here (if the rate is beyond ~65kHz, we don't need 
   // to know with precision
-  </span><span class="kw">let </span>mask        = <span class="number">0x0000ffff</span>;
-  moni.rate       = (rate[<span class="number">0</span>] &amp; mask) <span class="kw">as </span>u16;
-  moni.lost_rate  = (rate[<span class="number">1</span>] &amp; mask) <span class="kw">as </span>u16;
+  </span><span class="kw">let </span>mask           = <span class="number">0x0000ffff</span>;
+  moni.rate          = (rate[<span class="number">0</span>] &amp; mask) <span class="kw">as </span>u16;
+  moni.lost_rate     = (rate[<span class="number">1</span>] &amp; mask) <span class="kw">as </span>u16;
+  <span class="kw">let </span>rb_lost_rate  = RB_LOST_TRIGGER_RATE.get(bus)<span class="question-mark">?</span>;
+  <span class="kw">if </span>rb_lost_rate &gt; <span class="number">255 </span>{
+    moni.rb_lost_rate = <span class="number">255</span>;
+  } <span class="kw">else </span>{
+    moni.rb_lost_rate = rb_lost_rate <span class="kw">as </span>u8;
+  }
   <span class="prelude-val">Ok</span>(moni)
 }
 
-<span class="doccomment">/// Communications with the master trigger over Udp
+<span class="doccomment">/// Configure the MTB according to lifot settings.
 ///
-/// The master trigger can send packets over the network.
-/// These packets contain timestamps as well as the 
-/// eventid and a hitmaks to identify which LTBs have
-/// participated in the trigger.
-/// The packet format is described
-/// [here](https://gitlab.com/ucla-gaps-tof/firmware/-/tree/develop/)
-///
-/// # Arguments
-///
-/// * mt_address        : Udp address of the MasterTriggerBoard
-///
-/// * mt_sender         : push retrieved MasterTriggerEvents to 
-///                       this channel
-/// * mtb_moni_interval : time in seconds when we 
-///                       are acquiring mtb moni data.
-///
-/// * mtb_timeout_sec   : reconnect to mtb when we don't
-///                       see events in mtb_timeout seconds.
-///
-/// * verbose           : Print "heartbeat" output 
-///
-</span><span class="kw">pub fn </span>master_trigger(mt_address     : String,
-                      mt_sender      : <span class="kw-2">&amp;</span>Sender&lt;MasterTriggerEvent&gt;,
-                      moni_sender    : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;, 
-                      settings       : MTBSettings,
-                      thread_control : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;,
-                      verbose        : bool) {
-
-  <span class="comment">// missing event analysis - has to go away eventually
-  //let mut event_id_test = Vec::&lt;u32&gt;::new();
-
-  </span><span class="kw">let </span><span class="kw-2">mut </span>bus : IPBus;
-  <span class="kw">match </span>IPBus::new(mt_address.clone()) {
+/// # Arguments:
+///   * mt_address : udp address of the MTB
+///   * settings   : configure the MTB according
+///                  to these settings 
+</span><span class="kw">pub fn </span>configure_mtb(mt_address : <span class="kw-2">&amp;</span>str,
+                     settings   : <span class="kw-2">&amp;</span>MTBSettings) -&gt; <span class="prelude-ty">Result</span>&lt;(), MasterTriggerError&gt; {
+  <span class="kw">let </span><span class="kw-2">mut </span>bus : IPBus;
+  <span class="kw">match </span>IPBus::new(mt_address) {
     <span class="comment">// if that doesn't work, then probably the 
     // configuration is wrong, wo we might as 
     // well panic
     </span><span class="prelude-val">Err</span>(err) =&gt; {
       <span class="macro">error!</span>(<span class="string">"Can't connect to MTB! {err}"</span>);
-      <span class="macro">panic!</span>(<span class="string">"Without MTB, we can't proceed and might as well panic!"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::UdpTimeOut);
     }
     <span class="prelude-val">Ok</span>(_bus) =&gt; {
       bus = _bus;
@@ -1137,19 +1138,31 @@
     }
   }
 
-  <span class="kw">let </span>tiu_emulation_mode = settings.tiu_emulation_mode;
-  <span class="kw">match </span>set_tiu_emulation_mode(<span class="kw-2">&amp;mut </span>bus, tiu_emulation_mode) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to change tiu emulation mode! {err}"</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-      <span class="kw">if </span>tiu_emulation_mode {
-        <span class="macro">println!</span>(<span class="string">"==&gt; Setting TIU emulation mode! This setting is useful if the TIU is NOT connected!"</span>);
-      } <span class="kw">else </span>{
-        <span class="macro">println!</span>(<span class="string">"==&gt; Not setting TIU emulation mode! TIU needs to be active and connectected!"</span>);
+  <span class="kw">let </span>tiu_ignore_busy    = settings.tiu_ignore_busy;
+  <span class="kw">match </span>TIU_BUSY_IGNORE.set(<span class="kw-2">&amp;mut </span>bus, tiu_ignore_busy <span class="kw">as </span>u32) {
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to change tiu busy ignore settint! {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+      <span class="kw">if </span>tiu_ignore_busy {
+        <span class="macro">warn!</span>(<span class="string">"Ignoring TIU since tiu_busy_ignore is set in the config file!"</span>);
+        <span class="macro">println!</span>(<span class="string">"==&gt; Ignroing TIU since tiu_busy_ignore is set in the config file!"</span>);
       }
     }
   }
+
+  <span class="comment">// disable broken emulation mode!!
+  //let tiu_emulation_mode = settings.tiu_emulation_mode;
+  //match set_tiu_emulation_mode(&amp;mut bus, tiu_emulation_mode) {
+  //  Err(err) =&gt; error!("Unable to change tiu emulation mode! {err}"),
+  //  Ok(_) =&gt; {
+  //    if tiu_emulation_mode {
+  //      println!("==&gt; Setting TIU emulation mode! This will emulate a TIU. However, this is (usually) not a good run setting for taking data together with the tracker!");
+  //    } else {
+  //      println!("==&gt; Not setting TIU emulation mode! Good setting for combined runs with tracker! \u{1F4AF}");
+  //    }
+  //  }
+  //}
   
-  <span class="macro">info!</span>(<span class="string">"Settting rb integration window!"</span>);
+  </span><span class="macro">info!</span>(<span class="string">"Settting rb integration window!"</span>);
   <span class="kw">let </span>int_wind = settings.rb_int_window;
   <span class="kw">match </span>set_rb_int_window(<span class="kw-2">&amp;mut </span>bus, int_wind) {
     <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set rb integration window! {err}"</span>),
@@ -1164,94 +1177,92 @@
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
   }
   
+  <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+  }
   <span class="kw">match </span>settings.trigger_type {
     TriggerType::Poisson =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
       <span class="kw">match </span>set_poisson_trigger(<span class="kw-2">&amp;mut </span>bus,settings.poisson_trigger_rate) {
         <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set the POISSON trigger! {err}"</span>),
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
       }
     }
     TriggerType::Any     =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
       <span class="kw">match </span>set_any_trigger(<span class="kw-2">&amp;mut </span>bus,settings.trigger_prescale) {
         <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set the ANY trigger! {err}"</span>),
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
       }
     }
     TriggerType::Track   =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
       <span class="kw">match </span>set_track_trigger(<span class="kw-2">&amp;mut </span>bus, settings.trigger_prescale) {
         <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set the TRACK trigger! {err}"</span>),
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
       }
     }
     TriggerType::TrackCentral   =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
       <span class="kw">match </span>set_central_track_trigger(<span class="kw-2">&amp;mut </span>bus, settings.trigger_prescale) {
         <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set the CENTRAL TRACK trigger! {err}"</span>),
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
       }
     }
     TriggerType::TrackUmbCentral  =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err)  =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)   =&gt; ()
-      }
       <span class="kw">match </span>set_track_umb_central_trigger(<span class="kw-2">&amp;mut </span>bus, settings.trigger_prescale) {
         <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set the TRACK UMB CENTRAL trigger! {err}"</span>),
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)   =&gt; ()
       }
     }
     TriggerType::Gaps    =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
       <span class="kw">match </span>set_gaps_trigger(<span class="kw-2">&amp;mut </span>bus, settings.gaps_trigger_use_beta) {
         <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set the GAPS trigger! {err}"</span>),
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
       }
     }
     TriggerType::Gaps633    =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
       <span class="kw">match </span>set_gaps633_trigger(<span class="kw-2">&amp;mut </span>bus, settings.gaps_trigger_use_beta) {
         <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set the GAPS trigger! {err}"</span>),
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
       }
     }
     TriggerType::Gaps422    =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
       <span class="kw">match </span>set_gaps422_trigger(<span class="kw-2">&amp;mut </span>bus, settings.gaps_trigger_use_beta) {
         <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set the GAPS trigger! {err}"</span>),
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
       }
     }
     TriggerType::Gaps211    =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
       <span class="kw">match </span>set_gaps211_trigger(<span class="kw-2">&amp;mut </span>bus, settings.gaps_trigger_use_beta) {
         <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set the GAPS trigger! {err}"</span>),
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+      }
+    }
+    TriggerType::UmbCube =&gt; {
+      <span class="kw">match </span>set_umbcube_trigger(<span class="kw-2">&amp;mut </span>bus) {
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set UmbCube trigger! {err}"</span>),
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+      }
+    }
+    TriggerType::UmbCubeZ =&gt; {
+      <span class="kw">match </span>set_umbcubez_trigger(<span class="kw-2">&amp;mut </span>bus) {
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set UmbCubeZ trigger! {err}"</span>),
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+      }
+    }
+    TriggerType::UmbCorCube =&gt; {
+      <span class="kw">match </span>set_umbcorcube_trigger(<span class="kw-2">&amp;mut </span>bus) {
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set UmbCorCube trigger! {err}"</span>),
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+      }
+    }
+    TriggerType::CorCubeSide =&gt; {
+      <span class="kw">match </span>set_corcubeside_trigger(<span class="kw-2">&amp;mut </span>bus) {
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set CorCubeSide trigger! {err}"</span>),
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+      }
+    }
+    TriggerType::Umb3Cube =&gt; {
+      <span class="kw">match </span>set_umb3cube_trigger(<span class="kw-2">&amp;mut </span>bus) {
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set Umb3Cube trigger! {err}"</span>), 
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
       }
     }
@@ -1260,91 +1271,147 @@
       <span class="macro">warn!</span>(<span class="string">"Trigger condition undefined! Not setting anything!"</span>);
       <span class="macro">error!</span>(<span class="string">"Trigger conditions unknown!"</span>);
     }
-    TriggerType::UmbCube =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
-      <span class="kw">match </span>set_umbcube_trigger(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set UmbCube trigger! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
-    }
-    TriggerType::UmbCubeZ =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
-      <span class="kw">match </span>set_umbcubez_trigger(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set UmbCubeZ trigger! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
-    }
-    TriggerType::UmbCorCube =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
-      <span class="kw">match </span>set_umbcorcube_trigger(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set UmbCorCube trigger! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
-    }
-    TriggerType::CorCubeSide =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
-      <span class="kw">match </span>set_corcubeside_trigger(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set CorCubeSide trigger! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
-    }
-    TriggerType::Umb3Cube =&gt; {
-      <span class="kw">match </span>unset_all_triggers(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to undo previous trigger settings! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
-      <span class="kw">match </span>set_umb3cube_trigger(<span class="kw-2">&amp;mut </span>bus) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set Umb3Cube trigger! {err}"</span>), 
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
-    }
-
-    <span class="comment">//TriggerType::FixedRate =&gt; {
-    //  match unset_all_triggers(&amp;mut bus) {
-    //    Err(err) =&gt; error!("Unable to undo previous trigger settings! {err}"),
-    //    Ok(_)    =&gt; ()
-    //  }
-    //  error!("Fixed Rate trigger is currently not supported!");
-    //}
-    </span><span class="kw">_ </span>=&gt; {
+    <span class="kw">_ </span>=&gt; {
       <span class="macro">error!</span>(<span class="string">"Trigger type {} not covered!"</span>, settings.trigger_type);
       <span class="macro">println!</span>(<span class="string">"= =&gt; Not setting any trigger condition. You can set it through pico_hal.py"</span>);
       <span class="macro">warn!</span>(<span class="string">"Trigger condition undefined! Not setting anything!"</span>);
       <span class="macro">error!</span>(<span class="string">"Trigger conditions unknown!"</span>);
     }
   }
-
-  <span class="comment">//TIU_BUSY_IGNORE.set(&amp;mut bus, 1);
-
-  // reset the DAQ event queue before start
+    
+  <span class="comment">// global trigger type
+  </span><span class="kw">if </span>settings.use_combo_trigger {
+    <span class="kw">let </span>global_prescale = settings.global_trigger_prescale;
+    <span class="kw">let </span>prescale_val    = (u32::MAX <span class="kw">as </span>f32 * global_prescale <span class="kw">as </span>f32).floor() <span class="kw">as </span>u32;
+    <span class="macro">println!</span>(<span class="string">"=&gt; Setting an additonal trigger - using combo mode. Using prescale of {prescale_val}"</span>);
+    <span class="comment">// FIXME - the "global" is wrong. We need to rename this at some point
+    </span><span class="kw">match </span>settings.global_trigger_type {
+      TriggerType::Any             =&gt; {
+        <span class="kw">match </span>ANY_TRIG_PRESCALE.set(<span class="kw-2">&amp;mut </span>bus, prescale_val) {
+          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; (),
+          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Settting the prescale {} for the any trigger failed! {err}"</span>, prescale_val) 
+        }
+      }
+      TriggerType::Track           =&gt; {
+        <span class="kw">match </span>TRACK_TRIG_PRESCALE.set(<span class="kw-2">&amp;mut </span>bus, prescale_val) {
+          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; (),
+          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Settting the prescale {} for the any trigger failed! {err}"</span>, prescale_val) 
+        }
+      }
+      TriggerType::TrackCentral    =&gt; {
+        <span class="kw">match </span>TRACK_CENTRAL_PRESCALE.set(<span class="kw-2">&amp;mut </span>bus, prescale_val) {
+          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; (),
+          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Settting the prescale {} for the track central trigger failed! {err}"</span>, prescale_val) 
+        }
+      }
+      TriggerType::TrackUmbCentral =&gt; {
+        <span class="kw">match </span>TRACK_UMB_CENTRAL_PRESCALE.set(<span class="kw-2">&amp;mut </span>bus, prescale_val) {
+          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; (),
+          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Settting the prescale {} for the track umb central trigger failed! {err}"</span>, prescale_val) 
+        }
+      }
+      <span class="kw">_ </span>=&gt; {
+        <span class="macro">error!</span>(<span class="string">"Unable to set {} as a global trigger type!"</span>, settings.global_trigger_type);
+      }
+    }
+  }
+  
+  <span class="comment">// reset the DAQ event queue before start
   </span><span class="kw">match </span>reset_daq(<span class="kw-2">&amp;mut </span>bus) {<span class="comment">//, &amp;mt_address) {
-    </span><span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not reset DAQ! {err}"</span>),
+    </span><span class="prelude-val">Err</span>(err) =&gt; {
+      <span class="macro">error!</span>(<span class="string">"Can not reset DAQ! {err}"</span>);
+    }
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
   }
+  <span class="prelude-val">Ok</span>(())
+}
 
-  <span class="comment">// step 2 - event loop
-  
-  // timers - when to reconnect if no 
+<span class="doccomment">/// Communications with the master trigger over Udp
+///
+/// The master trigger can send packets over the network.
+/// These packets contain timestamps as well as the 
+/// eventid and a hitmaks to identify which LTBs have
+/// participated in the trigger.
+/// The packet format is described
+/// [here](https://gitlab.com/ucla-gaps-tof/firmware/-/tree/develop/)
+///
+/// # Arguments
+///
+/// * mt_address        : Udp address of the MasterTriggerBoard
+///
+/// * mt_sender         : push retrieved MasterTriggerEvents to 
+///                       this channel
+/// * mtb_timeout_sec   : reconnect to mtb when we don't
+///                       see events in mtb_timeout seconds.
+///
+/// * verbose           : Print "heartbeat" output 
+///
+</span><span class="kw">pub fn </span>master_trigger(mt_address     : <span class="kw-2">&amp;</span>str,
+                      mt_sender      : <span class="kw-2">&amp;</span>Sender&lt;MasterTriggerEvent&gt;,
+                      moni_sender    : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;, 
+                      thread_control : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;,
+                      verbose        : bool) {
+
+  <span class="comment">// missing event analysis - has to go away eventually
+  //let mut event_id_test = Vec::&lt;u32&gt;::new();
+
+  </span><span class="kw">let </span><span class="kw-2">mut </span>bus : IPBus;
+
+  <span class="comment">// timers - when to reconnect if no 
   // events have been received in a 
   // certain timeinterval
   </span><span class="kw">let </span><span class="kw-2">mut </span>heartbeat      = MTBHeartbeat::new();
   <span class="kw">let </span><span class="kw-2">mut </span>mtb_timeout    = Instant::now();
   <span class="kw">let </span><span class="kw-2">mut </span>moni_interval  = Instant::now();
   <span class="kw">let </span><span class="kw-2">mut </span>tc_timer       = Instant::now();
+  
+  <span class="kw">let </span><span class="kw-2">mut </span>settings       : MTBSettings;
+  <span class="kw">let </span><span class="kw-2">mut </span>cali_active    : bool;
+  <span class="kw">loop </span>{
+    <span class="kw">match </span>thread_control.lock() {
+      <span class="prelude-val">Ok</span>(tc) =&gt; {
+        settings    = tc.liftof_settings.mtb_settings.clone();  
+        cali_active = tc.calibration_active; 
+      }
+      <span class="prelude-val">Err</span>(err) =&gt; {
+        <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}"</span>);
+        <span class="kw">return</span>;
+      }
+    }
+    <span class="kw">if </span>!cali_active {
+      <span class="kw">break</span>;
+    } <span class="kw">else </span>{
+      thread::sleep(Duration::from_secs(<span class="number">5</span>));
+    }
+    <span class="kw">if </span>moni_interval.elapsed().as_secs() &gt; settings.mtb_moni_interval {
+      <span class="kw">match </span>IPBus::new(mt_address) {
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">debug!</span>(<span class="string">"Can't connect to MTB, will try again in 10 ms! {err}"</span>);
+          <span class="kw">continue</span>;
+        }
+        <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>moni_bus) =&gt; {
+          <span class="kw">match </span>get_mtbmonidata(<span class="kw-2">&amp;mut </span>moni_bus) { 
+            <span class="prelude-val">Err</span>(err) =&gt; {
+              <span class="macro">error!</span>(<span class="string">"Can not get MtbMoniData! {err}"</span>);
+            },
+            <span class="prelude-val">Ok</span>(moni) =&gt; {
+              <span class="kw">let </span>tp = moni.pack();
+              <span class="kw">match </span>moni_sender.send(tp) {
+                <span class="prelude-val">Err</span>(err) =&gt; {
+                  <span class="macro">error!</span>(<span class="string">"Can not send MtbMoniData over channel! {err}"</span>);
+                },
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
+              }
+            }
+          }
+        }
+      }
+      moni_interval = Instant::now();
+    }
+  } 
   <span class="kw">let </span>mtb_timeout_sec    = settings.mtb_timeout_sec;
   <span class="kw">let </span>mtb_moni_interval  = settings.mtb_moni_interval;
+  
   <span class="comment">// verbose, debugging
   </span><span class="kw">let </span><span class="kw-2">mut </span>last_event_id           = <span class="number">0u32</span>;
   <span class="comment">//let mut n_events                   = 0u64;
@@ -1360,26 +1427,63 @@
   <span class="kw">let </span><span class="kw-2">mut </span>n_iter_loop         = <span class="number">0u64</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>hb_timer            = Instant::now();
   <span class="kw">let </span>hb_interval             = Duration::from_secs(settings.hb_send_interval <span class="kw">as </span>u64);
-  <span class="comment">// indicator if the thread is active (it can 
-  // sleep during calibrations)
-  </span><span class="kw">let </span><span class="kw-2">mut </span>is_active              = <span class="bool-val">true</span>;
+
+  <span class="kw">match </span>configure_mtb(mt_address, <span class="kw-2">&amp;</span>settings) {
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Configuring the MTB failed! {err}"</span>),
+    <span class="prelude-val">Ok</span>(())   =&gt; ()
+  }
+
+  <span class="kw">let </span>connection_timeout = Instant::now(); 
+  <span class="kw">loop </span>{ 
+    <span class="kw">match </span>IPBus::new(mt_address) {
+      <span class="prelude-val">Err</span>(err) =&gt; {
+        <span class="macro">debug!</span>(<span class="string">"Can't connect to MTB, will try again in 10 ms! {err}"</span>);
+        <span class="comment">//panic!("Without MTB, we can't proceed and might as well panic!");
+        </span>thread::sleep(Duration::from_millis(<span class="number">10</span>));
+      }
+      <span class="prelude-val">Ok</span>(_bus) =&gt; {
+        bus = _bus;
+        <span class="kw">break
+        </span><span class="comment">//thread::sleep(Duration::from_micros(1000));
+      </span>}
+    }
+    <span class="kw">if </span>connection_timeout.elapsed().as_secs() &gt; <span class="number">10 </span>{
+      <span class="macro">error!</span>(<span class="string">"Unable to connect to MTB after 10 seconds!"</span>);
+      <span class="kw">match </span>thread_control.lock() {
+        <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
+          tc.thread_master_trg_active = <span class="bool-val">false</span>;
+        }
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}"</span>);
+        },
+      }
+      <span class="kw">return</span>;
+    }
+  }
+  
+  <span class="macro">debug!</span>(<span class="string">"Resetting master trigger DAQ"</span>);
+  <span class="comment">// We'll reset the pid as well
+  </span>bus.pid = <span class="number">0</span>;
+  <span class="kw">match </span>bus.realign_packet_id() {
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not realign packet ID! {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+  }
+  
+  <span class="kw">match </span>reset_daq(<span class="kw-2">&amp;mut </span>bus) {<span class="comment">//, &amp;mt_address) {
+    </span><span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not reset DAQ! {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+  }
   <span class="kw">loop </span>{
     <span class="comment">// Check thread control and what to do
+    // Deactivate this for now
     </span><span class="kw">if </span>tc_timer.elapsed().as_secs_f32() &gt; <span class="number">2.5 </span>{
       <span class="kw">match </span>thread_control.try_lock() {
         <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
-          <span class="kw">if </span>tc.thread_master_trg_active || tc.stop_flag {
-            <span class="comment">// if the thread is not supposed to be active, 
-            // idle
-            </span>is_active = <span class="bool-val">true</span>;
-          }
-          <span class="kw">if </span>!tc.thread_master_trg_active {
-            is_active = <span class="bool-val">false</span>;
-          }
-          <span class="kw">if </span>tc.stop_flag {
-            tc.thread_master_trg_active = <span class="bool-val">false</span>;
+          <span class="kw">if </span>tc.stop_flag || tc.sigint_recvd {
+            tc.end_all_rb_threads = <span class="bool-val">true</span>;
             <span class="kw">break</span>;
           }
+        
         },
         <span class="prelude-val">Err</span>(err) =&gt; {
           <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}"</span>);
@@ -1395,15 +1499,16 @@
       } <span class="kw">else </span>{
         <span class="macro">println!</span>(<span class="string">"= =&gt; [master_trigger] reconnection requested"</span>);
       }
-      <span class="kw">match </span>IPBus::new(mt_address.clone()) {
+      <span class="kw">match </span>IPBus::new(mt_address) {
         <span class="prelude-val">Err</span>(err) =&gt; {
           <span class="macro">error!</span>(<span class="string">"Can't connect to MTB! {err}"</span>);
           <span class="comment">//panic!("Without MTB, we can't proceed and might as well panic!");
+          </span><span class="kw">continue</span>; <span class="comment">// try again
         </span>}
         <span class="prelude-val">Ok</span>(_bus) =&gt; {
           bus = _bus;
-          thread::sleep(Duration::from_micros(<span class="number">1000</span>));
-          <span class="macro">debug!</span>(<span class="string">"Resetting master trigger DAQ"</span>);
+          <span class="comment">//thread::sleep(Duration::from_micros(1000));
+          </span><span class="macro">debug!</span>(<span class="string">"Resetting master trigger DAQ"</span>);
           <span class="comment">// We'll reset the pid as well
           </span>bus.pid = <span class="number">0</span>;
           <span class="kw">match </span>bus.realign_packet_id() {
@@ -1416,11 +1521,11 @@
           }
         }
       }
-      <span class="kw">match </span>bus.reconnect() {<span class="comment">//, &amp;mt_address) {
-        </span><span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not reconnect NTB! {err}"</span>),
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-      }
-      mtb_timeout    = Instant::now();
+      <span class="comment">//match bus.reconnect() {//, &amp;mt_address) {
+      //  Err(err) =&gt; error!("Can not reconnect NTB! {err}"),
+      //  Ok(_)    =&gt; ()
+      //}
+      </span>mtb_timeout    = Instant::now();
     }
     <span class="kw">if </span>moni_interval.elapsed().as_secs() &gt; mtb_moni_interval || first {
       <span class="kw">if </span>first {
@@ -1484,16 +1589,12 @@
       moni_interval = Instant::now();
     }
     
-    <span class="comment">// if we ar not active, don't get events
-    </span><span class="kw">if </span>!is_active {
-      <span class="kw">continue</span>;
-    }
-
     <span class="kw">match </span>get_event(<span class="kw-2">&amp;mut </span>bus){ <span class="comment">//,
       </span><span class="prelude-val">Err</span>(err) =&gt; {
         <span class="kw">match </span>err {
           MasterTriggerError::PackageFooterIncorrect
           | MasterTriggerError::PackageHeaderIncorrect 
+          | MasterTriggerError::DataTooShort
           | MasterTriggerError::BrokenPackage =&gt; {
             <span class="macro">error!</span>(<span class="string">"MasterTriggerEventPackage not adhering to expected format! {err}"</span>);
             <span class="macro">warn!</span>(<span class="string">"Resetting DAQ Event Queue!"</span>);
@@ -1521,8 +1622,9 @@
         last_event_id = _ev.event_id;
         <span class="comment">// we got an even successfully, so reset the 
         // connection timeout
-        </span>mtb_timeout = Instant::now();
-        heartbeat.n_events += <span class="number">1</span>;
+        //mtb_timeout = Instant::now();
+        
+        </span>heartbeat.n_events += <span class="number">1</span>;
         <span class="kw">match </span>mt_sender.send(_ev) {
           <span class="prelude-val">Err</span>(err) =&gt; {
             <span class="macro">error!</span>(<span class="string">"Can not send MasterTriggerEvent over channel! {err}"</span>);
@@ -1558,6 +1660,7 @@
           heartbeat.evq_num_events_avg = (evq_num_events <span class="kw">as </span>u64)/(n_iter_loop <span class="kw">as </span>u64);
         }
       }
+      
       heartbeat.total_elapsed += hb_timer.elapsed().as_secs() <span class="kw">as </span>u64;
       <span class="kw">match </span>TRIGGER_RATE.get(<span class="kw-2">&amp;mut </span>bus) {
         <span class="prelude-val">Ok</span>(trate) =&gt; {
@@ -1576,7 +1679,25 @@
           <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, LOST_TRIGGER_RATE);
         }
       }
+      <span class="kw">match </span>TRACK_TRIG_PRESCALE.get(<span class="kw-2">&amp;mut </span>bus) {
+        <span class="prelude-val">Ok</span>(ps) =&gt; {
+          heartbeat.prescale_track = (ps <span class="kw">as </span>f32) / (u32::MAX <span class="kw">as </span>f32) ;
+        }
       
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, LOST_TRIGGER_RATE);
+        }
+      }
+      <span class="kw">match </span>GAPS_TRIG_PRESCALE.get(<span class="kw-2">&amp;mut </span>bus) {
+        <span class="prelude-val">Ok</span>(ps) =&gt; {
+          heartbeat.prescale_gaps = (ps <span class="kw">as </span>f32) / (u32::MAX <span class="kw">as </span>f32) ;
+        }
+      
+        <span class="prelude-val">Err</span>(err) =&gt; {
+          <span class="macro">error!</span>(<span class="string">"Unable to query {}! {err}"</span>, LOST_TRIGGER_RATE);
+        }
+      }
+      heartbeat.version = ProtocolVersion::V1; 
       <span class="kw">if </span>verbose {
         <span class="macro">println!</span>(<span class="string">"{}"</span>, heartbeat);
       }
@@ -1590,7 +1711,6 @@
       }
       
       hb_timer = Instant::now();
-      
     } 
   }
 }

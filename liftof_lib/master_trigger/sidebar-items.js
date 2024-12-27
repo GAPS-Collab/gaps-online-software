@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["get_event","get_mtbmonidata","master_trigger"],"mod":["control","registers"],"struct":["MTBSettings"]};
+window.SIDEBAR_ITEMS = {"fn":["configure_mtb","get_event","get_mtbmonidata","master_trigger"],"mod":["control","registers"]};

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/style/color.rs`."><title>color.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/style/color.rs`."><title>color.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/style/</div>color.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -704,9 +705,40 @@
 <a href="#704" id="704">704</a>
 <a href="#705" id="705">705</a>
 <a href="#706" id="706">706</a>
-</pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::unreadable_literal)]
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a></pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::unreadable_literal)]
 
 </span><span class="kw">use </span>std::{fmt, str::FromStr};
+
+<span class="kw">use </span><span class="kw">crate</span>::style::stylize::{ColorDebug, ColorDebugKind};
 
 <span class="doccomment">/// ANSI Color
 ///
@@ -748,7 +780,7 @@
 /// ```
 /// use std::str::FromStr;
 ///
-/// use ratatui::prelude::*;
+/// use ratatui::style::Color;
 ///
 /// assert_eq!(Color::from_str("red"), Ok(Color::Red));
 /// assert_eq!("red".parse(), Ok(Color::Red));
@@ -819,7 +851,7 @@
     /// If the terminal does not support true color, code using the  [`TermwizBackend`] will
     /// fallback to the default text color. Crossterm and Termion do not have this capability and
     /// the display will be unpredictable (e.g. Terminal.app may display glitched blinking text).
-    /// See &lt;https://github.com/ratatui-org/ratatui/issues/475&gt; for an example of this problem.
+    /// See &lt;https://github.com/ratatui/ratatui/issues/475&gt; for an example of this problem.
     ///
     /// See also: &lt;https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit&gt;
     ///
@@ -872,7 +904,9 @@
     /// # Examples
     ///
     /// ```
-    /// use ratatui::prelude::*;
+    /// use std::str::FromStr;
+    ///
+    /// use ratatui::style::Color;
     ///
     /// #[derive(Debug, serde::Deserialize)]
     /// struct Theme {
@@ -967,7 +1001,7 @@
 /// ```
 /// use std::str::FromStr;
 ///
-/// use ratatui::prelude::*;
+/// use ratatui::style::Color;
 ///
 /// let color: Color = Color::from_str("blue").unwrap();
 /// assert_eq!(color, Color::Blue);
@@ -1067,111 +1101,112 @@
 }
 
 <span class="kw">impl </span>Color {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>stylize_debug(<span class="self">self</span>, kind: ColorDebugKind) -&gt; ColorDebug {
+        ColorDebug { kind, color: <span class="self">self </span>}
+    }
+
     <span class="doccomment">/// Converts a HSL representation to a `Color::Rgb` instance.
     ///
-    /// The `from_hsl` function converts the Hue, Saturation and Lightness values to a
-    /// corresponding `Color` RGB equivalent.
+    /// The `from_hsl` function converts the Hue, Saturation and Lightness values to a corresponding
+    /// `Color` RGB equivalent.
     ///
-    /// Hue values should be in the range [0, 360].
-    /// Saturation and L values should be in the range [0, 100].
-    /// Values that are not in the range are clamped to be within the range.
+    /// Hue values should be in the range [-180..180]. Values outside this range are normalized by
+    /// wrapping.
+    ///
+    /// Saturation and L values should be in the range [0.0..1.0]. Values outside this range are
+    /// clamped.
+    ///
+    /// Clamping to valid ranges happens before conversion to RGB.
     ///
     /// # Examples
     ///
     /// ```
-    /// use ratatui::prelude::*;
+    /// use ratatui::{palette::Hsl, style::Color};
     ///
-    /// let color: Color = Color::from_hsl(360.0, 100.0, 100.0);
+    /// // Minimum Lightness is black
+    /// let color: Color = Color::from_hsl(Hsl::new(0.0, 0.0, 0.0));
+    /// assert_eq!(color, Color::Rgb(0, 0, 0));
+    ///
+    /// // Maximum Lightness is white
+    /// let color: Color = Color::from_hsl(Hsl::new(0.0, 0.0, 1.0));
     /// assert_eq!(color, Color::Rgb(255, 255, 255));
     ///
-    /// let color: Color = Color::from_hsl(0.0, 0.0, 0.0);
-    /// assert_eq!(color, Color::Rgb(0, 0, 0));
+    /// // Minimum Saturation is fully desaturated red = gray
+    /// let color: Color = Color::from_hsl(Hsl::new(0.0, 0.0, 0.5));
+    /// assert_eq!(color, Color::Rgb(128, 128, 128));
+    ///
+    /// // Bright red
+    /// let color: Color = Color::from_hsl(Hsl::new(0.0, 1.0, 0.5));
+    /// assert_eq!(color, Color::Rgb(255, 0, 0));
+    ///
+    /// // Bright blue
+    /// let color: Color = Color::from_hsl(Hsl::new(-120.0, 1.0, 0.5));
+    /// assert_eq!(color, Color::Rgb(0, 0, 255));
     /// ```
-    </span><span class="kw">pub fn </span>from_hsl(h: f64, s: f64, l: f64) -&gt; <span class="self">Self </span>{
-        <span class="comment">// Clamp input values to valid ranges
-        </span><span class="kw">let </span>h = h.clamp(<span class="number">0.0</span>, <span class="number">360.0</span>);
-        <span class="kw">let </span>s = s.clamp(<span class="number">0.0</span>, <span class="number">100.0</span>);
-        <span class="kw">let </span>l = l.clamp(<span class="number">0.0</span>, <span class="number">100.0</span>);
+    </span><span class="attr">#[cfg(feature = <span class="string">"palette"</span>)]
+    </span><span class="kw">pub fn </span>from_hsl(hsl: palette::Hsl) -&gt; <span class="self">Self </span>{
+        <span class="kw">use </span>palette::{Clamp, FromColor, Srgb};
+        <span class="kw">let </span>hsl = hsl.clamp();
+        <span class="kw">let </span>Srgb {
+            red,
+            green,
+            blue,
+            standard: <span class="kw">_</span>,
+        }: Srgb&lt;u8&gt; = Srgb::from_color(hsl).into();
 
-        <span class="comment">// Delegate to the function for normalized HSL to RGB conversion
-        </span>normalized_hsl_to_rgb(h / <span class="number">360.0</span>, s / <span class="number">100.0</span>, l / <span class="number">100.0</span>)
-    }
-}
-
-<span class="doccomment">/// Converts normalized HSL (Hue, Saturation, Lightness) values to RGB (Red, Green, Blue) color
-/// representation. H, S, and L values should be in the range [0, 1].
-///
-/// Based on &lt;https://github.com/killercup/hsl-rs/blob/b8a30e11afd75f262e0550725333293805f4ead0/src/lib.rs&gt;
-</span><span class="kw">fn </span>normalized_hsl_to_rgb(hue: f64, saturation: f64, lightness: f64) -&gt; Color {
-    <span class="comment">// This function can be made into `const` in the future.
-    // This comment contains the relevant information for making it `const`.
-    //
-    // If it is `const` and made public, users can write the following:
-    //
-    // ```rust
-    // const SLATE_50: Color = normalized_hsl_to_rgb(0.210, 0.40, 0.98);
-    // ```
-    //
-    // For it to be const now, we need `#![feature(const_fn_floating_point_arithmetic)]`
-    // Tracking issue: https://github.com/rust-lang/rust/issues/57241
-    //
-    // We would also need to remove the use of `.round()` in this function, i.e.:
-    //
-    // ```rust
-    // Color::Rgb((r * 255.0) as u8, (g * 255.0) as u8, (b * 255.0) as u8)
-    // ```
-
-    // Initialize RGB components
-    </span><span class="kw">let </span>red: f64;
-    <span class="kw">let </span>green: f64;
-    <span class="kw">let </span>blue: f64;
-
-    <span class="comment">// Check if the color is achromatic (grayscale)
-    </span><span class="kw">if </span>saturation == <span class="number">0.0 </span>{
-        red = lightness;
-        green = lightness;
-        blue = lightness;
-    } <span class="kw">else </span>{
-        <span class="comment">// Calculate RGB components for colored cases
-        </span><span class="kw">let </span>q = <span class="kw">if </span>lightness &lt; <span class="number">0.5 </span>{
-            lightness * (<span class="number">1.0 </span>+ saturation)
-        } <span class="kw">else </span>{
-            lightness + saturation - lightness * saturation
-        };
-        <span class="kw">let </span>p = <span class="number">2.0 </span>* lightness - q;
-        red = hue_to_rgb(p, q, hue + <span class="number">1.0 </span>/ <span class="number">3.0</span>);
-        green = hue_to_rgb(p, q, hue);
-        blue = hue_to_rgb(p, q, hue - <span class="number">1.0 </span>/ <span class="number">3.0</span>);
+        <span class="self">Self</span>::Rgb(red, green, blue)
     }
 
-    <span class="comment">// Scale RGB components to the range [0, 255] and create a Color::Rgb instance
-    </span>Color::Rgb(
-        (red * <span class="number">255.0</span>).round() <span class="kw">as </span>u8,
-        (green * <span class="number">255.0</span>).round() <span class="kw">as </span>u8,
-        (blue * <span class="number">255.0</span>).round() <span class="kw">as </span>u8,
-    )
-}
+    <span class="doccomment">/// Converts a `HSLuv` representation to a `Color::Rgb` instance.
+    ///
+    /// The `from_hsluv` function converts the Hue, Saturation and Lightness values to a
+    /// corresponding `Color` RGB equivalent.
+    ///
+    /// Hue values should be in the range [-180.0..180.0]. Values outside this range are normalized
+    /// by wrapping.
+    ///
+    /// Saturation and L values should be in the range [0.0..100.0]. Values outside this range are
+    /// clamped.
+    ///
+    /// Clamping to valid ranges happens before conversion to RGB.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ratatui::{palette::Hsluv, style::Color};
+    ///
+    /// // Minimum Lightness is black
+    /// let color: Color = Color::from_hsluv(Hsluv::new(0.0, 100.0, 0.0));
+    /// assert_eq!(color, Color::Rgb(0, 0, 0));
+    ///
+    /// // Maximum Lightness is white
+    /// let color: Color = Color::from_hsluv(Hsluv::new(0.0, 0.0, 100.0));
+    /// assert_eq!(color, Color::Rgb(255, 255, 255));
+    ///
+    /// // Minimum Saturation is fully desaturated red = gray
+    /// let color = Color::from_hsluv(Hsluv::new(0.0, 0.0, 50.0));
+    /// assert_eq!(color, Color::Rgb(119, 119, 119));
+    ///
+    /// // Bright Red
+    /// let color = Color::from_hsluv(Hsluv::new(12.18, 100.0, 53.2));
+    /// assert_eq!(color, Color::Rgb(255, 0, 0));
+    ///
+    /// // Bright Blue
+    /// let color = Color::from_hsluv(Hsluv::new(-94.13, 100.0, 32.3));
+    /// assert_eq!(color, Color::Rgb(0, 0, 255));
+    /// ```
+    </span><span class="attr">#[cfg(feature = <span class="string">"palette"</span>)]
+    </span><span class="kw">pub fn </span>from_hsluv(hsluv: palette::Hsluv) -&gt; <span class="self">Self </span>{
+        <span class="kw">use </span>palette::{Clamp, FromColor, Srgb};
+        <span class="kw">let </span>hsluv = hsluv.clamp();
+        <span class="kw">let </span>Srgb {
+            red,
+            green,
+            blue,
+            standard: <span class="kw">_</span>,
+        }: Srgb&lt;u8&gt; = Srgb::from_color(hsluv).into();
 
-<span class="doccomment">/// Helper function to calculate RGB component for a specific hue value.
-</span><span class="kw">fn </span>hue_to_rgb(p: f64, q: f64, t: f64) -&gt; f64 {
-    <span class="comment">// Adjust the hue value to be within the valid range [0, 1]
-    </span><span class="kw">let </span><span class="kw-2">mut </span>t = t;
-    <span class="kw">if </span>t &lt; <span class="number">0.0 </span>{
-        t += <span class="number">1.0</span>;
-    }
-    <span class="kw">if </span>t &gt; <span class="number">1.0 </span>{
-        t -= <span class="number">1.0</span>;
-    }
-
-    <span class="comment">// Calculate the RGB component based on the hue value
-    </span><span class="kw">if </span>t &lt; <span class="number">1.0 </span>/ <span class="number">6.0 </span>{
-        p + (q - p) * <span class="number">6.0 </span>* t
-    } <span class="kw">else if </span>t &lt; <span class="number">1.0 </span>/ <span class="number">2.0 </span>{
-        q
-    } <span class="kw">else if </span>t &lt; <span class="number">2.0 </span>/ <span class="number">3.0 </span>{
-        p + (q - p) * (<span class="number">2.0 </span>/ <span class="number">3.0 </span>- t) * <span class="number">6.0
-    </span>} <span class="kw">else </span>{
-        p
+        <span class="self">Self</span>::Rgb(red, green, blue)
     }
 }
 
@@ -1179,36 +1214,61 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span>std::error::Error;
 
+    <span class="attr">#[cfg(feature = <span class="string">"palette"</span>)]
+    </span><span class="kw">use </span>palette::{Hsl, Hsluv};
+    <span class="kw">use </span>rstest::rstest;
     <span class="attr">#[cfg(feature = <span class="string">"serde"</span>)]
     </span><span class="kw">use </span>serde::de::{Deserialize, IntoDeserializer};
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_hsl_to_rgb() {
-        <span class="comment">// Test with valid HSL values
-        </span><span class="kw">let </span>color = Color::from_hsl(<span class="number">120.0</span>, <span class="number">50.0</span>, <span class="number">75.0</span>);
-        <span class="macro">assert_eq!</span>(color, Color::Rgb(<span class="number">159</span>, <span class="number">223</span>, <span class="number">159</span>));
+    <span class="attr">#[cfg(feature = <span class="string">"palette"</span>)]
+    #[rstest]
+    #[case::black(Hsl::new(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>), Color::Rgb(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::white(Hsl::new(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>), Color::Rgb(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>))]
+    #[case::valid(Hsl::new(<span class="number">120.0</span>, <span class="number">0.5</span>, <span class="number">0.75</span>), Color::Rgb(<span class="number">159</span>, <span class="number">223</span>, <span class="number">159</span>))]
+    #[case::min_hue(Hsl::new(-<span class="number">180.0</span>, <span class="number">0.5</span>, <span class="number">0.75</span>), Color::Rgb(<span class="number">159</span>, <span class="number">223</span>, <span class="number">223</span>))]
+    #[case::max_hue(Hsl::new(<span class="number">180.0</span>, <span class="number">0.5</span>, <span class="number">0.75</span>), Color::Rgb(<span class="number">159</span>, <span class="number">223</span>, <span class="number">223</span>))]
+    #[case::min_saturation(Hsl::new(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.5</span>), Color::Rgb(<span class="number">128</span>, <span class="number">128</span>, <span class="number">128</span>))]
+    #[case::max_saturation(Hsl::new(<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.5</span>), Color::Rgb(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::min_lightness(Hsl::new(<span class="number">0.0</span>, <span class="number">0.5</span>, <span class="number">0.0</span>), Color::Rgb(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::max_lightness(Hsl::new(<span class="number">0.0</span>, <span class="number">0.5</span>, <span class="number">1.0</span>), Color::Rgb(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>))]
+    #[case::under_hue_wraps(Hsl::new(-<span class="number">240.0</span>, <span class="number">0.5</span>, <span class="number">0.75</span>), Color::Rgb(<span class="number">159</span>, <span class="number">223</span>, <span class="number">159</span>))]
+    #[case::over_hue_wraps(Hsl::new(<span class="number">480.0</span>, <span class="number">0.5</span>, <span class="number">0.75</span>), Color::Rgb(<span class="number">159</span>, <span class="number">223</span>, <span class="number">159</span>))]
+    #[case::under_saturation_clamps(Hsl::new(<span class="number">0.0</span>, -<span class="number">0.5</span>, <span class="number">0.75</span>), Color::Rgb(<span class="number">191</span>, <span class="number">191</span>, <span class="number">191</span>))]
+    #[case::over_saturation_clamps(Hsl::new(<span class="number">0.0</span>, <span class="number">1.2</span>, <span class="number">0.75</span>), Color::Rgb(<span class="number">255</span>, <span class="number">128</span>, <span class="number">128</span>))]
+    #[case::under_lightness_clamps(Hsl::new(<span class="number">0.0</span>, <span class="number">0.5</span>, -<span class="number">0.20</span>), Color::Rgb(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::over_lightness_clamps(Hsl::new(<span class="number">0.0</span>, <span class="number">0.5</span>, <span class="number">1.5</span>), Color::Rgb(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>))]
+    #[case::under_saturation_lightness_clamps(Hsl::new(<span class="number">0.0</span>, -<span class="number">0.5</span>, -<span class="number">0.20</span>), Color::Rgb(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::over_saturation_lightness_clamps(Hsl::new(<span class="number">0.0</span>, <span class="number">1.2</span>, <span class="number">1.5</span>), Color::Rgb(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>))]
+    </span><span class="kw">fn </span>test_hsl_to_rgb(<span class="attr">#[case] </span>hsl: palette::Hsl, <span class="attr">#[case] </span>expected: Color) {
+        <span class="macro">assert_eq!</span>(Color::from_hsl(hsl), expected);
+    }
 
-        <span class="comment">// Test with H value at upper bound
-        </span><span class="kw">let </span>color = Color::from_hsl(<span class="number">360.0</span>, <span class="number">50.0</span>, <span class="number">75.0</span>);
-        <span class="macro">assert_eq!</span>(color, Color::Rgb(<span class="number">223</span>, <span class="number">159</span>, <span class="number">159</span>));
-
-        <span class="comment">// Test with H value exceeding the upper bound
-        </span><span class="kw">let </span>color = Color::from_hsl(<span class="number">400.0</span>, <span class="number">50.0</span>, <span class="number">75.0</span>);
-        <span class="macro">assert_eq!</span>(color, Color::Rgb(<span class="number">223</span>, <span class="number">159</span>, <span class="number">159</span>));
-
-        <span class="comment">// Test with S and L values exceeding the upper bound
-        </span><span class="kw">let </span>color = Color::from_hsl(<span class="number">240.0</span>, <span class="number">120.0</span>, <span class="number">150.0</span>);
-        <span class="macro">assert_eq!</span>(color, Color::Rgb(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>));
-
-        <span class="comment">// Test with H, S, and L values below the lower bound
-        </span><span class="kw">let </span>color = Color::from_hsl(-<span class="number">20.0</span>, -<span class="number">50.0</span>, -<span class="number">20.0</span>);
-        <span class="macro">assert_eq!</span>(color, Color::Rgb(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>));
-
-        <span class="comment">// Test with S and L values below the lower bound
-        </span><span class="kw">let </span>color = Color::from_hsl(<span class="number">60.0</span>, -<span class="number">20.0</span>, -<span class="number">10.0</span>);
-        <span class="macro">assert_eq!</span>(color, Color::Rgb(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>));
+    <span class="attr">#[cfg(feature = <span class="string">"palette"</span>)]
+    #[rstest]
+    #[case::black(Hsluv::new(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>), Color::Rgb(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::white(Hsluv::new(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">100.0</span>), Color::Rgb(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>))]
+    #[case::valid(Hsluv::new(<span class="number">120.0</span>, <span class="number">50.0</span>, <span class="number">75.0</span>), Color::Rgb(<span class="number">147</span>, <span class="number">198</span>, <span class="number">129</span>))]
+    #[case::min_hue(Hsluv::new(-<span class="number">180.0</span>, <span class="number">50.0</span>, <span class="number">75.0</span>), Color::Rgb(<span class="number">135</span>,<span class="number">196</span>, <span class="number">188</span>))]
+    #[case::max_hue(Hsluv::new(<span class="number">180.0</span>, <span class="number">50.0</span>, <span class="number">75.0</span>), Color::Rgb(<span class="number">135</span>, <span class="number">196</span>, <span class="number">188</span>))]
+    #[case::min_saturation(Hsluv::new(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">75.0</span>), Color::Rgb(<span class="number">185</span>, <span class="number">185</span>, <span class="number">185</span>))]
+    #[case::max_saturation(Hsluv::new(<span class="number">0.0</span>, <span class="number">100.0</span>, <span class="number">75.0</span>), Color::Rgb(<span class="number">255</span>, <span class="number">156</span>, <span class="number">177</span>))]
+    #[case::min_lightness(Hsluv::new(<span class="number">0.0</span>, <span class="number">50.0</span>, <span class="number">0.0</span>), Color::Rgb(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::max_lightness(Hsluv::new(<span class="number">0.0</span>, <span class="number">50.0</span>, <span class="number">100.0</span>), Color::Rgb(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>))]
+    #[case::under_hue_wraps(Hsluv::new(-<span class="number">240.0</span>, <span class="number">50.0</span>, <span class="number">75.0</span>), Color::Rgb(<span class="number">147</span>, <span class="number">198</span>, <span class="number">129</span>))]
+    #[case::over_hue_wraps(Hsluv::new(<span class="number">480.0</span>, <span class="number">50.0</span>, <span class="number">75.0</span>), Color::Rgb(<span class="number">147</span>, <span class="number">198</span>, <span class="number">129</span>))]
+    #[case::under_saturation_clamps(Hsluv::new(<span class="number">0.0</span>, -<span class="number">50.0</span>, <span class="number">75.0</span>), Color::Rgb(<span class="number">185</span>, <span class="number">185</span>, <span class="number">185</span>))]
+    #[case::over_saturation_clamps(Hsluv::new(<span class="number">0.0</span>, <span class="number">150.0</span>, <span class="number">75.0</span>), Color::Rgb(<span class="number">255</span>, <span class="number">156</span>, <span class="number">177</span>))]
+    #[case::under_lightness_clamps(Hsluv::new(<span class="number">0.0</span>, <span class="number">50.0</span>, -<span class="number">20.0</span>), Color::Rgb(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::over_lightness_clamps(Hsluv::new(<span class="number">0.0</span>, <span class="number">50.0</span>, <span class="number">150.0</span>), Color::Rgb(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>))]
+    #[case::under_saturation_lightness_clamps(Hsluv::new(<span class="number">0.0</span>, -<span class="number">50.0</span>, -<span class="number">20.0</span>), Color::Rgb(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::over_saturation_lightness_clamps(
+        Hsluv::new(<span class="number">0.0</span>, <span class="number">150.0</span>, <span class="number">150.0</span>),
+        Color::Rgb(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)
+    )]
+    </span><span class="kw">fn </span>test_hsluv_to_rgb(<span class="attr">#[case] </span>hsluv: palette::Hsluv, <span class="attr">#[case] </span>expected: Color) {
+        <span class="macro">assert_eq!</span>(Color::from_hsluv(hsluv), expected);
     }
 
     <span class="attr">#[test]

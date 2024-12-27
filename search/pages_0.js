@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['gaps_2donline_2dsoftware_20documentation_183',['gaps-online-software documentation',['../index.html',1,'']]]
+  ['documentation_0',['gaps-online-software documentation',['../index.html',1,'']]]
 ];

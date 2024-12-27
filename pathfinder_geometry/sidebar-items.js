@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["angle","line_segment","rect","transform2d","transform3d","unit_vector","util","vector"]};

@@ -1,5 +1,7 @@
 <map id="TofEvent" name="TofEvent">
-<area shape="rect" id="node1" title=" " alt="" coords="109,95,187,121"/>
-<area shape="rect" id="node2" href="$structTofEventHeader.html" title=" " alt="" coords="5,5,131,32"/>
-<area shape="rect" id="node3" href="$structMasterTriggerEvent.html" title=" " alt="" coords="155,5,303,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="109,93,187,119"/>
+<area shape="rect" id="Node000002" href="$structTofEventHeader.html" title=" " alt="" coords="5,5,131,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,39,139,91,135,95,86,43"/>
+<area shape="rect" id="Node000003" href="$structMasterTriggerEvent.html" title=" " alt="" coords="155,5,303,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="211,43,161,95,157,91,207,39"/>
 </map>

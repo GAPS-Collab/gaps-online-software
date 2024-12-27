@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Color","ColorBits","ColorSpace","PdfColor"],"struct":["Cmyk","Greyscale","Rgb","SpotColor"]};

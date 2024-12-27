@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/heartbeats.rs`."><title>heartbeats.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/heartbeats.rs`."><title>heartbeats.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">tof_dataclasses/</div>heartbeats.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -681,7 +682,113 @@
 <a href="#681" id="681">681</a>
 <a href="#682" id="682">682</a>
 <a href="#683" id="683">683</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Heartbeats - regularly (or on demand) sent 
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a></pre></div><pre class="rust"><code><span class="doccomment">//! Heartbeats - regularly (or on demand) sent 
 //! software monitoring data
 //!
 //! This includes heartbeats for different threads
@@ -690,15 +797,18 @@
 </span><span class="kw">use </span>std::fmt;
 <span class="kw">use </span>colored::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::serialization::{
-    Serialization,
-    SerializationError,
-    Packable,
-    parse_u8,
-    parse_u64,
-    parse_usize,
+  Serialization,
+  SerializationError,
+  Packable,
+  parse_u8,
+  parse_u16,
+  parse_f32,
+  parse_u64,
+  parse_usize,
 };
 
 <span class="kw">use </span><span class="kw">crate</span>::packets::PacketType;
+<span class="kw">use </span><span class="kw">crate</span>::version::ProtocolVersion;
 <span class="comment">// use std::collections::HashMap;
 
 </span><span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
@@ -958,6 +1068,7 @@
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>MTBHeartbeat {
+  <span class="kw">pub </span>version             : ProtocolVersion, 
   <span class="kw">pub </span>total_elapsed       : u64, <span class="comment">//aka met (mission elapsed time)
   </span><span class="kw">pub </span>n_events            : u64,
   <span class="kw">pub </span>evq_num_events_last : u64,
@@ -966,42 +1077,72 @@
   <span class="kw">pub </span>n_ev_missed         : u64,
   <span class="kw">pub </span>trate               : u64,
   <span class="kw">pub </span>lost_trate          : u64,
+  <span class="comment">// these will be available for ProtocolVersion::V1
+  </span><span class="kw">pub </span>prescale_track      : f32,
+  <span class="kw">pub </span>prescale_gaps       : f32,
+
 }
 
-  <span class="kw">impl </span>MTBHeartbeat {
-    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-      <span class="self">Self </span>{
-        total_elapsed       : <span class="number">0</span>,
-        n_events            : <span class="number">0</span>,
-        evq_num_events_last : <span class="number">0</span>,
-        evq_num_events_avg  : <span class="number">0</span>,
-        n_ev_unsent         : <span class="number">0</span>,
-        n_ev_missed         : <span class="number">0</span>,
-        trate               : <span class="number">0</span>,
-        lost_trate          : <span class="number">0</span>,
-      }
+<span class="kw">impl </span>MTBHeartbeat {
+  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+    <span class="self">Self </span>{
+      version             : ProtocolVersion::Unknown,
+      total_elapsed       : <span class="number">0</span>,
+      n_events            : <span class="number">0</span>,
+      evq_num_events_last : <span class="number">0</span>,
+      evq_num_events_avg  : <span class="number">0</span>,
+      n_ev_unsent         : <span class="number">0</span>,
+      n_ev_missed         : <span class="number">0</span>,
+      trate               : <span class="number">0</span>,
+      lost_trate          : <span class="number">0</span>,
+      <span class="comment">// available for protocol version V1 and larger
+      </span>prescale_track      : <span class="number">0.0</span>,
+      prescale_gaps       : <span class="number">0.0</span>,
     }
+  }
 
-    <span class="kw">pub fn </span>get_sent_packet_rate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
-      <span class="self">self</span>.n_events <span class="kw">as </span>f64 / <span class="self">self</span>.total_elapsed <span class="kw">as </span>f64
+  <span class="kw">pub fn </span>get_sent_packet_rate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+    <span class="self">self</span>.n_events <span class="kw">as </span>f64 / <span class="self">self</span>.total_elapsed <span class="kw">as </span>f64
+  }
+
+  <span class="comment">// get the prescale for the secondary trigger
+  </span><span class="kw">pub fn </span>get_prescale_track(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+    <span class="kw">if </span><span class="self">self</span>.version == ProtocolVersion::Unknown {
+      <span class="macro">error!</span>(<span class="string">"Prescale not available for protocol version &lt; V1!"</span>);
+      <span class="kw">return </span><span class="number">0.0</span>;
     }
+    <span class="kw">return </span><span class="self">self</span>.prescale_track <span class="kw">as </span>f64
+  }
+  
+  <span class="comment">// get the prescale for the secondary trigger
+  </span><span class="kw">pub fn </span>get_prescale_gaps(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+    <span class="kw">if </span><span class="self">self</span>.version == ProtocolVersion::Unknown {
+      <span class="macro">error!</span>(<span class="string">"Prescale not available for protocol version &lt; V1!"</span>);
+      <span class="kw">return </span><span class="number">0.0</span>;
+    }
+    <span class="kw">return </span><span class="self">self</span>.prescale_gaps <span class="kw">as </span>f64
+  }
 
 
-<span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-    <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;MTBHeartbeats"</span>);
+  <span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>repr = <span class="macro">format!</span>(<span class="string">"&lt;MTBHeartbeats (version : {})"</span>, <span class="self">self</span>.version);
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{1FA90} \u{1FA90} \u{1FA90} \u{1FA90} \u{1FA90} MTB HEARTBEAT \u{1FA90} \u{1FA90} \u{1FA90} \u{1FA90} \u{1FA90} "</span>));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n MET (Mission Elapsed Time): \t\t{:.1} sec"</span>, <span class="self">self</span>.total_elapsed));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. recorded Events: \t\t{}"</span>, <span class="self">self</span>.n_events));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Last MTB EVQ size \t\t\t{}"</span>, <span class="self">self</span>.evq_num_events_last));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Avg. MTB EVQ size (per 30s ): \t{:.2}"</span>, <span class="self">self</span>.evq_num_events_avg));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n trigger rate, recorded: \t\t{:.2} Hz"</span>, <span class="self">self</span>.n_events <span class="kw">as </span>f64 / <span class="self">self</span>.total_elapsed <span class="kw">as </span>f64));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n trigger rate, from register: \t\t{:.2} Hz"</span>, <span class="self">self</span>.trate));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n lost trg rate, from register: \t{:.2} Hz"</span>, <span class="self">self</span>.lost_trate));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n MET (Mission Elapsed Time)  : {:.1} sec"</span>, <span class="self">self</span>.total_elapsed));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. recorded Events        : {}"</span>, <span class="self">self</span>.n_events));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Last MTB EVQ size           : {}"</span>, <span class="self">self</span>.evq_num_events_last));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Avg. MTB EVQ size (per 30s ): {:.2}"</span>, <span class="self">self</span>.evq_num_events_avg));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n trigger rate, recorded:     : {:.2} Hz"</span>, <span class="self">self</span>.n_events <span class="kw">as </span>f64 / <span class="self">self</span>.total_elapsed <span class="kw">as </span>f64));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n trigger rate, from register : {:.2} Hz"</span>, <span class="self">self</span>.trate));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n lost trg rate, from register: {:.2} Hz"</span>, <span class="self">self</span>.lost_trate));
     <span class="kw">if </span><span class="self">self</span>.n_ev_unsent &gt; <span class="number">0 </span>{
-        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. sent errors: \t\t{}"</span>, <span class="self">self</span>.n_ev_unsent).bold());
+        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. sent errors        : {}"</span>, <span class="self">self</span>.n_ev_unsent).bold());
     }
     <span class="kw">if </span><span class="self">self</span>.n_ev_missed &gt; <span class="number">0 </span>{
-        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. missed events: \t\t{}"</span>, <span class="self">self</span>.n_ev_missed).bold());
+        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. missed events      : {}"</span>, <span class="self">self</span>.n_ev_missed).bold());
+    }
+    <span class="kw">if </span><span class="self">self</span>.version != ProtocolVersion::Unknown {
+        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Prescale, prim. ('GAPS') trg : {:.4}"</span>, <span class="self">self</span>.prescale_gaps));
+        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Prescale  sec. ('Track') trg : {:.4}"</span>, <span class="self">self</span>.prescale_track));
     }
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{1FA90} \u{1FA90} \u{1FA90} \u{1FA90} \u{1FA90} END HEARTBEAT \u{1FA90} \u{1FA90} \u{1FA90} \u{1FA90} \u{1FA90} "</span>));
     repr
@@ -1009,84 +1150,118 @@
 }
   
 
-  <span class="kw">impl </span>Default <span class="kw">for </span>MTBHeartbeat {
-    <span class="kw">fn </span>default () -&gt; <span class="self">Self </span>{
-      <span class="self">Self</span>::new()
-    }
+<span class="kw">impl </span>Default <span class="kw">for </span>MTBHeartbeat {
+  <span class="kw">fn </span>default () -&gt; <span class="self">Self </span>{
+    <span class="self">Self</span>::new()
   }
-  <span class="kw">impl </span>Packable <span class="kw">for </span>MTBHeartbeat {
-    <span class="kw">const </span>PACKET_TYPE : PacketType = PacketType::MTBHeartbeat;
+}
+
+<span class="kw">impl </span>Packable <span class="kw">for </span>MTBHeartbeat {
+  <span class="kw">const </span>PACKET_TYPE : PacketType = PacketType::MTBHeartbeat;
+}
+
+<span class="kw">impl </span>Serialization <span class="kw">for </span>MTBHeartbeat {
+  <span class="kw">const </span>HEAD : u16 = <span class="number">0xAAAA</span>;
+  <span class="kw">const </span>TAIL : u16 = <span class="number">0x5555</span>;
+  <span class="kw">const </span>SIZE : usize = <span class="number">68</span>;
+
+  <span class="kw">fn </span>from_bytestream(stream    :<span class="kw-2">&amp;</span>Vec&lt;u8&gt;,
+                     pos       :<span class="kw-2">&amp;mut </span>usize)
+  -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt;{
+    <span class="self">Self</span>::verify_fixed(stream, pos)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>hb = MTBHeartbeat::new();
+    hb.total_elapsed          = parse_u64(stream, pos);
+    hb.n_events               = parse_u64(stream, pos);
+    hb.evq_num_events_last    = parse_u64(stream, pos);
+    hb.evq_num_events_avg     = parse_u64(stream, pos);
+    hb.n_ev_unsent            = parse_u64(stream, pos);
+    hb.n_ev_missed            = parse_u64(stream, pos);
+    <span class="comment">// we use only 48bit here to carve out space for the 
+    // protocol version and the prescales
+    // this is a hack, but since we are expeting rates
+    // &lt; 65kHz, we should be fine with only 16bit for the 
+    // rate and can use the rest for the prescale
+    //let version_ps_rate       = parse_u64(stream, pos);
+    //let version               = version_ps_rate &amp; 0xff00000000000000;
+    //let prescale_track        = version_ps_rate &amp; 0x00ffffffff000000;
+    //let trate                 = version_ps_rate &amp; 0x0000000000ffffff;
+    //hb.version                = ProtocolVersion::from((version &gt;&gt; 56) as u8); 
+    </span>hb.version                = ProtocolVersion::from(parse_u8(stream, pos) <span class="kw">as </span>u8);
+    <span class="kw-2">*</span>pos += <span class="number">1</span>;
+    hb.trate                  = parse_u16(stream, pos) <span class="kw">as </span>u64;
+    hb.prescale_track         = parse_f32(stream, pos);
+    <span class="kw-2">*</span>pos += <span class="number">2</span>;
+    hb.lost_trate             = parse_u16(stream, pos) <span class="kw">as </span>u64;
+    hb.prescale_gaps          = parse_f32(stream, pos);
+    <span class="kw">if </span>hb.version == ProtocolVersion::Unknown {
+      hb.prescale_gaps  = <span class="number">0.0</span>;
+      hb.prescale_track = <span class="number">0.0
+    </span>}
+    <span class="kw-2">*</span>pos += <span class="number">2</span>;
+    <span class="prelude-val">Ok</span>(hb)
   }
 
-  <span class="kw">impl </span>Serialization <span class="kw">for </span>MTBHeartbeat {
-    <span class="kw">const </span>HEAD : u16 = <span class="number">0xAAAA</span>;
-    <span class="kw">const </span>TAIL : u16 = <span class="number">0x5555</span>;
-    <span class="kw">const </span>SIZE : usize = <span class="number">68</span>;
-
-    <span class="kw">fn </span>from_bytestream(stream    :<span class="kw-2">&amp;</span>Vec&lt;u8&gt;,
-                       pos       :<span class="kw-2">&amp;mut </span>usize)
-    -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt;{
-      <span class="self">Self</span>::verify_fixed(stream, pos)<span class="question-mark">?</span>;
-      <span class="kw">let </span><span class="kw-2">mut </span>hb = MTBHeartbeat::new();
-      hb.total_elapsed          = parse_u64(stream, pos);
-      hb.n_events               = parse_u64(stream, pos);
-      hb.evq_num_events_last    = parse_u64(stream, pos);
-      hb.evq_num_events_avg     = parse_u64(stream, pos);
-      hb.n_ev_unsent         = parse_u64(stream, pos);
-      hb.n_ev_missed         = parse_u64(stream, pos);
-      hb.trate                  = parse_u64(stream, pos);
-      hb.lost_trate             = parse_u64(stream, pos);
-      <span class="kw-2">*</span>pos += <span class="number">2</span>;
-      <span class="prelude-val">Ok</span>(hb)
-    }
-
-    <span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
-      <span class="kw">let </span><span class="kw-2">mut </span>bs = Vec::&lt;u8&gt;::with_capacity(<span class="self">Self</span>::SIZE);
-      bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::HEAD.to_le_bytes());
-      bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.total_elapsed.to_le_bytes());
-      bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_events.to_le_bytes());
-      bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.evq_num_events_last.to_le_bytes());
-      bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.evq_num_events_avg.to_le_bytes());
-      bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_ev_unsent.to_le_bytes());
-      bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_ev_missed.to_le_bytes());
-      bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.trate.to_le_bytes());
-      bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.lost_trate.to_le_bytes());
-      bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::TAIL.to_le_bytes());
-      bs
-    }
+  <span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>bs = Vec::&lt;u8&gt;::with_capacity(<span class="self">Self</span>::SIZE);
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::HEAD.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.total_elapsed.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_events.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.evq_num_events_last.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.evq_num_events_avg.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_ev_unsent.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_ev_missed.to_le_bytes());
+    bs.push(<span class="self">self</span>.version <span class="kw">as </span>u8);
+    bs.push(<span class="number">0u8</span>);
+    <span class="kw">let </span>short_trate = (<span class="self">self</span>.trate &amp; <span class="number">0x0000000000ffffff</span>) <span class="kw">as </span>u16;
+    bs.extend_from_slice(<span class="kw-2">&amp;</span>short_trate.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.prescale_track.to_le_bytes());
+    <span class="kw">let </span>short_lrate = (<span class="self">self</span>.lost_trate &amp; <span class="number">0x0000000000ffffff</span>) <span class="kw">as </span>u16;
+    <span class="comment">// FIXME - not needed, just filler
+    </span>bs.extend_from_slice(<span class="kw-2">&amp;</span>short_lrate.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span>short_lrate.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.prescale_gaps.to_le_bytes());
+    <span class="comment">//let rate_n_prescale_track =
+    //    (((self.version as u8) as u64) &lt;&lt; 56)
+    //  | (self.prescale_track as u64) &lt;&lt; 24 
+    //  | (self.trate &amp; 0x0000000000ffffff);
+    //bs.extend_from_slice(&amp;rate_n_prescale_track.to_le_bytes());
+    //let rate_n_prescale_gaps = 
+    // ((self.prescale_gaps as f64)   &lt;&lt; 24)
+    // | (self.lost_trate &amp; 0x0000000000ffffff);
+    //bs.extend_from_slice(&amp;rate_n_prescale_gaps.to_le_bytes());
+    </span>bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::TAIL.to_le_bytes());
+    bs
   }
+}
 
-  <span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
-  </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>MTBHeartbeat {
-    <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
+</span><span class="kw">impl </span>FromRandom <span class="kw">for </span>MTBHeartbeat {
+  <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
+    <span class="kw">let </span><span class="kw-2">mut </span>hb = <span class="self">Self</span>::new();
     <span class="kw">let </span><span class="kw-2">mut </span>rng             = rand::thread_rng();
-    <span class="kw">let </span>total_elapsed       = rng.gen::&lt;u64&gt;();
-    <span class="kw">let </span>n_events            = rng.gen::&lt;u64&gt;();
-    <span class="kw">let </span>evq_num_events_last = rng.gen::&lt;u64&gt;();
-    <span class="kw">let </span>evq_num_events_avg  = rng.gen::&lt;u64&gt;();
-    <span class="kw">let </span>n_ev_unsent      = rng.gen::&lt;u64&gt;();
-    <span class="kw">let </span>n_ev_missed      = rng.gen::&lt;u64&gt;();
-    <span class="kw">let </span>trate               = rng.gen::&lt;u64&gt;();
-    <span class="kw">let </span>lost_trate          = rng.gen::&lt;u64&gt;();
-    <span class="self">Self </span>{
-      total_elapsed,       
-        n_events,            
-        evq_num_events_last,
-        evq_num_events_avg,
-        n_ev_unsent,
-        n_ev_missed,
-        trate,
-        lost_trate,
-      }
+    hb.total_elapsed       = rng.gen::&lt;u64&gt;();
+    hb.n_events            = rng.gen::&lt;u64&gt;();
+    hb.evq_num_events_last = rng.gen::&lt;u64&gt;();
+    hb.evq_num_events_avg  = rng.gen::&lt;u64&gt;();
+    hb.n_ev_unsent         = rng.gen::&lt;u64&gt;();
+    hb.n_ev_missed         = rng.gen::&lt;u64&gt;();
+    hb.trate               = rng.gen::&lt;u16&gt;() <span class="kw">as </span>u64;
+    hb.lost_trate          = rng.gen::&lt;u16&gt;() <span class="kw">as </span>u64;
+    hb.version             = ProtocolVersion::from_random();
+    <span class="kw">if </span>hb.version != ProtocolVersion::Unknown {
+      hb.prescale_gaps       = rng.gen::&lt;f32&gt;();
+      hb.prescale_track      = rng.gen::&lt;f32&gt;();
     }
+    hb
   }
+}
 
-  <span class="kw">impl </span>fmt::Display <span class="kw">for </span>MTBHeartbeat {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-      <span class="kw">let </span>repr = <span class="self">self</span>.to_string();
-      <span class="macro">write!</span>(f, <span class="string">"{}"</span>, repr)
-    }
-  } 
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>MTBHeartbeat {
+  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">let </span>repr = <span class="self">self</span>.to_string();
+    <span class="macro">write!</span>(f, <span class="string">"{}"</span>, repr)
+  }
+} 
 
 <span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 #[test]
@@ -1100,8 +1275,10 @@
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>EVTBLDRHeartbeat {
-  <span class="kw">pub </span>met_seconds           : usize,
-  <span class="kw">pub </span>n_mte_received_tot    : usize,
+  <span class="doccomment">/// Mission elapsed time in seconds
+  </span><span class="kw">pub </span>met_seconds           : usize,
+  <span class="doccomment">/// Total number of received MasterTriggerEvents (from MTB)
+  </span><span class="kw">pub </span>n_mte_received_tot    : usize,
   <span class="kw">pub </span>n_rbe_received_tot    : usize,
   <span class="kw">pub </span>n_rbe_per_te          : usize,
   <span class="kw">pub </span>n_rbe_discarded_tot   : usize,
@@ -1110,17 +1287,27 @@
   <span class="kw">pub </span>n_sent                : usize,
   <span class="kw">pub </span>delta_mte_rbe         : usize,
   <span class="kw">pub </span>event_cache_size      : usize,
-  <span class="kw">pub </span>event_id_cache_size   : usize, 
+  
+  <span class="comment">// Per designe, the event_id cache and the 
+  // event_cache MUST have the same size. 
+  // I am just paranoid... 
+  // Let's repurpose this field for the 
+  // total number of lost hits due to DRS 
+  // deadtime
+  </span><span class="kw">pub </span>event_id_cache_size   : usize, 
+  <span class="kw">pub </span>drs_bsy_lost_hg_hits  : usize,
   <span class="kw">pub </span>rbe_wo_mte            : usize,
   <span class="kw">pub </span>mte_receiver_cbc_len  : usize,
   <span class="kw">pub </span>rbe_receiver_cbc_len  : usize,
   <span class="kw">pub </span>tp_sender_cbc_len     : usize,
   <span class="kw">pub </span>n_rbe_from_past       : usize,
   <span class="kw">pub </span>n_rbe_orphan          : usize,
-  <span class="kw">pub </span>n_ev_wo_evid          : usize,
+  <span class="comment">// let's deprecate this!
+  </span><span class="kw">pub </span>n_ev_wo_evid          : usize,
   <span class="kw">pub </span>data_mangled_ev       : usize,
   <span class="comment">// pub seen_rbevents         : HashMap&lt;u8, usize&gt;,
 </span>}
+
 <span class="kw">impl </span>EVTBLDRHeartbeat {
   <span class="comment">// pub fn new() -&gt; Self {
   //   let mut seen_rbevents = HashMap::&lt;u8, usize&gt;::new();
@@ -1144,6 +1331,7 @@
       delta_mte_rbe        : <span class="number">0</span>,
       event_cache_size     : <span class="number">0</span>,
       event_id_cache_size  : <span class="number">0</span>,
+      drs_bsy_lost_hg_hits : <span class="number">0</span>,
       rbe_wo_mte           : <span class="number">0</span>,
       mte_receiver_cbc_len : <span class="number">0</span>,
       rbe_receiver_cbc_len : <span class="number">0</span>,
@@ -1154,79 +1342,97 @@
       data_mangled_ev      : <span class="number">0</span>,
       <span class="comment">// seen_rbevents        : seen_rbevents, 
     </span>}
- }
- <span class="kw">pub fn </span>get_average_rbe_te(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
-  <span class="kw">if </span><span class="self">self</span>.n_sent &gt; <span class="number">0 </span>{
-    <span class="kw">return </span><span class="self">self</span>.n_rbe_per_te <span class="kw">as </span>f64 / <span class="self">self</span>.n_sent <span class="kw">as </span>f64;
   }
-  <span class="number">0.0
-</span>}
 
-<span class="kw">pub fn </span>get_timed_out_frac(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
-  <span class="kw">if </span><span class="self">self</span>.n_sent &gt; <span class="number">0 </span>{
-    <span class="kw">return </span><span class="self">self</span>.n_timed_out <span class="kw">as </span>f64 / <span class="self">self</span>.n_sent <span class="kw">as </span>f64;
-  }
-  <span class="number">0.0
-</span>}
+  <span class="kw">pub fn </span>get_average_rbe_te(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+   <span class="kw">if </span><span class="self">self</span>.n_sent &gt; <span class="number">0 </span>{
+     <span class="kw">return </span><span class="self">self</span>.n_rbe_per_te <span class="kw">as </span>f64 / <span class="self">self</span>.n_sent <span class="kw">as </span>f64;
+   }
+   <span class="number">0.0
+  </span>}
 
-<span class="comment">// pub fn add_rbevent(&amp;mut self, rb_id : u8) {
-//   *self.seen_rbevents.get_mut(&amp;rb_id).unwrap() += 1;
-// }
+  <span class="kw">pub fn </span>get_timed_out_frac(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+    <span class="kw">if </span><span class="self">self</span>.n_sent &gt; <span class="number">0 </span>{
+      <span class="kw">return </span><span class="self">self</span>.n_timed_out <span class="kw">as </span>f64 / <span class="self">self</span>.n_sent <span class="kw">as </span>f64;
+    }
+    <span class="number">0.0
+  </span>}
 
-</span><span class="kw">pub fn </span>get_incoming_vs_outgoing_mte(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
-  <span class="kw">if </span><span class="self">self</span>.n_sent &gt; <span class="number">0 </span>{
-    <span class="kw">return </span><span class="self">self</span>.n_mte_received_tot <span class="kw">as </span>f64 /  <span class="self">self</span>.n_sent <span class="kw">as </span>f64;
-  }
-  <span class="number">0.0
-</span>}
+  <span class="comment">// pub fn add_rbevent(&amp;mut self, rb_id : u8) {
+  //   *self.seen_rbevents.get_mut(&amp;rb_id).unwrap() += 1;
+  // }
+  
+  </span><span class="kw">pub fn </span>get_incoming_vs_outgoing_mte(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+    <span class="kw">if </span><span class="self">self</span>.n_sent &gt; <span class="number">0 </span>{
+      <span class="kw">return </span><span class="self">self</span>.n_mte_received_tot <span class="kw">as </span>f64 /  <span class="self">self</span>.n_sent <span class="kw">as </span>f64;
+    }
+    <span class="number">0.0
+  </span>}
 
- <span class="kw">pub fn </span>get_nrbe_discarded_frac(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
-   <span class="kw">if </span><span class="self">self</span>.n_rbe_received_tot &gt; <span class="number">0 </span>{
-    <span class="kw">return </span><span class="self">self</span>.n_rbe_discarded_tot <span class="kw">as </span>f64 / <span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64;
-  }
-  <span class="number">0.0
- </span>}
- 
-<span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-  <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;EVTBLDRHearbeats"</span>);
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} "</span>));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. events sent: \t\t\t{}"</span>, <span class="self">self</span>.n_sent).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Size of event cache: \t\t\t{}"</span>, <span class="self">self</span>.event_cache_size).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Size of event ID cache: \t\t{}"</span>, <span class="self">self</span>.event_id_cache_size).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. events timed out \t\t{}"</span>, <span class="self">self</span>.n_timed_out).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events timed out: \t\t{:.2}%"</span>, <span class="self">self</span>.get_timed_out_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple());
-  <span class="kw">if </span><span class="self">self</span>.n_sent &gt; <span class="number">0 </span>{
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events w/out event ID: \t{:.2}%"</span>, (((<span class="self">self</span>.n_ev_wo_evid / <span class="self">self</span>.n_sent) <span class="kw">as </span>f64)<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64))).bright_purple());
-  } <span class="kw">else </span>{ 
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events w/out event ID: \tN/A"</span>).bright_purple());
-  }
-  <span class="kw">if </span><span class="self">self</span>.n_rbe_received_tot &gt; <span class="number">0</span>{
+  <span class="kw">pub fn </span>get_nrbe_discarded_frac(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+    <span class="kw">if </span><span class="self">self</span>.n_rbe_received_tot &gt; <span class="number">0 </span>{
+     <span class="kw">return </span><span class="self">self</span>.n_rbe_discarded_tot <span class="kw">as </span>f64 / <span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64;
+   }
+   <span class="number">0.0
+  </span>}
+  
+  <span class="kw">pub fn </span>get_mangled_frac(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+    <span class="kw">if </span><span class="self">self</span>.n_mte_received_tot &gt; <span class="number">0 </span>{
+     <span class="kw">return </span><span class="self">self</span>.data_mangled_ev <span class="kw">as </span>f64 / <span class="self">self</span>.n_mte_received_tot <span class="kw">as </span>f64;
+   }
+   <span class="number">0.0
+  </span>}
+
+  <span class="kw">pub fn </span>get_drs_lost_frac(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+    <span class="kw">if </span><span class="self">self</span>.n_rbe_received_tot &gt; <span class="number">0 </span>{
+      <span class="kw">return </span><span class="self">self</span>.drs_bsy_lost_hg_hits <span class="kw">as </span>f64 / <span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64;
+    }
+    <span class="number">0.0
+  </span>}
+
+  <span class="kw">pub fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">""</span>);
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} "</span>));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Mission elapsed time (MET) [s]      : {}"</span>, <span class="self">self</span>.met_seconds).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. events sent                    : {}"</span>, <span class="self">self</span>.n_sent).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Size of event cache                 : {}"</span>, <span class="self">self</span>.event_cache_size).bright_purple());
+    <span class="comment">//repr += &amp;(format!("\n Size of event ID cache              : {}", self.event_id_cache_size).bright_purple());
+    </span>repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. events timed out               : {}"</span>, <span class="self">self</span>.n_timed_out).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events timed out            : {:.2}%"</span>, <span class="self">self</span>.get_timed_out_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple());
+    <span class="comment">//if self.n_sent &gt; 0 &amp;&amp; self.n_ev_wo_evid &gt; 0 {
+    //  repr += &amp;(format!("\n Percent events w/out event ID : {:.2}%", (((self.n_ev_wo_evid / self.n_sent) as f64)*(100 as f64))).bright_purple());
+    //} else if self.n_ev_wo_evid &gt; 0 { 
+    //  repr += &amp;(format!("\n Percent events w/out event ID : N/A").bright_purple());
+    //}
+    </span><span class="kw">if </span><span class="self">self</span>.n_mte_received_tot &gt; <span class="number">0</span>{ 
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. evts with ANY data mangling  : {}"     </span>, <span class="self">self</span>.data_mangled_ev));
+      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Per. evts with ANY data mangling  : {:.2}%" </span>, <span class="self">self</span>.get_mangled_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)));
+    }
+    <span class="kw">else </span>{repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events with data mangling: unable to calculate"</span>));}
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. evts with data mangling: \t\t{}"</span>, <span class="self">self</span>.data_mangled_ev));
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events with data mangling: \t\t\t {:.2}"</span>, ((<span class="self">self</span>.data_mangled_ev <span class="kw">as </span>f64)/(<span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64))<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)));
-  }
-  <span class="kw">else </span>{repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events with data mangling: unable to calculate"</span>));}
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Received MTEvents: \t\t\t{}"</span>, <span class="self">self</span>.n_mte_received_tot).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Skipped MTEvents: \t\t\t{}"</span>, <span class="self">self</span>.n_mte_skipped).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Incoming/outgoing MTEvents fraction   {:.2}"</span>, <span class="self">self</span>.get_incoming_vs_outgoing_mte()).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Received RBEvents: \t\t\t{}"</span>, <span class="self">self</span>.n_rbe_received_tot).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n RBEvents Discarded: \t\t\t{}"</span>, <span class="self">self</span>.n_rbe_discarded_tot).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent RBEvents discarded: \t\t{:.2}%"</span>, <span class="self">self</span>.get_nrbe_discarded_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
-  <span class="kw">if </span><span class="self">self</span>.n_sent &gt; <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.n_mte_received_tot &gt; <span class="number">0 </span>{
-      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n RBEvent/Evts sent       \t\t{:.2}"</span>, (<span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64/ <span class="self">self</span>.n_sent <span class="kw">as </span>f64)).bright_purple());
-      repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n RBEvent/MTEvents       \t\t{:.2}"</span>, (<span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64 / <span class="self">self</span>.n_mte_received_tot <span class="kw">as </span>f64)).bright_purple()); }
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. RBEvents with evid from past:  \t{}"</span>, <span class="self">self</span>.n_rbe_from_past).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. orphan RBEvents: \t\t{}"</span>, <span class="self">self</span>.n_rbe_orphan).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n\n Getting MTE from cache for RBEvent failed {} times :("</span>, <span class="self">self</span>.rbe_wo_mte).bright_blue());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch. len MTE Receiver: \t\t{}"</span>, <span class="self">self</span>.mte_receiver_cbc_len).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch. len RBE Reveiver: \t\t{}"</span>, <span class="self">self</span>.rbe_receiver_cbc_len).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch. len TP Sender: \t\t\t{}"</span>, <span class="self">self</span>.tp_sender_cbc_len).bright_purple());
-  repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} END EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50}"</span>));
-  repr
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Received MTEvents                   : {}"</span>, <span class="self">self</span>.n_mte_received_tot).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Skipped MTEvents                    : {}"</span>, <span class="self">self</span>.n_mte_skipped).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Incoming/outgoing MTEvents fraction : {:.2}"</span>, <span class="self">self</span>.get_incoming_vs_outgoing_mte()).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Received RBEvents                   : {}"</span>, <span class="self">self</span>.n_rbe_received_tot).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n RBEvents Discarded                  : {}"</span>, <span class="self">self</span>.n_rbe_discarded_tot).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent RBEvents discarded          : {:.2}%"</span>, <span class="self">self</span>.get_nrbe_discarded_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n DRS4 busy lost hits                 : {}"</span>, <span class="self">self</span>.drs_bsy_lost_hg_hits).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n RDS4 busy lost hits fraction        : {:.2}%"</span>, <span class="self">self</span>.get_drs_lost_frac()<span class="kw-2">*</span>(<span class="number">100.0 </span><span class="kw">as </span>f64)).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
+    <span class="kw">if </span><span class="self">self</span>.n_sent &gt; <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.n_mte_received_tot &gt; <span class="number">0 </span>{
+        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n RBEvent/Evts sent               : {:.2}"</span>, (<span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64/ <span class="self">self</span>.n_sent <span class="kw">as </span>f64)).bright_purple());
+        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n RBEvent/MTEvents                : {:.2}"</span>, (<span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64 / <span class="self">self</span>.n_mte_received_tot <span class="kw">as </span>f64)).bright_purple()); }
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. RBEvents with evid from past   : {}"</span>, <span class="self">self</span>.n_rbe_from_past).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. orphan RBEvents : {}"</span>, <span class="self">self</span>.n_rbe_orphan).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n\n Getting MTE from cache for RBEvent failed {} times :("</span>, <span class="self">self</span>.rbe_wo_mte).bright_blue());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch. len MTE Receiver                : {}"</span>, <span class="self">self</span>.mte_receiver_cbc_len).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch. len RBE Reveiver                : {}"</span>, <span class="self">self</span>.rbe_receiver_cbc_len).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch. len TP Sender                   : {}"</span>, <span class="self">self</span>.tp_sender_cbc_len).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} END EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50}"</span>));
+    repr
   }
 }
 
@@ -1246,60 +1452,63 @@
   <span class="kw">const </span>SIZE : usize = <span class="number">156</span>; <span class="comment">//
 
   </span><span class="kw">fn </span>from_bytestream(stream : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;, 
-                       pos        : <span class="kw-2">&amp;mut </span>usize)
-      -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt;{
-        <span class="self">Self</span>::verify_fixed(stream,pos)<span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>hb = EVTBLDRHeartbeat::new();
-        hb.met_seconds          = parse_usize(stream,pos);
-        hb.n_mte_received_tot   = parse_usize(stream,pos);
-        hb.n_rbe_received_tot   = parse_usize(stream,pos);
-        hb.n_rbe_per_te         = parse_usize(stream,pos);
-        hb.n_rbe_discarded_tot  = parse_usize(stream,pos);
-        hb.n_mte_skipped        = parse_usize(stream,pos);
-        hb.n_timed_out          = parse_usize(stream,pos);
-        hb.n_sent               = parse_usize(stream,pos);
-        hb.delta_mte_rbe        = parse_usize(stream,pos);
-        hb.event_cache_size     = parse_usize(stream,pos);
-        hb.event_id_cache_size  = parse_usize(stream,pos);
-        hb.rbe_wo_mte           = parse_usize(stream,pos);
-        hb.mte_receiver_cbc_len = parse_usize(stream,pos);
-        hb.rbe_receiver_cbc_len = parse_usize(stream,pos);
-        hb.tp_sender_cbc_len    = parse_usize(stream,pos);
-        hb.n_ev_wo_evid         = parse_usize(stream,pos);
-        hb.n_rbe_from_past      = parse_usize(stream,pos);
-        hb.n_rbe_orphan         = parse_usize(stream,pos);
-        hb.data_mangled_ev      = parse_usize(stream,pos);
-        <span class="comment">// hb.seen_rbevents        = HashMap::from(parse_u8(stream, pos));
-        </span><span class="kw-2">*</span>pos += <span class="number">2</span>;
-        <span class="prelude-val">Ok</span>(hb)
-      }
-      <span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
-          <span class="kw">let </span><span class="kw-2">mut </span>bs = Vec::&lt;u8&gt;::with_capacity(<span class="self">Self</span>::SIZE);
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::HEAD.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.met_seconds.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_mte_received_tot.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_received_tot.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_per_te.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_discarded_tot.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_mte_skipped.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_timed_out.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_sent.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.delta_mte_rbe.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.event_cache_size.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.event_id_cache_size.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.rbe_wo_mte.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.mte_receiver_cbc_len.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.rbe_receiver_cbc_len.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tp_sender_cbc_len.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_ev_wo_evid.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_from_past.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_orphan.to_le_bytes());
-          bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.data_mangled_ev.to_le_bytes());
-          <span class="comment">// bs.push(self.seen_rbevents.to_u8());
-          </span>bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::TAIL.to_le_bytes());
-          bs
-        }
-    }
+                     pos        : <span class="kw-2">&amp;mut </span>usize)
+    -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt;{
+    <span class="self">Self</span>::verify_fixed(stream,pos)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>hb = EVTBLDRHeartbeat::new();
+    hb.met_seconds          = parse_usize(stream,pos);
+    hb.n_mte_received_tot   = parse_usize(stream,pos);
+    hb.n_rbe_received_tot   = parse_usize(stream,pos);
+    hb.n_rbe_per_te         = parse_usize(stream,pos);
+    hb.n_rbe_discarded_tot  = parse_usize(stream,pos);
+    hb.n_mte_skipped        = parse_usize(stream,pos);
+    hb.n_timed_out          = parse_usize(stream,pos);
+    hb.n_sent               = parse_usize(stream,pos);
+    hb.delta_mte_rbe        = parse_usize(stream,pos);
+    hb.event_cache_size     = parse_usize(stream,pos);
+    <span class="comment">//hb.event_id_cache_size  = parse_usize(stream,pos);
+    </span>hb.drs_bsy_lost_hg_hits = parse_usize(stream,pos);
+    hb.rbe_wo_mte           = parse_usize(stream,pos);
+    hb.mte_receiver_cbc_len = parse_usize(stream,pos);
+    hb.rbe_receiver_cbc_len = parse_usize(stream,pos);
+    hb.tp_sender_cbc_len    = parse_usize(stream,pos);
+    hb.n_ev_wo_evid         = parse_usize(stream,pos);
+    hb.n_rbe_from_past      = parse_usize(stream,pos);
+    hb.n_rbe_orphan         = parse_usize(stream,pos);
+    hb.data_mangled_ev      = parse_usize(stream,pos);
+    <span class="comment">// hb.seen_rbevents        = HashMap::from(parse_u8(stream, pos));
+    </span><span class="kw-2">*</span>pos += <span class="number">2</span>;
+    <span class="prelude-val">Ok</span>(hb)
+  }
+    
+  <span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>bs = Vec::&lt;u8&gt;::with_capacity(<span class="self">Self</span>::SIZE);
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::HEAD.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.met_seconds.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_mte_received_tot.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_received_tot.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_per_te.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_discarded_tot.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_mte_skipped.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_timed_out.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_sent.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.delta_mte_rbe.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.event_cache_size.to_le_bytes());
+    <span class="comment">//bs.extend_from_slice(&amp;self.event_id_cache_size.to_le_bytes());
+    </span>bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.drs_bsy_lost_hg_hits.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.rbe_wo_mte.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.mte_receiver_cbc_len.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.rbe_receiver_cbc_len.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tp_sender_cbc_len.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_ev_wo_evid.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_from_past.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_orphan.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.data_mangled_ev.to_le_bytes());
+    <span class="comment">// bs.push(self.seen_rbevents.to_u8());
+    </span>bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::TAIL.to_le_bytes());
+    bs
+  }
+}
 
 <span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>EVTBLDRHeartbeat {
@@ -1315,7 +1524,8 @@
     <span class="kw">let </span>n_sent = rng.gen::&lt;usize&gt;();
     <span class="kw">let </span>delta_mte_rbe = rng.gen::&lt;usize&gt;();
     <span class="kw">let </span>event_cache_size = rng.gen::&lt;usize&gt;();
-    <span class="kw">let </span>event_id_cache_size = rng.gen::&lt;usize&gt;();
+    <span class="comment">//let event_id_cache_size = rng.gen::&lt;usize&gt;();
+    </span><span class="kw">let </span>drs_bsy_lost_hg_hits  = rng.gen::&lt;usize&gt;();
     <span class="kw">let </span>rbe_wo_mte = rng.gen::&lt;usize&gt;();
     <span class="kw">let </span>mte_receiver_cbc_len = rng.gen::&lt;usize&gt;();
     <span class="kw">let </span>rbe_receiver_cbc_len = rng.gen::&lt;usize&gt;();
@@ -1334,7 +1544,10 @@
       n_sent,
       delta_mte_rbe,
       event_cache_size,
-      event_id_cache_size,
+      <span class="comment">// don't randomize this, since it 
+      // won't get serialized
+      </span>event_id_cache_size : <span class="number">0</span>,
+      drs_bsy_lost_hg_hits,
       rbe_wo_mte,
       mte_receiver_cbc_len,
       rbe_receiver_cbc_len,
@@ -1350,8 +1563,9 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>EVTBLDRHeartbeat {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="kw">let </span>repr = <span class="self">self</span>.to_string();
-    <span class="macro">write!</span>(f, <span class="string">"{}"</span>, repr)
+    <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;EVTBLDRHearbeat:   "</span>);
+    repr += <span class="kw-2">&amp;</span><span class="self">self</span>.to_string();
+    <span class="macro">write!</span>(f, <span class="string">"{}&gt;"</span>, repr)
   }
 }  
 

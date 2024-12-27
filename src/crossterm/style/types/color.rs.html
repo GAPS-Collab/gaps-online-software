@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/crossterm-0.27.0/src/style/types/color.rs`."><title>color.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="crossterm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/crossterm-0.28.1/src/style/types/color.rs`."><title>color.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="crossterm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">crossterm/style/types/</div>color.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -511,7 +512,13 @@
 <a href="#511" id="511">511</a>
 <a href="#512" id="512">512</a>
 <a href="#513" id="513">513</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::{
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     convert::{AsRef, TryFrom},
     str::FromStr,
 };
@@ -686,6 +693,7 @@
         <span class="kw">let </span>src = src.to_lowercase();
 
         <span class="kw">match </span>src.as_ref() {
+            <span class="string">"reset" </span>=&gt; <span class="prelude-val">Ok</span>(Color::Reset),
             <span class="string">"black" </span>=&gt; <span class="prelude-val">Ok</span>(Color::Black),
             <span class="string">"dark_grey" </span>=&gt; <span class="prelude-val">Ok</span>(Color::DarkGrey),
             <span class="string">"red" </span>=&gt; <span class="prelude-val">Ok</span>(Color::Red),
@@ -736,6 +744,7 @@
         </span>S: serde::ser::Serializer,
     {
         <span class="kw">let </span>str = <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Color::Reset =&gt; <span class="string">"reset"</span>,
             Color::Black =&gt; <span class="string">"black"</span>,
             Color::DarkGrey =&gt; <span class="string">"dark_grey"</span>,
             Color::Red =&gt; <span class="string">"red"</span>,
@@ -755,20 +764,16 @@
             <span class="kw">_ </span>=&gt; <span class="string">""</span>,
         };
 
-        <span class="kw">if </span>str == <span class="string">"" </span>{
+        <span class="kw">if </span>str.is_empty() {
             <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-                Color::AnsiValue(value) =&gt; {
-                    <span class="kw">return </span>serializer.serialize_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"ansi_({})"</span>, value));
-                }
+                Color::AnsiValue(value) =&gt; serializer.serialize_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"ansi_({})"</span>, value)),
                 Color::Rgb { r, g, b } =&gt; {
-                    <span class="kw">return </span>serializer.serialize_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"rgb_({},{},{})"</span>, r, g, b));
+                    serializer.serialize_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"rgb_({},{},{})"</span>, r, g, b))
                 }
-                <span class="kw">_ </span>=&gt; {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(serde::ser::Error::custom(<span class="string">"Could not serialize enum type"</span>));
-                }
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(serde::ser::Error::custom(<span class="string">"Could not serialize enum type"</span>)),
             }
         } <span class="kw">else </span>{
-            <span class="kw">return </span>serializer.serialize_str(str);
+            serializer.serialize_str(str)
         }
     }
 }
@@ -784,7 +789,7 @@
             <span class="kw">type </span>Value = Color;
             <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
                 formatter.write_str(
-                    <span class="string">"`black`, `blue`, `dark_blue`, `cyan`, `dark_cyan`, `green`, `dark_green`, `grey`, `dark_grey`, `magenta`, `dark_magenta`, `red`, `dark_red`, `white`, `yellow`, `dark_yellow`, `ansi_(value)`, or `rgb_(r,g,b)` or `#rgbhex`"</span>,
+                    <span class="string">"`reset`, `black`, `blue`, `dark_blue`, `cyan`, `dark_cyan`, `green`, `dark_green`, `grey`, `dark_grey`, `magenta`, `dark_magenta`, `red`, `dark_red`, `white`, `yellow`, `dark_yellow`, `ansi_(value)`, or `rgb_(r,g,b)` or `#rgbhex`"</span>,
                 )
             }
             <span class="kw">fn </span>visit_str&lt;E&gt;(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Color, E&gt;
@@ -856,6 +861,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_known_color_conversion() {
+        <span class="macro">assert_eq!</span>(<span class="string">"reset"</span>.parse(), <span class="prelude-val">Ok</span>(Color::Reset));
         <span class="macro">assert_eq!</span>(<span class="string">"grey"</span>.parse(), <span class="prelude-val">Ok</span>(Color::Grey));
         <span class="macro">assert_eq!</span>(<span class="string">"dark_grey"</span>.parse(), <span class="prelude-val">Ok</span>(Color::DarkGrey));
         <span class="macro">assert_eq!</span>(<span class="string">"red"</span>.parse(), <span class="prelude-val">Ok</span>(Color::Red));
@@ -901,6 +907,14 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_deserial_known_color_conversion() {
+        <span class="macro">assert_eq!</span>(
+            serde_json::from_str::&lt;Color&gt;(<span class="string">"\"Reset\""</span>).unwrap(),
+            Color::Reset
+        );
+        <span class="macro">assert_eq!</span>(
+            serde_json::from_str::&lt;Color&gt;(<span class="string">"\"reset\""</span>).unwrap(),
+            Color::Reset
+        );
         <span class="macro">assert_eq!</span>(
             serde_json::from_str::&lt;Color&gt;(<span class="string">"\"Red\""</span>).unwrap(),
             Color::Red

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/widgets/chart.rs`."><title>chart.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/widgets/chart.rs`."><title>chart.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/widgets/</div>chart.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1461,18 +1462,102 @@
 <a href="#1461" id="1461">1461</a>
 <a href="#1462" id="1462">1462</a>
 <a href="#1463" id="1463">1463</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::max;
+<a href="#1464" id="1464">1464</a>
+<a href="#1465" id="1465">1465</a>
+<a href="#1466" id="1466">1466</a>
+<a href="#1467" id="1467">1467</a>
+<a href="#1468" id="1468">1468</a>
+<a href="#1469" id="1469">1469</a>
+<a href="#1470" id="1470">1470</a>
+<a href="#1471" id="1471">1471</a>
+<a href="#1472" id="1472">1472</a>
+<a href="#1473" id="1473">1473</a>
+<a href="#1474" id="1474">1474</a>
+<a href="#1475" id="1475">1475</a>
+<a href="#1476" id="1476">1476</a>
+<a href="#1477" id="1477">1477</a>
+<a href="#1478" id="1478">1478</a>
+<a href="#1479" id="1479">1479</a>
+<a href="#1480" id="1480">1480</a>
+<a href="#1481" id="1481">1481</a>
+<a href="#1482" id="1482">1482</a>
+<a href="#1483" id="1483">1483</a>
+<a href="#1484" id="1484">1484</a>
+<a href="#1485" id="1485">1485</a>
+<a href="#1486" id="1486">1486</a>
+<a href="#1487" id="1487">1487</a>
+<a href="#1488" id="1488">1488</a>
+<a href="#1489" id="1489">1489</a>
+<a href="#1490" id="1490">1490</a>
+<a href="#1491" id="1491">1491</a>
+<a href="#1492" id="1492">1492</a>
+<a href="#1493" id="1493">1493</a>
+<a href="#1494" id="1494">1494</a>
+<a href="#1495" id="1495">1495</a>
+<a href="#1496" id="1496">1496</a>
+<a href="#1497" id="1497">1497</a>
+<a href="#1498" id="1498">1498</a>
+<a href="#1499" id="1499">1499</a>
+<a href="#1500" id="1500">1500</a>
+<a href="#1501" id="1501">1501</a>
+<a href="#1502" id="1502">1502</a>
+<a href="#1503" id="1503">1503</a>
+<a href="#1504" id="1504">1504</a>
+<a href="#1505" id="1505">1505</a>
+<a href="#1506" id="1506">1506</a>
+<a href="#1507" id="1507">1507</a>
+<a href="#1508" id="1508">1508</a>
+<a href="#1509" id="1509">1509</a>
+<a href="#1510" id="1510">1510</a>
+<a href="#1511" id="1511">1511</a>
+<a href="#1512" id="1512">1512</a>
+<a href="#1513" id="1513">1513</a>
+<a href="#1514" id="1514">1514</a>
+<a href="#1515" id="1515">1515</a>
+<a href="#1516" id="1516">1516</a>
+<a href="#1517" id="1517">1517</a>
+<a href="#1518" id="1518">1518</a>
+<a href="#1519" id="1519">1519</a>
+<a href="#1520" id="1520">1520</a>
+<a href="#1521" id="1521">1521</a>
+<a href="#1522" id="1522">1522</a>
+<a href="#1523" id="1523">1523</a>
+<a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a>
+<a href="#1534" id="1534">1534</a>
+<a href="#1535" id="1535">1535</a>
+<a href="#1536" id="1536">1536</a>
+<a href="#1537" id="1537">1537</a>
+<a href="#1538" id="1538">1538</a>
+<a href="#1539" id="1539">1539</a>
+<a href="#1540" id="1540">1540</a>
+<a href="#1541" id="1541">1541</a>
+<a href="#1542" id="1542">1542</a>
+<a href="#1543" id="1543">1543</a>
+<a href="#1544" id="1544">1544</a>
+<a href="#1545" id="1545">1545</a>
+<a href="#1546" id="1546">1546</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::{cmp::max, ops::Not};
 
 <span class="kw">use </span>strum::{Display, EnumString};
-<span class="kw">use </span>unicode_width::UnicodeWidthStr;
 
 <span class="kw">use crate</span>::{
-    layout::Flex,
-    prelude::<span class="kw-2">*</span>,
-    style::Styled,
+    buffer::Buffer,
+    layout::{Alignment, Constraint, Flex, Layout, Position, Rect},
+    style::{Color, Style, Styled},
+    symbols::{<span class="self">self</span>},
+    text::Line,
     widgets::{
+        block::BlockExt,
         canvas::{Canvas, Line <span class="kw">as </span>CanvasLine, Points},
-        Block,
+        Block, Widget, WidgetRef,
     },
 };
 
@@ -1489,12 +1574,16 @@
 /// # Example
 ///
 /// ```rust
-/// use ratatui::{prelude::*, widgets::*};
+/// use ratatui::{
+///     style::{Style, Stylize},
+///     widgets::Axis,
+/// };
+///
 /// let axis = Axis::default()
 ///     .title("X Axis")
 ///     .style(Style::default().gray())
 ///     .bounds([0.0, 50.0])
-///     .labels(vec!["0".bold(), "25".into(), "50".bold()]);
+///     .labels(["0".bold(), "25".into(), "50".bold()]);
 /// ```
 </span><span class="attr">#[derive(Debug, Default, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>Axis&lt;<span class="lifetime">'a</span>&gt; {
@@ -1503,7 +1592,7 @@
     <span class="doccomment">/// Bounds for the axis (all data points outside these limits will not be represented)
     </span>bounds: [f64; <span class="number">2</span>],
     <span class="doccomment">/// A list of labels to put to the left or below the axis
-    </span>labels: <span class="prelude-ty">Option</span>&lt;Vec&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt;&gt;,
+    </span>labels: Vec&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
     <span class="doccomment">/// The style used to draw the axis itself
     </span>style: Style,
     <span class="doccomment">/// The alignment of the labels of the Axis
@@ -1546,22 +1635,31 @@
     /// more than 3 labels is currently broken and the middle labels won't be in the correct
     /// position, see [issue 334].
     ///
-    /// [issue 334]: https://github.com/ratatui-org/ratatui/issues/334
+    /// [issue 334]: https://github.com/ratatui/ratatui/issues/334
+    ///
+    /// `labels` is a vector of any type that can be converted into a [`Line`] (e.g. `&amp;str`,
+    /// `String`, `&amp;Line`, `Span`, ...). This allows you to style the labels using the methods
+    /// provided by [`Line`]. Any alignment set on the labels will be ignored as the alignment is
+    /// determined by the axis.
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     ///
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
-    /// let axis =
-    ///     Axis::default()
-    ///         .bounds([0.0, 50.0])
-    ///         .labels(vec!["0".bold(), "25".into(), "50".bold()]);
+    /// use ratatui::{style::Stylize, widgets::Axis};
+    ///
+    /// let axis = Axis::default()
+    ///     .bounds([0.0, 50.0])
+    ///     .labels(["0".bold(), "25".into(), "50".bold()]);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>labels(<span class="kw-2">mut </span><span class="self">self</span>, labels: Vec&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.labels = <span class="prelude-val">Some</span>(labels);
+    </span><span class="kw">pub fn </span>labels&lt;Labels&gt;(<span class="kw-2">mut </span><span class="self">self</span>, labels: Labels) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>Labels: IntoIterator,
+        Labels::Item: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
+    {
+        <span class="self">self</span>.labels = labels.into_iter().map(Into::into).collect();
         <span class="self">self
     </span>}
 
@@ -1578,7 +1676,8 @@
     /// like so
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{style::Stylize, widgets::Axis};
+    ///
     /// let axis = Axis::default().red();
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -1607,11 +1706,15 @@
     <span class="doccomment">/// Draw each point. This is the default.
     </span><span class="attr">#[default]
     </span>Scatter,
+
     <span class="doccomment">/// Draw a line between each following point.
     ///
     /// The order of the lines will be the same as the order of the points in the dataset, which
     /// allows this widget to draw lines both left-to-right and right-to-left
     </span>Line,
+
+    <span class="doccomment">/// Draw a bar chart. This will draw a bar for each point in the dataset.
+    </span>Bar,
 }
 
 <span class="doccomment">/// Allow users to specify the position of a legend in a [`Chart`]
@@ -1749,7 +1852,11 @@
 /// This example draws a red line between two points.
 ///
 /// ```rust
-/// use ratatui::{prelude::*, symbols::Marker, widgets::*};
+/// use ratatui::{
+///     style::Stylize,
+///     symbols::Marker,
+///     widgets::{Dataset, GraphType},
+/// };
 ///
 /// let dataset = Dataset::default()
 ///     .name("dataset 1")
@@ -1825,9 +1932,10 @@
 
     <span class="doccomment">/// Sets how the dataset should be drawn
     ///
-    /// [`Chart`] can draw either a [scatter](GraphType::Scatter) or [line](GraphType::Line) charts.
-    /// A scatter will draw only the points in the dataset while a line will also draw a line
-    /// between them. See [`GraphType`] for more details
+    /// [`Chart`] can draw [scatter](GraphType::Scatter), [line](GraphType::Line) or
+    /// [bar](GraphType::Bar) charts. A scatter chart draws only the points in the dataset, a line
+    /// char draws a line between each point, and a bar chart draws a line from the x axis to the
+    /// point.  See [`GraphType`] for more details
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -1852,7 +1960,8 @@
     /// like so
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{style::Stylize, widgets::Dataset};
+    ///
     /// let dataset = Dataset::default().red();
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -1866,9 +1975,9 @@
 /// labels, legend, ...).
 </span><span class="kw">struct </span>ChartLayout {
     <span class="doccomment">/// Location of the title of the x axis
-    </span>title_x: <span class="prelude-ty">Option</span>&lt;(u16, u16)&gt;,
+    </span>title_x: <span class="prelude-ty">Option</span>&lt;Position&gt;,
     <span class="doccomment">/// Location of the title of the y axis
-    </span>title_y: <span class="prelude-ty">Option</span>&lt;(u16, u16)&gt;,
+    </span>title_y: <span class="prelude-ty">Option</span>&lt;Position&gt;,
     <span class="doccomment">/// Location of the first label of the x axis
     </span>label_x: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="doccomment">/// Location of the first label of the y axis
@@ -1903,7 +2012,11 @@
 /// # Examples
 ///
 /// ```
-/// use ratatui::{prelude::*, widgets::*};
+/// use ratatui::{
+///     style::{Style, Stylize},
+///     symbols,
+///     widgets::{Axis, Block, Chart, Dataset, GraphType},
+/// };
 ///
 /// // Create the datasets to fill the chart with
 /// let datasets = vec![
@@ -1928,14 +2041,14 @@
 ///     .title("X Axis".red())
 ///     .style(Style::default().white())
 ///     .bounds([0.0, 10.0])
-///     .labels(vec!["0.0".into(), "5.0".into(), "10.0".into()]);
+///     .labels(["0.0", "5.0", "10.0"]);
 ///
 /// // Create the Y axis and define its properties
 /// let y_axis = Axis::default()
 ///     .title("Y Axis".red())
 ///     .style(Style::default().white())
 ///     .bounds([0.0, 10.0])
-///     .labels(vec!["0.0".into(), "5.0".into(), "10.0".into()]);
+///     .labels(["0.0", "5.0", "10.0"]);
 ///
 /// // Create the chart and link all the parts together
 /// let chart = Chart::new(datasets)
@@ -1972,17 +2085,19 @@
     /// This creates a simple chart with one [`Dataset`]
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
-    /// # let data_points = vec![];
+    /// use ratatui::widgets::{Chart, Dataset};
+    ///
+    /// let data_points = vec![];
     /// let chart = Chart::new(vec![Dataset::default().data(&amp;data_points)]);
     /// ```
     ///
     /// This creates a chart with multiple [`Dataset`]s
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
-    /// # let data_points = vec![];
-    /// # let data_points2 = vec![];
+    /// use ratatui::widgets::{Chart, Dataset};
+    ///
+    /// let data_points = vec![];
+    /// let data_points2 = vec![];
     /// let chart = Chart::new(vec![
     ///     Dataset::default().data(&amp;data_points),
     ///     Dataset::default().data(&amp;data_points2),
@@ -2032,12 +2147,13 @@
     /// # Example
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::widgets::{Axis, Chart};
+    ///
     /// let chart = Chart::new(vec![]).x_axis(
     ///     Axis::default()
     ///         .title("X Axis")
     ///         .bounds([0.0, 20.0])
-    ///         .labels(vec!["0".into(), "20".into()]),
+    ///         .labels(["0", "20"]),
     /// );
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2055,12 +2171,13 @@
     /// # Example
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::widgets::{Axis, Chart};
+    ///
     /// let chart = Chart::new(vec![]).y_axis(
     ///     Axis::default()
     ///         .title("Y Axis")
     ///         .bounds([0.0, 20.0])
-    ///         .labels(vec!["0".into(), "20".into()]),
+    ///         .labels(["0", "20"]),
     /// );
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2086,7 +2203,8 @@
     /// its height is greater than 25% of the total widget height.
     ///
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{layout::Constraint, widgets::Chart};
+    ///
     /// let constraints = (Constraint::Ratio(1, 3), Constraint::Ratio(1, 4));
     /// let chart = Chart::new(vec![]).hidden_legend_constraints(constraints);
     /// ```
@@ -2095,7 +2213,8 @@
     /// first one is always true.
     ///
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{layout::Constraint, widgets::Chart};
+    ///
     /// let constraints = (Constraint::Min(0), Constraint::Ratio(1, 4));
     /// let chart = Chart::new(vec![]).hidden_legend_constraints(constraints);
     /// ```
@@ -2104,7 +2223,8 @@
     /// [`Chart::legend_position`].
     ///
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{layout::Constraint, widgets::Chart};
+    ///
     /// let constraints = (Constraint::Length(0), Constraint::Ratio(1, 4));
     /// let chart = Chart::new(vec![]).hidden_legend_constraints(constraints);
     /// ```
@@ -2136,14 +2256,16 @@
     /// Show the legend on the top left corner.
     ///
     /// ```
-    /// # use ratatui::widgets::{Chart, LegendPosition};
+    /// use ratatui::widgets::{Chart, LegendPosition};
+    ///
     /// let chart: Chart = Chart::new(vec![]).legend_position(Some(LegendPosition::TopLeft));
     /// ```
     ///
     /// Hide the legend altogether
     ///
     /// ```
-    /// # use ratatui::widgets::{Chart, LegendPosition};
+    /// use ratatui::widgets::{Chart, LegendPosition};
+    ///
     /// let chart = Chart::new(vec![]).legend_position(None);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2162,22 +2284,22 @@
         <span class="kw">let </span><span class="kw-2">mut </span>y = area.bottom() - <span class="number">1</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>label_x = <span class="prelude-val">None</span>;
-        <span class="kw">if </span><span class="self">self</span>.x_axis.labels.is_some() &amp;&amp; y &gt; area.top() {
+        <span class="kw">if </span>!<span class="self">self</span>.x_axis.labels.is_empty() &amp;&amp; y &gt; area.top() {
             label_x = <span class="prelude-val">Some</span>(y);
             y -= <span class="number">1</span>;
         }
 
-        <span class="kw">let </span>label_y = <span class="self">self</span>.y_axis.labels.as_ref().and(<span class="prelude-val">Some</span>(x));
-        x += <span class="self">self</span>.max_width_of_labels_left_of_y_axis(area, <span class="self">self</span>.y_axis.labels.is_some());
+        <span class="kw">let </span>label_y = <span class="self">self</span>.y_axis.labels.is_empty().not().then_some(x);
+        x += <span class="self">self</span>.max_width_of_labels_left_of_y_axis(area, !<span class="self">self</span>.y_axis.labels.is_empty());
 
         <span class="kw">let </span><span class="kw-2">mut </span>axis_x = <span class="prelude-val">None</span>;
-        <span class="kw">if </span><span class="self">self</span>.x_axis.labels.is_some() &amp;&amp; y &gt; area.top() {
+        <span class="kw">if </span>!<span class="self">self</span>.x_axis.labels.is_empty() &amp;&amp; y &gt; area.top() {
             axis_x = <span class="prelude-val">Some</span>(y);
             y -= <span class="number">1</span>;
         }
 
         <span class="kw">let </span><span class="kw-2">mut </span>axis_y = <span class="prelude-val">None</span>;
-        <span class="kw">if </span><span class="self">self</span>.y_axis.labels.is_some() &amp;&amp; x + <span class="number">1 </span>&lt; area.right() {
+        <span class="kw">if </span>!<span class="self">self</span>.y_axis.labels.is_empty() &amp;&amp; x + <span class="number">1 </span>&lt; area.right() {
             axis_y = <span class="prelude-val">Some</span>(x);
             x += <span class="number">1</span>;
         }
@@ -2198,7 +2320,7 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>title) = <span class="self">self</span>.x_axis.title {
             <span class="kw">let </span>w = title.width() <span class="kw">as </span>u16;
             <span class="kw">if </span>w &lt; graph_area.width &amp;&amp; graph_area.height &gt; <span class="number">2 </span>{
-                title_x = <span class="prelude-val">Some</span>((x + graph_area.width - w, y));
+                title_x = <span class="prelude-val">Some</span>(Position::new(x + graph_area.width - w, y));
             }
         }
 
@@ -2206,7 +2328,7 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>title) = <span class="self">self</span>.y_axis.title {
             <span class="kw">let </span>w = title.width() <span class="kw">as </span>u16;
             <span class="kw">if </span>w + <span class="number">1 </span>&lt; graph_area.width &amp;&amp; graph_area.height &gt; <span class="number">2 </span>{
-                title_y = <span class="prelude-val">Some</span>((x, area.top()));
+                title_y = <span class="prelude-val">Some</span>(Position::new(x, area.top()));
             }
         }
 
@@ -2265,17 +2387,13 @@
         <span class="kw">let </span><span class="kw-2">mut </span>max_width = <span class="self">self
             </span>.y_axis
             .labels
-            .as_ref()
-            .map(|l| l.iter().map(Span::width).max().unwrap_or_default() <span class="kw">as </span>u16)
-            .unwrap_or_default();
+            .iter()
+            .map(Line::width)
+            .max()
+            .unwrap_or_default() <span class="kw">as </span>u16;
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(first_x_label) = <span class="self">self
-            </span>.x_axis
-            .labels
-            .as_ref()
-            .and_then(|labels| labels.first())
-        {
-            <span class="kw">let </span>first_label_width = first_x_label.content.width() <span class="kw">as </span>u16;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(first_x_label) = <span class="self">self</span>.x_axis.labels.first() {
+            <span class="kw">let </span>first_label_width = first_x_label.width() <span class="kw">as </span>u16;
             <span class="kw">let </span>width_left_of_y_axis = <span class="kw">match </span><span class="self">self</span>.x_axis.labels_alignment {
                 Alignment::Left =&gt; {
                     <span class="comment">// The last character of the label should be below the Y-Axis when it exists,
@@ -2300,7 +2418,7 @@
         graph_area: Rect,
     ) {
         <span class="kw">let </span><span class="prelude-val">Some</span>(y) = layout.label_x <span class="kw">else </span>{ <span class="kw">return </span>};
-        <span class="kw">let </span>labels = <span class="self">self</span>.x_axis.labels.as_ref().unwrap();
+        <span class="kw">let </span>labels = <span class="kw-2">&amp;</span><span class="self">self</span>.x_axis.labels;
         <span class="kw">let </span>labels_len = labels.len() <span class="kw">as </span>u16;
         <span class="kw">if </span>labels_len &lt; <span class="number">2 </span>{
             <span class="kw">return</span>;
@@ -2362,17 +2480,13 @@
         Rect::new(min_x, y, max_x - min_x, <span class="number">1</span>)
     }
 
-    <span class="kw">fn </span>render_label(buf: <span class="kw-2">&amp;mut </span>Buffer, label: <span class="kw-2">&amp;</span>Span, label_area: Rect, alignment: Alignment) {
-        <span class="kw">let </span>label_width = label.width() <span class="kw">as </span>u16;
-        <span class="kw">let </span>bounded_label_width = label_area.width.min(label_width);
-
-        <span class="kw">let </span>x = <span class="kw">match </span>alignment {
-            Alignment::Left =&gt; label_area.left(),
-            Alignment::Center =&gt; label_area.left() + label_area.width / <span class="number">2 </span>- bounded_label_width / <span class="number">2</span>,
-            Alignment::Right =&gt; label_area.right() - bounded_label_width,
+    <span class="kw">fn </span>render_label(buf: <span class="kw-2">&amp;mut </span>Buffer, label: <span class="kw-2">&amp;</span>Line, label_area: Rect, alignment: Alignment) {
+        <span class="kw">let </span>label = <span class="kw">match </span>alignment {
+            Alignment::Left =&gt; label.clone().left_aligned(),
+            Alignment::Center =&gt; label.clone().centered(),
+            Alignment::Right =&gt; label.clone().right_aligned(),
         };
-
-        buf.set_span(x, label_area.top(), label, bounded_label_width);
+        label.render(label_area, buf);
     }
 
     <span class="kw">fn </span>render_y_labels(
@@ -2383,7 +2497,7 @@
         graph_area: Rect,
     ) {
         <span class="kw">let </span><span class="prelude-val">Some</span>(x) = layout.label_y <span class="kw">else </span>{ <span class="kw">return </span>};
-        <span class="kw">let </span>labels = <span class="self">self</span>.y_axis.labels.as_ref().unwrap();
+        <span class="kw">let </span>labels = <span class="kw-2">&amp;</span><span class="self">self</span>.y_axis.labels;
         <span class="kw">let </span>labels_len = labels.len() <span class="kw">as </span>u16;
         <span class="kw">for </span>(i, label) <span class="kw">in </span>labels.iter().enumerate() {
             <span class="kw">let </span>dy = i <span class="kw">as </span>u16 * (graph_area.height - <span class="number">1</span>) / (labels_len - <span class="number">1</span>);
@@ -2421,14 +2535,14 @@
         <span class="comment">// Sample the style of the entire widget. This sample will be used to reset the style of
         // the cells that are part of the components put on top of the grah area (i.e legend and
         // axis names).
-        </span><span class="kw">let </span>original_style = buf.get(area.left(), area.top()).style();
+        </span><span class="kw">let </span>original_style = buf[(area.left(), area.top())].style();
 
         <span class="self">self</span>.render_x_labels(buf, <span class="kw-2">&amp;</span>layout, chart_area, graph_area);
         <span class="self">self</span>.render_y_labels(buf, <span class="kw-2">&amp;</span>layout, chart_area, graph_area);
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(y) = layout.axis_x {
             <span class="kw">for </span>x <span class="kw">in </span>graph_area.left()..graph_area.right() {
-                buf.get_mut(x, y)
+                buf[(x, y)]
                     .set_symbol(symbols::line::HORIZONTAL)
                     .set_style(<span class="self">self</span>.x_axis.style);
             }
@@ -2436,7 +2550,7 @@
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = layout.axis_y {
             <span class="kw">for </span>y <span class="kw">in </span>graph_area.top()..graph_area.bottom() {
-                buf.get_mut(x, y)
+                buf[(x, y)]
                     .set_symbol(symbols::line::VERTICAL)
                     .set_style(<span class="self">self</span>.y_axis.style);
             }
@@ -2444,7 +2558,7 @@
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(y) = layout.axis_x {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = layout.axis_y {
-                buf.get_mut(x, y)
+                buf[(x, y)]
                     .set_symbol(symbols::line::BOTTOM_LEFT)
                     .set_style(<span class="self">self</span>.x_axis.style);
             }
@@ -2461,22 +2575,36 @@
                         coords: dataset.data,
                         color: dataset.style.fg.unwrap_or(Color::Reset),
                     });
-                    <span class="kw">if </span>dataset.graph_type == GraphType::Line {
-                        <span class="kw">for </span>data <span class="kw">in </span>dataset.data.windows(<span class="number">2</span>) {
-                            ctx.draw(<span class="kw-2">&amp;</span>CanvasLine {
-                                x1: data[<span class="number">0</span>].<span class="number">0</span>,
-                                y1: data[<span class="number">0</span>].<span class="number">1</span>,
-                                x2: data[<span class="number">1</span>].<span class="number">0</span>,
-                                y2: data[<span class="number">1</span>].<span class="number">1</span>,
-                                color: dataset.style.fg.unwrap_or(Color::Reset),
-                            });
+                    <span class="kw">match </span>dataset.graph_type {
+                        GraphType::Line =&gt; {
+                            <span class="kw">for </span>data <span class="kw">in </span>dataset.data.windows(<span class="number">2</span>) {
+                                ctx.draw(<span class="kw-2">&amp;</span>CanvasLine {
+                                    x1: data[<span class="number">0</span>].<span class="number">0</span>,
+                                    y1: data[<span class="number">0</span>].<span class="number">1</span>,
+                                    x2: data[<span class="number">1</span>].<span class="number">0</span>,
+                                    y2: data[<span class="number">1</span>].<span class="number">1</span>,
+                                    color: dataset.style.fg.unwrap_or(Color::Reset),
+                                });
+                            }
                         }
+                        GraphType::Bar =&gt; {
+                            <span class="kw">for </span>(x, y) <span class="kw">in </span>dataset.data {
+                                ctx.draw(<span class="kw-2">&amp;</span>CanvasLine {
+                                    x1: <span class="kw-2">*</span>x,
+                                    y1: <span class="number">0.0</span>,
+                                    x2: <span class="kw-2">*</span>x,
+                                    y2: <span class="kw-2">*</span>y,
+                                    color: dataset.style.fg.unwrap_or(Color::Reset),
+                                });
+                            }
+                        }
+                        GraphType::Scatter =&gt; {}
                     }
                 })
                 .render(graph_area, buf);
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>((x, y)) = layout.title_x {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(Position { x, y }) = layout.title_x {
             <span class="kw">let </span>title = <span class="self">self</span>.x_axis.title.as_ref().unwrap();
             <span class="kw">let </span>width = graph_area
                 .right()
@@ -2494,7 +2622,7 @@
             buf.set_line(x, y, title, width);
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>((x, y)) = layout.title_y {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(Position { x, y }) = layout.title_y {
             <span class="kw">let </span>title = <span class="self">self</span>.y_axis.title.as_ref().unwrap();
             <span class="kw">let </span>width = graph_area
                 .right()
@@ -2579,6 +2707,7 @@
     <span class="kw">use </span>strum::ParseError;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::style::{Modifier, Stylize};
 
     <span class="kw">struct </span>LegendTestCase {
         chart_area: Rect,
@@ -2657,12 +2786,14 @@
     </span><span class="kw">fn </span>graph_type_to_string() {
         <span class="macro">assert_eq!</span>(GraphType::Scatter.to_string(), <span class="string">"Scatter"</span>);
         <span class="macro">assert_eq!</span>(GraphType::Line.to_string(), <span class="string">"Line"</span>);
+        <span class="macro">assert_eq!</span>(GraphType::Bar.to_string(), <span class="string">"Bar"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>graph_type_from_str() {
         <span class="macro">assert_eq!</span>(<span class="string">"Scatter"</span>.parse::&lt;GraphType&gt;(), <span class="prelude-val">Ok</span>(GraphType::Scatter));
         <span class="macro">assert_eq!</span>(<span class="string">"Line"</span>.parse::&lt;GraphType&gt;(), <span class="prelude-val">Ok</span>(GraphType::Line));
+        <span class="macro">assert_eq!</span>(<span class="string">"Bar"</span>.parse::&lt;GraphType&gt;(), <span class="prelude-val">Ok</span>(GraphType::Bar));
         <span class="macro">assert_eq!</span>(<span class="string">""</span>.parse::&lt;GraphType&gt;(), <span class="prelude-val">Err</span>(ParseError::VariantNotFound));
     }
 
@@ -2922,6 +3053,41 @@
             .hidden_legend_constraints((Constraint::Percentage(<span class="number">100</span>), Constraint::Percentage(<span class="number">100</span>)));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines(expected));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>bar_chart() {
+        <span class="kw">let </span>data = [
+            (<span class="number">0.0</span>, <span class="number">0.0</span>),
+            (<span class="number">2.0</span>, <span class="number">1.0</span>),
+            (<span class="number">4.0</span>, <span class="number">4.0</span>),
+            (<span class="number">6.0</span>, <span class="number">8.0</span>),
+            (<span class="number">8.0</span>, <span class="number">9.0</span>),
+            (<span class="number">10.0</span>, <span class="number">10.0</span>),
+        ];
+        <span class="kw">let </span>chart = Chart::new(<span class="macro">vec!</span>[Dataset::default()
+            .data(<span class="kw-2">&amp;</span>data)
+            .marker(symbols::Marker::Dot)
+            .graph_type(GraphType::Bar)])
+        .x_axis(Axis::default().bounds([<span class="number">0.0</span>, <span class="number">10.0</span>]))
+        .y_axis(Axis::default().bounds([<span class="number">0.0</span>, <span class="number">10.0</span>]));
+        <span class="kw">let </span>area = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">11</span>, <span class="number">11</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(area);
+        chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"          •"</span>,
+            <span class="string">"        • •"</span>,
+            <span class="string">"      • • •"</span>,
+            <span class="string">"      • • •"</span>,
+            <span class="string">"      • • •"</span>,
+            <span class="string">"      • • •"</span>,
+            <span class="string">"    • • • •"</span>,
+            <span class="string">"    • • • •"</span>,
+            <span class="string">"    • • • •"</span>,
+            <span class="string">"  • • • • •"</span>,
+            <span class="string">"• • • • • •"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 }
 </code></pre></div></section></main></body></html>

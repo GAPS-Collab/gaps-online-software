@@ -1,1 +1,0 @@
-searchState.loadedDescShard("liftof_mt", 0, "Standalone application to get events from the MTB (master …\nConfiguration of liftof-mt. Use the same config\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\nPublish TofPackets at port 42000\nSend RB request packets Relay RB network traffic through …\nMore printout to std::out")

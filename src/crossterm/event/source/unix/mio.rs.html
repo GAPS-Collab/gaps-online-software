@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/crossterm-0.27.0/src/event/source/unix/mio.rs`."><title>mio.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="crossterm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/crossterm-0.28.1/src/event/source/unix/mio.rs`."><title>mio.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="crossterm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">crossterm/event/source/unix/</div>mio.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -226,16 +227,10 @@
 <a href="#226" id="226">226</a>
 <a href="#227" id="227">227</a>
 <a href="#228" id="228">228</a>
-<a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::{collections::VecDeque, io, time::Duration};
+<a href="#229" id="229">229</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::{collections::VecDeque, io, time::Duration};
 
 <span class="kw">use </span>mio::{unix::SourceFd, Events, Interest, Poll, Token};
-<span class="kw">use </span>signal_hook_mio::v0_8::Signals;
+<span class="kw">use </span>signal_hook_mio::v1_0::Signals;
 
 <span class="attr">#[cfg(feature = <span class="string">"event-stream"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::event::sys::Waker;
@@ -260,7 +255,7 @@
     events: Events,
     parser: Parser,
     tty_buffer: [u8; TTY_BUFFER_SIZE],
-    tty_fd: FileDesc,
+    tty_fd: FileDesc&lt;<span class="lifetime">'static</span>&gt;,
     signals: Signals,
     <span class="attr">#[cfg(feature = <span class="string">"event-stream"</span>)]
     </span>waker: Waker,
@@ -271,7 +266,7 @@
         UnixInternalEventSource::from_file_descriptor(tty_fd()<span class="question-mark">?</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_file_descriptor(input_fd: FileDesc) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_file_descriptor(input_fd: FileDesc&lt;<span class="lifetime">'static</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>poll = Poll::new()<span class="question-mark">?</span>;
         <span class="kw">let </span>registry = poll.registry();
 
@@ -327,7 +322,7 @@
                 <span class="kw">match </span>token {
                     TTY_TOKEN =&gt; {
                         <span class="kw">loop </span>{
-                            <span class="kw">match </span><span class="self">self</span>.tty_fd.read(<span class="kw-2">&amp;mut </span><span class="self">self</span>.tty_buffer, TTY_BUFFER_SIZE) {
+                            <span class="kw">match </span><span class="self">self</span>.tty_fd.read(<span class="kw-2">&amp;mut </span><span class="self">self</span>.tty_buffer) {
                                 <span class="prelude-val">Ok</span>(read_count) =&gt; {
                                     <span class="kw">if </span>read_count &gt; <span class="number">0 </span>{
                                         <span class="self">self</span>.parser.advance(
@@ -354,23 +349,18 @@
                         }
                     }
                     SIGNAL_TOKEN =&gt; {
-                        <span class="kw">for </span>signal <span class="kw">in </span><span class="self">self</span>.signals.pending() {
-                            <span class="kw">match </span>signal {
-                                signal_hook::consts::SIGWINCH =&gt; {
-                                    <span class="comment">// TODO Should we remove tput?
-                                    //
-                                    // This can take a really long time, because terminal::size can
-                                    // launch new process (tput) and then it parses its output. It's
-                                    // not a really long time from the absolute time point of view, but
-                                    // it's a really long time from the mio, async-std/tokio executor, ...
-                                    // point of view.
-                                    </span><span class="kw">let </span>new_size = <span class="kw">crate</span>::terminal::size()<span class="question-mark">?</span>;
-                                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(InternalEvent::Event(Event::Resize(
-                                        new_size.<span class="number">0</span>, new_size.<span class="number">1</span>,
-                                    ))));
-                                }
-                                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">"Synchronize signal registration &amp; handling"</span>),
-                            };
+                        <span class="kw">if </span><span class="self">self</span>.signals.pending().next() == <span class="prelude-val">Some</span>(signal_hook::consts::SIGWINCH) {
+                            <span class="comment">// TODO Should we remove tput?
+                            //
+                            // This can take a really long time, because terminal::size can
+                            // launch new process (tput) and then it parses its output. It's
+                            // not a really long time from the absolute time point of view, but
+                            // it's a really long time from the mio, async-std/tokio executor, ...
+                            // point of view.
+                            </span><span class="kw">let </span>new_size = <span class="kw">crate</span>::terminal::size()<span class="question-mark">?</span>;
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(InternalEvent::Event(Event::Resize(
+                                new_size.<span class="number">0</span>, new_size.<span class="number">1</span>,
+                            ))));
                         }
                     }
                     <span class="attr">#[cfg(feature = <span class="string">"event-stream"</span>)]

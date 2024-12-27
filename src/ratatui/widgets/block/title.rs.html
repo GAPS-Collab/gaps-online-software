@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/widgets/block/title.rs`."><title>title.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/widgets/block/title.rs`."><title>title.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/widgets/block/</div>title.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -169,7 +170,21 @@
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
 <a href="#171" id="171">171</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! This module holds the [`Title`] element and its related configuration types.
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a></pre></div><pre class="rust"><code><span class="doccomment">//! This module holds the [`Title`] element and its related configuration types.
 //! A title is a piece of [`Block`](crate::widgets::Block) configuration.
 
 </span><span class="kw">use </span>strum::{Display, EnumString};
@@ -179,6 +194,17 @@
 <span class="doccomment">/// A [`Block`](crate::widgets::Block) title.
 ///
 /// It can be aligned (see [`Alignment`]) and positioned (see [`Position`]).
+///
+/// # Future Deprecation
+///
+/// This type is deprecated and will be removed in a future release. The reason for this is that the
+/// position of the title should be stored in the block itself, not in the title. The `Line` type
+/// has an alignment method that can be used to align the title. For more information see
+/// &lt;https://github.com/ratatui/ratatui/issues/738&gt;.
+///
+/// Use [`Line`] instead, when the position is not defined as part of the title. When a specific
+/// position is needed, use [`Block::title_top`](crate::widgets::Block::title_top) or
+/// [`Block::title_bottom`](crate::widgets::Block::title_bottom) instead.
 ///
 /// # Example
 ///
@@ -191,14 +217,14 @@
 ///
 /// Blue title on a white background (via [`Stylize`](crate::style::Stylize) trait).
 /// ```
-/// use ratatui::{prelude::*, widgets::block::*};
+/// use ratatui::{style::Stylize, widgets::block::Title};
 ///
 /// Title::from("Title".blue().on_white());
 /// ```
 ///
 /// Title with multiple styles (see [`Line`] and [`Stylize`](crate::style::Stylize)).
 /// ```
-/// use ratatui::{prelude::*, widgets::block::*};
+/// use ratatui::{style::Stylize, text::Line, widgets::block::Title};
 ///
 /// Title::from(Line::from(vec!["Q".white().underlined(), "uit".gray()]));
 /// ```
@@ -206,7 +232,7 @@
 /// Complete example
 /// ```
 /// use ratatui::{
-///     prelude::*,
+///     layout::Alignment,
 ///     widgets::{
 ///         block::{Position, Title},
 ///         Block,
@@ -244,7 +270,10 @@
 /// # Example
 ///
 /// ```
-/// use ratatui::widgets::{block::*, *};
+/// use ratatui::widgets::{
+///     block::{Position, Title},
+///     Block,
+/// };
 ///
 /// Block::new().title(Title::from("title").position(Position::Bottom));
 /// ```
@@ -259,7 +288,8 @@
     </span>Bottom,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Title&lt;<span class="lifetime">'a</span>&gt; {
+<span class="attr">#[deprecated = <span class="string">"use Block::title_top() or Block::title_bottom() instead. This will be removed in a future release."</span>]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Title&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Set the title content.
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>content&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: T) -&gt; <span class="self">Self

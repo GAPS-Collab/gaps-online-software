@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/crossterm-0.27.0/src/style.rs`."><title>style.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="crossterm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/crossterm-0.28.1/src/style.rs`."><title>style.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="crossterm" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">crossterm/</div>style.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -508,7 +509,117 @@
 <a href="#508" id="508">508</a>
 <a href="#509" id="509">509</a>
 <a href="#510" id="510">510</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! # Style
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a></pre></div><pre class="rust"><code><span class="doccomment">//! # Style
 //!
 //! The `style` module provides a functionality to apply attributes and colors on your text.
 //!
@@ -671,9 +782,23 @@
 ///
 /// This does not always provide a good result.
 </span><span class="kw">pub fn </span>available_color_count() -&gt; u16 {
-    env::var(<span class="string">"TERM"</span>)
-        .map(|x| <span class="kw">if </span>x.contains(<span class="string">"256color"</span>) { <span class="number">256 </span>} <span class="kw">else </span>{ <span class="number">8 </span>})
-        .unwrap_or(<span class="number">8</span>)
+    <span class="attr">#[cfg(windows)]
+    </span>{
+        <span class="comment">// Check if we're running in a pseudo TTY, which supports true color.
+        // Fall back to env vars otherwise for other terminals on Windows.
+        </span><span class="kw">if </span><span class="kw">crate</span>::ansi_support::supports_ansi() {
+            <span class="kw">return </span>u16::MAX;
+        }
+    }
+
+    <span class="kw">const </span>DEFAULT: u16 = <span class="number">8</span>;
+    env::var(<span class="string">"COLORTERM"</span>)
+        .or_else(|<span class="kw">_</span>| env::var(<span class="string">"TERM"</span>))
+        .map_or(DEFAULT, |x| <span class="kw">match </span>x {
+            <span class="kw">_ if </span>x.contains(<span class="string">"24bit"</span>) || x.contains(<span class="string">"truecolor"</span>) =&gt; u16::MAX,
+            <span class="kw">_ if </span>x.contains(<span class="string">"256"</span>) =&gt; <span class="number">256</span>,
+            <span class="kw">_ </span>=&gt; DEFAULT,
+        })
 }
 
 <span class="doccomment">/// Forces colored output on or off globally, overriding NO_COLOR.
@@ -789,13 +914,24 @@
 
 <span class="kw">impl </span>Command <span class="kw">for </span>SetColors {
     <span class="kw">fn </span>write_ansi(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>fmt::Write) -&gt; fmt::Result {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(color) = <span class="self">self</span>.<span class="number">0</span>.foreground {
-            SetForegroundColor(color).write_ansi(f)<span class="question-mark">?</span>;
+        <span class="comment">// Writing both foreground and background colors in one command resulted in about 20% more
+        // FPS (20 to 24 fps) on a fullscreen (171x51) app that writes every cell with a different
+        // foreground and background color, compared to separately using the SetForegroundColor and
+        // SetBackgroundColor commands (iTerm2, M2 Macbook Pro). `Esc[38;5;&lt;fg&gt;mEsc[48;5;&lt;bg&gt;m` (16
+        // chars) vs `Esc[38;5;&lt;fg&gt;;48;5;&lt;bg&gt;m` (14 chars)
+        </span><span class="kw">match </span>(<span class="self">self</span>.<span class="number">0</span>.foreground, <span class="self">self</span>.<span class="number">0</span>.background) {
+            (<span class="prelude-val">Some</span>(fg), <span class="prelude-val">Some</span>(bg)) =&gt; {
+                <span class="macro">write!</span>(
+                    f,
+                    <span class="macro">csi!</span>(<span class="string">"{};{}m"</span>),
+                    Colored::ForegroundColor(fg),
+                    Colored::BackgroundColor(bg)
+                )
+            }
+            (<span class="prelude-val">Some</span>(fg), <span class="prelude-val">None</span>) =&gt; <span class="macro">write!</span>(f, <span class="macro">csi!</span>(<span class="string">"{}m"</span>), Colored::ForegroundColor(fg)),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(bg)) =&gt; <span class="macro">write!</span>(f, <span class="macro">csi!</span>(<span class="string">"{}m"</span>), Colored::BackgroundColor(bg)),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(()),
         }
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(color) = <span class="self">self</span>.<span class="number">0</span>.background {
-            SetBackgroundColor(color).write_ansi(f)<span class="question-mark">?</span>;
-        }
-        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="attr">#[cfg(windows)]
@@ -1017,5 +1153,91 @@
 /// Gets the next element of `iter` and tries to parse it as a `u8`.
 </span><span class="kw">fn </span>parse_next_u8&lt;<span class="lifetime">'a</span>&gt;(iter: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
     iter.next().and_then(|s| s.parse().ok())
+}
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="comment">// On Windows many env var tests will fail so we need to conditionally check for ANSI support.
+    // This allows other terminals on Windows to still assert env var support.
+    </span><span class="macro">macro_rules!</span> skip_windows_ansi_supported {
+        () =&gt; {
+            <span class="attr">#[cfg(windows)]
+            </span>{
+                <span class="kw">if </span><span class="kw">crate</span>::ansi_support::supports_ansi() {
+                    <span class="kw">return</span>;
+                }
+            }
+        };
+    }
+
+    <span class="attr">#[cfg_attr(windows, test)]
+    #[cfg(windows)]
+    </span><span class="kw">fn </span>windows_always_truecolor() {
+        <span class="comment">// This should always be true on supported Windows 10+,
+        // but downlevel Windows clients and other terminals may fail `cargo test` otherwise.
+        </span><span class="kw">if </span><span class="kw">crate</span>::ansi_support::supports_ansi() {
+            <span class="macro">assert_eq!</span>(u16::MAX, available_color_count());
+        };
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>colorterm_overrides_term() {
+        <span class="macro">skip_windows_ansi_supported!</span>();
+        temp_env::with_vars(
+            [
+                (<span class="string">"COLORTERM"</span>, <span class="prelude-val">Some</span>(<span class="string">"truecolor"</span>)),
+                (<span class="string">"TERM"</span>, <span class="prelude-val">Some</span>(<span class="string">"xterm-256color"</span>)),
+            ],
+            || {
+                <span class="macro">assert_eq!</span>(u16::MAX, available_color_count());
+            },
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>term_24bits() {
+        <span class="macro">skip_windows_ansi_supported!</span>();
+        temp_env::with_vars(
+            [(<span class="string">"COLORTERM"</span>, <span class="prelude-val">None</span>), (<span class="string">"TERM"</span>, <span class="prelude-val">Some</span>(<span class="string">"xterm-24bits"</span>))],
+            || {
+                <span class="macro">assert_eq!</span>(u16::MAX, available_color_count());
+            },
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>term_256color() {
+        <span class="macro">skip_windows_ansi_supported!</span>();
+        temp_env::with_vars(
+            [(<span class="string">"COLORTERM"</span>, <span class="prelude-val">None</span>), (<span class="string">"TERM"</span>, <span class="prelude-val">Some</span>(<span class="string">"xterm-256color"</span>))],
+            || {
+                <span class="macro">assert_eq!</span>(<span class="number">256u16</span>, available_color_count());
+            },
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>default_color_count() {
+        <span class="macro">skip_windows_ansi_supported!</span>();
+        temp_env::with_vars([(<span class="string">"COLORTERM"</span>, <span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>str&gt;), (<span class="string">"TERM"</span>, <span class="prelude-val">None</span>)], || {
+            <span class="macro">assert_eq!</span>(<span class="number">8</span>, available_color_count());
+        });
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>unsupported_term_colorterm_values() {
+        <span class="macro">skip_windows_ansi_supported!</span>();
+        temp_env::with_vars(
+            [
+                (<span class="string">"COLORTERM"</span>, <span class="prelude-val">Some</span>(<span class="string">"gibberish"</span>)),
+                (<span class="string">"TERM"</span>, <span class="prelude-val">Some</span>(<span class="string">"gibberish"</span>)),
+            ],
+            || {
+                <span class="macro">assert_eq!</span>(<span class="number">8u16</span>, available_color_count());
+            },
+        );
+    }
 }
 </code></pre></div></section></main></body></html>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/compact_str-0.7.1/src/repr/iter.rs`."><title>iter.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="compact_str" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/compact_str-0.8.0/src/repr/iter.rs`."><title>iter.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="compact_str" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">compact_str/repr/</div>iter.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -186,83 +187,38 @@
 <a href="#186" id="186">186</a>
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
-<a href="#201" id="201">201</a>
-<a href="#202" id="202">202</a>
-<a href="#203" id="203">203</a>
-<a href="#204" id="204">204</a>
-<a href="#205" id="205">205</a>
-<a href="#206" id="206">206</a>
-<a href="#207" id="207">207</a>
-<a href="#208" id="208">208</a>
-<a href="#209" id="209">209</a>
-<a href="#210" id="210">210</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Implementations of the [`FromIterator`] trait to make building [`Repr`]s more ergonomic
+<a href="#189" id="189">189</a></pre></div><pre class="rust"><code><span class="doccomment">//! Implementations of the [`FromIterator`] trait to make building [`Repr`]s more ergonomic
 
-</span><span class="kw">use </span>core::iter::FromIterator;
-<span class="kw">use </span>std::borrow::Cow;
+</span><span class="kw">use </span>alloc::borrow::Cow;
+<span class="kw">use </span>alloc::boxed::Box;
+<span class="kw">use </span>alloc::string::String;
 
 <span class="kw">use super</span>::{
     InlineBuffer,
     Repr,
+    EMPTY,
     MAX_SIZE,
 };
-<span class="kw">use </span><span class="kw">crate</span>::CompactString;
+<span class="kw">use crate</span>::{
+    CompactString,
+    UnwrapWithMsg,
+};
 
 <span class="kw">impl </span>FromIterator&lt;char&gt; <span class="kw">for </span>Repr {
-    <span class="kw">fn </span>from_iter&lt;T: IntoIterator&lt;Item = char&gt;&gt;(iter: T) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>iter = iter.into_iter();
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>from_iter&lt;T: IntoIterator&lt;Item = char&gt;&gt;(iter: T) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>iter = iter.into_iter();
 
-        <span class="comment">// If the size hint indicates we can't store this inline, then create a heap string
-        </span><span class="kw">let </span>(size_hint, <span class="kw">_</span>) = iter.size_hint();
-        <span class="kw">if </span>size_hint &gt; MAX_SIZE {
-            <span class="kw">return </span>Repr::from_string(iter.collect(), <span class="bool-val">true</span>);
+        <span class="kw">let </span>(lower_bound, <span class="kw">_</span>) = iter.size_hint();
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="kw">match </span>Repr::with_capacity(lower_bound) {
+            <span class="prelude-val">Ok</span>(this) =&gt; this,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; EMPTY, <span class="comment">// Ignore the error and hope that the lower_bound is incorrect.
+        </span>};
+
+        <span class="kw">for </span>c <span class="kw">in </span>iter {
+            this.push_str(c.encode_utf8(<span class="kw-2">&amp;mut </span>[<span class="number">0</span>; <span class="number">4</span>]));
         }
-
-        <span class="comment">// Otherwise, continuously pull chars from the iterator
-        </span><span class="kw">let </span><span class="kw-2">mut </span>curr_len = <span class="number">0</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>inline_buf = InlineBuffer::new_const(<span class="string">""</span>);
-        <span class="kw">while let </span><span class="prelude-val">Some</span>(c) = iter.next() {
-            <span class="kw">let </span>char_len = c.len_utf8();
-
-            <span class="comment">// If this new character is too large to fit into the inline buffer, then create a heap
-            // string
-            </span><span class="kw">if </span>char_len + curr_len &gt; MAX_SIZE {
-                <span class="kw">let </span>(min_remaining, <span class="kw">_</span>) = iter.size_hint();
-                <span class="kw">let </span><span class="kw-2">mut </span>string = String::with_capacity(char_len + curr_len + min_remaining);
-
-                <span class="comment">// push existing characters onto the heap
-                // SAFETY: `inline_buf` has been filled with `char`s which are valid UTF-8
-                </span>string
-                    .push_str(<span class="kw">unsafe </span>{ core::str::from_utf8_unchecked(<span class="kw-2">&amp;</span>inline_buf.<span class="number">0</span>[..curr_len]) });
-                <span class="comment">// push current char onto the heap
-                </span>string.push(c);
-                <span class="comment">// extend heap with remaining characters
-                </span>string.extend(iter);
-
-                <span class="kw">return </span>Repr::from_string(string, <span class="bool-val">true</span>);
-            }
-
-            <span class="comment">// write the current char into a slice of the unoccupied space
-            </span>c.encode_utf8(<span class="kw-2">&amp;mut </span>inline_buf.<span class="number">0</span>[curr_len..]);
-            curr_len += char_len;
-        }
-
-        <span class="comment">// SAFETY: Everything we just pushed onto the buffer is a `str` which is valid UTF-8
-        </span><span class="kw">unsafe </span>{ inline_buf.set_len(curr_len) }
-
-        Repr::from_inline(inline_buf)
+        this
     }
 }
 
@@ -303,7 +259,7 @@
             <span class="comment">// extend heap with remaining strings
             </span>string.extend(iter);
 
-            <span class="kw">return </span>Repr::from_string(string, <span class="bool-val">true</span>);
+            <span class="kw">return </span>Repr::from_string(string, <span class="bool-val">true</span>).unwrap_with_msg();
         }
 
         <span class="comment">// write the current string into a slice of the unoccupied space
@@ -349,6 +305,8 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>alloc::string::String;
+
     <span class="kw">use </span><span class="kw">super</span>::Repr;
 
     <span class="attr">#[test]

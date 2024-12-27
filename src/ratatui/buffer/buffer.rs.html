@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/buffer/buffer.rs`."><title>buffer.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/buffer/buffer.rs`."><title>buffer.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/buffer/</div>buffer.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -932,12 +933,362 @@
 <a href="#932" id="932">932</a>
 <a href="#933" id="933">933</a>
 <a href="#934" id="934">934</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
+<a href="#935" id="935">935</a>
+<a href="#936" id="936">936</a>
+<a href="#937" id="937">937</a>
+<a href="#938" id="938">938</a>
+<a href="#939" id="939">939</a>
+<a href="#940" id="940">940</a>
+<a href="#941" id="941">941</a>
+<a href="#942" id="942">942</a>
+<a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+<a href="#1057" id="1057">1057</a>
+<a href="#1058" id="1058">1058</a>
+<a href="#1059" id="1059">1059</a>
+<a href="#1060" id="1060">1060</a>
+<a href="#1061" id="1061">1061</a>
+<a href="#1062" id="1062">1062</a>
+<a href="#1063" id="1063">1063</a>
+<a href="#1064" id="1064">1064</a>
+<a href="#1065" id="1065">1065</a>
+<a href="#1066" id="1066">1066</a>
+<a href="#1067" id="1067">1067</a>
+<a href="#1068" id="1068">1068</a>
+<a href="#1069" id="1069">1069</a>
+<a href="#1070" id="1070">1070</a>
+<a href="#1071" id="1071">1071</a>
+<a href="#1072" id="1072">1072</a>
+<a href="#1073" id="1073">1073</a>
+<a href="#1074" id="1074">1074</a>
+<a href="#1075" id="1075">1075</a>
+<a href="#1076" id="1076">1076</a>
+<a href="#1077" id="1077">1077</a>
+<a href="#1078" id="1078">1078</a>
+<a href="#1079" id="1079">1079</a>
+<a href="#1080" id="1080">1080</a>
+<a href="#1081" id="1081">1081</a>
+<a href="#1082" id="1082">1082</a>
+<a href="#1083" id="1083">1083</a>
+<a href="#1084" id="1084">1084</a>
+<a href="#1085" id="1085">1085</a>
+<a href="#1086" id="1086">1086</a>
+<a href="#1087" id="1087">1087</a>
+<a href="#1088" id="1088">1088</a>
+<a href="#1089" id="1089">1089</a>
+<a href="#1090" id="1090">1090</a>
+<a href="#1091" id="1091">1091</a>
+<a href="#1092" id="1092">1092</a>
+<a href="#1093" id="1093">1093</a>
+<a href="#1094" id="1094">1094</a>
+<a href="#1095" id="1095">1095</a>
+<a href="#1096" id="1096">1096</a>
+<a href="#1097" id="1097">1097</a>
+<a href="#1098" id="1098">1098</a>
+<a href="#1099" id="1099">1099</a>
+<a href="#1100" id="1100">1100</a>
+<a href="#1101" id="1101">1101</a>
+<a href="#1102" id="1102">1102</a>
+<a href="#1103" id="1103">1103</a>
+<a href="#1104" id="1104">1104</a>
+<a href="#1105" id="1105">1105</a>
+<a href="#1106" id="1106">1106</a>
+<a href="#1107" id="1107">1107</a>
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
+<a href="#1112" id="1112">1112</a>
+<a href="#1113" id="1113">1113</a>
+<a href="#1114" id="1114">1114</a>
+<a href="#1115" id="1115">1115</a>
+<a href="#1116" id="1116">1116</a>
+<a href="#1117" id="1117">1117</a>
+<a href="#1118" id="1118">1118</a>
+<a href="#1119" id="1119">1119</a>
+<a href="#1120" id="1120">1120</a>
+<a href="#1121" id="1121">1121</a>
+<a href="#1122" id="1122">1122</a>
+<a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
+<a href="#1126" id="1126">1126</a>
+<a href="#1127" id="1127">1127</a>
+<a href="#1128" id="1128">1128</a>
+<a href="#1129" id="1129">1129</a>
+<a href="#1130" id="1130">1130</a>
+<a href="#1131" id="1131">1131</a>
+<a href="#1132" id="1132">1132</a>
+<a href="#1133" id="1133">1133</a>
+<a href="#1134" id="1134">1134</a>
+<a href="#1135" id="1135">1135</a>
+<a href="#1136" id="1136">1136</a>
+<a href="#1137" id="1137">1137</a>
+<a href="#1138" id="1138">1138</a>
+<a href="#1139" id="1139">1139</a>
+<a href="#1140" id="1140">1140</a>
+<a href="#1141" id="1141">1141</a>
+<a href="#1142" id="1142">1142</a>
+<a href="#1143" id="1143">1143</a>
+<a href="#1144" id="1144">1144</a>
+<a href="#1145" id="1145">1145</a>
+<a href="#1146" id="1146">1146</a>
+<a href="#1147" id="1147">1147</a>
+<a href="#1148" id="1148">1148</a>
+<a href="#1149" id="1149">1149</a>
+<a href="#1150" id="1150">1150</a>
+<a href="#1151" id="1151">1151</a>
+<a href="#1152" id="1152">1152</a>
+<a href="#1153" id="1153">1153</a>
+<a href="#1154" id="1154">1154</a>
+<a href="#1155" id="1155">1155</a>
+<a href="#1156" id="1156">1156</a>
+<a href="#1157" id="1157">1157</a>
+<a href="#1158" id="1158">1158</a>
+<a href="#1159" id="1159">1159</a>
+<a href="#1160" id="1160">1160</a>
+<a href="#1161" id="1161">1161</a>
+<a href="#1162" id="1162">1162</a>
+<a href="#1163" id="1163">1163</a>
+<a href="#1164" id="1164">1164</a>
+<a href="#1165" id="1165">1165</a>
+<a href="#1166" id="1166">1166</a>
+<a href="#1167" id="1167">1167</a>
+<a href="#1168" id="1168">1168</a>
+<a href="#1169" id="1169">1169</a>
+<a href="#1170" id="1170">1170</a>
+<a href="#1171" id="1171">1171</a>
+<a href="#1172" id="1172">1172</a>
+<a href="#1173" id="1173">1173</a>
+<a href="#1174" id="1174">1174</a>
+<a href="#1175" id="1175">1175</a>
+<a href="#1176" id="1176">1176</a>
+<a href="#1177" id="1177">1177</a>
+<a href="#1178" id="1178">1178</a>
+<a href="#1179" id="1179">1179</a>
+<a href="#1180" id="1180">1180</a>
+<a href="#1181" id="1181">1181</a>
+<a href="#1182" id="1182">1182</a>
+<a href="#1183" id="1183">1183</a>
+<a href="#1184" id="1184">1184</a>
+<a href="#1185" id="1185">1185</a>
+<a href="#1186" id="1186">1186</a>
+<a href="#1187" id="1187">1187</a>
+<a href="#1188" id="1188">1188</a>
+<a href="#1189" id="1189">1189</a>
+<a href="#1190" id="1190">1190</a>
+<a href="#1191" id="1191">1191</a>
+<a href="#1192" id="1192">1192</a>
+<a href="#1193" id="1193">1193</a>
+<a href="#1194" id="1194">1194</a>
+<a href="#1195" id="1195">1195</a>
+<a href="#1196" id="1196">1196</a>
+<a href="#1197" id="1197">1197</a>
+<a href="#1198" id="1198">1198</a>
+<a href="#1199" id="1199">1199</a>
+<a href="#1200" id="1200">1200</a>
+<a href="#1201" id="1201">1201</a>
+<a href="#1202" id="1202">1202</a>
+<a href="#1203" id="1203">1203</a>
+<a href="#1204" id="1204">1204</a>
+<a href="#1205" id="1205">1205</a>
+<a href="#1206" id="1206">1206</a>
+<a href="#1207" id="1207">1207</a>
+<a href="#1208" id="1208">1208</a>
+<a href="#1209" id="1209">1209</a>
+<a href="#1210" id="1210">1210</a>
+<a href="#1211" id="1211">1211</a>
+<a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a>
+<a href="#1214" id="1214">1214</a>
+<a href="#1215" id="1215">1215</a>
+<a href="#1216" id="1216">1216</a>
+<a href="#1217" id="1217">1217</a>
+<a href="#1218" id="1218">1218</a>
+<a href="#1219" id="1219">1219</a>
+<a href="#1220" id="1220">1220</a>
+<a href="#1221" id="1221">1221</a>
+<a href="#1222" id="1222">1222</a>
+<a href="#1223" id="1223">1223</a>
+<a href="#1224" id="1224">1224</a>
+<a href="#1225" id="1225">1225</a>
+<a href="#1226" id="1226">1226</a>
+<a href="#1227" id="1227">1227</a>
+<a href="#1228" id="1228">1228</a>
+<a href="#1229" id="1229">1229</a>
+<a href="#1230" id="1230">1230</a>
+<a href="#1231" id="1231">1231</a>
+<a href="#1232" id="1232">1232</a>
+<a href="#1233" id="1233">1233</a>
+<a href="#1234" id="1234">1234</a>
+<a href="#1235" id="1235">1235</a>
+<a href="#1236" id="1236">1236</a>
+<a href="#1237" id="1237">1237</a>
+<a href="#1238" id="1238">1238</a>
+<a href="#1239" id="1239">1239</a>
+<a href="#1240" id="1240">1240</a>
+<a href="#1241" id="1241">1241</a>
+<a href="#1242" id="1242">1242</a>
+<a href="#1243" id="1243">1243</a>
+<a href="#1244" id="1244">1244</a>
+<a href="#1245" id="1245">1245</a>
+<a href="#1246" id="1246">1246</a>
+<a href="#1247" id="1247">1247</a>
+<a href="#1248" id="1248">1248</a>
+<a href="#1249" id="1249">1249</a>
+<a href="#1250" id="1250">1250</a>
+<a href="#1251" id="1251">1251</a>
+<a href="#1252" id="1252">1252</a>
+<a href="#1253" id="1253">1253</a>
+<a href="#1254" id="1254">1254</a>
+<a href="#1255" id="1255">1255</a>
+<a href="#1256" id="1256">1256</a>
+<a href="#1257" id="1257">1257</a>
+<a href="#1258" id="1258">1258</a>
+<a href="#1259" id="1259">1259</a>
+<a href="#1260" id="1260">1260</a>
+<a href="#1261" id="1261">1261</a>
+<a href="#1262" id="1262">1262</a>
+<a href="#1263" id="1263">1263</a>
+<a href="#1264" id="1264">1264</a>
+<a href="#1265" id="1265">1265</a>
+<a href="#1266" id="1266">1266</a>
+<a href="#1267" id="1267">1267</a>
+<a href="#1268" id="1268">1268</a>
+<a href="#1269" id="1269">1269</a>
+<a href="#1270" id="1270">1270</a>
+<a href="#1271" id="1271">1271</a>
+<a href="#1272" id="1272">1272</a>
+<a href="#1273" id="1273">1273</a>
+<a href="#1274" id="1274">1274</a>
+<a href="#1275" id="1275">1275</a>
+<a href="#1276" id="1276">1276</a>
+<a href="#1277" id="1277">1277</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::{
+    fmt,
+    ops::{Index, IndexMut},
+};
 
 <span class="kw">use </span>unicode_segmentation::UnicodeSegmentation;
 <span class="kw">use </span>unicode_width::UnicodeWidthStr;
 
-<span class="kw">use crate</span>::{buffer::Cell, prelude::<span class="kw-2">*</span>};
+<span class="kw">use crate</span>::{
+    buffer::Cell,
+    layout::{Position, Rect},
+    style::Style,
+    text::{Line, Span},
+};
 
 <span class="doccomment">/// A buffer that maps to the desired content of the terminal after the draw call
 ///
@@ -949,16 +1300,34 @@
 /// # Examples:
 ///
 /// ```
-/// use ratatui::{buffer::Cell, prelude::*};
+/// use ratatui::{
+///     buffer::{Buffer, Cell},
+///     layout::{Position, Rect},
+///     style::{Color, Style},
+/// };
 ///
+/// # fn foo() -&gt; Option&lt;()&gt; {
 /// let mut buf = Buffer::empty(Rect {
 ///     x: 0,
 ///     y: 0,
 ///     width: 10,
 ///     height: 5,
 /// });
-/// buf.get_mut(0, 2).set_symbol("x");
-/// assert_eq!(buf.get(0, 2).symbol(), "x");
+///
+/// // indexing using Position
+/// buf[Position { x: 0, y: 0 }].set_symbol("A");
+/// assert_eq!(buf[Position { x: 0, y: 0 }].symbol(), "A");
+///
+/// // indexing using (x, y) tuple (which is converted to Position)
+/// buf[(0, 1)].set_symbol("B");
+/// assert_eq!(buf[(0, 1)].symbol(), "x");
+///
+/// // getting an Option instead of panicking if the position is outside the buffer
+/// let cell = buf.cell_mut(Position { x: 0, y: 2 })?;
+/// cell.set_symbol("C");
+///
+/// let cell = buf.cell(Position { x: 0, y: 2 })?;
+/// assert_eq!(cell.symbol(), "C");
 ///
 /// buf.set_string(
 ///     3,
@@ -966,13 +1335,12 @@
 ///     "string",
 ///     Style::default().fg(Color::Red).bg(Color::White),
 /// );
-/// let cell = buf.get(5, 0);
+/// let cell = &amp;buf[(5, 0)]; // cannot move out of buf, so we borrow it
 /// assert_eq!(cell.symbol(), "r");
 /// assert_eq!(cell.fg, Color::Red);
 /// assert_eq!(cell.bg, Color::White);
-///
-/// buf.get_mut(5, 0).set_char('x');
-/// assert_eq!(buf.get(5, 0).symbol(), "x");
+/// # Some(())
+/// # }
 /// ```
 </span><span class="attr">#[derive(Default, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = <span class="string">"serde"</span>, derive(serde::Serialize, serde::Deserialize))]
@@ -1026,18 +1394,107 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.area
     }
 
-    <span class="doccomment">/// Returns a reference to Cell at the given coordinates
+    <span class="doccomment">/// Returns a reference to the [`Cell`] at the given coordinates
+    ///
+    /// Callers should use [`Buffer[]`](Self::index) or [`Buffer::cell`] instead of this method.
+    ///
+    /// Note: idiomatically methods named `get` usually return `Option&lt;&amp;T&gt;`, but this method panics
+    /// instead. This is kept for backwards compatibility. See [`cell`](Self::cell) for a safe
+    /// alternative.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the index is out of bounds.
     </span><span class="attr">#[track_caller]
+    #[deprecated(note = <span class="string">"Use Buffer[] or Buffer::cell instead"</span>)]
+    #[must_use]
     </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, x: u16, y: u16) -&gt; <span class="kw-2">&amp;</span>Cell {
         <span class="kw">let </span>i = <span class="self">self</span>.index_of(x, y);
         <span class="kw-2">&amp;</span><span class="self">self</span>.content[i]
     }
 
-    <span class="doccomment">/// Returns a mutable reference to Cell at the given coordinates
+    <span class="doccomment">/// Returns a mutable reference to the [`Cell`] at the given coordinates.
+    ///
+    /// Callers should use [`Buffer[]`](Self::index_mut) or [`Buffer::cell_mut`] instead of this
+    /// method.
+    ///
+    /// Note: idiomatically methods named `get_mut` usually return `Option&lt;&amp;mut T&gt;`, but this method
+    /// panics instead. This is kept for backwards compatibility. See [`cell_mut`](Self::cell_mut)
+    /// for a safe alternative.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the position is outside the `Buffer`'s area.
     </span><span class="attr">#[track_caller]
+    #[deprecated(note = <span class="string">"Use Buffer[] or Buffer::cell_mut instead"</span>)]
+    #[must_use]
     </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u16, y: u16) -&gt; <span class="kw-2">&amp;mut </span>Cell {
         <span class="kw">let </span>i = <span class="self">self</span>.index_of(x, y);
         <span class="kw-2">&amp;mut </span><span class="self">self</span>.content[i]
+    }
+
+    <span class="doccomment">/// Returns a reference to the [`Cell`] at the given position or [`None`] if the position is
+    /// outside the `Buffer`'s area.
+    ///
+    /// This method accepts any value that can be converted to [`Position`] (e.g. `(x, y)` or
+    /// `Position::new(x, y)`).
+    ///
+    /// For a method that panics when the position is outside the buffer instead of returning
+    /// `None`, use [`Buffer[]`](Self::index).
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use ratatui::{
+    ///     buffer::{Buffer, Cell},
+    ///     layout::{Position, Rect},
+    /// };
+    ///
+    /// let mut buffer = Buffer::empty(Rect::new(0, 0, 10, 10));
+    ///
+    /// assert_eq!(buffer.cell(Position::new(0, 0)), Some(&amp;Cell::default()));
+    /// assert_eq!(buffer.cell(Position::new(10, 10)), None);
+    /// assert_eq!(buffer.cell((0, 0)), Some(&amp;Cell::default()));
+    /// assert_eq!(buffer.cell((10, 10)), None);
+    /// ```
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>cell&lt;P: Into&lt;Position&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, position: P) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Cell&gt; {
+        <span class="kw">let </span>position = position.into();
+        <span class="kw">let </span>index = <span class="self">self</span>.index_of_opt(position)<span class="question-mark">?</span>;
+        <span class="self">self</span>.content.get(index)
+    }
+
+    <span class="doccomment">/// Returns a mutable reference to the [`Cell`] at the given position or [`None`] if the
+    /// position is outside the `Buffer`'s area.
+    ///
+    /// This method accepts any value that can be converted to [`Position`] (e.g. `(x, y)` or
+    /// `Position::new(x, y)`).
+    ///
+    /// For a method that panics when the position is outside the buffer instead of returning
+    /// `None`, use [`Buffer[]`](Self::index_mut).
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use ratatui::{
+    ///     buffer::{Buffer, Cell},
+    ///     layout::{Position, Rect},
+    ///     style::{Color, Style},
+    /// };
+    /// let mut buffer = Buffer::empty(Rect::new(0, 0, 10, 10));
+    ///
+    /// if let Some(cell) = buffer.cell_mut(Position::new(0, 0)) {
+    ///     cell.set_symbol("A");
+    /// }
+    /// if let Some(cell) = buffer.cell_mut((0, 0)) {
+    ///     cell.set_style(Style::default().fg(Color::Red));
+    /// }
+    /// ```
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>cell_mut&lt;P: Into&lt;Position&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, position: P) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Cell&gt; {
+        <span class="kw">let </span>position = position.into();
+        <span class="kw">let </span>index = <span class="self">self</span>.index_of_opt(position)<span class="question-mark">?</span>;
+        <span class="self">self</span>.content.get_mut(index)
     }
 
     <span class="doccomment">/// Returns the index in the `Vec&lt;Cell&gt;` for the given global (x, y) coordinates.
@@ -1047,9 +1504,9 @@
     /// # Examples
     ///
     /// ```
-    /// # use ratatui::prelude::*;
-    /// let rect = Rect::new(200, 100, 10, 10);
-    /// let buffer = Buffer::empty(rect);
+    /// use ratatui::{buffer::Buffer, layout::Rect};
+    ///
+    /// let buffer = Buffer::empty(Rect::new(200, 100, 10, 10));
     /// // Global coordinates to the top corner of this buffer's area
     /// assert_eq!(buffer.index_of(200, 100), 0);
     /// ```
@@ -1059,24 +1516,40 @@
     /// Panics when given an coordinate that is outside of this Buffer's area.
     ///
     /// ```should_panic
-    /// # use ratatui::prelude::*;
-    /// let rect = Rect::new(200, 100, 10, 10);
-    /// let buffer = Buffer::empty(rect);
+    /// use ratatui::{buffer::Buffer, layout::Rect};
+    ///
+    /// let buffer = Buffer::empty(Rect::new(200, 100, 10, 10));
     /// // Top coordinate is outside of the buffer in global coordinate space, as the Buffer's area
     /// // starts at (200, 100).
     /// buffer.index_of(0, 0); // Panics
     /// ```
     </span><span class="attr">#[track_caller]
+    #[must_use]
     </span><span class="kw">pub fn </span>index_of(<span class="kw-2">&amp;</span><span class="self">self</span>, x: u16, y: u16) -&gt; usize {
-        <span class="macro">debug_assert!</span>(
-            x &gt;= <span class="self">self</span>.area.left()
-                &amp;&amp; x &lt; <span class="self">self</span>.area.right()
-                &amp;&amp; y &gt;= <span class="self">self</span>.area.top()
-                &amp;&amp; y &lt; <span class="self">self</span>.area.bottom(),
-            <span class="string">"Trying to access position outside the buffer: x={x}, y={y}, area={:?}"</span>,
-            <span class="self">self</span>.area
-        );
-        ((y - <span class="self">self</span>.area.y) * <span class="self">self</span>.area.width + (x - <span class="self">self</span>.area.x)) <span class="kw">as </span>usize
+        <span class="self">self</span>.index_of_opt(Position { x, y }).unwrap_or_else(|| {
+            <span class="macro">panic!</span>(
+                <span class="string">"index outside of buffer: the area is {area:?} but index is ({x}, {y})"</span>,
+                area = <span class="self">self</span>.area,
+            )
+        })
+    }
+
+    <span class="doccomment">/// Returns the index in the `Vec&lt;Cell&gt;` for the given global (x, y) coordinates.
+    ///
+    /// Returns `None` if the given coordinates are outside of the Buffer's area.
+    ///
+    /// Note that this is private because of &lt;https://github.com/ratatui/ratatui/issues/1122&gt;
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">const fn </span>index_of_opt(<span class="kw-2">&amp;</span><span class="self">self</span>, position: Position) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="kw">let </span>area = <span class="self">self</span>.area;
+        <span class="kw">if </span>!area.contains(position) {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+        <span class="comment">// remove offset
+        </span><span class="kw">let </span>y = (position.y - <span class="self">self</span>.area.y) <span class="kw">as </span>usize;
+        <span class="kw">let </span>x = (position.x - <span class="self">self</span>.area.x) <span class="kw">as </span>usize;
+        <span class="kw">let </span>width = <span class="self">self</span>.area.width <span class="kw">as </span>usize;
+        <span class="prelude-val">Some</span>(y * width + x)
     }
 
     <span class="doccomment">/// Returns the (global) coordinates of a cell given its index
@@ -1086,7 +1559,8 @@
     /// # Examples
     ///
     /// ```
-    /// # use ratatui::prelude::*;
+    /// use ratatui::{buffer::Buffer, layout::Rect};
+    ///
     /// let rect = Rect::new(200, 100, 10, 10);
     /// let buffer = Buffer::empty(rect);
     /// assert_eq!(buffer.pos_of(0), (200, 100));
@@ -1098,12 +1572,14 @@
     /// Panics when given an index that is outside the Buffer's content.
     ///
     /// ```should_panic
-    /// # use ratatui::prelude::*;
+    /// use ratatui::{buffer::Buffer, layout::Rect};
+    ///
     /// let rect = Rect::new(0, 0, 10, 10); // 100 cells in total
     /// let buffer = Buffer::empty(rect);
     /// // Index 100 is the 101th cell, which lies outside of the area of this Buffer.
     /// buffer.pos_of(100); // Panics
     /// ```
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>pos_of(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; (u16, u16) {
         <span class="macro">debug_assert!</span>(
             i &lt; <span class="self">self</span>.content.len(),
@@ -1126,7 +1602,7 @@
     }
 
     <span class="doccomment">/// Print at most the first n characters of a string if enough space is available
-    /// until the end of the line.
+    /// until the end of the line. Skips zero-width graphemes and control characters.
     ///
     /// Use [`Buffer::set_string`] when the maximum amount of characters can be printed.
     </span><span class="kw">pub fn </span>set_stringn&lt;T, S&gt;(
@@ -1144,6 +1620,7 @@
         <span class="kw">let </span>max_width = max_width.try_into().unwrap_or(u16::MAX);
         <span class="kw">let </span><span class="kw-2">mut </span>remaining_width = <span class="self">self</span>.area.right().saturating_sub(x).min(max_width);
         <span class="kw">let </span>graphemes = UnicodeSegmentation::graphemes(string.as_ref(), <span class="bool-val">true</span>)
+            .filter(|symbol| !symbol.contains(|char: char| char.is_control()))
             .map(|symbol| (symbol, symbol.width() <span class="kw">as </span>u16))
             .filter(|(_symbol, width)| <span class="kw-2">*</span>width &gt; <span class="number">0</span>)
             .map_while(|(symbol, width)| {
@@ -1152,12 +1629,12 @@
             });
         <span class="kw">let </span>style = style.into();
         <span class="kw">for </span>(symbol, width) <span class="kw">in </span>graphemes {
-            <span class="self">self</span>.get_mut(x, y).set_symbol(symbol).set_style(style);
+            <span class="self">self</span>[(x, y)].set_symbol(symbol).set_style(style);
             <span class="kw">let </span>next_symbol = x + width;
             x += <span class="number">1</span>;
             <span class="comment">// Reset following cells if multi-width (they would be hidden by the grapheme),
             </span><span class="kw">while </span>x &lt; next_symbol {
-                <span class="self">self</span>.get_mut(x, y).reset();
+                <span class="self">self</span>[(x, y)].reset();
                 x += <span class="number">1</span>;
             }
         }
@@ -1195,12 +1672,14 @@
     ///
     /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
     /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
+    /// [`Color`]: crate::style::Color
     </span><span class="kw">pub fn </span>set_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, area: Rect, style: S) {
         <span class="kw">let </span>style = style.into();
         <span class="kw">let </span>area = <span class="self">self</span>.area.intersection(area);
         <span class="kw">for </span>y <span class="kw">in </span>area.top()..area.bottom() {
             <span class="kw">for </span>x <span class="kw">in </span>area.left()..area.right() {
-                <span class="self">self</span>.get_mut(x, y).set_style(style);
+                <span class="self">self</span>[(x, y)].set_style(style);
             }
         }
     }
@@ -1306,6 +1785,68 @@
     }
 }
 
+<span class="kw">impl</span>&lt;P: Into&lt;Position&gt;&gt; Index&lt;P&gt; <span class="kw">for </span>Buffer {
+    <span class="kw">type </span>Output = Cell;
+
+    <span class="doccomment">/// Returns a reference to the [`Cell`] at the given position.
+    ///
+    /// This method accepts any value that can be converted to [`Position`] (e.g. `(x, y)` or
+    /// `Position::new(x, y)`).
+    ///
+    /// # Panics
+    ///
+    /// May panic if the given position is outside the buffer's area. For a method that returns
+    /// `None` instead of panicking, use [`Buffer::cell`](Self::cell).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ratatui::{
+    ///     buffer::{Buffer, Cell},
+    ///     layout::{Position, Rect},
+    /// };
+    ///
+    /// let buf = Buffer::empty(Rect::new(0, 0, 10, 10));
+    /// let cell = &amp;buf[(0, 0)];
+    /// let cell = &amp;buf[Position::new(0, 0)];
+    /// ```
+    </span><span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, position: P) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
+        <span class="kw">let </span>position = position.into();
+        <span class="kw">let </span>index = <span class="self">self</span>.index_of(position.x, position.y);
+        <span class="kw-2">&amp;</span><span class="self">self</span>.content[index]
+    }
+}
+
+<span class="kw">impl</span>&lt;P: Into&lt;Position&gt;&gt; IndexMut&lt;P&gt; <span class="kw">for </span>Buffer {
+    <span class="doccomment">/// Returns a mutable reference to the [`Cell`] at the given position.
+    ///
+    /// This method accepts any value that can be converted to [`Position`] (e.g. `(x, y)` or
+    /// `Position::new(x, y)`).
+    ///
+    /// # Panics
+    ///
+    /// May panic if the given position is outside the buffer's area. For a method that returns
+    /// `None` instead of panicking, use [`Buffer::cell_mut`](Self::cell_mut).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ratatui::{
+    ///     buffer::{Buffer, Cell},
+    ///     layout::{Position, Rect},
+    /// };
+    ///
+    /// let mut buf = Buffer::empty(Rect::new(0, 0, 10, 10));
+    /// buf[(0, 0)].set_symbol("A");
+    /// buf[Position::new(0, 0)].set_symbol("B");
+    /// ```
+    </span><span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, position: P) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Output {
+        <span class="kw">let </span>position = position.into();
+        <span class="kw">let </span>index = <span class="self">self</span>.index_of(position.x, position.y);
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.content[index]
+    }
+}
+
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Buffer {
     <span class="doccomment">/// Writes a debug representation of the buffer to the given formatter.
     ///
@@ -1386,6 +1927,7 @@
     <span class="kw">use </span>rstest::{fixture, rstest};
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::style::{Color, Modifier, Stylize};
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>debug_empty_buffer() {
@@ -1487,17 +2029,90 @@
         <span class="kw">let </span>buf = Buffer::empty(rect);
 
         <span class="comment">// There are a total of 100 cells; zero-indexed means that 100 would be the 101st cell.
-        </span>buf.pos_of(<span class="number">100</span>);
+        </span><span class="kw">let _ </span>= buf.pos_of(<span class="number">100</span>);
+    }
+
+    <span class="attr">#[rstest]
+    #[case::left(<span class="number">9</span>, <span class="number">10</span>)]
+    #[case::top(<span class="number">10</span>, <span class="number">9</span>)]
+    #[case::right(<span class="number">20</span>, <span class="number">10</span>)]
+    #[case::bottom(<span class="number">10</span>, <span class="number">20</span>)]
+    #[should_panic(
+        expected = <span class="string">"index outside of buffer: the area is Rect { x: 10, y: 10, width: 10, height: 10 } but index is"
+    </span>)]
+    </span><span class="kw">fn </span>index_of_panics_on_out_of_bounds(<span class="attr">#[case] </span>x: u16, <span class="attr">#[case] </span>y: u16) {
+        <span class="kw">let _ </span>= Buffer::empty(Rect::new(<span class="number">10</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="number">10</span>)).index_of(x, y);
     }
 
     <span class="attr">#[test]
-    #[should_panic(expected = <span class="string">"outside the buffer"</span>)]
-    </span><span class="kw">fn </span>index_of_panics_on_out_of_bounds() {
-        <span class="kw">let </span>rect = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">10</span>);
-        <span class="kw">let </span>buf = Buffer::empty(rect);
+    </span><span class="kw">fn </span>test_cell() {
+        <span class="kw">let </span>buf = Buffer::with_lines([<span class="string">"Hello"</span>, <span class="string">"World"</span>]);
 
-        <span class="comment">// width is 10; zero-indexed means that 10 would be the 11th cell.
-        </span>buf.index_of(<span class="number">10</span>, <span class="number">0</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>expected = Cell::default();
+        expected.set_symbol(<span class="string">"H"</span>);
+
+        <span class="macro">assert_eq!</span>(buf.cell((<span class="number">0</span>, <span class="number">0</span>)), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>expected));
+        <span class="macro">assert_eq!</span>(buf.cell((<span class="number">10</span>, <span class="number">10</span>)), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(buf.cell(Position::new(<span class="number">0</span>, <span class="number">0</span>)), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>expected));
+        <span class="macro">assert_eq!</span>(buf.cell(Position::new(<span class="number">10</span>, <span class="number">10</span>)), <span class="prelude-val">None</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cell_mut() {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::with_lines([<span class="string">"Hello"</span>, <span class="string">"World"</span>]);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>expected = Cell::default();
+        expected.set_symbol(<span class="string">"H"</span>);
+
+        <span class="macro">assert_eq!</span>(buf.cell_mut((<span class="number">0</span>, <span class="number">0</span>)), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>expected));
+        <span class="macro">assert_eq!</span>(buf.cell_mut((<span class="number">10</span>, <span class="number">10</span>)), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(buf.cell_mut(Position::new(<span class="number">0</span>, <span class="number">0</span>)), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>expected));
+        <span class="macro">assert_eq!</span>(buf.cell_mut(Position::new(<span class="number">10</span>, <span class="number">10</span>)), <span class="prelude-val">None</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>index() {
+        <span class="kw">let </span>buf = Buffer::with_lines([<span class="string">"Hello"</span>, <span class="string">"World"</span>]);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>expected = Cell::default();
+        expected.set_symbol(<span class="string">"H"</span>);
+
+        <span class="macro">assert_eq!</span>(buf[(<span class="number">0</span>, <span class="number">0</span>)], expected);
+    }
+
+    <span class="attr">#[rstest]
+    #[case::left(<span class="number">9</span>, <span class="number">10</span>)]
+    #[case::top(<span class="number">10</span>, <span class="number">9</span>)]
+    #[case::right(<span class="number">20</span>, <span class="number">10</span>)]
+    #[case::bottom(<span class="number">10</span>, <span class="number">20</span>)]
+    #[should_panic(
+        expected = <span class="string">"index outside of buffer: the area is Rect { x: 10, y: 10, width: 10, height: 10 } but index is"
+    </span>)]
+    </span><span class="kw">fn </span>index_out_of_bounds_panics(<span class="attr">#[case] </span>x: u16, <span class="attr">#[case] </span>y: u16) {
+        <span class="kw">let </span>rect = Rect::new(<span class="number">10</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="number">10</span>);
+        <span class="kw">let </span>buf = Buffer::empty(rect);
+        <span class="kw">let _ </span>= buf[(x, y)];
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>index_mut() {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::with_lines([<span class="string">"Cat"</span>, <span class="string">"Dog"</span>]);
+        buf[(<span class="number">0</span>, <span class="number">0</span>)].set_symbol(<span class="string">"B"</span>);
+        buf[Position::new(<span class="number">0</span>, <span class="number">1</span>)].set_symbol(<span class="string">"L"</span>);
+        <span class="macro">assert_eq!</span>(buf, Buffer::with_lines([<span class="string">"Bat"</span>, <span class="string">"Log"</span>]));
+    }
+
+    <span class="attr">#[rstest]
+    #[case::left(<span class="number">9</span>, <span class="number">10</span>)]
+    #[case::top(<span class="number">10</span>, <span class="number">9</span>)]
+    #[case::right(<span class="number">20</span>, <span class="number">10</span>)]
+    #[case::bottom(<span class="number">10</span>, <span class="number">20</span>)]
+    #[should_panic(
+        expected = <span class="string">"index outside of buffer: the area is Rect { x: 10, y: 10, width: 10, height: 10 } but index is"
+    </span>)]
+    </span><span class="kw">fn </span>index_mut_out_of_bounds_panics(<span class="attr">#[case] </span>x: u16, <span class="attr">#[case] </span>y: u16) {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">10</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="number">10</span>));
+        buf[(x, y)].set_symbol(<span class="string">"A"</span>);
     }
 
     <span class="attr">#[test]
@@ -1864,6 +2479,77 @@
         buf.set_string(<span class="number">0</span>, <span class="number">0</span>, <span class="string">"foo"</span>, Style::new().red());
         buf.set_string(<span class="number">0</span>, <span class="number">1</span>, <span class="string">"bar"</span>, Style::new().blue());
         <span class="macro">assert_eq!</span>(buf, Buffer::with_lines([<span class="string">"foo"</span>.red(), <span class="string">"bar"</span>.blue()]));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>control_sequence_rendered_full() {
+        <span class="kw">let </span>text = <span class="string">"I \x1b[0;36mwas\x1b[0m here!"</span>;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::filled(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">25</span>, <span class="number">3</span>), Cell::new(<span class="string">"x"</span>));
+        buffer.set_string(<span class="number">1</span>, <span class="number">1</span>, text, Style::new());
+
+        <span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"xxxxxxxxxxxxxxxxxxxxxxxxx"</span>,
+            <span class="string">"xI [0;36mwas[0m here!xxxx"</span>,
+            <span class="string">"xxxxxxxxxxxxxxxxxxxxxxxxx"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>control_sequence_rendered_partially() {
+        <span class="kw">let </span>text = <span class="string">"I \x1b[0;36mwas\x1b[0m here!"</span>;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::filled(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">11</span>, <span class="number">3</span>), Cell::new(<span class="string">"x"</span>));
+        buffer.set_string(<span class="number">1</span>, <span class="number">1</span>, text, Style::new());
+
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>expected = Buffer::with_lines([
+            <span class="string">"xxxxxxxxxxx"</span>,
+            <span class="string">"xI [0;36mwa"</span>,
+            <span class="string">"xxxxxxxxxxx"</span>,
+        ]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
+    }
+
+    <span class="doccomment">/// Emojis normally contain various characters which should stay part of the Emoji.
+    /// This should work fine by utilizing unicode_segmentation but a testcase is probably helpful
+    /// due to the nature of never perfect Unicode implementations and all of its quirks.
+    </span><span class="attr">#[rstest]
+    </span><span class="comment">// Shrug without gender or skintone. Has a width of 2 like all emojis have.
+    </span><span class="attr">#[case::shrug(<span class="string">"🤷"</span>, <span class="string">"🤷xxxxx"</span>)]
+    </span><span class="comment">// Technically this is a (brown) bear, a zero-width joiner and a snowflake
+    // As it is joined its a single emoji and should therefore have a width of 2.
+    // Prior to unicode-width 0.2, this was incorrectly detected as width 4 for some reason
+    </span><span class="attr">#[case::polarbear(<span class="string">"🐻‍❄️"</span>, <span class="string">"🐻‍❄️xxxxx"</span>)]
+    </span><span class="comment">// Technically this is an eye, a zero-width joiner and a speech bubble
+    // Both eye and speech bubble include a 'display as emoji' variation selector
+    // Prior to unicode-width 0.2, this was incorrectly detected as width 4 for some reason
+    </span><span class="attr">#[case::eye_speechbubble(<span class="string">"👁️‍🗨️"</span>, <span class="string">"👁️‍🗨️xxxxx"</span>)]
+    </span><span class="kw">fn </span>renders_emoji(<span class="attr">#[case] </span>input: <span class="kw-2">&amp;</span>str, <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">use </span>unicode_width::UnicodeWidthChar;
+
+        <span class="macro">dbg!</span>(input);
+        <span class="macro">dbg!</span>(input.len());
+        <span class="macro">dbg!</span>(input
+            .graphemes(<span class="bool-val">true</span>)
+            .map(|symbol| (symbol, symbol.escape_unicode().to_string(), symbol.width()))
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;());
+        <span class="macro">dbg!</span>(input
+            .chars()
+            .map(|char| (
+                char,
+                char.escape_unicode().to_string(),
+                char.width(),
+                char.is_control()
+            ))
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;());
+
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::filled(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">7</span>, <span class="number">1</span>), Cell::new(<span class="string">"x"</span>));
+        buffer.set_string(<span class="number">0</span>, <span class="number">0</span>, input, Style::new());
+
+        <span class="kw">let </span>expected = Buffer::with_lines([expected]);
+        <span class="macro">assert_eq!</span>(buffer, expected);
     }
 }
 </code></pre></div></section></main></body></html>

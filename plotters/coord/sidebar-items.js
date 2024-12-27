@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["cartesian","combinators","ranged1d","ranged3d","types"],"struct":["Shift"],"trait":["CoordTranslate","ReverseCoordTranslate"]};

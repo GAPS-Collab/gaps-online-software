@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["AreaSeries","DashedLineSeries","DottedLineSeries","Histogram","LineSeries","PointSeries","SurfaceSeries"]};

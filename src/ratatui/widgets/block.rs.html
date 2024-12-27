@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/widgets/block.rs`."><title>block.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/widgets/block.rs`."><title>block.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/widgets/</div>block.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1363,7 +1364,248 @@
 <a href="#1363" id="1363">1363</a>
 <a href="#1364" id="1364">1364</a>
 <a href="#1365" id="1365">1365</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Elements related to the `Block` base widget.
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
+<a href="#1372" id="1372">1372</a>
+<a href="#1373" id="1373">1373</a>
+<a href="#1374" id="1374">1374</a>
+<a href="#1375" id="1375">1375</a>
+<a href="#1376" id="1376">1376</a>
+<a href="#1377" id="1377">1377</a>
+<a href="#1378" id="1378">1378</a>
+<a href="#1379" id="1379">1379</a>
+<a href="#1380" id="1380">1380</a>
+<a href="#1381" id="1381">1381</a>
+<a href="#1382" id="1382">1382</a>
+<a href="#1383" id="1383">1383</a>
+<a href="#1384" id="1384">1384</a>
+<a href="#1385" id="1385">1385</a>
+<a href="#1386" id="1386">1386</a>
+<a href="#1387" id="1387">1387</a>
+<a href="#1388" id="1388">1388</a>
+<a href="#1389" id="1389">1389</a>
+<a href="#1390" id="1390">1390</a>
+<a href="#1391" id="1391">1391</a>
+<a href="#1392" id="1392">1392</a>
+<a href="#1393" id="1393">1393</a>
+<a href="#1394" id="1394">1394</a>
+<a href="#1395" id="1395">1395</a>
+<a href="#1396" id="1396">1396</a>
+<a href="#1397" id="1397">1397</a>
+<a href="#1398" id="1398">1398</a>
+<a href="#1399" id="1399">1399</a>
+<a href="#1400" id="1400">1400</a>
+<a href="#1401" id="1401">1401</a>
+<a href="#1402" id="1402">1402</a>
+<a href="#1403" id="1403">1403</a>
+<a href="#1404" id="1404">1404</a>
+<a href="#1405" id="1405">1405</a>
+<a href="#1406" id="1406">1406</a>
+<a href="#1407" id="1407">1407</a>
+<a href="#1408" id="1408">1408</a>
+<a href="#1409" id="1409">1409</a>
+<a href="#1410" id="1410">1410</a>
+<a href="#1411" id="1411">1411</a>
+<a href="#1412" id="1412">1412</a>
+<a href="#1413" id="1413">1413</a>
+<a href="#1414" id="1414">1414</a>
+<a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
+<a href="#1417" id="1417">1417</a>
+<a href="#1418" id="1418">1418</a>
+<a href="#1419" id="1419">1419</a>
+<a href="#1420" id="1420">1420</a>
+<a href="#1421" id="1421">1421</a>
+<a href="#1422" id="1422">1422</a>
+<a href="#1423" id="1423">1423</a>
+<a href="#1424" id="1424">1424</a>
+<a href="#1425" id="1425">1425</a>
+<a href="#1426" id="1426">1426</a>
+<a href="#1427" id="1427">1427</a>
+<a href="#1428" id="1428">1428</a>
+<a href="#1429" id="1429">1429</a>
+<a href="#1430" id="1430">1430</a>
+<a href="#1431" id="1431">1431</a>
+<a href="#1432" id="1432">1432</a>
+<a href="#1433" id="1433">1433</a>
+<a href="#1434" id="1434">1434</a>
+<a href="#1435" id="1435">1435</a>
+<a href="#1436" id="1436">1436</a>
+<a href="#1437" id="1437">1437</a>
+<a href="#1438" id="1438">1438</a>
+<a href="#1439" id="1439">1439</a>
+<a href="#1440" id="1440">1440</a>
+<a href="#1441" id="1441">1441</a>
+<a href="#1442" id="1442">1442</a>
+<a href="#1443" id="1443">1443</a>
+<a href="#1444" id="1444">1444</a>
+<a href="#1445" id="1445">1445</a>
+<a href="#1446" id="1446">1446</a>
+<a href="#1447" id="1447">1447</a>
+<a href="#1448" id="1448">1448</a>
+<a href="#1449" id="1449">1449</a>
+<a href="#1450" id="1450">1450</a>
+<a href="#1451" id="1451">1451</a>
+<a href="#1452" id="1452">1452</a>
+<a href="#1453" id="1453">1453</a>
+<a href="#1454" id="1454">1454</a>
+<a href="#1455" id="1455">1455</a>
+<a href="#1456" id="1456">1456</a>
+<a href="#1457" id="1457">1457</a>
+<a href="#1458" id="1458">1458</a>
+<a href="#1459" id="1459">1459</a>
+<a href="#1460" id="1460">1460</a>
+<a href="#1461" id="1461">1461</a>
+<a href="#1462" id="1462">1462</a>
+<a href="#1463" id="1463">1463</a>
+<a href="#1464" id="1464">1464</a>
+<a href="#1465" id="1465">1465</a>
+<a href="#1466" id="1466">1466</a>
+<a href="#1467" id="1467">1467</a>
+<a href="#1468" id="1468">1468</a>
+<a href="#1469" id="1469">1469</a>
+<a href="#1470" id="1470">1470</a>
+<a href="#1471" id="1471">1471</a>
+<a href="#1472" id="1472">1472</a>
+<a href="#1473" id="1473">1473</a>
+<a href="#1474" id="1474">1474</a>
+<a href="#1475" id="1475">1475</a>
+<a href="#1476" id="1476">1476</a>
+<a href="#1477" id="1477">1477</a>
+<a href="#1478" id="1478">1478</a>
+<a href="#1479" id="1479">1479</a>
+<a href="#1480" id="1480">1480</a>
+<a href="#1481" id="1481">1481</a>
+<a href="#1482" id="1482">1482</a>
+<a href="#1483" id="1483">1483</a>
+<a href="#1484" id="1484">1484</a>
+<a href="#1485" id="1485">1485</a>
+<a href="#1486" id="1486">1486</a>
+<a href="#1487" id="1487">1487</a>
+<a href="#1488" id="1488">1488</a>
+<a href="#1489" id="1489">1489</a>
+<a href="#1490" id="1490">1490</a>
+<a href="#1491" id="1491">1491</a>
+<a href="#1492" id="1492">1492</a>
+<a href="#1493" id="1493">1493</a>
+<a href="#1494" id="1494">1494</a>
+<a href="#1495" id="1495">1495</a>
+<a href="#1496" id="1496">1496</a>
+<a href="#1497" id="1497">1497</a>
+<a href="#1498" id="1498">1498</a>
+<a href="#1499" id="1499">1499</a>
+<a href="#1500" id="1500">1500</a>
+<a href="#1501" id="1501">1501</a>
+<a href="#1502" id="1502">1502</a>
+<a href="#1503" id="1503">1503</a>
+<a href="#1504" id="1504">1504</a>
+<a href="#1505" id="1505">1505</a>
+<a href="#1506" id="1506">1506</a>
+<a href="#1507" id="1507">1507</a>
+<a href="#1508" id="1508">1508</a>
+<a href="#1509" id="1509">1509</a>
+<a href="#1510" id="1510">1510</a>
+<a href="#1511" id="1511">1511</a>
+<a href="#1512" id="1512">1512</a>
+<a href="#1513" id="1513">1513</a>
+<a href="#1514" id="1514">1514</a>
+<a href="#1515" id="1515">1515</a>
+<a href="#1516" id="1516">1516</a>
+<a href="#1517" id="1517">1517</a>
+<a href="#1518" id="1518">1518</a>
+<a href="#1519" id="1519">1519</a>
+<a href="#1520" id="1520">1520</a>
+<a href="#1521" id="1521">1521</a>
+<a href="#1522" id="1522">1522</a>
+<a href="#1523" id="1523">1523</a>
+<a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a>
+<a href="#1534" id="1534">1534</a>
+<a href="#1535" id="1535">1535</a>
+<a href="#1536" id="1536">1536</a>
+<a href="#1537" id="1537">1537</a>
+<a href="#1538" id="1538">1538</a>
+<a href="#1539" id="1539">1539</a>
+<a href="#1540" id="1540">1540</a>
+<a href="#1541" id="1541">1541</a>
+<a href="#1542" id="1542">1542</a>
+<a href="#1543" id="1543">1543</a>
+<a href="#1544" id="1544">1544</a>
+<a href="#1545" id="1545">1545</a>
+<a href="#1546" id="1546">1546</a>
+<a href="#1547" id="1547">1547</a>
+<a href="#1548" id="1548">1548</a>
+<a href="#1549" id="1549">1549</a>
+<a href="#1550" id="1550">1550</a>
+<a href="#1551" id="1551">1551</a>
+<a href="#1552" id="1552">1552</a>
+<a href="#1553" id="1553">1553</a>
+<a href="#1554" id="1554">1554</a>
+<a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
+<a href="#1560" id="1560">1560</a>
+<a href="#1561" id="1561">1561</a>
+<a href="#1562" id="1562">1562</a>
+<a href="#1563" id="1563">1563</a>
+<a href="#1564" id="1564">1564</a>
+<a href="#1565" id="1565">1565</a>
+<a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
+<a href="#1577" id="1577">1577</a>
+<a href="#1578" id="1578">1578</a>
+<a href="#1579" id="1579">1579</a>
+<a href="#1580" id="1580">1580</a>
+<a href="#1581" id="1581">1581</a>
+<a href="#1582" id="1582">1582</a>
+<a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
+<a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
+<a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
+<a href="#1590" id="1590">1590</a>
+<a href="#1591" id="1591">1591</a>
+<a href="#1592" id="1592">1592</a>
+<a href="#1593" id="1593">1593</a>
+<a href="#1594" id="1594">1594</a>
+<a href="#1595" id="1595">1595</a>
+<a href="#1596" id="1596">1596</a>
+<a href="#1597" id="1597">1597</a>
+<a href="#1598" id="1598">1598</a>
+<a href="#1599" id="1599">1599</a>
+<a href="#1600" id="1600">1600</a>
+<a href="#1601" id="1601">1601</a>
+<a href="#1602" id="1602">1602</a>
+<a href="#1603" id="1603">1603</a>
+<a href="#1604" id="1604">1604</a>
+<a href="#1605" id="1605">1605</a>
+<a href="#1606" id="1606">1606</a>
+<a href="#1607" id="1607">1607</a></pre></div><pre class="rust"><code><span class="doccomment">//! Elements related to the `Block` base widget.
 //!
 //! This holds everything needed to display and configure a [`Block`].
 //!
@@ -1373,7 +1615,14 @@
 </span><span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>strum::{Display, EnumString};
 
-<span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, style::Styled, symbols::border, widgets::Borders};
+<span class="kw">use crate</span>::{
+    buffer::Buffer,
+    layout::{Alignment, Rect},
+    style::{Style, Styled},
+    symbols::border,
+    text::Line,
+    widgets::{Borders, Widget, WidgetRef},
+};
 
 <span class="kw">mod </span>padding;
 <span class="kw">pub mod </span>title;
@@ -1392,19 +1641,50 @@
 /// both centered and non-centered titles are rendered, the centered space is calculated based on
 /// the full width of the block, rather than the leftover width.
 ///
-/// Titles are not rendered in the corners of the block unless there is no border on that edge.
-/// If the block is too small and multiple titles overlap, the border may get cut off at a corner.
+/// Titles are not rendered in the corners of the block unless there is no border on that edge. If
+/// the block is too small and multiple titles overlap, the border may get cut off at a corner.
 ///
 /// ```plain
 /// ┌With at least a left border───
 ///
 /// Without left border───
 /// ```
+/// # Constructor methods
+///
+/// - [`Block::new`] creates a new [`Block`] with no border or paddings.
+/// - [`Block::bordered`] Create a new block with all borders shown.
+///
+/// # Setter methods
+///
+/// These methods are fluent setters. They return a new [`Block`] with the specified property set.
+///
+/// - [`Block::borders`] Defines which borders to display.
+/// - [`Block::border_style`] Defines the style of the borders.
+/// - [`Block::border_type`] Sets the symbols used to display the border (e.g. single line, double
+///   line, thick or rounded borders).
+/// - [`Block::padding`] Defines the padding inside a [`Block`].
+/// - [`Block::style`] Sets the base style of the widget.
+/// - [`Block::title`] Adds a title to the block.
+/// - [`Block::title_alignment`] Sets the default [`Alignment`] for all block titles.
+/// - [`Block::title_style`] Applies the style to all titles.
+/// - [`Block::title_top`] Adds a title to the top of the block.
+/// - [`Block::title_bottom`] Adds a title to the bottom of the block.
+/// - [`Block::title_position`] Adds a title to the block.
+///
+/// # Other Methods
+/// - [`Block::inner`] Compute the inner area of a block based on its border visibility rules.
+///
+/// [`Style`]s are applied first to the entire block, then to the borders, and finally to the
+/// titles. If the block is used as a container for another widget, the inner widget can also be
+/// styled. See [`Style`] for more information on how merging styles works.
 ///
 /// # Examples
 ///
 /// ```
-/// use ratatui::{prelude::*, widgets::*};
+/// use ratatui::{
+///     style::{Color, Style},
+///     widgets::{Block, BorderType, Borders},
+/// };
 ///
 /// Block::new()
 ///     .border_type(BorderType::Rounded)
@@ -1416,22 +1696,30 @@
 ///
 /// You may also use multiple titles like in the following:
 /// ```
-/// use ratatui::{
-///     prelude::*,
-///     widgets::{
-///         block::{Position, Title},
-///         Block,
-///     },
+/// use ratatui::widgets::{
+///     block::{Position, Title},
+///     Block,
 /// };
 ///
 /// Block::new()
 ///     .title("Title 1")
 ///     .title(Title::from("Title 2").position(Position::Bottom));
 /// ```
+///
+/// You can also pass it as parameters of another widget so that the block surrounds them:
+/// ```
+/// use ratatui::widgets::{Block, Borders, List};
+///
+/// let surrounding_block = Block::default()
+///     .borders(Borders::ALL)
+///     .title("Here is a list of items");
+/// let items = ["Item 1", "Item 2", "Item 3"];
+/// let list = List::new(items).block(surrounding_block);
+/// ```
 </span><span class="attr">#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
 </span><span class="kw">pub struct </span>Block&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// List of titles
-    </span>titles: Vec&lt;Title&lt;<span class="lifetime">'a</span>&gt;&gt;,
+    </span>titles: Vec&lt;(<span class="prelude-ty">Option</span>&lt;Position&gt;, Line&lt;<span class="lifetime">'a</span>&gt;)&gt;,
     <span class="doccomment">/// The style to be patched to all titles of the block
     </span>titles_style: Style,
     <span class="doccomment">/// The default alignment of the titles that don't have one
@@ -1543,7 +1831,8 @@
     <span class="doccomment">/// Create a new block with [all borders](Borders::ALL) shown
     ///
     /// ```
-    /// # use ratatui::widgets::{Block, Borders};
+    /// use ratatui::widgets::{Block, Borders};
+    ///
     /// assert_eq!(Block::bordered(), Block::new().borders(Borders::ALL));
     /// ```
     </span><span class="kw">pub const fn </span>bordered() -&gt; <span class="self">Self </span>{
@@ -1566,9 +1855,9 @@
     /// [spans](crate::text::Span) (`Vec&lt;Span&gt;`).
     ///
     /// By default, the titles will avoid being rendered in the corners of the block but will align
-    /// against the left or right edge of the block if there is no border on that edge.
-    /// The following demonstrates this behavior, notice the second title is one character off to
-    /// the left.
+    /// against the left or right edge of the block if there is no border on that edge. The
+    /// following demonstrates this behavior, notice the second title is one character off to the
+    /// left.
     ///
     /// ```plain
     /// ┌With at least a left border───
@@ -1579,24 +1868,27 @@
     /// Note: If the block is too small and multiple titles overlap, the border might get cut off at
     /// a corner.
     ///
-    /// # Example
+    /// # Examples
+    ///
+    /// See the [Block example] for a visual representation of how the various borders and styles
+    /// look when rendered.
     ///
     /// The following example demonstrates:
     /// - Default title alignment
     /// - Multiple titles (notice "Center" is centered according to the full with of the block, not
-    /// the leftover space)
+    ///   the leftover space)
     /// - Two titles with the same alignment (notice the left titles are separated)
     /// ```
     /// use ratatui::{
-    ///     prelude::*,
-    ///     widgets::{block::*, *},
+    ///     text::Line,
+    ///     widgets::{Block, Borders},
     /// };
     ///
     /// Block::new()
     ///     .title("Title") // By default in the top left corner
-    ///     .title(Title::from("Left").alignment(Alignment::Left)) // also on the left
-    ///     .title(Title::from("Right").alignment(Alignment::Right))
-    ///     .title(Title::from("Center").alignment(Alignment::Center));
+    ///     .title(Line::from("Left").left_aligned()) // also on the left
+    ///     .title(Line::from("Right").right_aligned())
+    ///     .title(Line::from("Center").centered());
     /// // Renders
     /// // ┌Title─Left────Center─────────Right┐
     /// ```
@@ -1607,12 +1899,27 @@
     /// - [`Block::title_style`]
     /// - [`Block::title_alignment`]
     /// - [`Block::title_position`]
+    ///
+    /// # Future improvements
+    ///
+    /// In a future release of Ratatui this method will be changed to accept `Into&lt;Line&gt;` instead of
+    /// `Into&lt;Title&gt;`. This allows us to remove the unnecessary `Title` struct and store the
+    /// position in the block itself. For more information see
+    /// &lt;https://github.com/ratatui/ratatui/issues/738&gt;.
+    ///
+    /// [Block example]: https://github.com/ratatui/ratatui/blob/main/examples/README.md#block
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>title&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, title: T) -&gt; <span class="self">Self
     </span><span class="kw">where
         </span>T: Into&lt;Title&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
-        <span class="self">self</span>.titles.push(title.into());
+        <span class="kw">let </span>title = title.into();
+        <span class="kw">let </span>position = title.position;
+        <span class="kw">let </span><span class="kw-2">mut </span>content = title.content;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(alignment) = title.alignment {
+            content = content.alignment(alignment);
+        }
+        <span class="self">self</span>.titles.push((position, content));
         <span class="self">self
     </span>}
 
@@ -1625,7 +1932,8 @@
     /// # Example
     ///
     /// ```
-    /// # use ratatui::{ prelude::*, widgets::* };
+    /// use ratatui::{ widgets::Block, text::Line };
+    ///
     /// Block::bordered()
     ///     .title_top("Left1") // By default in the top left corner
     ///     .title_top(Line::from("Left2").left_aligned())
@@ -1639,8 +1947,8 @@
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>title_top&lt;T: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, title: T) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>title = Title::from(title).position(Position::Top);
-        <span class="self">self</span>.titles.push(title);
+        <span class="kw">let </span>line = title.into();
+        <span class="self">self</span>.titles.push((<span class="prelude-val">Some</span>(Position::Top), line));
         <span class="self">self
     </span>}
 
@@ -1653,7 +1961,8 @@
     /// # Example
     ///
     /// ```
-    /// # use ratatui::{ prelude::*, widgets::* };
+    /// use ratatui::{ widgets::Block, text::Line };
+    ///
     /// Block::bordered()
     ///     .title_bottom("Left1") // By default in the top left corner
     ///     .title_bottom(Line::from("Left2").left_aligned())
@@ -1667,17 +1976,23 @@
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>title_bottom&lt;T: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, title: T) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>title = Title::from(title).position(Position::Bottom);
-        <span class="self">self</span>.titles.push(title);
+        <span class="kw">let </span>line = title.into();
+        <span class="self">self</span>.titles.push((<span class="prelude-val">Some</span>(Position::Bottom), line));
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Applies the style to all titles.
     ///
+    /// This style will be applied to all titles of the block. If a title has a style set, it will
+    /// be applied after this style. This style will be applied after any [`Block::style`] or
+    /// [`Block::border_style`] is applied.
+    ///
+    /// See [`Style`] for more information on how merging styles works.
+    ///
     /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
     /// your own type that implements [`Into&lt;Style&gt;`]).
     ///
-    /// If a [`Title`] already has a style, the title's style will add on top of this one.
+    /// [`Color`]: crate::style::Color
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>title_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.titles_style = style.into();
@@ -1693,15 +2008,12 @@
     /// This example aligns all titles in the center except the "right" title which explicitly sets
     /// [`Alignment::Right`].
     /// ```
-    /// use ratatui::{
-    ///     prelude::*,
-    ///     widgets::{block::*, *},
-    /// };
+    /// use ratatui::{layout::Alignment, text::Line, widgets::Block};
     ///
     /// Block::new()
     ///     .title_alignment(Alignment::Center)
     ///     // This title won't be aligned in the center
-    ///     .title(Title::from("right").alignment(Alignment::Right))
+    ///     .title(Line::from("right").right_aligned())
     ///     .title("foo")
     ///     .title("bar");
     /// ```
@@ -1720,18 +2032,12 @@
     /// This example positions all titles on the bottom except the "top" title which explicitly sets
     /// [`Position::Top`].
     /// ```
-    /// use ratatui::{
-    ///     prelude::*,
-    ///     widgets::{
-    ///         block::{Position, Title},
-    ///         Block,
-    ///     },
-    /// };
+    /// use ratatui::widgets::{block::Position, Block};
     ///
     /// Block::new()
     ///     .title_position(Position::Bottom)
     ///     // This title won't be aligned in the center
-    ///     .title(Title::from("top").position(Position::Top))
+    ///     .title_top("top")
     ///     .title("foo")
     ///     .title("bar");
     /// ```
@@ -1743,7 +2049,10 @@
 
     <span class="doccomment">/// Defines the style of the borders.
     ///
-    /// If a [`Block::style`] is defined, `border_style` will be applied on top of it.
+    /// This style is applied only to the areas covered by borders, and is applied to the block
+    /// after any [`Block::style`] is applied.
+    ///
+    /// See [`Style`] for more information on how merging styles works.
     ///
     /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
     /// your own type that implements [`Into&lt;Style&gt;`]).
@@ -1752,25 +2061,58 @@
     ///
     /// This example shows a `Block` with blue borders.
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{
+    ///     style::{Style, Stylize},
+    ///     widgets::Block,
+    /// };
     /// Block::bordered().border_style(Style::new().blue());
     /// ```
+    ///
+    /// [`Color`]: crate::style::Color
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>border_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.border_style = style.into();
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Defines the block style.
+    <span class="doccomment">/// Defines the style of the entire block.
     ///
     /// This is the most generic [`Style`] a block can receive, it will be merged with any other
-    /// more specific style. Elements can be styled further with [`Block::title_style`] and
-    /// [`Block::border_style`].
+    /// more specific styles. Elements can be styled further with [`Block::title_style`] and
+    /// [`Block::border_style`], which will be applied on top of this style. If the block is used as
+    /// a container for another widget (e.g. a [`Paragraph`]), then the style of the widget is
+    /// generally applied before this style.
+    ///
+    /// See [`Style`] for more information on how merging styles works.
     ///
     /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
     /// your own type that implements [`Into&lt;Style&gt;`]).
     ///
-    /// This will also apply to the widget inside that block, unless the inner widget is styled.
+    /// # Example
+    ///
+    /// ```
+    /// use ratatui::{
+    ///     style::{Color, Style, Stylize},
+    ///     widgets::{Block, Paragraph},
+    /// };
+    ///
+    /// let block = Block::new().style(Style::new().red().on_black());
+    ///
+    /// // For border and title you can additionally apply styles on top of the block level style.
+    /// let block = Block::new()
+    ///     .style(Style::new().red().bold().italic())
+    ///     .border_style(Style::new().not_italic()) // will be red and bold
+    ///     .title_style(Style::new().not_bold()) // will be red and italic
+    ///     .title("Title");
+    ///
+    /// // To style the inner widget, you can style the widget itself.
+    /// let paragraph = Paragraph::new("Content")
+    ///     .block(block)
+    ///     .style(Style::new().white().not_bold()); // will be white, and italic
+    /// ```
+    ///
+    /// [`Paragraph`]: crate::widgets::Paragraph
+    /// [`Color`]: crate::style::Color
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.style = style.into();
@@ -1785,7 +2127,7 @@
     ///
     /// Display left and right borders.
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::widgets::{Block, Borders};
     /// Block::new().borders(Borders::LEFT | Borders::RIGHT);
     /// ```
     ///
@@ -1806,7 +2148,7 @@
     /// # Examples
     ///
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::widgets::{Block, BorderType};
     /// Block::bordered()
     ///     .border_type(BorderType::Rounded)
     ///     .title("Block");
@@ -1828,7 +2170,8 @@
     /// # Examples
     ///
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{widgets::Block, symbols};
+    ///
     /// Block::bordered().border_set(symbols::border::DOUBLE).title("Block");
     /// // Renders
     /// // ╔Block╗
@@ -1848,7 +2191,8 @@
     ///
     /// This renders a `Block` with no padding (the default).
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::widgets::{Block, Padding};
+    ///
     /// Block::bordered().padding(Padding::ZERO);
     /// // Renders
     /// // ┌───────┐
@@ -1859,7 +2203,8 @@
     /// This example shows a `Block` with padding left and right ([`Padding::horizontal`]).
     /// Notice the two spaces before and after the content.
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::widgets::{Block, Padding};
+    ///
     /// Block::bordered().padding(Padding::horizontal(2));
     /// // Renders
     /// // ┌───────────┐
@@ -1878,12 +2223,13 @@
     ///
     /// Draw a block nested within another block
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{widgets::Block, Frame};
+    ///
     /// # fn render_nested_block(frame: &amp;mut Frame) {
     /// let outer_block = Block::bordered().title("Outer");
     /// let inner_block = Block::bordered().title("Inner");
     ///
-    /// let outer_area = frame.size();
+    /// let outer_area = frame.area();
     /// let inner_area = outer_block.inner(outer_area);
     ///
     /// frame.render_widget(outer_block, outer_area);
@@ -1930,7 +2276,7 @@
     <span class="kw">fn </span>has_title_at_position(<span class="kw-2">&amp;</span><span class="self">self</span>, position: Position) -&gt; bool {
         <span class="self">self</span>.titles
             .iter()
-            .any(|title| title.position.unwrap_or(<span class="self">self</span>.titles_position) == position)
+            .any(|(pos, <span class="kw">_</span>)| pos.unwrap_or(<span class="self">self</span>.titles_position) == position)
     }
 }
 
@@ -1999,7 +2345,7 @@
     <span class="kw">fn </span>render_left_side(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         <span class="kw">if </span><span class="self">self</span>.borders.contains(Borders::LEFT) {
             <span class="kw">for </span>y <span class="kw">in </span>area.top()..area.bottom() {
-                buf.get_mut(area.left(), y)
+                buf[(area.left(), y)]
                     .set_symbol(<span class="self">self</span>.border_set.vertical_left)
                     .set_style(<span class="self">self</span>.border_style);
             }
@@ -2009,7 +2355,7 @@
     <span class="kw">fn </span>render_top_side(<span class="kw-2">&amp;</span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         <span class="kw">if </span><span class="self">self</span>.borders.contains(Borders::TOP) {
             <span class="kw">for </span>x <span class="kw">in </span>area.left()..area.right() {
-                buf.get_mut(x, area.top())
+                buf[(x, area.top())]
                     .set_symbol(<span class="self">self</span>.border_set.horizontal_top)
                     .set_style(<span class="self">self</span>.border_style);
             }
@@ -2020,7 +2366,7 @@
         <span class="kw">if </span><span class="self">self</span>.borders.contains(Borders::RIGHT) {
             <span class="kw">let </span>x = area.right() - <span class="number">1</span>;
             <span class="kw">for </span>y <span class="kw">in </span>area.top()..area.bottom() {
-                buf.get_mut(x, y)
+                buf[(x, y)]
                     .set_symbol(<span class="self">self</span>.border_set.vertical_right)
                     .set_style(<span class="self">self</span>.border_style);
             }
@@ -2031,7 +2377,7 @@
         <span class="kw">if </span><span class="self">self</span>.borders.contains(Borders::BOTTOM) {
             <span class="kw">let </span>y = area.bottom() - <span class="number">1</span>;
             <span class="kw">for </span>x <span class="kw">in </span>area.left()..area.right() {
-                buf.get_mut(x, y)
+                buf[(x, y)]
                     .set_symbol(<span class="self">self</span>.border_set.horizontal_bottom)
                     .set_style(<span class="self">self</span>.border_style);
             }
@@ -2040,7 +2386,7 @@
 
     <span class="kw">fn </span>render_bottom_right_corner(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Buffer, area: Rect) {
         <span class="kw">if </span><span class="self">self</span>.borders.contains(Borders::RIGHT | Borders::BOTTOM) {
-            buf.get_mut(area.right() - <span class="number">1</span>, area.bottom() - <span class="number">1</span>)
+            buf[(area.right() - <span class="number">1</span>, area.bottom() - <span class="number">1</span>)]
                 .set_symbol(<span class="self">self</span>.border_set.bottom_right)
                 .set_style(<span class="self">self</span>.border_style);
         }
@@ -2048,7 +2394,7 @@
 
     <span class="kw">fn </span>render_top_right_corner(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Buffer, area: Rect) {
         <span class="kw">if </span><span class="self">self</span>.borders.contains(Borders::RIGHT | Borders::TOP) {
-            buf.get_mut(area.right() - <span class="number">1</span>, area.top())
+            buf[(area.right() - <span class="number">1</span>, area.top())]
                 .set_symbol(<span class="self">self</span>.border_set.top_right)
                 .set_style(<span class="self">self</span>.border_style);
         }
@@ -2056,7 +2402,7 @@
 
     <span class="kw">fn </span>render_bottom_left_corner(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Buffer, area: Rect) {
         <span class="kw">if </span><span class="self">self</span>.borders.contains(Borders::LEFT | Borders::BOTTOM) {
-            buf.get_mut(area.left(), area.bottom() - <span class="number">1</span>)
+            buf[(area.left(), area.bottom() - <span class="number">1</span>)]
                 .set_symbol(<span class="self">self</span>.border_set.bottom_left)
                 .set_style(<span class="self">self</span>.border_style);
         }
@@ -2064,7 +2410,7 @@
 
     <span class="kw">fn </span>render_top_left_corner(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Buffer, area: Rect) {
         <span class="kw">if </span><span class="self">self</span>.borders.contains(Borders::LEFT | Borders::TOP) {
-            buf.get_mut(area.left(), area.top())
+            buf[(area.left(), area.top())]
                 .set_symbol(<span class="self">self</span>.border_set.top_left)
                 .set_style(<span class="self">self</span>.border_style);
         }
@@ -2075,7 +2421,7 @@
     /// Currently (due to the way lines are truncated), the right side of the leftmost title will
     /// be cut off if the block is too small to fit all titles. This is not ideal and should be
     /// the left side of that leftmost that is cut off. This is due to the line being truncated
-    /// incorrectly. See &lt;https://github.com/ratatui-org/ratatui/issues/932&gt;
+    /// incorrectly. See &lt;https://github.com/ratatui/ratatui/issues/932&gt;
     </span><span class="attr">#[allow(clippy::similar_names)]
     </span><span class="kw">fn </span>render_right_titles(<span class="kw-2">&amp;</span><span class="self">self</span>, position: Position, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         <span class="kw">let </span>titles = <span class="self">self</span>.filtered_titles(position, Alignment::Right);
@@ -2086,7 +2432,7 @@
             <span class="kw">if </span>titles_area.is_empty() {
                 <span class="kw">break</span>;
             }
-            <span class="kw">let </span>title_width = title.content.width() <span class="kw">as </span>u16;
+            <span class="kw">let </span>title_width = title.width() <span class="kw">as </span>u16;
             <span class="kw">let </span>title_area = Rect {
                 x: titles_area
                     .right()
@@ -2096,7 +2442,7 @@
                 ..titles_area
             };
             buf.set_style(title_area, <span class="self">self</span>.titles_style);
-            title.content.render_ref(title_area, buf);
+            title.render_ref(title_area, buf);
 
             <span class="comment">// bump the width of the titles area to the left
             </span>titles_area.width = titles_area
@@ -2118,7 +2464,7 @@
             .collect_vec();
         <span class="kw">let </span>total_width = titles
             .iter()
-            .map(|title| title.content.width() <span class="kw">as </span>u16 + <span class="number">1</span>) <span class="comment">// space between titles
+            .map(|title| title.width() <span class="kw">as </span>u16 + <span class="number">1</span>) <span class="comment">// space between titles
             </span>.sum::&lt;u16&gt;()
             .saturating_sub(<span class="number">1</span>); <span class="comment">// no space for the last title
 
@@ -2131,13 +2477,13 @@
             <span class="kw">if </span>titles_area.is_empty() {
                 <span class="kw">break</span>;
             }
-            <span class="kw">let </span>title_width = title.content.width() <span class="kw">as </span>u16;
+            <span class="kw">let </span>title_width = title.width() <span class="kw">as </span>u16;
             <span class="kw">let </span>title_area = Rect {
                 width: title_width.min(titles_area.width),
                 ..titles_area
             };
             buf.set_style(title_area, <span class="self">self</span>.titles_style);
-            title.content.render_ref(title_area, buf);
+            title.render_ref(title_area, buf);
 
             <span class="comment">// bump the titles area to the right and reduce its width
             </span>titles_area.x = titles_area.x.saturating_add(title_width + <span class="number">1</span>);
@@ -2154,13 +2500,13 @@
             <span class="kw">if </span>titles_area.is_empty() {
                 <span class="kw">break</span>;
             }
-            <span class="kw">let </span>title_width = title.content.width() <span class="kw">as </span>u16;
+            <span class="kw">let </span>title_width = title.width() <span class="kw">as </span>u16;
             <span class="kw">let </span>title_area = Rect {
                 width: title_width.min(titles_area.width),
                 ..titles_area
             };
             buf.set_style(title_area, <span class="self">self</span>.titles_style);
-            title.content.render_ref(title_area, buf);
+            title.render_ref(title_area, buf);
 
             <span class="comment">// bump the titles area to the right and reduce its width
             </span>titles_area.x = titles_area.x.saturating_add(title_width + <span class="number">1</span>);
@@ -2173,11 +2519,12 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         position: Position,
         alignment: Alignment,
-    ) -&gt; <span class="kw">impl </span>DoubleEndedIterator&lt;Item = <span class="kw-2">&amp;</span>Title&gt; {
-        <span class="self">self</span>.titles.iter().filter(<span class="kw">move </span>|title| {
-            title.position.unwrap_or(<span class="self">self</span>.titles_position) == position
-                &amp;&amp; title.alignment.unwrap_or(<span class="self">self</span>.titles_alignment) == alignment
-        })
+    ) -&gt; <span class="kw">impl </span>DoubleEndedIterator&lt;Item = <span class="kw-2">&amp;</span>Line&gt; {
+        <span class="self">self</span>.titles
+            .iter()
+            .filter(<span class="kw">move </span>|(pos, <span class="kw">_</span>)| pos.unwrap_or(<span class="self">self</span>.titles_position) == position)
+            .filter(<span class="kw">move </span>|(<span class="kw">_</span>, line)| line.alignment.unwrap_or(<span class="self">self</span>.titles_alignment) == alignment)
+            .map(|(<span class="kw">_</span>, line)| line)
     }
 
     <span class="doccomment">/// An area that is one line tall and spans the width of the block excluding the borders and
@@ -2197,6 +2544,35 @@
                 .saturating_sub(right_border),
             height: <span class="number">1</span>,
         }
+    }
+
+    <span class="doccomment">/// Calculate the left, and right space the [`Block`] will take up.
+    ///
+    /// The result takes the [`Block`]'s, [`Borders`], and [`Padding`] into account.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>horizontal_space(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (u16, u16) {
+        <span class="kw">let </span>left = <span class="self">self
+            </span>.padding
+            .left
+            .saturating_add(u16::from(<span class="self">self</span>.borders.contains(Borders::LEFT)));
+        <span class="kw">let </span>right = <span class="self">self
+            </span>.padding
+            .right
+            .saturating_add(u16::from(<span class="self">self</span>.borders.contains(Borders::RIGHT)));
+        (left, right)
+    }
+
+    <span class="doccomment">/// Calculate the top, and bottom space that the [`Block`] will take up.
+    ///
+    /// Takes the [`Padding`], [`Title`]'s position, and the [`Borders`] that are selected into
+    /// account when calculating the result.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>vertical_space(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (u16, u16) {
+        <span class="kw">let </span>has_top =
+            <span class="self">self</span>.borders.contains(Borders::TOP) || <span class="self">self</span>.has_title_at_position(Position::Top);
+        <span class="kw">let </span>top = <span class="self">self</span>.padding.top + u16::from(has_top);
+        <span class="kw">let </span>has_bottom =
+            <span class="self">self</span>.borders.contains(Borders::BOTTOM) || <span class="self">self</span>.has_title_at_position(Position::Bottom);
+        <span class="kw">let </span>bottom = <span class="self">self</span>.padding.bottom + u16::from(has_bottom);
+        (top, bottom)
     }
 }
 
@@ -2235,6 +2611,7 @@
     <span class="kw">use </span>strum::ParseError;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::style::{Color, Modifier, Stylize};
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>create_with_all_borders() {
@@ -2282,24 +2659,17 @@
         <span class="kw">let </span>area = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>);
         <span class="kw">let </span>expected = Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>);
 
-        <span class="kw">let </span>block = Block::new().title(Title::from(<span class="string">"Test"</span>).alignment(alignment));
+        <span class="kw">let </span>block = Block::new().title(Line::from(<span class="string">"Test"</span>).alignment(alignment));
         <span class="macro">assert_eq!</span>(block.inner(area), expected);
     }
 
     <span class="attr">#[rstest]
-    #[case::top_top(Borders::TOP, Position::Top, Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>))]
-    #[case::top_bot(Borders::BOTTOM, Position::Top, Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>))]
-    #[case::bot_top(Borders::TOP, Position::Bottom, Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>))]
-    #[case::top_top(Borders::BOTTOM, Position::Bottom, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
-    </span><span class="kw">fn </span>inner_takes_into_account_border_and_title(
-        <span class="attr">#[case] </span>borders: Borders,
-        <span class="attr">#[case] </span>position: Position,
-        <span class="attr">#[case] </span>expected: Rect,
-    ) {
+    #[case::top_top(Block::new().title_top(<span class="string">"Test"</span>).borders(Borders::TOP), Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>))]
+    #[case::top_bot(Block::new().title_top(<span class="string">"Test"</span>).borders(Borders::BOTTOM), Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::bot_top(Block::new().title_bottom(<span class="string">"Test"</span>).borders(Borders::TOP), Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>))]
+    #[case::bot_bot(Block::new().title_bottom(<span class="string">"Test"</span>).borders(Borders::BOTTOM), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
+    </span><span class="kw">fn </span>inner_takes_into_account_border_and_title(<span class="attr">#[case] </span>block: Block, <span class="attr">#[case] </span>expected: Rect) {
         <span class="kw">let </span>area = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>);
-        <span class="kw">let </span>block = Block::new()
-            .borders(borders)
-            .title(Title::from(<span class="string">"Test"</span>).position(position));
         <span class="macro">assert_eq!</span>(block.inner(area), expected);
     }
 
@@ -2309,45 +2679,158 @@
         <span class="macro">assert!</span>(!block.has_title_at_position(Position::Top));
         <span class="macro">assert!</span>(!block.has_title_at_position(Position::Bottom));
 
-        <span class="kw">let </span>block = Block::new().title(Title::from(<span class="string">"Test"</span>).position(Position::Top));
+        <span class="kw">let </span>block = Block::new().title_top(<span class="string">"test"</span>);
         <span class="macro">assert!</span>(block.has_title_at_position(Position::Top));
         <span class="macro">assert!</span>(!block.has_title_at_position(Position::Bottom));
 
-        <span class="kw">let </span>block = Block::new().title(Title::from(<span class="string">"Test"</span>).position(Position::Bottom));
+        <span class="kw">let </span>block = Block::new().title_bottom(<span class="string">"test"</span>);
         <span class="macro">assert!</span>(!block.has_title_at_position(Position::Top));
         <span class="macro">assert!</span>(block.has_title_at_position(Position::Bottom));
 
-        <span class="kw">let </span>block = Block::new()
+        <span class="attr">#[allow(deprecated)] </span><span class="comment">// until Title is removed
+        </span><span class="kw">let </span>block = Block::new()
             .title(Title::from(<span class="string">"Test"</span>).position(Position::Top))
             .title_position(Position::Bottom);
         <span class="macro">assert!</span>(block.has_title_at_position(Position::Top));
         <span class="macro">assert!</span>(!block.has_title_at_position(Position::Bottom));
 
-        <span class="kw">let </span>block = Block::new()
+        <span class="attr">#[allow(deprecated)] </span><span class="comment">// until Title is removed
+        </span><span class="kw">let </span>block = Block::new()
             .title(Title::from(<span class="string">"Test"</span>).position(Position::Bottom))
             .title_position(Position::Top);
         <span class="macro">assert!</span>(!block.has_title_at_position(Position::Top));
         <span class="macro">assert!</span>(block.has_title_at_position(Position::Bottom));
 
-        <span class="kw">let </span>block = Block::new()
-            .title(Title::from(<span class="string">"Test"</span>).position(Position::Top))
-            .title(Title::from(<span class="string">"Test"</span>).position(Position::Bottom));
+        <span class="kw">let </span>block = Block::new().title_top(<span class="string">"test"</span>).title_bottom(<span class="string">"test"</span>);
         <span class="macro">assert!</span>(block.has_title_at_position(Position::Top));
         <span class="macro">assert!</span>(block.has_title_at_position(Position::Bottom));
 
-        <span class="kw">let </span>block = Block::new()
+        <span class="attr">#[allow(deprecated)] </span><span class="comment">// until Title is removed
+        </span><span class="kw">let </span>block = Block::new()
             .title(Title::from(<span class="string">"Test"</span>).position(Position::Top))
             .title(Title::from(<span class="string">"Test"</span>))
             .title_position(Position::Bottom);
         <span class="macro">assert!</span>(block.has_title_at_position(Position::Top));
         <span class="macro">assert!</span>(block.has_title_at_position(Position::Bottom));
 
-        <span class="kw">let </span>block = Block::new()
+        <span class="attr">#[allow(deprecated)] </span><span class="comment">// until Title is removed
+        </span><span class="kw">let </span>block = Block::new()
             .title(Title::from(<span class="string">"Test"</span>))
             .title(Title::from(<span class="string">"Test"</span>).position(Position::Bottom))
             .title_position(Position::Top);
         <span class="macro">assert!</span>(block.has_title_at_position(Position::Top));
         <span class="macro">assert!</span>(block.has_title_at_position(Position::Bottom));
+    }
+
+    <span class="attr">#[rstest]
+    #[case::none(Borders::NONE, (<span class="number">0</span>, <span class="number">0</span>))]
+    #[case::top(Borders::TOP, (<span class="number">1</span>, <span class="number">0</span>))]
+    #[case::right(Borders::RIGHT, (<span class="number">0</span>, <span class="number">0</span>))]
+    #[case::bottom(Borders::BOTTOM, (<span class="number">0</span>, <span class="number">1</span>))]
+    #[case::left(Borders::LEFT, (<span class="number">0</span>, <span class="number">0</span>))]
+    #[case::top_right(Borders::TOP | Borders::RIGHT, (<span class="number">1</span>, <span class="number">0</span>))]
+    #[case::top_bottom(Borders::TOP | Borders::BOTTOM, (<span class="number">1</span>, <span class="number">1</span>))]
+    #[case::top_left(Borders::TOP | Borders::LEFT, (<span class="number">1</span>, <span class="number">0</span>))]
+    #[case::bottom_right(Borders::BOTTOM | Borders::RIGHT, (<span class="number">0</span>, <span class="number">1</span>))]
+    #[case::bottom_left(Borders::BOTTOM | Borders::LEFT, (<span class="number">0</span>, <span class="number">1</span>))]
+    #[case::left_right(Borders::LEFT | Borders::RIGHT, (<span class="number">0</span>, <span class="number">0</span>))]
+    </span><span class="kw">fn </span>vertical_space_takes_into_account_borders(
+        <span class="attr">#[case] </span>borders: Borders,
+        <span class="attr">#[case] </span>vertical_space: (u16, u16),
+    ) {
+        <span class="kw">let </span>block = Block::new().borders(borders);
+        <span class="macro">assert_eq!</span>(block.vertical_space(), vertical_space);
+    }
+
+    <span class="attr">#[rstest]
+    #[case::top_border_top_p1(Borders::TOP, Padding::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>), (<span class="number">2</span>, <span class="number">0</span>))]
+    #[case::right_border_top_p1(Borders::RIGHT, Padding::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">0</span>))]
+    #[case::bottom_border_top_p1(Borders::BOTTOM, Padding::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">1</span>))]
+    #[case::left_border_top_p1(Borders::LEFT, Padding::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">0</span>))]
+    #[case::top_bottom_border_all_p3(Borders::TOP | Borders::BOTTOM, Padding::new(<span class="number">100</span>, <span class="number">100</span>, <span class="number">4</span>, <span class="number">5</span>), (<span class="number">5</span>, <span class="number">6</span>))]
+    #[case::no_border(Borders::NONE, Padding::new(<span class="number">100</span>, <span class="number">100</span>, <span class="number">10</span>, <span class="number">13</span>), (<span class="number">10</span>, <span class="number">13</span>))]
+    #[case::all(Borders::ALL, Padding::new(<span class="number">100</span>, <span class="number">100</span>, <span class="number">1</span>, <span class="number">3</span>), (<span class="number">2</span>, <span class="number">4</span>))]
+    </span><span class="kw">fn </span>vertical_space_takes_into_account_padding(
+        <span class="attr">#[case] </span>borders: Borders,
+        <span class="attr">#[case] </span>padding: Padding,
+        <span class="attr">#[case] </span>vertical_space: (u16, u16),
+    ) {
+        <span class="kw">let </span>block = Block::new().borders(borders).padding(padding);
+        <span class="macro">assert_eq!</span>(block.vertical_space(), vertical_space);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>vertical_space_takes_into_account_titles() {
+        <span class="kw">let </span>block = Block::new().title_top(<span class="string">"Test"</span>);
+        <span class="macro">assert_eq!</span>(block.vertical_space(), (<span class="number">1</span>, <span class="number">0</span>));
+
+        <span class="kw">let </span>block = Block::new().title_bottom(<span class="string">"Test"</span>);
+        <span class="macro">assert_eq!</span>(block.vertical_space(), (<span class="number">0</span>, <span class="number">1</span>));
+    }
+
+    <span class="attr">#[rstest]
+    #[case::top_border_top_title(Block::new(), Borders::TOP, Position::Top, (<span class="number">1</span>, <span class="number">0</span>))]
+    #[case::right_border_top_title(Block::new(), Borders::RIGHT, Position::Top, (<span class="number">1</span>, <span class="number">0</span>))]
+    #[case::bottom_border_top_title(Block::new(), Borders::BOTTOM, Position::Top, (<span class="number">1</span>, <span class="number">1</span>))]
+    #[case::left_border_top_title(Block::new(), Borders::LEFT, Position::Top, (<span class="number">1</span>, <span class="number">0</span>))]
+    #[case::top_border_top_title(Block::new(), Borders::TOP, Position::Bottom, (<span class="number">1</span>, <span class="number">1</span>))]
+    #[case::right_border_top_title(Block::new(), Borders::RIGHT, Position::Bottom, (<span class="number">0</span>, <span class="number">1</span>))]
+    #[case::bottom_border_top_title(Block::new(), Borders::BOTTOM, Position::Bottom, (<span class="number">0</span>, <span class="number">1</span>))]
+    #[case::left_border_top_title(Block::new(), Borders::LEFT, Position::Bottom, (<span class="number">0</span>, <span class="number">1</span>))]
+    </span><span class="kw">fn </span>vertical_space_takes_into_account_borders_and_title(
+        <span class="attr">#[case] </span>block: Block,
+        <span class="attr">#[case] </span>borders: Borders,
+        <span class="attr">#[case] </span>pos: Position,
+        <span class="attr">#[case] </span>vertical_space: (u16, u16),
+    ) {
+        <span class="kw">let </span>block = block.borders(borders).title_position(pos).title(<span class="string">"Test"</span>);
+        <span class="macro">assert_eq!</span>(block.vertical_space(), vertical_space);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>horizontal_space_takes_into_account_borders() {
+        <span class="kw">let </span>block = Block::bordered();
+        <span class="macro">assert_eq!</span>(block.horizontal_space(), (<span class="number">1</span>, <span class="number">1</span>));
+
+        <span class="kw">let </span>block = Block::new().borders(Borders::LEFT);
+        <span class="macro">assert_eq!</span>(block.horizontal_space(), (<span class="number">1</span>, <span class="number">0</span>));
+
+        <span class="kw">let </span>block = Block::new().borders(Borders::RIGHT);
+        <span class="macro">assert_eq!</span>(block.horizontal_space(), (<span class="number">0</span>, <span class="number">1</span>));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>horizontal_space_takes_into_account_padding() {
+        <span class="kw">let </span>block = Block::new().padding(Padding::new(<span class="number">1</span>, <span class="number">1</span>, <span class="number">100</span>, <span class="number">100</span>));
+        <span class="macro">assert_eq!</span>(block.horizontal_space(), (<span class="number">1</span>, <span class="number">1</span>));
+
+        <span class="kw">let </span>block = Block::new().padding(Padding::new(<span class="number">3</span>, <span class="number">5</span>, <span class="number">0</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(block.horizontal_space(), (<span class="number">3</span>, <span class="number">5</span>));
+
+        <span class="kw">let </span>block = Block::new().padding(Padding::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">100</span>, <span class="number">100</span>));
+        <span class="macro">assert_eq!</span>(block.horizontal_space(), (<span class="number">0</span>, <span class="number">1</span>));
+
+        <span class="kw">let </span>block = Block::new().padding(Padding::new(<span class="number">1</span>, <span class="number">0</span>, <span class="number">100</span>, <span class="number">100</span>));
+        <span class="macro">assert_eq!</span>(block.horizontal_space(), (<span class="number">1</span>, <span class="number">0</span>));
+    }
+
+    <span class="attr">#[rstest]
+    #[case::all_bordered_all_padded(Block::bordered(), Padding::new(<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>), (<span class="number">2</span>, <span class="number">2</span>))]
+    #[case::all_bordered_left_padded(Block::bordered(), Padding::new(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), (<span class="number">2</span>, <span class="number">1</span>))]
+    #[case::all_bordered_right_padded(Block::bordered(), Padding::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">2</span>))]
+    #[case::all_bordered_top_padded(Block::bordered(), Padding::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">1</span>))]
+    #[case::all_bordered_bottom_padded(Block::bordered(), Padding::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>), (<span class="number">1</span>, <span class="number">1</span>))]
+    #[case::left_bordered_left_padded(Block::new().borders(Borders::LEFT), Padding::new(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), (<span class="number">2</span>, <span class="number">0</span>))]
+    #[case::left_bordered_right_padded(Block::new().borders(Borders::LEFT), Padding::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">1</span>))]
+    #[case::right_bordered_right_padded(Block::new().borders(Borders::RIGHT), Padding::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>), (<span class="number">0</span>, <span class="number">2</span>))]
+    #[case::right_bordered_left_padded(Block::new().borders(Borders::RIGHT), Padding::new(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">1</span>))]
+    </span><span class="kw">fn </span>horizontal_space_takes_into_account_borders_and_padding(
+        <span class="attr">#[case] </span>block: Block,
+        <span class="attr">#[case] </span>padding: Padding,
+        <span class="attr">#[case] </span>horizontal_space: (u16, u16),
+    ) {
+        <span class="kw">let </span>block = block.padding(padding);
+        <span class="macro">assert_eq!</span>(block.horizontal_space(), horizontal_space);
     }
 
     <span class="attr">#[test]
@@ -2449,7 +2932,8 @@
         <span class="kw">use </span>Alignment::<span class="kw-2">*</span>;
         <span class="kw">use </span>Position::<span class="kw-2">*</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">11</span>, <span class="number">3</span>));
-        Block::bordered()
+        <span class="attr">#[allow(deprecated)] </span><span class="comment">// until Title is removed
+        </span>Block::bordered()
             .title(Title::from(<span class="string">"A"</span>).position(Top).alignment(Left))
             .title(Title::from(<span class="string">"B"</span>).position(Top).alignment(Center))
             .title(Title::from(<span class="string">"C"</span>).position(Top).alignment(Right))
@@ -2514,13 +2998,13 @@
             <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="number">1</span>));
             Block::new()
                 .title_alignment(block_title_alignment)
-                .title(Title::from(<span class="string">"test"</span>).alignment(alignment))
+                .title(Line::from(<span class="string">"test"</span>).alignment(alignment))
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
             <span class="macro">assert_eq!</span>(buffer, Buffer::with_lines([expected]));
         }
     }
 
-    <span class="doccomment">/// This is a regression test for bug &lt;https://github.com/ratatui-org/ratatui/issues/929&gt;
+    <span class="doccomment">/// This is a regression test for bug &lt;https://github.com/ratatui/ratatui/issues/929&gt;
     </span><span class="attr">#[test]
     </span><span class="kw">fn </span>render_right_aligned_empty_title() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));

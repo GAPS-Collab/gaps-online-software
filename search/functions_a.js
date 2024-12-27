@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['voltages_154',['voltages',['../structRBCalibration.html#adfab387bd6bebb965be054e754076452',1,'RBCalibration']]]
+  ['voltages_0',['voltages',['../structRBCalibration.html#a56bae47243a511741f1aa28fc6fb5842',1,'RBCalibration']]]
 ];

@@ -1,29 +1,4 @@
 var structTofHit =
 [
-    [ "get_charge_a", "structTofHit.html#a3b06af7026a826119e0ce54d6c6b25c9", null ],
-    [ "get_charge_b", "structTofHit.html#a0f28542a8bb21748c6089938f73fe381", null ],
-    [ "get_charge_min_i", "structTofHit.html#a3603b33ce16eaddaef6f11e330fe7a7c", null ],
-    [ "get_peak_a", "structTofHit.html#a08e68ad931b36232e8f52c29a05b9e09", null ],
-    [ "get_peak_b", "structTofHit.html#acd3687f7d5039ba61c2aef760b5b6355", null ],
-    [ "get_t0", "structTofHit.html#aa65986678facbcf8c4d773d9783fe214", null ],
-    [ "get_t_avg", "structTofHit.html#add0ce258627ee513e9d1450832e967d1", null ],
-    [ "get_time_a", "structTofHit.html#af2c2846772959b0c6f1929b5fd0c939c", null ],
-    [ "get_time_b", "structTofHit.html#ab0ed7ac6e2292e72c55912b2a644f1a9", null ],
-    [ "get_timestamp48", "structTofHit.html#ad1260551e11471967105e43ee71319e0", null ],
-    [ "get_x_pos", "structTofHit.html#ac8bde89ef95032ea10e9591a59db35cf", null ],
-    [ "set_paddle_len", "structTofHit.html#aea570005131df3d3077d25512df181e2", null ],
-    [ "to_string", "structTofHit.html#afa2cbd718256a9ba9f611c8189cf695f", null ],
-    [ "baseline_a", "structTofHit.html#ae8b8043d59cdffc6ad0ade105614384a", null ],
-    [ "baseline_a_rms", "structTofHit.html#ae597714f49fc0c980ad0896965820d69", null ],
-    [ "baseline_b", "structTofHit.html#a770905e5108175a885f88cc712001d08", null ],
-    [ "baseline_b_rms", "structTofHit.html#aa562d778f3120c15cdc3ea5ad6157029", null ],
-    [ "broken", "structTofHit.html#a52dff42b6f445d2f0e511c80600facd4", null ],
-    [ "ctr_etx", "structTofHit.html#a8cc01c56ab908c4ae8c3b01d93082df0", null ],
-    [ "paddle_id", "structTofHit.html#ae2a4b070762f1702099b8e651d883c4c", null ],
-    [ "paddle_len", "structTofHit.html#aa9754214cd8cba72b6e9b252cebf97ff", null ],
-    [ "phase", "structTofHit.html#a7ccf0363860f0f789b24bb9fc8371d39", null ],
-    [ "tail", "structTofHit.html#a828331e30508d4e22bf6740516d9be95", null ],
-    [ "timestamp16", "structTofHit.html#ae1c3755571cbebd921aa90b83aee7f1e", null ],
-    [ "timestamp32", "structTofHit.html#a1317449d74bd518abc7c6ed8536c819f", null ],
-    [ "version", "structTofHit.html#a2e85ffa58c630e4f6c2328568e635aea", null ]
+    [ "set_paddle_len", "structTofHit.html#aea570005131df3d3077d25512df181e2", null ]
 ];

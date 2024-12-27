@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["BitMapBackendError"],"mod":["bitmap_pixel"],"struct":["BitMapBackend"]};

@@ -1,18 +1,6 @@
 var searchData=
 [
-  ['paddle_43',['Paddle',['../structPaddle.html',1,'']]],
-  ['pamonidata_44',['PAMoniData',['../structPAMoniData.html',1,'']]],
-  ['parse_5ff16_45',['parse_f16',['../namespaceGaps.html#adbed3ea3f57b77872fd060984c65e4be',1,'Gaps']]],
-  ['parse_5ff32_46',['parse_f32',['../namespaceGaps.html#aa324d073f3fec42714ed7f1dfa9528ce',1,'Gaps']]],
-  ['parse_5ff64_47',['parse_f64',['../namespaceGaps.html#a75bc2048681872469a0e8164a07eb145',1,'Gaps']]],
-  ['parse_5fi32_48',['parse_i32',['../namespaceGaps.html#a2fa35da8776bb053ebdb6f9da7ea245e',1,'Gaps']]],
-  ['parse_5fstring_49',['parse_string',['../namespaceGaps.html#abaf57ec43250a61eb58cc3fd3b68848a',1,'Gaps']]],
-  ['parse_5fu16_50',['parse_u16',['../namespaceGaps.html#a8d5ee03930328391169c3f11a9b06e8e',1,'Gaps']]],
-  ['parse_5fu32_51',['parse_u32',['../namespaceGaps.html#ac09d7b4a66f0df27a63af339dd6d7ea8',1,'Gaps']]],
-  ['parse_5fu64_52',['parse_u64',['../namespaceGaps.html#aa913722aa6668823951e07f44b8698d6',1,'Gaps']]],
-  ['parse_5fu8_53',['parse_u8',['../namespaceGaps.html#af02b80458f7649651a342344e3b103ee',1,'Gaps']]],
-  ['pbmonidata_54',['PBMoniData',['../structPBMoniData.html',1,'']]],
-  ['pressure_55',['pressure',['../structRBMoniData.html#a417357f8a34942a7eefecb7ba73800ba',1,'RBMoniData']]],
-  ['primary_5fbeta_56',['primary_beta',['../structTofEventSummary.html#aaaf4cf393a61aacf8e5e3e390f2ea474',1,'TofEventSummary']]],
-  ['primary_5fcharge_57',['primary_charge',['../structTofEventSummary.html#a7254ca37addca5afb86310d1fc6e8b09',1,'TofEventSummary']]]
+  ['n_5fpackets_5fread_0',['n_packets_read',['../structGaps_1_1CRReader.html#abf1e7af9a9f1c617b96e7d717512182b',1,'Gaps::CRReader::n_packets_read()'],['../classGaps_1_1TofPacketReader.html#a0d60c227d18a002876b946ea1f6f9ed4',1,'Gaps::TofPacketReader::n_packets_read()']]],
+  ['n_5ftrigger_5fpaddles_1',['n_trigger_paddles',['../structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e',1,'TofEventSummary']]],
+  ['noi_5fdata_2',['noi_data',['../structRBCalibration.html#a71265fb6bc6cd97c69bc54923cc06f0e',1,'RBCalibration']]]
 ];

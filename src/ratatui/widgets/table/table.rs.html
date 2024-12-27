@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/widgets/table/table.rs`."><title>table.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/widgets/table/table.rs`."><title>table.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/widgets/table/</div>table.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1805,12 +1806,514 @@
 <a href="#1805" id="1805">1805</a>
 <a href="#1806" id="1806">1806</a>
 <a href="#1807" id="1807">1807</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>itertools::Itertools;
+<a href="#1808" id="1808">1808</a>
+<a href="#1809" id="1809">1809</a>
+<a href="#1810" id="1810">1810</a>
+<a href="#1811" id="1811">1811</a>
+<a href="#1812" id="1812">1812</a>
+<a href="#1813" id="1813">1813</a>
+<a href="#1814" id="1814">1814</a>
+<a href="#1815" id="1815">1815</a>
+<a href="#1816" id="1816">1816</a>
+<a href="#1817" id="1817">1817</a>
+<a href="#1818" id="1818">1818</a>
+<a href="#1819" id="1819">1819</a>
+<a href="#1820" id="1820">1820</a>
+<a href="#1821" id="1821">1821</a>
+<a href="#1822" id="1822">1822</a>
+<a href="#1823" id="1823">1823</a>
+<a href="#1824" id="1824">1824</a>
+<a href="#1825" id="1825">1825</a>
+<a href="#1826" id="1826">1826</a>
+<a href="#1827" id="1827">1827</a>
+<a href="#1828" id="1828">1828</a>
+<a href="#1829" id="1829">1829</a>
+<a href="#1830" id="1830">1830</a>
+<a href="#1831" id="1831">1831</a>
+<a href="#1832" id="1832">1832</a>
+<a href="#1833" id="1833">1833</a>
+<a href="#1834" id="1834">1834</a>
+<a href="#1835" id="1835">1835</a>
+<a href="#1836" id="1836">1836</a>
+<a href="#1837" id="1837">1837</a>
+<a href="#1838" id="1838">1838</a>
+<a href="#1839" id="1839">1839</a>
+<a href="#1840" id="1840">1840</a>
+<a href="#1841" id="1841">1841</a>
+<a href="#1842" id="1842">1842</a>
+<a href="#1843" id="1843">1843</a>
+<a href="#1844" id="1844">1844</a>
+<a href="#1845" id="1845">1845</a>
+<a href="#1846" id="1846">1846</a>
+<a href="#1847" id="1847">1847</a>
+<a href="#1848" id="1848">1848</a>
+<a href="#1849" id="1849">1849</a>
+<a href="#1850" id="1850">1850</a>
+<a href="#1851" id="1851">1851</a>
+<a href="#1852" id="1852">1852</a>
+<a href="#1853" id="1853">1853</a>
+<a href="#1854" id="1854">1854</a>
+<a href="#1855" id="1855">1855</a>
+<a href="#1856" id="1856">1856</a>
+<a href="#1857" id="1857">1857</a>
+<a href="#1858" id="1858">1858</a>
+<a href="#1859" id="1859">1859</a>
+<a href="#1860" id="1860">1860</a>
+<a href="#1861" id="1861">1861</a>
+<a href="#1862" id="1862">1862</a>
+<a href="#1863" id="1863">1863</a>
+<a href="#1864" id="1864">1864</a>
+<a href="#1865" id="1865">1865</a>
+<a href="#1866" id="1866">1866</a>
+<a href="#1867" id="1867">1867</a>
+<a href="#1868" id="1868">1868</a>
+<a href="#1869" id="1869">1869</a>
+<a href="#1870" id="1870">1870</a>
+<a href="#1871" id="1871">1871</a>
+<a href="#1872" id="1872">1872</a>
+<a href="#1873" id="1873">1873</a>
+<a href="#1874" id="1874">1874</a>
+<a href="#1875" id="1875">1875</a>
+<a href="#1876" id="1876">1876</a>
+<a href="#1877" id="1877">1877</a>
+<a href="#1878" id="1878">1878</a>
+<a href="#1879" id="1879">1879</a>
+<a href="#1880" id="1880">1880</a>
+<a href="#1881" id="1881">1881</a>
+<a href="#1882" id="1882">1882</a>
+<a href="#1883" id="1883">1883</a>
+<a href="#1884" id="1884">1884</a>
+<a href="#1885" id="1885">1885</a>
+<a href="#1886" id="1886">1886</a>
+<a href="#1887" id="1887">1887</a>
+<a href="#1888" id="1888">1888</a>
+<a href="#1889" id="1889">1889</a>
+<a href="#1890" id="1890">1890</a>
+<a href="#1891" id="1891">1891</a>
+<a href="#1892" id="1892">1892</a>
+<a href="#1893" id="1893">1893</a>
+<a href="#1894" id="1894">1894</a>
+<a href="#1895" id="1895">1895</a>
+<a href="#1896" id="1896">1896</a>
+<a href="#1897" id="1897">1897</a>
+<a href="#1898" id="1898">1898</a>
+<a href="#1899" id="1899">1899</a>
+<a href="#1900" id="1900">1900</a>
+<a href="#1901" id="1901">1901</a>
+<a href="#1902" id="1902">1902</a>
+<a href="#1903" id="1903">1903</a>
+<a href="#1904" id="1904">1904</a>
+<a href="#1905" id="1905">1905</a>
+<a href="#1906" id="1906">1906</a>
+<a href="#1907" id="1907">1907</a>
+<a href="#1908" id="1908">1908</a>
+<a href="#1909" id="1909">1909</a>
+<a href="#1910" id="1910">1910</a>
+<a href="#1911" id="1911">1911</a>
+<a href="#1912" id="1912">1912</a>
+<a href="#1913" id="1913">1913</a>
+<a href="#1914" id="1914">1914</a>
+<a href="#1915" id="1915">1915</a>
+<a href="#1916" id="1916">1916</a>
+<a href="#1917" id="1917">1917</a>
+<a href="#1918" id="1918">1918</a>
+<a href="#1919" id="1919">1919</a>
+<a href="#1920" id="1920">1920</a>
+<a href="#1921" id="1921">1921</a>
+<a href="#1922" id="1922">1922</a>
+<a href="#1923" id="1923">1923</a>
+<a href="#1924" id="1924">1924</a>
+<a href="#1925" id="1925">1925</a>
+<a href="#1926" id="1926">1926</a>
+<a href="#1927" id="1927">1927</a>
+<a href="#1928" id="1928">1928</a>
+<a href="#1929" id="1929">1929</a>
+<a href="#1930" id="1930">1930</a>
+<a href="#1931" id="1931">1931</a>
+<a href="#1932" id="1932">1932</a>
+<a href="#1933" id="1933">1933</a>
+<a href="#1934" id="1934">1934</a>
+<a href="#1935" id="1935">1935</a>
+<a href="#1936" id="1936">1936</a>
+<a href="#1937" id="1937">1937</a>
+<a href="#1938" id="1938">1938</a>
+<a href="#1939" id="1939">1939</a>
+<a href="#1940" id="1940">1940</a>
+<a href="#1941" id="1941">1941</a>
+<a href="#1942" id="1942">1942</a>
+<a href="#1943" id="1943">1943</a>
+<a href="#1944" id="1944">1944</a>
+<a href="#1945" id="1945">1945</a>
+<a href="#1946" id="1946">1946</a>
+<a href="#1947" id="1947">1947</a>
+<a href="#1948" id="1948">1948</a>
+<a href="#1949" id="1949">1949</a>
+<a href="#1950" id="1950">1950</a>
+<a href="#1951" id="1951">1951</a>
+<a href="#1952" id="1952">1952</a>
+<a href="#1953" id="1953">1953</a>
+<a href="#1954" id="1954">1954</a>
+<a href="#1955" id="1955">1955</a>
+<a href="#1956" id="1956">1956</a>
+<a href="#1957" id="1957">1957</a>
+<a href="#1958" id="1958">1958</a>
+<a href="#1959" id="1959">1959</a>
+<a href="#1960" id="1960">1960</a>
+<a href="#1961" id="1961">1961</a>
+<a href="#1962" id="1962">1962</a>
+<a href="#1963" id="1963">1963</a>
+<a href="#1964" id="1964">1964</a>
+<a href="#1965" id="1965">1965</a>
+<a href="#1966" id="1966">1966</a>
+<a href="#1967" id="1967">1967</a>
+<a href="#1968" id="1968">1968</a>
+<a href="#1969" id="1969">1969</a>
+<a href="#1970" id="1970">1970</a>
+<a href="#1971" id="1971">1971</a>
+<a href="#1972" id="1972">1972</a>
+<a href="#1973" id="1973">1973</a>
+<a href="#1974" id="1974">1974</a>
+<a href="#1975" id="1975">1975</a>
+<a href="#1976" id="1976">1976</a>
+<a href="#1977" id="1977">1977</a>
+<a href="#1978" id="1978">1978</a>
+<a href="#1979" id="1979">1979</a>
+<a href="#1980" id="1980">1980</a>
+<a href="#1981" id="1981">1981</a>
+<a href="#1982" id="1982">1982</a>
+<a href="#1983" id="1983">1983</a>
+<a href="#1984" id="1984">1984</a>
+<a href="#1985" id="1985">1985</a>
+<a href="#1986" id="1986">1986</a>
+<a href="#1987" id="1987">1987</a>
+<a href="#1988" id="1988">1988</a>
+<a href="#1989" id="1989">1989</a>
+<a href="#1990" id="1990">1990</a>
+<a href="#1991" id="1991">1991</a>
+<a href="#1992" id="1992">1992</a>
+<a href="#1993" id="1993">1993</a>
+<a href="#1994" id="1994">1994</a>
+<a href="#1995" id="1995">1995</a>
+<a href="#1996" id="1996">1996</a>
+<a href="#1997" id="1997">1997</a>
+<a href="#1998" id="1998">1998</a>
+<a href="#1999" id="1999">1999</a>
+<a href="#2000" id="2000">2000</a>
+<a href="#2001" id="2001">2001</a>
+<a href="#2002" id="2002">2002</a>
+<a href="#2003" id="2003">2003</a>
+<a href="#2004" id="2004">2004</a>
+<a href="#2005" id="2005">2005</a>
+<a href="#2006" id="2006">2006</a>
+<a href="#2007" id="2007">2007</a>
+<a href="#2008" id="2008">2008</a>
+<a href="#2009" id="2009">2009</a>
+<a href="#2010" id="2010">2010</a>
+<a href="#2011" id="2011">2011</a>
+<a href="#2012" id="2012">2012</a>
+<a href="#2013" id="2013">2013</a>
+<a href="#2014" id="2014">2014</a>
+<a href="#2015" id="2015">2015</a>
+<a href="#2016" id="2016">2016</a>
+<a href="#2017" id="2017">2017</a>
+<a href="#2018" id="2018">2018</a>
+<a href="#2019" id="2019">2019</a>
+<a href="#2020" id="2020">2020</a>
+<a href="#2021" id="2021">2021</a>
+<a href="#2022" id="2022">2022</a>
+<a href="#2023" id="2023">2023</a>
+<a href="#2024" id="2024">2024</a>
+<a href="#2025" id="2025">2025</a>
+<a href="#2026" id="2026">2026</a>
+<a href="#2027" id="2027">2027</a>
+<a href="#2028" id="2028">2028</a>
+<a href="#2029" id="2029">2029</a>
+<a href="#2030" id="2030">2030</a>
+<a href="#2031" id="2031">2031</a>
+<a href="#2032" id="2032">2032</a>
+<a href="#2033" id="2033">2033</a>
+<a href="#2034" id="2034">2034</a>
+<a href="#2035" id="2035">2035</a>
+<a href="#2036" id="2036">2036</a>
+<a href="#2037" id="2037">2037</a>
+<a href="#2038" id="2038">2038</a>
+<a href="#2039" id="2039">2039</a>
+<a href="#2040" id="2040">2040</a>
+<a href="#2041" id="2041">2041</a>
+<a href="#2042" id="2042">2042</a>
+<a href="#2043" id="2043">2043</a>
+<a href="#2044" id="2044">2044</a>
+<a href="#2045" id="2045">2045</a>
+<a href="#2046" id="2046">2046</a>
+<a href="#2047" id="2047">2047</a>
+<a href="#2048" id="2048">2048</a>
+<a href="#2049" id="2049">2049</a>
+<a href="#2050" id="2050">2050</a>
+<a href="#2051" id="2051">2051</a>
+<a href="#2052" id="2052">2052</a>
+<a href="#2053" id="2053">2053</a>
+<a href="#2054" id="2054">2054</a>
+<a href="#2055" id="2055">2055</a>
+<a href="#2056" id="2056">2056</a>
+<a href="#2057" id="2057">2057</a>
+<a href="#2058" id="2058">2058</a>
+<a href="#2059" id="2059">2059</a>
+<a href="#2060" id="2060">2060</a>
+<a href="#2061" id="2061">2061</a>
+<a href="#2062" id="2062">2062</a>
+<a href="#2063" id="2063">2063</a>
+<a href="#2064" id="2064">2064</a>
+<a href="#2065" id="2065">2065</a>
+<a href="#2066" id="2066">2066</a>
+<a href="#2067" id="2067">2067</a>
+<a href="#2068" id="2068">2068</a>
+<a href="#2069" id="2069">2069</a>
+<a href="#2070" id="2070">2070</a>
+<a href="#2071" id="2071">2071</a>
+<a href="#2072" id="2072">2072</a>
+<a href="#2073" id="2073">2073</a>
+<a href="#2074" id="2074">2074</a>
+<a href="#2075" id="2075">2075</a>
+<a href="#2076" id="2076">2076</a>
+<a href="#2077" id="2077">2077</a>
+<a href="#2078" id="2078">2078</a>
+<a href="#2079" id="2079">2079</a>
+<a href="#2080" id="2080">2080</a>
+<a href="#2081" id="2081">2081</a>
+<a href="#2082" id="2082">2082</a>
+<a href="#2083" id="2083">2083</a>
+<a href="#2084" id="2084">2084</a>
+<a href="#2085" id="2085">2085</a>
+<a href="#2086" id="2086">2086</a>
+<a href="#2087" id="2087">2087</a>
+<a href="#2088" id="2088">2088</a>
+<a href="#2089" id="2089">2089</a>
+<a href="#2090" id="2090">2090</a>
+<a href="#2091" id="2091">2091</a>
+<a href="#2092" id="2092">2092</a>
+<a href="#2093" id="2093">2093</a>
+<a href="#2094" id="2094">2094</a>
+<a href="#2095" id="2095">2095</a>
+<a href="#2096" id="2096">2096</a>
+<a href="#2097" id="2097">2097</a>
+<a href="#2098" id="2098">2098</a>
+<a href="#2099" id="2099">2099</a>
+<a href="#2100" id="2100">2100</a>
+<a href="#2101" id="2101">2101</a>
+<a href="#2102" id="2102">2102</a>
+<a href="#2103" id="2103">2103</a>
+<a href="#2104" id="2104">2104</a>
+<a href="#2105" id="2105">2105</a>
+<a href="#2106" id="2106">2106</a>
+<a href="#2107" id="2107">2107</a>
+<a href="#2108" id="2108">2108</a>
+<a href="#2109" id="2109">2109</a>
+<a href="#2110" id="2110">2110</a>
+<a href="#2111" id="2111">2111</a>
+<a href="#2112" id="2112">2112</a>
+<a href="#2113" id="2113">2113</a>
+<a href="#2114" id="2114">2114</a>
+<a href="#2115" id="2115">2115</a>
+<a href="#2116" id="2116">2116</a>
+<a href="#2117" id="2117">2117</a>
+<a href="#2118" id="2118">2118</a>
+<a href="#2119" id="2119">2119</a>
+<a href="#2120" id="2120">2120</a>
+<a href="#2121" id="2121">2121</a>
+<a href="#2122" id="2122">2122</a>
+<a href="#2123" id="2123">2123</a>
+<a href="#2124" id="2124">2124</a>
+<a href="#2125" id="2125">2125</a>
+<a href="#2126" id="2126">2126</a>
+<a href="#2127" id="2127">2127</a>
+<a href="#2128" id="2128">2128</a>
+<a href="#2129" id="2129">2129</a>
+<a href="#2130" id="2130">2130</a>
+<a href="#2131" id="2131">2131</a>
+<a href="#2132" id="2132">2132</a>
+<a href="#2133" id="2133">2133</a>
+<a href="#2134" id="2134">2134</a>
+<a href="#2135" id="2135">2135</a>
+<a href="#2136" id="2136">2136</a>
+<a href="#2137" id="2137">2137</a>
+<a href="#2138" id="2138">2138</a>
+<a href="#2139" id="2139">2139</a>
+<a href="#2140" id="2140">2140</a>
+<a href="#2141" id="2141">2141</a>
+<a href="#2142" id="2142">2142</a>
+<a href="#2143" id="2143">2143</a>
+<a href="#2144" id="2144">2144</a>
+<a href="#2145" id="2145">2145</a>
+<a href="#2146" id="2146">2146</a>
+<a href="#2147" id="2147">2147</a>
+<a href="#2148" id="2148">2148</a>
+<a href="#2149" id="2149">2149</a>
+<a href="#2150" id="2150">2150</a>
+<a href="#2151" id="2151">2151</a>
+<a href="#2152" id="2152">2152</a>
+<a href="#2153" id="2153">2153</a>
+<a href="#2154" id="2154">2154</a>
+<a href="#2155" id="2155">2155</a>
+<a href="#2156" id="2156">2156</a>
+<a href="#2157" id="2157">2157</a>
+<a href="#2158" id="2158">2158</a>
+<a href="#2159" id="2159">2159</a>
+<a href="#2160" id="2160">2160</a>
+<a href="#2161" id="2161">2161</a>
+<a href="#2162" id="2162">2162</a>
+<a href="#2163" id="2163">2163</a>
+<a href="#2164" id="2164">2164</a>
+<a href="#2165" id="2165">2165</a>
+<a href="#2166" id="2166">2166</a>
+<a href="#2167" id="2167">2167</a>
+<a href="#2168" id="2168">2168</a>
+<a href="#2169" id="2169">2169</a>
+<a href="#2170" id="2170">2170</a>
+<a href="#2171" id="2171">2171</a>
+<a href="#2172" id="2172">2172</a>
+<a href="#2173" id="2173">2173</a>
+<a href="#2174" id="2174">2174</a>
+<a href="#2175" id="2175">2175</a>
+<a href="#2176" id="2176">2176</a>
+<a href="#2177" id="2177">2177</a>
+<a href="#2178" id="2178">2178</a>
+<a href="#2179" id="2179">2179</a>
+<a href="#2180" id="2180">2180</a>
+<a href="#2181" id="2181">2181</a>
+<a href="#2182" id="2182">2182</a>
+<a href="#2183" id="2183">2183</a>
+<a href="#2184" id="2184">2184</a>
+<a href="#2185" id="2185">2185</a>
+<a href="#2186" id="2186">2186</a>
+<a href="#2187" id="2187">2187</a>
+<a href="#2188" id="2188">2188</a>
+<a href="#2189" id="2189">2189</a>
+<a href="#2190" id="2190">2190</a>
+<a href="#2191" id="2191">2191</a>
+<a href="#2192" id="2192">2192</a>
+<a href="#2193" id="2193">2193</a>
+<a href="#2194" id="2194">2194</a>
+<a href="#2195" id="2195">2195</a>
+<a href="#2196" id="2196">2196</a>
+<a href="#2197" id="2197">2197</a>
+<a href="#2198" id="2198">2198</a>
+<a href="#2199" id="2199">2199</a>
+<a href="#2200" id="2200">2200</a>
+<a href="#2201" id="2201">2201</a>
+<a href="#2202" id="2202">2202</a>
+<a href="#2203" id="2203">2203</a>
+<a href="#2204" id="2204">2204</a>
+<a href="#2205" id="2205">2205</a>
+<a href="#2206" id="2206">2206</a>
+<a href="#2207" id="2207">2207</a>
+<a href="#2208" id="2208">2208</a>
+<a href="#2209" id="2209">2209</a>
+<a href="#2210" id="2210">2210</a>
+<a href="#2211" id="2211">2211</a>
+<a href="#2212" id="2212">2212</a>
+<a href="#2213" id="2213">2213</a>
+<a href="#2214" id="2214">2214</a>
+<a href="#2215" id="2215">2215</a>
+<a href="#2216" id="2216">2216</a>
+<a href="#2217" id="2217">2217</a>
+<a href="#2218" id="2218">2218</a>
+<a href="#2219" id="2219">2219</a>
+<a href="#2220" id="2220">2220</a>
+<a href="#2221" id="2221">2221</a>
+<a href="#2222" id="2222">2222</a>
+<a href="#2223" id="2223">2223</a>
+<a href="#2224" id="2224">2224</a>
+<a href="#2225" id="2225">2225</a>
+<a href="#2226" id="2226">2226</a>
+<a href="#2227" id="2227">2227</a>
+<a href="#2228" id="2228">2228</a>
+<a href="#2229" id="2229">2229</a>
+<a href="#2230" id="2230">2230</a>
+<a href="#2231" id="2231">2231</a>
+<a href="#2232" id="2232">2232</a>
+<a href="#2233" id="2233">2233</a>
+<a href="#2234" id="2234">2234</a>
+<a href="#2235" id="2235">2235</a>
+<a href="#2236" id="2236">2236</a>
+<a href="#2237" id="2237">2237</a>
+<a href="#2238" id="2238">2238</a>
+<a href="#2239" id="2239">2239</a>
+<a href="#2240" id="2240">2240</a>
+<a href="#2241" id="2241">2241</a>
+<a href="#2242" id="2242">2242</a>
+<a href="#2243" id="2243">2243</a>
+<a href="#2244" id="2244">2244</a>
+<a href="#2245" id="2245">2245</a>
+<a href="#2246" id="2246">2246</a>
+<a href="#2247" id="2247">2247</a>
+<a href="#2248" id="2248">2248</a>
+<a href="#2249" id="2249">2249</a>
+<a href="#2250" id="2250">2250</a>
+<a href="#2251" id="2251">2251</a>
+<a href="#2252" id="2252">2252</a>
+<a href="#2253" id="2253">2253</a>
+<a href="#2254" id="2254">2254</a>
+<a href="#2255" id="2255">2255</a>
+<a href="#2256" id="2256">2256</a>
+<a href="#2257" id="2257">2257</a>
+<a href="#2258" id="2258">2258</a>
+<a href="#2259" id="2259">2259</a>
+<a href="#2260" id="2260">2260</a>
+<a href="#2261" id="2261">2261</a>
+<a href="#2262" id="2262">2262</a>
+<a href="#2263" id="2263">2263</a>
+<a href="#2264" id="2264">2264</a>
+<a href="#2265" id="2265">2265</a>
+<a href="#2266" id="2266">2266</a>
+<a href="#2267" id="2267">2267</a>
+<a href="#2268" id="2268">2268</a>
+<a href="#2269" id="2269">2269</a>
+<a href="#2270" id="2270">2270</a>
+<a href="#2271" id="2271">2271</a>
+<a href="#2272" id="2272">2272</a>
+<a href="#2273" id="2273">2273</a>
+<a href="#2274" id="2274">2274</a>
+<a href="#2275" id="2275">2275</a>
+<a href="#2276" id="2276">2276</a>
+<a href="#2277" id="2277">2277</a>
+<a href="#2278" id="2278">2278</a>
+<a href="#2279" id="2279">2279</a>
+<a href="#2280" id="2280">2280</a>
+<a href="#2281" id="2281">2281</a>
+<a href="#2282" id="2282">2282</a>
+<a href="#2283" id="2283">2283</a>
+<a href="#2284" id="2284">2284</a>
+<a href="#2285" id="2285">2285</a>
+<a href="#2286" id="2286">2286</a>
+<a href="#2287" id="2287">2287</a>
+<a href="#2288" id="2288">2288</a>
+<a href="#2289" id="2289">2289</a>
+<a href="#2290" id="2290">2290</a>
+<a href="#2291" id="2291">2291</a>
+<a href="#2292" id="2292">2292</a>
+<a href="#2293" id="2293">2293</a>
+<a href="#2294" id="2294">2294</a>
+<a href="#2295" id="2295">2295</a>
+<a href="#2296" id="2296">2296</a>
+<a href="#2297" id="2297">2297</a>
+<a href="#2298" id="2298">2298</a>
+<a href="#2299" id="2299">2299</a>
+<a href="#2300" id="2300">2300</a>
+<a href="#2301" id="2301">2301</a></pre></div><pre class="rust"><code><span class="kw">use </span>itertools::Itertools;
 
 <span class="attr">#[allow(unused_imports)] </span><span class="comment">// `Cell` is used in the doc comment but not the code
-</span><span class="kw">use </span><span class="kw">super</span>::Cell;
-<span class="kw">use super</span>::{HighlightSpacing, Row, TableState};
-<span class="kw">use crate</span>::{layout::Flex, prelude::<span class="kw-2">*</span>, style::Styled, widgets::Block};
+</span><span class="kw">use </span><span class="kw">crate</span>::widgets::table::Cell;
+<span class="kw">use crate</span>::{
+    buffer::Buffer,
+    layout::{Constraint, Flex, Layout, Rect},
+    style::{Style, Styled},
+    text::Text,
+    widgets::{
+        block::BlockExt,
+        table::{HighlightSpacing, Row, TableState},
+        Block, StatefulWidget, StatefulWidgetRef, Widget, WidgetRef,
+    },
+};
 
 <span class="doccomment">/// A widget to display data in formatted columns.
 ///
@@ -1828,16 +2331,17 @@
 ///
 /// [`Table`] is also a [`StatefulWidget`], which means you can use it with [`TableState`] to allow
 /// the user to scroll through the rows and select one of them. When rendering a [`Table`] with a
-/// [`TableState`], the selected row will be highlighted. If the selected row is not visible (based
-/// on the offset), the table will be scrolled to make the selected row visible.
+/// [`TableState`], the selected row, column and cell will be highlighted. If the selected row is
+/// not visible (based on the offset), the table will be scrolled to make the selected row visible.
 ///
 /// Note: if the `widths` field is empty, the table will be rendered with equal widths.
+/// Note: Highlight styles are applied in the following order: Row, Column, Cell.
 ///
 /// See the table example and the recipe and traceroute tabs in the demo2 example in the [Examples]
 /// directory for a more in depth example of the various configuration options and for how to handle
 /// state.
 ///
-/// [Examples]: https://github.com/ratatui-org/ratatui/blob/master/examples/README.md
+/// [Examples]: https://github.com/ratatui/ratatui/blob/master/examples/README.md
 ///
 /// # Constructor methods
 ///
@@ -1855,14 +2359,20 @@
 /// - [`Table::column_spacing`] sets the spacing between each column.
 /// - [`Table::block`] wraps the table in a [`Block`] widget.
 /// - [`Table::style`] sets the base style of the widget.
-/// - [`Table::highlight_style`] sets the style of the selected row.
+/// - [`Table::row_highlight_style`] sets the style of the selected row.
+/// - [`Table::column_highlight_style`] sets the style of the selected column.
+/// - [`Table::cell_highlight_style`] sets the style of the selected cell.
 /// - [`Table::highlight_symbol`] sets the symbol to be displayed in front of the selected row.
 /// - [`Table::highlight_spacing`] sets when to show the highlight spacing.
 ///
 /// # Example
 ///
 /// ```rust
-/// use ratatui::{prelude::*, widgets::*};
+/// use ratatui::{
+///     layout::Constraint,
+///     style::{Style, Stylize},
+///     widgets::{Block, Row, Table},
+/// };
 ///
 /// let rows = [Row::new(vec!["Cell1", "Cell2", "Cell3"])];
 /// // Columns widths are constrained in the same way as Layout...
@@ -1887,8 +2397,10 @@
 ///     .footer(Row::new(vec!["Updated on Dec 28"]))
 ///     // As any other widget, a Table can be wrapped in a Block.
 ///     .block(Block::new().title("Table"))
-///     // The selected row and its content can also be styled.
-///     .highlight_style(Style::new().reversed())
+///     // The selected row, column, cell and its content can also be styled.
+///     .row_highlight_style(Style::new().reversed())
+///     .column_highlight_style(Style::new().red())
+///     .cell_highlight_style(Style::new().blue())
 ///     // ...and potentially show a symbol in front of the selection.
 ///     .highlight_symbol("&gt;&gt;");
 /// ```
@@ -1897,7 +2409,12 @@
 /// bottom margin, and style. See [`Row`] for more details.
 ///
 /// ```rust
-/// # use ratatui::{prelude::*, widgets::*};
+/// use ratatui::{
+///     style::{Style, Stylize},
+///     text::{Line, Span},
+///     widgets::{Cell, Row, Table},
+/// };
+///
 /// // a Row can be created from simple strings.
 /// let row = Row::new(vec!["Row11", "Row12", "Row13"]);
 ///
@@ -1907,11 +2424,8 @@
 /// // If you need more control over the styling, create Cells directly
 /// let row = Row::new(vec![
 ///     Cell::from("Row31"),
-///     Cell::from("Row32").style(Style::default().fg(Color::Yellow)),
-///     Cell::from(Line::from(vec![
-///         Span::raw("Row"),
-///         Span::styled("33", Style::default().fg(Color::Green)),
-///     ])),
+///     Cell::from("Row32").style(Style::new().yellow()),
+///     Cell::from(Line::from(vec![Span::raw("Row"), Span::from("33").green()])),
 /// ]);
 ///
 /// // If a Row need to display some content over multiple lines, specify the height.
@@ -1927,14 +2441,19 @@
 /// details.
 ///
 /// ```rust
-/// # use ratatui::{prelude::*, widgets::*};
+/// use ratatui::{
+///     style::{Style, Stylize},
+///     text::{Line, Span, Text},
+///     widgets::Cell,
+/// };
+///
 /// Cell::from("simple string");
 /// Cell::from("simple styled span".red());
 /// Cell::from(Span::raw("raw span"));
 /// Cell::from(Span::styled("styled span", Style::new().red()));
 /// Cell::from(Line::from(vec![
 ///     Span::raw("a vec of "),
-///     Span::styled("spans", Style::new().bold()),
+///     Span::from("spans").bold(),
 /// ]));
 /// Cell::from(Text::from("text"));
 /// ```
@@ -1944,7 +2463,10 @@
 /// These default columns widths can be overridden using the `Table::widths` method.
 ///
 /// ```rust
-/// use ratatui::{prelude::*, widgets::*};
+/// use ratatui::{
+///     layout::Constraint,
+///     widgets::{Row, Table},
+/// };
 ///
 /// let text = "Mary had a\nlittle lamb.";
 ///
@@ -1959,7 +2481,11 @@
 /// the [`Stylize`] trait to set the style of the widget more concisely.
 ///
 /// ```rust
-/// use ratatui::{prelude::*, widgets::*};
+/// use ratatui::{
+///     layout::Constraint,
+///     style::Stylize,
+///     widgets::{Row, Table},
+/// };
 ///
 /// let rows = [Row::new(vec!["Cell1", "Cell2", "Cell3"])];
 /// let widths = [
@@ -1976,7 +2502,13 @@
 /// user to scroll through the rows and select one of them.
 ///
 /// ```rust
-/// # use ratatui::{prelude::*, widgets::*};
+/// use ratatui::{
+///     layout::{Constraint, Rect},
+///     style::{Style, Stylize},
+///     widgets::{Block, Row, Table, TableState},
+///     Frame,
+/// };
+///
 /// # fn ui(frame: &amp;mut Frame) {
 /// # let area = Rect::default();
 /// // Note: TableState should be stored in your application state (not constructed in your render
@@ -1994,12 +2526,15 @@
 /// ];
 /// let table = Table::new(rows, widths)
 ///     .block(Block::new().title("Table"))
-///     .highlight_style(Style::new().add_modifier(Modifier::REVERSED))
+///     .row_highlight_style(Style::new().reversed())
 ///     .highlight_symbol("&gt;&gt;");
 ///
 /// frame.render_stateful_widget(table, area, &amp;mut table_state);
 /// # }
 /// ```
+///
+/// [`Frame::render_widget`]: crate::Frame::render_widget
+/// [`Stylize`]: crate::style::Stylize
 </span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 </span><span class="kw">pub struct </span>Table&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Data to display in each row
@@ -2024,7 +2559,13 @@
     </span>style: Style,
 
     <span class="doccomment">/// Style used to render the selected row
-    </span>highlight_style: Style,
+    </span>row_highlight_style: Style,
+
+    <span class="doccomment">/// Style used to render the selected column
+    </span>column_highlight_style: Style,
+
+    <span class="doccomment">/// Style used to render the selected cell
+    </span>cell_highlight_style: Style,
 
     <span class="doccomment">/// Symbol in front of the selected row
     </span>highlight_symbol: Text&lt;<span class="lifetime">'a</span>&gt;,
@@ -2046,7 +2587,9 @@
             column_spacing: <span class="number">1</span>,
             block: <span class="prelude-val">None</span>,
             style: Style::new(),
-            highlight_style: Style::new(),
+            row_highlight_style: Style::new(),
+            column_highlight_style: Style::new(),
+            cell_highlight_style: Style::new(),
             highlight_symbol: Text::default(),
             highlight_spacing: HighlightSpacing::default(),
             flex: Flex::Start,
@@ -2068,7 +2611,11 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{
+    ///     layout::Constraint,
+    ///     widgets::{Row, Table},
+    /// };
+    ///
     /// let rows = [
     ///     Row::new(vec!["Cell1", "Cell2"]),
     ///     Row::new(vec!["Cell3", "Cell4"]),
@@ -2109,7 +2656,8 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::widgets::{Row, Table};
+    ///
     /// let rows = [
     ///     Row::new(vec!["Cell1", "Cell2"]),
     ///     Row::new(vec!["Cell3", "Cell4"]),
@@ -2134,7 +2682,8 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::widgets::{Cell, Row, Table};
+    ///
     /// let header = Row::new(vec![
     ///     Cell::from("Header Cell 1"),
     ///     Cell::from("Header Cell 2"),
@@ -2156,7 +2705,8 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::widgets::{Cell, Row, Table};
+    ///
     /// let footer = Row::new(vec![
     ///     Cell::from("Footer Cell 1"),
     ///     Cell::from("Footer Cell 2"),
@@ -2183,7 +2733,11 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{
+    ///     layout::Constraint,
+    ///     widgets::{Cell, Row, Table},
+    /// };
+    ///
     /// let table = Table::default().widths([Constraint::Length(5), Constraint::Length(5)]);
     /// let table = Table::default().widths(vec![Constraint::Length(5); 2]);
     ///
@@ -2210,9 +2764,13 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
-    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
-    /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
+    /// use ratatui::{
+    ///     layout::Constraint,
+    ///     widgets::{Row, Table},
+    /// };
+    ///
+    /// let rows = [Row::new(vec!["Cell1", "Cell2"])];
+    /// let widths = [Constraint::Length(5), Constraint::Length(5)];
     /// let table = Table::new(rows, widths).column_spacing(1);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2231,9 +2789,13 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
-    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
-    /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
+    /// use ratatui::{
+    ///     layout::Constraint,
+    ///     widgets::{Block, Cell, Row, Table},
+    /// };
+    ///
+    /// let rows = [Row::new(vec!["Cell1", "Cell2"])];
+    /// let widths = [Constraint::Length(5), Constraint::Length(5)];
     /// let block = Block::bordered().title("Table");
     /// let table = Table::new(rows, widths).block(block);
     /// ```
@@ -2256,7 +2818,12 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{
+    ///     layout::Constraint,
+    ///     style::{Style, Stylize},
+    ///     widgets::{Row, Table},
+    /// };
+    ///
     /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
     /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
     /// let table = Table::new(rows, widths).style(Style::new().red().italic());
@@ -2266,11 +2833,19 @@
     /// the [`Stylize`] trait to set the style of the widget more concisely.
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{
+    ///     layout::Constraint,
+    ///     style::Stylize,
+    ///     widgets::{Cell, Row, Table},
+    /// };
+    ///
     /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
     /// # let widths = vec![Constraint::Length(5), Constraint::Length(5)];
     /// let table = Table::new(rows, widths).red().italic();
     /// ```
+    ///
+    /// [`Color`]: crate::style::Color
+    /// [`Stylize`]: crate::style::Stylize
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.style = style.into();
@@ -2290,14 +2865,96 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
-    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
-    /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
+    /// use ratatui::{
+    ///     layout::Constraint,
+    ///     style::{Style, Stylize},
+    ///     widgets::{Cell, Row, Table},
+    /// };
+    ///
+    /// let rows = [Row::new(vec!["Cell1", "Cell2"])];
+    /// let widths = [Constraint::Length(5), Constraint::Length(5)];
     /// let table = Table::new(rows, widths).highlight_style(Style::new().red().italic());
     /// ```
+    ///
+    /// [`Color`]: crate::style::Color
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
-    </span><span class="kw">pub fn </span>highlight_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, highlight_style: S) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.highlight_style = highlight_style.into();
+    #[deprecated(note = <span class="string">"use `Table::row_highlight_style` instead"</span>)]
+    </span><span class="kw">pub fn </span>highlight_style&lt;S: Into&lt;Style&gt;&gt;(<span class="self">self</span>, highlight_style: S) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.row_highlight_style(highlight_style)
+    }
+
+    <span class="doccomment">/// Set the style of the selected row
+    ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
+    /// This style will be applied to the entire row, including the selection symbol if it is
+    /// displayed, and will override any style set on the row or on the individual cells.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use ratatui::{layout::Constraint, style::{Style, Stylize}, widgets::{Row, Table}};
+    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
+    /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
+    /// let table = Table::new(rows, widths).row_highlight_style(Style::new().red().italic());
+    /// ```
+    /// [`Color`]: crate::style::Color
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>row_highlight_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, highlight_style: S) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.row_highlight_style = highlight_style.into();
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set the style of the selected column
+    ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
+    /// This style will be applied to the entire column, and will override any style set on the
+    /// row or on the individual cells.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use ratatui::{layout::Constraint, style::{Style, Stylize}, widgets::{Row, Table}};
+    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
+    /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
+    /// let table = Table::new(rows, widths).column_highlight_style(Style::new().red().italic());
+    /// ```
+    /// [`Color`]: crate::style::Color
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>column_highlight_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, highlight_style: S) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.column_highlight_style = highlight_style.into();
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set the style of the selected cell
+    ///
+    /// `style` accepts any type that is convertible to [`Style`] (e.g. [`Style`], [`Color`], or
+    /// your own type that implements [`Into&lt;Style&gt;`]).
+    ///
+    /// This style will be applied to the selected cell, and will override any style set on the
+    /// row or on the individual cells.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use ratatui::{layout::Constraint, style::{Style, Stylize}, widgets::{Row, Table}};
+    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
+    /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
+    /// let table = Table::new(rows, widths).cell_highlight_style(Style::new().red().italic());
+    /// ```
+    /// [`Color`]: crate::style::Color
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>cell_highlight_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, highlight_style: S) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.cell_highlight_style = highlight_style.into();
         <span class="self">self
     </span>}
 
@@ -2308,7 +2965,11 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::{
+    ///     layout::Constraint,
+    ///     widgets::{Cell, Row, Table},
+    /// };
+    ///
     /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
     /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
     /// let table = Table::new(rows, widths).highlight_symbol("&gt;&gt;");
@@ -2340,9 +3001,13 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{prelude::*, widgets::*};
-    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
-    /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
+    /// use ratatui::{
+    ///     layout::Constraint,
+    ///     widgets::{HighlightSpacing, Row, Table},
+    /// };
+    ///
+    /// let rows = [Row::new(vec!["Cell1", "Cell2"])];
+    /// let widths = [Constraint::Length(5), Constraint::Length(5)];
     /// let table = Table::new(rows, widths).highlight_spacing(HighlightSpacing::Always);
     /// ```
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
@@ -2364,8 +3029,11 @@
     /// Create a table that needs at least 30 columns to display.  Any extra space will be assigned
     /// to the last column.
     /// ```
-    /// # use ratatui::layout::{Constraint, Flex};
-    /// # use ratatui::widgets::{Table, Row};
+    /// use ratatui::{
+    ///     layout::{Constraint, Flex},
+    ///     widgets::{Row, Table},
+    /// };
+    ///
     /// let widths = [
     ///     Constraint::Min(10),
     ///     Constraint::Min(10),
@@ -2420,8 +3088,25 @@
             <span class="kw">return</span>;
         }
 
+        <span class="kw">if </span>state.selected.is_some_and(|s| s &gt;= <span class="self">self</span>.rows.len()) {
+            state.select(<span class="prelude-val">Some</span>(<span class="self">self</span>.rows.len().saturating_sub(<span class="number">1</span>)));
+        }
+
+        <span class="kw">if </span><span class="self">self</span>.rows.is_empty() {
+            state.select(<span class="prelude-val">None</span>);
+        }
+
+        <span class="kw">let </span>column_count = <span class="self">self</span>.column_count();
+        <span class="kw">if </span>state.selected_column.is_some_and(|s| s &gt;= column_count) {
+            state.select_column(<span class="prelude-val">Some</span>(column_count.saturating_sub(<span class="number">1</span>)));
+        }
+        <span class="kw">if </span>column_count == <span class="number">0 </span>{
+            state.select_column(<span class="prelude-val">None</span>);
+        }
+
         <span class="kw">let </span>selection_width = <span class="self">self</span>.selection_width(state);
-        <span class="kw">let </span>columns_widths = <span class="self">self</span>.get_columns_widths(table_area.width, selection_width);
+        <span class="kw">let </span>columns_widths =
+            <span class="self">self</span>.get_columns_widths(table_area.width, selection_width, column_count);
         <span class="kw">let </span>(header_area, rows_area, footer_area) = <span class="self">self</span>.layout(table_area);
 
         <span class="self">self</span>.render_header(header_area, buf, <span class="kw-2">&amp;</span>columns_widths);
@@ -2499,6 +3184,8 @@
         state.offset = start_index;
 
         <span class="kw">let </span><span class="kw-2">mut </span>y_offset = <span class="number">0</span>;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>selected_row_area = <span class="prelude-val">None</span>;
         <span class="kw">for </span>(i, row) <span class="kw">in </span><span class="self">self
             </span>.rows
             .iter()
@@ -2514,14 +3201,14 @@
             );
             buf.set_style(row_area, row.style);
 
-            <span class="kw">let </span>is_selected = state.selected().is_some_and(|index| index == i);
+            <span class="kw">let </span>is_selected = state.selected.is_some_and(|index| index == i);
             <span class="kw">if </span>selection_width &gt; <span class="number">0 </span>&amp;&amp; is_selected {
                 <span class="kw">let </span>selection_area = Rect {
                     width: selection_width,
                     ..row_area
                 };
                 buf.set_style(selection_area, row.style);
-                highlight_symbol.clone().render(selection_area, buf);
+                highlight_symbol.render_ref(selection_area, buf);
             };
             <span class="kw">for </span>((x, width), cell) <span class="kw">in </span>columns_widths.iter().zip(row.cells.iter()) {
                 cell.render(
@@ -2530,9 +3217,35 @@
                 );
             }
             <span class="kw">if </span>is_selected {
-                buf.set_style(row_area, <span class="self">self</span>.highlight_style);
+                selected_row_area = <span class="prelude-val">Some</span>(row_area);
             }
             y_offset += row.height_with_margin();
+        }
+
+        <span class="kw">let </span>selected_column_area = state.selected_column.and_then(|s| {
+            <span class="comment">// The selection is clamped by the column count. Since a user can manually specify an
+            // incorrect number of widths, we should use panic free methods.
+            </span>columns_widths.get(s).map(|(x, width)| Rect {
+                x: x + area.x,
+                width: <span class="kw-2">*</span>width,
+                ..area
+            })
+        });
+
+        <span class="kw">match </span>(selected_row_area, selected_column_area) {
+            (<span class="prelude-val">Some</span>(row_area), <span class="prelude-val">Some</span>(col_area)) =&gt; {
+                buf.set_style(row_area, <span class="self">self</span>.row_highlight_style);
+                buf.set_style(col_area, <span class="self">self</span>.column_highlight_style);
+                <span class="kw">let </span>cell_area = row_area.intersection(col_area);
+                buf.set_style(cell_area, <span class="self">self</span>.cell_highlight_style);
+            }
+            (<span class="prelude-val">Some</span>(row_area), <span class="prelude-val">None</span>) =&gt; {
+                buf.set_style(row_area, <span class="self">self</span>.row_highlight_style);
+            }
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(col_area)) =&gt; {
+                buf.set_style(col_area, <span class="self">self</span>.column_highlight_style);
+            }
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; (),
         }
     }
 
@@ -2540,16 +3253,13 @@
     ///
     /// Returns (x, width). When self.widths is empty, it is assumed `.widths()` has not been called
     /// and a default of equal widths is returned.
-    </span><span class="kw">fn </span>get_columns_widths(<span class="kw-2">&amp;</span><span class="self">self</span>, max_width: u16, selection_width: u16) -&gt; Vec&lt;(u16, u16)&gt; {
+    </span><span class="kw">fn </span>get_columns_widths(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        max_width: u16,
+        selection_width: u16,
+        col_count: usize,
+    ) -&gt; Vec&lt;(u16, u16)&gt; {
         <span class="kw">let </span>widths = <span class="kw">if </span><span class="self">self</span>.widths.is_empty() {
-            <span class="kw">let </span>col_count = <span class="self">self
-                </span>.rows
-                .iter()
-                .chain(<span class="self">self</span>.header.iter())
-                .chain(<span class="self">self</span>.footer.iter())
-                .map(|r| r.cells.len())
-                .max()
-                .unwrap_or(<span class="number">0</span>);
             <span class="comment">// Divide the space between each column equally
             </span><span class="macro">vec!</span>[Constraint::Length(max_width / col_count.max(<span class="number">1</span>) <span class="kw">as </span>u16); col_count]
         } <span class="kw">else </span>{
@@ -2613,10 +3323,20 @@
         (start, end)
     }
 
+    <span class="kw">fn </span>column_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.rows
+            .iter()
+            .chain(<span class="self">self</span>.footer.iter())
+            .chain(<span class="self">self</span>.header.iter())
+            .map(|r| r.cells.len())
+            .max()
+            .unwrap_or_default()
+    }
+
     <span class="doccomment">/// Returns the width of the selection column if a row is selected, or the `highlight_spacing`
     /// is set to show the column always, otherwise 0.
     </span><span class="kw">fn </span>selection_width(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>TableState) -&gt; u16 {
-        <span class="kw">let </span>has_selection = state.selected().is_some();
+        <span class="kw">let </span>has_selection = state.selected.is_some();
         <span class="kw">if </span><span class="self">self</span>.highlight_spacing.should_add(has_selection) {
             <span class="self">self</span>.highlight_symbol.width() <span class="kw">as </span>u16
         } <span class="kw">else </span>{
@@ -2666,8 +3386,15 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span>std::vec;
 
+    <span class="kw">use </span>rstest::{fixture, rstest};
+
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use crate</span>::{layout::Constraint::<span class="kw-2">*</span>, style::Style, text::Line, widgets::Cell};
+    <span class="kw">use crate</span>::{
+        layout::Constraint::<span class="kw-2">*</span>,
+        style::{Color, Modifier, Style, Stylize},
+        text::Line,
+        widgets::Cell,
+    };
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>new() {
@@ -2681,7 +3408,7 @@
         <span class="macro">assert_eq!</span>(table.column_spacing, <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(table.block, <span class="prelude-val">None</span>);
         <span class="macro">assert_eq!</span>(table.style, Style::default());
-        <span class="macro">assert_eq!</span>(table.highlight_style, Style::default());
+        <span class="macro">assert_eq!</span>(table.row_highlight_style, Style::default());
         <span class="macro">assert_eq!</span>(table.highlight_symbol, Text::default());
         <span class="macro">assert_eq!</span>(table.highlight_spacing, HighlightSpacing::WhenSelected);
         <span class="macro">assert_eq!</span>(table.flex, Flex::Start);
@@ -2690,14 +3417,14 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>default() {
         <span class="kw">let </span>table = Table::default();
-        <span class="macro">assert_eq!</span>(table.rows, <span class="macro">vec!</span>[]);
+        <span class="macro">assert_eq!</span>(table.rows, []);
         <span class="macro">assert_eq!</span>(table.header, <span class="prelude-val">None</span>);
         <span class="macro">assert_eq!</span>(table.footer, <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[]);
+        <span class="macro">assert_eq!</span>(table.widths, []);
         <span class="macro">assert_eq!</span>(table.column_spacing, <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(table.block, <span class="prelude-val">None</span>);
         <span class="macro">assert_eq!</span>(table.style, Style::default());
-        <span class="macro">assert_eq!</span>(table.highlight_style, Style::default());
+        <span class="macro">assert_eq!</span>(table.row_highlight_style, Style::default());
         <span class="macro">assert_eq!</span>(table.highlight_symbol, Text::default());
         <span class="macro">assert_eq!</span>(table.highlight_spacing, HighlightSpacing::WhenSelected);
         <span class="macro">assert_eq!</span>(table.flex, Flex::Start);
@@ -2726,14 +3453,19 @@
         <span class="kw">let </span>table = Table::default().widths([Constraint::Length(<span class="number">100</span>)]);
         <span class="macro">assert_eq!</span>(table.widths, [Constraint::Length(<span class="number">100</span>)]);
 
-        <span class="attr">#[allow(clippy::needless_borrows_for_generic_args)]
+        <span class="comment">// ensure that code that uses &amp;[] continues to work as there is a large amount of code that
+        // uses this pattern
+        </span><span class="attr">#[allow(clippy::needless_borrows_for_generic_args)]
         </span><span class="kw">let </span>table = Table::default().widths(<span class="kw-2">&amp;</span>[Constraint::Length(<span class="number">100</span>)]);
         <span class="macro">assert_eq!</span>(table.widths, [Constraint::Length(<span class="number">100</span>)]);
 
         <span class="kw">let </span>table = Table::default().widths(<span class="macro">vec!</span>[Constraint::Length(<span class="number">100</span>)]);
         <span class="macro">assert_eq!</span>(table.widths, [Constraint::Length(<span class="number">100</span>)]);
 
-        <span class="kw">let </span>table = Table::default().widths(<span class="kw-2">&amp;</span><span class="macro">vec!</span>[Constraint::Length(<span class="number">100</span>)]);
+        <span class="comment">// ensure that code that uses &amp;some_vec continues to work as there is a large amount of code
+        // that uses this pattern
+        </span><span class="attr">#[allow(clippy::needless_borrows_for_generic_args)]
+        </span><span class="kw">let </span>table = Table::default().widths(<span class="kw-2">&amp;</span><span class="macro">vec!</span>[Constraint::Length(<span class="number">100</span>)]);
         <span class="macro">assert_eq!</span>(table.widths, [Constraint::Length(<span class="number">100</span>)]);
 
         <span class="kw">let </span>table = Table::default().widths([<span class="number">100</span>].into_iter().map(Constraint::Length));
@@ -2775,10 +3507,32 @@
     }
 
     <span class="attr">#[test]
+    #[allow(deprecated)]
     </span><span class="kw">fn </span>highlight_style() {
         <span class="kw">let </span>style = Style::default().red().italic();
         <span class="kw">let </span>table = Table::default().highlight_style(style);
-        <span class="macro">assert_eq!</span>(table.highlight_style, style);
+        <span class="macro">assert_eq!</span>(table.row_highlight_style, style);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>row_highlight_style() {
+        <span class="kw">let </span>style = Style::default().red().italic();
+        <span class="kw">let </span>table = Table::default().row_highlight_style(style);
+        <span class="macro">assert_eq!</span>(table.row_highlight_style, style);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>column_highlight_style() {
+        <span class="kw">let </span>style = Style::default().red().italic();
+        <span class="kw">let </span>table = Table::default().column_highlight_style(style);
+        <span class="macro">assert_eq!</span>(table.column_highlight_style, style);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>cell_highlight_style() {
+        <span class="kw">let </span>style = Style::default().red().italic();
+        <span class="kw">let </span>table = Table::default().cell_highlight_style(style);
+        <span class="macro">assert_eq!</span>(table.cell_highlight_style, style);
     }
 
     <span class="attr">#[test]
@@ -2803,31 +3557,110 @@
     </span><span class="kw">fn </span>widths_conversions() {
         <span class="kw">let </span>array = [Constraint::Percentage(<span class="number">100</span>)];
         <span class="kw">let </span>table = Table::new(Vec::&lt;Row&gt;::new(), array);
-        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">"array"</span>);
+        <span class="macro">assert_eq!</span>(table.widths, [Constraint::Percentage(<span class="number">100</span>)], <span class="string">"array"</span>);
 
         <span class="kw">let </span>array_ref = <span class="kw-2">&amp;</span>[Constraint::Percentage(<span class="number">100</span>)];
         <span class="kw">let </span>table = Table::new(Vec::&lt;Row&gt;::new(), array_ref);
-        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">"array ref"</span>);
+        <span class="macro">assert_eq!</span>(table.widths, [Constraint::Percentage(<span class="number">100</span>)], <span class="string">"array ref"</span>);
 
         <span class="kw">let </span>vec = <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)];
         <span class="kw">let </span>slice = vec.as_slice();
         <span class="kw">let </span>table = Table::new(Vec::&lt;Row&gt;::new(), slice);
-        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">"slice"</span>);
+        <span class="macro">assert_eq!</span>(table.widths, [Constraint::Percentage(<span class="number">100</span>)], <span class="string">"slice"</span>);
 
         <span class="kw">let </span>vec = <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)];
         <span class="kw">let </span>table = Table::new(Vec::&lt;Row&gt;::new(), vec);
-        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">"vec"</span>);
+        <span class="macro">assert_eq!</span>(table.widths, [Constraint::Percentage(<span class="number">100</span>)], <span class="string">"vec"</span>);
 
         <span class="kw">let </span>vec_ref = <span class="kw-2">&amp;</span><span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)];
         <span class="kw">let </span>table = Table::new(Vec::&lt;Row&gt;::new(), vec_ref);
-        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">"vec ref"</span>);
+        <span class="macro">assert_eq!</span>(table.widths, [Constraint::Percentage(<span class="number">100</span>)], <span class="string">"vec ref"</span>);
+    }
+
+    <span class="attr">#[cfg(test)]
+    </span><span class="kw">mod </span>state {
+
+        <span class="kw">use super</span>::<span class="kw-2">*</span>;
+        <span class="kw">use crate</span>::{
+            buffer::Buffer,
+            layout::{Constraint, Rect},
+            widgets::{Row, StatefulWidget, Table, TableState},
+        };
+
+        <span class="attr">#[fixture]
+        </span><span class="kw">fn </span>table_buf() -&gt; Buffer {
+            Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">10</span>))
+        }
+
+        <span class="attr">#[rstest]
+        </span><span class="kw">fn </span>test_list_state_empty_list(<span class="kw-2">mut </span>table_buf: Buffer) {
+            <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::default();
+
+            <span class="kw">let </span>rows: Vec&lt;Row&gt; = Vec::new();
+            <span class="kw">let </span>widths = <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)];
+            <span class="kw">let </span>table = Table::new(rows, widths);
+            state.select_first();
+            StatefulWidget::render(table, table_buf.area, <span class="kw-2">&amp;mut </span>table_buf, <span class="kw-2">&amp;mut </span>state);
+            <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">None</span>);
+            <span class="macro">assert_eq!</span>(state.selected_column, <span class="prelude-val">None</span>);
+        }
+
+        <span class="attr">#[rstest]
+        </span><span class="kw">fn </span>test_list_state_single_item(<span class="kw-2">mut </span>table_buf: Buffer) {
+            <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::default();
+
+            <span class="kw">let </span>widths = <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)];
+
+            <span class="kw">let </span>items = <span class="macro">vec!</span>[Row::new(<span class="macro">vec!</span>[<span class="string">"Item 1"</span>])];
+            <span class="kw">let </span>table = Table::new(items, widths);
+            state.select_first();
+            StatefulWidget::render(<span class="kw-2">&amp;</span>table, table_buf.area, <span class="kw-2">&amp;mut </span>table_buf, <span class="kw-2">&amp;mut </span>state);
+            <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+            <span class="macro">assert_eq!</span>(state.selected_column, <span class="prelude-val">None</span>);
+
+            state.select_last();
+            StatefulWidget::render(<span class="kw-2">&amp;</span>table, table_buf.area, <span class="kw-2">&amp;mut </span>table_buf, <span class="kw-2">&amp;mut </span>state);
+            <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+            <span class="macro">assert_eq!</span>(state.selected_column, <span class="prelude-val">None</span>);
+
+            state.select_previous();
+            StatefulWidget::render(<span class="kw-2">&amp;</span>table, table_buf.area, <span class="kw-2">&amp;mut </span>table_buf, <span class="kw-2">&amp;mut </span>state);
+            <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+            <span class="macro">assert_eq!</span>(state.selected_column, <span class="prelude-val">None</span>);
+
+            state.select_next();
+            StatefulWidget::render(<span class="kw-2">&amp;</span>table, table_buf.area, <span class="kw-2">&amp;mut </span>table_buf, <span class="kw-2">&amp;mut </span>state);
+            <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+            <span class="macro">assert_eq!</span>(state.selected_column, <span class="prelude-val">None</span>);
+
+            <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::default();
+
+            state.select_first_column();
+            StatefulWidget::render(<span class="kw-2">&amp;</span>table, table_buf.area, <span class="kw-2">&amp;mut </span>table_buf, <span class="kw-2">&amp;mut </span>state);
+            <span class="macro">assert_eq!</span>(state.selected_column, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+            <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">None</span>);
+
+            state.select_last_column();
+            StatefulWidget::render(<span class="kw-2">&amp;</span>table, table_buf.area, <span class="kw-2">&amp;mut </span>table_buf, <span class="kw-2">&amp;mut </span>state);
+            <span class="macro">assert_eq!</span>(state.selected_column, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+            <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">None</span>);
+
+            state.select_previous_column();
+            StatefulWidget::render(<span class="kw-2">&amp;</span>table, table_buf.area, <span class="kw-2">&amp;mut </span>table_buf, <span class="kw-2">&amp;mut </span>state);
+            <span class="macro">assert_eq!</span>(state.selected_column, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+            <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">None</span>);
+
+            state.select_next_column();
+            StatefulWidget::render(<span class="kw-2">&amp;</span>table, table_buf.area, <span class="kw-2">&amp;mut </span>table_buf, <span class="kw-2">&amp;mut </span>state);
+            <span class="macro">assert_eq!</span>(state.selected_column, <span class="prelude-val">Some</span>(<span class="number">0</span>));
+            <span class="macro">assert_eq!</span>(state.selected, <span class="prelude-val">None</span>);
+        }
     }
 
     <span class="attr">#[cfg(test)]
     </span><span class="kw">mod </span>render {
-        <span class="kw">use </span>rstest::rstest;
-
         <span class="kw">use super</span>::<span class="kw-2">*</span>;
+        <span class="kw">use </span><span class="kw">crate</span>::layout::Alignment;
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>render_empty_area() {
@@ -2999,6 +3832,17 @@
         }
 
         <span class="attr">#[test]
+        </span><span class="kw">fn </span>render_with_selected_column_and_incorrect_width_count_does_not_panic() {
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">3</span>));
+            <span class="kw">let </span>table = Table::new(
+                <span class="macro">vec!</span>[Row::new(<span class="macro">vec!</span>[<span class="string">"Row1"</span>, <span class="string">"Row2"</span>, <span class="string">"Row3"</span>])],
+                [Constraint::Length(<span class="number">10</span>); <span class="number">1</span>],
+            );
+            <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::new().with_selected_column(<span class="number">2</span>);
+            StatefulWidget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf, <span class="kw-2">&amp;mut </span>state);
+        }
+
+        <span class="attr">#[test]
         </span><span class="kw">fn </span>render_with_selected() {
             <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
             <span class="kw">let </span>rows = <span class="macro">vec!</span>[
@@ -3006,9 +3850,9 @@
                 Row::new(<span class="macro">vec!</span>[<span class="string">"Cell3"</span>, <span class="string">"Cell4"</span>]),
             ];
             <span class="kw">let </span>table = Table::new(rows, [Constraint::Length(<span class="number">5</span>); <span class="number">2</span>])
-                .highlight_style(Style::new().red())
+                .row_highlight_style(Style::new().red())
                 .highlight_symbol(<span class="string">"&gt;&gt;"</span>);
-            <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::new().with_selected(<span class="number">0</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::new().with_selected(<span class="prelude-val">Some</span>(<span class="number">0</span>));
             StatefulWidget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf, <span class="kw-2">&amp;mut </span>state);
             <span class="kw">let </span>expected = Buffer::with_lines([
                 <span class="string">"&gt;&gt;Cell1 Cell2  "</span>.red(),
@@ -3018,9 +3862,108 @@
             <span class="macro">assert_eq!</span>(buf, expected);
         }
 
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>render_with_selected_column() {
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
+            <span class="kw">let </span>rows = <span class="macro">vec!</span>[
+                Row::new(<span class="macro">vec!</span>[<span class="string">"Cell1"</span>, <span class="string">"Cell2"</span>]),
+                Row::new(<span class="macro">vec!</span>[<span class="string">"Cell3"</span>, <span class="string">"Cell4"</span>]),
+            ];
+            <span class="kw">let </span>table = Table::new(rows, [Constraint::Length(<span class="number">5</span>); <span class="number">2</span>])
+                .column_highlight_style(Style::new().blue())
+                .highlight_symbol(<span class="string">"&gt;&gt;"</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::new().with_selected_column(<span class="prelude-val">Some</span>(<span class="number">1</span>));
+            StatefulWidget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf, <span class="kw-2">&amp;mut </span>state);
+            <span class="kw">let </span>expected = Buffer::with_lines::&lt;[Line; <span class="number">3</span>]&gt;([
+                Line::from(<span class="macro">vec!</span>[
+                    <span class="string">"Cell1"</span>.into(),
+                    <span class="string">" "</span>.into(),
+                    <span class="string">"Cell2"</span>.blue(),
+                    <span class="string">"    "</span>.into(),
+                ]),
+                Line::from(<span class="macro">vec!</span>[
+                    <span class="string">"Cell3"</span>.into(),
+                    <span class="string">" "</span>.into(),
+                    <span class="string">"Cell4"</span>.blue(),
+                    <span class="string">"    "</span>.into(),
+                ]),
+                Line::from(<span class="macro">vec!</span>[<span class="string">"      "</span>.into(), <span class="string">"     "</span>.blue(), <span class="string">"    "</span>.into()]),
+            ]);
+            <span class="macro">assert_eq!</span>(buf, expected);
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>render_with_selected_cell() {
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">4</span>));
+            <span class="kw">let </span>rows = <span class="macro">vec!</span>[
+                Row::new(<span class="macro">vec!</span>[<span class="string">"Cell1"</span>, <span class="string">"Cell2"</span>, <span class="string">"Cell3"</span>]),
+                Row::new(<span class="macro">vec!</span>[<span class="string">"Cell4"</span>, <span class="string">"Cell5"</span>, <span class="string">"Cell6"</span>]),
+                Row::new(<span class="macro">vec!</span>[<span class="string">"Cell7"</span>, <span class="string">"Cell8"</span>, <span class="string">"Cell9"</span>]),
+            ];
+            <span class="kw">let </span>table = Table::new(rows, [Constraint::Length(<span class="number">5</span>); <span class="number">3</span>])
+                .highlight_symbol(<span class="string">"&gt;&gt;"</span>)
+                .cell_highlight_style(Style::new().green());
+            <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::new().with_selected_cell((<span class="number">1</span>, <span class="number">2</span>));
+            StatefulWidget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">4</span>), <span class="kw-2">&amp;mut </span>buf, <span class="kw-2">&amp;mut </span>state);
+            <span class="kw">let </span>expected = Buffer::with_lines::&lt;[Line; <span class="number">4</span>]&gt;([
+                Line::from(<span class="macro">vec!</span>[<span class="string">"  Cell1 "</span>.into(), <span class="string">"Cell2 "</span>.into(), <span class="string">"Cell3"</span>.into()]),
+                Line::from(<span class="macro">vec!</span>[<span class="string">"&gt;&gt;Cell4 Cell5 "</span>.into(), <span class="string">"Cell6"</span>.green(), <span class="string">" "</span>.into()]),
+                Line::from(<span class="macro">vec!</span>[<span class="string">"  Cell7 "</span>.into(), <span class="string">"Cell8 "</span>.into(), <span class="string">"Cell9"</span>.into()]),
+                Line::from(<span class="macro">vec!</span>[<span class="string">"                    "</span>.into()]),
+            ]);
+            <span class="macro">assert_eq!</span>(buf, expected);
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>render_with_selected_row_and_column() {
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">4</span>));
+            <span class="kw">let </span>rows = <span class="macro">vec!</span>[
+                Row::new(<span class="macro">vec!</span>[<span class="string">"Cell1"</span>, <span class="string">"Cell2"</span>, <span class="string">"Cell3"</span>]),
+                Row::new(<span class="macro">vec!</span>[<span class="string">"Cell4"</span>, <span class="string">"Cell5"</span>, <span class="string">"Cell6"</span>]),
+                Row::new(<span class="macro">vec!</span>[<span class="string">"Cell7"</span>, <span class="string">"Cell8"</span>, <span class="string">"Cell9"</span>]),
+            ];
+            <span class="kw">let </span>table = Table::new(rows, [Constraint::Length(<span class="number">5</span>); <span class="number">3</span>])
+                .highlight_symbol(<span class="string">"&gt;&gt;"</span>)
+                .row_highlight_style(Style::new().red())
+                .column_highlight_style(Style::new().blue());
+            <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::new().with_selected(<span class="number">1</span>).with_selected_column(<span class="number">2</span>);
+            StatefulWidget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">4</span>), <span class="kw-2">&amp;mut </span>buf, <span class="kw-2">&amp;mut </span>state);
+            <span class="kw">let </span>expected = Buffer::with_lines::&lt;[Line; <span class="number">4</span>]&gt;([
+                Line::from(<span class="macro">vec!</span>[<span class="string">"  Cell1 "</span>.into(), <span class="string">"Cell2 "</span>.into(), <span class="string">"Cell3"</span>.blue()]),
+                Line::from(<span class="macro">vec!</span>[<span class="string">"&gt;&gt;Cell4 Cell5 "</span>.red(), <span class="string">"Cell6"</span>.blue(), <span class="string">" "</span>.red()]),
+                Line::from(<span class="macro">vec!</span>[<span class="string">"  Cell7 "</span>.into(), <span class="string">"Cell8 "</span>.into(), <span class="string">"Cell9"</span>.blue()]),
+                Line::from(<span class="macro">vec!</span>[<span class="string">"              "</span>.into(), <span class="string">"     "</span>.blue(), <span class="string">" "</span>.into()]),
+            ]);
+            <span class="macro">assert_eq!</span>(buf, expected);
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>render_with_selected_row_and_column_and_cell() {
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">4</span>));
+            <span class="kw">let </span>rows = <span class="macro">vec!</span>[
+                Row::new(<span class="macro">vec!</span>[<span class="string">"Cell1"</span>, <span class="string">"Cell2"</span>, <span class="string">"Cell3"</span>]),
+                Row::new(<span class="macro">vec!</span>[<span class="string">"Cell4"</span>, <span class="string">"Cell5"</span>, <span class="string">"Cell6"</span>]),
+                Row::new(<span class="macro">vec!</span>[<span class="string">"Cell7"</span>, <span class="string">"Cell8"</span>, <span class="string">"Cell9"</span>]),
+            ];
+            <span class="kw">let </span>table = Table::new(rows, [Constraint::Length(<span class="number">5</span>); <span class="number">3</span>])
+                .highlight_symbol(<span class="string">"&gt;&gt;"</span>)
+                .row_highlight_style(Style::new().red())
+                .column_highlight_style(Style::new().blue())
+                .cell_highlight_style(Style::new().green());
+            <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::new().with_selected(<span class="number">1</span>).with_selected_column(<span class="number">2</span>);
+            StatefulWidget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">4</span>), <span class="kw-2">&amp;mut </span>buf, <span class="kw-2">&amp;mut </span>state);
+            <span class="kw">let </span>expected = Buffer::with_lines::&lt;[Line; <span class="number">4</span>]&gt;([
+                Line::from(<span class="macro">vec!</span>[<span class="string">"  Cell1 "</span>.into(), <span class="string">"Cell2 "</span>.into(), <span class="string">"Cell3"</span>.blue()]),
+                Line::from(<span class="macro">vec!</span>[<span class="string">"&gt;&gt;Cell4 Cell5 "</span>.red(), <span class="string">"Cell6"</span>.green(), <span class="string">" "</span>.red()]),
+                Line::from(<span class="macro">vec!</span>[<span class="string">"  Cell7 "</span>.into(), <span class="string">"Cell8 "</span>.into(), <span class="string">"Cell9"</span>.blue()]),
+                Line::from(<span class="macro">vec!</span>[<span class="string">"              "</span>.into(), <span class="string">"     "</span>.blue(), <span class="string">" "</span>.into()]),
+            ]);
+            <span class="macro">assert_eq!</span>(buf, expected);
+        }
+
         <span class="doccomment">/// Note that this includes a regression test for a bug where the table would not render the
         /// correct rows when there is no selection.
-        /// &lt;https://github.com/ratatui-org/ratatui/issues/1179&gt;
+        /// &lt;https://github.com/ratatui/ratatui/issues/1179&gt;
         </span><span class="attr">#[rstest]
         #[case::no_selection(<span class="prelude-val">None</span>, <span class="number">50</span>, [<span class="string">"50"</span>, <span class="string">"51"</span>, <span class="string">"52"</span>, <span class="string">"53"</span>, <span class="string">"54"</span>]</span>)]
         <span class="attr">#[case::selection_before_offset(<span class="number">20</span>, <span class="number">20</span>, [<span class="string">"20"</span>, <span class="string">"21"</span>, <span class="string">"22"</span>, <span class="string">"23"</span>, <span class="string">"24"</span>]</span>)]
@@ -3040,7 +3983,7 @@
             <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">5</span>));
             <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::new()
                 .with_offset(<span class="number">50</span>)
-                .with_selected(selected_row);
+                .with_selected(selected_row.into());
 
             StatefulWidget::render(table.clone(), Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">5</span>), <span class="kw-2">&amp;mut </span>buf, <span class="kw-2">&amp;mut </span>state);
 
@@ -3057,15 +4000,15 @@
         </span><span class="kw">fn </span>length_constraint() {
             <span class="comment">// without selection, more than needed width
             </span><span class="kw">let </span>table = Table::default().widths([Length(<span class="number">4</span>), Length(<span class="number">4</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">4</span>), (<span class="number">5</span>, <span class="number">4</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">0</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">4</span>), (<span class="number">5</span>, <span class="number">4</span>)]);
 
             <span class="comment">// with selection, more than needed width
             </span><span class="kw">let </span>table = Table::default().widths([Length(<span class="number">4</span>), Length(<span class="number">4</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">3</span>), [(<span class="number">3</span>, <span class="number">4</span>), (<span class="number">8</span>, <span class="number">4</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">3</span>, <span class="number">0</span>), [(<span class="number">3</span>, <span class="number">4</span>), (<span class="number">8</span>, <span class="number">4</span>)]);
 
             <span class="comment">// without selection, less than needed width
             </span><span class="kw">let </span>table = Table::default().widths([Length(<span class="number">4</span>), Length(<span class="number">4</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">3</span>), (<span class="number">4</span>, <span class="number">3</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">3</span>), (<span class="number">4</span>, <span class="number">3</span>)]);
 
             <span class="comment">// with selection, less than needed width
             // &lt;--------7px--------&gt;
@@ -3074,26 +4017,26 @@
             // └────────┘x└────────┘
             // column spacing (i.e. `x`) is always prioritized
             </span><span class="kw">let </span>table = Table::default().widths([Length(<span class="number">4</span>), Length(<span class="number">4</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">3</span>), [(<span class="number">3</span>, <span class="number">2</span>), (<span class="number">6</span>, <span class="number">1</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">3</span>, <span class="number">0</span>), [(<span class="number">3</span>, <span class="number">2</span>), (<span class="number">6</span>, <span class="number">1</span>)]);
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>max_constraint() {
             <span class="comment">// without selection, more than needed width
             </span><span class="kw">let </span>table = Table::default().widths([Max(<span class="number">4</span>), Max(<span class="number">4</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">4</span>), (<span class="number">5</span>, <span class="number">4</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">0</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">4</span>), (<span class="number">5</span>, <span class="number">4</span>)]);
 
             <span class="comment">// with selection, more than needed width
             </span><span class="kw">let </span>table = Table::default().widths([Max(<span class="number">4</span>), Max(<span class="number">4</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">3</span>), [(<span class="number">3</span>, <span class="number">4</span>), (<span class="number">8</span>, <span class="number">4</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">3</span>, <span class="number">0</span>), [(<span class="number">3</span>, <span class="number">4</span>), (<span class="number">8</span>, <span class="number">4</span>)]);
 
             <span class="comment">// without selection, less than needed width
             </span><span class="kw">let </span>table = Table::default().widths([Max(<span class="number">4</span>), Max(<span class="number">4</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">3</span>), (<span class="number">4</span>, <span class="number">3</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">3</span>), (<span class="number">4</span>, <span class="number">3</span>)]);
 
             <span class="comment">// with selection, less than needed width
             </span><span class="kw">let </span>table = Table::default().widths([Max(<span class="number">4</span>), Max(<span class="number">4</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">3</span>), [(<span class="number">3</span>, <span class="number">2</span>), (<span class="number">6</span>, <span class="number">1</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">3</span>, <span class="number">0</span>), [(<span class="number">3</span>, <span class="number">2</span>), (<span class="number">6</span>, <span class="number">1</span>)]);
         }
 
         <span class="attr">#[test]
@@ -3104,42 +4047,42 @@
 
             // without selection, more than needed width
             </span><span class="kw">let </span>table = Table::default().widths([Min(<span class="number">4</span>), Min(<span class="number">4</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">10</span>), (<span class="number">11</span>, <span class="number">9</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">0</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">10</span>), (<span class="number">11</span>, <span class="number">9</span>)]);
 
             <span class="comment">// with selection, more than needed width
             </span><span class="kw">let </span>table = Table::default().widths([Min(<span class="number">4</span>), Min(<span class="number">4</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">3</span>), [(<span class="number">3</span>, <span class="number">8</span>), (<span class="number">12</span>, <span class="number">8</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">3</span>, <span class="number">0</span>), [(<span class="number">3</span>, <span class="number">8</span>), (<span class="number">12</span>, <span class="number">8</span>)]);
 
             <span class="comment">// without selection, less than needed width
             // allocates spacer
             </span><span class="kw">let </span>table = Table::default().widths([Min(<span class="number">4</span>), Min(<span class="number">4</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">3</span>), (<span class="number">4</span>, <span class="number">3</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">3</span>), (<span class="number">4</span>, <span class="number">3</span>)]);
 
             <span class="comment">// with selection, less than needed width
             // always allocates selection and spacer
             </span><span class="kw">let </span>table = Table::default().widths([Min(<span class="number">4</span>), Min(<span class="number">4</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">3</span>), [(<span class="number">3</span>, <span class="number">2</span>), (<span class="number">6</span>, <span class="number">1</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">3</span>, <span class="number">0</span>), [(<span class="number">3</span>, <span class="number">2</span>), (<span class="number">6</span>, <span class="number">1</span>)]);
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>percentage_constraint() {
             <span class="comment">// without selection, more than needed width
             </span><span class="kw">let </span>table = Table::default().widths([Percentage(<span class="number">30</span>), Percentage(<span class="number">30</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">6</span>), (<span class="number">7</span>, <span class="number">6</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">0</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">6</span>), (<span class="number">7</span>, <span class="number">6</span>)]);
 
             <span class="comment">// with selection, more than needed width
             </span><span class="kw">let </span>table = Table::default().widths([Percentage(<span class="number">30</span>), Percentage(<span class="number">30</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">3</span>), [(<span class="number">3</span>, <span class="number">5</span>), (<span class="number">9</span>, <span class="number">5</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">3</span>, <span class="number">0</span>), [(<span class="number">3</span>, <span class="number">5</span>), (<span class="number">9</span>, <span class="number">5</span>)]);
 
             <span class="comment">// without selection, less than needed width
             // rounds from positions: [0.0, 0.0, 2.1, 3.1, 5.2, 7.0]
             </span><span class="kw">let </span>table = Table::default().widths([Percentage(<span class="number">30</span>), Percentage(<span class="number">30</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">2</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">2</span>)]);
 
             <span class="comment">// with selection, less than needed width
             // rounds from positions: [0.0, 3.0, 5.1, 6.1, 7.0, 7.0]
             </span><span class="kw">let </span>table = Table::default().widths([Percentage(<span class="number">30</span>), Percentage(<span class="number">30</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">3</span>), [(<span class="number">3</span>, <span class="number">1</span>), (<span class="number">5</span>, <span class="number">1</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">3</span>, <span class="number">0</span>), [(<span class="number">3</span>, <span class="number">1</span>), (<span class="number">5</span>, <span class="number">1</span>)]);
         }
 
         <span class="attr">#[test]
@@ -3147,22 +4090,22 @@
             <span class="comment">// without selection, more than needed width
             // rounds from positions: [0.00, 0.00, 6.67, 7.67, 14.33]
             </span><span class="kw">let </span>table = Table::default().widths([Ratio(<span class="number">1</span>, <span class="number">3</span>), Ratio(<span class="number">1</span>, <span class="number">3</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">7</span>), (<span class="number">8</span>, <span class="number">6</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">0</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">7</span>), (<span class="number">8</span>, <span class="number">6</span>)]);
 
             <span class="comment">// with selection, more than needed width
             // rounds from positions: [0.00, 3.00, 10.67, 17.33, 20.00]
             </span><span class="kw">let </span>table = Table::default().widths([Ratio(<span class="number">1</span>, <span class="number">3</span>), Ratio(<span class="number">1</span>, <span class="number">3</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">3</span>), [(<span class="number">3</span>, <span class="number">6</span>), (<span class="number">10</span>, <span class="number">5</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">20</span>, <span class="number">3</span>, <span class="number">0</span>), [(<span class="number">3</span>, <span class="number">6</span>), (<span class="number">10</span>, <span class="number">5</span>)]);
 
             <span class="comment">// without selection, less than needed width
             // rounds from positions: [0.00, 2.33, 3.33, 5.66, 7.00]
             </span><span class="kw">let </span>table = Table::default().widths([Ratio(<span class="number">1</span>, <span class="number">3</span>), Ratio(<span class="number">1</span>, <span class="number">3</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">3</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">3</span>)]);
 
             <span class="comment">// with selection, less than needed width
             // rounds from positions: [0.00, 3.00, 5.33, 6.33, 7.00, 7.00]
             </span><span class="kw">let </span>table = Table::default().widths([Ratio(<span class="number">1</span>, <span class="number">3</span>), Ratio(<span class="number">1</span>, <span class="number">3</span>)]);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">3</span>), [(<span class="number">3</span>, <span class="number">1</span>), (<span class="number">5</span>, <span class="number">2</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">7</span>, <span class="number">3</span>, <span class="number">0</span>), [(<span class="number">3</span>, <span class="number">1</span>), (<span class="number">5</span>, <span class="number">2</span>)]);
         }
 
         <span class="doccomment">/// When more width is available than requested, the behavior is controlled by flex
@@ -3170,7 +4113,7 @@
         </span><span class="kw">fn </span>underconstrained_flex() {
             <span class="kw">let </span>table = Table::default().widths([Min(<span class="number">10</span>), Min(<span class="number">10</span>), Min(<span class="number">1</span>)]);
             <span class="macro">assert_eq!</span>(
-                table.get_columns_widths(<span class="number">62</span>, <span class="number">0</span>),
+                table.get_columns_widths(<span class="number">62</span>, <span class="number">0</span>, <span class="number">0</span>),
                 <span class="kw-2">&amp;</span>[(<span class="number">0</span>, <span class="number">20</span>), (<span class="number">21</span>, <span class="number">20</span>), (<span class="number">42</span>, <span class="number">20</span>)]
             );
 
@@ -3178,7 +4121,7 @@
                 .widths([Min(<span class="number">10</span>), Min(<span class="number">10</span>), Min(<span class="number">1</span>)])
                 .flex(Flex::Legacy);
             <span class="macro">assert_eq!</span>(
-                table.get_columns_widths(<span class="number">62</span>, <span class="number">0</span>),
+                table.get_columns_widths(<span class="number">62</span>, <span class="number">0</span>, <span class="number">0</span>),
                 <span class="kw-2">&amp;</span>[(<span class="number">0</span>, <span class="number">10</span>), (<span class="number">11</span>, <span class="number">10</span>), (<span class="number">22</span>, <span class="number">40</span>)]
             );
 
@@ -3186,7 +4129,7 @@
                 .widths([Min(<span class="number">10</span>), Min(<span class="number">10</span>), Min(<span class="number">1</span>)])
                 .flex(Flex::SpaceBetween);
             <span class="macro">assert_eq!</span>(
-                table.get_columns_widths(<span class="number">62</span>, <span class="number">0</span>),
+                table.get_columns_widths(<span class="number">62</span>, <span class="number">0</span>, <span class="number">0</span>),
                 <span class="kw-2">&amp;</span>[(<span class="number">0</span>, <span class="number">20</span>), (<span class="number">21</span>, <span class="number">20</span>), (<span class="number">42</span>, <span class="number">20</span>)]
             );
         }
@@ -3197,7 +4140,7 @@
         </span><span class="kw">fn </span>underconstrained_segment_size() {
             <span class="kw">let </span>table = Table::default().widths([Min(<span class="number">10</span>), Min(<span class="number">10</span>), Min(<span class="number">1</span>)]);
             <span class="macro">assert_eq!</span>(
-                table.get_columns_widths(<span class="number">62</span>, <span class="number">0</span>),
+                table.get_columns_widths(<span class="number">62</span>, <span class="number">0</span>, <span class="number">0</span>),
                 <span class="kw-2">&amp;</span>[(<span class="number">0</span>, <span class="number">20</span>), (<span class="number">21</span>, <span class="number">20</span>), (<span class="number">42</span>, <span class="number">20</span>)]
             );
 
@@ -3205,7 +4148,7 @@
                 .widths([Min(<span class="number">10</span>), Min(<span class="number">10</span>), Min(<span class="number">1</span>)])
                 .flex(Flex::Legacy);
             <span class="macro">assert_eq!</span>(
-                table.get_columns_widths(<span class="number">62</span>, <span class="number">0</span>),
+                table.get_columns_widths(<span class="number">62</span>, <span class="number">0</span>, <span class="number">0</span>),
                 <span class="kw-2">&amp;</span>[(<span class="number">0</span>, <span class="number">10</span>), (<span class="number">11</span>, <span class="number">10</span>), (<span class="number">22</span>, <span class="number">40</span>)]
             );
         }
@@ -3222,7 +4165,7 @@
                 .footer(Row::new(<span class="macro">vec!</span>[<span class="string">"h"</span>, <span class="string">"i"</span>]))
                 .column_spacing(<span class="number">0</span>);
             <span class="macro">assert_eq!</span>(
-                table.get_columns_widths(<span class="number">30</span>, <span class="number">0</span>),
+                table.get_columns_widths(<span class="number">30</span>, <span class="number">0</span>, <span class="number">3</span>),
                 <span class="kw-2">&amp;</span>[(<span class="number">0</span>, <span class="number">10</span>), (<span class="number">10</span>, <span class="number">10</span>), (<span class="number">20</span>, <span class="number">10</span>)]
             );
         }
@@ -3233,7 +4176,7 @@
                 .rows(<span class="macro">vec!</span>[])
                 .header(Row::new(<span class="macro">vec!</span>[<span class="string">"f"</span>, <span class="string">"g"</span>]))
                 .column_spacing(<span class="number">0</span>);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">10</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">5</span>), (<span class="number">5</span>, <span class="number">5</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">10</span>, <span class="number">0</span>, <span class="number">2</span>), [(<span class="number">0</span>, <span class="number">5</span>), (<span class="number">5</span>, <span class="number">5</span>)]);
         }
 
         <span class="attr">#[test]
@@ -3242,7 +4185,7 @@
                 .rows(<span class="macro">vec!</span>[])
                 .footer(Row::new(<span class="macro">vec!</span>[<span class="string">"h"</span>, <span class="string">"i"</span>]))
                 .column_spacing(<span class="number">0</span>);
-            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">10</span>, <span class="number">0</span>), [(<span class="number">0</span>, <span class="number">5</span>), (<span class="number">5</span>, <span class="number">5</span>)]);
+            <span class="macro">assert_eq!</span>(table.get_columns_widths(<span class="number">10</span>, <span class="number">0</span>, <span class="number">2</span>), [(<span class="number">0</span>, <span class="number">5</span>), (<span class="number">5</span>, <span class="number">5</span>)]);
         }
 
         <span class="attr">#[track_caller]
@@ -3610,6 +4553,51 @@
                 .add_modifier(Modifier::BOLD)
                 .remove_modifier(Modifier::CROSSED_OUT)
         );
+    }
+
+    <span class="attr">#[rstest]
+    #[case::no_columns(<span class="macro">vec!</span>[]</span>, <span class="macro">vec!</span>[], <span class="macro">vec!</span>[], <span class="number">0</span>)]
+    <span class="attr">#[case::only_header(<span class="macro">vec!</span>[<span class="string">"H1"</span>, <span class="string">"H2"</span>]</span>, <span class="macro">vec!</span>[], <span class="macro">vec!</span>[], <span class="number">2</span>)]
+    <span class="attr">#[case::only_rows(
+        <span class="macro">vec!</span>[]</span>,
+        <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="string">"C1"</span>, <span class="string">"C2"</span>], <span class="macro">vec!</span>[<span class="string">"C1"</span>, <span class="string">"C2"</span>, <span class="string">"C3"</span>]],
+        <span class="macro">vec!</span>[],
+        <span class="number">3
+    </span>)]
+    <span class="attr">#[case::only_footer(<span class="macro">vec!</span>[]</span>, <span class="macro">vec!</span>[], <span class="macro">vec!</span>[<span class="string">"F1"</span>, <span class="string">"F2"</span>, <span class="string">"F3"</span>, <span class="string">"F4"</span>], <span class="number">4</span>)]
+    <span class="attr">#[case::rows_longer(
+        <span class="macro">vec!</span>[<span class="string">"H1"</span>, <span class="string">"H2"</span>, <span class="string">"H3"</span>, <span class="string">"H4"</span>]</span>,
+        <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="string">"C1"</span>, <span class="string">"C2"</span>],<span class="macro">vec!</span>[<span class="string">"C1"</span>, <span class="string">"C2"</span>, <span class="string">"C3"</span>]],
+        <span class="macro">vec!</span>[<span class="string">"F1"</span>, <span class="string">"F2"</span>],
+        <span class="number">4
+    </span>)]
+    <span class="attr">#[case::rows_longer(
+        <span class="macro">vec!</span>[<span class="string">"H1"</span>, <span class="string">"H2"</span>]</span>,
+        <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="string">"C1"</span>, <span class="string">"C2"</span>], <span class="macro">vec!</span>[<span class="string">"C1"</span>, <span class="string">"C2"</span>, <span class="string">"C3"</span>, <span class="string">"C4"</span>]],
+        <span class="macro">vec!</span>[<span class="string">"F1"</span>, <span class="string">"F2"</span>],
+        <span class="number">4
+    </span>)]
+    <span class="attr">#[case::footer_longer(
+        <span class="macro">vec!</span>[<span class="string">"H1"</span>, <span class="string">"H2"</span>]</span>,
+        <span class="macro">vec!</span>[<span class="macro">vec!</span>[<span class="string">"C1"</span>, <span class="string">"C2"</span>], <span class="macro">vec!</span>[<span class="string">"C1"</span>, <span class="string">"C2"</span>, <span class="string">"C3"</span>]],
+        <span class="macro">vec!</span>[<span class="string">"F1"</span>, <span class="string">"F2"</span>, <span class="string">"F3"</span>, <span class="string">"F4"</span>],
+        <span class="number">4
+    </span>)]
+
+    <span class="kw">fn </span>column_count(
+        <span class="attr">#[case] </span>header: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
+        <span class="attr">#[case] </span>rows: Vec&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;&gt;,
+        <span class="attr">#[case] </span>footer: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
+        <span class="attr">#[case] </span>expected: usize,
+    ) {
+        <span class="kw">let </span>header = Row::new(header);
+        <span class="kw">let </span>footer = Row::new(footer);
+        <span class="kw">let </span>rows: Vec&lt;Row&gt; = rows.into_iter().map(Row::new).collect();
+        <span class="kw">let </span>table = Table::new(rows, Vec::&lt;Constraint&gt;::new())
+            .header(header)
+            .footer(footer);
+        <span class="kw">let </span>column_count = table.column_count();
+        <span class="macro">assert_eq!</span>(column_count, expected);
     }
 }
 </code></pre></div></section></main></body></html>

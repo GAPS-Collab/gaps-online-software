@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tui-logger-0.11.2/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tui_logger" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tui-logger-0.14.1/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tui_logger" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">tui_logger/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1523,7 +1524,103 @@
 <a href="#1523" id="1523">1523</a>
 <a href="#1524" id="1524">1524</a>
 <a href="#1525" id="1525">1525</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! # Logger with smart widget for the `tui` and `ratatui` crate
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a>
+<a href="#1534" id="1534">1534</a>
+<a href="#1535" id="1535">1535</a>
+<a href="#1536" id="1536">1536</a>
+<a href="#1537" id="1537">1537</a>
+<a href="#1538" id="1538">1538</a>
+<a href="#1539" id="1539">1539</a>
+<a href="#1540" id="1540">1540</a>
+<a href="#1541" id="1541">1541</a>
+<a href="#1542" id="1542">1542</a>
+<a href="#1543" id="1543">1543</a>
+<a href="#1544" id="1544">1544</a>
+<a href="#1545" id="1545">1545</a>
+<a href="#1546" id="1546">1546</a>
+<a href="#1547" id="1547">1547</a>
+<a href="#1548" id="1548">1548</a>
+<a href="#1549" id="1549">1549</a>
+<a href="#1550" id="1550">1550</a>
+<a href="#1551" id="1551">1551</a>
+<a href="#1552" id="1552">1552</a>
+<a href="#1553" id="1553">1553</a>
+<a href="#1554" id="1554">1554</a>
+<a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
+<a href="#1560" id="1560">1560</a>
+<a href="#1561" id="1561">1561</a>
+<a href="#1562" id="1562">1562</a>
+<a href="#1563" id="1563">1563</a>
+<a href="#1564" id="1564">1564</a>
+<a href="#1565" id="1565">1565</a>
+<a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
+<a href="#1577" id="1577">1577</a>
+<a href="#1578" id="1578">1578</a>
+<a href="#1579" id="1579">1579</a>
+<a href="#1580" id="1580">1580</a>
+<a href="#1581" id="1581">1581</a>
+<a href="#1582" id="1582">1582</a>
+<a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
+<a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
+<a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
+<a href="#1590" id="1590">1590</a>
+<a href="#1591" id="1591">1591</a>
+<a href="#1592" id="1592">1592</a>
+<a href="#1593" id="1593">1593</a>
+<a href="#1594" id="1594">1594</a>
+<a href="#1595" id="1595">1595</a>
+<a href="#1596" id="1596">1596</a>
+<a href="#1597" id="1597">1597</a>
+<a href="#1598" id="1598">1598</a>
+<a href="#1599" id="1599">1599</a>
+<a href="#1600" id="1600">1600</a>
+<a href="#1601" id="1601">1601</a>
+<a href="#1602" id="1602">1602</a>
+<a href="#1603" id="1603">1603</a>
+<a href="#1604" id="1604">1604</a>
+<a href="#1605" id="1605">1605</a>
+<a href="#1606" id="1606">1606</a>
+<a href="#1607" id="1607">1607</a>
+<a href="#1608" id="1608">1608</a>
+<a href="#1609" id="1609">1609</a>
+<a href="#1610" id="1610">1610</a>
+<a href="#1611" id="1611">1611</a>
+<a href="#1612" id="1612">1612</a>
+<a href="#1613" id="1613">1613</a>
+<a href="#1614" id="1614">1614</a>
+<a href="#1615" id="1615">1615</a>
+<a href="#1616" id="1616">1616</a>
+<a href="#1617" id="1617">1617</a>
+<a href="#1618" id="1618">1618</a>
+<a href="#1619" id="1619">1619</a>
+<a href="#1620" id="1620">1620</a>
+<a href="#1621" id="1621">1621</a>
+<a href="#1622" id="1622">1622</a></pre></div><pre class="rust"><code><span class="doccomment">//! # Logger with smart widget for the `tui` and `ratatui` crate
 //!
 //! [![dependency status](https://deps.rs/repo/github/gin66/tui-logger/status.svg?service=github&amp;nocache=0_9_1)](https://deps.rs/repo/github/gin66/tui-logger)
 //! ![Build examples](https://github.com/gin66/tui-logger/workflows/Build%20examples/badge.svg?service=github)
@@ -1651,14 +1748,14 @@
 //!
 //! ## `slog` support
 //!
-//! `tui-logger` provides a TuiSlogDrain which implements `slog::Drain` and will route all records
+//! `tui-logger` provides a [`TuiSlogDrain`] which implements `slog::Drain` and will route all records
 //! it receives to the `tui-logger` widget.
 //!
 //! Enabled by feature "slog-support"
 //!
 //! ## `tracing-subscriber` support
 //!
-//! `tui-logger` provides a TuiTracingSubscriberLayer which implements
+//! `tui-logger` provides a [`TuiTracingSubscriberLayer`] which implements
 //! `tracing_subscriber::Layer` and will collect all events
 //! it receives to the `tui-logger` widget
 //!
@@ -1684,10 +1781,20 @@
 //! }
 //! ```
 //!
-//! ## Applications using tui-logger
+//! ## Internals
 //!
-//! * [wash](https://github.com/wasmCloud/wash)
-//! * [rocker](https://github.com/atlassian/rocker)
+//! For logging there are two circular buffers in use:
+//! * "hot" buffer, which is written to during any logging macro invocation
+//! * main buffer, which holds events to be displayed by the widgets.
+//!
+//! The size of the "hot" buffer is 1000 and can be modified by `set_hot_buffer_depth()`.
+//! The size of the main buffer is 10000 and can be modified by `set_buffer_depth()`.
+//!
+//! Reason for this scheme: The main buffer is locked for a while during widget updates.
+//! In order to block the log-macros, this scheme is in use.
+//!
+//! The copy from "hot" buffer to main buffer is performed by a call to `move_events()`,
+//! which is done in a cyclic task, which repeats every 10 ms, or when the hot buffer is half full.
 //!
 //! ## THANKS TO
 //!
@@ -1711,11 +1818,16 @@
 //! * [Josh McKinney](https://github.com/joshka) for providing patch in
 //! [#56](https://github.com/gin66/tui-logger/issues/56) for Copy on TuiWidgetEvent and
 //! TuiLoggerWidget
+//! * [nick42d](https://github.com/nick42d) for providing patch in
+//! [#63](https://github.com/gin66/tui-logger/issues/63) for semver checks
+//! * [Tom Groenwoldt](https://github.com/tomgroenwoldt) for providing patch in [#65](https://github.com/gin66/tui-logger/issues/65) for ratatui update
 //!
 //!## Star History
 //!
 //![![Star History Chart](https://api.star-history.com/svg?repos=gin66/tui-logger&amp;type=Date)](https://star-history.com/#gin66/tui-logger&amp;Date)
-</span><span class="attr">#[macro_use]
+</span><span class="comment">// Enable docsrs doc_cfg - to display non-default feature documentation.
+</span><span class="attr">#![cfg_attr(docsrs, feature(doc_cfg))]
+#[macro_use]
 </span><span class="kw">extern crate </span>lazy_static;
 
 <span class="kw">use </span>std::collections::hash_map::Iter;
@@ -1727,25 +1839,36 @@
 <span class="kw">use </span>std::io::Write;
 <span class="kw">use </span>std::mem;
 <span class="kw">use </span>std::sync::Arc;
-
-<span class="kw">use </span>ratatui::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>ratatui::widgets::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::thread;
 
 <span class="kw">use </span>chrono::{DateTime, Local};
-<span class="kw">use </span>log::{Level, LevelFilter, Log, Metadata, Record};
+<span class="kw">use </span>log::{Level, Log, Metadata, Record, SetLoggerError};
 <span class="kw">use </span>parking_lot::Mutex;
+<span class="kw">use </span>ratatui::{
+    buffer::Buffer,
+    layout::{Constraint, Direction, Layout, Rect},
+    style::{Modifier, Style},
+    text::Line,
+    widgets::{Block, BorderType, Borders, Widget},
+};
 
 <span class="kw">mod </span>circular;
 <span class="attr">#[cfg(feature = <span class="string">"slog-support"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"slog-support"</span>)))]
 </span><span class="kw">mod </span>slog;
 <span class="attr">#[cfg(feature = <span class="string">"tracing-support"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"tracing-support"</span>)))]
 </span><span class="kw">mod </span>tracing_subscriber;
 
 <span class="kw">pub use </span><span class="kw">crate</span>::circular::CircularBuffer;
 <span class="attr">#[cfg(feature = <span class="string">"slog-support"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"slog-support"</span>)))]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::slog::TuiSlogDrain;
 <span class="attr">#[cfg(feature = <span class="string">"tracing-support"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"tracing-support"</span>)))]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::tracing_subscriber::TuiTracingSubscriberLayer;
+<span class="attr">#[doc(no_inline)]
+</span><span class="kw">pub use </span>log::LevelFilter;
 
 <span class="kw">struct </span>ExtLogRecord {
     timestamp: DateTime&lt;Local&gt;,
@@ -1756,8 +1879,8 @@
     msg: String,
 }
 
-<span class="kw">fn </span>advance_levelfilter(levelfilter: <span class="kw-2">&amp;</span>LevelFilter) -&gt; (<span class="prelude-ty">Option</span>&lt;LevelFilter&gt;, <span class="prelude-ty">Option</span>&lt;LevelFilter&gt;) {
-    <span class="kw">match </span><span class="kw-2">*</span>levelfilter {
+<span class="kw">fn </span>advance_levelfilter(levelfilter: LevelFilter) -&gt; (<span class="prelude-ty">Option</span>&lt;LevelFilter&gt;, <span class="prelude-ty">Option</span>&lt;LevelFilter&gt;) {
+    <span class="kw">match </span>levelfilter {
         LevelFilter::Trace =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(LevelFilter::Debug)),
         LevelFilter::Debug =&gt; (<span class="prelude-val">Some</span>(LevelFilter::Trace), <span class="prelude-val">Some</span>(LevelFilter::Info)),
         LevelFilter::Info =&gt; (<span class="prelude-val">Some</span>(LevelFilter::Debug), <span class="prelude-val">Some</span>(LevelFilter::Warn)),
@@ -1811,8 +1934,8 @@
         <span class="self">self</span>.config.keys()
     }
     <span class="doccomment">/// Get the levelfilter for a given target.
-    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, target: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>LevelFilter&gt; {
-        <span class="self">self</span>.config.get(target)
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, target: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="self">self</span>.config.get(target).cloned()
     }
     <span class="doccomment">/// Retrieve an iterator through all entries of the table.
     </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Iter&lt;String, LevelFilter&gt; {
@@ -1827,7 +1950,7 @@
         <span class="kw">if </span><span class="self">self</span>.origin_generation != origin.generation {
             <span class="kw">for </span>(target, origin_levelfilter) <span class="kw">in </span>origin.iter() {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(levelfilter) = <span class="self">self</span>.get(target) {
-                    <span class="kw">if </span>levelfilter &lt;= origin_levelfilter {
+                    <span class="kw">if </span>levelfilter &lt;= <span class="kw-2">*</span>origin_levelfilter {
                         <span class="kw">continue</span>;
                     }
                 }
@@ -1855,6 +1978,7 @@
 }
 <span class="kw">struct </span>HotLog {
     events: CircularBuffer&lt;ExtLogRecord&gt;,
+    mover_thread: <span class="prelude-ty">Option</span>&lt;thread::JoinHandle&lt;()&gt;&gt;,
 }
 <span class="kw">struct </span>TuiLoggerInner {
     hot_depth: usize,
@@ -1877,7 +2001,8 @@
         }
         <span class="comment">// Exchange new event buffer with the hot buffer
         </span><span class="kw">let </span><span class="kw-2">mut </span>received_events = {
-            <span class="kw">let </span>new_circular = CircularBuffer::new(<span class="self">self</span>.inner.lock().hot_depth);
+            <span class="kw">let </span>hot_depth = <span class="self">self</span>.inner.lock().hot_depth;
+            <span class="kw">let </span>new_circular = CircularBuffer::new(hot_depth);
             <span class="kw">let </span><span class="kw-2">mut </span>hl = <span class="self">self</span>.hot_log.lock();
             mem::replace(<span class="kw-2">&amp;mut </span>hl.events, new_circular)
         };
@@ -1938,6 +2063,7 @@
         };
         <span class="kw">let </span>hl = HotLog {
             events: CircularBuffer::new(<span class="number">1000</span>),
+            mover_thread: <span class="prelude-val">None</span>,
         };
         <span class="kw">let </span>tli = TuiLoggerInner {
             hot_depth: <span class="number">1000</span>,
@@ -1955,18 +2081,65 @@
     };
 }
 
-<span class="doccomment">/// Init the logger and record with `log` crate.
-</span><span class="kw">pub fn </span>init_logger(max_level: LevelFilter) -&gt; <span class="prelude-ty">Result</span>&lt;(), log::SetLoggerError&gt; {
-    log::set_max_level(max_level);
-    log::set_logger(<span class="kw-2">&amp;*</span>TUI_LOGGER)
+<span class="comment">// Lots of boilerplate code, so that init_logger can return two error types...
+</span><span class="attr">#[derive(Debug)]
+</span><span class="kw">pub enum </span>TuiLoggerError {
+    SetLoggerError(SetLoggerError),
+    ThreadError(std::io::Error),
+}
+<span class="kw">impl </span>std::error::Error <span class="kw">for </span>TuiLoggerError {
+    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            TuiLoggerError::SetLoggerError(<span class="kw">_</span>) =&gt; <span class="string">"SetLoggerError"</span>,
+            TuiLoggerError::ThreadError(<span class="kw">_</span>) =&gt; <span class="string">"ThreadError"</span>,
+        }
+    }
+    <span class="kw">fn </span>cause(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="kw">dyn </span>std::error::Error&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            TuiLoggerError::SetLoggerError(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            TuiLoggerError::ThreadError(err) =&gt; <span class="prelude-val">Some</span>(err),
+        }
+    }
+}
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>TuiLoggerError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            TuiLoggerError::SetLoggerError(err) =&gt; <span class="macro">write!</span>(f, <span class="string">"SetLoggerError({})"</span>, err),
+            TuiLoggerError::ThreadError(err) =&gt; <span class="macro">write!</span>(f, <span class="string">"ThreadError({})"</span>, err),
+        }
+    }
+}
+
+<span class="doccomment">/// Init the logger.
+</span><span class="kw">pub fn </span>init_logger(max_level: LevelFilter) -&gt; <span class="prelude-ty">Result</span>&lt;(), TuiLoggerError&gt; {
+    <span class="kw">let </span>join_handle = thread::Builder::new()
+        .name(<span class="string">"tui-logger::move_events"</span>.into())
+        .spawn(|| {
+            <span class="kw">let </span>duration = std::time::Duration::from_millis(<span class="number">10</span>);
+            <span class="kw">loop </span>{
+                thread::park_timeout(duration);
+                TUI_LOGGER.move_events();
+            }
+        })
+        .map_err(|err| TuiLoggerError::ThreadError(err))<span class="question-mark">?</span>;
+    TUI_LOGGER.hot_log.lock().mover_thread = <span class="prelude-val">Some</span>(join_handle);
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">"tracing-support"</span>) {
+        set_default_level(max_level);
+        <span class="prelude-val">Ok</span>(())
+    } <span class="kw">else </span>{
+        log::set_max_level(max_level);
+        log::set_logger(<span class="kw-2">&amp;*</span>TUI_LOGGER).map_err(|err| TuiLoggerError::SetLoggerError(err))
+    }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"slog-support"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"slog-support"</span>)))]
 </span><span class="kw">pub fn </span>slog_drain() -&gt; TuiSlogDrain {
     TuiSlogDrain
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"tracing-support"</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"tracing-support"</span>)))]
 </span><span class="kw">pub fn </span>tracing_subscriber_layer() -&gt; TuiTracingSubscriberLayer {
     TuiTracingSubscriberLayer
 }
@@ -1977,10 +2150,10 @@
     TUI_LOGGER.inner.lock().hot_depth = depth;
 }
 
-<span class="doccomment">/// Move events from hot circular buffer to the main one.
-/// If defined, log records will be written to file.
-</span><span class="kw">pub fn </span>move_events() {
-    TUI_LOGGER.move_events();
+<span class="doccomment">/// Set the depth of the circular buffer in order to avoid message loss.
+/// This will delete all existing messages in the circular buffer.
+</span><span class="kw">pub fn </span>set_buffer_depth(depth: usize) {
+    TUI_LOGGER.inner.lock().events = CircularBuffer::new(depth);
 }
 
 <span class="doccomment">/// Define filename for logging.
@@ -2018,7 +2191,16 @@
             line: record.line().unwrap_or(<span class="number">0</span>),
             msg: <span class="macro">format!</span>(<span class="string">"{}"</span>, record.args()),
         };
-        <span class="self">self</span>.hot_log.lock().events.push(log_entry);
+        <span class="kw">let </span><span class="kw-2">mut </span>events_lock = <span class="self">self</span>.hot_log.lock();
+        events_lock.events.push(log_entry);
+        <span class="kw">let </span>need_signal =
+            (events_lock.events.total_elements() % (events_lock.events.capacity() / <span class="number">2</span>)) == <span class="number">0</span>;
+        <span class="kw">if </span>need_signal {
+            events_lock
+                .mover_thread
+                .as_ref()
+                .map(|jh| thread::Thread::unpark(jh.thread()));
+        }
     }
 }
 
@@ -2194,8 +2376,8 @@
 }
 <span class="kw">impl</span>&lt;<span class="lifetime">'b</span>&gt; Default <span class="kw">for </span>TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
     <span class="kw">fn </span>default() -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
-        TUI_LOGGER.move_events();
-        TuiLoggerTargetWidget {
+        <span class="comment">//TUI_LOGGER.move_events();
+        </span>TuiLoggerTargetWidget {
             block: <span class="prelude-val">None</span>,
             style: Default::default(),
             style_off: <span class="prelude-val">None</span>,
@@ -2291,7 +2473,8 @@
         <span class="kw">let </span>la_width = list_area.width <span class="kw">as </span>usize;
 
         {
-            <span class="kw">let </span>hot_targets = <span class="kw-2">&amp;</span>TUI_LOGGER.inner.lock().targets;
+            <span class="kw">let </span>inner = <span class="kw-2">&amp;</span>TUI_LOGGER.inner.lock();
+            <span class="kw">let </span>hot_targets = <span class="kw-2">&amp;</span>inner.targets;
             <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state.lock();
             <span class="kw">let </span>hide_off = state.hide_off;
             <span class="kw">let </span>offset = state.offset;
@@ -2349,10 +2532,20 @@
             state.offset = offset;
 
             <span class="kw">let </span>targets = <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span>state.config);
+            <span class="kw">let </span>default_level = inner.default;
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..list_height {
                 <span class="kw">let </span>t = <span class="kw-2">&amp;</span><span class="self">self</span>.targets[i + offset];
-                <span class="kw">let </span>hot_level_filter = hot_targets.get(t).unwrap();
-                <span class="kw">let </span>level_filter = targets.get(t).unwrap();
+                <span class="comment">// Comment in relation to issue #69:
+                // Widgets maintain their own list of level filters per target.
+                // These lists are not forwarded to the TUI_LOGGER, but kept widget private.
+                // Example: This widget's private list contains a target named "not_yet",
+                // and the application hasn't logged an entry with target "not_yet".
+                // If displaying the target list, then "not_yet" will be only present in target,
+                // but not in hot_targets. In issue #69 the problem has been, that
+                // `hot_targets.get(t).unwrap()` has caused a panic. Which is to be expected.
+                // The remedy is to use unwrap_or with default_level.
+                </span><span class="kw">let </span>hot_level_filter = hot_targets.get(t).unwrap_or(default_level);
+                <span class="kw">let </span>level_filter = targets.get(t).unwrap_or(default_level);
                 <span class="kw">for </span>(j, sym, lev) <span class="kw">in </span><span class="kw-2">&amp;</span>[
                     (<span class="number">0</span>, <span class="string">"E"</span>, Level::Error),
                     (<span class="number">1</span>, <span class="string">"W"</span>, Level::Warn),
@@ -2360,25 +2553,26 @@
                     (<span class="number">3</span>, <span class="string">"D"</span>, Level::Debug),
                     (<span class="number">4</span>, <span class="string">"T"</span>, Level::Trace),
                 ] {
-                    <span class="kw">let </span>cell = buf.get_mut(la_left + j, la_top + i <span class="kw">as </span>u16);
-                    <span class="kw">let </span>cell_style = <span class="kw">if </span><span class="kw-2">*</span>hot_level_filter &gt;= <span class="kw-2">*</span>lev {
-                        <span class="kw">if </span><span class="kw-2">*</span>level_filter &gt;= <span class="kw-2">*</span>lev {
-                            <span class="kw">if </span>!focus_selected || i + offset == state.selected {
-                                <span class="self">self</span>.style_show
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(cell) = buf.cell_mut((la_left + j, la_top + i <span class="kw">as </span>u16)) {
+                        <span class="kw">let </span>cell_style = <span class="kw">if </span>hot_level_filter &gt;= <span class="kw-2">*</span>lev {
+                            <span class="kw">if </span>level_filter &gt;= <span class="kw-2">*</span>lev {
+                                <span class="kw">if </span>!focus_selected || i + offset == state.selected {
+                                    <span class="self">self</span>.style_show
+                                } <span class="kw">else </span>{
+                                    <span class="self">self</span>.style_hide
+                                }
                             } <span class="kw">else </span>{
                                 <span class="self">self</span>.style_hide
                             }
+                        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(style_off) = <span class="self">self</span>.style_off {
+                            style_off
                         } <span class="kw">else </span>{
-                            <span class="self">self</span>.style_hide
-                        }
-                    } <span class="kw">else if let </span><span class="prelude-val">Some</span>(style_off) = <span class="self">self</span>.style_off {
-                        style_off
-                    } <span class="kw">else </span>{
-                        cell.set_symbol(<span class="string">" "</span>);
-                        <span class="kw">continue</span>;
-                    };
-                    cell.set_style(cell_style);
-                    cell.set_symbol(sym);
+                            cell.set_symbol(<span class="string">" "</span>);
+                            <span class="kw">continue</span>;
+                        };
+                        cell.set_style(cell_style);
+                        cell.set_symbol(sym);
+                    }
                 }
                 buf.set_stringn(la_left + <span class="number">5</span>, la_top + i <span class="kw">as </span>u16, <span class="string">":"</span>, la_width, <span class="self">self</span>.style);
                 buf.set_stringn(
@@ -2425,8 +2619,8 @@
 }
 <span class="kw">impl</span>&lt;<span class="lifetime">'b</span>&gt; Default <span class="kw">for </span>TuiLoggerWidget&lt;<span class="lifetime">'b</span>&gt; {
     <span class="kw">fn </span>default() -&gt; TuiLoggerWidget&lt;<span class="lifetime">'b</span>&gt; {
-        TUI_LOGGER.move_events();
-        TuiLoggerWidget {
+        <span class="comment">//TUI_LOGGER.move_events();
+        </span>TuiLoggerWidget {
             block: <span class="prelude-val">None</span>,
             style: Default::default(),
             style_error: <span class="prelude-val">None</span>,
@@ -2669,7 +2863,7 @@
             <span class="kw">let </span><span class="kw-2">mut </span>circular = CircularBuffer::new(<span class="number">10</span>); <span class="comment">// MAGIC constant
             </span><span class="kw">for </span>evt <span class="kw">in </span>tui_lock.events.rev_iter() {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(level) = state.config.get(<span class="kw-2">&amp;</span>evt.target) {
-                    <span class="kw">if </span><span class="kw-2">*</span>level &lt; evt.level {
+                    <span class="kw">if </span>level &lt; evt.level {
                         <span class="kw">continue</span>;
                     }
                 } <span class="kw">else if let </span><span class="prelude-val">Some</span>(level) = state.config.default_display_level {
@@ -2782,8 +2976,8 @@
 }
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Default <span class="kw">for </span>TuiLoggerSmartWidget&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        TUI_LOGGER.move_events();
-        TuiLoggerSmartWidget {
+        <span class="comment">//TUI_LOGGER.move_events();
+        </span>TuiLoggerSmartWidget {
             title_log: Line::from(<span class="string">"Tui Log"</span>),
             title_target: Line::from(<span class="string">"Tui Target Selector"</span>),
             style: <span class="prelude-val">None</span>,

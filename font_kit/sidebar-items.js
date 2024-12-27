@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["canvas","error","family","family_handle","family_name","file_type","font","handle","hinting","loader","loaders","metrics","outline","properties","source","sources"]};

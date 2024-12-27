@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/widgets/barchart.rs`."><title>barchart.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/widgets/barchart.rs`."><title>barchart.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/widgets/</div>barchart.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1327,7 +1328,39 @@
 <a href="#1327" id="1327">1327</a>
 <a href="#1328" id="1328">1328</a>
 <a href="#1329" id="1329">1329</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, style::Styled, widgets::Block};
+<a href="#1330" id="1330">1330</a>
+<a href="#1331" id="1331">1331</a>
+<a href="#1332" id="1332">1332</a>
+<a href="#1333" id="1333">1333</a>
+<a href="#1334" id="1334">1334</a>
+<a href="#1335" id="1335">1335</a>
+<a href="#1336" id="1336">1336</a>
+<a href="#1337" id="1337">1337</a>
+<a href="#1338" id="1338">1338</a>
+<a href="#1339" id="1339">1339</a>
+<a href="#1340" id="1340">1340</a>
+<a href="#1341" id="1341">1341</a>
+<a href="#1342" id="1342">1342</a>
+<a href="#1343" id="1343">1343</a>
+<a href="#1344" id="1344">1344</a>
+<a href="#1345" id="1345">1345</a>
+<a href="#1346" id="1346">1346</a>
+<a href="#1347" id="1347">1347</a>
+<a href="#1348" id="1348">1348</a>
+<a href="#1349" id="1349">1349</a>
+<a href="#1350" id="1350">1350</a>
+<a href="#1351" id="1351">1351</a>
+<a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a></pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
+    buffer::Buffer,
+    layout::{Direction, Rect},
+    style::{Style, Styled},
+    symbols::{<span class="self">self</span>},
+    text::Line,
+    widgets::{block::BlockExt, Block, Widget, WidgetRef},
+};
 
 <span class="kw">mod </span>bar;
 <span class="kw">mod </span>bar_group;
@@ -1371,7 +1404,10 @@
 /// The first group is added by an array slice (`&amp;[(&amp;str, u64)]`).
 /// The second group is added by a [`BarGroup`] instance.
 /// ```
-/// use ratatui::{prelude::*, widgets::*};
+/// use ratatui::{
+///     style::{Style, Stylize},
+///     widgets::{Bar, BarChart, BarGroup, Block},
+/// };
 ///
 /// BarChart::default()
 ///     .block(Block::bordered().title("BarChart"))
@@ -1442,7 +1478,8 @@
     /// The first group is added by an array slice (`&amp;[(&amp;str, u64)]`).
     /// The second group is added by a [`BarGroup`] instance.
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::widgets::{Bar, BarChart, BarGroup};
+    ///
     /// BarChart::default()
     ///     .data(&amp;[("B0", 0), ("B1", 2), ("B2", 4), ("B3", 3)])
     ///     .data(BarGroup::default().bars(&amp;[Bar::default().value(10), Bar::default().value(20)]));
@@ -1472,7 +1509,7 @@
     /// This example shows the default behavior when `max` is not set.
     /// The maximum value in the dataset is taken (here, `100`).
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::widgets::BarChart;
     /// BarChart::default().data(&amp;[("foo", 1), ("bar", 2), ("baz", 100)]);
     /// // Renders
     /// //     █
@@ -1483,7 +1520,8 @@
     /// This example shows a custom max value.
     /// The maximum height being `2`, `bar` &amp; `baz` render as the max.
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::widgets::BarChart;
+    ///
     /// BarChart::default()
     ///     .data(&amp;[("foo", 1), ("bar", 2), ("baz", 100)])
     ///     .max(2);
@@ -1505,6 +1543,8 @@
     ///
     /// It is also possible to set individually the style of each [`Bar`].
     /// In this case the default style will be patched by the individual style
+    ///
+    /// [`Color`]: crate::style::Color
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>bar_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.bar_style = style.into();
@@ -1533,7 +1573,8 @@
     ///
     /// This shows two bars with a gap of `3`. Notice the labels will always stay under the bar.
     /// ```
-    /// # use ratatui::{prelude::*, widgets::*};
+    /// use ratatui::widgets::BarChart;
+    ///
     /// BarChart::default()
     ///     .data(&amp;[("foo", 1), ("bar", 2)])
     ///     .bar_gap(3);
@@ -1568,6 +1609,8 @@
     /// # See also
     ///
     /// [`Bar::value_style`] to set the value style individually.
+    ///
+    /// [`Color`]: crate::style::Color
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>value_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.value_style = style.into();
@@ -1585,6 +1628,8 @@
     /// # See also
     ///
     /// [`Bar::label`] to set the label style individually.
+    ///
+    /// [`Color`]: crate::style::Color
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>label_style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.label_style = style.into();
@@ -1604,6 +1649,8 @@
     /// your own type that implements [`Into&lt;Style&gt;`]).
     ///
     /// The style will be applied to everything that isn't styled (borders, bars, labels, ...).
+    ///
+    /// [`Color`]: crate::style::Color
     </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>style&lt;S: Into&lt;Style&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.style = style.into();
@@ -1760,7 +1807,7 @@
                         } <span class="kw">else </span>{
                             <span class="self">self</span>.bar_set.empty
                         };
-                        buf.get_mut(bars_area.left() + x, bar_y)
+                        buf[(bars_area.left() + x, bar_y)]
                             .set_symbol(symbol)
                             .set_style(bar_style);
                     }
@@ -1836,7 +1883,7 @@
                     <span class="kw">let </span>bar_style = <span class="self">self</span>.bar_style.patch(bar.style);
 
                     <span class="kw">for </span>x <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.bar_width {
-                        buf.get_mut(bar_x + x, area.top() + j)
+                        buf[(bar_x + x, area.top() + j)]
                             .set_symbol(symbol)
                             .set_style(bar_style);
                     }
@@ -1944,7 +1991,12 @@
     <span class="kw">use </span>itertools::iproduct;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::widgets::BorderType;
+    <span class="kw">use crate</span>::{
+        layout::Alignment,
+        style::{Color, Modifier, Stylize},
+        text::Span,
+        widgets::BorderType,
+    };
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>default() {
@@ -2027,7 +2079,7 @@
             <span class="string">"f b       "</span>,
         ]);
         <span class="kw">for </span>(x, y) <span class="kw">in </span><span class="macro">iproduct!</span>([<span class="number">0</span>, <span class="number">2</span>], [<span class="number">0</span>, <span class="number">1</span>]) {
-            expected.get_mut(x, y).set_fg(Color::Red);
+            expected[(x, y)].set_fg(Color::Red);
         }
         <span class="macro">assert_eq!</span>(buffer, expected);
     }
@@ -2119,8 +2171,8 @@
             <span class="string">"█1█ █2█   "</span>,
             <span class="string">"foo bar   "</span>,
         ]);
-        expected.get_mut(<span class="number">1</span>, <span class="number">1</span>).set_fg(Color::Red);
-        expected.get_mut(<span class="number">5</span>, <span class="number">1</span>).set_fg(Color::Red);
+        expected[(<span class="number">1</span>, <span class="number">1</span>)].set_fg(Color::Red);
+        expected[(<span class="number">5</span>, <span class="number">1</span>)].set_fg(Color::Red);
         <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
@@ -2137,8 +2189,8 @@
             <span class="string">"1 2       "</span>,
             <span class="string">"f b       "</span>,
         ]);
-        expected.get_mut(<span class="number">0</span>, <span class="number">2</span>).set_fg(Color::Red);
-        expected.get_mut(<span class="number">2</span>, <span class="number">2</span>).set_fg(Color::Red);
+        expected[(<span class="number">0</span>, <span class="number">2</span>)].set_fg(Color::Red);
+        expected[(<span class="number">2</span>, <span class="number">2</span>)].set_fg(Color::Red);
         <span class="macro">assert_eq!</span>(buffer, expected);
     }
 
@@ -2156,7 +2208,7 @@
             <span class="string">"f b       "</span>,
         ]);
         <span class="kw">for </span>(x, y) <span class="kw">in </span><span class="macro">iproduct!</span>(<span class="number">0</span>..<span class="number">10</span>, <span class="number">0</span>..<span class="number">3</span>) {
-            expected.get_mut(x, y).set_fg(Color::Red);
+            expected[(x, y)].set_fg(Color::Red);
         }
         <span class="macro">assert_eq!</span>(buffer, expected);
     }
@@ -2287,9 +2339,9 @@
         <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines([<span class="string">"label"</span>, <span class="string">"5████"</span>]);
 
         <span class="comment">// first line has a yellow foreground. first cell contains italic "5"
-        </span>expected.get_mut(<span class="number">0</span>, <span class="number">1</span>).modifier.insert(Modifier::ITALIC);
+        </span>expected[(<span class="number">0</span>, <span class="number">1</span>)].modifier.insert(Modifier::ITALIC);
         <span class="kw">for </span>x <span class="kw">in </span><span class="number">0</span>..<span class="number">5 </span>{
-            expected.get_mut(x, <span class="number">1</span>).set_fg(Color::Yellow);
+            expected[(x, <span class="number">1</span>)].set_fg(Color::Yellow);
         }
 
         <span class="kw">let </span>expected_color = bar_color.unwrap_or(Color::Yellow);
@@ -2297,13 +2349,13 @@
         <span class="comment">// second line contains the word "label". Since the bar value is 2,
         // then the first 2 characters of "label" are italic red.
         // the rest is white (using the Bar's style).
-        </span><span class="kw">let </span>cell = expected.get_mut(<span class="number">0</span>, <span class="number">0</span>).set_fg(Color::Red);
+        </span><span class="kw">let </span>cell = expected[(<span class="number">0</span>, <span class="number">0</span>)].set_fg(Color::Red);
         cell.modifier.insert(Modifier::ITALIC);
-        <span class="kw">let </span>cell = expected.get_mut(<span class="number">1</span>, <span class="number">0</span>).set_fg(Color::Red);
+        <span class="kw">let </span>cell = expected[(<span class="number">1</span>, <span class="number">0</span>)].set_fg(Color::Red);
         cell.modifier.insert(Modifier::ITALIC);
-        expected.get_mut(<span class="number">2</span>, <span class="number">0</span>).set_fg(expected_color);
-        expected.get_mut(<span class="number">3</span>, <span class="number">0</span>).set_fg(expected_color);
-        expected.get_mut(<span class="number">4</span>, <span class="number">0</span>).set_fg(expected_color);
+        expected[(<span class="number">2</span>, <span class="number">0</span>)].set_fg(expected_color);
+        expected[(<span class="number">3</span>, <span class="number">0</span>)].set_fg(expected_color);
+        expected[(<span class="number">4</span>, <span class="number">0</span>)].set_fg(expected_color);
 
         <span class="macro">assert_eq!</span>(buffer, expected);
     }
@@ -2356,9 +2408,9 @@
         // bold: because of BarChart::label_style
         // red: is included with the label itself
         </span><span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines([<span class="string">"2████"</span>, <span class="string">"G1   "</span>]);
-        <span class="kw">let </span>cell = expected.get_mut(<span class="number">0</span>, <span class="number">1</span>).set_fg(Color::Red);
+        <span class="kw">let </span>cell = expected[(<span class="number">0</span>, <span class="number">1</span>)].set_fg(Color::Red);
         cell.modifier.insert(Modifier::BOLD);
-        <span class="kw">let </span>cell = expected.get_mut(<span class="number">1</span>, <span class="number">1</span>).set_fg(Color::Red);
+        <span class="kw">let </span>cell = expected[(<span class="number">1</span>, <span class="number">1</span>)].set_fg(Color::Red);
         cell.modifier.insert(Modifier::BOLD);
 
         <span class="macro">assert_eq!</span>(buffer, expected);

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/style.rs`."><title>style.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/style.rs`."><title>style.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/</div>style.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -799,7 +800,110 @@
 <a href="#799" id="799">799</a>
 <a href="#800" id="800">800</a>
 <a href="#801" id="801">801</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! `style` contains the primitives used to control how your user interface will look.
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a></pre></div><pre class="rust"><code><span class="doccomment">//! `style` contains the primitives used to control how your user interface will look.
 //!
 //! There are two ways to set styles:
 //! - Creating and using the [`Style`] struct. (e.g. `Style::new().fg(Color::Red)`).
@@ -814,7 +918,10 @@
 //! ## Example
 //!
 //! ```
-//! use ratatui::prelude::*;
+//! use ratatui::{
+//!     style::{Color, Modifier, Style},
+//!     text::Span,
+//! };
 //!
 //! let heading_style = Style::new()
 //!     .fg(Color::Black)
@@ -836,13 +943,16 @@
 //! - [`Span`]s can be styled again, which will merge the styles.
 //! - Many widget types can be styled directly rather than calling their `style()` method.
 //!
-//! See the [`Stylize`] and [`Styled`] traits for more information. These traits are re-exported in
-//! the [`prelude`] module for convenience.
+//! See the [`Stylize`] and [`Styled`] traits for more information.
 //!
 //! ## Example
 //!
 //! ```
-//! use ratatui::{prelude::*, widgets::*};
+//! use ratatui::{
+//!     style::{Color, Modifier, Style, Stylize},
+//!     text::Span,
+//!     widgets::Paragraph,
+//! };
 //!
 //! assert_eq!(
 //!     "hello".red().on_blue().bold(),
@@ -866,13 +976,13 @@
 //! );
 //! ```
 //!
-//! [`prelude`]: crate::prelude
 //! [`Span`]: crate::text::Span
 
 </span><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span>bitflags::bitflags;
 <span class="kw">pub use </span>color::{Color, ParseColorError};
+<span class="kw">use </span>stylize::ColorDebugKind;
 <span class="kw">pub use </span>stylize::{Styled, Stylize};
 
 <span class="kw">mod </span>color;
@@ -892,7 +1002,7 @@
     /// ## Examples
     ///
     /// ```rust
-    /// use ratatui::{prelude::*};
+    /// use ratatui::style::Modifier;
     ///
     /// let m = Modifier::BOLD | Modifier::ITALIC;
     /// ```
@@ -928,7 +1038,7 @@
 <span class="doccomment">/// Style lets you control the main characteristics of the displayed elements.
 ///
 /// ```rust
-/// use ratatui::prelude::*;
+/// use ratatui::style::{Color, Modifier, Style};
 ///
 /// Style::default()
 ///     .fg(Color::Black)
@@ -939,7 +1049,8 @@
 /// Styles can also be created with a [shorthand notation](crate::style#using-style-shorthands).
 ///
 /// ```rust
-/// # use ratatui::prelude::*;
+/// use ratatui::style::{Style, Stylize};
+///
 /// Style::new().black().on_green().italic().bold();
 /// ```
 ///
@@ -949,7 +1060,11 @@
 /// anywhere that accepts `Into&lt;Style&gt;`.
 ///
 /// ```rust
-/// # use ratatui::prelude::*;
+/// use ratatui::{
+///     style::{Color, Modifier, Style},
+///     text::Line,
+/// };
+///
 /// Line::styled("hello", Style::new().fg(Color::Red));
 /// // simplifies to
 /// Line::styled("hello", Color::Red);
@@ -964,7 +1079,11 @@
 /// just S3.
 ///
 /// ```rust
-/// use ratatui::prelude::*;
+/// use ratatui::{
+///     buffer::Buffer,
+///     layout::Rect,
+///     style::{Color, Modifier, Style},
+/// };
 ///
 /// let styles = [
 ///     Style::default()
@@ -981,7 +1100,7 @@
 /// ];
 /// let mut buffer = Buffer::empty(Rect::new(0, 0, 1, 1));
 /// for style in &amp;styles {
-///     buffer.get_mut(0, 0).set_style(*style);
+///     buffer[(0, 0)].set_style(*style);
 /// }
 /// assert_eq!(
 ///     Style {
@@ -992,7 +1111,7 @@
 ///         add_modifier: Modifier::BOLD | Modifier::UNDERLINED,
 ///         sub_modifier: Modifier::empty(),
 ///     },
-///     buffer.get(0, 0).style(),
+///     buffer[(0, 0)].style(),
 /// );
 /// ```
 ///
@@ -1000,7 +1119,11 @@
 /// reset all properties until that point use [`Style::reset`].
 ///
 /// ```
-/// use ratatui::prelude::*;
+/// use ratatui::{
+///     buffer::Buffer,
+///     layout::Rect,
+///     style::{Color, Modifier, Style},
+/// };
 ///
 /// let styles = [
 ///     Style::default()
@@ -1010,7 +1133,7 @@
 /// ];
 /// let mut buffer = Buffer::empty(Rect::new(0, 0, 1, 1));
 /// for style in &amp;styles {
-///     buffer.get_mut(0, 0).set_style(*style);
+///     buffer[(0, 0)].set_style(*style);
 /// }
 /// assert_eq!(
 ///     Style {
@@ -1021,10 +1144,10 @@
 ///         add_modifier: Modifier::empty(),
 ///         sub_modifier: Modifier::empty(),
 ///     },
-///     buffer.get(0, 0).style(),
+///     buffer[(0, 0)].style(),
 /// );
 /// ```
-</span><span class="attr">#[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="attr">#[derive(Default, Clone, Copy, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = <span class="string">"serde"</span>, derive(serde::Serialize, serde::Deserialize))]
 </span><span class="kw">pub struct </span>Style {
     <span class="kw">pub </span>fg: <span class="prelude-ty">Option</span>&lt;Color&gt;,
@@ -1033,6 +1156,16 @@
     </span><span class="kw">pub </span>underline_color: <span class="prelude-ty">Option</span>&lt;Color&gt;,
     <span class="kw">pub </span>add_modifier: Modifier,
     <span class="kw">pub </span>sub_modifier: Modifier,
+}
+
+<span class="doccomment">/// A custom debug implementation that prints only the fields that are not the default, and unwraps
+/// the `Option`s.
+</span><span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Style {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        f.write_str(<span class="string">"Style::new()"</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.fmt_stylize(f)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    }
 }
 
 <span class="kw">impl </span>Styled <span class="kw">for </span>Style {
@@ -1076,7 +1209,8 @@
     /// ## Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::style::{Color, Style};
+    ///
     /// let style = Style::default().fg(Color::Blue);
     /// let diff = Style::default().fg(Color::Red);
     /// assert_eq!(style.patch(diff), Style::default().fg(Color::Red));
@@ -1092,7 +1226,8 @@
     /// ## Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::style::{Color, Style};
+    ///
     /// let style = Style::default().bg(Color::Blue);
     /// let diff = Style::default().bg(Color::Red);
     /// assert_eq!(style.patch(diff), Style::default().bg(Color::Red));
@@ -1116,7 +1251,8 @@
     /// ## Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::style::{Color, Modifier, Style};
+    ///
     /// let style = Style::default()
     ///     .underline_color(Color::Blue)
     ///     .add_modifier(Modifier::UNDERLINED);
@@ -1144,7 +1280,8 @@
     /// ## Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::style::{Modifier, Style};
+    ///
     /// let style = Style::default().add_modifier(Modifier::BOLD);
     /// let diff = Style::default().add_modifier(Modifier::ITALIC);
     /// let patched = style.patch(diff);
@@ -1165,7 +1302,8 @@
     /// ## Examples
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::style::{Modifier, Style};
+    ///
     /// let style = Style::default().add_modifier(Modifier::BOLD | Modifier::ITALIC);
     /// let diff = Style::default().remove_modifier(Modifier::ITALIC);
     /// let patched = style.patch(diff);
@@ -1187,7 +1325,8 @@
     ///
     /// ## Examples
     /// ```
-    /// # use ratatui::prelude::*;
+    /// use ratatui::style::{Color, Modifier, Style};
+    ///
     /// let style_1 = Style::default().fg(Color::Yellow);
     /// let style_2 = Style::default().bg(Color::Red);
     /// let combined = style_1.patch(style_2);
@@ -1214,6 +1353,54 @@
 
         <span class="self">self
     </span>}
+
+    <span class="doccomment">/// Formats the style in a way that can be copy-pasted into code using the style shorthands.
+    ///
+    /// This is useful for debugging and for generating code snippets.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fmt_stylize(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">use </span>fmt::Debug;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(fg) = <span class="self">self</span>.fg {
+            fg.stylize_debug(ColorDebugKind::Foreground).fmt(f)<span class="question-mark">?</span>;
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(bg) = <span class="self">self</span>.bg {
+            bg.stylize_debug(ColorDebugKind::Background).fmt(f)<span class="question-mark">?</span>;
+        }
+        <span class="attr">#[cfg(feature = <span class="string">"underline-color"</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(underline_color) = <span class="self">self</span>.underline_color {
+            underline_color
+                .stylize_debug(ColorDebugKind::Underline)
+                .fmt(f)<span class="question-mark">?</span>;
+        }
+        <span class="kw">for </span>modifier <span class="kw">in </span><span class="self">self</span>.add_modifier.iter() {
+            <span class="kw">match </span>modifier {
+                Modifier::BOLD =&gt; f.write_str(<span class="string">".bold()"</span>)<span class="question-mark">?</span>,
+                Modifier::DIM =&gt; f.write_str(<span class="string">".dim()"</span>)<span class="question-mark">?</span>,
+                Modifier::ITALIC =&gt; f.write_str(<span class="string">".italic()"</span>)<span class="question-mark">?</span>,
+                Modifier::UNDERLINED =&gt; f.write_str(<span class="string">".underlined()"</span>)<span class="question-mark">?</span>,
+                Modifier::SLOW_BLINK =&gt; f.write_str(<span class="string">".slow_blink()"</span>)<span class="question-mark">?</span>,
+                Modifier::RAPID_BLINK =&gt; f.write_str(<span class="string">".rapid_blink()"</span>)<span class="question-mark">?</span>,
+                Modifier::REVERSED =&gt; f.write_str(<span class="string">".reversed()"</span>)<span class="question-mark">?</span>,
+                Modifier::HIDDEN =&gt; f.write_str(<span class="string">".hidden()"</span>)<span class="question-mark">?</span>,
+                Modifier::CROSSED_OUT =&gt; f.write_str(<span class="string">".crossed_out()"</span>)<span class="question-mark">?</span>,
+                <span class="kw">_ </span>=&gt; f.write_fmt(<span class="macro">format_args!</span>(<span class="string">".add_modifier(Modifier::{modifier:?})"</span>))<span class="question-mark">?</span>,
+            }
+        }
+        <span class="kw">for </span>modifier <span class="kw">in </span><span class="self">self</span>.sub_modifier.iter() {
+            <span class="kw">match </span>modifier {
+                Modifier::BOLD =&gt; f.write_str(<span class="string">".not_bold()"</span>)<span class="question-mark">?</span>,
+                Modifier::DIM =&gt; f.write_str(<span class="string">".not_dim()"</span>)<span class="question-mark">?</span>,
+                Modifier::ITALIC =&gt; f.write_str(<span class="string">".not_italic()"</span>)<span class="question-mark">?</span>,
+                Modifier::UNDERLINED =&gt; f.write_str(<span class="string">".not_underlined()"</span>)<span class="question-mark">?</span>,
+                Modifier::SLOW_BLINK =&gt; f.write_str(<span class="string">".not_slow_blink()"</span>)<span class="question-mark">?</span>,
+                Modifier::RAPID_BLINK =&gt; f.write_str(<span class="string">".not_rapid_blink()"</span>)<span class="question-mark">?</span>,
+                Modifier::REVERSED =&gt; f.write_str(<span class="string">".not_reversed()"</span>)<span class="question-mark">?</span>,
+                Modifier::HIDDEN =&gt; f.write_str(<span class="string">".not_hidden()"</span>)<span class="question-mark">?</span>,
+                Modifier::CROSSED_OUT =&gt; f.write_str(<span class="string">".not_crossed_out()"</span>)<span class="question-mark">?</span>,
+                <span class="kw">_ </span>=&gt; f.write_fmt(<span class="macro">format_args!</span>(<span class="string">".remove_modifier(Modifier::{modifier:?})"</span>))<span class="question-mark">?</span>,
+            }
+        }
+        <span class="prelude-val">Ok</span>(())
+    }
 }
 
 <span class="kw">impl </span>From&lt;Color&gt; <span class="kw">for </span>Style {
@@ -1224,7 +1411,8 @@
     /// # Example
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::style::{Color, Style};
+    ///
     /// let style = Style::from(Color::Red);
     /// ```
     </span><span class="kw">fn </span>from(color: Color) -&gt; <span class="self">Self </span>{
@@ -1238,7 +1426,8 @@
     /// # Example
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::style::{Color, Style};
+    ///
     /// // red foreground, blue background
     /// let style = Style::from((Color::Red, Color::Blue));
     /// // default foreground, blue background
@@ -1260,7 +1449,8 @@
     /// # Example
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::style::{Style, Modifier};
+    ///
     /// // add bold and italic
     /// let style = Style::from(Modifier::BOLD|Modifier::ITALIC);
     </span><span class="kw">fn </span>from(modifier: Modifier) -&gt; <span class="self">Self </span>{
@@ -1274,7 +1464,8 @@
     /// # Example
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::style::{Modifier, Style};
+    ///
     /// // add bold and italic, remove dim
     /// let style = Style::from((Modifier::BOLD | Modifier::ITALIC, Modifier::DIM));
     /// ```
@@ -1293,7 +1484,8 @@
     /// # Example
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::style::{Color, Modifier, Style};
+    ///
     /// // red foreground, add bold and italic
     /// let style = Style::from((Color::Red, Modifier::BOLD | Modifier::ITALIC));
     /// ```
@@ -1310,7 +1502,8 @@
     /// # Example
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::style::{Color, Modifier, Style};
+    ///
     /// // red foreground, blue background, add bold and italic
     /// let style = Style::from((Color::Red, Color::Blue, Modifier::BOLD | Modifier::ITALIC));
     /// ```
@@ -1326,7 +1519,8 @@
     /// # Example
     ///
     /// ```rust
-    /// # use ratatui::prelude::*;
+    /// use ratatui::style::{Color, Modifier, Style};
+    ///
     /// // red foreground, blue background, add bold and italic, remove dim
     /// let style = Style::from((
     ///     Color::Red,
@@ -1349,6 +1543,20 @@
     <span class="kw">use </span>rstest::rstest;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="attr">#[rstest]
+    #[case(Style::new(), <span class="string">"Style::new()"</span>)]
+    #[case(Style::new().red(), <span class="string">"Style::new().red()"</span>)]
+    #[case(Style::new().on_blue(), <span class="string">"Style::new().on_blue()"</span>)]
+    #[case(Style::new().bold(), <span class="string">"Style::new().bold()"</span>)]
+    #[case(Style::new().not_italic(), <span class="string">"Style::new().not_italic()"</span>)]
+    #[case(
+        Style::new().red().on_blue().bold().italic().not_dim().not_hidden(),
+        <span class="string">"Style::new().red().on_blue().bold().italic().not_dim().not_hidden()"
+    </span>)]
+    </span><span class="kw">fn </span>debug(<span class="attr">#[case] </span>style: Style, <span class="attr">#[case] </span>expected: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) {
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{style:?}"</span>), expected);
+    }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>combined_patch_gives_same_result_as_individual_patch() {
@@ -1396,9 +1604,9 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>));
 
         <span class="kw">for </span>m <span class="kw">in </span>mods {
-            buffer.get_mut(<span class="number">0</span>, <span class="number">0</span>).set_style(Style::reset());
-            buffer.get_mut(<span class="number">0</span>, <span class="number">0</span>).set_style(Style::new().add_modifier(m));
-            <span class="kw">let </span>style = buffer.get(<span class="number">0</span>, <span class="number">0</span>).style();
+            buffer[(<span class="number">0</span>, <span class="number">0</span>)].set_style(Style::reset());
+            buffer[(<span class="number">0</span>, <span class="number">0</span>)].set_style(Style::new().add_modifier(m));
+            <span class="kw">let </span>style = buffer[(<span class="number">0</span>, <span class="number">0</span>)].style();
             <span class="macro">assert!</span>(style.add_modifier.contains(m));
             <span class="macro">assert!</span>(!style.sub_modifier.contains(m));
         }

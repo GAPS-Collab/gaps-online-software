@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"macro":["def_linear_colormap"],"struct":["BlackWhite","Bone","Copper","DerivedColorMap","MandelbrotHSL","ViridisRGB","ViridisRGBA","VulcanoHSL"],"trait":["ColorMap"]};

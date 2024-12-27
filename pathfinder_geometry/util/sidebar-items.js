@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["EPSILON"],"fn":["alignup_i32","approx_eq","clamp","lerp"]};

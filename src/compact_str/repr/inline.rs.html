@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/compact_str-0.7.1/src/repr/inline.rs`."><title>inline.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="compact_str" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/compact_str-0.8.0/src/repr/inline.rs`."><title>inline.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="compact_str" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">compact_str/repr/</div>inline.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -201,7 +202,10 @@
 <a href="#201" id="201">201</a>
 <a href="#202" id="202">202</a>
 <a href="#203" id="203">203</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>core::ptr;
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a></pre></div><pre class="rust"><code><span class="kw">use </span>core::ptr;
 
 <span class="kw">use super</span>::{
     Repr,
@@ -210,9 +214,16 @@
 };
 
 <span class="doccomment">/// A buffer stored on the stack whose size is equal to the stack size of `String`
-</span><span class="attr">#[repr(transparent)]
+</span><span class="attr">#[cfg(target_pointer_width = <span class="string">"64"</span>)]
+#[repr(C, align(<span class="number">8</span>))]
 </span><span class="kw">pub struct </span>InlineBuffer(<span class="kw">pub </span>[u8; MAX_SIZE]);
+
+<span class="attr">#[cfg(target_pointer_width = <span class="string">"32"</span>)]
+#[repr(C, align(<span class="number">4</span>))]
+</span><span class="kw">pub struct </span>InlineBuffer(<span class="kw">pub </span>[u8; MAX_SIZE]);
+
 <span class="macro">static_assertions::assert_eq_size!</span>(InlineBuffer, Repr);
+<span class="macro">static_assertions::assert_eq_align!</span>(InlineBuffer, Repr);
 
 <span class="kw">impl </span>InlineBuffer {
     <span class="doccomment">/// Construct a new [`InlineString`]. A string that lives in a small buffer on the stack
@@ -224,10 +235,10 @@
         <span class="macro">debug_assert!</span>(text.len() &lt;= MAX_SIZE);
 
         <span class="kw">let </span>len = text.len();
-        <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>; MAX_SIZE];
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = InlineBuffer([<span class="number">0u8</span>; MAX_SIZE]);
 
         <span class="comment">// set the length in the last byte
-        </span>buffer[MAX_SIZE - <span class="number">1</span>] = len <span class="kw">as </span>u8 | LENGTH_MASK;
+        </span>buffer.<span class="number">0</span>[MAX_SIZE - <span class="number">1</span>] = len <span class="kw">as </span>u8 | LENGTH_MASK;
 
         <span class="comment">// copy the string into our buffer
         //
@@ -240,9 +251,9 @@
         // * dst (`buffer`) is valid for `len` bytes because we assert src is less than MAX_SIZE
         // * src and dst don't overlap because we created dst
         //
-        </span>ptr::copy_nonoverlapping(text.as_ptr(), buffer.as_mut_ptr(), len);
+        </span>ptr::copy_nonoverlapping(text.as_ptr(), buffer.<span class="number">0</span>.as_mut_ptr(), len);
 
-        InlineBuffer(buffer)
+        buffer
     }
 
     <span class="attr">#[inline]
@@ -316,20 +327,16 @@
             <span class="self">self</span>.<span class="number">0</span>[MAX_SIZE - <span class="number">1</span>] = len <span class="kw">as </span>u8 | LENGTH_MASK;
         }
     }
-
-    <span class="attr">#[inline(always)]
-    </span><span class="kw">pub fn </span>copy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        InlineBuffer(<span class="self">self</span>.<span class="number">0</span>)
-    }
 }
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span>rayon::prelude::<span class="kw-2">*</span>;
-
-    <span class="attr">#[test]
+    <span class="attr">#[rustversion::since(<span class="number">1.63</span>)]
+    #[test]
     #[ignore] </span><span class="comment">// we run this in CI, but unless you're compiling in release, this takes a while
     </span><span class="kw">fn </span>test_unused_utf8_bytes() {
+        <span class="kw">use </span>rayon::prelude::<span class="kw-2">*</span>;
+
         <span class="comment">// test to validate for all char the first and last bytes are never within a specified range
         // note: according to the UTF-8 spec it shouldn't be, but we double check that here
         </span>(<span class="number">0</span>..u32::MAX).into_par_iter().for_each(|i| {
@@ -345,9 +352,8 @@
                 }
 
                 <span class="comment">// check ranges for last byte
-                </span><span class="kw">match </span>buf[c.len_utf8() - <span class="number">1</span>] {
-                    x @ <span class="number">192</span>..=<span class="number">255 </span>=&gt; <span class="macro">panic!</span>(<span class="string">"last byte within 192..=255, {}"</span>, x),
-                    <span class="kw">_ </span>=&gt; (),
+                </span><span class="kw">if let </span>x @ <span class="number">192</span>..=<span class="number">255 </span>= buf[c.len_utf8() - <span class="number">1</span>] {
+                    <span class="macro">panic!</span>(<span class="string">"last byte within 192..=255, {}"</span>, x)
                 }
             }
         })
@@ -355,6 +361,8 @@
 
     <span class="attr">#[cfg(feature = <span class="string">"smallvec"</span>)]
     </span><span class="kw">mod </span>smallvec {
+        <span class="kw">use </span>alloc::string::String;
+
         <span class="kw">use </span>quickcheck_macros::quickcheck;
 
         <span class="kw">use </span><span class="kw">crate</span>::repr::{
@@ -375,7 +383,7 @@
             </span><span class="macro">assert!</span>(array[length..].iter().all(|b| <span class="kw-2">*</span>b == <span class="number">0</span>));
 
             <span class="comment">// taking a string slice should give back the same string as the original
-            </span><span class="kw">let </span>ex_s = <span class="kw">unsafe </span>{ std::str::from_utf8_unchecked(<span class="kw-2">&amp;</span>array[..length]) };
+            </span><span class="kw">let </span>ex_s = <span class="kw">unsafe </span>{ core::str::from_utf8_unchecked(<span class="kw-2">&amp;</span>array[..length]) };
             <span class="macro">assert_eq!</span>(s, ex_s);
         }
 
@@ -399,7 +407,7 @@
             </span><span class="macro">assert!</span>(array[length..].iter().all(|b| <span class="kw-2">*</span>b == <span class="number">0</span>));
 
             <span class="comment">// taking a string slice should give back the same string as the original
-            </span><span class="kw">let </span>ex_s = <span class="kw">unsafe </span>{ std::str::from_utf8_unchecked(<span class="kw-2">&amp;</span>array[..length]) };
+            </span><span class="kw">let </span>ex_s = <span class="kw">unsafe </span>{ core::str::from_utf8_unchecked(<span class="kw-2">&amp;</span>array[..length]) };
             <span class="macro">assert_eq!</span>(s, ex_s);
         }
     }

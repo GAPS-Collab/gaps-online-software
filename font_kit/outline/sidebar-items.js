@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["Contour","Outline","OutlineBuilder","PointFlags"],"trait":["OutlineSink"]};

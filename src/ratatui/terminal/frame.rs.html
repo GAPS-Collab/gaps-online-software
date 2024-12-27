@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.27.0/src/terminal/frame.rs`."><title>frame.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.29.0/src/terminal/frame.rs`."><title>frame.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ratatui/terminal/</div>frame.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -203,7 +204,62 @@
 <a href="#203" id="203">203</a>
 <a href="#204" id="204">204</a>
 <a href="#205" id="205">205</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a></pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
+    buffer::Buffer,
+    layout::{Position, Rect},
+    widgets::{StatefulWidget, StatefulWidgetRef, Widget, WidgetRef},
+};
 
 <span class="doccomment">/// A consistent view into the terminal state for rendering a single frame.
 ///
@@ -215,13 +271,14 @@
 /// to the terminal. This avoids drawing redundant cells.
 ///
 /// [`Buffer`]: crate::buffer::Buffer
+/// [`Terminal::draw`]: crate::Terminal::draw
 </span><span class="attr">#[derive(Debug, Hash)]
 </span><span class="kw">pub struct </span>Frame&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Where should the cursor be after drawing this frame?
     ///
     /// If `None`, the cursor is hidden and its position is controlled by the backend. If `Some((x,
     /// y))`, the cursor is shown and placed at `(x, y)` after the call to `Terminal::draw()`.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) cursor_position: <span class="prelude-ty">Option</span>&lt;(u16, u16)&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) cursor_position: <span class="prelude-ty">Option</span>&lt;Position&gt;,
 
     <span class="doccomment">/// The area of the viewport
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) viewport_area: Rect,
@@ -236,6 +293,8 @@
 <span class="doccomment">/// `CompletedFrame` represents the state of the terminal after all changes performed in the last
 /// [`Terminal::draw`] call have been applied. Therefore, it is only valid until the next call to
 /// [`Terminal::draw`].
+///
+/// [`Terminal::draw`]: crate::Terminal::draw
 </span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 </span><span class="kw">pub struct </span>CompletedFrame&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// The buffer that was used to draw the last frame.
@@ -247,13 +306,25 @@
 }
 
 <span class="kw">impl </span>Frame&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="doccomment">/// The size of the current frame
+    <span class="doccomment">/// The area of the current frame
     ///
     /// This is guaranteed not to change during rendering, so may be called multiple times.
     ///
     /// If your app listens for a resize event from the backend, it should ignore the values from
     /// the event for any calculations that are used to render the current frame and use this value
-    /// instead as this is the size of the buffer that is used to render the current frame.
+    /// instead as this is the area of the buffer that is used to render the current frame.
+    </span><span class="kw">pub const fn </span>area(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Rect {
+        <span class="self">self</span>.viewport_area
+    }
+
+    <span class="doccomment">/// The area of the current frame
+    ///
+    /// This is guaranteed not to change during rendering, so may be called multiple times.
+    ///
+    /// If your app listens for a resize event from the backend, it should ignore the values from
+    /// the event for any calculations that are used to render the current frame and use this value
+    /// instead as this is the area of the buffer that is used to render the current frame.
+    </span><span class="attr">#[deprecated = <span class="string">"use .area() as it's the more correct name"</span>]
     </span><span class="kw">pub const fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Rect {
         <span class="self">self</span>.viewport_area
     }
@@ -266,10 +337,12 @@
     /// # Example
     ///
     /// ```rust
-    /// # use ratatui::{backend::TestBackend, prelude::*, widgets::Block};
+    /// # use ratatui::{backend::TestBackend, Terminal};
     /// # let backend = TestBackend::new(5, 5);
     /// # let mut terminal = Terminal::new(backend).unwrap();
     /// # let mut frame = terminal.get_frame();
+    /// use ratatui::{layout::Rect, widgets::Block};
+    ///
     /// let block = Block::new();
     /// let area = Rect::new(0, 0, 5, 5);
     /// frame.render_widget(block, area);
@@ -289,17 +362,19 @@
     ///
     /// ```rust
     /// # #[cfg(feature = "unstable-widget-ref")] {
-    /// # use ratatui::{backend::TestBackend, prelude::*, widgets::Block};
+    /// # use ratatui::{backend::TestBackend, Terminal};
     /// # let backend = TestBackend::new(5, 5);
     /// # let mut terminal = Terminal::new(backend).unwrap();
     /// # let mut frame = terminal.get_frame();
+    /// use ratatui::{layout::Rect, widgets::Block};
+    ///
     /// let block = Block::new();
     /// let area = Rect::new(0, 0, 5, 5);
     /// frame.render_widget_ref(block, area);
     /// # }
     /// ```
     </span><span class="attr">#[allow(clippy::needless_pass_by_value)]
-    #[stability::unstable(feature = <span class="string">"widget-ref"</span>)]
+    #[instability::unstable(feature = <span class="string">"widget-ref"</span>)]
     </span><span class="kw">pub fn </span>render_widget_ref&lt;W: WidgetRef&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, widget: W, area: Rect) {
         widget.render_ref(area, <span class="self">self</span>.buffer);
     }
@@ -315,10 +390,15 @@
     /// # Example
     ///
     /// ```rust
-    /// # use ratatui::{backend::TestBackend, prelude::*, widgets::*};
+    /// # use ratatui::{backend::TestBackend, Terminal};
     /// # let backend = TestBackend::new(5, 5);
     /// # let mut terminal = Terminal::new(backend).unwrap();
     /// # let mut frame = terminal.get_frame();
+    /// use ratatui::{
+    ///     layout::Rect,
+    ///     widgets::{List, ListItem, ListState},
+    /// };
+    ///
     /// let mut state = ListState::default().with_selected(Some(1));
     /// let list = List::new(vec![ListItem::new("Item 1"), ListItem::new("Item 2")]);
     /// let area = Rect::new(0, 0, 5, 5);
@@ -346,10 +426,15 @@
     ///
     /// ```rust
     /// # #[cfg(feature = "unstable-widget-ref")] {
-    /// # use ratatui::{backend::TestBackend, prelude::*, widgets::*};
+    /// # use ratatui::{backend::TestBackend, Terminal};
     /// # let backend = TestBackend::new(5, 5);
     /// # let mut terminal = Terminal::new(backend).unwrap();
     /// # let mut frame = terminal.get_frame();
+    /// use ratatui::{
+    ///     layout::Rect,
+    ///     widgets::{List, ListItem, ListState},
+    /// };
+    ///
     /// let mut state = ListState::default().with_selected(Some(1));
     /// let list = List::new(vec![ListItem::new("Item 1"), ListItem::new("Item 2")]);
     /// let area = Rect::new(0, 0, 5, 5);
@@ -357,7 +442,7 @@
     /// # }
     /// ```
     </span><span class="attr">#[allow(clippy::needless_pass_by_value)]
-    #[stability::unstable(feature = <span class="string">"widget-ref"</span>)]
+    #[instability::unstable(feature = <span class="string">"widget-ref"</span>)]
     </span><span class="kw">pub fn </span>render_stateful_widget_ref&lt;W&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, widget: W, area: Rect, state: <span class="kw-2">&amp;mut </span>W::State)
     <span class="kw">where
         </span>W: StatefulWidgetRef,
@@ -368,11 +453,30 @@
     <span class="doccomment">/// After drawing this frame, make the cursor visible and put it at the specified (x, y)
     /// coordinates. If this method is not called, the cursor will be hidden.
     ///
-    /// Note that this will interfere with calls to `Terminal::hide_cursor()`,
-    /// `Terminal::show_cursor()`, and `Terminal::set_cursor()`. Pick one of the APIs and stick
-    /// with it.
+    /// Note that this will interfere with calls to [`Terminal::hide_cursor`],
+    /// [`Terminal::show_cursor`], and [`Terminal::set_cursor_position`]. Pick one of the APIs and
+    /// stick with it.
+    ///
+    /// [`Terminal::hide_cursor`]: crate::Terminal::hide_cursor
+    /// [`Terminal::show_cursor`]: crate::Terminal::show_cursor
+    /// [`Terminal::set_cursor_position`]: crate::Terminal::set_cursor_position
+    </span><span class="kw">pub fn </span>set_cursor_position&lt;P: Into&lt;Position&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, position: P) {
+        <span class="self">self</span>.cursor_position = <span class="prelude-val">Some</span>(position.into());
+    }
+
+    <span class="doccomment">/// After drawing this frame, make the cursor visible and put it at the specified (x, y)
+    /// coordinates. If this method is not called, the cursor will be hidden.
+    ///
+    /// Note that this will interfere with calls to [`Terminal::hide_cursor`],
+    /// [`Terminal::show_cursor`], and [`Terminal::set_cursor_position`]. Pick one of the APIs and
+    /// stick with it.
+    ///
+    /// [`Terminal::hide_cursor`]: crate::Terminal::hide_cursor
+    /// [`Terminal::show_cursor`]: crate::Terminal::show_cursor
+    /// [`Terminal::set_cursor_position`]: crate::Terminal::set_cursor_position
+    </span><span class="attr">#[deprecated = <span class="string">"the method set_cursor_position indicates more clearly what about the cursor to set"</span>]
     </span><span class="kw">pub fn </span>set_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u16, y: u16) {
-        <span class="self">self</span>.cursor_position = <span class="prelude-val">Some</span>((x, y));
+        <span class="self">self</span>.set_cursor_position(Position { x, y });
     }
 
     <span class="doccomment">/// Gets the buffer that this `Frame` draws into as a mutable reference.
@@ -397,7 +501,7 @@
     /// # Examples
     ///
     /// ```rust
-    /// # use ratatui::{backend::TestBackend, prelude::*, widgets::*};
+    /// # use ratatui::{backend::TestBackend, Terminal};
     /// # let backend = TestBackend::new(5, 5);
     /// # let mut terminal = Terminal::new(backend).unwrap();
     /// # let mut frame = terminal.get_frame();

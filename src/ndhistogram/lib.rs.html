@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ndhistogram-0.9.0/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ndhistogram" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ndhistogram-0.10.0/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ndhistogram" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">ndhistogram/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -314,7 +315,35 @@
 <a href="#314" id="314">314</a>
 <a href="#315" id="315">315</a>
 <a href="#316" id="316">316</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! ndhistogram implements multi-dimensional histograms for Rust.
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a></pre></div><pre class="rust"><code><span class="doccomment">//! ndhistogram implements multi-dimensional histograms for Rust.
 //!
 //!
 //! This library aims to provide a similar feature set to the C++ library
@@ -347,6 +376,7 @@
 //!    7. [Merge Histograms](#merge-histograms)
 //!    8. [Iterate over Histogram Bins in Parallel](#iterate-over-histogram-bins-in-parallel)
 //! 5. [Crate Feature Flags](#crate-feature-flags)
+//! 6. [How to contribute](#how-to-contribute)
 //!
 //! ## Usage
 //!
@@ -354,7 +384,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! ndhistogram = "0.9.0"
+//! ndhistogram = "0.10.0"
 //! ```
 //!
 //! See the [change log](https://github.com/davehadley/ndhistogram/blob/main/ndhistogram/CHANGELOG.md)
@@ -366,8 +396,9 @@
 //! ```rust
 //! use ndhistogram::{Histogram, ndhistogram, axis::Uniform};
 //!
+//! # fn main() -&gt; Result&lt;(), ndhistogram::Error&gt; {
 //! // create a 1D histogram with 10 equally sized bins between -5 and 5
-//! let mut hist = ndhistogram!(Uniform::new(10, -5.0, 5.0));
+//! let mut hist = ndhistogram!(Uniform::new(10, -5.0, 5.0)?);
 //! // fill this histogram with a single value
 //! hist.fill(&amp;1.0);
 //! // fill this histogram with weights
@@ -382,28 +413,29 @@
 //! }
 //! // print the histogram to stdout
 //! println!("{}", hist);
+//! # Ok(()) }
 //! ```
 //!
 //! ## Overview
 //!
-//! A [Histogram](Histogram) is composed of two components:
-//! - The [Axes](Axes) which is a set of [Axis](axis::Axis) corresponding to each dimension of the histogram.
-//! The [Axes](Axes) and [Axis](axis::Axis) define the binning of the histogram and are responsible for mapping from coordinate space (eg \[x,y,z\]) to an integer bin number.
-//! - The histogram bin value storage. Valid bin value types include any integer and floating number type as well as user defined types that implement [Fill](Fill), [FillWith](FillWith) or [FillWithWeighted](FillWithWeighted).
+//! A [Histogram] is composed of two components:
+//! - The [Axes] which is a set of [Axis](axis::Axis) corresponding to each dimension of the histogram.
+//!   The [Axes] and [Axis](axis::Axis) define the binning of the histogram and are responsible for mapping from coordinate space (eg \[x,y,z\]) to an integer bin number.
+//! - The histogram bin value storage. Valid bin value types include any integer and floating number type as well as user defined types that implement [Fill], [FillWith] or [FillWithWeighted].
 //!
 //! ### Histogram Implementations
 //!
-//! - [VecHistogram](VecHistogram): bin values are stored in a [Vec](std::vec::Vec).
-//! Created with the [ndhistogram](ndhistogram) macro.
-//! This is the recommended implementation for most use cases.
-//! However, as memory is allocated even for empty bins,
-//! this may not be practical for very high dimension histograms.
-//! - [HashHistogram](HashHistogram): bin values are stored in a [HashMap](std::collections::HashMap).
-//! Created with the [sparsehistogram](sparsehistogram) macro.
-//! Useful for high dimension, mostly empty, histograms as empty bins
-//! take up no memory.
+//! - [VecHistogram]: bin values are stored in a [Vec].
+//!   Created with the [ndhistogram] macro.
+//!   This is the recommended implementation for most use cases.
+//!   However, as memory is allocated even for empty bins,
+//!   this may not be practical for very high dimension histograms.
+//! - [HashHistogram]: bin values are stored in a [HashMap](std::collections::HashMap).
+//!   Created with the [sparsehistogram] macro.
+//!   Useful for high dimension, mostly empty, histograms as empty bins
+//!   take up no memory.
 //!
-//! Alternative implementations are possible by implementing the [Histogram](Histogram) trait.
+//! Alternative implementations are possible by implementing the [Histogram] trait.
 //!
 //! ### Axis Implementations
 //!
@@ -419,11 +451,11 @@
 //! Histograms may be filled with values of the following types:
 //!
 //! - Primitive floating point and integer number types.
-//! - All types that implement [Fill](Fill)
-//! - All types that implement [FillWith](FillWith)
-//! - All types that implement [FillWithWeighted](FillWithWeighted)
-//! - All types that implement [AddAssign](std::ops::AddAssign) (as they are also [FillWith](FillWith)).
-//! - All types that implement [AddAssign](std::ops::AddAssign) and [One](num_traits::One) (as they are also [Fill](Fill)).
+//! - All types that implement [Fill]
+//! - All types that implement [FillWith]
+//! - All types that implement [FillWithWeighted]
+//! - All types that implement [AddAssign](std::ops::AddAssign) (as they are also [FillWith]).
+//! - All types that implement [AddAssign](std::ops::AddAssign) and [One](num_traits::One) (as they are also [Fill]).
 //!
 //! This crate defines the following bin value types:
 //!
@@ -432,7 +464,7 @@
 //! - [Mean](value::Mean) : computes the mean of the values it is filled with.
 //! - [WeightedMean](value::WeightedMean) : as Mean but with weighted fills.
 //!
-//! User defined bin value types are possible by implementing the [Fill](Fill), [FillWith](FillWith) or [FillWithWeighted](FillWithWeighted) traits.
+//! User defined bin value types are possible by implementing the [Fill], [FillWith] or [FillWithWeighted] traits.
 //!
 //! ## How to Guide
 //!
@@ -440,15 +472,16 @@
 //!
 //! ```rust
 //! use ndhistogram::{Histogram, ndhistogram, axis::Uniform, value::Mean};
+//! # fn main() -&gt; Result&lt;(), ndhistogram::Error&gt; {
 //! // Create a histogram whose bin values are i32
-//! let mut hist = ndhistogram!(Uniform::new(10, -5.0, 5.0); i32);
+//! let mut hist = ndhistogram!(Uniform::new(10, -5.0, 5.0)?; i32);
 //! hist.fill_with(&amp;1.0, 2);
 //! let value: Option&lt;&amp;i32&gt; = hist.value(&amp;1.0);
 //! assert_eq!(value, Some(&amp;2));
 //!
 //! // More complex value types beyond primitives are available
 //! // "Mean" calculates the average of values it is filled with
-//! let mut hist = ndhistogram!(Uniform::new(10, -5.0, 5.0); Mean);
+//! let mut hist = ndhistogram!(Uniform::new(10, -5.0, 5.0)?; Mean);
 //! hist.fill_with(&amp;1.0, 1.0);
 //! hist.fill_with(&amp;1.0, 3.0);
 //! assert_eq!(hist.value(&amp;1.0).unwrap().mean(), 2.0);
@@ -457,24 +490,28 @@
 //!
 //! // user defined value types are possible by implementing
 //! // Fill, FillWith or FillWithWeighted traits
+//! # Ok(()) }
 //! ```
 //!
 //! ### Create and Use a 2D Histogram
 //!
 //! ```rust
 //! use ndhistogram::{Histogram, ndhistogram, axis::Uniform};
+//! # fn main() -&gt; Result&lt;(), ndhistogram::Error&gt; {
 //! // create a 2D histogram
-//! let mut hist = ndhistogram!(Uniform::new(10, -5.0, 5.0), Uniform::new(10, -5.0, 5.0));
+//! let mut hist = ndhistogram!(Uniform::new(10, -5.0, 5.0)?, Uniform::new(10, -5.0, 5.0)?);
 //! // fill 2D histogram
 //! hist.fill(&amp;(1.0, 2.0));
 //! // read back the histogram values
 //! let x1_y2 = hist.value(&amp;(1.0, 2.0));
 //! // higher dimensions are possible with additional arguments to ndhistogram
+//! # Ok(()) }
 //! ```
 //!
 //! ### Create a Histogram with a Discrete Axis
 //! ```rust
 //! use ndhistogram::{Histogram, ndhistogram, axis::Category};
+//! # fn main() -&gt; Result&lt;(), ndhistogram::Error&gt; {
 //! let mut hist = ndhistogram!(Category::new(vec![0, 2, 4]));
 //! hist.fill_with(&amp;2, 42.0);
 //! hist.fill_with(&amp;1, 128.0);
@@ -488,19 +525,22 @@
 //! let mut hist = ndhistogram!(Category::new(vec!["Red", "Blue", "Green"]));
 //! hist.fill(&amp;"Red");
 //! assert_eq!(hist.value(&amp;"Red"), Some(&amp;1.0));
+//! # Ok(()) }
 //! ```
 //!
 //! ### Create a Histogram with Variable Sized Bins
 //!
 //! ```rust
 //! use ndhistogram::{Histogram, ndhistogram, axis::Variable};
-//! let mut hist = ndhistogram!(Variable::new(vec![0.0, 1.0, 3.0, 6.0]));
+//! # fn main() -&gt; Result&lt;(), ndhistogram::Error&gt; {
+//! let mut hist = ndhistogram!(Variable::new(vec![0.0, 1.0, 3.0, 6.0])?);
 //! for x in 0..6 {
 //!     hist.fill(&amp;f64::from(x));
 //! }
 //! assert_eq!(hist.value(&amp;0.0), Some(&amp;1.0));
 //! assert_eq!(hist.value(&amp;1.0), Some(&amp;2.0));
 //! assert_eq!(hist.value(&amp;3.0), Some(&amp;3.0));
+//! # Ok(()) }
 //! ```
 //!
 //! ### Create a Histogram with a Periodic or Cyclic Axis
@@ -508,55 +548,62 @@
 //! ```rust
 //! use std::f64::consts::PI;
 //! use ndhistogram::{Histogram, ndhistogram, axis::UniformCyclic};
-//! let mut hist = ndhistogram!(UniformCyclic::&lt;f64&gt;::new(10, 0.0, 2.0*PI));
+//! # fn main() -&gt; Result&lt;(), ndhistogram::Error&gt; {
+//! let mut hist = ndhistogram!(UniformCyclic::&lt;f64&gt;::new(10, 0.0, 2.0*PI)?);
 //! hist.fill(&amp;PI);
 //! hist.fill(&amp;-PI);
 //! // +pi and -pi are mapped onto the same value
 //! assert_eq!(hist.value(&amp;-PI), Some(&amp;2.0));
 //! assert_eq!(hist.value(&amp;PI), Some(&amp;2.0));
+//! # Ok(()) }
 //! ```
 //!
 //! ### Create a Sparse Histogram
 //!
 //! ```rust
 //! use ndhistogram::{Histogram, sparsehistogram, axis::Uniform};
+//! # fn main() -&gt; Result&lt;(), ndhistogram::Error&gt; {
 //! // This histogram has 1e18 bins, too many to allocate with a normal histogram
 //! let mut histogram_with_lots_of_bins = sparsehistogram!(
-//!     Uniform::new(1_000_000, -5.0, 5.0),
-//!     Uniform::new(1_000_000, -5.0, 5.0),
-//!     Uniform::new(1_000_000, -5.0, 5.0)
+//!     Uniform::new(1_000_000, -5.0, 5.0)?,
+//!     Uniform::new(1_000_000, -5.0, 5.0)?,
+//!     Uniform::new(1_000_000, -5.0, 5.0)?
 //! );
 //! histogram_with_lots_of_bins.fill(&amp;(1.0, 2.0, 3.0));
 //! // read back the filled value
 //! assert_eq!(histogram_with_lots_of_bins.value(&amp;(1.0, 2.0, 3.0)).unwrap(), &amp;1.0);
 //! // unfilled bins will return None
 //! assert!(histogram_with_lots_of_bins.value(&amp;(0.0, 0.0, 0.0)).is_none());
+//! # Ok(()) }
 //! ```
 //!
 //! ### Merge Histograms
 //!
 //! ```rust
 //! use ndhistogram::{Histogram, ndhistogram, axis::Uniform};
-//! let mut hist1 = ndhistogram!(Uniform::&lt;f64&gt;::new(10, -5.0, 5.0));
-//! let mut hist2 = ndhistogram!(Uniform::&lt;f64&gt;::new(10, -5.0, 5.0));
+//! # fn main() -&gt; Result&lt;(), ndhistogram::Error&gt; {
+//! let mut hist1 = ndhistogram!(Uniform::&lt;f64&gt;::new(10, -5.0, 5.0)?);
+//! let mut hist2 = ndhistogram!(Uniform::&lt;f64&gt;::new(10, -5.0, 5.0)?);
 //! hist1.fill_with(&amp;0.0, 2.0);
 //! hist2.fill_with(&amp;0.0, 3.0);
 //! let combined_hist = (hist1 + &amp;hist2).expect("Axes are compatible");
 //! # assert_eq!(combined_hist.value(&amp;0.0).unwrap(), &amp;5.0);
+//! # Ok(()) }
 //! ```
 //!
 //! ### Iterate over Histogram Bins in Parallel
 //!
 //! ```rust
-//! # #[cfg(feature = "rayon")]
-//! # {
+//! # fn main() -&gt; Result&lt;(), ndhistogram::Error&gt; {
+//! #[cfg(feature = "rayon")] {
 //! use rayon::prelude::*;
 //! use ndhistogram::{Histogram, ndhistogram, axis::Uniform};
-//! let mut histogram = ndhistogram!(Uniform::&lt;f64&gt;::new(10, -5.0, 5.0));
+//! let mut histogram = ndhistogram!(Uniform::&lt;f64&gt;::new(10, -5.0, 5.0)?);
 //! let sum: f64 = histogram.par_iter().map(|bin| bin.value).sum();
 //! // see also: par_iter_mut, par_values, par_values_mut.
 //! assert_eq!(sum, 0.0);
 //! # }
+//! # Ok(()) }
 //! ```
 //! Requires "rayon" feature enabled.
 //!
@@ -566,9 +613,18 @@
 //!   - [serde] : enable support for histogram serialization and deserialization.
 //!   - [rayon] : enable parallel iteration over histograms.
 //!
+//! ## How to contribute
+//!
+//! If you discover a bug in this crate or a mistake in the documentation please either
+//! [open an issue](https://github.com/davehadley/ndhistogram/issues) or
+//! [submit a pull request](https://github.com/davehadley/ndhistogram/pulls).
+//!
+//! If you want to request or add a new feature please
+//! [open an issue](https://github.com/davehadley/ndhistogram/issues).
+//!
 
 </span><span class="attr">#![doc(issue_tracker_base_url = <span class="string">"https://github.com/davehadley/ndhistogram/issues"</span>)]
-#![doc(html_root_url = <span class="string">"https://docs.rs/ndhistogram/0.9.0"</span>)]
+#![doc(html_root_url = <span class="string">"https://docs.rs/ndhistogram/0.10.0"</span>)]
 #![cfg_attr(
     debug_assertions,
     warn(
@@ -627,6 +683,8 @@
 
 <span class="doccomment">/// Provides errors that may be returned by [Histogram]s.
 </span><span class="kw">pub mod </span>error;
+
+<span class="kw">pub use </span>error::Error;
 
 <span class="attr">#[macro_use]
 </span><span class="kw">mod </span>macros;

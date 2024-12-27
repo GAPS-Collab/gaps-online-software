@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Error","Object","StringFormat"],"macro":["dictionary"],"mod":["content","filters","xobject"],"struct":["Bookmark","Dictionary","Document","Stream"],"type":["ObjectId","Result"]};

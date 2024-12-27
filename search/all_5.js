@@ -1,16 +1,11 @@
 var searchData=
 [
-  ['gaps_18',['Gaps',['../namespaceGaps.html',1,'']]],
-  ['gaps_2donline_2dsoftware_20documentation_19',['gaps-online-software documentation',['../index.html',1,'']]],
-  ['get_5ffilename_20',['get_filename',['../classGaps_1_1TofPacketReader.html#ad7460faef779b1af3048212d928e40e7',1,'Gaps::TofPacketReader']]],
-  ['get_5ffpga_5ftemp_21',['get_fpga_temp',['../structMtbMoniData.html#ae3f5e000a0afc2e21eaef0e319f3fa7a',1,'MtbMoniData']]],
-  ['get_5fnext_5fpacket_22',['get_next_packet',['../classGaps_1_1TofPacketReader.html#a80c6a32384e55586be13bc2b8e2e7458',1,'Gaps::TofPacketReader']]],
-  ['get_5frbevent_23',['get_rbevent',['../structTofEvent.html#a794247ff0963ea316256d0423b9460f7',1,'TofEvent']]],
-  ['get_5frbids_24',['get_rbids',['../structTofEvent.html#ac9c16f7b24c02f6ef7c4638a516ef325',1,'TofEvent']]],
-  ['get_5ftimestamp48_25',['get_timestamp48',['../structTofEventHeader.html#a16fd4aad49cf4719f5bc1025ff513215',1,'TofEventHeader::get_timestamp48()'],['../structRBEventHeader.html#a824de6e619d8ccb6fa71fa7a73d4017b',1,'RBEventHeader::get_timestamp48()']]],
-  ['get_5ftimestamp_5fabs48_26',['get_timestamp_abs48',['../structMasterTriggerEvent.html#a39fdaf7835bd4691d17e3dcad9d64cda',1,'MasterTriggerEvent']]],
-  ['get_5ftimestamp_5fgps48_27',['get_timestamp_gps48',['../structMasterTriggerEvent.html#a455353807880e3474df222b7f42d7268',1,'MasterTriggerEvent']]],
-  ['get_5ftofpaddles_28',['get_tofpaddles',['../namespaceGaps.html#ae5fbd2163c2d1c5c8eee7b686e9f3378',1,'Gaps']]],
-  ['get_5ftrigger_5fhits_29',['get_trigger_hits',['../structMasterTriggerEvent.html#aaf8974dcebd34ca3b46078f5ded868ce',1,'MasterTriggerEvent::get_trigger_hits()'],['../structTofEventSummary.html#a5146269be1e6dbabaa70574d55823188',1,'TofEventSummary::get_trigger_hits()']]],
-  ['get_5ftrigger_5fsources_30',['get_trigger_sources',['../structMasterTriggerEvent.html#a10e4d924cea6d9cf121290f7effab1e0',1,'MasterTriggerEvent::get_trigger_sources()'],['../structTofEventSummary.html#a046c1b6d75a38be53a7a8c9715fe9b76',1,'TofEventSummary::get_trigger_sources()']]]
+  ['fatalexception_0',['FatalException',['../classGaps_1_1FatalException.html',1,'Gaps']]],
+  ['formatter_3c_20eventstatus_20_3e_1',['formatter&lt; EventStatus &gt;',['../structstd_1_1formatter_3_01EventStatus_01_4.html',1,'std']]],
+  ['from_5fbytestream_2',['from_bytestream',['../structRBCalibration.html#a06e35ae344be8dc7040823dd16420a71',1,'RBCalibration::from_bytestream()'],['../structMasterTriggerEvent.html#a92eba169f890dbdf936adba5572e06fe',1,'MasterTriggerEvent::from_bytestream()'],['../structTofEvent.html#ac62d2f3b9db6a01c93cfa7f76ad30451',1,'TofEvent::from_bytestream()'],['../structLTBMoniData.html#aefb436425beaa3961db07a8af2fc5916',1,'LTBMoniData::from_bytestream()'],['../structPBMoniData.html#a307509a33e6e6fe59f6c50ed35b736a8',1,'PBMoniData::from_bytestream()'],['../structPAMoniData.html#a8576c002af8a04e3660ab40dba03cc55',1,'PAMoniData::from_bytestream()'],['../structMtbMoniData.html#a108660e8d66cfddde8c71b5f56783714',1,'MtbMoniData::from_bytestream()'],['../structCPUMoniData.html#ada7e8973c01ac0f7690b7b6f4d53b8f2',1,'CPUMoniData::from_bytestream()'],['../structTofPacket.html#a7ab592f11c676473ff62dac29e9e9861',1,'TofPacket::from_bytestream()']]],
+  ['from_5ffile_3',['from_file',['../structRBCalibration.html#ad3b079190ff34f2575d56a8baf40f3c9',1,'RBCalibration']]],
+  ['from_5ftofpacket_4',['from_tofpacket',['../structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77',1,'TofEvent']]],
+  ['from_5ftxtfile_5',['from_txtfile',['../structRBCalibration.html#a3a13e042d18ab68914ebe48dd1ea1783',1,'RBCalibration']]],
+  ['fromtofpacket_6',['FromTofPacket',['../structFromTofPacket.html',1,'']]],
+  ['fromtofpacket_3c_20mtbmonidata_20_3e_7',['FromTofPacket&lt; MtbMoniData &gt;',['../structFromTofPacket.html',1,'']]]
 ];

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_rbs.rs`."><title>tab_rbs.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_rbs.rs`."><title>tab_rbs.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">liftof_tui/tabs/</div>tab_rbs.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1309,7 +1310,55 @@
 <a href="#1309" id="1309">1309</a>
 <a href="#1310" id="1310">1310</a>
 <a href="#1311" id="1311">1311</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! ReadoutBoard Status tab
+<a href="#1312" id="1312">1312</a>
+<a href="#1313" id="1313">1313</a>
+<a href="#1314" id="1314">1314</a>
+<a href="#1315" id="1315">1315</a>
+<a href="#1316" id="1316">1316</a>
+<a href="#1317" id="1317">1317</a>
+<a href="#1318" id="1318">1318</a>
+<a href="#1319" id="1319">1319</a>
+<a href="#1320" id="1320">1320</a>
+<a href="#1321" id="1321">1321</a>
+<a href="#1322" id="1322">1322</a>
+<a href="#1323" id="1323">1323</a>
+<a href="#1324" id="1324">1324</a>
+<a href="#1325" id="1325">1325</a>
+<a href="#1326" id="1326">1326</a>
+<a href="#1327" id="1327">1327</a>
+<a href="#1328" id="1328">1328</a>
+<a href="#1329" id="1329">1329</a>
+<a href="#1330" id="1330">1330</a>
+<a href="#1331" id="1331">1331</a>
+<a href="#1332" id="1332">1332</a>
+<a href="#1333" id="1333">1333</a>
+<a href="#1334" id="1334">1334</a>
+<a href="#1335" id="1335">1335</a>
+<a href="#1336" id="1336">1336</a>
+<a href="#1337" id="1337">1337</a>
+<a href="#1338" id="1338">1338</a>
+<a href="#1339" id="1339">1339</a>
+<a href="#1340" id="1340">1340</a>
+<a href="#1341" id="1341">1341</a>
+<a href="#1342" id="1342">1342</a>
+<a href="#1343" id="1343">1343</a>
+<a href="#1344" id="1344">1344</a>
+<a href="#1345" id="1345">1345</a>
+<a href="#1346" id="1346">1346</a>
+<a href="#1347" id="1347">1347</a>
+<a href="#1348" id="1348">1348</a>
+<a href="#1349" id="1349">1349</a>
+<a href="#1350" id="1350">1350</a>
+<a href="#1351" id="1351">1351</a>
+<a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a>
+<a href="#1356" id="1356">1356</a>
+<a href="#1357" id="1357">1357</a>
+<a href="#1358" id="1358">1358</a>
+<a href="#1359" id="1359">1359</a>
+<a href="#1360" id="1360">1360</a></pre></div><pre class="rust"><code><span class="doccomment">//! ReadoutBoard Status tab
 //!
 //! Find connected ReadoutBoards and show their 
 //! details as well as the last waveforms
@@ -1318,66 +1367,79 @@
 </span><span class="kw">use </span>std::time::Instant;
 <span class="kw">use </span>std::fs;
 <span class="kw">use </span>std::collections::{
-    VecDeque,
-    HashMap,
+  VecDeque,
+  HashMap,
 };
 
-<span class="comment">//extern crate histo;
-//use histo::Histogram;
-</span><span class="kw">use </span>ndhistogram::{
-    Histogram,
-    Hist1D,
-    ndhistogram,
+<span class="kw">use </span>ndhistogram::{
+  Histogram,
+  Hist1D,
+  ndhistogram,
 };
+
 <span class="kw">use </span>ndhistogram::axis::{
-    Uniform,
+  Uniform,
 };
 
+<span class="kw">use </span>ratatui::prelude::Stylize;
 <span class="kw">use </span>ratatui::{
-    <span class="comment">//backend::CrosstermBackend,
-    </span>terminal::Frame,
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{
-        Modifier,
-        <span class="comment">//Style
-    </span>},
-    text::{
-        <span class="comment">//Span,
-        </span>Line
+  <span class="comment">//backend::CrosstermBackend,
+  //terminal::Frame,
+  </span>Frame,
+  layout::{Alignment, Constraint, Direction, Layout, Rect},
+  style::{
+    Modifier,
+    Style
+  },
+  text::{
+    <span class="comment">//Span,
+    </span>Line
+  },
+  widgets::{
+    Block,
+    BorderType,
+    Borders,
+    List,
+    ListItem,
+    ListState,
+    Paragraph,
+    Row,
+    Table,
     },
-    widgets::{
-        Block, BorderType, Borders, List, ListItem, ListState, Paragraph},
 };
 
 <span class="kw">use </span>crossbeam_channel::{
-    Receiver
+  Receiver
 };
 
 
 <span class="kw">use </span>tof_dataclasses::packets::{
-    TofPacket,
-    PacketType
+  TofPacket,
+  PacketType
 };
+
 <span class="kw">use </span>tof_dataclasses::calibrations::RBCalibrations;
 <span class="kw">use </span>tof_dataclasses::errors::SerializationError;
 <span class="kw">use </span>tof_dataclasses::events::RBEvent;
 <span class="comment">//use tof_dataclasses::serialization::Serialization;
 </span><span class="kw">use </span>tof_dataclasses::monitoring::{
-    RBMoniData,
-    LTBMoniData,
-    PAMoniData,
-    RBMoniDataSeries,
-    LTBMoniDataSeries,
-    PAMoniDataSeries,
+  RBMoniData,
+  LTBMoniData,
+  PAMoniData,
+  RBMoniDataSeries,
+  LTBMoniDataSeries,
+  PAMoniDataSeries,
 };
+
 <span class="kw">use </span>tof_dataclasses::series::MoniSeries;
 <span class="kw">use </span>tof_dataclasses::io::RBEventMemoryStreamer;
 <span class="kw">use </span>tof_dataclasses::database::ReadoutBoard;
 
 <span class="kw">use </span><span class="kw">crate</span>::widgets::{
-    timeseries,
-    <span class="comment">//histogram,
+  timeseries,
+  <span class="comment">//histogram,
 </span>};
+
 <span class="kw">use </span><span class="kw">crate</span>::colors::{
   ColorTheme,
 };
@@ -1396,6 +1458,7 @@
   PAMoniData,
   PBMoniData,
   LTBMoniData,
+  GlobalRates,
   SelectRB,
 }
 
@@ -1404,12 +1467,12 @@
   <span class="kw">pub </span>tp_receiver        : Receiver&lt;TofPacket&gt;,
   <span class="kw">pub </span>rb_receiver        : Receiver&lt;RBEvent&gt;,
   <span class="kw">pub </span>rb_selector        : u8,
-  <span class="kw">pub </span>ltb_selector       : u8,
   <span class="kw">pub </span>rb_changed         : bool,
   <span class="kw">pub </span>rb_calibration     : RBCalibrations,
   <span class="kw">pub </span>cali_loaded        : bool,
   <span class="kw">pub </span>event_queue        : VecDeque&lt;RBEvent&gt;,
   <span class="kw">pub </span>moni_queue         : RBMoniDataSeries,
+  <span class="kw">pub </span>global_rates       : HashMap&lt;u8, String&gt;,
   <span class="kw">pub </span>ltb_moni_queue     : LTBMoniDataSeries,  
   <span class="kw">pub </span>pa_show_biases     : bool,
   <span class="kw">pub </span>pa_moni_queue      : PAMoniDataSeries,
@@ -1442,10 +1505,8 @@
   </span><span class="kw">pub </span>rbl_state          : ListState,
   <span class="kw">pub </span>rbl_items          : Vec::&lt;ListItem&lt;<span class="lifetime">'a</span>&gt;&gt;,
   <span class="kw">pub </span>rbl_active         : bool,
-  <span class="comment">// list for the ltb selector
-  </span><span class="kw">pub </span>ltbl_state         : ListState,
-  <span class="kw">pub </span>ltbl_items         : Vec::&lt;ListItem&lt;<span class="lifetime">'a</span>&gt;&gt;,
-  <span class="kw">pub </span>ltbl_active        : bool,
+  <span class="comment">// FIXME - get this from the DB!
+  </span><span class="kw">pub </span>rb_to_rat          : HashMap&lt;u8,u8&gt;,
 }
 
 <span class="kw">impl </span>RBTab&lt;<span class="lifetime">'_</span>&gt;  {
@@ -1454,15 +1515,18 @@
              rb_receiver  : Receiver&lt;RBEvent&gt;,
              rbs          : HashMap&lt;u8, ReadoutBoard&gt;,
              theme        : ColorTheme) -&gt; RBTab&lt;<span class="lifetime">'static</span>&gt;  {
+    <span class="kw">let </span>rb_non_exist = <span class="macro">vec!</span>[<span class="number">10</span>,<span class="number">12</span>,<span class="number">34</span>,<span class="number">37</span>,<span class="number">38</span>,<span class="number">43</span>,<span class="number">45</span>,<span class="number">47</span>,<span class="number">48</span>,<span class="number">49</span>];
     <span class="kw">let </span><span class="kw-2">mut </span>rb_select_items = Vec::&lt;ListItem&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>global_rates    = HashMap::&lt;u8,String&gt;::new();
+    <span class="kw">for </span>k <span class="kw">in </span><span class="number">1</span>..<span class="number">51 </span>{
+      <span class="kw">if </span>rb_non_exist.contains(<span class="kw-2">&amp;</span>k) {
+        <span class="kw">continue</span>;
+      }
+      global_rates.insert(k <span class="kw">as </span>u8, String::from(<span class="string">"\u{203c} no data yet"</span>));
+    }
     <span class="kw">for </span>k <span class="kw">in </span><span class="number">1</span>..<span class="number">51 </span>{
       <span class="kw">let </span>this_item = <span class="macro">format!</span>(<span class="string">"  RB{:0&gt;2}"</span>, k);
       rb_select_items.push(ListItem::new(Line::from(this_item)));
-    }
-    <span class="kw">let </span><span class="kw-2">mut </span>ltb_select_items = Vec::&lt;ListItem&gt;::new();
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">1</span>..<span class="number">21 </span>{
-      <span class="kw">let </span>this_item = <span class="macro">format!</span>(<span class="string">"  LTB{:0&gt;2}"</span>, k);
-      ltb_select_items.push(ListItem::new(Line::from(this_item)));
     }
 
     <span class="kw">let </span>queue_size = <span class="number">1000usize</span>;
@@ -1472,22 +1536,64 @@
       <span class="comment">//ch_data.push(Vec::&lt;(f64,f64)&gt;::new());
       </span>ch_data.push(tmp_vec);
     }
-    <span class="kw">let </span>bins = Uniform::new(<span class="number">50</span>,-<span class="number">0.5</span>,<span class="number">49.5</span>);
+    <span class="kw">let </span>bins = Uniform::new(<span class="number">50</span>,-<span class="number">0.5</span>,<span class="number">49.5</span>).unwrap();
     <span class="kw">let </span><span class="kw-2">mut </span>rbl_state    = ListState::default();
     rbl_state.select(<span class="prelude-val">Some</span>(<span class="number">1</span>));
-    <span class="kw">let </span><span class="kw-2">mut </span>ltbl_state   = ListState::default();
-    ltbl_state.select(<span class="prelude-val">Some</span>(<span class="number">1</span>));
-    RBTab {
+    <span class="macro">warn!</span>(<span class="string">"Using hardcoded values for the RB-&gt;RAT hashmap!"</span>);
+    <span class="comment">// FIXME - get this from DB!
+    </span><span class="kw">let </span>rb_to_rat
+      = HashMap::&lt;u8,u8&gt;::from(
+      [(<span class="number">1</span>, <span class="number">10</span>),
+       (<span class="number">2</span>, <span class="number">15</span>),
+       (<span class="number">3</span>,  <span class="number">1</span>),
+       (<span class="number">4</span>, <span class="number">15</span>),
+       (<span class="number">5</span>, <span class="number">20</span>),
+       (<span class="number">6</span>, <span class="number">19</span>),
+       (<span class="number">7</span>, <span class="number">17</span>),
+       (<span class="number">8</span>,  <span class="number">9</span>),
+       (<span class="number">11</span>,<span class="number">10</span>),
+       (<span class="number">13</span>, <span class="number">4</span>),
+       (<span class="number">14</span>, <span class="number">2</span>),
+       (<span class="number">15</span>, <span class="number">1</span>),
+       (<span class="number">16</span>, <span class="number">8</span>),
+       (<span class="number">17</span>,<span class="number">17</span>),
+       (<span class="number">18</span>,<span class="number">13</span>),
+       (<span class="number">19</span>, <span class="number">7</span>),
+       (<span class="number">20</span>, <span class="number">7</span>),
+       (<span class="number">21</span>, <span class="number">5</span>),
+       (<span class="number">22</span>,<span class="number">11</span>),
+       (<span class="number">23</span>, <span class="number">5</span>),
+       (<span class="number">24</span>, <span class="number">6</span>),
+       (<span class="number">25</span>, <span class="number">8</span>),
+       (<span class="number">26</span>,<span class="number">11</span>),
+       (<span class="number">27</span>, <span class="number">6</span>),
+       (<span class="number">28</span>,<span class="number">20</span>),
+       (<span class="number">29</span>, <span class="number">3</span>),
+       (<span class="number">30</span>, <span class="number">9</span>),
+       (<span class="number">31</span>, <span class="number">3</span>),
+       (<span class="number">32</span>, <span class="number">2</span>),
+       (<span class="number">33</span>,<span class="number">18</span>),
+       (<span class="number">34</span>,<span class="number">18</span>),
+       (<span class="number">35</span>, <span class="number">4</span>),
+       (<span class="number">36</span>,<span class="number">19</span>),
+       (<span class="number">39</span>,<span class="number">12</span>),
+       (<span class="number">40</span>,<span class="number">12</span>),
+       (<span class="number">41</span>,<span class="number">14</span>),
+       (<span class="number">42</span>,<span class="number">14</span>),
+       (<span class="number">44</span>,<span class="number">16</span>),
+       (<span class="number">46</span>,<span class="number">16</span>)]);
+
+RBTab {
       tp_receiver        : tp_receiver,
       rb_receiver        : rb_receiver,
       rb_selector        : <span class="number">0</span>,
-      ltb_selector       : <span class="number">9</span>,
       rb_changed         : <span class="bool-val">false</span>,
       rb_calibration     : RBCalibrations::new(<span class="number">0</span>),
       cali_loaded        : <span class="bool-val">false</span>,
       event_queue        : VecDeque::&lt;RBEvent&gt;::with_capacity(queue_size),
       <span class="comment">//moni_queue         : VecDeque::&lt;RBMoniData&gt;::with_capacity(queue_size),
       </span>moni_queue         : RBMoniDataSeries::new(),
+      global_rates       : global_rates,
       met_queue          : VecDeque::&lt;f64&gt;::with_capacity(queue_size),
       met_queue_moni     : HashMap::&lt;u8, VecDeque&lt;f64&gt;&gt;::new(),
       ltb_moni_queue     : LTBMoniDataSeries::new(),
@@ -1520,19 +1626,17 @@
       rbl_items          : rb_select_items,
       rbl_active         : <span class="bool-val">false</span>,
       
-      ltbl_state         : ltbl_state,
-      ltbl_items         : ltb_select_items,
-      ltbl_active        : <span class="bool-val">false</span>,
+      rb_to_rat          : rb_to_rat
     }
   }
   
   <span class="kw">pub fn </span>receive_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), SerializationError&gt; {
     <span class="kw">let </span>met    = <span class="self">self</span>.timer.elapsed().as_secs_f64();
     <span class="kw">let </span><span class="kw-2">mut </span>ev = RBEvent::new();
-    <span class="kw">let </span>bins   = Uniform::new(<span class="number">50</span>,-<span class="number">0.5</span>,<span class="number">49.5</span>);
+    <span class="kw">let </span>bins   = Uniform::new(<span class="number">50</span>,-<span class="number">0.5</span>,<span class="number">49.5</span>).unwrap();
     <span class="comment">//info!("Receive packet!"); 
     </span><span class="kw">if </span><span class="self">self</span>.rb_changed {
-      <span class="macro">info!</span>(<span class="string">"RB change detectod!"</span>);
+      <span class="macro">debug!</span>(<span class="string">"RB change detectod!"</span>);
       <span class="comment">// currently, only one RB at a time is supported
       //self.moni_queue.clear();
       </span><span class="self">self</span>.event_queue.clear();
@@ -1546,7 +1650,7 @@
           <span class="self">self</span>.cali_loaded = <span class="bool-val">false</span>;
         }, 
         <span class="prelude-val">Some</span>(_rb_id) =&gt; {
-          <span class="kw">let </span>cali_path = <span class="macro">format!</span>(<span class="string">"calibrations/rb_{:02}.cali.tof.gaps"</span>, _rb_id + <span class="number">1</span>);
+          <span class="kw">let </span>cali_path = <span class="macro">format!</span>(<span class="string">"calibrations/RB{:02}.cali.tof.gaps"</span>, _rb_id + <span class="number">1</span>);
           <span class="kw">if </span>fs::metadata(cali_path.clone()).is_ok() {
             <span class="kw">match </span>RBCalibrations::from_file(cali_path.clone(), <span class="bool-val">true</span>) {
               <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to load RBCalibration from file {}! {err}"</span>, cali_path),
@@ -1578,7 +1682,7 @@
           <span class="macro">debug!</span>(<span class="string">"Got next packet {}!"</span>, pack);
           <span class="kw">match </span>pack.packet_type {
             PacketType::PAMoniData =&gt; {
-              <span class="macro">trace!</span>(<span class="string">"Received new PAMoniData!"</span>);
+              <span class="macro">info!</span>(<span class="string">"Received new PAMoniData!"</span>);
               <span class="kw">let </span>moni : PAMoniData = pack.unpack()<span class="question-mark">?</span>;
               <span class="self">self</span>.pa_moni_queue.add(moni);
               <span class="kw">if </span>!<span class="self">self</span>.met_queue_pa_moni.contains_key(<span class="kw-2">&amp;</span>moni.board_id) {
@@ -1610,6 +1714,8 @@
               <span class="kw">let </span>moni : RBMoniData = pack.unpack()<span class="question-mark">?</span>;
               <span class="self">self</span>.moni_queue.add(moni);
               <span class="self">self</span>.n_moni += <span class="number">1</span>;
+              <span class="comment">// capture the rate for the global rate window
+              </span><span class="self">self</span>.global_rates.insert(moni.board_id, <span class="macro">format!</span>(<span class="string">"{}"</span>,moni.rate));
               <span class="kw">if </span>!<span class="self">self</span>.met_queue_moni.contains_key(<span class="kw-2">&amp;</span>moni.board_id) {
                 <span class="comment">// FIXME - make the 1000 (which is queue size) a member
                 </span><span class="self">self</span>.met_queue_moni.insert(moni.board_id, VecDeque::&lt;f64&gt;::with_capacity(<span class="number">1000</span>));
@@ -1725,37 +1831,6 @@
     <span class="self">self</span>.rbl_state.select(<span class="prelude-val">None</span>);
   }
   
-  <span class="kw">pub fn </span>next_ltb(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-    <span class="kw">let </span>i = <span class="kw">match </span><span class="self">self</span>.ltbl_state.selected() {
-      <span class="prelude-val">Some</span>(i) =&gt; {
-        <span class="kw">if </span>i &gt;= <span class="self">self</span>.ltbl_items.len() - <span class="number">1 </span>{
-          <span class="self">self</span>.ltbl_items.len() - <span class="number">1
-        </span>} <span class="kw">else </span>{
-          i + <span class="number">1
-        </span>}
-      }
-      <span class="prelude-val">None </span>=&gt; <span class="number">0</span>,
-    };
-    <span class="self">self</span>.ltbl_state.select(<span class="prelude-val">Some</span>(i));
-  }
-
-  <span class="kw">pub fn </span>previous_ltb(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-    <span class="kw">let </span>i = <span class="kw">match </span><span class="self">self</span>.ltbl_state.selected() {
-      <span class="prelude-val">Some</span>(i) =&gt; {
-        <span class="kw">if </span>i == <span class="number">0 </span>{
-          <span class="number">0 
-        </span>} <span class="kw">else </span>{
-          i - <span class="number">1
-        </span>}
-      }
-      <span class="prelude-val">None </span>=&gt; <span class="number">0</span>,
-    };
-    <span class="self">self</span>.ltbl_state.select(<span class="prelude-val">Some</span>(i));
-  }
-
-  <span class="kw">pub fn </span>unselect_ltbl(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-    <span class="self">self</span>.ltbl_state.select(<span class="prelude-val">None</span>);
-  }
 
   <span class="kw">pub fn </span>render(<span class="kw-2">&amp;mut </span><span class="self">self</span>, main_window : <span class="kw-2">&amp;</span>Rect, frame : <span class="kw-2">&amp;mut </span>Frame) {
     <span class="kw">match </span><span class="self">self</span>.view {
@@ -1768,18 +1843,7 @@
                </span>Constraint::Percentage(<span class="number">90</span>)].as_ref(),
           )
           .split(<span class="kw-2">*</span>main_window);
-        <span class="comment">//let par_rb_title_string = String::from("Select ReadoutBoard (RB)");
-        //let (first, rest) = par_title_string.split_at(1);
-        //let par_title = Line::from(vec![
-        //  Span::styled(
-        //      first,
-        //      Style::default()
-        //          .fg(self.theme.hc)
-        //          .add_modifier(Modifier::UNDERLINED),
-        //  ),
-        //  Span::styled(rest, self.theme.style()),
-        //]);
-        </span><span class="kw">let </span>rbs = Block::default()
+        <span class="kw">let </span>rbs = Block::default()
           .borders(Borders::ALL)
           .style(<span class="self">self</span>.theme.style())
           .title(<span class="string">"Select ReadoutBoard (RB)"</span>)
@@ -1788,17 +1852,7 @@
           .highlight_style(<span class="self">self</span>.theme.highlight().add_modifier(Modifier::BOLD))
           .highlight_symbol(<span class="string">"&gt;&gt;"</span>)
           .repeat_highlight_symbol(<span class="bool-val">true</span>);
-        <span class="comment">// No ltb selection right now
-        //let ltbs = Block::default()
-        //  .borders(Borders::ALL)
-        //  .style(self.theme.style())
-        //  .title("Select LocalTriggerBoard (LTB)")
-        //  .border_type(BorderType::Plain);
-        //let ltb_select_list = List::new(self.ltbl_items.clone()).block(ltbs)
-        //  .highlight_style(self.theme.highlight().add_modifier(Modifier::BOLD))
-        //  .highlight_symbol("&gt;&gt;")
-        //  .repeat_highlight_symbol(true);
-        </span><span class="kw">match </span><span class="self">self</span>.list_focus {
+        <span class="kw">match </span><span class="self">self</span>.list_focus {
           RBLTBListFocus::RBList =&gt; {
             <span class="kw">match </span><span class="self">self</span>.rbl_state.selected() {
               <span class="prelude-val">None    </span>=&gt; {
@@ -1822,31 +1876,14 @@
             }
           },
           <span class="kw">_ </span>=&gt; ()
-          <span class="comment">// no ltb selection right now
-          //RBLTBListFocus::LTBList =&gt; {
-          //  match self.ltbl_state.selected() {
-          //    None    =&gt; {
-          //      let selector =  1;
-          //      if self.ltb_selector != selector {
-          //        self.ltb_selector = selector;
-          //      } 
-          //    },
-          //    Some(_ltbid) =&gt; {
-          //      let selector =  _ltbid as u8 + 1;
-          //      if self.ltb_selector != selector {
-          //        self.ltb_selector = selector;
-          //      }
-          //    },
-          //  }
-          //}
-        </span>}
+        }
         <span class="kw">let </span>view_string : String;
         <span class="kw">match </span><span class="self">self</span>.rbs.get(<span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector) {
           <span class="prelude-val">Some</span>(_rb) =&gt; {
             view_string = <span class="macro">format!</span>(<span class="string">"{}"</span>, _rb.to_summary_str());
           }
           <span class="prelude-val">None </span>=&gt; {
-            view_string = <span class="macro">format!</span>(<span class="string">"No information for RB {} in DBor DB not available!"</span>, <span class="self">self</span>.rb_selector);
+            view_string = <span class="macro">format!</span>(<span class="string">"No information for RB {} in DB \n or DB not available!"</span>, <span class="self">self</span>.rb_selector);
           }
         }
         <span class="kw">let </span>rb_view = Paragraph::new(view_string)
@@ -1863,8 +1900,7 @@
 
         frame.render_stateful_widget(rb_select_list,  main_lo[<span class="number">0</span>], <span class="kw-2">&amp;mut </span><span class="self">self</span>.rbl_state );
         frame.render_widget(rb_view, main_lo[<span class="number">1</span>]);
-        <span class="comment">//frame.render_stateful_widget(ltb_select_list, list_chunks[1], &amp;mut self.ltbl_state );
-      </span>},
+      },
       RBTabView::Waveform =&gt; {
         <span class="comment">// set up general layout
         </span><span class="kw">let </span>status_chunks = Layout::default()
@@ -1913,7 +1949,7 @@
         ch_chunks.append(<span class="kw-2">&amp;mut </span>ch_chunks_2);
         <span class="comment">// the waveform plots
         </span><span class="kw">for </span>ch <span class="kw">in </span><span class="number">0</span>..<span class="number">9 </span>{
-          <span class="kw">let </span>label          = <span class="macro">format!</span>(<span class="string">"Ch{}"</span>, ch);
+          <span class="kw">let </span>label          = <span class="macro">format!</span>(<span class="string">"Ch{}"</span>, ch + <span class="number">1</span>);
           <span class="kw">let </span>ch_tc_theme    = <span class="self">self</span>.theme.clone();
           <span class="kw">let </span><span class="kw-2">mut </span>ch_ts_data = VecDeque::from(<span class="self">self</span>.ch_data[ch].clone());
           <span class="kw">let </span>ch_ts = timeseries(<span class="kw-2">&amp;mut </span>ch_ts_data,
@@ -1953,7 +1989,7 @@
             .border_type(BorderType::Rounded),
         );
         frame.render_widget(event_view, detail_and_ch9_chunks[<span class="number">1</span>]);
-      }, <span class="comment">// end Waveform
+      } <span class="comment">// end Waveform
       </span>RBTabView::RBMoniData =&gt; {
         <span class="comment">// Have 4 columns a 4 plots each. We use col(0,0) for the RBMoniData string,
         // so this leaves us with 13 plots
@@ -2038,9 +2074,7 @@
             <span class="macro">error!</span>(<span class="string">"No rate data available for board {}"</span>, <span class="self">self</span>.rb_selector);
           },
           <span class="prelude-val">Some</span>(rdata) =&gt; {
-            <span class="kw">if </span>rate_ts.len() == <span class="number">0 </span>{
-              <span class="macro">error!</span>(<span class="string">"We have 0 length rate data for board {}!"</span>, <span class="self">self</span>.rb_selector);
-            } <span class="kw">else </span>{
+            <span class="kw">if </span>rdata.len() != <span class="number">0 </span>{
               <span class="kw">for </span>(k, time) <span class="kw">in </span><span class="self">self</span>.met_queue_moni.get(<span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector).unwrap().iter().enumerate() {
                 rate_ts.push_back((<span class="kw-2">*</span>time, rdata[k] <span class="kw">as </span>f64));
               }
@@ -2349,9 +2383,9 @@
             )
             .split(columns[<span class="number">1</span>]);
         
-        <span class="kw">let </span>last_ltb_moni = <span class="self">self</span>.ltb_moni_queue.get_last_moni(<span class="self">self</span>.ltb_selector);
-        <span class="kw">let </span><span class="kw-2">mut </span>ltb_moni_str = <span class="macro">format!</span>(<span class="string">"No data for board {}!"</span>, <span class="self">self</span>.ltb_selector);
-        <span class="kw">let </span><span class="kw-2">mut </span>ltb_thr_str  = <span class="macro">format!</span>(<span class="string">"No data for board {}!"</span>, <span class="self">self</span>.ltb_selector);
+        <span class="kw">let </span>last_ltb_moni    = <span class="self">self</span>.ltb_moni_queue.get_last_moni(<span class="self">self</span>.rb_selector);
+        <span class="kw">let </span><span class="kw-2">mut </span>ltb_moni_str = <span class="macro">format!</span>(<span class="string">"No data for board {}!"</span>, <span class="self">self</span>.rb_selector);
+        <span class="kw">let </span><span class="kw-2">mut </span>ltb_thr_str  = <span class="macro">format!</span>(<span class="string">"No data for board {}!"</span>, <span class="self">self</span>.rb_selector);
         <span class="kw">match </span>last_ltb_moni {
           <span class="prelude-val">None </span>=&gt; (),
           <span class="prelude-val">Some</span>(mon) =&gt; {
@@ -2388,15 +2422,15 @@
 
         <span class="kw">let </span>tt_name   = String::from(<span class="string">"Trenz Temp"</span>);
         <span class="kw">let </span>tt_title  = String::from(<span class="string">"Trenz Temp [\u{00B0}C]"</span>);
-        <span class="kw">let </span>tt_data   = <span class="self">self</span>.ltb_moni_queue.get_var_for_board(<span class="string">"trenz_temp"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ltb_selector);
+        <span class="kw">let </span>tt_data   = <span class="self">self</span>.ltb_moni_queue.get_var_for_board(<span class="string">"trenz_temp"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>tt_ts = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>tt_data {
           <span class="prelude-val">None </span>=&gt; {
-            <span class="macro">error!</span>(<span class="string">"No trenz temp data available for board {}"</span>, <span class="self">self</span>.ltb_selector);
+            <span class="macro">error!</span>(<span class="string">"No trenz temp data available for board {}"</span>, <span class="self">self</span>.rb_selector);
           },
           <span class="prelude-val">Some</span>(data) =&gt; {
             <span class="kw">if </span>data.len() != <span class="number">0 </span>{
-              <span class="kw">for </span>(k, time) <span class="kw">in </span><span class="self">self</span>.met_queue_ltb_moni.get(<span class="kw-2">&amp;</span><span class="self">self</span>.ltb_selector).unwrap().iter().enumerate() {
+              <span class="kw">for </span>(k, time) <span class="kw">in </span><span class="self">self</span>.met_queue_ltb_moni.get(<span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector).unwrap().iter().enumerate() {
                 tt_ts.push_back((<span class="kw-2">*</span>time, data[k] <span class="kw">as </span>f64));
               }
             }
@@ -2410,15 +2444,15 @@
 
         <span class="kw">let </span>lt_name   = String::from(<span class="string">"LTB Temperature"</span>);
         <span class="kw">let </span>lt_title  = String::from(<span class="string">"LTB Temp. [\u{00B0}C]"</span>);
-        <span class="kw">let </span>lt_data      = <span class="self">self</span>.ltb_moni_queue.get_var_for_board(<span class="string">"ltb_temp"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ltb_selector);
+        <span class="kw">let </span>lt_data      = <span class="self">self</span>.ltb_moni_queue.get_var_for_board(<span class="string">"ltb_temp"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
         <span class="kw">let </span><span class="kw-2">mut </span>lt_ts    = VecDeque::&lt;(f64, f64)&gt;::new(); 
         <span class="kw">match </span>lt_data {
           <span class="prelude-val">None </span>=&gt; {
-            <span class="macro">error!</span>(<span class="string">"No LTB temp data available for board {}"</span>, <span class="self">self</span>.ltb_selector);
+            <span class="macro">error!</span>(<span class="string">"No LTB temp data available for board {}"</span>, <span class="self">self</span>.rb_selector);
           },
           <span class="prelude-val">Some</span>(data) =&gt; {
             <span class="kw">if </span>data.len() != <span class="number">0 </span>{
-              <span class="kw">for </span>(k, time) <span class="kw">in </span><span class="self">self</span>.met_queue_ltb_moni.get(<span class="kw-2">&amp;</span><span class="self">self</span>.ltb_selector).unwrap().iter().enumerate() {
+              <span class="kw">for </span>(k, time) <span class="kw">in </span><span class="self">self</span>.met_queue_ltb_moni.get(<span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector).unwrap().iter().enumerate() {
                 lt_ts.push_back((<span class="kw-2">*</span>time, data[k] <span class="kw">as </span>f64));
               }
             }
@@ -2551,7 +2585,7 @@
         } <span class="kw">else </span>{
           <span class="comment">// the temperature plots
           </span><span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">16 </span>{
-            <span class="kw">let </span>identifier = <span class="macro">format!</span>(<span class="string">"temp_{}"</span>, k+<span class="number">1</span>);
+            <span class="kw">let </span>identifier = <span class="macro">format!</span>(<span class="string">"temps{}"</span>, k+<span class="number">1</span>);
             <span class="kw">let </span>name   = <span class="macro">format!</span>(<span class="string">"Ch {} Temperature"</span>, k+<span class="number">1</span>);
             <span class="kw">let </span>title  = <span class="macro">format!</span>(<span class="string">"Ch {} Temp [\u{00B0}C]"</span>, k+<span class="number">1</span>);
             <span class="kw">let </span>c_data = <span class="self">self</span>.pa_moni_queue.get_var_for_board(<span class="kw-2">&amp;</span>identifier, <span class="kw-2">&amp;</span><span class="self">self</span>.rb_selector);
@@ -2582,13 +2616,77 @@
               frame.render_widget(tc, col3[k-<span class="number">12</span>]);
             }
           }
-
         }
-
       }
       RBTabView::PBMoniData =&gt; {
       }
-      RBTabView::Info =&gt; {
+      RBTabView::GlobalRates =&gt; {
+        <span class="comment">// this is just the simple example
+        </span><span class="kw">let </span><span class="kw-2">mut </span>rows = Vec::&lt;Row&gt;::new();
+        <span class="comment">// we have 40 rbs
+        </span><span class="kw">let </span><span class="kw-2">mut </span>rbids = Vec::from_iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>.global_rates.keys());
+        rbids.sort();
+        <span class="kw">let </span><span class="kw-2">mut </span>ncol = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>this_row = Vec::&lt;String&gt;::new();
+        <span class="kw">for </span>k <span class="kw">in </span>rbids {
+          this_row.push(<span class="macro">format!</span>(<span class="string">"RB {:02}"</span>, k));
+          <span class="kw">if </span><span class="self">self</span>.global_rates[k] == String::from(<span class="string">"0"</span>) {
+            this_row.push(<span class="macro">format!</span>(<span class="string">"\u{203c} {} Hz"</span>, <span class="self">self</span>.global_rates[k]));
+          } <span class="kw">else </span>{
+            this_row.push(<span class="macro">format!</span>(<span class="string">"\u{2714} {} Hz"</span>, <span class="self">self</span>.global_rates[k]));
+          }
+          ncol += <span class="number">2</span>;
+          <span class="kw">if </span>ncol == <span class="number">8 </span>{
+            rows.push(Row::new(this_row.clone()));
+            this_row = Vec::&lt;String&gt;::new();
+            ncol = <span class="number">0</span>;
+          }
+          <span class="comment">//let this_row = vec![format!("{}",k) , format!("{}", global_rates[k])];
+          //rows.push(this_row);
+        </span>}
+        <span class="comment">// Columns widths are constrained in the same way as Layout...
+        </span><span class="kw">let </span>widths = [
+          Constraint::Percentage(<span class="number">12</span>),
+          Constraint::Percentage(<span class="number">12</span>),
+          Constraint::Percentage(<span class="number">12</span>),
+          Constraint::Percentage(<span class="number">12</span>),
+          Constraint::Percentage(<span class="number">12</span>),
+          Constraint::Percentage(<span class="number">12</span>),
+          Constraint::Percentage(<span class="number">12</span>),
+          Constraint::Percentage(<span class="number">16</span>),
+        ];
+        <span class="kw">let </span>table = Table::new(rows, widths)
+          <span class="comment">// ...and they can be separated by a fixed spacing.
+          </span>.column_spacing(<span class="number">1</span>)
+          <span class="comment">// You can set the style of the entire Table.
+          </span>.style(Style::new().blue())
+          <span class="comment">// It has an optional header, which is simply a Row always visible at the top.
+          </span>.header(
+            Row::new(<span class="macro">vec!</span>[<span class="string">"RBs"</span>, <span class="string">"Rate"</span>, <span class="string">"RBs"</span>, <span class="string">"Rate"</span>, <span class="string">"RBs"</span>, <span class="string">"Rate"</span>, <span class="string">"RBs"</span>, <span class="string">"Rate"</span>])
+              .style(<span class="self">self</span>.theme.style())
+              <span class="comment">// To add space between the header and the rest of the rows, specify the margin
+              </span>.bottom_margin(<span class="number">1</span>),
+          )
+          <span class="comment">// It has an optional footer, which is simply a Row always visible at the bottom.
+          //.footer(Row::new(vec!["Updated on Dec 28"]))
+          // As any other widget, a Table can be wrapped in a Block.
+          </span>.block(
+            Block::default()
+              .borders(Borders::ALL)
+              .style(<span class="self">self</span>.theme.style())
+              .title(<span class="string">"RB Trigger rates (scalar, from RBMoniData)"</span>)
+              .border_type(BorderType::Rounded),
+            )
+          <span class="comment">// The selected row, column, cell and its content can also be styled.
+          </span>.row_highlight_style(<span class="self">self</span>.theme.style())
+          .column_highlight_style(<span class="self">self</span>.theme.style())
+          .cell_highlight_style(<span class="self">self</span>.theme.style());
+          <span class="comment">// ...and potentially show a symbol in front of the selection.
+          //.highlight_symbol("&gt;&gt;");
+        </span>frame.render_widget(table, <span class="kw-2">*</span>main_window); 
+      }
+      <span class="comment">// This seems deprecated
+      </span>RBTabView::Info =&gt; {
         <span class="kw">let </span>main_view = Layout::default()
           .direction(Direction::Horizontal)
           .constraints(

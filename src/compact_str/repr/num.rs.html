@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/compact_str-0.7.1/src/repr/num.rs`."><title>num.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="compact_str" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0 (f6e511eec 2024-10-15)" data-channel="1.82.0" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/compact_str-0.8.0/src/repr/num.rs`."><title>num.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="compact_str" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">compact_str/repr/</div>num.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -554,9 +555,13 @@
 <a href="#554" id="554">554</a>
 <a href="#555" id="555">555</a>
 <a href="#556" id="556">556</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Implementations for efficiently converting a number into a [`Repr`]
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a></pre></div><pre class="rust"><code><span class="doccomment">//! Implementations for efficiently converting a number into a [`Repr`]
 //!
-//! Adapted from the implemenation in the `std` library at
+//! Adapted from the implementation in the `std` library at
 //! &lt;https://github.com/rust-lang/rust/blob/b8214dc6c6fc20d0a660fb5700dca9ebf51ebe89/src/libcore/fmt/num.rs#L188-L266&gt;
 
 </span><span class="kw">use </span>core::{
@@ -567,6 +572,10 @@
 
 <span class="kw">use </span><span class="kw">super</span>::traits::IntoRepr;
 <span class="kw">use </span><span class="kw">super</span>::Repr;
+<span class="kw">use crate</span>::{
+    ToCompactStringError,
+    UnwrapWithMsg,
+};
 
 <span class="kw">const </span>DEC_DIGITS_LUT: <span class="kw-2">&amp;</span>[u8] = <span class="string">b"\
       0001020304050607080910111213141516171819\
@@ -579,13 +588,12 @@
 </span><span class="macro">macro_rules!</span> impl_IntoRepr {
     (<span class="macro-nonterminal">$t</span>:ident, <span class="macro-nonterminal">$conv_ty</span>:ident) =&gt; {
         <span class="kw">impl </span>IntoRepr <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
-            <span class="attr">#[inline]
-            </span><span class="kw">fn </span>into_repr(<span class="self">self</span>) -&gt; Repr {
+            <span class="kw">fn </span>into_repr(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Repr, ToCompactStringError&gt; {
                 <span class="comment">// Determine the number of digits in this value
                 //
                 // Note: this considers the `-` symbol
                 </span><span class="kw">let </span>num_digits = NumChars::num_chars(<span class="self">self</span>);
-                <span class="kw">let </span><span class="kw-2">mut </span>repr = Repr::with_capacity(num_digits);
+                <span class="kw">let </span><span class="kw-2">mut </span>repr = Repr::with_capacity(num_digits).unwrap_with_msg();
 
                 <span class="attr">#[allow(unused_comparisons)]
                 </span><span class="kw">let </span>is_nonnegative = <span class="self">self </span>&gt;= <span class="number">0</span>;
@@ -654,7 +662,7 @@
                 <span class="comment">// we should have moved all the way down our buffer
                 </span><span class="macro">debug_assert_eq!</span>(curr, <span class="number">0</span>);
 
-                repr
+                <span class="prelude-val">Ok</span>(repr)
             }
         }
     };
@@ -684,17 +692,17 @@
 /// characters and then writing.
 </span><span class="kw">impl </span>IntoRepr <span class="kw">for </span>u128 {
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>into_repr(<span class="self">self</span>) -&gt; Repr {
+    </span><span class="kw">fn </span>into_repr(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Repr, ToCompactStringError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = itoa::Buffer::new();
-        Repr::new(buffer.format(<span class="self">self</span>))
+        <span class="prelude-val">Ok</span>(Repr::new(buffer.format(<span class="self">self</span>))<span class="question-mark">?</span>)
     }
 }
 
 <span class="kw">impl </span>IntoRepr <span class="kw">for </span>i128 {
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>into_repr(<span class="self">self</span>) -&gt; Repr {
+    </span><span class="kw">fn </span>into_repr(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Repr, ToCompactStringError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = itoa::Buffer::new();
-        Repr::new(buffer.format(<span class="self">self</span>))
+        <span class="prelude-val">Ok</span>(Repr::new(buffer.format(<span class="self">self</span>))<span class="question-mark">?</span>)
     }
 }
 
@@ -703,7 +711,7 @@
     (<span class="macro-nonterminal">$t</span>:path) =&gt; {
         <span class="kw">impl </span>IntoRepr <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
             <span class="attr">#[inline]
-            </span><span class="kw">fn </span>into_repr(<span class="self">self</span>) -&gt; Repr {
+            </span><span class="kw">fn </span>into_repr(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Repr, ToCompactStringError&gt; {
                 <span class="self">self</span>.get().into_repr()
             }
         }
@@ -974,6 +982,8 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>alloc::string::ToString;
+
     <span class="kw">use </span><span class="kw">super</span>::IntoRepr;
 
     <span class="attr">#[test]
@@ -981,7 +991,7 @@
         <span class="kw">let </span>vals = [u8::MIN, u8::MIN + <span class="number">1</span>, <span class="number">0</span>, <span class="number">42</span>, u8::MAX - <span class="number">1</span>, u8::MAX];
 
         <span class="kw">for </span>x <span class="kw">in </span><span class="kw-2">&amp;</span>vals {
-            <span class="kw">let </span>repr = u8::into_repr(<span class="kw-2">*</span>x);
+            <span class="kw">let </span>repr = u8::into_repr(<span class="kw-2">*</span>x).unwrap();
             <span class="macro">assert_eq!</span>(repr.as_str(), x.to_string());
         }
     }
@@ -991,7 +1001,7 @@
         <span class="kw">let </span>vals = [i8::MIN, i8::MIN + <span class="number">1</span>, <span class="number">0</span>, <span class="number">42</span>, i8::MAX - <span class="number">1</span>, i8::MAX];
 
         <span class="kw">for </span>x <span class="kw">in </span><span class="kw-2">&amp;</span>vals {
-            <span class="kw">let </span>repr = i8::into_repr(<span class="kw-2">*</span>x);
+            <span class="kw">let </span>repr = i8::into_repr(<span class="kw-2">*</span>x).unwrap();
             <span class="macro">assert_eq!</span>(repr.as_str(), x.to_string());
         }
     }
@@ -1001,7 +1011,7 @@
         <span class="kw">let </span>vals = [u16::MIN, u16::MIN + <span class="number">1</span>, <span class="number">0</span>, <span class="number">42</span>, u16::MAX - <span class="number">1</span>, u16::MAX];
 
         <span class="kw">for </span>x <span class="kw">in </span><span class="kw-2">&amp;</span>vals {
-            <span class="kw">let </span>repr = u16::into_repr(<span class="kw-2">*</span>x);
+            <span class="kw">let </span>repr = u16::into_repr(<span class="kw-2">*</span>x).unwrap();
             <span class="macro">assert_eq!</span>(repr.as_str(), x.to_string());
         }
     }
@@ -1011,7 +1021,7 @@
         <span class="kw">let </span>vals = [i16::MIN, i16::MIN + <span class="number">1</span>, <span class="number">0</span>, <span class="number">42</span>, i16::MAX - <span class="number">1</span>, i16::MAX];
 
         <span class="kw">for </span>x <span class="kw">in </span><span class="kw-2">&amp;</span>vals {
-            <span class="kw">let </span>repr = i16::into_repr(<span class="kw-2">*</span>x);
+            <span class="kw">let </span>repr = i16::into_repr(<span class="kw-2">*</span>x).unwrap();
             <span class="macro">assert_eq!</span>(repr.as_str(), x.to_string());
         }
     }
@@ -1021,7 +1031,7 @@
         <span class="kw">let </span>vals = [u32::MIN, u32::MIN + <span class="number">1</span>, <span class="number">0</span>, <span class="number">42</span>, u32::MAX - <span class="number">1</span>, u32::MAX];
 
         <span class="kw">for </span>x <span class="kw">in </span><span class="kw-2">&amp;</span>vals {
-            <span class="kw">let </span>repr = u32::into_repr(<span class="kw-2">*</span>x);
+            <span class="kw">let </span>repr = u32::into_repr(<span class="kw-2">*</span>x).unwrap();
             <span class="macro">assert_eq!</span>(repr.as_str(), x.to_string());
         }
     }
@@ -1031,7 +1041,7 @@
         <span class="kw">let </span>vals = [i32::MIN, i32::MIN + <span class="number">1</span>, <span class="number">0</span>, <span class="number">42</span>, i32::MAX - <span class="number">1</span>, i32::MAX];
 
         <span class="kw">for </span>x <span class="kw">in </span><span class="kw-2">&amp;</span>vals {
-            <span class="kw">let </span>repr = i32::into_repr(<span class="kw-2">*</span>x);
+            <span class="kw">let </span>repr = i32::into_repr(<span class="kw-2">*</span>x).unwrap();
             <span class="macro">assert_eq!</span>(repr.as_str(), x.to_string());
         }
     }
@@ -1041,7 +1051,7 @@
         <span class="kw">let </span>vals = [u64::MIN, u64::MIN + <span class="number">1</span>, <span class="number">0</span>, <span class="number">42</span>, u64::MAX - <span class="number">1</span>, u64::MAX];
 
         <span class="kw">for </span>x <span class="kw">in </span><span class="kw-2">&amp;</span>vals {
-            <span class="kw">let </span>repr = u64::into_repr(<span class="kw-2">*</span>x);
+            <span class="kw">let </span>repr = u64::into_repr(<span class="kw-2">*</span>x).unwrap();
             <span class="macro">assert_eq!</span>(repr.as_str(), x.to_string());
         }
     }
@@ -1051,7 +1061,7 @@
         <span class="kw">let </span>vals = [i64::MIN, i64::MIN + <span class="number">1</span>, <span class="number">0</span>, <span class="number">42</span>, i64::MAX - <span class="number">1</span>, i64::MAX];
 
         <span class="kw">for </span>x <span class="kw">in </span><span class="kw-2">&amp;</span>vals {
-            <span class="kw">let </span>repr = i64::into_repr(<span class="kw-2">*</span>x);
+            <span class="kw">let </span>repr = i64::into_repr(<span class="kw-2">*</span>x).unwrap();
             <span class="macro">assert_eq!</span>(repr.as_str(), x.to_string());
         }
     }
@@ -1068,7 +1078,7 @@
         ];
 
         <span class="kw">for </span>x <span class="kw">in </span><span class="kw-2">&amp;</span>vals {
-            <span class="kw">let </span>repr = usize::into_repr(<span class="kw-2">*</span>x);
+            <span class="kw">let </span>repr = usize::into_repr(<span class="kw-2">*</span>x).unwrap();
             <span class="macro">assert_eq!</span>(repr.as_str(), x.to_string());
         }
     }
@@ -1085,7 +1095,7 @@
         ];
 
         <span class="kw">for </span>x <span class="kw">in </span><span class="kw-2">&amp;</span>vals {
-            <span class="kw">let </span>repr = isize::into_repr(<span class="kw-2">*</span>x);
+            <span class="kw">let </span>repr = isize::into_repr(<span class="kw-2">*</span>x).unwrap();
             <span class="macro">assert_eq!</span>(repr.as_str(), x.to_string());
         }
     }
@@ -1095,7 +1105,7 @@
         <span class="kw">let </span>vals = [u128::MIN, u128::MIN + <span class="number">1</span>, <span class="number">0</span>, <span class="number">42</span>, u128::MAX - <span class="number">1</span>, u128::MAX];
 
         <span class="kw">for </span>x <span class="kw">in </span><span class="kw-2">&amp;</span>vals {
-            <span class="kw">let </span>repr = u128::into_repr(<span class="kw-2">*</span>x);
+            <span class="kw">let </span>repr = u128::into_repr(<span class="kw-2">*</span>x).unwrap();
             <span class="macro">assert_eq!</span>(repr.as_str(), x.to_string());
         }
     }
@@ -1105,7 +1115,7 @@
         <span class="kw">let </span>vals = [i128::MIN, i128::MIN + <span class="number">1</span>, <span class="number">0</span>, <span class="number">42</span>, i128::MAX - <span class="number">1</span>, i128::MAX];
 
         <span class="kw">for </span>x <span class="kw">in </span><span class="kw-2">&amp;</span>vals {
-            <span class="kw">let </span>repr = i128::into_repr(<span class="kw-2">*</span>x);
+            <span class="kw">let </span>repr = i128::into_repr(<span class="kw-2">*</span>x).unwrap();
             <span class="macro">assert_eq!</span>(repr.as_str(), x.to_string());
         }
     }
