@@ -10,8 +10,6 @@ use std::sync::{
     Mutex,
 };
 
-//use std::path::Path;
-
 use std::thread;
 use std::time::{
     Duration,
@@ -41,30 +39,24 @@ use crossbeam_channel::{unbounded,
 
 use ratatui::prelude::Alignment;
 use ratatui::{
-    backend::CrosstermBackend,
-    //terminal::Frame,
-    Frame,
-    layout::{
-        Constraint,
-        Direction,
-        Layout,
-        Rect
-    },
-    style::{
-        Color,
-        Style,
-    },
-    widgets::{
-        Paragraph,
-        Block,
-        Borders,
-    },
-    Terminal,
+  backend::CrosstermBackend,
+  //terminal::Frame,
+  Frame,
+  style::{
+      Color,
+      Style,
+  },
+  widgets::{
+      Paragraph,
+      Block,
+      Borders,
+  },
+  Terminal,
 };
 
 use tof_dataclasses::packets::{
     TofPacket,
-    PacketType
+    //PacketType
 };
 
 use tof_dataclasses::database::{
@@ -77,7 +69,7 @@ use tof_dataclasses::database::{
 
 use tof_dataclasses::serialization::{
     Serialization,
-    Packable,
+    //Packable,
 };
 use tof_dataclasses::events::{
     MasterTriggerEvent,
@@ -87,52 +79,62 @@ use tof_dataclasses::events::{
     TofEventSummary,
     //RBWaveform,
 };
+
+use tof_dataclasses::io::{
+  TofPacketWriter,
+  FileType
+};
+
 use tof_dataclasses::calibrations::RBCalibrations;
-//use liftof_lib::settings::LiftofSettings;
+use liftof_lib::settings::LiftofSettings;
 
 use liftof_tui::menu::{
-    UIMenuItem,
-    MenuItem,
-    MainMenu,
-    TriggerMenu,
-    EventMenu,
-    MoniMenu,
-    ActiveMenu,
-    RBMenu2,
-    UIMenu,
-    PAMoniMenu,
-    SettingsMenu,
-    THMenu,
-    TSMenu,
-    //TSMenuItem,
-    RWMenu,
-    HBMenu,
-    //RWMenuItem,
+  UIMenuItem,
+  MenuItem,
+  MainMenu,
+  TriggerMenu,
+  EventMenu,
+  MoniMenu,
+  ActiveMenu,
+  RBMenu2,
+  UIMenu,
+  PAMoniMenu,
+  SettingsMenu,
+  THMenu,
+  TSMenu,
+  RWMenu,
+  HBMenu,
+  TelemetryMenu,
 };
 
 use liftof_tui::colors::{
-    ColorSet,
-    ColorTheme,
-    COLORSETBW, // current default (valkyrie)
-    //COLORSETOMILU
+  ColorSet,
+  ColorTheme,
+  COLORSETBW, // current default (valkyrie)
+  //COLORSETOMILU
 };
 
 use liftof_tui::{
-    EventTab,
-    HomeTab,
-    SettingsTab,
-    TofHitTab,
-    RBTab,
-    RBTabView,
-    MTTab,
-    CPUTab,
-    //RBWaveformTab,
-    TofSummaryTab, 
-    TelemetryTab,
-    CommandTab,
-    PaddleTab,
-    HeartBeatTab,
-    HeartBeatView
+  MainLayout,
+  EventTab,
+  HomeTab,
+  SettingsTab,
+  TofHitTab,
+  RBTab,
+  RBTabView,
+  MTTab,
+  CPUTab,
+  //RBWaveformTab,
+  TofSummaryTab, 
+  TelemetryTab,
+  TelemetryTabView,
+  CommandTab,
+  PaddleTab,
+  HeartBeatTab,
+  HeartBeatView,
+  //packet_sorter,
+  packet_distributor,
+  socket_wrap_tofstream
 };
 
 
@@ -209,55 +211,6 @@ cfg_if::cfg_if! {
   }
 }
 
-
-/// ZMQ socket wrapper for the zmq socket which is 
-/// supposed to receive data from the TOF system.
-fn socket_wrap_tofstream(address   : &str,
-                         tp_sender : Sender<TofPacket>) {
-  let ctx = zmq::Context::new();
-  // FIXME - don't hardcode this IP
-  let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
-  socket.connect(address).expect("Unable to connect to data (PUB) socket {adress}");
-  socket.set_subscribe(b"").expect("Can't subscribe to any message on 0MQ socket!");
-  //let mut n_pack = 0usize;
-  info!("0MQ SUB socket connected to address {address}");
-  // per default, we create master trigger packets from TofEventSummary, 
-  // except we have "real" mtb packets
-  //let mut craft_mte_packets = true;
-  loop {
-    match socket.recv_bytes(0) {
-      Err(err) => error!("Can't receive TofPacket! {err}"),
-      Ok(payload)    => {
-        match TofPacket::from_bytestream(&payload, &mut 0) {
-          Ok(tp) => {
-            match tp_sender.send(tp) {
-              Ok(_) => (),
-              Err(err) => error!("Can't send TofPacket over channel! {err}")
-            }
-          }
-          Err(err) => {
-            debug!("Can't decode payload! {err}");
-            // that might have an RB prefix, forward 
-            // it 
-            match TofPacket::from_bytestream(&payload, &mut 4) {
-              Err(err) => {
-                error!("Don't understand bytestream! {err}"); 
-              },
-              Ok(tp) => {
-                match tp_sender.send(tp) {
-                  Ok(_) => (),
-                  Err(err) => error!("Can't send TofPacket over channel! {err}")
-                }
-              }
-            }
-          }  
-        }
-      }
-    }
-  }
-}
-
-
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {
@@ -275,16 +228,18 @@ struct Args {
   /// --features=telemetry
   #[arg(short, long, default_value_t = false)]
   from_telemetry : bool,
+  /// Capture the packets and save them in .tof.gaps files
+  #[arg(long, default_value_t = false)]
+  capture        : bool,
   /// Allow to control the liftof-cc server with commands
   /// WARNING - this is an expert feature. Only use if 
   /// you are know what you are doing
   #[arg(long, default_value_t = false)]
-  allow_commands : bool
-
-  ///// generic liftof config file. If not given, we 
-  ///// assume liftof-config.toml in this directory
-  //#[arg(short, long)]
-  //config: Option<String>,
+  allow_commands : bool,
+  /// generic liftof config file. If not given, we 
+  /// assume liftof-config.toml in this directory
+  #[arg(short, long)]
+  config: Option<String>,
 }
 
 enum Event<I> {
@@ -313,284 +268,6 @@ fn render_logs<'a>(theme : ColorTheme) -> TuiLoggerWidget<'a> {
     .style(theme.style())
 }
 
-#[derive(Debug, Clone)]
-pub struct MainLayout {
-  pub menu : Rect,
-  pub main : Rect,
-  pub log  : Rect,
-  pub help : Rect
-  //pub rect : Vec<Rect>
-}
-
-impl MainLayout {
-
-  fn new(size : Rect) -> MainLayout {
-    let chunks = Layout::default()
-    .direction(Direction::Vertical)
-    //.margin(1)
-    .constraints(
-      [
-        Constraint::Length(3),
-        Constraint::Min(2),
-        Constraint::Length(5),
-      ]
-      .as_ref(),
-    )
-    .split(size);
-    // logs and help
-    let logs_n_help = Layout::default()
-    .direction(Direction::Horizontal)
-    .constraints(
-      [Constraint::Percentage(80),
-       Constraint::Percentage(20)]
-       .as_ref(),
-    )
-    .split(chunks[2]);  
-    MainLayout {
-      //rect : chunks.to_vec()
-      menu : chunks[0],
-      main : chunks[1],
-      log  : logs_n_help[0],
-      help : logs_n_help[1],
-    }
-  }
-}
-
-
-/// Just produce a summary of all the packets we received
-fn packet_sorter(packet_type : &PacketType,
-                 packet_map  : &Arc<Mutex<HashMap<String,usize>>>) {
-  match packet_map.lock() {
-    Ok(mut pm) => {
-      match packet_type {
-        PacketType::Unknown            => {
-          *pm.get_mut("Unknown").unwrap() += 1;
-        },
-        PacketType::RBEvent            => { 
-          *pm.get_mut("RBEvent").unwrap() += 1;
-        },
-        PacketType::TofEvent           => { 
-          *pm.get_mut("TofEvent").unwrap() += 1;
-        },
-        PacketType::HeartBeatDataSink  => { 
-          *pm.get_mut("HeartBeatDataSink").unwrap() += 1;
-        },
-        PacketType::MTBHeartbeat => {
-          *pm.get_mut("MTBHeartbeat").unwrap() += 1;
-        }
-        PacketType::EVTBLDRHeartbeat => { 
-          *pm.get_mut("EVTBLDRHeartbeat").unwrap() += 1;
-        }
-        PacketType::MasterTrigger      => { 
-          *pm.get_mut("MasterTrigger").unwrap() += 1;
-        },
-        PacketType::RBEventHeader      => { 
-          *pm.get_mut("RBEventHeader").unwrap() += 1;
-        },
-        PacketType::CPUMoniData      => { 
-          *pm.get_mut("CPUMoniData").unwrap() += 1;
-        },
-        PacketType::MonitorMtb         => { 
-          *pm.get_mut("MonitorMtb").unwrap() += 1;
-        },
-        PacketType::RBMoniData         => { 
-          *pm.get_mut("RBMoniData").unwrap() += 1;
-        },
-        PacketType::RBEventMemoryView  => { 
-          *pm.get_mut("RBEventMemoryView").unwrap() += 1;
-        },
-        PacketType::RBCalibration      => { 
-          *pm.get_mut("RBCalibration").unwrap() += 1;
-        },
-        PacketType::TofCommand         => { 
-          *pm.get_mut("TofCommand").unwrap() += 1;
-        },
-        PacketType::TofResponse        => {
-          *pm.get_mut("TofResponse").unwrap() += 1;
-        },
-        PacketType::RBCommand          => { 
-          *pm.get_mut("RBCommand").unwrap() += 1;
-        },
-        PacketType::PAMoniData         => { 
-          *pm.get_mut("PAMoniData").unwrap() += 1;
-        },
-        PacketType::PBMoniData         => { 
-          *pm.get_mut("PBMoniData").unwrap() += 1;
-        },
-        PacketType::LTBMoniData        => { 
-          *pm.get_mut("LTBMoniData").unwrap() += 1;
-        },
-        PacketType::MultiPacket        => { 
-          *pm.get_mut("MultiPacket").unwrap() += 1;
-        },
-        PacketType::RBWaveform        => { 
-          *pm.get_mut("RBWaveform").unwrap() += 1;
-        },
-        PacketType::TofEventSummary        => { 
-          *pm.get_mut("TofEventSummary").unwrap() += 1;
-        },
-        PacketType::RBPing               => {
-          *pm.get_mut("RBPing").unwrap() += 1;
-        }
-        _ => {
-          error!("Packet type {packet_type} currently not supported!");
-        }
-      }
-    },
-    Err(err) => {
-      error!("Can't lock shared memory! {err}");
-    }
-  }
-}
-
-/// Receive packets from an IP address
-/// and distrubute them to their receivers
-/// while taking notes of everything
-///
-/// This is a Pablo Pubsub kind of persona
-/// (see a fantastic talk at RustConf 2023)
-fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
-                      tp_sender_mt : Sender<TofPacket>,
-                      tp_sender_rb : Sender<TofPacket>,
-                      tp_sender_ev : Sender<TofPacket>,
-                      tp_sender_cp : Sender<TofPacket>,
-                      tp_sender_tr : Sender<TofPacket>,
-                      rbwf_sender  : Sender<TofPacket>,
-                      ts_send      : Sender<TofEventSummary>,
-                      th_send      : Sender<TofHit>,
-                      tp_sender_hb : Sender<TofPacket>,
-                      str_list     : Arc<Mutex<VecDeque<String>>>,
-                      pck_map      : Arc<Mutex<HashMap<String, usize>>>) {
-  let mut n_pack = 0usize;
-  // per default, we create master trigger packets from TofEventSummary, 
-  // except we have "real" mtb packets
-  let mut craft_mte_packets = true;
-
-  loop {
-    //match data_socket.recv_bytes(0) {
-    match tp_from_sock.recv() {
-      Err(err) => error!("Can't receive TofPacket! {err}"),
-      Ok(tp) => {
-        //println!("{:?}", pck_map);
-        packet_sorter(&tp.packet_type, &pck_map);
-        n_pack += 1;
-        //println!("Got TP {}", tp);
-        match str_list.lock() {
-          Err(err) => error!("Can't lock shared memory! {err}"),
-          Ok(mut _list)    => {
-            //let prefix  = String::from_utf8(payload[0..4].to_vec()).expect("Can't get prefix!");
-            //let message = format!("{}-{} {}", n_pack,prefix, tp.to_string());
-            let message = format!("{} : {}", n_pack, tp);
-            _list.push_back(message);
-          }
-        }
-        match tp.packet_type {
-          PacketType::TofResponse => { 
-            match tp_sender_tr.send(tp) {
-              Err(err) => error!("Can't send TP! {err}"),
-              Ok(_)    => (),
-            }
-          }
-          PacketType::MonitorMtb |
-          PacketType::MasterTrigger => {
-            // apparently, we are getting MasterTriggerEvents, 
-            // sow we won't be needing to craft them from 
-            // TofEventSummary packets
-            if tp.packet_type == PacketType::MasterTrigger {
-              craft_mte_packets = false;
-            }
-            match tp_sender_mt.send(tp) {
-              Err(err) => error!("Can't send TP! {err}"),
-              Ok(_)    => (),
-            }
-          },
-          PacketType::RBWaveform => {
-            match rbwf_sender.send(tp) {
-              Err(err) => error!("Can't send TP! {err}"),
-              Ok(_)    => (),
-            }
-          }
-          PacketType::TofEventSummary => {
-            match TofEventSummary::from_tofpacket(&tp) {
-              Err(err) => {
-                error!("Unable to unpack TofEventSummary! {err}");
-              }
-              Ok(ts) => {
-                if craft_mte_packets {
-                  let mte    = MasterTriggerEvent::from(&ts);
-                  let mte_tp = mte.pack();
-                  //error!("We are sending the following tp {}", mte_tp);
-                  match tp_sender_mt.send(mte_tp) {
-                    Err(err) => error!("Can't send MTE TP! {err}"),
-                    Ok(_)    => ()
-                  }
-                }
-                for h in &ts.hits {
-                  match th_send.send(*h) {
-                    Err(err) => error!("Can't send TP! {err}"),
-                    Ok(_)    => (),
-                  }
-                }
-                match ts_send.send(ts) {
-                  Err(err) => error!("Can't send TP! {err}"),
-                  Ok(_)    => (),
-                }
-              }
-            }
-          }
-          PacketType::TofEvent => {
-            // since the tof event contains MTEs, we don't need
-            // to craft them
-            craft_mte_packets = false;
-            match tp_sender_ev.send(tp) {
-              Err(err) => error!("Can't send TP! {err}"),
-              Ok(_)    => (),
-            }
-            // Disasemble the packets
-            //match TofEvent::from_bytestream(tp.payload, &mut 0) {
-            //  Err(err) => {
-            //    error!("Can't decode TofEvent");
-            //  },
-            //  Ok(ev) => {
-            //    //for rbev in ev.rb_events {
-            //    //  let 
-            //    //  match tp_sender_rb.send
-            //    //}
-            //  }
-            //}
-          }
-          PacketType::RBEvent |
-          PacketType::RBEventMemoryView | 
-          PacketType::LTBMoniData |
-          PacketType::PAMoniData  |
-          PacketType::PBMoniData  |
-          PacketType::RBMoniData => {
-            match tp_sender_rb.send(tp) {
-              Err(err) => error!("Can't send TP! {err}"),
-              Ok(_)    => (),
-            }
-          }
-          PacketType::CPUMoniData => {
-            match tp_sender_cp.send(tp) {
-              Err(err) => error!("Can't send TP! {err}"),
-              Ok(_)    => (),
-            }
-          }
-          PacketType::HeartBeatDataSink |
-          PacketType::EVTBLDRHeartbeat  | 
-          PacketType::MTBHeartbeat      => {
-            match tp_sender_hb.send(tp) {
-              Err(err) => error!("Can't send TP! {err}"),
-              Ok(_)    => {
-              },
-            }
-          }
-          _ => () 
-        }
-      }
-    } 
-  }
-}
 
 // make a "holder" for all the tabs and menus, 
 // so that it can be put in an Arc(Mutex), so
@@ -607,6 +284,7 @@ pub struct TabbedInterface<'a> {
   pub te_menu       :  EventMenu<'a>,
   pub mo_menu       :  MoniMenu<'a>,
   pub hb_menu       :  HBMenu<'a>,
+  pub tl_menu       :  TelemetryMenu<'a>,
   pub active_menu   :  ActiveMenu,
 
   // The tabs
@@ -615,7 +293,7 @@ pub struct TabbedInterface<'a> {
   // waifu tab
   pub wf_tab        : RBTab<'a>,
   pub settings_tab  : SettingsTab<'a>,
-  pub home_tab      : HomeTab,
+  pub home_tab      : HomeTab<'a>,
   pub event_tab     : EventTab,
   pub cmd_tab       : CommandTab<'a>,
 
@@ -625,7 +303,7 @@ pub struct TabbedInterface<'a> {
   pub ts_tab        : TofSummaryTab,
   
   // telemetry 
-  pub te_tab        : TelemetryTab,
+  pub te_tab        : TelemetryTab<'a>,
 
   // paddles 
   pub pd_tab        : PaddleTab<'a>,
@@ -650,22 +328,22 @@ impl<'a> TabbedInterface<'a> {
              te_menu      : EventMenu<'a>,
              mo_menu      : MoniMenu<'a>,
              hb_menu      : HBMenu<'a>,
+             tl_menu      : TelemetryMenu<'a>,
              active_menu  : ActiveMenu,
              mt_tab       : MTTab,
              cpu_tab      : CPUTab,
              wf_tab       : RBTab<'a>,
              settings_tab : SettingsTab<'a>,
-             home_tab     : HomeTab,
+             home_tab     : HomeTab<'a>,
              event_tab    : EventTab,
              th_tab       : TofHitTab<'a>,
              //rbwf_tab     : RBWaveformTab,
              ts_tab       : TofSummaryTab,
-             te_tab       : TelemetryTab,
+             te_tab       : TelemetryTab<'a>,
              cmd_tab      : CommandTab<'a>,
              hb_tab       : HeartBeatTab,
              pd_tab       : PaddleTab<'a>) -> Self {
     Self {
-
       ui_menu     ,
       rb_menu     , 
       mt_menu     , 
@@ -677,6 +355,7 @@ impl<'a> TabbedInterface<'a> {
       te_menu     ,
       mo_menu     ,
       hb_menu     ,
+      tl_menu     ,
       active_menu ,
       mt_tab      , 
       cpu_tab     , 
@@ -754,6 +433,7 @@ impl<'a> TabbedInterface<'a> {
     self.th_menu.theme.update(&cs);
     self.te_menu.theme.update(&cs);
     self.hb_menu.theme.update(&cs);
+    self.tl_menu.theme.update(&cs);
     self.home_tab    .theme.update(&cs);
     self.event_tab   .theme.update(&cs);
     self.wf_tab      .theme.update(&cs);
@@ -814,10 +494,10 @@ impl<'a> TabbedInterface<'a> {
     }
   }
 
-  //pub fn render_cpu(&mut self, master_lo : &mut MainLayout, frame : &mut Frame) {
-  //  self.ui_menu.render(&master_lo.rect[0], frame);
-  //  self.cpu_tab.render(&master_lo.rect[1], frame);
-  //}
+  pub fn render_cpu(&mut self, master_lo : &mut MainLayout, frame : &mut Frame) {
+    self.ui_menu.render(&master_lo.menu, frame);
+    self.cpu_tab.render(&master_lo.main, frame);
+  }
   
   pub fn render_mt(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
     self.ui_menu.render(&main_lo.menu, frame);
@@ -945,16 +625,20 @@ impl<'a> TabbedInterface<'a> {
   //}
   
   pub fn render_telemetrytab(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
-    //self.ts_menu.render(&master_lo.rect[0], frame);
-    self.ui_menu.render(&main_lo.menu, frame);
+    match self.active_menu {
+      ActiveMenu::Telemetry => {
+        self.tl_menu.render(&main_lo.menu, frame);
+      }
+      _ => {
+        self.ui_menu.render(&main_lo.menu, frame);
+      }
+    }
     self.te_tab.render(&main_lo.main, frame);
   }
 
   pub fn render(&mut self,
                 main_lo : &mut MainLayout,
                 frame   : &mut Frame) {
-    
-
     match self.active_menu {
       ActiveMenu::MainMenu => {
         match self.ui_menu.get_active_menu_item() {
@@ -972,7 +656,8 @@ impl<'a> TabbedInterface<'a> {
             self.render_mt(main_lo, frame);
           }
           UIMenuItem::Monitoring => {
-            self.render_home(main_lo, frame);
+            self.render_cpu(main_lo, frame);
+            //self.render_home(main_lo, frame);
           }
           UIMenuItem::Telemetry => {
             self.render_telemetrytab(main_lo, frame);
@@ -1006,6 +691,9 @@ impl<'a> TabbedInterface<'a> {
       }
       ActiveMenu::Heartbeats => {
         self.render_heartbeats(main_lo, frame);
+      }
+      ActiveMenu::Telemetry => {
+        self.render_telemetrytab(main_lo, frame);
       }
       ActiveMenu::Events => {
         match self.te_menu.active_menu_item {
@@ -1140,6 +828,16 @@ impl<'a> TabbedInterface<'a> {
               _ => ()
             }
           }
+          ActiveMenu::Telemetry => {
+            match self.tl_menu.get_active_menu_item() {
+              UIMenuItem::Back => {
+                self.ui_menu.set_active_menu_item(UIMenuItem::Telemetry);
+                self.ui_menu.active_menu_item = MenuItem::ReadoutBoards;
+                self.active_menu = ActiveMenu::MainMenu;
+              }
+              _ => ()
+            }
+          }
           ActiveMenu::MainMenu => {
             match self.ui_menu.get_active_menu_item() {
               UIMenuItem::ReadoutBoards => {
@@ -1161,6 +859,9 @@ impl<'a> TabbedInterface<'a> {
               }
               UIMenuItem::Heartbeats => {
                 self.active_menu = ActiveMenu::Heartbeats;
+              }
+              UIMenuItem::Telemetry => {
+                self.active_menu = ActiveMenu::Telemetry;
               }
               UIMenuItem::Commands => {
                 self.cmd_tab.send_command(); 
@@ -1232,6 +933,18 @@ impl<'a> TabbedInterface<'a> {
               _ => ()
             }
           }
+          ActiveMenu::Telemetry => {
+            self.tl_menu.next();
+            match self.tl_menu.get_active_menu_item() {
+              UIMenuItem::Stream => {
+                self.te_tab.view = TelemetryTabView::Stream; 
+              }
+              UIMenuItem::MergedEvents => {
+                self.te_tab.view = TelemetryTabView::MergedEvents; 
+              }
+              _ => ()
+            }
+          }
           //ActiveMenu::Trigger => {
           //  self.mt_menu.next();
           //}
@@ -1289,6 +1002,18 @@ impl<'a> TabbedInterface<'a> {
           }
           ActiveMenu::Monitoring => {
             self.mo_menu.prev();
+          }
+          ActiveMenu::Telemetry => {
+            self.tl_menu.prev();
+            match self.tl_menu.get_active_menu_item() {
+              UIMenuItem::Stream => {
+                self.te_tab.view = TelemetryTabView::Stream; 
+              }
+              UIMenuItem::MergedEvents => {
+                self.te_tab.view = TelemetryTabView::MergedEvents; 
+              }
+              _ => ()
+            }
           }
           ActiveMenu::Heartbeats => {
             self.hb_menu.prev();
@@ -1383,6 +1108,33 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   
   let args = Args::parse();                   
   let allow_commands = args.allow_commands;
+  
+  let config          : LiftofSettings;
+  match args.config {
+    None => {
+      match LiftofSettings::from_toml("liftof-config.toml") {
+        Err(err) => {
+          error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+          panic!("Unable to parse config file!");
+        }
+        Ok(_cfg) => {
+          config = _cfg;
+        }
+      }
+    }
+    Some(cfg_file) => {
+      //cfg_file_str = cfg_file.clone();
+      match LiftofSettings::from_toml(&cfg_file) {
+        Err(err) => {
+          error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+          panic!("Unable to parse config file!");
+        }
+        Ok(_cfg) => {
+          config = _cfg;
+        }
+      }
+    } // end Some
+  } // end match
 
   let home_stream_wd_cnt : Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
   let home_streamer      = home_stream_wd_cnt.clone();
@@ -1415,32 +1167,10 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   for pdl in paddles {
     paddle_map.insert(pdl.paddle_id as u8, pdl.clone());
   }
-  let mut pm = HashMap::<String, usize>::new();
-  pm.insert(String::from("Unknown"          ) ,0);
-  pm.insert(String::from("RBEvent"          ) ,0); 
-  pm.insert(String::from("TofEvent"         ) ,0); 
-  pm.insert(String::from("HeartBeatDataSink") ,0); 
-  pm.insert(String::from("MTBHeartbeat"     ) ,0); 
-  pm.insert(String::from("EVTBLDRHeartbeat" ) ,0); 
-  pm.insert(String::from("MasterTrigger"    ) ,0);
-  pm.insert(String::from("RBEventHeader"    ) ,0);
-  pm.insert(String::from("CPUMoniData"      ) ,0); 
-  pm.insert(String::from("MonitorMtb"       ) ,0); 
-  pm.insert(String::from("RBMoniData"       ) ,0); 
-  pm.insert(String::from("PAMoniData"       ) ,0); 
-  pm.insert(String::from("PBMoniData"       ) ,0); 
-  pm.insert(String::from("LTBMoniData"      ) ,0); 
-  pm.insert(String::from("RBEventMemoryView") ,0); 
-  pm.insert(String::from("RBCalibration"    ) ,0); 
-  pm.insert(String::from("TofCommand"       ) ,0); 
-  pm.insert(String::from("TofResponse"      ) ,0); 
-  pm.insert(String::from("RBCommand"        ) ,0); 
-  pm.insert(String::from("MultiPacket"      ) ,0); 
-  pm.insert(String::from("RBPing"           ) ,0); 
-  pm.insert(String::from("RBWaveform"       ) ,0); 
-  pm.insert(String::from("TofEventSummary"  ) ,0); 
-  
-  let packet_map : Arc<Mutex<HashMap<String, usize>>> = Arc::new(Mutex::new(pm));
+
+  // map for counting TofPackets
+  let pm = HashMap::<&str, usize>::new();
+  let packet_map : Arc<Mutex<HashMap<&str, usize>>> = Arc::new(Mutex::new(pm));
   let packet_map_home = packet_map.clone();
 
   // this determines the source of all TofPackets
@@ -1461,6 +1191,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (rbe_send, rbe_recv)         : (Sender<RBEvent>, Receiver<RBEvent>)                       = unbounded();
   let (th_send, th_recv)           : (Sender<TofHit>, Receiver<TofHit>)                         = unbounded();
   let (ts_send, ts_recv)           : (Sender<TofEventSummary>, Receiver<TofEventSummary>)       = unbounded();
+  // channel to send TofEventSummary from tofevent to paddle tab
+  let (ts_send_pdl, ts_recv_pdl)   : (Sender<TofEventSummary>, Receiver<TofEventSummary>)       = unbounded();
   let (te_send, te_recv)           : (Sender<TofEvent>, Receiver<TofEvent>)                     = unbounded();
 
   // send tof packets containing heartbeats
@@ -1504,6 +1236,15 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
 
   // FIXME - spawn a new thread per each tab!
   let th_sender_c = th_send.clone();
+  let mut writer : Option<TofPacketWriter> = None;
+  if args.capture{
+    info!("Capturing packets and write them to disk!");
+    let file_type = FileType::RunFile(0);
+    // FIXME - create "captured" directory
+    writer = Some(TofPacketWriter::new(String::from("."), file_type));
+    // FIXME - use value from config file
+    writer.as_mut().unwrap().mbytes_per_file = 420;
+  }
   let _packet_dist_thread = thread::Builder::new()
     .name("packet-distributor".into())
     .spawn(move || {
@@ -1519,7 +1260,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                          hb_pack_send,
                          home_stream_wd_cnt,
                          packet_map,
-                         );
+                         writer);
     }).expect("Failed to spawn mt packet receiver thread!");
   
   // spawn the telemetry receiver thread
@@ -1602,6 +1343,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let te_menu         = EventMenu::new(color_theme.clone());
   let mo_menu         = MoniMenu::new(color_theme.clone());
   let hb_menu         = HBMenu::new(color_theme.clone());
+  let tl_menu         = TelemetryMenu::new(color_theme.clone());
   // The tabs
   let mt_tab          = MTTab::new(mt_pack_recv,
                                    mte_recv,
@@ -1624,6 +1366,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //                                         readoutboards,
   //                                         color_theme.clone());
   let ts_tab          = TofSummaryTab::new(ts_recv,
+                                           ts_send_pdl,
                                            &dsijch_paddle_map,
                                            color_theme.clone());
   let te_tab          : TelemetryTab;
@@ -1640,7 +1383,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   }
   let cmd_sender_addr = String::from("tcp://192.168.37.5:42000");
   let cmd_tab         = CommandTab::new(tr_pack_recv, cmd_sender_addr, color_theme.clone(), allow_commands);
-  let pd_tab          = PaddleTab::new(te_recv, paddle_map, rbcalibrations, color_theme.clone());
+  let pd_tab          = PaddleTab::new(ts_recv_pdl, rbwf_pack_recv, paddle_map, rbcalibrations, color_theme.clone());
   let hb_tab          = HeartBeatTab::new(hb_pack_recv, color_theme.clone());
   let active_menu     = ActiveMenu::MainMenu;
   let tabs            = TabbedInterface::new(ui_menu,
@@ -1654,6 +1397,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                              te_menu,
                                              mo_menu,
                                              hb_menu,
+                                             tl_menu,
                                              active_menu,
                                              mt_tab,
                                              cpu_tab,

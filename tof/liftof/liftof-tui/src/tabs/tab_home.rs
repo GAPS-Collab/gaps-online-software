@@ -33,19 +33,19 @@ use crate::colors::ColorTheme;
 
 
 #[derive(Debug, Clone)]
-pub struct HomeTab {
+pub struct HomeTab<'a> {
   pub theme      : ColorTheme,
   pub streamer   : Arc<Mutex<VecDeque<String>>>,
-  pub pack_stat  : Arc<Mutex<HashMap<String, usize>>>,
+  pub pack_stat  : Arc<Mutex<HashMap<&'a str, usize>>>,
   pub stream     : String,
   pub stream_max : usize, 
   start_time     : Instant,
 }
 
-impl HomeTab {
+impl HomeTab<'_> {
   pub fn new(theme     : ColorTheme,
              streamer  : Arc<Mutex<VecDeque<String>>>,
-             pack_stat : Arc<Mutex<HashMap<String,usize>>>) -> HomeTab {
+             pack_stat : Arc<Mutex<HashMap<&str,usize>>>) -> HomeTab {
     HomeTab {
       theme,
       streamer, 

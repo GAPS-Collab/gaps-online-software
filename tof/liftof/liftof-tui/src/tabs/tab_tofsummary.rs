@@ -1,6 +1,9 @@
 use std::collections::VecDeque;
 
-use crossbeam_channel::Receiver;
+use crossbeam_channel::{
+  Sender,
+  Receiver
+};
 
 //extern crate ndhistogram;
 use ndhistogram::{
@@ -65,6 +68,8 @@ use crate::widgets::{
 #[derive(Debug, Clone)]
 pub struct TofSummaryTab {
   pub ts_receiver     : Receiver<TofEventSummary>,
+  /// pass our events on when we are done with them!
+  pub ts_sender       : Sender<TofEventSummary>,
   pub summary_queue   : VecDeque<TofEventSummary>,
   pub queue_size      : usize,
   pub n_trg_pdl_histo : Hist1D<Uniform<f32>>, 
@@ -84,6 +89,7 @@ pub struct TofSummaryTab {
 
 impl TofSummaryTab {
   pub fn new(ts_receiver  : Receiver<TofEventSummary>,
+             ts_sender    : Sender<TofEventSummary>,
              dsijchpidmap : &DsiJChPidMapping,
              theme        : ColorTheme) -> Self {
     
@@ -91,6 +97,7 @@ impl TofSummaryTab {
     let mhg_bins      = Uniform::new(160, 0.0, 160.0).unwrap();
     Self {
       ts_receiver     : ts_receiver,
+      ts_sender       : ts_sender,
       summary_queue   : VecDeque::<TofEventSummary>::new(),
       queue_size      : 10000,
       n_trg_pdl_histo : ndhistogram!(bins),
@@ -143,9 +150,13 @@ impl TofSummaryTab {
           self.evid_test_info += &(format!("\n-- -- previous: {:?}", self.evid_test_chnks));
           self.event_id_test.clear();
         }
-        self.summary_queue.push_back(ts);
+        self.summary_queue.push_back(ts.clone());
         if self.summary_queue.len() > self.queue_size {
           self.summary_queue.pop_front();
+        }
+        match self.ts_sender.send(ts) {
+          Ok(_)    => (),
+          Err(err) => error!("Unable to pass on TofEvent! {err}")
         }
       }
     }

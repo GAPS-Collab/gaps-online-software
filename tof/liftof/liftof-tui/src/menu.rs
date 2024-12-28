@@ -22,6 +22,7 @@ pub enum ActiveMenu {
   Events,
   Monitoring,
   Heartbeats,
+  Telemetry,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -109,7 +110,10 @@ pub enum UIMenuItem {
   DataSenderHB,
   // Selection
   Yes,
-  No
+  No,
+  // TelemetryMenu
+  Stream,
+  MergedEvents
 }
 
 impl UIMenuItem {
@@ -150,7 +154,9 @@ impl UIMenuItem {
       UIMenuItem::TriggerHB      => String::from("TriggerHB"),
       UIMenuItem::DataSenderHB   => String::from("DataSenderHB"),
       UIMenuItem::Yes            => String::from("Yes"),
-      UIMenuItem::No             => String::from("No")
+      UIMenuItem::No             => String::from("No"),
+      UIMenuItem::Stream         => String::from("Stream"),
+      UIMenuItem::MergedEvents   => String::from("MergedEvents"),
     // _ => String::from("Unknown"),
     } 
   }
@@ -236,6 +242,7 @@ impl UIMenu<'_> for MainMenu<'_> {
                      UIMenuItem::Trigger,
                      UIMenuItem::Alerts,
                      UIMenuItem::Heartbeats,
+                     UIMenuItem::Monitoring,
                      UIMenuItem::Telemetry,
                      UIMenuItem::Commands,
                      UIMenuItem::Settings,
@@ -259,9 +266,6 @@ impl UIMenu<'_> for MainMenu<'_> {
     self.active_index
   }
   
-  //fn get_titles(&self) -> Vec<Line> {
-  //  self.titles.clone()
-  //}
   fn get_active_menu_item(&self) -> UIMenuItem {
     self.active_menu_item2
   }
@@ -321,10 +325,6 @@ impl UIMenu<'_> for RBMenu2<'_> {
   fn set_active_menu_item(&mut self, item : UIMenuItem) {
     self.active_menu_item2 = item;
   }
-  
-  //fn get_titles(&self) -> Vec<Line> {
-  //  self.titles.clone()
-  //}
   
   fn get_active_menu_item(&self) -> UIMenuItem {
     match self.active_index {
@@ -491,8 +491,7 @@ impl UIMenu<'_> for PaddleMenu<'_> {
   fn get_items() -> Vec<UIMenuItem> {
     let items = vec![UIMenuItem::Back,
                      UIMenuItem::Signal,
-                     UIMenuItem::RecoVars,
-                     UIMenuItem::Quit];
+                     UIMenuItem::RecoVars];
     items
   }
 
@@ -573,6 +572,60 @@ impl UIMenu<'_> for HBMenu<'_> {
 }
 
 impl HBMenu<'_> {
+
+  pub fn new(theme : ColorTheme) -> Self {
+    let theme_c = theme.clone();
+    let titles  = Self::get_titles(theme_c);
+    Self {
+      theme,
+      active_index : 0,
+      titles,
+      active_menu_item : UIMenuItem::Back,
+    }
+  }
+}
+
+//============================================
+
+#[derive(Debug, Clone)]
+pub struct TelemetryMenu<'a>  {
+  pub theme            : ColorTheme,
+  pub active_menu_item : UIMenuItem,
+  pub active_index     : usize, 
+  pub titles           : Vec<Line<'a>>,
+}
+
+impl UIMenu<'_> for TelemetryMenu<'_> {
+  
+  fn get_items() -> Vec<UIMenuItem> {
+    let items = vec![UIMenuItem::Back,
+                     UIMenuItem::Stream,
+                     UIMenuItem::MergedEvents];
+    items
+  }
+
+  fn get_theme(&self) -> ColorTheme {
+    self.theme
+  }
+
+  fn set_active_idx(&mut self, idx : usize) {
+    self.active_index = idx;
+  }
+
+  fn get_active_idx(&self) -> usize {
+    self.active_index
+  }
+  
+  fn set_active_menu_item(&mut self, item : UIMenuItem) {
+    self.active_menu_item = item;
+  }
+  
+  fn get_active_menu_item(&self) -> UIMenuItem {
+    self.active_menu_item
+  }
+}
+
+impl TelemetryMenu<'_> {
 
   pub fn new(theme : ColorTheme) -> Self {
     let theme_c = theme.clone();

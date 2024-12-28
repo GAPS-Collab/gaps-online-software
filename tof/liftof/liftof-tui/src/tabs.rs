@@ -18,16 +18,17 @@ pub use crate::tab_home::HomeTab;
 pub use crate::tab_events::EventTab;
 pub use crate::tab_paddles::PaddleTab;
 pub use crate::tab_heartbeats::{
-    HeartBeatTab,
-    HeartBeatView
+  HeartBeatTab,
+  HeartBeatView
 };
 pub use crate::tab_rbs::{
-    RBTab,
-    RBTabView,
-    RBLTBListFocus,
+  RBTab,
+  RBTabView,
+  RBLTBListFocus,
 };
 pub use crate::tab_telemetry::{
-    TelemetryTab
+  TelemetryTab,
+  TelemetryTabView,
 };
 
 
