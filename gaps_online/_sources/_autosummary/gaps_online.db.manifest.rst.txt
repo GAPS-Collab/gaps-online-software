@@ -1,0 +1,15 @@
+gaps\_online.db.manifest
+========================
+
+.. automodule:: gaps_online.db.manifest
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_HG_for_LG
+      get_cube_paddles
+      get_tof_paddles
+      get_umbrella_paddles
+   

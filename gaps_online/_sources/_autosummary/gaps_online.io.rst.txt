@@ -1,0 +1,17 @@
+gaps\_online.io
+===============
+
+.. automodule:: gaps_online.io
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_telemetry_binaries
+      get_tof_binaries
+      get_ts_from_binfile
+      get_ts_from_toffile
+      grace_get_telemetry_binaries
+      safe_unpack_merged_event
+   

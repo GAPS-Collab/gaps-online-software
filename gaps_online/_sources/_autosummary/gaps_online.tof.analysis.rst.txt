@@ -1,0 +1,14 @@
+gaps\_online.tof.analysis
+=========================
+
+.. automodule:: gaps_online.tof.analysis
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      calc_rms
+      create_occupancy_dict
+      find_paddle
+   

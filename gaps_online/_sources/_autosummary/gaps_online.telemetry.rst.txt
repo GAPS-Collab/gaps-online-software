@@ -1,0 +1,12 @@
+gaps\_online.telemetry
+======================
+
+.. automodule:: gaps_online.telemetry
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      save_unpack_merged_event
+   

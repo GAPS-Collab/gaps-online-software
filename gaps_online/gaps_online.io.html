@@ -1,0 +1,712 @@
+
+<!DOCTYPE html>
+
+
+<html lang="python" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>gaps_online.io &#8212; gaps_online 0.10 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=5ebd55ad"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'gaps_online.io';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="python"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">gaps_online 0.10 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="_autosummary/gaps_online.html">
+    gaps_online
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="_autosummary/gaps_online.html">
+    gaps_online
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="_autosummary/gaps_online.io.html">gaps_online.io</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">gaps_online.io</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="gaps-online-io">
+<h1>gaps_online.io<a class="headerlink" href="#gaps-online-io" title="Link to this heading">#</a></h1>
+<p>input/output for TOF only data as well as telemetry files (&quot;.bin&quot;).</p>
+<section id="readers-writers">
+<h2>Readers/Writers<a class="headerlink" href="#readers-writers" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.io.</span></span><span class="sig-name descname"><span class="pre">TelemetryPacketReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Ellipsis</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.io.TelemetryPacketReader" title="Link to this definition">#</a></dt>
+<dd><p>Read the GAPS binary data stream, dubbed as &quot;telemetry&quot;</p>
+<p>These are binary files, typically with a name like RAW240716_094940.bin,
+where the numbers are the UTC timestamp when the file has been written.</p>
+<p>These telemetry files contains data seperated by delimiters, called &quot;packets&quot;.
+The TelemetryPacketReader will recognized the delimiters, and emit these 
+individual packets.</p>
+<p>When creating a new instalnce of TelemetryPacketReader, the intance will emit packets
+until the whole file is consumed. To re-use the same instance, call
+TelemetryPacketReader::rewind</p>
+<p># Arguments</p>
+<ul class="simple">
+<li><p>filename - the name of the binary file to be read</p></li>
+<li><dl class="simple">
+<dt>filter   - emit only TelemetryPackets of a certain type. If set to </dt><dd><p>TelemetryPacketType::Unknown, all packets will be emitted</p>
+</dd>
+</dl>
+</li>
+<li><p>start    - [NOT IMPLEMENTED]</p></li>
+<li><p>stop     - [NOT IMPLEMENTED]</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketReader.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><a class="headerlink" href="#gaps_online.io.TelemetryPacketReader.filter" title="Link to this definition">#</a></dt>
+<dd><p>Any filter will be selecting packets of only this type</p>
+<p>If all packets should be allowed, set the packet type to Unknown</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketReader.get_packet_index">
+<span class="sig-name descname"><span class="pre">get_packet_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.io.TelemetryPacketReader.get_packet_index" title="Link to this definition">#</a></dt>
+<dd><p>Return an inventory of packets in this file, where TelemetryPacketType is
+represented by its associtated integer</p>
+<p># Arguments
+* verbose    : print the associated TelemetryPacketTypes (names)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketReader.rewind">
+<span class="sig-name descname"><span class="pre">rewind</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.io.TelemetryPacketReader.rewind" title="Link to this definition">#</a></dt>
+<dd><p>&quot;Rewind&quot; the file, meaning set the cursor to the beginning again.</p>
+<p>All packets can be emitted again</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gaps_online.io.TofPacketReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.io.</span></span><span class="sig-name descname"><span class="pre">TofPacketReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Ellipsis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nevents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.io.TofPacketReader" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TofPacketReader.packet_index">
+<span class="sig-name descname"><span class="pre">packet_index</span></span><a class="headerlink" href="#gaps_online.io.TofPacketReader.packet_index" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.io.TofPacketReader.rewind">
+<span class="sig-name descname"><span class="pre">rewind</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.io.TofPacketReader.rewind" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="packets">
+<h2>Packets<a class="headerlink" href="#packets" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacket">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.io.</span></span><span class="sig-name descname"><span class="pre">TelemetryPacket</span></span><a class="headerlink" href="#gaps_online.io.TelemetryPacket" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacket.header">
+<span class="sig-name descname"><span class="pre">header</span></span><a class="headerlink" href="#gaps_online.io.TelemetryPacket.header" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacket.packet_type">
+<span class="sig-name descname"><span class="pre">packet_type</span></span><a class="headerlink" href="#gaps_online.io.TelemetryPacket.packet_type" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacket.payload">
+<span class="sig-name descname"><span class="pre">payload</span></span><a class="headerlink" href="#gaps_online.io.TelemetryPacket.payload" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.io.</span></span><span class="sig-name descname"><span class="pre">TelemetryPacketType</span></span><a class="headerlink" href="#gaps_online.io.TelemetryPacketType" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.Ack">
+<span class="sig-name descname"><span class="pre">Ack</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.Ack</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.Ack" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.AnyTofHK">
+<span class="sig-name descname"><span class="pre">AnyTofHK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.AnyTofHK</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.AnyTofHK" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.AnyTrackerHK">
+<span class="sig-name descname"><span class="pre">AnyTrackerHK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.AnyTrackerHK</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.AnyTrackerHK" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.BoringEvent">
+<span class="sig-name descname"><span class="pre">BoringEvent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.BoringEvent</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.BoringEvent" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.CardHKP">
+<span class="sig-name descname"><span class="pre">CardHKP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.CardHKP</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.CardHKP" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.CoolingHK">
+<span class="sig-name descname"><span class="pre">CoolingHK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.CoolingHK</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.CoolingHK" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.GPS">
+<span class="sig-name descname"><span class="pre">GPS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.GPS</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.GPS" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.GcuEvtBldSettings">
+<span class="sig-name descname"><span class="pre">GcuEvtBldSettings</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.GcuEvtBldSettings</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.GcuEvtBldSettings" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.GcuMon">
+<span class="sig-name descname"><span class="pre">GcuMon</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.GcuMon</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.GcuMon" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.InterestingEvent">
+<span class="sig-name descname"><span class="pre">InterestingEvent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.InterestingEvent</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.InterestingEvent" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.LabJackHK">
+<span class="sig-name descname"><span class="pre">LabJackHK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.LabJackHK</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.LabJackHK" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.MagHK">
+<span class="sig-name descname"><span class="pre">MagHK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.MagHK</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.MagHK" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.NoGapsTriggerEvent">
+<span class="sig-name descname"><span class="pre">NoGapsTriggerEvent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.NoGapsTriggerEvent</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.NoGapsTriggerEvent" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.NoTofDataEvent">
+<span class="sig-name descname"><span class="pre">NoTofDataEvent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.NoTofDataEvent</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.NoTofDataEvent" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.PDUHK">
+<span class="sig-name descname"><span class="pre">PDUHK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.PDUHK</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.PDUHK" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.RBWaveform">
+<span class="sig-name descname"><span class="pre">RBWaveform</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.RBWaveform</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.RBWaveform" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.TmP214">
+<span class="sig-name descname"><span class="pre">TmP214</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.TmP214</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.TmP214" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.TmP33">
+<span class="sig-name descname"><span class="pre">TmP33</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.TmP33</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.TmP33" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.TmP34">
+<span class="sig-name descname"><span class="pre">TmP34</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.TmP34</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.TmP34" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.TmP37">
+<span class="sig-name descname"><span class="pre">TmP37</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.TmP37</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.TmP37" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.TmP38">
+<span class="sig-name descname"><span class="pre">TmP38</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.TmP38</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.TmP38" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.TmP55">
+<span class="sig-name descname"><span class="pre">TmP55</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.TmP55</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.TmP55" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.TmP64">
+<span class="sig-name descname"><span class="pre">TmP64</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.TmP64</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.TmP64" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.TmP96">
+<span class="sig-name descname"><span class="pre">TmP96</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.TmP96</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.TmP96" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.Tracker">
+<span class="sig-name descname"><span class="pre">Tracker</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.Tracker</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.Tracker" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.TrackerDAQCntr">
+<span class="sig-name descname"><span class="pre">TrackerDAQCntr</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.TrackerDAQCntr</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.TrackerDAQCntr" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.TrkTempLeak">
+<span class="sig-name descname"><span class="pre">TrkTempLeak</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.TrkTempLeak</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.TrkTempLeak" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TelemetryPacketType.Unknown">
+<span class="sig-name descname"><span class="pre">Unknown</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TelemetryPacketType.Unknown</span></em><a class="headerlink" href="#gaps_online.io.TelemetryPacketType.Unknown" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gaps_online.io.TofPacket">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.io.</span></span><span class="sig-name descname"><span class="pre">TofPacket</span></span><a class="headerlink" href="#gaps_online.io.TofPacket" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.io.TofPacket.from_bytestream">
+<span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.io.TofPacket.from_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TofPacket.packet_type">
+<span class="sig-name descname"><span class="pre">packet_type</span></span><a class="headerlink" href="#gaps_online.io.TofPacket.packet_type" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.io.TofPacket.to_bytestream">
+<span class="sig-name descname"><span class="pre">to_bytestream</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.io.TofPacket.to_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.io.TofPacketType">
+<span class="sig-prename descclassname"><span class="pre">gaps_online.io.</span></span><span class="sig-name descname"><span class="pre">TofPacketType</span></span><a class="headerlink" href="#gaps_online.io.TofPacketType" title="Link to this definition">#</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">PacketType</span></code></p>
+</dd></dl>
+
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/gaps_online.io.html#module-gaps_online.io" title="gaps_online.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaps_online.io</span></code></a></p></td>
+<td><p>Work with telemetry and .tof.gaps files</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#readers-writers">Readers/Writers</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketReader"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketReader</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketReader.filter"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketReader.filter</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketReader.get_packet_index"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketReader.get_packet_index()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketReader.rewind"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketReader.rewind()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TofPacketReader"><code class="docutils literal notranslate"><span class="pre">TofPacketReader</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TofPacketReader.packet_index"><code class="docutils literal notranslate"><span class="pre">TofPacketReader.packet_index</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TofPacketReader.rewind"><code class="docutils literal notranslate"><span class="pre">TofPacketReader.rewind()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#packets">Packets</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacket"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacket.header"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.header</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacket.packet_type"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.packet_type</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacket.payload"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.payload</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.Ack"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.Ack</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.AnyTofHK"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.AnyTofHK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.AnyTrackerHK"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.AnyTrackerHK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.BoringEvent"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.BoringEvent</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.CardHKP"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.CardHKP</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.CoolingHK"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.CoolingHK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.GPS"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.GPS</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.GcuEvtBldSettings"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.GcuEvtBldSettings</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.GcuMon"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.GcuMon</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.InterestingEvent"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.InterestingEvent</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.LabJackHK"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.LabJackHK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.MagHK"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.MagHK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.NoGapsTriggerEvent"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.NoGapsTriggerEvent</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.NoTofDataEvent"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.NoTofDataEvent</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.PDUHK"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.PDUHK</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.RBWaveform"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.RBWaveform</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.TmP214"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.TmP214</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.TmP33"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.TmP33</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.TmP34"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.TmP34</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.TmP37"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.TmP37</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.TmP38"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.TmP38</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.TmP55"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.TmP55</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.TmP64"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.TmP64</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.TmP96"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.TmP96</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.Tracker"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.Tracker</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.TrackerDAQCntr"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.TrackerDAQCntr</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.TrkTempLeak"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.TrkTempLeak</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TelemetryPacketType.Unknown"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketType.Unknown</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TofPacket"><code class="docutils literal notranslate"><span class="pre">TofPacket</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TofPacket.from_bytestream"><code class="docutils literal notranslate"><span class="pre">TofPacket.from_bytestream()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TofPacket.packet_type"><code class="docutils literal notranslate"><span class="pre">TofPacket.packet_type</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TofPacket.to_bytestream"><code class="docutils literal notranslate"><span class="pre">TofPacket.to_bytestream()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.TofPacketType"><code class="docutils literal notranslate"><span class="pre">TofPacketType</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/gaps_online.io.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, J.A.Stoessl.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

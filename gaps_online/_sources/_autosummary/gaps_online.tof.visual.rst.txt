@@ -1,0 +1,23 @@
+gaps\_online.tof.visual
+=======================
+
+.. automodule:: gaps_online.tof.visual
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      eventbld_hb_plots
+      mtb_rate_plot
+      plot_hg_lg_hits
+      plot_ltb_threshold_timeseries
+      plot_paddle_charge2d
+      plot_rb_paddles
+      timeseries_multiplot
+      timeseries_plot
+      tof_2dproj
+      tof_projection_xy
+      unroll_cbe_sides
+      unroll_cor
+   

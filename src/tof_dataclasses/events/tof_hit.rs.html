@@ -666,7 +666,8 @@
 <a href="#665" id="665">665</a>
 <a href="#666" id="666">666</a>
 <a href="#667" id="667">667</a>
-<a href="#668" id="668">668</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span>half::f16;
 
@@ -1015,8 +1016,8 @@
   <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
   </span><span class="kw">pub fn </span>set_paddle(<span class="kw-2">&amp;mut </span><span class="self">self</span>, paddle : <span class="kw-2">&amp;</span>Paddle) {
     <span class="self">self</span>.cable_len  = paddle.cable_len;
-    <span class="self">self</span>.paddle_len = paddle.length;
-  }
+    <span class="self">self</span>.paddle_len = paddle.length * <span class="number">10.0</span>; <span class="comment">// stupid units!
+  </span>}
 
   <span class="doccomment">/// Get the (official) paddle id
   ///
@@ -1073,6 +1074,7 @@
     <span class="comment">//(self.time_a.to_f32() - self.get_t0())*C_LIGHT_PADDLE*10.0 // 10 for cm-&gt;mm 
     // FIX - we are actually resetting the particle interaction time to 0 for this
     //(self.time_a.to_f32() - self.get_t0())*C_LIGHT_PADDLE*10.0 // 10 for cm-&gt;mm
+    // FIX - paddle units!! 
     </span><span class="kw">if </span><span class="self">self</span>.time_a == <span class="self">self</span>.time_b {
       <span class="kw">return </span><span class="number">0.5</span><span class="kw-2">*</span><span class="self">self</span>.paddle_len;
     }
