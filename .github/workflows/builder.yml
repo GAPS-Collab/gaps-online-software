@@ -32,6 +32,11 @@ jobs:
         version: 13
         platform: x64   
 
+    - name: Set up rye
+      uses: eifinger/setup-rye@v4
+      with:
+        enable-cache: true
+
     - name: Install dependencies
       run : sudo apt update && sudo apt install doxygen pybind11-dev graphviz cargo lm-sensors libsqlite3-dev
     
@@ -66,10 +71,17 @@ jobs:
       run: touch ${{ github.workspace }}/build/doc/html/.nojekyll
       shell: bash
 
+    - name: Create python API docs
+      run: source ${{github.workspace }}/install/setup-env.sh && cd ${{ github.workspace }}/python/doc/ && ${{ github.workspace }}/python/doc/build-sphinx.doc
+
     - name: Consolidate docs
       run: cp -r ${{ github.workspace }}/tof/liftof/target/doc/* ${{ github.workspace }}/build/doc/html/
       shell: bash
-
+      
+    - name: Consolidate pydocs
+      run: cp -r ${{ github.workspace }}/python/doc/build/html ${{ github.workspace }}/build/doc/html/gaps_online
+      shell: bash
+      
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
