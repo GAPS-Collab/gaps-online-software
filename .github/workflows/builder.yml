@@ -72,7 +72,7 @@ jobs:
       shell: bash
 
     - name: Create python API docs
-      run: source ${{github.workspace }}/install/setup-env.sh && cd ${{ github.workspace }}/python/doc/ && ${{ github.workspace }}/python/doc/build-sphinx.doc
+      run: source ${{github.workspace }}/install/setup-env.sh && cd ${{ github.workspace }}/python/doc/ && ${{ github.workspace }}/python/doc/build-sphinx.sh
 
     - name: Consolidate docs
       run: cp -r ${{ github.workspace }}/tof/liftof/target/doc/* ${{ github.workspace }}/build/doc/html/
