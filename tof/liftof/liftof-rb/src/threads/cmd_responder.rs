@@ -197,21 +197,45 @@ pub fn cmd_responder(cmd_server_address        : String,
                   }
                 }
                 match cmd.command_code {
-                  TofCommandCode::SetPreampBias => {
-                    match PreampBiasConfig::from_bytestream(&cmd.payload, &mut 0) {
-                      Ok(pb_cfg) => { 
-                        match PASetBias::set_manual_biases(pb_cfg.biases) {
-                          Ok(_)    => info!("Set preamp biases to {}!", pb_cfg),
-                          Err(err) => {
-                            error!("Unable to set preamp biases! {err:?}");
-                            continue;
-                          }
-                        }
+                  TofCommandCode::DataRunStart => {
+                    let rc = run_config.clone();
+                    match run_config_sender.send(rc) {
+                      Ok(_)    => {
+                        info!("Run started successfully!");
+                        //return_val = Ok(TofCommandCode::DataRunStart);
                       },
                       Err(err) => {
-                        error!("Unable to set preamp biases! {err}");
-                        // FIXME - send response packet
-                        continue;
+                        error!("Error starting run! {err}");
+                        //return_val = Err(CmdError::RunStartError);
+                      }
+                    }
+                  }
+                  TofCommandCode::DataRunStop => {
+                    let rc = RunConfig::new();
+                    match run_config_sender.send(rc) {
+                      Ok(_)    => {
+                        info!("Run stopped successfully!");
+                        //return_val = Ok(TofCommandCode::DataRunStop);
+                      },
+                      Err(err) => {
+                        error!("Error stopping run! {err}");
+                        //return_val = Err(CmdError::RunStopError);
+                      }
+                    }
+                  }
+                  TofCommandCode::RBCalibration => {
+                    match rb_calibration(&run_config_sender,
+                                         &tp_to_pub,
+                                         save_cali_wf,
+                                         address_for_cali.clone()) {
+                      Ok(_) => {
+                        println!("== ==> [cmd-responder] Calibration successful!");
+                        info!("Default calibration data taking successful!");
+                        return_val = Ok(TofCommandCode::RBCalibration);
+                      },
+                      Err(err) => {
+                        error!("Default calibration data taking failed! Error {err}!");
+                        //return_val = Err(CmdError::CalibrationError);
                       }
                     }
                   }
@@ -337,23 +361,6 @@ pub fn cmd_responder(cmd_server_address        : String,
                           }
                         }
                       },
-                      //TofCommand::SetPreampBias   (value) =>  {
-                      //  info!("Received set preamp bias command! Will communicate to preamps");
-                      //  // MSB second 8 bits are LTB ID
-                      //  let preamp_id: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
-                      //  // MSB third 16 bits are extra (not used)
-                      //  let preamp_bias: u16 = (value | MASK_CMD_16BIT) as u16;
-                      //  match send_preamp_bias_set(preamp_id, preamp_bias) {
-                      //    Ok(_)    => {
-                      //      info!("Bias sent to preamp!");
-                      //      return_val = Ok(TofCommandCode::SetPreampBias);
-                      //    },
-                      //    Err(err) => {
-                      //      error!("Preamp bias sending failed! Err {err}");
-                      //      return_val = Err(CmdError::PreampBiasSetError);
-                      //    }
-                      //  }
-                      //},
                       TofCommand::DataRunStop(value)   => {
                         // MSB fourth 8 bits are RB ID
                         let rb_id: u8 = (value | MASK_CMD_8BIT) as u8;
