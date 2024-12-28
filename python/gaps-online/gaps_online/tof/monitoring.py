@@ -1,3 +1,15 @@
+"""
+Read and work with monitoring data. This is also designated as 
+"Housekeeping". This is temperature/power data from ReadoutBoards,
+Preamps, Powerboards, LTBs and the MasterTriggerBoard.
+
+This module provides access to the different containers holding the 
+monitoring data.
+
+The *Series allows to basically convert binary files to 
+polars dataframes
+"""
+
 try:
     import go_pybindings as tdc
 

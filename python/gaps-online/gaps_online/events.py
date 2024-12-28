@@ -1,3 +1,12 @@
+"""
+Various containers for event structures. 
+
+* Tof specific
+
+* "Merged", that is with the tracker part
+
+"""
+
 import_tl_success  = False
 import_rtd_success = False
 try:

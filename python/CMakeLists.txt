@@ -70,6 +70,12 @@ if(BUILD_RUSTPYBINDINGS)
       COMMAND cargo doc 
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python/pybindings
   )
+
+  #add_custom_target(
+  #  go-sphinx-doc
+  #    COMMAND ./build-sphinx.sh
+  #    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python/doc
+  #)
   
   # install the files, taking care of APPLE's dylib ending
   if(APPLE) 

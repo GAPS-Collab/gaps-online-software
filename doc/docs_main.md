@@ -33,9 +33,10 @@ The rust side of the rust pybdingings is documented through the `rust doc` syste
 
 * [go-pybidings](go_pybindings/index.html). Pyo3 wrapper for a part of the rust code. If `BUILD_TELEMETRY` and/or `BUILD_LIFTOF` are enabled, these parts of the code will be exposed through python as well.
 
- 
+The python API exposed through python (which is what a user will encounter in their ipython shell or similar)
+are doucmented through sphinx and can be found here:
 
-
+* [gaps-online](gaps_online/index.html) The 'meta' package for access through python. 
 
 ## Executable programs and higher level libraries [liftof]
 

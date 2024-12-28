@@ -1,3 +1,7 @@
+"""
+Interaction with telemetry stream & packets.
+"""
+
 telemetry_import_success = False
 try:
   import go_pybindings
