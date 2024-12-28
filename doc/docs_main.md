@@ -1,24 +1,34 @@
 # gaps-online-software documentation
 
-WIP - this is work in progress
+The GAPS online softere allows to read and work with TOF only data
+as well as telemetered data to ground from several different APIs.
 
-## Rust API
+## APIs
+
+### Rust API
 
 * [tof-dataclasses](tof_dataclasses/index.html)
 _tof-dataclasses provides the Rust side of the general TOF API. This comprises
 classes for events, calibration and (de)serialization methods_
 
+* [telemetry-dataclasses](telemetry_dataclasses/index.html)
+_telemetry-dataclasses provides Rust bindings to read and work with
+telemetered data, as is in *.bin files sent down from the experiment.
+
+Telemetered data wraps all TOF (and other data) in a new packet tppe
+with a dedicated header. 
+
 * [tof-control](tof_control/index.html)
 _tof-control is Takeru's code for changing voltages/thresholds etc and monitor
 Tof environmental sensors_
 
-## CXX API
+### CXX API
 
 The CXX API is an independent implementation of the rust `tof-dataclasses` project.
 
 * [CXX-API](index.html)
 
-## Python API
+### Python API
 
 The python API is exposed through `gaps_online` which can be imported
 if the `setup-env.sh` shell has been sourced and the thus PYTHONPATH
