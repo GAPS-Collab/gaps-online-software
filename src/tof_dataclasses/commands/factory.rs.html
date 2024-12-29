@@ -301,7 +301,16 @@
 <a href="#300" id="300">300</a>
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a></pre></div><pre class="rust"><code><span class="doccomment">//! The actual command list - one function per ocmmand
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a></pre></div><pre class="rust"><code><span class="doccomment">//! The actual command list - one function per ocmmand
 //!
 //! These are factory functions and each of them will 
 //! return a single command
@@ -334,7 +343,8 @@
        (<span class="number">5</span>, <span class="number">20</span>), 
        (<span class="number">6</span>, <span class="number">19</span>), 
        (<span class="number">7</span>, <span class="number">17</span>), 
-       (<span class="number">8</span>,  <span class="number">9</span>),  
+       (<span class="number">8</span>,  <span class="number">9</span>),
+       (<span class="number">9</span>, <span class="number">13</span>),  
        (<span class="number">11</span>,<span class="number">10</span>),
        (<span class="number">13</span>, <span class="number">4</span>), 
        (<span class="number">14</span>, <span class="number">2</span>), 
@@ -505,6 +515,14 @@
   <span class="prelude-val">Some</span>(cmd)
 }
 
+<span class="doccomment">/// Send the 'sudo shutdown now' command to
+/// ALL RBs
+</span><span class="kw">pub fn </span>shutdown_all_rbs() -&gt; <span class="prelude-ty">Option</span>&lt;TofCommandV2&gt; {
+  <span class="prelude-val">Some</span>(TofCommandV2 {
+    command_code : TofCommandCode::ShutdownRB,
+    payload      : Vec::&lt;u8&gt;::new()
+  })
+}
 
 <span class="doccomment">/// Send the 'sudo shutdown now command to
 /// the TOF main computer ("TOFCPU")

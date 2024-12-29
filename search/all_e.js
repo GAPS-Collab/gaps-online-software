@@ -10,5 +10,5 @@ var searchData=
   ['rbmonidata_7',['RBMoniData',['../structRBMoniData.html',1,'']]],
   ['rbwaveform_8',['RBWaveform',['../structRBWaveform.html',1,'']]],
   ['returns_9',['returns',['../structMasterTriggerEvent.html#autotoc_md0',1,'Returns'],['../structTofEventSummary.html#autotoc_md1',1,'Returns']]],
-  ['rust_20api_10',['Rust API',['../index.html#autotoc_md3',1,'']]]
+  ['rust_20api_10',['Rust API',['../index.html#autotoc_md4',1,'']]]
 ];

@@ -1106,7 +1106,60 @@
 <a href="#1105" id="1105">1105</a>
 <a href="#1106" id="1106">1106</a>
 <a href="#1107" id="1107">1107</a>
-<a href="#1108" id="1108">1108</a></pre></div><pre class="rust"><code><span class="doccomment">//! Menus for the main application and 
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
+<a href="#1112" id="1112">1112</a>
+<a href="#1113" id="1113">1113</a>
+<a href="#1114" id="1114">1114</a>
+<a href="#1115" id="1115">1115</a>
+<a href="#1116" id="1116">1116</a>
+<a href="#1117" id="1117">1117</a>
+<a href="#1118" id="1118">1118</a>
+<a href="#1119" id="1119">1119</a>
+<a href="#1120" id="1120">1120</a>
+<a href="#1121" id="1121">1121</a>
+<a href="#1122" id="1122">1122</a>
+<a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
+<a href="#1126" id="1126">1126</a>
+<a href="#1127" id="1127">1127</a>
+<a href="#1128" id="1128">1128</a>
+<a href="#1129" id="1129">1129</a>
+<a href="#1130" id="1130">1130</a>
+<a href="#1131" id="1131">1131</a>
+<a href="#1132" id="1132">1132</a>
+<a href="#1133" id="1133">1133</a>
+<a href="#1134" id="1134">1134</a>
+<a href="#1135" id="1135">1135</a>
+<a href="#1136" id="1136">1136</a>
+<a href="#1137" id="1137">1137</a>
+<a href="#1138" id="1138">1138</a>
+<a href="#1139" id="1139">1139</a>
+<a href="#1140" id="1140">1140</a>
+<a href="#1141" id="1141">1141</a>
+<a href="#1142" id="1142">1142</a>
+<a href="#1143" id="1143">1143</a>
+<a href="#1144" id="1144">1144</a>
+<a href="#1145" id="1145">1145</a>
+<a href="#1146" id="1146">1146</a>
+<a href="#1147" id="1147">1147</a>
+<a href="#1148" id="1148">1148</a>
+<a href="#1149" id="1149">1149</a>
+<a href="#1150" id="1150">1150</a>
+<a href="#1151" id="1151">1151</a>
+<a href="#1152" id="1152">1152</a>
+<a href="#1153" id="1153">1153</a>
+<a href="#1154" id="1154">1154</a>
+<a href="#1155" id="1155">1155</a>
+<a href="#1156" id="1156">1156</a>
+<a href="#1157" id="1157">1157</a>
+<a href="#1158" id="1158">1158</a>
+<a href="#1159" id="1159">1159</a>
+<a href="#1160" id="1160">1160</a>
+<a href="#1161" id="1161">1161</a></pre></div><pre class="rust"><code><span class="doccomment">//! Menus for the main application and 
 //! individual tabs
 
 </span><span class="kw">use </span>ratatui::widgets::Tabs;
@@ -1130,6 +1183,7 @@
   Events,
   Monitoring,
   Heartbeats,
+  Telemetry,
 }
 
 <span class="attr">#[derive(Copy, Clone, Debug, PartialEq)]
@@ -1217,7 +1271,10 @@
   DataSenderHB,
   <span class="comment">// Selection
   </span>Yes,
-  No
+  No,
+  <span class="comment">// TelemetryMenu
+  </span>Stream,
+  MergedEvents
 }
 
 <span class="kw">impl </span>UIMenuItem {
@@ -1258,7 +1315,9 @@
       UIMenuItem::TriggerHB      =&gt; String::from(<span class="string">"TriggerHB"</span>),
       UIMenuItem::DataSenderHB   =&gt; String::from(<span class="string">"DataSenderHB"</span>),
       UIMenuItem::Yes            =&gt; String::from(<span class="string">"Yes"</span>),
-      UIMenuItem::No             =&gt; String::from(<span class="string">"No"</span>)
+      UIMenuItem::No             =&gt; String::from(<span class="string">"No"</span>),
+      UIMenuItem::Stream         =&gt; String::from(<span class="string">"Stream"</span>),
+      UIMenuItem::MergedEvents   =&gt; String::from(<span class="string">"MergedEvents"</span>),
     <span class="comment">// _ =&gt; String::from("Unknown"),
     </span>} 
   }
@@ -1344,6 +1403,7 @@
                      UIMenuItem::Trigger,
                      UIMenuItem::Alerts,
                      UIMenuItem::Heartbeats,
+                     UIMenuItem::Monitoring,
                      UIMenuItem::Telemetry,
                      UIMenuItem::Commands,
                      UIMenuItem::Settings,
@@ -1367,10 +1427,7 @@
     <span class="self">self</span>.active_index
   }
   
-  <span class="comment">//fn get_titles(&amp;self) -&gt; Vec&lt;Line&gt; {
-  //  self.titles.clone()
-  //}
-  </span><span class="kw">fn </span>get_active_menu_item(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; UIMenuItem {
+  <span class="kw">fn </span>get_active_menu_item(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; UIMenuItem {
     <span class="self">self</span>.active_menu_item2
   }
 }
@@ -1430,11 +1487,7 @@
     <span class="self">self</span>.active_menu_item2 = item;
   }
   
-  <span class="comment">//fn get_titles(&amp;self) -&gt; Vec&lt;Line&gt; {
-  //  self.titles.clone()
-  //}
-  
-  </span><span class="kw">fn </span>get_active_menu_item(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; UIMenuItem {
+  <span class="kw">fn </span>get_active_menu_item(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; UIMenuItem {
     <span class="kw">match </span><span class="self">self</span>.active_index {
       <span class="number">0 </span>=&gt; UIMenuItem::Back,
       <span class="number">1 </span>=&gt; UIMenuItem::Waveforms,
@@ -1599,8 +1652,7 @@
   <span class="kw">fn </span>get_items() -&gt; Vec&lt;UIMenuItem&gt; {
     <span class="kw">let </span>items = <span class="macro">vec!</span>[UIMenuItem::Back,
                      UIMenuItem::Signal,
-                     UIMenuItem::RecoVars,
-                     UIMenuItem::Quit];
+                     UIMenuItem::RecoVars];
     items
   }
 
@@ -1681,6 +1733,60 @@
 }
 
 <span class="kw">impl </span>HBMenu&lt;<span class="lifetime">'_</span>&gt; {
+
+  <span class="kw">pub fn </span>new(theme : ColorTheme) -&gt; <span class="self">Self </span>{
+    <span class="kw">let </span>theme_c = theme.clone();
+    <span class="kw">let </span>titles  = <span class="self">Self</span>::get_titles(theme_c);
+    <span class="self">Self </span>{
+      theme,
+      active_index : <span class="number">0</span>,
+      titles,
+      active_menu_item : UIMenuItem::Back,
+    }
+  }
+}
+
+<span class="comment">//============================================
+
+</span><span class="attr">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>TelemetryMenu&lt;<span class="lifetime">'a</span>&gt;  {
+  <span class="kw">pub </span>theme            : ColorTheme,
+  <span class="kw">pub </span>active_menu_item : UIMenuItem,
+  <span class="kw">pub </span>active_index     : usize, 
+  <span class="kw">pub </span>titles           : Vec&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
+}
+
+<span class="kw">impl </span>UIMenu&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>TelemetryMenu&lt;<span class="lifetime">'_</span>&gt; {
+  
+  <span class="kw">fn </span>get_items() -&gt; Vec&lt;UIMenuItem&gt; {
+    <span class="kw">let </span>items = <span class="macro">vec!</span>[UIMenuItem::Back,
+                     UIMenuItem::Stream,
+                     UIMenuItem::MergedEvents];
+    items
+  }
+
+  <span class="kw">fn </span>get_theme(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ColorTheme {
+    <span class="self">self</span>.theme
+  }
+
+  <span class="kw">fn </span>set_active_idx(<span class="kw-2">&amp;mut </span><span class="self">self</span>, idx : usize) {
+    <span class="self">self</span>.active_index = idx;
+  }
+
+  <span class="kw">fn </span>get_active_idx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+    <span class="self">self</span>.active_index
+  }
+  
+  <span class="kw">fn </span>set_active_menu_item(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item : UIMenuItem) {
+    <span class="self">self</span>.active_menu_item = item;
+  }
+  
+  <span class="kw">fn </span>get_active_menu_item(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; UIMenuItem {
+    <span class="self">self</span>.active_menu_item
+  }
+}
+
+<span class="kw">impl </span>TelemetryMenu&lt;<span class="lifetime">'_</span>&gt; {
 
   <span class="kw">pub fn </span>new(theme : ColorTheme) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>theme_c = theme.clone();

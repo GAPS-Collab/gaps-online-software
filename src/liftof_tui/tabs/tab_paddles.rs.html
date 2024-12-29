@@ -501,7 +501,134 @@
 <a href="#500" id="500">500</a>
 <a href="#501" id="501">501</a>
 <a href="#502" id="502">502</a>
-<a href="#503" id="503">503</a></pre></div><pre class="rust"><code><span class="doccomment">//! Paddle overview - waveforms, 2d charge plot 
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
+<a href="#505" id="505">505</a>
+<a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
+<a href="#509" id="509">509</a>
+<a href="#510" id="510">510</a>
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a></pre></div><pre class="rust"><code><span class="doccomment">//! Paddle overview - waveforms, 2d charge plot 
 //! as well as baselines and baseline rms from
 //! TofHits
 //!
@@ -551,10 +678,11 @@
 
 <span class="comment">//use tof_dataclasses::serialization::Serialization;
 </span><span class="kw">use </span>tof_dataclasses::errors::SerializationError;
-<span class="comment">//use tof_dataclasses::packets::TofPacket;
-</span><span class="kw">use </span>tof_dataclasses::events::{
+<span class="kw">use </span>tof_dataclasses::packets::TofPacket;
+<span class="kw">use </span>tof_dataclasses::events::{
   <span class="comment">//RBEvent,
-  </span>TofEvent,
+  //TofEvent,
+  </span>TofEventSummary,
   <span class="comment">//TofHit,
   //TofEventHeader,
   //MasterTriggerEvent,
@@ -580,21 +708,33 @@
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>PaddleTab&lt;<span class="lifetime">'a</span>&gt; {
   <span class="kw">pub </span>theme              : ColorTheme,
-  <span class="kw">pub </span>te_receiver        : Receiver&lt;TofEvent&gt;,
-  <span class="kw">pub </span>event_queue        : VecDeque&lt;TofEvent&gt;,
+  <span class="kw">pub </span>te_receiver        : Receiver&lt;TofEventSummary&gt;,
+  <span class="kw">pub </span>event_queue        : VecDeque&lt;TofEventSummary&gt;,
+  <span class="kw">pub </span>wf_receiver        : Receiver&lt;TofPacket&gt;,
   <span class="kw">pub </span>queue_size         : usize,
   <span class="kw">pub </span>menu               : PaddleMenu&lt;<span class="lifetime">'a</span>&gt;,
-  <span class="kw">pub </span>wf                 : HashMap&lt;u8, VecDeque&lt;RBWaveform&gt;&gt;,
-  <span class="kw">pub </span>last_wf_ch_a       : VecDeque&lt;(f64, f64)&gt;,
-  <span class="kw">pub </span>last_wf_ch_b       : VecDeque&lt;(f64, f64)&gt;,
+  <span class="kw">pub </span>wf                 : HashMap&lt;u8, RBWaveform&gt;,
+  <span class="kw">pub </span>last_wf_ch_a       : HashMap&lt;u8, VecDeque&lt;(f64, f64)&gt;&gt;,
+  <span class="kw">pub </span>last_wf_ch_b       : HashMap&lt;u8, VecDeque&lt;(f64, f64)&gt;&gt;,
   <span class="kw">pub </span>wf_label_a         : String,
   <span class="kw">pub </span>wf_label_b         : String,
   <span class="comment">// baseline histograms
-  </span><span class="kw">pub </span>calibrations       : Arc&lt;Mutex&lt;HashMap&lt;u8, RBCalibrations&gt;&gt;&gt;,
+  </span><span class="kw">pub </span>calibrations       : HashMap&lt;u8, RBCalibrations&gt;,
   <span class="kw">pub </span>baseline_ch_a      : HashMap&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;,
   <span class="kw">pub </span>baseline_ch_b      : HashMap&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;,
   <span class="kw">pub </span>baseline_rms_ch_a  : HashMap&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;,
   <span class="kw">pub </span>baseline_rms_ch_b  : HashMap&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;,
+
+  <span class="comment">// energy depostion &amp; relative position histograms
+  </span><span class="kw">pub </span>h_edep     : HashMap&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;,
+  <span class="kw">pub </span>h_rel_pos  : HashMap&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;,
+
+  <span class="kw">pub </span>pca_histo  : HashMap&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;,
+  <span class="kw">pub </span>pcb_histo  : HashMap&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;,
+  <span class="kw">pub </span>pha_histo  : HashMap&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;,
+  <span class="kw">pub </span>phb_histo  : HashMap&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;,
+  <span class="kw">pub </span>pta_histo  : HashMap&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;,
+  <span class="kw">pub </span>ptb_histo  : HashMap&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;,
 
   <span class="comment">// charges
   </span><span class="kw">pub </span>charge_a           : HashMap&lt;u8, VecDeque&lt;f64&gt;&gt;,
@@ -611,7 +751,8 @@
 }
 
 <span class="kw">impl </span>PaddleTab&lt;<span class="lifetime">'_</span>&gt; {
-  <span class="kw">pub fn </span>new(te_receiver : Receiver&lt;TofEvent&gt;,
+  <span class="kw">pub fn </span>new(te_receiver : Receiver&lt;TofEventSummary&gt;,
+             wf_receiver : Receiver&lt;TofPacket&gt;,
              all_paddles : HashMap&lt;u8, Paddle&gt;,
              calibrations: Arc&lt;Mutex&lt;HashMap&lt;u8, RBCalibrations&gt;&gt;&gt;,
              theme       : ColorTheme) -&gt; <span class="self">Self </span>{
@@ -621,42 +762,85 @@
       <span class="kw">let </span>this_item = <span class="macro">format!</span>(<span class="string">"  Paddle{:0&gt;3}"</span>, k);
       pd_select_items.push(ListItem::new(Line::from(this_item)));
     }
+    <span class="comment">// get calibrations
+    </span><span class="kw">let </span><span class="kw-2">mut </span>calibrations_cloned = HashMap::&lt;u8, RBCalibrations&gt;::new();
+    <span class="kw">match </span>calibrations.lock() {
+      <span class="prelude-val">Err</span>(_err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to get lock on rbcalibrations!"</span>),
+      <span class="prelude-val">Ok</span>(cali) =&gt; {
+        calibrations_cloned = cali.clone();
+      }
+    }
     <span class="kw">let </span><span class="kw-2">mut </span>charge_a   = HashMap::&lt;u8, VecDeque&lt;f64&gt;&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>charge_b   = HashMap::&lt;u8, VecDeque&lt;f64&gt;&gt;::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>wf         = HashMap::&lt;u8, VecDeque&lt;RBWaveform&gt;&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>wf         = HashMap::&lt;u8, RBWaveform&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>bl_ch_a    = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>bl_ch_b    = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>blrms_ch_a = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>blrms_ch_b = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>h_edep_    = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>h_rel_pos_ = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>pca_histo  = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>pcb_histo  = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>pha_histo  = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>phb_histo  = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>pta_histo  = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>ptb_histo  = HashMap::&lt;u8, Hist1D&lt;Uniform&lt;f32&gt;&gt;&gt;::new();
     <span class="kw">let </span>bins_bl        = Uniform::new(<span class="number">20</span>, -<span class="number">2.0</span>, <span class="number">2.0</span>).unwrap();
-    <span class="kw">let </span>bins_bl_rms    = Uniform::new(<span class="number">20</span>, <span class="number">0.0</span>, <span class="number">2.0</span>).unwrap(); 
+    <span class="kw">let </span>bins_bl_rms    = Uniform::new(<span class="number">20</span>, <span class="number">0.0</span>,  <span class="number">2.0</span>).unwrap(); 
+    <span class="kw">let </span>bins_edep      = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">25.0</span>).unwrap();
+    <span class="kw">let </span>bins_relpos    = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">1.2</span>).unwrap(); 
+    <span class="kw">let </span>bins_ph        = Uniform::new(<span class="number">50</span>, <span class="number">0.0</span>, <span class="number">200.0</span>).unwrap();
+    <span class="kw">let </span>bins_pt        = Uniform::new(<span class="number">50</span>, <span class="number">25.0</span>, <span class="number">350.0</span>).unwrap();
+    <span class="kw">let </span>bins_pc        = Uniform::new(<span class="number">30</span>, <span class="number">0.0</span>, <span class="number">40.0</span>).unwrap();
+    <span class="kw">let </span><span class="kw-2">mut </span>lwf_ch_a   = HashMap::&lt;u8, VecDeque&lt;(f64, f64)&gt;&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>lwf_ch_b   = HashMap::&lt;u8, VecDeque&lt;(f64, f64)&gt;&gt;::new();
     <span class="kw">for </span>pid <span class="kw">in </span><span class="number">1</span>..<span class="number">161 </span>{
       charge_a.insert(pid, VecDeque::&lt;f64&gt;::new());
       charge_b.insert(pid, VecDeque::&lt;f64&gt;::new());
-      wf.insert(pid, VecDeque::&lt;RBWaveform&gt;::new());
+      <span class="comment">//wf.insert(pid, VecDeque::&lt;RBWaveform&gt;::new());
+      </span>wf.insert(pid, RBWaveform::new());
       bl_ch_a.insert(pid, <span class="macro">ndhistogram!</span>(bins_bl.clone()));
       bl_ch_b.insert(pid, <span class="macro">ndhistogram!</span>(bins_bl.clone()));
       blrms_ch_a.insert(pid, <span class="macro">ndhistogram!</span>(bins_bl_rms.clone()));
       blrms_ch_b.insert(pid, <span class="macro">ndhistogram!</span>(bins_bl_rms.clone()));
+      h_edep_.insert(pid, <span class="macro">ndhistogram!</span>(bins_edep.clone()));
+      h_rel_pos_.insert(pid, <span class="macro">ndhistogram!</span>(bins_relpos.clone()));
+      pca_histo.insert(pid, <span class="macro">ndhistogram!</span>(bins_pc .clone()));
+      pcb_histo.insert(pid, <span class="macro">ndhistogram!</span>(bins_pc .clone()));
+      pha_histo.insert(pid, <span class="macro">ndhistogram!</span>(bins_ph .clone()));
+      phb_histo.insert(pid, <span class="macro">ndhistogram!</span>(bins_ph .clone()));
+      pta_histo.insert(pid, <span class="macro">ndhistogram!</span>(bins_pt .clone()));
+      ptb_histo.insert(pid, <span class="macro">ndhistogram!</span>(bins_pt .clone()));
+      lwf_ch_a.insert(pid, VecDeque::&lt;(f64,f64)&gt;::new());
+      lwf_ch_b.insert(pid, VecDeque::&lt;(f64,f64)&gt;::new());
     }
 
     <span class="self">Self </span>{
       theme,
       te_receiver,
-      event_queue       : VecDeque::&lt;TofEvent&gt;::new(),
-      queue_size        : <span class="number">100</span>, <span class="comment">// short queue for waveforms so that we don't see 
-                               // all the old stuff
+      wf_receiver,
+      event_queue       : VecDeque::&lt;TofEventSummary&gt;::new(),
+      queue_size        : <span class="number">10000</span>, <span class="comment">// enough points for histograms! 
+                                 
       </span>menu              : PaddleMenu::new(theme_c),
       wf                : wf,
       wf_label_a        : String::from(<span class="string">"A"</span>),
       wf_label_b        : String::from(<span class="string">"B"</span>),
-      last_wf_ch_a      : VecDeque::&lt;(f64, f64)&gt;::new(),
-      last_wf_ch_b      : VecDeque::&lt;(f64, f64)&gt;::new(),
-      calibrations,
+      last_wf_ch_a      : lwf_ch_a,
+      last_wf_ch_b      : lwf_ch_b,
+      calibrations      : calibrations_cloned,
       baseline_ch_a     : bl_ch_a,
       baseline_ch_b     : bl_ch_b,
       baseline_rms_ch_a : blrms_ch_a,
       baseline_rms_ch_b : blrms_ch_b,
+      h_edep            : h_edep_,
+      h_rel_pos         : h_rel_pos_,
+      pca_histo,
+      pcb_histo,
+      pha_histo,
+      phb_histo,
+      pta_histo,
+      ptb_histo,
       charge_a          ,
       charge_b          ,
       all_paddles,
@@ -702,14 +886,57 @@
   }
  
   <span class="kw">pub fn </span>receive_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), SerializationError&gt; {  
+    <span class="kw">match </span><span class="self">self</span>.wf_receiver.try_recv() {
+      <span class="prelude-val">Err</span>(_err) =&gt; {
+      }
+      <span class="prelude-val">Ok</span>(wf_pack)    =&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>wf : RBWaveform = wf_pack.unpack()<span class="question-mark">?</span>;
+        <span class="kw">match </span><span class="self">self</span>.calibrations.get(<span class="kw-2">&amp;</span>wf.rb_id) {
+          <span class="prelude-val">None </span>=&gt; <span class="macro">error!</span>(<span class="string">"RBCalibrations for board {} not available!"</span>, wf.rb_id),
+          <span class="prelude-val">Some</span>(rbcal) =&gt; {
+            <span class="kw">match </span>wf.calibrate(rbcal) {
+              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Calibration error! {err}"</span>),
+              <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
+            }
+          }
+        }
+        <span class="kw">if </span>wf.paddle_id == <span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8 {
+          <span class="kw">let </span>rb_channel_a = wf.rb_channel_a + <span class="number">1</span>;
+          <span class="kw">let </span>rb_channel_b = wf.rb_channel_b + <span class="number">1</span>;
+          <span class="kw">if </span>(rb_channel_a != <span class="self">self</span>.current_paddle.rb_chA <span class="kw">as </span>u8 ) 
+             || (rb_channel_b != <span class="self">self</span>.current_paddle.rb_chB <span class="kw">as </span>u8 ) {
+            <span class="macro">error!</span>(<span class="string">"Inconsistent paddle RB channels! Maybe A and B are switched!"</span>);
+          }
+        }
+        <span class="kw">if </span>wf.paddle_id == <span class="number">0 </span>{
+          <span class="macro">error!</span>(<span class="string">"Got waveform with padle id 0!"</span>);
+        } <span class="kw">else if </span>wf.paddle_id &gt; <span class="number">160 </span>{
+          <span class="macro">error!</span>(<span class="string">"Got paddle id which is too large! {}"</span>, wf.paddle_id);
+        } <span class="kw">else </span>{
+          <span class="kw">let </span>pid = wf.paddle_id <span class="kw">as </span>u8;
+          <span class="kw-2">*</span><span class="self">self</span>.wf.get_mut(<span class="kw-2">&amp;</span>pid).unwrap() = wf;
+        }
+      }
+    }
     <span class="kw">match </span><span class="self">self</span>.te_receiver.try_recv() {
       <span class="prelude-val">Err</span>(_err) =&gt; {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       },
-      <span class="prelude-val">Ok</span>(ev)    =&gt; {
-        <span class="kw">let </span>hits = ev.get_hits();
-        <span class="comment">// FIXME - get baselines from hits
-        </span><span class="kw">for </span>h <span class="kw">in </span>hits {
+      <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>ev)    =&gt; {
+        <span class="comment">//let hits = ev.get_hits();
+        // FIXME - get baselines from hits
+        </span><span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;mut </span>ev.hits {
+          <span class="self">self</span>.h_edep.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>h.get_edep());
+          h.set_paddle(<span class="kw-2">&amp;</span><span class="self">self</span>.current_paddle);
+          <span class="kw">let </span>rel_pos = h.get_pos()/(<span class="self">self</span>.current_paddle.length<span class="kw-2">*</span><span class="number">10.0</span>);
+          <span class="self">self</span>.h_rel_pos.get_mut(<span class="kw-2">&amp;</span>h.paddle_id).unwrap().fill(<span class="kw-2">&amp;</span>rel_pos);
+          <span class="self">self</span>.pha_histo.get_mut(<span class="kw-2">&amp;</span>h.paddle_id).unwrap().fill(<span class="kw-2">&amp;</span>h.get_peak_a());
+          <span class="self">self</span>.phb_histo.get_mut(<span class="kw-2">&amp;</span>h.paddle_id).unwrap().fill(<span class="kw-2">&amp;</span>h.get_peak_b());
+          <span class="self">self</span>.pca_histo.get_mut(<span class="kw-2">&amp;</span>h.paddle_id).unwrap().fill(<span class="kw-2">&amp;</span>h.get_charge_a());
+          <span class="self">self</span>.pcb_histo.get_mut(<span class="kw-2">&amp;</span>h.paddle_id).unwrap().fill(<span class="kw-2">&amp;</span>h.get_charge_b());
+          <span class="self">self</span>.pta_histo.get_mut(<span class="kw-2">&amp;</span>h.paddle_id).unwrap().fill(<span class="kw-2">&amp;</span>h.get_time_a());
+          <span class="self">self</span>.ptb_histo.get_mut(<span class="kw-2">&amp;</span>h.paddle_id).unwrap().fill(<span class="kw-2">&amp;</span>h.get_time_a());
+
           <span class="self">self</span>.charge_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().push_back(h.get_charge_a() <span class="kw">as </span>f64);
           <span class="self">self</span>.charge_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().push_back(h.get_charge_b() <span class="kw">as </span>f64);
           <span class="kw">if </span><span class="self">self</span>.charge_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().len() &gt; <span class="self">self</span>.queue_size {
@@ -733,37 +960,6 @@
           </span><span class="self">self</span>.baseline_rms_ch_a.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>h.get_bl_a_rms());
           <span class="comment">//self.baseline_ch_b.get_mut(&amp;(h.paddle_id as u8)).unwrap().fill(&amp;h.get_bl_b());
           </span><span class="self">self</span>.baseline_rms_ch_b.get_mut(<span class="kw-2">&amp;</span>(h.paddle_id <span class="kw">as </span>u8)).unwrap().fill(<span class="kw-2">&amp;</span>h.get_bl_b_rms());
-        }
-        <span class="kw">let </span>wfs  = ev.get_rbwaveforms();
-        <span class="kw">for </span><span class="kw-2">mut </span>wf <span class="kw">in </span>wfs {
-          <span class="comment">// FIXME - this is an incpmplete cosistency check and 
-          // should be removed soon
-          </span><span class="kw">if </span>wf.paddle_id == <span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8 {
-            <span class="kw">let </span>rb_channel_a = wf.rb_channel_a + <span class="number">1</span>;
-            <span class="kw">let </span>rb_channel_b = wf.rb_channel_b + <span class="number">1</span>;
-            <span class="kw">if </span>(rb_channel_a != <span class="self">self</span>.current_paddle.rb_chA <span class="kw">as </span>u8 ) 
-               || (rb_channel_b != <span class="self">self</span>.current_paddle.rb_chB <span class="kw">as </span>u8 ) {
-              <span class="macro">error!</span>(<span class="string">"Inconsistent paddle RB channels! Maybe A and B are switched!"</span>);
-            }
-          }
-          <span class="kw">match </span><span class="self">self</span>.calibrations.lock() {
-            <span class="prelude-val">Err</span>(_err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to get lock on rbcalibrations!"</span>),
-            <span class="prelude-val">Ok</span>(cali) =&gt; {
-              <span class="kw">match </span>cali.get(<span class="kw-2">&amp;</span>wf.rb_id) {
-                <span class="prelude-val">None </span>=&gt; <span class="macro">error!</span>(<span class="string">"RBCalibrations for board {} not available!"</span>, wf.rb_id),
-                <span class="prelude-val">Some</span>(rbcal) =&gt; {
-                  <span class="kw">match </span>wf.calibrate(rbcal) {
-                    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Calibration error! {err}"</span>),
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
-                  }
-                }
-              }
-            }
-          }
-          <span class="self">self</span>.wf.get_mut(<span class="kw-2">&amp;</span>(wf.paddle_id <span class="kw">as </span>u8)).unwrap().push_back(wf.clone());
-          <span class="kw">if </span><span class="self">self</span>.wf.get_mut(<span class="kw-2">&amp;</span>(wf.paddle_id <span class="kw">as </span>u8)).unwrap().len() &gt; <span class="self">self</span>.queue_size {
-            <span class="self">self</span>.wf.get_mut(<span class="kw-2">&amp;</span>(wf.paddle_id <span class="kw">as </span>u8)).unwrap().pop_front();
-          }
         }
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
       }
@@ -878,7 +1074,7 @@
         <span class="comment">//let mut label_a   = String::from("");
         //let mut label_b   = String::from("");
         </span><span class="kw">let </span>wf_theme      = <span class="self">self</span>.theme.clone();
-        <span class="kw">match </span><span class="self">self</span>.wf.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap().pop_front() {
+        <span class="kw">match </span><span class="self">self</span>.wf.get_mut(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)) {
           <span class="prelude-val">None </span>=&gt; {
             <span class="comment">//for (i,k) in wf.adc.iter().enumerate() {
             //  wf_data_a.push_back((i as f64, *k as f64));
@@ -895,8 +1091,8 @@
                 wf_data_a.push_back((wf.nanoseconds_a[k] <span class="kw">as </span>f64, wf.voltages_a[k] <span class="kw">as </span>f64));
               }
             }
-            <span class="self">self</span>.last_wf_ch_a = wf_data_a.clone();
-            <span class="comment">//label_b  = format!("Paddle {}B, RB {}-{}",self.current_paddle.paddle_id, wf.rb_id, wf.rb_channel_b + 1);
+            <span class="comment">//*self.last_wf_ch_a.get_mut(&amp;wf.paddle_id).unwrap() = wf_data_a;
+            //label_b  = format!("Paddle {}B, RB {}-{}",self.current_paddle.paddle_id, wf.rb_id, wf.rb_channel_b + 1);
             </span><span class="kw">if </span>wf.voltages_b.len() == <span class="number">0 </span>{
               <span class="kw">for </span>(i,k) <span class="kw">in </span>wf.adc_b.iter().enumerate() {
                 wf_data_b.push_back((i <span class="kw">as </span>f64, <span class="kw-2">*</span>k <span class="kw">as </span>f64));
@@ -906,26 +1102,18 @@
                 wf_data_b.push_back((wf.nanoseconds_b[k] <span class="kw">as </span>f64, wf.voltages_b[k] <span class="kw">as </span>f64));
               }
             }
-            <span class="self">self</span>.last_wf_ch_b = wf_data_b.clone();
-          }
+            <span class="comment">//*self.last_wf_ch_b.get_mut(&amp;wf.paddle_id).unwrap() = wf_data_b;
+          </span>}
         }
         
-        <span class="kw">if </span>wf_data_a.len() == <span class="number">0 </span>{
-          wf_data_a = <span class="self">self</span>.last_wf_ch_a.clone();
-        }
-        <span class="kw">let </span>wf_theme_a = wf_theme.clone();
         <span class="kw">let </span>wf_chart_a = timeseries(<span class="kw-2">&amp;mut </span>wf_data_a,
                                     <span class="self">self</span>.wf_label_a.clone(),
                                     <span class="self">self</span>.wf_label_a.clone(),
-                                    <span class="kw-2">&amp;</span>wf_theme_a);
-        <span class="kw">if </span>wf_data_b.len() == <span class="number">0 </span>{
-          wf_data_b = <span class="self">self</span>.last_wf_ch_b.clone();
-        }
-        <span class="kw">let </span>wf_theme_b = wf_theme.clone();
+                                    <span class="kw-2">&amp;</span>wf_theme);
         <span class="kw">let </span>wf_chart_b = timeseries(<span class="kw-2">&amp;mut </span>wf_data_b,
                                     <span class="self">self</span>.wf_label_b.clone(),
                                     <span class="self">self</span>.wf_label_b.clone(),
-                                    <span class="kw-2">&amp;</span>wf_theme_b);
+                                    <span class="kw-2">&amp;</span>wf_theme);
         frame.render_widget(wf_chart_a, wf_lo[<span class="number">0</span>]);
         frame.render_widget(wf_chart_b, wf_lo[<span class="number">1</span>]);
         
@@ -964,41 +1152,107 @@
           </span>})
           .x_bounds([<span class="number">0.0</span>, <span class="number">200.0</span>])
           .y_bounds([<span class="number">0.0</span>, <span class="number">200.0</span>]);
-       
-      <span class="comment">// baseline histos
-      //println!("{:?}", self.baseline_ch_a.get(&amp;(self.current_paddle.paddle_id as u8)).unwrap());
-      </span><span class="kw">let </span>bl_a_labels     = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_ch_a.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap());
-      <span class="kw">let </span>bl_a_data       = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_ch_a.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
-      <span class="kw">let </span>bl_a_chart      = histogram(bl_a_data, String::from(<span class="string">"Baseline Side A [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
-      frame.render_widget(bl_a_chart, bla_lo[<span class="number">0</span>]);
-      
-      <span class="kw">let </span>bl_a_rms_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_rms_ch_a.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
-      <span class="kw">let </span>bl_a_rms_chart  = histogram(bl_a_rms_data, String::from(<span class="string">"Baseline RMS Side A [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
-      frame.render_widget(bl_a_rms_chart, bla_lo[<span class="number">1</span>]);
-      
-      <span class="comment">// B side
-      // let bl_b_labels = create_labels(&amp;self.baseline_ch_b.get(&amp;(self.current_paddle.paddle_id as u8)).unwrap());
-      </span><span class="kw">let </span>bl_b_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_ch_b.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
-      <span class="kw">let </span>bl_b_chart  = histogram(bl_b_data, String::from(<span class="string">"Baseline Side B [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
-      frame.render_widget(bl_b_chart, blb_lo[<span class="number">0</span>]);
-      
-      <span class="comment">// let bl_b_rms_labels = create_labels(&amp;self.baseline_rms_ch_b.get(&amp;(self.current_paddle.paddle_id as u8)).unwrap());
-      </span><span class="kw">let </span>bl_b_rms_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_rms_ch_b.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
-      <span class="kw">let </span>bl_b_rms_chart  = histogram(bl_b_rms_data, String::from(<span class="string">"Baseline RMS Side B [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
-      frame.render_widget(bl_b_rms_chart, blb_lo[<span class="number">1</span>]);
+        frame.render_widget(charge_plot, ch_lo[<span class="number">0</span>]);
+         
+        <span class="comment">// baseline histos
+        //println!("{:?}", self.baseline_ch_a.get(&amp;(self.current_paddle.paddle_id as u8)).unwrap());
+        </span><span class="kw">let </span>bl_a_labels     = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_ch_a.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap());
+        <span class="kw">let </span>bl_a_data       = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_ch_a.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
+        <span class="kw">let </span>bl_a_chart      = histogram(bl_a_data, String::from(<span class="string">"Baseline Side A [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        frame.render_widget(bl_a_chart, bla_lo[<span class="number">0</span>]);
+        
+        <span class="kw">let </span>bl_a_rms_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_rms_ch_a.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
+        <span class="kw">let </span>bl_a_rms_chart  = histogram(bl_a_rms_data, String::from(<span class="string">"Baseline RMS Side A [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        frame.render_widget(bl_a_rms_chart, bla_lo[<span class="number">1</span>]);
+        
+        <span class="comment">// B side
+        // let bl_b_labels = create_labels(&amp;self.baseline_ch_b.get(&amp;(self.current_paddle.paddle_id as u8)).unwrap());
+        </span><span class="kw">let </span>bl_b_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_ch_b.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
+        <span class="kw">let </span>bl_b_chart  = histogram(bl_b_data, String::from(<span class="string">"Baseline Side B [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        frame.render_widget(bl_b_chart, blb_lo[<span class="number">0</span>]);
+        
+        <span class="comment">// let bl_b_rms_labels = create_labels(&amp;self.baseline_rms_ch_b.get(&amp;(self.current_paddle.paddle_id as u8)).unwrap());
+        </span><span class="kw">let </span>bl_b_rms_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_rms_ch_b.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>bl_a_labels, <span class="number">1</span>, <span class="bool-val">false</span>); 
+        <span class="kw">let </span>bl_b_rms_chart  = histogram(bl_b_rms_data, String::from(<span class="string">"Baseline RMS Side B [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        frame.render_widget(bl_b_rms_chart, blb_lo[<span class="number">1</span>]);
+      }
+      UIMenuItem::RecoVars =&gt; {
+        <span class="kw">let </span>main_lo = Layout::default()
+          .direction(Direction::Horizontal)
+          .constraints(
+              [Constraint::Percentage(<span class="number">60</span>), Constraint::Percentage(<span class="number">40</span>)].as_ref(),
+          )
+          .split(<span class="kw-2">*</span>main_window);
+        <span class="kw">let </span>col_left = Layout::default()
+          .direction(Direction::Horizontal)
+          .constraints(
+              [Constraint::Percentage(<span class="number">50</span>), Constraint::Percentage(<span class="number">50</span>)].as_ref(),
+          )
+          .split(main_lo[<span class="number">0</span>]);
+        <span class="kw">let </span>rows_right = Layout::default()
+          .direction(Direction::Vertical)
+          .constraints(
+              [Constraint::Percentage(<span class="number">33</span>),
+               Constraint::Percentage(<span class="number">33</span>),
+               Constraint::Percentage(<span class="number">34</span>)].as_ref(),
+          )
+          .split(main_lo[<span class="number">1</span>]);
+        <span class="kw">let </span>rows_left_left = Layout::default()
+          .direction(Direction::Vertical)
+          .constraints(
+              [Constraint::Percentage(<span class="number">33</span>),
+               Constraint::Percentage(<span class="number">33</span>),
+               Constraint::Percentage(<span class="number">34</span>)].as_ref(),
+          )
+          .split(col_left[<span class="number">0</span>]);
+        <span class="kw">let </span>rows_left_right = Layout::default()
+          .direction(Direction::Vertical)
+          .constraints(
+              [Constraint::Percentage(<span class="number">33</span>),
+               Constraint::Percentage(<span class="number">33</span>),
+               Constraint::Percentage(<span class="number">34</span>)].as_ref(),
+          )
+          .split(col_left[<span class="number">1</span>]);
+        
+        <span class="comment">// histograms
+        </span><span class="kw">let </span>pid        = <span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8;
 
-      
-      <span class="comment">//charge_plot.
-      //  .marker(Marker::Dot)
-      //  .paint(|ctx| {
-      //    let mut points = Points {
-      //      coords : &amp;[(10.0, 10.0)],
-      //      color  : self.theme.hc,
-      //    };
-      //    ctx.draw(&amp;points);
-      //  }
-      //);
-      </span>frame.render_widget(charge_plot, ch_lo[<span class="number">0</span>]);
+        <span class="kw">let </span>ph_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pha_histo.get(<span class="kw-2">&amp;</span>pid).unwrap());
+        <span class="kw">let </span>pha_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pha_histo.get(<span class="kw-2">&amp;</span>pid).unwrap(), <span class="kw-2">&amp;</span>ph_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
+        <span class="kw">let </span>pha_chart  = histogram(pha_data, String::from(<span class="string">"Pulse height SideA [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        frame.render_widget(pha_chart, rows_left_left[<span class="number">0</span>]);
+        <span class="kw">let </span>phb_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.phb_histo.get(<span class="kw-2">&amp;</span>pid).unwrap(), <span class="kw-2">&amp;</span>ph_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
+        <span class="kw">let </span>phb_chart  = histogram(phb_data, String::from(<span class="string">"Pulse height SideB [mV]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        frame.render_widget(phb_chart, rows_left_right[<span class="number">0</span>]);
+        
+        <span class="kw">let </span>pt_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pta_histo.get(<span class="kw-2">&amp;</span>pid).unwrap());
+        <span class="kw">let </span>pta_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pta_histo.get(<span class="kw-2">&amp;</span>pid).unwrap(), <span class="kw-2">&amp;</span>pt_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
+        <span class="kw">let </span>pta_chart  = histogram(pta_data, String::from(<span class="string">"Pulse time SideA [a.u.]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        frame.render_widget(pta_chart, rows_left_left[<span class="number">1</span>]);
+
+        <span class="kw">let </span>ptb_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.ptb_histo.get(<span class="kw-2">&amp;</span>pid).unwrap(), <span class="kw-2">&amp;</span>pt_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
+        <span class="kw">let </span>ptb_chart  = histogram(ptb_data, String::from(<span class="string">"Pulse time SideB [a.u.]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        frame.render_widget(ptb_chart, rows_left_right[<span class="number">1</span>]);
+        
+        <span class="kw">let </span>pc_labels  = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.pca_histo.get(<span class="kw-2">&amp;</span>pid).unwrap());
+        <span class="kw">let </span>pca_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pca_histo.get(<span class="kw-2">&amp;</span>pid).unwrap(), <span class="kw-2">&amp;</span>pc_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
+        <span class="kw">let </span>pca_chart  = histogram(pca_data, String::from(<span class="string">"Pulse charge SideA [mC]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        frame.render_widget(pca_chart, rows_left_left[<span class="number">2</span>]);
+        
+        <span class="kw">let </span>pcb_data   = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.pcb_histo.get(<span class="kw-2">&amp;</span>pid).unwrap(), <span class="kw-2">&amp;</span>pc_labels, <span class="number">5</span>, <span class="bool-val">false</span>); 
+        <span class="kw">let </span>pcb_chart  = histogram(pcb_data, String::from(<span class="string">"Pulse charge SideB [mC]"</span>), <span class="number">2</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        frame.render_widget(pcb_chart, rows_left_right[<span class="number">2</span>]);
+
+        <span class="comment">// edep hist
+        </span><span class="kw">let </span>edep_labels       = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.h_edep.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap());
+        <span class="kw">let </span>edep_data         = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.h_edep.get    (<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>edep_labels, <span class="number">1</span>, <span class="bool-val">false</span>);
+        <span class="kw">let </span>edep_chart        = histogram(edep_data, String::from(<span class="string">"Reco. Energy Deposition [minI]"</span>), <span class="number">1</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        frame.render_widget(edep_chart, rows_right[<span class="number">0</span>]);
+        <span class="comment">// norm_pos
+        </span><span class="kw">let </span>relpos_labels     = create_labels(<span class="kw-2">&amp;</span><span class="self">self</span>.h_rel_pos.get(<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap());
+        <span class="kw">let </span>relpos_data       = prep_data(<span class="kw-2">&amp;</span><span class="self">self</span>.h_rel_pos.get    (<span class="kw-2">&amp;</span>(<span class="self">self</span>.current_paddle.paddle_id <span class="kw">as </span>u8)).unwrap(), <span class="kw-2">&amp;</span>relpos_labels, <span class="number">1</span>, <span class="bool-val">false</span>);
+        <span class="kw">let </span>relpos_chart      = histogram(relpos_data, String::from(<span class="string">"Rel. pos. (1 = B side)"</span>), <span class="number">1</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.theme);
+        frame.render_widget(relpos_chart, rows_right[<span class="number">1</span>]);
       }
       <span class="kw">_ </span>=&gt; ()
     } <span class="comment">// end match

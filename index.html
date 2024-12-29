@@ -95,21 +95,27 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
   <div class="headertitle"><div class="title">gaps-online-software documentation </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2gaps-online-software_2gaps-online-software_2doc_2docs__main"></a> WIP - this is work in progress</p>
+<div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2gaps-online-software_2gaps-online-software_2doc_2docs__main"></a> The GAPS online softere allows to read and work with TOF only data as well as telemetered data to ground from several different APIs.</p>
 <h1><a class="anchor" id="autotoc_md3"></a>
-Rust API</h1>
+APIs</h1>
+<h2><a class="anchor" id="autotoc_md4"></a>
+Rust API</h2>
 <ul>
 <li><a href="tof_dataclasses/index.html">tof-dataclasses</a> <em>tof-dataclasses provides the Rust side of the general TOF API. This comprises classes for events, calibration and (de)serialization methods</em></li>
+<li><a href="telemetry_dataclasses/index.html">telemetry-dataclasses</a> _telemetry-dataclasses provides Rust bindings to read and work with telemetered data, as is in *.bin files sent down from the experiment.</li>
+</ul>
+<p>Telemetered data wraps all TOF (and other data) in a new packet tppe with a dedicated header.</p>
+<ul>
 <li><a href="tof_control/index.html">tof-control</a> <em>tof-control is Takeru's code for changing voltages/thresholds etc and monitor Tof environmental sensors</em></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md4"></a>
-CXX API</h1>
+<h2><a class="anchor" id="autotoc_md5"></a>
+CXX API</h2>
 <p>The CXX API is an independent implementation of the rust <code>tof-dataclasses</code> project.</p>
 <ul>
 <li><a href="index.html">CXX-API</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md5"></a>
-Python API</h1>
+<h2><a class="anchor" id="autotoc_md6"></a>
+Python API</h2>
 <p>The python API is exposed through <code>gaps_online</code> which can be imported if the <code>setup-env.sh</code> shell has been sourced and the thus PYTHONPATH has been modified. If <code>BUILD_RUSTPYBINDINGS</code> are enabled, the project exposes the rust code throug pyo3 crafted pybindings. The CXX interface is wrapped through pybind11, these pybindings can be enable with <code>BUILD_CXXPYBINDINGS</code> <em>as of version 0.10 (LELEWAA) we discourage to use the cxx pybindings, sinde the rust pybindings have matured enough and are faster as well as more stable</em></p>
 <p>The rust side of the rust pybdingings is documented through the <code>rust doc</code> system and can be found here:</p>
 <ul>
@@ -119,7 +125,7 @@ Python API</h1>
 <ul>
 <li><a href="gaps_online/index.html">gaps-online</a> The 'meta' package for access through python.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md6"></a>
+<h1><a class="anchor" id="autotoc_md7"></a>
 Executable programs and higher level libraries [liftof]</h1>
 <p>Liftof ("liftof is for TOF") is a collection of binaries and a library which are used for in-flight data taking. Liftof is written in <a href="https://www.rust-lang.org/">Rust</a> It also ships with binaries for debugging and analysis.</p>
 <ul>

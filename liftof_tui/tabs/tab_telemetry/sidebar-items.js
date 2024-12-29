@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["TelemetryTab"]};
+window.SIDEBAR_ITEMS = {"enum":["TelemetryTabView"],"struct":["TelemetryTab"]};

@@ -267,36 +267,21 @@
 <a href="#266" id="266">266</a>
 <a href="#267" id="267">267</a>
 <a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{
-    <span class="comment">//HashMap,
-    </span>VecDeque,
+<a href="#269" id="269">269</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{
+  HashMap,
+  VecDeque,
 };
+
+<span class="kw">use </span>std::time::Instant;
+
 <span class="comment">//use std::sync::{
-//    Arc,
-//    Mutex,
+//  Arc,
+//  Mutex,
 //};
 
 </span><span class="kw">use </span>crossbeam_channel::{
-    Receiver,
-    Sender,
+  Receiver,
+  Sender,
 };
 
 <span class="kw">use </span>telemetry_dataclasses::packets::{
@@ -313,10 +298,12 @@
 </span><span class="kw">use </span>ratatui::Frame;
 <span class="kw">use </span>ratatui::layout::Rect;
 <span class="kw">use </span>ratatui::widgets::{
-    Block,
-    BorderType,
-    Borders,
-    Paragraph,
+  Block,
+  BorderType,
+  Borders,
+  Paragraph,
+  Table,
+  Row,
 };
 
 <span class="kw">use </span>tof_dataclasses::serialization::{
@@ -329,247 +316,224 @@
 <span class="comment">//    PacketType,
 </span>};
 
-<span class="comment">//use tof_dataclasses::events::{
-//    RBEvent,
-//    TofEvent,
-//    TofHit,
-//    TofEventHeader,
-//    TofEventSummary,
-//    MasterTriggerEvent,
-//};
+<span class="kw">use </span>telemetry_dataclasses::packets::TelemetryPacketType;
 
-</span><span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme;
+<span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme;
+<span class="kw">use </span><span class="kw">crate</span>::telly_packet_counter;
+
+<span class="attr">#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub enum </span>TelemetryTabView {
+  Stream,
+  MergedEvents
+}
 
 <span class="comment">// no clone ore debug implemented for 
 // zmq socket
-</span><span class="kw">pub struct </span>TelemetryTab {
+</span><span class="kw">pub struct </span>TelemetryTab&lt;<span class="lifetime">'a</span>&gt; {
   <span class="kw">pub </span>theme         : ColorTheme, 
-  <span class="comment">//pub tp_receiver   : Receiver&lt;TofPacket&gt;,
-  //pub event_queue   : VecDeque&lt;TofEvent&gt;,
-  //pub zmq_socket    : zmq::Socket,
-  </span><span class="kw">pub </span>tele_recv     : Receiver&lt;TelemetryPacket&gt;,
+  <span class="kw">pub </span>tele_recv     : Receiver&lt;TelemetryPacket&gt;,
   <span class="kw">pub </span>queue_size    : usize, <span class="comment">//8
   </span><span class="kw">pub </span>merged_queue  : VecDeque&lt;MergedEvent&gt;,
   <span class="kw">pub </span>header_queue  : VecDeque&lt;TelemetryHeader&gt;,
   <span class="comment">// when we decide to use ONLY the telemetry stream,
   // we have to pass on the decoded TOF packets
   </span><span class="kw">pub </span>tp_sender     : <span class="prelude-ty">Option</span>&lt;Sender&lt;TofPacket&gt;&gt;,
-  
-  <span class="comment">//pub mte_sender    : Sender&lt;MasterTriggerEvent&gt;,
-  //pub rbe_sender    : Sender&lt;RBEvent&gt;,
-  //pub th_sender     : Sender&lt;TofHit&gt;,
-  //pub streamer   : Arc&lt;Mutex&lt;VecDeque&lt;String&gt;&gt;&gt;,
-  //pub pack_stat  : Arc&lt;Mutex&lt;HashMap&lt;String, usize&gt;&gt;&gt;,
-  //pub stream     : String,
-  //pub stream_max : usize, 
-</span>}
+  <span class="kw">pub </span>view          : TelemetryTabView, 
+  <span class="kw">pub </span>pack_map      : HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, usize&gt;,
+  start_time        : Instant,
+}
 
-<span class="kw">impl </span>TelemetryTab {
-  <span class="kw">pub fn </span>new(<span class="comment">//tp_receiver : Receiver&lt;TofPacket&gt;,
-             //mte_sender  : Sender&lt;MasterTriggerEvent&gt;,
-             //rbe_sender  : Sender&lt;RBEvent&gt;,
-             </span>tp_sender   : <span class="prelude-ty">Option</span>&lt;Sender&lt;TofPacket&gt;&gt;,
+<span class="kw">impl </span>TelemetryTab&lt;<span class="lifetime">'_</span>&gt; {
+  <span class="kw">pub fn </span>new(tp_sender   : <span class="prelude-ty">Option</span>&lt;Sender&lt;TofPacket&gt;&gt;,
              tele_recv   : Receiver&lt;TelemetryPacket&gt;,
              theme       : ColorTheme) -&gt; <span class="self">Self </span>{
-             <span class="comment">//streamer  : Arc&lt;Mutex&lt;VecDeque&lt;String&gt;&gt;&gt;,
-             //pack_stat : Arc&lt;Mutex&lt;HashMap&lt;String,usize&gt;&gt;&gt;) -&gt; HomeTab&lt;T&gt; {
-    </span><span class="self">Self </span>{
+    <span class="self">Self </span>{
       theme,
       tele_recv    : tele_recv,
       queue_size   : <span class="number">20000</span>,
       merged_queue : VecDeque::&lt;MergedEvent&gt;::new(),
       header_queue : VecDeque::&lt;TelemetryHeader&gt;::new(),
       tp_sender    : tp_sender,
+      view         : TelemetryTabView::Stream, 
+      pack_map     : HashMap::&lt;<span class="kw-2">&amp;</span>str, usize&gt;::new(),
+      start_time   : Instant::now()
     }
   }
  
   <span class="kw">pub fn </span>receive_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), SerializationError&gt; {  
     <span class="kw">match </span><span class="self">self</span>.tele_recv.try_recv() {
-        <span class="prelude-val">Err</span>(crossbeam_channel::TryRecvError::Empty) =&gt; {
-            <span class="macro">trace!</span>(<span class="string">"No data available yet."</span>);
-            <span class="comment">// Handle the empty case, possibly by doing nothing or logging.
-        </span>},
-        <span class="prelude-val">Err</span>(crossbeam_channel::TryRecvError::Disconnected) =&gt; {
-            <span class="macro">error!</span>(<span class="string">"Telemetry channel disconnected."</span>);
-            <span class="comment">// Handle the disconnection, possibly by stopping processing or returning an error.
-            </span><span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::Disconnected);
-        },
-        <span class="prelude-val">Ok</span>(packet) =&gt; {
-            <span class="comment">// Process the received packet as before
-            </span><span class="self">self</span>.header_queue.push_back(packet.header.clone());
-            <span class="kw">if </span><span class="self">self</span>.header_queue.len() &gt; <span class="self">self</span>.queue_size {
-                <span class="kw">let _ </span>= <span class="self">self</span>.header_queue.pop_front();
-            }
+      <span class="prelude-val">Err</span>(crossbeam_channel::TryRecvError::Empty) =&gt; {
+        <span class="macro">trace!</span>(<span class="string">"No data available yet."</span>);
+        <span class="comment">// Handle the empty case, possibly by doing nothing or logging.
+      </span>},
+      <span class="prelude-val">Err</span>(crossbeam_channel::TryRecvError::Disconnected) =&gt; {
+        <span class="macro">error!</span>(<span class="string">"Telemetry channel disconnected."</span>);
+        <span class="comment">// Handle the disconnection, possibly by stopping processing or returning an error.
+        </span><span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::Disconnected);
+      },
+      <span class="prelude-val">Ok</span>(packet) =&gt; {
+        <span class="comment">// Process the received packet as before
+        </span><span class="kw">let </span>telly_ptype = TelemetryPacketType::from(packet.header.ptype);
+        telly_packet_counter(<span class="kw-2">&amp;mut </span><span class="self">self</span>.pack_map, <span class="kw-2">&amp;</span>telly_ptype);
 
-            <span class="kw">if </span>packet.header.ptype == <span class="number">90 </span>{
-                <span class="kw">let </span>expected_size = (packet.header.length <span class="kw">as </span>usize) - TelemetryHeader::SIZE;
-                <span class="kw">if </span>expected_size &gt; packet.payload.len() {
-                    <span class="macro">println!</span>(<span class="string">"Unable to decode MergedEvent Telemetry packet! The expected size is {}, but the payload len is {}"</span>, expected_size - TelemetryHeader::SIZE, packet.payload.len());
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::StreamTooShort);
-                }
-                <span class="kw">match </span>MergedEvent::from_bytestream(<span class="kw-2">&amp;</span>packet.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
-                    <span class="prelude-val">Err</span>(err) =&gt; {
-                        <span class="macro">error!</span>(<span class="string">"Unable to decode MergedEvent! {err}"</span>);
-                    }
-                    <span class="prelude-val">Ok</span>(me) =&gt; {
-                        <span class="kw">if let </span><span class="prelude-val">Some</span>(sender) = <span class="kw-2">&amp;</span><span class="self">self</span>.tp_sender {
-                            <span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>me.tof_data, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
-                                <span class="prelude-val">Err</span>(err) =&gt; {
-                                    <span class="macro">error!</span>(<span class="string">"Can't unpack TofPacket! {err}"</span>);
-                                }
-                                <span class="prelude-val">Ok</span>(tp) =&gt; {
-                                    <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = sender.send(tp) {
-                                        <span class="macro">error!</span>(<span class="string">"Unable to send TP over channel! {err}"</span>);
-                                    }
-                                }
-                            }
-                        }
-                        <span class="self">self</span>.merged_queue.push_back(me);
-                        <span class="kw">if </span><span class="self">self</span>.merged_queue.len() &gt; <span class="self">self</span>.queue_size {
-                            <span class="kw">let _ </span>= <span class="self">self</span>.merged_queue.pop_front();
-                        }
-                    }
-                }
-            }
+        <span class="self">self</span>.header_queue.push_back(packet.header.clone());
+        <span class="kw">if </span><span class="self">self</span>.header_queue.len() &gt; <span class="self">self</span>.queue_size {
+          <span class="kw">let _ </span>= <span class="self">self</span>.header_queue.pop_front();
         }
+        <span class="kw">if </span>packet.header.ptype == <span class="number">92 </span>{
+          <span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>packet.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
+            <span class="prelude-val">Err</span>(err) =&gt; {
+              <span class="macro">error!</span>(<span class="string">"Unable to decode AnyHKpacket! {err}"</span>);
+            }
+            <span class="prelude-val">Ok</span>(tpack) =&gt; {
+              <span class="kw">if let </span><span class="prelude-val">Some</span>(sender) = <span class="kw-2">&amp;</span><span class="self">self</span>.tp_sender {
+                <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = sender.send(tpack) {
+                  <span class="macro">error!</span>(<span class="string">"Unable to send TP over channel! {err}"</span>);
+                }
+              }
+            }
+          }
+        }
+        
+        <span class="kw">if </span>packet.header.ptype == <span class="number">90 </span>|| packet.header.ptype == <span class="number">191  </span>{
+          <span class="kw">let </span>expected_size = (packet.header.length <span class="kw">as </span>usize) - TelemetryHeader::SIZE;
+          <span class="kw">if </span>expected_size &gt; packet.payload.len() {
+            <span class="macro">error!</span>(<span class="string">"Unable to decode MergedEvent Telemetry packet of type {}! The expected size is {}, but the payload len is {}"</span>, packet.header.ptype, expected_size - TelemetryHeader::SIZE, packet.payload.len());
+            <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::StreamTooShort);
+          }
+          <span class="kw">match </span>MergedEvent::from_bytestream(<span class="kw-2">&amp;</span>packet.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
+            <span class="prelude-val">Err</span>(err) =&gt; {
+              <span class="macro">error!</span>(<span class="string">"Unable to decode MergedEvent Telemetry packet of type {}! The expected size is {}, but the payload len is {}! {err}"</span>, packet.header.ptype, expected_size - TelemetryHeader::SIZE, packet.payload.len());
+            }
+            <span class="prelude-val">Ok</span>(me) =&gt; {
+              <span class="kw">if let </span><span class="prelude-val">Some</span>(sender) = <span class="kw-2">&amp;</span><span class="self">self</span>.tp_sender {
+                <span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>me.tof_data, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
+                  <span class="prelude-val">Err</span>(err) =&gt; {
+                    <span class="macro">error!</span>(<span class="string">"Can't unpack TofPacket! {err}"</span>);
+                  }
+                  <span class="prelude-val">Ok</span>(tp) =&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = sender.send(tp) {
+                      <span class="macro">error!</span>(<span class="string">"Unable to send TP over channel! {err}"</span>);
+                    }
+                  }
+                }
+              }
+              <span class="self">self</span>.merged_queue.push_back(me);
+              <span class="kw">if </span><span class="self">self</span>.merged_queue.len() &gt; <span class="self">self</span>.queue_size {
+                <span class="kw">let _ </span>= <span class="self">self</span>.merged_queue.pop_front();
+              }
+            }
+          }
+        }
+      }
     }
     <span class="prelude-val">Ok</span>(())
   }
-    <span class="comment">//match self.tp_receiver.try_recv() {
-    //  Err(_err) =&gt; {
-    //    return Ok(());
-    //  },
-    //  Ok(pack)    =&gt; {
-    //    let ev : TofEvent = pack.unpack()?;
-    //    match self.mte_sender.send(ev.mt_event.clone()) {
-    //      Err(err) =&gt; error!("Can send MasterTriggerEvent! {err}"),
-    //      Ok(_)    =&gt; ()
-    //    }
-    //    for k in ev.rb_events.iter() {
-    //      let rb_ev = k.clone();
-    //      for h in rb_ev.hits.iter() {
-    //        match self.th_sender.send(h.clone()) {
-    //          Err(err) =&gt; error!("Can not send TofHit! {err}"),
-    //          Ok(_)    =&gt; ()
-    //        }
-    //      }
-    //      match self.rbe_sender.send(k.clone()) {
-    //        Err(err) =&gt; error!("Can not send RBEvent! {err}"),
-    //        Ok(_)    =&gt; ()
-    //      }
-    //    }
-    //    self.event_queue.push_back(ev);
-    //    if self.event_queue.len() &gt; self.queue_size {
-    //      self.event_queue.pop_front();
-    //    }
-    //    return Ok(());
-    //  }
-    //}
 
-//   pub fn render(&amp;mut self, main_window : &amp;Rect, frame : &amp;mut Frame) {
-    
-//     // as usual, layout first
-//     let main_lo = Layout::default()
-//       .direction(Direction::Horizontal)
-//       .constraints(
-//           [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
-//       )
-//       .split(*main_window);
-    
-//     let packet_lo = Layout::default()
-//       .direction(Direction::Vertical)
-//       .constraints(
-//           [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
-//       )
-//       .split(main_lo[0]);
-
-
-//     let mut header_string = String::from("");
-//     if let Some(header) = self.header_queue.back() {
-//       header_string = format!("{}", header);
-//     }
-//     let header_view = Paragraph::new(header_string)
-//       .style(self.theme.style())
-//       .alignment(Alignment::Left)
-//       .block(
-//         Block::default()
-//           .borders(Borders::ALL)
-//           .border_type(BorderType::Rounded)
-//           .title("Last Header from Telemetry stream")
-//       );
-
-//     frame.render_widget(header_view, packet_lo[0]);
-//     let mut merged_string = String::from("");
-//     if let Some(ev) =  self.merged_queue.back() {
-//       merged_string = format!("{}", ev);
-//     }
-//     let merged_view = Paragraph::new(merged_string)
-//     //let merged_view = Paragraph::new(header_string)
-//       .style(self.theme.style())
-//       .alignment(Alignment::Left)
-//       .block(
-//         Block::default()
-//           .borders(Borders::ALL)
-//           .border_type(BorderType::Rounded)
-//           .title("Last MergedEvent from Telemetry stream")
-//       );
-//     frame.render_widget(merged_view, packet_lo[1]);
-//   }
-// }
-
-</span><span class="kw">pub fn </span>render(<span class="kw-2">&amp;mut </span><span class="self">self</span>, main_window: <span class="kw-2">&amp;</span>Rect, frame: <span class="kw-2">&amp;mut </span>Frame) {
-  <span class="comment">// Layout first
-  </span><span class="kw">let </span>main_lo = Layout::default()
-      .direction(Direction::Horizontal)
-      .constraints(
-          [Constraint::Percentage(<span class="number">30</span>), Constraint::Percentage(<span class="number">70</span>)].as_ref(),
-      )
-      .split(<span class="kw-2">*</span>main_window);
+  <span class="kw">pub fn </span>render(<span class="kw-2">&amp;mut </span><span class="self">self</span>, main_window: <span class="kw-2">&amp;</span>Rect, frame: <span class="kw-2">&amp;mut </span>Frame) {
+    <span class="kw">match </span><span class="self">self</span>.view {
+      TelemetryTabView::Stream =&gt; {
+        <span class="comment">// Layout first
+        </span><span class="kw">let </span>main_lo = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(
+                [Constraint::Percentage(<span class="number">33</span>),
+                 Constraint::Percentage(<span class="number">33</span>),
+                 Constraint::Percentage(<span class="number">34</span>)].as_ref(),
+            )
+            .split(<span class="kw-2">*</span>main_window);
+        
+        <span class="kw">let </span>packet_lo = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(
+                [Constraint::Percentage(<span class="number">30</span>), Constraint::Percentage(<span class="number">70</span>)].as_ref(),
+            )
+            .split(main_lo[<span class="number">0</span>]);
   
-  <span class="kw">let </span>packet_lo = Layout::default()
-      .direction(Direction::Vertical)
-      .constraints(
-          [Constraint::Percentage(<span class="number">30</span>), Constraint::Percentage(<span class="number">70</span>)].as_ref(),
-      )
-      .split(main_lo[<span class="number">0</span>]);
-
-  <span class="comment">// Create header_string safely
-  </span><span class="kw">let </span>header_string = <span class="kw">if let </span><span class="prelude-val">Some</span>(header) = <span class="self">self</span>.header_queue.back() {
-      <span class="macro">format!</span>(<span class="string">"{}"</span>, header)
-  } <span class="kw">else </span>{
-      String::from(<span class="string">"No header available"</span>)
-  };
+        <span class="comment">// Create header_string safely
+        </span><span class="kw">let </span>header_string = <span class="kw">if let </span><span class="prelude-val">Some</span>(header) = <span class="self">self</span>.header_queue.back() {
+            <span class="macro">format!</span>(<span class="string">"{}"</span>, header)
+        } <span class="kw">else </span>{
+            String::from(<span class="string">"No header available"</span>)
+        };
+        
+        <span class="kw">let </span>header_view = Paragraph::new(header_string)
+            .style(<span class="self">self</span>.theme.style())
+            .alignment(Alignment::Left)
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_type(BorderType::Rounded)
+                    .title(<span class="string">"Last Header from Telemetry stream"</span>)
+            );
   
-  <span class="kw">let </span>header_view = Paragraph::new(header_string)
-      .style(<span class="self">self</span>.theme.style())
-      .alignment(Alignment::Left)
-      .block(
-          Block::default()
-              .borders(Borders::ALL)
-              .border_type(BorderType::Rounded)
-              .title(<span class="string">"Last Header from Telemetry stream"</span>)
-      );
-
-  frame.render_widget(header_view, packet_lo[<span class="number">0</span>]);
-
-  <span class="comment">// Create merged_string safely
-  </span><span class="kw">let </span>merged_string = <span class="kw">if let </span><span class="prelude-val">Some</span>(ev) = <span class="self">self</span>.merged_queue.back() {
-      <span class="macro">format!</span>(<span class="string">"{}"</span>, ev)
-  } <span class="kw">else </span>{
-      String::from(<span class="string">"No merged event available"</span>)
-  };
+        frame.render_widget(header_view, packet_lo[<span class="number">0</span>]);
   
-  <span class="kw">let </span>merged_view = Paragraph::new(merged_string)
-      .style(<span class="self">self</span>.theme.style())
-      .alignment(Alignment::Left)
-      .block(
-          Block::default()
-              .borders(Borders::ALL)
-              .border_type(BorderType::Rounded)
-              .title(<span class="string">"Last MergedEvent from Telemetry stream"</span>)
-      );
-
-  frame.render_widget(merged_view, packet_lo[<span class="number">1</span>]);
+        <span class="comment">// Create merged_string safely
+        </span><span class="kw">let </span>merged_string = <span class="kw">if let </span><span class="prelude-val">Some</span>(ev) = <span class="self">self</span>.merged_queue.back() {
+            <span class="macro">format!</span>(<span class="string">"{}"</span>, ev)
+        } <span class="kw">else </span>{
+            String::from(<span class="string">"No merged event available"</span>)
+        };
+        
+        <span class="kw">let </span>merged_view = Paragraph::new(merged_string)
+            .style(<span class="self">self</span>.theme.style())
+            .alignment(Alignment::Left)
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_type(BorderType::Rounded)
+                    .title(<span class="string">"Last MergedEvent from Telemetry stream"</span>)
+            );
+  
+        frame.render_widget(merged_view, packet_lo[<span class="number">1</span>]);
+  
+        <span class="comment">// packet overview table, similar to home tab 
+        </span><span class="kw">let </span><span class="kw-2">mut </span>rows   = Vec::&lt;Row&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>sum_pack = <span class="number">0</span>;
+        <span class="kw">let </span>passed_time = <span class="self">self</span>.start_time.elapsed().as_secs_f64();
+        <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.pack_map.keys() {
+          <span class="comment">//stat_string_render += "  -- -- -- -- -- -- -- -- -- --\n";
+          </span><span class="kw">if </span><span class="self">self</span>.pack_map[k] != <span class="number">0 </span>{
+            sum_pack += <span class="self">self</span>.pack_map[k];
+            <span class="kw">if </span>k.contains(<span class="string">"Heart"</span>){
+              rows.push(Row::new(<span class="macro">vec!</span>[<span class="macro">format!</span>(<span class="string">"  \u{1f493} {:.1}"</span>, <span class="self">self</span>.pack_map[k]),
+                                      <span class="macro">format!</span>(<span class="string">"{:.1}"</span>, (<span class="self">self</span>.pack_map[k] <span class="kw">as </span>f64)/passed_time,),
+                                      <span class="macro">format!</span>(<span class="string">"[{}]"</span>, k)]));
+            } <span class="kw">else </span>{
+              rows.push(Row::new(<span class="macro">vec!</span>[<span class="macro">format!</span>(<span class="string">"  \u{279f} {:.1}"</span>, <span class="self">self</span>.pack_map[k]),
+                                      <span class="macro">format!</span>(<span class="string">"{:.1}"</span>, (<span class="self">self</span>.pack_map[k] <span class="kw">as </span>f64)/passed_time,),
+                                      <span class="macro">format!</span>(<span class="string">"[{}]"</span>, k)]));
+            }
+          }
+        }
+        rows.push(Row::new(<span class="macro">vec!</span>[<span class="string">"  \u{FE4C}\u{FE4C}\u{FE4C}"</span>,<span class="string">"\u{FE4C}\u{FE4C}"</span>,<span class="string">"\u{FE4C}\u{FE4C}\u{FE4C}\u{FE4C}\u{FE4C}\u{FE4C}"</span>])); 
+        rows.push(Row::new(<span class="macro">vec!</span>[<span class="macro">format!</span>(<span class="string">"  \u{279f}{}"</span>, sum_pack),
+                           <span class="macro">format!</span>(<span class="string">"{:.1}/s"</span>, (sum_pack <span class="kw">as </span>f64)/passed_time),
+                           <span class="macro">format!</span>(<span class="string">"[TOTAL]"</span>)]));
+        
+        <span class="kw">let </span>widths = [Constraint::Percentage(<span class="number">30</span>),
+                      Constraint::Percentage(<span class="number">20</span>),
+                      Constraint::Percentage(<span class="number">50</span>)];
+        <span class="kw">let </span>table  = Table::new(rows, widths)
+          .column_spacing(<span class="number">1</span>)
+          .header(
+            Row::new(<span class="macro">vec!</span>[<span class="string">"  N"</span>, <span class="string">"\u{1f4e6}/s"</span>, <span class="string">"Type"</span>])
+            .bottom_margin(<span class="number">1</span>)
+            .top_margin(<span class="number">1</span>)
+            .style(Style::new().add_modifier(Modifier::UNDERLINED))
+          )
+          .block(Block::new()
+                 .title(<span class="string">"Telemetry Packet summary \u{1f4e6}"</span>)
+                 .borders(Borders::ALL)
+                 <span class="comment">//.border_type(BorderType::Rounded)
+                 </span>)
+          .style(<span class="self">self</span>.theme.style());
+        frame.render_widget(table, main_lo[<span class="number">2</span>])
+      }
+      TelemetryTabView::MergedEvents =&gt; {
+      }
+    }
   }
 }
 </code></pre></div></section></main></body></html>

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["colors","menu","tabs","widgets"]};
+window.SIDEBAR_ITEMS = {"fn":["packet_distributor","socket_wrap_tofstream","telly_packet_counter"],"mod":["colors","layout","menu","tabs","widgets"]};

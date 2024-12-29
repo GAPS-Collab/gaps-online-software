@@ -257,9 +257,23 @@
 <a href="#256" id="256">256</a>
 <a href="#257" id="257">257</a>
 <a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::VecDeque;
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::VecDeque;
 
-<span class="kw">use </span>crossbeam_channel::Receiver;
+<span class="kw">use </span>crossbeam_channel::{
+  Sender,
+  Receiver
+};
 
 <span class="comment">//extern crate ndhistogram;
 </span><span class="kw">use </span>ndhistogram::{
@@ -324,6 +338,8 @@
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>TofSummaryTab {
   <span class="kw">pub </span>ts_receiver     : Receiver&lt;TofEventSummary&gt;,
+  <span class="doccomment">/// pass our events on when we are done with them!
+  </span><span class="kw">pub </span>ts_sender       : Sender&lt;TofEventSummary&gt;,
   <span class="kw">pub </span>summary_queue   : VecDeque&lt;TofEventSummary&gt;,
   <span class="kw">pub </span>queue_size      : usize,
   <span class="kw">pub </span>n_trg_pdl_histo : Hist1D&lt;Uniform&lt;f32&gt;&gt;, 
@@ -343,6 +359,7 @@
 
 <span class="kw">impl </span>TofSummaryTab {
   <span class="kw">pub fn </span>new(ts_receiver  : Receiver&lt;TofEventSummary&gt;,
+             ts_sender    : Sender&lt;TofEventSummary&gt;,
              dsijchpidmap : <span class="kw-2">&amp;</span>DsiJChPidMapping,
              theme        : ColorTheme) -&gt; <span class="self">Self </span>{
     
@@ -350,6 +367,7 @@
     <span class="kw">let </span>mhg_bins      = Uniform::new(<span class="number">160</span>, <span class="number">0.0</span>, <span class="number">160.0</span>).unwrap();
     <span class="self">Self </span>{
       ts_receiver     : ts_receiver,
+      ts_sender       : ts_sender,
       summary_queue   : VecDeque::&lt;TofEventSummary&gt;::new(),
       queue_size      : <span class="number">10000</span>,
       n_trg_pdl_histo : <span class="macro">ndhistogram!</span>(bins),
@@ -402,9 +420,13 @@
           <span class="self">self</span>.evid_test_info += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n-- -- previous: {:?}"</span>, <span class="self">self</span>.evid_test_chnks));
           <span class="self">self</span>.event_id_test.clear();
         }
-        <span class="self">self</span>.summary_queue.push_back(ts);
+        <span class="self">self</span>.summary_queue.push_back(ts.clone());
         <span class="kw">if </span><span class="self">self</span>.summary_queue.len() &gt; <span class="self">self</span>.queue_size {
           <span class="self">self</span>.summary_queue.pop_front();
+        }
+        <span class="kw">match </span><span class="self">self</span>.ts_sender.send(ts) {
+          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; (),
+          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to pass on TofEvent! {err}"</span>)
         }
       }
     }

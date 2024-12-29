@@ -192,19 +192,19 @@
 
 
 <span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>HomeTab {
+</span><span class="kw">pub struct </span>HomeTab&lt;<span class="lifetime">'a</span>&gt; {
   <span class="kw">pub </span>theme      : ColorTheme,
   <span class="kw">pub </span>streamer   : Arc&lt;Mutex&lt;VecDeque&lt;String&gt;&gt;&gt;,
-  <span class="kw">pub </span>pack_stat  : Arc&lt;Mutex&lt;HashMap&lt;String, usize&gt;&gt;&gt;,
+  <span class="kw">pub </span>pack_stat  : Arc&lt;Mutex&lt;HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, usize&gt;&gt;&gt;,
   <span class="kw">pub </span>stream     : String,
   <span class="kw">pub </span>stream_max : usize, 
   start_time     : Instant,
 }
 
-<span class="kw">impl </span>HomeTab {
+<span class="kw">impl </span>HomeTab&lt;<span class="lifetime">'_</span>&gt; {
   <span class="kw">pub fn </span>new(theme     : ColorTheme,
              streamer  : Arc&lt;Mutex&lt;VecDeque&lt;String&gt;&gt;&gt;,
-             pack_stat : Arc&lt;Mutex&lt;HashMap&lt;String,usize&gt;&gt;&gt;) -&gt; HomeTab {
+             pack_stat : Arc&lt;Mutex&lt;HashMap&lt;<span class="kw-2">&amp;</span>str,usize&gt;&gt;&gt;) -&gt; HomeTab {
     HomeTab {
       theme,
       streamer, 
