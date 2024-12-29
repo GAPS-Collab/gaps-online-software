@@ -31,7 +31,8 @@ pub fn get_rbratmap_hardcoded() ->  HashMap<u8,u8> {
        (5, 20), 
        (6, 19), 
        (7, 17), 
-       (8,  9),  
+       (8,  9),
+       (9, 13),  
        (11,10),
        (13, 4), 
        (14, 2), 
@@ -202,6 +203,14 @@ pub fn shutdown_ratpair(pdu : u8, pduchannel : u8) -> Option<TofCommandV2> {
   Some(cmd)
 }
 
+/// Send the 'sudo shutdown now' command to
+/// ALL RBs
+pub fn shutdown_all_rbs() -> Option<TofCommandV2> {
+  Some(TofCommandV2 {
+    command_code : TofCommandCode::ShutdownRB,
+    payload      : Vec::<u8>::new()
+  })
+}
 
 /// Send the 'sudo shutdown now command to
 /// the TOF main computer ("TOFCPU")

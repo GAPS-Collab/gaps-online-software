@@ -58,6 +58,19 @@ pub fn py_shutdown_rb(rb : u8) -> PyResult<PyTofCommand> {
   })
 }
 
+
+/// Send the 'sudo shutdown now' command to
+/// ALL RBs
+#[pyfunction]
+#[pyo3(name="shutdown_all_rbs")]
+pub fn py_shutdown_all_rbs() -> PyResult<PyTofCommand> {
+  let cmd = shutdown_all_rbs().unwrap();
+  let pycmd = PyTofCommand { 
+    command : cmd
+  };
+  return Ok(pycmd);
+}
+
 /// Send the 'sudo shutdown now' command to all RBs in a RAT
 ///
 /// # Arguments:

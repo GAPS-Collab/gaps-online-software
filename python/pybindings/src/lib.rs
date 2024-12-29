@@ -363,6 +363,7 @@ fn tof_command_factory<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(py_get_ratrbmap_hardcoded, m)?)?;
   m.add_function(wrap_pyfunction!(py_get_ratpdumap_hardcoded, m)?)?;
   m.add_function(wrap_pyfunction!(py_shutdown_rb, m)?)?;
+  m.add_function(wrap_pyfunction!(py_shutdown_all_rbs, m)?)?;
   m.add_function(wrap_pyfunction!(py_shutdown_rat, m)?)?;
   m.add_function(wrap_pyfunction!(py_shutdown_ratpair, m)?)?;
   m.add_function(wrap_pyfunction!(py_shutdown_tofcpu, m)?)?;
