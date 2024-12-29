@@ -120,7 +120,7 @@ pub fn py_shutdown_ratpair(pdu : u8, pduchannel : u8) -> PyResult<PyTofCommand> 
 /// Send the 'sudo shutdown now command to
 /// the TOF main computer ("TOFCPU")
 #[pyfunction]
-#[pyo3(name="shutdown_ratpair")]
+#[pyo3(name="shutdown_cpu")]
 pub fn py_shutdown_tofcpu() -> PyResult<PyTofCommand> {
   match shutdown_tofcpu() {
     None => {
