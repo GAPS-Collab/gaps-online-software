@@ -27,11 +27,9 @@ use crate::memory::*;
 use tof_dataclasses::events::{RBEvent,
                               DataType};
 use tof_dataclasses::commands::{
-    TofCommand,
     TofOperationMode,
 };
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::commands::config::RunConfig;
 
 // Takeru's tof-control
@@ -960,19 +958,6 @@ pub fn prefix_board_id_noquery(board_id : u8, input : &mut Vec<u8>) -> Vec<u8> {
   bytestream.append(input);
   bytestream
 }
-
-
-/// strip of the first 4 bytes of the incoming vector 
-pub fn cmd_from_bytestream(bytestream : &mut Vec<u8>) ->Result<TofCommand, SerializationError>{
-  //let bytestream = cmd.drain(0..4);
-  // FIXME - remove expect call
-  TofCommand::from_bytestream(&bytestream, &mut 4)
-  //tof_command
-}
-
-
-
-
 
 /// Reset DMA pointer and buffer occupancy registers
 ///

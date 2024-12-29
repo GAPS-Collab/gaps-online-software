@@ -1,25 +1,23 @@
 use std::time::{
-    //Instant,
-    Duration,
+  //Instant,
+  Duration,
 };
 use std::thread;
 use std::sync::{
-    Arc,
-    Mutex,
+  Arc,
+  Mutex,
 };
 
-//use std::time::Instant;
-//use std::path::Path;
 use crossbeam_channel::Sender;
 
 use tof_control::helper::pa_type::PASetBias;
 
 use tof_dataclasses::commands::{
-    TofCommand,
-    TofCommandV2,
-    TofCommandCode,
-    TofResponse,
-    TofResponseCode,
+  TofCommand,
+  TofCommandV2,
+  TofCommandCode,
+  TofResponse,
+  TofResponseCode,
 };
 
 use tof_dataclasses::commands::config::{
@@ -49,9 +47,9 @@ use crate::api::{rb_calibration,
                  send_ltb_threshold_set,
 };
 use crate::threads::monitoring::{
-    get_ltb_moni,
-    get_pb_moni,
-    get_rb_moni
+  get_ltb_moni,
+  get_pb_moni,
+  get_rb_moni
 };
 
 use liftof_lib::constants::DEFAULT_RB_ID;
@@ -231,7 +229,7 @@ pub fn cmd_responder(cmd_server_address        : String,
                       Ok(_) => {
                         println!("== ==> [cmd-responder] Calibration successful!");
                         info!("Default calibration data taking successful!");
-                        return_val = Ok(TofCommandCode::RBCalibration);
+                        //return_val = Ok(TofCommandCode::RBCalibration);
                       },
                       Err(err) => {
                         error!("Default calibration data taking failed! Error {err}!");
@@ -342,25 +340,6 @@ pub fn cmd_responder(cmd_server_address        : String,
                           }
                         }
                       },
-                      TofCommand::SetThresholds   (value) =>  {
-                        info!("Received set threshold command! Will communicate to LTBs");
-                        // MSB first 8 bits are LTB ID
-                        let ltb_id: u8 = ((value | (MASK_CMD_8BIT << 24)) >> 24) as u8;
-                        // MSB second 8 bits are LTB ID
-                        let threshold_name: LTBThresholdName = LTBThresholdName::from(((value | (MASK_CMD_8BIT << 16)) >> 16) as u8);
-                        // MSB third 16 bits are extra (not used)
-                        let threshold_level: u16 = (value | MASK_CMD_16BIT) as u16;
-                        match send_ltb_threshold_set(ltb_id, threshold_name, threshold_level) {
-                          Ok(_)    => {
-                            info!("Threshold sent to LTB!");
-                            return_val = Ok(TofCommandCode::SetLTBThresholds);
-                          },
-                          Err(err) => {
-                            error!("LTB threshold sending failed! Err {err}");
-                            return_val = Err(CmdError::ThresholdSetError);
-                          }
-                        }
-                      },
                       TofCommand::DataRunStop(value)   => {
                         // MSB fourth 8 bits are RB ID
                         let rb_id: u8 = (value | MASK_CMD_8BIT) as u8;
@@ -450,18 +429,6 @@ pub fn cmd_responder(cmd_server_address        : String,
                           // The packet was not for this RB so bye
                           continue;
                         }
-                      },
-                      TofCommand::TriggerModeForced  (_) => {
-                        warn!("Not implemented");
-                        return_val = Err(CmdError::NotImplementedError);
-                      },
-                      TofCommand::UnspoolEventCache  (_) => {
-                        warn!("Not implemented");
-                        return_val = Err(CmdError::NotImplementedError);
-                      },
-                      TofCommand::SystemdReboot  (_) => {
-                        warn!("Not implemented");
-                        return_val = Err(CmdError::NotImplementedError);
                       }
                       _ => {
                         error!("{} is not implemented!", cmd);
