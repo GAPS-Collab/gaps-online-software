@@ -8,7 +8,7 @@ use tof_dataclasses::serialization::{
   parse_u16,
   parse_u16_be,
   //parse_u32,
-  parse_u64,
+  //parse_u64,
   Serialization,
   SerializationError,
   //Packable
@@ -109,12 +109,13 @@ impl Serialization for MagnetoMeter {
     }
     mag.header  = TelemetryHeader::from_bytestream(stream, pos)?;
     // we do have to deal with a bunch of empty bytes
-    let n_empty = parse_u8(stream, pos);
-    if n_empty != 16 {
-      error!("Decoding of magnetometer packet faILed! We expected 16 empty bytes, but got {} instead!", n_empty);
+    *pos += 1;
+    let mut n_data = parse_u8(stream, pos);
+    if n_data != 16 {
+      error!("Decoding of magnetometer packet faILed! We expected 16 data bytes, but got {} instead!", n_data);
       return Err(SerializationError::WrongByteSize);
     }
-    *pos += n_empty as usize;
+    //*pos += n_empty as usize;
     mag.mag_x = parse_u16_be(stream, pos);
     mag.acc_x = parse_u16_be(stream, pos);
     mag.mag_y = parse_u16_be(stream, pos);
@@ -133,6 +134,31 @@ impl Serialization for MagnetoMeter {
       return Err(SerializationError::WrongByteSize);
     }
     *pos += 1; // ALEX - "the checksum we are not checking"
+    mag.end_byte = parse_u16_be(stream, pos);
+    if mag.end_byte != 32767 {
+      error!("Decoding of magnetormeter packet faailed! Tail incorrect!");
+      return Err(SerializationError::TailInvalid);
+    }
+    *pos += 1; // empty bytes that we do not care about from the first magnetometer packet
+    n_data     = parse_u8(stream, pos);
+    if n_data != 16 {
+      error!("The second magnetometer data chunk seems to have the wrong size! ({} instead of 16)", n_data);
+      return Err(SerializationError::WrongByteSize);
+    };
+    mag.roll        = parse_u16_be(stream, pos); 
+    mag.mag_roll    = parse_u16_be(stream, pos); 
+    mag.pitch       = parse_u16_be(stream, pos); 
+    mag.mag_field   = parse_u16_be(stream, pos); 
+    mag.yaw         = parse_u16_be(stream, pos); 
+    mag.grav_field  = parse_u16_be(stream, pos); 
+    *pos += 4; // ALEX - "more temp data we are not reading out"
+    mag.zero = parse_u8(stream, pos);
+    if mag.zero != 0 {
+      // FIXME - better error type
+      error!("Decoding of magnetometer packet failed! Byte whcih should be zero is not zero!");
+      return Err(SerializationError::WrongByteSize);
+    }
+    *pos += 1; // ALEX  - "another checksum (from second packet) we are not checking"
     mag.end_byte = parse_u16_be(stream, pos);
     if mag.end_byte != 32767 {
       error!("Decoding of magnetormeter packet faailed! Tail incorrect!");
