@@ -1207,10 +1207,18 @@
 <a href="#1206" id="1206">1206</a>
 <a href="#1207" id="1207">1207</a>
 <a href="#1208" id="1208">1208</a>
-<a href="#1209" id="1209">1209</a></pre></div><pre class="rust"><code><span class="doccomment">//! Basic telemetry packets
+<a href="#1209" id="1209">1209</a>
+<a href="#1210" id="1210">1210</a>
+<a href="#1211" id="1211">1211</a>
+<a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a></pre></div><pre class="rust"><code><span class="doccomment">//! Basic telemetry packets
 //!
 
-</span><span class="kw">use </span>std::fmt;
+</span><span class="kw">pub mod </span>magnetometer;
+
+<span class="kw">pub use </span>magnetometer::MagnetoMeter;
+
+<span class="kw">use </span>std::fmt;
 <span class="kw">use </span>log::{
   <span class="comment">//info,
   </span>debug,
