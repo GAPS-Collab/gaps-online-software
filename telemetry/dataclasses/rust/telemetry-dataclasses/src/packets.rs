@@ -1,6 +1,10 @@
 //! Basic telemetry packets
 //!
 
+pub mod magnetometer;
+
+pub use magnetometer::MagnetoMeter;
+
 use std::fmt;
 use log::{
   //info,
