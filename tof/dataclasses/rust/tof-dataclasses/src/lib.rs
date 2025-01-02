@@ -44,6 +44,7 @@ pub mod series;
 pub mod heartbeats;
 pub mod version;
 pub mod status;
+pub mod alerts;
 #[cfg(feature="database")]
 pub mod database;
 #[cfg(feature="caraspace-serial")]

@@ -1,5 +1,11 @@
 # LELEWAA series
 
+## v0.10.8
+* Alert system - TofAlert as a general container for 
+  any kind of anomaly
+* Restore MTBMoniData to cary power data, since that 
+  might be helpful for inspection of MTB glitches
+
 ## v0.10.7
 * Fix a bug in RBMoniSeries, where mag tot was not returned
 * Changes MtbMoniData - use VCCBRAM for RB_LOST_RATE.
