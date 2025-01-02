@@ -831,6 +831,99 @@ impl PyTrackerEvent {
 }
 
 #[pyclass]
+#[pyo3(name="MagnetoMeterPacket")]
+pub struct PyMagnetoMeterPacket {
+  mag : tel_api::MagnetoMeter,
+}
+
+#[pymethods]
+impl PyMagnetoMeterPacket {
+
+  #[new]
+  fn new() -> Self {
+    Self {
+      mag : tel_api::MagnetoMeter::new(),
+    }
+  }
+
+ #[getter]
+ fn temp         (&self) -> u16 { 
+   self.mag.temp
+ }
+ 
+ #[getter]
+ fn mag_x        (&self) -> u16 { 
+   self.mag.mag_x
+ }
+ 
+ #[getter]
+ fn mag_y        (&self) -> u16 { 
+   self.mag.mag_y
+ }
+ 
+ #[getter]
+ fn mag_z        (&self) -> u16 { 
+   self.mag.mag_z
+ }
+ 
+ //#[getter]
+ //fn mag_tot        (&self) -> u16 { 
+ //  self.mag.mag_z
+ //}
+ 
+ #[getter]
+ fn acc_x        (&self) -> u16 { 
+   self.mag.acc_x
+ }
+ 
+ #[getter]
+ fn acc_y        (&self) -> u16 { 
+   self.mag.acc_y
+ }
+ 
+ #[getter]
+ fn acc_z        (&self) -> u16 { 
+   self.mag.acc_z
+ }
+ 
+ #[getter]
+ fn roll         (&self) -> u16 { 
+   self.mag.roll
+ }
+ 
+ #[getter]
+ fn pitch        (&self) -> u16 { 
+   self.mag.pitch
+ }
+ 
+ #[getter]
+ fn yaw          (&self) -> u16 { 
+   self.mag.yaw
+ }
+ 
+ #[getter]
+ fn mag_roll     (&self) -> u16 { 
+   self.mag.mag_roll
+ }
+ 
+ #[getter]
+ fn mag_field    (&self) -> u16 { 
+   self.mag.mag_field
+ }
+ 
+ #[getter]
+ fn grav_field   (&self) -> u16 { 
+   self.mag.grav_field
+ }
+ 
+ //fn expected_size(&self) -> u64 { 
+ //fn end_byte     (&self) -> u16 { 
+ //fn zero         (&self) -> u8  { 
+ //fn ndata        (&self) -> u8  { 
+
+}
+
+#[pyclass]
 #[pyo3(name="GPSPacket")]
 pub struct PyGPSPacket {
   gps : tel_api::GPSPacket,
