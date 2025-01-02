@@ -104,6 +104,13 @@ pub fn parse_u16(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
   value
 }
 
+pub fn parse_u16_be(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
+  let value = u16::from_be_bytes([bs[*pos], bs[*pos+1]]);
+  *pos += 2;
+  value
+}
+
+
 // FIXME - make this a generic
 pub fn parse_u16_deque(bs : &VecDeque::<u8>, pos : &mut usize) -> u16 {
   let value = u16::from_le_bytes([bs[*pos], bs[*pos+1]]);
