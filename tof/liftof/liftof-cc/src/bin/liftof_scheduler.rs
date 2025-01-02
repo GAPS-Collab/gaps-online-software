@@ -209,6 +209,9 @@ fn main() {
       error!("Unable to write to path {filename}! {err} Falling back to default file path");
     }
   }
+
+  // All RBs
+
   loop {
     thread::sleep(sleep_time);
     //println!("=> Cmd responder loop iteration!");
@@ -322,7 +325,10 @@ fn main() {
                 }
               }
               TofCommandCode::ShutdownRB => {
-                let cmd_rb_list  = cmd.payload.clone();
+                let mut cmd_rb_list  = cmd.payload.clone();
+                if cmd_rb_list.is_empty() {
+                  cmd_rb_list = all_rb_ids.clone();
+                }
                 info!("Received Shutdown RB command for RBs {:?}", cmd_rb_list);
                 let cmd_args     = vec![String::from("sudo"),
                                         String::from("shutdown"),
@@ -408,12 +414,13 @@ fn main() {
               }
               TofCommandCode::RBCalibration => {
                 info!("Received RBCalibration command!");
-                if cmd.payload.len() < 2 {
+                if cmd.payload.len() < 3 {
                   error!("Broken RBCalibration command!");
                   continue;
                 }
-                let save_waveforms = cmd.payload[1] != 0;
-                let send_packets   = cmd.payload[0] != 0;  
+                let pre_run_cali   = cmd.payload[0] != 0;
+                let send_packets   = cmd.payload[1] != 0;  
+                let save_waveforms = cmd.payload[2] != 0;
                 match LiftofSettings::from_toml(&cfg_file) {
                   Err(err) => {
                     error!("CRITICAL! Unable to parse .toml settings file! {}", err);
@@ -423,8 +430,10 @@ fn main() {
                   Ok(mut config) => {
                     config.data_publisher_settings.send_cali_packets = send_packets;
                     config.save_cali_wf                              = save_waveforms;
-                    config.pre_run_calibration = true;
+                    config.pre_run_calibration = pre_run_cali;
                     config.to_toml(String::from(cfg_file.clone()));
+                    info!("We changed the data publisher settings to be this {}",config.data_publisher_settings);
+                    
                     success = TofReturnCode::Success;
                   }
                 }   

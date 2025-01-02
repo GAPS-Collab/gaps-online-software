@@ -38,12 +38,13 @@ def get_version(binary):
     os.chdir('..')
     return version
 
-def build_for_muslx86_64(binary, njobs=24):
+def build_for_muslx86_64(binary, njobs=24, clean=False):
     if binary == 'liftof-scheduler':
         os.chdir('liftof-cc')
     else:
         os.chdir(f'{binary}')
-    sub.run(["cargo clean"], shell=True)
+    if clean:
+        sub.run(["cargo clean"], shell=True)
     build_cmd = f'CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build -j {njobs} --target=x86_64-unknown-linux-musl --bin {binary} --release --all-features'
     result = sub.run([build_cmd], shell=True)
     shutil.move(f'../target/x86_64-unknown-linux-musl/release/{binary}', '../build/')
@@ -53,12 +54,13 @@ def build_for_muslx86_64(binary, njobs=24):
     version = result.stdout.split()[1]
     shutil.copy(f'build/{binary}', f'releases/{binary}.musl.x86.{version}')
 
-def build_for_arm32(binary, njobs=24):
+def build_for_arm32(binary, njobs=24, clean=False):
     """
     Readoutboards have ARM32 architecture
     """
     os.chdir(f'{binary}')
-    sub.run(["cargo clean"], shell=True)
+    if clean:
+        sub.run(["cargo clean"], shell=True)
     build_cmd = f'CARGO_TARGET_ARMV7_UNKNOWN_LINUX_MUSLEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build -j {njobs} --bin {binary} --target=armv7-unknown-linux-musleabi --all-features --release' 
     result = sub.run([build_cmd], shell=True)
     shutil.move(f'../target/armv7-unknown-linux-musleabi/release/{binary}', '../build/')
@@ -124,6 +126,7 @@ if __name__ == '__main__':
 
     deployparser = subparsers.add_parser('deploy', help='Deploy liftof components')
     deployparser.add_argument("-j", type=int, default=24, help="Use <j> number of cores")
+    deployparser.add_argument("--clean", action="store_true", help="Run a 'cargo clean' before the build")
     deployparser.add_argument("--no-musl", action="store_true", help="Do not use musl as libc replacement (not recommended)")
     deployparser.add_argument("--debug", action="store_true", help="Deploy to debug directory", default=False)
     deployparser.add_argument("--tofcpu-ssh-name", type=str, help="The name of the tof-cpu in .ssh/config", default="tofcpu-pl")
@@ -145,13 +148,13 @@ if __name__ == '__main__':
         os.makedirs('build', exist_ok=True)
         os.makedirs('releases', exist_ok=True)
         if args.binary == 'liftof-rb':
-            build_for_arm32(args.binary)
+            build_for_arm32(args.binary, njobs=args.j,clean=args.clean)
 #bui    ld_for_muslx86_64('liftof-cc')
         else:
             #if args.no_musl:
             #    build_for_gnux86_64(arggs.binary, njobs=args.j)
             #else:
-            build_for_muslx86_64(args.binary, njobs=args.j)
+            build_for_muslx86_64(args.binary, njobs=args.j, clean=args.clean)
         if args.cmd == 'deploy':
             if args.debug:
                 deploy(args.binary, dest_dir='bin/debug')
