@@ -427,6 +427,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             // since it relies on quantities only calculated 
             // in the TofEventSummary packet 
             let mut save_to_disk = true;
+            n_sent += 1;
+            heartbeat.n_sent += 1;
             if send_tev_sum {
               let tes  = ev_to_send.get_summary();
               if settings.only_save_interesting {
@@ -447,8 +449,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                 }
                 Ok(_)    => {
                   debug!("Event with id {} sent!", evid);
-                  n_sent += 1;
-                  heartbeat.n_sent += 1;
                 }
               }
             }
@@ -484,8 +484,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                 }
                 Ok(_)    => {
                   debug!("Event with id {} sent!", evid);
-                  n_sent += 1;
-                  heartbeat.n_sent += 1;
                 }
               }
             } 
