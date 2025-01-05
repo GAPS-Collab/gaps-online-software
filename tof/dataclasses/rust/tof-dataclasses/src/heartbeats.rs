@@ -489,31 +489,50 @@ pub struct EVTBLDRHeartbeat {
   pub met_seconds           : usize,
   /// Total number of received MasterTriggerEvents (from MTB)
   pub n_mte_received_tot    : usize,
+  /// Total number of received RBEvents (from all RB)
   pub n_rbe_received_tot    : usize,
+  /// Average number of RBEvents per each MTEvent
   pub n_rbe_per_te          : usize,
+  /// Total number of discarded RBEvents (accross all boards)
   pub n_rbe_discarded_tot   : usize,
+  /// TOtal number of missed MTEvents. "Skipped means" gaps in 
+  /// consecutive rising event ids
   pub n_mte_skipped         : usize,
+  /// Total number of events that timed out, which means they 
+  /// got send before all RBEvents could be associated with 
+  /// this event
   pub n_timed_out           : usize,
+  /// Total number of events passed on to the gloabl data sink 
+  /// thread
   pub n_sent                : usize,
+  /// ?
   pub delta_mte_rbe         : usize,
+  /// The total size of the current event cache in number of events
   pub event_cache_size      : usize,
-  
-  // Per designe, the event_id cache and the 
-  // event_cache MUST have the same size. 
-  // I am just paranoid... 
-  // Let's repurpose this field for the 
-  // total number of lost hits due to DRS 
-  // deadtime
+  /// In paralel to the event_cache, the event_id cache holds event ids.
+  /// This should be perfectly aligned to the event_cache by design.
   pub event_id_cache_size   : usize, 
+  /// The total number of hits which we lost due to the DRS being busy
+  /// (this is on the Readoutboards)
   pub drs_bsy_lost_hg_hits  : usize,
+  /// The total number of RBEvents which do not have a MasterTriggerEvent
   pub rbe_wo_mte            : usize,
+  /// The current length of the channel which we use to send events from 
+  /// the MasterTrigger thread to the event builder
   pub mte_receiver_cbc_len  : usize,
+  /// The current length of the channel whcih we use for all readoutboard
+  /// threads to send their events to the event builder
   pub rbe_receiver_cbc_len  : usize,
+  /// the current length of the channel which we use to send built events 
+  /// to the global data sink thread
   pub tp_sender_cbc_len     : usize,
+  /// The total number of RBEvents which have an event id which is SMALLER
+  /// than the smallest event id in the event cache. 
   pub n_rbe_from_past       : usize,
   pub n_rbe_orphan          : usize,
   // let's deprecate this!
-  pub n_ev_wo_evid          : usize,
+  pub n_rbe_per_loop          : usize,
+  /// The totabl number of events with the "AnyDataMangling" flag set
   pub data_mangled_ev       : usize,
   // pub seen_rbevents         : HashMap<u8, usize>,
 }
@@ -546,7 +565,7 @@ impl EVTBLDRHeartbeat {
       mte_receiver_cbc_len : 0,
       rbe_receiver_cbc_len : 0,
       tp_sender_cbc_len    : 0,
-      n_ev_wo_evid         : 0,
+      n_rbe_per_loop         : 0,
       n_rbe_orphan         : 0,
       n_rbe_from_past      : 0,
       data_mangled_ev      : 0,
@@ -609,9 +628,9 @@ impl EVTBLDRHeartbeat {
     //repr += &(format!("\n Size of event ID cache              : {}", self.event_id_cache_size).bright_purple());
     repr += &(format!("\n Num. events timed out               : {}", self.n_timed_out).bright_purple());
     repr += &(format!("\n Percent events timed out            : {:.2}%", self.get_timed_out_frac()*(100 as f64)).bright_purple());
-    //if self.n_sent > 0 && self.n_ev_wo_evid > 0 {
-    //  repr += &(format!("\n Percent events w/out event ID : {:.2}%", (((self.n_ev_wo_evid / self.n_sent) as f64)*(100 as f64))).bright_purple());
-    //} else if self.n_ev_wo_evid > 0 { 
+    //if self.n_sent > 0 && self.n_rbe_per_loop > 0 {
+    //  repr += &(format!("\n Percent events w/out event ID : {:.2}%", (((self.n_rbe_per_loop / self.n_sent) as f64)*(100 as f64))).bright_purple());
+    //} else if self.n_rbe_per_loop > 0 { 
     //  repr += &(format!("\n Percent events w/out event ID : N/A").bright_purple());
     //}
     if self.n_mte_received_tot > 0{ 
@@ -634,8 +653,9 @@ impl EVTBLDRHeartbeat {
     if self.n_sent > 0 && self.n_mte_received_tot > 0 {
         repr += &(format!("\n RBEvent/Evts sent               : {:.2}", (self.n_rbe_received_tot as f64/ self.n_sent as f64)).bright_purple());
         repr += &(format!("\n RBEvent/MTEvents                : {:.2}", (self.n_rbe_received_tot as f64 / self.n_mte_received_tot as f64)).bright_purple()); }
-    repr += &(format!("\n Num. RBEvents with evid from past   : {}", self.n_rbe_from_past).bright_purple());
-    repr += &(format!("\n Num. orphan RBEvents : {}", self.n_rbe_orphan).bright_purple());
+    repr += &(format!("\n Current RBevents / iteration        : {:.2}", self.n_rbe_per_loop).bright_purple());
+    repr += &(format!("\n Num. RBEvents with evid from past   : {}",  self.n_rbe_from_past).bright_purple());
+    repr += &(format!("\n Num. orphan RBEvents                : {}",  self.n_rbe_orphan).bright_purple());
     repr += &(format!("\n\n Getting MTE from cache for RBEvent failed {} times :(", self.rbe_wo_mte).bright_blue());
     repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
     repr += &(format!("\n Ch. len MTE Receiver                : {}", self.mte_receiver_cbc_len).bright_purple());
@@ -682,7 +702,7 @@ impl Serialization for EVTBLDRHeartbeat {
     hb.mte_receiver_cbc_len = parse_usize(stream,pos);
     hb.rbe_receiver_cbc_len = parse_usize(stream,pos);
     hb.tp_sender_cbc_len    = parse_usize(stream,pos);
-    hb.n_ev_wo_evid         = parse_usize(stream,pos);
+    hb.n_rbe_per_loop         = parse_usize(stream,pos);
     hb.n_rbe_from_past      = parse_usize(stream,pos);
     hb.n_rbe_orphan         = parse_usize(stream,pos);
     hb.data_mangled_ev      = parse_usize(stream,pos);
@@ -710,7 +730,7 @@ impl Serialization for EVTBLDRHeartbeat {
     bs.extend_from_slice(&self.mte_receiver_cbc_len.to_le_bytes());
     bs.extend_from_slice(&self.rbe_receiver_cbc_len.to_le_bytes());
     bs.extend_from_slice(&self.tp_sender_cbc_len.to_le_bytes());
-    bs.extend_from_slice(&self.n_ev_wo_evid.to_le_bytes());
+    bs.extend_from_slice(&self.n_rbe_per_loop.to_le_bytes());
     bs.extend_from_slice(&self.n_rbe_from_past.to_le_bytes());
     bs.extend_from_slice(&self.n_rbe_orphan.to_le_bytes());
     bs.extend_from_slice(&self.data_mangled_ev.to_le_bytes());
@@ -740,7 +760,7 @@ impl FromRandom for EVTBLDRHeartbeat {
     let mte_receiver_cbc_len = rng.gen::<usize>();
     let rbe_receiver_cbc_len = rng.gen::<usize>();
     let tp_sender_cbc_len = rng.gen::<usize>();
-    let n_ev_wo_evid = rng.gen::<usize>();
+    let n_rbe_per_loop = rng.gen::<usize>();
     let n_rbe_from_past = rng.gen::<usize>();
     let n_rbe_orphan = rng.gen::<usize>();
     let data_mangled_ev = rng.gen::<usize>();
@@ -763,7 +783,7 @@ impl FromRandom for EVTBLDRHeartbeat {
       rbe_receiver_cbc_len,
       tp_sender_cbc_len,
       n_mte_received_tot,
-      n_ev_wo_evid,
+      n_rbe_per_loop,
       n_rbe_from_past,
       n_rbe_orphan,
       data_mangled_ev

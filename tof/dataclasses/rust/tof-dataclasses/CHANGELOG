@@ -3,7 +3,7 @@
 ## v0.10.8
 * Alert system - TofAlert as a general container for 
   any kind of anomaly
-* Restore MTBMoniData to cary power data, since that 
+* Restore MTBMoniData to carry power data, since that 
   might be helpful for inspection of MTB glitches
 
 ## v0.10.7
