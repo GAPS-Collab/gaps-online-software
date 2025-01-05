@@ -20,6 +20,7 @@ use std::time::{
 //use std::io::Write;
 use std::process::{
   Command,
+  Stdio,
   Child,
   exit
 };
@@ -54,6 +55,7 @@ use tof_dataclasses::events::{
   RBEvent
 };
 
+use tof_dataclasses::ipbus::IPBus;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::database::{
   connect_to_db,
@@ -77,6 +79,10 @@ use liftof_lib::{
   LIFTOF_LOGO_SHOW,
   master_trigger,
   LiftofSettings,
+};
+
+use liftof_lib::master_trigger::control::{
+  unset_all_triggers,
 };
 
 use liftof_lib::thread_control::ThreadControl;
@@ -245,12 +251,21 @@ fn main() {
       exit(0);
     }
     CommandCC::SoftReboot => {
-      
-      //info!("Will sort reboot RAT {:?}", cmd_rb_list);
-      //let cmd_args     = vec![String::from("sudo"),
-      //                        String::from("shutdown"),
-      //                        String::from("now")]; 
-      //ssh_command_rbs(&cmd_rb_list, cmd_args);
+      let rblist : Vec<u8>;
+      if args.rat_id.is_some() {
+        let rbs = get_ratrbmap_hardcoded().get(&args.rat_id.unwrap()).unwrap().clone();
+        rblist  =  vec![rbs.0, rbs.1];
+      } else {
+        rblist = get_rbratmap_hardcoded().keys().cloned().collect();  
+      }
+      info!("Will sort reboot RBs {:?}", rblist);
+      let cmd_args     = vec![String::from("sudo"),
+                              String::from("shutdown"),
+                              String::from("now")]; 
+      match ssh_command_rbs(&rblist, cmd_args) {
+        Ok(_)    => info!("SSH commands issued successfully!"),
+        Err(err) => error!("Issues during ssh commanding! {err}")
+      }
       exit(0);
     }
     CommandCC::Staging => {
@@ -339,6 +354,7 @@ fn main() {
       tc.liftof_settings    = config.clone();
       tc.write_data_to_disk = write_stream;
       tc.calibration_active = tc.liftof_settings.pre_run_calibration || set_cali_active;
+      tc.holdoff_mtb_thread = true;
     },
     Err(err) => {
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -402,9 +418,9 @@ fn main() {
   //#[cfg(feature="tof-ctrl")]
   //let mut cpu_moni_handle  : thread::JoinHandle<_> = thread::spawn(||{});
   //let mut sig_handle       : thread::JoinHandle<_> = thread::spawn(||{});
-  let mut rb_handles       = Vec::<thread::JoinHandle<_>>::new();
+  let mut rb_handles        = Vec::<thread::JoinHandle<_>>::new();
 
-  let verbose         = args.verbose;
+  let verbose               = args.verbose;
   
   let mtb_address           = config.mtb_address.clone();
   info!("Will connect to the master trigger board at {}!", mtb_address);
@@ -442,6 +458,8 @@ fn main() {
     let rb_address = format!("tof-rb{:02}:config/liftof-config.toml", rb.rb_id);
     match Command::new("scp")
       .args([&cfg_file_str, &rb_address])
+      .stdout(Stdio::null())
+      .stderr(Stdio::null())
       .spawn() {
       Err(err) => {
         error!("Unable to spawn ssh process to copy config on RB {}! {}", rb.rb_id, err);
@@ -505,9 +523,6 @@ fn main() {
   for k in &rb_list {
     rb_id_list.push(k.rb_id);
   }
-
-  println!("=> Restarting liftof-rb on all requested boards!");
-  restart_liftof_rb(&rb_id_list); 
   let mtb_link_id_map = get_linkid_rbid_map(&rb_list);
 
   // Prepare outputfiles
@@ -632,7 +647,6 @@ fn main() {
   thread::sleep(one_second);
   
   // now start the RB threads
-  debug!("starting rb threads..");
   println!("=> Initializing RB data acquisition");
   for n in 0..nboards {
     let mut this_rb           = rb_list[n].clone();
@@ -658,12 +672,13 @@ fn main() {
   thread::sleep(one_second);
 
   // master trigger
-  let mtb_moni_sender = tp_to_sink.clone(); 
+  let mtb_moni_sender   = tp_to_sink.clone(); 
   let thread_control_mt = Arc::clone(&thread_control);
+  let mtb_address_c     = mtb_address.clone();
   let _mtb_handle = thread::Builder::new()
     .name("master-trigger".into())
     .spawn(move || {
-                    master_trigger(&mtb_address, 
+                    master_trigger(&mtb_address_c, 
                                    &master_ev_send,
                                    &mtb_moni_sender,
                                    thread_control_mt,
@@ -674,7 +689,6 @@ fn main() {
   .expect("Failed to spawn master-trigger thread!");
   
   println!("=> All threads initialized!");
-  
   // default  behaviour is to stop
   // when we are done
   let mut dont_stop = false;
@@ -692,25 +706,58 @@ fn main() {
       if pre_run_calibration {
         let tc_cali = thread_control.clone();
         calibrate_tof(tc_cali, &rb_list, true);
-        restart_liftof_rb(&rb_id_list);
       }
       if verification_rt_sec > 0 {
         println!("=> Starting verification run!");
+        restart_liftof_rb(&rb_id_list);
         let tc_verification = thread_control.clone();
         let tp_sender_veri  = tp_to_sink.clone();
         verification_run(verification_rt_sec, tp_sender_veri, tc_verification);
-        restart_liftof_rb(&rb_id_list);
         println!("=> Verification run finished!");
       }
-      thread::sleep(5*one_second);
       // in this scenario, we want to end
       // after we are done
       dont_stop = false;
+      println!("=> Stopping triggers, awaiting MTB/RB synchronisation!");
+      // if this whole business fails, then the triggers won't stop, but 
+      // it is not a catastrophe, since then just the synching will go 
+      // to hell, but it'll recover over time 
+      match IPBus::new(&mtb_address) {
+        Ok(mut bus) => {
+          match unset_all_triggers(&mut bus) {
+            Err(err) => {
+              error!("Unable to stop MTB triggers! {err}");
+            }
+            Ok(_) => info!("Triggers stopped!")
+          }
+        }
+        Err(err) => error!("Unable to connect to MTB to stop triggers! {err}")
+      }
+      restart_liftof_rb(&rb_id_list);
       let cc_pub_addr = &config.cmd_dispatcher_settings.cc_server_address;
       init_run_start(cc_pub_addr);
+      println!("=> Releasing docking clamps...");
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          // literally, literally releasing the clamps!!
+          tc.holdoff_mtb_thread = false;
+        }
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl at this time! Unable to launch! {err}");
+        }
+      }
+      thread::sleep(one_second*5);
+      println!("------------------------------------------------------------------------");
+      // Let's fly!!
+      println!("=> Second star to the right, and straight on till morning! \u{1f680}");
+      println!("\u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50}  \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50}");
     }
     _ => ()
   }
+  
+  // ---------------------------------------------------------
+  // Now we have setup everything and we are ready to go
+
 
   //---------------------------------------------------------
   // 

@@ -39,6 +39,13 @@ use liftof_lib::thread_control::ThreadControl;
 
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 
+// just for debugging
+//use tof_dataclasses::io::{
+//  TofPacketWriter,
+//  FileType
+//};
+
+
 /// Events ... assemble! 
 ///
 /// The event_builder collects all available event information,
@@ -69,24 +76,12 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                       data_sink      : &Sender<TofPacket>,
                       mtb_link_map   : HashMap<u8,u8>,
                       thread_control : Arc<Mutex<ThreadControl>>) { 
-  // missing event analysis
-  //let mut event_id_test = Vec::<u32>::new();
-
-  // debug the number of rb events we have seen 
-  // in production mode, these features should go away
-  // FIXEM - add debug flags to features
-  //let mut seen_rbevents      = HashMap::<u8, u64>::new();
-  //let mut too_early_rbevents = HashMap::<u8, u64>::new(); 
-  //// 10, 12, 37,38, 43, 45 don't exist
-  //for k in 1..51 {
-  //  if k == 10 || k ==12 || k == 37 || k == 38 || k == 43 || k == 45 {
-  //    continue;
-  //  } else {
-  //    seen_rbevents.insert(k as u8, 0);
-  //    too_early_rbevents.insert(k as u8, 0);
-  //  }
-  //}
+  // deleteme
+  //let file_type = FileType::RunFile(12345);
+  //let mut writer = TofPacketWriter::new(String::from("."), file_type);
+  //writer.mbytes_per_file = 420;
   
+
   // set up the event builder. Since we are now doing settings only at run 
   // start, it is fine to do this outside of the loop
   let mut send_tev_sum    : bool;
@@ -264,8 +259,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               }
               heartbeat.n_rbe_discarded_tot += 1;
               heartbeat.n_rbe_orphan        += 1;
-              error!("We can't associate event id {} with a MTEvent in range {} .. {} !", last_rb_evid, event_id_cache[0], event_id_cache.back().unwrap());
-              println!("{}", rb_ev);
+              let delta_evid = last_rb_evid - *event_id_cache.back().unwrap();
+              debug!("We can't associate event id {} from RB {} with a MTEvent in range {} .. {}. It is {} event ids ahead !", last_rb_evid, rb_ev.header.rb_id, event_id_cache[0], event_id_cache.back().unwrap(), delta_evid);
+              debug!("{}", rb_ev);
+              //let orphan_pack = rb_ev.pack();
+              //writer.add_tof_packet(&orphan_pack);
               continue 'main;
             },
             Some(ev) => {
