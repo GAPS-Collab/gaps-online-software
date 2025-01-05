@@ -14,37 +14,30 @@ use std::sync::{
 
 use std::collections::VecDeque;
 use std::collections::HashMap;
-//use std::path::Path;
-//
+
 use crossbeam_channel::{
   Receiver,
   Sender,
 };
 
-
 use tof_dataclasses::events::{
   MasterTriggerEvent,
   TofEvent,
-  RBEvent
+  RBEvent,
+  EventStatus,
 };
 
 use tof_dataclasses::serialization::Packable;
-
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::events::EventStatus;
+use tof_dataclasses::commands::config::BuildStrategy;
+use tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
 
-//use liftof_lib::heartbeat_printer;
 use liftof_lib::settings::{
   TofEventBuilderSettings,
 };
-use tof_dataclasses::commands::config::BuildStrategy;
 use liftof_lib::thread_control::ThreadControl;
 
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
-
-use tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
-
-
 
 /// Events ... assemble! 
 ///
@@ -82,26 +75,26 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   // debug the number of rb events we have seen 
   // in production mode, these features should go away
   // FIXEM - add debug flags to features
-  let mut seen_rbevents      = HashMap::<u8, u64>::new();
-  let mut too_early_rbevents = HashMap::<u8, u64>::new(); 
-  // 10, 12, 37,38, 43, 45 don't exist
-  for k in 1..51 {
-    if k == 10 || k ==12 || k == 37 || k == 38 || k == 43 || k == 45 {
-      continue;
-    } else {
-      seen_rbevents.insert(k as u8, 0);
-      too_early_rbevents.insert(k as u8, 0);
-    }
-  }
+  //let mut seen_rbevents      = HashMap::<u8, u64>::new();
+  //let mut too_early_rbevents = HashMap::<u8, u64>::new(); 
+  //// 10, 12, 37,38, 43, 45 don't exist
+  //for k in 1..51 {
+  //  if k == 10 || k ==12 || k == 37 || k == 38 || k == 43 || k == 45 {
+  //    continue;
+  //  } else {
+  //    seen_rbevents.insert(k as u8, 0);
+  //    too_early_rbevents.insert(k as u8, 0);
+  //  }
+  //}
   
   // set up the event builder. Since we are now doing settings only at run 
   // start, it is fine to do this outside of the loop
   let mut send_tev_sum    : bool;
   let mut send_rbwaveform : bool;
   let mut send_rbwf_freq  : u32;
-  let mut rbwf_ctr          = 0u64;
-  let mut settings          : TofEventBuilderSettings;
-  let mut run_id             : u32;
+  let mut rbwf_ctr        = 0u64;
+  let mut settings        : TofEventBuilderSettings;
+  let mut run_id          : u32;
   // this can block it is fine bc it is only 
   // happening once at init
   let mut cali_active : bool;
@@ -134,16 +127,12 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut event_cache          = HashMap::<u32, TofEvent>::new();
   let mut event_id_cache       = VecDeque::<u32>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
   let mut n_received           : usize;
-  let mut n_mte_skipped        = 0u32;
-  let mut first_evid           : u32;
   let mut last_evid            = 0;
   let mut n_sent               = 0usize;
   // debug
   let mut last_rb_evid         : u32;
   let mut n_rbe_per_te         = 0usize;
   let mut debug_timer          = Instant::now();
-  let met_seconds              = 0f64;  
-  //let mut n_receiving_errors  = 0;
   let mut check_tc_update      = Instant::now();
   let daq_reset_cooldown       = Instant::now();
   let reset_daq_flag           = false;
@@ -151,7 +140,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut hb_timer             = Instant::now(); 
   let hb_interval              = Duration::from_secs(settings.hb_send_interval as u64);
   
-
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
       //println!("= => [evt_builder] checkling tc..");
@@ -205,18 +193,15 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         }   
         Ok(mt) => {
           debug!("Received MasterTriggerEvent {}!", mt);
-          let mut event = TofEvent::from(mt);
+          let mut event       = TofEvent::from(mt);
           event.header.run_id = run_id;
           if last_evid != 0 {
             if event.mt_event.event_id != last_evid + 1 {
-              //let delta_id = event.mt_event.event_id - last_evid;
               if event.mt_event.event_id > last_evid {
-                n_mte_skipped += event.mt_event.event_id - last_evid - 1;
+                heartbeat.n_mte_skipped += (event.mt_event.event_id - last_evid - 1) as usize;
               }
-              //error!("We skipped event ids {}", delta_id );
             }
           }
-          heartbeat.n_mte_skipped = n_mte_skipped as usize;
           last_evid = event.mt_event.event_id;
           event_cache.insert(last_evid, event);
           // use this to keep track of the order
@@ -226,65 +211,69 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           heartbeat.n_mte_received_tot += 1;
         }
       } // end match Ok(mt)
-      //if n_received % 10 == 0 {
-      //  println!("==> Received 10 more MasterTriggerEvents");
-      //}
     } // end getting MTEvents
     trace!("Debug timer MTE received! {:?}", debug_timer.elapsed());
-    first_evid = event_id_cache[0]; 
     // recycle that variable for the rb events as well
     n_received = 0;
+    // The second receiver gets RBEvents from all ReadoutBoards. ReadoutBoard events are 
+    // NOT cached by design. The assumption here is that due to caching on the RBs and the 
+    // longer pathway (harting cable + ethernet cables) and DRS and user time, RBEvents are 
+    // ALWAYS later than the MTEvents.
     'main: while !ev_from_rb.is_empty() && n_received < settings.n_rbe_per_loop as usize {
       match ev_from_rb.try_recv() {
         Err(err) => {
           error!("Can't receive RBEvent! Err {err}");
         },
         Ok(rb_ev) => {
-          // FIXME - this is technically a bit risky, but 
-          // mt event should arrive so much earlier (seconds)
-          // I hope it won't be a problem. Otherwise we have
-          // to add another cache.
-          //println!("==> Len evt cache {}", event_cache.len());
-          heartbeat.event_cache_size    = event_cache.len();
-          heartbeat.event_id_cache_size = event_id_cache.len();
           heartbeat.n_rbe_received_tot += 1;
           n_received += 1;
-          match seen_rbevents.get_mut(&rb_ev.header.rb_id) {
-            Some(value) => {
-              *value += 1;
-            }
-            None => {
-              warn!("Unable to do bookkeeping for RB {}", rb_ev.header.rb_id);
-            }
-          }
+          //match seen_rbevents.get_mut(&rb_ev.header.rb_id) {
+          //  Some(value) => {
+          //    *value += 1;
+          //  }
+          //  None => {
+          //    warn!("Unable to do bookkeeping for RB {}", rb_ev.header.rb_id);
+          //  }
+          //}
           //iter_ev = 0;
           last_rb_evid = rb_ev.header.event_id;
-          if last_rb_evid < first_evid {
+          // try to asscociate the rb events with the mtb events
+          // the event ids from the RBEvents have to be in the 
+          // range of the MTB Event
+          // The event_id_cache is sorted, that is why it works
+          if last_rb_evid < event_id_cache[0] {
+            // this is the first check. If this fails, then the event is for 
+            // sure not in the event_cache and we can dismiss it right away,
+            // knowing that it is from the past
             n_received -= 1;
             debug!("The received RBEvent {} is from the ancient past! Currently, we don't have a way to deal with that and this event will be DISCARDED! The RBEvent queue will be re-synchronized...", last_rb_evid);
-            //attempts += 1;
             heartbeat.n_rbe_discarded_tot += 1;
-            heartbeat.n_rbe_from_past += 1;
-            *too_early_rbevents.get_mut(&rb_ev.header.rb_id).unwrap() += 1;
+            heartbeat.n_rbe_from_past     += 1;
+            //*too_early_rbevents.get_mut(&rb_ev.header.rb_id).unwrap() += 1;
             continue;
           }
+          // Now try to get the master trigger event for 
+          // this RBEvent
           match event_cache.get_mut(&last_rb_evid) {
             None => {
-              //FIXME - big issue!
-              //println!("Surprisingly we don't have that!");
-              // insert a new TofEvent
-              //let new_ev = TofEvent::new();
-              heartbeat.rbe_wo_mte += 1;
+              // This means that either we dropped the MTB event,
+              // or the RBEvent is from the future
+              if last_rb_evid < *event_id_cache.back().unwrap() {
+                // we know that this is neither too late nor too early!
+                heartbeat.rbe_wo_mte          += 1;
+              }
               heartbeat.n_rbe_discarded_tot += 1;
-              heartbeat.n_rbe_orphan += 1;
-              //error!("No MTEvent for RBEvent. rb event id {}, first mte {}, last mte {}", last_rb_evid, first_evid, last_cache_evid);
+              heartbeat.n_rbe_orphan        += 1;
+              error!("We can't associate event id {} with a MTEvent in range {} .. {} !", last_rb_evid, event_id_cache[0], event_id_cache.back().unwrap());
+              println!("{}", rb_ev);
               continue 'main;
             },
             Some(ev) => {
               if settings.build_strategy == BuildStrategy::AdaptiveThorough {
                 match mtb_link_map.get(&rb_ev.header.rb_id) {
                   None => {
-                    error!("Don't know MTB Link ID for {}", rb_ev.header.rb_id)
+                    error!("Don't know MTB Link ID for {}", rb_ev.header.rb_id);
+                    error!("This RBEvent gets discarded!");
                   }
                   Some(link_id) => {
                     if ev.mt_event.get_rb_link_ids().contains(link_id) {
@@ -306,6 +295,19 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         }
       }
     }
+    // FIXME - timing debugging
+    let debug_timer_elapsed = debug_timer.elapsed().as_secs_f64();
+    //println!("Debug timer elapsed {}", debug_timer_elapsed);
+    if debug_timer_elapsed > 35.0  {
+      debug_timer = Instant::now(); 
+    }
+    trace!("Debug timer RBE received! {:?}", debug_timer.elapsed());
+
+    // -----------------------------------------------------
+    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    // This concludes the actually "event building" part
+    // -----------------------------------------------------
+
     let av_rb_ev = n_rbe_per_te as f64 / n_sent as f64;
     if settings.build_strategy == BuildStrategy::Adaptive || 
       settings.build_strategy  == BuildStrategy::AdaptiveThorough {
@@ -327,16 +329,16 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         settings.n_rbe_per_loop = 40;
       }
     }
-    let debug_timer_elapsed = debug_timer.elapsed().as_secs_f64();
-    //println!("Debug timer elapsed {}", debug_timer_elapsed);
-    if debug_timer_elapsed > 35.0  {
-      debug_timer = Instant::now(); 
-    }
-    trace!("Debug timer RBE received! {:?}", debug_timer.elapsed());
-    //if event_sending == send_every_x_event {
+    heartbeat.n_rbe_per_loop = settings.n_rbe_per_loop as usize;
+
+    //-----------------------------------------
+    // From here on, we are checking all events
+    // in the cache, deciding which ones are 
+    // ready to be passed on
+    // ----------------------------------------
+
     let mut prior_ev_sent = 0u32;
     let mut first_ev_sent = false;
-   
 
     for idx in 0..event_id_cache.len() {
       // if there wasn't a first element, size would be 0
@@ -400,6 +402,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               }
             }
           }
+          
           if ready_to_send {
             // if we don't cache it, we have to send it. 
             //let ev_to_send = ev.clone();
@@ -423,9 +426,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             // sum up lost hits due to drs4 deadtime
             heartbeat.drs_bsy_lost_hg_hits += ev_to_send.get_lost_hits() as usize;
 
-            // This only works if we are sending TofEventSummary
-            // since it relies on quantities only calculated 
-            // in the TofEventSummary packet 
             let mut save_to_disk = true;
             n_sent += 1;
             heartbeat.n_sent += 1;
@@ -493,28 +493,17 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           }
         }
       }
-    } 
-    // end loop over event_id_cache
-    let met_elapsed = hb_timer.elapsed();
+    } // end loop over event_id_cache
     if hb_timer.elapsed() >= hb_interval {
+      // make sure the heartbeat has the latest mission elapsed time
+      heartbeat.met_seconds         += hb_timer.elapsed().as_secs_f64() as usize;
+      // get the length of the various caches at this moment in time
+      heartbeat.event_cache_size     = event_cache.len();
+      heartbeat.event_id_cache_size  = event_id_cache.len();
       heartbeat.mte_receiver_cbc_len = m_trig_ev.len();
       heartbeat.rbe_receiver_cbc_len = ev_from_rb.len();
       heartbeat.tp_sender_cbc_len    = data_sink.len();
 
-      //println!("{}", heartbeat);
-      let mut counters = HashMap::<u8,u64>::new();
-      if met_seconds > 0.0 {
-        for k in seen_rbevents.keys() {
-          counters.insert(*k, (seen_rbevents[&k] as f64/met_seconds as f64).floor() as u64);
-        }
-      }
-      //let mut table = rb_table(&counters, true); 
-      //println!("{table}");
-      //
-      //table = rb_table(&too_early_rbevents, false);
-      //println!("{table}");
-      
-      heartbeat.met_seconds += met_elapsed.as_secs_f64() as usize;
       let pack         = heartbeat.pack();
       match data_sink.send(pack) {
         Err(err) => {
