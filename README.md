@@ -31,6 +31,7 @@ for the python API will follow soon.
 * `pybind11` is used to build the pybindings for the C++ API. It also 
    requires a minimum of `gcc-13` and python `3.10`
 *  a number of C++ libraries are pulled from github during installation.
+* The C++ API uses the C++20 standard and thus wants gcc-13 or later.
 
 ### software repository
 
@@ -107,7 +108,6 @@ The software includes (<src> is the original source directory of `gaps-online-so
     from the MTB and the readoutboards, analyses and packages them and answers to commands from the flight 
     computer
   - `liftof-lib` - common functionality for all `liftof` code, factored out
-  - `liftof-analysis` - recently started project to perform common analysis tasks directly with the rust API
   - `liftof-tui` - an interactive tui ("terminal user interface") which allows a live view of waveforms and 
                    other tof related quantities in the terminal.
 - A database system : `<src>/gaps_db` written in Python/django it uses a `sqlite` backend and is basically the 
