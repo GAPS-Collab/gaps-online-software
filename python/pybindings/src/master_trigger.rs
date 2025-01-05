@@ -1308,13 +1308,18 @@ fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
     -> PyResult<PyMasterTriggerEvent> {
     let use_dbg_version = debug;
     if !use_dbg_version {
+      let mut event = PyMasterTriggerEvent::new();
       match mt_api::get_event(&mut self.ipbus) {
-        Err(err) => {
+        None => {
+          // we just return an empty event!
+          //warn!("Did not get an event, returning empty event!");
+          Ok(event)
+        }
+        Some(Err(err)) => {
           //error!("Unable to obtain event from the MTB!");
           return Err(PyValueError::new_err(err.to_string()));
         }
-        Ok(mte) => {
-          let mut event = PyMasterTriggerEvent::new();
+        Some(Ok(mte)) => {
           event.set_event(mte);
           Ok(event)
         }
