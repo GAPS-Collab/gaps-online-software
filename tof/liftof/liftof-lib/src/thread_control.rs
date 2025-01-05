@@ -1,5 +1,4 @@
 //! Thread control structures
-//! FIXME - this should go to liftof-lib
 
 use std::collections::HashMap;
 use std::fmt;
@@ -30,6 +29,9 @@ pub struct ThreadControl {
   pub finished_calibrations      : HashMap<u8,bool>,
   /// Hold the actual calibration data
   pub calibrations               : HashMap<u8, RBCalibrations>,
+  /// Hold off the master trigger thread, until everything else
+  /// is ready
+  pub holdoff_mtb_thread         : bool,
   /// alive indicator for cmd dispatch thread
   pub thread_cmd_dispatch_active : bool,
   /// alive indicator for data sink thread
@@ -77,6 +79,7 @@ impl ThreadControl {
       calibrations               : HashMap::<u8, RBCalibrations>::new(),
       sigint_recvd               : false,
       end_all_rb_threads         : false,
+      holdoff_mtb_thread         : false,
       thread_cmd_dispatch_active : false,
       thread_data_sink_active    : false,
       thread_runner_active       : false,
@@ -113,14 +116,15 @@ impl fmt::Display for ThreadControl {
     }
     repr        += &(format!("\n    -- verification run: {}", self.verification_active));
     repr        += "\n    -- program status:";
-    repr        += &(format!("\n  stop flag : {}", self.stop_flag));
+    repr        += &(format!("\n  stop flag        : {}", self.stop_flag));
     repr        += "\n    -- reported thread activity:";
-    repr        += &(format!("\n  cmd dispatcher : {}", self.thread_cmd_dispatch_active));
-    repr        += &(format!("\n  runner         : {}", self.thread_runner_active));
-    repr        += &(format!("\n  data sink      : {}", self.thread_data_sink_active));
-    repr        += &(format!("\n  monitoring     : {}", self.thread_monitoring_active));
-    repr        += &(format!("\n  evt builder    : {}", self.thread_event_bldr_active));
-    repr        += &(format!("\n  master_trigger : {}", self.thread_master_trg_active));
+    repr        += &(format!("\n  holdoff mtb thr. : {}", self.holdoff_mtb_thread));
+    repr        += &(format!("\n  cmd dispatcher   : {}", self.thread_cmd_dispatch_active));
+    repr        += &(format!("\n  runner           : {}", self.thread_runner_active));
+    repr        += &(format!("\n  data sink        : {}", self.thread_data_sink_active));
+    repr        += &(format!("\n  monitoring       : {}", self.thread_monitoring_active));
+    repr        += &(format!("\n  evt builder      : {}", self.thread_event_bldr_active));
+    repr        += &(format!("\n  master_trigger   : {}", self.thread_master_trg_active));
     if self.thread_rbcomm_active.len() > 0 {
       repr        += "\n -- active RB threads";
       for k in self.thread_rbcomm_active.keys() {
