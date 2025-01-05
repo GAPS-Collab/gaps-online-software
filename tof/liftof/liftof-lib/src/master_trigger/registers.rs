@@ -100,7 +100,7 @@ impl MTBRegister<'_> {
   fn write(&self, bus : &mut IPBus, value : u32)
     -> Result<(), Box<dyn Error>> {
       let masked_value = self.mask & value;
-      println!("Writing ... {:x}", masked_value);
+      //println!("Writing ... {:x}", masked_value);
       Ok(bus.write(self.addr, masked_value)?)
   }
   
@@ -367,8 +367,8 @@ pub const EVENT_CNT : MTBRegister<'static> = MTBRegister {
 /// EVENT_CNT_RESET     0xc     0x30    0   w   Pulse   Write 1 to reset the event counter
 pub const EVENT_CNT_RESET : MTBRegister<'static> = MTBRegister {
   addr  : 0xc,
-  mask  : 0x00000001,
-  descr : "Reset the event event ID",
+  mask  : 0x1,
+  descr : "Reset the event ID",
   rmw   : false,
   ro    : false,
   pulse : true
@@ -439,8 +439,19 @@ pub const EVQ_RESET : MTBRegister<'static> = MTBRegister {
 /// FULL 	0x12 	0x48 	0 	r 		DAQ Buffer Full
 pub const EVQ_FULL : MTBRegister<'static> = MTBRegister {
   addr  : 0x12,
-  mask  : 0x00000001,
+  mask  : 0x1,
   descr : "Read FULL bit of the MT.EVENT_QUEUE",
+  rmw   : false,
+  ro    : true,
+  pulse : false,
+};
+
+/// The DAQ buffer is empty
+/// FULL 	0x12 	0x48 	1 	r 		DAQ Buffer Full
+pub const EVQ_EMPTY : MTBRegister<'static> = MTBRegister {
+  addr  : 0x12,
+  mask  : 0x2,
+  descr : "Read EMPTY bit of the MT.EVENT_QUEUE",
   rmw   : false,
   ro    : true,
   pulse : false,

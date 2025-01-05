@@ -428,7 +428,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   let mut fit_result = (0.0f32, 0.0f32, 0.0f32);
   if fit_sinus {
     if !active_channels.contains(&8) {
-      error!("RB {} does not have ch9 data!", rb.rb_id);
+      warn!("RB {} does not have ch9 data!", rb.rb_id);
       //println!("{}", event.header);
       return Err(AnalysisError::NoChannel9);
     }
