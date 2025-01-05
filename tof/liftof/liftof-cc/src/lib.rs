@@ -63,8 +63,9 @@ use tof_dataclasses::errors::{
 
 use tof_dataclasses::commands::{
   TofCommand,
+  TofCommandV2,
   TofReturnCode,
-  //TofCommandCode,
+  TofCommandCode,
 };
 
 use tof_dataclasses::status::TofDetectorStatus;
@@ -175,11 +176,19 @@ pub fn rb_table(counters : &HashMap<u8, u64>, label_is_hz : bool) -> Table {
 
 /// Regular run start sequence
 pub fn init_run_start(cc_pub_addr : &str) {
-  let one_second  = Duration::from_secs(1);
-  let cmd_payload = PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
-  let cmd         = TofCommand::DataRunStart(cmd_payload);
-  let packet      = cmd.pack();
-  let mut payload = String::from("BRCT").into_bytes();
+  let one_second   = Duration::from_secs(1);
+  // deprecated way of sending commands, however as long as we might have RBS
+  // with old software, we do want to send the "old style" as well
+  let cmd_payload  = PAD_CMD_32BIT | (255u32) << 16 | (255u32) << 8 | (255u32);
+  let cmd_depr     = TofCommand::DataRunStart(cmd_payload);
+  let packet_depr  = cmd_depr.pack();
+  let mut payload_depr = String::from("BRCT").into_bytes();
+  payload_depr.append(&mut packet_depr.to_bytestream());
+  
+  let mut cmd      = TofCommandV2::new();
+  cmd.command_code = TofCommandCode::DataRunStart;
+  let packet       = cmd.pack();
+  let mut payload  = String::from("BRCT").into_bytes();
   payload.append(&mut packet.to_bytestream());
   
   // open 0MQ socket here
@@ -192,28 +201,15 @@ pub fn init_run_start(cc_pub_addr : &str) {
     thread::sleep(one_second);
     print!("..");
   }
-  print!("done!\n");
-  match cmd_sender.send(&payload, 0) {
+  // send old and new commands
+  match cmd_sender.send(&payload_depr, 0) {
     Err(err) => {
-      error!("Unable to send command, error{err}");
+      error!("Unable to send command! {err}");
     },
     Ok(_) => {
       debug!("We sent {:?}", payload);
     }
   }
-}
-
-/// Regular run stop sequence
-pub fn end_run(cc_pub_addr : &str) {
-  let cmd          = TofCommand::DataRunStop(DEFAULT_RB_ID as u32);
-  let packet       = cmd.pack();
-  let mut payload  = String::from("BRCT").into_bytes();
-  payload.append(&mut packet.to_bytestream());
-  let ctx         = zmq::Context::new();
-  let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-  cmd_sender.bind(cc_pub_addr).expect("Unable to bind to (PUB) socket!");
-  // after we opened the socket, give the RBs a chance to connect
-  println!("=> Sending run stop command to all RBs...");
   match cmd_sender.send(&payload, 0) {
     Err(err) => {
       error!("Unable to send command! {err}");
@@ -222,9 +218,45 @@ pub fn end_run(cc_pub_addr : &str) {
       debug!("We sent {:?}", payload);
     }
   }
+  print!("done!\n");
+}
+
+/// Regular run stop sequence
+pub fn end_run(cc_pub_addr : &str) {
+  let cmd_depr     = TofCommand::DataRunStop(DEFAULT_RB_ID as u32);
+  let packet_depr  = cmd_depr.pack();
+  let mut payload_depr = String::from("BRCT").into_bytes();
+  payload_depr.append(&mut packet_depr.to_bytestream());
+
+  let mut cmd      = TofCommandV2::new();
+  cmd.command_code = TofCommandCode::DataRunStop;
+  let packet       = cmd.pack();
+  let mut payload  = String::from("BRCT").into_bytes();
+  payload.append(&mut packet.to_bytestream());
+  let ctx         = zmq::Context::new();
+  let cmd_sender  = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+  cmd_sender.bind(cc_pub_addr).expect("Unable to bind to (PUB) socket!");
+  // after we opened the socket, give the RBs a chance to connect
+  println!("=> Sending run stop command to all RBs...");
   println!("=> Waiting for RBs to stoop data acquisition..");
   for _ in 0..10 {
     print!("..");
+  }
+  match cmd_sender.send(&payload_depr, 0) {
+    Err(err) => {
+      error!("Unable to send command! {err}");
+    },
+    Ok(_) => {
+      debug!("We sent {:?}", payload);
+    }
+  }
+  match cmd_sender.send(&payload, 0) {
+    Err(err) => {
+      error!("Unable to send command! {err}");
+    },
+    Ok(_) => {
+      debug!("We sent {:?}", payload);
+    }
   }
   print!("..done!\n");
 }
@@ -501,7 +533,7 @@ pub fn manage_liftof_cc_service(mode : &str) -> TofReturnCode {
 pub fn ssh_command_rbs(rb_list : &Vec<u8>,
                        cmd     : Vec<String>) -> Result<Vec<u8>, TofError> {
   let mut rb_handles       = Vec::<thread::JoinHandle<_>>::new();
-  println!("=> Executing ssh command {:?} on {} RBs!", cmd, rb_list.len());
+  info!("=> Executing ssh command {:?} on {} RBs!", cmd, rb_list.len());
   let mut children = Vec::<(u8,Child)>::new();
   for rb in rb_list {
     // also populate the rb thread nandles
@@ -737,15 +769,22 @@ pub fn calibrate_tof(thread_control : Arc<Mutex<ThreadControl>>,
     },
   }
 
+  // deprecated commanding
   let voltage_level = DEFAULT_CALIB_VOLTAGE;
   let rb_id         = DEFAULT_RB_ID;
   let extra         = DEFAULT_CALIB_EXTRA;
   println!("=> Received calibration default command! Will init calibration run of all RBs...");
   let cmd_payload: u32
     = (voltage_level as u32) << 16 | (rb_id as u32) << 8 | (extra as u32);
-  let default_calib = TofCommand::DefaultCalibration(cmd_payload);
-  let tp = default_calib.pack();
-  let mut payload  = String::from("BRCT").into_bytes();
+  let default_calib_depr = TofCommand::DefaultCalibration(cmd_payload);
+  let tp_depr = default_calib_depr.pack();
+  let mut payload_depr = String::from("BRCT").into_bytes();
+  payload_depr.append(&mut tp_depr.to_bytestream());
+
+  let mut default_calib      = TofCommandV2::new();
+  default_calib.command_code = TofCommandCode::RBCalibration;
+  let tp                     = default_calib.pack();
+  let mut payload            = String::from("BRCT").into_bytes();
   payload.append(&mut tp.to_bytestream());
   // open 0MQ socket here
   let ctx = zmq::Context::new();
@@ -754,8 +793,15 @@ pub fn calibrate_tof(thread_control : Arc<Mutex<ThreadControl>>,
   cmd_sender.bind(&cc_pub_addr).expect("Unable to bind to (PUB) socket!");
   println!("=> Give the RBs a chance to connect and wait a bit..");
   thread::sleep(10*one_second);
+  match cmd_sender.send(&payload_depr, 0) { Err(err) => {
+      error!("Unable to send command! {err}");
+    },
+    Ok(_) => {
+      println!("=> Calibration  initialized!");
+    }
+  }
   match cmd_sender.send(&payload, 0) { Err(err) => {
-      error!("Unable to send command, error{err}");
+      error!("Unable to send command! {err}");
     },
     Ok(_) => {
       println!("=> Calibration  initialized!");
