@@ -122,11 +122,11 @@ if __name__ == '__main__':
     buildparser.add_argument("-j", type=int, default=24, help="Use <j> number of cores")
     buildparser.add_argument("--no-musl", action="store_true", help="Do not use musl as libc replacement (not recommended)")
     buildparser.add_argument("--get-version", action="store_true", help="Get the lastest version string from the compiled binary!")
+    buildparser.add_argument("--clean", action="store_true", help="Run a 'cargo clean' before the build")
     buildparser.add_argument("binary", type=str, help="Select the binary to build")
 
     deployparser = subparsers.add_parser('deploy', help='Deploy liftof components')
     deployparser.add_argument("-j", type=int, default=24, help="Use <j> number of cores")
-    deployparser.add_argument("--clean", action="store_true", help="Run a 'cargo clean' before the build")
     deployparser.add_argument("--no-musl", action="store_true", help="Do not use musl as libc replacement (not recommended)")
     deployparser.add_argument("--debug", action="store_true", help="Deploy to debug directory", default=False)
     deployparser.add_argument("--tofcpu-ssh-name", type=str, help="The name of the tof-cpu in .ssh/config", default="tofcpu-pl")
