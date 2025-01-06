@@ -43,25 +43,27 @@
 <a href="#42" id="42">42</a>
 <a href="#43" id="43">43</a>
 <a href="#44" id="44">44</a>
-<a href="#45" id="45">45</a></pre></div><pre class="rust"><code><span class="kw">pub mod </span>tab_mt;
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a></pre></div><pre class="rust"><code><span class="kw">pub mod </span>tab_mt;
 <span class="kw">pub mod </span>tab_home;
 <span class="kw">pub mod </span>tab_rbs;
 <span class="kw">pub mod </span>tab_settings;
 <span class="kw">pub mod </span>tab_events;
 <span class="kw">pub mod </span>tab_cpu;
-<span class="comment">//pub mod tab_rbwaveform;
-</span><span class="kw">pub mod </span>tab_tofsummary;
+<span class="kw">pub mod </span>tab_tofsummary;
 <span class="kw">pub mod </span>tab_tofhit;
 <span class="kw">pub mod </span>tab_telemetry;
 <span class="kw">pub mod </span>tab_commands;
 <span class="kw">pub mod </span>tab_paddles;
 <span class="kw">pub mod </span>tab_heartbeats;
+<span class="kw">pub mod </span>tab_alerts;
 
 <span class="kw">pub use </span><span class="kw">crate</span>::tab_mt::MTTab;
 <span class="kw">pub use </span><span class="kw">crate</span>::tab_settings::SettingsTab;
 <span class="kw">pub use </span><span class="kw">crate</span>::tab_home::HomeTab;
 <span class="kw">pub use </span><span class="kw">crate</span>::tab_events::EventTab;
 <span class="kw">pub use </span><span class="kw">crate</span>::tab_paddles::PaddleTab;
+<span class="kw">pub use </span><span class="kw">crate</span>::tab_alerts::AlertTab;
 <span class="kw">pub use </span><span class="kw">crate</span>::tab_heartbeats::{
   HeartBeatTab,
   HeartBeatView

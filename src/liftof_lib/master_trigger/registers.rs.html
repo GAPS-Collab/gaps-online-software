@@ -2408,7 +2408,18 @@
 <a href="#2407" id="2407">2407</a>
 <a href="#2408" id="2408">2408</a>
 <a href="#2409" id="2409">2409</a>
-<a href="#2410" id="2410">2410</a></pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard registers
+<a href="#2410" id="2410">2410</a>
+<a href="#2411" id="2411">2411</a>
+<a href="#2412" id="2412">2412</a>
+<a href="#2413" id="2413">2413</a>
+<a href="#2414" id="2414">2414</a>
+<a href="#2415" id="2415">2415</a>
+<a href="#2416" id="2416">2416</a>
+<a href="#2417" id="2417">2417</a>
+<a href="#2418" id="2418">2418</a>
+<a href="#2419" id="2419">2419</a>
+<a href="#2420" id="2420">2420</a>
+<a href="#2421" id="2421">2421</a></pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard registers
 //!
 //! This should be the same as the reference
 //! doucmentation on the [UCLA gitlab server](https://gitlab.com/ucla-gaps-tof/firmware/-/blob/master/regmap/mt_address_table.org?ref_type=heads)
@@ -2510,8 +2521,8 @@
   </span><span class="kw">fn </span>write(<span class="kw-2">&amp;</span><span class="self">self</span>, bus : <span class="kw-2">&amp;mut </span>IPBus, value : u32)
     -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
       <span class="kw">let </span>masked_value = <span class="self">self</span>.mask &amp; value;
-      <span class="macro">println!</span>(<span class="string">"Writing ... {:x}"</span>, masked_value);
-      <span class="prelude-val">Ok</span>(bus.write(<span class="self">self</span>.addr, masked_value)<span class="question-mark">?</span>)
+      <span class="comment">//println!("Writing ... {:x}", masked_value);
+      </span><span class="prelude-val">Ok</span>(bus.write(<span class="self">self</span>.addr, masked_value)<span class="question-mark">?</span>)
   }
   
   <span class="kw">fn </span>read_all(<span class="kw-2">&amp;</span><span class="self">self</span>, bus : <span class="kw-2">&amp;mut </span>IPBus)
@@ -2777,8 +2788,8 @@
 /// EVENT_CNT_RESET     0xc     0x30    0   w   Pulse   Write 1 to reset the event counter
 </span><span class="kw">pub const </span>EVENT_CNT_RESET : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
   addr  : <span class="number">0xc</span>,
-  mask  : <span class="number">0x00000001</span>,
-  descr : <span class="string">"Reset the event event ID"</span>,
+  mask  : <span class="number">0x1</span>,
+  descr : <span class="string">"Reset the event ID"</span>,
   rmw   : <span class="bool-val">false</span>,
   ro    : <span class="bool-val">false</span>,
   pulse : <span class="bool-val">true
@@ -2849,8 +2860,19 @@
 /// FULL 	0x12 	0x48 	0 	r 		DAQ Buffer Full
 </span><span class="kw">pub const </span>EVQ_FULL : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
   addr  : <span class="number">0x12</span>,
-  mask  : <span class="number">0x00000001</span>,
+  mask  : <span class="number">0x1</span>,
   descr : <span class="string">"Read FULL bit of the MT.EVENT_QUEUE"</span>,
+  rmw   : <span class="bool-val">false</span>,
+  ro    : <span class="bool-val">true</span>,
+  pulse : <span class="bool-val">false</span>,
+};
+
+<span class="doccomment">/// The DAQ buffer is empty
+/// FULL 	0x12 	0x48 	1 	r 		DAQ Buffer Full
+</span><span class="kw">pub const </span>EVQ_EMPTY : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
+  addr  : <span class="number">0x12</span>,
+  mask  : <span class="number">0x2</span>,
+  descr : <span class="string">"Read EMPTY bit of the MT.EVENT_QUEUE"</span>,
   rmw   : <span class="bool-val">false</span>,
   ro    : <span class="bool-val">true</span>,
   pulse : <span class="bool-val">false</span>,

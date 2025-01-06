@@ -552,7 +552,16 @@
 <a href="#551" id="551">551</a>
 <a href="#552" id="552">552</a>
 <a href="#553" id="553">553</a>
-<a href="#554" id="554">554</a></pre></div><pre class="rust"><code><span class="doccomment">//! Liftof scheduler - this will run as an additional process
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a></pre></div><pre class="rust"><code><span class="doccomment">//! Liftof scheduler - this will run as an additional process
 //! on the TOF main computer to schedule run/start stop
 //! through the liftof-cc main program
 //!
@@ -763,7 +772,10 @@
       <span class="macro">error!</span>(<span class="string">"Unable to write to path {filename}! {err} Falling back to default file path"</span>);
     }
   }
-  <span class="kw">loop </span>{
+
+  <span class="comment">// All RBs
+
+  </span><span class="kw">loop </span>{
     thread::sleep(sleep_time);
     <span class="comment">//println!("=&gt; Cmd responder loop iteration!");
     </span><span class="kw">let </span><span class="kw-2">mut </span>success = TofReturnCode::Unknown;
@@ -876,7 +888,10 @@
                 }
               }
               TofCommandCode::ShutdownRB =&gt; {
-                <span class="kw">let </span>cmd_rb_list  = cmd.payload.clone();
+                <span class="kw">let </span><span class="kw-2">mut </span>cmd_rb_list  = cmd.payload.clone();
+                <span class="kw">if </span>cmd_rb_list.is_empty() {
+                  cmd_rb_list = all_rb_ids.clone();
+                }
                 <span class="macro">info!</span>(<span class="string">"Received Shutdown RB command for RBs {:?}"</span>, cmd_rb_list);
                 <span class="kw">let </span>cmd_args     = <span class="macro">vec!</span>[String::from(<span class="string">"sudo"</span>),
                                         String::from(<span class="string">"shutdown"</span>),
@@ -962,12 +977,13 @@
               }
               TofCommandCode::RBCalibration =&gt; {
                 <span class="macro">info!</span>(<span class="string">"Received RBCalibration command!"</span>);
-                <span class="kw">if </span>cmd.payload.len() &lt; <span class="number">2 </span>{
+                <span class="kw">if </span>cmd.payload.len() &lt; <span class="number">3 </span>{
                   <span class="macro">error!</span>(<span class="string">"Broken RBCalibration command!"</span>);
                   <span class="kw">continue</span>;
                 }
-                <span class="kw">let </span>save_waveforms = cmd.payload[<span class="number">1</span>] != <span class="number">0</span>;
-                <span class="kw">let </span>send_packets   = cmd.payload[<span class="number">0</span>] != <span class="number">0</span>;  
+                <span class="kw">let </span>pre_run_cali   = cmd.payload[<span class="number">0</span>] != <span class="number">0</span>;
+                <span class="kw">let </span>send_packets   = cmd.payload[<span class="number">1</span>] != <span class="number">0</span>;  
+                <span class="kw">let </span>save_waveforms = cmd.payload[<span class="number">2</span>] != <span class="number">0</span>;
                 <span class="kw">match </span>LiftofSettings::from_toml(<span class="kw-2">&amp;</span>cfg_file) {
                   <span class="prelude-val">Err</span>(err) =&gt; {
                     <span class="macro">error!</span>(<span class="string">"CRITICAL! Unable to parse .toml settings file! {}"</span>, err);
@@ -977,8 +993,10 @@
                   <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>config) =&gt; {
                     config.data_publisher_settings.send_cali_packets = send_packets;
                     config.save_cali_wf                              = save_waveforms;
-                    config.pre_run_calibration = <span class="bool-val">true</span>;
+                    config.pre_run_calibration = pre_run_cali;
                     config.to_toml(String::from(cfg_file.clone()));
+                    <span class="macro">info!</span>(<span class="string">"We changed the data publisher settings to be this {}"</span>,config.data_publisher_settings);
+                    
                     success = TofReturnCode::Success;
                   }
                 }   

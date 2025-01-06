@@ -788,7 +788,27 @@
 <a href="#787" id="787">787</a>
 <a href="#788" id="788">788</a>
 <a href="#789" id="789">789</a>
-<a href="#790" id="790">790</a></pre></div><pre class="rust"><code><span class="doccomment">//! Heartbeats - regularly (or on demand) sent 
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a></pre></div><pre class="rust"><code><span class="doccomment">//! Heartbeats - regularly (or on demand) sent 
 //! software monitoring data
 //!
 //! This includes heartbeats for different threads
@@ -1279,32 +1299,51 @@
   </span><span class="kw">pub </span>met_seconds           : usize,
   <span class="doccomment">/// Total number of received MasterTriggerEvents (from MTB)
   </span><span class="kw">pub </span>n_mte_received_tot    : usize,
-  <span class="kw">pub </span>n_rbe_received_tot    : usize,
-  <span class="kw">pub </span>n_rbe_per_te          : usize,
-  <span class="kw">pub </span>n_rbe_discarded_tot   : usize,
-  <span class="kw">pub </span>n_mte_skipped         : usize,
-  <span class="kw">pub </span>n_timed_out           : usize,
-  <span class="kw">pub </span>n_sent                : usize,
-  <span class="kw">pub </span>delta_mte_rbe         : usize,
-  <span class="kw">pub </span>event_cache_size      : usize,
-  
-  <span class="comment">// Per designe, the event_id cache and the 
-  // event_cache MUST have the same size. 
-  // I am just paranoid... 
-  // Let's repurpose this field for the 
-  // total number of lost hits due to DRS 
-  // deadtime
+  <span class="doccomment">/// Total number of received RBEvents (from all RB)
+  </span><span class="kw">pub </span>n_rbe_received_tot    : usize,
+  <span class="doccomment">/// Average number of RBEvents per each MTEvent
+  </span><span class="kw">pub </span>n_rbe_per_te          : usize,
+  <span class="doccomment">/// Total number of discarded RBEvents (accross all boards)
+  </span><span class="kw">pub </span>n_rbe_discarded_tot   : usize,
+  <span class="doccomment">/// TOtal number of missed MTEvents. "Skipped means" gaps in 
+  /// consecutive rising event ids
+  </span><span class="kw">pub </span>n_mte_skipped         : usize,
+  <span class="doccomment">/// Total number of events that timed out, which means they 
+  /// got send before all RBEvents could be associated with 
+  /// this event
+  </span><span class="kw">pub </span>n_timed_out           : usize,
+  <span class="doccomment">/// Total number of events passed on to the gloabl data sink 
+  /// thread
+  </span><span class="kw">pub </span>n_sent                : usize,
+  <span class="doccomment">/// ?
+  </span><span class="kw">pub </span>delta_mte_rbe         : usize,
+  <span class="doccomment">/// The total size of the current event cache in number of events
+  </span><span class="kw">pub </span>event_cache_size      : usize,
+  <span class="doccomment">/// In paralel to the event_cache, the event_id cache holds event ids.
+  /// This should be perfectly aligned to the event_cache by design.
   </span><span class="kw">pub </span>event_id_cache_size   : usize, 
-  <span class="kw">pub </span>drs_bsy_lost_hg_hits  : usize,
-  <span class="kw">pub </span>rbe_wo_mte            : usize,
-  <span class="kw">pub </span>mte_receiver_cbc_len  : usize,
-  <span class="kw">pub </span>rbe_receiver_cbc_len  : usize,
-  <span class="kw">pub </span>tp_sender_cbc_len     : usize,
-  <span class="kw">pub </span>n_rbe_from_past       : usize,
+  <span class="doccomment">/// The total number of hits which we lost due to the DRS being busy
+  /// (this is on the Readoutboards)
+  </span><span class="kw">pub </span>drs_bsy_lost_hg_hits  : usize,
+  <span class="doccomment">/// The total number of RBEvents which do not have a MasterTriggerEvent
+  </span><span class="kw">pub </span>rbe_wo_mte            : usize,
+  <span class="doccomment">/// The current length of the channel which we use to send events from 
+  /// the MasterTrigger thread to the event builder
+  </span><span class="kw">pub </span>mte_receiver_cbc_len  : usize,
+  <span class="doccomment">/// The current length of the channel whcih we use for all readoutboard
+  /// threads to send their events to the event builder
+  </span><span class="kw">pub </span>rbe_receiver_cbc_len  : usize,
+  <span class="doccomment">/// the current length of the channel which we use to send built events 
+  /// to the global data sink thread
+  </span><span class="kw">pub </span>tp_sender_cbc_len     : usize,
+  <span class="doccomment">/// The total number of RBEvents which have an event id which is SMALLER
+  /// than the smallest event id in the event cache. 
+  </span><span class="kw">pub </span>n_rbe_from_past       : usize,
   <span class="kw">pub </span>n_rbe_orphan          : usize,
   <span class="comment">// let's deprecate this!
-  </span><span class="kw">pub </span>n_ev_wo_evid          : usize,
-  <span class="kw">pub </span>data_mangled_ev       : usize,
+  </span><span class="kw">pub </span>n_rbe_per_loop          : usize,
+  <span class="doccomment">/// The totabl number of events with the "AnyDataMangling" flag set
+  </span><span class="kw">pub </span>data_mangled_ev       : usize,
   <span class="comment">// pub seen_rbevents         : HashMap&lt;u8, usize&gt;,
 </span>}
 
@@ -1336,7 +1375,7 @@
       mte_receiver_cbc_len : <span class="number">0</span>,
       rbe_receiver_cbc_len : <span class="number">0</span>,
       tp_sender_cbc_len    : <span class="number">0</span>,
-      n_ev_wo_evid         : <span class="number">0</span>,
+      n_rbe_per_loop         : <span class="number">0</span>,
       n_rbe_orphan         : <span class="number">0</span>,
       n_rbe_from_past      : <span class="number">0</span>,
       data_mangled_ev      : <span class="number">0</span>,
@@ -1399,9 +1438,9 @@
     <span class="comment">//repr += &amp;(format!("\n Size of event ID cache              : {}", self.event_id_cache_size).bright_purple());
     </span>repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. events timed out               : {}"</span>, <span class="self">self</span>.n_timed_out).bright_purple());
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Percent events timed out            : {:.2}%"</span>, <span class="self">self</span>.get_timed_out_frac()<span class="kw-2">*</span>(<span class="number">100 </span><span class="kw">as </span>f64)).bright_purple());
-    <span class="comment">//if self.n_sent &gt; 0 &amp;&amp; self.n_ev_wo_evid &gt; 0 {
-    //  repr += &amp;(format!("\n Percent events w/out event ID : {:.2}%", (((self.n_ev_wo_evid / self.n_sent) as f64)*(100 as f64))).bright_purple());
-    //} else if self.n_ev_wo_evid &gt; 0 { 
+    <span class="comment">//if self.n_sent &gt; 0 &amp;&amp; self.n_rbe_per_loop &gt; 0 {
+    //  repr += &amp;(format!("\n Percent events w/out event ID : {:.2}%", (((self.n_rbe_per_loop / self.n_sent) as f64)*(100 as f64))).bright_purple());
+    //} else if self.n_rbe_per_loop &gt; 0 { 
     //  repr += &amp;(format!("\n Percent events w/out event ID : N/A").bright_purple());
     //}
     </span><span class="kw">if </span><span class="self">self</span>.n_mte_received_tot &gt; <span class="number">0</span>{ 
@@ -1424,8 +1463,9 @@
     <span class="kw">if </span><span class="self">self</span>.n_sent &gt; <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.n_mte_received_tot &gt; <span class="number">0 </span>{
         repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n RBEvent/Evts sent               : {:.2}"</span>, (<span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64/ <span class="self">self</span>.n_sent <span class="kw">as </span>f64)).bright_purple());
         repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n RBEvent/MTEvents                : {:.2}"</span>, (<span class="self">self</span>.n_rbe_received_tot <span class="kw">as </span>f64 / <span class="self">self</span>.n_mte_received_tot <span class="kw">as </span>f64)).bright_purple()); }
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. RBEvents with evid from past   : {}"</span>, <span class="self">self</span>.n_rbe_from_past).bright_purple());
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. orphan RBEvents : {}"</span>, <span class="self">self</span>.n_rbe_orphan).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Current RBevents / iteration        : {:.2}"</span>, <span class="self">self</span>.n_rbe_per_loop).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. RBEvents with evid from past   : {}"</span>,  <span class="self">self</span>.n_rbe_from_past).bright_purple());
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Num. orphan RBEvents                : {}"</span>,  <span class="self">self</span>.n_rbe_orphan).bright_purple());
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n\n Getting MTE from cache for RBEvent failed {} times :("</span>, <span class="self">self</span>.rbe_wo_mte).bright_blue());
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"</span>));
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Ch. len MTE Receiver                : {}"</span>, <span class="self">self</span>.mte_receiver_cbc_len).bright_purple());
@@ -1472,7 +1512,7 @@
     hb.mte_receiver_cbc_len = parse_usize(stream,pos);
     hb.rbe_receiver_cbc_len = parse_usize(stream,pos);
     hb.tp_sender_cbc_len    = parse_usize(stream,pos);
-    hb.n_ev_wo_evid         = parse_usize(stream,pos);
+    hb.n_rbe_per_loop         = parse_usize(stream,pos);
     hb.n_rbe_from_past      = parse_usize(stream,pos);
     hb.n_rbe_orphan         = parse_usize(stream,pos);
     hb.data_mangled_ev      = parse_usize(stream,pos);
@@ -1500,7 +1540,7 @@
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.mte_receiver_cbc_len.to_le_bytes());
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.rbe_receiver_cbc_len.to_le_bytes());
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tp_sender_cbc_len.to_le_bytes());
-    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_ev_wo_evid.to_le_bytes());
+    bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_per_loop.to_le_bytes());
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_from_past.to_le_bytes());
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.n_rbe_orphan.to_le_bytes());
     bs.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.data_mangled_ev.to_le_bytes());
@@ -1530,7 +1570,7 @@
     <span class="kw">let </span>mte_receiver_cbc_len = rng.gen::&lt;usize&gt;();
     <span class="kw">let </span>rbe_receiver_cbc_len = rng.gen::&lt;usize&gt;();
     <span class="kw">let </span>tp_sender_cbc_len = rng.gen::&lt;usize&gt;();
-    <span class="kw">let </span>n_ev_wo_evid = rng.gen::&lt;usize&gt;();
+    <span class="kw">let </span>n_rbe_per_loop = rng.gen::&lt;usize&gt;();
     <span class="kw">let </span>n_rbe_from_past = rng.gen::&lt;usize&gt;();
     <span class="kw">let </span>n_rbe_orphan = rng.gen::&lt;usize&gt;();
     <span class="kw">let </span>data_mangled_ev = rng.gen::&lt;usize&gt;();
@@ -1553,7 +1593,7 @@
       rbe_receiver_cbc_len,
       tp_sender_cbc_len,
       n_mte_received_tot,
-      n_ev_wo_evid,
+      n_rbe_per_loop,
       n_rbe_from_past,
       n_rbe_orphan,
       data_mangled_ev

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wide-0.7.30/src/f64x4_.rs`."><title>f64x4_.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wide" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">wide/</div>f64x4_.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wide-0.7.31/src/f64x4_.rs`."><title>f64x4_.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wide" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">wide/</div>f64x4_.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -1514,7 +1514,24 @@
 <a href="#1513" id="1513">1513</a>
 <a href="#1514" id="1514">1514</a>
 <a href="#1515" id="1515">1515</a>
-<a href="#1516" id="1516">1516</a></pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href="#1516" id="1516">1516</a>
+<a href="#1517" id="1517">1517</a>
+<a href="#1518" id="1518">1518</a>
+<a href="#1519" id="1519">1519</a>
+<a href="#1520" id="1520">1520</a>
+<a href="#1521" id="1521">1521</a>
+<a href="#1522" id="1522">1522</a>
+<a href="#1523" id="1523">1523</a>
+<a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a></pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="macro">pick!</span> {
   <span class="kw">if </span><span class="attr">#[cfg(target_feature=<span class="string">"avx"</span>)] </span>{
@@ -1530,8 +1547,8 @@
 
 <span class="macro">macro_rules!</span> const_f64_as_f64x4 {
   (<span class="macro-nonterminal">$i</span>:ident, <span class="macro-nonterminal">$f</span>:expr) =&gt; {
-    <span class="kw">pub const </span><span class="macro-nonterminal">$i</span>: f64x4 =
-      <span class="kw">unsafe </span>{ ConstUnionHack256bit { f64a4: [<span class="macro-nonterminal">$f</span>; <span class="number">4</span>] }.f64x4 };
+    <span class="attr">#[allow(non_upper_case_globals)]
+    </span><span class="kw">pub const </span><span class="macro-nonterminal">$i</span>: f64x4 = f64x4::new([<span class="macro-nonterminal">$f</span>; <span class="number">4</span>]);
   };
 }
 
@@ -1872,8 +1889,8 @@
 <span class="kw">impl </span>f64x4 {
   <span class="attr">#[inline]
   #[must_use]
-  </span><span class="kw">pub fn </span>new(array: [f64; <span class="number">4</span>]) -&gt; <span class="self">Self </span>{
-    <span class="self">Self</span>::from(array)
+  </span><span class="kw">pub const fn </span>new(array: [f64; <span class="number">4</span>]) -&gt; <span class="self">Self </span>{
+    <span class="kw">unsafe </span>{ core::intrinsics::transmute(array) }
   }
   <span class="attr">#[inline]
   #[must_use]
@@ -1901,6 +1918,35 @@
         <span class="self">Self </span>{
           a : <span class="self">self</span>.a.abs(),
           b : <span class="self">self</span>.b.abs(),
+        }
+      }
+    }
+  }
+
+  <span class="attr">#[inline]
+  #[must_use]
+  </span><span class="kw">pub fn </span>floor(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    <span class="macro">pick!</span> {
+      <span class="kw">if </span><span class="attr">#[cfg(target_feature=<span class="string">"avx"</span>)] </span>{
+        <span class="self">Self </span>{ avx: floor_m256d(<span class="self">self</span>.avx) }
+      } <span class="kw">else </span>{
+        <span class="self">Self </span>{
+          a : <span class="self">self</span>.a.floor(),
+          b : <span class="self">self</span>.b.floor(),
+        }
+      }
+    }
+  }
+  <span class="attr">#[inline]
+  #[must_use]
+  </span><span class="kw">pub fn </span>ceil(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    <span class="macro">pick!</span> {
+      <span class="kw">if </span><span class="attr">#[cfg(target_feature=<span class="string">"avx"</span>)] </span>{
+        <span class="self">Self </span>{ avx: ceil_m256d(<span class="self">self</span>.avx) }
+      } <span class="kw">else </span>{
+        <span class="self">Self </span>{
+          a : <span class="self">self</span>.a.ceil(),
+          b : <span class="self">self</span>.b.ceil(),
         }
       }
     }
@@ -2132,8 +2178,7 @@
     (<span class="self">self </span>&amp; magnitude_mask) | (sign &amp; <span class="self">Self</span>::from(-<span class="number">0.0</span>))
   }
 
-  <span class="attr">#[allow(non_upper_case_globals)]
-  #[inline]
+  <span class="attr">#[inline]
   </span><span class="kw">pub fn </span>asin_acos(<span class="self">self</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2225,8 +2270,7 @@
     (asin, acos)
   }
 
-  <span class="attr">#[allow(non_upper_case_globals)]
-  #[inline]
+  <span class="attr">#[inline]
   </span><span class="kw">pub fn </span>acos(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2313,7 +2357,6 @@
   }
   <span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>asin(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2399,8 +2442,7 @@
     asin
   }
 
-  <span class="attr">#[allow(non_upper_case_globals)]
-  #[inline]
+  <span class="attr">#[inline]
   </span><span class="kw">pub fn </span>atan(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2456,8 +2498,7 @@
     re
   }
 
-  <span class="attr">#[allow(non_upper_case_globals)]
-  #[inline]
+  <span class="attr">#[inline]
   </span><span class="kw">pub fn </span>atan2(<span class="self">self</span>, x: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2539,7 +2580,6 @@
 
   <span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>sin_cos(<span class="self">self</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
     <span class="comment">// Based on the Agner Fog "vector class library":
     // https://github.com/vectorclass/version2/blob/master/vectormath_trig.h
@@ -2681,7 +2721,6 @@
   }
 
   <span class="attr">#[inline]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">fn </span>vm_pow2n(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="macro">const_f64_as_f64x4!</span>(pow2_52, <span class="number">4503599627370496.0</span>);
     <span class="macro">const_f64_as_f64x4!</span>(bias, <span class="number">1023.0</span>);
@@ -2693,7 +2732,6 @@
   <span class="doccomment">/// Calculate the exponent of a packed `f64x4`
   </span><span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>exp(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="macro">const_f64_as_f64x4!</span>(P2, <span class="number">1.0 </span>/ <span class="number">2.0</span>);
     <span class="macro">const_f64_as_f64x4!</span>(P3, <span class="number">1.0 </span>/ <span class="number">6.0</span>);
@@ -2724,7 +2762,6 @@
   }
 
   <span class="attr">#[inline]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">fn </span>exponent(<span class="self">self</span>) -&gt; f64x4 {
     <span class="macro">const_f64_as_f64x4!</span>(pow2_52, <span class="number">4503599627370496.0</span>);
     <span class="macro">const_f64_as_f64x4!</span>(bias, <span class="number">1023.0</span>);
@@ -2737,7 +2774,6 @@
   }
 
   <span class="attr">#[inline]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">fn </span>fraction_2(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>t1 = cast::&lt;<span class="kw">_</span>, u64x4&gt;(<span class="self">self</span>);
     <span class="kw">let </span>t2 = cast::&lt;<span class="kw">_</span>, u64x4&gt;(
@@ -2791,7 +2827,6 @@
   <span class="doccomment">/// Natural log (ln(x))
   </span><span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>ln(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
     <span class="macro">const_f64_as_f64x4!</span>(HALF, <span class="number">0.5</span>);
     <span class="macro">const_f64_as_f64x4!</span>(P0, <span class="number">7.70838733755885391666E0</span>);
@@ -2853,7 +2888,6 @@
 
   <span class="attr">#[inline]
   #[must_use]
-  #[allow(non_upper_case_globals)]
   </span><span class="kw">pub fn </span>pow_f64x4(<span class="self">self</span>, y: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
     <span class="macro">const_f64_as_f64x4!</span>(ln2d_hi, <span class="number">0.693145751953125</span>);
     <span class="macro">const_f64_as_f64x4!</span>(ln2d_lo, <span class="number">1.42860682030941723212E-6</span>);

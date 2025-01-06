@@ -132,8 +132,11 @@
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a></pre></div><pre class="rust"><code><span class="doccomment">//! Thread control structures
-//! FIXME - this should go to liftof-lib
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a></pre></div><pre class="rust"><code><span class="doccomment">//! Thread control structures
 
 </span><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::fmt;
@@ -164,6 +167,9 @@
   </span><span class="kw">pub </span>finished_calibrations      : HashMap&lt;u8,bool&gt;,
   <span class="doccomment">/// Hold the actual calibration data
   </span><span class="kw">pub </span>calibrations               : HashMap&lt;u8, RBCalibrations&gt;,
+  <span class="doccomment">/// Hold off the master trigger thread, until everything else
+  /// is ready
+  </span><span class="kw">pub </span>holdoff_mtb_thread         : bool,
   <span class="doccomment">/// alive indicator for cmd dispatch thread
   </span><span class="kw">pub </span>thread_cmd_dispatch_active : bool,
   <span class="doccomment">/// alive indicator for data sink thread
@@ -211,6 +217,7 @@
       calibrations               : HashMap::&lt;u8, RBCalibrations&gt;::new(),
       sigint_recvd               : <span class="bool-val">false</span>,
       end_all_rb_threads         : <span class="bool-val">false</span>,
+      holdoff_mtb_thread         : <span class="bool-val">false</span>,
       thread_cmd_dispatch_active : <span class="bool-val">false</span>,
       thread_data_sink_active    : <span class="bool-val">false</span>,
       thread_runner_active       : <span class="bool-val">false</span>,
@@ -247,14 +254,15 @@
     }
     repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n    -- verification run: {}"</span>, <span class="self">self</span>.verification_active));
     repr        += <span class="string">"\n    -- program status:"</span>;
-    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  stop flag : {}"</span>, <span class="self">self</span>.stop_flag));
+    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  stop flag        : {}"</span>, <span class="self">self</span>.stop_flag));
     repr        += <span class="string">"\n    -- reported thread activity:"</span>;
-    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  cmd dispatcher : {}"</span>, <span class="self">self</span>.thread_cmd_dispatch_active));
-    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  runner         : {}"</span>, <span class="self">self</span>.thread_runner_active));
-    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  data sink      : {}"</span>, <span class="self">self</span>.thread_data_sink_active));
-    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  monitoring     : {}"</span>, <span class="self">self</span>.thread_monitoring_active));
-    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  evt builder    : {}"</span>, <span class="self">self</span>.thread_event_bldr_active));
-    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  master_trigger : {}"</span>, <span class="self">self</span>.thread_master_trg_active));
+    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  holdoff mtb thr. : {}"</span>, <span class="self">self</span>.holdoff_mtb_thread));
+    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  cmd dispatcher   : {}"</span>, <span class="self">self</span>.thread_cmd_dispatch_active));
+    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  runner           : {}"</span>, <span class="self">self</span>.thread_runner_active));
+    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  data sink        : {}"</span>, <span class="self">self</span>.thread_data_sink_active));
+    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  monitoring       : {}"</span>, <span class="self">self</span>.thread_monitoring_active));
+    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  evt builder      : {}"</span>, <span class="self">self</span>.thread_event_bldr_active));
+    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  master_trigger   : {}"</span>, <span class="self">self</span>.thread_master_trg_active));
     <span class="kw">if </span><span class="self">self</span>.thread_rbcomm_active.len() &gt; <span class="number">0 </span>{
       repr        += <span class="string">"\n -- active RB threads"</span>;
       <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.thread_rbcomm_active.keys() {

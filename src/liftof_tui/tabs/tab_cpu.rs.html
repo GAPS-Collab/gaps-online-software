@@ -298,16 +298,25 @@
 <a href="#297" id="297">297</a>
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::time::Instant;
-<span class="kw">use </span>std::collections::VecDeque;
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a></pre></div><pre class="rust"><code><span class="doccomment">//! Visualize the CPUMoniData packet
+
+</span><span class="kw">use </span>std::time::Instant;
+<span class="kw">use </span>std::collections::{
+  VecDeque,
+  HashMap,
+};
+<span class="kw">use </span>std::sync::{
+  Arc,
+  Mutex,
+};
 
 <span class="kw">use </span>crossbeam_channel::Receiver;
 
 <span class="kw">use </span>ratatui::symbols::line::<span class="kw-2">*</span>;
 <span class="kw">use </span>ratatui::{
-    <span class="comment">//backend::CrosstermBackend,
-    //symbols, 
-    </span>Frame,
+    Frame,
     layout::{
         Alignment,
         Constraint,
@@ -325,40 +334,37 @@
 };
 
 <span class="kw">use </span>tof_dataclasses::packets::{
-    TofPacket,
-    PacketType,
+  TofPacket,
+  PacketType,
 };
 <span class="kw">use </span>tof_dataclasses::monitoring::CPUMoniData;
 <span class="kw">use </span>tof_dataclasses::errors::SerializationError;
-<span class="comment">//use tof_dataclasses::serialization::{
-//    Serialization,
-//    Packable
-//};
+<span class="kw">use </span>tof_dataclasses::alerts::TofAlert;
 
-</span><span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme;
+<span class="kw">use </span><span class="kw">crate</span>::colors::ColorTheme;
 <span class="kw">use </span><span class="kw">crate</span>::widgets::timeseries;
 
 <span class="comment">//pub const LG_LINE_HORIZONTAL : &amp;str = "◉";
 //pub const LG_LINE_HORIZONTAL : &amp;str = "▥";
 </span><span class="kw">pub const </span>LG_LINE_HORIZONTAL : <span class="kw-2">&amp;</span>str = <span class="string">"░"</span>;
 <span class="kw">pub const </span>LG_LINE: Set = Set {
-        vertical         : THICK_VERTICAL,
-        <span class="comment">//horizontal       : THICK_HORIZONTAL,
-        </span>horizontal       : LG_LINE_HORIZONTAL,
-        top_right        : THICK_TOP_RIGHT,
-        top_left         : THICK_TOP_LEFT,
-        bottom_right     : THICK_BOTTOM_RIGHT,
-        bottom_left      : THICK_BOTTOM_LEFT,
-        vertical_left    : THICK_VERTICAL_LEFT,
-        vertical_right   : THICK_VERTICAL_RIGHT,
-        horizontal_down  : THICK_HORIZONTAL_DOWN,
-        horizontal_up    : THICK_HORIZONTAL_UP,
-        cross            : THICK_CROSS,
+  vertical         : THICK_VERTICAL,
+  <span class="comment">//horizontal       : THICK_HORIZONTAL,
+  </span>horizontal       : LG_LINE_HORIZONTAL,
+  top_right        : THICK_TOP_RIGHT,
+  top_left         : THICK_TOP_LEFT,
+  bottom_right     : THICK_BOTTOM_RIGHT,
+  bottom_left      : THICK_BOTTOM_LEFT,
+  vertical_left    : THICK_VERTICAL_LEFT,
+  vertical_right   : THICK_VERTICAL_RIGHT,
+  horizontal_down  : THICK_HORIZONTAL_DOWN,
+  horizontal_up    : THICK_HORIZONTAL_UP,
+  cross            : THICK_CROSS,
 };
 
 
 <span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>CPUTab {
+</span><span class="kw">pub struct </span>CPUTab&lt;<span class="lifetime">'a</span>&gt; {
   <span class="kw">pub </span>theme      : ColorTheme,
   <span class="kw">pub </span>freq_queue  : Vec&lt;VecDeque&lt;(f64,f64)&gt;&gt;,
   <span class="kw">pub </span>temp_queue  : Vec&lt;VecDeque&lt;(f64,f64)&gt;&gt;,
@@ -367,15 +373,32 @@
   timer          : Instant,
   queue_size     : usize,
   <span class="kw">pub </span>last_moni  : CPUMoniData,
+  alerts         : Arc&lt;Mutex&lt;HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, TofAlert&lt;<span class="lifetime">'a</span>&gt;&gt;&gt;&gt;,
+  alerts_active  : bool,
+  moni_old_check : Instant,
 }
 
-<span class="kw">impl </span>CPUTab {
+<span class="kw">impl </span>CPUTab&lt;<span class="lifetime">'_</span>&gt; {
 
-  <span class="kw">pub fn </span>new(tp_recv : Receiver&lt;TofPacket&gt;,
-             theme : ColorTheme) -&gt; <span class="self">Self </span>{
+  <span class="kw">pub fn </span>new&lt;<span class="lifetime">'a</span>&gt;(tp_recv : Receiver&lt;TofPacket&gt;,
+                 alerts  : Arc&lt;Mutex&lt;HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, TofAlert&lt;<span class="lifetime">'a</span>&gt;&gt;&gt;&gt;, 
+                 theme   : ColorTheme) -&gt; CPUTab&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">let </span>queue_size    = <span class="number">1000usize</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>freq_queue = Vec::&lt;VecDeque::&lt;(f64,f64)&gt;&gt;::with_capacity(<span class="number">4</span>);
     <span class="kw">let </span><span class="kw-2">mut </span>temp_queue = Vec::&lt;VecDeque::&lt;(f64,f64)&gt;&gt;::with_capacity(<span class="number">4</span>);
+    <span class="comment">// check if the alerts are active
+    </span><span class="kw">let </span><span class="kw-2">mut </span>alerts_active = <span class="bool-val">false</span>;
+    <span class="kw">match </span>alerts.lock() {
+      <span class="prelude-val">Ok</span>(al) =&gt; {
+        <span class="kw">if </span>al.len() &gt; <span class="number">0 </span>{
+          alerts_active = <span class="bool-val">true</span>;
+          <span class="macro">info!</span>(<span class="string">"Found {} active alerts!"</span>, al.len());
+        }
+      }
+      <span class="prelude-val">Err</span>(err) =&gt; {
+        <span class="macro">error!</span>(<span class="string">"Unable to lock alert mutex! {err}"</span>);
+      }
+    }
 
     <span class="kw">for </span>_core <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
       <span class="kw">let </span>core_queue  = VecDeque::&lt;(f64,f64)&gt;::with_capacity(queue_size);
@@ -388,20 +411,23 @@
 
 
     CPUTab {
-      theme      : theme,
-      timer      : Instant::now(),
-      freq_queue  : freq_queue,
-      temp_queue  : temp_queue,
-      disk_usage : <span class="number">0u8</span>,
-      tp_recv    : tp_recv,
-      queue_size : <span class="number">1000usize</span>,
-      last_moni  : CPUMoniData::new(),
+      theme          : theme,
+      timer          : Instant::now(),
+      freq_queue     : freq_queue,
+      temp_queue     : temp_queue,
+      disk_usage     : <span class="number">0u8</span>,
+      tp_recv        : tp_recv,
+      queue_size     : <span class="number">1000usize</span>,
+      last_moni      : CPUMoniData::new(),
+      alerts         : alerts,
+      alerts_active  : alerts_active,
+      moni_old_check : Instant::now(),
     }
   }
   
   <span class="kw">pub fn </span>receive_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), SerializationError&gt; {
     <span class="kw">let </span>moni : CPUMoniData;<span class="comment">// CPUMoniData::new();
-    </span><span class="kw">let </span>met      = <span class="self">self</span>.timer.elapsed().as_secs_f64();
+    </span><span class="kw">let </span>met  = <span class="self">self</span>.timer.elapsed().as_secs_f64();
     <span class="kw">match </span><span class="self">self</span>.tp_recv.try_recv() {
       <span class="prelude-val">Err</span>(err)   =&gt; {
         <span class="macro">trace!</span>(<span class="string">"Can't receive packet! {err}"</span>);
@@ -411,9 +437,7 @@
         <span class="macro">trace!</span>(<span class="string">"Got next packet {}!"</span>, pack);
         <span class="kw">match </span>pack.packet_type {
           PacketType::CPUMoniData =&gt; {
-            <span class="comment">//moni = CPUMoniData::from_bytestream(&amp;pack.payload, &amp;mut 0)?;
-            // new API!
-            </span>moni = pack.unpack()<span class="question-mark">?</span>;
+            moni = pack.unpack()<span class="question-mark">?</span>;
           }
           <span class="kw">_ </span>=&gt; {
             <span class="kw">return </span><span class="prelude-val">Ok</span>(());
@@ -440,162 +464,142 @@
     }
     <span class="self">self</span>.disk_usage = moni.disk_usage;
     <span class="self">self</span>.last_moni  = moni;
+    <span class="comment">// in this case we can check in with the alert system
+    </span><span class="kw">if </span><span class="self">self</span>.alerts_active {
+      <span class="kw">match </span><span class="self">self</span>.alerts.lock() {
+        <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>al) =&gt; {
+          <span class="comment">// we can work with mtb relevant alerts here
+          </span>al.get_mut(<span class="string">"cpu_core0_temp"</span>).unwrap().trigger(temps[<span class="number">0</span>] <span class="kw">as </span>f32);
+          al.get_mut(<span class="string">"cpu_core1_temp"</span>).unwrap().trigger(temps[<span class="number">1</span>] <span class="kw">as </span>f32);
+          al.get_mut(<span class="string">"cpu_disk"</span>).unwrap()      .trigger(moni.disk_usage <span class="kw">as </span>f32);
+          al.get_mut(<span class="string">"cpu_hk_too_old"</span>).unwrap().trigger(<span class="self">self</span>.moni_old_check.elapsed().as_secs() <span class="kw">as </span>f32);
+        },
+        <span class="prelude-val">Err</span>(err)   =&gt;  <span class="macro">error!</span>(<span class="string">"Unable to lock global alerts! {err}"</span>),
+      }
+    }
+    <span class="self">self</span>.moni_old_check = Instant::now();
     <span class="prelude-val">Ok</span>(())
   }
 
   <span class="kw">pub fn </span>render(<span class="kw-2">&amp;mut </span><span class="self">self</span>, main_window : <span class="kw-2">&amp;</span>Rect, frame : <span class="kw-2">&amp;mut </span>Frame) {
-        <span class="kw">let </span>main_chunks = Layout::default()
-          .direction(Direction::Horizontal)
-          .constraints(
-              [Constraint::Percentage(<span class="number">30</span>), Constraint::Percentage(<span class="number">70</span>)].as_ref(),
-          )
-          .split(<span class="kw-2">*</span>main_window);
-        <span class="kw">let </span>main_cols0 = Layout::default()
-          .direction(Direction::Vertical)
-          .constraints(
-              [Constraint::Percentage(<span class="number">90</span>),
-               Constraint::Percentage(<span class="number">10</span>)].as_ref(),
-          )
-          .split(main_chunks[<span class="number">0</span>]);
-      
-        <span class="kw">let </span>graph_chunks = Layout::default()
-          .direction(Direction::Horizontal)
-          .constraints(
-              [Constraint::Percentage(<span class="number">50</span>),
-               Constraint::Percentage(<span class="number">50</span>)].as_ref(),
-          )
-          .split(main_chunks[<span class="number">1</span>]).to_vec();
+    <span class="kw">let </span>main_chunks = Layout::default()
+      .direction(Direction::Horizontal)
+      .constraints(
+          [Constraint::Percentage(<span class="number">30</span>), Constraint::Percentage(<span class="number">70</span>)].as_ref(),
+      )
+      .split(<span class="kw-2">*</span>main_window);
+    <span class="kw">let </span>main_cols0 = Layout::default()
+      .direction(Direction::Vertical)
+      .constraints(
+          [Constraint::Percentage(<span class="number">90</span>),
+           Constraint::Percentage(<span class="number">10</span>)].as_ref(),
+      )
+      .split(main_chunks[<span class="number">0</span>]);
+    
+    <span class="kw">let </span>graph_chunks = Layout::default()
+      .direction(Direction::Horizontal)
+      .constraints(
+          [Constraint::Percentage(<span class="number">50</span>),
+           Constraint::Percentage(<span class="number">50</span>)].as_ref(),
+      )
+      .split(main_chunks[<span class="number">1</span>]).to_vec();
 
-        
-        <span class="kw">let </span>freq_chunks = Layout::default()
-          .direction(Direction::Vertical)
-          .constraints(
-              [Constraint::Percentage(<span class="number">25</span>),
-               Constraint::Percentage(<span class="number">25</span>),
-               Constraint::Percentage(<span class="number">26</span>),
-               Constraint::Percentage(<span class="number">25</span>)].as_ref(),
-          )
-          .split(graph_chunks[<span class="number">0</span>]).to_vec();
-        
-        <span class="kw">let </span>temp_chunks = Layout::default()
-          .direction(Direction::Vertical)
-          .constraints(
-              [Constraint::Percentage(<span class="number">25</span>),
-               Constraint::Percentage(<span class="number">25</span>),
-               Constraint::Percentage(<span class="number">26</span>),
-               Constraint::Percentage(<span class="number">25</span>)].as_ref(),
-          )
-          .split(graph_chunks[<span class="number">1</span>]).to_vec();
+    
+    <span class="kw">let </span>freq_chunks = Layout::default()
+      .direction(Direction::Vertical)
+      .constraints(
+          [Constraint::Percentage(<span class="number">25</span>),
+           Constraint::Percentage(<span class="number">25</span>),
+           Constraint::Percentage(<span class="number">26</span>),
+           Constraint::Percentage(<span class="number">25</span>)].as_ref(),
+      )
+      .split(graph_chunks[<span class="number">0</span>]).to_vec();
+    
+    <span class="kw">let </span>temp_chunks = Layout::default()
+      .direction(Direction::Vertical)
+      .constraints(
+          [Constraint::Percentage(<span class="number">25</span>),
+           Constraint::Percentage(<span class="number">25</span>),
+           Constraint::Percentage(<span class="number">26</span>),
+           Constraint::Percentage(<span class="number">25</span>)].as_ref(),
+      )
+      .split(graph_chunks[<span class="number">1</span>]).to_vec();
 
 
-        <span class="kw">let </span>info_view_str = <span class="macro">format!</span>(<span class="string">"{}"</span>, <span class="self">self</span>.last_moni);
+    <span class="kw">let </span>info_view_str = <span class="macro">format!</span>(<span class="string">"{}"</span>, <span class="self">self</span>.last_moni);
 
-        <span class="kw">let </span>info_view = Paragraph::new(info_view_str)
+    <span class="kw">let </span>info_view = Paragraph::new(info_view_str)
+    .style(<span class="self">self</span>.theme.style())
+    .alignment(Alignment::Left)
+    .block(
+      Block::default()
+        .borders(Borders::ALL)
         .style(<span class="self">self</span>.theme.style())
-        .alignment(Alignment::Left)
-        .block(
-          Block::default()
-            .borders(Borders::ALL)
-            .style(<span class="self">self</span>.theme.style())
-            .title(<span class="string">"Info"</span>)
-            .border_type(BorderType::Rounded),
-        );
-        <span class="comment">//let foo_par3 = Paragraph::new(foo3)
-        //.style(self.theme.style())
-        //.alignment(Alignment::Left)
-        //.block(
-        //  Block::default()
-        //    .borders(Borders::ALL)
-        //    .style(self.theme.style())
-        //    .title("Overview")
-        //    .border_type(BorderType::Rounded),
-        //);
-        
-        // disc usage gauge
-        //self.disk_usage = 42;
-        
-        </span><span class="kw">let </span><span class="kw-2">mut </span>ratio = <span class="self">self</span>.disk_usage <span class="kw">as </span>f64/<span class="number">100.0</span>;
-        <span class="kw">if </span>ratio &gt; <span class="number">1.00 </span>{
-          <span class="macro">error!</span>(<span class="string">"TOF CPU disk filled to more than 100%"</span>);
-          ratio = <span class="number">0.0</span>;
-        }
-        <span class="kw">let </span>fg_color  : Color;
-        <span class="kw">if </span><span class="self">self</span>.disk_usage &gt; <span class="number">80 </span>{
-          fg_color   = Color::Red; <span class="comment">// this should be an 
-                                      // alert color
-        </span>} <span class="kw">else </span>{
-          fg_color = <span class="self">self</span>.theme.hc;
-        }
+        .title(<span class="string">"Info"</span>)
+        .border_type(BorderType::Rounded),
+    );
+    <span class="kw">let </span><span class="kw-2">mut </span>ratio = <span class="self">self</span>.disk_usage <span class="kw">as </span>f64/<span class="number">100.0</span>;
+    <span class="kw">if </span>ratio &gt; <span class="number">1.00 </span>{
+      <span class="macro">error!</span>(<span class="string">"TOF CPU disk filled to more than 100%"</span>);
+      ratio = <span class="number">0.0</span>;
+    }
+    <span class="kw">let </span>fg_color  : Color;
+    <span class="kw">if </span><span class="self">self</span>.disk_usage &gt; <span class="number">80 </span>{
+      fg_color   = Color::Red; <span class="comment">// this should be an 
+                                  // alert color
+    </span>} <span class="kw">else </span>{
+      fg_color = <span class="self">self</span>.theme.hc;
+    }
 
-        <span class="kw">let </span>label_str = <span class="macro">format!</span>(<span class="string">"Disc usage {} %"</span>, <span class="self">self</span>.disk_usage);
-        <span class="kw">let </span>du_gauge = LineGauge::default()
-          .block(
-            Block::default()
-            .borders(Borders::ALL)
-            .style(<span class="self">self</span>.theme.style())
-            .title(<span class="string">"Disk usage (/tpool)"</span>)
-            .border_type(BorderType::Rounded)
-          )
-          .filled_style(
-            Style::default()
-              .fg(fg_color)
-              .bg(<span class="self">self</span>.theme.bg1)
-              .add_modifier(Modifier::BOLD)
-          )
-          <span class="comment">//.use_unicode(true)
-          </span>.label(label_str)
-          <span class="comment">//.line_set(symbols::line::THICK)  // THICK
-          </span>.line_set(LG_LINE)
-          <span class="comment">//.percent(self.disk_usage as u16);
-          </span>.ratio(ratio);
-        <span class="comment">//let foo_par4 = Paragraph::new(foo4)
-        //.style(self.theme.style())
-        //.alignment(Alignment::Left)
-        //.block(
-        //  Block::default()
-        //    .borders(Borders::ALL)
-        //    .style(self.theme.style())
-        //    .title("Overview")
-        //    .border_type(BorderType::Rounded),
-        //);
-        </span><span class="kw">for </span>core <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
-          <span class="kw">let </span>label            = <span class="macro">format!</span>(<span class="string">"Core{} freq. [GHz]"</span>, core);
-          <span class="kw">let </span>core_theme       = <span class="self">self</span>.theme.clone();
-          <span class="kw">let </span><span class="kw-2">mut </span>freq_ts_data = VecDeque::from(<span class="self">self</span>.freq_queue[core].clone());
-          <span class="kw">let </span>freq_ts = timeseries(<span class="kw-2">&amp;mut </span>freq_ts_data,
-                                   label.clone(),
-                                   label.clone(),
-                                   <span class="kw-2">&amp;</span>core_theme  );
-          frame.render_widget(freq_ts,freq_chunks[core]);
-        }
-       
-        <span class="kw">let </span>temp_labels = <span class="macro">vec!</span>[<span class="string">"Core0 T [\u{00B0}C]"</span>, 
-                               <span class="string">"Core1 T [\u{00B0}C]"</span>,
-                               <span class="string">"CPU   T [\u{00B0}C]"</span>,
-                               <span class="string">"MB    T [\u{00B0}C]"</span>];
+    <span class="kw">let </span>label_str = <span class="macro">format!</span>(<span class="string">"Disc usage {} %"</span>, <span class="self">self</span>.disk_usage);
+    <span class="kw">let </span>du_gauge = LineGauge::default()
+      .block(
+        Block::default()
+        .borders(Borders::ALL)
+        .style(<span class="self">self</span>.theme.style())
+        .title(<span class="string">"Disk usage (/tpool)"</span>)
+        .border_type(BorderType::Rounded)
+      )
+      .filled_style(
+        Style::default()
+          .fg(fg_color)
+          .bg(<span class="self">self</span>.theme.bg1)
+          .add_modifier(Modifier::BOLD)
+      )
+      <span class="comment">//.use_unicode(true)
+      </span>.label(label_str)
+      <span class="comment">//.line_set(symbols::line::THICK)  // THICK
+      </span>.line_set(LG_LINE)
+      <span class="comment">//.percent(self.disk_usage as u16);
+      </span>.ratio(ratio);
+    <span class="kw">for </span>core <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
+      <span class="kw">let </span>label            = <span class="macro">format!</span>(<span class="string">"Core{} freq. [GHz]"</span>, core);
+      <span class="kw">let </span>core_theme       = <span class="self">self</span>.theme.clone();
+      <span class="kw">let </span><span class="kw-2">mut </span>freq_ts_data = VecDeque::from(<span class="self">self</span>.freq_queue[core].clone());
+      <span class="kw">let </span>freq_ts = timeseries(<span class="kw-2">&amp;mut </span>freq_ts_data,
+                               label.clone(),
+                               label.clone(),
+                               <span class="kw-2">&amp;</span>core_theme  );
+      frame.render_widget(freq_ts,freq_chunks[core]);
+    }
+    
+    <span class="kw">let </span>temp_labels = <span class="macro">vec!</span>[<span class="string">"Core0 T [\u{00B0}C]"</span>, 
+                           <span class="string">"Core1 T [\u{00B0}C]"</span>,
+                           <span class="string">"CPU   T [\u{00B0}C]"</span>,
+                           <span class="string">"MB    T [\u{00B0}C]"</span>];
 
-        <span class="kw">for </span>core <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
-          <span class="kw">let </span>label            = temp_labels[core].to_string();
-          <span class="kw">let </span>core_theme       = <span class="self">self</span>.theme.clone();
-          <span class="kw">let </span><span class="kw-2">mut </span>temp_ts_data = VecDeque::from(<span class="self">self</span>.temp_queue[core].clone());
-          <span class="kw">let </span>temp_ts = timeseries(<span class="kw-2">&amp;mut </span>temp_ts_data,
-                                   label.clone(),
-                                   label.clone(),
-                                   <span class="kw-2">&amp;</span>core_theme  );
-          frame.render_widget(temp_ts,temp_chunks[core]);
-        }
-        frame.render_widget(info_view, main_cols0[<span class="number">0</span>]);
-        frame.render_widget(du_gauge, main_cols0[<span class="number">1</span>]);
-
-        <span class="comment">//let mut ch_chunks = Layout::default()
-        //  .direction(Direction::Vertical)
-        //  .constraints(
-        //      [Constraint::Percentage(25),
-        //       Constraint::Percentage(25),
-        //       Constraint::Percentage(26),
-        //       Constraint::Percentage(25)].as_ref(),
-        //  )
-        //  .split(wf_chunks[0]).to_vec();
-  </span>}
+    <span class="kw">for </span>core <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
+      <span class="kw">let </span>label            = temp_labels[core].to_string();
+      <span class="kw">let </span>core_theme       = <span class="self">self</span>.theme.clone();
+      <span class="kw">let </span><span class="kw-2">mut </span>temp_ts_data = VecDeque::from(<span class="self">self</span>.temp_queue[core].clone());
+      <span class="kw">let </span>temp_ts = timeseries(<span class="kw-2">&amp;mut </span>temp_ts_data,
+                               label.clone(),
+                               label.clone(),
+                               <span class="kw-2">&amp;</span>core_theme  );
+      frame.render_widget(temp_ts,temp_chunks[core]);
+    }
+    frame.render_widget(info_view, main_cols0[<span class="number">0</span>]);
+    frame.render_widget(du_gauge, main_cols0[<span class="number">1</span>]);
+  }
 }
 </code></pre></div></section></main></body></html>

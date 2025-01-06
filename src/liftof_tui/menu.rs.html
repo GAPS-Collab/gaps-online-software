@@ -1166,8 +1166,7 @@
 <span class="kw">use </span>ratatui::text::{Span, Line};
 <span class="kw">use </span>ratatui::style::{Color, Modifier, Style};
 <span class="kw">use </span>ratatui::widgets::{Block, Borders};
-<span class="comment">//use ratatui::terminal::Frame;
-</span><span class="kw">use </span>ratatui::Frame;
+<span class="kw">use </span>ratatui::Frame;
 <span class="kw">use </span>ratatui::layout::Rect;
 
 <span class="kw">use </span><span class="kw">crate</span>::colors::{
@@ -1274,7 +1273,8 @@
   No,
   <span class="comment">// TelemetryMenu
   </span>Stream,
-  MergedEvents
+  MergedEvents, 
+  GPS,
 }
 
 <span class="kw">impl </span>UIMenuItem {
@@ -1318,6 +1318,7 @@
       UIMenuItem::No             =&gt; String::from(<span class="string">"No"</span>),
       UIMenuItem::Stream         =&gt; String::from(<span class="string">"Stream"</span>),
       UIMenuItem::MergedEvents   =&gt; String::from(<span class="string">"MergedEvents"</span>),
+      UIMenuItem::GPS            =&gt; String::from(<span class="string">"GPS"</span>),
     <span class="comment">// _ =&gt; String::from("Unknown"),
     </span>} 
   }
@@ -1760,7 +1761,6 @@
   
   <span class="kw">fn </span>get_items() -&gt; Vec&lt;UIMenuItem&gt; {
     <span class="kw">let </span>items = <span class="macro">vec!</span>[UIMenuItem::Back,
-                     UIMenuItem::Stream,
                      UIMenuItem::MergedEvents];
     items
   }

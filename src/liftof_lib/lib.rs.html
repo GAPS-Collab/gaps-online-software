@@ -1271,7 +1271,7 @@
   </span><span class="kw">let </span><span class="kw-2">mut </span>fit_result = (<span class="number">0.0f32</span>, <span class="number">0.0f32</span>, <span class="number">0.0f32</span>);
   <span class="kw">if </span>fit_sinus {
     <span class="kw">if </span>!active_channels.contains(<span class="kw-2">&amp;</span><span class="number">8</span>) {
-      <span class="macro">error!</span>(<span class="string">"RB {} does not have ch9 data!"</span>, rb.rb_id);
+      <span class="macro">warn!</span>(<span class="string">"RB {} does not have ch9 data!"</span>, rb.rb_id);
       <span class="comment">//println!("{}", event.header);
       </span><span class="kw">return </span><span class="prelude-val">Err</span>(AnalysisError::NoChannel9);
     }
