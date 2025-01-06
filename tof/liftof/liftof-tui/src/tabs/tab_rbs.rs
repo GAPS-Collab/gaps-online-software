@@ -6,6 +6,11 @@
 
 use std::time::Instant;
 use std::fs;
+use std::sync::{
+    Arc,
+    Mutex,
+};
+
 use std::collections::{
   VecDeque,
   HashMap,
@@ -74,6 +79,7 @@ use tof_dataclasses::monitoring::{
 use tof_dataclasses::series::MoniSeries;
 use tof_dataclasses::io::RBEventMemoryStreamer;
 use tof_dataclasses::database::ReadoutBoard;
+use tof_dataclasses::alerts::*;
 
 use crate::widgets::{
   timeseries,
@@ -147,14 +153,32 @@ pub struct RBTab<'a>  {
   pub rbl_active         : bool,
   // FIXME - get this from the DB!
   pub rb_to_rat          : HashMap<u8,u8>,
+  // tie into the alert system
+  pub alerts             : Arc<Mutex<HashMap<&'a str,TofAlert<'a>>>>,
+  alerts_active          : bool,
+  moni_old_check         : HashMap<u8,Instant>,
 }
 
 impl RBTab<'_>  {
 
-  pub fn new(tp_receiver  : Receiver<TofPacket>,
-             rb_receiver  : Receiver<RBEvent>,
-             rbs          : HashMap<u8, ReadoutBoard>,
-             theme        : ColorTheme) -> RBTab<'static>  {
+  pub fn new<'a>(tp_receiver  : Receiver<TofPacket>,
+                 rb_receiver  : Receiver<RBEvent>,
+                 rbs          : HashMap<u8, ReadoutBoard>,
+                 alerts       : Arc<Mutex<HashMap<&'a str,TofAlert<'a>>>>,
+                 theme        : ColorTheme) -> RBTab<'a>  {
+    // check if the alerts are active
+    let mut alerts_active = false;
+    match alerts.lock() {
+      Ok(al) => {
+        if al.len() > 0 {
+          alerts_active = true;
+          info!("Found {} active alerts!", al.len());
+        }
+      }
+      Err(err) => {
+        error!("Unable to lock alert mutex! {err}");
+      }
+    }
     let rb_non_exist = vec![10,12,34,37,38,43,45,47,48,49];
     let mut rb_select_items = Vec::<ListItem>::new();
     let mut global_rates    = HashMap::<u8,String>::new();
@@ -164,9 +188,11 @@ impl RBTab<'_>  {
       }
       global_rates.insert(k as u8, String::from("\u{203c} no data yet"));
     }
+    let mut moni_old_check = HashMap::<u8, Instant>::new();
     for k in 1..51 {
       let this_item = format!("  RB{:0>2}", k);
       rb_select_items.push(ListItem::new(Line::from(this_item)));
+      moni_old_check.insert(k, Instant::now());
     }
 
     let queue_size = 1000usize;
@@ -266,7 +292,10 @@ RBTab {
       rbl_items          : rb_select_items,
       rbl_active         : false,
       
-      rb_to_rat          : rb_to_rat
+      rb_to_rat          : rb_to_rat,
+      alerts             : alerts,
+      alerts_active      : alerts_active,
+      moni_old_check     : moni_old_check,
     }
   }
   
@@ -278,7 +307,7 @@ RBTab {
     if self.rb_changed {
       debug!("RB change detectod!");
       // currently, only one RB at a time is supported
-      //self.moni_queue.clear();
+      // FIXME
       self.event_queue.clear();
       self.met_queue.clear();
       //self.met_queue_moni.clear();
@@ -307,6 +336,26 @@ RBTab {
       self.rb_changed = false;
       info!("RB changed!");
     }
+   
+    // check the age of the RBMoni data 
+    for k in self.moni_old_check.keys() {
+      let moni_age = self.moni_old_check.get(&k).unwrap().elapsed().as_secs();
+      // check if any of the alerts trigger, then notify global alerts
+      let alert_key_old  = format!("rb{:02}_hk_too_old", k);
+      match self.alerts.lock() {
+        Ok(mut al) => {
+          // we can work with mtb relevant alerts here
+          match al.get_mut(alert_key_old.as_str() ) {
+            None => (),
+            Some(rb_moni_old_alert) => {
+              rb_moni_old_alert.trigger(moni_age as f32);
+            }
+          }
+        },
+        Err(err)   =>  error!("Unable to lock global alerts! {err}"),
+      }
+    }
+
     if !self.rb_receiver.is_empty() {
       match self.rb_receiver.try_recv() {
         Err(_) => (),
@@ -352,10 +401,34 @@ RBTab {
             PacketType::RBMoniData   => {
               trace!("Received new RBMoniData!");
               let moni : RBMoniData = pack.unpack()?;
+              // check in with alert system
+              *self.moni_old_check.get_mut(&moni.board_id).unwrap() = Instant::now();
+              if self.alerts_active {
+                // FIXME - unify and get rid of all this goddam hardcoding in several 
+                //         places!
+                //let rb_list = vec![1,2,3,4,5,6,7,8,9,11,13,14,15,16,17,18,19,
+                //                   20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+                //                   34,35,36,39,40,41,44,46];
+                let alert_key_rate = format!("rb{:02}_rate_zero", moni.board_id);
+                let alert_key_temp = format!("rb{:02}_temp", moni.board_id);
+                //let alert_key_old  = format!("rb{:02}_hk_too_old", moni.board_id);
+                //let moni_age = self.moni_old_check.get(&moni.board_id).unwrap().elapsed().as_secs();
+                match self.alerts.lock() {
+                  Ok(mut al) => {
+                    // we can work with mtb relevant alerts here
+                    al.get_mut(alert_key_rate.as_str()).unwrap().trigger(moni.rate as f32);
+                    al.get_mut(alert_key_temp.as_str()).unwrap().trigger(moni.tmp_drs);
+                    //al.get_mut(alert_key_old.as_str()).unwrap() .trigger(moni_age as f32);
+                  },
+                  Err(err)   =>  error!("Unable to lock global alerts! {err}"),
+                }
+              }
+
               self.moni_queue.add(moni);
               self.n_moni += 1;
               // capture the rate for the global rate window
               self.global_rates.insert(moni.board_id, format!("{}",moni.rate));
+                
               if !self.met_queue_moni.contains_key(&moni.board_id) {
                 // FIXME - make the 1000 (which is queue size) a member
                 self.met_queue_moni.insert(moni.board_id, VecDeque::<f64>::with_capacity(1000));

@@ -87,7 +87,7 @@ impl TelemetryTab<'_> {
       tp_sender    : tp_sender,
       view         : TelemetryTabView::Stream, 
       pack_map     : HashMap::<&str, usize>::new(),
-      start_time   : Instant::now()
+      start_time   : Instant::now(),
     }
   }
  

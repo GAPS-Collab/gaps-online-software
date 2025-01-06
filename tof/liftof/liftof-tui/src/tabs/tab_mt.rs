@@ -7,70 +7,76 @@ use std::collections::{
   HashMap
 };
 
+use std::sync::{
+  Arc,
+  Mutex,
+};
+
 use std::time::{
   Instant
 };
 
 use ratatui::{
-    symbols,
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{
-        Color,
-        //Modifier,
-        Style},
-    text::Span,
-    Frame,
-    //terminal::Frame,
-    widgets::{
-        Block,
-        Dataset,
-        Axis,
-        GraphType,
-        BorderType,
-        Chart,
-        //BarChart,
-        Borders,
-        Paragraph
-    },
+  symbols,
+  layout::{Alignment, Constraint, Direction, Layout, Rect},
+  style::{
+      Color,
+      //Modifier,
+      Style},
+  text::Span,
+  Frame,
+  //terminal::Frame,
+  widgets::{
+      Block,
+      Dataset,
+      Axis,
+      GraphType,
+      BorderType,
+      Chart,
+      //BarChart,
+      Borders,
+      Paragraph
+  },
 };
 
-extern crate crossbeam_channel;
 use crossbeam_channel::Receiver;
 
-extern crate ndhistogram;
 use ndhistogram::{
-    ndhistogram,
-    Histogram,
-    Hist1D,
+  ndhistogram,
+  Histogram,
+  Hist1D,
 };
+
 use ndhistogram::axis::{
-    Uniform,
+  Uniform,
 };
 
 use tof_dataclasses::packets::{
-    TofPacket,
-    PacketType
+  TofPacket,
+  PacketType
 };
+
 use tof_dataclasses::events::MasterTriggerEvent;
 use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::errors::SerializationError;
-//use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::database::DsiJChPidMapping;
 use tof_dataclasses::events::master_trigger::LTBThreshold;
+
+use tof_dataclasses::alerts::*;
+
 use crate::colors::{
-    ColorTheme,
+  ColorTheme,
 };
 
 use crate::widgets::{
-    //clean_data,
-    prep_data,
-    create_labels,
-    histogram,
-    timeseries
+  prep_data,
+  create_labels,
+  histogram,
+  timeseries
 };
 
 #[derive(Debug, Clone)]
-pub struct MTTab {
+pub struct MTTab<'a> {
   pub event_queue    : VecDeque<MasterTriggerEvent>,
   pub moni_queue     : VecDeque<MtbMoniData>,
   pub met_queue      : VecDeque<f64>,
@@ -94,15 +100,32 @@ pub struct MTTab {
   pub mtlink_rb_map  : HashMap<u8,u8>,
   pub problem_hits   : Vec<(u8, u8, (u8, u8), LTBThreshold)>,
   timer              : Instant,
+  moni_old_check     : Instant,
+  alerts             : Arc<Mutex<HashMap<&'a str,TofAlert<'a>>>>,
+  alerts_active      : bool
 }
 
-impl MTTab {
+impl<'a> MTTab<'a> {
 
-  pub fn new(tp_receiver  : Receiver<TofPacket>,
-             mte_receiver : Receiver<MasterTriggerEvent>,
-             mapping      : &DsiJChPidMapping,
-             mtlink_rb_map: HashMap<u8,u8>,
-             theme        : ColorTheme) -> MTTab {
+  pub fn new(tp_receiver   : Receiver<TofPacket>,
+             mte_receiver  : Receiver<MasterTriggerEvent>,
+             mapping       : DsiJChPidMapping,
+             mtlink_rb_map : HashMap<u8,u8>,
+             alerts        : Arc<Mutex<HashMap<&'a str, TofAlert<'a>>>>,
+             theme         : ColorTheme) -> MTTab {
+    // check if the alerts are active
+    let mut alerts_active = false;
+    match alerts.lock() {
+      Ok(al) => {
+        if al.len() > 0 {
+          alerts_active = true;
+          info!("Found {} active alerts!", al.len());
+        }
+      }
+      Err(err) => {
+        error!("Unable to lock alert mutex! {err}");
+      }
+    }
     let bins          = Uniform::new(50, 0.0, 50.0).unwrap();
     let mtb_link_bins = Uniform::new(50, 0.0, 50.0).unwrap();
     let panel_bins    = Uniform::new(22, 1.0, 22.0).unwrap();
@@ -128,6 +151,9 @@ impl MTTab {
       mtlink_rb_map  : mtlink_rb_map,
       problem_hits   : Vec::<(u8, u8, (u8, u8), LTBThreshold)>::new(),
       timer          : Instant::now(),
+      moni_old_check : Instant::now(),
+      alerts         : alerts,
+      alerts_active  : alerts_active,
     }
   }
 
@@ -161,6 +187,21 @@ impl MTTab {
             info!("Got new MtbMoniData!");
             let moni : MtbMoniData = pack.unpack()?;
             self.n_moni += 1;
+            // check alert conditions
+            if self.alerts_active {
+              match self.alerts.lock() {
+                Ok(mut al) => {
+                  // we can work with mtb relevant alerts here
+                  al.get_mut("mtb_lost_rate").unwrap()     .trigger(moni.lost_rate as f32);
+                  al.get_mut("mtb_fpga_temp").unwrap() .trigger(moni.get_fpga_temp());
+                  al.get_mut("mtb_rate_zero").unwrap() .trigger(moni.rate as f32);
+                  al.get_mut("mtb_hk_too_old").unwrap().trigger(self.moni_old_check.elapsed().as_secs() as f32);
+                },
+                Err(err)   =>  error!("Unable to lock global alerts! {err}"),
+              }
+            }
+            self.moni_old_check = Instant::now();
+
             self.moni_queue.push_back(moni);
             if self.moni_queue.len() > self.queue_size {
               self.moni_queue.pop_front();
@@ -171,7 +212,7 @@ impl MTTab {
             }
             self.lost_r_queue.push_back((met, moni.lost_rate as f64));
             if self.lost_r_queue.len() > self.queue_size {
-              self.rate_queue.pop_front();
+              self.lost_r_queue.pop_front();
             }
             self.fpgatmp_queue.push_back((met, moni.get_fpga_temp() as f64));
             if self.fpgatmp_queue.len() > self.queue_size {
@@ -471,14 +512,12 @@ impl MTTab {
     let tp_labels  = create_labels(&self.panel_histo);
     let tph_data   = prep_data(&self.panel_histo, &tp_labels, 2, true); 
     let tpc_chart  = histogram(tph_data, String::from("Triggered Panel ID"), 3, 0, &self.theme);
-    //frame.render_widget(tpc_chart,      view_layout[2]);
     frame.render_widget(tpc_chart, trig_pan_and_hits[0]);
     frame.render_widget(nch_chart, trig_pan_and_hits[1]);
 
     // render everything
     frame.render_widget(rate_chart,      info_layout[0]); 
     frame.render_widget(lost_t_ts,       info_layout[1]);
-    //frame.render_widget(nch_chart,       info_layout[1]);
     frame.render_widget(fpga_temp_chart, info_layout[2]);
     frame.render_widget(event_view,      view_layout[0]);
     frame.render_widget(moni_view,       view_layout[1]);
