@@ -23,7 +23,6 @@ use std::collections::{
 #[macro_use] extern crate log;
 
 // third party widgets
-use tui_logger::TuiLoggerWidget;
 use tui_popup::Popup;
 
 use crossterm::{
@@ -42,10 +41,10 @@ use ratatui::{
   backend::CrosstermBackend,
   //terminal::Frame,
   Frame,
-  style::{
-      Color,
-      Style,
-  },
+  //style::{
+  //    Color,
+  //    Style,
+  //},
   widgets::{
       Paragraph,
       Block,
@@ -60,24 +59,24 @@ use tof_dataclasses::packets::{
 };
 
 use tof_dataclasses::database::{
-    connect_to_db,
-    get_dsi_j_ch_pid_map,
-    get_linkid_rbid_map,
-    ReadoutBoard,
-    Paddle,
+  connect_to_db,
+  get_dsi_j_ch_pid_map,
+  get_linkid_rbid_map,
+  ReadoutBoard,
+  Paddle,
 };
 
-use tof_dataclasses::serialization::{
-    Serialization,
-    //Packable,
-};
+//use tof_dataclasses::serialization::{
+//  //Serialization,
+//  //Packable,
+//};
 use tof_dataclasses::events::{
-    MasterTriggerEvent,
-    RBEvent,
-    TofEvent,
-    TofHit,
-    TofEventSummary,
-    //RBWaveform,
+  MasterTriggerEvent,
+  RBEvent,
+  TofEvent,
+  TofHit,
+  TofEventSummary,
+  //RBWaveform,
 };
 
 use tof_dataclasses::io::{
@@ -86,6 +85,14 @@ use tof_dataclasses::io::{
 };
 
 use tof_dataclasses::calibrations::RBCalibrations;
+use tof_dataclasses::alerts::{
+  TofAlert,
+  TofAlertManifest,
+  load_alerts
+};
+use telemetry_dataclasses::packets::TelemetryPacket;
+
+
 use liftof_lib::settings::LiftofSettings;
 
 use liftof_tui::menu::{
@@ -114,28 +121,29 @@ use liftof_tui::colors::{
   //COLORSETOMILU
 };
 
-use liftof_tui::{
-  MainLayout,
-  EventTab,
-  HomeTab,
-  SettingsTab,
-  TofHitTab,
-  RBTab,
-  RBTabView,
-  MTTab,
-  CPUTab,
-  //RBWaveformTab,
-  TofSummaryTab, 
-  TelemetryTab,
-  TelemetryTabView,
-  CommandTab,
-  PaddleTab,
-  HeartBeatTab,
-  HeartBeatView,
-  //packet_sorter,
-  packet_distributor,
-  socket_wrap_tofstream
-};
+use liftof_tui::*;// {
+//  MainLayout,
+//  EventTab,
+//  HomeTab,
+//  SettingsTab,
+//  TofHitTab,
+//  RBTab,
+//  RBTabView,
+//  MTTab,
+//  CPUTab,
+//  //RBWaveformTab,
+//  TofSummaryTab, 
+//  TelemetryTab,
+//  TelemetryTabView,
+//  AlertTab,
+//  CommandTab,
+//  PaddleTab,
+//  HeartBeatTab,
+//  HeartBeatView,
+//  //packet_sorter,
+//  packet_distributor,
+//  socket_wrap_tofstream
+//};
 
 
 //extern crate clap;
@@ -147,69 +155,6 @@ use clap::{arg,
            Parser
 };
 
-cfg_if::cfg_if! {
-  if #[cfg(feature = "telemetry")]  {
-    use telemetry_dataclasses::packets::{
-      TelemetryHeader,
-      TelemetryPacket,
-    };
-
-    /// Get the GAPS merged event telemetry stream and 
-    /// broadcast it to the relevant tab
-    ///
-    /// # Arguments
-    ///
-    /// * tele_sender : Channel to forward the received telemetry
-    ///                 packets
-    /// * address     : Address to susbscribe to for telemetry 
-    ///                 stream (must be zmq.PUB) on the Sender
-    ///                 side
-    fn socket_wrap_telemetry(address     : &str,
-                             tele_sender : Sender<TelemetryPacket>) {
-      let ctx = zmq::Context::new();
-      // FIXME - don't hardcode this IP
-      // typically how it is done is that this program runs either on a gse
-      // or there is a local forwarding of the port thrugh ssh
-      //let address : &str = "tcp://127.0.0.1:55555";
-      let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
-      match socket.connect(&address) {
-        Err(err) => {
-          error!("Unable to connect to data (PUB) socket {address}! {err}");
-          panic!("Can not connect to zmq PUB socket!");
-        }
-        Ok(_) => ()
-      }
-      socket.set_subscribe(b"") .expect("Can't subscribe to any message on 0MQ socket! {err}");
-      loop {
-        match socket.recv_bytes(0) {
-          Err(err)    => error!("Can't receive TofPacket! {err}"),
-          Ok(mut payload) => {
-            match TelemetryHeader::from_bytestream(&payload, &mut 0) {
-              Err(err) => {
-                error!("Can not decode telemtry header! {err}");
-                //for k in pos - 5 .. pos + 5 {
-                //  println!("{}",stream[k]);
-                //}
-              }
-              Ok(header) => {
-                let mut packet = TelemetryPacket::new();
-                if payload.len() > TelemetryHeader::SIZE {
-                  payload.drain(0..TelemetryHeader::SIZE);
-                }
-                packet.header  = header;
-                packet.payload = payload;
-                match tele_sender.send(packet) {
-                  Err(err) => error!("Can not send telemetry packet to downstream! {err}"),
-                  Ok(_)    => ()
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
 
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
@@ -240,6 +185,10 @@ struct Args {
   /// assume liftof-config.toml in this directory
   #[arg(short, long)]
   config: Option<String>,
+  /// The alert manifest allows to configure alerts
+  /// and subscribe to pages
+  #[arg(long)]
+  alert_manifest: Option<String>,
 }
 
 enum Event<I> {
@@ -248,25 +197,6 @@ enum Event<I> {
 }
 
 
-/// Use the TuiLoggerWidget to display 
-/// the most recent log messages
-///
-///
-fn render_logs<'a>(theme : ColorTheme) -> TuiLoggerWidget<'a> {
-  TuiLoggerWidget::default()
-    .style_error(Style::default().fg(Color::Red))
-    .style_debug(Style::default().fg(Color::Green))
-    .style_warn(Style::default().fg(Color::Yellow))
-    .style_trace(Style::default().fg(Color::Gray))
-    .style_info(Style::default().fg(Color::Blue))
-    .block(
-      Block::default()
-        .title("Logs")
-        .border_style(theme.style())
-        .borders(Borders::ALL),
-    )   
-    .style(theme.style())
-}
 
 
 // make a "holder" for all the tabs and menus, 
@@ -288,8 +218,8 @@ pub struct TabbedInterface<'a> {
   pub active_menu   :  ActiveMenu,
 
   // The tabs
-  pub mt_tab        : MTTab,
-  pub cpu_tab       : CPUTab,
+  pub mt_tab        : MTTab<'a>,
+  pub cpu_tab       : CPUTab<'a>,
   // waifu tab
   pub wf_tab        : RBTab<'a>,
   pub settings_tab  : SettingsTab<'a>,
@@ -298,13 +228,12 @@ pub struct TabbedInterface<'a> {
   pub cmd_tab       : CommandTab<'a>,
 
   pub th_tab        : TofHitTab<'a>,
-  // flight packets
-  //pub rbwf_tab      : RBWaveformTab,
   pub ts_tab        : TofSummaryTab,
   
   // telemetry 
   pub te_tab        : TelemetryTab<'a>,
 
+  pub al_tab        : AlertTab<'a>,
   // paddles 
   pub pd_tab        : PaddleTab<'a>,
 
@@ -330,8 +259,8 @@ impl<'a> TabbedInterface<'a> {
              hb_menu      : HBMenu<'a>,
              tl_menu      : TelemetryMenu<'a>,
              active_menu  : ActiveMenu,
-             mt_tab       : MTTab,
-             cpu_tab      : CPUTab,
+             mt_tab       : MTTab<'a>,
+             cpu_tab      : CPUTab<'a>,
              wf_tab       : RBTab<'a>,
              settings_tab : SettingsTab<'a>,
              home_tab     : HomeTab<'a>,
@@ -340,6 +269,7 @@ impl<'a> TabbedInterface<'a> {
              //rbwf_tab     : RBWaveformTab,
              ts_tab       : TofSummaryTab,
              te_tab       : TelemetryTab<'a>,
+             al_tab       : AlertTab<'a>,
              cmd_tab      : CommandTab<'a>,
              hb_tab       : HeartBeatTab,
              pd_tab       : PaddleTab<'a>) -> Self {
@@ -367,6 +297,7 @@ impl<'a> TabbedInterface<'a> {
       //rbwf_tab    ,
       ts_tab      ,
       te_tab      ,
+      al_tab      ,
       cmd_tab     ,
       pd_tab      , 
       hb_tab      ,
@@ -421,6 +352,8 @@ impl<'a> TabbedInterface<'a> {
       Err(err) => error!("Can not receive a new packet from the Telemetry Stream! {err}"),
       Ok(_)    => ()
     }
+    // check for alerts
+    self.al_tab.check_alert_state();
   }
 
   fn update_color_theme(&mut self, cs : ColorSet) {
@@ -453,45 +386,21 @@ impl<'a> TabbedInterface<'a> {
   pub fn render_home(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
     self.ui_menu.render (&main_lo.menu, frame);
     self.home_tab.render(&main_lo.main, frame);
-    if self.quit_request {
-      let popup = Popup::new("Quit liftof-tui?")
-        .title("Press Y to confirm, any key to abort")
-        .style(self.home_tab.theme.style());
-      frame.render_widget(&popup, frame.area());
-    }
   }
   
   pub fn render_alerts(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
     self.ui_menu.render (&main_lo.menu, frame);
-    //self.alert_tab.render(&master_lo.rect[1], frame);
-    if self.quit_request {
-      let popup = Popup::new("Quit liftof-tui?")
-        .title("Press Y to confirm, any key to abort")
-        .style(self.home_tab.theme.style());
-      frame.render_widget(&popup, frame.area());
-    }
+    self.al_tab.render(&main_lo.main, frame);
   }
 
   pub fn render_events(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
     self.te_menu.render  (&main_lo.menu, frame);
     self.event_tab.render(&main_lo.main, frame);
-    if self.quit_request {
-      let popup = Popup::new("Quit liftof-tui?")
-        .title("Press Y to confirm, any key to abort")
-        .style(self.home_tab.theme.style());
-      frame.render_widget(&popup, frame.area());
-    }
   }
 
   pub fn render_monitoring(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
     self.mo_menu.render(&main_lo.menu, frame);
     self.home_tab.render(&main_lo.main, frame);
-    if self.quit_request {
-      let popup = Popup::new("Quit liftof-tui?")
-        .title("Press Y to confirm, any key to abort")
-        .style(self.home_tab.theme.style());
-      frame.render_widget(&popup, frame.area());
-    }
   }
 
   pub fn render_cpu(&mut self, master_lo : &mut MainLayout, frame : &mut Frame) {
@@ -502,12 +411,6 @@ impl<'a> TabbedInterface<'a> {
   pub fn render_mt(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
     self.ui_menu.render(&main_lo.menu, frame);
     self.mt_tab.render (&main_lo.main, frame);
-    if self.quit_request {
-      let popup = Popup::new("Quit liftof-tui?")
-        .title("Press Y to confirm, any key to abort")
-        .style(self.home_tab.theme.style());
-      frame.render_widget(&popup, frame.area());
-    }
   }
   
   pub fn render_rbs(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
@@ -520,12 +423,6 @@ impl<'a> TabbedInterface<'a> {
         self.ui_menu.render(&main_lo.menu, frame);
         self.wf_tab.render (&main_lo.main, frame);
       }
-    }
-    if self.quit_request {
-      let popup = Popup::new("Quit liftof-tui?")
-        .title("Press Y to confirm, any key to abort")
-        .style(self.home_tab.theme.style());
-      frame.render_widget(&popup, frame.area());
     }
   }
   
@@ -540,12 +437,6 @@ impl<'a> TabbedInterface<'a> {
         self.pd_tab.render (&main_lo.main, frame);
       }
     }
-    if self.quit_request {
-      let popup = Popup::new("Quit liftof-tui?")
-        .title("Press Y to confirm, any key to abort")
-        .style(self.home_tab.theme.style());
-      frame.render_widget(&popup, frame.area());
-    }
   }
 
   pub fn render_heartbeats(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
@@ -558,55 +449,25 @@ impl<'a> TabbedInterface<'a> {
       }
     }
     self.hb_tab.render(&main_lo.main, frame);
-    if self.quit_request {
-      let popup = Popup::new("Quit liftof-tui?")
-        .title("Press Y to confirm, any key to abort")
-        .style(self.home_tab.theme.style());
-      frame.render_widget(&popup, frame.area());
-    }
   }
 
   pub fn render_commands(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
     self.ui_menu.render(&main_lo.menu, frame);
     self.cmd_tab.render(&main_lo.main, frame);
-    if self.quit_request {
-      let popup = Popup::new("Quit liftof-tui?")
-        .title("Press Y to confirm, any key to abort")
-        .style(self.home_tab.theme.style());
-      frame.render_widget(&popup, frame.area());
-    }
   }
 
   pub fn render_settings(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
     self.ui_menu.render     (&main_lo.menu, frame);
     self.settings_tab.render(&main_lo.main, frame);
-    if self.quit_request {
-      let popup = Popup::new("Quit liftof-tui?")
-        .title("Press Y to confirm, any key to abort")
-        .style(self.home_tab.theme.style());
-      frame.render_widget(&popup, frame.area());
-    }
   }
    
   pub fn render_quit(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
     self.ui_menu.render(&main_lo.menu, frame);
-    if self.quit_request {
-      let popup = Popup::new("Quit liftof-tui?")
-        .title("Press Y to confirm, any key to abort")
-        .style(self.home_tab.theme.style());
-      frame.render_widget(&popup, frame.area());
-    }
   }
 
   pub fn render_tofhittab(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
     self.th_menu.render(&main_lo.menu, frame);
     self.th_tab.render(&main_lo.main, frame);
-    if self.quit_request {
-      let popup = Popup::new("Quit liftof-tui?")
-        .title("Press Y to confirm, any key to abort")
-        .style(self.home_tab.theme.style());
-      frame.render_widget(&popup, frame.area());
-    }
   }
 
   pub fn render_tofsummarytab(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
@@ -724,6 +585,12 @@ impl<'a> TabbedInterface<'a> {
         }
       }
       _ => ()
+    }
+    if self.quit_request {
+      let popup = Popup::new("Quit liftof-tui?")
+        .title("Press Y to confirm, any key to abort")
+        .style(self.home_tab.theme.style());
+      frame.render_widget(&popup, frame.area());
     }
   }
 
@@ -1037,6 +904,9 @@ impl<'a> TabbedInterface<'a> {
         }
       }
       KeyCode::Down => {
+        if self.ui_menu.get_active_menu_item() == UIMenuItem::Alerts {
+          self.al_tab.next_row();
+        }
         if self.settings_tab.ctl_active {
           self.settings_tab.next_ct();
           match self.settings_tab.get_colorset() {
@@ -1067,6 +937,9 @@ impl<'a> TabbedInterface<'a> {
         }
       }
       KeyCode::Up => {
+        if self.ui_menu.get_active_menu_item() == UIMenuItem::Alerts {
+          self.al_tab.previous_row();
+        }
         if self.settings_tab.ctl_active {
           self.settings_tab.previous_ct();
           match self.settings_tab.get_colorset() {
@@ -1135,9 +1008,34 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
       }
     } // end Some
   } // end match
+ 
+  // alerts for everybody! (yay I guess..)
+  let global_alerts      = Arc::new(Mutex::new(HashMap::<&'static str, TofAlert<'static>>::new())); 
+  match args.alert_manifest {
+    Some(mani_file) => {
+      match TofAlertManifest::from_toml(&mani_file) {
+        Err(err) => {
+          panic!("CRITICAL! Unable to parse alert manifest! {}", err);
+        }
+        Ok(mani) => {
+          let glob_al = load_alerts(mani);
+          match global_alerts.lock() {
+            Ok(mut gal) => {
+              *gal = glob_al;
+            }
+            Err(err) => error!("Unable to lock global alerts! {err}"),
+          }
+        }
+      }
+    }
+    None => {
+      warn!("Not loading an alert manifest! Alert feature not available!");
+    }
+  } // end match
 
   let home_stream_wd_cnt : Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
   let home_streamer      = home_stream_wd_cnt.clone();
+
 
   // calibrations for everybody!
   let rbcalibrations : Arc<Mutex<HashMap<u8, RBCalibrations>>> = Arc::new(Mutex::new(HashMap::<u8, RBCalibrations>::new()));
@@ -1272,6 +1170,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
         .spawn(move || {
           socket_wrap_telemetry(
             telemetry_address,
+            32000, // FIXME - can be up to u16::MAX
             te_pack_send
           );
         })
@@ -1345,18 +1244,25 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let hb_menu         = HBMenu::new(color_theme.clone());
   let tl_menu         = TelemetryMenu::new(color_theme.clone());
   // The tabs
+  let ts_tab          = TofSummaryTab::new(ts_recv,
+                                           ts_send_pdl,
+                                           &dsijch_paddle_map,
+                                           color_theme.clone());
   let mt_tab          = MTTab::new(mt_pack_recv,
                                    mte_recv,
-                                   &dsijch_paddle_map,
+                                   dsijch_paddle_map,
                                    mtlink_rb_map,
+                                   global_alerts.clone(),
                                    color_theme.clone());
  
   let cpu_tab         = CPUTab::new(cp_pack_recv,
+                                    global_alerts.clone(),
                                     color_theme.clone());
   // waifu tab
   let wf_tab          = RBTab::new(rb_pack_recv,
                                    rbe_recv,
                                    readoutboards.clone(),
+                                   global_alerts.clone(),
                                    color_theme.clone());
   let settings_tab    = SettingsTab::new(color_theme.clone());
   let home_tab        = HomeTab::new(color_theme.clone(), home_streamer, packet_map_home);
@@ -1365,10 +1271,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //let rbwf_tab        = RBWaveformTab::new(rbwf_pack_recv,
   //                                         readoutboards,
   //                                         color_theme.clone());
-  let ts_tab          = TofSummaryTab::new(ts_recv,
-                                           ts_send_pdl,
-                                           &dsijch_paddle_map,
-                                           color_theme.clone());
   let te_tab          : TelemetryTab;
   if args.from_telemetry {
     te_tab            = TelemetryTab::new(Some(tp_to_distrib),
@@ -1385,6 +1287,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let cmd_tab         = CommandTab::new(tr_pack_recv, cmd_sender_addr, color_theme.clone(), allow_commands);
   let pd_tab          = PaddleTab::new(ts_recv_pdl, rbwf_pack_recv, paddle_map, rbcalibrations, color_theme.clone());
   let hb_tab          = HeartBeatTab::new(hb_pack_recv, color_theme.clone());
+  let al_tab          = AlertTab::new(color_theme.clone(),global_alerts.clone()); 
   let active_menu     = ActiveMenu::MainMenu;
   let tabs            = TabbedInterface::new(ui_menu,
                                              rb_menu,
@@ -1409,6 +1312,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                              //rbwf_tab,
                                              ts_tab,
                                              te_tab,
+                                             al_tab,
                                              cmd_tab,
                                              hb_tab,
                                              pd_tab);
@@ -1446,10 +1350,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                 if tab_changed {
                   let _ = terminal.clear();
                 }
-                //if want_quit {
-                //  quit_app = true;
-                //  // true means end program
-                //}
                 let cs = tabs.get_colorset();
                 color_theme.update(&cs);
               }

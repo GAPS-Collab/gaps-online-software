@@ -5,7 +5,6 @@ use ratatui::widgets::Tabs;
 use ratatui::text::{Span, Line};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::widgets::{Block, Borders};
-//use ratatui::terminal::Frame;
 use ratatui::Frame;
 use ratatui::layout::Rect;
 
@@ -113,7 +112,8 @@ pub enum UIMenuItem {
   No,
   // TelemetryMenu
   Stream,
-  MergedEvents
+  MergedEvents, 
+  GPS,
 }
 
 impl UIMenuItem {
@@ -157,6 +157,7 @@ impl UIMenuItem {
       UIMenuItem::No             => String::from("No"),
       UIMenuItem::Stream         => String::from("Stream"),
       UIMenuItem::MergedEvents   => String::from("MergedEvents"),
+      UIMenuItem::GPS            => String::from("GPS"),
     // _ => String::from("Unknown"),
     } 
   }
@@ -599,7 +600,6 @@ impl UIMenu<'_> for TelemetryMenu<'_> {
   
   fn get_items() -> Vec<UIMenuItem> {
     let items = vec![UIMenuItem::Back,
-                     UIMenuItem::Stream,
                      UIMenuItem::MergedEvents];
     items
   }

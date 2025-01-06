@@ -12,11 +12,29 @@ use std::sync::Arc;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 
+use tui_logger::TuiLoggerWidget;
+use ratatui::{
+  style::{
+    Color,
+    Style,
+  },
+  widgets::{
+    Block,
+    Borders,
+  },
+};
+
 pub use crate::tabs::*;
 pub use crate::layout::*;
 
+use crate::colors::ColorTheme;
+
 #[cfg(feature = "telemetry")]
-use telemetry_dataclasses::packets::TelemetryPacketType;
+use telemetry_dataclasses::packets::{
+  TelemetryPacketType,
+  TelemetryPacket,
+  TelemetryHeader
+};
 
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::packets::PacketType;
@@ -75,58 +93,35 @@ pub fn telly_packet_counter(pack_map : &mut HashMap<&str, usize>, packet_type : 
   }
 }
 
-
-#[cfg(feature = "telemetry")]
-/// Just produce a summary of all the packets we received
-fn telly_packet_sorter(packet_type : &TelemetryPacketType,
-                       packet_map  : &Arc<Mutex<HashMap<&str, usize>>>) {
-  match packet_map.lock() {
-    Ok(mut pm) => {
-      let pack_key : &str;
-      match packet_type {
-        TelemetryPacketType::Unknown            => pack_key = "Unknown",
-        TelemetryPacketType::CardHKP            => pack_key = "CardHKP",
-        TelemetryPacketType::CoolingHK          => pack_key = "CoolingHKP",
-        TelemetryPacketType::PDUHK              => pack_key = "PDUHK",
-        TelemetryPacketType::Tracker            => pack_key = "Tracker",
-        TelemetryPacketType::TrackerDAQCntr     => pack_key = "TrakcerDAQCntr",
-        TelemetryPacketType::GPS                => pack_key = "GPS",
-        TelemetryPacketType::TrkTempLeak        => pack_key = "TrkTempLeak",
-        TelemetryPacketType::BoringEvent        => pack_key = "BoringEvent",
-        TelemetryPacketType::RBWaveform         => pack_key = "RBWaveform",
-        TelemetryPacketType::AnyTofHK           => pack_key = "AnyTofHK",
-        TelemetryPacketType::GcuEvtBldSettings  => pack_key = "GcuEvtBldSettings",
-        TelemetryPacketType::LabJackHK          => pack_key = "LabJackHK",
-        TelemetryPacketType::MagHK              => pack_key = "MagHK",
-        TelemetryPacketType::GcuMon             => pack_key = "GcuMon",
-        TelemetryPacketType::InterestingEvent   => pack_key = "InterestingEvent",
-        TelemetryPacketType::NoGapsTriggerEvent => pack_key = "NoGapsTriggerEvent",
-        TelemetryPacketType::NoTofDataEvent     => pack_key = "NoTofDataEvent",
-        TelemetryPacketType::Ack                => pack_key = "Ack",     
-        TelemetryPacketType::AnyTrackerHK       => pack_key = "AnyTrackerHK",
-        TelemetryPacketType::TmP33              => pack_key = "TmP33",
-        TelemetryPacketType::TmP34              => pack_key = "TmP34",
-        TelemetryPacketType::TmP37              => pack_key = "TmP37",
-        TelemetryPacketType::TmP38              => pack_key = "TmP38",
-        TelemetryPacketType::TmP55              => pack_key = "TmP55",
-        TelemetryPacketType::TmP64              => pack_key = "TmP64",
-        TelemetryPacketType::TmP96              => pack_key = "TmP96",
-        TelemetryPacketType::TmP214             => pack_key = "TmP214",
-        //_                              => pack_key = "Unknown",
-      }
-      if pm.get(pack_key).is_some() {
-        *pm.get_mut(pack_key).unwrap() += 1;
-      } else {
-        pm.insert(pack_key, 0);
-      }
-    }
-    Err(err) => {
-      error!("Can't lock shared memory! {err}");
-    }
-  }
+/// Use the TuiLoggerWidget to display 
+/// the most recent log messages
+///
+///
+pub fn render_logs<'a>(theme : ColorTheme) -> TuiLoggerWidget<'a> {
+  TuiLoggerWidget::default()
+    .style_error(Style::default().fg(Color::Red))
+    .style_debug(Style::default().fg(Color::Green))
+    .style_warn(Style::default().fg(Color::Yellow))
+    .style_trace(Style::default().fg(Color::Gray))
+    .style_info(Style::default().fg(Color::Blue))
+    .block(
+      Block::default()
+        .title("Logs")
+        .border_style(theme.style())
+        .borders(Borders::ALL),
+    )   
+    .style(theme.style())
 }
 
-/// Just produce a summary of all the packets we received
+/// Count the different types of tofpackets and store the result 
+/// in a HashMap
+///
+/// # Arguments:
+///
+///   * packet_type : TofPacket type to llokup it's position in 
+///                   the map
+///   * packet_map  : An arc/mutex to the HashMap we use to store
+///                   the counted values in.
 fn packet_sorter(packet_type : &PacketType,
                  packet_map  : &Arc<Mutex<HashMap<&str,usize>>>) {
   match packet_map.lock() {
@@ -383,6 +378,86 @@ pub fn socket_wrap_tofstream(address   : &str,
               }
             }
           }  
+        }
+      }
+    }
+  }
+}
+
+cfg_if::cfg_if! {
+  if #[cfg(feature = "telemetry")]  {
+    //use telemetry_dataclasses::packets::{
+    //  TelemetryHeader,
+    //  TelemetryPacket,
+    //};
+
+    /// Get the GAPS merged event telemetry stream and 
+    /// broadcast it to the relevant tab
+    ///
+    /// # Arguments
+    ///
+    /// * address     : Address to susbscribe to for telemetry 
+    ///                 stream (must be zmq.PUB) on the Sender
+    ///                 side
+    /// * cachesize   : Getting the packets from the funneled stream leads
+    ///                 to duplicates. To eliminate these, we store the 
+    ///                 packet counter variable in a Dequee of a given 
+    ///                 size
+    /// * tele_sender : Channel to forward the received telemetry
+    ///                 packets
+    pub fn socket_wrap_telemetry(address     : &str,
+                                 cachesize   : usize,
+                                 tele_sender : Sender<TelemetryPacket>) {
+      let ctx = zmq::Context::new();
+      // FIXME - don't hardcode this IP
+      // typically how it is done is that this program runs either on a gse
+      // or there is a local forwarding of the port thrugh ssh
+      //let address : &str = "tcp://127.0.0.1:55555";
+      let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
+      match socket.connect(&address) {
+        Err(err) => {
+          error!("Unable to connect to data (PUB) socket {address}! {err}");
+          panic!("Can not connect to zmq PUB socket!");
+        }
+        Ok(_) => ()
+      }
+      let mut cache = VecDeque::<u16>::with_capacity(cachesize);
+      socket.set_subscribe(b"") .expect("Can't subscribe to any message on 0MQ socket! {err}");
+      loop {
+        match socket.recv_bytes(0) {
+          Err(err)    => error!("Can't receive TofPacket! {err}"),
+          Ok(mut payload) => {
+            match TelemetryHeader::from_bytestream(&payload, &mut 0) {
+              Err(err) => {
+                error!("Can not decode telemtry header! {err}");
+                //for k in pos - 5 .. pos + 5 {
+                //  println!("{}",stream[k]);
+                //}
+              }
+              Ok(header) => {
+                let mut packet = TelemetryPacket::new();
+                if payload.len() > TelemetryHeader::SIZE {
+                  payload.drain(0..TelemetryHeader::SIZE);
+                }
+                if cache.contains(&header.counter) {
+                  // drop this packet
+                  continue;
+                } else {
+                  cache.push_back(header.counter); 
+                }
+                if cache.len() == cachesize {
+                  cache.pop_front();
+                }
+
+                packet.header  = header;
+                packet.payload = payload;
+                match tele_sender.send(packet) {
+                  Err(err) => error!("Can not send telemetry packet to downstream! {err}"),
+                  Ok(_)    => ()
+                }
+              }
+            }
+          }
         }
       }
     }
