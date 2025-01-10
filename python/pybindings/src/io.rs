@@ -42,7 +42,7 @@ impl PyTofPacketReader {
   }
 
   #[getter]
-  fn packet_index(&mut self) -> PyResult<HashMap<u8, usize>> {
+  fn packet_index(&mut self) -> PyResult<HashMap<PacketType, usize>> {
     let idx = self.reader.get_packet_index()?;
     self.reader.rewind()?;
     Ok(idx)

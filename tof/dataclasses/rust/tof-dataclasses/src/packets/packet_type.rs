@@ -13,10 +13,12 @@ cfg_if::cfg_if! {
 
 #[cfg(feature = "pybindings")]
 use pyo3::pyclass;
+#[cfg(feature = "pybindings")]
+use pyo3::pymethods;
 
 /// Types of serializable data structures used
 /// throughout the tof system
-#[derive(Debug, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
 #[cfg_attr(feature = "pybindings", pyclass)]
 #[repr(u8)]
 pub enum PacketType {
@@ -131,6 +133,66 @@ impl From<u8> for PacketType {
     }
   }
 }
+
+#[cfg(feature = "pybindings")]
+#[pymethods]
+impl PacketType {
+
+  #[getter]
+  fn __eq__(&self, b: &PacketType) -> bool {
+      self == b
+  }
+
+  #[getter]
+  fn __hash__(&self) -> usize {
+    (*self as u8) as usize
+    //match self {
+    //  PacketType::Unknown               => 0 , 
+    //  PacketType::RBEvent               => 20,
+    //  PacketType::TofEvent              => 21,
+    //  PacketType::RBWaveform            => 22,
+    //  PacketType::TofEventSummary       => 23,
+    //  PacketType::HeartBeatDataSink     => 40,    
+    //  PacketType::MasterTrigger         => 60,    // needs to be renamed to either MasterTriggerEvent or MTEvent
+    //  PacketType::TriggerConfig         => 61,
+    //  PacketType::MTBHeartbeat          => 62, 
+    //  PacketType::EVTBLDRHeartbeat      => 63,
+    //  PacketType::RBChannelMaskConfig   => 64,
+    //  PacketType::TofRBConfig           => 68,
+    //  PacketType::AnalysisEngineConfig  => 69,
+    //  PacketType::RBEventHeader         => 70,    // needs to go away
+    //  PacketType::TOFEventBuilderConfig => 71,
+    //  PacketType::DataPublisherConfig   => 72,
+    //  PacketType::TofRunConfig          => 73,
+    //  PacketType::CPUMoniData           => 80,
+    //  PacketType::MonitorMtb            => 90,
+    //  PacketType::RBMoniData            => 100,
+    //  PacketType::PBMoniData            => 101,
+    //  PacketType::LTBMoniData           => 102,
+    //  PacketType::PAMoniData            => 103,
+    //  PacketType::RBEventMemoryView     => 120, // We'll keep it for now - indicates that the event
+    //  PacketType::RBCalibration         => 130,
+    //  PacketType::TofCommand            => 140,
+    //  PacketType::TofCommandV2          => 141,
+    //  PacketType::TofResponse           => 142,
+    //  PacketType::RBCommand             => 150,
+    //  PacketType::RBPing                => 160,
+    //  PacketType::PreampBiasConfig      => 161,
+    //  PacketType::RunConfig             => 162,
+    //  PacketType::LTBThresholdConfig    => 163,
+    //  PacketType::TofDetectorStatus     => 171,
+    //  PacketType::ConfigBinary          => 201,
+    //  PacketType::LiftofRBBinary        => 202,
+    //  PacketType::LiftofBinaryService   => 203,
+    //  PacketType::LiftofCCBinary        => 204,
+    //  PacketType::RBCalibrationFlightV  => 210,
+    //  PacketType::RBCalibrationFlightT  => 211,
+    //  PacketType::BfswAckPacket         => 212,
+    //  PacketType::MultiPacket           => 255,
+    //}
+  } 
+}
+
 
 #[cfg(feature = "random")]
 impl FromRandom for PacketType {

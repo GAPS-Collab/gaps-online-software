@@ -188,7 +188,7 @@ pub fn summarize_toffile(fname : String) {
   let outfile_type  = FileType::SummaryFile(fname.clone());
   let mut writer    = TofPacketWriter::new(outfile,outfile_type); 
   let mut n_errors  = 0u32;
-  let npack : usize = reader.get_packet_index().unwrap_or(HashMap::<u8,usize>::new()).values().cloned().collect::<Vec<usize>>().iter().sum();
+  let npack : usize = reader.get_packet_index().unwrap_or(HashMap::<PacketType,usize>::new()).values().cloned().collect::<Vec<usize>>().iter().sum();
   let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
   let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
   let bar_label  = String::from("Reading events");
@@ -874,8 +874,8 @@ impl TofPacketReader {
   /// Get an index of the file - count number of packets
   ///
   /// Returns the number of all PacketTypes in the file
-  pub fn get_packet_index(&mut self) -> io::Result<HashMap<u8, usize>> {
-    let mut index  = HashMap::<u8, usize>::new();
+  pub fn get_packet_index(&mut self) -> io::Result<HashMap<PacketType, usize>> {
+    let mut index  = HashMap::<PacketType, usize>::new();
     let mut buffer = [0];
     loop {
       match self.file_reader.read_exact(&mut buffer) {
@@ -938,11 +938,11 @@ impl TofPacketReader {
               self.cursor += size as usize;
               // and then we add the packet type to the 
               // hashmap
-              let ptype_key = ptype as u8;
-              if index.contains_key(&ptype_key) {
-                *index.get_mut(&ptype_key).unwrap() += 1;
+              //let ptype_key = ptype as u8;
+              if index.contains_key(&ptype) {
+                *index.get_mut(&ptype).unwrap() += 1;
               } else {
-                index.insert(ptype_key, 1usize);
+                index.insert(ptype, 1usize);
               }
             }
           }
