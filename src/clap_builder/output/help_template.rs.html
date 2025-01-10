@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap_builder-4.5.23/src/output/help_template.rs`."><title>help_template.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="clap_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">clap_builder/output/</div>help_template.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap_builder-4.5.26/src/output/help_template.rs`."><title>help_template.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="clap_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">clap_builder/output/</div>help_template.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -1143,10 +1143,7 @@
 <a href="#1142" id="1142">1142</a>
 <a href="#1143" id="1143">1143</a>
 <a href="#1144" id="1144">1144</a>
-<a href="#1145" id="1145">1145</a>
-<a href="#1146" id="1146">1146</a>
-<a href="#1147" id="1147">1147</a>
-<a href="#1148" id="1148">1148</a></pre></div><pre class="rust"><code><span class="comment">// HACK: for rust 1.64 (1.68 doesn't need this since this is in lib.rs)
+<a href="#1145" id="1145">1145</a></pre></div><pre class="rust"><code><span class="comment">// HACK: for rust 1.64 (1.68 doesn't need this since this is in lib.rs)
 //
 // Wanting consistency in our calls
 </span><span class="attr">#![allow(clippy::write_with_newline)]
@@ -1154,6 +1151,7 @@
 </span><span class="comment">// Std
 </span><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::cmp;
+<span class="kw">use </span>std::collections::BTreeMap;
 
 <span class="comment">// Internal
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::PossibleValue;
@@ -1615,7 +1613,7 @@
         <span class="macro">debug!</span>(<span class="string">"HelpTemplate::write_args {_category}"</span>);
         <span class="comment">// The shortest an arg can legally be is 2 (i.e. '-x')
         </span><span class="kw">let </span><span class="kw-2">mut </span>longest = <span class="number">2</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>ord_v = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>ord_v = BTreeMap::new();
 
         <span class="comment">// Determine the longest
         </span><span class="kw">for </span><span class="kw-2">&amp;</span>arg <span class="kw">in </span>args.iter().filter(|arg| {
@@ -1634,9 +1632,8 @@
             }
 
             <span class="kw">let </span>key = (sort_key)(arg);
-            ord_v.push((key, arg));
+            ord_v.insert(key, arg);
         }
-        ord_v.sort_by(|a, b| a.<span class="number">0</span>.cmp(<span class="kw-2">&amp;</span>b.<span class="number">0</span>));
 
         <span class="kw">let </span>next_line_help = <span class="self">self</span>.will_args_wrap(args, longest);
 
@@ -2006,19 +2003,17 @@
         <span class="kw">use </span>std::fmt::Write <span class="kw">as _</span>;
         <span class="kw">let </span>header = <span class="kw-2">&amp;</span><span class="self">self</span>.styles.get_header();
 
-        <span class="kw">let </span><span class="kw-2">mut </span>ord_v = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>ord_v = BTreeMap::new();
         <span class="kw">for </span>subcommand <span class="kw">in </span>cmd
             .get_subcommands()
             .filter(|subcommand| should_show_subcommand(subcommand))
         {
-            ord_v.push((
-                subcommand.get_display_order(),
-                subcommand.get_name(),
+            ord_v.insert(
+                (subcommand.get_display_order(), subcommand.get_name()),
                 subcommand,
-            ));
+            );
         }
-        ord_v.sort_by(|a, b| (a.<span class="number">0</span>, <span class="kw-2">&amp;</span>a.<span class="number">1</span>).cmp(<span class="kw-2">&amp;</span>(b.<span class="number">0</span>, <span class="kw-2">&amp;</span>b.<span class="number">1</span>)));
-        <span class="kw">for </span>(<span class="kw">_</span>, <span class="kw">_</span>, subcommand) <span class="kw">in </span>ord_v {
+        <span class="kw">for </span>(<span class="kw">_</span>, subcommand) <span class="kw">in </span>ord_v {
             <span class="kw">if </span>!<span class="kw-2">*</span>first {
                 <span class="self">self</span>.writer.push_str(<span class="string">"\n\n"</span>);
             }
@@ -2063,7 +2058,7 @@
 
         <span class="comment">// The shortest an arg can legally be is 2 (i.e. '-x')
         </span><span class="kw">let </span><span class="kw-2">mut </span>longest = <span class="number">2</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>ord_v = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>ord_v = BTreeMap::new();
         <span class="kw">for </span>subcommand <span class="kw">in </span>cmd
             .get_subcommands()
             .filter(|subcommand| should_show_subcommand(subcommand))
@@ -2078,19 +2073,18 @@
                 <span class="kw">let _ </span>= <span class="macro">write!</span>(styled, <span class="string">", {literal}--{long}{literal:#}"</span>,);
             }
             longest = longest.max(styled.display_width());
-            ord_v.push((subcommand.get_display_order(), styled, subcommand));
+            ord_v.insert((subcommand.get_display_order(), styled), subcommand);
         }
-        ord_v.sort_by(|a, b| (a.<span class="number">0</span>, <span class="kw-2">&amp;</span>a.<span class="number">1</span>).cmp(<span class="kw-2">&amp;</span>(b.<span class="number">0</span>, <span class="kw-2">&amp;</span>b.<span class="number">1</span>)));
 
         <span class="macro">debug!</span>(<span class="string">"HelpTemplate::write_subcommands longest = {longest}"</span>);
 
         <span class="kw">let </span>next_line_help = <span class="self">self</span>.will_subcommands_wrap(cmd.get_subcommands(), longest);
 
-        <span class="kw">for </span>(i, (<span class="kw">_</span>, sc_str, sc)) <span class="kw">in </span>ord_v.into_iter().enumerate() {
+        <span class="kw">for </span>(i, (sc_str, sc)) <span class="kw">in </span>ord_v.into_iter().enumerate() {
             <span class="kw">if </span><span class="number">0 </span>&lt; i {
                 <span class="self">self</span>.writer.push_str(<span class="string">"\n"</span>);
             }
-            <span class="self">self</span>.write_subcommand(sc_str, sc, next_line_help, longest);
+            <span class="self">self</span>.write_subcommand(sc_str.<span class="number">1</span>, sc, next_line_help, longest);
         }
     }
 

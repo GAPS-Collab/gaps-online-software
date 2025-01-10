@@ -1844,7 +1844,7 @@
   <span class="kw">let </span>outfile_type  = FileType::SummaryFile(fname.clone());
   <span class="kw">let </span><span class="kw-2">mut </span>writer    = TofPacketWriter::new(outfile,outfile_type); 
   <span class="kw">let </span><span class="kw-2">mut </span>n_errors  = <span class="number">0u32</span>;
-  <span class="kw">let </span>npack : usize = reader.get_packet_index().unwrap_or(HashMap::&lt;u8,usize&gt;::new()).values().cloned().collect::&lt;Vec&lt;usize&gt;&gt;().iter().sum();
+  <span class="kw">let </span>npack : usize = reader.get_packet_index().unwrap_or(HashMap::&lt;PacketType,usize&gt;::new()).values().cloned().collect::&lt;Vec&lt;usize&gt;&gt;().iter().sum();
   <span class="kw">let </span>bar_template : <span class="kw-2">&amp;</span>str = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:&gt;7}/{len:7}"</span>;
   <span class="kw">let </span>bar_style  = ProgressStyle::with_template(bar_template).expect(<span class="string">"Unable to set progressbar style!"</span>);
   <span class="kw">let </span>bar_label  = String::from(<span class="string">"Reading events"</span>);
@@ -2530,8 +2530,8 @@
   <span class="doccomment">/// Get an index of the file - count number of packets
   ///
   /// Returns the number of all PacketTypes in the file
-  </span><span class="kw">pub fn </span>get_packet_index(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;HashMap&lt;u8, usize&gt;&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>index  = HashMap::&lt;u8, usize&gt;::new();
+  </span><span class="kw">pub fn </span>get_packet_index(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;HashMap&lt;PacketType, usize&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>index  = HashMap::&lt;PacketType, usize&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0</span>];
     <span class="kw">loop </span>{
       <span class="kw">match </span><span class="self">self</span>.file_reader.read_exact(<span class="kw-2">&amp;mut </span>buffer) {
@@ -2594,11 +2594,11 @@
               <span class="self">self</span>.cursor += size <span class="kw">as </span>usize;
               <span class="comment">// and then we add the packet type to the 
               // hashmap
-              </span><span class="kw">let </span>ptype_key = ptype <span class="kw">as </span>u8;
-              <span class="kw">if </span>index.contains_key(<span class="kw-2">&amp;</span>ptype_key) {
-                <span class="kw-2">*</span>index.get_mut(<span class="kw-2">&amp;</span>ptype_key).unwrap() += <span class="number">1</span>;
+              //let ptype_key = ptype as u8;
+              </span><span class="kw">if </span>index.contains_key(<span class="kw-2">&amp;</span>ptype) {
+                <span class="kw-2">*</span>index.get_mut(<span class="kw-2">&amp;</span>ptype).unwrap() += <span class="number">1</span>;
               } <span class="kw">else </span>{
-                index.insert(ptype_key, <span class="number">1usize</span>);
+                index.insert(ptype, <span class="number">1usize</span>);
               }
             }
           }
