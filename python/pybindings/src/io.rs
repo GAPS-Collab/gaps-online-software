@@ -29,16 +29,35 @@ pub struct PyTofPacketReader {
 #[pymethods]
 impl PyTofPacketReader {
   
+  /// Create a new instance of a TofPacketReader. 
   #[new]
   #[pyo3(signature = (filename, filter=PacketType::Unknown,start=0, nevents=0))]
-  fn new(filename : String, filter : PacketType, start : usize, nevents : usize) -> Self {
+  fn new(filename : &PyAny, filter : PacketType, start : usize, nevents : usize) -> PyResult<Self> {
+    let input_str : String;
+    match filename.extract::<String>() {
+      Ok(_fname) => {
+        input_str = _fname;
+      }
+      Err(_) => {
+        match filename.extract::<std::path::PathBuf>() {
+          Ok(_fname) => {
+            input_str = _fname.to_str().expect("Unable to convert input to string!").to_owned();
+          }
+          Err(_) => {
+          return Err(pyo3::exceptions::PyTypeError::new_err(
+              "Expected str or pathlib.Path",));
+          }
+        }
+      }
+    }
+
     let mut pyreader = Self {
-      reader : io_api::TofPacketReader::new(filename),
+      reader : io_api::TofPacketReader::new(input_str),
     };
     pyreader.reader.filter     = filter;
     pyreader.reader.skip_ahead = start;
     pyreader.reader.stop_after = nevents;
-    pyreader
+    Ok(pyreader)
   }
 
   #[getter]
