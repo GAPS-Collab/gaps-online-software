@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/instability-0.3.6/src/item_like.rs`."><title>item_like.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="instability" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">instability/</div>item_like.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/instability-0.3.7/src/item_like.rs`."><title>item_like.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="instability" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">instability/</div>item_like.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -90,7 +90,40 @@
 <a href="#89" id="89">89</a>
 <a href="#90" id="90">90</a>
 <a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a></pre></div><pre class="rust"><code><span class="kw">use </span>syn::Visibility;
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a></pre></div><pre class="rust"><code><span class="kw">use </span>syn::Visibility;
 
 <span class="kw">pub trait </span>Stability {
     <span class="attr">#[allow(unused)]
@@ -107,11 +140,33 @@
     <span class="kw">fn </span>is_public(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>.visibility(), Visibility::Public(<span class="kw">_</span>))
     }
+
+    <span class="kw">fn </span>allowed_lints(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;syn::Ident&gt;;
 }
 
-<span class="macro">macro_rules!</span> impl_has_visibility {
-($(<span class="macro-nonterminal">$ty</span>:ty),+ $(,)<span class="question-mark">?</span>) =&gt; {
-    $(
+<span class="doccomment">/// Implement `ItemLike` for the given type.
+///
+/// This makes each of the syn::Item* types implement our `ItemLike` trait to make it possible to
+/// work with them in a more uniform way.
+///
+/// A single type can be passed to this macro, or multiple types can be passed at once.
+/// Each type can be passed with a list of lints that are allowed for that type (defaulting to
+/// `dead_code` if not specified).
+</span><span class="macro">macro_rules!</span> impl_item_like {
+    <span class="comment">// run impl_item_like for each item in a list of items
+    </span>($($(<span class="attr">#[allow($(<span class="macro-nonterminal">$lint</span>:ident),<span class="kw-2">*</span>)]</span>)<span class="question-mark">? </span><span class="macro-nonterminal">$ty</span>:ty ),+ ,) =&gt; {
+        $(
+            <span class="macro">impl_item_like!</span>($(<span class="attr">#[allow($(<span class="macro-nonterminal">$lint</span>),<span class="kw-2">*</span>)]</span>)<span class="question-mark">? </span><span class="macro-nonterminal">$ty </span>);
+        )*
+    };
+
+    <span class="comment">// run impl_item_like for a single item without any lints
+    </span>(<span class="macro-nonterminal">$ty</span>:ty) =&gt; {
+        <span class="macro">impl_item_like!</span>(<span class="attr">#[allow(dead_code)] </span><span class="macro-nonterminal">$ty </span>);
+    };
+
+    <span class="comment">// Implement `ItemLike` for the given type.
+    </span>(<span class="attr">#[allow($(<span class="macro-nonterminal">$lint</span>:ident),<span class="kw-2">*</span>)] </span><span class="macro-nonterminal">$ty</span>:ty) =&gt; {
         <span class="kw">impl </span>Stability <span class="kw">for </span><span class="macro-nonterminal">$ty </span>{
             <span class="kw">fn </span>attrs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[syn::Attribute] {
                 <span class="kw-2">&amp;</span><span class="self">self</span>.attrs
@@ -130,12 +185,18 @@
             <span class="kw">fn </span>set_visibility(<span class="kw-2">&amp;mut </span><span class="self">self</span>, visibility: Visibility) {
                 <span class="self">self</span>.vis = visibility;
             }
+
+            <span class="kw">fn </span>allowed_lints(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;syn::Ident&gt; {
+                <span class="macro">vec!</span>[
+                    $(syn::Ident::new(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$lint</span>), proc_macro2::Span::call_site()),)*
+                ]
+            }
         }
-    )*
-};
+    };
+
 }
 
-<span class="macro">impl_has_visibility!</span>(
+<span class="macro">impl_item_like!</span>(
     syn::ItemType,
     syn::ItemEnum,
     syn::ItemFn,
@@ -143,7 +204,8 @@
     syn::ItemTrait,
     syn::ItemConst,
     syn::ItemStatic,
-    syn::ItemUse,
+    <span class="attr">#[allow(unused_imports)]
+    </span>syn::ItemUse,
 );
 
 <span class="kw">impl </span>Stability <span class="kw">for </span>syn::ItemStruct {
@@ -170,6 +232,10 @@
             .for_each(|field| field.vis = visibility.clone());
 
         <span class="self">self</span>.vis = visibility;
+    }
+
+    <span class="kw">fn </span>allowed_lints(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;syn::Ident&gt; {
+        <span class="macro">vec!</span>[syn::Ident::new(<span class="string">"dead_code"</span>, proc_macro2::Span::call_site())]
     }
 }
 
